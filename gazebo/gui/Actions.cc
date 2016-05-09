@@ -98,6 +98,8 @@ QAction *gazebo::gui::g_showInertiaAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showLinkFrameAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_showSkeletonAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;

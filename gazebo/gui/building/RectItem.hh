@@ -20,6 +20,10 @@
 
 #include <memory>
 #include <vector>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -68,46 +72,46 @@ namespace gazebo
 
       /// \brief Set the width of the rect item.
       /// \param[in] _width Width of the rect item in pixels.
-      public: void SetWidth(int _width);
+      public: void SetWidth(const int _width);
 
       /// \brief Set the height of the rect item.
       /// \param[in] _height Height of the rect item in pixels.
-      public: void SetHeight(int _height);
+      public: void SetHeight(const int _height);
 
       /// \brief Set the size of the rect item.
       /// \param[in] _size Size of the rect item in pixels.
-      public: void SetSize(QSize _size);
+      public: void SetSize(const ignition::math::Vector2i &_size);
 
       /// \brief Get the width of the rect item.
       /// \return Width of the rect item in pixels.
-      public: double GetWidth() const;
+      public: double Width() const;
 
       /// \brief Get the height of the rect item.
       /// \return Height of the rect item in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Set the position of this item inside its parent wall.
       /// \param[in] _positionOnWall New normalized position on wall.
-      public: void SetPositionOnWall(double _positionOnWall);
+      public: void SetPositionOnWall(const double _positionOnWall);
 
       /// \brief Get the position of this item inside its parent wall.
       /// \return Normalized position on parent wall.
-      public: double GetPositionOnWall() const;
+      public: double PositionOnWall() const;
 
       /// \brief Set the angle of this item inside its parent wall.
       /// \param[in] _angleOnWall New angle on wall, either 0 or 180 degrees.
-      public: void SetAngleOnWall(double _angleOnWall);
+      public: void SetAngleOnWall(const double _angleOnWall);
 
       /// \brief Get the angle of this item inside its parent wall.
       /// \return Angle on parent wall in degrees.
-      public: double GetAngleOnWall() const;
+      public: double AngleOnWall() const;
 
       /// \brief Show the grabber and rotate handles of the rect item.
       /// \param[in] _show True to draw the handles, and false to hide them.
-      public: void ShowHandles(bool _show);
+      public: void ShowHandles(const bool _show);
 
       // Documentation inherited
-      public: void SetHighlighted(bool _highlighted);
+      public: void SetHighlighted(const bool _highlighted);
 
       /// \brief Detach the rect item from its parent.
       public: void DetachFromParent();
@@ -122,34 +126,34 @@ namespace gazebo
 
       /// \brief Set the position of the rect item
       /// \param[in] _pos Position in pixel coordinates.
-      public: virtual void SetPosition(const QPointF &_pos);
+      public: virtual void SetPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the position of the rect item
       /// \param[in] _x X position in pixel coordinates.
       /// \param[in] _y Y position in pixel coordinates.
-      public: virtual void SetPosition(double _x, double _y);
+      public: virtual void SetPosition(const double _x, const double _y);
 
       /// \brief Set the rotation of the rect item.
       /// \param[in] _angle Rotation angle in degrees.
-      public: virtual void SetRotation(double _angle);
+      public: virtual void SetRotation(const double _angle);
 
       /// \brief Set the resize flag of the rect item.
       /// \param[in] _flag Resize flag which controls how the item can be
       /// resized.
-      public: virtual void SetResizeFlag(unsigned int _flag);
+      public: virtual void SetResizeFlag(const unsigned int _flag);
 
       /// \brief Get the rotation of the rect item
       /// \return Rotation in degrees.
-      public: virtual double GetRotation() const;
+      public: virtual double Rotation() const;
 
       // Documentation inherited
-      public: virtual QVector3D GetSize() const;
+      public: virtual ignition::math::Vector3d Size() const;
 
       // Documentation inherited
-      public: virtual QVector3D GetScenePosition() const;
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
       // Documentation inherited
-      public: virtual double GetSceneRotation() const;
+      public: virtual double SceneRotation() const;
 
       /// \brief Get the bounding box of the rect item.
       /// \return The bounding box of the rect item.
@@ -241,7 +245,7 @@ namespace gazebo
       /// brief Helper function for resizing the rect item.
       /// \param[in] _x Change in x (width).
       /// \param[in] _y Change in y (height).
-      private: void AdjustSize(double _x, double _y);
+      private: void AdjustSize(const double _x, const double _y);
 
       /// \brief Qt callback for opening the item inspector
       private slots: virtual void OnOpenInspector();
@@ -268,7 +272,7 @@ namespace gazebo
       protected: double drawingOriginY;
 
       /// \brief Border color of the rect item.
-      protected: QColor borderColor;
+      protected: common::Color borderColor;
 
       /// \brief Rotation angle of the rect item in degrees.
       protected: double rotationAngle;

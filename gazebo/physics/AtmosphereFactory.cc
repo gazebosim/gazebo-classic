@@ -42,19 +42,16 @@ void AtmosphereFactory::RegisterAtmosphere(const std::string &_classname,
                                            AtmosphereFactoryFn _factoryfn)
 {
   if (AtmosphereFactory::models.find(_classname) != models.end())
-  {
-    gzerr << "Atmosphere Type[" << _classname << "] already registered.\n";
     return;
-  }
   AtmosphereFactory::models[_classname] = _factoryfn;
 }
 
 //////////////////////////////////////////////////
-AtmospherePtr AtmosphereFactory::NewAtmosphere(
+std::unique_ptr<Atmosphere> AtmosphereFactory::NewAtmosphere(
     const std::string &_classname,
-    WorldPtr _world)
+    World &_world)
 {
-  AtmospherePtr result;
+  std::unique_ptr<Atmosphere> result;
 
   std::map<std::string, AtmosphereFactoryFn>::iterator iter =
     AtmosphereFactory::models.find(_classname);

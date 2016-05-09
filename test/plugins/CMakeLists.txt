@@ -11,6 +11,8 @@ include_directories(
 
 link_directories(
   ${SDFormat_LIBRARY_DIRS}
+  ${CURL_LIBDIR}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)

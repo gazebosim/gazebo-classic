@@ -14,22 +14,18 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_FUTURES_TEST_HH_
+#define GAZEBO_GUI_FUTURES_TEST_HH_
 
-#ifndef _GAZEBO_PHYSICS_ADIABATICATMOSPHEREPRIVATE_HH_
-#define _GAZEBO_PHYSICS_ADIABATICATMOSPHEREPRIVATE_HH_
+#include "gazebo/gui/QTestFixture.hh"
 
-namespace gazebo
+/// \brief A test class for the main window class.
+class Futures_TEST : public QTestFixture
 {
-  namespace physics
-  {
-    class AdiabaticAtmospherePrivate
-    {
-      /// \brief Adiabatic atmosphere power parameter used to calculate
-      /// pressure and density of air.
-      /// See https://en.wikipedia.org/wiki/Density_of_air#Altitude
-      public: double adiabaticPower;
-    };
-  }
-}
+  Q_OBJECT
+
+  /// \brief Verify the futures have been created and are valid.
+  private slots: void Verify();
+};
 
 #endif

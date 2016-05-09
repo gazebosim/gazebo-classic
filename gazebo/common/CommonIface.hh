@@ -75,7 +75,6 @@ namespace gazebo
     /// \return Environment variable contents, or NULL on error.
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
-    /// \}
 
     /// \brief Splits a string into tokens.
     /// \param[in] _str Input string.
@@ -95,6 +94,7 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     std::string unique_file_path(const std::string &_pathAndName,
                                           const std::string &_extension);
+    /// \}
   }
 
   ///////////////////////////////////////////////

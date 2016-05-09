@@ -65,6 +65,7 @@ Model::Model(BasePtr _parent)
 //////////////////////////////////////////////////
 Model::~Model()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -84,6 +85,11 @@ void Model::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("self_collide"))
   {
     this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+
+  if (this->sdf->HasElement("enable_wind"))
+  {
+    this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
   }
 
   if (this->sdf->HasElement("allow_auto_disable"))
@@ -411,12 +417,13 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
-  this->plugins.clear();
   this->attachedModels.clear();
+  this->canonicalLink.reset();
+  this->jointController.reset();
   this->joints.clear();
   this->links.clear();
-  this->canonicalLink.reset();
   this->models.clear();
+  this->plugins.clear();
 
   this->UnregisterIntrospectionItems();
 
@@ -1094,6 +1101,7 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
+  _msg.set_enable_wind(this->WindMode());
   msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale);
@@ -1147,6 +1155,9 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   if (_msg.has_scale())
     this->SetScale(msgs::ConvertIgn(_msg.scale()));
+
+  if (_msg.has_enable_wind())
+    this->SetWindMode(_msg.enable_wind());
 }
 
 //////////////////////////////////////////////////
@@ -1476,6 +1487,20 @@ bool Model::RemoveJoint(const std::string &_name)
            << "], not removed.\n";
     return false;
   }
+}
+
+/////////////////////////////////////////////////
+void Model::SetWindMode(const bool _enable)
+{
+  this->sdf->GetElement("enable_wind")->Set(_enable);
+  for (auto &link : this->links)
+    link->SetWindMode(_enable);
+}
+
+/////////////////////////////////////////////////
+bool Model::WindMode() const
+{
+  return this->sdf->Get<bool>("enable_wind");
 }
 
 /////////////////////////////////////////////////

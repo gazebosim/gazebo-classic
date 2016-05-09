@@ -58,6 +58,7 @@ set (sources
   ModelDatabase.cc
   MouseEvent.cc
   PID.cc
+  SemanticVersion.cc
   SkeletonAnimation.cc
   Skeleton.cc
   SphericalCoordinates.cc
@@ -112,6 +113,7 @@ set (headers
   MouseEvent.hh
   PID.hh
   Plugin.hh
+  SemanticVersion.hh
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
@@ -147,6 +149,7 @@ set (gtest_sources
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc

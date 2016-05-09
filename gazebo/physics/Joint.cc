@@ -81,13 +81,7 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
-  // Remove all the sensors attached to the joint
-  for (auto const &sensor : this->sensors)
-  {
-    event::Events::removeSensor(sensor);
-  }
-
-  this->sensors.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -408,6 +402,13 @@ void Joint::Fini()
     event::Events::removeSensor(sensor);
   }
   this->sensors.clear();
+
+  this->anchorLink.reset();
+  this->applyDamping.reset();
+  this->childLink.reset();
+  this->model.reset();
+  this->parentLink.reset();
+  this->sdfJoint.reset();
 
   this->UnregisterIntrospectionItems();
 

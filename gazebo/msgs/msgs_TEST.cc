@@ -2276,6 +2276,7 @@ TEST_F(MsgsTest, LinkToSDF)
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
+  linkMsg.set_enable_wind(false);
   msgs::Set(linkMsg.mutable_pose(), pose.Ign());
 
   const double laserRetro1 = 0.4;
@@ -2306,6 +2307,7 @@ TEST_F(MsgsTest, LinkToSDF)
   EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
+  EXPECT_FALSE(linkSDF->Get<bool>("enable_wind"));
   EXPECT_EQ(pose, linkSDF->Get<math::Pose>("pose"));
 
   sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");

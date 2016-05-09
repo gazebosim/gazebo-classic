@@ -65,6 +65,7 @@ set(tests
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_base.cc
   physics_basic_controller_response.cc
   physics_collision.cc
   physics_friction.cc
@@ -78,6 +79,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   region_events.cc
   rest_web.cc
   road.cc
@@ -99,6 +101,7 @@ set(tests
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
+  world_remove.cc
   worlds_installed.cc
   )
 
@@ -122,6 +125,12 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
+  set_property(
+    SOURCE world_clone.cc
+    PROPERTY COMPILE_DEFINITIONS
+    GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+  )
+
   # Increase timeout for debug-mode
   if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
       ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
@@ -130,6 +139,9 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+
+  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
+    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests
@@ -159,6 +171,7 @@ gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_editor_undo.cc
   model_manipulation.cc
   track_visual.cc
   undo.cc
@@ -172,4 +185,7 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
+
+  set_target_properties(${TEST_TYPE}_model_editor_undo PROPERTIES
+    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()

@@ -51,8 +51,12 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
 
-      /// \brief Pointer to the atmosphere model.
-      public: AtmospherePtr atmosphere;
+      /// \brief Unique pointer the wind. The world owns this pointer.
+      public: std::unique_ptr<Wind> wind;
+
+      /// \brief Unique pointer the atmosphere model.
+      /// The world owns this pointer.
+      public: std::unique_ptr<Atmosphere> atmosphere;
 
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;
@@ -223,6 +227,9 @@ namespace gazebo
 
       /// \brief True to enable the physics engine.
       public: bool enablePhysicsEngine;
+
+      /// \brief True to enable the wind.
+      public: bool enableWind;
 
       /// \brief True to enable the atmosphere model.
       public: bool enableAtmosphere;
