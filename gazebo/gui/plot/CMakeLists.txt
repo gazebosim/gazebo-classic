@@ -5,10 +5,11 @@ set (sources_local
   plot/ExportDialog.cc
   plot/IncrementalPlot.cc
   plot/IntrospectionCurveHandler.cc
+  plot/Palette.cc
   plot/PlotCanvas.cc
   plot/PlotCurve.cc
   plot/PlotManager.cc
-  plot/Palette.cc
+  plot/PlotTracker.cc
   plot/PlotWindow.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc

@@ -73,6 +73,9 @@ void QTestFixture::init()
   this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
   gazebo::rendering::load();
+
+  // register qt metatypes so they can be used in signals and slots
+  gazebo::gui::register_metatypes();
 }
 
 /////////////////////////////////////////////////
