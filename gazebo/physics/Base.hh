@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_PHYSICS_BASE_HH_
-#define _GAZEBO_PHYSICS_BASE_HH_
+#ifndef GAZEBO_PHYSICS_BASE_HH_
+#define GAZEBO_PHYSICS_BASE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -39,7 +39,8 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
@@ -277,7 +278,7 @@ namespace gazebo
       /// \return The scoped name.
       public: std::string GetScopedName(bool _prependWorldName = false) const;
 
-      /// \brief Return the common::Uri of this entity.
+      /// \brief Return the common::URI of this entity.
       /// The URI includes the world where the entity is contained and all the
       /// hierarchy of sub-entities that can compose this entity.
       /// E.g.: A link entity contains the name of the link and the model where

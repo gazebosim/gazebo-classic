@@ -29,7 +29,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet
     /// \{
 
     /// \brief Bullet surface parameters.

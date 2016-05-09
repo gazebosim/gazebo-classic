@@ -67,10 +67,11 @@ class ModelListWidget_TEST : public QTestFixture
   /// \param[in] _gravity True if gravity is enabled for this link.
   /// \param[in] _kinematic True if the link is in kinematic mode.
   /// \param[in] _canonical True if this is a canonical link.
+  /// \param[in] _enableWind True if wind is enabled for this link.
   /// \param[in] _pose Expected pose values.
   private: void CheckLinkProperty(QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
-    bool _canonical, const gazebo::math::Pose &_pose);
+    bool _canonical, bool _enableWind, const gazebo::math::Pose &_pose);
 
   /// \brief Set link property values.
   /// \param[in] _propTreeBrowser Property browser.
@@ -81,11 +82,12 @@ class ModelListWidget_TEST : public QTestFixture
   /// \param[in] _kinematic New kinematic value.
   /// \param[in] _canonical True if this is a canonical link and the pose
   /// should not be set.
+  /// \param[in] _enableWind New enable_wind value.
   /// \param[in] _pose New pose values.
   private: void SetLinkProperty(QtTreePropertyBrowser *propTreeBrowser,
     QList<QtProperty *> _properties, const std::string &_name,
     bool _selfCollide, bool _gravity, bool _kinematic, bool _canonical,
-    const gazebo::math::Pose &_pose);
+    bool _enableWind, const gazebo::math::Pose &_pose);
 
   /// \brief Test to see the tree widget has correct items.
   private slots: void TreeWidget();

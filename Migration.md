@@ -12,6 +12,16 @@ release will remove the deprecated code.
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
 
+## Gazebo 7.1.0 to 7.X
+
+### Additions
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + public: virtual void Fini();
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + public: virtual void Fini();
+
 ## Gazebo 6.X to 7.X
 
 ### Additions

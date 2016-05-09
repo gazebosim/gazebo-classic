@@ -64,7 +64,10 @@ math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
   if (this->jointId)
     dJointGetScrewAnchor(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid, returning 0 vector.\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -96,7 +99,10 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
   if (this->jointId)
     dJointGetScrewAxis(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
