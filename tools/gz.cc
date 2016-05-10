@@ -583,7 +583,7 @@ bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
     std::cout << "Error subscribing to notification" << std::endl;
   }
 
-  this->requestId = transport::RequestInsert(_sdf->ToString(), _pose);
+  this->requestId = transport::RequestInsertSDF(_sdf->ToString(), _pose);
 
   // Wait for Ctrl+C while we might receive the notification
   ignition::transport::waitForShutdown();

@@ -80,7 +80,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
     << "</model>"
     << "</sdf>";
 
-  transport::RequestInsert(newModelStr.str());
+  transport::RequestInsertSDF(newModelStr.str());
 
   WaitUntilEntitySpawn(modelName, 100, 100);
   WaitUntilSensorSpawn(raySensorName, 100, 100);

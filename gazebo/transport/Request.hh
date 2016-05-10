@@ -42,7 +42,18 @@ namespace gazebo
     /// \param[in] _pose Optional pose where entity will be spawned.
     /// \return Unique id for the request.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestInsert(const std::string &_sdf,
+    size_t RequestInsertSDF(const std::string &_sdf,
+        const ignition::math::Pose3d &_pose =
+        ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
+                               0, 0, 0));
+
+    /// \brief Helper class to send an entity insert request using ignition
+    /// transport.
+    /// \param[in] _sdf Entity SDF as a string.
+    /// \param[in] _pose Optional pose where entity will be spawned.
+    /// \return Unique id for the request.
+    GZ_TRANSPORT_VISIBLE
+    size_t RequestInsertFile(const std::string &_filename,
         const ignition::math::Pose3d &_pose =
         ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                0, 0, 0));

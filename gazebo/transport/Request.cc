@@ -48,7 +48,7 @@ size_t transport::RequestDelete(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-size_t transport::RequestInsert(const std::string &_sdf,
+size_t transport::RequestInsertSDF(const std::string &_sdf,
     const ignition::math::Pose3d &_pose)
 {
   // Unique id for request
@@ -57,6 +57,35 @@ size_t transport::RequestInsert(const std::string &_sdf,
   // Factory msg
   msgs::Factory msg;
   msg.set_sdf(_sdf);
+  if (_pose != ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
+                                      0, 0, 0))
+  {
+    msgs::Set(msg.mutable_pose(), _pose);
+  }
+
+  // Operation msg
+  msgs::Operation req;
+  req.set_type(msgs::Operation::INSERT_ENTITY);
+  req.set_id(id);
+  req.mutable_factory()->CopyFrom(msg);
+
+  // Request
+  ignition::transport::Node ignNode;
+  ignNode.Request("/request", req, unused);
+
+  return id;
+}
+
+/////////////////////////////////////////////////
+size_t transport::RequestInsertFile(const std::string &_filename,
+    const ignition::math::Pose3d &_pose)
+{
+  // Unique id for request
+  auto id = ignition::math::Rand::IntUniform(1, 10000);
+
+  // Factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename(_filename);
   if (_pose != ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                       0, 0, 0))
   {

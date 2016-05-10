@@ -1707,7 +1707,7 @@ void ModelCreator::CreateTheEntity()
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
 
-  transport::RequestInsert(this->dataPtr->modelSDF->ToString(),
+  transport::RequestInsertSDF(this->dataPtr->modelSDF->ToString(),
       this->dataPtr->modelPose);
 }
 

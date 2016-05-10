@@ -1385,7 +1385,7 @@ void World::SetPaused(bool _p)
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
   gzwarn << "Factory topic is deprecated. Use "
-      << "transport::RequestInsert() instead." << std::endl;
+      << "transport::RequestInsertSDF() instead." << std::endl;
 
   // TODO: Converting to operation on Gazebo8, remove on Gazebo9
   msgs::Operation msg;
@@ -2840,7 +2840,7 @@ void World::OnLightModifyMsg(ConstLightPtr &_msg)
 void World::OnLightFactoryMsg(ConstLightPtr &_msg)
 {
   gzwarn << "Factory topic is deprecated. Use "
-      << "transport::RequestInsert() instead." << std::endl;
+      << "transport::RequestInsertSDF() instead." << std::endl;
 
   // TODO: Converting to operation on Gazebo8, remove on Gazebo9
   msgs::Factory fac;

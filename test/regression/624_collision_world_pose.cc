@@ -84,7 +84,7 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
       << "</model>"
       << "</sdf>";
 
-    transport::RequestInsert(newModelStr.str());
+    transport::RequestInsertSDF(newModelStr.str());
 
     // Wait for the entity to spawn
     while (!this->HasEntity(name))

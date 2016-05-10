@@ -361,7 +361,7 @@ void ModelMaker::CreateTheEntity()
         this->dataPtr->modelVisual->GetWorldPose().Ign());
 
     // Spawn the model in the physics server
-    transport::RequestInsert(this->dataPtr->modelSDF->ToString());
+    transport::RequestInsertSDF(this->dataPtr->modelSDF->ToString());
   }
   else
   {
