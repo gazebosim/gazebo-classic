@@ -374,17 +374,13 @@ void ModelMaker::CreateTheEntity()
   if (!dPtr->clone)
   {
     sdf::ElementPtr modelElem;
-    bool isModel = false;
-    bool isLight = false;
     if (dPtr->modelSDF->Root()->HasElement("model"))
     {
       modelElem = dPtr->modelSDF->Root()->GetElement("model");
-      isModel = true;
     }
     else if (dPtr->modelSDF->Root()->HasElement("light"))
     {
       modelElem = dPtr->modelSDF->Root()->GetElement("light");
-      isLight = true;
     }
 
     // The server will generate a unique name in case of name collision
