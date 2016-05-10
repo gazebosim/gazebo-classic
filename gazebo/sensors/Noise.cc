@@ -79,8 +79,7 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
 
 //////////////////////////////////////////////////
 Noise::Noise(NoiseType _type)
-  : type(_type),
-    customNoiseCallback(nullptr)
+  : type(_type)
 {
 }
 
