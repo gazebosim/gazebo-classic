@@ -94,6 +94,11 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool IsActive() const;
 
+      /// \brief Sets the current reported pose of the IMU
+      /// \param _orientation current IMU orientation
+      public: void SetOrientation(
+        const ignition::math::Quaterniond &_orientation);
+
       /// \brief Callback when link data is received
       /// \param[in] _msg Message containing link data
       private: void OnLinkData(ConstLinkDataPtr &_msg);

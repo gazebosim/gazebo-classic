@@ -278,6 +278,17 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
+void ImuSensor::SetOrientation(const ignition::math::Quaterniond &_orientation)
+{
+  // such that imuPose - referencePose = _orientation
+  // or, that referencePose = -_orientation + imuPose
+  ignition::math::Pose3d orientationPose
+    = ignition::math::Pose3d(ignition::math::Vector3d(), _orientation);
+  this->dataPtr->referencePose = -orientationPose +
+    (this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+}
+
+//////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
   msgs::LinkData msg;
