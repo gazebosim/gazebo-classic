@@ -18,6 +18,10 @@
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
 
+1. Server generates unique model names in case of overlap
+    * [Pull request 2296](https://bitbucket.org/osrf/gazebo/pull-request/2296)
+    * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
+
 ## Gazebo 7.1.0 (2016-04-07)
 
 1. fix: remove back projection
