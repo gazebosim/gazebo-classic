@@ -116,7 +116,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->transparent = false;
   this->dataPtr->wireframe = false;
 
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg = nullptr;
   this->dataPtr->enableVisualizations = _enableVisualizations;
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(_name);
@@ -124,9 +124,9 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->idString = std::to_string(this->dataPtr->id);
 
   this->dataPtr->name = _name;
-  this->dataPtr->manager = NULL;
-  this->dataPtr->raySceneQuery = NULL;
-  this->dataPtr->skyx = NULL;
+  this->dataPtr->manager = nullptr;
+  this->dataPtr->raySceneQuery = nullptr;
+  this->dataPtr->skyx = nullptr;
 
   this->dataPtr->receiveMutex = new std::mutex();
 
@@ -185,7 +185,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->dataPtr->sdf);
 
-  this->dataPtr->terrain = NULL;
+  this->dataPtr->terrain = nullptr;
   this->dataPtr->selectedVis.reset();
 
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
@@ -224,7 +224,7 @@ void Scene::Clear()
   this->dataPtr->joints.clear();
 
   delete this->dataPtr->terrain;
-  this->dataPtr->terrain = NULL;
+  this->dataPtr->terrain = nullptr;
 
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
@@ -261,7 +261,7 @@ void Scene::Clear()
   this->dataPtr->userCameras.clear();
 
   delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
+  this->dataPtr->skyx = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
 
@@ -274,12 +274,12 @@ void Scene::Clear()
 Scene::~Scene()
 {
   delete this->dataPtr->requestMsg;
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg = nullptr;
   delete this->dataPtr->receiveMutex;
-  this->dataPtr->receiveMutex = NULL;
+  this->dataPtr->receiveMutex = nullptr;
 
   // raySceneQuery deletion handled by ogre
-  this->dataPtr->raySceneQuery= NULL;
+  this->dataPtr->raySceneQuery= nullptr;
 
   this->Clear();
 
@@ -567,7 +567,7 @@ Grid *Scene::GetGrid(const uint32_t index) const
   if (index >= this->dataPtr->grids.size())
   {
     gzerr << "Scene::GetGrid() Invalid index\n";
-    return NULL;
+    return nullptr;
   }
 
   return this->dataPtr->grids[index];
@@ -1138,7 +1138,7 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
-  Ogre::Entity *closestEntity = NULL;
+  Ogre::Entity *closestEntity = nullptr;
 
   for (iter = result.begin(); iter != result.end(); ++iter)
   {
@@ -1395,8 +1395,8 @@ void Scene::DrawLine(const ignition::math::Vector3d &_start,
                      const ignition::math::Vector3d &_end,
                      const std::string &_name)
 {
-  Ogre::SceneNode *sceneNode = NULL;
-  Ogre::ManualObject *obj = NULL;
+  Ogre::SceneNode *sceneNode = nullptr;
+  Ogre::ManualObject *obj = nullptr;
   bool attached = false;
 
   if (this->dataPtr->manager->hasManualObject(_name))
@@ -2140,7 +2140,7 @@ void Scene::PreRender()
             !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
         {
           ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
-          GZ_ASSERT(iter->second, "Visual pointer is NULL");
+          GZ_ASSERT(iter->second, "Visual pointer is nullptr");
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
           this->dataPtr->poseMsgs.erase(prev);
@@ -2466,7 +2466,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(sm);
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -2779,7 +2779,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     {
       // Ignore collision visuals for the heightmap
       if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
-          this->dataPtr->terrain == NULL)
+          this->dataPtr->terrain == nullptr)
       {
         try
         {
@@ -3391,7 +3391,7 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
     {
       // do not remove ModelManipulator's SelectionObj
       // FIXME remove this hardcoded check, issue #1832
-      if (std::dynamic_pointer_cast<SelectionObj>(childVis) != NULL)
+      if (std::dynamic_pointer_cast<SelectionObj>(childVis) != nullptr)
         continue;
 
       toRemove.push_back(childVis);

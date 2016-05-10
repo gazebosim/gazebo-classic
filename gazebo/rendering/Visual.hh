@@ -175,7 +175,7 @@ namespace gazebo
       /// \brief Get an attached visual based on an index. Index should be
       /// between 0 and Visual::GetChildCount.
       /// \param[in] _index Index of the child to retreive.
-      /// \return Pointer to the child visual, NULL if index is invalid.
+      /// \return Pointer to the child visual, nullptr if index is invalid.
       public: VisualPtr GetChild(unsigned int _index);
 
       /// \brief Attach a mesh to this visual by name.
@@ -447,7 +447,7 @@ namespace gazebo
       public: bool IsPlane() const;
 
       /// \brief Get the parent visual, if one exists.
-      /// \return Pointer to the parent visual, NULL if no parent.
+      /// \return Pointer to the parent visual, nullptr if no parent.
       public: VisualPtr GetParent() const;
 
       /// \brief Get the root visual
@@ -499,7 +499,7 @@ namespace gazebo
       /// \param[in] _onComplete Callback used when the move is complete.
       public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete = NULL);
+                                   boost::function<void()> _onComplete = nullptr);
 
       /// \brief Set visibility flags for this visual and all children.
       /// \param[in] _flags The visiblity flags.

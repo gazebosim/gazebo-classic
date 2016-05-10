@@ -27,7 +27,7 @@ void ImagesView_TEST::Construction()
 
   // Create a new data logger widget
   std::unique_ptr<gazebo::gui::ImagesView> view(
-      new gazebo::gui::ImagesView(NULL));
+      new gazebo::gui::ImagesView(nullptr));
   view->show();
 
   QCoreApplication::processEvents();
@@ -48,12 +48,12 @@ void ImagesView_TEST::Switch()
 
   // Create a new data logger widget
   std::unique_ptr<gazebo::gui::ImagesView> view(
-      new gazebo::gui::ImagesView(NULL));
+      new gazebo::gui::ImagesView(nullptr));
   view->show();
 
   // Get the frame that holds the images
   QFrame *frame = view->findChild<QFrame *>("blackBorderFrame");
-  QVERIFY(frame != NULL);
+  QVERIFY(frame != nullptr);
 
   // The layout should be the only child of the frame on construction.
   QVERIFY(frame->children().size() == 1);
@@ -98,7 +98,7 @@ void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
     const std::string &_topicName, int _count)
 {
   QFrame *frame = _view->findChild<QFrame*>("blackBorderFrame");
-  QVERIFY(frame != NULL);
+  QVERIFY(frame != nullptr);
 
   _view->SetTopic(_topicName);
 

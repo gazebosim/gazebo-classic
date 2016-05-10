@@ -352,7 +352,7 @@ float HeightmapShape::GetMinHeight() const
 common::Image HeightmapShape::GetImage() const
 {
   double height = 0.0;
-  unsigned char *imageData = NULL;
+  unsigned char *imageData = nullptr;
 
   /// \todo Support multiple terrain objects
   double minHeight = this->GetMinHeight();

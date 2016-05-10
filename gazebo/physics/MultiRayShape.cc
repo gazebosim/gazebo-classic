@@ -214,7 +214,7 @@ bool MultiRayShape::SetRay(const unsigned int _rayIndex,
 void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
                            const math::Vector3 &/*_end*/)
 {
-  // msgs::Vector3d *pt = NULL;
+  // msgs::Vector3d *pt = nullptr;
 
   // FIXME: need to lock this when spawning models with ray.
   // This fails because RaySensor::laserShape->Update()

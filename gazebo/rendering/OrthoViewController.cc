@@ -43,7 +43,7 @@ OrthoViewController::OrthoViewController(UserCameraPtr _camera)
 OrthoViewController::~OrthoViewController()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 
   this->refVisual.reset();
 }

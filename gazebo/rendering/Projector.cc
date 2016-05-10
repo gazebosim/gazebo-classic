@@ -190,11 +190,11 @@ Projector::ProjectorFrameListener::ProjectorFrameListener()
   this->initialized = false;
   this->usingShaders = false;
 
-  this->node = NULL;
-  this->filterNode = NULL;
-  this->projectorQuery = NULL;
-  this->frustum = NULL;
-  this->filterFrustum = NULL;
+  this->node = nullptr;
+  this->filterNode = nullptr;
+  this->projectorQuery = nullptr;
+  this->frustum = nullptr;
+  this->filterFrustum = nullptr;
 
   this->nodeName = "Projector";
   this->filterNodeName = "ProjectorFilter";
@@ -209,20 +209,20 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
   {
     this->filterNode->detachObject(this->filterFrustum);
     this->node->removeAndDestroyChild(this->filterNodeName);
-    this->filterNode = NULL;
+    this->filterNode = nullptr;
   }
 
   if (this->node)
   {
     this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
-    this->node = NULL;
+    this->node = nullptr;
   }
 
   delete this->frustum;
   delete this->filterFrustum;
-  this->frustum = NULL;
-  this->filterFrustum = NULL;
+  this->frustum = nullptr;
+  this->filterFrustum = nullptr;
 
   if (this->projectorQuery)
     this->sceneMgr->destroyQuery(this->projectorQuery);
@@ -301,14 +301,14 @@ void Projector::ProjectorFrameListener::SetSceneNode()
   {
     this->filterNode->detachObject(this->filterFrustum);
     this->node->removeAndDestroyChild(this->filterNodeName);
-    this->filterNode = NULL;
+    this->filterNode = nullptr;
   }
 
   if (this->node)
   {
     this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
-    this->node = NULL;
+    this->node = nullptr;
   }
 
   this->node = this->visual->GetSceneNode()->createChildSceneNode(

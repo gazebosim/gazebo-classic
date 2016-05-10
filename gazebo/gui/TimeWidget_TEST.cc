@@ -33,39 +33,39 @@ void TimeWidget_TEST::Reset()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
 
   // Wait a little bit so that time increases.
-  this->ProcessEventsAndDraw(NULL, 10, 100);
+  this->ProcessEventsAndDraw(nullptr, 10, 100);
 
   // Get the time panel
   gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
       GetTimePanel();
-  QVERIFY(timePanel != NULL);
+  QVERIFY(timePanel != nullptr);
 
   // Get the time widget
   gazebo::gui::TimeWidget *timeWidget =
       timePanel->findChild<gazebo::gui::TimeWidget *>("timeWidget");
-  QVERIFY(timeWidget != NULL);
+  QVERIFY(timeWidget != nullptr);
   timeWidget->setVisible(true);
 
   // Get the sim time line edit
   QLineEdit *simTimeEdit = timeWidget->findChild<QLineEdit *>(
       "timeWidgetSimTime");
-  QVERIFY(simTimeEdit != NULL);
+  QVERIFY(simTimeEdit != nullptr);
 
   // Get the real time line edit
   QLineEdit *realTimeEdit = timeWidget->findChild<QLineEdit *>(
       "timeWidgetRealTime");
-  QVERIFY(realTimeEdit != NULL);
+  QVERIFY(realTimeEdit != nullptr);
 
   QLineEdit *iterationsEdit = timeWidget->findChild<QLineEdit *>(
       "timeWidgetIterations");
-  QVERIFY(iterationsEdit != NULL);
+  QVERIFY(iterationsEdit != nullptr);
 
   std::string txt;
   double value;
@@ -86,7 +86,7 @@ void TimeWidget_TEST::Reset()
   QVERIFY(intValue > 0);
 
   // verify reset action is not null
-  QVERIFY(gazebo::gui::g_resetWorldAct != NULL);
+  QVERIFY(gazebo::gui::g_resetWorldAct != nullptr);
   QVERIFY(gazebo::gui::g_resetWorldAct->isEnabled());
   QVERIFY(!mainWindow->IsPaused());
 
@@ -125,7 +125,7 @@ void TimeWidget_TEST::Reset()
   QVERIFY(!mainWindow->IsPaused());
 
   // Wait a little bit so that time increases.
-  this->ProcessEventsAndDraw(NULL, 10, 100);
+  this->ProcessEventsAndDraw(nullptr, 10, 100);
 
   // Make sure real time is greater than zero
   txt = realTimeEdit->text().toStdString();
@@ -158,7 +158,7 @@ void TimeWidget_TEST::ValidTimes()
 
     // Create the main window.
     gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-    QVERIFY(mainWindow != NULL);
+    QVERIFY(mainWindow != nullptr);
 
     mainWindow->Load();
     mainWindow->Init();
@@ -167,37 +167,37 @@ void TimeWidget_TEST::ValidTimes()
     this->ProcessEventsAndDraw(mainWindow);
 
     gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-    QVERIFY(cam != NULL);
+    QVERIFY(cam != nullptr);
 
     // Get the time panel
     gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
         GetTimePanel();
-    QVERIFY(timePanel != NULL);
+    QVERIFY(timePanel != nullptr);
 
     // Get the time widget
     gazebo::gui::TimeWidget *timeWidget =
         timePanel->findChild<gazebo::gui::TimeWidget *>("timeWidget");
-    QVERIFY(timeWidget != NULL);
+    QVERIFY(timeWidget != nullptr);
     timeWidget->setVisible(true);
 
     // Get the percent real time line
     QLineEdit *percentEdit = timeWidget->findChild<QLineEdit *>(
         "timeWidgetPercentRealTime");
-    QVERIFY(percentEdit != NULL);
+    QVERIFY(percentEdit != nullptr);
 
     // Get the sim time line
     QLineEdit *simTimeEdit = timeWidget->findChild<QLineEdit *>(
         "timeWidgetSimTime");
-    QVERIFY(simTimeEdit != NULL);
+    QVERIFY(simTimeEdit != nullptr);
 
     // Get the real time line
     QLineEdit *realTimeEdit = timeWidget->findChild<QLineEdit *>(
         "timeWidgetRealTime");
-    QVERIFY(realTimeEdit != NULL);
+    QVERIFY(realTimeEdit != nullptr);
 
     // Get the fps line
     QLineEdit *fpsEdit = timeWidget->findChild<QLineEdit *>("timeWidgetFPS");
-    QVERIFY(fpsEdit != NULL);
+    QVERIFY(fpsEdit != nullptr);
 
     // some machines are unable to hit the target FPS
     // sample update time and determine whether to skip FPS lower bound check
@@ -214,7 +214,7 @@ void TimeWidget_TEST::ValidTimes()
     double lowerFPSBound = skipFPSTest ? 0 : 45;
 
     // Wait a little bit so that time increases.
-    this->ProcessEventsAndDraw(NULL, iterations, 1);
+    this->ProcessEventsAndDraw(nullptr, iterations, 1);
 
     std::string txt;
     double value;

@@ -180,7 +180,7 @@ namespace gazebo
       /// \brief Get the SDF for a profile.
       /// \param[in] _name The name of the profile to be accessed.
       /// \return Pointer to the SDF physics element representing the profile.
-      /// Can be NULL if no profile was found.
+      /// Can be nullptr if no profile was found.
       public: sdf::ElementPtr ProfileSDF(const std::string &_name) const;
 
       /// \brief Set the SDF for a profile.

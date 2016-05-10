@@ -198,8 +198,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr parentElem = _sdf->GetElement("parent");
   sdf::ElementPtr childElem = _sdf->GetElement("child");
 
-  GZ_ASSERT(parentElem, "Parent element is NULL");
-  GZ_ASSERT(childElem, "Child element is NULL");
+  GZ_ASSERT(parentElem, "Parent element is nullptr");
+  GZ_ASSERT(childElem, "Child element is nullptr");
 
   std::string parentName = parentElem->Get<std::string>();
   std::string childName = childElem->Get<std::string>();
@@ -385,7 +385,7 @@ void Joint::Init()
     }
   }
 
-  // Set parent name: if parentLink is NULL, it's name be the world
+  // Set parent name: if parentLink is nullptr, it's name be the world
   if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
 }

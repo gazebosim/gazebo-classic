@@ -38,7 +38,7 @@ unsigned int LightPrivate::lightCounter = 0;
 Light::Light(ScenePtr _scene)
   : dataPtr(new LightPrivate)
 {
-  this->dataPtr->line = NULL;
+  this->dataPtr->line = nullptr;
   this->dataPtr->scene = _scene;
 
   this->dataPtr->lightCounter++;

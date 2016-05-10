@@ -39,13 +39,13 @@ ImportImageView::ImportImageView(ImportImageDialog *_parent)
   this->dataPtr->drawInProgress = false;
 
   this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-  this->dataPtr->gridLines = NULL;
-  this->dataPtr->imageItem = NULL;
-  this->dataPtr->imagePixmap = NULL;
+  this->dataPtr->gridLines = nullptr;
+  this->dataPtr->imageItem = nullptr;
+  this->dataPtr->imagePixmap = nullptr;
 
-  this->dataPtr->noImageText = NULL;
+  this->dataPtr->noImageText = nullptr;
 
-  this->dataPtr->measureItem = NULL;
+  this->dataPtr->measureItem = nullptr;
   this->dataPtr->drawDistanceEnabled = false;
 }
 
@@ -62,12 +62,12 @@ void ImportImageView::SetImage(const std::string &_filename)
   if (this->dataPtr->gridLines)
   {
     this->scene()->removeItem(this->dataPtr->gridLines);
-    this->dataPtr->gridLines = NULL;
+    this->dataPtr->gridLines = nullptr;
   }
   if (this->dataPtr->noImageText)
   {
     this->scene()->removeItem(this->dataPtr->noImageText);
-    this->dataPtr->noImageText = NULL;
+    this->dataPtr->noImageText = nullptr;
   }
   if (this->dataPtr->measureItem)
     this->scene()->removeItem(this->dataPtr->measureItem);
@@ -212,7 +212,7 @@ void ImportImageView::mouseReleaseEvent(QMouseEvent *_event)
 
   if (!this->dataPtr->drawInProgress)
   {
-    this->dataPtr->currentMouseItem = NULL;
+    this->dataPtr->currentMouseItem = nullptr;
   }
 
   QGraphicsView::mouseReleaseEvent(_event);
@@ -278,7 +278,7 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
     this->dataPtr->dialog->dataPtr->resolutionSpin->setValue(
         distanceImage / this->dataPtr->dialog->dataPtr->distanceSpin->value());
 
-    this->dataPtr->currentMouseItem = NULL;
+    this->dataPtr->currentMouseItem = nullptr;
     this->dataPtr->drawInProgress = false;
     this->releaseKeyboard();
     this->dataPtr->dialog->dataPtr->distanceSpin->setFocus();

@@ -50,7 +50,7 @@ MapShape::MapShape(CollisionPtr _parent)
 {
   this->AddType(Base::MAP_SHAPE);
 
-  this->root = new QuadNode(NULL);
+  this->root = new QuadNode(nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -58,7 +58,7 @@ MapShape::~MapShape()
 {
   delete this->root;
   delete this->mapImage;
-  this->mapImage = NULL;
+  this->mapImage = nullptr;
 }
 
 //////////////////////////////////////////////////

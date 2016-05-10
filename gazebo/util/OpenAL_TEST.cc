@@ -121,7 +121,7 @@ TEST_F(OpenAL, BadSDF)
   util::OpenALSourcePtr source;
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
-  // NULL SDF
+  // nullptr SDF
   EXPECT_EQ(util::OpenAL::Instance()->CreateSource(sdf::ElementPtr()), source);
 
   sdf::SDFPtr sdf(new sdf::SDF);
@@ -155,7 +155,7 @@ TEST_F(OpenAL, BadValues)
   EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
   source = util::OpenAL::Instance()->CreateSource(sdf->Root());
-  EXPECT_TRUE(source != NULL);
+  EXPECT_TRUE(source != nullptr);
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
 
@@ -191,7 +191,7 @@ TEST_F(OpenAL, SourcePlay)
   EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
   source = util::OpenAL::Instance()->CreateSource(sdf->Root());
-  EXPECT_TRUE(source != NULL);
+  EXPECT_TRUE(source != nullptr);
 
   EXPECT_TRUE(source->OnContact());
 
@@ -253,7 +253,7 @@ TEST_F(OpenAL, SourceVelPose)
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
   source = util::OpenAL::Instance()->CreateSource(sdf->Root());
-  EXPECT_TRUE(source != NULL);
+  EXPECT_TRUE(source != nullptr);
 
   EXPECT_FALSE(source->OnContact());
   EXPECT_TRUE(source->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
@@ -284,7 +284,7 @@ TEST_F(OpenAL, Sourcevalid)
 
     EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->Root()) != NULL);
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->Root()) != nullptr);
   }
 
   // No Pitch, gain, loop, contact
@@ -300,7 +300,7 @@ TEST_F(OpenAL, Sourcevalid)
 
     EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->Root()) != NULL);
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->Root()) != nullptr);
   }
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
@@ -319,8 +319,8 @@ TEST_F(OpenAL, SinkCreate)
   sink1 = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
   sink2 = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
 
-  EXPECT_TRUE(sink1 != NULL);
-  EXPECT_TRUE(sink2 == NULL);
+  EXPECT_TRUE(sink1 != nullptr);
+  EXPECT_TRUE(sink2 == nullptr);
 
   EXPECT_NO_THROW(util::OpenAL::Instance()->Fini());
   EXPECT_NO_THROW(sink1.reset());
@@ -333,7 +333,7 @@ TEST_F(OpenAL, SinkVelPose)
   common::load();
 
   sink = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
-  EXPECT_TRUE(sink != NULL);
+  EXPECT_TRUE(sink != nullptr);
 
   EXPECT_FALSE(sink->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
   EXPECT_FALSE(sink->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));

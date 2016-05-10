@@ -52,8 +52,8 @@ ModelSnap::ModelSnap()
   this->dataPtr->initialized = false;
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
-  this->dataPtr->snapLines = NULL;
-  this->dataPtr->updateMutex = NULL;
+  this->dataPtr->snapLines = nullptr;
+  this->dataPtr->updateMutex = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -61,7 +61,7 @@ ModelSnap::~ModelSnap()
 {
   this->Clear();
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -81,11 +81,11 @@ void ModelSnap::Clear()
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
     delete this->dataPtr->snapLines;
-    this->dataPtr->snapLines = NULL;
+    this->dataPtr->snapLines = nullptr;
     this->dataPtr->snapVisual.reset();
 
-    if (this->dataPtr->snapHighlight != NULL &&
-        this->dataPtr->highlightVisual != NULL)
+    if (this->dataPtr->snapHighlight != nullptr &&
+        this->dataPtr->highlightVisual != nullptr)
     {
       this->dataPtr->highlightVisual->
           DeleteDynamicLine(this->dataPtr->snapHighlight);
@@ -98,7 +98,7 @@ void ModelSnap::Clear()
   this->dataPtr->renderConnection.reset();
 
   delete this->dataPtr->updateMutex;
-  this->dataPtr->updateMutex = NULL;
+  this->dataPtr->updateMutex = nullptr;
 
   this->dataPtr->scene.reset();
   this->dataPtr->userCamera.reset();

@@ -33,7 +33,7 @@ namespace gazebo
       public: std::mutex mutex;
 
       /// \brief Depth camera image data buffer.
-      public: float *depthBuffer = NULL;
+      public: float *depthBuffer = nullptr;
     };
   }
 }

@@ -93,11 +93,11 @@ RectItem::~RectItem()
 {
   for (int i = 0; i < 8; ++i)
   {
-    this->dataPtr->grabbers[i]->setParentItem(NULL);
+    this->dataPtr->grabbers[i]->setParentItem(nullptr);
     delete this->dataPtr->grabbers[i];
   }
 
-  this->dataPtr->rotateHandle->setParentItem(NULL);
+  this->dataPtr->rotateHandle->setParentItem(nullptr);
   delete this->dataPtr->rotateHandle;
 
   if (!this->parentItem() && !this->measures.empty())
@@ -187,11 +187,11 @@ void RectItem::SetHighlighted(bool _highlighted)
 bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 {
   RotateHandle *rotateH = dynamic_cast<RotateHandle *>(_watched);
-  if (rotateH != NULL)
+  if (rotateH != nullptr)
     return this->RotateEventFilter(rotateH, _event);
 
   GrabberHandle *grabber = dynamic_cast<GrabberHandle *>(_watched);
-  if (grabber != NULL && grabber->isEnabled())
+  if (grabber != nullptr && grabber->isEnabled())
     return this->GrabberEventFilter(grabber, _event);
 
   return false;
@@ -961,7 +961,7 @@ void RectItem::UpdateMeasures()
   // Only windows and doors can have a wall as parent
   WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
     this->parentItem());
-  if (wallItem == NULL)
+  if (wallItem == nullptr)
   {
     for (unsigned int i = 0; i < this->measures.size(); ++i)
     {
@@ -1035,7 +1035,7 @@ void RectItem::UpdateMeasures()
 /////////////////////////////////////////////////
 void RectItem::DetachFromParent()
 {
-  this->setParentItem(NULL);
+  this->setParentItem(nullptr);
   for (unsigned int i = 0; i < this->measures.size(); i++)
-    this->measures[i]->setParentItem(NULL);
+    this->measures[i]->setParentItem(nullptr);
 }

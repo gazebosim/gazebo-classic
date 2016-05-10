@@ -105,13 +105,13 @@ void PhysicsEngine::Fini()
   if (this->contactManager)
   {
     delete this->contactManager;
-    this->contactManager = NULL;
+    this->contactManager = nullptr;
   }
 
   if (this->physicsUpdateMutex)
   {
     delete this->physicsUpdateMutex;
-    this->physicsUpdateMutex = NULL;
+    this->physicsUpdateMutex = nullptr;
   }
 
   this->world.reset();

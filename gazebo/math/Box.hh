@@ -137,9 +137,9 @@ namespace gazebo
       public: Vector3 max;
 
       /// \brief Enumeration of extents
-      private: enum Extent {EXTENT_NULL, EXTENT_FINITE};
+      private: enum Extent {EXTENT_nullptr, EXTENT_FINITE};
 
-      /// \brief When set to EXTENT_NULL (in the default constructor)
+      /// \brief When set to EXTENT_nullptr (in the default constructor)
       /// the min and max are not valid positions
       private: Extent extent;
     };

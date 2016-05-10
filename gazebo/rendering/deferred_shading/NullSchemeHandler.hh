@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _NULLSCHEMEHANDLER_HH_
-#define _NULLSCHEMEHANDLER_HH_
+#ifndef _nullptrSCHEMEHANDLER_HH_
+#define _nullptrSCHEMEHANDLER_HH_
 
 #include <OgreMaterialManager.h>
 #include "gazebo/util/system.hh"

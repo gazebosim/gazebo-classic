@@ -19,7 +19,7 @@
 using namespace gazebo;
 using namespace msgs;
 
-std::map<std::string, MsgFactoryFn> *MsgFactory::msgMap = NULL;
+std::map<std::string, MsgFactoryFn> *MsgFactory::msgMap = nullptr;
 
 /////////////////////////////////////////////////
 void MsgFactory::RegisterMsg(const std::string &_msgType,

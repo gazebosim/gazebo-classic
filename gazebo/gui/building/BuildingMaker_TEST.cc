@@ -29,7 +29,7 @@ void BuildingMaker_TEST::Attach()
 {
   // Create a building maker
   auto buildingMaker = new gazebo::gui::BuildingMaker();
-  QVERIFY(buildingMaker != NULL);
+  QVERIFY(buildingMaker != nullptr);
 
   // Attach a window to a wall
   buildingMaker->AttachManip("window", "wall");
@@ -75,7 +75,7 @@ void BuildingMaker_TEST::Layers()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -84,7 +84,7 @@ void BuildingMaker_TEST::Layers()
 
   // Create a building maker
   auto buildingMaker = new gazebo::gui::BuildingMaker();
-  QVERIFY(buildingMaker != NULL);
+  QVERIFY(buildingMaker != nullptr);
 
   // Add a wall on each level
   int levelCount = 3;
@@ -106,7 +106,7 @@ void BuildingMaker_TEST::Layers()
   sdf::SDF sdf;
   sdf.SetFromString(sdfStr);
 
-  QVERIFY(sdf.Root() != NULL);
+  QVERIFY(sdf.Root() != nullptr);
   QVERIFY(sdf.Root()->HasElement("model"));
   QVERIFY(sdf.Root()->GetElement("model")->HasElement("link"));
 
@@ -115,7 +115,7 @@ void BuildingMaker_TEST::Layers()
   auto link = sdf.Root()->GetElement("model")->GetElement("link");
   while (link)
   {
-    QVERIFY(link != NULL);
+    QVERIFY(link != nullptr);
     QVERIFY(link->HasAttribute("name"));
     QVERIFY(link->Get<std::string>("name") == "Wall_" + std::to_string(count));
     QVERIFY(link->HasElement("visual"));
@@ -130,7 +130,7 @@ void BuildingMaker_TEST::Layers()
     link = link->GetNextElement("link");
     count++;
   }
-  QVERIFY(link == NULL);
+  QVERIFY(link == nullptr);
   QCOMPARE(count, levelCount);
 
   delete buildingMaker;

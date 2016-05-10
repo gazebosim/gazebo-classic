@@ -54,7 +54,7 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
   renderLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(renderLayout);
-  this->attachCameraThread = NULL;
+  this->attachCameraThread = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -101,7 +101,7 @@ void OculusWindow::AttachCameraToVisual()
 {
   if (!this->scene)
   {
-    gzerr << "OculusWindow::AttachCameraToVisual(): Scene is NULL" << std::endl;
+    gzerr << "OculusWindow::AttachCameraToVisual(): Scene is nullptr" << std::endl;
     return;
   }
   int tries = 0;
@@ -138,7 +138,7 @@ bool OculusWindow::CreateCamera()
   this->scene = rendering::get_scene();
 
   if (!this->scene)
-    gzerr << "Unable to create an oculus camera, scene is NULL" << std::endl;
+    gzerr << "Unable to create an oculus camera, scene is nullptr" << std::endl;
 
   this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
   return this->oculusCamera->Ready();

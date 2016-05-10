@@ -58,7 +58,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor;
-      public: ConfigChildWidget() : groupWidget(NULL) {}
+      public: ConfigChildWidget() : groupWidget(nullptr) {}
 
       /// \brief Widget's key value.
       public: std::string key;
@@ -73,7 +73,7 @@ namespace gazebo
       public: std::map<QWidget *, QLabel *> mapWidgetToUnit;
 
       /// \brief Pointer to group widget.
-      /// NULL if this widget is not contained inside a group widget.
+      /// nullptr if this widget is not contained inside a group widget.
       public: GroupWidget *groupWidget;
     };
 
@@ -671,7 +671,7 @@ namespace gazebo
 
       /// \brief Get a config child widget by its name.
       /// \param[in] _name Scoped name of the child widget.
-      /// \return The child widget with the given name or NULL if it wasn't
+      /// \return The child widget with the given name or nullptr if it wasn't
       /// found.
       public: ConfigChildWidget *ConfigChildWidgetByName(
           const std::string &_name) const;

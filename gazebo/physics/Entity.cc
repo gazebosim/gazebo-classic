@@ -235,7 +235,7 @@ void Entity::StopAnimation()
 //////////////////////////////////////////////////
 void Entity::PublishPose()
 {
-  GZ_ASSERT(this->GetParentModel() != NULL,
+  GZ_ASSERT(this->GetParentModel() != nullptr,
       "An entity without a parent model should not happen");
 
   this->world->PublishModelPose(this->GetParentModel());
@@ -535,7 +535,7 @@ ModelPtr Entity::GetParentModel()
     return boost::dynamic_pointer_cast<Model>(shared_from_this());
 
   p = this->parent;
-  GZ_ASSERT(p, "Parent of an entity is NULL");
+  GZ_ASSERT(p, "Parent of an entity is nullptr");
 
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();
@@ -604,7 +604,7 @@ void Entity::Fini()
 
   if (this->visualMsg)
     delete this->visualMsg;
-  this->visualMsg = NULL;
+  this->visualMsg = nullptr;
 
   this->parentEntity.reset();
 

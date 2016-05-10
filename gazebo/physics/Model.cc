@@ -464,7 +464,7 @@ const sdf::ElementPtr Model::GetSDF()
 //////////////////////////////////////////////////
 const sdf::ElementPtr Model::UnscaledSDF()
 {
-  GZ_ASSERT(this->sdf != NULL, "Model sdf member is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Model sdf member is nullptr");
   this->sdf->Update();
 
   sdf::ElementPtr unscaledSdf(this->sdf);
@@ -870,7 +870,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   // Load the joint
   joint->Load(_sdf);
 
-  if (this->GetJoint(joint->GetScopedName()) != NULL)
+  if (this->GetJoint(joint->GetScopedName()) != nullptr)
   {
     gzerr << "can't have two joint with the same name\n";
     gzthrow("can't have two joints with the same name ["+
@@ -1290,7 +1290,7 @@ ignition::math::Vector3d Model::Scale() const
 //////////////////////////////////////////////////
 void Model::PublishScale()
 {
-  GZ_ASSERT(this->GetParentModel() != NULL,
+  GZ_ASSERT(this->GetParentModel() != nullptr,
       "A model without a parent model should not happen");
 
   this->world->PublishModelScale(this->GetParentModel());

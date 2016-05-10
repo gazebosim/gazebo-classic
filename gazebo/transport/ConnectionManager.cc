@@ -40,7 +40,7 @@ class TopicManagerProcessTask : public tbb::task
   public: tbb::task *execute()
           {
             TopicManager::Instance()->ProcessNodes();
-            return NULL;
+            return nullptr;
           }
 };
 
@@ -55,7 +55,7 @@ class TopicManagerConnectionTask : public tbb::task
   public: tbb::task *execute()
           {
             TopicManager::Instance()->ConnectSubToPub(pub);
-            return NULL;
+            return nullptr;
           }
 
   /// \brief Publish message
@@ -70,7 +70,7 @@ ConnectionManager::ConnectionManager()
   this->stop = false;
   this->stopped = true;
 
-  this->serverConn = NULL;
+  this->serverConn = nullptr;
 
   this->eventConnections.push_back(
       event::Events::ConnectStop(boost::bind(&ConnectionManager::Stop, this)));
@@ -82,7 +82,7 @@ ConnectionManager::~ConnectionManager()
   this->eventConnections.clear();
 
   delete this->serverConn;
-  this->serverConn = NULL;
+  this->serverConn = nullptr;
   this->Fini();
 }
 
@@ -228,7 +228,7 @@ void ConnectionManager::Fini()
     this->serverConn->ProcessWriteQueue();
     this->serverConn->Shutdown();
     delete this->serverConn;
-    this->serverConn = NULL;
+    this->serverConn = nullptr;
   }
 
   this->eventConnections.clear();

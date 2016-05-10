@@ -44,17 +44,17 @@ TEST_F(BoxShapeTest, Scale)
 
   physics::BoxShapePtr box(new physics::BoxShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = boxSDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("box");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   box->Load(elem);
 
   // Test scaling with unit size
@@ -153,17 +153,17 @@ TEST_F(BoxShapeTest, Volume)
 
   physics::BoxShapePtr box(new physics::BoxShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = boxSDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("box");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   box->Load(elem);
 
   // A 1x1x1 box has volume 1

@@ -105,7 +105,7 @@ void ModelCreator_TEST::NestedModel()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -114,13 +114,13 @@ void ModelCreator_TEST::NestedModel()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Create a model creator
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
-  QVERIFY(modelCreator != NULL);
+  QVERIFY(modelCreator != nullptr);
 
   // Create a box model and add it to the model creator
   double mass = 1.0;
@@ -135,7 +135,7 @@ void ModelCreator_TEST::NestedModel()
   // Verify it has been added
   gazebo::rendering::VisualPtr boxModelVis =
       scene->GetVisual("ModelPreview_0_0::box_model");
-  QVERIFY(boxModelVis != NULL);
+  QVERIFY(boxModelVis != nullptr);
 
   // test loading nested model from sdf
   sdf::ElementPtr modelSDF(new sdf::Element);
@@ -146,39 +146,39 @@ void ModelCreator_TEST::NestedModel()
   // verify the model with joint has been added
   gazebo::rendering::VisualPtr modelVis =
       scene->GetVisual("ModelPreview_0_0::model_00");
-  QVERIFY(modelVis != NULL);
+  QVERIFY(modelVis != nullptr);
   gazebo::rendering::VisualPtr link00Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_00");
-  QVERIFY(link00Vis != NULL);
+  QVERIFY(link00Vis != nullptr);
   gazebo::rendering::VisualPtr link01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_01");
-  QVERIFY(link01Vis != NULL);
+  QVERIFY(link01Vis != nullptr);
   gazebo::rendering::VisualPtr model01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::model_01");
-  QVERIFY(model01Vis != NULL);
+  QVERIFY(model01Vis != nullptr);
 
   // remove box model and verify
   modelCreator->RemoveEntity(boxModelVis->GetName());
   boxModelVis = scene->GetVisual("ModelPreview_0_0::box_model");
-  QVERIFY(boxModelVis == NULL);
+  QVERIFY(boxModelVis == nullptr);
 
   // remove nested model and verify
   modelCreator->RemoveEntity(modelVis->GetName());
   modelVis = scene->GetVisual("ModelPreview_0_0::model_00");
-  QVERIFY(modelVis == NULL);
+  QVERIFY(modelVis == nullptr);
   link00Vis = scene->GetVisual("ModelPreview_0_0::model_00::link_00");
-  QVERIFY(link00Vis == NULL);
+  QVERIFY(link00Vis == nullptr);
   link01Vis = scene->GetVisual("ModelPreview_0_0::model_00::link_01");
-  QVERIFY(link01Vis == NULL);
+  QVERIFY(link01Vis == nullptr);
   model01Vis = scene->GetVisual("ModelPreview_0_0::model_00::model_01");
-  QVERIFY(model01Vis == NULL);
+  QVERIFY(model01Vis == nullptr);
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -191,7 +191,7 @@ void ModelCreator_TEST::SaveState()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -200,9 +200,9 @@ void ModelCreator_TEST::SaveState()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Start never saved
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
@@ -212,7 +212,7 @@ void ModelCreator_TEST::SaveState()
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
-  QVERIFY(cylinder != NULL);
+  QVERIFY(cylinder != nullptr);
   QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::NEVER_SAVED);
 
@@ -255,10 +255,10 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -271,7 +271,7 @@ void ModelCreator_TEST::Selection()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -280,9 +280,9 @@ void ModelCreator_TEST::Selection()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Start never saved
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
@@ -292,17 +292,17 @@ void ModelCreator_TEST::Selection()
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
-  QVERIFY(cylinder != NULL);
+  QVERIFY(cylinder != nullptr);
 
   modelCreator->AddShape(gui::ModelCreator::ENTITY_BOX);
   gazebo::rendering::VisualPtr box =
       scene->GetVisual("ModelPreview_0_0::link_1");
-  QVERIFY(box != NULL);
+  QVERIFY(box != nullptr);
 
   modelCreator->AddShape(gui::ModelCreator::ENTITY_SPHERE);
   gazebo::rendering::VisualPtr sphere =
       scene->GetVisual("ModelPreview_0_0::link_2");
-  QVERIFY(sphere != NULL);
+  QVERIFY(sphere != nullptr);
 
   // verify initial selected state
   QVERIFY(!cylinder->GetHighlighted());
@@ -336,10 +336,10 @@ void ModelCreator_TEST::Selection()
   QVERIFY(!sphere->GetHighlighted());
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -352,7 +352,7 @@ void ModelCreator_TEST::ModelPlugin()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -361,9 +361,9 @@ void ModelCreator_TEST::ModelPlugin()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Start never saved
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
@@ -373,14 +373,14 @@ void ModelCreator_TEST::ModelPlugin()
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
-  QVERIFY(cylinder != NULL);
+  QVERIFY(cylinder != nullptr);
 
   // add model plugin
   modelCreator->OnAddModelPlugin("test_name", "test_filename",
       "<data>test</data>");
   gazebo::gui::ModelPluginData *modelPluginData =
        modelCreator->ModelPlugin("test_name");
-  QVERIFY(modelPluginData != NULL);
+  QVERIFY(modelPluginData != nullptr);
   sdf::ElementPtr modelPluginSDF = modelPluginData->modelPluginSDF;
   QCOMPARE(modelPluginSDF->Get<std::string>("name"), std::string("test_name"));
   QCOMPARE(modelPluginSDF->Get<std::string>("filename"),
@@ -391,13 +391,13 @@ void ModelCreator_TEST::ModelPlugin()
   // remove the model plugin
   modelCreator->RemoveModelPlugin("test_name");
   modelPluginData = modelCreator->ModelPlugin("test_name");
-  QVERIFY(modelPluginData == NULL);
+  QVERIFY(modelPluginData == nullptr);
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -410,7 +410,7 @@ void ModelCreator_TEST::NestedModelSelection()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -419,19 +419,19 @@ void ModelCreator_TEST::NestedModelSelection()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Create a model creator
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
-  QVERIFY(modelCreator != NULL);
+  QVERIFY(modelCreator != nullptr);
 
   // a link
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
-  QVERIFY(cylinder != NULL);
+  QVERIFY(cylinder != nullptr);
 
   // Add various models and links into the editor
   // a box nested model
@@ -447,7 +447,7 @@ void ModelCreator_TEST::NestedModelSelection()
   /// Verify it has been added
   gazebo::rendering::VisualPtr boxModelVis =
       scene->GetVisual("ModelPreview_0_0::box_model");
-  QVERIFY(boxModelVis != NULL);
+  QVERIFY(boxModelVis != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -462,16 +462,16 @@ void ModelCreator_TEST::NestedModelSelection()
   // verify the model has been added
   gazebo::rendering::VisualPtr modelVis =
       scene->GetVisual("ModelPreview_0_0::model_00");
-  QVERIFY(modelVis != NULL);
+  QVERIFY(modelVis != nullptr);
   gazebo::rendering::VisualPtr link00Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_00");
-  QVERIFY(link00Vis != NULL);
+  QVERIFY(link00Vis != nullptr);
   gazebo::rendering::VisualPtr link01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_01");
-  QVERIFY(link01Vis != NULL);
+  QVERIFY(link01Vis != nullptr);
   gazebo::rendering::VisualPtr model01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::model_01");
-  QVERIFY(model01Vis != NULL);
+  QVERIFY(model01Vis != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -581,11 +581,11 @@ void ModelCreator_TEST::NestedModelSelection()
   QVERIFY(!model01Vis->GetHighlighted());
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -598,7 +598,7 @@ void ModelCreator_TEST::CopyPaste()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -607,16 +607,16 @@ void ModelCreator_TEST::CopyPaste()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
   QVERIFY(modelCreator);
 
-  QVERIFY(gazebo::gui::g_copyAct != NULL);
-  QVERIFY(gazebo::gui::g_pasteAct != NULL);
-  QVERIFY(gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_copyAct != nullptr);
+  QVERIFY(gazebo::gui::g_pasteAct != nullptr);
+  QVERIFY(gui::g_editModelAct != nullptr);
 
   // switch to editor mode
   gui::g_editModelAct->toggle();
@@ -626,7 +626,7 @@ void ModelCreator_TEST::CopyPaste()
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
 
-  QVERIFY(cylinder != NULL);
+  QVERIFY(cylinder != nullptr);
 
   // Add various models and links into the editor
   // a box nested model
@@ -641,7 +641,7 @@ void ModelCreator_TEST::CopyPaste()
   /// Verify it has been added
   gazebo::rendering::VisualPtr boxModel =
       scene->GetVisual("ModelPreview_0_0::box_model");
-  QVERIFY(boxModel != NULL);
+  QVERIFY(boxModel != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -654,7 +654,7 @@ void ModelCreator_TEST::CopyPaste()
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
     mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   // Move to center of the screen
   QPoint moveTo(glWidget->width() * 0.5, glWidget->height() * 0.5);
@@ -666,7 +666,7 @@ void ModelCreator_TEST::CopyPaste()
   // Verify there is a clone of the cylinder link
   rendering::VisualPtr cylinderClone =
       scene->GetVisual(cylinder->GetName() + "_clone");
-  QVERIFY(cylinderClone != NULL);
+  QVERIFY(cylinderClone != nullptr);
 
 
   // copy and paste box model
@@ -684,16 +684,16 @@ void ModelCreator_TEST::CopyPaste()
   // Verify there is a clone of the box model
   rendering::VisualPtr boxModelClone =
       scene->GetVisual(boxModel->GetName() + "_clone");
-  QVERIFY(boxModelClone != NULL);
+  QVERIFY(boxModelClone != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 // Generate a main function for the test

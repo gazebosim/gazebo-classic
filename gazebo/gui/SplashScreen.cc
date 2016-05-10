@@ -69,10 +69,10 @@ SplashScreen::SplashScreen()
 SplashScreen::~SplashScreen()
 {
   delete this->dataPtr->splashScreen;
-  this->dataPtr->splashScreen = NULL;
+  this->dataPtr->splashScreen = nullptr;
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

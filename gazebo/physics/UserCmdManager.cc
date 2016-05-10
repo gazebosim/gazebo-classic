@@ -57,7 +57,7 @@ UserCmd::~UserCmd()
   this->dataPtr->world.reset();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -153,7 +153,7 @@ UserCmdManager::~UserCmdManager()
   this->dataPtr->redoCmds.clear();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

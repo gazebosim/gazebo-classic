@@ -28,9 +28,9 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void EditorMaterialSwitcher_TEST::CreateMaterialSwitcher()
 {
-  // set NULL camera - should not work and the material scheme should be empty
+  // set nullptr camera - should not work and the material scheme should be empty
   gui::EditorMaterialSwitcherPtr emptyMaterialSwitcher(
-      new gui::EditorMaterialSwitcher(NULL));
+      new gui::EditorMaterialSwitcher(nullptr));
   QCOMPARE(emptyMaterialSwitcher->MaterialScheme(), std::string(""));
 
   std::string scheme = "material_scheme";
@@ -51,7 +51,7 @@ void EditorMaterialSwitcher_TEST::CreateMaterialSwitcher()
   gui::EditorMaterialSwitcherPtr materialSwitcher(
       new gui::EditorMaterialSwitcher(camera));
 
-  QVERIFY(materialSwitcher != NULL);
+  QVERIFY(materialSwitcher != nullptr);
 
   // verify scheme
   materialSwitcher->SetMaterialScheme(scheme);

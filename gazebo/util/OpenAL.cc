@@ -49,8 +49,8 @@ using namespace util;
 OpenAL::OpenAL()
 : dataPtr(new OpenALPrivate)
 {
-  this->dataPtr->context = NULL;
-  this->dataPtr->audioDevice = NULL;
+  this->dataPtr->context = nullptr;
+  this->dataPtr->audioDevice = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -69,7 +69,7 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
 
   // Open the default audio device
   if (deviceName == "default")
-    this->dataPtr->audioDevice = alcOpenDevice(NULL);
+    this->dataPtr->audioDevice = alcOpenDevice(nullptr);
   else
   {
     auto deviceList = this->DeviceList();
@@ -79,7 +79,7 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
   }
 
   // Make sure that we could open the audio device
-  if (this->dataPtr->audioDevice == NULL)
+  if (this->dataPtr->audioDevice == nullptr)
   {
     gzerr << "Unable to open audio device["
       << deviceName << "]\n Audio will be disabled.\n";
@@ -87,9 +87,9 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
   }
 
   // Create the audio context
-  this->dataPtr->context = alcCreateContext(this->dataPtr->audioDevice, NULL);
+  this->dataPtr->context = alcCreateContext(this->dataPtr->audioDevice, nullptr);
 
-  if (this->dataPtr->context == NULL)
+  if (this->dataPtr->context == nullptr)
   {
     gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
     return false;
@@ -112,15 +112,15 @@ void OpenAL::Fini()
   if (this->dataPtr->audioDevice)
   {
     alcCloseDevice(this->dataPtr->audioDevice);
-    this->dataPtr->audioDevice = NULL;
+    this->dataPtr->audioDevice = nullptr;
   }
 
   if (this->dataPtr->context)
   {
     this->dataPtr->context = alcGetCurrentContext();
-    alcMakeContextCurrent(NULL);
+    alcMakeContextCurrent(nullptr);
     alcDestroyContext(this->dataPtr->context);
-    this->dataPtr->context = NULL;
+    this->dataPtr->context = nullptr;
   }
 
   this->dataPtr->sink.reset();
@@ -131,7 +131,7 @@ OpenALSinkPtr OpenAL::CreateSink(sdf::ElementPtr /*_sdf*/)
 {
   OpenALSinkPtr result;
 
-  if (this->dataPtr->sink == NULL)
+  if (this->dataPtr->sink == nullptr)
   {
     this->dataPtr->sink.reset(new OpenALSink);
     result  = this->dataPtr->sink;
@@ -173,7 +173,7 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
 std::set<std::string> OpenAL::DeviceList() const
 {
   std::set<std::string> deviceList;
-  const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+  const ALCchar *devices = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
   while (*devices != '\0')
   {
     std::string str(devices);
@@ -531,12 +531,12 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
   FILE *testFile = fopen(fullPathAudioFile.c_str(), "r");
 
   // If the audio file couldn't be opened, try the gazebo paths
-  if (testFile == NULL)
+  if (testFile == nullptr)
   {
     gzerr << "Unable to open audio file[" << _audioFile << "]\n";
   }
 
-  uint8_t *dataBuffer = NULL;
+  uint8_t *dataBuffer = nullptr;
 
 #ifdef HAVE_FFMPEG
   unsigned int dataBufferSize;

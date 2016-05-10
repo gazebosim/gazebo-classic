@@ -114,12 +114,12 @@ TEST_F(JointControllerTest, Construction)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
-  EXPECT_TRUE(model != NULL);
+  EXPECT_TRUE(model != nullptr);
 
   // Create the joint controller
   physics::JointControllerPtr jointController(
       new physics::JointController(model));
-  EXPECT_TRUE(jointController != NULL);
+  EXPECT_TRUE(jointController != nullptr);
 
   // All values should be empty
   EXPECT_TRUE(jointController->GetJoints().empty());
@@ -138,12 +138,12 @@ TEST_F(JointControllerTest, AddJoint)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
-  EXPECT_TRUE(model != NULL);
+  EXPECT_TRUE(model != nullptr);
 
   // Create the joint controller
   physics::JointControllerPtr jointController(
       new physics::JointController(model));
-  EXPECT_TRUE(jointController != NULL);
+  EXPECT_TRUE(jointController != nullptr);
 
   physics::JointPtr joint(new FakeJoint(model));
   joint->SetName("joint");
@@ -237,12 +237,12 @@ TEST_F(JointControllerTest, SetJointPositions)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
-  EXPECT_TRUE(model != NULL);
+  EXPECT_TRUE(model != nullptr);
 
   // Create the joint controller
   physics::JointControllerPtr jointController(
       new physics::JointController(model));
-  EXPECT_TRUE(jointController != NULL);
+  EXPECT_TRUE(jointController != nullptr);
 
   physics::JointPtr joint1(new FakeJoint(model));
   joint1->SetName("joint1");

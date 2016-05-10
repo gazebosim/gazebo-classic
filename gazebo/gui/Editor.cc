@@ -25,7 +25,7 @@ using namespace gui;
 Editor::Editor(MainWindow *_mainWindow)
   : mainWindow(_mainWindow)
 {
-  this->tabWidget = NULL;
+  this->tabWidget = nullptr;
 }
 
 /////////////////////////////////////////////////

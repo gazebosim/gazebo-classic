@@ -177,7 +177,7 @@ TopToolbar::TopToolbar(QWidget *_parent)
 TopToolbar::~TopToolbar()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -290,7 +290,7 @@ QAction *TopToolbar::InsertSeparator(const QString &_before)
   {
     gzerr << "Requested action [" << _before.toStdString() << "] not found"
           << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   return this->dataPtr->toolbar->insertSeparator(beforeAction);
@@ -304,7 +304,7 @@ QAction *TopToolbar::InsertWidget(const QString &_before, QWidget *_widget)
   {
     gzerr << "Requested action [" << _before.toStdString() << "] not found"
           << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   return this->dataPtr->toolbar->insertWidget(beforeAction, _widget);

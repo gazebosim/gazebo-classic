@@ -39,7 +39,7 @@ TEST_F(LogRecord_TEST, Constructor)
   const char *homePath = common::getEnv("HOMEPATH");
 #endif
 
-  EXPECT_TRUE(homePath != NULL);
+  EXPECT_TRUE(homePath != nullptr);
 
   common::SystemPaths *paths = common::SystemPaths::Instance();
   boost::filesystem::path logPath = paths->TmpPath() + "/gazebo";

@@ -30,7 +30,7 @@ void LaserVisualization_TEST::Lines()
   this->Load("worlds/laser_lines_test.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();
@@ -39,7 +39,7 @@ void LaserVisualization_TEST::Lines()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   cam->SetCaptureData(true);
 

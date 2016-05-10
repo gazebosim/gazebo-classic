@@ -181,7 +181,7 @@ void WindowItem::OnApply()
     itemPos.Y(-itemPos.Y());
     this->dataPtr->windowPos = itemPos;
     this->setPos(Conversions::Convert(this->dataPtr->windowPos));
-    // this->dataPtr->setParentItem(NULL);
+    // this->dataPtr->setParentItem(nullptr);
   }
   this->WindowChanged();
 }

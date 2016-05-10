@@ -39,7 +39,7 @@ EditorMaterialSwitcher::EditorMaterialSwitcher(
   if (!this->camera)
   {
     gzerr << "Cannot create a material switcher for the model editor. "
-          << "Camera is NULL" << std::endl;
+          << "Camera is nullptr" << std::endl;
     return;
   }
 
@@ -126,7 +126,7 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
     {
       gzerr << "Unable to get an Ogre sub-entity when switching editor model "
           << "material" << std::endl;
-      return NULL;
+      return nullptr;
     }
 
     // use the original material for gui visuals
@@ -144,11 +144,11 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
       {
         gzerr << "Unable to get an Ogre entity when switching editor model "
             << "material" << std::endl;
-        return NULL;
+        return nullptr;
       }
 
       if (entity->getUserObjectBindings().getUserAny().isEmpty())
-        return NULL;
+        return nullptr;
 
       std::string userAny = "";
       try
@@ -160,14 +160,14 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
       {
         gzerr << "Unable to cast Ogre user data when switching editor model "
             <<  "material" << std::endl;
-        return NULL;
+        return nullptr;
       }
 
       rendering::VisualPtr result =
           this->camera->GetScene()->GetVisual(userAny);
 
       if (!result)
-        return NULL;
+        return nullptr;
 
       if (result->IsPlane())
       {
@@ -185,7 +185,7 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
     if (material.empty())
     {
       gzerr << "Cannot find model editor materials" << std::endl;
-      return NULL;
+      return nullptr;
     }
 
     // set the material for the models
@@ -212,5 +212,5 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
 
     return newTechnique;
   }
-  return NULL;
+  return nullptr;
 }

@@ -108,7 +108,7 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
 ModelPluginInspector::~ModelPluginInspector()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -174,7 +174,7 @@ msgs::Plugin *ModelPluginInspector::Data() const
   if (!msg)
   {
     gzerr << "It wasn't possible to get the plugin message" << std::endl;
-    return NULL;
+    return nullptr;
   }
   return msg;
 }

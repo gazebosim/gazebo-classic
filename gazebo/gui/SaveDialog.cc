@@ -182,7 +182,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 SaveDialog::~SaveDialog()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

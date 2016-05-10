@@ -31,7 +31,7 @@ using namespace gui;
 void GraphScene_TEST::Initialization()
 {
   GraphScene *gs = new GraphScene();
-  QVERIFY(gs != NULL);
+  QVERIFY(gs != nullptr);
   delete gs;
 }
 
@@ -40,40 +40,40 @@ void GraphScene_TEST::NodeUpdates()
 {
   GraphScene gs;
   QVERIFY(!gs.HasNode("node1"));
-  QVERIFY(gs.GetNode("node1") == NULL);
+  QVERIFY(gs.GetNode("node1") == nullptr);
 
   QGVNode *node1 = gs.AddNode("node1");
 
-  QVERIFY(node1 != NULL);
+  QVERIFY(node1 != nullptr);
   QVERIFY(gs.HasNode("node1"));
-  QVERIFY(gs.GetNode("node1") != NULL);
+  QVERIFY(gs.GetNode("node1") != nullptr);
 
   gs.RemoveNode("node1");
 
   QVERIFY(!gs.HasNode("node1"));
-  QVERIFY(gs.GetNode("node1") == NULL);
+  QVERIFY(gs.GetNode("node1") == nullptr);
 }
 
 /////////////////////////////////////////////////
 void GraphScene_TEST::EdgeUpdates()
 {
   GraphScene gs;
-  QGVNode *node1 = NULL;
-  QGVNode *node2 = NULL;
-  QGVEdge *edge1 = NULL;
-  QGVEdge *edgeBad = NULL;
+  QGVNode *node1 = nullptr;
+  QGVNode *node2 = nullptr;
+  QGVEdge *edge1 = nullptr;
+  QGVEdge *edgeBad = nullptr;
 
   edgeBad = gs.AddEdge("edgeBad", "nodeBad", "nodeBad2");
-  QVERIFY(edgeBad == NULL);
+  QVERIFY(edgeBad == nullptr);
 
   node1 = gs.AddNode("node1");
-  QVERIFY(node1 != NULL);
+  QVERIFY(node1 != nullptr);
 
   node2 = gs.AddNode("node2");
-  QVERIFY(node2 != NULL);
+  QVERIFY(node2 != nullptr);
 
   edge1 = gs.AddEdge("edge1", "node1", "node2");
-  QVERIFY(edge1 != NULL);
+  QVERIFY(edge1 != nullptr);
 
   QVERIFY(gs.hasEdge(tr("edge1")));
 
@@ -88,7 +88,7 @@ void GraphScene_TEST::EdgeUpdates()
 void GraphScene_TEST::EdgeColor()
 {
   GraphScene gs;
-  QGVEdge *edge1 = NULL;
+  QGVEdge *edge1 = nullptr;
 
   gs.AddNode("node1");
   gs.AddNode("node2");

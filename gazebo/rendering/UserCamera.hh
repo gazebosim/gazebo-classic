@@ -152,7 +152,7 @@ namespace gazebo
       /// mouse picking.
       /// \param[in] _mousePos The position of the mouse in screen coordinates
       /// \param[out] _mod Used for object manipulation
-      /// \return The selected entity, or NULL
+      /// \return The selected entity, or nullptr
       public: VisualPtr GetVisual(const math::Vector2i &_mousePos,
                                   std::string &_mod);
 

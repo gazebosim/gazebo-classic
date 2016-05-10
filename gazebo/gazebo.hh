@@ -54,7 +54,7 @@ namespace gazebo
 
   /// \brief Create and load a new world from an SDF world file.
   /// \param[in] _worldFile The world file to load from.
-  /// \return Pointer to the created world. NULL on error.
+  /// \return Pointer to the created world. nullptr on error.
   GAZEBO_VISIBLE
   gazebo::physics::WorldPtr loadWorld(const std::string &_worldFile);
 

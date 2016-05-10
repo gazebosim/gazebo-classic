@@ -36,13 +36,13 @@ namespace gazebo
     {
       /// \brief Constructor
       public: OculusCameraPrivate()
-              : rightCamera(NULL),
-                externalCamera(NULL),
-                rightViewport(NULL),
-                externalViewport(NULL),
-                externalSceneManager(NULL),
-                node(NULL),
-                controlSub(NULL),
+              : rightCamera(nullptr),
+                externalCamera(nullptr),
+                rightViewport(nullptr),
+                externalViewport(nullptr),
+                externalSceneManager(nullptr),
+                node(nullptr),
+                controlSub(nullptr),
                 ready(false),
                 frameIndex(1),
                 oculusTrackingWarned(false) {}

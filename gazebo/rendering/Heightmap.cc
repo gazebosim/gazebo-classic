@@ -66,15 +66,15 @@ Heightmap::Heightmap(ScenePtr _scene)
   : dataPtr(new HeightmapPrivate)
 {
   this->dataPtr->scene = _scene;
-  this->dataPtr->terrainGlobals = NULL;
-  this->dataPtr->terrainPaging = NULL;
-  this->dataPtr->pageManager = NULL;
+  this->dataPtr->terrainGlobals = nullptr;
+  this->dataPtr->terrainPaging = nullptr;
+  this->dataPtr->pageManager = nullptr;
 
   this->dataPtr->terrainIdx = 0;
   this->dataPtr->useTerrainPaging = false;
 
-  this->dataPtr->pageManager = NULL;
-  this->dataPtr->terrainPaging = NULL;
+  this->dataPtr->pageManager = nullptr;
+  this->dataPtr->terrainPaging = nullptr;
   this->dataPtr->terrainHashChanged = true;
   this->dataPtr->terrainsImported = true;
 
@@ -99,11 +99,11 @@ Heightmap::~Heightmap()
     this->dataPtr->terrainGroup->removeAllTerrains();
 
     OGRE_DELETE this->dataPtr->terrainGroup;
-    this->dataPtr->terrainGroup = NULL;
+    this->dataPtr->terrainGroup = nullptr;
   }
 
   OGRE_DELETE this->dataPtr->terrainGlobals;
-  this->dataPtr->terrainGlobals = NULL;
+  this->dataPtr->terrainGlobals = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -171,12 +171,12 @@ common::Image Heightmap::Image() const
   common::Image result;
 
   double height = 0.0;
-  unsigned char *imageData = NULL;
+  unsigned char *imageData = nullptr;
 
   /// \todo Support multiple terrain objects
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
 
   double minHeight = terrain->getMinHeight();
   double maxHeight = terrain->getMaxHeight() - minHeight;
@@ -327,7 +327,7 @@ bool Heightmap::PrepareTerrainPaging(
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
-  if (this->dataPtr->terrainGlobals != NULL)
+  if (this->dataPtr->terrainGlobals != nullptr)
     return;
 
   const Ogre::RenderSystemCapabilities *capabilities;
@@ -627,7 +627,7 @@ void Heightmap::ConfigureTerrainDefaults()
 void Heightmap::SetWireframe(const bool _show)
 {
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
 
   Ogre::Material *material = terrain->getMaterial().get();
 
@@ -738,7 +738,7 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 double Heightmap::Height(const double _x, const double _y, const double _z)
     const
 {
-  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is NULL");
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is nullptr");
 
   Ogre::TerrainGroup::RayResult result =
       this->dataPtr->terrainGroup->rayIntersects(
@@ -883,7 +883,7 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
 double Heightmap::AvgHeight(const ignition::math::Vector3d &_pos,
     const double _radius) const
 {
-  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is NULL");
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is nullptr");
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)
@@ -926,7 +926,7 @@ double Heightmap::AvgHeight(const ignition::math::Vector3d &_pos,
 void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, const double _outsideRadius,
     const double _insideRadius, const double _weight, const std::string &_op)
 {
-  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is NULL");
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is nullptr");
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)
@@ -1036,7 +1036,7 @@ void Heightmap::SetupShadows(bool _enableShadows)
   }
   else
   {
-    matProfile->setReceiveDynamicShadowsPSSM(NULL);
+    matProfile->setReceiveDynamicShadowsPSSM(nullptr);
   }
 }
 
@@ -1089,7 +1089,7 @@ GzTerrainMatGen::SM2Profile::SM2Profile(
     const Ogre::String &_desc)
 : TerrainMaterialGeneratorA::SM2Profile(_parent, _name, _desc)
 {
-  this->mShaderGen = NULL;
+  this->mShaderGen = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -1097,7 +1097,7 @@ GzTerrainMatGen::SM2Profile::~SM2Profile()
 {
   // Because the base SM2Profile has no virtual destructor:
   delete this->mShaderGen;
-  this->mShaderGen = NULL;
+  this->mShaderGen = nullptr;
 }
 
 /////////////////////////////////////////////////

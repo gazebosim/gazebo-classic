@@ -43,7 +43,7 @@ void MainWindow_TEST::StepState()
   this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();
@@ -51,7 +51,7 @@ void MainWindow_TEST::StepState()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(gazebo::gui::g_stepAct != NULL);
+  QVERIFY(gazebo::gui::g_stepAct != nullptr);
   QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
   QVERIFY(!mainWindow->IsPaused());
 
@@ -92,7 +92,7 @@ void MainWindow_TEST::Selection()
   this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();
@@ -102,11 +102,11 @@ void MainWindow_TEST::Selection()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   gazebo::gui::GLWidget *glWidget =
     mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   gazebo::math::Vector2i glWidgetCenter(
       glWidget->width()*0.5, glWidget->height()*0.5);
@@ -114,7 +114,7 @@ void MainWindow_TEST::Selection()
   // get model at center of window - should get the box
   gazebo::rendering::VisualPtr vis =
       cam->GetVisual(glWidgetCenter);
-  QVERIFY(vis != NULL);
+  QVERIFY(vis != nullptr);
   QVERIFY(vis->GetRootVisual()->GetName() == "box");
 
   // move camera to look at the box
@@ -126,7 +126,7 @@ void MainWindow_TEST::Selection()
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
       cam->GetVisual(gazebo::math::Vector2i(0, 0));
-  QVERIFY(vis2 != NULL);
+  QVERIFY(vis2 != nullptr);
   QVERIFY(vis2->GetRootVisual()->GetName() == "box");
 
   // look upwards
@@ -136,7 +136,7 @@ void MainWindow_TEST::Selection()
 
   // verify there is nothing in the middle of the window
   gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
-  QVERIFY(vis3 == NULL);
+  QVERIFY(vis3 == nullptr);
 
   // reset orientation
   ignition::math::Quaterniond identityRot(ignition::math::Vector3d(0, 0, 0));
@@ -146,7 +146,7 @@ void MainWindow_TEST::Selection()
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
       cam->GetVisual(gazebo::math::Vector2i(0, 0));
-  QVERIFY(vis4 != NULL);
+  QVERIFY(vis4 != nullptr);
   QVERIFY(vis4->GetRootVisual()->GetName() == "box");
 
   // hide the box
@@ -154,7 +154,7 @@ void MainWindow_TEST::Selection()
   gazebo::rendering::VisualPtr vis5 = cam->GetVisual(glWidgetCenter);
 
   // verify we don't get anything now
-  QVERIFY(vis5 == NULL);
+  QVERIFY(vis5 == nullptr);
 
   cam->Fini();
   mainWindow->close();
@@ -170,7 +170,7 @@ void MainWindow_TEST::SceneDestruction()
   this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();
@@ -180,9 +180,9 @@ void MainWindow_TEST::SceneDestruction()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   cam->Fini();
   mainWindow->close();
@@ -201,7 +201,7 @@ void MainWindow_TEST::UserCameraFPS()
   this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();
@@ -211,7 +211,7 @@ void MainWindow_TEST::UserCameraFPS()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   // some machines are unable to hit the target FPS
   // sample update time and determine whether to skip FPS lower bound check
@@ -228,7 +228,7 @@ void MainWindow_TEST::UserCameraFPS()
   double lowerFPSBound = skipFPSTest ? 0 : 45;
 
   // Wait a little bit for the average FPS to even out.
-  this->ProcessEventsAndDraw(NULL, iterations, 1);
+  this->ProcessEventsAndDraw(nullptr, iterations, 1);
 
   std::cerr << "\nFPS[" << cam->AvgFPS() << "]\n" << std::endl;
 
@@ -249,7 +249,7 @@ void MainWindow_TEST::CopyPaste()
   this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();
@@ -258,14 +258,14 @@ void MainWindow_TEST::CopyPaste()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
     mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   // Test model copy
   {
@@ -279,7 +279,7 @@ void MainWindow_TEST::CopyPaste()
     this->ProcessEventsAndDraw(mainWindow);
 
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
 
     // Select the model
     gazebo::event::Events::setSelectedEntity(modelName, "normal");
@@ -296,8 +296,8 @@ void MainWindow_TEST::CopyPaste()
 
     this->ProcessEventsAndDraw(mainWindow);
 
-    QVERIFY(gazebo::gui::g_copyAct != NULL);
-    QVERIFY(gazebo::gui::g_pasteAct != NULL);
+    QVERIFY(gazebo::gui::g_copyAct != nullptr);
+    QVERIFY(gazebo::gui::g_pasteAct != nullptr);
 
     // Copy the model
     QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier, 100);
@@ -323,7 +323,7 @@ void MainWindow_TEST::CopyPaste()
       QTest::qWait(100);
       sleep++;
     }
-    QVERIFY(modelVisClone != NULL);
+    QVERIFY(modelVisClone != nullptr);
   }
 
   // Test light copy
@@ -333,7 +333,7 @@ void MainWindow_TEST::CopyPaste()
     gazebo::event::Events::setSelectedEntity(lightName, "normal");
 
     gazebo::rendering::VisualPtr lightVis = scene->GetVisual(lightName);
-    QVERIFY(lightVis != NULL);
+    QVERIFY(lightVis != nullptr);
 
     // Wait until the light is selected
     int sleep = 0;
@@ -372,7 +372,7 @@ void MainWindow_TEST::CopyPaste()
       QTest::qWait(30);
       sleep++;
     }
-    QVERIFY(lightClone != NULL);
+    QVERIFY(lightClone != nullptr);
 
     lightClone.reset();
   }
@@ -400,7 +400,7 @@ void MainWindow_TEST::Wireframe()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -487,7 +487,7 @@ void MainWindow_TEST::NonDefaultWorld()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -536,7 +536,7 @@ void MainWindow_TEST::UserCameraJoystick()
   this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
 
@@ -550,7 +550,7 @@ void MainWindow_TEST::UserCameraJoystick()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   ignition::math::Pose3d startPose = cam->WorldPose();
   QVERIFY(startPose == ignition::math::Pose3d(5, -5, 2, 0, 0.275643, 2.35619));
@@ -631,7 +631,7 @@ void MainWindow_TEST::ActionCreationDestruction()
   this->Load("worlds/empty.world", false, false, true);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();
@@ -881,7 +881,7 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
   this->Load("worlds/usercamera_test.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();
@@ -890,7 +890,7 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   cam->SetCaptureData(true);
 
@@ -935,7 +935,7 @@ void MainWindow_TEST::MenuBar()
   this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();
@@ -944,7 +944,7 @@ void MainWindow_TEST::MenuBar()
 
   // Get the user camera
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   QList<QMenuBar *> menuBars  = mainWindow->findChildren<QMenuBar *>();
   QVERIFY(!menuBars.empty());
@@ -1012,7 +1012,7 @@ void MainWindow_TEST::WindowModes()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -1048,7 +1048,7 @@ void MainWindow_TEST::MinimumSize()
   this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();

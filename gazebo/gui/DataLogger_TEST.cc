@@ -51,11 +51,11 @@ void DataLogger_TEST::RecordButton()
     // Get the size label
     QLabel *sizeLabel = dataLogger->findChild<QLabel *>("dataLoggerSizeLabel");
 
-    QVERIFY(recordButton != NULL);
-    QVERIFY(destPathLabel != NULL);
-    QVERIFY(sizeLabel != NULL);
-    QVERIFY(timeLabel != NULL);
-    QVERIFY(statusLabel != NULL);
+    QVERIFY(recordButton != nullptr);
+    QVERIFY(destPathLabel != nullptr);
+    QVERIFY(sizeLabel != nullptr);
+    QVERIFY(timeLabel != nullptr);
+    QVERIFY(statusLabel != nullptr);
 
     std::string txt;
 
@@ -118,13 +118,13 @@ void DataLogger_TEST::RecordButton()
     // Get the confirmation dialog
     QDialog *confirmationDialog = dataLogger->findChild<QDialog *>(
         "dataLoggerConfirmationDialog");
-    QVERIFY(confirmationDialog != NULL);
+    QVERIFY(confirmationDialog != nullptr);
     QVERIFY(confirmationDialog->isVisible());
 
     // Get the confirmation label
     QLabel *confirmationLabel = confirmationDialog->findChild<QLabel *>(
         "dataLoggerConfirmationLabel");
-    QVERIFY(confirmationLabel != NULL);
+    QVERIFY(confirmationLabel != nullptr);
 
     // Make sure the confirmation label contains the correct file
     txt = confirmationLabel->text().toStdString();

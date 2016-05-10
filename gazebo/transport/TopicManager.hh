@@ -101,7 +101,7 @@ namespace gazebo
                                      unsigned int _queueLimit,
                                      double _hzRate)
               {
-                google::protobuf::Message *msg = NULL;
+                google::protobuf::Message *msg = nullptr;
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
                 if (!msg)
@@ -119,7 +119,7 @@ namespace gazebo
                 msgTypename = msg->GetTypeName();
 
                 publication = this->FindPublication(_topic);
-                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+                GZ_ASSERT(publication != nullptr, "FindPublication returned nullptr");
 
                 publication->AddPublisher(pub);
                 if (!publication->GetLocallyAdvertised())

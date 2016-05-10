@@ -80,7 +80,7 @@ void WindTest::WindParam()
 
   Load("worlds/empty.world", false);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   transport::NodePtr windNode;
   windNode = transport::NodePtr(new transport::Node());
@@ -160,7 +160,7 @@ void WindTest::WindParamBool()
 {
   Load("worlds/empty.world", false);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   physics::Wind &wind = world->Wind();
 
@@ -189,11 +189,11 @@ void WindTest::WindSetLinearVelFunc()
 {
   Load("worlds/empty.world", false);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
-  EXPECT_TRUE(model != NULL);
+  EXPECT_TRUE(model != nullptr);
 
   physics::Wind &wind = world->Wind();
 

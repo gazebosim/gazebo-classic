@@ -49,7 +49,7 @@ LayersWidget::LayersWidget(QWidget *_parent)
 LayersWidget::~LayersWidget()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

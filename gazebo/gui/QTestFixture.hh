@@ -57,7 +57,7 @@ class QTestFixture : public QObject
   /// won't be triggered.
   /// \param[in] _repeat Number of times to repeat the loop.
   /// \param[in] _ms Time to sleep for each loop in milliseconds.
-  protected: void ProcessEventsAndDraw(QMainWindow *_mainWindow = NULL,
+  protected: void ProcessEventsAndDraw(QMainWindow *_mainWindow = nullptr,
       const unsigned int _repeat = 10, const unsigned int _ms = 30);
 
   /// \brief Get memory information about the current process.

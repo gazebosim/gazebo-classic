@@ -36,18 +36,18 @@ TEST_F(UserCmdManagerTest, CreateCmd)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  EXPECT_TRUE(world != NULL);
+  EXPECT_TRUE(world != nullptr);
 
   // Create a manager
   physics::UserCmdManager *manager = new physics::UserCmdManager(world);
-  EXPECT_TRUE(manager != NULL);
+  EXPECT_TRUE(manager != nullptr);
 
   // Create the command
   unsigned int id = 21;
   std::string description = "Command description";
   msgs::UserCmd::Type type = msgs::UserCmd::MOVING;
   physics::UserCmd *cmd = new physics::UserCmd(id, world, description, type);
-  EXPECT_TRUE(cmd != NULL);
+  EXPECT_TRUE(cmd != nullptr);
 
   // Check data
   EXPECT_EQ(id, cmd->Id());
@@ -56,9 +56,9 @@ TEST_F(UserCmdManagerTest, CreateCmd)
 
   // Clean up
   delete cmd;
-  cmd = NULL;
+  cmd = nullptr;
   delete manager;
-  manager = NULL;
+  manager = nullptr;
 }
 
 int main(int argc, char **argv)

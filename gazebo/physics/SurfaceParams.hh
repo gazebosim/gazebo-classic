@@ -195,14 +195,14 @@ namespace gazebo
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
       /// \brief Get access to FrictionPyramid data, if available.
-      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// \return Pointer to FrictionPyramid data or nullptr if class does
       /// not use FrictionPyramid data.
       /// \deprecated See function FrictionPyramid
       public: virtual FrictionPyramidPtr GetFrictionPyramid() const
           GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get access to FrictionPyramid data, if available.
-      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// \return Pointer to FrictionPyramid data or nullptr if class does
       /// not use FrictionPyramid data.
       public: virtual FrictionPyramidPtr FrictionPyramid() const;
 

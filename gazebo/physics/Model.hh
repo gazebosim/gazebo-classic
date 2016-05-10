@@ -163,7 +163,7 @@ namespace gazebo
 
       /// \brief Get a nested model that is a direct child of this model.
       /// \param[in] _name Name of the child model to get.
-      /// \return Pointer to the model, NULL if the name is invalid.
+      /// \return Pointer to the model, nullptr if the name is invalid.
       public: ModelPtr NestedModel(const std::string &_name) const;
 
       /// \brief Get all the nested models.
@@ -187,13 +187,13 @@ namespace gazebo
       /// \cond
       /// This is an internal function
       /// \brief Get a link by id.
-      /// \return Pointer to the link, NULL if the id is invalid.
+      /// \return Pointer to the link, nullptr if the id is invalid.
       public: LinkPtr GetLinkById(unsigned int _id) const;
       /// \endcond
 
       /// \brief Get a link by name.
       /// \param[in] _name Name of the link to get.
-      /// \return Pointer to the link, NULL if the name is invalid.
+      /// \return Pointer to the link, nullptr if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
 
       /// \brief If true, all links within the model will collide by default.
@@ -251,7 +251,7 @@ namespace gazebo
       /// completes.
       public: void SetJointAnimation(
                const std::map<std::string, common::NumericAnimationPtr> &_anims,
-               boost::function<void()> _onComplete = NULL);
+               boost::function<void()> _onComplete = nullptr);
 
       /// \brief Stop the current animations.
       public: virtual void StopAnimation();
@@ -382,7 +382,7 @@ namespace gazebo
       /// \param[in] _parent parent link of joint
       /// \param[in] _child child link of joint
       /// \return a JointPtr to the new joint created,
-      ///         returns NULL JointPtr() if joint by name _name
+      ///         returns nullptr JointPtr() if joint by name _name
       ///         already exists.
       /// \throws common::Exception When _type is not recognized
       public: gazebo::physics::JointPtr CreateJoint(
@@ -409,7 +409,7 @@ namespace gazebo
       /// \brief Create a new link for this model
       /// \param[in] _name name of the new link
       /// \return a LinkPtr to the new link created,
-      /// returns NULL if link _name already exists.
+      /// returns nullptr if link _name already exists.
       public: LinkPtr CreateLink(const std::string &_name);
 
       /// \brief Callback when the pose of the model has been changed.

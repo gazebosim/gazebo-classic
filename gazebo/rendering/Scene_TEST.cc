@@ -32,7 +32,7 @@ TEST_F(Scene_TEST, AddRemoveCameras)
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   // verify no cameras are currently in the scene
   EXPECT_EQ(scene->CameraCount(), 0u);
@@ -50,20 +50,20 @@ TEST_F(Scene_TEST, AddRemoveCameras)
   // Remove a camera and check that it has been removed
   scene->RemoveCamera(camera->Name());
   EXPECT_EQ(scene->CameraCount(), 1u);
-  EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
-  EXPECT_TRUE(scene->GetCamera("test_camera2") != NULL);
+  EXPECT_TRUE(scene->GetCamera("test_camera") == nullptr);
+  EXPECT_TRUE(scene->GetCamera("test_camera2") != nullptr);
 
   // remove non-existent camera
   scene->RemoveCamera("no_such_camera");
   EXPECT_EQ(scene->CameraCount(), 1u);
-  EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
-  EXPECT_TRUE(scene->GetCamera("test_camera2") != NULL);
+  EXPECT_TRUE(scene->GetCamera("test_camera") == nullptr);
+  EXPECT_TRUE(scene->GetCamera("test_camera2") != nullptr);
 
   // Remove the remaining camera and check that it has been removed
   scene->RemoveCamera(camera2->Name());
   EXPECT_EQ(scene->CameraCount(), 0u);
-  EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
-  EXPECT_TRUE(scene->GetCamera("test_camera2") == NULL);
+  EXPECT_TRUE(scene->GetCamera("test_camera") == nullptr);
+  EXPECT_TRUE(scene->GetCamera("test_camera2") == nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -73,25 +73,25 @@ TEST_F(Scene_TEST, AddRemoveVisuals)
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   // Check that it has two visuals, the world and origin visuals
   EXPECT_EQ(scene->VisualCount(), 2u);
-  EXPECT_TRUE(scene->GetVisual("__world_node__") != NULL);
+  EXPECT_TRUE(scene->GetVisual("__world_node__") != nullptr);
 
   // Add a visual and check that it has been added
   rendering::VisualPtr visual1;
   visual1.reset(new rendering::Visual("visual1", scene));
   scene->AddVisual(visual1);
   EXPECT_EQ(scene->VisualCount(), 3u);
-  EXPECT_TRUE(scene->GetVisual("visual1") != NULL);
+  EXPECT_TRUE(scene->GetVisual("visual1") != nullptr);
 
   // Add a visual and check that it has been added
   rendering::VisualPtr visual2;
   visual2.reset(new rendering::Visual("visual2", scene));
   scene->AddVisual(visual2);
   EXPECT_EQ(scene->VisualCount(), 4u);
-  EXPECT_TRUE(scene->GetVisual("visual2") != NULL);
+  EXPECT_TRUE(scene->GetVisual("visual2") != nullptr);
 
   // Remove a visual and check that it has been removed
   scene->RemoveVisual(visual1);
@@ -113,7 +113,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   // Wait until all models are inserted
   int sleep = 0;
@@ -129,9 +129,9 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   }
 
   // Check that the model visuals were properly added
-  ASSERT_TRUE(box != NULL);
-  ASSERT_TRUE(sphere != NULL);
-  ASSERT_TRUE(cylinder != NULL);
+  ASSERT_TRUE(box != nullptr);
+  ASSERT_TRUE(sphere != nullptr);
+  ASSERT_TRUE(cylinder != nullptr);
 
   const std::vector<std::string> models = {
     "box",
@@ -163,7 +163,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   {
     for (auto const &suffix : suffixes)
     {
-      EXPECT_TRUE(scene->GetVisual(modelName + suffix) != NULL)
+      EXPECT_TRUE(scene->GetVisual(modelName + suffix) != nullptr)
           << "check visual exists: " << modelName + suffix;
     }
   }
@@ -180,11 +180,11 @@ TEST_F(Scene_TEST, RemoveModelVisual)
     common::Time::MSleep(1000);
     sleep++;
   }
-  ASSERT_TRUE(box == NULL);
+  ASSERT_TRUE(box == nullptr);
 
   for (auto const &suffix : suffixes)
   {
-    EXPECT_TRUE(scene->GetVisual("box" + suffix) == NULL)
+    EXPECT_TRUE(scene->GetVisual("box" + suffix) == nullptr)
         << "check visual does not exist: " << "box" + suffix;
   }
 }
@@ -203,7 +203,7 @@ TEST_F(Scene_TEST, VisualType)
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   // Spawn another box. The model loading process is slightly different so
   // check that its visuals also have the correct visual type.
@@ -225,10 +225,10 @@ TEST_F(Scene_TEST, VisualType)
   }
 
   // Check that the model visuals were properly added
-  ASSERT_TRUE(box != NULL);
-  ASSERT_TRUE(sphere != NULL);
-  ASSERT_TRUE(cylinder != NULL);
-  ASSERT_TRUE(newBox != NULL);
+  ASSERT_TRUE(box != nullptr);
+  ASSERT_TRUE(sphere != nullptr);
+  ASSERT_TRUE(cylinder != nullptr);
+  ASSERT_TRUE(newBox != nullptr);
 
   // Verify type is VT_MODEL
   EXPECT_TRUE(box->GetType() == rendering::Visual::VT_MODEL);
@@ -241,10 +241,10 @@ TEST_F(Scene_TEST, VisualType)
   rendering::VisualPtr sphereLink = scene->GetVisual("sphere::link");
   rendering::VisualPtr cylinderLink = scene->GetVisual("cylinder::link");
   rendering::VisualPtr newBoxLink = scene->GetVisual("new_box::body");
-  EXPECT_TRUE(boxLink != NULL);
-  EXPECT_TRUE(sphereLink != NULL);
-  EXPECT_TRUE(cylinderLink != NULL);
-  EXPECT_TRUE(newBoxLink != NULL);
+  EXPECT_TRUE(boxLink != nullptr);
+  EXPECT_TRUE(sphereLink != nullptr);
+  EXPECT_TRUE(cylinderLink != nullptr);
+  EXPECT_TRUE(newBoxLink != nullptr);
 
   // Verify type is VT_LINK
   EXPECT_TRUE(boxLink->GetType() == rendering::Visual::VT_LINK);
@@ -258,10 +258,10 @@ TEST_F(Scene_TEST, VisualType)
   rendering::VisualPtr cylinderVisual =
       scene->GetVisual("cylinder::link::visual");
   rendering::VisualPtr newBoxVisual = scene->GetVisual("new_box::body::visual");
-  EXPECT_TRUE(boxVisual != NULL);
-  EXPECT_TRUE(sphereVisual != NULL);
-  EXPECT_TRUE(cylinderVisual != NULL);
-  EXPECT_TRUE(newBoxVisual != NULL);
+  EXPECT_TRUE(boxVisual != nullptr);
+  EXPECT_TRUE(sphereVisual != nullptr);
+  EXPECT_TRUE(cylinderVisual != nullptr);
+  EXPECT_TRUE(newBoxVisual != nullptr);
 
   // Verify type is VT_VISUAL
   EXPECT_TRUE(boxVisual->GetType() == rendering::Visual::VT_VISUAL);
@@ -277,10 +277,10 @@ TEST_F(Scene_TEST, VisualType)
       scene->GetVisual("cylinder::link::collision");
   rendering::VisualPtr newBoxCollision =
       scene->GetVisual("new_box::body::geom");
-  EXPECT_TRUE(boxCollision != NULL);
-  EXPECT_TRUE(sphereCollision != NULL);
-  EXPECT_TRUE(cylinderCollision != NULL);
-  EXPECT_TRUE(newBoxCollision != NULL);
+  EXPECT_TRUE(boxCollision != nullptr);
+  EXPECT_TRUE(sphereCollision != nullptr);
+  EXPECT_TRUE(cylinderCollision != nullptr);
+  EXPECT_TRUE(newBoxCollision != nullptr);
 
   // Verify type is VT_COLLISION
   EXPECT_TRUE(boxCollision->GetType() == rendering::Visual::VT_COLLISION);
@@ -297,10 +297,10 @@ TEST_F(Scene_TEST, VisualType)
       scene->GetVisual("cylinder::link_INERTIA_VISUAL__");
   rendering::VisualPtr newBoxInertia =
       scene->GetVisual("new_box::body_INERTIA_VISUAL__");
-  EXPECT_TRUE(boxInertia != NULL);
-  EXPECT_TRUE(sphereInertia != NULL);
-  EXPECT_TRUE(cylinderInertia != NULL);
-  EXPECT_TRUE(newBoxInertia != NULL);
+  EXPECT_TRUE(boxInertia != nullptr);
+  EXPECT_TRUE(sphereInertia != nullptr);
+  EXPECT_TRUE(cylinderInertia != nullptr);
+  EXPECT_TRUE(newBoxInertia != nullptr);
 
   // Verify type is VT_PHYSICS
   EXPECT_TRUE(boxInertia->GetType() == rendering::Visual::VT_PHYSICS);
@@ -316,10 +316,10 @@ TEST_F(Scene_TEST, VisualType)
       scene->GetVisual("cylinder::link_COM_VISUAL__");
   rendering::VisualPtr newBoxCOM =
       scene->GetVisual("new_box::body_COM_VISUAL__");
-  EXPECT_TRUE(boxCOM != NULL);
-  EXPECT_TRUE(sphereCOM != NULL);
-  EXPECT_TRUE(cylinderCOM != NULL);
-  EXPECT_TRUE(newBoxCOM != NULL);
+  EXPECT_TRUE(boxCOM != nullptr);
+  EXPECT_TRUE(sphereCOM != nullptr);
+  EXPECT_TRUE(cylinderCOM != nullptr);
+  EXPECT_TRUE(newBoxCOM != nullptr);
 
   // Verify type is VT_PHYSICS
   EXPECT_TRUE(boxCOM->GetType() == rendering::Visual::VT_PHYSICS);
@@ -336,10 +336,10 @@ TEST_F(Scene_TEST, VisualType)
       scene->GetVisual("cylinder::link_LINK_FRAME_VISUAL__");
   rendering::VisualPtr newBoxLinkFrame =
       scene->GetVisual("new_box::body_LINK_FRAME_VISUAL__");
-  EXPECT_TRUE(boxLinkFrame != NULL);
-  EXPECT_TRUE(sphereLinkFrame != NULL);
-  EXPECT_TRUE(cylinderLinkFrame != NULL);
-  EXPECT_TRUE(newBoxLinkFrame != NULL);
+  EXPECT_TRUE(boxLinkFrame != nullptr);
+  EXPECT_TRUE(sphereLinkFrame != nullptr);
+  EXPECT_TRUE(cylinderLinkFrame != nullptr);
+  EXPECT_TRUE(newBoxLinkFrame != nullptr);
 
   // Verify type is VT_PHYSICS
   EXPECT_TRUE(boxLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);

@@ -40,7 +40,7 @@
 boost::mutex fini_mutex;
 std::vector<gazebo::SystemPluginPtr> g_plugins;
 
-gazebo::Master *g_master = NULL;
+gazebo::Master *g_master = nullptr;
 
 /////////////////////////////////////////////////
 struct g_vectorStringDup
@@ -142,7 +142,7 @@ bool gazebo::shutdown()
   gazebo::sensors::fini();
 
   delete g_master;
-  g_master = NULL;
+  g_master = nullptr;
 
   // Cleanup model database.
   common::ModelDatabase::Instance()->Fini();
@@ -191,7 +191,7 @@ void gazebo::runWorld(gazebo::physics::WorldPtr _world,
                       unsigned int _iterations)
 {
   if (!_world)
-    gzerr << "World pointer is NULL\n";
+    gzerr << "World pointer is nullptr\n";
   else
     _world->RunBlocking(_iterations);
 }

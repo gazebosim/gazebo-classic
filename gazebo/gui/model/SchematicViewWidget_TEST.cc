@@ -114,7 +114,7 @@ void SchematicViewWidget_TEST::Selection()
   QVERIFY(svWidget);
 
   QGraphicsView *view = svWidget->findChild<QGraphicsView *>();
-  QVERIFY(view != NULL);
+  QVERIFY(view != nullptr);
 
   svWidget->show();
 

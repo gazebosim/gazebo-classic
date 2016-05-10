@@ -86,7 +86,7 @@ namespace gazebo
       /// \param[in] _visualMsg Msg containing information of the visual
       /// to be added.
       public: void AddVisual(const std::string &_name,
-          const msgs::Visual *_visualMsg = NULL);
+          const msgs::Visual *_visualMsg = nullptr);
 
       /// \brief Update a visual widget from a visual msg.
       /// \param[in] _name Name of visual to be updated.

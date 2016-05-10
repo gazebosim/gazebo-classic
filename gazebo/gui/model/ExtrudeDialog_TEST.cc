@@ -28,7 +28,7 @@ void ExtrudeDialog_TEST::BadFilename()
 
   gazebo::gui::ExtrudeDialog *extrudeDialog =
       new gazebo::gui::ExtrudeDialog(bad);
-  QVERIFY(extrudeDialog != NULL);
+  QVERIFY(extrudeDialog != nullptr);
 
   delete extrudeDialog;
 }
@@ -48,7 +48,7 @@ void ExtrudeDialog_TEST::GetSpinValues()
   QCOMPARE(thickness, 0.1);
   QDoubleSpinBox *thicknessSpin =
       extrudeDialog->findChild<QDoubleSpinBox *>("thicknessSpin");
-  QVERIFY(thicknessSpin != NULL);
+  QVERIFY(thicknessSpin != nullptr);
   thicknessSpin->setValue(1.0);
   thickness = extrudeDialog->GetThickness();
   QCOMPARE(thickness, 1.0);
@@ -58,7 +58,7 @@ void ExtrudeDialog_TEST::GetSpinValues()
   QCOMPARE(resolution, 3543.3);
   QDoubleSpinBox *resolutionSpin =
       extrudeDialog->findChild<QDoubleSpinBox *>("resolutionSpin");
-  QVERIFY(resolutionSpin != NULL);
+  QVERIFY(resolutionSpin != nullptr);
   resolutionSpin->setValue(1010.1);
   resolution = extrudeDialog->GetResolution();
   QCOMPARE(resolution, 1010.1);
@@ -68,7 +68,7 @@ void ExtrudeDialog_TEST::GetSpinValues()
   QCOMPARE(samples, (unsigned int)5);
   QSpinBox *samplesSpin =
       extrudeDialog->findChild<QSpinBox *>("samplesSpin");
-  QVERIFY(samplesSpin != NULL);
+  QVERIFY(samplesSpin != nullptr);
   samplesSpin->setValue(20);
   samples = extrudeDialog->GetSamples();
   QCOMPARE(samples, (unsigned int)20);

@@ -43,7 +43,7 @@ Battery::Battery()
 Battery::~Battery()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

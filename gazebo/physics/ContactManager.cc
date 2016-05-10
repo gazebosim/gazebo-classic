@@ -60,12 +60,12 @@ ContactManager::~ContactManager()
       iter->second->collisionNames.clear();
       iter->second->publisher.reset();
       delete iter->second;
-      iter->second = NULL;
+      iter->second = nullptr;
     }
   }
   this->customContactPublishers.clear();
   delete this->customMutex;
-  this->customMutex = NULL;
+  this->customMutex = nullptr;
 
   this->world.reset();
 }
@@ -87,7 +87,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
                                     Collision *_collision2,
                                     const common::Time &_time)
 {
-  Contact *result = NULL;
+  Contact *result = nullptr;
 
   if (!_collision1 || !_collision2)
     return result;
@@ -176,7 +176,7 @@ Contact *ContactManager::GetContact(unsigned int _index) const
   if (_index < this->contactIndex)
     return this->contacts[_index];
   else
-    return NULL;
+    return nullptr;
 }
 
 /////////////////////////////////////////////////

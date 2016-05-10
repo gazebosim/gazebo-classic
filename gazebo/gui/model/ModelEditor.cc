@@ -62,7 +62,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->Init("modelEditorTab", "Insert", this->dataPtr->modelPalette);
   this->tabWidget->addTab(this->dataPtr->modelTree, tr("Model"));
 
-  GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
+  GZ_ASSERT(this->tabWidget != nullptr, "Editor tab widget is nullptr");
 
   rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
       gui::get_active_camera());
@@ -72,14 +72,14 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   }
   else
   {
-    gzerr << "User camera is NULL. "
+    gzerr << "User camera is nullptr. "
         << "Non-editable models will keep their original material"
         << std::endl;
   }
 
 
-  this->dataPtr->schematicViewAct = NULL;
-  this->dataPtr->svWidget = NULL;
+  this->dataPtr->schematicViewAct = nullptr;
+  this->dataPtr->svWidget = nullptr;
 #ifdef HAVE_GRAPHVIZ
   RenderWidget *renderWidget = _mainWindow->RenderWidget();
   this->dataPtr->svWidget = new SchematicViewWidget(renderWidget);
@@ -269,8 +269,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       gui::Events::ConnectCreateEntity(
         boost::bind(&ModelEditor::OnCreateEntity, this, _1, _2)));
 
-  this->dataPtr->menuBar = NULL;
-  this->dataPtr->insertModel = NULL;
+  this->dataPtr->menuBar = nullptr;
+  this->dataPtr->insertModel = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -284,7 +284,7 @@ void ModelEditor::AddItemToPalette(QWidget *_item,
 {
   if (!_item)
   {
-    gzerr << "Item is NULL" << std::endl;
+    gzerr << "Item is nullptr" << std::endl;
     return;
   }
 

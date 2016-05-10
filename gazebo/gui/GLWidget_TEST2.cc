@@ -55,7 +55,7 @@ void GLWidget_TEST2::KeyPresses()
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
       mainWindow.findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   // Set up a keypress filter
   gazebo::gui::KeyEventHandler::Instance()->

@@ -508,7 +508,7 @@ rendering::VisualPtr ApplyWrenchVisual::GetForceVisual() const
   if (!dPtr->forceVisual)
   {
     gzerr << "Force visual not found, but it should exist." << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   std::lock_guard<std::mutex> lock(dPtr->mutex);
@@ -525,7 +525,7 @@ rendering::VisualPtr ApplyWrenchVisual::GetTorqueVisual() const
   if (!dPtr->torqueVisual)
   {
     gzerr << "Torque visual not found, but it should exist." << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   std::lock_guard<std::mutex> lock(dPtr->mutex);
@@ -542,7 +542,7 @@ rendering::SelectionObjPtr ApplyWrenchVisual::GetRotTool() const
   if (!dPtr->rotTool)
   {
     gzerr << "Rot tool not found, but it should exist." << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   return dPtr->rotTool;

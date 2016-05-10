@@ -48,7 +48,7 @@ namespace gazebo
               void Init(const std::string &_topic, NodePtr _node,
                         bool _latching)
               {
-                google::protobuf::Message *msg = NULL;
+                google::protobuf::Message *msg = nullptr;
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
                 if (!msg)

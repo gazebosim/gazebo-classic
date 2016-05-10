@@ -208,12 +208,12 @@ SurfaceParams::~SurfaceParams()
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   if (!_sdf)
-    gzerr << "Surface _sdf is NULL" << std::endl;
+    gzerr << "Surface _sdf is nullptr" << std::endl;
   else
   {
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
     if (!contactElem)
-      gzerr << "Surface contact sdf member is NULL" << std::endl;
+      gzerr << "Surface contact sdf member is nullptr" << std::endl;
     else
     {
       this->collideWithoutContact =

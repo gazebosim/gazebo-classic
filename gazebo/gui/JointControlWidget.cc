@@ -561,7 +561,7 @@ void JointControlWidget::LayoutForceTab(msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
-  while ((wItem = this->dataPtr->forceGridLayout->takeAt(0)) != NULL)
+  while ((wItem = this->dataPtr->forceGridLayout->takeAt(0)) != nullptr)
   {
     if (wItem->widget())
       delete wItem->widget();
@@ -612,7 +612,7 @@ void JointControlWidget::LayoutPositionTab(msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
-  while ((wItem = this->dataPtr->positionGridLayout->takeAt(0)) != NULL)
+  while ((wItem = this->dataPtr->positionGridLayout->takeAt(0)) != nullptr)
   {
     if (wItem->widget())
       delete wItem->widget();
@@ -683,7 +683,7 @@ void JointControlWidget::LayoutVelocityTab(msgs::Model &_modelMsg)
 {
   // Remove the old widgets;
   QLayoutItem *wItem;
-  while ((wItem = this->dataPtr->velocityGridLayout->takeAt(0)) != NULL)
+  while ((wItem = this->dataPtr->velocityGridLayout->takeAt(0)) != nullptr)
   {
     if (wItem->widget())
       delete wItem->widget();

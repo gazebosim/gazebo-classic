@@ -123,7 +123,7 @@ namespace gazebo
                 /*M test;
                 google::protobuf::Message *m;
                 if ((m =dynamic_cast<google::protobuf::Message*>(&test))
-                    == NULL)
+                    == nullptr)
                   gzthrow("Message type must be a google::protobuf type\n");
                   */
               }
@@ -134,7 +134,7 @@ namespace gazebo
                 M test;
                 google::protobuf::Message *m;
                 if ((m = dynamic_cast<google::protobuf::Message*>(&test))
-                    == NULL)
+                    == nullptr)
                   gzthrow("Message type must be a google::protobuf type\n");
                 return m->GetTypeName();
               }

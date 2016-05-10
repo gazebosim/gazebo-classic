@@ -420,7 +420,7 @@ void TopicManager::Unadvertise(const std::string &_topic, const uint32_t _id)
 //////////////////////////////////////////////////
 void TopicManager::Unadvertise(PublisherPtr _pub)
 {
-  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+  GZ_ASSERT(_pub, "Unadvertising a nullptr Publisher");
 
   if (_pub)
   {

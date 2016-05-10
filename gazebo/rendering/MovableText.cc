@@ -44,9 +44,9 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 MovableText::MovableText()
-    : camera(NULL),
-    renderWindow(NULL) ,
-    font(NULL) ,
+    : camera(nullptr),
+    renderWindow(nullptr) ,
+    font(nullptr) ,
     viewportAspectCoef(0.75),
     spaceWidth(0) ,
     updateColors(true) ,
@@ -55,7 +55,7 @@ MovableText::MovableText()
     onTop(false) ,
     baseline(0.0)
 {
-  this->renderOp.vertexData = NULL;
+  this->renderOp.vertexData = nullptr;
 
   this->dirty = true;
   this->mutex = new boost::recursive_mutex();
@@ -280,11 +280,11 @@ void MovableText::_setupGeometry()
   GZ_ASSERT(this->font, "font class member is null");
   GZ_ASSERT(!this->material.isNull(), "material class member is null");
 
-  Ogre::VertexDeclaration *decl = NULL;
-  Ogre::VertexBufferBinding *bind = NULL;
+  Ogre::VertexDeclaration *decl = nullptr;
+  Ogre::VertexBufferBinding *bind = nullptr;
   Ogre::HardwareVertexBufferSharedPtr ptbuf;
   Ogre::HardwareVertexBufferSharedPtr cbuf;
-  float *pVert = NULL;
+  float *pVert = nullptr;
   float largestWidth = 0;
   float left = 0;
   float top = 0;
@@ -311,7 +311,7 @@ void MovableText::_setupGeometry()
     // if (this->renderOp.vertexData->vertexCount != vertexCount)
     {
       delete this->renderOp.vertexData;
-      this->renderOp.vertexData = NULL;
+      this->renderOp.vertexData = nullptr;
       this->updateColors = true;
     }
   }
@@ -609,7 +609,7 @@ void MovableText::_updateColors(void)
 
   Ogre::RGBA clr;
   Ogre::HardwareVertexBufferSharedPtr vbuf;
-  Ogre::RGBA *pDest = NULL;
+  Ogre::RGBA *pDest = nullptr;
   unsigned int i;
 
   GZ_ASSERT(this->font, "font class member is null");

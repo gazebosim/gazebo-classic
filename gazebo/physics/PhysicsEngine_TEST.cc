@@ -49,7 +49,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   transport::NodePtr physicsNode;
   physicsNode = transport::NodePtr(new transport::Node());
@@ -180,7 +180,7 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
 {
   Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
 

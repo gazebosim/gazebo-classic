@@ -373,7 +373,7 @@ ViewState::ViewState(ModelRightMenu *_parent,
   : QObject(_parent)
 {
   this->globalEnable = false;
-  this->action = NULL;
+  this->action = nullptr;
   this->parent = _parent;
   this->checkRequest = _checkRequest;
   this->uncheckRequest = _uncheckRequest;

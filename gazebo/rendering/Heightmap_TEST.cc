@@ -31,18 +31,18 @@ TEST_F(Heightmap_TEST, splitTerrain)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   scene = gazebo::rendering::create_scene("default", false);
 
   // Make sure that the scene is created
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   gazebo::rendering::Heightmap *heightmap =
       new gazebo::rendering::Heightmap(scene);
 
   // Check that the heightmap is created
-  EXPECT_TRUE(heightmap != NULL);
+  EXPECT_TRUE(heightmap != nullptr);
 
   std::vector<float> heights;
   std::vector<std::vector<float> > heightsSplit;

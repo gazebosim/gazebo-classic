@@ -58,7 +58,7 @@ namespace gazebo
 
       /// \brief Get a node from the scene.
       /// \param[in] _name Name of the name.
-      /// \return Pointer to the node, NULL if it does not exist.
+      /// \return Pointer to the node, nullptr if it does not exist.
       public: QGVNode *GetNode(const std::string &_name);
 
       /// \brief Add an edge to connect two nodes.

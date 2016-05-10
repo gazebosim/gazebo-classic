@@ -54,7 +54,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
 {
   this->setObjectName("insertModel");
-  this->dataPtr->modelDatabaseItem = NULL;
+  this->dataPtr->modelDatabaseItem = nullptr;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->dataPtr->fileTreeWidget = new QTreeWidget();
@@ -134,7 +134,7 @@ InsertModelWidget::~InsertModelWidget()
 {
   delete this->dataPtr->watcher;
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -226,7 +226,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
   bool pathExists = this->IsPathAccessible(dir);
 
   QString qpath = QString::fromStdString(_path);
-  QTreeWidgetItem *topItem = NULL;
+  QTreeWidgetItem *topItem = nullptr;
 
   QList<QTreeWidgetItem *> matchList =
     this->dataPtr->fileTreeWidget->findItems(qpath, Qt::MatchExactly);

@@ -1752,7 +1752,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   sdf::initFile("surface.sdf", sdf2);
   msgs::SurfaceToSDF(surfaceMsg2, sdf2);
 
-  ASSERT_TRUE(sdf2 != NULL);
+  ASSERT_TRUE(sdf2 != nullptr);
 
   ASSERT_TRUE(sdf2->HasElement("bounce"));
   EXPECT_DOUBLE_EQ(
@@ -3547,7 +3547,7 @@ TEST_F(MsgsTest, PluginToFromSDF)
   sdf2.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", sdf2);
   msgs::PluginToSDF(msg2, sdf2);
-  EXPECT_TRUE(sdf2 != NULL);
+  EXPECT_TRUE(sdf2 != nullptr);
   EXPECT_EQ(sdf2->Get<std::string>("name"), name);
   EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
   EXPECT_TRUE(sdf2->HasElement("plugin_param"));

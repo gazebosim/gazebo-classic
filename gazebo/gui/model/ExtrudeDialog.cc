@@ -131,7 +131,7 @@ ExtrudeDialog::ExtrudeDialog(const std::string &_filename, QWidget *_parent)
 ExtrudeDialog::~ExtrudeDialog()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

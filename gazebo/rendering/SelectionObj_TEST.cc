@@ -38,7 +38,7 @@ TEST_F(SelectionObj_TEST, SelectionObjTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // Test calling constructor and Load functions and make sure
   // there are no segfaults
@@ -127,13 +127,13 @@ TEST_F(SelectionObj_TEST, LoadFini)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // Create and load visual
   rendering::SelectionObjPtr obj;
   obj.reset(new rendering::SelectionObj("obj", scene->WorldVisual()));
   obj->Load();
-  EXPECT_TRUE(obj != NULL);
+  EXPECT_TRUE(obj != nullptr);
 
   // Check that it was added to the scene (by Load)
   EXPECT_EQ(scene->GetVisual("obj"), obj);
@@ -142,17 +142,17 @@ TEST_F(SelectionObj_TEST, LoadFini)
   scene->RemoveVisual(obj);
 
   // Check that it was removed
-  EXPECT_TRUE(scene->GetVisual("obj") == NULL);
+  EXPECT_TRUE(scene->GetVisual("obj") == nullptr);
 
   // Reset pointer
   obj.reset();
-  EXPECT_TRUE(obj == NULL);
+  EXPECT_TRUE(obj == nullptr);
 
   // Create another visual with the same name
   rendering::SelectionObjPtr obj2;
   obj2.reset(new rendering::SelectionObj("obj", scene->WorldVisual()));
   obj2->Load();
-  EXPECT_TRUE(obj2 != NULL);
+  EXPECT_TRUE(obj2 != nullptr);
 
   // Check that the scene returns the new visual
   EXPECT_EQ(scene->GetVisual("obj"), obj2);
@@ -161,11 +161,11 @@ TEST_F(SelectionObj_TEST, LoadFini)
   scene->RemoveVisual(obj2);
 
   // Check that it was removed
-  EXPECT_TRUE(scene->GetVisual("obj") == NULL);
+  EXPECT_TRUE(scene->GetVisual("obj") == nullptr);
 
   // Reset pointer
   obj2.reset();
-  EXPECT_TRUE(obj2 == NULL);
+  EXPECT_TRUE(obj2 == nullptr);
 }
 
 /////////////////////////////////////////////////

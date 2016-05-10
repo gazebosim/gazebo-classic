@@ -76,7 +76,7 @@ void ModelTreeWidget_TEST::AddRemoveNestedModels()
   QVERIFY(nestedModelsItem->child(0)->data(0, Qt::UserRole) == "nestedModel2");
 
   delete modelTree;
-  modelTree = NULL;
+  modelTree = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -89,7 +89,7 @@ void ModelTreeWidget_TEST::LoadNestedModel()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -98,13 +98,13 @@ void ModelTreeWidget_TEST::LoadNestedModel()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Get the top level model
   gazebo::rendering::VisualPtr modelVis = scene->GetVisual("model_00");
-  QVERIFY(modelVis != NULL);
+  QVERIFY(modelVis != nullptr);
 
   // Edit the top level model
   gui::g_editModelAct->trigger();
@@ -115,7 +115,7 @@ void ModelTreeWidget_TEST::LoadNestedModel()
   // Get model tree
   gazebo::gui::ModelTreeWidget *modelTree =
       mainWindow->findChild<gazebo::gui::ModelTreeWidget *>();
-  QVERIFY(modelTree != NULL);
+  QVERIFY(modelTree != nullptr);
 
   // Get tree
   QTreeWidget *tree = modelTree->findChild<QTreeWidget *>();
@@ -164,7 +164,7 @@ void ModelTreeWidget_TEST::LoadNestedModel()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -206,7 +206,7 @@ void ModelTreeWidget_TEST::AddRemoveLinks()
   QVERIFY(linksItem->child(0)->data(0, Qt::UserRole) == "link2");
 
   delete modelTree;
-  modelTree = NULL;
+  modelTree = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -250,7 +250,7 @@ void ModelTreeWidget_TEST::AddRemoveJoints()
   QVERIFY(jointsItem->child(0)->data(0, Qt::UserRole) == "joint2Id");
 
   delete modelTree;
-  modelTree = NULL;
+  modelTree = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -300,7 +300,7 @@ void ModelTreeWidget_TEST::AddRemoveModelPlugins()
       == "plugin2");
 
   delete modelTree;
-  modelTree = NULL;
+  modelTree = nullptr;
 }
 
 // Generate a main function for the test

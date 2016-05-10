@@ -25,7 +25,7 @@ namespace gazebo
   /// \brief A plugin loaded within the gzclient on startup.
   class GZ_GUI_VISIBLE GUIPlugin : public QWidget, public PluginT<GUIPlugin>
   {
-    public: GUIPlugin() : QWidget(NULL)
+    public: GUIPlugin() : QWidget(nullptr)
             {this->type = GUI_PLUGIN;}
 
     /// \brief Load function

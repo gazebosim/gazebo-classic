@@ -82,7 +82,7 @@ void ModelEditorPalette_TEST::AddItem()
   QVERIFY(retButton4 == testButton4);
 
   delete palette;
-  palette = NULL;
+  palette = nullptr;
 }
 
 // Generate a main function for the test

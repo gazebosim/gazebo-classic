@@ -191,17 +191,17 @@ namespace gazebo
       public: virtual void StopAnimation();
 
       /// \brief Get the parent model, if one exists.
-      /// \return Pointer to a model, or NULL if no parent model exists.
+      /// \return Pointer to a model, or nullptr if no parent model exists.
       public: ModelPtr GetParentModel();
 
       /// \brief Get a child collision entity, if one exists.
       /// \param[in] _name Name of the child collision object.
-      /// \return Pointer to the Collision object, or NULL if not found.
+      /// \return Pointer to the Collision object, or nullptr if not found.
       public: CollisionPtr GetChildCollision(const std::string &_name);
 
       /// \brief Get a child linke entity, if one exists.
       /// \param[in] _name Name of the child Link object.
-      /// \return Pointer to the Link object, or NULL if not found.
+      /// \return Pointer to the Link object, or nullptr if not found.
       public: LinkPtr GetChildLink(const std::string &_name);
 
       /// \brief Get the distance to the nearest entity below

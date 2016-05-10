@@ -103,7 +103,7 @@ namespace gazebo
     /// \brief Find a connection given a host and port
     /// \param[in] _host Host name
     /// \param[in] _port Port number
-    /// \return The found connection, or NULL
+    /// \return The found connection, or nullptr
     private: transport::ConnectionPtr FindConnection(const std::string &_host,
                                                      uint16_t _port);
 

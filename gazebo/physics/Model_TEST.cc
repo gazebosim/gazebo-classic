@@ -39,7 +39,7 @@ TEST_F(ModelTest, Scale)
 
   // Create the model
   physics::ModelPtr modelPtr(new physics::Model(basePtr));
-  EXPECT_TRUE(modelPtr != NULL);
+  EXPECT_TRUE(modelPtr != nullptr);
 
   // Check default scale
   EXPECT_EQ(modelPtr->Scale(), ignition::math::Vector3d(1, 1, 1));

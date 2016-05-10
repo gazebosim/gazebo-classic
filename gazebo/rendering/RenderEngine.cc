@@ -68,14 +68,14 @@ using namespace rendering;
 RenderEngine::RenderEngine()
   : dataPtr(new RenderEnginePrivate)
 {
-  this->dataPtr->logManager = NULL;
-  this->dataPtr->root = NULL;
+  this->dataPtr->logManager = nullptr;
+  this->dataPtr->root = nullptr;
 
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
-  this->dataPtr->overlaySystem = NULL;
+  this->dataPtr->overlaySystem = nullptr;
 #endif
 
-  this->dummyDisplay = NULL;
+  this->dummyDisplay = nullptr;
 
   this->dataPtr->initialized = false;
 
@@ -352,7 +352,7 @@ void RenderEngine::Fini()
 
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
   delete this->dataPtr->overlaySystem;
-  this->dataPtr->overlaySystem = NULL;
+  this->dataPtr->overlaySystem = nullptr;
 #endif
 
   // TODO: this was causing a segfault. Need to debug, and put back in
@@ -378,10 +378,10 @@ void RenderEngine::Fini()
     {
     }
   }
-  this->dataPtr->root = NULL;
+  this->dataPtr->root = nullptr;
 
   delete this->dataPtr->logManager;
-  this->dataPtr->logManager = NULL;
+  this->dataPtr->logManager = nullptr;
 
   for (unsigned int i = 0; i < this->dataPtr->scenes.size(); ++i)
     this->dataPtr->scenes[i].reset();
@@ -396,7 +396,7 @@ void RenderEngine::Fini()
     XDestroyWindow(static_cast<Display*>(this->dummyDisplay),
                    this->dummyWindowId);
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
-    this->dummyDisplay = NULL;
+    this->dummyDisplay = nullptr;
   }
 # endif
 
@@ -416,7 +416,7 @@ void RenderEngine::LoadPlugins()
     std::string path(*iter);
     DIR *dir = opendir(path.c_str());
 
-    if (dir == NULL)
+    if (dir == nullptr)
     {
       continue;
     }
@@ -573,7 +573,7 @@ void RenderEngine::SetupResources()
   for (iter = paths.begin(); iter != paths.end(); ++iter)
   {
     DIR *dir;
-    if ((dir = opendir((*iter).c_str())) == NULL)
+    if ((dir = opendir((*iter).c_str())) == nullptr)
     {
       continue;
     }
@@ -648,7 +648,7 @@ void RenderEngine::SetupRenderSystem()
 
   int c = 0;
 
-  renderSys = NULL;
+  renderSys = nullptr;
 
   do
   {
@@ -661,7 +661,7 @@ void RenderEngine::SetupRenderSystem()
   while (renderSys &&
          renderSys->getName().compare("OpenGL Rendering Subsystem") != 0);
 
-  if (renderSys == NULL)
+  if (renderSys == nullptr)
   {
     gzthrow("unable to find OpenGL rendering system. OGRE is probably "
             "installed incorrectly. Double check the OGRE cmake output, "
@@ -722,7 +722,7 @@ bool RenderEngine::CreateContext()
 
     this->dummyContext = glXCreateContext(
         static_cast<Display*>(this->dummyDisplay),
-        dummyVisual, NULL, 1);
+        dummyVisual, nullptr, 1);
 
     if (!this->dummyContext)
     {

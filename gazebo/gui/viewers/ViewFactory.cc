@@ -53,7 +53,7 @@ TopicView *ViewFactory::NewView(const std::string &_msgType,
                                 const std::string &_topicName,
                                 QWidget *_parent)
 {
-  TopicView *view = NULL;
+  TopicView *view = nullptr;
 
   std::map<std::string, ViewFactoryFn>::iterator iter = viewMap.find(_msgType);
   if (iter != viewMap.end())

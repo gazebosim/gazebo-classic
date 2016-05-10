@@ -44,16 +44,16 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
   : Camera(_name, _scene),
     dataPtr(new UserCameraPrivate)
 {
-  this->dataPtr->orbitViewController = NULL;
-  this->dataPtr->orthoViewController = NULL;
-  this->dataPtr->fpsViewController = NULL;
-  this->dataPtr->viewController = NULL;
-  this->dataPtr->selectionBuffer = NULL;
+  this->dataPtr->orbitViewController = nullptr;
+  this->dataPtr->orthoViewController = nullptr;
+  this->dataPtr->fpsViewController = nullptr;
+  this->dataPtr->viewController = nullptr;
+  this->dataPtr->selectionBuffer = nullptr;
   this->dataPtr->joyTwistControl = true;
   this->dataPtr->joystickButtonToggleLast = false;
   this->dataPtr->joyPoseControl = true;
-  this->dataPtr->rightCamera = NULL;
-  this->dataPtr->rightViewport = NULL;
+  this->dataPtr->rightCamera = nullptr;
+  this->dataPtr->rightViewport = nullptr;
   this->dataPtr->stereoEnabled = _stereoEnabled;
 
   // Set default UserCamera render rate to 120Hz when stereo rendering is
@@ -74,7 +74,7 @@ UserCamera::~UserCamera()
   this->connections.clear();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -718,7 +718,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 //////////////////////////////////////////////////
 std::string UserCamera::GetViewControllerTypeString()
 {
-  GZ_ASSERT(this->dataPtr->viewController, "ViewController != NULL");
+  GZ_ASSERT(this->dataPtr->viewController, "ViewController != nullptr");
   return this->dataPtr->viewController->GetTypeString();
 }
 

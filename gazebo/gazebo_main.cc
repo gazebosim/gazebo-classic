@@ -121,7 +121,7 @@ int main(int _argc, char **_argv)
   sigact.sa_handler = sig_handler;
   if (sigemptyset(&sigact.sa_mask) != 0)
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
-  if (sigaction(SIGINT, &sigact, NULL))
+  if (sigaction(SIGINT, &sigact, nullptr))
   {
     gzerr << "Stopping. Unable to catch SIGINT.\n"
           << " Please visit http://gazebosim.org/support.html for help.\n";
@@ -139,8 +139,8 @@ int main(int _argc, char **_argv)
     argvServer[i] = _argv[i];
     argvClient[i] = _argv[i];
   }
-  argvServer[_argc] = static_cast<char*>(NULL);
-  argvClient[_argc] = static_cast<char*>(NULL);
+  argvServer[_argc] = static_cast<char*>(nullptr);
+  argvClient[_argc] = static_cast<char*>(nullptr);
 
   // Need to check the return of wait function (8 lines below) to know
   // what should be returned by the process
@@ -186,7 +186,7 @@ int main(int _argc, char **_argv)
     // server->Run();
     // server->Fini();
     // delete server;
-    // server = NULL;
+    // server = nullptr;
     execvp(argvServer[0], argvServer);
   }
 

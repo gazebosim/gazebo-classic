@@ -58,7 +58,7 @@ namespace gazebo
                 this->pub->SendMessage();
                 delete this->msg;
                 this->pub.reset();
-                return NULL;
+                return nullptr;
               }
 
       /// \brief Pointer to the publisher.

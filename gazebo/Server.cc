@@ -109,7 +109,7 @@ Server::Server()
 {
   this->dataPtr->initialized = false;
   this->dataPtr->systemPluginsArgc = 0;
-  this->dataPtr->systemPluginsArgv = NULL;
+  this->dataPtr->systemPluginsArgv = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -520,7 +520,7 @@ void Server::Run()
   sigact.sa_handler = Server::SigInt;
   if (sigemptyset(&sigact.sa_mask) != 0)
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
-  if (sigaction(SIGINT, &sigact, NULL))
+  if (sigaction(SIGINT, &sigact, nullptr))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
 #endif
 
@@ -664,8 +664,8 @@ void Server::ProcessControlMsgs()
 
       if (success)
       {
-        // world should not be NULL at this point.
-        GZ_ASSERT(world, "NULL world pointer");
+        // world should not be nullptr at this point.
+        GZ_ASSERT(world, "nullptr world pointer");
 
         // Save the world's state in a temporary file (clone.<PORT>.world).
         boost::filesystem::path tmpDir =

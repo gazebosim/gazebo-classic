@@ -27,11 +27,11 @@ void JointCreationDialog_TEST::Type()
 {
   // Create a joint maker
   auto jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Create a dialog
   auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
-  QVERIFY(jointCreationDialog != NULL);
+  QVERIFY(jointCreationDialog != nullptr);
 
   // Open it
   jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE);
@@ -44,7 +44,7 @@ void JointCreationDialog_TEST::Type()
   // Get the config widget
   auto configWidget =
       jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
-  QVERIFY(configWidget != NULL);
+  QVERIFY(configWidget != nullptr);
 
   // Check that only the correct button is checked (Revolute - 1)
   for (int i = 0; i < radioButtons.size(); ++i)
@@ -100,7 +100,7 @@ void JointCreationDialog_TEST::Links()
 {
   // Create a joint maker
   auto jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Add links to list
   std::vector<std::string> scopedLinkNames =
@@ -116,7 +116,7 @@ void JointCreationDialog_TEST::Links()
 
   // Create a dialog
   auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
-  QVERIFY(jointCreationDialog != NULL);
+  QVERIFY(jointCreationDialog != nullptr);
 
   // Open it
   jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE);
@@ -125,19 +125,19 @@ void JointCreationDialog_TEST::Links()
   // Get the config widget
   auto configWidget =
       jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
-  QVERIFY(configWidget != NULL);
+  QVERIFY(configWidget != nullptr);
 
   // Get the parent and child widgets
   auto parentWidget = configWidget->ConfigChildWidgetByName("parentCombo");
-  QVERIFY(parentWidget != NULL);
+  QVERIFY(parentWidget != nullptr);
   auto childWidget = configWidget->ConfigChildWidgetByName("childCombo");
-  QVERIFY(childWidget != NULL);
+  QVERIFY(childWidget != nullptr);
 
   // Get parent and child combo boxes
   auto parentCombo = parentWidget->findChild<QComboBox *>();
-  QVERIFY(parentCombo != NULL);
+  QVERIFY(parentCombo != nullptr);
   auto childCombo = childWidget->findChild<QComboBox *>();
-  QVERIFY(childCombo != NULL);
+  QVERIFY(childCombo != nullptr);
 
   // Check that each combo box has an empty option plus all link options
   int linkSize = static_cast<int>(linkNames.size());
@@ -213,7 +213,7 @@ void JointCreationDialog_TEST::Links()
   // Get swap button
   auto swapButton =
       jointCreationDialog->findChild<QToolButton *>("JointCreationSwapButton");
-  QVERIFY(swapButton != NULL);
+  QVERIFY(swapButton != nullptr);
 
   // Trigger swap
   swapButton->click();
@@ -254,7 +254,7 @@ void JointCreationDialog_TEST::Links()
   // Trigger create
   auto createButton = jointCreationDialog->findChild<QPushButton *>(
       "JointCreationCreateButton");
-  QVERIFY(createButton != NULL);
+  QVERIFY(createButton != nullptr);
 
   createButton->click();
 
@@ -270,7 +270,7 @@ void JointCreationDialog_TEST::Axis()
 {
   // Create a joint maker
   auto jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Add links to list
   std::vector<std::string> scopedLinkNames =
@@ -285,7 +285,7 @@ void JointCreationDialog_TEST::Axis()
 
   // Create a dialog
   auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
-  QVERIFY(jointCreationDialog != NULL);
+  QVERIFY(jointCreationDialog != nullptr);
 
   // Open it
   jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
@@ -298,7 +298,7 @@ void JointCreationDialog_TEST::Axis()
   // Get the config widget
   auto configWidget =
       jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
-  QVERIFY(configWidget != NULL);
+  QVERIFY(configWidget != nullptr);
 
   // Set child and parent from 3D scene
   jointCreationDialog->SetParent(scopedLinkNames[0]);
@@ -328,7 +328,7 @@ void JointCreationDialog_TEST::Axis()
 
   // Set an axis to be zero
   auto axis1Widget = configWidget->ConfigChildWidgetByName("axis1");
-  QVERIFY(axis1Widget != NULL);
+  QVERIFY(axis1Widget != nullptr);
 
   auto axis1Spins = axis1Widget->findChildren<QDoubleSpinBox *>();
   QVERIFY(axis1Spins.size() == 3u);
@@ -357,7 +357,7 @@ void JointCreationDialog_TEST::Axis()
   // Get reset button
   auto resetButton =
       jointCreationDialog->findChild<QPushButton *>("JointCreationResetButton");
-  QVERIFY(resetButton != NULL);
+  QVERIFY(resetButton != nullptr);
 
   // Trigger reset
   resetButton->click();
@@ -377,7 +377,7 @@ void JointCreationDialog_TEST::Align()
 {
   // Create a joint maker
   auto jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Add links to list
   std::vector<std::string> scopedLinkNames =
@@ -392,7 +392,7 @@ void JointCreationDialog_TEST::Align()
 
   // Create a dialog
   auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
-  QVERIFY(jointCreationDialog != NULL);
+  QVERIFY(jointCreationDialog != nullptr);
 
   // Open it
   jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
@@ -405,7 +405,7 @@ void JointCreationDialog_TEST::Align()
   // Get the config widget
   auto configWidget =
       jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
-  QVERIFY(configWidget != NULL);
+  QVERIFY(configWidget != nullptr);
 
   // Set child and parent from 3D scene
   jointCreationDialog->SetParent(scopedLinkNames[0]);
@@ -425,7 +425,7 @@ void JointCreationDialog_TEST::Align()
 
   // Get align widget and check it has all the buttons
   auto alignWidget = configWidget->ConfigChildWidgetByName("align");
-  QVERIFY(alignWidget != NULL);
+  QVERIFY(alignWidget != nullptr);
 
   auto alignButtons = alignWidget->findChildren<QToolButton *>();
   QVERIFY(alignButtons.size() == 9u);
@@ -476,9 +476,9 @@ void JointCreationDialog_TEST::Align()
 
   // Check that all buttons are disabled when the link is changed
   auto parentWidget = configWidget->ConfigChildWidgetByName("parentCombo");
-  QVERIFY(parentWidget != NULL);
+  QVERIFY(parentWidget != nullptr);
   auto parentCombo = parentWidget->findChild<QComboBox *>();
-  QVERIFY(parentCombo != NULL);
+  QVERIFY(parentCombo != nullptr);
   parentCombo->setCurrentIndex(2);
 
   for (auto button : alignButtons)
@@ -517,7 +517,7 @@ void JointCreationDialog_TEST::RelativePose()
 {
   // Create a joint maker
   auto jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Add links to list
   std::vector<std::string> scopedLinkNames =
@@ -532,7 +532,7 @@ void JointCreationDialog_TEST::RelativePose()
 
   // Create a dialog
   auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
-  QVERIFY(jointCreationDialog != NULL);
+  QVERIFY(jointCreationDialog != nullptr);
 
   // Open it
   jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
@@ -545,7 +545,7 @@ void JointCreationDialog_TEST::RelativePose()
   // Get the config widget
   auto configWidget =
       jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
-  QVERIFY(configWidget != NULL);
+  QVERIFY(configWidget != nullptr);
 
   // Check the default value
   QVERIFY(configWidget->PoseWidgetValue("relative_pose") ==
@@ -576,7 +576,7 @@ void JointCreationDialog_TEST::RelativePose()
 
   // Get relative pose widget and check it has all the spins
   auto relPosWidget = configWidget->ConfigChildWidgetByName("relative_pose");
-  QVERIFY(relPosWidget != NULL);
+  QVERIFY(relPosWidget != nullptr);
 
   auto spins = relPosWidget->findChildren<QDoubleSpinBox *>();
   QVERIFY(spins.size() == 6u);
@@ -599,7 +599,7 @@ void JointCreationDialog_TEST::Cancel()
 {
   // Create a joint maker
   auto jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Add links to list
   std::vector<std::string> scopedLinkNames =
@@ -614,7 +614,7 @@ void JointCreationDialog_TEST::Cancel()
 
   // Create a dialog
   auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
-  QVERIFY(jointCreationDialog != NULL);
+  QVERIFY(jointCreationDialog != nullptr);
 
   // Open it
   jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
@@ -623,7 +623,7 @@ void JointCreationDialog_TEST::Cancel()
   // Trigger cancel
   auto cancelButton = jointCreationDialog->findChild<QPushButton *>(
       "JointCreationCancelButton");
-  QVERIFY(cancelButton != NULL);
+  QVERIFY(cancelButton != nullptr);
 
   cancelButton->click();
 

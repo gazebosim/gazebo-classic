@@ -54,7 +54,7 @@ ModelAlign::~ModelAlign()
 {
   this->Clear();
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -88,7 +88,7 @@ void ModelAlign::Init()
 
   if (!this->dataPtr->scene)
   {
-    gzerr << "Unable to initialize Model Align tool, scene is NULL"
+    gzerr << "Unable to initialize Model Align tool, scene is nullptr"
         << std::endl;
   }
 

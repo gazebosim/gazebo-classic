@@ -45,17 +45,17 @@ TEST_F(SphereShapeTest, Scale)
   physics::SphereShapePtr sphere(
       new physics::SphereShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = sphereSDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("sphere");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   sphere->Load(elem);
 
   // Test scaling with unit size
@@ -134,17 +134,17 @@ TEST_F(SphereShapeTest, Volume)
   physics::SphereShapePtr sphere(
       new physics::SphereShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = sphereSDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("sphere");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   sphere->Load(elem);
 
   EXPECT_DOUBLE_EQ(sphere->ComputeVolume(), 4*M_PI/3);

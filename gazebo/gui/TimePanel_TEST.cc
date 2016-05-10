@@ -27,7 +27,7 @@ void TimePanel_TEST::SetPaused()
 
   // Create a new time panel widget
   gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
-  QVERIFY(timePanel != NULL);
+  QVERIFY(timePanel != nullptr);
 
   // verify initial state
   QVERIFY(!timePanel->IsPaused());
@@ -51,7 +51,7 @@ void TimePanel_TEST::SpaceBar()
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -60,7 +60,7 @@ void TimePanel_TEST::SpaceBar()
 
   // Get the time panel
   auto timePanel = mainWindow->RenderWidget()->GetTimePanel();
-  QVERIFY(timePanel != NULL);
+  QVERIFY(timePanel != nullptr);
 
   // verify initial state
   QVERIFY(!timePanel->IsPaused());

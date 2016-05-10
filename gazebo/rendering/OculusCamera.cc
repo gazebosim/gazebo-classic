@@ -53,7 +53,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   {
     gzerr << "Oculus Rift not detected. "
           << "Oculus error["
-          << ovrHmd_GetLastError(NULL) << "]. "
+          << ovrHmd_GetLastError(nullptr) << "]. "
           << "Is the oculusd service running?\n"
           << "Did you copy the udev rules from the oculussdk repo?\n"
           << "See: http://gazebosim.org/tutorials?tut=oculus"
@@ -65,7 +65,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   {
     gzerr << "Oculus Rift detected, display not enabled. "
           << "Oculus error["
-          << ovrHmd_GetLastError(NULL) << "]. "
+          << ovrHmd_GetLastError(nullptr) << "]. "
           << std::endl;
     return;
   }
@@ -142,7 +142,7 @@ OculusCamera::~OculusCamera()
 
   this->connections.clear();
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -358,7 +358,7 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->dataPtr->rightViewport->setDimensions(0.5, 0, 0.5, 1);
 
     delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
+    this->saveFrameBuffer = nullptr;
   }
 }
 
@@ -470,7 +470,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
 
-  if (this->GetScene()->GetSkyX() != NULL)
+  if (this->GetScene()->GetSkyX() != nullptr)
     rt->addListener(this->GetScene()->GetSkyX());
 
   rt = this->dataPtr->renderTextureRight->getBuffer()->getRenderTarget();
@@ -484,7 +484,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
 
-  if (this->GetScene()->GetSkyX() != NULL)
+  if (this->GetScene()->GetSkyX() != nullptr)
     rt->addListener(this->GetScene()->GetSkyX());
 
   ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];

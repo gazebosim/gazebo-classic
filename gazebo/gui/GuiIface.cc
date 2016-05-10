@@ -57,13 +57,13 @@ boost::property_tree::ptree g_propTree;
 
 using namespace gazebo;
 
-gui::ModelRightMenu *g_modelRightMenu = NULL;
+gui::ModelRightMenu *g_modelRightMenu = nullptr;
 
 std::string g_worldname = "default";
 
 QApplication *g_app;
-gui::SplashScreen *g_splashScreen = NULL;
-gui::MainWindow *g_main_win = NULL;
+gui::SplashScreen *g_splashScreen = nullptr;
+gui::MainWindow *g_main_win = nullptr;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
 
@@ -313,7 +313,7 @@ bool gui::run(int _argc, char **_argv)
   sigact.sa_handler = signal_handler;
   if (sigemptyset(&sigact.sa_mask) != 0)
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
-  if (sigaction(SIGINT, &sigact, NULL))
+  if (sigaction(SIGINT, &sigact, nullptr))
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return false;

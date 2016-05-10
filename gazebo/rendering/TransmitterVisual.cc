@@ -47,7 +47,7 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
   dPtr->node = transport::NodePtr(new transport::Node());
   dPtr->node->Init(dPtr->scene->Name());
 
-  dPtr->points = NULL;
+  dPtr->points = nullptr;
 
   dPtr->signalPropagationSub = dPtr->node->Subscribe(_topicName,
       &TransmitterVisual::OnNewPropagationGrid, this);

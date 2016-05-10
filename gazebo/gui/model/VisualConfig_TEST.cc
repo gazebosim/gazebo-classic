@@ -30,7 +30,7 @@ void VisualConfig_TEST::Initialization()
   VisualConfig vc;
 
   QCOMPARE(vc.GetVisualCount(), 0u);
-  QVERIFY(vc.GetData("NotFound") == NULL);
+  QVERIFY(vc.GetData("NotFound") == nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -45,10 +45,10 @@ void VisualConfig_TEST::VisualUpdates()
 
   QCOMPARE(vc.GetVisualCount(), 3u);
 
-  QVERIFY(vc.GetData("v1") != NULL);
-  QVERIFY(vc.GetData("v2") != NULL);
-  QVERIFY(vc.GetData("v3") != NULL);
-  QVERIFY(vc.GetData("NotFound") == NULL);
+  QVERIFY(vc.GetData("v1") != nullptr);
+  QVERIFY(vc.GetData("v2") != nullptr);
+  QVERIFY(vc.GetData("v3") != nullptr);
+  QVERIFY(vc.GetData("NotFound") == nullptr);
 
   msgs::VisualPtr visualMsgPtr(new msgs::Visual);
   visualMsgPtr->set_transparency(0.50);
@@ -73,9 +73,9 @@ void VisualConfig_TEST::VisualUpdates()
 
   QCOMPARE(vc.GetVisualCount(), 0u);
 
-  QVERIFY(vc.GetData("v1") == NULL);
-  QVERIFY(vc.GetData("v2") == NULL);
-  QVERIFY(vc.GetData("v3") == NULL);
+  QVERIFY(vc.GetData("v1") == nullptr);
+  QVERIFY(vc.GetData("v2") == nullptr);
+  QVERIFY(vc.GetData("v3") == nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -116,7 +116,7 @@ void VisualConfig_TEST::AppliedSignal()
   // Create a link inspector
   gazebo::gui::VisualConfig *visualConfig =
       new gazebo::gui::VisualConfig();
-  QVERIFY(visualConfig != NULL);
+  QVERIFY(visualConfig != nullptr);
 
   // Connect signals
   connect(visualConfig, SIGNAL(Applied()), this, SLOT(OnApply()));

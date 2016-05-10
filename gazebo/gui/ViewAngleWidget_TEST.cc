@@ -34,7 +34,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -43,7 +43,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Get camera
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   // Get camera default pose and check that's the current pose
   ignition::math::Pose3d defaultPose = cam->DefaultPose().Ign();
@@ -55,7 +55,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Get the view angle widget
   gazebo::gui::ViewAngleWidget *viewAngleWidget =
       mainWindow->findChild<gazebo::gui::ViewAngleWidget *>("viewAngleWidget");
-  QVERIFY(viewAngleWidget != NULL);
+  QVERIFY(viewAngleWidget != nullptr);
 
   QApplication::postEvent(viewAngleWidget, new QShowEvent());
 
@@ -146,7 +146,7 @@ void ViewAngleWidget_TEST::Projections()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -155,12 +155,12 @@ void ViewAngleWidget_TEST::Projections()
 
   // Get camera
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   // Get the view angle widget
   gazebo::gui::ViewAngleWidget *viewAngleWidget =
       mainWindow->findChild<gazebo::gui::ViewAngleWidget *>("viewAngleWidget");
-  QVERIFY(viewAngleWidget != NULL);
+  QVERIFY(viewAngleWidget != nullptr);
 
   // Get the combobox
   QList<QComboBox *> comboBoxes =

@@ -50,7 +50,7 @@ void ModelSnap_TEST::Snap()
   this->Load("worlds/shapes.world", false, false, true);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();
@@ -66,16 +66,16 @@ void ModelSnap_TEST::Snap()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::rendering::VisualPtr model01Vis = scene->GetVisual(model01Name);
-  QVERIFY(model01Vis != NULL);
+  QVERIFY(model01Vis != nullptr);
   gazebo::rendering::VisualPtr model02Vis = scene->GetVisual(model02Name);
-  QVERIFY(model02Vis != NULL);
+  QVERIFY(model02Vis != nullptr);
   gazebo::rendering::VisualPtr model03Vis = scene->GetVisual(model03Name);
-  QVERIFY(model03Vis != NULL);
+  QVERIFY(model03Vis != nullptr);
 
   this->SetPause(true);
 

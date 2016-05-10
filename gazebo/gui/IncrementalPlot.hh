@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
-      public: IncrementalPlot(QWidget *_parent = NULL);
+      public: IncrementalPlot(QWidget *_parent = nullptr);
 
       /// \brief Destructor
       public: virtual ~IncrementalPlot();

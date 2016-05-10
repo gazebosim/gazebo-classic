@@ -150,10 +150,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
-  this->glWidget = NULL;
+  this->glWidget = nullptr;
 
   delete this->topToolbar;
-  this->topToolbar = NULL;
+  this->topToolbar = nullptr;
 
   // we created the scene here we are responsible for removing it.
   rendering::remove_scene(gui::get_world());

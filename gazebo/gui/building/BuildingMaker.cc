@@ -268,7 +268,7 @@ BuildingModelManip *BuildingMaker::ManipByName(const std::string &_name)
 {
   auto it = this->dataPtr->allItems.find(_name);
   if (it == this->dataPtr->allItems.end())
-    return NULL;
+    return nullptr;
   else
     return this->dataPtr->allItems[_name];
 }
@@ -1087,7 +1087,7 @@ void BuildingMaker::GenerateSDFWithCSG()
       m1->SetScale(wallVis->GetScale().Ign());
 
       std::string booleanMeshName = buildingModelManip->Name() + "_Boolean";
-      common::Mesh *booleanMesh = NULL;
+      common::Mesh *booleanMesh = nullptr;
       for (auto const &childManip : parentManip->second)
       {
         if (booleanMesh)

@@ -31,7 +31,7 @@ void HotkeyDialog_TEST::HotkeyChart()
   this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();
@@ -41,7 +41,7 @@ void HotkeyDialog_TEST::HotkeyChart()
   // Check there is no hotkey dialog
   gazebo::gui::HotkeyDialog *hotkeyDialog =
       mainWindow->findChild<gazebo::gui::HotkeyDialog *>("hotkeyChart");
-  QVERIFY(hotkeyDialog == NULL);
+  QVERIFY(hotkeyDialog == nullptr);
 
   // Trigger hotkey chart action
   gazebo::gui::g_hotkeyChartAct->trigger();
@@ -49,7 +49,7 @@ void HotkeyDialog_TEST::HotkeyChart()
   // Check that dialog was created and is visible
   hotkeyDialog =
       mainWindow->findChild<gazebo::gui::HotkeyDialog *>("hotkeyChart");
-  QVERIFY(hotkeyDialog != NULL);
+  QVERIFY(hotkeyDialog != nullptr);
   QVERIFY(hotkeyDialog->isVisible());
 
   // Press Esc to close it

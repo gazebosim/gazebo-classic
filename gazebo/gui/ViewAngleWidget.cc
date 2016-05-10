@@ -82,7 +82,7 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
 ViewAngleWidget::~ViewAngleWidget()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

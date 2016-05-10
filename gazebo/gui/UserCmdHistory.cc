@@ -80,7 +80,7 @@ UserCmdHistory::UserCmdHistory()
 UserCmdHistory::~UserCmdHistory()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -89,7 +89,7 @@ void UserCmdHistory::OnUndo()
   if (!this->dataPtr->active)
     return;
 
-  this->OnUndoCommand(NULL);
+  this->OnUndoCommand(nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -133,7 +133,7 @@ void UserCmdHistory::OnRedo()
   if (!this->dataPtr->active)
     return;
 
-  this->OnRedoCommand(NULL);
+  this->OnRedoCommand(nullptr);
 }
 
 /////////////////////////////////////////////////

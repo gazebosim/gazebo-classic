@@ -72,7 +72,7 @@ namespace gazebo
       public: tbb::task *execute()
               {
                 this->func(this->data);
-                return NULL;
+                return nullptr;
               }
 
       /// \brief The boost function pointer

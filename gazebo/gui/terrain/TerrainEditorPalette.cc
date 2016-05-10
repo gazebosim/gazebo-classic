@@ -264,7 +264,7 @@ void TerrainEditorPalette::OnSave()
   rendering::ScenePtr scene = camera->GetScene();
 
   // Get a pointer to the heightmap, if the scen is valid.
-  rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
+  rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : nullptr;
   common::Image img = heightmap->Image();
 
   // Get a filename to save to.
@@ -293,7 +293,7 @@ bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
   rendering::ScenePtr scene = camera->GetScene();
 
   // Get a pointer to the heightmap, if the scen is valid.
-  rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
+  rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : nullptr;
 
   // Only try to modify if the heightmap exists, and the LEFT mouse button
   // was used.
@@ -321,7 +321,7 @@ bool TerrainEditorPalette::OnMouseMove(const common::MouseEvent &_event)
   rendering::ScenePtr scene = camera->GetScene();
 
   // Get a pointer to the heightmap, if the scen is valid.
-  rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
+  rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : nullptr;
 
   if (heightmap && !_event.Shift())
   {

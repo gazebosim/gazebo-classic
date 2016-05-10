@@ -29,13 +29,13 @@ void SplashScreen_TEST::Show()
   this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::SplashScreen *splashObj = new gazebo::gui::SplashScreen();
-  QVERIFY(splashObj != NULL);
+  QVERIFY(splashObj != nullptr);
 
   QVERIFY(splashObj->Visible());
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
 
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();

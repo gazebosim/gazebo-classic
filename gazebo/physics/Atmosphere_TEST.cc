@@ -60,7 +60,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
 
   this->Load("worlds/empty.world", false);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   transport::NodePtr atmosphereNode;
   atmosphereNode = transport::NodePtr(new transport::Node());
@@ -131,7 +131,7 @@ void AtmosphereTest::AtmosphereParamBool
 {
   Load("worlds/empty.world", false);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   physics::Atmosphere &atmosphere = world->Atmosphere();
 

@@ -27,16 +27,16 @@ void LaserView_TEST::Construction()
   this->Load("worlds/ray_test.world");
 
   // Create a new laser view widget
-  gazebo::gui::LaserView *view = new gazebo::gui::LaserView(NULL);
+  gazebo::gui::LaserView *view = new gazebo::gui::LaserView(nullptr);
 
-  QVERIFY(view != NULL);
+  QVERIFY(view != nullptr);
 
   view->show();
 
   // Get the frame that holds the images
   QFrame *frame = view->findChild<QFrame*>("blackBorderFrame");
 
-  QVERIFY(frame != NULL);
+  QVERIFY(frame != nullptr);
 
   view->SetTopic("~/hokuyo/link/laser/scan");
 
@@ -60,32 +60,32 @@ void LaserView_TEST::Buttons()
   this->Load("worlds/ray_test.world");
 
   // Create a new laser view widget
-  gazebo::gui::LaserView *view = new gazebo::gui::LaserView(NULL);
+  gazebo::gui::LaserView *view = new gazebo::gui::LaserView(nullptr);
 
-  QVERIFY(view != NULL);
+  QVERIFY(view != nullptr);
 
   view->show();
 
   view->SetTopic("~/hokuyo/link/laser/scan");
 
   // Spin the Qt update loop for a while to process events.
-  this->ProcessEventsAndDraw(NULL, 50, 10);
+  this->ProcessEventsAndDraw(nullptr, 50, 10);
 
   // Get Fit in View button and click it
   QPushButton *pushButton = view->findChild<QPushButton *>();
-  QVERIFY(pushButton != NULL);
+  QVERIFY(pushButton != nullptr);
   pushButton->click();
 
   // Spin the Qt update loop for a while to process events.
-  this->ProcessEventsAndDraw(NULL, 50, 10);
+  this->ProcessEventsAndDraw(nullptr, 50, 10);
 
   // Get Degrees radio button and toggle it
   QRadioButton *radioButton = view->findChild<QRadioButton *>();
-  QVERIFY(radioButton != NULL);
+  QVERIFY(radioButton != nullptr);
   radioButton->toggle();
 
   // Spin the Qt update loop for a while to process events.
-  this->ProcessEventsAndDraw(NULL, 50, 10);
+  this->ProcessEventsAndDraw(nullptr, 50, 10);
 
   view->hide();
   delete view;

@@ -101,10 +101,10 @@ VideoVisual::~VideoVisual()
       reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);
 
   delete dPtr->video;
-  dPtr->video = NULL;
+  dPtr->video = nullptr;
 
   delete [] dPtr->imageBuffer;
-  dPtr->imageBuffer = NULL;
+  dPtr->imageBuffer = nullptr;
 }
 
 /////////////////////////////////////////////////

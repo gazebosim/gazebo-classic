@@ -28,7 +28,7 @@ void RenderWidget_TEST::InsertWidget()
 
   // Get the splitter widget
   QSplitter *splitter = renderWidget->findChild<QSplitter *>();
-  QVERIFY(splitter != NULL);
+  QVERIFY(splitter != nullptr);
 
   QVERIFY(splitter->count() == 1);
   QWidget *render3DWidget = splitter->widget(0);

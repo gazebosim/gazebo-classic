@@ -43,7 +43,7 @@ void ModelListWidget_TEST::TreeWidget()
     QTreeWidget *modelTreeWidget = modelListWidget->findChild<QTreeWidget*>(
         "modelTreeWidget");
 
-    QVERIFY(modelTreeWidget != NULL);
+    QVERIFY(modelTreeWidget != nullptr);
 
     QList<QTreeWidgetItem *> treeSceneItems =
         modelTreeWidget->findItems(tr("Scene"), Qt::MatchExactly);
@@ -62,7 +62,7 @@ void ModelListWidget_TEST::TreeWidget()
     QCOMPARE(treeModelItems.size(), 1);
 
     QTreeWidgetItem *modelsItem = treeModelItems.front();
-    QVERIFY(modelsItem != NULL);
+    QVERIFY(modelsItem != nullptr);
 
     delete modelListWidget;
   }
@@ -299,7 +299,7 @@ void ModelListWidget_TEST::ModelsTree()
   QCOMPARE(treeModelItems.size(), 1);
 
   QTreeWidgetItem *modelsItem = treeModelItems.front();
-  QVERIFY(modelsItem != NULL);
+  QVERIFY(modelsItem != nullptr);
 
   // verify that there are 4 models, ground plane, sphere, box, and cylinder
   int modelCount = 4;
@@ -325,10 +325,10 @@ void ModelListWidget_TEST::ModelsTree()
   }
 
   // find all models in the tree
-  QTreeWidgetItem *groundPlaneItem = NULL;
-  QTreeWidgetItem *boxItem = NULL;
-  QTreeWidgetItem *sphereItem = NULL;
-  QTreeWidgetItem *cylinderItem = NULL;
+  QTreeWidgetItem *groundPlaneItem = nullptr;
+  QTreeWidgetItem *boxItem = nullptr;
+  QTreeWidgetItem *sphereItem = nullptr;
+  QTreeWidgetItem *cylinderItem = nullptr;
   for (int i = 0; i < modelsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = modelsItem->child(i);
@@ -343,15 +343,15 @@ void ModelListWidget_TEST::ModelsTree()
   }
 
   // verify all models are present
-  QVERIFY(groundPlaneItem != NULL);
-  QVERIFY(boxItem != NULL);
-  QVERIFY(sphereItem != NULL);
-  QVERIFY(cylinderItem != NULL);
+  QVERIFY(groundPlaneItem != nullptr);
+  QVERIFY(boxItem != nullptr);
+  QVERIFY(sphereItem != nullptr);
+  QVERIFY(cylinderItem != nullptr);
 
   node.reset();
   delete requestMsg;
   delete modelListWidget;
-  modelListWidget = NULL;
+  modelListWidget = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -385,7 +385,7 @@ void ModelListWidget_TEST::ModelProperties()
   QCOMPARE(treeModelItems.size(), 1);
 
   QTreeWidgetItem *modelsItem = treeModelItems.front();
-  QVERIFY(modelsItem != NULL);
+  QVERIFY(modelsItem != nullptr);
 
   // verify that there is only 1 model
   int modelCount = 1;
@@ -401,7 +401,7 @@ void ModelListWidget_TEST::ModelProperties()
 
   // Get the model item
   QTreeWidgetItem *modelItem = modelsItem->child(0);
-  QVERIFY(modelItem != NULL);
+  QVERIFY(modelItem != nullptr);
   std::string modelName = "multilink";
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
@@ -411,7 +411,7 @@ void ModelListWidget_TEST::ModelProperties()
   QtTreePropertyBrowser *propTreeBrowser =
     dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
-  QVERIFY(propTreeBrowser != NULL);
+  QVERIFY(propTreeBrowser != nullptr);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
 
   // select the models item
@@ -657,7 +657,7 @@ void ModelListWidget_TEST::LinkProperties()
   QCOMPARE(treeModelItems.size(), 1);
 
   QTreeWidgetItem *modelsItem = treeModelItems.front();
-  QVERIFY(modelsItem != NULL);
+  QVERIFY(modelsItem != nullptr);
 
   // verify that there is only 1 model
   int modelCount = 1;
@@ -673,7 +673,7 @@ void ModelListWidget_TEST::LinkProperties()
 
   // Get the model item
   QTreeWidgetItem *modelItem = modelsItem->child(0);
-  QVERIFY(modelItem != NULL);
+  QVERIFY(modelItem != nullptr);
   std::string modelName = "multilink";
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
@@ -683,7 +683,7 @@ void ModelListWidget_TEST::LinkProperties()
   QtTreePropertyBrowser *propTreeBrowser =
     dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
-  QVERIFY(propTreeBrowser != NULL);
+  QVERIFY(propTreeBrowser != nullptr);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
 
   // select the models item
@@ -728,7 +728,7 @@ void ModelListWidget_TEST::LinkProperties()
 
   // select the box link
   QTreeWidgetItem *boxLinkItem = modelItem->child(0);
-  QVERIFY(boxLinkItem != NULL);
+  QVERIFY(boxLinkItem != nullptr);
   std::string boxLinkName = "box_link";
   QCOMPARE(boxLinkItem->text(0), tr(boxLinkName.c_str()));
 
@@ -802,7 +802,7 @@ void ModelListWidget_TEST::LinkProperties()
 
   // select the sphere link
   QTreeWidgetItem *sphereLinkItem = modelItem->child(1);
-  QVERIFY(sphereLinkItem != NULL);
+  QVERIFY(sphereLinkItem != nullptr);
   std::string sphereLinkName = "sphere_link";
   QCOMPARE(sphereLinkItem->text(0), tr(sphereLinkName.c_str()));
 
@@ -894,7 +894,7 @@ void ModelListWidget_TEST::PhysicsProperties()
     modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
     dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
-  QVERIFY(propTreeBrowser != NULL);
+  QVERIFY(propTreeBrowser != nullptr);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
 
   // Get the physics item from the model tree
@@ -904,7 +904,7 @@ void ModelListWidget_TEST::PhysicsProperties()
     modelTreeWidget->findItems(tr("Physics"), Qt::MatchExactly);
   QCOMPARE(treePhysicsItems.size(), 1);
   QTreeWidgetItem *physicsItem = treePhysicsItems.front();
-  QVERIFY(physicsItem != NULL);
+  QVERIFY(physicsItem != nullptr);
 
   // select the physics item after giving it time to be rendered
   QTest::qWait(10);

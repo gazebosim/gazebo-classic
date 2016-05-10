@@ -40,7 +40,7 @@ using namespace physics;
 MeshShape::MeshShape(CollisionPtr _parent)
   : Shape(_parent)
 {
-  this->submesh = NULL;
+  this->submesh = nullptr;
   this->AddType(Base::MESH_SHAPE);
   sdf::initFile("mesh_shape.sdf", this->sdf);
 }
@@ -68,13 +68,13 @@ void MeshShape::Init()
       return;
     }
 
-    if ((this->mesh = meshManager->Load(meshStr)) == NULL)
+    if ((this->mesh = meshManager->Load(meshStr)) == nullptr)
       gzerr << "Unable to load mesh from file[" << meshStr << "]\n";
   }
 
   if (this->submesh)
     delete this->submesh;
-  this->submesh = NULL;
+  this->submesh = nullptr;
 
   if (this->sdf->HasElement("submesh"))
   {

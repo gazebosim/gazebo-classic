@@ -63,7 +63,7 @@ using namespace transport;
 extern void dummy_callback_fn(uint32_t);
 
 unsigned int Connection::idCounter = 0;
-IOManager *Connection::iomanager = NULL;
+IOManager *Connection::iomanager = nullptr;
 
 // Version 1.52 of boost has an address::is_unspecfied function, but
 // Version 1.46.1 (installed on ubuntu) does not. So this helper function
@@ -88,7 +88,7 @@ Connection::Connection()
   this->dropMsgLogged = false;
   this->headerBuffer = new char[HEADER_LENGTH+1];
 
-  if (iomanager == NULL)
+  if (iomanager == nullptr)
     iomanager = new IOManager();
 
   this->socket = new boost::asio::ip::tcp::socket(iomanager->GetIO());
@@ -96,7 +96,7 @@ Connection::Connection()
   iomanager->IncCount();
   this->id = idCounter++;
 
-  this->acceptor = NULL;
+  this->acceptor = nullptr;
   this->readQuit = false;
   this->connectError = false;
   this->writeQueue.clear();
@@ -123,7 +123,7 @@ Connection::Connection()
 Connection::~Connection()
 {
   delete [] this->headerBuffer;
-  this->headerBuffer = NULL;
+  this->headerBuffer = nullptr;
 
   this->Shutdown();
 
@@ -134,7 +134,7 @@ Connection::~Connection()
     {
       this->idCounter = 0;
       delete iomanager;
-      iomanager = NULL;
+      iomanager = nullptr;
     }
   }
 }
@@ -373,7 +373,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
       this->Shutdown();
     }
 
-    // Call the callback, in not NULL
+    // Call the callback, in not nullptr
     if (!this->callbacks.front().first.empty())
       this->callbacks.front().first(this->callbacks.front().second);
 
@@ -464,7 +464,7 @@ void Connection::Close()
     }
 
     delete this->socket;
-    this->socket = NULL;
+    this->socket = nullptr;
   }
 
   if (this->acceptor && this->acceptor->is_open())
@@ -479,7 +479,7 @@ void Connection::Close()
     }
 
     delete this->acceptor;
-    this->acceptor = NULL;
+    this->acceptor = nullptr;
   }
 
   boost::recursive_mutex::scoped_lock lock2(this->writeMutex);
@@ -502,7 +502,7 @@ void Connection::Cancel()
       // Left empty on purpose
     }
     delete this->acceptor;
-    this->acceptor = NULL;
+    this->acceptor = nullptr;
   }
 
   {
@@ -672,11 +672,11 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 {
   boost::asio::ip::address_v4 address;
 
-  // Get the GAZEBO_HOSTNAME environment variable. This will be NULL if it's not
+  // Get the GAZEBO_HOSTNAME environment variable. This will be nullptr if it's not
   // set.
   char *hostname = getenv("GAZEBO_HOSTNAME");
 
-  // Get the GAZEBO_IP environment variable. This will be NULL if it's not
+  // Get the GAZEBO_IP environment variable. This will be nullptr if it's not
   // set.
   char *ip = getenv("GAZEBO_IP");
 
@@ -741,9 +741,9 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     char host[NI_MAXHOST];
 
     // Iterate over all the interface addresses
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
-      if (ifa->ifa_addr == NULL)
+      if (ifa->ifa_addr == nullptr)
         continue;
 
       int family = ifa->ifa_addr->sa_family;
@@ -755,7 +755,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
         int s = getnameinfo(ifa->ifa_addr,
             (family == AF_INET) ? sizeof(struct sockaddr_in) :
             sizeof(struct sockaddr_in6),
-            host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+            host, NI_MAXHOST, nullptr, 0, NI_NUMERICHOST);
 
         if (s != 0)
           gzthrow(std::string("getnameinfo() failed[") +
@@ -790,7 +790,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 
   // Look up our address.
   ULONG outBufLen = 0;
-  PIP_ADAPTER_ADDRESSES addrs = NULL;
+  PIP_ADAPTER_ADDRESSES addrs = nullptr;
 
   // Not sure whether these are the right flags, but they work
   // on Windows 7
@@ -799,14 +799,14 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 
   // The first time, it'll fail; we're asking how much space is needed to
   // store the result.
-  GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen);
+  GetAdaptersAddresses(AF_INET, flags, nullptr, addrs, &outBufLen);
 
   // Allocate the required space.
   addrs = new IP_ADAPTER_ADDRESSES[outBufLen];
   ULONG ret;
 
   // Now the call should succeed.
-  if ((ret = GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen)) ==
+  if ((ret = GetAdaptersAddresses(AF_INET, flags, nullptr, addrs, &outBufLen)) ==
       NO_ERROR)
   {
     // Iterate over all returned adapters, arbitrarily sticking with the

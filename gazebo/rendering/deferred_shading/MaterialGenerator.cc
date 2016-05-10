@@ -32,7 +32,7 @@ using namespace rendering;
 MaterialGenerator::MaterialGenerator()
   : vsMask(0), fsMask(0), matMask(0), impl(0)
 {
-  this->impl = NULL;
+  this->impl = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -130,8 +130,8 @@ const Ogre::MaterialPtr &MaterialGenerator::GetTemplateMaterial(
     return i->second;
   else
   {
-    if (this->impl == NULL)
-      printf("ERROR NULL\n");
+    if (this->impl == nullptr)
+      printf("ERROR nullptr\n");
     /// Create it
     this->templateMat[_permutation] =
       this->impl->GenerateTemplateMaterial(_permutation);

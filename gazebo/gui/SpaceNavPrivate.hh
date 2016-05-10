@@ -32,7 +32,7 @@ namespace gazebo
       /// \brief Constructor
       public: SpaceNavPrivate()
       {
-        this->pollThread = NULL;
+        this->pollThread = nullptr;
         this->stop = false;
         this->buttons[0] = 0;
         this->buttons[1] = 0;
@@ -45,7 +45,7 @@ namespace gazebo
         if (this->pollThread)
           this->pollThread->join();
         delete this->pollThread;
-        this->pollThread = NULL;
+        this->pollThread = nullptr;
       }
 
       /// \brief Additional thread

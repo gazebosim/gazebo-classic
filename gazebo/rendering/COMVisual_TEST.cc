@@ -36,7 +36,7 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // create a default link message
   gazebo::msgs::LinkPtr linkDefaultMsg;

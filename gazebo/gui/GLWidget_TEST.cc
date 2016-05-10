@@ -52,7 +52,7 @@ void GLWidget_TEST::SelectObject()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   mainWindow->Load();
   mainWindow->Init();
@@ -63,7 +63,7 @@ void GLWidget_TEST::SelectObject()
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
       mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   // Click in the center of the screen
   QPoint moveTo(glWidget->width()/2, glWidget->height()/2);

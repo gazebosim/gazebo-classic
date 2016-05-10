@@ -182,7 +182,7 @@ namespace gazebo
 
       /// \brief Get a pointer to a ray
       /// \param[in] _rayIndex index to the ray
-      /// \return Pointer to the ray, or NULL on error
+      /// \return Pointer to the ray, or nullptr on error
       /// \sa RayCount()
       public: RayShapePtr Ray(const unsigned int _rayIndex) const;
 

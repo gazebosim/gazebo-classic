@@ -308,7 +308,7 @@ msgs::Joint *JointInspector::Data() const
 
   if (currentParent == currentChild)
   {
-    return NULL;
+    return nullptr;
   }
 
   // Get updated message from widget
@@ -317,7 +317,7 @@ msgs::Joint *JointInspector::Data() const
   if (!msg)
   {
     gzerr << "It wasn't possible to get the joint message" << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   // Use parent / child from our custom widget

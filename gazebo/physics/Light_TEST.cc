@@ -40,7 +40,7 @@ TEST_F(LightTest, Constructor)
 
   // Create the light
   physics::LightPtr lightPtr(new physics::Light(basePtr));
-  EXPECT_TRUE(lightPtr != NULL);
+  EXPECT_TRUE(lightPtr != nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -60,7 +60,7 @@ TEST_F(LightTest, LightMsg)
 
   // Create the light
   physics::LightPtr lightPtr(new physics::Light(basePtr));
-  EXPECT_TRUE(lightPtr != NULL);
+  EXPECT_TRUE(lightPtr != nullptr);
 
   // Create the light message
   msgs::Light lightMsg;

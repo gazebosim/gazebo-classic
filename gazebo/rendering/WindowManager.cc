@@ -82,7 +82,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
-  Ogre::RenderWindow *window = NULL;
+  Ogre::RenderWindow *window = nullptr;
 
   // Mac and Windows *must* use externalWindow handle.
 #if defined(Q_OS_MAC) || defined(_MSC_VER)
@@ -109,7 +109,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   stream << "OgreWindow(" << this->dataPtr->windowCounter++ << ")";
 
   int attempts = 0;
-  while (window == NULL && (attempts++) < 10)
+  while (window == nullptr && (attempts++) < 10)
   {
     try
     {
@@ -119,7 +119,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
     catch(...)
     {
       gzerr << " Unable to create the rendering window\n";
-      window = NULL;
+      window = nullptr;
     }
   }
 
@@ -218,5 +218,5 @@ Ogre::RenderWindow *WindowManager::Window(const uint32_t _id) const
   if (_id < this->dataPtr->windows.size())
     return this->dataPtr->windows[_id];
   else
-    return NULL;
+    return nullptr;
 }

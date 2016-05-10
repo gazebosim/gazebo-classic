@@ -26,7 +26,7 @@ void LinkInspector_TEST::RemoveButton()
   // Create a link inspector
   gazebo::gui::LinkInspector *linkInspector =
       new gazebo::gui::LinkInspector();
-  QVERIFY(linkInspector != NULL);
+  QVERIFY(linkInspector != nullptr);
 
   // Open it
   linkInspector->Open();
@@ -55,7 +55,7 @@ void LinkInspector_TEST::AppliedSignal()
   // Create a link inspector
   gazebo::gui::LinkInspector *linkInspector =
       new gazebo::gui::LinkInspector();
-  QVERIFY(linkInspector != NULL);
+  QVERIFY(linkInspector != nullptr);
 
   // Connect signals
   connect(linkInspector, SIGNAL(Applied()), this, SLOT(OnApply()));

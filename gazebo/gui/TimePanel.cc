@@ -110,7 +110,7 @@ TimePanel::~TimePanel()
   this->dataPtr->node.reset();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

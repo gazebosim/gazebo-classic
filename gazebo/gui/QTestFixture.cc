@@ -34,7 +34,7 @@
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()
-  : server(NULL), serverThread(NULL),
+  : server(nullptr), serverThread(nullptr),
     resMaxPercentChange(0), shareMaxPercentChange(0),
     residentStart(0), shareStart(0)
 {
@@ -70,7 +70,7 @@ void QTestFixture::init()
   this->resMaxPercentChange = 3.0;
   this->shareMaxPercentChange = 1.0;
 
-  this->serverThread = NULL;
+  this->serverThread = nullptr;
   this->GetMemInfo(this->residentStart, this->shareStart);
   gazebo::rendering::load();
 }
@@ -124,7 +124,7 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
   this->server->Run();
 
   delete this->server;
-  this->server = NULL;
+  this->server = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -160,7 +160,7 @@ void QTestFixture::cleanup()
   }
 
   delete this->serverThread;
-  this->serverThread = NULL;
+  this->serverThread = nullptr;
 
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);

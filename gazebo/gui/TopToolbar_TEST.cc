@@ -32,7 +32,7 @@ void TopToolbar_TEST::WindowModes()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -42,7 +42,7 @@ void TopToolbar_TEST::WindowModes()
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =
       mainWindow->findChild<gazebo::gui::TopToolbar *>("topToolbar");
-  QVERIFY(topToolbar != NULL);
+  QVERIFY(topToolbar != nullptr);
 
   // Check RTSN are visible
   QVERIFY(gazebo::gui::g_arrowAct->isVisible());
@@ -101,7 +101,7 @@ void TopToolbar_TEST::Insert()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -111,36 +111,36 @@ void TopToolbar_TEST::Insert()
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =
       mainWindow->findChild<gazebo::gui::TopToolbar *>("topToolbar");
-  QVERIFY(topToolbar != NULL);
+  QVERIFY(topToolbar != nullptr);
 
   // Get number of actions
   QToolBar *toolbar = topToolbar->findChild<QToolBar *>("topToolbarToolbar");
-  QVERIFY(toolbar != NULL);
+  QVERIFY(toolbar != nullptr);
 
   int actionsCount = toolbar->actions().size();
 
   // Insert separator and see increase in number of actions
   QAction *separator = topToolbar->InsertSeparator("toolbarSpacerAction");
-  QVERIFY(separator != NULL);
+  QVERIFY(separator != nullptr);
   QCOMPARE(toolbar->actions().size(), actionsCount + 1);
   actionsCount = toolbar->actions().size();
 
   // Fail to insert before inexistent action
   QAction *separatorFail = topToolbar->InsertSeparator("fail");
-  QVERIFY(separatorFail == NULL);
+  QVERIFY(separatorFail == nullptr);
   QCOMPARE(toolbar->actions().size(), actionsCount);
 
   // Insert widget and see increase in number of actions
   QWidget *widget = new QWidget();
   QAction *widgetAct = topToolbar->InsertWidget("toolbarSpacerAction", widget);
-  QVERIFY(widgetAct != NULL);
+  QVERIFY(widgetAct != nullptr);
   QCOMPARE(toolbar->actions().size(), actionsCount + 1);
   actionsCount = toolbar->actions().size();
 
   // Fail to insert before inexistent action
   QWidget *widgetFail = new QWidget();
   QAction *widgetActFail = topToolbar->InsertWidget("fail", widgetFail);
-  QVERIFY(widgetActFail == NULL);
+  QVERIFY(widgetActFail == nullptr);
   QCOMPARE(toolbar->actions().size(), actionsCount);
 
   // Insert action and see increase in number of actions
@@ -169,7 +169,7 @@ void TopToolbar_TEST::Add()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -179,24 +179,24 @@ void TopToolbar_TEST::Add()
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =
       mainWindow->findChild<gazebo::gui::TopToolbar *>("topToolbar");
-  QVERIFY(topToolbar != NULL);
+  QVERIFY(topToolbar != nullptr);
 
   // Get number of actions
   QToolBar *toolbar = topToolbar->findChild<QToolBar *>("topToolbarToolbar");
-  QVERIFY(toolbar != NULL);
+  QVERIFY(toolbar != nullptr);
 
   int actionsCount = toolbar->actions().size();
 
   // Add separator and see increase in number of actions
   QAction *separator = topToolbar->AddSeparator();
-  QVERIFY(separator != NULL);
+  QVERIFY(separator != nullptr);
   QCOMPARE(toolbar->actions().size(), actionsCount + 1);
   actionsCount = toolbar->actions().size();
 
   // Add widget and see increase in number of actions
   QWidget *widget = new QWidget();
   QAction *widgetAct = topToolbar->AddWidget(widget);
-  QVERIFY(widgetAct != NULL);
+  QVERIFY(widgetAct != nullptr);
   QCOMPARE(toolbar->actions().size(), actionsCount + 1);
   actionsCount = toolbar->actions().size();
 

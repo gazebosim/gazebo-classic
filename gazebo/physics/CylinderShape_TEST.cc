@@ -46,17 +46,17 @@ TEST_F(CylinderShapeTest, Scale)
   physics::CylinderShapePtr cylinder(
       new physics::CylinderShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = cylinderSDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("cylinder");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   cylinder->Load(elem);
 
   // Test scaling with unit size
@@ -160,17 +160,17 @@ TEST_F(CylinderShapeTest, Volume)
   physics::CylinderShapePtr cylinder(
       new physics::CylinderShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = cylinderSDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("cylinder");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   cylinder->Load(elem);
 
   EXPECT_FLOAT_EQ(cylinder->ComputeVolume(), M_PI);

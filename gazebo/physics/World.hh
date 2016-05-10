@@ -166,7 +166,7 @@ namespace gazebo
       /// Get a Model using an index, where index must be greater than zero
       /// and less than World::GetModelCount()
       /// \param[in] _index The index of the model [0..GetModelCount)
-      /// \return A pointer to the Model. NULL if _index is invalid.
+      /// \return A pointer to the Model. nullptr if _index is invalid.
       public: ModelPtr GetModel(unsigned int _index) const;
 
       /// \brief Get a list of all the models.
@@ -230,28 +230,28 @@ namespace gazebo
       /// Searches the list of entities, and return a pointer to the model
       /// with a matching _name.
       /// \param[in] _name The name of the Model to find.
-      /// \return A pointer to the entity, or NULL if no entity was found.
+      /// \return A pointer to the entity, or nullptr if no entity was found.
       public: BasePtr GetByName(const std::string &_name);
 
       /// \brief Get a model by name.
       /// This function is the same as GetByName, but limits the search to
       /// only models.
       /// \param[in] _name The name of the Model to find.
-      /// \return A pointer to the Model, or NULL if no model was found.
+      /// \return A pointer to the Model, or nullptr if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
 
       /// \brief Get a light by name.
       /// This function is the same as GetByName, but limits the search to
       /// only lights.
       /// \param[in] _name The name of the Light to find.
-      /// \return A pointer to the Light, or NULL if no light was found.
+      /// \return A pointer to the Light, or nullptr if no light was found.
       public: LightPtr Light(const std::string &_name);
 
       /// \brief Get a pointer to an Entity based on a name.
       /// This function is the same as GetByName, but limits the search to
       /// only Entities.
       /// \param[in] _name The name of the Entity to find.
-      /// \return A pointer to the Entity, or NULL if no Entity was found.
+      /// \return A pointer to the Entity, or nullptr if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
       /// \brief Get the nearest model below and not encapsulating a point.
@@ -260,14 +260,14 @@ namespace gazebo
       /// function.
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
-      /// \return A pointer to nearest Model, NULL if none is found.
+      /// \return A pointer to nearest Model, nullptr if none is found.
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Get the nearest entity below a point.
       /// Projects a Ray down (-Z axis) starting at the given point. The
       /// first entity hit by the Ray is returned.
       /// \param[in] _pt The 3D point to search below
-      /// \return A pointer to nearest Entity, NULL if none is found.
+      /// \return A pointer to nearest Entity, nullptr if none is found.
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Set the current world state.
@@ -431,7 +431,7 @@ namespace gazebo
       /// Each Entity has a unique ID, this function finds a Model with
       /// a passed in _id.
       /// \param[in] _id The id of the Model
-      /// \return A pointer to the model, or NULL if no Model was found.
+      /// \return A pointer to the model, or nullptr if no Model was found.
       private: ModelPtr GetModelById(unsigned int _id);
       /// \endcond
 

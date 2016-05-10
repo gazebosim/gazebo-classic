@@ -140,7 +140,7 @@ void DiagnosticManager::StartTimer(const std::string &_name)
   TimerMap::iterator iter = this->dataPtr->timers.find(_name);
   if (iter != this->dataPtr->timers.end())
   {
-    GZ_ASSERT(iter->second != NULL, "DiagnosticTimerPtr is NULL");
+    GZ_ASSERT(iter->second != nullptr, "DiagnosticTimerPtr is nullptr");
     iter->second->Start();
   }
   else
@@ -156,7 +156,7 @@ void DiagnosticManager::StopTimer(const std::string &_name)
   TimerMap::iterator iter = this->dataPtr->timers.find(_name);
   if (iter != this->dataPtr->timers.end())
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is nullptr");
     iter->second->Stop();
   }
   else
@@ -174,7 +174,7 @@ void DiagnosticManager::Lap(const std::string &_name,
     gzerr << "Unable to find timer with name[" << _name << "]\n";
   else
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is nullptr");
 
     iter->second->Lap(_prefix);
   }
@@ -215,7 +215,7 @@ common::Time DiagnosticManager::Time(const int _index) const
 
   if (iter != this->dataPtr->timers.end())
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is nullptr");
     return iter->second->GetElapsed();
   }
   else
@@ -266,7 +266,7 @@ common::Time DiagnosticManager::Time(const std::string &_label) const
 
   if (iter != this->dataPtr->timers.end())
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is nullptr");
     return iter->second->GetElapsed();
   }
   else

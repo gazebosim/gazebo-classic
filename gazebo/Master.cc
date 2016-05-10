@@ -72,7 +72,7 @@ Master::Master()
   : dataPtr(new MasterPrivate())
 {
   this->dataPtr->stop = false;
-  this->dataPtr->runThread = NULL;
+  this->dataPtr->runThread = nullptr;
   this->dataPtr->connection = boost::make_shared<transport::Connection>();
 }
 
@@ -563,7 +563,7 @@ void Master::Stop()
   {
     this->dataPtr->runThread->join();
     delete this->dataPtr->runThread;
-    this->dataPtr->runThread = NULL;
+    this->dataPtr->runThread = nullptr;
   }
 }
 
@@ -577,7 +577,7 @@ void Master::Fini()
   this->dataPtr->connection.reset();
 
   delete this->dataPtr->runThread;
-  this->dataPtr->runThread = NULL;
+  this->dataPtr->runThread = nullptr;
 
   this->dataPtr->msgs.clear();
   this->dataPtr->worldNames.clear();

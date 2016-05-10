@@ -27,12 +27,12 @@ void JointInspector_TEST::AddRemoveLink()
 {
   // Create a joint maker
   gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Create a joint inspector
   gazebo::gui::JointInspector *jointInspector =
       new gazebo::gui::JointInspector(jointMaker);
-  QVERIFY(jointInspector != NULL);
+  QVERIFY(jointInspector != nullptr);
 
   // Get combo boxes
   QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
@@ -81,12 +81,12 @@ void JointInspector_TEST::AddRemoveNestedLink()
 {
   // Create a joint maker
   gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Create a joint inspector
   gazebo::gui::JointInspector *jointInspector =
       new gazebo::gui::JointInspector(jointMaker);
-  QVERIFY(jointInspector != NULL);
+  QVERIFY(jointInspector != nullptr);
 
   // Get combo boxes
   QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
@@ -135,7 +135,7 @@ void JointInspector_TEST::Swap()
 {
   // Create a joint maker
   gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Add links to list
   gazebo::gui::model::Events::linkInserted("model::link1");
@@ -144,7 +144,7 @@ void JointInspector_TEST::Swap()
   // Create a joint inspector
   gazebo::gui::JointInspector *jointInspector =
       new gazebo::gui::JointInspector(jointMaker);
-  QVERIFY(jointInspector != NULL);
+  QVERIFY(jointInspector != nullptr);
 
   // Open it so link boxes are updated with new links
   jointInspector->Open();
@@ -187,12 +187,12 @@ void JointInspector_TEST::RemoveButton()
 {
   // Create a joint maker
   gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Create a joint inspector
   gazebo::gui::JointInspector *jointInspector =
       new gazebo::gui::JointInspector(jointMaker);
-  QVERIFY(jointInspector != NULL);
+  QVERIFY(jointInspector != nullptr);
 
   // Open it
   jointInspector->Open();
@@ -219,7 +219,7 @@ void JointInspector_TEST::AppliedSignal()
 {
   // Create a joint maker
   gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Add links to list
   gazebo::gui::model::Events::linkInserted("model::link1");
@@ -229,7 +229,7 @@ void JointInspector_TEST::AppliedSignal()
   // Create a joint inspector
   gazebo::gui::JointInspector *jointInspector =
       new gazebo::gui::JointInspector(jointMaker);
-  QVERIFY(jointInspector != NULL);
+  QVERIFY(jointInspector != nullptr);
 
   // Connect signals
   connect(jointInspector, SIGNAL(Applied()), this, SLOT(OnApply()));

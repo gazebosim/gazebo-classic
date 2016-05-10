@@ -32,16 +32,16 @@ void ModelData_TEST::Clone()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -76,7 +76,7 @@ void ModelData_TEST::Clone()
   QCOMPARE(cloneLink->Name(), cloneLinkName);
   QCOMPARE(cloneLink->Scale(), ignition::math::Vector3d::One);
   QCOMPARE(cloneLink->Pose(), ignition::math::Pose3d::Zero);
-  QVERIFY(cloneLink->linkVisual != NULL);
+  QVERIFY(cloneLink->linkVisual != nullptr);
   QCOMPARE(cloneLink->linkVisual->GetName(), "model::" + cloneLinkName);
   QVERIFY(cloneLink->Scale() == ignition::math::Vector3d::One);
 
@@ -84,7 +84,7 @@ void ModelData_TEST::Clone()
   QCOMPARE(cloneLink->visuals.size(), link->visuals.size());
   QVERIFY(cloneLink->visuals.size() == 1u);
   rendering::VisualPtr cloneVis = cloneLink->visuals.begin()->first;
-  QVERIFY(cloneVis != NULL);
+  QVERIFY(cloneVis != nullptr);
   QCOMPARE(cloneVis->GetName(), "model::" + cloneLinkName + "::visual");
   QCOMPARE(cloneVis->GetGeometryType(), std::string("box"));
   QCOMPARE(cloneVis->GetGeometrySize(), size);
@@ -93,7 +93,7 @@ void ModelData_TEST::Clone()
   QCOMPARE(cloneLink->collisions.size(), link->collisions.size());
   QVERIFY(cloneLink->collisions.size() == 1u);
   rendering::VisualPtr cloneCol = cloneLink->collisions.begin()->first;
-  QVERIFY(cloneCol != NULL);
+  QVERIFY(cloneCol != nullptr);
   QCOMPARE(cloneCol->GetName(), "model::" + cloneLinkName + "::collision");
   QCOMPARE(cloneCol->GetGeometryType(), std::string("box"));
   QCOMPARE(cloneCol->GetGeometrySize(), size);
@@ -145,7 +145,7 @@ void ModelData_TEST::Clone()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -158,16 +158,16 @@ void ModelData_TEST::LinkScale()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -811,7 +811,7 @@ void ModelData_TEST::LinkScale()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -823,17 +823,17 @@ void ModelData_TEST::LinkVolume()
   this->Load("worlds/empty.world");
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
 
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   for (int i = 0; i < 10; ++i)
   {

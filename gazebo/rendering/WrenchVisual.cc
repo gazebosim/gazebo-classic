@@ -119,10 +119,10 @@ WrenchVisual::~WrenchVisual()
   dPtr->connections.clear();
 
   delete dPtr->forceLine;
-  dPtr->forceLine = NULL;
+  dPtr->forceLine = nullptr;
 
   delete dPtr->forceNode;
-  dPtr->forceNode = NULL;
+  dPtr->forceNode = nullptr;
 }
 
 /////////////////////////////////////////////////

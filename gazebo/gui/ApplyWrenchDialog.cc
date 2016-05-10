@@ -400,7 +400,7 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
   this->Fini();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

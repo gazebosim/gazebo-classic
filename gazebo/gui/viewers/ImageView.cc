@@ -58,7 +58,7 @@ ImageView::ImageView(QWidget *_parent)
 ImageView::~ImageView()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 
   this->sub.reset();
 }

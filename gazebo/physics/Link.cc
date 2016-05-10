@@ -313,7 +313,7 @@ void Link::Fini()
   this->connections.clear();
 
   delete this->publishDataMutex;
-  this->publishDataMutex = NULL;
+  this->publishDataMutex = nullptr;
 
   Entity::Fini();
 }
@@ -468,7 +468,7 @@ void Link::SetCollideMode(const std::string &_mode)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide() const
 {
-  GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Link sdf member is nullptr");
   if (this->sdf->HasElement("self_collide"))
     return this->sdf->Get<bool>("self_collide");
   else

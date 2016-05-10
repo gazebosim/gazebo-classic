@@ -33,7 +33,7 @@ void ModelEditor_TEST::AddItemToPalette()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -59,7 +59,7 @@ void ModelEditor_TEST::AddItemToPalette()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -72,7 +72,7 @@ void ModelEditor_TEST::OnEdit()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -84,7 +84,7 @@ void ModelEditor_TEST::OnEdit()
       dynamic_cast<gui::ModelEditor *>(mainWindow->Editor("model"));
   QVERIFY(modelEditor);
 
-  QVERIFY(gui::g_editModelAct != NULL);
+  QVERIFY(gui::g_editModelAct != nullptr);
 
   // verify simulation is not paused
   QVERIFY(!mainWindow->IsPaused());
@@ -142,7 +142,7 @@ void ModelEditor_TEST::OnEdit()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -155,7 +155,7 @@ void ModelEditor_TEST::InsertTab()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -164,10 +164,10 @@ void ModelEditor_TEST::InsertTab()
 
   // Get the main tab
   auto mainTab = mainWindow->findChild<QTabWidget *>("mainTab");
-  QVERIFY(mainTab != NULL);
+  QVERIFY(mainTab != nullptr);
 
   // Get the insert tab
-  QWidget *insertModel = NULL;
+  QWidget *insertModel = nullptr;
   for (int i = 0; i < mainTab->count(); ++i)
   {
     if (mainTab->tabText(i) == tr("Insert"))
@@ -176,14 +176,14 @@ void ModelEditor_TEST::InsertTab()
       break;
     }
   }
-  QVERIFY(insertModel != NULL);
+  QVERIFY(insertModel != nullptr);
 
   // Switch to editor mode
-  QVERIFY(gui::g_editModelAct != NULL);
+  QVERIFY(gui::g_editModelAct != nullptr);
   gui::g_editModelAct->toggle();
 
   // Check that the insert tab is not in mainTab anymore
-  insertModel = NULL;
+  insertModel = nullptr;
   for (int i = 0; i < mainTab->count(); ++i)
   {
     if (mainTab->tabText(i) == tr("Insert"))
@@ -192,13 +192,13 @@ void ModelEditor_TEST::InsertTab()
       break;
     }
   }
-  QVERIFY(insertModel == NULL);
+  QVERIFY(insertModel == nullptr);
 
   // Switch back to simulation
   gui::g_editModelAct->toggle();
 
   // Check that the insert tab in mainTab again
-  insertModel = NULL;
+  insertModel = nullptr;
   for (int i = 0; i < mainTab->count(); ++i)
   {
     if (mainTab->tabText(i) == tr("Insert"))
@@ -207,11 +207,11 @@ void ModelEditor_TEST::InsertTab()
       break;
     }
   }
-  QVERIFY(insertModel != NULL);
+  QVERIFY(insertModel != nullptr);
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 // Generate a main function for the test

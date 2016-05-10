@@ -125,7 +125,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
 
-  this->dataPtr->entityMaker = NULL;
+  this->dataPtr->entityMaker = nullptr;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -958,7 +958,7 @@ void GLWidget::OnMoveMode(bool _mode)
 {
   if (_mode)
   {
-    this->dataPtr->entityMaker = NULL;
+    this->dataPtr->entityMaker = nullptr;
     this->dataPtr->state = "select";
   }
 }
@@ -1331,7 +1331,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

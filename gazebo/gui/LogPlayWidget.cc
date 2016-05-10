@@ -245,7 +245,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 LogPlayWidget::~LogPlayWidget()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

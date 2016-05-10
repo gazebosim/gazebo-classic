@@ -57,7 +57,7 @@ void SaveDialog_TEST::SaveLocation()
   // find the browse button
   QList<QPushButton *> pushButtons = saveDialog->findChildren<QPushButton *>();
   QVERIFY(!pushButtons.empty());
-  QPushButton *browseButton = NULL;
+  QPushButton *browseButton = nullptr;
   for (int i = 0; i < pushButtons.size(); ++i)
   {
     QPushButton *button = pushButtons[i];

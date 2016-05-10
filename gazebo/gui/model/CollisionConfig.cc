@@ -325,7 +325,7 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
       return dynamic_cast<msgs::Collision *>(it.second->configWidget->Msg());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

@@ -37,7 +37,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // create a fake child visual where the joint visual will be attached to
   gazebo::rendering::VisualPtr childVis;
@@ -92,12 +92,12 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   EXPECT_EQ(jointVis->GetPose(), math::Pose(1, 2, 3, 1.57, 1.57, 0));
 
   // has axis 1 and it is visible
-  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual() != nullptr);
   EXPECT_TRUE(jointVis->GetArrowVisual()->GetVisible());
 
   // has axis 2 and it is visible
-  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
-  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != nullptr);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != nullptr);
   EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
 
   // update pose from a message
@@ -111,12 +111,12 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
-  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual() != nullptr);
   EXPECT_TRUE(jointVis->GetArrowVisual()->GetVisible());
 
   // axis 2 still visible
-  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
-  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != nullptr);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != nullptr);
   EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
 
   // update joint type and axis from a message
@@ -141,12 +141,12 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
-  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual() != nullptr);
   EXPECT_TRUE(jointVis->GetArrowVisual()->GetVisible());
 
   // axis 2 still there but not visible
-  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
-  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != nullptr);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != nullptr);
   EXPECT_FALSE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
 
   // update joint type and pose from a message
@@ -161,12 +161,12 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   EXPECT_EQ(jointVis->GetPose(), math::Pose(0, -2, 1, -1.57, 1.57, 0));
 
   // axis 1 still there but not visible
-  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual() != nullptr);
   EXPECT_FALSE(jointVis->GetArrowVisual()->GetVisible());
 
   // axis 2 still there but not visible
-  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
-  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != nullptr);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != nullptr);
   EXPECT_FALSE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
 }
 

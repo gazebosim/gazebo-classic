@@ -232,7 +232,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
   }
 
-  ArrowVisualPtr axis2Visual = NULL;
+  ArrowVisualPtr axis2Visual = nullptr;
   if (dPtr->parentAxisVis)
   {
     axis2Visual = dPtr->parentAxisVis->GetArrowVisual();

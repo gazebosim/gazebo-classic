@@ -36,7 +36,7 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
@@ -74,11 +74,11 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   scene->RemoveVisual(linkFrameVis);
 
   // Check that it was removed
-  EXPECT_TRUE(scene->GetVisual("_LINK_FRAME_VISUAL_") == NULL);
+  EXPECT_TRUE(scene->GetVisual("_LINK_FRAME_VISUAL_") == nullptr);
 
   // Reset pointer
   linkFrameVis.reset();
-  EXPECT_TRUE(linkFrameVis == NULL);
+  EXPECT_TRUE(linkFrameVis == nullptr);
 }
 
 /////////////////////////////////////////////////

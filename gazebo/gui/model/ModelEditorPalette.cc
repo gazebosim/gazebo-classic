@@ -265,7 +265,7 @@ void ModelEditorPalette::AddItem(QWidget *_item,
     category = "Other";
 
   auto iter = this->dataPtr->categories.find(category);
-  QGridLayout *catLayout = NULL;
+  QGridLayout *catLayout = nullptr;
   if (iter == this->dataPtr->categories.end())
   {
     catLayout = new QGridLayout();

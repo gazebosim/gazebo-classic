@@ -61,7 +61,7 @@ JointController::JointController(ModelPtr _model)
 JointController::~JointController()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

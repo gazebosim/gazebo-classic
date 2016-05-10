@@ -34,7 +34,7 @@ void LightMaker_TEST::PointLight()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -43,25 +43,25 @@ void LightMaker_TEST::PointLight()
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Check there's no light in the scene yet
   gazebo::rendering::LightPtr light = scene->GetLight("__default__");
-  QVERIFY(light == NULL);
+  QVERIFY(light == nullptr);
   light = scene->GetLight("user_point_light_0");
-  QVERIFY(light == NULL);
+  QVERIFY(light == nullptr);
 
   // Create a pointLight maker
   gazebo::gui::PointLightMaker *pointLightMaker =
       new gazebo::gui::PointLightMaker();
-  QVERIFY(pointLightMaker != NULL);
+  QVERIFY(pointLightMaker != nullptr);
 
   // Start the maker to make a light
   pointLightMaker->Start();
 
   // Check there's a light in the scene -- this is the preview
   light = scene->GetLight("__default__");
-  QVERIFY(light != NULL);
+  QVERIFY(light != nullptr);
 
   // Check that the light appeared in the center of the screen
   ignition::math::Vector3d startPos = pointLightMaker->EntityPosition();
@@ -88,15 +88,15 @@ void LightMaker_TEST::PointLight()
 
   // Check there's no light in the scene -- the preview is gone
   light = scene->GetLight("__default__");
-  QVERIFY(light == NULL);
+  QVERIFY(light == nullptr);
   light = scene->GetLight("user_point_light");
-  QVERIFY(light == NULL);
+  QVERIFY(light == nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a light in the scene -- this is the final pointLight
   light = scene->GetLight("user_point_light_0");
-  QVERIFY(light != NULL);
+  QVERIFY(light != nullptr);
 
   // Terminate
   mainWindow->close();
@@ -113,7 +113,7 @@ void LightMaker_TEST::CopyLight()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -122,19 +122,19 @@ void LightMaker_TEST::CopyLight()
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Check there's a light but no clone in the scene yet
   gazebo::rendering::LightPtr light = scene->GetLight("spotlight");
-  QVERIFY(light != NULL);
+  QVERIFY(light != nullptr);
   light = scene->GetLight("spotlight_clone_tmp");
-  QVERIFY(light == NULL);
+  QVERIFY(light == nullptr);
   light = scene->GetLight("spotlight_clone");
-  QVERIFY(light == NULL);
+  QVERIFY(light == nullptr);
 
   // Create a generic light maker
   gazebo::gui::LightMaker *lightMaker = new gazebo::gui::LightMaker();
-  QVERIFY(lightMaker != NULL);
+  QVERIFY(lightMaker != nullptr);
 
   // Start the maker to copy the light
   lightMaker->InitFromLight("spotlight");
@@ -142,7 +142,7 @@ void LightMaker_TEST::CopyLight()
 
   // Check there's a light in the scene -- this is the preview
   light = scene->GetLight("spotlight_clone_tmp");
-  QVERIFY(light != NULL);
+  QVERIFY(light != nullptr);
 
   // Check that the light appeared in the center of the screen
   ignition::math::Vector3d startPos = lightMaker->EntityPosition();
@@ -169,13 +169,13 @@ void LightMaker_TEST::CopyLight()
 
   // Check there's no light in the scene -- the preview is gone
   light = scene->GetLight("spotlight_clone_tmp");
-  QVERIFY(light == NULL);
+  QVERIFY(light == nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a light in the scene -- this is the final light
   light = scene->GetLight("spotlight_clone");
-  QVERIFY(light != NULL);
+  QVERIFY(light != nullptr);
 
   // Terminate
   mainWindow->close();

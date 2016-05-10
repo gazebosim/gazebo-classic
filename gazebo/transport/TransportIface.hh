@@ -169,7 +169,7 @@ namespace gazebo
     bool getMinimalComms();
 
     /// \brief Create a connection to master.
-    /// \return Connection to the master, NULL on error.
+    /// \return Connection to the master, nullptr on error.
     GZ_TRANSPORT_VISIBLE
     transport::ConnectionPtr connectToMaster();
 

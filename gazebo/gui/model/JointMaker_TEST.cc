@@ -62,7 +62,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -140,7 +140,7 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -155,18 +155,18 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   // Get the top level model link
   gazebo::rendering::VisualPtr link00Vis =
       scene->GetVisual("model_00::link_00");
-  QVERIFY(link00Vis != NULL);
+  QVERIFY(link00Vis != nullptr);
 
   // Get the nested model links
   gazebo::rendering::VisualPtr link01Vis =
       scene->GetVisual("model_00::model_01::link_01");
-  QVERIFY(link01Vis != NULL);
+  QVERIFY(link01Vis != nullptr);
   gazebo::rendering::VisualPtr link02Vis =
       scene->GetVisual("model_00::model_01::model_02::link_02");
-  QVERIFY(link02Vis != NULL);
+  QVERIFY(link02Vis != nullptr);
   gazebo::rendering::VisualPtr link03Vis =
       scene->GetVisual("model_00::model_01::model_02::model_03::link_03");
-  QVERIFY(link03Vis != NULL);
+  QVERIFY(link03Vis != nullptr);
 
   unsigned int jointCount = jointMaker->JointCount();
 
@@ -247,7 +247,7 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -280,8 +280,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 1u);
 
   gui::JointData *rev2joint = boxJointData[0];
-  QVERIFY(rev2joint != NULL);
-  QVERIFY(rev2joint->inspector != NULL);
+  QVERIFY(rev2joint != nullptr);
+  QVERIFY(rev2joint->inspector != nullptr);
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(rev2joint->jointMsg->type()) == "revolute2");
@@ -334,8 +334,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 1u);
 
   gui::JointData *prisJoint = cylinderJointData[0];
-  QVERIFY(prisJoint != NULL);
-  QVERIFY(prisJoint->inspector != NULL);
+  QVERIFY(prisJoint != nullptr);
+  QVERIFY(prisJoint->inspector != nullptr);
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(prisJoint->jointMsg->type()) == "prismatic");
@@ -377,8 +377,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 2u);
 
   gui::JointData *gearboxJoint = cylinderJointData[0];
-  QVERIFY(gearboxJoint != NULL);
-  QVERIFY(gearboxJoint->inspector != NULL);
+  QVERIFY(gearboxJoint != nullptr);
+  QVERIFY(gearboxJoint->inspector != nullptr);
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(gearboxJoint->jointMsg->type()) == "gearbox");
@@ -431,8 +431,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 3u);
 
   gui::JointData *fixedJoint = cylinderJointData[1];
-  QVERIFY(fixedJoint != NULL);
-  QVERIFY(fixedJoint->inspector != NULL);
+  QVERIFY(fixedJoint != nullptr);
+  QVERIFY(fixedJoint->inspector != nullptr);
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(fixedJoint->jointMsg->type()) == "fixed");
@@ -466,7 +466,7 @@ void JointMaker_TEST::ShowJoints()
   gui::JointMaker *jointMaker = new gui::JointMaker();
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -502,10 +502,10 @@ void JointMaker_TEST::ShowJoints()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(revoluteJointData->hotspot != NULL);
-  QVERIFY(prismaticJointData->hotspot != NULL);
-  QVERIFY(revoluteJointData->jointVisual != NULL);
-  QVERIFY(prismaticJointData->jointVisual != NULL);
+  QVERIFY(revoluteJointData->hotspot != nullptr);
+  QVERIFY(prismaticJointData->hotspot != nullptr);
+  QVERIFY(revoluteJointData->jointVisual != nullptr);
+  QVERIFY(prismaticJointData->jointVisual != nullptr);
 
   // toggle joint visualization and verify
   jointMaker->ShowJoints(false);
@@ -545,7 +545,7 @@ void JointMaker_TEST::Selection()
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -657,7 +657,7 @@ void JointMaker_TEST::LinkList()
   this->Load("worlds/empty.world");
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Check there are no links in the beginning
   auto linkList = jointMaker->LinkList();
@@ -705,12 +705,12 @@ void JointMaker_TEST::UpdateMsg()
 
   // Create joint maker
   auto jointMaker = new gui::JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   // Create main window
   auto mainWindow = new gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -742,7 +742,7 @@ void JointMaker_TEST::UpdateMsg()
   QCOMPARE(type1, gui::JointMaker::JOINT_HINGE);
 
   auto msg1 = jointData->jointMsg;
-  QVERIFY(msg1 != NULL);
+  QVERIFY(msg1 != nullptr);
   QVERIFY(msg1->name() == name1);
   QVERIFY(gui::JointMaker::ConvertJointType(
       msgs::ConvertJointType(msg1->type())) == type1);
@@ -751,38 +751,38 @@ void JointMaker_TEST::UpdateMsg()
   QCOMPARE(msgs::ConvertIgn(msg1->pose()), ignition::math::Pose3d::Zero);
 
   auto parentVis = jointData->parent;
-  QVERIFY(parentVis != NULL);
+  QVERIFY(parentVis != nullptr);
 
   auto childVis = jointData->child;
-  QVERIFY(childVis != NULL);
+  QVERIFY(childVis != nullptr);
 
   auto hotspot = jointData->hotspot;
-  QVERIFY(hotspot != NULL);
+  QVERIFY(hotspot != nullptr);
 
   auto visual = jointData->visual;
-  QVERIFY(visual != NULL);
+  QVERIFY(visual != nullptr);
 
   auto line = jointData->line;
-  QVERIFY(line != NULL);
+  QVERIFY(line != nullptr);
 
   auto handles = jointData->handles;
-  QVERIFY(handles != NULL);
+  QVERIFY(handles != nullptr);
 
   auto inspector = jointData->inspector;
-  QVERIFY(inspector != NULL);
+  QVERIFY(inspector != nullptr);
 
   QVERIFY(jointData->dirty);
 
   // Check there's no joint visual until update
   auto jointVisual = jointData->jointVisual;
-  QVERIFY(jointVisual == NULL);
+  QVERIFY(jointVisual == nullptr);
 
   jointData->Update();
 
   QVERIFY(!jointData->dirty);
 
   jointVisual = jointData->jointVisual;
-  QVERIFY(jointVisual != NULL);
+  QVERIFY(jointVisual != nullptr);
 
   // Change data and update - 1 axis -> 2 axes
   std::string name2 = "new_name";

@@ -41,14 +41,14 @@ template<typename T> bool CastAnyValue(const boost::any &_value, T &_return)
 Preset::Preset()
     : dataPtr(new PresetPrivate)
 {
-  GZ_ASSERT(this->dataPtr != NULL, "Data ptr NULL for Preset!");
+  GZ_ASSERT(this->dataPtr != nullptr, "Data ptr nullptr for Preset!");
 }
 
 //////////////////////////////////////////////////
 Preset::Preset(const std::string &_name)
     : dataPtr(new PresetPrivate(_name))
 {
-  GZ_ASSERT(this->dataPtr != NULL, "Data ptr NULL for Preset!");
+  GZ_ASSERT(this->dataPtr != nullptr, "Data ptr nullptr for Preset!");
 }
 
 //////////////////////////////////////////////////
@@ -57,7 +57,7 @@ Preset::~Preset()
   this->dataPtr->elementSDF.reset();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -67,7 +67,7 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
 
   if (!_physicsEngine)
   {
-    gzwarn << "Physics engine for PresetManager is NULL. PresetManager will "
+    gzwarn << "Physics engine for PresetManager is nullptr. PresetManager will "
            << "have no effect on simulation!" << std::endl;
     result = false;
   }
@@ -182,7 +182,7 @@ bool Preset::SDF(const sdf::ElementPtr _sdfElement)
 {
   if (!_sdfElement)
   {
-    gzwarn << "Can't add NULL SDF element to Preset" << std::endl;
+    gzwarn << "Can't add nullptr SDF element to Preset" << std::endl;
     return false;
   }
   if (_sdfElement->GetName() != "physics")
@@ -199,12 +199,12 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
     const sdf::ElementPtr _sdf)
     : dataPtr(new PresetManagerPrivate)
 {
-  GZ_ASSERT(this->dataPtr != NULL, "Data pointer NULL for PresetManager!");
+  GZ_ASSERT(this->dataPtr != nullptr, "Data pointer nullptr for PresetManager!");
 
   this->dataPtr->physicsEngine = _physicsEngine;
   if (!_physicsEngine || !_sdf)
   {
-    gzerr << "Required arguments NULL for PresetManager" << std::endl;
+    gzerr << "Required arguments nullptr for PresetManager" << std::endl;
     return;
   }
 
@@ -251,13 +251,13 @@ PresetManager::~PresetManager()
   this->dataPtr->presetProfiles.clear();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
 bool PresetManager::CurrentProfile(const std::string &_name)
 {
-  GZ_ASSERT(this->dataPtr->physicsEngine, "Physics engine was NULL");
+  GZ_ASSERT(this->dataPtr->physicsEngine, "Physics engine was nullptr");
 
   if (_name.empty())
     return false;
@@ -350,7 +350,7 @@ bool PresetManager::GetProfileParam(const std::string &_name,
 bool PresetManager::SetCurrentProfileParam(const std::string &_key,
     const boost::any &_value)
 {
-  if (this->CurrentProfile().empty() || this->CurrentPreset() == NULL)
+  if (this->CurrentProfile().empty() || this->CurrentPreset() == nullptr)
   {
     return false;
   }
@@ -457,9 +457,9 @@ sdf::ElementPtr PresetManager::ProfileSDF(const std::string &_name) const
 {
   if (_name.empty() || !this->HasProfile(_name))
   {
-    gzerr << "Profile [" << _name << "] does not exist. Returning NULL "
+    gzerr << "Profile [" << _name << "] does not exist. Returning nullptr "
           << "SDF pointer." << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   return this->dataPtr->presetProfiles[_name].SDF();
@@ -471,7 +471,7 @@ bool PresetManager::ProfileSDF(const std::string &_name,
 {
   if (!_sdf)
   {
-    gzwarn << "Received NULL SDF element pointer in ProfileSDF" << std::endl;
+    gzwarn << "Received nullptr SDF element pointer in ProfileSDF" << std::endl;
     return false;
   }
 
@@ -497,7 +497,7 @@ bool PresetManager::ProfileSDF(const std::string &_name,
 void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
     Preset &_preset) const
 {
-  GZ_ASSERT(_elem, "NULL elem in GeneratePresetFromSDF, should never happen");
+  GZ_ASSERT(_elem, "nullptr elem in GeneratePresetFromSDF, should never happen");
 
   // Check for physics engine type. If the type specified in SDF doesn't match
   // the type of the physics engine, don't add the children to the parameter
@@ -513,7 +513,7 @@ void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;
         elem = elem->GetNextElement())
   {
-    if (elem->GetValue() != NULL)
+    if (elem->GetValue() != nullptr)
     {
       _preset.SetParam(elem->GetName(), elem->GetAny());
     }
@@ -540,14 +540,14 @@ void PresetManager::GenerateSDFFromPreset(const std::string &_name,
   GZ_ASSERT(_elem, "Null SDF pointer in preset");
 
   this->GenerateSDFHelper(iter->second, _elem);
-  GZ_ASSERT(_elem, "Generated NULL SDF pointer");
+  GZ_ASSERT(_elem, "Generated nullptr SDF pointer");
 }
 
 //////////////////////////////////////////////////
 void PresetManager::GenerateSDFHelper(const Preset &_preset,
     sdf::ElementPtr &_elem) const
 {
-  GZ_ASSERT(_elem, "NULL elem in GenerateSDFHelper, should never happen");
+  GZ_ASSERT(_elem, "nullptr elem in GenerateSDFHelper, should never happen");
 
   // For each element, enforce that its equivalent in Preset has the same value
   for (sdf::ElementPtr elem = _elem->GetFirstElement(); elem;

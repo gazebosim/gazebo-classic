@@ -57,7 +57,7 @@ TEST_F(PresetManagerTest, GetSetPresetParam)
 /////////////////////////////////////////////////
 TEST_F(PresetManagerTest, GetSetProfileParam)
 {
-  EXPECT_NO_THROW(physics::PresetManager(NULL, NULL));
+  EXPECT_NO_THROW(physics::PresetManager(nullptr, nullptr));
 
   // Load preset test world
   Load("test/worlds/presets.world", true);
@@ -223,7 +223,7 @@ TEST_F(PresetManagerTest, SDF)
     // Compare the SDF as strings
     EXPECT_EQ(presetManager->ProfileSDF("preset_3")->ToString(""),
         physicsSDF->ToString(""));
-    EXPECT_TRUE(presetManager->ProfileSDF("preset_3") != NULL);
+    EXPECT_TRUE(presetManager->ProfileSDF("preset_3") != nullptr);
     EXPECT_TRUE(presetManager->CurrentProfile("preset_3"));
     try
     {
@@ -241,25 +241,25 @@ TEST_F(PresetManagerTest, SDF)
     }
 
     // GenerateSDFFromPreset
-    sdf::ElementPtr generatedPhysicsSDF = NULL;
+    sdf::ElementPtr generatedPhysicsSDF = nullptr;
     presetManager->GenerateSDFFromPreset("this_preset_does_not_exist",
         generatedPhysicsSDF);
     // Call doesn't do anything
-    ASSERT_TRUE(generatedPhysicsSDF == NULL);
+    ASSERT_TRUE(generatedPhysicsSDF == nullptr);
 
     presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
     // Compare the SDF as strings
-    ASSERT_TRUE(generatedPhysicsSDF != NULL);
+    ASSERT_TRUE(generatedPhysicsSDF != nullptr);
 
     EXPECT_EQ(generatedPhysicsSDF->ToString(""), physicsSDF->ToString(""));
   }
 
   {
     // Try to set a null pointer
-    sdf::ElementPtr nullElement = NULL;
+    sdf::ElementPtr nullElement = nullptr;
     presetManager->ProfileSDF("preset_3", nullElement);
     // Should have no effect
-    EXPECT_TRUE(presetManager->ProfileSDF("preset_3") != NULL);
+    EXPECT_TRUE(presetManager->ProfileSDF("preset_3") != nullptr);
   }
 
   {

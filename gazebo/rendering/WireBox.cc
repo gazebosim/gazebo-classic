@@ -42,7 +42,7 @@ WireBox::~WireBox()
 {
   delete this->dataPtr->lines;
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

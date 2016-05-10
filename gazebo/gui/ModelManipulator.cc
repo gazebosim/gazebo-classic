@@ -56,7 +56,7 @@ ModelManipulator::~ModelManipulator()
 {
   this->Clear();
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

@@ -172,7 +172,7 @@ void DoorItem::OnApply()
     itemPos.setY(-itemPos.y());
     this->dataPtr->doorPos = Conversions::Convert(itemPos);
     this->setPos(itemPos);
-//    this->setParentItem(NULL);
+//    this->setParentItem(nullptr);
   }
   this->DoorChanged();
 }

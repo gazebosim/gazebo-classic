@@ -53,7 +53,7 @@ namespace gazebo
       /// corner.
       protected: void Init(const std::string &_objName,
           const std::string &_tabLabel, QWidget *_widget,
-          QWidget *_cornerWidget = NULL);
+          QWidget *_cornerWidget = nullptr);
 
       /// \brief The tab widget that holds the editor's set of buttons.
       protected: QTabWidget *tabWidget;

@@ -49,7 +49,7 @@ std::string gazebo::custom_exec(std::string _cmd)
 
   while (!feof(pipe))
   {
-    if (fgets(buffer, 128, pipe) != NULL)
+    if (fgets(buffer, 128, pipe) != nullptr)
       result += buffer;
   }
 
@@ -72,13 +72,13 @@ void RenderingFixture::SetUp()
 /////////////////////////////////////////////////
 ServerFixture::ServerFixture()
 {
-  this->server = NULL;
+  this->server = nullptr;
   this->serverRunning = false;
   this->paused = false;
   this->percentRealTime = 0;
   this->gotImage = 0;
-  this->imgData = NULL;
-  this->serverThread = NULL;
+  this->imgData = nullptr;
+  this->serverThread = nullptr;
   this->uniqueCounter = 0;
 
   gzLogInit("test-", "test.log");
@@ -139,7 +139,7 @@ void ServerFixture::Unload()
   }
 
   delete this->serverThread;
-  this->serverThread = NULL;
+  this->serverThread = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -175,7 +175,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
 void ServerFixture::LoadArgs(const std::string &_args)
 {
   delete this->server;
-  this->server = NULL;
+  this->server = nullptr;
 
   // Split the string into a vector of parameters.
   std::vector<std::string> params;
@@ -257,7 +257,7 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
   if (!this->server->ParseArgs(argc, argv))
   {
     ASSERT_NO_THROW(delete this->server);
-    this->server = NULL;
+    this->server = nullptr;
     return;
   }
 
@@ -272,7 +272,7 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
   ASSERT_NO_THROW(this->server->Fini());
 
   ASSERT_NO_THROW(delete this->server);
-  this->server = NULL;
+  this->server = nullptr;
 
   // Deallocate memory for the command line arguments allocated with strdup.
   for (int i = 0; i < argc; ++i)
@@ -288,7 +288,7 @@ rendering::ScenePtr ServerFixture::GetScene(
   // Wait for the scene to get loaded.
   int i = 0;
   int timeoutDS = 20;
-  while (rendering::get_scene(_sceneName) == NULL && i < timeoutDS)
+  while (rendering::get_scene(_sceneName) == nullptr && i < timeoutDS)
   {
     common::Time::MSleep(100);
     ++i;
@@ -505,7 +505,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
     unsigned int &_height)
 {
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
@@ -515,7 +515,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   if (*_imgData)
   {
     delete *_imgData;
-    *_imgData = NULL;
+    *_imgData = nullptr;
   }
   (*_imgData) = new unsigned char[_width *_height*3];
   this->imgData = _imgData;

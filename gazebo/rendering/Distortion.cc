@@ -44,7 +44,7 @@ Distortion::Distortion()
 Distortion::~Distortion()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -71,7 +71,7 @@ void Distortion::SetCamera(CameraPtr _camera)
 {
   if (!_camera)
   {
-    gzerr << "Unable to apply distortion, camera is NULL" << std::endl;
+    gzerr << "Unable to apply distortion, camera is nullptr" << std::endl;
     return;
   }
 

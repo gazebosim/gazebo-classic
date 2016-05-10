@@ -106,11 +106,11 @@ namespace gazebo
       /// \param[in] _menu Menu to be added.
       public: void AddMenu(QMenu *_menu);
 
-      /// \brief Show a custom menubar. If NULL is used, the default menubar
+      /// \brief Show a custom menubar. If nullptr is used, the default menubar
       /// is shown.
-      /// \param[in] _bar The menubar to show. NULL will show the default
+      /// \param[in] _bar The menubar to show. nullptr will show the default
       /// menubar.
-      public: void ShowMenuBar(QMenuBar *_bar = NULL);
+      public: void ShowMenuBar(QMenuBar *_bar = nullptr);
 
       /// \brief Create a new action with information from the given action,
       /// such as text and tooltip. The new action triggers the original action

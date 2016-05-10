@@ -97,14 +97,14 @@ namespace gazebo
 
       /// \brief Get a scene by name
       /// \param[in] _name Name of the scene to retreive.
-      /// \return A pointer to the Scene, or NULL if the scene doesn't
+      /// \return A pointer to the Scene, or nullptr if the scene doesn't
       /// exist.
       public: ScenePtr GetScene(const std::string &_name="");
 
       /// \brief Get a scene by index. The index should be between 0 and
       /// GetSceneCount().
       /// \param[in] _index The index of the scene.
-      /// \return A pointer to a Scene, or NULL if the index was invalid.
+      /// \return A pointer to a Scene, or nullptr if the index was invalid.
       public: ScenePtr GetScene(unsigned int _index);
 
       /// \brief Get the number of scenes.

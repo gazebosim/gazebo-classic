@@ -25,7 +25,7 @@ Box::Box()
 {
   this->min.Set(0, 0, 0);
   this->max.Set(0, 0, 0);
-  this->extent = EXTENT_NULL;
+  this->extent = EXTENT_nullptr;
 }
 
 
@@ -93,7 +93,7 @@ math::Vector3 Box::GetCenter() const
 //////////////////////////////////////////////////
 void Box::Merge(const Box &_box)
 {
-  if (this->extent == EXTENT_NULL)
+  if (this->extent == EXTENT_nullptr)
   {
     this->min = _box.min;
     this->max = _box.max;
@@ -121,7 +121,7 @@ Box Box::operator+(const Box &_b) const
 {
   Vector3 mn, mx;
 
-  if (this->extent != EXTENT_NULL)
+  if (this->extent != EXTENT_nullptr)
   {
     mn = this->min;
     mx = this->max;
@@ -141,7 +141,7 @@ Box Box::operator+(const Box &_b) const
 //////////////////////////////////////////////////
 const Box &Box::operator+=(const Box &_b)
 {
-  if (this->extent != EXTENT_NULL)
+  if (this->extent != EXTENT_nullptr)
   {
     this->min.SetToMin(_b.min);
     this->max.SetToMax(_b.max);

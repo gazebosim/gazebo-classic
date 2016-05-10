@@ -97,7 +97,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Qt Object
-      public: ModelCreator(QObject *_parent = NULL);
+      public: ModelCreator(QObject *_parent = nullptr);
 
       /// \brief Destructor
       public: virtual ~ModelCreator();
@@ -392,7 +392,7 @@ namespace gazebo
       /// \param[in] _emit True to emit nested model inserted events.
       /// \return Data describing the model.
       private: NestedModelData *CreateModelFromSDF(const sdf::ElementPtr &_sdf,
-          const rendering::VisualPtr &_parentVis = NULL,
+          const rendering::VisualPtr &_parentVis = nullptr,
           const bool _emit = true);
 
       /// \brief Callback when a specific alignment configuration is set.

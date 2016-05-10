@@ -870,7 +870,7 @@ void JointCreationDialog::OnAlign(const int _int)
   std::vector<std::string> configs = {"min", "center", "max"};
 
   // Find out which axis was changed
-  QButtonGroup *group = NULL;
+  QButtonGroup *group = nullptr;
   unsigned int g;
   QObject *senderObject = this->sender();
   if (senderObject == this->dataPtr->reverseXBox)

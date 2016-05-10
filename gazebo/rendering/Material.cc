@@ -176,7 +176,7 @@ void Material::Update(const gazebo::common::Material *_mat)
 
   // Only add the texture unit if it's not present in the material
   if (!_mat->GetTextureImage().empty() &&
-      pass->getTextureUnitState(_mat->GetTextureImage()) == NULL)
+      pass->getTextureUnitState(_mat->GetTextureImage()) == nullptr)
   {
     Ogre::TextureUnitState *texState = pass->createTextureUnitState(
         _mat->GetTextureImage());

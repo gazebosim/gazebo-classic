@@ -60,7 +60,7 @@ ImagesView::~ImagesView()
   this->sub.reset();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -122,7 +122,7 @@ void ImagesView::SetTopic(const std::string &_topicName)
 /////////////////////////////////////////////////
 void ImagesView::AddImage(int _width, int _height)
 {
-  std::unique_ptr<ImageFrame> imageFrame(new ImageFrame(NULL));
+  std::unique_ptr<ImageFrame> imageFrame(new ImageFrame(nullptr));
   imageFrame->setBaseSize(_width, _height);
   imageFrame->setMinimumSize(320, 240);
   imageFrame->show();

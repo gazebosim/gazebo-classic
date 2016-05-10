@@ -141,7 +141,7 @@ namespace gazebo
 
       /// \brief Get a previous message for a publisher.
       /// \param[in] _pubId ID of the publisher.
-      /// \return Pointer to the previous message. NULL if there is no
+      /// \return Pointer to the previous message. nullptr if there is no
       /// previous message.
       public: MessagePtr GetPrevMsg(uint32_t _pubId);
 

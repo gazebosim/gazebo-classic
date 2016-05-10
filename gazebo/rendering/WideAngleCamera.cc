@@ -416,13 +416,13 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
 {
   this->dataPtr->lens = new CameraLens();
 
-  this->dataPtr->envCubeMapTexture = NULL;
+  this->dataPtr->envCubeMapTexture = nullptr;
   this->dataPtr->envTextureSize = _textureSize;
 
   for (int i = 0; i < 6; ++i)
   {
-    this->dataPtr->envCameras[i] = NULL;
-    this->dataPtr->envRenderTargets[i] = NULL;
+    this->dataPtr->envCameras[i] = nullptr;
+    this->dataPtr->envRenderTargets[i] = nullptr;
   }
 }
 
@@ -486,18 +486,18 @@ void WideAngleCamera::Fini()
                                    this->GetScene());
 
     this->dataPtr->envRenderTargets[i]->removeAllViewports();
-    this->dataPtr->envRenderTargets[i] = NULL;
+    this->dataPtr->envRenderTargets[i] = nullptr;
 
     this->GetScene()->OgreSceneManager()->destroyCamera(
         this->dataPtr->envCameras[i]->getName());
-    this->dataPtr->envCameras[i] = NULL;
+    this->dataPtr->envCameras[i] = nullptr;
   }
 
   if (this->dataPtr->envCubeMapTexture)
     Ogre::TextureManager::getSingleton().remove(
       this->dataPtr->envCubeMapTexture->getName());
 
-  this->dataPtr->envCubeMapTexture = NULL;
+  this->dataPtr->envCubeMapTexture = nullptr;
 
   Camera::Fini();
 }

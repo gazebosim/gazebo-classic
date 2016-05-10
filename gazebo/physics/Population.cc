@@ -56,7 +56,7 @@ Population::~Population()
 //////////////////////////////////////////////////
 bool Population::PopulateAll()
 {
-  GZ_ASSERT(this->dataPtr->populationElem, "<population> SDF element is NULL");
+  GZ_ASSERT(this->dataPtr->populationElem, "<population> SDF element is nullptr");
 
   sdf::ElementPtr popElem = this->dataPtr->populationElem;
   bool result = true;
@@ -78,7 +78,7 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   std::vector<math::Vector3> objects;
   PopulationParams params;
 
-  GZ_ASSERT(_population, "'_population' parameter is NULL");
+  GZ_ASSERT(_population, "'_population' parameter is nullptr");
 
   if (!this->ParseSdf(_population, params))
     return false;
@@ -158,7 +158,7 @@ bool Population::ElementFromSdf(const sdf::ElementPtr &_sdfElement,
 bool Population::ParseSdf(sdf::ElementPtr _population,
   PopulationParams &_params)
 {
-  GZ_ASSERT(_population, "'_population' parameter is NULL");
+  GZ_ASSERT(_population, "'_population' parameter is nullptr");
 
   // Read the model element.
   sdf::ElementPtr model;

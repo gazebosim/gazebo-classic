@@ -39,7 +39,7 @@ void ConfigWidget_TEST::EmptyMsgWidget()
   visualConfigWidget->Load(&visualMsg);
   gazebo::msgs::Visual *retVisualMsg =
       dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->Msg());
-  QVERIFY(retVisualMsg != NULL);
+  QVERIFY(retVisualMsg != nullptr);
   delete visualConfigWidget;
 
   gazebo::gui::ConfigWidget *collisionConfigWidget =
@@ -48,7 +48,7 @@ void ConfigWidget_TEST::EmptyMsgWidget()
   collisionConfigWidget->Load(&collisionMsg);
   gazebo::msgs::Collision *retCollisionMsg =
       dynamic_cast<gazebo::msgs::Collision *>(collisionConfigWidget->Msg());
-  QVERIFY(retCollisionMsg != NULL);
+  QVERIFY(retCollisionMsg != nullptr);
   delete collisionConfigWidget;
 }
 
@@ -104,7 +104,7 @@ void ConfigWidget_TEST::JointMsgWidget()
   {
     gazebo::msgs::Joint *retJointMsg =
         dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->Msg());
-    QVERIFY(retJointMsg != NULL);
+    QVERIFY(retJointMsg != nullptr);
 
     // joint
     QVERIFY(retJointMsg->name() == "test_joint");
@@ -274,7 +274,7 @@ void ConfigWidget_TEST::JointMsgWidget()
   {
     gazebo::msgs::Joint *retJointMsg =
         dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->Msg());
-    QVERIFY(retJointMsg != NULL);
+    QVERIFY(retJointMsg != nullptr);
 
     // joint
     QVERIFY(retJointMsg->name() == "test_joint_updated");
@@ -410,7 +410,7 @@ void ConfigWidget_TEST::JointMsgWidget()
   {
     gazebo::msgs::Joint *retJointMsg =
         dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->Msg());
-    QVERIFY(retJointMsg != NULL);
+    QVERIFY(retJointMsg != nullptr);
 
     // joint
     QVERIFY(retJointMsg->name() == "test_joint_updated2");
@@ -513,7 +513,7 @@ void ConfigWidget_TEST::VisualMsgWidget()
   {
     gazebo::msgs::Visual *retVisualMsg =
         dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->Msg());
-    QVERIFY(retVisualMsg != NULL);
+    QVERIFY(retVisualMsg != nullptr);
 
     // visual
     QVERIFY(retVisualMsg->name() == "test_visual");
@@ -678,7 +678,7 @@ void ConfigWidget_TEST::VisualMsgWidget()
   {
     gazebo::msgs::Visual *retVisualMsg =
         dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->Msg());
-    QVERIFY(retVisualMsg != NULL);
+    QVERIFY(retVisualMsg != nullptr);
 
     // visual
     QVERIFY(retVisualMsg->name() == "test_visual_updated");
@@ -775,7 +775,7 @@ void ConfigWidget_TEST::PluginMsgWidget()
   {
     gazebo::msgs::Plugin *retPluginMsg =
         dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->Msg());
-    QVERIFY(retPluginMsg != NULL);
+    QVERIFY(retPluginMsg != nullptr);
 
     // plugin
     QVERIFY(retPluginMsg->name() == "test_plugin");
@@ -808,7 +808,7 @@ void ConfigWidget_TEST::PluginMsgWidget()
   {
     gazebo::msgs::Plugin *retPluginMsg =
         dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->Msg());
-    QVERIFY(retPluginMsg != NULL);
+    QVERIFY(retPluginMsg != nullptr);
 
     // plugin
     QVERIFY(retPluginMsg->name() == "test_plugin_updated");
@@ -1132,15 +1132,15 @@ void ConfigWidget_TEST::CreatedExternally()
   gazebo::gui::ConfigChildWidget *enumWidget =
       configWidget->CreateEnumWidget("enum", enumValues, 4);
 
-  QVERIFY(uintWidget != NULL);
-  QVERIFY(intWidget != NULL);
-  QVERIFY(doubleWidget != NULL);
-  QVERIFY(stringWidget != NULL);
-  QVERIFY(boolWidget != NULL);
-  QVERIFY(vector3dWidget != NULL);
-  QVERIFY(colorWidget != NULL);
-  QVERIFY(poseWidget != NULL);
-  QVERIFY(enumWidget != NULL);
+  QVERIFY(uintWidget != nullptr);
+  QVERIFY(intWidget != nullptr);
+  QVERIFY(doubleWidget != nullptr);
+  QVERIFY(stringWidget != nullptr);
+  QVERIFY(boolWidget != nullptr);
+  QVERIFY(vector3dWidget != nullptr);
+  QVERIFY(colorWidget != nullptr);
+  QVERIFY(poseWidget != nullptr);
+  QVERIFY(enumWidget != nullptr);
 
   // Create a custom child widget
   QLabel *customLabel = new QLabel("custom label");
@@ -1172,7 +1172,7 @@ void ConfigWidget_TEST::CreatedExternally()
 
   // Fail to add invalid children
   QCOMPARE(configWidget->AddConfigChildWidget("", uintWidget), false);
-  QCOMPARE(configWidget->AddConfigChildWidget("validName", NULL), false);
+  QCOMPARE(configWidget->AddConfigChildWidget("validName", nullptr), false);
   QCOMPARE(configWidget->AddConfigChildWidget("uint", intWidget), false);
 
   QCOMPARE(configWidget->ConfigChildWidgetCount(), 10u);
@@ -1247,8 +1247,8 @@ void ConfigWidget_TEST::CreatedExternally()
 
   gazebo::gui::GroupWidget *groupWidget =
       configWidget->CreateGroupWidget("groupWidget", groupChildWidget, 0);
-  QVERIFY(groupWidget != NULL);
-  QVERIFY(groupWidget->childWidget != NULL);
+  QVERIFY(groupWidget != nullptr);
+  QVERIFY(groupWidget->childWidget != nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -1256,7 +1256,7 @@ void ConfigWidget_TEST::EnumConfigWidget()
 {
   // Create a parent widget
   gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget();
-  QVERIFY(configWidget != NULL);
+  QVERIFY(configWidget != nullptr);
 
   // Create an enum child widget
   std::vector<std::string> enumValues;
@@ -1266,7 +1266,7 @@ void ConfigWidget_TEST::EnumConfigWidget()
   gazebo::gui::ConfigChildWidget *enumWidget =
       configWidget->CreateEnumWidget("Enum Label", enumValues);
 
-  QVERIFY(enumWidget != NULL);
+  QVERIFY(enumWidget != nullptr);
 
   // Add it to parent
   QVERIFY(configWidget->AddConfigChildWidget("enumWidgetName", enumWidget));
@@ -1282,7 +1282,7 @@ void ConfigWidget_TEST::EnumConfigWidget()
 
   // Check the number of items
   QComboBox *comboBox = enumWidget->findChild<QComboBox *>();
-  QVERIFY(comboBox != NULL);
+  QVERIFY(comboBox != nullptr);
   QCOMPARE(comboBox->count(), 3);
 
   // Add an item and check count
@@ -1323,7 +1323,7 @@ void ConfigWidget_TEST::ChildUIntSignal()
   // Create child uint widget
   gazebo::gui::ConfigChildWidget *uintWidget =
       configWidget->CreateUIntWidget("uint");
-  QVERIFY(uintWidget != NULL);
+  QVERIFY(uintWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("uint", uintWidget));
@@ -1366,7 +1366,7 @@ void ConfigWidget_TEST::ChildIntSignal()
   // Create child int widget
   gazebo::gui::ConfigChildWidget *intWidget =
       configWidget->CreateIntWidget("int");
-  QVERIFY(intWidget != NULL);
+  QVERIFY(intWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("int", intWidget));
@@ -1409,7 +1409,7 @@ void ConfigWidget_TEST::ChildDoubleSignal()
   // Create child double widget
   gazebo::gui::ConfigChildWidget *doubleWidget =
       configWidget->CreateDoubleWidget("double");
-  QVERIFY(doubleWidget != NULL);
+  QVERIFY(doubleWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("double", doubleWidget));
@@ -1453,7 +1453,7 @@ void ConfigWidget_TEST::ChildBoolSignal()
   // Create child bool widget
   gazebo::gui::ConfigChildWidget *boolWidget =
       configWidget->CreateBoolWidget("bool");
-  QVERIFY(boolWidget != NULL);
+  QVERIFY(boolWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("bool", boolWidget));
@@ -1498,7 +1498,7 @@ void ConfigWidget_TEST::ChildStringSignal()
   // Create child string widget
   gazebo::gui::ConfigChildWidget *stringWidget =
       configWidget->CreateStringWidget("string");
-  QVERIFY(stringWidget != NULL);
+  QVERIFY(stringWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("string", stringWidget));
@@ -1542,7 +1542,7 @@ void ConfigWidget_TEST::ChildVector3dSignal()
   // Create child vector3 widget
   gazebo::gui::ConfigChildWidget *vector3Widget =
       configWidget->CreateVector3dWidget("vector3");
-  QVERIFY(vector3Widget != NULL);
+  QVERIFY(vector3Widget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("vector3", vector3Widget));
@@ -1608,7 +1608,7 @@ void ConfigWidget_TEST::ChildColorSignal()
   // Create child color widget
   gazebo::gui::ConfigChildWidget *colorWidget =
       configWidget->CreateColorWidget("color");
-  QVERIFY(colorWidget != NULL);
+  QVERIFY(colorWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("color", colorWidget));
@@ -1653,7 +1653,7 @@ void ConfigWidget_TEST::ChildPoseSignal()
   // Create child pose widget
   gazebo::gui::ConfigChildWidget *poseWidget =
       configWidget->CreatePoseWidget("pose");
-  QVERIFY(poseWidget != NULL);
+  QVERIFY(poseWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("pose", poseWidget));
@@ -1696,7 +1696,7 @@ void ConfigWidget_TEST::ChildGeometrySignal()
   // Create child widget
   gazebo::gui::ConfigChildWidget *geometryWidget =
       configWidget->CreateGeometryWidget("geometry");
-  QVERIFY(geometryWidget != NULL);
+  QVERIFY(geometryWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("geometry", geometryWidget));
@@ -1755,7 +1755,7 @@ void ConfigWidget_TEST::ChildEnumSignal()
   enumValues.push_back("value3");
   gazebo::gui::ConfigChildWidget *enumWidget =
       configWidget->CreateEnumWidget("enum", enumValues);
-  QVERIFY(enumWidget != NULL);
+  QVERIFY(enumWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("enum", enumWidget));
@@ -1795,21 +1795,21 @@ void ConfigWidget_TEST::GetChildWidgetByName()
 {
   // Create config widget and check it has no children
   gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
-  QVERIFY(configWidget != NULL);
+  QVERIFY(configWidget != nullptr);
   QCOMPARE(configWidget->ConfigChildWidgetCount(), 0u);
 
   // Try to get a child widget by name
   gazebo::gui::ConfigChildWidget *widget =
       configWidget->ConfigChildWidgetByName("child_widget");
-  QVERIFY(widget == NULL);
+  QVERIFY(widget == nullptr);
 
   widget = configWidget->ConfigChildWidgetByName("");
-  QVERIFY(widget == NULL);
+  QVERIFY(widget == nullptr);
 
   // Create child widget
   gazebo::gui::ConfigChildWidget *childWidget =
       configWidget->CreateBoolWidget("child_widget");
-  QVERIFY(childWidget != NULL);
+  QVERIFY(childWidget != nullptr);
 
   // Add to config widget
   QVERIFY(configWidget->AddConfigChildWidget("child_widget", childWidget));
@@ -1817,11 +1817,11 @@ void ConfigWidget_TEST::GetChildWidgetByName()
 
   // Get the widget by name
   widget = configWidget->ConfigChildWidgetByName("child_widget");
-  QVERIFY(widget != NULL);
+  QVERIFY(widget != nullptr);
 
-  // Check that a bad name returns NULL
+  // Check that a bad name returns nullptr
   widget = configWidget->ConfigChildWidgetByName("bad_name");
-  QVERIFY(widget == NULL);
+  QVERIFY(widget == nullptr);
 
   delete configWidget;
 }

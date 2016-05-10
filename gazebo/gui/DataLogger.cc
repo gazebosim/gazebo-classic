@@ -226,7 +226,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->dataPtr->statusTime = 0;
 
   // Timer used to hide the confirmation dialog
-  this->dataPtr->confirmationDialog = NULL;
+  this->dataPtr->confirmationDialog = nullptr;
   this->dataPtr->confirmationTimer = new QTimer(this);
   connect(this->dataPtr->confirmationTimer, SIGNAL(timeout()), this,
       SLOT(OnConfirmationTimeout()));

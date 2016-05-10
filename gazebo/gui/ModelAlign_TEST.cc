@@ -35,7 +35,7 @@ void ModelAlign_TEST::AlignXMin()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -74,7 +74,7 @@ void ModelAlign_TEST::AlignXMin()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -110,7 +110,7 @@ void ModelAlign_TEST::AlignXMinReverse()
 
   // Get the scene
   auto scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::event::Events::preRender();
 
@@ -151,7 +151,7 @@ void ModelAlign_TEST::AlignXMinReverse()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -189,7 +189,7 @@ void ModelAlign_TEST::AlignXCenter()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -228,7 +228,7 @@ void ModelAlign_TEST::AlignXCenter()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -263,7 +263,7 @@ void ModelAlign_TEST::AlignXMax()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -302,7 +302,7 @@ void ModelAlign_TEST::AlignXMax()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -339,7 +339,7 @@ void ModelAlign_TEST::AlignXMaxReverse()
 
   // Get the scene
   auto scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::event::Events::preRender();
 
@@ -380,7 +380,7 @@ void ModelAlign_TEST::AlignXMaxReverse()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -418,7 +418,7 @@ void ModelAlign_TEST::AlignYMin()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -457,7 +457,7 @@ void ModelAlign_TEST::AlignYMin()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -493,7 +493,7 @@ void ModelAlign_TEST::AlignYMinReverse()
 
   // Get the scene
   auto scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::event::Events::preRender();
 
@@ -534,7 +534,7 @@ void ModelAlign_TEST::AlignYMinReverse()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -572,7 +572,7 @@ void ModelAlign_TEST::AlignYCenter()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -611,7 +611,7 @@ void ModelAlign_TEST::AlignYCenter()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -647,7 +647,7 @@ void ModelAlign_TEST::AlignYMax()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -686,7 +686,7 @@ void ModelAlign_TEST::AlignYMax()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -723,7 +723,7 @@ void ModelAlign_TEST::AlignYMaxReverse()
 
   // Get the scene
   auto scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::event::Events::preRender();
 
@@ -764,7 +764,7 @@ void ModelAlign_TEST::AlignYMaxReverse()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -802,7 +802,7 @@ void ModelAlign_TEST::AlignZMin()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -841,7 +841,7 @@ void ModelAlign_TEST::AlignZMin()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -877,7 +877,7 @@ void ModelAlign_TEST::AlignZMinReverse()
 
   // Get the scene
   auto scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::event::Events::preRender();
 
@@ -918,7 +918,7 @@ void ModelAlign_TEST::AlignZMinReverse()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -956,7 +956,7 @@ void ModelAlign_TEST::AlignZCenter()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -995,7 +995,7 @@ void ModelAlign_TEST::AlignZCenter()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -1030,7 +1030,7 @@ void ModelAlign_TEST::AlignZMax()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("Dumpster");
@@ -1069,7 +1069,7 @@ void ModelAlign_TEST::AlignZMax()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -1106,7 +1106,7 @@ void ModelAlign_TEST::AlignZMaxReverse()
 
   // Get the scene
   auto scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::event::Events::preRender();
 
@@ -1147,7 +1147,7 @@ void ModelAlign_TEST::AlignZMaxReverse()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -1185,7 +1185,7 @@ void ModelAlign_TEST::AlignScale()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   std::vector<std::string> modelNames;
   modelNames.push_back("box");
@@ -1223,7 +1223,7 @@ void ModelAlign_TEST::AlignScale()
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
-    QVERIFY(modelVis != NULL);
+    QVERIFY(modelVis != nullptr);
     auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
@@ -1266,7 +1266,7 @@ void ModelAlign_TEST::SetHighlighted()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Create a deeply nested visual where each level has a different transparency
   gazebo::rendering::VisualPtr vis1;

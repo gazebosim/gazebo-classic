@@ -33,7 +33,7 @@
 
 using namespace gazebo;
 
-boost::thread *g_runThread = NULL;
+boost::thread *g_runThread = nullptr;
 boost::condition_variable g_responseCondition;
 boost::mutex requestMutex;
 bool g_stopped = true;
@@ -141,7 +141,7 @@ void transport::fini()
   {
     g_runThread->join();
     delete g_runThread;
-    g_runThread = NULL;
+    g_runThread = nullptr;
   }
   transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();

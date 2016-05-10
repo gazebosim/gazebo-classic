@@ -43,7 +43,7 @@ TEST_F(Connection, IPWhiteList)
   EXPECT_EQ(connection->GetIPWhiteList(),
       std::string(",") + localAddress + ",127.0.0.1,192.168.1.1,");
   delete connection;
-  connection = NULL;
+  connection = nullptr;
 
   // Restore value
   if (ipEnv)

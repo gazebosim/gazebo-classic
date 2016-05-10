@@ -27,7 +27,7 @@ void ModelPluginInspector_TEST::Buttons()
 {
   gazebo::gui::ModelPluginInspector *inspector =
       new gazebo::gui::ModelPluginInspector();
-  QVERIFY(inspector != NULL);
+  QVERIFY(inspector != nullptr);
 
   // Check buttons
   QList<QPushButton *> buttons = inspector->findChildren<QPushButton *>();
@@ -59,7 +59,7 @@ void ModelPluginInspector_TEST::Update()
 {
   gazebo::gui::ModelPluginInspector *inspector =
       new gazebo::gui::ModelPluginInspector();
-  QVERIFY(inspector != NULL);
+  QVERIFY(inspector != nullptr);
 
   // Check fields
   QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
@@ -102,7 +102,7 @@ void ModelPluginInspector_TEST::RemoveButton()
   // Create a modelPlugin inspector
   gazebo::gui::ModelPluginInspector *modelPluginInspector =
       new gazebo::gui::ModelPluginInspector();
-  QVERIFY(modelPluginInspector != NULL);
+  QVERIFY(modelPluginInspector != nullptr);
 
   // Open it
   modelPluginInspector->open();
@@ -128,7 +128,7 @@ void ModelPluginInspector_TEST::ReadOnly()
 {
   gazebo::gui::ModelPluginInspector *inspector =
       new gazebo::gui::ModelPluginInspector();
-  QVERIFY(inspector != NULL);
+  QVERIFY(inspector != nullptr);
 
   // Check fields
   QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
@@ -155,7 +155,7 @@ void ModelPluginInspector_TEST::Clear()
 {
   gazebo::gui::ModelPluginInspector *inspector =
       new gazebo::gui::ModelPluginInspector();
-  QVERIFY(inspector != NULL);
+  QVERIFY(inspector != nullptr);
 
   // Check fields
   QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
@@ -201,7 +201,7 @@ void ModelPluginInspector_TEST::GetData()
 {
   gazebo::gui::ModelPluginInspector *inspector =
       new gazebo::gui::ModelPluginInspector();
-  QVERIFY(inspector != NULL);
+  QVERIFY(inspector != nullptr);
 
   // Check fields
   QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();

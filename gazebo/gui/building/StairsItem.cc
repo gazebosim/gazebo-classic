@@ -153,7 +153,7 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
       break;
   }
 
-  if (mouseEvent == NULL)
+  if (mouseEvent == nullptr)
     return false;
 
   if (_rotate->MouseState() == QEvent::GraphicsSceneMouseMove)
@@ -260,7 +260,7 @@ void StairsItem::OnApply()
     this->dataPtr->stairsPos = dialog->StartPosition() / this->itemScale;
     this->dataPtr->stairsPos.Y(-this->dataPtr->stairsPos.Y());
     this->setPos(Conversions::Convert(this->dataPtr->stairsPos));
-    this->setParentItem(NULL);
+    this->setParentItem(nullptr);
   }
   if (this->dataPtr->stairsSteps != dialog->Steps())
   {

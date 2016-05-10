@@ -30,7 +30,7 @@ void CollisionConfig_TEST::Initialization()
   gazebo::gui::CollisionConfig cc;
 
   QCOMPARE(cc.GetCollisionCount(), 0u);
-  QVERIFY(cc.GetData("NotFound") == NULL);
+  QVERIFY(cc.GetData("NotFound") == nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -46,10 +46,10 @@ void CollisionConfig_TEST::CollisionUpdates()
 
   QCOMPARE(cc.GetCollisionCount(), 3u);
 
-  QVERIFY(cc.GetData("c1") != NULL);
-  QVERIFY(cc.GetData("c2") != NULL);
-  QVERIFY(cc.GetData("c3") != NULL);
-  QVERIFY(cc.GetData("NotFound") == NULL);
+  QVERIFY(cc.GetData("c1") != nullptr);
+  QVERIFY(cc.GetData("c2") != nullptr);
+  QVERIFY(cc.GetData("c3") != nullptr);
+  QVERIFY(cc.GetData("NotFound") == nullptr);
 
   msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
   collisionMsgPtr->set_laser_retro(0.0000789);
@@ -74,9 +74,9 @@ void CollisionConfig_TEST::CollisionUpdates()
 
   QCOMPARE(cc.GetCollisionCount(), 0u);
 
-  QVERIFY(cc.GetData("c1") == NULL);
-  QVERIFY(cc.GetData("c2") == NULL);
-  QVERIFY(cc.GetData("c3") == NULL);
+  QVERIFY(cc.GetData("c1") == nullptr);
+  QVERIFY(cc.GetData("c2") == nullptr);
+  QVERIFY(cc.GetData("c3") == nullptr);
 }
 
 /////////////////////////////////////////////////
@@ -117,7 +117,7 @@ void CollisionConfig_TEST::AppliedSignal()
   // Create a link inspector
   gazebo::gui::CollisionConfig *collisionConfig =
       new gazebo::gui::CollisionConfig();
-  QVERIFY(collisionConfig != NULL);
+  QVERIFY(collisionConfig != nullptr);
 
   // Connect signals
   connect(collisionConfig, SIGNAL(Applied()), this, SLOT(OnApply()));

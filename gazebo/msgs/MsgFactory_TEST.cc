@@ -39,7 +39,7 @@ std::string custom_exec(const std::string &_cmd)
 
   while (!feof(pipe))
   {
-    if (fgets(buffer, 128, pipe) != NULL)
+    if (fgets(buffer, 128, pipe) != nullptr)
       result += buffer;
   }
 
@@ -53,7 +53,7 @@ TEST_F(MsgFactory, BadMsgType)
 {
   boost::shared_ptr<google::protobuf::Message> msg =
     gazebo::msgs::MsgFactory::NewMsg("bad");
-  EXPECT_EQ(NULL, msg.get());
+  EXPECT_EQ(nullptr, msg.get());
 }
 
 /////////////////////////////////////////////////

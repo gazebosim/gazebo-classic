@@ -812,7 +812,7 @@ namespace gazebo
       /// \deprecated See function that accepts ignition::math parameters.
       public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   std::function<void()> _onComplete = NULL)
+                                   std::function<void()> _onComplete = nullptr)
                                    GAZEBO_DEPRECATED(7.0);
 
       /// \brief Move the camera to a series of poses (this is an
@@ -825,7 +825,7 @@ namespace gazebo
       public: bool MoveToPositions(
                   const std::vector<ignition::math::Pose3d> &_pts,
                   const double _time,
-                  std::function<void()> _onComplete = NULL);
+                  std::function<void()> _onComplete = nullptr);
 
       /// \brief Get the path to saved screenshots.
       /// \return Path to saved screenshots.

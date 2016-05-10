@@ -418,7 +418,7 @@ void Publication::AddPublisher(PublisherPtr _pub)
 //////////////////////////////////////////////////
 void Publication::RemovePublisher(PublisherPtr _pub)
 {
-  GZ_ASSERT(_pub, "Received a NULL PublisherPtr");
+  GZ_ASSERT(_pub, "Received a nullptr PublisherPtr");
 
   if (_pub)
     this->RemovePublisher(_pub->Id());

@@ -236,12 +236,12 @@ namespace gazebo
       /// \brief Get a camera based on an index. Index must be between
       /// 0 and Scene::GetCameraCount.
       /// \param[in] _index Index of the camera to get.
-      /// \return Pointer to the camera. Or NULL if the index is invalid.
+      /// \return Pointer to the camera. Or nullptr if the index is invalid.
       public: CameraPtr GetCamera(const uint32_t _index) const;
 
       /// \brief Get a camera by name.
       /// \param[in] _name Name of the camera.
-      /// \return Pointer to the camera. Or NULL if the name is invalid.
+      /// \return Pointer to the camera. Or nullptr if the name is invalid.
       public: CameraPtr GetCamera(const std::string &_name) const;
 
       /// \brief Create a user camera.
@@ -266,7 +266,7 @@ namespace gazebo
       /// \brief Get a user camera by index. The index value must be between
       /// 0 and Scene::GetUserCameraCount.
       /// \param[in] _index Index of the UserCamera to get.
-      /// \return Pointer to the UserCamera, or NULL if the index was
+      /// \return Pointer to the UserCamera, or nullptr if the index was
       /// invalid.
       public: UserCameraPtr GetUserCamera(const uint32_t _index) const;
 
@@ -276,7 +276,7 @@ namespace gazebo
 
       /// \brief Get a light by name.
       /// \param[in] _name Name of the light to get.
-      /// \return Pointer to the light, or NULL if the light was not found.
+      /// \return Pointer to the light, or nullptr if the light was not found.
       public: LightPtr GetLight(const std::string &_name) const;
 
       /// \brief Get the count of the lights.
@@ -291,17 +291,17 @@ namespace gazebo
       /// \brief Get a light based on an index. The index must be between
       /// 0 and Scene::GetLightCount.
       /// \param[in] _index Index of the light.
-      /// \return Pointer to the Light or NULL if index was invalid.
+      /// \return Pointer to the Light or nullptr if index was invalid.
       public: LightPtr GetLight(const uint32_t _index) const;
 
       /// \brief Get a visual by name.
       /// \param[in] _name Name of the visual to retrieve.
-      /// \return Pointer to the visual, NULL if not found.
+      /// \return Pointer to the visual, nullptr if not found.
       public: VisualPtr GetVisual(const std::string &_name) const;
 
       /// \brief Get a visual by id.
       /// \param[in] _id ID of the visual to retrieve.
-      /// \return Pointer to the visual, NULL if not found.
+      /// \return Pointer to the visual, nullptr if not found.
       public: VisualPtr GetVisual(const uint32_t _id) const;
 
       /// \brief Select a visual by name.
@@ -315,7 +315,7 @@ namespace gazebo
       /// \param[in] _camera The ogre camera, used to do mouse picking
       /// \param[in] _mousePos The position of the mouse in screen coordinates
       /// \param[out] _mod Used for object manipulation
-      /// \return The selected entity, or NULL
+      /// \return The selected entity, or nullptr
       /// \deprecated See VisualAt()
       public: VisualPtr GetVisualAt(CameraPtr _camera,
                                     const math::Vector2i &_mousePos,
@@ -326,7 +326,7 @@ namespace gazebo
       /// \param[in] _camera The ogre camera, used to do mouse picking
       /// \param[in] _mousePos The position of the mouse in screen coordinates
       /// \param[out] _mod Used for object manipulation
-      /// \return The selected entity, or NULL
+      /// \return The selected entity, or nullptr
       public: VisualPtr VisualAt(CameraPtr _camera,
                                  const ignition::math::Vector2i &_mousePos,
                                  std::string &_mod);
@@ -339,7 +339,7 @@ namespace gazebo
       /// \param[in] _camera Pointer to the camera used to project the mouse
       /// position.
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
-      /// \return Pointer to the visual, NULL if none found.
+      /// \return Pointer to the visual, nullptr if none found.
       /// \deprecated See VisualAt()
       public: VisualPtr GetVisualAt(CameraPtr _camera,
           const math::Vector2i &_mousePos) GAZEBO_DEPRECATED(7.0);
@@ -348,7 +348,7 @@ namespace gazebo
       /// \param[in] _camera Pointer to the camera used to project the mouse
       /// position.
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
-      /// \return Pointer to the visual, NULL if none found.
+      /// \return Pointer to the visual, nullptr if none found.
       public: VisualPtr VisualAt(CameraPtr _camera,
                                  const ignition::math::Vector2i &_mousePos);
 
@@ -356,7 +356,7 @@ namespace gazebo
       /// \param[in] _camera Pointer to the camera used to project the mouse
       /// position.
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
-      /// \return Pointer to the visual, NULL if none found.
+      /// \return Pointer to the visual, nullptr if none found.
       /// \deprecated See ModelVisualAt()
       public: VisualPtr GetModelVisualAt(CameraPtr _camera,
           const math::Vector2i &_mousePos) GAZEBO_DEPRECATED(7.0);
@@ -365,20 +365,20 @@ namespace gazebo
       /// \param[in] _camera Pointer to the camera used to project the mouse
       /// position.
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
-      /// \return Pointer to the visual, NULL if none found.
+      /// \return Pointer to the visual, nullptr if none found.
       public: VisualPtr ModelVisualAt(CameraPtr _camera,
           const ignition::math::Vector2i &_mousePos);
 
       /// \brief Get the closest visual below a given visual.
       /// \param[in] _visualName Name of the visual to search below.
-      /// \return Pointer to the visual below, or NULL if no visual.
+      /// \return Pointer to the visual below, or nullptr if no visual.
       /// \deprecated See VisualBelow()
       public: VisualPtr GetVisualBelow(const std::string &_visualName)
           GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the closest visual below a given visual.
       /// \param[in] _visualName Name of the visual to search below.
-      /// \return Pointer to the visual below, or NULL if no visual.
+      /// \return Pointer to the visual below, or nullptr if no visual.
       public: VisualPtr VisualBelow(const std::string &_visualName);
 
       /// \brief Get a visual directly below a point.
@@ -549,20 +549,20 @@ namespace gazebo
       public: std::string StripSceneName(const std::string &_name) const;
 
       /// \brief Get a pointer to the heightmap.
-      /// \return Pointer to the heightmap, NULL if no heightmap.
+      /// \return Pointer to the heightmap, nullptr if no heightmap.
       public: Heightmap *GetHeightmap() const;
 
       /// \brief Clear rendering::Scene
       public: void Clear();
 
       /// \brief Get the currently selected visual.
-      /// \return Pointer to the currently selected visual, or NULL if
+      /// \return Pointer to the currently selected visual, or nullptr if
       /// nothing is selected.
       /// \deprecated See SelectedVisual()
       public: VisualPtr GetSelectedVisual() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the currently selected visual.
-      /// \return Pointer to the currently selected visual, or NULL if
+      /// \return Pointer to the currently selected visual, or nullptr if
       /// nothing is selected.
       public: VisualPtr SelectedVisual() const;
 
@@ -678,7 +678,7 @@ namespace gazebo
       /// \param[in] _mousePos 2D position of the mouse in pixels.
       /// \param[in] _ignoreSelectionObj True to ignore selection objects,
       /// which are GUI objects use to manipulate objects.
-      /// \return Pointer to the Ogre::Entity, NULL if none.
+      /// \return Pointer to the Ogre::Entity, nullptr if none.
       private: Ogre::Entity *OgreEntityAt(CameraPtr _camera,
           const ignition::math::Vector2i &_mousePos,
           const bool _ignoreSelectionObj);

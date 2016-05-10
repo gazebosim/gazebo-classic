@@ -64,7 +64,7 @@ namespace gazebo
         this->ambientLight = new AmbientLight<techniquePolicy>();
         const Ogre::MaterialPtr &mat = this->ambientLight->getMaterial();
         mat->load();
-        this->instanceManager = NULL;
+        this->instanceManager = nullptr;
         this->rsmActive = false;
       }
 

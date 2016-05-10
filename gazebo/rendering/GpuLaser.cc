@@ -57,14 +57,14 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
 : Camera(_namePrefix, _scene, _autoRender),
   dataPtr(new GpuLaserPrivate)
 {
-  this->dataPtr->laserBuffer = NULL;
-  this->dataPtr->laserScan = NULL;
-  this->dataPtr->matFirstPass = NULL;
-  this->dataPtr->matSecondPass = NULL;
+  this->dataPtr->laserBuffer = nullptr;
+  this->dataPtr->laserScan = nullptr;
+  this->dataPtr->matFirstPass = nullptr;
+  this->dataPtr->matSecondPass = nullptr;
   for (int i = 0; i < 3; ++i)
-    this->dataPtr->firstPassTextures[i] = NULL;
-  this->dataPtr->secondPassTexture = NULL;
-  this->dataPtr->orthoCam = NULL;
+    this->dataPtr->firstPassTextures[i] = nullptr;
+  this->dataPtr->secondPassTexture = nullptr;
+  this->dataPtr->orthoCam = nullptr;
   this->dataPtr->w2nd = 0;
   this->dataPtr->h2nd = 0;
   this->cameraCount = 0;
@@ -293,7 +293,7 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
                    const bool _updateTex)
 {
   Ogre::RenderSystem *renderSys;
-  Ogre::Viewport *vp = NULL;
+  Ogre::Viewport *vp = nullptr;
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 

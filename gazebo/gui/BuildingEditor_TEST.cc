@@ -34,7 +34,7 @@ void BuildingEditor_TEST::ExitBuildingEditor()
   this->Load("worlds/empty.world", false, false, true);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();
@@ -44,9 +44,9 @@ void BuildingEditor_TEST::ExitBuildingEditor()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::gui::g_editBuildingAct->trigger();
 

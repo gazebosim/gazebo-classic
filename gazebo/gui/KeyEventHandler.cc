@@ -107,7 +107,7 @@ void KeyEventHandler::Add(const std::string &_name,
 void KeyEventHandler::Remove(const std::string &_name,
     std::list<Filter> &_list)
 {
-  _list.remove(Filter(_name, NULL));
+  _list.remove(Filter(_name, nullptr));
 }
 
 /////////////////////////////////////////////////

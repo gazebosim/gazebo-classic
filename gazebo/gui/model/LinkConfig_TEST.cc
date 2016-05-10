@@ -30,7 +30,7 @@ void LinkConfig_TEST::Initialization()
   LinkConfig lc;
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
-  QVERIFY(cw != NULL);
+  QVERIFY(cw != nullptr);
 
   QCOMPARE(cw->DoubleWidgetValue("inertial::mass"), 1.0);
   QCOMPARE(cw->DoubleWidgetValue("inertial::ixx"), 1.0);
@@ -50,7 +50,7 @@ void LinkConfig_TEST::LinkMsgUpdate()
   msgs::LinkPtr linkMsgPtr(new msgs::Link);
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
-  QVERIFY(cw != NULL);
+  QVERIFY(cw != nullptr);
 
   linkMsgPtr->set_gravity(false);
   linkMsgPtr->set_self_collide(true);
@@ -72,7 +72,7 @@ void LinkConfig_TEST::PoseUpdate()
   const ignition::math::Pose3d pose(5.0, 10.0, 15.0, -0.1, -0.2, -0.3);
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
-  QVERIFY(cw != NULL);
+  QVERIFY(cw != nullptr);
 
   lc.SetPose(pose);
   ignition::math::Pose3d p = cw->PoseWidgetValue("pose");
@@ -86,7 +86,7 @@ void LinkConfig_TEST::MassUpdate()
   gazebo::gui::LinkConfig lc;
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
-  QVERIFY(cw != NULL);
+  QVERIFY(cw != nullptr);
 
   lc.SetMass(50.0);
 
@@ -99,7 +99,7 @@ void LinkConfig_TEST::InertiaMatrixUpdate()
   gazebo::gui::LinkConfig lc;
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
-  QVERIFY(cw != NULL);
+  QVERIFY(cw != nullptr);
 
   lc.SetInertiaMatrix(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
 
@@ -119,7 +119,7 @@ void LinkConfig_TEST::InertialPoseUpdate()
   const ignition::math::Pose3d pose(5.0, 10.0, 15.0, -0.1, -0.2, -0.3);
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
-  QVERIFY(cw != NULL);
+  QVERIFY(cw != nullptr);
 
   lc.SetInertialPose(pose);
   ignition::math::Pose3d p = cw->PoseWidgetValue("inertial::pose");

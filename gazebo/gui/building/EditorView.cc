@@ -121,7 +121,7 @@ EditorView::EditorView(QWidget *_parent)
   this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 //  this->setRenderHint(QPainter::SmoothPixmapTransform);
 //  this->setRenderHint(QPainter::Antialiasing);
-  this->gridLines = NULL;
+  this->gridLines = nullptr;
 
   this->viewScale = 1.0;
   this->levelCounter = 0;
@@ -309,7 +309,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
   }
 
   if (!this->drawInProgress)
-    this->currentMouseItem = NULL;
+    this->currentMouseItem = nullptr;
 
   QGraphicsView::mouseReleaseEvent(_event);
 }
@@ -328,8 +328,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       if (this->drawInProgress && wallSegmentItem)
       {
         this->snapToGrabber = false;
-        this->snapGrabberOther = NULL;
-        this->snapGrabberCurrent = NULL;
+        this->snapGrabberOther = nullptr;
+        this->snapGrabberCurrent = nullptr;
 
         QPointF p1 = wallSegmentItem->line().p1();
         QPointF p2 = this->mapToScene(_event->pos());
@@ -554,7 +554,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
     }
     this->drawMode = NONE;
     this->drawInProgress = false;
-    this->currentMouseItem = NULL;
+    this->currentMouseItem = nullptr;
     this->releaseKeyboard();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     gui::editor::Events::createBuildingEditorItem(std::string());
@@ -585,9 +585,9 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
     delete this->currentMouseItem;
 
     this->snapToGrabber = false;
-    this->snapGrabberOther = NULL;
-    this->snapGrabberCurrent = NULL;
-    this->currentMouseItem = NULL;
+    this->snapGrabberOther = nullptr;
+    this->snapGrabberCurrent = nullptr;
+    this->currentMouseItem = nullptr;
     this->drawMode = NONE;
     this->drawInProgress = false;
     this->releaseKeyboard();
@@ -677,7 +677,7 @@ void EditorView::DeleteItem(EditorItem *_item)
 /////////////////////////////////////////////////
 void EditorView::DrawWall(const QPoint &_pos)
 {
-  WallSegmentItem *wallSegmentItem = NULL;
+  WallSegmentItem *wallSegmentItem = nullptr;
 
   // First point on the chain
   if (!this->drawInProgress)
@@ -743,8 +743,8 @@ void EditorView::DrawWall(const QPoint &_pos)
 
     // Reset and start a new segment
     this->snapToGrabber = false;
-    this->snapGrabberOther = NULL;
-    this->snapGrabberCurrent = NULL;
+    this->snapGrabberOther = nullptr;
+    this->snapGrabberCurrent = nullptr;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
     wallSegmentItem->SetTexture3d("");
@@ -781,7 +781,7 @@ void EditorView::DrawWall(const QPoint &_pos)
 /////////////////////////////////////////////////
 void EditorView::DrawWindow(const QPoint &_pos)
 {
-  WindowItem *windowItem = NULL;
+  WindowItem *windowItem = nullptr;
   if (!drawInProgress)
   {
     windowItem = new WindowItem();
@@ -804,7 +804,7 @@ void EditorView::DrawWindow(const QPoint &_pos)
 /////////////////////////////////////////////////
 void EditorView::DrawDoor(const QPoint &_pos)
 {
-  DoorItem *doorItem = NULL;
+  DoorItem *doorItem = nullptr;
   if (!drawInProgress)
   {
     doorItem = new DoorItem();
@@ -826,7 +826,7 @@ void EditorView::DrawDoor(const QPoint &_pos)
 /////////////////////////////////////////////////
 void EditorView::DrawStairs(const QPoint &_pos)
 {
-  StairsItem *stairsItem = NULL;
+  StairsItem *stairsItem = nullptr;
   if (!drawInProgress)
   {
     stairsItem = new StairsItem();
@@ -952,7 +952,7 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
   if (this->drawInProgress && this->currentMouseItem)
   {
     this->scene()->removeItem(this->currentMouseItem);
-    this->currentMouseItem = NULL;
+    this->currentMouseItem = nullptr;
     this->drawInProgress = false;
   }
 
@@ -1019,7 +1019,7 @@ void EditorView::OnDiscardModel()
       this->scene()->sceneRect().height());
   this->scene()->addItem(this->gridLines);
 
-  this->currentMouseItem = NULL;
+  this->currentMouseItem = nullptr;
   this->drawInProgress = false;
   this->drawMode = NONE;
   gui::editor::Events::createBuildingEditorItem(std::string());
@@ -1166,7 +1166,7 @@ void EditorView::DeleteLevel(int _level)
   {
     this->scene()->removeItem(this->levels[_level]->backgroundPixmap);
     delete this->levels[_level]->backgroundPixmap;
-    this->levels[_level]->backgroundPixmap = NULL;
+    this->levels[_level]->backgroundPixmap = nullptr;
   }
 
   this->OnChangeLevel(newLevelIndex);
@@ -1341,11 +1341,11 @@ void EditorView::CancelDrawMode()
       delete this->currentMouseItem;
     }
     this->snapToGrabber = false;
-    this->snapGrabberOther = NULL;
-    this->snapGrabberCurrent = NULL;
+    this->snapGrabberOther = nullptr;
+    this->snapGrabberCurrent = nullptr;
     this->drawMode = NONE;
     this->drawInProgress = false;
-    this->currentMouseItem = NULL;
+    this->currentMouseItem = nullptr;
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
 }

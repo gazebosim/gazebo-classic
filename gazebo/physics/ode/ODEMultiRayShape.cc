@@ -83,7 +83,7 @@ void ODEMultiRayShape::UpdateRays()
   ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
-  if (ode == NULL)
+  if (ode == nullptr)
     gzthrow("Invalid physics engine. Must use ODE.");
 
   // Do we need to lock the physics engine here? YES!
@@ -102,7 +102,7 @@ void ODEMultiRayShape::UpdateRays()
 void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dContactGeom contact;
-  ODEMultiRayShape *self = NULL;
+  ODEMultiRayShape *self = nullptr;
 
   self = static_cast<ODEMultiRayShape*>(_data);
 
@@ -123,8 +123,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
   else
   {
-    ODECollision *collision1 = NULL;
-    ODECollision *collision2 = NULL;
+    ODECollision *collision1 = nullptr;
+    ODECollision *collision2 = nullptr;
     dGeomID rayId = 0;
 
     // Get pointers to the underlying collisions
@@ -148,8 +148,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
     }
 
-    ODECollision *rayCollision = NULL;
-    ODECollision *hitCollision = NULL;
+    ODECollision *rayCollision = nullptr;
+    ODECollision *hitCollision = nullptr;
 
     // Figure out which one is a ray; note that this assumes
     // that the ODE dRayClass is used *soley* by the RayCollision.
@@ -163,7 +163,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
     }
     else if (dGeomGetClass(_o2) == dRayClass)
     {
-      GZ_ASSERT(rayCollision == NULL, "rayCollision is not null");
+      GZ_ASSERT(rayCollision == nullptr, "rayCollision is not null");
       rayCollision = collision2;
       hitCollision = collision1;
       rayId = _o2;

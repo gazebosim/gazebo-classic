@@ -43,7 +43,7 @@ Event::Event(EventPrivate &_d)
 Event::~Event()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -54,7 +54,7 @@ bool Event::GetSignaled() const
 
 //////////////////////////////////////////////////
 ConnectionPrivate::ConnectionPrivate()
-  : event(NULL), id(-1)
+  : event(nullptr), id(-1)
 {
 }
 
@@ -91,11 +91,11 @@ Connection::~Connection()
   {
     this->dataPtr->event->Disconnect(this->dataPtr->id);
     this->dataPtr->id = -1;
-    this->dataPtr->event = NULL;
+    this->dataPtr->event = nullptr;
   }
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

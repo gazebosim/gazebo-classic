@@ -228,23 +228,23 @@ namespace gazebo
       /// This is an internal function.
       /// \brief Get a child or self by id.
       /// \param[in] _id ID of the object to retreive.
-      /// \return A pointer to the object, NULL if not found
+      /// \return A pointer to the object, nullptr if not found
       public: BasePtr GetById(unsigned int _id) const;
       /// \endcond
 
       /// \brief Get by name.
       /// \param[in] _name Get a child (or self) object by name
-      /// \return A pointer to the object, NULL if not found
+      /// \return A pointer to the object, nullptr if not found
       public: BasePtr GetByName(const std::string &_name);
 
       /// \brief Get a child by index.
       /// \param[in] _i Index of the child to retreive.
-      /// \return A pointer to the object, NULL if the index is invalid.
+      /// \return A pointer to the object, nullptr if the index is invalid.
       public: BasePtr GetChild(unsigned int _i) const;
 
       /// \brief Get a child by name.
       /// \param[in] _name Name of the child.
-      /// \return A pointer to the object, NULL if not found
+      /// \return A pointer to the object, nullptr if not found
       public: BasePtr GetChild(const std::string &_name);
 
       /// \brief Remove a child by name.

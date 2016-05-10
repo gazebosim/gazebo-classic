@@ -29,7 +29,7 @@ TEST_F(DiagnosticsTest, Diagnostics)
 {
 #ifdef ENABLE_DIAGNOSTICS
   util::DiagnosticManager *mgr = util::DiagnosticManager::Instance();
-  EXPECT_TRUE(mgr != NULL);
+  EXPECT_TRUE(mgr != nullptr);
 
   common::Time prev = common::Time::GetWallTime();
   {

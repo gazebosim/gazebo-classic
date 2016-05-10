@@ -74,7 +74,7 @@ AlignWidget::AlignWidget(QWidget *_parent)
 AlignWidget::~AlignWidget()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

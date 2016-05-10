@@ -346,18 +346,18 @@ namespace gazebo
       /// This is an internal function
       /// \brief Get a collision by id.
       /// \param[in] _id Id of the collision object to find.
-      /// \return Pointer to the collision, NULL if the id is invalid.
+      /// \return Pointer to the collision, nullptr if the id is invalid.
       public: CollisionPtr GetCollisionById(unsigned int _id) const;
       /// \endcond
 
       /// \brief Get a child collision by name
       /// \param[in] _name Name of the collision object.
-      /// \return Pointer to the collision, NULL if the name was not found.
+      /// \return Pointer to the collision, nullptr if the name was not found.
       public: CollisionPtr GetCollision(const std::string &_name);
 
       /// \brief Get a child collision by index
       /// \param[in] _index Index of the collision object.
-      /// \return Pointer to the collision, NULL if the name was not found.
+      /// \return Pointer to the collision, nullptr if the name was not found.
       public: CollisionPtr GetCollision(unsigned int _index) const;
 
       /// \brief Get all the child collisions.
@@ -583,7 +583,7 @@ namespace gazebo
 
       /// \brief Get a battery by name.
       /// \param[in] _name Name of the battery to get.
-      /// \return Pointer to the battery, NULL if the name is invalid.
+      /// \return Pointer to the battery, nullptr if the name is invalid.
       public: common::BatteryPtr Battery(const std::string &_name) const;
 
       /// \brief Get a battery based on an index.

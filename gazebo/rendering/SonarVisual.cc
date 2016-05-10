@@ -52,7 +52,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
 
-  dPtr->sonarRay = NULL;
+  dPtr->sonarRay = nullptr;
 
   dPtr->connections.push_back(
       event::Events::ConnectPreRender(
@@ -66,7 +66,7 @@ SonarVisual::~SonarVisual()
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
   delete dPtr->sonarRay;
-  dPtr->sonarRay = NULL;
+  dPtr->sonarRay = nullptr;
 }
 
 /////////////////////////////////////////////////

@@ -59,7 +59,7 @@ namespace gazebo
       /// \return Pointer to the new topic viewer.
       public: static TopicView *NewView(const std::string &_msgType,
                                         const std::string &_topicName,
-                                        QWidget *_parent = NULL);
+                                        QWidget *_parent = nullptr);
 
       /// \brief Get all the view types
       /// \param _types Vector of strings of the view types.

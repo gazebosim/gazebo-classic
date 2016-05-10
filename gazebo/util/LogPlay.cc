@@ -57,7 +57,7 @@ using namespace util;
 LogPlay::LogPlay()
 : dataPtr(new LogPlayPrivate)
 {
-  this->dataPtr->logStartXml = NULL;
+  this->dataPtr->logStartXml = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -378,7 +378,7 @@ bool LogPlay::ReadIterations()
 /////////////////////////////////////////////////
 bool LogPlay::IsOpen() const
 {
-  return this->dataPtr->logStartXml != NULL;
+  return this->dataPtr->logStartXml != nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -715,7 +715,7 @@ bool LogPlayPrivate::ChunkData(
   // Make sure we have valid xml pointer
   if (!_xml)
   {
-    gzerr << "NULL XML element" << std::endl;
+    gzerr << "nullptr XML element" << std::endl;
     return false;
   }
 

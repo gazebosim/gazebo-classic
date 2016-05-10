@@ -52,7 +52,7 @@ RTShaderSystem::~RTShaderSystem()
 {
   this->Fini();
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -101,7 +101,7 @@ void RTShaderSystem::Fini()
       Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
   // Finalize RTShader system.
-  if (this->dataPtr->shaderGenerator != NULL)
+  if (this->dataPtr->shaderGenerator != nullptr)
   {
     // On Windows, we're using 1.9RC1, which doesn't have a bunch of changes.
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
@@ -109,7 +109,7 @@ void RTShaderSystem::Fini()
 #else
     Ogre::RTShader::ShaderGenerator::destroy();
 #endif
-    this->dataPtr->shaderGenerator = NULL;
+    this->dataPtr->shaderGenerator = nullptr;
   }
 
   this->dataPtr->pssmSetup.setNull();

@@ -38,7 +38,7 @@ RayQuery::RayQuery(CameraPtr _camera)
 RayQuery::~RayQuery()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

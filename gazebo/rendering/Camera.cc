@@ -69,7 +69,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   this->sdf.reset(new sdf::Element);
   sdf::initFile("camera.sdf", this->sdf);
 
-  this->animState = NULL;
+  this->animState = nullptr;
   this->windowId = 0;
   this->scene = _scene;
 
@@ -77,25 +77,25 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   this->textureWidth = this->textureHeight = 0;
 
-  this->saveFrameBuffer = NULL;
+  this->saveFrameBuffer = nullptr;
   this->saveCount = 0;
-  this->bayerFrameBuffer = NULL;
+  this->bayerFrameBuffer = nullptr;
 
   this->name = _name;
   this->scopedName = this->scene->Name() + "::" + _name;
   this->scopedUniqueName = this->scopedName + "(" +
     boost::lexical_cast<std::string>(++this->dataPtr->cameraCounter) + ")";
 
-  this->renderTarget = NULL;
-  this->renderTexture = NULL;
+  this->renderTarget = nullptr;
+  this->renderTexture = nullptr;
 
   this->captureData = false;
   this->captureDataOnce = false;
 
-  this->camera = NULL;
-  this->viewport = NULL;
+  this->camera = nullptr;
+  this->viewport = nullptr;
 
-  this->sceneNode = NULL;
+  this->sceneNode = nullptr;
 
   this->screenshotPath = getenv("HOME");
   this->screenshotPath += "/.gazebo/pictures";
@@ -221,11 +221,11 @@ void Camera::Fini()
 {
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
-  this->saveFrameBuffer = NULL;
+  this->saveFrameBuffer = nullptr;
 
   if (this->bayerFrameBuffer)
     delete [] this->bayerFrameBuffer;
-  this->bayerFrameBuffer = NULL;
+  this->bayerFrameBuffer = nullptr;
 
   this->initialized = false;
 
@@ -242,20 +242,20 @@ void Camera::Fini()
 
   if (this->renderTarget)
     this->renderTarget->removeAllViewports();
-  this->renderTarget = NULL;
+  this->renderTarget = nullptr;
 
   if (this->renderTexture)
     Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
-  this->renderTexture = NULL;
+  this->renderTexture = nullptr;
 
   if (this->camera)
   {
     this->scene->OgreSceneManager()->destroyCamera(this->scopedUniqueName);
-    this->camera = NULL;
+    this->camera = nullptr;
   }
 
-  this->sceneNode = NULL;
-  this->viewport = NULL;
+  this->sceneNode = nullptr;
+  this->viewport = nullptr;
 
   this->scene.reset();
   this->connections.clear();
@@ -349,7 +349,7 @@ void Camera::Update()
       {
       }
 
-      this->animState = NULL;
+      this->animState = nullptr;
 
       this->AnimationComplete();
 
@@ -1704,7 +1704,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     if (this->dataPtr->distortion)
       this->dataPtr->distortion->SetCamera(shared_from_this());
 
-    if (this->GetScene()->GetSkyX() != NULL)
+    if (this->GetScene()->GetSkyX() != nullptr)
       this->renderTarget->addListener(this->GetScene()->GetSkyX());
   }
 }
@@ -1899,7 +1899,7 @@ bool Camera::IsVisible(const std::string &_visualName)
 /////////////////////////////////////////////////
 bool Camera::IsAnimating() const
 {
-  return this->animState != NULL;
+  return this->animState != nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -2130,7 +2130,7 @@ void Camera::UpdateFOV()
     this->camera->setFOVy(Ogre::Radian(vfov));
 
     delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
+    this->saveFrameBuffer = nullptr;
   }
 }
 

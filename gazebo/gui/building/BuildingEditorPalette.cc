@@ -278,7 +278,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 BuildingEditorPalette::~BuildingEditorPalette()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

@@ -621,7 +621,7 @@ QTreeWidgetItem *ModelTreeWidget::FindItemByData(const std::string &_data,
     if (item)
       return item;
   }
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

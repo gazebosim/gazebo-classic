@@ -37,7 +37,7 @@ TEST_F(SonarVisual_TEST, SonarVisualTest)
   if (!scene)
       scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // test calling constructor and Load functions and make sure
   // there are no segfaults

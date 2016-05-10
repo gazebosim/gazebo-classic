@@ -59,8 +59,8 @@ Actor::Actor(BasePtr _parent)
   : Model(_parent)
 {
   this->AddType(ACTOR);
-  this->mesh = NULL;
-  this->skeleton = NULL;
+  this->mesh = nullptr;
+  this->skeleton = nullptr;
   this->pathLength = 0.0;
   this->lastTraj = 1e+5;
 }
@@ -364,7 +364,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
     double animScale = _sdf->Get<double>("scale");
-    Skeleton *skel = NULL;
+    Skeleton *skel = nullptr;
 
     if (extension == "bvh")
     {
@@ -375,7 +375,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       if (extension == "dae")
       {
         MeshManager::Instance()->Load(animFile);
-        const Mesh *animMesh = NULL;
+        const Mesh *animMesh = nullptr;
         if (MeshManager::Instance()->HasMesh(animFile))
           animMesh = MeshManager::Instance()->GetMesh(animFile);
         if (animMesh && animMesh->HasSkeleton())
@@ -468,7 +468,7 @@ void Actor::Update()
   if ((currentTime - this->prevFrameTime).Double() < (1.0 / 20.0))
     return;
 
-  TrajectoryInfo *tinfo = NULL;
+  TrajectoryInfo *tinfo = nullptr;
 
   if (!this->customTrajectoryInfo)
   {
@@ -502,7 +502,7 @@ void Actor::Update()
       }
     }
 
-    if (tinfo == NULL)
+    if (tinfo == nullptr)
     {
       gzerr << "Trajectory not found at " << this->scriptTime << "\n";
       return;

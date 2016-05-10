@@ -104,14 +104,14 @@ namespace gazebo
 
       /// \brief Get the render window associated with the given id.
       /// \param[in] _id ID of the window.
-      /// \return Pointer to the render window, NULL if the id is invalid.
+      /// \return Pointer to the render window, nullptr if the id is invalid.
       /// \deprecated See Window()
       public: Ogre::RenderWindow *GetWindow(uint32_t _id)
           GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the render window associated with the given id.
       /// \param[in] _id ID of the window.
-      /// \return Pointer to the render window, NULL if the id is invalid.
+      /// \return Pointer to the render window, nullptr if the id is invalid.
       public: Ogre::RenderWindow *Window(const uint32_t _id) const;
 
       /// \internal

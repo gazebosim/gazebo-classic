@@ -83,11 +83,11 @@ namespace gazebo
       /// a new contact is generated. All other users should just make use
       /// of the accessor functions.
       ///
-      /// If no one is listening, then the return value will be NULL.
+      /// If no one is listening, then the return value will be nullptr.
       /// This is a signal to the Physics engine that it can skip the extra
       /// processing necessary to get back contact information.
       /// \return The new contact. The physics engine should populate the
-      /// contact's parameters. NULL will be returned if there are no
+      /// contact's parameters. nullptr will be returned if there are no
       /// subscribers to the contact topic.
       public: Contact *NewContact(Collision *_collision1,
                                   Collision *_collision2,
@@ -99,7 +99,7 @@ namespace gazebo
       /// \brief Get a single contact by index. The index must be between
       /// 0 and ContactManager::GetContactCount.
       /// \param[in] _index Index of the Contact to return.
-      /// \return Pointer to a contact, NULL If index is invalid.
+      /// \return Pointer to a contact, nullptr If index is invalid.
       public: Contact *GetContact(unsigned int _index) const;
 
       /// \brief Get all the contacts.

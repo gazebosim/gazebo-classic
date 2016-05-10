@@ -224,14 +224,14 @@ namespace gazebo
     /// \return Pointer to model.
     protected: physics::ModelPtr SpawnModel(const msgs::Model &_msg);
 
-    /// \brief Check that a pointer is not NULL. A function is created
+    /// \brief Check that a pointer is not nullptr. A function is created
     /// for this purpose, since ASSERT's cannot be called from non-void
     /// functions.
-    /// \param[in] _ptr Pointer to verify is not NULL.
+    /// \param[in] _ptr Pointer to verify is not nullptr.
     protected: template<typename T>
       static void CheckPointer(boost::shared_ptr<T> _ptr)
       {
-        ASSERT_TRUE(_ptr != NULL);
+        ASSERT_TRUE(_ptr != nullptr);
       }
 
     /// \brief Spawn a camera.
@@ -623,7 +623,7 @@ namespace gazebo
 
     /// \brief Get a pointer to a model.
     /// \param[in] _name Name of the model to get.
-    /// \return Pointer to the model, or NULL if the model was not found.
+    /// \return Pointer to the model, or nullptr if the model was not found.
     protected: physics::ModelPtr GetModel(const std::string &_name);
 
     /// \brief Remove a model by name.

@@ -87,7 +87,7 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   this->mainWindow->RenderWidget()->InsertWidget(0,
       this->buildingEditorWidget);
 
-  this->menuBar = NULL;
+  this->menuBar = nullptr;
 }
 
 /////////////////////////////////////////////////

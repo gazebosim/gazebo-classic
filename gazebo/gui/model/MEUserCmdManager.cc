@@ -77,7 +77,7 @@ MEUserCmd::MEUserCmd(const unsigned int _id,
   this->dataPtr->id = _id;
   this->dataPtr->description = _description;
   this->dataPtr->type = _type;
-  this->dataPtr->sdf = NULL;
+  this->dataPtr->sdf = nullptr;
   this->dataPtr->scopedName = "";
 }
 

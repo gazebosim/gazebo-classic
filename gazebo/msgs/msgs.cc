@@ -60,7 +60,7 @@ namespace gazebo
     /////////////////////////////////////////////
     msgs::Header *GetHeader(google::protobuf::Message &message)
     {
-      google::protobuf::Message *msg = NULL;
+      google::protobuf::Message *msg = nullptr;
 
       if (GetFD(message, "str_id"))
         msg = &message;
@@ -224,7 +224,7 @@ namespace gazebo
       _msg->set_pixel_format(_i.GetPixelFormat());
       _msg->set_step(_i.GetPitch());
 
-      unsigned char *data = NULL;
+      unsigned char *data = nullptr;
       unsigned int size;
       _i.GetData(&data, size);
       _msg->set_data(data, size);

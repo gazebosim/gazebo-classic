@@ -193,7 +193,7 @@ TimeWidget::TimeWidget(QWidget *_parent)
 TimeWidget::~TimeWidget()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

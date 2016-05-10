@@ -80,7 +80,7 @@ void Base::Load(sdf::ElementPtr _sdf)
   if (_sdf)
     this->sdf = _sdf;
 
-  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "this->sdf is nullptr");
 
   if (this->sdf->HasAttribute("name"))
     this->name = this->sdf->Get<std::string>("name");
@@ -99,8 +99,8 @@ void Base::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  GZ_ASSERT(_sdf != nullptr, "_sdf parameter is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is nullptr");
   this->sdf->Copy(_sdf);
 }
 
@@ -140,7 +140,7 @@ void Base::Reset(Base::EntityType _resetType)
 //////////////////////////////////////////////////
 void Base::SetName(const std::string &_name)
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is nullptr");
   GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
   this->name = _name;
@@ -174,7 +174,7 @@ bool Base::GetSaveable() const
 //////////////////////////////////////////////////
 int Base::GetParentId() const
 {
-  return this->parent == NULL ? 0 : this->parent->GetId();
+  return this->parent == nullptr ? 0 : this->parent->GetId();
 }
 
 //////////////////////////////////////////////////
@@ -192,7 +192,7 @@ BasePtr Base::GetParent() const
 //////////////////////////////////////////////////
 void Base::AddChild(BasePtr _child)
 {
-  if (_child == NULL)
+  if (_child == nullptr)
     gzthrow("Cannot add a null _child to an entity");
 
   // Add this _child to our list
@@ -311,7 +311,7 @@ BasePtr Base::GetByName(const std::string &_name)
   Base_V::const_iterator iter;
 
   for (iter = this->children.begin();
-      iter != this->children.end() && result == NULL; ++iter)
+      iter != this->children.end() && result == nullptr; ++iter)
     result = (*iter)->GetByName(_name);
 
   return result;
@@ -440,7 +440,7 @@ const WorldPtr &Base::GetWorld() const
 //////////////////////////////////////////////////
 const sdf::ElementPtr Base::GetSDF()
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is nullptr");
   this->sdf->Update();
   return this->sdf;
 }

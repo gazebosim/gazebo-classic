@@ -31,14 +31,14 @@ TEST_F(ContactManagerTest, CreateFilter)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   EXPECT_EQ(manager->GetFilterCount(), 0u);
 
@@ -76,14 +76,14 @@ TEST_F(ContactManagerTest, RemoveFilter)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   // Add one filter then remove it
   std::map<std::string, physics::CollisionPtr> collisionMap;
@@ -107,7 +107,7 @@ TEST_F(ContactManagerTest, RemoveFilter)
     ss << name << i;
     std::map<std::string, physics::CollisionPtr> collisions;
     collisionMap["collision"] = physics::CollisionPtr();
-    ASSERT_TRUE(collisionMap["collision"] == NULL);
+    ASSERT_TRUE(collisionMap["collision"] == nullptr);
 
     manager->CreateFilter(ss.str(), collisions);
     EXPECT_TRUE(manager->HasFilter(ss.str()));

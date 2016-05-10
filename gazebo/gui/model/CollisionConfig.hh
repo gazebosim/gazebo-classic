@@ -95,7 +95,7 @@ namespace gazebo
       /// \param[in] _collisionMsg Msg containing information of the collision
       /// to be added.
       public: void AddCollision(const std::string &_name,
-          const msgs::Collision *_collisionMsg = NULL);
+          const msgs::Collision *_collisionMsg = nullptr);
 
       /// \brief Update a collision widget from a collision msg.
       /// \param[in] _name Name of collision to be updated.

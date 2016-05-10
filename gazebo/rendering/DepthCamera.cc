@@ -42,12 +42,12 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
   : Camera(_namePrefix, _scene, _autoRender),
     dataPtr(new DepthCameraPrivate)
 {
-  this->depthTarget = NULL;
-  this->dataPtr->depthBuffer = NULL;
-  this->dataPtr->depthMaterial = NULL;
-  this->dataPtr->pcdTarget = NULL;
-  this->dataPtr->pcdBuffer = NULL;
-  this->dataPtr->pcdMaterial = NULL;
+  this->depthTarget = nullptr;
+  this->dataPtr->depthBuffer = nullptr;
+  this->dataPtr->depthMaterial = nullptr;
+  this->dataPtr->pcdTarget = nullptr;
+  this->dataPtr->pcdBuffer = nullptr;
+  this->dataPtr->pcdMaterial = nullptr;
   this->dataPtr->outputPoints = false;
 }
 
@@ -253,7 +253,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
           Ogre::Material *_material, const std::string &_matName)
 {
   Ogre::RenderSystem *renderSys;
-  Ogre::Viewport *vp = NULL;
+  Ogre::Viewport *vp = nullptr;
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
