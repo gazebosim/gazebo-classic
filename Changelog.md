@@ -152,6 +152,11 @@
     * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
     * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
 
+1. Model editor: Reset visual / collision insertion / deletion
+        * [Pull request #2254](https://bitbucket.org/osrf/gazebo/pull-request/2254)
+        * [Issue #1777](https://bitbucket.org/osrf/gazebo/issues/1777)
+        * [Issue #1852](https://bitbucket.org/osrf/gazebo/issues/1852)
+
 1. Building editor: Add layers to building levels
     * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
     * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
