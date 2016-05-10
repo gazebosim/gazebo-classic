@@ -59,8 +59,8 @@ SplashScreen::SplashScreen()
   this->dataPtr->splashScreen->setLayout(textLayout);
   this->dataPtr->splashScreen->setFixedSize(pixmap.size());
 
-  this->dataPtr->splashScreen->show();
-  this->dataPtr->splashScreen->repaint();
+  //this->dataPtr->splashScreen->show();
+  //this->dataPtr->splashScreen->repaint();
 
   QTimer::singleShot(2000, this, SLOT(Update()));
 }
@@ -79,11 +79,11 @@ SplashScreen::~SplashScreen()
 void SplashScreen::Update()
 {
   rendering::UserCameraPtr cam = get_active_camera();
-  if (cam && cam->GetScene() && cam->GetScene()->Initialized())
-  {
+  //if (cam && cam->GetScene() && cam->GetScene()->Initialized())
+  //{
     this->dataPtr->splashScreen->hide();
     return;
-  }
+  //}
 
   QTimer::singleShot(100, this, SLOT(Update()));
 }
