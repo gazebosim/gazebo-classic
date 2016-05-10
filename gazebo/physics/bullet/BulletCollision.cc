@@ -30,7 +30,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
     : Collision(_parent)
 {
   this->SetName("Bullet_Collision");
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   this->surface.reset(new BulletSurfaceParams());
 }
 
@@ -39,7 +39,7 @@ BulletCollision::~BulletCollision()
 {
   /*
   delete this->collisionShape;
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   */
 }
 
