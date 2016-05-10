@@ -6,6 +6,10 @@
     * [Pull request 2272](https://bitbucket.org/osrf/gazebo/pull-request/2272)
     * [Issue #1917](https://bitbucket.org/osrf/gazebo/issue/1917)
 
+1. Fix model snap tool highlighting
+    * [Pull request 2293](https://bitbucket.org/osrf/gazebo/pull-request/2293)
+    * [Issue #1955](https://bitbucket.org/osrf/gazebo/issue/1955)
+
 ### Gazebo 5.3.0 (2015-04-07)
 
 1. fix: remove back projection
