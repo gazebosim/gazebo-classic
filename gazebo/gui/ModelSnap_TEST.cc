@@ -81,7 +81,6 @@ void ModelSnap_TEST::Highlight()
   mainWindow->Init();
   mainWindow->show();
 
-  std::string model01Name = "cylinder";
   std::string model02Name = "box";
   std::string model03Name = "sphere";
 
