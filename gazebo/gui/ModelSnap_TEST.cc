@@ -103,8 +103,6 @@ void ModelSnap_TEST::Highlight()
 
   QVERIFY(!FindRedColor(cam));
 
-  gazebo::rendering::VisualPtr model01Vis = scene->GetVisual(model01Name);
-  QVERIFY(model01Vis != NULL);
   gazebo::rendering::VisualPtr model02Vis = scene->GetVisual(model02Name);
   QVERIFY(model02Vis != NULL);
   gazebo::rendering::VisualPtr model03Vis = scene->GetVisual(model03Name);
