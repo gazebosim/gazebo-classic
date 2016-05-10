@@ -94,6 +94,9 @@ namespace gazebo
 
       /// \brief A variable to indicate the hovered triangle has changed.
       public: bool hoverTriangleDirty;
+
+      /// \brief True to reset the model snap tool.
+      public: bool reset;
     };
   }
 }

@@ -51,6 +51,9 @@ namespace gazebo
       /// \brief Reset the model snapping tool.
       public: void Reset();
 
+      /// \brief Clean up the model snap tool.
+      public: void Fini();
+
       /// \brief Calculate the translation and rotation needed to snap the
       /// centroid of a mesh triangle of a visual to another, taking into
       /// account any pose offsets.
