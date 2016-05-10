@@ -338,7 +338,8 @@ SensorPtr SensorManager::GetSensor(const std::string &_name) const
       if (!result)
       {
         result = tmpSensor;
-        GZ_ASSERT(result != nullptr, "SensorContainer contains a nullptr Sensor");
+        GZ_ASSERT(result != nullptr,
+            "SensorContainer contains a nullptr Sensor");
       }
       else
       {
