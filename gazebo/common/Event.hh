@@ -641,7 +641,7 @@ namespace gazebo
         return;
 
       this->Disconnect(_c->GetId());
-      _c->dataPtr->event = NULL;
+      _c->dataPtr->event = nullptr;
       _c->dataPtr->id = -1;
     }
 
