@@ -126,6 +126,9 @@ std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
+  gzerr << "SchematicViewWidget::AddNode is not working yet.\n";
+  return;
+
   std::string name = this->UnscopedName(_node);
 
   if (name.empty() || this->scene->HasNode(name))
@@ -182,6 +185,9 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     const std::string &/*_name*/, const std::string &_type,
     const std::string &_parent, const std::string &_child)
 {
+  gzerr << "SchematicViewWidget::AddEdge is not working yet.\n";
+  return;
+
   std::string parentNode = this->UnscopedName(_parent);
   std::string childNode = this->UnscopedName(_child);
 
