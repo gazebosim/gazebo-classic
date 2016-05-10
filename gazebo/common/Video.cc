@@ -86,7 +86,8 @@ bool Video::Load(const std::string &_filename)
   this->avFrame = common::AVFrameAlloc();
 
   // Open video file
-  if (avformat_open_input(&this->formatCtx, _filename.c_str(), nullptr, nullptr) < 0)
+  if (avformat_open_input(&this->formatCtx, _filename.c_str(),
+        nullptr, nullptr) < 0)
   {
     gzerr << "Unable to read video file[" << _filename << "]\n";
     return false;

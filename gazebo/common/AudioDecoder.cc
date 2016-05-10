@@ -175,7 +175,8 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->formatCtx = avformat_alloc_context();
 
   // Open file
-  if (avformat_open_input(&this->formatCtx, _filename.c_str(), nullptr, nullptr) < 0)
+  if (avformat_open_input(&this->formatCtx,
+        _filename.c_str(), nullptr, nullptr) < 0)
   {
     gzerr << "Unable to open audio file[" << _filename << "]\n";
     this->formatCtx = nullptr;
