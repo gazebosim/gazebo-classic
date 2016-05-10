@@ -46,8 +46,8 @@ ModelSnap::ModelSnap()
   this->dataPtr->initialized = false;
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
-  this->dataPtr->snapLines = NULL;
-  this->dataPtr->snapHighlight = NULL;
+  this->dataPtr->snapLines = nullptr;
+  this->dataPtr->snapHighlight = nullptr;
 
   this->dataPtr->updateMutex = new boost::recursive_mutex();
 }
