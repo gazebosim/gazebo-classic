@@ -328,7 +328,7 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
   // Check to see if the log has already been added.
   if (this->dataPtr->logs.find(_name) != this->dataPtr->logs.end())
   {
-    GZ_ASSERT(this->dataPtr->logs.find(_name)->second != NULL,
+    GZ_ASSERT(this->dataPtr->logs.find(_name)->second != nullptr,
         "Unable to find log");
 
     if (this->dataPtr->logs.find(_name)->second->RelativeFilename() !=
@@ -457,7 +457,7 @@ unsigned int LogRecord::FileSize(const std::string &_name) const
 
     if (iter != this->dataPtr->logs.end())
     {
-      GZ_ASSERT(iter->second, "Log object is NULL");
+      GZ_ASSERT(iter->second, "Log object is null");
       result += iter->second->BufferSize();
     }
   }
