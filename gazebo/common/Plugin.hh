@@ -410,5 +410,4 @@ namespace gazebo
     return new classname();\
   }
 }
-
 #endif

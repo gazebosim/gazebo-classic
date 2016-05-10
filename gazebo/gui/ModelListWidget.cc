@@ -2540,47 +2540,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
     this->FillPropertyTree(_msg.link(i), prop);
   }
-
-  for (int i = 0; i < _msg.plugin_size(); ++i)
-  {
-    QtVariantProperty *prop;
-    prop = this->dataPtr->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("plugin"));
-    prop->setToolTip(tr(_msg.plugin(i).name().c_str()));
-
-    bItem = this->dataPtr->propTreeBrowser->addProperty(prop);
-    this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
-
-    //gzdbg << _msg.plugin(i).DebugString() << std::endl;
-
-     this->FillPropertyTree(_msg.plugin(i), prop);
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Plugin &_msg,
-                                       QtProperty *_parent)
-{
-  QtVariantProperty *item = NULL;
-
-  // name
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
-      tr("name"));
-  item->setValue(_msg.name().c_str());
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
-
-  // filename
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
-    tr("filename"));
-  item->setValue(_msg.filename().c_str());
-  this->AddProperty(item, _parent);
-
-  // innerxml
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
-    tr("innerxml"));
-  item->setValue(_msg.innerxml().c_str());
-  this->AddProperty(item, _parent);
 }
 
 /////////////////////////////////////////////////
