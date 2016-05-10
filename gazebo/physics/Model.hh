@@ -441,6 +441,12 @@ namespace gazebo
       /// \brief Publish the scale.
       private: virtual void PublishScale();
 
+      /// \brief Register items in the introspection service.
+      private: void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      private: void UnregisterIntrospectionItems();
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
@@ -480,6 +486,9 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
+
+      /// \brief All the introspection items regsitered for this.
+      private: std::vector<common::URI> introspectionItems;
     };
     /// \}
   }

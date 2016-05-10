@@ -38,6 +38,7 @@ Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
+  this->typeStr = "base";
   this->id = physics::getUniqueId();
   this->typeStr = "base";
   this->saveable = true;
@@ -324,6 +325,34 @@ std::string Base::GetScopedName(bool _prependWorldName) const
     return this->world->GetName() + "::" + this->scopedName;
   else
     return this->scopedName;
+}
+
+
+//////////////////////////////////////////////////
+common::URI Base::URI() const
+{
+  common::URI uri;
+
+  uri.SetScheme("data");
+
+  BasePtr p = this->parent;
+  while (p)
+  {
+    if (p->GetParent())
+    {
+      uri.Path().PushFront(p->GetName());
+      uri.Path().PushFront(p->TypeStr());
+    }
+
+    p = p->GetParent();
+  }
+
+  uri.Path().PushBack(this->TypeStr());
+  uri.Path().PushBack(this->GetName());
+  uri.Path().PushFront(this->world->GetName());
+  uri.Path().PushFront("world");
+
+  return uri;
 }
 
 //////////////////////////////////////////////////
