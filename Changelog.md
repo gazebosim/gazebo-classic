@@ -3,6 +3,7 @@
 ## Gazebo 8.x.x (2017-xx-xx)
 
 1. Change NULL to nullptr.
+    * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
     * [Pull request #2295](https://bitbucket.org/osrf/gazebo/pull-request/2295)
 
 1. Fix memory and other issues found from running Coverity.

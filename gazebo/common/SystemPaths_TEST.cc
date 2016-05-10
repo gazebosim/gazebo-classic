@@ -18,9 +18,8 @@
 
 #include <string>
 #include <vector>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "test/util.hh"
 
@@ -103,19 +102,19 @@ TEST_F(SystemPathsTest, SystemPaths)
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH="));
   paths->ClearGazeboPaths();
   // In this case, we expect to get the compiled-in default
-  boost::split(tmpstrings, GAZEBO_RESOURCE_PATH, boost::is_any_of(":"));
+  tmpstrings = common::split(GAZEBO_RESOURCE_PATH, ":");
   EXPECT_EQ(tmpstrings.size(), paths->GetGazeboPaths().size());
 
   putenv(const_cast<char*>("OGRE_RESOURCE_PATH="));
   paths->ClearOgrePaths();
   // In this case, we expect to get the compiled-in default
-  boost::split(tmpstrings, OGRE_RESOURCE_PATH, boost::is_any_of(":"));
+  tmpstrings = common::split(OGRE_RESOURCE_PATH, ":");
   EXPECT_EQ(tmpstrings.size(), paths->GetOgrePaths().size());
 
   putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH="));
   paths->ClearPluginPaths();
   // In this case, we expect to get the compiled-in default
-  boost::split(tmpstrings, GAZEBO_PLUGIN_PATH, boost::is_any_of(":"));
+  tmpstrings = common::split(GAZEBO_PLUGIN_PATH, ":");
   EXPECT_EQ(tmpstrings.size(), paths->GetPluginPaths().size());
 
   std::cout << "GAZEBO_RESOURCE_BACKUP[" << gazeboResourcePathBackup << "]\n";
