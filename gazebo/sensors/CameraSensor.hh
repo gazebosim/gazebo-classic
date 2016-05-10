@@ -116,7 +116,14 @@ namespace gazebo
       protected: virtual void Fini();
 
       /// \brief Handle the render event.
-      private: void Render();
+      protected: virtual void Render();
+
+      /// \brief Get the value of the rendered flag
+      protected: bool Rendered() const;
+
+      /// \brief Set the value of the rendered flag
+      /// \param[in] _value New rendered value.
+      protected: void SetRendered(const bool _value);
 
       /// \brief Pointer to the camera.
       protected: rendering::CameraPtr camera;

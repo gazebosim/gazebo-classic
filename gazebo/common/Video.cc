@@ -23,10 +23,6 @@
 using namespace gazebo;
 using namespace common;
 
-/// \brief Destination audio video frame
-/// TODO Do not merge forward. Declared here for gazebo7 ABI compatibility
-AVFrame *avFrameDst;
-
 /////////////////////////////////////////////////
 // #ifdef HAVE_FFMPEG
 // static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
@@ -51,9 +47,7 @@ Video::Video()
   this->swsCtx = NULL;
   this->avFrame = NULL;
   this->videoStream = -1;
-
-  this->pic = NULL;
-  avFrameDst = NULL;
+  this->avFrameDst = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -75,7 +69,7 @@ void Video::Cleanup()
   // Close the codec
   avcodec_close(this->codecCtx);
 
-  av_free(avFrameDst);
+  av_free(this->avFrameDst);
 #endif
 }
 
@@ -159,11 +153,11 @@ bool Video::Load(const std::string &_filename)
     return false;
   }
 
-  avFrameDst = common::AVFrameAlloc();
-  avFrameDst->format = this->codecCtx->pix_fmt;
-  avFrameDst->width = this->codecCtx->width;
-  avFrameDst->height = this->codecCtx->height;
-  av_image_alloc(avFrameDst->data, avFrameDst->linesize,
+  this->avFrameDst = common::AVFrameAlloc();
+  this->avFrameDst->format = this->codecCtx->pix_fmt;
+  this->avFrameDst->width = this->codecCtx->width;
+  this->avFrameDst->height = this->codecCtx->height;
+  av_image_alloc(this->avFrameDst->data, this->avFrameDst->linesize,
       this->codecCtx->width, this->codecCtx->height, this->codecCtx->pix_fmt,
       1);
 
@@ -228,10 +222,10 @@ bool Video::GetNextFrame(unsigned char **_buffer)
       if (frameAvailable)
       {
         sws_scale(swsCtx, this->avFrame->data, this->avFrame->linesize, 0,
-            this->codecCtx->height, avFrameDst->data,
-            avFrameDst->linesize);
+            this->codecCtx->height, this->avFrameDst->data,
+            this->avFrameDst->linesize);
 
-        memcpy(*_buffer, avFrameDst->data[0],
+        memcpy(*_buffer, this->avFrameDst->data[0],
             this->codecCtx->height * (this->codecCtx->width*3));
 
         // Debug:

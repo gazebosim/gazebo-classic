@@ -218,6 +218,10 @@ namespace gazebo
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
 
+      /// \brief Get a pointer to the world.
+      /// \return Pointer to the world.
+      public: WorldPtr World() const;
+
       /// \brief Get a pointer to the contact manger.
       /// \return Pointer to the contact manager.
       public: ContactManager *GetContactManager() const;

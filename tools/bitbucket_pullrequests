@@ -140,6 +140,7 @@ class BitbucketPullRequests
         jsonHash = getJson(@url_pullrequests + "/" + id)
       puts "1. " + jsonHash["title"]
       puts "    * [Pull request #{id}](https://bitbucket.org/osrf/gazebo/pull-request/#{id})"
+      puts ""
     }
   end
 

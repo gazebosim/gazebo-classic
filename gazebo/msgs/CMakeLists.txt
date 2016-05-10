@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
+  atmosphere.proto
   axis.proto
   battery.proto
   boxgeom.proto
@@ -16,6 +17,7 @@ set (msgs
   contacts.proto
   contactsensor.proto
   cylindergeom.proto
+  density.proto
   diagnostics.proto
   distortion.proto
   factory.proto
@@ -24,6 +26,7 @@ set (msgs
   friction.proto
   geometry.proto
   gps.proto
+  gps_sensor.proto
   gui_camera.proto
   gui.proto
   gz_string.proto
@@ -36,6 +39,7 @@ set (msgs
   image_stamped.proto
   images_stamped.proto
   imu.proto
+  imu_sensor.proto
   inertial.proto
   int.proto
   joint.proto
@@ -93,6 +97,7 @@ set (msgs
   scene.proto
   selection.proto
   sensor.proto
+  sensor_noise.proto
   server_control.proto
   shadows.proto
   sim_event.proto
@@ -112,6 +117,7 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wind.proto
   wireless_node.proto
   wireless_nodes.proto
   world_control.proto

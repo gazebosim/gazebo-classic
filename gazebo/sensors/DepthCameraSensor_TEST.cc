@@ -63,10 +63,8 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  unsigned int imageWidth = sensor->DepthCamera()->ImageWidth();
-  unsigned int imageHeight = sensor->DepthCamera()->ImageHeight();
-  EXPECT_EQ(imageWidth, 640u);
-  EXPECT_EQ(imageHeight, 480u);
+  EXPECT_EQ(sensor->ImageWidth(), 640u);
+  EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
@@ -86,26 +84,24 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   }
   EXPECT_LT(i, 300);
 
-  unsigned int imageSize = imageWidth * imageHeight;
+  unsigned int imageSize =
+      sensor->ImageWidth() * sensor->ImageHeight();
 
   std::lock_guard<std::mutex> lock(g_depthMutex);
   // Check that the depth values are valid
   for (unsigned int i = 0; i < imageSize; ++i)
   {
-    // in gazebo versions < 8.0.0,
-    // depth camera returns 0.0 if nothing is detected within range
-    if (!gazebo::math::equal(g_depthBuffer[i], 0.0f))
-    {
-      EXPECT_TRUE(g_depthBuffer[i] <= depthCamera->FarClip());
-      EXPECT_TRUE(g_depthBuffer[i] >= depthCamera->NearClip());
-    }
+    EXPECT_TRUE(g_depthBuffer[i] <= depthCamera->FarClip());
+    EXPECT_TRUE(g_depthBuffer[i] >= depthCamera->NearClip());
+    EXPECT_TRUE(!ignition::math::equal(g_depthBuffer[i], 0.0f));
   }
 
   // sphere with radius 1m is at 2m in front of depth camera
   // so verify depth readings are between 1-2m in the mid row
-  unsigned int halfHeight = static_cast<unsigned int>(imageHeight*0.5)-1;
-  for (unsigned int i = imageWidth*halfHeight;
-      i < imageWidth*(halfHeight+1); ++i)
+  unsigned int halfHeight =
+    static_cast<unsigned int>(sensor->ImageHeight()*0.5)-1;
+  for (unsigned int i = sensor->ImageWidth()*halfHeight;
+      i < sensor->ImageWidth()*(halfHeight+1); ++i)
   {
     EXPECT_TRUE(g_depthBuffer[i] < 2.0f);
     EXPECT_TRUE(g_depthBuffer[i] >= 1.0f);

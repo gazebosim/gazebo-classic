@@ -271,8 +271,9 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
 
   vp = _target->getViewport(0);
 
-  // return 0 in case no renderable object is inside frustrum
-  vp->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
+  // return farClip in case no renderable object is inside frustrum
+  vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
+      this->FarClip(), this->FarClip()));
 
   Ogre::CompositorManager::getSingleton().setCompositorEnabled(
                                                 vp, _matName, true);
@@ -392,7 +393,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     this->depthViewport->setBackgroundColour(
         Conversions::Convert(this->scene->BackgroundColor()));
     this->depthViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     double ratio = static_cast<double>(this->depthViewport->getActualWidth()) /
                    static_cast<double>(this->depthViewport->getActualHeight());

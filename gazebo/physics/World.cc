@@ -70,11 +70,14 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Atmosphere.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Wind.hh"
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
@@ -143,6 +146,8 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableWind = true;
+  this->dataPtr->enableAtmosphere = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -256,6 +261,28 @@ void World::Load(sdf::ElementPtr _sdf)
     gzthrow("Unable to create physics engine\n");
 
   this->dataPtr->physicsEngine->Load(physicsElem);
+
+  // This should come before loading of entities
+  sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
+
+  this->dataPtr->wind.reset(new physics::Wind(*this,
+                            this->dataPtr->sdf->GetElement("wind")));
+
+  if (this->dataPtr->wind == NULL)
+    gzthrow("Unable to create wind\n");
+
+  this->dataPtr->wind->Load(windElem);
+
+  // This should come after loading physics engine
+  sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
+
+  type = atmosphereElem->Get<std::string>("type");
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type, *this);
+
+  if (this->dataPtr->atmosphere == NULL)
+    gzerr << "Unable to create atmosphere model\n";
+
+  this->dataPtr->atmosphere->Load(atmosphereElem);
 
   // This should also come before loading of entities
   {
@@ -941,6 +968,18 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
+Wind &World::Wind() const
+{
+  return *this->dataPtr->wind;
+}
+
+//////////////////////////////////////////////////
+Atmosphere &World::Atmosphere() const
+{
+  return *this->dataPtr->atmosphere;
+}
+
+//////////////////////////////////////////////////
 PresetManagerPtr World::GetPresetManager() const
 {
   return this->dataPtr->presetManager;
@@ -1067,6 +1106,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
+  light->SetStatic(true);
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);
@@ -2071,8 +2111,6 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 
   if (entity)
     model = entity->GetParentModel();
-  else
-    gzerr << "Unable to find entity below point[" << _pt << "]\n";
 
   return model;
 }
@@ -2759,6 +2797,43 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
+}
+
+/////////////////////////////////////////////////
+bool World::WindEnabled() const
+{
+  return this->dataPtr->enableWind;
+}
+
+/////////////////////////////////////////////////
+void World::SetWindEnabled(const bool _enable)
+{
+  if (this->dataPtr->enableWind == _enable)
+    return;
+
+  this->dataPtr->enableWind = _enable;
+
+  for (auto const &model : this->dataPtr->models)
+  {
+    Link_V links = model->GetLinks();
+    for (auto const &link : links)
+    {
+      if (link->WindMode())
+        link->SetWindEnabled(this->dataPtr->enableWind);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+bool World::AtmosphereEnabled() const
+{
+  return this->dataPtr->enableAtmosphere;
+}
+
+/////////////////////////////////////////////////
+void World::SetAtmosphereEnabled(const bool _enable)
+{
+  this->dataPtr->enableAtmosphere = _enable;
 }
 
 /////////////////////////////////////////////////

@@ -84,6 +84,7 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
+  gzdbg << "Engine: " << _physicsEngine << std::endl;
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);

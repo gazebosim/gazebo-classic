@@ -583,6 +583,7 @@ void Entity::Fini()
   {
     auto msg = msgs::CreateRequest("entity_delete", this->GetScopedName());
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
   // Clean transport

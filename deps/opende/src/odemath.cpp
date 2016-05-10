@@ -20,8 +20,8 @@
  *                                                                       *
  *************************************************************************/
 
-#include <ode/common.h>
-#include <ode/odemath.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/odemath.h>
 #include "config.h"
 
 

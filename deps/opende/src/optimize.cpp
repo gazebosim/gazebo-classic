@@ -1,7 +1,7 @@
 #include <iostream>
 #include <boost/shared_array.hpp>
-#include <ode/odemath.h>
-#include <ode/matrix.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/matrix.h>
 #include <vector>
 #include <limits>
 #include "util.h"

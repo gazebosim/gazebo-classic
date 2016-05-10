@@ -212,6 +212,10 @@ ODESurfaceParamsPtr ODECollision::GetODESurface() const
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeGlobal()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
+  if (!this->link)
+    return;
+
   dQuaternion q;
 
   // Transform into global pose since a static collision does not have a link
@@ -234,6 +238,10 @@ void ODECollision::OnPoseChangeGlobal()
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeRelative()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
+  if (!this->link)
+    return;
+
   dQuaternion q;
   // Transform into CoM relative Pose
   math::Pose localPose = this->GetRelativePose();
