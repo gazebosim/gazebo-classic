@@ -28,7 +28,7 @@ namespace gazebo
     class DepthCameraSensorPrivate
     {
       /// \brief Depth data buffer.
-      public: float *depthBuffer = NULL;
+      public: float *depthBuffer = nullptr;
 
       /// \brief Local pointer to the depthCamera.
       public: rendering::DepthCameraPtr depthCamera;
