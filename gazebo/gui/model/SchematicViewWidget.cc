@@ -341,11 +341,12 @@ void SchematicViewWidget::OnSetSelectedEntity(const std::string &_name,
 {
   this->scene->blockSignals(true);
 
-  // Select all nodes which start with _name, so we select all links of a
+  // Select all nodes with the same top level name, so we select all links of a
   // nested model.
   for (auto &node : this->nodes)
   {
-    if (node.first.find(_name) == 0)
+    auto topLevelName = this->TopLevelName(node.first);
+    if (topLevelName == _name)
     {
       node.second->setSelected(_selected);
 
