@@ -77,7 +77,7 @@ void DARTBoxShape::SetSize(const math::Vector3 &_size)
   DARTCollisionPtr dartCollisionParent =
       boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
-  if (dartCollisionParent->GetDARTCollisionShape() == NULL)
+  if (dartCollisionParent->GetDARTCollisionShape() == nullptr)
   {
     dart::dynamics::BodyNode *dtBodyNode =
         dartCollisionParent->GetDARTBodyNode();

@@ -31,7 +31,7 @@ namespace gazebo
       /// \brief Constructor
       public: DARTCollisionPrivate(dart::dynamics::BodyNode *_dtBodyNode)
         : dtBodyNode(_dtBodyNode),
-          dtCollisionShape(NULL),
+          dtCollisionShape(nullptr),
           categoryBits(0),
           collideBits(0)
       {
