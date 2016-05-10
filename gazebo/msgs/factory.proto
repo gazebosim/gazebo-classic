@@ -1,17 +1,37 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Factory 
-/// \brief Message to create new model in gazebo
-
+/// \interface Factory
+/// \brief Message to create new entities in gazebo, at the given pose.
+/// A model can be created in one of the following ways:
+///
+/// 1. From an SDF string (sdf field)
+/// 2. From an SDF file (sdf_filename)
+/// 3. Cloning an existing model (clone_model_name)
+///
+/// If more than one way is specified, the first field will be parsed and the
+/// following ignored.
 
 import "pose.proto";
 
 message Factory
 {
+  /// \brief SDF description in string format.
   optional string sdf                       = 1;
+
+  /// \brief Full path to SDF file.
   optional string sdf_filename              = 2;
+
+  /// \brief Pose where the entity will be spawned.
   optional Pose pose                        = 3;
+
+  /// \brief ?
   optional string edit_name                 = 4;
+
+  /// \brief Name of model to clone.
   optional string clone_model_name          = 5;
+
+  /// \brief Whether the server is allowed to rename the model in case of
+  /// overlap with existing models.
+  optional bool allow_renaming              = 6;
 }

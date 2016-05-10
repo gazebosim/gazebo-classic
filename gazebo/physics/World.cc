@@ -1914,13 +1914,7 @@ void World::ProcessFactoryMsgs()
             model->GetSDF()->Clone());
 
         std::string newName = model->GetName() + "_clone";
-        int i = 0;
-        while (this->GetModel(newName))
-        {
-          newName = model->GetName() + "_clone_" +
-            boost::lexical_cast<std::string>(i);
-          i++;
-        }
+        newName = this->UniqueModelName(newName);
 
         this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
             "name")->Set(newName);
@@ -2001,6 +1995,29 @@ void World::ProcessFactoryMsgs()
         }
         else if (isModel)
         {
+          auto entityName = elem->Get<std::string>("name");
+          if (entityName.empty())
+          {
+            gzerr << "Can't load model with empty name" << std::endl;
+            continue;
+          }
+
+          // Model with the given name already exists
+          if (this->GetModel(entityName))
+          {
+            // If allow renaming is disabled
+            if (factoryMsg.has_allow_renaming() && !factoryMsg.allow_renaming())
+            {
+              gzwarn << "A model named [" << entityName << "] already exists "
+                    << "and allow_renaming is false. Model won't be inserted."
+                    << std::endl;
+              continue;
+            }
+
+            entityName = this->UniqueModelName(entityName);
+            elem->GetAttribute("name")->Set(entityName);
+          }
+
           modelsToLoad.push_back(elem);
         }
         else if (isLight)
@@ -2756,4 +2773,16 @@ void World::ResetPhysicsStates()
 {
   for (auto &model : this->dataPtr->models)
     model->ResetPhysicsStates();
+}
+
+//////////////////////////////////////////////////
+std::string World::UniqueModelName(const std::string &_name)
+{
+  std::string result = _name;
+
+  int i = 0;
+  while (this->GetModel(result))
+    result = _name + "_" + std::to_string(i++);
+
+  return result;
 }
