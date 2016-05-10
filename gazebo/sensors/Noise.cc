@@ -35,7 +35,7 @@ using namespace sensors;
 NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     const std::string &_sensorType)
 {
-  GZ_ASSERT(_sdf != nullptr, "noise sdf is nullptr");
+  GZ_ASSERT(_sdf != nullptr, "noise sdf is null");
   GZ_ASSERT(_sdf->GetName() == "noise", "Not a noise SDF element");
 
   std::string typeString = _sdf->Get<std::string>("type");
@@ -93,7 +93,7 @@ Noise::~Noise()
 void Noise::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
-  GZ_ASSERT(this->sdf != nullptr, "this->sdf is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "this->sdf is null");
 }
 
 //////////////////////////////////////////////////

@@ -29,7 +29,7 @@ using namespace physics;
 BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world,
   BasePtr _parent) : UniversalJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is nullptr");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
   this->bulletUniversal = nullptr;
 }
@@ -126,7 +126,7 @@ void BulletUniversalJoint::Init()
   this->SetLowStop(1, this->GetLowerLimit(1));
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is nullptr");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->bulletUniversal, true);
 
   // Allows access to impulse

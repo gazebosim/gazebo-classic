@@ -80,7 +80,7 @@ void Base::Load(sdf::ElementPtr _sdf)
   if (_sdf)
     this->sdf = _sdf;
 
-  GZ_ASSERT(this->sdf != nullptr, "this->sdf is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "this->sdf is null");
 
   if (this->sdf->HasAttribute("name"))
     this->name = this->sdf->Get<std::string>("name");
@@ -99,8 +99,8 @@ void Base::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != nullptr, "_sdf parameter is nullptr");
-  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is nullptr");
+  GZ_ASSERT(_sdf != nullptr, "_sdf parameter is null");
+  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is null");
   this->sdf->Copy(_sdf);
 }
 
@@ -140,7 +140,7 @@ void Base::Reset(Base::EntityType _resetType)
 //////////////////////////////////////////////////
 void Base::SetName(const std::string &_name)
 {
-  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is null");
   GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
   this->name = _name;
@@ -440,7 +440,7 @@ const WorldPtr &Base::GetWorld() const
 //////////////////////////////////////////////////
 const sdf::ElementPtr Base::GetSDF()
 {
-  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "Base sdf member is null");
   this->sdf->Update();
   return this->sdf;
 }

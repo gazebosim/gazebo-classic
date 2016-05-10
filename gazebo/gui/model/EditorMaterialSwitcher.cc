@@ -39,7 +39,7 @@ EditorMaterialSwitcher::EditorMaterialSwitcher(
   if (!this->camera)
   {
     gzerr << "Cannot create a material switcher for the model editor. "
-          << "Camera is nullptr" << std::endl;
+          << "Camera is null" << std::endl;
     return;
   }
 

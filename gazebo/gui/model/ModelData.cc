@@ -219,7 +219,7 @@ void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 {
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
   ignition::math::Vector3d dScale = _scale / this->scale;
@@ -432,7 +432,7 @@ void LinkData::Load(sdf::ElementPtr _sdf)
 {
   if (!_sdf)
   {
-    gzwarn << "nullptr SDF pointer, not loading link data." << std::endl;
+    gzwarn << "null SDF pointer, not loading link data." << std::endl;
     return;
   }
 
@@ -637,7 +637,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
 /////////////////////////////////////////////////
 LinkData *LinkData::Clone(const std::string &_newName)
 {
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
   LinkData *cloneLink = new LinkData();
   auto cloneSDF = this->linkSDF->Clone();
 
@@ -855,8 +855,8 @@ double LinkData::ComputeVolume() const
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   double volume = 0;
 
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
-  GZ_ASSERT(collisionConfig, "CollisionConfig is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
+  GZ_ASSERT(collisionConfig, "CollisionConfig is null");
 
   for (auto const &it : this->collisions)
   {
@@ -917,7 +917,7 @@ void LinkData::OnApply()
 /////////////////////////////////////////////////
 bool LinkData::Apply()
 {
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
@@ -1174,7 +1174,7 @@ bool LinkData::Apply()
 /////////////////////////////////////////////////
 void LinkData::OnAddVisual(const std::string &_name)
 {
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
 
   // add a visual when the user adds a visual via the inspector's visual tab
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
@@ -1221,7 +1221,7 @@ void LinkData::OnAddVisual(const std::string &_name)
 /////////////////////////////////////////////////
 void LinkData::OnAddCollision(const std::string &_name)
 {
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
 
   // add a collision when the user adds a collision via the inspector's
   // collision tab
@@ -1271,7 +1271,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 /////////////////////////////////////////////////
 void LinkData::OnRemoveVisual(const std::string &_name)
 {
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
 
   // find and remove visual when the user removes it in the
   // inspector's visual tab
@@ -1294,7 +1294,7 @@ void LinkData::OnRemoveVisual(const std::string &_name)
 /////////////////////////////////////////////////
 void LinkData::OnRemoveCollision(const std::string &_name)
 {
-  GZ_ASSERT(this->linkVisual, "LinkVisual is nullptr");
+  GZ_ASSERT(this->linkVisual, "LinkVisual is null");
 
   // find and remove collision visual when the user removes it in the
   // inspector's collision tab

@@ -718,7 +718,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 //////////////////////////////////////////////////
 std::string UserCamera::GetViewControllerTypeString()
 {
-  GZ_ASSERT(this->dataPtr->viewController, "ViewController != nullptr");
+  GZ_ASSERT(this->dataPtr->viewController, "ViewController != null");
   return this->dataPtr->viewController->GetTypeString();
 }
 

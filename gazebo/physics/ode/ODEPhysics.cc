@@ -418,8 +418,8 @@ void ODEPhysics::UpdatePhysics()
       Collision *col1 = contactFeedback->collision1;
       Collision *col2 = contactFeedback->collision2;
 
-      GZ_ASSERT(col1 != nullptr, "Collision 1 is nullptr");
-      GZ_ASSERT(col2 != nullptr, "Collision 2 is nullptr");
+      GZ_ASSERT(col1 != nullptr, "Collision 1 is null");
+      GZ_ASSERT(col2 != nullptr, "Collision 2 is null");
 
       for (int j = 0; j < this->dataPtr->jointFeedbacks[i]->count; ++j)
       {

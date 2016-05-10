@@ -665,7 +665,7 @@ void Server::ProcessControlMsgs()
       if (success)
       {
         // world should not be nullptr at this point.
-        GZ_ASSERT(world, "nullptr world pointer");
+        GZ_ASSERT(world, "null world pointer");
 
         // Save the world's state in a temporary file (clone.<PORT>.world).
         boost::filesystem::path tmpDir =

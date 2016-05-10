@@ -418,7 +418,7 @@ SubMesh::SubMesh(const SubMesh *_mesh)
 {
   if (!_mesh)
   {
-    gzerr << "Submesh is nullptr." << std::endl;
+    gzerr << "Submesh is null." << std::endl;
     return;
   }
 

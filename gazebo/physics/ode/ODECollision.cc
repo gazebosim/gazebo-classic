@@ -119,7 +119,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
   if (dGeomGetSpace(this->collisionId) == 0)
   {
     dSpaceAdd(this->spaceId, this->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is nullptr");
+    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is null");
   }
 
   if (this->collisionId && this->placeable)

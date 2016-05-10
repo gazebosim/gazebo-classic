@@ -72,7 +72,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   if (_outBufferSize == nullptr)
   {
-    gzerr << "outBufferSize is nullptr!!\n";
+    gzerr << "outBufferSize is null!!\n";
     return false;
   }
 

@@ -464,7 +464,7 @@ const sdf::ElementPtr Model::GetSDF()
 //////////////////////////////////////////////////
 const sdf::ElementPtr Model::UnscaledSDF()
 {
-  GZ_ASSERT(this->sdf != nullptr, "Model sdf member is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "Model sdf member is null");
   this->sdf->Update();
 
   sdf::ElementPtr unscaledSdf(this->sdf);

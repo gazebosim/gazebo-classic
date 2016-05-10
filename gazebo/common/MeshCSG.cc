@@ -271,7 +271,7 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
 {
   if (!_surface)
   {
-    gzerr << _mesh->GetName() << ": Surface is nullptr\n";
+    gzerr << _mesh->GetName() << ": Surface is null\n";
 //    _surface = gts_surface_new(gts_surface_class(), gts_face_class(),
 //        gts_edge_class(), gts_vertex_class());
     return;

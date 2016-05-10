@@ -88,7 +88,7 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
   else
   {
     gzwarn << "World: " << _contact.world() << " not found,"
-           << "contact collision pointers will be nullptr";
+           << "contact collision pointers will be null";
   }
 
   for (int j = 0; j < _contact.position_size(); ++j)

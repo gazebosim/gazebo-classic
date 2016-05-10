@@ -457,7 +457,7 @@ unsigned int LogRecord::FileSize(const std::string &_name) const
 
     if (iter != this->dataPtr->logs.end())
     {
-      GZ_ASSERT(iter->second, "Log object is nullptr");
+      GZ_ASSERT(iter->second, "Log object is null");
       result += iter->second->BufferSize();
     }
   }

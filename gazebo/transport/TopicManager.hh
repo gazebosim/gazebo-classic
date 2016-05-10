@@ -119,7 +119,8 @@ namespace gazebo
                 msgTypename = msg->GetTypeName();
 
                 publication = this->FindPublication(_topic);
-                GZ_ASSERT(publication != nullptr, "FindPublication returned nullptr");
+                GZ_ASSERT(publication != nullptr,
+                    "FindPublication returned null");
 
                 publication->AddPublisher(pub);
                 if (!publication->GetLocallyAdvertised())

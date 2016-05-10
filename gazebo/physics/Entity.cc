@@ -535,7 +535,7 @@ ModelPtr Entity::GetParentModel()
     return boost::dynamic_pointer_cast<Model>(shared_from_this());
 
   p = this->parent;
-  GZ_ASSERT(p, "Parent of an entity is nullptr");
+  GZ_ASSERT(p, "Parent of an entity is null");
 
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();

@@ -738,7 +738,7 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 double Heightmap::Height(const double _x, const double _y, const double _z)
     const
 {
-  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is nullptr");
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is null");
 
   Ogre::TerrainGroup::RayResult result =
       this->dataPtr->terrainGroup->rayIntersects(
@@ -883,7 +883,7 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
 double Heightmap::AvgHeight(const ignition::math::Vector3d &_pos,
     const double _radius) const
 {
-  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is nullptr");
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is null");
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)
@@ -926,7 +926,7 @@ double Heightmap::AvgHeight(const ignition::math::Vector3d &_pos,
 void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, const double _outsideRadius,
     const double _insideRadius, const double _weight, const std::string &_op)
 {
-  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is nullptr");
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is null");
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)

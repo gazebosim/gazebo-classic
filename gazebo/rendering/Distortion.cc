@@ -71,7 +71,7 @@ void Distortion::SetCamera(CameraPtr _camera)
 {
   if (!_camera)
   {
-    gzerr << "Unable to apply distortion, camera is nullptr" << std::endl;
+    gzerr << "Unable to apply distortion, camera is null" << std::endl;
     return;
   }
 

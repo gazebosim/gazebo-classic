@@ -2822,7 +2822,7 @@ void World::SetAtmosphereEnabled(const bool _enable)
 /////////////////////////////////////////////////
 void World::_AddDirty(Entity *_entity)
 {
-  GZ_ASSERT(_entity != nullptr, "_entity is nullptr");
+  GZ_ASSERT(_entity != nullptr, "_entity is null");
   this->dataPtr->dirtyPoses.push_back(_entity);
 }
 

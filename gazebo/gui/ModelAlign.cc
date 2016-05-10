@@ -88,7 +88,7 @@ void ModelAlign::Init()
 
   if (!this->dataPtr->scene)
   {
-    gzerr << "Unable to initialize Model Align tool, scene is nullptr"
+    gzerr << "Unable to initialize Model Align tool, scene is null"
         << std::endl;
   }
 

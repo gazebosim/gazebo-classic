@@ -63,7 +63,7 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine, dSpaceID _spaceId)
 ODERayShape::ODERayShape(CollisionPtr _parent)
 : RayShape(_parent)
 {
-  GZ_ASSERT(_parent, "Parent collision shape is nullptr");
+  GZ_ASSERT(_parent, "Parent collision shape is null");
   this->SetName("ODE Ray Shape");
 
   ODECollisionPtr collision =
@@ -72,7 +72,7 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
   this->physicsEngine = boost::static_pointer_cast<ODEPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 
-  GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is nullptr");
+  GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is null");
   this->geomId = dCreateRay(collision->GetSpaceId(), 1.0);
 
   // Create default ray with unit length

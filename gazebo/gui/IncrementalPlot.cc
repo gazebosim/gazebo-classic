@@ -157,12 +157,12 @@ void IncrementalPlot::Add(const QString &_label,
   else
     curve = iter->second;
 
-  GZ_ASSERT(curve != nullptr, "Curve is nullptr");
+  GZ_ASSERT(curve != nullptr, "Curve is null");
 
   // Get the  curve data
   CurveData *curveData = static_cast<CurveData *>(curve->data());
 
-  GZ_ASSERT(curveData != nullptr, "Curve data is nullptr");
+  GZ_ASSERT(curveData != nullptr, "Curve data is null");
 
   // Add all the points
   for (std::list<QPointF>::const_iterator ptIter = _pts.begin();
@@ -189,12 +189,12 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
   else
     curve = iter->second;
 
-  GZ_ASSERT(curve != nullptr, "Curve is nullptr");
+  GZ_ASSERT(curve != nullptr, "Curve is null");
 
   // Get the curve data
   CurveData *curveData = static_cast<CurveData *>(curve->data());
 
-  GZ_ASSERT(curveData != nullptr, "Curve data is nullptr");
+  GZ_ASSERT(curveData != nullptr, "Curve data is null");
 
   // Add a point
   curveData->Add(_pt);
@@ -203,7 +203,7 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
 /////////////////////////////////////////////////
 void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
 {
-  GZ_ASSERT(_curve != nullptr, "Curve is nullptr");
+  GZ_ASSERT(_curve != nullptr, "Curve is null");
 
   CurveData *curveData = static_cast<CurveData *>(_curve->data());
   const QPointF &lastPoint = curveData->samples().back();

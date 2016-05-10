@@ -62,7 +62,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->Init("modelEditorTab", "Insert", this->dataPtr->modelPalette);
   this->tabWidget->addTab(this->dataPtr->modelTree, tr("Model"));
 
-  GZ_ASSERT(this->tabWidget != nullptr, "Editor tab widget is nullptr");
+  GZ_ASSERT(this->tabWidget != nullptr, "Editor tab widget is null");
 
   rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
       gui::get_active_camera());
@@ -72,7 +72,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   }
   else
   {
-    gzerr << "User camera is nullptr. "
+    gzerr << "User camera is null. "
         << "Non-editable models will keep their original material"
         << std::endl;
   }
@@ -284,7 +284,7 @@ void ModelEditor::AddItemToPalette(QWidget *_item,
 {
   if (!_item)
   {
-    gzerr << "Item is nullptr" << std::endl;
+    gzerr << "Item is null" << std::endl;
     return;
   }
 

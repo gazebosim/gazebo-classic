@@ -465,7 +465,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   if (!gui::get_active_camera() ||
       !gui::get_active_camera()->GetScene())
   {
-    gzerr << "Unable to edit model. GUI camera or scene is nullptr"
+    gzerr << "Unable to edit model. GUI camera or scene is null"
         << std::endl;
     return;
   }

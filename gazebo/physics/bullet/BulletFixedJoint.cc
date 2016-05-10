@@ -31,7 +31,7 @@ using namespace physics;
 BulletFixedJoint::BulletFixedJoint(btDynamicsWorld *_world, BasePtr _parent)
     : FixedJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is nullptr");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
   this->bulletFixed = nullptr;
 }
@@ -144,7 +144,7 @@ void BulletFixedJoint::Init()
   this->bulletFixed->setLimit(0.0, 0.0);
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is nullptr");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->bulletFixed, true);
 
   // Allows access to impulse

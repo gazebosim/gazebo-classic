@@ -468,7 +468,7 @@ void Link::SetCollideMode(const std::string &_mode)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide() const
 {
-  GZ_ASSERT(this->sdf != nullptr, "Link sdf member is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "Link sdf member is null");
   if (this->sdf->HasElement("self_collide"))
     return this->sdf->Get<bool>("self_collide");
   else

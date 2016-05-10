@@ -77,7 +77,7 @@ struct CollisionFilter : public btOverlapFilterCallback
       btBroadphaseProxy *_proxy1) const
     {
       GZ_ASSERT(_proxy0 != nullptr && _proxy1 != nullptr,
-          "Bullet broadphase overlapping pair proxies are nullptr");
+          "Bullet broadphase overlapping pair proxies are null");
 
       bool collide = (_proxy0->m_collisionFilterGroup
           & _proxy1->m_collisionFilterMask) != 0;
@@ -96,11 +96,11 @@ struct CollisionFilter : public btOverlapFilterCallback
 
       BulletLink *link0 = static_cast<BulletLink *>(
           rb0->getUserPointer());
-      GZ_ASSERT(link0 != nullptr, "Link0 in collision pair is nullptr");
+      GZ_ASSERT(link0 != nullptr, "Link0 in collision pair is null");
 
       BulletLink *link1 = static_cast<BulletLink *>(
           rb1->getUserPointer());
-      GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is nullptr");
+      GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is null");
 
       if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
       {
@@ -129,11 +129,11 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     BulletLink *link1 = static_cast<BulletLink *>(
         obA->getUserPointer());
-    GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is nullptr");
+    GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is null");
 
     BulletLink *link2 = static_cast<BulletLink *>(
         obB->getUserPointer());
-    GZ_ASSERT(link2 != nullptr, "Link2 in collision pair is nullptr");
+    GZ_ASSERT(link2 != nullptr, "Link2 in collision pair is null");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = link1->GetCollision(colIndex);
@@ -267,7 +267,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   btOverlapFilterCallback *filterCallback = new CollisionFilter();
   btOverlappingPairCache* pairCache = this->dynamicsWorld->getPairCache();
   GZ_ASSERT(pairCache != nullptr,
-      "Bullet broadphase overlapping pair cache is nullptr");
+      "Bullet broadphase overlapping pair cache is null");
   pairCache->setOverlapFilterCallback(filterCallback);
 
   // TODO: Enable this to do custom contact setting

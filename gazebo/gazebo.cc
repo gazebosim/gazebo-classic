@@ -191,7 +191,7 @@ void gazebo::runWorld(gazebo::physics::WorldPtr _world,
                       unsigned int _iterations)
 {
   if (!_world)
-    gzerr << "World pointer is nullptr\n";
+    gzerr << "World pointer is null\n";
   else
     _world->RunBlocking(_iterations);
 }

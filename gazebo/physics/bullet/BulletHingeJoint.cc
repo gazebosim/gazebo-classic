@@ -31,7 +31,7 @@ using namespace physics;
 BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
     : HingeJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is nullptr");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
   this->bulletHinge = nullptr;
   this->angleOffset = 0;
@@ -165,9 +165,9 @@ void BulletHingeJoint::Init()
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->sdf != nullptr, "Joint sdf member is nullptr");
+  GZ_ASSERT(this->sdf != nullptr, "Joint sdf member is null");
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  GZ_ASSERT(axisElem != nullptr, "Joint axis sdf member is nullptr");
+  GZ_ASSERT(axisElem != nullptr, "Joint axis sdf member is null");
   {
     sdf::ElementPtr limitElem;
     limitElem = this->sdf->GetElement("axis")->GetElement("limit");
@@ -182,7 +182,7 @@ void BulletHingeJoint::Init()
     axisElem->GetElement("dynamics")->Get<double>("friction"));
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is nullptr");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->bulletHinge, true);
 
   // Allows access to impulse

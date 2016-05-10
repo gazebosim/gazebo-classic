@@ -1622,7 +1622,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   if (!newMenuBar)
   {
-    gzerr << "Unable to set nullptr menu bar" << std::endl;
+    gzerr << "Unable to set null menu bar" << std::endl;
     return;
   }
 

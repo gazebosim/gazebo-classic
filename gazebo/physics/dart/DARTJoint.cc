@@ -79,7 +79,7 @@ void DARTJoint::Init()
   Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
   // if (theChildLink != nullptr)
-  GZ_ASSERT(dartChildLink.get() != nullptr, "dartChildLink pointer is nullptr");
+  GZ_ASSERT(dartChildLink.get() != nullptr, "dartChildLink pointer is null");
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->GetWorldPose());
@@ -355,7 +355,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   if (theChildLink != nullptr)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
-    GZ_ASSERT(dartChildBody, "dartChildBody pointer is nullptr");
+    GZ_ASSERT(dartChildBody, "dartChildBody pointer is null");
     F2 = -dart::math::dAdT(
           this->dataPtr->dtJoint->getTransformFromChildBodyNode(),
           dartChildBody->getBodyForce());
@@ -399,7 +399,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   if (theChildLink != nullptr)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
-    GZ_ASSERT(dartChildBody, "dartChildBody pointer is nullptr");
+    GZ_ASSERT(dartChildBody, "dartChildBody pointer is null");
     F2 = -dart::math::dAdT(
       this->dataPtr->dtJoint->getTransformFromChildBodyNode(),
       dartChildBody->getBodyForce());
@@ -502,7 +502,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   if (theChildLink != nullptr)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
-    GZ_ASSERT(dartChildBody, "dartChildBody pointer is nullptr");
+    GZ_ASSERT(dartChildBody, "dartChildBody pointer is null");
     Eigen::Isometry3d TJ2 = Eigen::Isometry3d::Identity();
     TJ2.translation() =
         this->dataPtr->dtJoint->getTransformFromChildBodyNode().translation();

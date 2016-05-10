@@ -2140,7 +2140,7 @@ void Scene::PreRender()
             !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
         {
           ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
-          GZ_ASSERT(iter->second, "Visual pointer is nullptr");
+          GZ_ASSERT(iter->second, "Visual pointer is null");
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
           this->dataPtr->poseMsgs.erase(prev);
