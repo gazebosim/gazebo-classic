@@ -79,7 +79,6 @@ set (qt_headers
   ConfigWidget.hh
   DataLogger.hh
   Editor.hh
-  Futures.hh
   GLWidget.hh
   HotkeyDialog.hh
   InsertModelWidget.hh
@@ -106,6 +105,7 @@ set (headers
   qt_test.h
   Conversions.hh
   EntityMaker.hh
+  Futures.hh
   GuiIface.hh
   GuiEvents.hh
   GuiPlugin.hh
