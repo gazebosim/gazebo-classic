@@ -27,14 +27,14 @@ SimbodyCollision::SimbodyCollision(LinkPtr _parent)
     : Collision(_parent)
 {
   this->SetName("Simbody_Collision");
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   this->surface.reset(new SurfaceParams());
 }
 
 //////////////////////////////////////////////////
 SimbodyCollision::~SimbodyCollision()
 {
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
 }
 
 //////////////////////////////////////////////////
