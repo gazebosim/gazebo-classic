@@ -69,7 +69,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   // Bytes per pixel
   unsigned int bpp = pitch / imgWidth;
 
-  unsigned char *data = NULL;
+  unsigned char *data = nullptr;
   unsigned int count;
   this->img.GetData(&data, count);
 
