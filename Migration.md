@@ -7,10 +7,38 @@ release will remove the deprecated code.
 
 ## Gazebo 7.X to 8.X
 
+### Additions
+
+1. **gazebo/common/Event.hh**
+    + public: bool Connection::Id() const;
+    + public: bool Event::Signaled() const;
+    + public: void Event::SetSignaled(const bool);
+
 ### Modifications
+
+1. **gazebo/common/Event.hh**
+    + ConnectionPrivate made not visible
+    + Connection(Event*, int) constructor changed to
+      Connection(Event*, const int)
+    + EventTPrivate no longer inherits from EventPrivate
 
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
+
+### Deprecations
+
+1. **gazebo/common/Event.hh**
+    + ***Deprecation:*** public: bool Event::GetSignaled() const;
+    + ***Replacement:*** public: bool Event::Signaled() const;
+    + ***Deprecation:*** public: bool Connection::GetId() const;
+    + ***Replacement:*** public: bool Connection::Id() const;
+
+### Deletions
+
+1. **gazebo/common/Event.hh**
+    + EventPrivate class
+    + Event(EventPrivate&) constructor
+    + Connection() constructor
 
 ## Gazebo 7.1.0 to 7.X
 
