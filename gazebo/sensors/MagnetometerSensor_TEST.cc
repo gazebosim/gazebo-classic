@@ -54,10 +54,10 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
 {
   Load("worlds/empty.world", false, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
-  ASSERT_TRUE(mgr != NULL);
+  ASSERT_TRUE(mgr != nullptr);
 
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   sdf::ElementPtr sdf(new sdf::Element);
   sdf::initFile("sensor.sdf", sdf);
@@ -80,7 +80,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
       (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   // At pose [0,0,0,0,0,0] the body frame magnetic field should be default
   EXPECT_EQ(sensor->MagneticField(), world->MagneticField());
@@ -92,11 +92,11 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Spawn a magnetometer sensor with a PI/2 aniclockwise rotation about Z axis
@@ -111,7 +111,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   sensors::MagnetometerSensorPtr magSensor =
       std::dynamic_pointer_cast<sensors::MagnetometerSensor>(sensor);
 
-  ASSERT_TRUE(magSensor != NULL);
+  ASSERT_TRUE(magSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   magSensor->SetActive(true);
