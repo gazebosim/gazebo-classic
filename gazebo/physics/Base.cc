@@ -101,15 +101,13 @@ void Base::Fini()
   }
 
   // Also destroy all children.
-  for (auto &iter : this->children)
+  while (!this->children.empty())
   {
-    if (iter)
-      iter->Fini();
+    auto child = this->children.front();
+    this->RemoveChild(child);
   }
   this->children.clear();
 
-  if (this->sdf)
-    this->sdf->Reset();
   this->sdf.reset();
 
   this->world.reset();
@@ -192,7 +190,11 @@ void Base::AddChild(BasePtr _child)
     gzthrow("Cannot add a null _child to an entity");
 
   // Add this _child to our list
-  this->children.push_back(_child);
+  if (std::find(this->children.begin(), this->children.end(), _child)
+      == this->children.end())
+  {
+    this->children.push_back(_child);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -242,6 +244,7 @@ void Base::RemoveChild(physics::BasePtr _child)
     return;
 
   // Fini
+  _child->SetParent(nullptr);
   _child->Fini();
 
   // Remove from vector if still there
