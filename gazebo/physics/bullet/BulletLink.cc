@@ -252,8 +252,8 @@ void BulletLink::SetGravityMode(bool _mode)
     // this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
   else
   {
-    math::Vector3 g = this->bulletPhysics->GetGravity();
-    this->rigidLink->setGravity(btVector3(g.x, g.y, g.z));
+    auto g = this->world->Gravity();
+    this->rigidLink->setGravity(btVector3(g.X(), g.Y(), g.Z()));
     /*btScalar btMass = this->mass.GetAsDouble();
     btmath::Vector3 fallInertia(0, 0, 0);
 
