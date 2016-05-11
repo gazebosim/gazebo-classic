@@ -73,7 +73,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world), system(), matter(system), forces(system),
       gravity(forces, matter, -SimTK::ZAxis, 0),
       discreteForces(forces, matter),
-      tracker(system), contact(system, tracker),  integ(NULL)
+      tracker(system), contact(system, tracker),  integ(nullptr)
       , contactMaterialStiffness(0.0)
       , contactMaterialDissipation(0.0)
       , contactMaterialPlasticCoefRestitution(0.0)
@@ -83,7 +83,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       , contactMaterialViscousFriction(0.0)
       , contactImpactCaptureVelocity(0.0)
       , contactStictionTransitionVelocity(0.0)
-      , dynamicsWorld(NULL)
+      , dynamicsWorld(nullptr)
       , stepTimeDouble(0.0)
 {
   // Instantiate the Multibody System
@@ -440,10 +440,10 @@ void SimbodyPhysics::UpdateCollision()
 
       /// \TODO: See issue #1584
       /// \TODO: below, get collision data from simbody contacts
-      Collision *collision1 = NULL;
-      Collision *collision2 = NULL;
-      physics::LinkPtr link1 = NULL;
-      physics::LinkPtr link2 = NULL;
+      Collision *collision1 = nullptr;
+      Collision *collision2 = nullptr;
+      physics::LinkPtr link1 = nullptr;
+      physics::LinkPtr link2 = nullptr;
 
       /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
       const SimTK::ContactGeometry &cg1 = cs1.getShape();
@@ -483,7 +483,7 @@ void SimbodyPhysics::UpdateCollision()
         }
       }
 
-      // add contacts to the manager. This will return NULL if no one is
+      // add contacts to the manager. This will return nullptr if no one is
       // listening for contact information.
       Contact *contactFeedback = this->contactManager->NewContact(collision1,
           collision2, this->world->GetSimTime());
@@ -715,7 +715,7 @@ void SimbodyPhysics::Fini()
 //////////////////////////////////////////////////
 LinkPtr SimbodyPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
     gzthrow("Link must have a parent\n");
 
   SimbodyLinkPtr link(new SimbodyLink(_parent));
@@ -975,7 +975,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     MobilizedBody mobod;
 
     MobilizedBody parentMobod =
-      gzInb == NULL ? this->matter.Ground() : gzInb->masterMobod;
+      gzInb == nullptr ? this->matter.Ground() : gzInb->masterMobod;
 
     if (mob.isAddedBaseMobilizer())
     {
@@ -991,7 +991,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             massProps,    Transform());
 
         SimTK::Transform inboard_X_ML;
-        if (gzInb == NULL)
+        if (gzInb == nullptr)
         {
           // GZ_ASSERT(gzOutb, "must be here");
           physics::ModelPtr model = gzOutb->GetParentModel();
