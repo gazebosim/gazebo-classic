@@ -34,6 +34,7 @@ DARTSurfaceParams::DARTSurfaceParams()
 DARTSurfaceParams::~DARTSurfaceParams()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
