@@ -396,20 +396,20 @@ Time Time::Sleep(const common::Time &_time)
     }
 #elif defined(_WIN32)
     // Borrowed from roscpp_core/rostime/src/time.cpp
-    HANDLE timer = NULL;
+    HANDLE timer = nullptr;
     LARGE_INTEGER sleepTime;
     sleepTime.QuadPart = -
       static_cast<int64_t>(interval.tv_sec)*10000000LL -
       static_cast<int64_t>(interval.tv_nsec) / 100LL;
 
-    timer = CreateWaitableTimer(NULL, TRUE, NULL);
-    if (timer == NULL)
+    timer = CreateWaitableTimer(nullptr, TRUE, nullptr);
+    if (timer == nullptr)
     {
       gzerr << "Unable to create waitable timer. Sleep will be incorrect.\n";
       return result;
     }
 
-    if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
+    if (!SetWaitableTimer (timer, &sleepTime, 0, nullptr, nullptr, 0))
     {
       gzerr << "Unable to use waitable timer. Sleep will be incorrect.\n";
       return result;
