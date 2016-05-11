@@ -127,7 +127,8 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
     this->dataPtr->modelVisual.reset();
   }
 
-  // Name
+  // Desired name (the server will append a number to generate a unique name
+  // in case of overlap.
   std::string modelName;
   if (_shape == BOX)
     modelName = "unit_box";

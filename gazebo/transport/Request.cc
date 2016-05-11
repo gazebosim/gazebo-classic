@@ -156,3 +156,22 @@ size_t transport::RequestInsert(const msgs::Light &_msg)
   return id;
 }
 
+/////////////////////////////////////////////////
+size_t transport::RequestInsert(const msgs::Factory &_msg)
+{
+  // Unique id for request
+  auto id = ignition::math::Rand::IntUniform(1, 10000);
+
+  // Operation msg
+  msgs::Operation req;
+  req.set_type(msgs::Operation::INSERT_LIGHT);
+  req.set_id(id);
+  req.mutable_factory()->CopyFrom(_msg);
+
+  // Request
+  ignition::transport::Node ignNode;
+  ignNode.Request("/request", req, unused);
+
+  return id;
+}
+

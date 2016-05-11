@@ -69,7 +69,11 @@ namespace gazebo
 
     /// \brief Helper class to create requests for ignition transport.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestInsert(const msgs::Light &_light);
+    size_t RequestInsert(const msgs::Light &_msg);
+
+    /// \brief Helper class to create requests for ignition transport.
+    GZ_TRANSPORT_VISIBLE
+    size_t RequestInsert(const msgs::Factory &_msg);
   }
 }
 #endif
