@@ -144,7 +144,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       }
 
       // Store pointer to the joint we will actuate
-      physics::JointPtr joint = _parent->GetJoint(jointName);
+      physics::JointPtr joint = _parent->JointByName(jointName);
       if (!joint)
       {
         gzwarn << "Invalid SDF: actuator joint " << jointName << " does not "
@@ -168,8 +168,8 @@ void ActuatorPlugin::WorldUpdateCallback()
   for (unsigned int i = 0; i < this->joints.size(); i++)
   {
     const int index = this->actuators[i].jointIndex;
-    const float velocity = this->joints[i]->GetVelocity(index);
-    float curForce = this->joints[i]->GetForce(index);
+    const float velocity = this->joints[i]->Velocity(index);
+    float curForce = this->joints[i]->Force(index);
     float maxForce = this->actuators[i].modelFunction(velocity, curForce,
               this->actuators[i]);
     this->joints[i]->SetEffortLimit(index, maxForce);

@@ -48,12 +48,14 @@ void InitialVelocityPlugin::Reset()
 {
   if (this->sdf->HasElement("linear"))
   {
-    math::Vector3 linear = this->sdf->Get<math::Vector3>("linear");
+    ignition::math::Vector3d linear =
+      this->sdf->Get<ignition::math::Vector3d>("linear");
     this->model->SetLinearVel(linear);
   }
   if (this->sdf->HasElement("angular"))
   {
-    math::Vector3 angular = this->sdf->Get<math::Vector3>("angular");
+    ignition::math::Vector3d angular =
+      this->sdf->Get<ignition::math::Vector3d>("angular");
     this->model->SetAngularVel(angular);
   }
 }

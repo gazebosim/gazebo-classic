@@ -133,6 +133,7 @@ ignition::math::Vector3Stats Vector3Stats::Ign() const
   result.Y() = this->Y().Ign();
   result.Z() = this->Z().Ign();
   result.Mag() = this->Mag().Ign();
+  return result;
 }
 
 //////////////////////////////////////////////////

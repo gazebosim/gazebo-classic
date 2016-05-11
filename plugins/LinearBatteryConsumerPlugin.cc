@@ -42,7 +42,7 @@ void LinearBatteryConsumerPlugin::Load(physics::ModelPtr _parent,
 {
   sdf::ElementPtr elem = _sdf->GetElement("link_name");
   GZ_ASSERT(elem, "Element link_name doesn't exist!");
-  physics::LinkPtr link = _parent->GetLink(elem->Get<std::string>());
+  physics::LinkPtr link = _parent->LinkByName(elem->Get<std::string>());
   GZ_ASSERT(link, "Link was NULL");
 
   elem = _sdf->GetElement("battery_name");

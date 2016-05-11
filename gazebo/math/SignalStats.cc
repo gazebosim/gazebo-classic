@@ -261,4 +261,6 @@ ignition::math::SignalStats SignalStats::Ign() const
 
   for (auto const &statistic : this->dataPtr->stats)
     result.InsertData(statistic->Value());
+
+  return result;
 }

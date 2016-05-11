@@ -74,7 +74,7 @@ namespace gazebo
                  public: physics::ModelPtr model;
 
                  /// \brief Initial object pose.
-                 public: math::Pose pose;
+                 public: ignition::math::Pose3d pose;
                };
     typedef boost::shared_ptr<Object> ObjectPtr;
 
@@ -85,7 +85,7 @@ namespace gazebo
     protected: Object_M objects;
 
     /// \brief Map of strings to model poses.
-    typedef std::map<std::string, math::Pose> Pose_M;
+    typedef std::map<std::string, ignition::math::Pose3d> Pose_M;
 
     /// \brief Map of strings to Pose_M (arrangement map).
     typedef std::map<std::string, Pose_M> Arrangement_M;
