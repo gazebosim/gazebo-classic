@@ -66,7 +66,9 @@ void TimePanel_TEST::SpaceBar()
   QVERIFY(!timePanel->IsPaused());
 
   // Press space bar
+  std::cerr << "before Key_Space" << std::endl;
   QTest::keyClick(timePanel, Qt::Key_Space);
+  std::cerr << "after Key_Space" << std::endl;
 
   // Process some events until it gets paused
   for (unsigned int i = 0; i < 10 && !timePanel->IsPaused(); ++i)

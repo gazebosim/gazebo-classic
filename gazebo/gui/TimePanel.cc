@@ -206,10 +206,17 @@ void TimePanel::SetPaused(bool _paused)
 /////////////////////////////////////////////////
 void TimePanel::TogglePause()
 {
+  std::cerr << "TogglePause()" << std::endl;
   if (this->IsPaused())
+  {
+    std::cerr << "play" << std::endl;
     g_playAct->trigger();
+  }
   else
+  {
+    std::cerr << "pause" << std::endl;
     g_pauseAct->trigger();
+  }
 }
 
 /////////////////////////////////////////////////
