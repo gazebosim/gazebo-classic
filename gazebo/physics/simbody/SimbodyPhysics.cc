@@ -194,7 +194,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.mutable_gravity()->CopyFrom(
       msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -417,6 +417,10 @@ void SimbodyPhysics::UpdateCollision()
   // Get all contacts from Simbody
   const SimTK::State &state = this->integ->getState();
 
+  // The tracker cannot generate a snapshot without a subsystem
+  if (state.getNumSubsystems() == 0)
+    return;
+
   // get contact snapshot
   const SimTK::ContactSnapshot &contactSnapshot =
     this->tracker.getActiveContacts(state);
@@ -638,6 +642,10 @@ void SimbodyPhysics::UpdatePhysics()
 
   common::Time currTime =  this->world->GetRealTime();
 
+  // Simbody cannot step the integrator without a subsystem
+  const SimTK::State &s = this->integ->getState();
+  if (s.getNumSubsystems() == 0)
+    return;
 
   bool trying = true;
   while (trying && integ->getTime() < this->world->GetSimTime().Double())
@@ -656,7 +664,6 @@ void SimbodyPhysics::UpdatePhysics()
   }
 
   this->simbodyPhysicsStepped = true;
-  const SimTK::State &s = this->integ->getState();
 
   // debug
   // gzerr << "time [" << s.getTime()

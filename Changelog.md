@@ -6,6 +6,9 @@
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
 
+1. Change NULL to nullptr.
+    * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
+
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
     * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)
@@ -20,6 +23,9 @@
 
 1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
     * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
+
+1. Add common::URI class
+    * [Pull request #2275](https://bitbucket.org/osrf/gazebo/pull-request/2275)
 
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
@@ -64,6 +70,9 @@
 1. Update model editor snap to grid modifier key
     * [Pull request 2259](https://bitbucket.org/osrf/gazebo/pull-request/2259)
     * [Issue #1583](https://bitbucket.org/osrf/gazebo/issues/1583)
+
+1. PIMPLize gui/model/ModelEditorPalette
+    * [Pull request 2279](https://bitbucket.org/osrf/gazebo/pull-request/2279)
 
 1. Properly cleanup pointers when destroying a blank world.
     * [Pull request 2220](https://bitbucket.org/osrf/gazebo/pull-request/2220)

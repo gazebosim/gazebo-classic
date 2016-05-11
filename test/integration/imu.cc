@@ -70,10 +70,8 @@ void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
 {
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
   // Rotate into IMU's frame
-  _g = _rot.GetInverse().RotateVector(physics->GetGravity());
+  _g = _rot.GetInverse().RotateVector(world->Gravity());
 }
 
 void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
@@ -123,10 +121,6 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  // get physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-
   // get pendulum
   std::string pendulumName = "model_pendulum";
   physics::ModelPtr pendulumModel = world->GetModel(pendulumName);
@@ -164,7 +158,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   ballNoFrictionImu->Init();
 
   // get gravity
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
 
   // run for 1900 steps (Step(1) each time), or 1.9 seconds, enough
   // to capture what we need from this experiment.
@@ -245,12 +239,12 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Y(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Z(), 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.x, g.x, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.y, g.y, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.z, g.z, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.x, g.x, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.y, g.y, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.z, g.z, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.x, g.X(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.y, g.Y(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.z, g.Z(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.x, g.X(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.y, g.Y(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.z, g.Z(), IMU_TOL);
       }
       // should use contact detector for these timing stuff
       else if (world->GetSimTime().Double() >= 1.2 &&
@@ -263,7 +257,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       {
         // on the ground
         double imuMag = imuLinearAccel.Length();
-        double gMag = g.GetLength();
+        double gMag = g.Length();
         EXPECT_NEAR(imuMag, gMag, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.y, 0, IMU_TOL);
@@ -303,19 +297,19 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Y(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Z(), 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.x, g.x, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.y, g.y, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.z, g.z, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.x, g.x, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.y, g.y, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.z, g.z, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.x, g.X(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.y, g.Y(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.z, g.Z(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.x, g.X(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.y, g.Y(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.z, g.Z(), IMU_TOL);
       }
       else if (world->GetSimTime().Double() >= 1.3 &&
                world->GetSimTime().Double() <= 1.751)
       {
         // on the ramp
         const double rampAngle = 0.5;
-        double gMag = g.GetLength();
+        double gMag = g.Length();
         double imuMag = imuLinearAccel.Length();
         EXPECT_NEAR(imuMag, gMag*cos(rampAngle), IMU_TOL);
 
@@ -328,7 +322,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       {
         // on the ground
         double imuMag = imuLinearAccel.Length();
-        double gMag = g.GetLength();
+        double gMag = g.Length();
         EXPECT_NEAR(imuMag, gMag, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.y, 0, IMU_TOL);

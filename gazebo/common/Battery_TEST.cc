@@ -49,6 +49,16 @@ TEST_F(BatteryTest, AddConsumer)
   double powerLoad = 0;
   EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
   EXPECT_DOUBLE_EQ(powerLoad, 5.0);
+
+  // Resetting the voltage has no effect on the power load
+  battery->ResetVoltage();
+  EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
+  EXPECT_DOUBLE_EQ(powerLoad, 5.0);
+
+  // Reinitializing the battery discard any power load
+  battery->Init();
+  EXPECT_EQ(battery->PowerLoads().size(), 0u);
+  EXPECT_FALSE(battery->PowerLoad(consumerId, powerLoad));
 }
 
 /////////////////////////////////////////////////
@@ -175,6 +185,16 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   // Reinitialize the battery, and expect the same result
   battery->Init();
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage);
+
+  for (int i = 0; i < N; ++i)
+    battery->Update();
+
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage + N * fixture.step);
+
+  // Reset the voltage to its initial value, and expect the same result
+  battery->ResetVoltage();
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage);
 
   for (int i = 0; i < N; ++i)
     battery->Update();

@@ -420,7 +420,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->StSignaled(true);
+        this->SetSignaled(true);
         for (auto iter: this->connections)
         {
           if (iter.second->on)

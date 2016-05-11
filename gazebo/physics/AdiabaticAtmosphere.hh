@@ -31,6 +31,9 @@ namespace gazebo
     /// Forward declare private data class.
     class AdiabaticAtmospherePrivate;
 
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Adiabatic atmosphere model based on the
     /// troposphere model in the
     /// Manual of the ICAO Standard Atmosphere.
@@ -51,9 +54,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
-
-      // Documentation inherited
-      public: virtual void Init();
 
       // Documentation inherited
       public: virtual std::string Type() const;
@@ -83,6 +83,7 @@ namespace gazebo
       /// \brief Private data pointer.
       protected: std::unique_ptr<AdiabaticAtmospherePrivate> dataPtr;
     };
+    /// \}
   }
 }
 #endif

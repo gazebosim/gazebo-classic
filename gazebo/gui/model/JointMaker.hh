@@ -65,6 +65,7 @@ namespace gazebo
   {
     class JointData;
     class JointInspector;
+    class MEUserCmdManager;
 
     // Forward declare private data.
     class JointMakerPrivate;
@@ -144,6 +145,10 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed, or an empty string
       /// to remove the new joint under creation.
       public: void RemoveJoint(const std::string &_jointName);
+
+      /// \brief Remove joint by name and register user command.
+      /// \param[in] _jointName Name of joint to be removed.
+      public: void RemoveJointByUser(const std::string &_jointName);
 
       /// \brief Remove all joints connected to link.
       /// \param[in] _linkName Name of the link.
@@ -283,6 +288,10 @@ namespace gazebo
 
       /// \brief Finalize joint creation.
       public: void FinalizeCreation();
+
+      /// \brief Set the user command manager variable.
+      /// \param[in] _manager Pointer to the manager.
+      public: void SetUserCmdManager(MEUserCmdManager *_manager);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.

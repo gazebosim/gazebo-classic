@@ -7,30 +7,47 @@ release will remove the deprecated code.
 
 ## Gazebo 7.X to 8.X
 
+### Additions
+
+1. **gazebo/common/Event.hh**
+    + public: bool Connection::Id() const;
+    + public: bool Event::Signaled() const;
+    + public: void Event::SetSignaled(const bool);
+
 ### Modifications
 
 1. **gazebo/common/Event.hh**
-    + added protected: bool signaled to Event class
     + ConnectionPrivate made not visible
-    + Connection::dataPtr changed to std::unique_ptr
-    + EventConnection(const bool, boost::function<T>*) changed to
-      EventConnection(const bool, boost::function<T>) (function pointer
-      passed as a copy instead of as a pointer)
-    + EventConnection::callback stored as boost::function<T>
-      instead of std::shared_ptr<boost::function<T>>
+    + Connection(Event*, int) constructor changed to
+      Connection(Event*, const int)
     + EventTPrivate no longer inherits from EventPrivate
-    + EventT::myDataPtr changed to std::unique_ptr
 
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
+
+### Deprecations
+
+1. **gazebo/common/Event.hh**
+    + ***Deprecation:*** public: bool Event::GetSignaled() const;
+    + ***Replacement:*** public: bool Event::Signaled() const;
+    + ***Deprecation:*** public: bool Connection::GetId() const;
+    + ***Replacement:*** public: bool Connection::Id() const;
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: math::Vector3 GetGravity const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
 ### Deletions
 
 1. **gazebo/common/Event.hh**
     + EventPrivate class
     + Event(EventPrivate&) constructor
-    + Event::dataPtr member variable
-    + ConnectionPrivate() constructor
     + Connection() constructor
 
 ## Gazebo 7.1.0 to 7.X
