@@ -326,7 +326,7 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   else if (_key == "real_time_factor")
     _value = this->GetTargetRealTimeFactor();
   else if (_key == "gravity")
-    _value = this->GetGravity();
+    _value = this->world->Gravity();
   else if (_key == "magnetic_field")
     _value = this->world->MagneticField();
   else

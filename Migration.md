@@ -33,6 +33,16 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: bool Connection::GetId() const;
     + ***Replacement:*** public: bool Connection::Id() const;
 
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: math::Vector3 GetGravity const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
 ### Deletions
 
 1. **gazebo/common/Event.hh**

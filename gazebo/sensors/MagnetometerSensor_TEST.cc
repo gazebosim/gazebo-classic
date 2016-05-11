@@ -83,8 +83,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
   EXPECT_TRUE(sensor != nullptr);
 
   // At pose [0,0,0,0,0,0] the body frame magnetic field should be default
-  EXPECT_EQ(sensor->MagneticField(),
-      world->GetPhysicsEngine()->MagneticField());
+  EXPECT_EQ(sensor->MagneticField(), world->MagneticField());
 }
 
 /////////////////////////////////////////////////
@@ -121,7 +120,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
 
   // Determine the magnetic field in the body frame
   ignition::math::Vector3d field = modelPose.Rot().Inverse().RotateVector(
-        world->GetPhysicsEngine()->MagneticField());
+        world->MagneticField());
 
   // Check for match
   EXPECT_EQ(magSensor->MagneticField(), field);
