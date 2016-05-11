@@ -468,6 +468,8 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
     rendering::VisualPtr rootVis = vis->GetRootVisual();
+    // TODO gui::get_entity_id always return 0 in QTestFixture due to NULL
+    // g_main_win
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model

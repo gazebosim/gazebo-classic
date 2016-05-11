@@ -72,6 +72,12 @@ namespace gazebo
       private: void GetNextColor();
 
       public: friend class SelectionBuffer;
+
+      /// \brief Plain material technique
+      private: Ogre::Technique *plainTechnique = nullptr;
+
+      /// \brief Overlay material technique
+      private: Ogre::Technique *overlayTechnique = nullptr;
     };
   }
 }
