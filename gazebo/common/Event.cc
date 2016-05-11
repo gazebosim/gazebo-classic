@@ -22,40 +22,32 @@ using namespace gazebo;
 using namespace event;
 
 //////////////////////////////////////////////////
-EventPrivate::EventPrivate()
-  : signaled(false)
-{
-}
-
-//////////////////////////////////////////////////
 Event::Event()
-  : dataPtr(new EventPrivate())
-{
-}
-
-//////////////////////////////////////////////////
-Event::Event(EventPrivate &_d)
-  : dataPtr(&_d)
+  : signaled(false)
 {
 }
 
 //////////////////////////////////////////////////
 Event::~Event()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 bool Event::GetSignaled() const
 {
-  return this->dataPtr->signaled;
+  return this->Signaled();
 }
 
 //////////////////////////////////////////////////
-ConnectionPrivate::ConnectionPrivate()
-  : event(NULL), id(-1)
+bool Event::Signaled() const
 {
+  return this->signaled;
+}
+
+//////////////////////////////////////////////////
+void Event::SetSignaled(const bool _sig)
+{
+  this->signaled = _sig;
 }
 
 //////////////////////////////////////////////////
@@ -65,13 +57,7 @@ ConnectionPrivate::ConnectionPrivate(Event *_e, int _i)
 }
 
 //////////////////////////////////////////////////
-Connection::Connection()
-  : dataPtr(new ConnectionPrivate())
-{
-}
-
-//////////////////////////////////////////////////
-Connection::Connection(Event *_e, int _i)
+Connection::Connection(Event *_e, const int _i)
   : dataPtr(new ConnectionPrivate(_e, _i))
 {
   this->dataPtr->creationTime = common::Time::GetWallTime();
@@ -82,24 +68,29 @@ Connection::~Connection()
 {
   common::Time diffTime = common::Time::GetWallTime() -
     this->dataPtr->creationTime;
-  if ((this->dataPtr->event && !this->dataPtr->event->GetSignaled()) &&
+  if ((this->dataPtr->event && !this->dataPtr->event->Signaled()) &&
       diffTime < common::Time(0, 10000))
-    gzwarn << "Warning: Deleteing a connection right after creation. "
+  {
+    gzwarn << "Warning: Deleting a connection right after creation. "
           << "Make sure to save the ConnectionPtr from a Connect call\n";
+  }
 
   if (this->dataPtr->event && this->dataPtr->id >= 0)
   {
     this->dataPtr->event->Disconnect(this->dataPtr->id);
     this->dataPtr->id = -1;
-    this->dataPtr->event = NULL;
+    this->dataPtr->event = nullptr;
   }
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 int Connection::GetId() const
+{
+  return this->Id();
+}
+
+//////////////////////////////////////////////////
+int Connection::Id() const
 {
   return this->dataPtr->id;
 }

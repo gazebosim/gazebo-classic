@@ -34,7 +34,7 @@ using namespace physics;
 ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId, BasePtr _parent)
     : Hinge2Joint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateHinge2(_worldId, NULL);
+  this->jointId = dJointCreateHinge2(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////

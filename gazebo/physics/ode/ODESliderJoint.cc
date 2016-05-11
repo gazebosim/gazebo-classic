@@ -35,7 +35,7 @@ using namespace physics;
 ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
     : SliderJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateSlider(_worldId, NULL);
+  this->jointId = dJointCreateSlider(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
