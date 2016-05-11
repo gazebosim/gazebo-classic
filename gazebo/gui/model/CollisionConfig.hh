@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_COLLISION_CONFIG_HH_
-#define _GAZEBO_COLLISION_CONFIG_HH_
+#ifndef GAZEBO_GUI_MODEL_COLLISIONCONFIG_HH_
+#define GAZEBO_GUI_MODEL_COLLISIONCONFIG_HH_
 
 #include <map>
 #include <string>
@@ -163,6 +163,12 @@ namespace gazebo
 
       /// \brief Map of id to collision config widget.
       private: std::map<int, CollisionConfigData *> configs;
+
+      /// \brief Map of collision config widgets which were deleted.
+      private: std::map<int, CollisionConfigData *> deletedConfigs;
+
+      /// \brief Map of collision config widgets which were added.
+      private: std::map<int, CollisionConfigData *> addedConfigs;
 
       /// \brief Counter for the number of collisions.
       private: int counter;
