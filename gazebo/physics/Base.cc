@@ -328,33 +328,6 @@ std::string Base::GetScopedName(bool _prependWorldName) const
 }
 
 //////////////////////////////////////////////////
-common::URI Base::URI() const
-{
-  common::URI uri;
-
-  uri.SetScheme("data");
-
-  BasePtr p = this->parent;
-  while (p)
-  {
-    if (p->GetParent())
-    {
-      uri.Path().PushFront(p->GetName());
-      uri.Path().PushFront(p->TypeStr());
-    }
-
-    p = p->GetParent();
-  }
-
-  uri.Path().PushBack(this->TypeStr());
-  uri.Path().PushBack(this->GetName());
-  uri.Path().PushFront(this->world->GetName());
-  uri.Path().PushFront("world");
-
-  return uri;
-}
-
-//////////////////////////////////////////////////
 void Base::ComputeScopedName()
 {
   BasePtr p = this->parent;

@@ -711,7 +711,9 @@ find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)
-endif (QWT_INCLUDE_DIR AND QWT_LIBRARY)
+else()
+  set(HAVE_QWT FALSE)
+endif ()
 
 # version
 set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )

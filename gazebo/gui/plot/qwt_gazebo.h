@@ -40,6 +40,7 @@
 #include <qwt/qwt_scale_engine.h>
 #include <qwt/qwt_scale_widget.h>
 #include <qwt/qwt_symbol.h>
+#include <qwt/qwt_plot_renderer.h>
 
 #pragma clang diagnostic pop
 
