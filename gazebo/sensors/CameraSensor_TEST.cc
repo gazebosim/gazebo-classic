@@ -43,7 +43,7 @@ TEST_F(CameraSensor_TEST, CreateCamera)
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   EXPECT_TRUE(sensor->IsActive());
 
@@ -59,7 +59,7 @@ TEST_F(CameraSensor_TEST, CreateCamera)
     sleep++;
     common::Time::MSleep(100);
   }
-  EXPECT_TRUE(sensor->ImageData() != NULL);
+  EXPECT_TRUE(sensor->ImageData() != nullptr);
 
   // Remove the sensor
   std::string sensorScopedName = sensor->ScopedName();
@@ -74,7 +74,7 @@ TEST_F(CameraSensor_TEST, CreateCamera)
     common::Time::MSleep(100);
   }
   EXPECT_TRUE(sensors::SensorManager::Instance()->GetSensor(sensorScopedName)
-      == NULL);
+      == nullptr);
 
   // Check that sensor is invalid after being removed.
   EXPECT_EQ(sensor->ImageWidth(), 0u);

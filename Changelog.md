@@ -6,6 +6,9 @@
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
 
+1. Change NULL to nullptr.
+    * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
+
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
     * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)

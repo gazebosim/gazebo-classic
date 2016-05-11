@@ -17,10 +17,15 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture
+class WorldTest : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
 {
+  /// \brief Test clearing an empty (blank) world.
+  /// \param[in] _physicsEngine Name of physics engine.
+  public: void ClearEmptyWorld(const std::string &_physicsEngine);
 };
 
 /// \brief Pose after physics update
@@ -72,11 +77,17 @@ void onWorldUpdateEnd()
 }
 
 /////////////////////////////////////////////////
-TEST_F(WorldTest, ClearEmptyWorld)
+void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
 {
-  Load("worlds/blank.world");
+  this->Load("worlds/blank.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  gzdbg << "Engine: " << _physicsEngine << std::endl;
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -91,6 +102,12 @@ TEST_F(WorldTest, ClearEmptyWorld)
   // Now spawn something, and the model count should increase
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, ClearEmptyWorld)
+{
+  ClearEmptyWorld(GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -470,6 +487,8 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
   event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
