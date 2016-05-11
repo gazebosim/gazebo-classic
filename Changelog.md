@@ -8,6 +8,7 @@
 
 1. Change NULL to nullptr.
     * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
+    * [Pull request #2297](https://bitbucket.org/osrf/gazebo/pull-request/2297)
 
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
