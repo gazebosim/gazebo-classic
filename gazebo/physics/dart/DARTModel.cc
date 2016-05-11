@@ -38,6 +38,7 @@ DARTModel::DARTModel(BasePtr _parent)
 DARTModel::~DARTModel()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
