@@ -9,6 +9,9 @@
     * [Pull request 2259](https://bitbucket.org/osrf/gazebo/pull-request/2259)
     * [Issue #1583](https://bitbucket.org/osrf/gazebo/issues/1583)
 
+1. PIMPLize gui/model/ModelEditorPalette
+    * [Pull request 2279](https://bitbucket.org/osrf/gazebo/pull-request/2279)
+
 1. Properly cleanup pointers when destroying a blank world.
     * [Pull request 2220](https://bitbucket.org/osrf/gazebo/pull-request/2220)
 
@@ -148,6 +151,11 @@
 1. Model editor: Fix inserting custom links
     * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
     * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
+
+1. Model editor: Reset visual / collision insertion / deletion
+        * [Pull request #2254](https://bitbucket.org/osrf/gazebo/pull-request/2254)
+        * [Issue #1777](https://bitbucket.org/osrf/gazebo/issues/1777)
+        * [Issue #1852](https://bitbucket.org/osrf/gazebo/issues/1852)
 
 1. Building editor: Add layers to building levels
     * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)

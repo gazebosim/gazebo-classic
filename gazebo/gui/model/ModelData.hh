@@ -174,6 +174,9 @@ namespace gazebo
       /// \param[in] _name Name of collision.
       private slots: void OnRemoveCollision(const std::string &_name);
 
+      /// \brief Qt callback when the inspector is opened.
+      private slots: void OnInspectorOpened();
+
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -204,6 +207,9 @@ namespace gazebo
       /// \brief Visuals of the link.
       public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
 
+      /// \brief Deleted visuals of the link.
+      public: std::map<rendering::VisualPtr, msgs::Visual> deletedVisuals;
+
       /// \brief Msgs for updating visuals.
       public: std::vector<msgs::Visual *> visualUpdateMsgs;
 
@@ -212,6 +218,9 @@ namespace gazebo
 
       /// \brief Collisions of the link.
       public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
+
+      /// \brief Deleted collisions of the link.
+      public: std::map<rendering::VisualPtr, msgs::Collision> deletedCollisions;
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
