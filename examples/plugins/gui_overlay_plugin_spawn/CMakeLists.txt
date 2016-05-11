@@ -14,7 +14,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 QT4_WRAP_CPP(headers_MOC GUIExampleSpawnWidget.hh)
 
-add_library(gui_example_spawn_widget SHARED ${headers_MOC}
+add_library(gui_example_spawn_widget MODULE ${headers_MOC}
   GUIExampleSpawnWidget.cc)
 target_link_libraries(gui_example_spawn_widget ${GAZEBO_LIBRARIES}
     ${QT_LIBRARIES}

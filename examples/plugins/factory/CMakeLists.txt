@@ -5,7 +5,7 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
-add_library(factory SHARED factory.cc)
+add_library(factory MODULE factory.cc)
 target_link_libraries(factory
   ${GAZEBO_LIBRARIES}
 )

@@ -5,5 +5,5 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
-add_library(parameters SHARED parameters.cc)
+add_library(parameters MODULE parameters.cc)
 target_link_libraries(parameters ${GAZEBO_LIBRARIES})

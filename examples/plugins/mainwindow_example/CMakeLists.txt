@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 QT4_WRAP_CPP(headers_MOC MainWindowExampleWidget.hh)
 
-add_library(main_window_example_widget SHARED ${headers_MOC}
+add_library(main_window_example_widget MODULE ${headers_MOC}
   MainWindowExampleWidget.cc)
 target_link_libraries(main_window_example_widget ${GAZEBO_LIBRARIES} 
     ${QT_LIBRARIES}

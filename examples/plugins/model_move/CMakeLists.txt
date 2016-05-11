@@ -16,5 +16,5 @@ list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 add_executable(path_publisher path_publisher.cc)
 target_link_libraries(path_publisher ${GAZEBO_LIBRARIES})
 
-add_library(model_move SHARED model_move.cc)
+add_library(model_move MODULE model_move.cc)
 target_link_libraries(model_move ${GAZEBO_LIBRARIES})

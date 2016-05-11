@@ -5,5 +5,5 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
-add_library(animate_joints SHARED animate_joints.cc)
+add_library(animate_joints MODULE animate_joints.cc)
 target_link_libraries(animate_joints ${GAZEBO_LIBRARIES})

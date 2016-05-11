@@ -11,5 +11,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 add_subdirectory(msgs)
 
-add_library(custom_messages SHARED custom_messages.cc)
+add_library(custom_messages MODULE custom_messages.cc)
 target_link_libraries(custom_messages my_msgs ${GAZEBO_libraries})
