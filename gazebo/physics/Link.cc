@@ -1473,9 +1473,9 @@ double Link::GetWorldEnergyPotential() const
   // use origin as reference position
   // E = -m g^T z
   double m = this->GetInertial()->GetMass();
-  math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
+  auto g = this->GetWorld()->Gravity();
   math::Vector3 z = this->GetWorldCoGPose().pos;
-  return -m * g.Dot(z);
+  return -m * g.Dot(z.Ign());
 }
 
 /////////////////////////////////////////////////

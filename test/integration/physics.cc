@@ -101,11 +101,11 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -197,14 +197,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       t = world->GetSimTime().Double();
       EXPECT_EQ(vel1.x, 0);
       EXPECT_EQ(vel1.y, 0);
-      EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
+      EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
       EXPECT_EQ(pose1.pos.x, x0);
       EXPECT_EQ(pose1.pos.y, 0);
-      EXPECT_NEAR(pose1.pos.z, z0 + g.z/2*t*t, (z0+g.z/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, z0 + g.Z()/2*t*t, (z0+g.Z()/2*t*t)*PHYSICS_TOL);
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
@@ -231,7 +231,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   }
 
   // Predict time of contact with ground plane.
-  double tHit = sqrt(2*(z0-0.5) / (-g.z));
+  double tHit = sqrt(2*(z0-0.5) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
@@ -280,7 +280,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
       if (name == "test_empty")
-        EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
+        EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       else
         EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
 
@@ -311,8 +311,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
       if (name == "test_empty")
       {
-        EXPECT_NEAR(pose1.pos.z, z0+g.z/2*t*t,
-            fabs((z0+g.z/2*t*t)*PHYSICS_TOL));
+        EXPECT_NEAR(pose1.pos.z, z0+g.Z()/2*t*t,
+            fabs((z0+g.Z()/2*t*t)*PHYSICS_TOL));
       }
       else
         EXPECT_NEAR(pose1.pos.z, 0.5, PHYSICS_TOL);
@@ -382,11 +382,11 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LT(g.z, 0);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LT(g.Z(), 0);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -495,14 +495,14 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       t = world->GetSimTime().Double();
       EXPECT_NEAR(vel1.x, 0, 1e-16);
       EXPECT_NEAR(vel1.y, 0, 1e-16);
-      EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
+      EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
       pose1 = model->GetWorldPose();
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL*PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.z, z0+radius + g.z/2*t*t,
-                  (z0+radius+g.z/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.pos.z, z0+radius + g.Z()/2*t*t,
+                  (z0+radius+g.Z()/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
       world->Step(steps);
@@ -519,7 +519,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   }
 
   // Predict time of contact with ground plane.
-  double tHit = sqrt(2*(z0-0.5) / (-g.z));
+  double tHit = sqrt(2*(z0-0.5) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();

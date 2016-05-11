@@ -104,7 +104,7 @@ TEST_F(RaySensor_TEST, CreateLaser)
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   double angleRes = (sensor->AngleMax() - sensor->AngleMin()).Radian() /
                      sensor->RayCount();
@@ -168,7 +168,7 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   // range count = ray count * resolution
   EXPECT_EQ(sensor->RayCount(), 120);

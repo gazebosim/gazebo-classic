@@ -62,7 +62,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(
       this->Topic(), 30);
-  GZ_ASSERT(this->pub != NULL,
+  GZ_ASSERT(this->pub != nullptr,
       "wirelessReceiverSensor did not get a valid publisher pointer");
 
   sdf::ElementPtr transceiverElem =
