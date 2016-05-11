@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_PHYSICS_LIGHT_HH_
 #define _GAZEBO_PHYSICS_LIGHT_HH_
 
@@ -58,7 +57,7 @@ namespace gazebo
       public: void SetState(const LightState &_state);
 
       // Documentation inherited
-      public: void OnPoseChange();
+      protected: virtual void OnPoseChange();
 
       /// \brief Publish the pose.
       private: void PublishPose();

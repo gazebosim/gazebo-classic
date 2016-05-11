@@ -107,7 +107,7 @@ void SensorManager::Update(bool _force)
     if (this->worlds.empty() && physics::worlds_running() && this->initialized)
     {
       auto world = physics::get_world();
-      this->worlds[world->GetName()] = world;
+      this->worlds[world->Name()] = world;
       world->_SetSensorsInitialized(true);
     }
 
@@ -479,7 +479,7 @@ void SensorManager::SensorContainer::RunLoop()
   physics::WorldPtr world = physics::get_world();
   GZ_ASSERT(world != NULL, "Pointer to World is NULL");
 
-  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr engine = world->Physics();
   GZ_ASSERT(engine != NULL, "Pointer to PhysicsEngine is NULL");
 
   engine->InitForThread();
@@ -487,7 +487,7 @@ void SensorManager::SensorContainer::RunLoop()
   // The original value was hardcode to 1.0. Changed the value to
   // 1000 * MaxStepSize in order to handle simulation with a
   // large step size.
-  double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
+  double maxSensorUpdate = engine->MaxStepSize() * 1000;
 
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
@@ -534,14 +534,14 @@ void SensorManager::SensorContainer::RunLoop()
     }
 
     // Get the start time of the update.
-    startTime = world->GetSimTime();
+    startTime = world->SimTime();
 
     this->Update(false);
 
     // Compute the time it took to update the sensors.
     // It's possible that the world time was reset during the Update. This
     // would case a negative diffTime. Instead, just use a event time of zero
-    diffTime = std::max(common::Time::Zero, world->GetSimTime() - startTime);
+    diffTime = std::max(common::Time::Zero, world->SimTime() - startTime);
 
     // Set the default sleep time
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
@@ -736,7 +736,7 @@ void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
 
   // Create the new event.
   SimTimeEvent *event = new SimTimeEvent;
-  event->time = world->GetSimTime() + _time;
+  event->time = world->SimTime() + _time;
   event->condition = _var;
 
   // Add the event to the list.

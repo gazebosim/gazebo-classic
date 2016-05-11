@@ -33,7 +33,7 @@ TEST_F(Issue1208Test, Reset)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   world->Step(1);
@@ -44,7 +44,7 @@ TEST_F(Issue1208Test, Reset)
   // real time update rate of the physics engine.
   // It's a little convoluted, but it's an easy way to get
   // data from the plugin without using transport.
-  EXPECT_NEAR(physics->GetRealTimeUpdateRate(), 1.0, 1e-2);
+  EXPECT_NEAR(physics->RealTimeUpdateRate(), 1.0, 1e-2);
 }
 
 /////////////////////////////////////////////////

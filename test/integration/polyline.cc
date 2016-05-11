@@ -36,16 +36,16 @@ void PolylineTest::ComputeVolume(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr cubeModel = world->GetModel("cube");
+  physics::ModelPtr cubeModel = world->ModelByName("cube");
   EXPECT_TRUE(cubeModel != NULL);
 
-  physics::LinkPtr cubeLink = cubeModel->GetLink("polyLine2");
+  physics::LinkPtr cubeLink = cubeModel->LinkByName("polyLine2");
   EXPECT_TRUE(cubeLink != NULL);
 
-  physics::CollisionPtr cubeColl = cubeLink->GetCollision("collision");
+  physics::CollisionPtr cubeColl = cubeLink->CollisionByName("collision");
   EXPECT_TRUE(cubeColl != NULL);
 
-  physics::ShapePtr shape = cubeColl->GetShape();
+  physics::ShapePtr shape = cubeColl->Shape();
   EXPECT_TRUE(shape != NULL);
 
   // The actual volume of the cube shape is 1*1*1.5 = 1.5
@@ -82,24 +82,25 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr triangleModel = world->GetModel("triangle");
+  physics::ModelPtr triangleModel = world->ModelByName("triangle");
   EXPECT_TRUE(triangleModel != NULL);
 
-  physics::LinkPtr triangleLink = triangleModel->GetLink("link");
+  physics::LinkPtr triangleLink = triangleModel->LinkByName("link");
   EXPECT_TRUE(triangleLink != NULL);
 
-  physics::CollisionPtr triangleColl = triangleLink->GetCollision("collision");
+  physics::CollisionPtr triangleColl =
+    triangleLink->CollisionByName("collision");
   EXPECT_TRUE(triangleColl != NULL);
 
-  physics::ShapePtr shape = triangleColl->GetShape();
+  physics::ShapePtr shape = triangleColl->Shape();
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::POLYLINE_SHAPE));
 
   physics::PolylineShapePtr polyShape =
-    boost::dynamic_pointer_cast<physics::PolylineShape>(shape);
+    std::dynamic_pointer_cast<physics::PolylineShape>(shape);
   EXPECT_TRUE(polyShape != NULL);
 
-  EXPECT_DOUBLE_EQ(polyShape->GetHeight(), 1.0);
+  EXPECT_DOUBLE_EQ(polyShape->Height(), 1.0);
 
   std::vector<std::vector<ignition::math::Vector2d> > vertices =
     polyShape->Vertices();
@@ -134,12 +135,12 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   // Spawn a sphere over the polyline shape, and check that it doesn't pass
   // through the polyline
   {
-    SpawnSphere("test_sphere", math::Vector3(0, 0, 1.5),
-        math::Vector3(0, 0, 0));
-    physics::ModelPtr sphere = GetModel("test_sphere");
+    SpawnSphere("test_sphere", ignition::math::Vector3d(0, 0, 1.5),
+        ignition::math::Vector3d(0, 0, 0));
+    physics::ModelPtr sphere = this->GetModel("test_sphere");
 
     common::Time::MSleep(1000);
-    EXPECT_NEAR(sphere->GetWorldPose().pos.z, 1.5, 1e-2);
+    EXPECT_NEAR(sphere->WorldPose().Pos().Z(), 1.5, 1e-2);
   }
 }
 

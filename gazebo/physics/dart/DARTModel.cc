@@ -216,7 +216,7 @@ dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 {
   return std::dynamic_pointer_cast<DARTPhysics>(
-    this->GetWorld()->GetPhysicsEngine());
+    this->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////

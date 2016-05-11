@@ -37,85 +37,107 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PresetManager.hh"
+
+#include "gazebo/physics/PhysicsEnginePrivate.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 PhysicsEngine::PhysicsEngine(WorldPtr _world)
-  : world(_world)
+: physicsEngineDPtr(new PhysicsEnginePrivate)
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("physics.sdf", this->sdf);
+  this->physicsEngineDPtr->world = _world;
+  this->ConstructionHelper();
+}
 
-  this->targetRealTimeFactor = 0;
-  this->realTimeUpdateRate = 0;
-  this->maxStepSize = 0;
+//////////////////////////////////////////////////
+PhysicsEngine::PhysicsEngine(PhysicsEnginePrivate &_dataPtr, WorldPtr _world)
+: physicsEngineDPtr(&_dataPtr)
+{
+  this->physicsEngineDPtr->world = _world;
+  this->ConstructionHelper();
+}
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->world->GetName());
-  this->physicsSub = this->node->Subscribe("~/physics",
+//////////////////////////////////////////////////
+void PhysicsEngine::ConstructionHelper()
+{
+  this->physicsEngineDPtr->sdf.reset(new sdf::Element);
+  sdf::initFile("physics.sdf", this->physicsEngineDPtr->sdf);
+
+  this->physicsEngineDPtr->targetRealTimeFactor = 0;
+  this->physicsEngineDPtr->realTimeUpdateRate = 0;
+  this->physicsEngineDPtr->maxStepSize = 0;
+
+  this->physicsEngineDPtr->node = transport::NodePtr(new transport::Node());
+  this->physicsEngineDPtr->node->Init(this->physicsEngineDPtr->world->Name());
+  this->physicsEngineDPtr->physicsSub = this->physicsEngineDPtr->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
-  this->responsePub =
-    this->node->Advertise<msgs::Response>("~/response");
+  this->physicsEngineDPtr->responsePub =
+    this->physicsEngineDPtr->node->Advertise<msgs::Response>("~/response");
 
-  this->requestSub = this->node->Subscribe("~/request",
-                                           &PhysicsEngine::OnRequest, this);
-
-  this->physicsUpdateMutex = new boost::recursive_mutex();
+  this->physicsEngineDPtr->requestSub =
+    this->physicsEngineDPtr->node->Subscribe("~/request",
+        &PhysicsEngine::OnRequest, this);
 
   // Create and initialized the contact manager.
-  this->contactManager = new ContactManager();
-  this->contactManager->Init(this->world);
+  this->physicsEngineDPtr->contactManager = new ContactManager();
+  this->physicsEngineDPtr->contactManager->Init(this->physicsEngineDPtr->world);
 }
 
 //////////////////////////////////////////////////
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf->Copy(_sdf);
+  this->physicsEngineDPtr->sdf->Copy(_sdf);
 
-  this->realTimeUpdateRate =
-      this->sdf->GetElement("real_time_update_rate")->Get<double>();
-  this->targetRealTimeFactor =
-      this->sdf->GetElement("real_time_factor")->Get<double>();
-  this->maxStepSize =
-      this->sdf->GetElement("max_step_size")->Get<double>();
+  this->physicsEngineDPtr->realTimeUpdateRate =
+      this->physicsEngineDPtr->sdf->GetElement(
+          "real_time_update_rate")->Get<double>();
+  this->physicsEngineDPtr->targetRealTimeFactor =
+      this->physicsEngineDPtr->sdf->GetElement(
+          "real_time_factor")->Get<double>();
+  this->physicsEngineDPtr->maxStepSize =
+      this->physicsEngineDPtr->sdf->GetElement("max_step_size")->Get<double>();
 }
 
 //////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
-  this->world.reset();
-  this->node->Fini();
+  this->physicsEngineDPtr->world.reset();
+  this->physicsEngineDPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////
 PhysicsEngine::~PhysicsEngine()
 {
-  this->sdf->Reset();
-  this->sdf.reset();
-  delete this->physicsUpdateMutex;
-  this->physicsUpdateMutex = NULL;
-  this->responsePub.reset();
-  this->requestSub.reset();
-  this->node.reset();
+  this->physicsEngineDPtr->sdf->Reset();
+  this->physicsEngineDPtr->sdf.reset();
+  this->physicsEngineDPtr->responsePub.reset();
+  this->physicsEngineDPtr->requestSub.reset();
+  this->physicsEngineDPtr->node.reset();
 
-  delete this->contactManager;
+  delete this->physicsEngineDPtr->contactManager;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->world->Gravity();
+  return this->Gravity();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d PhysicsEngine::Gravity() const
+{
+  return this->physicsEngineDPtr->world->Gravity();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d PhysicsEngine::MagneticField() const
 {
-  return this->world->MagneticField();
+  return this->physicsEngineDPtr->world->MagneticField();
 }
 
 //////////////////////////////////////////////////
@@ -124,7 +146,8 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 {
   CollisionPtr result;
   LinkPtr link =
-    std::dynamic_pointer_cast<Link>(this->world->GetEntity(_linkName));
+    std::dynamic_pointer_cast<Link>(
+        this->physicsEngineDPtr->world->EntityByName(_linkName));
 
   if (!link)
     gzerr << "Unable to find link[" << _linkName << "]\n";
@@ -137,7 +160,13 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 //////////////////////////////////////////////////
 double PhysicsEngine::GetUpdatePeriod()
 {
-  double updateRate = this->GetRealTimeUpdateRate();
+  return this->UpdatePeriod();
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::UpdatePeriod() const
+{
+  double updateRate = this->RealTimeUpdateRate();
   if (updateRate > 0)
     return 1.0/updateRate;
   else
@@ -154,13 +183,25 @@ ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
 //////////////////////////////////////////////////
 double PhysicsEngine::GetTargetRealTimeFactor() const
 {
-  return this->targetRealTimeFactor;
+  return this->TargetRealTimeFactor();
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::TargetRealTimeFactor() const
+{
+  return this->physicsEngineDPtr->targetRealTimeFactor;
 }
 
 //////////////////////////////////////////////////
 double PhysicsEngine::GetRealTimeUpdateRate() const
 {
-  return this->realTimeUpdateRate;
+  return this->RealTimeUpdateRate();
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::RealTimeUpdateRate() const
+{
+  return this->physicsEngineDPtr->realTimeUpdateRate;
 }
 
 //////////////////////////////////////////////////
@@ -172,37 +213,37 @@ double PhysicsEngine::GetMaxStepSize() const
 //////////////////////////////////////////////////
 double PhysicsEngine::MaxStepSize() const
 {
-  return this->maxStepSize;
+  return this->physicsEngineDPtr->maxStepSize;
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetTargetRealTimeFactor(double _factor)
+void PhysicsEngine::SetTargetRealTimeFactor(const double _factor)
 {
-  this->sdf->GetElement("real_time_factor")->Set(_factor);
-  this->targetRealTimeFactor = _factor;
+  this->physicsEngineDPtr->sdf->GetElement("real_time_factor")->Set(_factor);
+  this->physicsEngineDPtr->targetRealTimeFactor = _factor;
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetRealTimeUpdateRate(double _rate)
+void PhysicsEngine::SetRealTimeUpdateRate(const double _rate)
 {
-  this->sdf->GetElement("real_time_update_rate")->Set(_rate);
-  this->realTimeUpdateRate = _rate;
+  this->physicsEngineDPtr->sdf->GetElement("real_time_update_rate")->Set(_rate);
+  this->physicsEngineDPtr->realTimeUpdateRate = _rate;
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetMaxStepSize(double _stepSize)
+void PhysicsEngine::SetMaxStepSize(const double _stepSize)
 {
-  this->sdf->GetElement("max_step_size")->Set(_stepSize);
-  this->maxStepSize = _stepSize;
+  this->physicsEngineDPtr->sdf->GetElement("max_step_size")->Set(_stepSize);
+  this->physicsEngineDPtr->maxStepSize = _stepSize;
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
+void PhysicsEngine::SetAutoDisableFlag(const bool /*_autoDisable*/)
 {
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetMaxContacts(unsigned int /*_maxContacts*/)
+void PhysicsEngine::SetMaxContacts(const unsigned int /*_maxContacts*/)
 {
 }
 
@@ -214,7 +255,8 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  this->world->GetPresetManager()->CurrentProfile(_msg->profile_name());
+  this->physicsEngineDPtr->world->PresetMgr()->CurrentProfile(
+      _msg->profile_name());
 }
 
 //////////////////////////////////////////////////
@@ -269,13 +311,13 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 #ifndef _WIN32
 #pragma GCC diagnostic pop
 #endif
-      this->world->SetMagneticField(
+      this->physicsEngineDPtr->world->SetMagneticField(
           boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
       gzwarn << "SetParam failed for [" << _key << "] in physics engine "
-             << this->GetType() << std::endl;
+             << this->Type() << std::endl;
       return false;
     }
   }
@@ -297,8 +339,14 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 //////////////////////////////////////////////////
 boost::any PhysicsEngine::GetParam(const std::string &_key) const
 {
+  return this->Param(_key);
+}
+
+//////////////////////////////////////////////////
+boost::any PhysicsEngine::Param(const std::string &_key) const
+{
   boost::any value;
-  this->PhysicsEngine::GetParam(_key, value);
+  this->PhysicsEngine::Param(_key, value);
   return value;
 }
 
@@ -306,22 +354,29 @@ boost::any PhysicsEngine::GetParam(const std::string &_key) const
 bool PhysicsEngine::GetParam(const std::string &_key,
     boost::any &_value) const
 {
+  return this->Param(_key, _value);
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::Param(const std::string &_key,
+    boost::any &_value) const
+{
   if (_key == "type")
-    _value = this->GetType();
+    _value = this->Type();
   else if (_key == "max_step_size")
-    _value = this->GetMaxStepSize();
+    _value = this->MaxStepSize();
   else if (_key == "real_time_update_rate")
-    _value = this->GetRealTimeUpdateRate();
+    _value = this->RealTimeUpdateRate();
   else if (_key == "real_time_factor")
-    _value = this->GetTargetRealTimeFactor();
+    _value = this->TargetRealTimeFactor();
   else if (_key == "gravity")
-    _value = this->GetGravity();
+    _value = this->Gravity();
   else if (_key == "magnetic_field")
-    _value = this->world->MagneticField();
+    _value = this->physicsEngineDPtr->world->MagneticField();
   else
   {
-    gzwarn << "GetParam failed for [" << _key << "] in physics engine "
-           << this->GetType() << std::endl;
+    gzwarn << "Param failed for [" << _key << "] in physics engine "
+           << this->Type() << std::endl;
     return false;
   }
 
@@ -331,19 +386,31 @@ bool PhysicsEngine::GetParam(const std::string &_key,
 //////////////////////////////////////////////////
 ContactManager *PhysicsEngine::GetContactManager() const
 {
-  return this->contactManager;
+  return this->ContactMgr();
+}
+
+//////////////////////////////////////////////////
+ContactManager *PhysicsEngine::ContactMgr() const
+{
+  return this->physicsEngineDPtr->contactManager;
 }
 
 //////////////////////////////////////////////////
 sdf::ElementPtr PhysicsEngine::GetSDF() const
 {
-  return this->sdf;
+  return this->SDF();
+}
+
+//////////////////////////////////////////////////
+sdf::ElementPtr PhysicsEngine::SDF() const
+{
+  return this->physicsEngineDPtr->sdf;
 }
 
 //////////////////////////////////////////////////
 WorldPtr PhysicsEngine::World() const
 {
-  return this->world;
+  return this->physicsEngineDPtr->world;
 }
 
 //////////////////////////////////////////////////
@@ -358,3 +425,36 @@ void PhysicsEngine::SetGravity(const gazebo::math::Vector3 &_gravity)
   return this->SetGravity(_gravity.Ign());
 }
 
+//////////////////////////////////////////////////
+void PhysicsEngine::Reset()
+{
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::UpdatePhysics()
+{
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::GetAutoDisableFlag()
+{
+  return this->AutoDisableFlag();
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::AutoDisableFlag() const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+boost::recursive_mutex *PhysicsEngine::GetPhysicsUpdateMutex() const
+{
+  return NULL;
+}
+
+//////////////////////////////////////////////////
+std::recursive_mutex &PhysicsEngine::PhysicsUpdateMutex() const
+{
+  return this->physicsEngineDPtr->physicsUpdateMutex;
+}

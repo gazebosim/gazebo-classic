@@ -35,9 +35,8 @@ TEST_F(JointControllerTest, PositionControl)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
-  gazebo::physics::JointControllerPtr jointController =
-    model->GetJointController();
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
+  gazebo::physics::JointControllerPtr jointController = model->JointCtrl();
 
   world->Step(100);
 
@@ -55,7 +54,8 @@ TEST_F(JointControllerTest, PositionControl)
 
   world->Step(5000);
 
-  math::Angle angle = model->GetJoint("arm_shoulder_pan_joint")->GetAngle(0);
+  ignition::math::Angle angle =
+    model->JointByName("arm_shoulder_pan_joint")->Angle(0);
 
   EXPECT_NEAR(angle.Radian(), 1.0, 0.1);
 }
@@ -66,9 +66,8 @@ TEST_F(JointControllerTest, VelocityControl)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
-  gazebo::physics::JointControllerPtr jointController =
-    model->GetJointController();
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
+  gazebo::physics::JointControllerPtr jointController = model->JointCtrl();
 
   world->Step(100);
 
@@ -85,7 +84,7 @@ TEST_F(JointControllerTest, VelocityControl)
   pub->Publish(msg);
 
   world->Step(5000);
-  double vel = model->GetJoint("arm_shoulder_pan_joint")->GetVelocity(0);
+  double vel = model->JointByName("arm_shoulder_pan_joint")->Velocity(0);
 
   EXPECT_NEAR(vel, 0.2, 0.05);
 }

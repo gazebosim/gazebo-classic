@@ -135,7 +135,7 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
     msgs::Time pauseT = ws.pause_time();
     bool paused = ws.paused();
 
-    std::string worldName = physics::get_world()->GetName();
+    std::string worldName = physics::get_world()->Name();
     std::string event = "{\n";
 
     event += "\"session\": \"" + this->session + "\", ";
@@ -223,7 +223,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 
       event += "\"name\": ";
       event += "\"";
-      event += world->GetName();
+      event += world->Name();
       event += "\", ";
 
       if (!world->IsPaused())
@@ -243,19 +243,19 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 
       event += "\"real_time\": ";
       event += "\"";
-      t = world->GetRealTime();
+      t = world->RealTime();
       event += t.FormattedString();
       event += "\", ";
 
       event += "\"sim_time\": ";
       event += "\"";
-      t = world->GetSimTime();
+      t = world->SimTime();
       event += t.FormattedString();
       event += "\", ";
 
       event += "\"pause_time\": ";
       event += "\"";
-      t = world->GetPauseTime();
+      t = world->PauseTime();
       event += t.FormattedString();
       event += "\" ";
 

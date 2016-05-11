@@ -49,7 +49,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // store a pointer to the simbody physics engine for convenience
   this->simbodyJointDPtr->simbodyPhysics =
   std::dynamic_pointer_cast<SimbodyPhysics>(
-      this->simbodyJointDPtr->model->World()->GetPhysicsEngine());
+      this->simbodyJointDPtr->model->World()->Physics());
 
   Joint::Load(_sdf);
 
@@ -281,7 +281,8 @@ void SimbodyJoint::SetAxis(const unsigned int _index,
 {
   ignition::math::Pose3d parentModelPose;
   if (this->simbodyJointDPtr->parentLink)
-    parentModelPose = this->simbodyJointDPtr->parentLink->Model()->WorldPose();
+    parentModelPose =
+      this->simbodyJointDPtr->parentLink->ParentModel()->WorldPose();
 
   // Set joint axis
   // assuming incoming axis is defined in the model frame, so rotate them
@@ -349,10 +350,10 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->AngleCount())
   {
-    if (this->simbodyJointDPtr->forceAppliedTime < this->World()->GetSimTime())
+    if (this->simbodyJointDPtr->forceAppliedTime < this->World()->SimTime())
     {
       // reset forces if time step is new
-      this->simbodyJointDPtr->forceAppliedTime = this->World()->GetSimTime();
+      this->simbodyJointDPtr->forceAppliedTime = this->World()->SimTime();
       this->simbodyJointDPtr->forceApplied[0] =
         this->simbodyJointDPtr->forceApplied[1] = 0;
     }

@@ -431,7 +431,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
         // instead of max force.
         // this means the friction will change when the step size changes.
         double dt =
-          this->bulletJointDPtr->world->GetPhysicsEngine()->MaxStepSize();
+          this->bulletJointDPtr->world->Physics()->MaxStepSize();
 
         this->bulletHinge->enableAngularMotor(true, 0.0,
           dt * boost::any_cast<double>(_value));
@@ -472,7 +472,7 @@ double BulletHingeJoint::Param(const std::string &_key,
     if (this->bulletHinge)
     {
       double dt =
-        this->bulletJointDPtr->world->GetPhysicsEngine()->MaxStepSize();
+        this->bulletJointDPtr->world->Physics()->MaxStepSize();
       return this->bulletHinge->getMaxMotorImpulse() / dt;
     }
     else

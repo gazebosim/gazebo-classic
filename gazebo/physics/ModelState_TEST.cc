@@ -92,24 +92,24 @@ TEST_F(ModelStateTest, Nested)
   for (const auto &m : modelStates)
   {
     // model state properties
-    EXPECT_EQ(m.GetPose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+    EXPECT_EQ(m.Pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
     EXPECT_EQ(m.Scale(), ignition::math::Vector3d::One);
-    EXPECT_EQ(m.GetJointStateCount(), 0u);
-    EXPECT_EQ(m.GetJointStates().size(), 0u);
+    EXPECT_EQ(m.JointStateCount(), 0u);
+    EXPECT_EQ(m.JointStates().size(), 0u);
 
     // link state
-    EXPECT_EQ(m.GetLinkStateCount(), 1u);
-    EXPECT_EQ(m.GetLinkStates().size(), 1u);
+    EXPECT_EQ(m.LinkStateCount(), 1u);
+    EXPECT_EQ(m.LinkStates().size(), 1u);
     EXPECT_TRUE(m.HasLinkState("link_00"));
-    EXPECT_NO_THROW(m.GetLinkState("link_00"));
+    EXPECT_NO_THROW(m.LinkStateByName("link_00"));
     physics::LinkState linkState =
-        m.GetLinkState("link_00");
-    EXPECT_EQ(linkState.GetPose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
-    EXPECT_EQ(linkState.GetVelocity(),
+        m.LinkStateByName("link_00");
+    EXPECT_EQ(linkState.Pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+    EXPECT_EQ(linkState.Velocity(),
         ignition::math::Pose3d(0.001, 0, 0, 0, 0, 0));
-    EXPECT_EQ(linkState.GetAcceleration(),
+    EXPECT_EQ(linkState.Acceleration(),
         ignition::math::Pose3d(0, 0.006121, 0, 0.012288, 0, 0.001751));
-    EXPECT_EQ(linkState.GetWrench(),
+    EXPECT_EQ(linkState.Wrench(),
         ignition::math::Pose3d(0, 0.006121, 0, 0, 0, 0));
 
     // nested model state
@@ -118,24 +118,24 @@ TEST_F(ModelStateTest, Nested)
     physics::ModelState nestedModelState =
         m.NestedModelState("model_01");
 
-    EXPECT_EQ(nestedModelState.GetPose(),
+    EXPECT_EQ(nestedModelState.Pose(),
         ignition::math::Pose3d(1, 0, 0.5, 0, 0, 0));
-    EXPECT_EQ(nestedModelState.GetJointStateCount(), 0u);
-    EXPECT_EQ(nestedModelState.GetJointStates().size(), 0u);
+    EXPECT_EQ(nestedModelState.JointStateCount(), 0u);
+    EXPECT_EQ(nestedModelState.JointStates().size(), 0u);
 
     // nested model's link state
-    EXPECT_EQ(nestedModelState.GetLinkStateCount(), 1u);
-    EXPECT_EQ(nestedModelState.GetLinkStates().size(), 1u);
-    EXPECT_NO_THROW(nestedModelState.GetLinkState("link_01"));
+    EXPECT_EQ(nestedModelState.LinkStateCount(), 1u);
+    EXPECT_EQ(nestedModelState.LinkStates().size(), 1u);
+    EXPECT_NO_THROW(nestedModelState.LinkStateByName("link_01"));
     physics::LinkState nestedLinkState =
-        nestedModelState.GetLinkState("link_01");
-    EXPECT_EQ(nestedLinkState.GetPose(),
+        nestedModelState.LinkStateByName("link_01");
+    EXPECT_EQ(nestedLinkState.Pose(),
         ignition::math::Pose3d(1.25, 0, 0.5, 0, 0, 0));
-    EXPECT_EQ(nestedLinkState.GetVelocity(),
+    EXPECT_EQ(nestedLinkState.Velocity(),
         ignition::math::Pose3d(0, -0.001, 0, 0, 0, 0));
-    EXPECT_EQ(nestedLinkState.GetAcceleration(),
+    EXPECT_EQ(nestedLinkState.Acceleration(),
         ignition::math::Pose3d(0, 0.000674, 0, -0.001268, 0, 0));
-    EXPECT_EQ(nestedLinkState.GetWrench(),
+    EXPECT_EQ(nestedLinkState.Wrench(),
         ignition::math::Pose3d(0, 0.000674, 0, 0, 0, 0));
 
     // double nested model state
@@ -143,24 +143,24 @@ TEST_F(ModelStateTest, Nested)
     EXPECT_NO_THROW(nestedModelState.NestedModelState("model_02"));
     nestedModelState = nestedModelState.NestedModelState("model_02");
 
-    EXPECT_EQ(nestedModelState.GetPose(),
+    EXPECT_EQ(nestedModelState.Pose(),
         ignition::math::Pose3d(1, 1, 0.5, 0, 0, 0));
-    EXPECT_EQ(nestedModelState.GetJointStateCount(), 0u);
-    EXPECT_EQ(nestedModelState.GetJointStates().size(), 0u);
+    EXPECT_EQ(nestedModelState.JointStateCount(), 0u);
+    EXPECT_EQ(nestedModelState.JointStates().size(), 0u);
 
     // double nested model's link state
-    EXPECT_EQ(nestedModelState.GetLinkStateCount(), 1u);
-    EXPECT_EQ(nestedModelState.GetLinkStates().size(), 1u);
+    EXPECT_EQ(nestedModelState.LinkStateCount(), 1u);
+    EXPECT_EQ(nestedModelState.LinkStates().size(), 1u);
     EXPECT_TRUE(nestedModelState.HasLinkState("link_02"));
-    EXPECT_NO_THROW(nestedModelState.GetLinkState("link_02"));
-    nestedLinkState = nestedModelState.GetLinkState("link_02");
-    EXPECT_EQ(nestedLinkState.GetPose(),
+    EXPECT_NO_THROW(nestedModelState.LinkStateByName("link_02"));
+    nestedLinkState = nestedModelState.LinkStateByName("link_02");
+    EXPECT_EQ(nestedLinkState.Pose(),
         ignition::math::Pose3d(1.25, 1, 0.5, 0, 0, 0));
-    EXPECT_EQ(nestedLinkState.GetVelocity(),
+    EXPECT_EQ(nestedLinkState.Velocity(),
         ignition::math::Pose3d(0, 0, 0.001, 0, 0, 0));
-    EXPECT_EQ(nestedLinkState.GetAcceleration(),
+    EXPECT_EQ(nestedLinkState.Acceleration(),
         ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
-    EXPECT_EQ(nestedLinkState.GetWrench(),
+    EXPECT_EQ(nestedLinkState.Wrench(),
         ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
   }
 }

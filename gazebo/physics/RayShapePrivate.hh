@@ -50,6 +50,9 @@ namespace gazebo
 
       /// \brief End position of the ray in global cs
       public: ignition::math::Vector3d globalEndPos;
+
+      /// \brief Name of the object this ray collided with
+      public: std::string collisionName;
     };
   }
 }

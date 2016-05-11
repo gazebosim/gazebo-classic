@@ -73,9 +73,9 @@ void MagnetometerSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   physics::EntityPtr parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
   this->dataPtr->parentLink =
-    boost::dynamic_pointer_cast<physics::Link>(parentEntity);
+    std::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   this->dataPtr->magPub = this->node->Advertise<msgs::Magnetometer>(
       this->GetTopic(), 50);
@@ -140,11 +140,11 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
   {
     // Get pose in gazebo reference frame
     ignition::math::Pose3d magPose =
-      this->pose + this->dataPtr->parentLink->GetWorldPose().Ign();
+      this->pose + this->dataPtr->parentLink->WorldPose();
 
     // Get the reference magnetic field
     ignition::math::Vector3d field =
-      this->world->GetPhysicsEngine()->MagneticField();
+      this->world->Physics()->MagneticField();
 
     // Rotate the magnetic field into the body frame
     field = magPose.Rot().Inverse().RotateVector(field);
@@ -177,7 +177,7 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 
   // Save the time of the measurement
   msgs::Set(this->dataPtr->magMsg.mutable_time(),
-            this->world->GetSimTime());
+            this->world->SimTime());
 
   // Publish the message if needed
   if (this->dataPtr->magPub)

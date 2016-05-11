@@ -151,7 +151,7 @@ void SphereAtlasDemoPlugin::Load(physics::ModelPtr _model,
 
   for (unsigned int i = 0; i < this->jointNames.size(); ++i)
   {
-    physics::JointPtr j = model->GetJoint(this->jointNames[i]);
+    physics::JointPtr j = model->JointByName(this->jointNames[i]);
     this->joints.push_back(j);
   }
 
@@ -180,14 +180,14 @@ void SphereAtlasDemoPlugin::Reset()
 /////////////////////////////////////////////////
 void SphereAtlasDemoPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->World()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
   double dt = stepTime.Double();
 
   for (unsigned int j = 0; j < this->joints.size(); ++j)
   {
-    double p = this->joints[j]->GetAngle(0).Radian();
+    double p = this->joints[j]->Angle(0).Radian();
     double target = 0;
     double perror = target - p;
     double derror = (perror - this->qp[j])/dt;

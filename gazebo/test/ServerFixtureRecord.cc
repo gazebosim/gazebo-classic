@@ -49,7 +49,28 @@ void ServerFixture::Record(const std::string &_prefix,
 
 /////////////////////////////////////////////////
 void ServerFixture::Record(const std::string &_prefix,
+                           const ignition::math::SignalStats &_stats)
+{
+  auto map = _stats.Map();
+  for (auto const &stat : map)
+  {
+    this->Record(_prefix + stat.first, stat.second);
+  }
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::Record(const std::string &_prefix,
                            const math::Vector3Stats &_stats)
+{
+  this->Record(_prefix + "_x_", _stats.X().Ign());
+  this->Record(_prefix + "_y_", _stats.Y().Ign());
+  this->Record(_prefix + "_z_", _stats.Z().Ign());
+  this->Record(_prefix + "_mag_", _stats.Mag().Ign());
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::Record(const std::string &_prefix,
+                           const ignition::math::Vector3Stats &_stats)
 {
   this->Record(_prefix + "_x_", _stats.X());
   this->Record(_prefix + "_y_", _stats.Y());

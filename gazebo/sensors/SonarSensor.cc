@@ -115,13 +115,13 @@ void SonarSensor::Load(const std::string &_worldName)
       "SonarSensor did not get a valid World pointer");
 
   this->dataPtr->parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != NULL,
       "Unable to get the parent entity.");
 
   physics::PhysicsEnginePtr physicsEngine =
-    this->world->GetPhysicsEngine();
+    this->world->Physics();
 
   GZ_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
@@ -143,8 +143,8 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->sonarCollision->AddType(physics::Base::SENSOR_COLLISION);
   this->dataPtr->parentEntity->AddChild(this->dataPtr->sonarCollision);
 
-  this->dataPtr->sonarShape = boost::dynamic_pointer_cast<physics::MeshShape>(
-      this->dataPtr->sonarCollision->GetShape());
+  this->dataPtr->sonarShape = std::dynamic_pointer_cast<physics::MeshShape>(
+      this->dataPtr->sonarCollision->Shape());
 
   GZ_ASSERT(this->dataPtr->sonarShape != NULL,
       "Unable to get the sonar shape from the sonar collision.");
@@ -166,23 +166,22 @@ void SonarSensor::Load(const std::string &_worldName)
       this->dataPtr->sonarMidPose);
 
   // Don't create contacts when objects collide with the sonar shape
-  this->dataPtr->sonarCollision->GetSurface()->collideWithoutContact = true;
-  this->dataPtr->sonarCollision->GetSurface()->collideWithoutContactBitmask = 1;
+  this->dataPtr->sonarCollision->Surface()->collideWithoutContact = true;
+  this->dataPtr->sonarCollision->Surface()->collideWithoutContactBitmask = 1;
   this->dataPtr->sonarCollision->SetCollideBits(~GZ_SENSOR_COLLIDE);
   this->dataPtr->sonarCollision->SetCategoryBits(GZ_SENSOR_COLLIDE);
 
-  /*std::vector<std::string> collisions;
-  collisions.push_back(this->dataPtr->sonarCollision->GetScopedName());
+  // std::vector<std::string> collisions;
+  // collisions.push_back(this->dataPtr->sonarCollision->ScopedName());
 
-  physics::ContactManager *contactMgr =
-    this->world->GetPhysicsEngine()->GetContactManager();
-    */
+  // physics::ContactManager *contactMgr =
+  //   this->world->Physics()->GetContactManager();
 
   // Create a contact topic for the collision shape
   std::string topic =
-    this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
-        this->dataPtr->sonarCollision->GetScopedName(),
-        this->dataPtr->sonarCollision->GetScopedName());
+    this->world->Physics()->ContactMgr()->CreateFilter(
+        this->dataPtr->sonarCollision->ScopedName(),
+        this->dataPtr->sonarCollision->ScopedName());
 
   // Subscribe to the contact topic
   this->dataPtr->contactSub = this->node->Subscribe(topic,
@@ -211,7 +210,7 @@ void SonarSensor::Init()
   Sensor::Init();
   this->dataPtr->sonarMsg.mutable_sonar()->set_frame(this->ParentName());
   msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
-      this->world->GetSimTime());
+      this->world->SimTime());
   this->dataPtr->sonarMsg.mutable_sonar()->set_range(this->dataPtr->rangeMax);
 
   if (this->dataPtr->sonarPub)
@@ -221,11 +220,10 @@ void SonarSensor::Init()
 //////////////////////////////////////////////////
 void SonarSensor::Fini()
 {
-  if (this->world && this->world->GetRunning())
+  if (this->world && this->world->Running())
   {
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(this->dataPtr->sonarCollision->GetScopedName());
+    physics::ContactManager *mgr = this->world->Physics()->ContactMgr();
+    mgr->RemoveFilter(this->dataPtr->sonarCollision->ScopedName());
   }
 
   this->dataPtr->sonarPub.reset();
@@ -287,12 +285,12 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
             this->lastMeasurementTime);
 
   ignition::math::Pose3d referencePose =
-    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+    this->pose + this->dataPtr->parentEntity->WorldPose();
   ignition::math::Vector3d pos;
 
   // A 5-step hysteresis window was chosen to reduce range value from

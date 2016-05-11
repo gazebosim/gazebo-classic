@@ -56,14 +56,15 @@ void Road::Init()
   this->roadDPtr->node = transport::NodePtr(new transport::Node());
   this->roadDPtr->node->Init();
 
-  this->roadPub = this->roadDPtr->node->Advertise<msgs::Road>("~/roads", 10);
+  this->roadDPtr->roadPub =
+    this->roadDPtr->node->Advertise<msgs::Road>("~/roads", 10);
 
   msgs::Road msg;
 
-  msg.set_name(this->GetName());
+  msg.set_name(this->Name());
 
   this->roadDPtr->width = this->roadDPtr->sdf->Get<double>("width");
-  msg.set_width(this->width);
+  msg.set_width(this->roadDPtr->width);
 
   if (this->roadDPtr->sdf->HasElement("material"))
   {
@@ -102,23 +103,22 @@ void Road::Init()
     msgs::Set(ptMsg, point);
   }
 
-  this->roadPub->Publish(msg);
+  this->roadDPtr->roadPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 std::vector<math::Vector3> Road::GetPoints() const
 {
   std::vector<math::Vector3> result;
-  std::vector<ignition::math::Vector3d> tmp;
-  for (auto pt : this->points)
+  for (auto pt : this->roadDPtr->points)
     result.push_back(pt);
-  return pt;
+  return result;
 }
 
 /////////////////////////////////////////////////
 const std::vector<ignition::math::Vector3d> &Road::Points() const
 {
-  return this->points;
+  return this->roadDPtr->points;
 }
 
 /////////////////////////////////////////////////
@@ -130,5 +130,5 @@ double Road::GetWidth() const
 /////////////////////////////////////////////////
 double Road::Width() const
 {
-  return this->width;
+  return this->roadDPtr->width;
 }

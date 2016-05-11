@@ -70,9 +70,6 @@ namespace gazebo
       public: virtual double ThreadPitch() const;
 
       // Documentation inherited
-      public: virtual double GetThreadPitch() const;
-
-      // Documentation inherited
       public: virtual ignition::math::Angle AngleImpl(
                   const unsigned int _index) const;
 

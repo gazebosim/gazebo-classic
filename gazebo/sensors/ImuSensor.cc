@@ -183,7 +183,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   // Start publishing measurements on the topic.
   this->dataPtr->parentEntity->SetPublishData(true);
 
-  std::string topic = "~/" + this->dataPtr->parentEntity->GetScopedName();
+  std::string topic = "~/" + this->dataPtr->parentEntity->ScopedName();
   this->dataPtr->linkDataSub = this->node->Subscribe(topic,
     &ImuSensor::OnLinkData, this);
 }
@@ -193,8 +193,8 @@ void ImuSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->dataPtr->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-      this->world->GetEntity(this->ParentName()));
+  this->dataPtr->parentEntity = std::dynamic_pointer_cast<physics::Link>(
+      this->world->EntityByName(this->ParentName()));
 
   if (!this->dataPtr->parentEntity)
   {
@@ -202,10 +202,10 @@ void ImuSensor::Load(const std::string &_worldName)
             "]. Must be a link\n");
   }
   this->dataPtr->referencePose = this->pose +
-    this->dataPtr->parentEntity->GetWorldPose().Ign();
+    this->dataPtr->parentEntity->WorldPose();
   this->dataPtr->lastLinearVel =
     this->dataPtr->referencePose.Rot().RotateVector(
-        this->dataPtr->parentEntity->GetWorldLinearVel().Ign());
+        this->dataPtr->parentEntity->WorldLinearVel());
 }
 
 //////////////////////////////////////////////////
@@ -274,7 +274,7 @@ ignition::math::Quaterniond ImuSensor::Orientation() const
 void ImuSensor::SetReferencePose()
 {
   this->dataPtr->referencePose =
-    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+    this->pose + this->dataPtr->parentEntity->WorldPose();
 }
 
 //////////////////////////////////////////////////
@@ -311,12 +311,12 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     this->dataPtr->imuMsg.set_entity_name(this->ParentName());
 
     this->dataPtr->gravity =
-      this->world->GetPhysicsEngine()->GetGravity().Ign();
+      this->world->Physics()->Gravity();
 
     msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 
     ignition::math::Pose3d parentEntityPose =
-      this->dataPtr->parentEntity->GetWorldPose().Ign();
+      this->dataPtr->parentEntity->WorldPose();
     ignition::math::Pose3d imuPose = this->pose + parentEntityPose;
 
     // Get the angular velocity

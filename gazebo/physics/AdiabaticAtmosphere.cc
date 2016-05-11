@@ -150,6 +150,6 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 void AdiabaticAtmosphere::ComputeAdiabaticPower()
 {
   this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
-      this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
+      this->World()->Physics()->Gravity().Length() /
       (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
 }

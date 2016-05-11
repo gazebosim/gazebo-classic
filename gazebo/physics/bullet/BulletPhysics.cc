@@ -43,6 +43,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/physics/PhysicsEnginePrivate.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
@@ -105,8 +106,10 @@ struct CollisionFilter : public btOverlapFilterCallback
 
       if (!link0->SelfCollide() || !link1->SelfCollide())
       {
-        if (link0->Model() == link1->Model())
+        if (link0->ParentModel() == link1->ParentModel())
+        {
           collide = false;
+        }
       }
       return collide;
     }
@@ -137,29 +140,29 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     GZ_ASSERT(link2 != NULL, "Link2 in collision pair is NULL");
 
     unsigned int colIndex = 0;
-    CollisionPtr collisionPtr1 = link1->Collision(colIndex);
-    CollisionPtr collisionPtr2 = link2->Collision(colIndex);
+    CollisionPtr collisionPtr1 = link1->CollisionByIndex(colIndex);
+    CollisionPtr collisionPtr2 = link2->CollisionByIndex(colIndex);
 
     if (!collisionPtr1 || !collisionPtr2)
       continue;
 
-    PhysicsEnginePtr engine = collisionPtr1->World()->GetPhysicsEngine();
+    PhysicsEnginePtr engine = collisionPtr1->World()->Physics();
     BulletPhysicsPtr bulletPhysics =
           std::static_pointer_cast<BulletPhysics>(engine);
 
     // Add a new contact to the manager. This will return NULL if no one is
     // listening for contact information.
-    Contact *contactFeedback = bulletPhysics->GetContactManager()->NewContact(
+    Contact *contactFeedback = bulletPhysics->ContactMgr()->NewContact(
         collisionPtr1.get(), collisionPtr2.get(),
-        collisionPtr1->World()->GetSimTime());
+        collisionPtr1->World()->SimTime());
 
     if (!contactFeedback)
       continue;
 
     ignition::math::Pose3d body1Pose = link1->WorldPose();
     ignition::math::Pose3d body2Pose = link2->WorldPose();
-    ignition::math::Vector3d cg1Pos = link1->Inertial()->Pose().Pos();
-    ignition::math::Vector3d cg2Pos = link2->Inertial()->Pose().Pos();
+    ignition::math::Vector3d cg1Pos = link1->Inertia().Pose().Pos();
+    ignition::math::Vector3d cg2Pos = link2->Inertia().Pose().Pos();
     ignition::math::Vector3d localForce1;
     ignition::math::Vector3d localForce2;
     ignition::math::Vector3d localTorque1;
@@ -307,9 +310,10 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  sdf::ElementPtr bulletElem =
+    this->physicsEngineDPtr->sdf->GetElement("bullet");
 
-  auto g = this->world->Gravity();
+  auto g = this->physicsEngineDPtr->world->Gravity();
   // ODEPhysics checks this, so we will too.
   if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
@@ -322,10 +326,10 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // http://web.archive.org/web/20120430155635/http://bulletphysics.org/
   //     mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse
   info.m_splitImpulse =
-      boost::any_cast<bool>(this->GetParam("split_impulse"));
+      boost::any_cast<bool>(this->Param("split_impulse"));
   info.m_splitImpulsePenetrationThreshold =
     boost::any_cast<double>(
-    this->GetParam("split_impulse_penetration_threshold"));
+    this->Param("split_impulse_penetration_threshold"));
 
   // Use multiple friction directions.
   // This is important for rolling without slip (see issue #480)
@@ -339,9 +343,9 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
 
   info.m_numIterations =
-      boost::any_cast<int>(this->GetParam("iters"));
+      boost::any_cast<int>(this->Param("iters"));
   info.m_sor =
-      boost::any_cast<double>(this->GetParam("sor"));
+      boost::any_cast<double>(this->Param("sor"));
 
   gzlog << " debug physics: "
         << " iters[" << info.m_numIterations
@@ -387,31 +391,35 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->solverType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
-      boost::any_cast<double>(this->GetParam("min_step_size")));
+      boost::any_cast<double>(this->Param("min_step_size")));
     physicsMsg.set_iters(
-      boost::any_cast<int>(this->GetParam("iters")));
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+      boost::any_cast<int>(this->Param("iters")));
+    physicsMsg.set_enable_physics(
+        this->physicsEngineDPtr->world->PhysicsEngineEnabled());
     physicsMsg.set_sor(
-      boost::any_cast<double>(this->GetParam("sor")));
+      boost::any_cast<double>(this->Param("sor")));
     physicsMsg.set_cfm(
-      boost::any_cast<double>(this->GetParam("cfm")));
+      boost::any_cast<double>(this->Param("cfm")));
     physicsMsg.set_erp(
-      boost::any_cast<double>(this->GetParam("erp")));
+      boost::any_cast<double>(this->Param("erp")));
 
     physicsMsg.set_contact_surface_layer(
-      boost::any_cast<double>(this->GetParam("contact_surface_layer")));
+      boost::any_cast<double>(this->Param("contact_surface_layer")));
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->world->Gravity()));
+      msgs::Convert(this->physicsEngineDPtr->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
         msgs::Convert(this->MagneticField()));
-    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
-    physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
-    physicsMsg.set_max_step_size(this->maxStepSize);
+    physicsMsg.set_real_time_update_rate(
+        this->physicsEngineDPtr->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(
+        this->physicsEngineDPtr->targetRealTimeFactor);
+    physicsMsg.set_max_step_size(
+        this->physicsEngineDPtr->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
-    this->responsePub->Publish(response);
+    this->physicsEngineDPtr->responsePub->Publish(response);
   }
 }
 
@@ -442,7 +450,10 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam("erp", _msg->erp());
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+  {
+    this->physicsEngineDPtr->world->SetPhysicsEngineEnabled(
+        _msg->enable_physics());
+  }
 
   if (_msg->has_contact_surface_layer())
     this->SetParam("contact_surface_layer", _msg->contact_surface_layer());
@@ -464,23 +475,24 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   }
 
   /// Make sure all models get at least one update cycle.
-  this->world->EnableAllModels();
+  this->physicsEngineDPtr->world->EnableAllModels();
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::UpdateCollision()
 {
-  this->contactManager->ResetCount();
+  this->physicsEngineDPtr->contactManager->ResetCount();
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::UpdatePhysics()
 {
   // need to lock, otherwise might conflict with world resetting
-  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+  std::lock_guard<std::recursive_mutex> lock(
+      this->physicsEngineDPtr->physicsUpdateMutex);
 
-  this->dynamicsWorld->stepSimulation(
-    this->maxStepSize, 1, this->maxStepSize);
+  this->dynamicsWorld->stepSimulation( this->physicsEngineDPtr->maxStepSize, 1,
+    this->physicsEngineDPtr->maxStepSize);
 }
 
 //////////////////////////////////////////////////
@@ -508,14 +520,14 @@ void BulletPhysics::SetSORPGSIters(unsigned int _iters)
   // Line below commented out because it wasn't helping pendulum test.
   info.m_numIterations = _iters;
 
-  this->sdf->GetElement("bullet")->GetElement(
+  this->physicsEngineDPtr->sdf->GetElement("bullet")->GetElement(
       "solver")->GetElement("iters")->Set(_iters);
 }
 
 //////////////////////////////////////////////////
 bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  sdf::ElementPtr bulletElem = this->physicsEngineDPtr->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
@@ -583,7 +595,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     {
       /// TODO: Implement max contacts param
       int value = boost::any_cast<int>(_value);
-      this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
+      this->physicsEngineDPtr->sdf->GetElement("max_contacts")->GetValue()->Set(value);
     }
     else if (_key == "min_step_size")
     {
@@ -610,14 +622,14 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 boost::any BulletPhysics::Param(const std::string &_key) const
 {
   boost::any value;
-  this->GetParam(_key, value);
+  this->Param(_key, value);
   return value;
 }
 
 //////////////////////////////////////////////////
 bool BulletPhysics::Param(const std::string &_key, boost::any &_value) const
 {
-  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  sdf::ElementPtr bulletElem = this->physicsEngineDPtr->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   if (_key == "solver_type")
@@ -644,12 +656,12 @@ bool BulletPhysics::Param(const std::string &_key, boost::any &_value) const
       "split_impulse_penetration_threshold");
   }
   else if (_key == "max_contacts")
-    _value = this->sdf->GetElement("max_contacts")->Get<int>();
+    _value = this->physicsEngineDPtr->sdf->GetElement("max_contacts")->Get<int>();
   else if (_key == "min_step_size")
     _value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
   else
   {
-    return PhysicsEngine::GetParam(_key, _value);
+    return PhysicsEngine::Param(_key, _value);
   }
   return true;
 }
@@ -705,7 +717,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new BulletRayShape(_collision));
     else
-      shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new BulletRayShape(this->physicsEngineDPtr->world->Physics()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -756,7 +768,7 @@ void BulletPhysics::ConvertMass(void * /*_engineMass*/,
 //////////////////////////////////////////////////
 double BulletPhysics::WorldCFM() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("bullet");
+  sdf::ElementPtr elem = this->physicsEngineDPtr->sdf->GetElement("bullet");
   elem = elem->GetElement("constraints");
   return elem->Get<double>("cfm");
 }
@@ -764,7 +776,7 @@ double BulletPhysics::WorldCFM() const
 //////////////////////////////////////////////////
 void BulletPhysics::SetWorldCFM(double _cfm)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("bullet");
+  sdf::ElementPtr elem = this->physicsEngineDPtr->sdf->GetElement("bullet");
   elem = elem->GetElement("constraints");
   elem->GetElement("cfm")->Set(_cfm);
 
@@ -775,7 +787,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity);
+  this->physicsEngineDPtr->world->SetGravitySDF(_gravity);
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

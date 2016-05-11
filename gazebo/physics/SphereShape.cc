@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/SphereShape.hh"
 
 using namespace gazebo;
@@ -34,19 +35,25 @@ SphereShape::~SphereShape()
 //////////////////////////////////////////////////
 void SphereShape::Init()
 {
-  this->SetRadius(this->sdf->Get<double>("radius"));
+  this->SetRadius(this->shapeDPtr->sdf->Get<double>("radius"));
 }
 
 //////////////////////////////////////////////////
-void SphereShape::SetRadius(double _radius)
+void SphereShape::SetRadius(const double _radius)
 {
-  this->sdf->GetElement("radius")->Set(_radius);
+  this->shapeDPtr->sdf->GetElement("radius")->Set(_radius);
 }
 
 //////////////////////////////////////////////////
 double SphereShape::GetRadius() const
 {
-  return this->sdf->Get<double>("radius");
+  return this->Radius();
+}
+
+//////////////////////////////////////////////////
+double SphereShape::Radius() const
+{
+  return this->shapeDPtr->sdf->Get<double>("radius");
 }
 
 //////////////////////////////////////////////////
@@ -61,22 +68,22 @@ void SphereShape::SetScale(const ignition::math::Vector3d &_scale)
   if (_scale.Min() < 0)
     return;
 
-  if (_scale == this->scale)
+  if (_scale == this->shapeDPtr->scale)
     return;
 
   double newRadius = _scale.Max();
-  double oldRadius = this->scale.Max();
+  double oldRadius = this->shapeDPtr->scale.Max();
 
-  this->SetRadius((newRadius/oldRadius)*this->GetRadius());
+  this->SetRadius((newRadius/oldRadius)*this->Radius());
 
-  this->scale = _scale;
+  this->shapeDPtr->scale = _scale;
 }
 
 //////////////////////////////////////////////////
 void SphereShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::SPHERE);
-  _msg.mutable_sphere()->set_radius(this->GetRadius());
+  _msg.mutable_sphere()->set_radius(this->Radius());
 }
 
 //////////////////////////////////////////////////
@@ -88,5 +95,5 @@ void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 double SphereShape::ComputeVolume() const
 {
-  return IGN_SPHERE_VOLUME(this->GetRadius());
+  return IGN_SPHERE_VOLUME(this->Radius());
 }

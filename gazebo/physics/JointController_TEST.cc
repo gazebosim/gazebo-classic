@@ -34,79 +34,81 @@ class FakeJoint : public physics::Joint
   public: FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
           {}
 
-  public: virtual physics::LinkPtr GetJointLink(unsigned int) const
+  public: virtual physics::LinkPtr JointLink(const unsigned int) const
           {return physics::LinkPtr();}
 
   public: virtual bool AreConnected(physics::LinkPtr, physics::LinkPtr) const
           {return true;}
 
-  public: virtual void SetAxis(unsigned int, const math::Vector3 &)
+  public: virtual void SetAxis(const unsigned int,
+              const ignition::math::Vector3d &)
           {}
 
-  public: virtual void SetDamping(unsigned int, double)
+  public: virtual void SetDamping(const unsigned int, const double)
           {}
 
-  public: virtual void SetStiffnessDamping(unsigned int, double,
-              double , double)
+  public: virtual void SetStiffnessDamping(const unsigned int, const double,
+              const double , const double)
           {}
 
-  public: virtual void SetStiffness(unsigned int , double)
+  public: virtual void SetStiffness(const unsigned int , const double)
           {}
 
-  public: virtual math::Vector3 GetGlobalAxis(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d GlobalAxis(const unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual void SetAnchor(unsigned int, const math::Vector3 &)
+  public: virtual void SetAnchor(const unsigned int,
+              const ignition::math::Vector3d &)
           {}
 
-  public: virtual math::Vector3 GetAnchor(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d Anchor(const unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual math::Angle GetHighStop(unsigned int)
-          {return math::Angle::Zero;}
+  public: virtual ignition::math::Angle HighStop(const unsigned int) const
+          {return ignition::math::Angle::Zero;}
 
-  public: virtual math::Angle GetLowStop(unsigned int)
-          {return math::Angle::Zero;}
+  public: virtual ignition::math::Angle LowStop(const unsigned int) const
+          {return ignition::math::Angle::Zero;}
 
-  public: virtual void SetVelocity(unsigned int, double)
+  public: virtual void SetVelocity(const unsigned int, const double)
           {}
 
-  public: virtual double GetVelocity(unsigned int) const
+  public: virtual double Velocity(const unsigned int) const
           {return 0.0;}
 
-  public: virtual void SetForce(unsigned int, double)
+  public: virtual void SetForce(const unsigned int, const double)
           {}
 
-  public: virtual physics::JointWrench GetForceTorque(unsigned int)
+  public: virtual physics::JointWrench ForceTorque(const unsigned int) const
           {return physics::JointWrench();}
 
-  public: virtual unsigned int GetAngleCount() const
+  public: virtual unsigned int AngleCount() const
           {return 0;}
 
-  public: virtual math::Vector3 GetLinkForce(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d LinkForce(const unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual math::Vector3 GetLinkTorque(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d LinkTorque(const unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual void SetAttribute(const std::string &, unsigned int,
+  public: virtual void SetAttribute(const std::string &, const unsigned int,
               const boost::any &)
           {}
 
   public: virtual double GetAttribute(const std::string &,
-              unsigned int)
+              const unsigned int)
           {return 0.0;}
 
-  public: virtual bool SetParam(const std::string &, unsigned int,
+  public: virtual bool SetParam(const std::string &, const unsigned int,
               const boost::any &)
           {return true;}
 
-  public: virtual double GetParam(const std::string &, unsigned int)
+  public: virtual double Param(const std::string &, const unsigned int)
           {return 0.0;}
 
-  protected: virtual math::Angle GetAngleImpl(
-                 unsigned int) const
-          {return math::Angle::Zero;}
+  protected: virtual ignition::math::Angle AngleImpl(
+                 const unsigned int) const
+          {return ignition::math::Angle::Zero;}
 };
 
 /////////////////////////////////////////////////
@@ -155,74 +157,74 @@ TEST_F(JointControllerTest, AddJoint)
   EXPECT_EQ(joints.size(), 1u);
 
   // Set a new position PID
-  jointController->SetPositionPID(joint->GetScopedName(), common::PID(4, 1, 9));
+  jointController->SetPositionPID(joint->ScopedName(), common::PID(4, 1, 9));
 
   // Check the new position PID values
   std::map<std::string, common::PID> posPids =
     jointController->GetPositionPIDs();
   EXPECT_EQ(posPids.size(), 1u);
-  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetPGain(), 4);
-  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetIGain(), 1);
-  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetDGain(), 9);
+  EXPECT_DOUBLE_EQ(posPids[joint->ScopedName()].GetPGain(), 4);
+  EXPECT_DOUBLE_EQ(posPids[joint->ScopedName()].GetIGain(), 1);
+  EXPECT_DOUBLE_EQ(posPids[joint->ScopedName()].GetDGain(), 9);
 
   // Restore the default position PID values
   jointController->SetPositionPID(
-    joint->GetScopedName(), common::PID(1, 0.1, 0.01));
+    joint->ScopedName(), common::PID(1, 0.1, 0.01));
 
   // Check the default position PID values
   posPids = jointController->GetPositionPIDs();
   EXPECT_EQ(posPids.size(), 1u);
-  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetPGain(), 1);
-  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetIGain(), 0.1);
-  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetDGain(), 0.01);
+  EXPECT_DOUBLE_EQ(posPids[joint->ScopedName()].GetPGain(), 1);
+  EXPECT_DOUBLE_EQ(posPids[joint->ScopedName()].GetIGain(), 0.1);
+  EXPECT_DOUBLE_EQ(posPids[joint->ScopedName()].GetDGain(), 0.01);
 
   // Set a new velocity PID
-  jointController->SetVelocityPID(joint->GetScopedName(), common::PID(4, 1, 9));
+  jointController->SetVelocityPID(joint->ScopedName(), common::PID(4, 1, 9));
 
   // Check the new velocity PID values
   std::map<std::string, common::PID> velPids =
     jointController->GetVelocityPIDs();
   EXPECT_EQ(velPids.size(), 1u);
-  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetPGain(), 4);
-  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetIGain(), 1);
-  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetDGain(), 9);
+  EXPECT_DOUBLE_EQ(velPids[joint->ScopedName()].GetPGain(), 4);
+  EXPECT_DOUBLE_EQ(velPids[joint->ScopedName()].GetIGain(), 1);
+  EXPECT_DOUBLE_EQ(velPids[joint->ScopedName()].GetDGain(), 9);
 
   // Restore the default velocity PID values
   jointController->SetVelocityPID(
-    joint->GetScopedName(), common::PID(1, 0.1, 0.01));
+    joint->ScopedName(), common::PID(1, 0.1, 0.01));
 
   // Check the default velocity PID values
   velPids = jointController->GetVelocityPIDs();
   EXPECT_EQ(velPids.size(), 1u);
-  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetPGain(), 1);
-  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetIGain(), 0.1);
-  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetDGain(), 0.01);
+  EXPECT_DOUBLE_EQ(velPids[joint->ScopedName()].GetPGain(), 1);
+  EXPECT_DOUBLE_EQ(velPids[joint->ScopedName()].GetIGain(), 0.1);
+  EXPECT_DOUBLE_EQ(velPids[joint->ScopedName()].GetDGain(), 0.01);
 
   // Set a joint position target
   EXPECT_TRUE(jointController->SetPositionTarget(
-        joint->GetScopedName(), 12.3));
+        joint->ScopedName(), 12.3));
   std::map<std::string, double> positions = jointController->GetPositions();
   EXPECT_EQ(positions.size(), 1u);
-  EXPECT_DOUBLE_EQ(positions[joint->GetScopedName()], 12.3);
+  EXPECT_DOUBLE_EQ(positions[joint->ScopedName()], 12.3);
 
   // Set a joint velocity target
   EXPECT_TRUE(jointController->SetVelocityTarget(
-        joint->GetScopedName(), 3.21));
+        joint->ScopedName(), 3.21));
   std::map<std::string, double> velocities = jointController->GetVelocities();
   EXPECT_EQ(velocities.size(), 1u);
-  EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
+  EXPECT_DOUBLE_EQ(velocities[joint->ScopedName()], 3.21);
 
   // Try setting a position target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetPositionTarget("my_bad_name", 12.3));
   positions = jointController->GetPositions();
   EXPECT_EQ(positions.size(), 1u);
-  EXPECT_DOUBLE_EQ(positions[joint->GetScopedName()], 12.3);
+  EXPECT_DOUBLE_EQ(positions[joint->ScopedName()], 12.3);
 
   // Try setting a velocity target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetVelocityTarget("my_bad_name", 3.21));
   velocities = jointController->GetVelocities();
   EXPECT_EQ(velocities.size(), 1u);
-  EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
+  EXPECT_DOUBLE_EQ(velocities[joint->ScopedName()], 3.21);
 
   // Reset the controller
   jointController->Reset();
@@ -259,8 +261,8 @@ TEST_F(JointControllerTest, SetJointPositions)
 
   // Set joint positions for the two joints, and expect no expections.
   std::map<std::string, double> positions;
-  positions[joint1->GetScopedName()] = 1.2;
-  positions[joint2->GetScopedName()] = 2.3;
+  positions[joint1->ScopedName()] = 1.2;
+  positions[joint2->ScopedName()] = 2.3;
   EXPECT_NO_THROW(jointController->SetJointPositions(positions));
 }
 

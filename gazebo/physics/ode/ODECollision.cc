@@ -254,7 +254,7 @@ void ODECollision::OnPoseChangeGlobal()
 
   // un-offset cog location
   ignition::math::Vector3d cogVec =
-    this->odeCollisionDPtr->link->Inertial()->CoG();
+    this->odeCollisionDPtr->link->Inertia().CoG();
   localPose.Pos() = localPose.Pos() - cogVec;
 
   q[0] = localPose.Rot().W();
@@ -279,7 +279,8 @@ void ODECollision::OnPoseChangeRelative()
   ignition::math::Pose3d localPose = this->RelativePose();
 
   // un-offset cog location
-  ignition::math::Vector3d cog_vec = this->odeCollisionDPtr->link->Inertial()->CoG();
+  ignition::math::Vector3d cog_vec =
+    this->odeCollisionDPtr->link->Inertia().CoG();
   localPose.Pos() = localPose.Pos() - cog_vec;
 
   q[0] = localPose.Rot().W();

@@ -372,7 +372,7 @@ Base *Base::BaseByName(const std::string &_name) const
   if (this->ScopedName() == _name || this->Name() == _name)
     return const_cast<Base*>(this);
 
-  Base *result;
+  Base *result = NULL;
 
   for (auto iter = this->baseDPtr->children.begin();
        iter != this->baseDPtr->children.end() && result == NULL; ++iter)
@@ -393,7 +393,7 @@ std::string Base::GetScopedName(bool _prependWorldName) const
 std::string Base::ScopedName(bool _prependWorldName) const
 {
   if (_prependWorldName && this->baseDPtr->world)
-    return this->baseDPtr->world->GetName() + "::" + this->baseDPtr->scopedName;
+    return this->baseDPtr->world->Name() + "::" + this->baseDPtr->scopedName;
   else
     return this->baseDPtr->scopedName;
 }
@@ -476,6 +476,12 @@ const WorldPtr &Base::GetWorld() const
 const WorldPtr &Base::World() const
 {
   return this->baseDPtr->world;
+}
+
+//////////////////////////////////////////////////
+const sdf::ElementPtr Base::GetSDF()
+{
+  return this->SDF();
 }
 
 //////////////////////////////////////////////////

@@ -48,15 +48,18 @@ Shape::Shape(ShapePrivate &_dataPtr, BasePtr _parent)
   this->AddType(Base::SHAPE);
   this->SetName("shape");
 
-  if (_p)
-    this->shapeDPtr->collisionParent = _p;
+  if (_parent)
+  {
+    this->shapeDPtr->collisionParent =
+      std::dynamic_pointer_cast<Collision>(_parent);
+  }
 }
 
 //////////////////////////////////////////////////
 Shape::~Shape()
 {
-  if (this->collisionParent)
-    this->collisionParent->SetShape(ShapePtr());
+  if (this->shapeDPtr->collisionParent)
+    this->shapeDPtr->collisionParent->SetShape(ShapePtr());
 }
 
 //////////////////////////////////////////////////
@@ -68,13 +71,13 @@ math::Vector3 Shape::GetScale() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Shape::Scale() const
 {
-  return this->scale;
+  return this->shapeDPtr->scale;
 }
 
 //////////////////////////////////////////////////
 double Shape::ComputeVolume() const
 {
-  if (!this->collisionParent)
+  if (!this->shapeDPtr->collisionParent)
   {
     gzerr << "Cannot discern shape type, returning 0 volume" << std::endl;
     return 0;
@@ -83,7 +86,7 @@ double Shape::ComputeVolume() const
          << " bounding box approximation" << std::endl;
 
   ignition::math::Vector3d size =
-    this->collisionParent->BoundingBox().Size();
+    this->shapeDPtr->collisionParent->BoundingBox().Size();
   return size.X() * size.Y() * size.Z();
 }
 

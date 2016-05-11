@@ -48,13 +48,13 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
 
     _stream.setf(std::ios::fixed);
     if (this->stamp == "sim")
-      _stream << _state.GetSimTime().Double() << " ";
+      _stream << _state.SimTime().Double() << " ";
     else if (this->stamp == "real")
-      _stream << _state.GetRealTime().Double() << " ";
+      _stream << _state.RealTime().Double() << " ";
     else if (this->stamp == "wall")
-      _stream << _state.GetWallTime().Double() << " ";
+      _stream << _state.WallTime().Double() << " ";
     else if (this->stamp == "iterations")
-      _stream << _state.GetIterations() << " ";
+      _stream << _state.Iterations() << " ";
     _stream.setf(flags);
   }
 
@@ -62,7 +62,7 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
 }
 
 /////////////////////////////////////////////////
-std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
+std::string FilterBase::FilterPose(const ignition::math::Pose3d &_pose,
     const std::string &_xmlName,
     std::string _filter,
     const gazebo::physics::State &_state)
@@ -82,7 +82,7 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
   }
 
   // Get the euler angles.
-  gazebo::math::Vector3 rpy = _pose.rot.GetAsEuler();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
   // If the filter is empty, then output the whole pose.
   if (!_filter.empty())
@@ -103,29 +103,29 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
         case 'X':
         case 'x':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.x << " ";
+            << _pose.Pos().X() << " ";
           break;
         case 'Y':
         case 'y':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.y << " ";
+            << _pose.Pos().Y() << " ";
           break;
         case 'Z':
         case 'z':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.z << " ";
+            << _pose.Pos().Z() << " ";
           break;
         case 'R':
         case 'r':
-          this->Out(result, _state) << std::fixed << rpy.x << " ";
+          this->Out(result, _state) << std::fixed << rpy.X() << " ";
           break;
         case 'P':
         case 'p':
-          this->Out(result, _state) << std::fixed << rpy.y << " ";
+          this->Out(result, _state) << std::fixed << rpy.Y() << " ";
           break;
         case 'A':
         case 'a':
-          this->Out(result, _state) << std::fixed << rpy.z << " ";
+          this->Out(result, _state) << std::fixed << rpy.Z() << " ";
           break;
         default:
           std::cerr << "Invalid pose value[" << *elemIter << "]\n";
@@ -200,10 +200,10 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
         unsigned int axis =
           boost::lexical_cast<unsigned int>(*elemIter);
 
-        if (axis >= _state.GetAngleCount())
+        if (axis >= _state.AngleCount())
           continue;
 
-        gazebo::math::Angle angle = _state.GetAngle(axis);
+        ignition::math::Angle angle = _state.Angle(axis);
 
         if (this->xmlOutput)
         {
@@ -238,7 +238,7 @@ std::string JointFilter::Filter(gazebo::physics::ModelState &_state)
   std::string regexStr = *partIter;
   boost::replace_all(regexStr, "*", ".*");
   boost::regex regex(regexStr);
-  states = _state.GetJointStates(regex);
+  states = _state.JointStates(regex);
 
   ++partIter;
 
@@ -261,8 +261,8 @@ std::string JointFilter::Filter(gazebo::physics::ModelState &_state)
     }
     else
     {
-      if (!this->xmlOutput && iter->second.GetAngleCount() == 1)
-        result << std::fixed << iter->second.GetAngle(0);
+      if (!this->xmlOutput && iter->second.AngleCount() == 1)
+        result << std::fixed << iter->second.Angle(0);
       else
         result << std::fixed << iter->second;
     }
@@ -305,16 +305,16 @@ std::string LinkFilter::FilterParts(gazebo::physics::LinkState &_state,
     elemParts = *_partIter;
 
   if (part == "pose")
-    result << this->FilterPose(_state.GetPose(), part, elemParts,
+    result << this->FilterPose(_state.Pose(), part, elemParts,
         _state);
   else if (part == "acceleration")
-    result << this->FilterPose(_state.GetAcceleration(), part,
+    result << this->FilterPose(_state.Acceleration(), part,
         elemParts, _state);
   else if (part == "velocity")
-    result << this->FilterPose(_state.GetVelocity(), part, elemParts,
+    result << this->FilterPose(_state.Velocity(), part, elemParts,
         _state);
   else if (part == "wrench")
-    result << this->FilterPose(_state.GetWrench(), part, elemParts,
+    result << this->FilterPose(_state.Wrench(), part, elemParts,
         _state);
 
   return result.str();
@@ -337,10 +337,10 @@ std::string LinkFilter::Filter(gazebo::physics::ModelState &_state)
     std::string regexStr = *partIter;
     boost::replace_all(regexStr, "*", ".*");
     boost::regex regex(regexStr);
-    states = _state.GetLinkStates(regex);
+    states = _state.LinkStates(regex);
   }
   else
-    states = _state.GetLinkStates();
+    states = _state.LinkStates();
 
   ++partIter;
 
@@ -354,7 +354,7 @@ std::string LinkFilter::Filter(gazebo::physics::ModelState &_state)
     if (partIter != this->parts.end())
     {
       if (this->xmlOutput)
-        result << "<link name='" << iter->second.GetName() << "'>\n";
+        result << "<link name='" << iter->second.Name() << "'>\n";
 
       result << this->FilterParts(iter->second, partIter);
 
@@ -441,7 +441,7 @@ std::string ModelFilter::FilterParts(gazebo::physics::ModelState &_state,
   if (*_partIter == "pose")
   {
     // Get the model state pose
-    gazebo::math::Pose pose = _state.GetPose();
+    ignition::math::Pose3d pose = _state.Pose();
     ++_partIter;
 
     // Get the elements to filter pose by.
@@ -474,10 +474,10 @@ std::string ModelFilter::Filter(gazebo::physics::WorldState &_state)
     std::string regexStr = *partIter;
     boost::replace_all(regexStr, "*", ".*");
     boost::regex regex(regexStr);
-    states = _state.GetModelStates(regex);
+    states = _state.ModelStates(regex);
   }
   else
-    states = _state.GetModelStates();
+    states = _state.ModelStates();
 
   ++partIter;
 
@@ -493,7 +493,7 @@ std::string ModelFilter::Filter(gazebo::physics::WorldState &_state)
     else
     {
       if (this->xmlOutput)
-        result << "<model name='" << iter->second.GetName() << "'>\n";
+        result << "<model name='" << iter->second.Name() << "'>\n";
 
       // Filter the pose of the model.
       if (partIter != this->parts.end())
@@ -542,7 +542,7 @@ std::string StateFilter::Filter(const std::string &_stateString)
 
   if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
   {
-    if ((state.GetSimTime() - this->prevTime).Double() <
+    if ((state.SimTime() - this->prevTime).Double() <
         1.0 / this->hz)
     {
       return result.str();
@@ -552,11 +552,11 @@ std::string StateFilter::Filter(const std::string &_stateString)
   if (this->xmlOutput)
   {
     result << "<sdf version='" << SDF_VERSION << "'>\n"
-      << "<state world_name='" << state.GetName() << "'>\n"
-      << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
-      << "<real_time>" << state.GetRealTime() << "</real_time>\n"
-      << "<wall_time>" << state.GetWallTime() << "</wall_time>\n"
-      << "<iterations>" << state.GetIterations() << "</iterations>\n";
+      << "<state world_name='" << state.Name() << "'>\n"
+      << "<sim_time>" << state.SimTime() << "</sim_time>\n"
+      << "<real_time>" << state.RealTime() << "</real_time>\n"
+      << "<wall_time>" << state.WallTime() << "</wall_time>\n"
+      << "<iterations>" << state.Iterations() << "</iterations>\n";
   }
 
   result << this->filter.Filter(state);
@@ -564,7 +564,7 @@ std::string StateFilter::Filter(const std::string &_stateString)
   if (this->xmlOutput)
     result << "</state></sdf>\n";
 
-  this->prevTime = state.GetSimTime();
+  this->prevTime = state.SimTime();
   return result.str();
 }
 
@@ -724,7 +724,7 @@ void LogCommand::Info(const std::string &_filename)
         state.Load(worldElem->GetElement("state"));
 
         // Store the start time.
-        startTime = state.GetWallTime();
+        startTime = state.WallTime();
       }
     }
 
@@ -738,7 +738,7 @@ void LogCommand::Info(const std::string &_filename)
       sdf::readString(stateString, g_stateSdf);
 
       state.Load(g_stateSdf);
-      endTime = state.GetWallTime();
+      endTime = state.WallTime();
     }
     else
       endTime = startTime;

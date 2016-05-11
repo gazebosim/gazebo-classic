@@ -82,7 +82,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 void ODEMultiRayShape::UpdateRays()
 {
   ODEPhysicsPtr ode = std::dynamic_pointer_cast<ODEPhysics>(
-      this->World()->GetPhysicsEngine());
+      this->World()->Physics());
 
   if (ode == NULL)
     gzthrow("Invalid physics engine. Must use ODE.");
@@ -90,7 +90,7 @@ void ODEMultiRayShape::UpdateRays()
   // Do we need to lock the physics engine here? YES!
   // especially when spawning models with sensors
   {
-    boost::recursive_mutex::scoped_lock lock(*ode->GetPhysicsUpdateMutex());
+    std::lock_guard<std::recursive_mutex> lock(ode->PhysicsUpdateMutex());
 
     // Do collision detection
     dSpaceCollide2((dGeomID) (this->superSpaceId),
@@ -230,7 +230,7 @@ void ODEMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
   else
   {
     ray.reset(new ODERayShape(std::dynamic_pointer_cast<ODEPhysics>(
-            this->World()->GetPhysicsEngine()), this->raySpaceId));
+            this->World()->Physics()), this->raySpaceId));
     dGeomSetData(ray->ODEGeomId(), ray.get());
   }
 

@@ -41,7 +41,7 @@ namespace gazebo
       public: virtual void UpdateRays();
 
       // Documentation inherited
-      protected: void AddRay(const ignition::math::Vector3d &_start,
+      public: void AddRay(const ignition::math::Vector3d &_start,
                              const ignition::math::Vector3d &_end);
 
       private: BulletPhysicsPtr physicsEngine;

@@ -89,8 +89,11 @@ namespace gazebo
       public: std::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
-      public: void (Entity::*setWorldPoseFunc)(
+      public: std::function<void(const ignition::math::Pose3d &,
+                  const bool, const bool)> setWorldPoseFunc;
+      /*public: void (Entity::*setWorldPoseFunc)(
                    const ignition::math::Pose3d &, const bool, const bool);
+                   */
     };
   }
 }

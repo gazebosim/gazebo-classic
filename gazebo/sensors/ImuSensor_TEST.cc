@@ -84,9 +84,9 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   if (_physicsEngine == "simbody")
   {
@@ -95,8 +95,8 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   }
 
   double z = 3;
-  double gravityZ = physics->GetGravity().z;
-  double stepSize = physics->GetMaxStepSize();
+  double gravityZ = physics->Gravity().Z();
+  double stepSize = physics->MaxStepSize();
 
   std::string modelName = "imuModel";
   std::string imuSensorName = "imuSensor";
@@ -134,7 +134,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   double tHit = sqrt((z-0.5) / (-gravityZ));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
-  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double dtHit = tHit+0.5 - world->SimTime().Double();
   double steps = ceil(dtHit / stepSize);
   EXPECT_GT(steps, 0);
   world->Step(steps);

@@ -32,12 +32,13 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/JointPrivate.hh"
 #include "gazebo/physics/Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-sdf::ElementPtr Joint::sdfJoint;
+sdf::ElementPtr JointPrivate::sdfJoint;
 
 //////////////////////////////////////////////////
 Joint::Joint(BasePtr _parent)
@@ -48,9 +49,9 @@ Joint::Joint(BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
-Joint::Joint(BasePtr _parent)
-: Base(*new JointPrivate, _parent),
-  jointDPtr(static_cast<JointPrivate*>(this->baseDPtr)
+Joint::Joint(JointPrivate &_dataPtr, BasePtr _parent)
+: Base(_dataPtr, _parent),
+  jointDPtr(static_cast<JointPrivate*>(this->baseDPtr))
 {
   this->ConstructionHelper();
 }
@@ -113,18 +114,18 @@ bool Joint::Load(LinkPtr _parent, LinkPtr _child,
 {
   if (_parent)
   {
-    this->world = _parent->World();
-    this->jointDPtr->model = _parent->Model();
+    this->jointDPtr->world = _parent->World();
+    this->jointDPtr->model = ModelPtr(_parent->ParentModel());
   }
   else if (_child)
   {
-    this->world = _child->World();
-    this->jointDPtr->model = _child->Model();
+    this->jointDPtr->world = _child->World();
+    this->jointDPtr->model = ModelPtr(_child->ParentModel());
   }
   else
   {
     gzerr << "both parent and child link do no exist\n";
-    return false
+    return false;
   }
 
   this->jointDPtr->parentLink = _parent;
@@ -235,22 +236,23 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
   if (this->jointDPtr->model)
   {
-    this->jointDPtr->childLink = this->jointDPtr->model->GetLink(childName);
+    this->jointDPtr->childLink = this->jointDPtr->model->LinkByName(childName);
     if (!this->jointDPtr->childLink)
     {
       // need to do this if child link belongs to another model
       this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(childName));
+          this->World()->BaseByName(childName));
     }
-    this->jointDPtr->parentLink = this->jointDPtr->model->GetLink(parentName);
+    this->jointDPtr->parentLink =
+      this->jointDPtr->model->LinkByName(parentName);
   }
   else
   {
     this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
-        this->GetWorld()->GetByName(childName));
+        this->World()->BaseByName(childName));
 
     this->jointDPtr->parentLink = std::dynamic_pointer_cast<Link>(
-        this->GetWorld()->GetByName(parentName));
+        this->World()->BaseByName(parentName));
   }
 
   // Link might not have been found because it is on another model
@@ -263,21 +265,21 @@ void Joint::Load(sdf::ElementPtr _sdf)
     while (!this->jointDPtr->parentLink && parentModel && parentModel->HasType(MODEL))
     {
       std::string scopedParentName =
-          parentModel->GetScopedName() + "::" + parentName;
+          parentModel->ScopedName() + "::" + parentName;
 
       this->jointDPtr->parentLink = std::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(scopedParentName));
+          this->World()->BaseByName(scopedParentName));
 
-      parentModel = parentModel->GetParent();
+      parentModel = parentModel->Parent();
     }
     if (!this->jointDPtr->parentLink)
     {
       std::string parentNameThisModel =
           parentName.substr(parentName.find("::"));
-      parentNameThisModel = parentModel->GetName() + parentNameThisModel;
+      parentNameThisModel = parentModel->Name() + parentNameThisModel;
 
       this->jointDPtr->parentLink = std::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(parentNameThisModel));
+          this->World()->BaseByName(parentNameThisModel));
     }
     if (!this->jointDPtr->parentLink)
       gzthrow("Couldn't Find Parent Link[" + parentName + "]");
@@ -290,25 +292,25 @@ void Joint::Load(sdf::ElementPtr _sdf)
     while (!this->jointDPtr->childLink && parentModel && parentModel->HasType(MODEL))
     {
       std::string scopedChildName =
-          parentModel->GetScopedName() + "::" + childName;
+          parentModel->ScopedName() + "::" + childName;
       this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(scopedChildName));
+          this->World()->BaseByName(scopedChildName));
 
-        parentModel = parentModel->GetParent();
+        parentModel = parentModel->Parent();
     }
     if (!this->jointDPtr->childLink)
     {
       std::string childNameThisModel = childName.substr(childName.find("::"));
-      childNameThisModel = parentModel->GetName() + childNameThisModel;
+      childNameThisModel = parentModel->Name() + childNameThisModel;
 
       this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(childNameThisModel));
+          this->World()->BaseByName(childNameThisModel));
     }
     if (!this->jointDPtr->childLink)
       gzthrow("Couldn't Find Child Link[" + childName  + "]");
   }
 
-  this->LoadImpl(_sdf->Get<math::Pose>("pose"));
+  this->LoadImpl(_sdf->Get<ignition::math::Pose3d>("pose"));
 }
 
 /////////////////////////////////////////////////
@@ -368,7 +370,7 @@ bool Joint::LoadImpl(const ignition::math::Pose3d &_pose)
         event::Events::createSensor(sensorElem,
             this->World()->Name(), this->ScopedName(), this->Id());
 
-        this->sensors.push_back(sensorName);
+        this->jointDPtr->sensors.push_back(sensorName);
       }
       else
       {
@@ -401,7 +403,7 @@ void Joint::Init()
   if (this->AngleCount() >= 1 && this->jointDPtr->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->jointDPtr->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
+    this->SetAxis(0, axisElem->Get<ignition::math::Vector3d>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -409,16 +411,16 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(0, this->jointDPtr->upperLimit[0].Radian());
-      this->SetLowStop(0, this->jointDPtr->lowerLimit[0].Radian());
-      this->SetHighStop(0, this->jointDPtr->upperLimit[0].Radian());
+      this->SetHighStop(0, this->jointDPtr->upperLimit[0]);
+      this->SetLowStop(0, this->jointDPtr->lowerLimit[0]);
+      this->SetHighStop(0, this->jointDPtr->upperLimit[0]);
     }
   }
 
   if (this->AngleCount() >= 2 && this->jointDPtr->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->jointDPtr->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
+    this->SetAxis(1, axisElem->Get<ignition::math::Vector3d>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -426,9 +428,9 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(1, this->jointDPtr->upperLimit[1].Radian());
-      this->SetLowStop(1, this->jointDPtr->lowerLimit[1].Radian());
-      this->SetHighStop(1, this->jointDPtr->upperLimit[1].Radian());
+      this->SetHighStop(1, this->jointDPtr->upperLimit[1]);
+      this->SetLowStop(1, this->jointDPtr->lowerLimit[1]);
+      this->SetHighStop(1, this->jointDPtr->upperLimit[1]);
     }
   }
 
@@ -552,7 +554,7 @@ void Joint::Reset()
   {
     this->SetVelocity(i, 0.0);
   }
-  this->jointDPtr->staticAngle.SetFromRadian(0);
+  this->jointDPtr->staticAngle.Radian(0);
 }
 
 //////////////////////////////////////////////////
@@ -575,7 +577,7 @@ void Joint::Detach()
 void Joint::SetModel(ModelPtr _model)
 {
   this->jointDPtr->model = _model;
-  this->SetWorld(this->jointDPtr->model->GetWorld());
+  this->SetWorld(this->jointDPtr->model->World());
 }
 
 //////////////////////////////////////////////////
@@ -593,7 +595,7 @@ double Joint::Param(const std::string &_key, const unsigned int _index) const
   }
   else if (_key == "lo_stop")
   {
-    return this->GetLowStop(_index).Radian();
+    return this->LowStop(_index).Radian();
   }
   gzerr << "GetParam unrecognized parameter ["
         << _key
@@ -668,21 +670,19 @@ msgs::Joint::Type Joint::MsgType() const
     return msgs::Joint::FIXED;
   }
 
-  gzerr << "No joint recognized in type ["
-        << this->GetType()
-        << "], returning REVOLUTE"
-        << std::endl;
+  gzerr << "No joint recognized in type [" << this->Type()
+        << "], returning REVOLUTE" << std::endl;
   return msgs::Joint::REVOLUTE;
 }
 
 //////////////////////////////////////////////////
 void Joint::FillMsg(msgs::Joint &_msg)
 {
-  _msg.set_name(this->GetScopedName());
-  _msg.set_id(this->GetId());
+  _msg.set_name(this->ScopedName());
+  _msg.set_id(this->Id());
 
-  msgs::Set(_msg.mutable_pose(), this->jointDPtr->anchorPose.Ign());
-  _msg.set_type(this->GetMsgType());
+  msgs::Set(_msg.mutable_pose(), this->jointDPtr->anchorPose);
+  _msg.set_type(this->MsgType());
 
   for (unsigned int i = 0; i < this->AngleCount(); ++i)
   {
@@ -695,20 +695,20 @@ void Joint::FillMsg(msgs::Joint &_msg)
     else
       break;
 
-    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i).Ign());
-    axis->set_limit_lower(this->GetLowStop(i).Radian());
+    msgs::Set(axis->mutable_xyz(), this->LocalAxis(i));
+    axis->set_limit_lower(this->LowStop(i).Radian());
     axis->set_limit_upper(this->HighStop(i).Radian());
-    axis->set_limit_effort(this->GetEffortLimit(i));
-    axis->set_limit_velocity(this->GetVelocityLimit(i));
-    axis->set_damping(this->GetDamping(i));
-    axis->set_friction(this->GetParam("friction", i));
+    axis->set_limit_effort(this->EffortLimit(i));
+    axis->set_limit_velocity(this->VelocityLimit(i));
+    axis->set_damping(this->Damping(i));
+    axis->set_friction(this->Param("friction", i));
     axis->set_use_parent_model_frame(this->jointDPtr->axisParentModelFrame[i]);
   }
 
-  if (this->GetParent())
+  if (this->Parent())
   {
-    _msg.set_parent(this->GetParent()->GetScopedName());
-    _msg.set_parent_id(this->GetParent()->GetId());
+    _msg.set_parent(this->Parent()->ScopedName());
+    _msg.set_parent_id(this->Parent()->Id());
   }
   else
   {
@@ -716,10 +716,10 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.set_parent_id(0);
   }
 
-  if (this->GetChild())
+  if (this->Child())
   {
-    _msg.set_child(this->GetChild()->GetScopedName());
-    _msg.set_child_id(this->GetChild()->GetId());
+    _msg.set_child(this->Child()->ScopedName());
+    _msg.set_child_id(this->Child()->Id());
   }
   else
   {
@@ -728,15 +728,15 @@ void Joint::FillMsg(msgs::Joint &_msg)
   }
 
   // Add in the sensor data.
-  if (this->sdf->HasElement("sensor"))
+  if (this->jointDPtr->sdf->HasElement("sensor"))
   {
-    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    sdf::ElementPtr sensorElem = this->jointDPtr->sdf->GetElement("sensor");
     while (sensorElem)
     {
       msgs::Sensor *msg = _msg.add_sensor();
       msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
-      msg->set_parent(this->GetScopedName());
-      msg->set_parent_id(this->GetId());
+      msg->set_parent(this->ScopedName());
+      msg->set_parent_id(this->Id());
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
@@ -809,8 +809,7 @@ bool Joint::SetPosition(const unsigned int /*_index*/, const double _position)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPositionMaximal(const unsigned int _index,
-    const double _position)
+bool Joint::SetPositionMaximal(const unsigned int _index, double _position)
 {
   // check if index is within bounds
   if (_index >= this->AngleCount())
@@ -847,7 +846,7 @@ bool Joint::SetPositionMaximal(const unsigned int _index,
       this->HasType(Base::UNIVERSAL_JOINT) ||
       this->HasType(Base::SLIDER_JOINT))
   {
-    if (childLink)
+    if (this->jointDPtr->childLink)
     {
       // Get all connected links to this joint
       Link_V connectedLinks;
@@ -858,7 +857,7 @@ bool Joint::SetPositionMaximal(const unsigned int _index,
         // gzerr << "found connected links: ";
         // for (Link_V::iterator li = connectedLinks.begin();
         //                       li != connectedLinks.end(); ++li)
-        //   std::cout << (*li)->GetName() << " ";
+        //   std::cout << (*li)->Name() << " ";
         // std::cout << "\n";
 
         // successfully found a subset of links connected to this joint
@@ -877,7 +876,7 @@ bool Joint::SetPositionMaximal(const unsigned int _index,
 
         // Compute new child link pose based on position change
         ignition::math::Pose3d newChildLinkPose =
-          this->ComputeChildLinkPose(_index, _position);
+          this->ChildLinkPose(_index, _position);
 
         // debug
         // gzerr << "child link pose0 [" << childLinkPose
@@ -887,8 +886,8 @@ bool Joint::SetPositionMaximal(const unsigned int _index,
         // update all connected links
         {
           // block any other physics pose updates
-          boost::recursive_mutex::scoped_lock lock(
-            *this->World()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+          std::lock_guard<std::recursive_mutex> lock(
+            this->World()->Physics()->PhysicsUpdateMutex());
 
           for (Link_V::iterator li = connectedLinks.begin();
                                 li != connectedLinks.end(); ++li)
@@ -897,7 +896,7 @@ bool Joint::SetPositionMaximal(const unsigned int _index,
             (*li)->MoveFrame(childLinkPose, newChildLinkPose);
 
             // debug
-            // gzerr << "moved " << (*li)->GetName()
+            // gzerr << "moved " << (*li)->Name()
             //       << " p0 [" << childLinkPose
             //       << "] p1 [" << newChildLinkPose
             //       << "]\n";
@@ -1022,16 +1021,16 @@ bool Joint::SetVelocityMaximal(const unsigned int _index,
 //////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
-  for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < _state.AngleCount(); ++i)
   {
     this->SetVelocity(i, 0.0);
-    this->SetPosition(i, _state.GetAngle(i).Radian());
+    this->SetPosition(i, _state.Angle(i).Radian());
   }
 }
 
 //////////////////////////////////////////////////
 double Joint::CheckAndTruncateForce(const unsigned int _index,
-    const double _effort)
+    double _effort) const
 {
   if (_index >= this->AngleCount())
   {
@@ -1048,8 +1047,7 @@ double Joint::CheckAndTruncateForce(const unsigned int _index,
     {
       _effort = _effort > 0 ? 0 : _effort;
     }
-    else if (this->GetVelocity(_index) <
-             -this->jointDPtr->velocityLimit[_index])
+    else if (this->Velocity(_index) < -this->jointDPtr->velocityLimit[_index])
     {
       _effort = _effort < 0 ? 0 : _effort;
     }
@@ -1092,7 +1090,7 @@ double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(const ignition::math::Vector3d &_axis) const
+double Joint::InertiaRatio(const ignition::math::Vector3d &_axis) const
 {
   if (this->jointDPtr->parentLink && this->jointDPtr->childLink)
   {
@@ -1102,8 +1100,8 @@ double Joint::GetInertiaRatio(const ignition::math::Vector3d &_axis) const
       this->jointDPtr->childLink->WorldInertiaMatrix();
 
     // matrix times axis
-    ignition::math::Vector3 pia = pm * _axis;
-    ignition::math::Vector3 cia = cm * _axis;
+    ignition::math::Vector3d pia = pm * _axis;
+    ignition::math::Vector3d cia = cm * _axis;
     double piam = pia.Length();
     double ciam = cia.Length();
 
@@ -1188,7 +1186,7 @@ double Joint::GetStiffness(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double Joint::Stiffness(const unsigned int _index) const
+double Joint::SpringStiffness(const unsigned int _index) const
 {
   if (static_cast<unsigned int>(_index) < this->AngleCount())
   {
@@ -1262,8 +1260,8 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
 }
 
 //////////////////////////////////////////////////
-void Joint::LowerLimit(const unsigned int _index,
-                       const ignition::math::Angle &_limit)
+void Joint::SetLowerLimit(const unsigned int _index,
+    const ignition::math::Angle &_limit)
 {
   if (_index >= this->AngleCount())
   {
@@ -1302,7 +1300,7 @@ void Joint::LowerLimit(const unsigned int _index,
 //////////////////////////////////////////////////
 void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
 {
-  return this->SetUpperLimit(_index, _limit);
+  return this->SetUpperLimit(_index, _limit.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1444,7 +1442,7 @@ ignition::math::Pose3d Joint::WorldPose() const
   if (this->jointDPtr->childLink)
   {
     return this->jointDPtr->anchorPose +
-      this->jointDPtr->childLink->GetWorldPose();
+      this->jointDPtr->childLink->WorldPose();
   }
   return this->jointDPtr->anchorPose;
 }
@@ -1491,7 +1489,7 @@ ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
   {
     gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
           << std::endl;
-    return ignition::math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -1499,10 +1497,12 @@ ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
   {
     // Use parent model frame
     if (this->jointDPtr->parentLink)
-      return this->jointDPtr->parentLink->GetModel()->GetWorldPose().rot;
+    {
+      return this->jointDPtr->parentLink->ParentModel()->WorldPose().Rot();
+    }
 
     // Parent model is world, use world frame
-    return ignition::math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   return this->WorldPose().Rot();
@@ -1522,7 +1522,7 @@ ignition::math::Quaterniond Joint::AxisFrameOffset(
   {
     gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
           << " returning identity rotation." << std::endl;
-    return igniton::math::Quaterniond();
+    return ignition::math::Quaterniond::Identity;
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -1535,7 +1535,8 @@ ignition::math::Quaterniond Joint::AxisFrameOffset(
     ignition::math::Pose3d jointWorldPose = this->WorldPose();
     if (this->jointDPtr->parentLink)
     {
-      parentModelWorldPose = this->jointDPtr->parentLink->Model()->WorldPose();
+      parentModelWorldPose =
+        this->jointDPtr->parentLink->ParentModel()->WorldPose();
     }
     return (parentModelWorldPose - jointWorldPose).Rot();
   }
@@ -1580,7 +1581,7 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
 {
   // debug
   // std::string pn;
-  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // if (_originalParentLink) pn = _originalParentLink->Name();
   // gzerr << "first call to find connected links: "
   //       << " parent " << pn
   //       << " this joint " << this->Name() << "\n";
@@ -1615,7 +1616,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
 
 //////////////////////////////////////////////////
 ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
-          const double _position)
+          const double _position) const
 {
   // child link pose
   ignition::math::Pose3d childLinkPose =
@@ -1639,7 +1640,7 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
   else
   {
     anchor = this->Anchor(_index);
-    axis = this->lobalAxis(_index);
+    axis = this->GlobalAxis(_index);
   }
 
   // delta-position along an axis
@@ -1667,7 +1668,7 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
     // Joint Trajectory velocity and use time step since last update.
     /*
     double dt =
-      this->jointDPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+      this->jointDPtr->model->GetWorld()->Physics()->GetMaxStepTime();
     this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
     */
   }
@@ -1681,14 +1682,14 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
     newRelativePose.Pos() = relativePose.Pos() + axis * dposition;
     newRelativePose.Rot() = relativePose.Rot();
 
-    newWorldPose = ignition::math::Pose3d(newRelativePose.pos + anchor,
+    newWorldPose = ignition::math::Pose3d(newRelativePose.Pos() + anchor,
         newRelativePose.Rot());
 
     /// \TODO: ideally we want to set this according to Joint Trajectory
     /// velocity and use time step since last update.
     /*
     double dt =
-      this->jointDPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+      this->jointDPtr->model->GetWorld()->Physics()->GetMaxStepTime();
     this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
     */
   }
@@ -1795,7 +1796,8 @@ math::Angle Joint::GetAngleImpl(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-void Joint::SetAxis(const unsigned int _index)
+void Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   // record axis in sdf element
   if (_index == 0)

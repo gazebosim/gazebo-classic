@@ -84,7 +84,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
 
   // At pose [0,0,0,0,0,0] the body frame magnetic field should be default
   EXPECT_EQ(sensor->MagneticField(),
-      world->GetPhysicsEngine()->MagneticField());
+      world->Physics()->MagneticField());
 }
 
 /////////////////////////////////////////////////
@@ -96,9 +96,9 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Spawn a magnetometer sensor with a PI/2 aniclockwise rotation about Z axis
   std::string modelName = "magModel";
@@ -121,7 +121,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
 
   // Determine the magnetic field in the body frame
   ignition::math::Vector3d field = modelPose.Rot().Inverse().RotateVector(
-        world->GetPhysicsEngine()->MagneticField());
+        world->Physics()->MagneticField());
 
   // Check for match
   EXPECT_EQ(magSensor->MagneticField(), field);

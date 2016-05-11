@@ -49,7 +49,7 @@ TEST_P(SpawnModels, WirelessTransmitters)
          boost::lexical_cast<std::string>(j);
 
       SpawnWirelessTransmitterSensor(modelName, sensorName,
-          math::Vector3(i, j, 0.25), math::Vector3(0, 0, 0),
+          ignition::math::Vector3d(i, j, 0.25), ignition::math::Vector3d(0, 0, 0),
           "osrf", 2450.0, power, gain);
 
       sensors::WirelessTransmitterPtr tx =

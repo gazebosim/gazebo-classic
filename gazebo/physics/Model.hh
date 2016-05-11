@@ -274,7 +274,7 @@ namespace gazebo
       /// \brief Get a joint
       /// \param name The name of the joint, specified in the world file
       /// \return Pointer to the joint
-      public: JointPtr Joint(const std::string &_name) const;
+      public: JointPtr JointByName(const std::string &_name) const;
 
       /// \cond
       /// This is an internal function
@@ -302,7 +302,7 @@ namespace gazebo
       /// \brief Get a link by name.
       /// \param[in] _name Name of the link to get.
       /// \return Pointer to the link, NULL if the name is invalid.
-      public: LinkPtr Link(const std::string &_name = "canonical") const;
+      public: LinkPtr LinkByName(const std::string &_name = "canonical") const;
 
       /// \brief If true, all links within the model will collide by default.
       /// Two links within the same model will not collide if both have
@@ -526,7 +526,7 @@ namespace gazebo
 
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.
-      public: JointControllerPtr JointController() const;
+      public: JointControllerPtr JointCtrl() const;
 
       /// \brief Get a gripper based on an index.
       /// \return A pointer to a Gripper. Null if the _index is invalid.
@@ -535,7 +535,7 @@ namespace gazebo
 
       /// \brief Get a gripper based on an index.
       /// \return A pointer to a Gripper. Null if the _index is invalid.
-      public: GripperPtr Gripper(const size_t _index) const;
+      public: GripperPtr GripperByIndex(const size_t _index) const;
 
       /// \brief Get the number of grippers in this model.
       /// \return Size of this->grippers array.

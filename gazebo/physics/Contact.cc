@@ -81,9 +81,9 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
   if (world)
   {
     this->collision1 = std::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_contact.collision1())).get();
+        this->world->EntityByName(_contact.collision1())).get();
     this->collision2 = std::dynamic_pointer_cast<Collision>(
-      this->world->GetEntity(_contact.collision2())).get();
+      this->world->EntityByName(_contact.collision2())).get();
   }
   else
   {
@@ -130,9 +130,9 @@ std::string Contact::DebugString() const
 {
   std::ostringstream stream;
 
-  stream << "World [" << this->world->GetName() << "]\n"
-         << "Collision 1[" << this->collision1->GetScopedName() << "]\n"
-         << "Collision 2[" << this->collision2->GetScopedName() << "]\n"
+  stream << "World [" << this->world->Name() << "]\n"
+         << "Collision 1[" << this->collision1->ScopedName() << "]\n"
+         << "Collision 2[" << this->collision2->ScopedName() << "]\n"
          << "Time[" << this->time << "]\n"
          << "Contact Count[" << this->count << "]\n";
 
@@ -154,9 +154,9 @@ std::string Contact::DebugString() const
 //////////////////////////////////////////////////
 void Contact::FillMsg(msgs::Contact &_msg) const
 {
-  _msg.set_world(this->world->GetName());
-  _msg.set_collision1(this->collision1->GetScopedName());
-  _msg.set_collision2(this->collision2->GetScopedName());
+  _msg.set_world(this->world->Name());
+  _msg.set_collision1(this->collision1->ScopedName());
+  _msg.set_collision2(this->collision2->ScopedName());
   msgs::Set(_msg.mutable_time(), this->time);
 
   for (int j = 0; j < this->count; ++j)
@@ -167,17 +167,17 @@ void Contact::FillMsg(msgs::Contact &_msg) const
     msgs::Set(_msg.add_normal(), this->normals[j].Ign());
 
     msgs::JointWrench *jntWrench = _msg.add_wrench();
-    jntWrench->set_body_1_name(this->collision1->GetScopedName());
-    jntWrench->set_body_1_id(this->collision1->GetId());
-    jntWrench->set_body_2_name(this->collision2->GetScopedName());
-    jntWrench->set_body_2_id(this->collision2->GetId());
+    jntWrench->set_body_1_name(this->collision1->ScopedName());
+    jntWrench->set_body_1_id(this->collision1->Id());
+    jntWrench->set_body_2_name(this->collision2->ScopedName());
+    jntWrench->set_body_2_id(this->collision2->Id());
 
     msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force.Ign());
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque.Ign());
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
 
     wrenchMsg =  jntWrench->mutable_body_2_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force.Ign());
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque.Ign());
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque);
   }
 }

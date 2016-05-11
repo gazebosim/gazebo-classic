@@ -70,12 +70,12 @@ void TrackVisualTest::TrackVisual()
   QVERIFY(trackedModelVis == boxModelVis);
 
   // Get box model
-  auto boxModel = world->GetModel("box");
+  auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
-  QVERIFY(boxModel->GetWorldPose().Ign() == boxModelVisPose);
+  QVERIFY(boxModel->WorldPose() == boxModelVisPose);
 
   // Get box model pose
-  auto boxModelPose = boxModel->GetWorldPose();
+  auto boxModelPose = boxModel->WorldPose();
   QVERIFY(boxModelPose == ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
 
   // Check that camera's position is static when tracking a model

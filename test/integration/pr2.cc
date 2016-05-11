@@ -68,8 +68,8 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
   while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
 
-  physics::get_world("default")->GetPhysicsEngine()->SetGravity(
-      math::Vector3(-0.5, 0, -0.1));
+  physics::get_world("default")->Physics()->SetGravity(
+      ignition::math::Vector3d(-0.5, 0, -0.1));
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
@@ -107,22 +107,22 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("pr2");
+  physics::ModelPtr model = world->ModelByName("pr2");
   ASSERT_TRUE(model != NULL);
 
-  physics::LinkPtr link = model->GetLink("torso_lift_link");
+  physics::LinkPtr link = model->LinkByName("torso_lift_link");
   ASSERT_TRUE(link != NULL);
 
-  physics::JointPtr motor = model->GetJoint("torso_lift_motor_screw_joint");
+  physics::JointPtr motor = model->JointByName("torso_lift_motor_screw_joint");
   ASSERT_TRUE(motor != NULL);
   motor->SetEffortLimit(0, 1000);
 
   physics::JointPtr screw =
-    model->GetJoint("torso_lift_screw_torso_lift_joint");
+    model->JointByName("torso_lift_screw_torso_lift_joint");
   ASSERT_TRUE(screw != NULL);
 
   // Let it settle a bit
@@ -137,10 +137,10 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   }
 
   // Expect torso to lift at least 1 mm/s
-  gzdbg << "motor " << motor->GetVelocity(0) << std::endl;
-  gzdbg << "screw " << screw->GetVelocity(0) << std::endl;
-  gzdbg << "link  " << link->GetWorldLinearVel() << std::endl;
-  EXPECT_GT(link->GetWorldLinearVel().z, 1e-3);
+  gzdbg << "motor " << motor->Velocity(0) << std::endl;
+  gzdbg << "screw " << screw->Velocity(0) << std::endl;
+  gzdbg << "link  " << link->WorldLinearVel() << std::endl;
+  EXPECT_GT(link->WorldLinearVel().Z(), 1e-3);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -173,22 +173,22 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
   // simulate a few steps
   int steps = 20;
   world->Step(steps);
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->MaxStepSize();
   EXPECT_GT(dt, 0);
-  t = world->GetSimTime().Double();
+  t = world->SimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 

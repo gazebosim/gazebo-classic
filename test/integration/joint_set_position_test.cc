@@ -84,18 +84,18 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->MaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -104,10 +104,10 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   gzlog << "t after one step : " << t << "\n";
 
   // get pointer to model
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   while (!model)
   {
-    model = world->GetModel("model_1");
+    model = world->ModelByName("model_1");
     gzdbg << "waiting for model_1 to spawn\n";
     sleep(1);
   }
@@ -124,16 +124,16 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   const double pub_rate = 10000.0;
 
   physics::Link_V links;
-  links.push_back(model->GetLink("link_1"));
-  links.push_back(model->GetLink("link_2"));
-  links.push_back(model->GetLink("link_3"));
-  links.push_back(model->GetLink("link_4"));
-  links.push_back(model->GetLink("link_5"));
-  links.push_back(model->GetLink("link_2a"));
-  links.push_back(model->GetLink("link_2b"));
-  links.push_back(model->GetLink("link_3a"));
-  links.push_back(model->GetLink("link_4a"));
-  links.push_back(model->GetLink("link_5a"));
+  links.push_back(model->LinkByName("link_1"));
+  links.push_back(model->LinkByName("link_2"));
+  links.push_back(model->LinkByName("link_3"));
+  links.push_back(model->LinkByName("link_4"));
+  links.push_back(model->LinkByName("link_5"));
+  links.push_back(model->LinkByName("link_2a"));
+  links.push_back(model->LinkByName("link_2b"));
+  links.push_back(model->LinkByName("link_3a"));
+  links.push_back(model->LinkByName("link_4a"));
+  links.push_back(model->LinkByName("link_5a"));
 
   for (physics::Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
@@ -141,18 +141,18 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   }
 
   physics::Joint_V joints;
-  joints.push_back(model->GetJoint("model_1::joint_01"));
-  joints.push_back(model->GetJoint("model_1::joint_12"));
-  // joints.push_back(model->GetJoint("model_1::joint_23"));
-  // joints.push_back(model->GetJoint("model_1::joint_34"));
-  // joints.push_back(model->GetJoint("model_1::joint_45"));
-  // joints.push_back(model->GetJoint("model_1::joint_52"));
-  joints.push_back(model->GetJoint("model_1::joint_22a"));
-  joints.push_back(model->GetJoint("model_1::joint_2a2b"));
-  // joints.push_back(model->GetJoint("model_1::joint_2b3a"));
-  // joints.push_back(model->GetJoint("model_1::joint_3a4a"));
-  // joints.push_back(model->GetJoint("model_1::joint_4a5a"));
-  // joints.push_back(model->GetJoint("model_1::joint_5a2b"));
+  joints.push_back(model->JointByName("model_1::joint_01"));
+  joints.push_back(model->JointByName("model_1::joint_12"));
+  // joints.push_back(model->JointByName("model_1::joint_23"));
+  // joints.push_back(model->JointByName("model_1::joint_34"));
+  // joints.push_back(model->JointByName("model_1::joint_45"));
+  // joints.push_back(model->JointByName("model_1::joint_52"));
+  joints.push_back(model->JointByName("model_1::joint_22a"));
+  joints.push_back(model->JointByName("model_1::joint_2a2b"));
+  // joints.push_back(model->JointByName("model_1::joint_2b3a"));
+  // joints.push_back(model->JointByName("model_1::joint_3a4a"));
+  // joints.push_back(model->JointByName("model_1::joint_4a5a"));
+  // joints.push_back(model->JointByName("model_1::joint_5a2b"));
 
   for (physics::Joint_V::iterator ji = joints.begin(); ji != joints.end(); ++ji)
   {
@@ -160,7 +160,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   }
 
   world->SetPaused(true);
-  start_time = world->GetSimTime().Double();
+  start_time = world->SimTime().Double();
   start_wall_time = common::Time::GetWallTime().Double();
   double last_update_wall_time = -1e16;
 
@@ -203,17 +203,17 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li)
     {
-      math::Vector3 linVel = (*li)->GetWorldLinearVel();
-      math::Vector3 angVel = (*li)->GetWorldAngularVel();
-      EXPECT_NEAR(linVel.x, 0, TOL);
-      EXPECT_NEAR(linVel.y, 0, TOL);
-      EXPECT_NEAR(linVel.z, 0, TOL);
-      EXPECT_NEAR(angVel.x, 0, TOL);
-      EXPECT_NEAR(angVel.y, 0, TOL);
-      EXPECT_NEAR(angVel.z, 0, TOL);
+      ignition::math::Vector3d linVel = (*li)->WorldLinearVel();
+      ignition::math::Vector3d angVel = (*li)->WorldAngularVel();
+      EXPECT_NEAR(linVel.X(), 0, TOL);
+      EXPECT_NEAR(linVel.Y(), 0, TOL);
+      EXPECT_NEAR(linVel.Z(), 0, TOL);
+      EXPECT_NEAR(angVel.X(), 0, TOL);
+      EXPECT_NEAR(angVel.Y(), 0, TOL);
+      EXPECT_NEAR(angVel.Z(), 0, TOL);
     }
   }
-  double test_duration = world->GetSimTime().Double() - start_time;
+  double test_duration = world->SimTime().Double() - start_time;
   elapsed_wall_time = common::Time::GetWallTime().Double() - start_wall_time;
 
   gzdbg << "  elapsed sim time [" << test_duration
@@ -261,18 +261,18 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->MaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -281,10 +281,10 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   gzlog << "t after one step : " << t << "\n";
 
   // get pointer to model
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   while (!model)
   {
-    model = world->GetModel("model_1");
+    model = world->ModelByName("model_1");
     gzdbg << "waiting for model_1 to spawn\n";
     sleep(1);
   }
@@ -301,16 +301,16 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   const double pub_rate = 10000.0;
 
   physics::Link_V links;
-  links.push_back(model->GetLink("link_1"));
-  links.push_back(model->GetLink("link_2"));
-  links.push_back(model->GetLink("link_3"));
-  links.push_back(model->GetLink("link_4"));
-  links.push_back(model->GetLink("link_5"));
-  links.push_back(model->GetLink("link_2a"));
-  links.push_back(model->GetLink("link_2b"));
-  links.push_back(model->GetLink("link_3a"));
-  links.push_back(model->GetLink("link_4a"));
-  links.push_back(model->GetLink("link_5a"));
+  links.push_back(model->LinkByName("link_1"));
+  links.push_back(model->LinkByName("link_2"));
+  links.push_back(model->LinkByName("link_3"));
+  links.push_back(model->LinkByName("link_4"));
+  links.push_back(model->LinkByName("link_5"));
+  links.push_back(model->LinkByName("link_2a"));
+  links.push_back(model->LinkByName("link_2b"));
+  links.push_back(model->LinkByName("link_3a"));
+  links.push_back(model->LinkByName("link_4a"));
+  links.push_back(model->LinkByName("link_5a"));
 
   for (physics::Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
@@ -318,18 +318,18 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   }
 
   physics::Joint_V joints;
-  joints.push_back(model->GetJoint("model_1::joint_01"));
-  joints.push_back(model->GetJoint("model_1::joint_12"));
-  // joints.push_back(model->GetJoint("model_1::joint_23"));
-  // joints.push_back(model->GetJoint("model_1::joint_34"));
-  // joints.push_back(model->GetJoint("model_1::joint_45"));
-  // joints.push_back(model->GetJoint("model_1::joint_52"));
-  joints.push_back(model->GetJoint("model_1::joint_22a"));
-  joints.push_back(model->GetJoint("model_1::joint_2a2b"));
-  // joints.push_back(model->GetJoint("model_1::joint_2b3a"));
-  // joints.push_back(model->GetJoint("model_1::joint_3a4a"));
-  // joints.push_back(model->GetJoint("model_1::joint_4a5a"));
-  // joints.push_back(model->GetJoint("model_1::joint_5a2b"));
+  joints.push_back(model->JointByName("model_1::joint_01"));
+  joints.push_back(model->JointByName("model_1::joint_12"));
+  // joints.push_back(model->JointByName("model_1::joint_23"));
+  // joints.push_back(model->JointByName("model_1::joint_34"));
+  // joints.push_back(model->JointByName("model_1::joint_45"));
+  // joints.push_back(model->JointByName("model_1::joint_52"));
+  joints.push_back(model->JointByName("model_1::joint_22a"));
+  joints.push_back(model->JointByName("model_1::joint_2a2b"));
+  // joints.push_back(model->JointByName("model_1::joint_2b3a"));
+  // joints.push_back(model->JointByName("model_1::joint_3a4a"));
+  // joints.push_back(model->JointByName("model_1::joint_4a5a"));
+  // joints.push_back(model->JointByName("model_1::joint_5a2b"));
 
   for (physics::Joint_V::iterator ji = joints.begin(); ji != joints.end(); ++ji)
   {
@@ -337,7 +337,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   }
 
   world->SetPaused(false);
-  start_time = world->GetSimTime().Double();
+  start_time = world->SimTime().Double();
   start_wall_time = common::Time::GetWallTime().Double();
   double last_update_wall_time = -1e16;
 
@@ -377,17 +377,17 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li)
     {
-      math::Vector3 linVel = (*li)->GetWorldLinearVel();
-      math::Vector3 angVel = (*li)->GetWorldAngularVel();
-      EXPECT_NEAR(linVel.x, 0, TOL);
-      EXPECT_NEAR(linVel.y, 0, TOL);
-      EXPECT_NEAR(linVel.z, 0, TOL);
-      EXPECT_NEAR(angVel.x, 0, TOL);
-      EXPECT_NEAR(angVel.y, 0, TOL);
-      EXPECT_NEAR(angVel.z, 0, TOL);
+      ignition::math::Vector3d linVel = (*li)->WorldLinearVel();
+      ignition::math::Vector3d angVel = (*li)->WorldAngularVel();
+      EXPECT_NEAR(linVel.X(), 0, TOL);
+      EXPECT_NEAR(linVel.Y(), 0, TOL);
+      EXPECT_NEAR(linVel.Z(), 0, TOL);
+      EXPECT_NEAR(angVel.X(), 0, TOL);
+      EXPECT_NEAR(angVel.Y(), 0, TOL);
+      EXPECT_NEAR(angVel.Z(), 0, TOL);
     }
   }
-  double test_duration = world->GetSimTime().Double() - start_time;
+  double test_duration = world->SimTime().Double() - start_time;
   elapsed_wall_time = common::Time::GetWallTime().Double() - start_wall_time;
 
   gzdbg << "  elapsed sim time [" << test_duration
@@ -439,18 +439,18 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->MaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -459,10 +459,10 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   gzlog << "t after one step : " << t << "\n";
 
   // get pointer to model
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   while (!model)
   {
-    model = world->GetModel("model_1");
+    model = world->ModelByName("model_1");
     gzdbg << "waiting for model_1 to spawn\n";
     sleep(1);
   }
@@ -479,16 +479,16 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   const double pub_rate = 10000.0;
 
   physics::Link_V links;
-  links.push_back(model->GetLink("link_1"));
-  links.push_back(model->GetLink("link_2"));
-  links.push_back(model->GetLink("link_3"));
-  links.push_back(model->GetLink("link_4"));
-  links.push_back(model->GetLink("link_5"));
-  links.push_back(model->GetLink("link_2a"));
-  links.push_back(model->GetLink("link_2b"));
-  links.push_back(model->GetLink("link_3a"));
-  links.push_back(model->GetLink("link_4a"));
-  links.push_back(model->GetLink("link_5a"));
+  links.push_back(model->LinkByName("link_1"));
+  links.push_back(model->LinkByName("link_2"));
+  links.push_back(model->LinkByName("link_3"));
+  links.push_back(model->LinkByName("link_4"));
+  links.push_back(model->LinkByName("link_5"));
+  links.push_back(model->LinkByName("link_2a"));
+  links.push_back(model->LinkByName("link_2b"));
+  links.push_back(model->LinkByName("link_3a"));
+  links.push_back(model->LinkByName("link_4a"));
+  links.push_back(model->LinkByName("link_5a"));
 
   for (physics::Link_V::iterator li = links.begin(); li != links.end(); ++li)
   {
@@ -496,31 +496,33 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   }
 
   physics::Joint_V joints;
-  // joints.push_back(model->GetJoint("model_1::joint_01"));
-  // joints.push_back(model->GetJoint("model_1::joint_12"));
-  joints.push_back(model->GetJoint("model_1::joint_23"));
-  joints.push_back(model->GetJoint("model_1::joint_34"));
-  joints.push_back(model->GetJoint("model_1::joint_45"));
-  joints.push_back(model->GetJoint("model_1::joint_52"));
-  // joints.push_back(model->GetJoint("model_1::joint_22a"));
-  // joints.push_back(model->GetJoint("model_1::joint_2a2b"));
-  joints.push_back(model->GetJoint("model_1::joint_2b3a"));
-  joints.push_back(model->GetJoint("model_1::joint_3a4a"));
-  joints.push_back(model->GetJoint("model_1::joint_4a5a"));
-  joints.push_back(model->GetJoint("model_1::joint_5a2b"));
+  // joints.push_back(model->JointByName("model_1::joint_01"));
+  // joints.push_back(model->JointByName("model_1::joint_12"));
+  joints.push_back(model->JointByName("model_1::joint_23"));
+  joints.push_back(model->JointByName("model_1::joint_34"));
+  joints.push_back(model->JointByName("model_1::joint_45"));
+  joints.push_back(model->JointByName("model_1::joint_52"));
+  // joints.push_back(model->JointByName("model_1::joint_22a"));
+  // joints.push_back(model->JointByName("model_1::joint_2a2b"));
+  joints.push_back(model->JointByName("model_1::joint_2b3a"));
+  joints.push_back(model->JointByName("model_1::joint_3a4a"));
+  joints.push_back(model->JointByName("model_1::joint_4a5a"));
+  joints.push_back(model->JointByName("model_1::joint_5a2b"));
 
   for (physics::Joint_V::iterator ji = joints.begin(); ji != joints.end(); ++ji)
   {
     EXPECT_TRUE((*ji)  != NULL);
   }
 
-  std::vector<math::Pose> linkPoses;
+  std::vector<ignition::math::Pose3d> linkPoses;
   for (physics::Link_V::iterator li = links.begin();
-                                 li != links.end(); ++li)
-    linkPoses.push_back((*li)->GetWorldPose());
+       li != links.end(); ++li)
+  {
+    linkPoses.push_back((*li)->WorldPose());
+  }
 
   world->SetPaused(true);
-  start_time = world->GetSimTime().Double();
+  start_time = world->SimTime().Double();
   start_wall_time = common::Time::GetWallTime().Double();
   double last_update_wall_time = -1e16;
 
@@ -558,22 +560,22 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
     //       << " - " << last_update_wall_time
     //       << " >= " << (1.0/pub_rate) << "\n";
 
-    std::vector<math::Pose>::iterator pi = linkPoses.begin();
+    std::vector<ignition::math::Pose3d>::iterator pi = linkPoses.begin();
     for (physics::Link_V::iterator li = links.begin();
-                                   li != links.end(); ++li, ++pi)
+         li != links.end(); ++li, ++pi)
     {
-      math::Pose pose = (*li)->GetWorldPose();
-      EXPECT_NEAR(pose.pos.x, pi->pos.x, TOL);
-      EXPECT_NEAR(pose.pos.y, pi->pos.y, TOL);
-      EXPECT_NEAR(pose.pos.z, pi->pos.z, TOL);
-      EXPECT_NEAR(pose.rot.w, pi->rot.w, TOL);
-      EXPECT_NEAR(pose.rot.x, pi->rot.x, TOL);
-      EXPECT_NEAR(pose.rot.y, pi->rot.y, TOL);
-      EXPECT_NEAR(pose.rot.z, pi->rot.z, TOL);
+      ignition::math::Pose3d pose = (*li)->WorldPose();
+      EXPECT_NEAR(pose.Pos().X(), pi->Pos().X(), TOL);
+      EXPECT_NEAR(pose.Pos().Y(), pi->Pos().Y(), TOL);
+      EXPECT_NEAR(pose.Pos().Z(), pi->Pos().Z(), TOL);
+      EXPECT_NEAR(pose.Rot().W(), pi->Rot().W(), TOL);
+      EXPECT_NEAR(pose.Rot().X(), pi->Rot().X(), TOL);
+      EXPECT_NEAR(pose.Rot().Y(), pi->Rot().Y(), TOL);
+      EXPECT_NEAR(pose.Rot().Z(), pi->Rot().Z(), TOL);
     }
   }
 
-  double test_duration = world->GetSimTime().Double() - start_time;
+  double test_duration = world->SimTime().Double() - start_time;
   elapsed_wall_time = common::Time::GetWallTime().Double() - start_wall_time;
 
   gzdbg << "  elapsed sim time [" << test_duration

@@ -51,7 +51,7 @@ DARTLink::~DARTLink()
 void DARTLink::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->dartPhysics = std::dynamic_pointer_cast<DARTPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->GetWorld()->Physics());
 
   if (this->dataPtr->dartPhysics == NULL)
     gzthrow("Not using the dart physics engine");
@@ -820,7 +820,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 {
   return std::dynamic_pointer_cast<DARTPhysics>(
-        this->GetWorld()->GetPhysicsEngine());
+        this->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////

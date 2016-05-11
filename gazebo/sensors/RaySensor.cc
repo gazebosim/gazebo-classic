@@ -79,7 +79,7 @@ void RaySensor::Load(const std::string &_worldName)
       "RaySensor did not get a valid World pointer");
 
   physics::PhysicsEnginePtr physicsEngine =
-    this->world->GetPhysicsEngine();
+    this->world->Physics();
 
   GZ_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
@@ -95,8 +95,8 @@ void RaySensor::Load(const std::string &_worldName)
   this->dataPtr->laserCollision->SetInitialRelativePose(this->pose);
 
   this->dataPtr->laserShape =
-    boost::dynamic_pointer_cast<physics::MultiRayShape>(
-        this->dataPtr->laserCollision->GetShape());
+    std::dynamic_pointer_cast<physics::MultiRayShape>(
+        this->dataPtr->laserCollision->Shape());
 
   GZ_ASSERT(this->dataPtr->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
@@ -114,7 +114,7 @@ void RaySensor::Load(const std::string &_worldName)
   }
 
   this->dataPtr->parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != NULL,
       "Unable to get the parent entity.");
@@ -175,7 +175,7 @@ double RaySensor::GetRangeMin() const
 double RaySensor::RangeMin() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetMinRange();
+    return this->dataPtr->laserShape->MinRange();
   else
     return -1;
 }
@@ -190,7 +190,7 @@ double RaySensor::GetRangeMax() const
 double RaySensor::RangeMax() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetMaxRange();
+    return this->dataPtr->laserShape->MaxRange();
   else
     return -1;
 }
@@ -218,7 +218,7 @@ double RaySensor::GetRangeResolution() const
 double RaySensor::RangeResolution() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetResRange();
+    return this->dataPtr->laserShape->ResolutionRange();
   else
     return -1;
 }
@@ -233,7 +233,7 @@ int RaySensor::GetRayCount() const
 int RaySensor::RayCount() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetSampleCount();
+    return this->dataPtr->laserShape->SampleCount();
   else
     return -1;
 }
@@ -250,8 +250,8 @@ int RaySensor::RangeCount() const
   // TODO: maybe should check against this->dataPtr->laserMsg.ranges_size()
   //       as users use this to loop through GetRange() calls
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetSampleCount() *
-      this->dataPtr->laserShape->GetScanResolution();
+    return this->dataPtr->laserShape->SampleCount() *
+      this->dataPtr->laserShape->ScanResolution();
   else
     return -1;
 }
@@ -266,7 +266,7 @@ int RaySensor::GetVerticalRayCount() const
 int RaySensor::VerticalRayCount() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetVerticalSampleCount();
+    return this->dataPtr->laserShape->VerticalSampleCount();
   else
     return -1;
 }
@@ -281,8 +281,8 @@ int RaySensor::GetVerticalRangeCount() const
 int RaySensor::VerticalRangeCount() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetVerticalSampleCount() *
-      this->dataPtr->laserShape->GetVerticalScanResolution();
+    return this->dataPtr->laserShape->VerticalSampleCount() *
+      this->dataPtr->laserShape->VerticalScanResolution();
   else
     return -1;
 }
@@ -293,7 +293,7 @@ ignition::math::Angle RaySensor::VerticalAngleMin() const
   if (this->dataPtr->laserShape)
   {
     return ignition::math::Angle(
-        this->dataPtr->laserShape->GetVerticalMinAngle().Radian());
+        this->dataPtr->laserShape->VerticalMinAngle().Radian());
   }
   else
     return -1;
@@ -305,7 +305,7 @@ ignition::math::Angle RaySensor::VerticalAngleMax() const
   if (this->dataPtr->laserShape)
   {
     return ignition::math::Angle(
-        this->dataPtr->laserShape->GetVerticalMaxAngle().Radian());
+        this->dataPtr->laserShape->VerticalMaxAngle().Radian());
   }
   else
     return -1;
@@ -417,7 +417,7 @@ int RaySensor::Fiducial(const unsigned int _index) const
     gzerr << "Invalid fiducial index[" << _index << "]\n";
     return 0.0;
   }
-  return this->dataPtr->laserShape->GetFiducial(idx);
+  return this->dataPtr->laserShape->Fiducial(idx);
 }
 
 //////////////////////////////////////////////////
@@ -428,7 +428,7 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->dataPtr->laserShape->Update();
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
 
   // moving this behind laserShape update
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -440,7 +440,7 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+      this->pose + this->dataPtr->parentEntity->WorldPose());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());
@@ -535,23 +535,23 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
         j4 = hjb + vjb * rayCount;
 
         // range readings of 4 corners
-        r1 = this->LaserShape()->GetRange(j1);
-        r2 = this->LaserShape()->GetRange(j2);
-        r3 = this->LaserShape()->GetRange(j3);
-        r4 = this->LaserShape()->GetRange(j4);
+        r1 = this->LaserShape()->Range(j1);
+        r2 = this->LaserShape()->Range(j2);
+        r3 = this->LaserShape()->Range(j3);
+        r4 = this->LaserShape()->Range(j4);
         range = (1-vb)*((1 - hb) * r1 + hb * r2)
             + vb *((1 - hb) * r3 + hb * r4);
 
         // intensity is averaged
-        intensity = 0.25 * (this->LaserShape()->GetRetro(j1)
-            + this->LaserShape()->GetRetro(j2)
-            + this->LaserShape()->GetRetro(j3)
-            + this->LaserShape()->GetRetro(j4));
+        intensity = 0.25 * (this->LaserShape()->Retro(j1)
+            + this->LaserShape()->Retro(j2)
+            + this->LaserShape()->Retro(j3)
+            + this->LaserShape()->Retro(j4));
       }
       else
       {
-        range = this->dataPtr->laserShape->GetRange(j * this->RayCount() + i);
-        intensity = this->dataPtr->laserShape->GetRetro(j *
+        range = this->dataPtr->laserShape->Range(j * this->RayCount() + i);
+        intensity = this->dataPtr->laserShape->Retro(j *
             this->RayCount() + i);
       }
 

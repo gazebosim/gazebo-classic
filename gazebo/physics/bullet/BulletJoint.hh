@@ -144,10 +144,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ApplyStiffnessDamping();
 
-      // Documentation inherited.
-      public: virtual void SetAxis(const unsigned int _index,
-                                   const ignition::math::Vector3d &_axis);
-
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.

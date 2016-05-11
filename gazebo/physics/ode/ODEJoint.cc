@@ -678,9 +678,8 @@ JointWrench ODEJoint::ForceTorque(const unsigned int /*_index*/) const
       // convert torque from about child CG to joint anchor location
       // cg position specified in child link frame
       ignition::math::Pose3d cgPose;
-      physics::InertialPtr inertial = this->jointDPtr->childLink->Inertial();
-      if (inertial)
-        cgPose = inertial->Pose();
+      const physics::Inertial inertial = this->jointDPtr->childLink->Inertia();
+      cgPose = inertial.Pose();
 
       // anchorPose location of joint in child frame
       // childMomentArm: from child CG to joint location in child link frame
@@ -730,9 +729,8 @@ JointWrench ODEJoint::ForceTorque(const unsigned int /*_index*/) const
 
       // parent cg specified in parent link frame
       ignition::math::Pose3d cgPose;
-      InertialPtr inertial = this->jointDPtr->parentLink->Inertial();
-      if (inertial)
-        cgPose = inertial->Pose();
+      const Inertial inertial = this->jointDPtr->parentLink->Inertia();
+      cgPose = inertial.Pose();
 
       // get parent CG pose in child link frame
       ignition::math::Pose3d parentCGInChildLink =
@@ -867,7 +865,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
      return;
   }
 
-  double dt = this->World()->GetPhysicsEngine()->MaxStepSize();
+  double dt = this->World()->Physics()->MaxStepSize();
   for (unsigned int i = 0; i < this->AngleCount(); ++i)
   {
     double angle = this->Angle(i).Radian();
@@ -1140,10 +1138,10 @@ void ODEJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->AngleCount())
   {
-    if (this->odeJointDPtr->forceAppliedTime < this->World()->GetSimTime())
+    if (this->odeJointDPtr->forceAppliedTime < this->World()->SimTime())
     {
       // reset forces if time step is new
-      this->odeJointDPtr->forceAppliedTime = this->World()->GetSimTime();
+      this->odeJointDPtr->forceAppliedTime = this->World()->SimTime();
       this->odeJointDPtr->forceApplied[0] = this->odeJointDPtr->forceApplied[1] = 0;
     }
 

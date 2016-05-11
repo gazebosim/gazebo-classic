@@ -205,7 +205,7 @@ namespace gazebo
       public: virtual void DebugPrint() const;
 
       // Documentation inherited
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(const uint32_t _seed);
 
       /// Documentation inherited
       public: virtual bool SetParam(const std::string &_key,

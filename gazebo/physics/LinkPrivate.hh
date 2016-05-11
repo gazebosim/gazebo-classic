@@ -37,7 +37,7 @@ namespace gazebo
     class LinkPrivate : public EntityPrivate
     {
       /// \brief Inertial properties.
-      public: InertialPtr inertial;
+      public: Inertial inertial;
 
       /// \brief Center of gravity visual elements.
       public: std::vector<std::string> cgVisuals;
@@ -89,7 +89,7 @@ namespace gazebo
       public: bool publishData;
 
       /// \brief Mutex to protect the publishData variable
-      public: boost::recursive_mutex *publishDataMutex;
+      public: std::recursive_mutex publishDataMutex;
 
       /// \brief Cached list of collisions. This is here for performance.
       public: Collision_V collisions;
@@ -101,7 +101,7 @@ namespace gazebo
       public: std::vector<msgs::Wrench> wrenchMsgs;
 
       /// \brief Mutex to protect the wrenchMsgs variable.
-      public: boost::mutex wrenchMsgMutex;
+      public: std::mutex wrenchMsgMutex;
 
       /// \brief All the attached batteries.
       public: std::vector<common::BatteryPtr> batteries;

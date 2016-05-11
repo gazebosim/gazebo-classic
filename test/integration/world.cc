@@ -30,7 +30,7 @@ TEST_F(WorldTest, ClearEmptyWorld)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 
   world->Clear();
 
@@ -38,11 +38,11 @@ TEST_F(WorldTest, ClearEmptyWorld)
   for (unsigned int i = 0; i < 20; ++i)
     common::Time::MSleep(500);
 
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 
   // Now spawn something, and the model count should increase
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
-  EXPECT_EQ(world->GetModelCount(), 1u);
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
+  EXPECT_EQ(world->ModelCount(), 1u);
 }
 
 /////////////////////////////////////////////////
@@ -52,17 +52,17 @@ TEST_F(WorldTest, Clear)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  EXPECT_EQ(world->GetModelCount(), 2u);
+  EXPECT_EQ(world->ModelCount(), 2u);
 
   world->Clear();
-  while (world->GetModelCount() > 0u)
+  while (world->ModelCount() > 0u)
     common::Time::MSleep(1000);
 
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
 
-  EXPECT_EQ(world->GetModelCount(), 1u);
+  EXPECT_EQ(world->ModelCount(), 1u);
 }
 
 /////////////////////////////////////////////////
@@ -78,10 +78,10 @@ TEST_F(WorldTest, ModifyLight)
     // Check light objects
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 1u);
-    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+    EXPECT_STREQ(lights[0]->Name().c_str(), "sun");
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
@@ -107,7 +107,7 @@ TEST_F(WorldTest, ModifyLight)
     // Check light objects
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 1u);
-    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+    EXPECT_STREQ(lights[0]->Name().c_str(), "sun");
     msgs::Light lightMsg;
     lights[0]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 0);
@@ -115,7 +115,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.diffuse().b(), 0);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
     EXPECT_EQ(sceneMsg.light(0).diffuse().r(), 0);
@@ -142,7 +142,7 @@ TEST_F(WorldTest, ModifyLight)
     // Check light objects
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 2u);
-    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_light");
+    EXPECT_STREQ(lights[1]->Name().c_str(), "test_light");
     msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 1);
@@ -151,7 +151,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::POINT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
@@ -171,10 +171,10 @@ TEST_F(WorldTest, ModifyLight)
     // Check light objects
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 1u);
-    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+    EXPECT_STREQ(lights[0]->Name().c_str(), "sun");
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
@@ -195,7 +195,7 @@ TEST_F(WorldTest, ModifyLight)
     // Check light objects
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 2u);
-    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
+    EXPECT_STREQ(lights[1]->Name().c_str(), "test_spot_light");
     msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 1);
@@ -204,7 +204,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
@@ -232,7 +232,7 @@ TEST_F(WorldTest, ModifyLight)
     // Check light objects
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 2u);
-    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
+    EXPECT_STREQ(lights[1]->Name().c_str(), "test_spot_light");
     msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
     EXPECT_EQ(lightMsg.diffuse().r(), 1);
@@ -250,7 +250,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(1).diffuse().r(), 1);
@@ -284,7 +284,7 @@ TEST_F(WorldTest, ModifyLight)
     // Check light objects
     physics::Light_V lights = world->Lights();
     EXPECT_EQ(lights.size(), 3u);
-    EXPECT_STREQ(lights[2]->GetName().c_str(), "test_light");
+    EXPECT_STREQ(lights[2]->Name().c_str(), "test_light");
     msgs::Light lightMsg;
     lights[2]->FillMsg(lightMsg);
     EXPECT_DOUBLE_EQ(lightMsg.diffuse().r(), 0);
@@ -293,7 +293,7 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(lightMsg.type(), msgs::Light::DIRECTIONAL);
 
     // Check scene message
-    msgs::Scene sceneMsg = world->GetSceneMsg();
+    msgs::Scene sceneMsg = world->SceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 3);
     EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_light");
     EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 0);
@@ -311,8 +311,8 @@ TEST_F(WorldTest, RemoveModelPaused)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  physics::ModelPtr boxModel = world->ModelByName("box");
 
   EXPECT_TRUE(sphereModel != NULL);
   EXPECT_TRUE(boxModel != NULL);
@@ -320,8 +320,8 @@ TEST_F(WorldTest, RemoveModelPaused)
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
 
-  sphereModel = world->GetModel("sphere");
-  boxModel = world->GetModel("box");
+  sphereModel = world->ModelByName("sphere");
+  boxModel = world->ModelByName("box");
 
   EXPECT_FALSE(sphereModel != NULL);
   EXPECT_FALSE(boxModel != NULL);
@@ -334,8 +334,8 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  physics::ModelPtr boxModel = world->ModelByName("box");
 
   EXPECT_TRUE(sphereModel != NULL);
   EXPECT_TRUE(boxModel != NULL);
@@ -344,8 +344,8 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
 
-  sphereModel = world->GetModel("sphere");
-  boxModel = world->GetModel("box");
+  sphereModel = world->ModelByName("sphere");
+  boxModel = world->ModelByName("box");
 
   EXPECT_FALSE(sphereModel != NULL);
   EXPECT_FALSE(boxModel != NULL);

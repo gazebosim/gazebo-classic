@@ -21,6 +21,7 @@
 #endif
 
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/PlaneShape.hh"
 
 using namespace gazebo;
@@ -71,7 +72,7 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 //////////////////////////////////////////////////
 void PlaneShape::SetNormal(const ignition::math::Vector3d &_norm)
 {
-  this->sdf->GetElement("normal")->Set(_norm);
+  this->shapeDPtr->sdf->GetElement("normal")->Set(_norm);
   this->CreatePlane();
 }
 
@@ -84,7 +85,7 @@ math::Vector3 PlaneShape::GetNormal() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d PlaneShape::Normal() const
 {
-  return this->sdf->Get<ignition::math::Vector3d>("normal");
+  return this->shapeDPtr->sdf->Get<ignition::math::Vector3d>("normal");
 }
 
 //////////////////////////////////////////////////
@@ -96,7 +97,7 @@ void PlaneShape::SetSize(const math::Vector2d &_size)
 //////////////////////////////////////////////////
 void PlaneShape::SetSize(const ignition::math::Vector2d &_size)
 {
-  this->sdf->GetElement("size")->Set(_size);
+  this->shapeDPtr->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
@@ -108,7 +109,7 @@ math::Vector2d PlaneShape::GetSize() const
 //////////////////////////////////////////////////
 ignition::math::Vector2d PlaneShape::Size() const
 {
-  return this->sdf->Get<ignition::math::Vector2d>("size");
+  return this->shapeDPtr->sdf->Get<ignition::math::Vector2d>("size");
 }
 
 //////////////////////////////////////////////////
@@ -120,10 +121,10 @@ void PlaneShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (this->scale == _scale)
+  if (this->shapeDPtr->scale == _scale)
     return;
 
-  this->scale = _scale;
+  this->shapeDPtr->scale = _scale;
 
   ignition::math::Vector2d size = this->Size() *
     ignition::math::Vector2d(_scale.X(), _scale.Y());

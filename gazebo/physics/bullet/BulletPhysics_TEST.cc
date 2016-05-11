@@ -48,9 +48,9 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   WorldPtr world = get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), physicsEngineStr);
+  EXPECT_EQ(physics->Type(), physicsEngineStr);
 
   BulletPhysicsPtr bulletPhysics
       = std::static_pointer_cast<BulletPhysics>(physics);
@@ -79,31 +79,31 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
       splitImpulsePenetrationThreshold);
 
   boost::any value;
-  value = bulletPhysics->GetParam("solver_type");
+  value = bulletPhysics->Param("solver_type");
   std::string typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
-  value = bulletPhysics->GetParam("iters");
+  value = bulletPhysics->Param("iters");
   int itersRet = boost::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
-  value = bulletPhysics->GetParam("sor");
+  value = bulletPhysics->Param("sor");
   double sorRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
-  value = bulletPhysics->GetParam("cfm");
+  value = bulletPhysics->Param("cfm");
   double cfmRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
-  value = bulletPhysics->GetParam("erp");
+  value = bulletPhysics->Param("erp");
   double erpRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
 
-  value = bulletPhysics->GetParam("contact_surface_layer");
+  value = bulletPhysics->Param("contact_surface_layer");
   double contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
-  value = bulletPhysics->GetParam("split_impulse");
+  value = bulletPhysics->Param("split_impulse");
   double splitImpulseRet = boost::any_cast<bool>(value);
   EXPECT_DOUBLE_EQ(splitImpulse, splitImpulseRet);
 
-  value = bulletPhysics->GetParam("split_impulse_penetration_threshold");
+  value = bulletPhysics->Param("split_impulse_penetration_threshold");
   double splitImpulsePenetrationThresholdRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(splitImpulsePenetrationThreshold,
     splitImpulsePenetrationThresholdRet);
@@ -134,31 +134,31 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   bulletPhysics->SetParam("split_impulse_penetration_threshold",
       splitImpulsePenetrationThreshold);
 
-  value = bulletPhysics->GetParam("solver_type");
+  value = bulletPhysics->Param("solver_type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
-  value = bulletPhysics->GetParam("iters");
+  value = bulletPhysics->Param("iters");
   itersRet = boost::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
-  value = bulletPhysics->GetParam("sor");
+  value = bulletPhysics->Param("sor");
   sorRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
-  value = bulletPhysics->GetParam("cfm");
+  value = bulletPhysics->Param("cfm");
   cfmRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
-  value = bulletPhysics->GetParam("erp");
+  value = bulletPhysics->Param("erp");
   erpRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
 
-  value = bulletPhysics->GetParam("contact_surface_layer");
+  value = bulletPhysics->Param("contact_surface_layer");
   contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
-  value = bulletPhysics->GetParam("split_impulse");
+  value = bulletPhysics->Param("split_impulse");
   splitImpulseRet = boost::any_cast<bool>(value);
   EXPECT_DOUBLE_EQ(splitImpulse, splitImpulseRet);
 
-  value = bulletPhysics->GetParam("split_impulse_penetration_threshold");
+  value = bulletPhysics->Param("split_impulse_penetration_threshold");
   splitImpulsePenetrationThresholdRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(splitImpulsePenetrationThreshold,
     splitImpulsePenetrationThresholdRet);
@@ -169,13 +169,13 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   bulletPhysics->SetParam("max_contacts", maxContacts);
   bulletPhysics->SetParam("min_step_size", minStepSize);
   bulletPhysics->SetParam("max_step_size", maxStepSize);
-  value = bulletPhysics->GetParam("max_contacts");
+  value = bulletPhysics->Param("max_contacts");
   maxContactsRet = boost::any_cast<int>(value);
   EXPECT_DOUBLE_EQ(maxContacts, maxContactsRet);
-  value = bulletPhysics->GetParam("min_step_size");
+  value = bulletPhysics->Param("min_step_size");
   minStepSizeRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(minStepSize, minStepSizeRet);
-  value = bulletPhysics->GetParam("max_step_size");
+  value = bulletPhysics->Param("max_step_size");
   maxStepSizeRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(maxStepSize, maxStepSizeRet);
 }
@@ -198,7 +198,7 @@ void BulletPhysics_TEST::PhysicsMsgParam()
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr engine = world->Physics();
   ASSERT_TRUE(engine != NULL);
 
   transport::NodePtr phyNode;

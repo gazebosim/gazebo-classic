@@ -45,21 +45,21 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
         const std::string &_name)
     {
       // Get the model pointer
-      this->model = _world->GetModel(_name);
+      this->model = _world->ModelByName(_name);
 
       // Get the link pointer
-      this->link = this->model->GetLink();
+      this->link = this->model->LinkByName();
 
       // Get surface params
-      physics::Collision_V collisions = this->link->GetCollisions();
+      physics::Collision_V collisions = this->link->Collisions();
       auto iter = collisions.begin();
       EXPECT_TRUE(iter != collisions.end());
 
-      auto surf = (*iter)->GetSurface();
+      auto surf = (*iter)->Surface();
       EXPECT_TRUE(surf != NULL);
 
       auto surfODE =
-          boost::static_pointer_cast<physics::ODESurfaceParams>(surf);
+          std::static_pointer_cast<physics::ODESurfaceParams>(surf);
 
       this->coefficient = surf->FrictionPyramid()->MuTorsion();
       this->patch = surf->FrictionPyramid()->PatchRadius();
@@ -67,11 +67,10 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       this->kp = surfODE->kp;
 
       // Get inertial params
-      auto inertial = link->GetInertial();
-      EXPECT_TRUE(inertial != NULL);
+      auto inertial = link->Inertia();
 
-      this->mass = inertial->GetMass();
-      this->izz = inertial->GetIZZ();
+      this->mass = inertial.Mass();
+      this->izz = inertial.IZZ();
 
       this->error.InsertStatistic("maxAbs");
     }
@@ -157,13 +156,13 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   world->Step(1);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, 0);
-  EXPECT_DOUBLE_EQ(g.z, -9.8);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
+  ignition::math::Vector3d g = physics->Gravity();
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), 0);
+  EXPECT_DOUBLE_EQ(g.Z(), -9.8);
 
   // Sleep to ensure transport topics are all advertised
   common::Time::MSleep(100);
@@ -254,7 +253,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
 
     // Check that contact depth is:
     // normal force = kp * depth
-    double expectedDepth = sphere.mass * -g.z / sphere.kp;
+    double expectedDepth = sphere.mass * -g.Z() / sphere.kp;
     double relativeError =
       std::abs(contact.depth(0) - expectedDepth)/expectedDepth;
     gzdbg << "sphere_mass_" << number
@@ -289,13 +288,13 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, 0);
-  EXPECT_DOUBLE_EQ(g.z, -9.8);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
+  ignition::math::Vector3d g = physics->Gravity();
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), 0);
+  EXPECT_DOUBLE_EQ(g.Z(), -9.8);
 
   // Load the spheres
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
@@ -339,7 +338,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
     double appliedTorque = 1000;
     for (auto sphere : spheres)
     {
-      sphere.link->AddRelativeTorque(math::Vector3(0, 0, appliedTorque));
+      sphere.link->AddRelativeTorque(ignition::math::Vector3d(0, 0, appliedTorque));
     }
 
     world->Step(1);
@@ -348,12 +347,12 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
     for (auto sphere : spheres)
     {
       // Get angular acceleration
-      math::Vector3 acc = sphere.model->GetWorldAngularAccel();
-      EXPECT_NEAR(acc.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(acc.y, 0, g_friction_tolerance);
+      ignition::math::Vector3d acc = sphere.model->WorldAngularAccel();
+      EXPECT_NEAR(acc.X(), 0, g_friction_tolerance);
+      EXPECT_NEAR(acc.Y(), 0, g_friction_tolerance);
 
       // Calculate torque due to friction
-      double normalZ = -sphere.mass * g.z;
+      double normalZ = -sphere.mass * g.Z();
       double frictionCoef = sphere.coefficient * 3*M_PI/16 *
           sphere.patch;
       double frictionTorque = normalZ * frictionCoef;
@@ -361,11 +360,11 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
       {
-        EXPECT_NEAR(acc.z, 0, g_friction_tolerance);
+        EXPECT_NEAR(acc.Z(), 0, g_friction_tolerance);
       }
       else
       {
-        sphere.error.InsertData(acc.z - frictionAcc);
+        sphere.error.InsertData(acc.Z() - frictionAcc);
       }
     }
   }
@@ -373,7 +372,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   // Check error separately to reduce console spam
   for (auto sphere : spheres)
   {
-    gzdbg << "Model " << sphere.model->GetName() << std::endl;
+    gzdbg << "Model " << sphere.model->Name() << std::endl;
     EXPECT_NEAR(sphere.error.Map()["maxAbs"], 0.0, g_friction_tolerance);
   }
 }
@@ -394,13 +393,13 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, 0);
-  EXPECT_DOUBLE_EQ(g.z, -9.8);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
+  ignition::math::Vector3d g = physics->Gravity();
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), 0);
+  EXPECT_DOUBLE_EQ(g.Z(), -9.8);
 
   // Load the spheres
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
@@ -434,39 +433,40 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
     double appliedTorque = 1000;
     for (auto sphere : spheres)
     {
-      sphere.link->AddRelativeTorque(math::Vector3(0, 0, appliedTorque));
+      sphere.link->AddRelativeTorque(
+          ignition::math::Vector3d(0, 0, appliedTorque));
     }
 
     world->Step(1);
     step++;
-    gzdbg << "world time: " << world->GetSimTime().Double() << std::endl;
+    gzdbg << "world time: " << world->SimTime().Double() << std::endl;
 
     for (auto sphere : spheres)
     {
       // Get angular acceleration
-      math::Vector3 acc = sphere.model->GetWorldAngularAccel();
-      EXPECT_NEAR(acc.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(acc.y, 0, g_friction_tolerance);
+      ignition::math::Vector3d acc = sphere.model->WorldAngularAccel();
+      EXPECT_NEAR(acc.X(), 0, g_friction_tolerance);
+      EXPECT_NEAR(acc.Y(), 0, g_friction_tolerance);
 
       // Calculate torque due to friction
-      double depthAtEquilibrium = sphere.mass * -g.z / sphere.kp;
+      double depthAtEquilibrium = sphere.mass * -g.Z() / sphere.kp;
       double patch = sqrt(sphere.radius * depthAtEquilibrium);
-      double normalZ = -sphere.mass * g.z;
+      double normalZ = -sphere.mass * g.Z();
       double frictionTorque =
           normalZ * sphere.coefficient * 3 * M_PI * patch / 16;
-      gzdbg << sphere.model->GetName()
+      gzdbg << sphere.model->Name()
             << " frictionTorque " << frictionTorque
             << std::endl;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
       {
-        EXPECT_NEAR(acc.z, 0, g_friction_tolerance);
+        EXPECT_NEAR(acc.Z(), 0, g_friction_tolerance);
       }
       else
       {
         double expectedAcc = (appliedTorque - frictionTorque) / sphere.izz;
-        double relativeError = std::abs(acc.z - expectedAcc) / expectedAcc;
+        double relativeError = std::abs(acc.Z() - expectedAcc) / expectedAcc;
 
         // Less than 1% error
         EXPECT_LT(relativeError, 0.01);

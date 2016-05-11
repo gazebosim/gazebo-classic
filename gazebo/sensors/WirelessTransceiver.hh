@@ -18,6 +18,7 @@
 #define _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
 
 #include <string>
+#include <memory>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -82,7 +83,7 @@ namespace gazebo
       protected: double gain = 2.5;
 
       /// \brief Parent entity which the sensor is attached to
-      protected: boost::weak_ptr<physics::Link> parentEntity;
+      protected: std::weak_ptr<physics::Link> parentEntity;
 
       /// \brief Sensor reference pose
       protected: ignition::math::Pose3d referencePose;

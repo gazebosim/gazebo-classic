@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "gazebo/common/Events.hh"
 
@@ -44,8 +44,8 @@ using namespace physics;
 Gripper::Gripper(ModelPtr _model)
 {
   this->model = _model;
-  this->world = this->model->GetWorld();
-  this->physics = this->world->GetPhysicsEngine();
+  this->world = _model->World();
+  this->physics = this->world->Physics();
 
   this->diffs.resize(10);
   this->diffIndex = 0;
@@ -61,11 +61,10 @@ Gripper::Gripper(ModelPtr _model)
 /////////////////////////////////////////////////
 Gripper::~Gripper()
 {
-  if (this->world && this->world->GetRunning())
+  if (this->world && this->world->Running())
   {
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(this->GetName());
+    physics::ContactManager *mgr = this->world->Physics()->ContactMgr();
+    mgr->RemoveFilter(this->Name());
   }
 
   this->model.reset();
@@ -77,7 +76,7 @@ Gripper::~Gripper()
 /////////////////////////////////////////////////
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
 
   this->name = _sdf->Get<std::string>("name");
   this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
@@ -88,26 +87,31 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   this->detachSteps = graspCheck->Get<int>("detach_steps");
 
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
-  this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
+  this->palmLink =
+      this->model->LinkByName(palmLinkElem->Get<std::string>());
+
   if (!this->palmLink)
+  {
     gzerr << "palm link [" << palmLinkElem->Get<std::string>()
           << "] not found!\n";
+  }
 
   sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
 
   while (gripperLinkElem)
   {
     physics::LinkPtr gripperLink
-      = this->model->GetLink(gripperLinkElem->Get<std::string>());
-    for (unsigned int j = 0; j < gripperLink->GetChildCount(); ++j)
+      = this->model->LinkByName(gripperLinkElem->Get<std::string>());
+
+    for (unsigned int j = 0; j < gripperLink->ChildCount(); ++j)
     {
-      physics::CollisionPtr collision = gripperLink->GetCollision(j);
+      physics::CollisionPtr collision = gripperLink->CollisionByIndex(j);
       std::map<std::string, physics::CollisionPtr>::iterator collIter
-        = this->collisions.find(collision->GetScopedName());
+        = this->collisions.find(collision->ScopedName());
       if (collIter != this->collisions.end())
         continue;
 
-      this->collisions[collision->GetScopedName()] = collision;
+      this->collisions[collision->ScopedName()] = collision;
     }
     gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");
   }
@@ -116,9 +120,8 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   {
     // request the contact manager to publish messages to a custom topic for
     // this sensor
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(this->GetName(), this->collisions);
+    physics::ContactManager *mgr = this->world->Physics()->ContactMgr();
+    std::string topic = mgr->CreateFilter(this->Name(), this->collisions);
     if (!this->contactSub)
     {
       this->contactSub = this->node->Subscribe(topic,
@@ -126,7 +129,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
     }
   }
   this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
-          boost::bind(&Gripper::OnUpdate, this)));
+          std::bind(&Gripper::OnUpdate, this)));
 }
 
 /////////////////////////////////////////////////
@@ -162,7 +165,7 @@ void Gripper::OnUpdate()
     this->HandleDetach();
 
   {
-    boost::mutex::scoped_lock lock(this->mutexContacts);
+    std::lock_guard<std::mutex> lock(this->mutexContacts);
     this->contacts.clear();
   }
 
@@ -194,14 +197,14 @@ void Gripper::HandleAttach()
     if (this->collisions.find(name1) == this->collisions.end())
     {
       cc[name1] = std::dynamic_pointer_cast<Collision>(
-          this->world->GetEntity(name1));
+          this->world->EntityByName(name1));
       contactCounts[name1] += 1;
     }
 
     if (this->collisions.find(name2) == this->collisions.end())
     {
       cc[name2] = std::dynamic_pointer_cast<Collision>(
-          this->world->GetEntity(name2));
+          this->world->EntityByName(name2));
       contactCounts[name2] += 1;
     }
   }
@@ -215,8 +218,8 @@ void Gripper::HandleAttach()
     {
       if (!this->attached && cc[iter->first])
       {
-        math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
-          this->palmLink->GetWorldPose();
+        math::Pose diff = cc[iter->first]->Link()->WorldPose() -
+          this->palmLink->WorldPose();
 
         double dd = (diff - this->prevDiff).pos.GetSquaredLength();
 
@@ -231,10 +234,10 @@ void Gripper::HandleAttach()
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Pose());
+              cc[iter->first]->Link(), ignition::math::Pose3d());
           this->fixedJoint->Init();
-          this->fixedJoint->SetHighStop(0, 0);
-          this->fixedJoint->SetLowStop(0, 0);
+          this->fixedJoint->SetHighStop(0, ignition::math::Angle::Zero);
+          this->fixedJoint->SetLowStop(0, ignition::math::Angle::Zero);
         }
 
         this->diffIndex = (this->diffIndex+1) % 10;
@@ -257,14 +260,14 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
   for (int i = 0; i < _msg->contact_size(); ++i)
   {
     CollisionPtr collision1 = std::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_msg->contact(i).collision1()));
+        this->world->EntityByName(_msg->contact(i).collision1()));
     CollisionPtr collision2 = std::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_msg->contact(i).collision2()));
+        this->world->EntityByName(_msg->contact(i).collision2()));
 
     if ((collision1 && !collision1->IsStatic()) &&
         (collision2 && !collision2->IsStatic()))
     {
-      boost::mutex::scoped_lock lock(this->mutexContacts);
+      std::lock_guard<std::mutex> lock(this->mutexContacts);
       this->contacts.push_back(_msg->contact(i));
     }
   }
@@ -279,6 +282,12 @@ void Gripper::ResetDiffs()
 
 /////////////////////////////////////////////////
 std::string Gripper::GetName() const
+{
+  return this->Name();
+}
+
+/////////////////////////////////////////////////
+std::string Gripper::Name() const
 {
   return this->name;
 }

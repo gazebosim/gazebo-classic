@@ -69,10 +69,10 @@ void AltimeterSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::EntityPtr parentEntity = this->world->GetEntity(
+  physics::EntityPtr parentEntity = this->world->EntityByName(
       this->ParentName());
   this->dataPtr->parentLink =
-    boost::dynamic_pointer_cast<physics::Link>(parentEntity);
+    std::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   this->dataPtr->altPub =
     this->node->Advertise<msgs::Altimeter>(this->Topic(), 50);
@@ -108,7 +108,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
     // Initialise reference altitude
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     this->dataPtr->altMsg.set_vertical_reference((this->pose +
-         this->dataPtr->parentLink->GetWorldPose().Ign()).Pos().Z());
+         this->dataPtr->parentLink->WorldPose()).Pos().Z());
   }
 }
 
@@ -134,14 +134,13 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
   if (this->dataPtr->parentLink)
   {
     ignition::math::Pose3d parentPose =
-      this->dataPtr->parentLink->GetWorldPose().Ign();
+      this->dataPtr->parentLink->WorldPose();
 
     // Get pose in gazebo reference frame
     ignition::math::Pose3d altPose = this->pose + parentPose;
 
     ignition::math::Vector3d altVel =
-      this->dataPtr->parentLink->GetWorldLinearVel(
-          this->pose.Pos()).Ign();
+      this->dataPtr->parentLink->WorldLinearVel(this->pose.Pos());
 
     // Apply noise to the position and velocity
     if (this->noises.find(ALTIMETER_POSITION_NOISE_METERS) !=
@@ -172,7 +171,7 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
 
   // Save the time of the measurement
   msgs::Set(this->dataPtr->altMsg.mutable_time(),
-      this->world->GetSimTime());
+      this->world->SimTime());
 
   // Publish the message if needed
   if (this->dataPtr->altPub)

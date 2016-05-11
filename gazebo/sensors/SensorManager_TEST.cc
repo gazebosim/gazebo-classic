@@ -68,7 +68,7 @@ TEST_F(SensorManager_TEST, Data)
   EXPECT_EQ(sensors.size(), sensorCount);
 
   // Get the current simulation time
-  common::Time time = physics::get_world()->GetSimTime();
+  common::Time time = physics::get_world()->SimTime();
 
   // Wait for 1 second
   for (unsigned int i = 0; i < 10; ++i)

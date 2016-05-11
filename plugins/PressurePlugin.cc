@@ -71,21 +71,20 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     std::string collisionName =
       collisionScopedName.substr(collisionScopedName.rfind("::") + 2);
     // Get physics pointers
-    physics::EntityPtr entity = world->GetEntity(linkName);
+    physics::EntityPtr entity = world->EntityByName(linkName);
     if (entity && entity->HasType(physics::Base::LINK))
     {
-      physics::LinkPtr link =
-        boost::dynamic_pointer_cast<physics::Link>(entity);
+      physics::LinkPtr link = std::dynamic_pointer_cast<physics::Link>(entity);
       if (link)
       {
-        physics::CollisionPtr collision = link->GetCollision(collisionName);
+        physics::CollisionPtr collision = link->CollisionByName(collisionName);
         if (collision)
         {
-          physics::ShapePtr shape = collision->GetShape();
+          physics::ShapePtr shape = collision->Shape();
           if (shape->HasType(physics::Base::BOX_SHAPE))
           {
             physics::BoxShapePtr box =
-              boost::dynamic_pointer_cast<physics::BoxShape>(shape);
+              std::dynamic_pointer_cast<physics::BoxShape>(shape);
             if (box)
             {
               ignition::math::Vector3d size = box->Size();
@@ -141,11 +140,11 @@ void PressurePlugin::OnUpdate()
       {
         // TODO: determine whether body1Force or body2Force should be used.
         normalForce = iter2->second.normals[i].x *
-                      iter2->second.wrench[i].body1Force.x +
+                      iter2->second.wrench[i].body1Force.X() +
                       iter2->second.normals[i].y *
-                      iter2->second.wrench[i].body1Force.y +
+                      iter2->second.wrench[i].body1Force.Y() +
                       iter2->second.normals[i].z *
-                      iter2->second.wrench[i].body1Force.z;
+                      iter2->second.wrench[i].body1Force.Z();
         normalForceSum += normalForce;
       }
     }

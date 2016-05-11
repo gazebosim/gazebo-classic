@@ -14,17 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WORLD_PRIVATE_HH_
-#define _GAZEBO_WORLD_PRIVATE_HH_
+#ifndef GAZEBO_WORLD_PRIVATE_HH_
+#define GAZEBO_WORLD_PRIVATE_HH_
 
 #include <atomic>
 #include <deque>
 #include <vector>
 #include <list>
 #include <set>
-#include <boost/thread.hpp>
 #include <sdf/sdf.hh>
 #include <string>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
@@ -59,7 +62,7 @@ namespace gazebo
       public: BasePtr rootElement;
 
       /// \brief thread in which the world is updated.
-      public: boost::thread *thread;
+      public: std::thread *thread;
 
       /// \brief True to stop the world from running.
       public: bool stop;
@@ -155,10 +158,10 @@ namespace gazebo
       public: common::Time realTimeOffset;
 
       /// \brief Mutex to protect incoming message buffers.
-      public: boost::recursive_mutex *receiveMutex;
+      public: std::recursive_mutex receiveMutex;
 
       /// \brief Mutex to protext loading of models.
-      public: boost::mutex *loadModelMutex;
+      public: std::mutex loadModelMutex;
 
       /// \brief Mutex to protext loading of lights.
       public: std::mutex loadLightMutex;
@@ -167,7 +170,7 @@ namespace gazebo
       /// Used in Entity.cc.
       /// Entity::Reset to call Entity::SetWorldPose and Entity::SetRelativePose
       /// Entity::SetWorldPose to call Entity::setWorldPoseFunc
-      public: boost::mutex *setWorldPoseMutex;
+      public: std::mutex setWorldPoseMutex;
 
       /// \brief Used by World classs in following calls:
       /// World::Step for then entire function
@@ -175,7 +178,7 @@ namespace gazebo
       /// and waits on setpInc on World::stepIhc as it's decremented.
       /// World::Reset while World::ResetTime, entities, World::physicsEngine
       /// World::SetPaused to assign world::pause
-      public: boost::recursive_mutex *worldUpdateMutex;
+      public: std::recursive_mutex worldUpdateMutex;
 
       /// \brief THe world's SDF values.
       public: sdf::ElementPtr sdf;
@@ -281,11 +284,11 @@ namespace gazebo
       public: uint64_t stopIterations;
 
       /// \brief Condition used for log worker.
-      public: boost::condition_variable logCondition;
+      public: std::condition_variable logCondition;
 
       /// \brief Condition used to guarantee the log worker thread doesn't
       /// skip an interation.
-      public: boost::condition_variable logContinueCondition;
+      public: std::condition_variable logContinueCondition;
 
       /// \brief Last iteration recorded by the log worker thread.
       public: uint64_t logPrevIteration;
@@ -294,16 +297,16 @@ namespace gazebo
       public: common::Time logRealTime;
 
       /// \brief Mutex to protect the log worker thread.
-      public: boost::mutex logMutex;
+      public: std::mutex logMutex;
 
       /// \brief Mutex to protect the log state buffers
-      public: boost::mutex logBufferMutex;
+      public: std::mutex logBufferMutex;
 
       /// \brief Mutex to protect the deleteEntity list.
-      public: boost::mutex entityDeleteMutex;
+      public: std::mutex entityDeleteMutex;
 
       /// \brief Worker thread for logging.
-      public: boost::thread *logThread;
+      public: std::thread *logThread;
 
       /// \brief A cached list of models. This is here for performance.
       public: Model_V models;
@@ -313,7 +316,7 @@ namespace gazebo
 
       /// \brief This mutex is used to by the ::RemoveModel and
       /// ::ProcessFactoryMsgs functions.
-      public: boost::mutex factoryDeleteMutex;
+      public: std::mutex factoryDeleteMutex;
 
       /// \brief when physics engine makes an update and changes a link pose,
       /// this flag is set to trigger Entity::SetWorldPose on the

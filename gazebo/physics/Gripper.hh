@@ -20,6 +20,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -59,7 +60,13 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Return the name of the gripper.
-      public: std::string GetName() const;
+      /// \deprecated See std::string Name() const;
+      public: std::string GetName() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Return the name of the gripper.
+      /// \return Name of the gripper
+      public: std::string Name() const;
+
 
       /// \brief True if the gripper is attached to another model.
       /// \return True if the gripper is active and a joint has been
@@ -107,7 +114,7 @@ namespace gazebo
       private: std::vector<msgs::Contact> contacts;
 
       /// \brief Mutex used to protect reading/writing the sonar message.
-      private: boost::mutex mutexContacts;
+      private: std::mutex mutexContacts;
 
       /// \brief True if the gripper has an object.
       private: bool attached;

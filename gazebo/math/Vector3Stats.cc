@@ -27,6 +27,12 @@ Vector3Stats::Vector3Stats()
 }
 
 //////////////////////////////////////////////////
+Vector3Stats::Vector3Stats(const ignition::math::Vector3Stats &_v)
+  : dataPtr(new Vector3StatsPrivate(_v))
+{
+}
+
+//////////////////////////////////////////////////
 Vector3Stats::~Vector3Stats()
 {
   delete this->dataPtr;
@@ -119,3 +125,22 @@ SignalStats &Vector3Stats::Mag()
   return this->dataPtr->mag;
 }
 
+//////////////////////////////////////////////////
+ignition::math::Vector3Stats Vector3Stats::Ign() const
+{
+  ignition::math::Vector3Stats result;
+  result.X() = this->X().Ign();
+  result.Y() = this->Y().Ign();
+  result.Z() = this->Z().Ign();
+  result.Mag() = this->Mag().Ign();
+}
+
+//////////////////////////////////////////////////
+Vector3Stats &Vector3Stats::operator=(const ignition::math::Vector3Stats &_v)
+{
+  this->X() = _v.X();
+  this->Y() = _v.Y();
+  this->Z() = _v.Z();
+  this->Mag() = _v.Mag();
+  return *this;
+}

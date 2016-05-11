@@ -52,7 +52,7 @@ ODELink::~ODELink()
 void ODELink::Load(sdf::ElementPtr _sdf)
 {
   this->odeLinkDPtr->odePhysics = std::dynamic_pointer_cast<ODEPhysics>(
-      this->World()->GetPhysicsEngine());
+      this->World()->Physics());
 
   if (this->odeLinkDPtr->odePhysics == NULL)
   {
@@ -74,7 +74,8 @@ void ODELink::Init()
     dBodySetData(this->odeLinkDPtr->linkId, this);
 
     // Only use auto disable if no joints and no sensors are present
-    if (this->Model()->AutoDisable() && this->Model()->JointCount() == 0 &&
+    if (this->ParentModel()->AutoDisable() &&
+        this->ParentModel()->JointCount() == 0 &&
         this->SensorCount() == 0)
     {
       dBodySetAutoDisableDefaults(this->odeLinkDPtr->linkId);
@@ -98,8 +99,7 @@ void ODELink::Init()
 
   if (this->odeLinkDPtr->linkId)
   {
-    GZ_ASSERT(this->linkDPtr->inertial != NULL, "Inertial pointer is NULL");
-    ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial->CoG();
+    ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial.CoG();
     for (auto const &child : this->odeLinkDPtr->children)
     {
       if (child->HasType(Base::COLLISION))
@@ -159,9 +159,9 @@ void ODELink::MoveCallback(const dBodyID _id)
   self->odeLinkDPtr->dirtyPose.Rot().Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
-  GZ_ASSERT(self->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
-  ignition::math::Vector3d cog = self->odeLinkDPtr->dirtyPose.Rot().RotateVector(
-      self->odeLinkDPtr->inertial->CoG());
+  ignition::math::Vector3d cog =
+    self->odeLinkDPtr->dirtyPose.Rot().RotateVector(
+      self->odeLinkDPtr->inertial.CoG());
 
   self->odeLinkDPtr->dirtyPose.Pos() -= cog;
 
@@ -251,9 +251,8 @@ void ODELink::OnPoseChange()
 
   const ignition::math::Pose3d myPose = this->WorldPose();
 
-  GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
   ignition::math::Vector3d cog = myPose.Rot().RotateVector(
-      this->odeLinkDPtr->inertial->CoG());
+      this->odeLinkDPtr->inertial.CoG());
 
   // adding cog location for ode pose
   dBodySetPosition(this->odeLinkDPtr->linkId,
@@ -322,8 +321,7 @@ void ODELink::UpdateCollisionOffsets()
 {
   if (this->odeLinkDPtr->linkId)
   {
-    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
-    ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial->CoG();
+    ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial.CoG();
     for (auto const &child : this->odeLinkDPtr->children)
     {
       if (child->HasType(Base::COLLISION))
@@ -370,7 +368,7 @@ void ODELink::UpdateSurface()
         // Set max_vel and min_depth
         boost::any value;
         if (g->ODESurface()->maxVel < 0 &&
-            this->World()->GetPhysicsEngine()->GetParam(
+            this->World()->Physics()->Param(
               "contact_max_correcting_vel", value))
         {
           try
@@ -401,11 +399,11 @@ void ODELink::UpdateMass()
     return;
   }
 
-  if (this->odeLinkDPtr->inertial->Mass() <= 0)
+  if (this->odeLinkDPtr->inertial.Mass() <= 0)
   {
     gzerr << "Setting custom link " << this->ScopedName()
           << "mass to zero or less is an error. Using a value of 1.0.\n";
-    this->odeLinkDPtr->inertial->SetMass(1.0);
+    this->odeLinkDPtr->inertial.SetMass(1.0);
   }
 
   dMass odeMass;
@@ -414,17 +412,14 @@ void ODELink::UpdateMass()
   // The CoG must always be (0, 0, 0)
   ignition::math::Vector3d cog(0, 0, 0);
 
-  GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
-
   // give ODE un-rotated inertia
-  ignition::math::Matrix3d moi = this->odeLinkDPtr->inertial->MOI(
-    ignition::math::Pose3d(this->odeLinkDPtr->inertial->CoG(),
-      ignition::math::Quaterniond()));
+  ignition::math::Matrix3d moi = this->odeLinkDPtr->inertial.MOI(
+    this->odeLinkDPtr->inertial.CoG());
 
   ignition::math::Vector3d principals(moi(0, 0), moi(1, 1), moi(2, 2));
   ignition::math::Vector3d products(moi(0, 1), moi(0, 2), moi(1, 2));
 
-  dMassSetParameters(&odeMass, this->odeLinkDPtr->inertial->Mass(),
+  dMassSetParameters(&odeMass, this->odeLinkDPtr->inertial.Mass(),
       cog.X(), cog.Y(), cog.Z(),
       principals.X(), principals.Y(), principals.Z(),
       products.X(), products.Y(), products.Z());
@@ -459,10 +454,9 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
   if (this->odeLinkDPtr->linkId)
   {
     dVector3 dvel;
-    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
 
     ignition::math::Vector3d offsetFromCoG = _offset -
-      this->odeLinkDPtr->inertial->CoG();
+      this->odeLinkDPtr->inertial.CoG();
 
     dBodyGetRelPointVel(this->odeLinkDPtr->linkId,
         offsetFromCoG.X(), offsetFromCoG.Y(), offsetFromCoG.Z(), dvel);
@@ -489,11 +483,9 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
     dVector3 dvel;
     ignition::math::Pose3d wPose = this->WorldPose();
 
-    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
-
     ignition::math::Vector3d offsetFromCoG =
         wPose.Rot().RotateVectorReverse(_q * _offset)
-        - this->odeLinkDPtr->inertial->CoG();
+        - this->odeLinkDPtr->inertial.CoG();
 
     dBodyGetRelPointVel(this->odeLinkDPtr->linkId,
         offsetFromCoG.X(), offsetFromCoG.Y(), offsetFromCoG.Z(), dvel);
@@ -678,7 +670,7 @@ void ODELink::AddLinkForce(const ignition::math::Vector3d &_force,
       this->WorldPose().Rot().RotateVector(_force);
     // Does this need to be rotated?
     ignition::math::Vector3d offsetCoG =
-      _offset - this->odeLinkDPtr->inertial->CoG();
+      _offset - this->odeLinkDPtr->inertial.CoG();
 
     this->SetEnabled(true);
     dBodyAddForceAtRelPos(this->odeLinkDPtr->linkId,
@@ -811,7 +803,7 @@ bool ODELink::Kinematic() const
 //////////////////////////////////////////////////
 void ODELink::SetAutoDisable(const bool _disable)
 {
-  if (this->Model()->JointCount() == 0 && this->odeLinkDPtr->linkId)
+  if (this->ParentModel()->JointCount() == 0 && this->odeLinkDPtr->linkId)
   {
     dBodySetAutoDisableFlag(this->odeLinkDPtr->linkId, _disable);
   }

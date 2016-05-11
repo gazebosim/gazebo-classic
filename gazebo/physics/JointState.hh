@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A joint state
- * Author: Nate Koenig
- */
-
-#ifndef _JOINTSTATE_HH_
-#define _JOINTSTATE_HH_
+#ifndef GAZEBO_PHYSICS_JOINTSTATE_HH_
+#define GAZEBO_PHYSICS_JOINTSTATE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -82,17 +78,36 @@ namespace gazebo
 
       /// \brief Get the number of angles.
       /// \return The number of angles.
-      public: unsigned int GetAngleCount() const;
+      /// \deprecated See unsigned int GetAngleCount() const
+      public: unsigned int GetAngleCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the number of angles.
+      /// \return The number of angles.
+      public: unsigned int AngleCount() const;
 
       /// \brief Get the joint angle.
       /// \param[in] _axis The axis index.
       /// \return Angle of the axis.
       /// \throw common::Exception When _axis is invalid.
-      public: math::Angle GetAngle(unsigned int _axis) const;
+      /// \deprecated See math::Angle GetAngle(unsigned int _axis) const;
+      public: math::Angle GetAngle(unsigned int _axis) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the joint angle.
+      /// \param[in] _axis The axis index.
+      /// \return Angle of the axis.
+      /// \throw common::Exception When _axis is invalid.
+      public: ignition::math::Angle Angle(const unsigned int _axis) const;
 
       /// \brief Get the angles.
       /// \return Vector of angles.
-      public: const std::vector<math::Angle> &GetAngles() const;
+      /// \deprecated See const std::vector<math::Angle> &Angles() const
+      public: std::vector<math::Angle> GetAngles() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angles.
+      /// \return Vector of angles.
+      public: const std::vector<ignition::math::Angle> &Angles() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -124,10 +139,10 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::JointState &_state)
       {
-        _out << "<joint name='" << _state.GetName() << "'>";
+        _out << "<joint name='" << _state.Name() << "'>";
 
         int i = 0;
-        for (std::vector<math::Angle>::const_iterator iter =
+        for (std::vector<ignition::math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
           _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
@@ -138,7 +153,7 @@ namespace gazebo
         return _out;
       }
 
-      private: std::vector<math::Angle> angles;
+      private: std::vector<ignition::math::Angle> angles;
     };
     /// \}
   }

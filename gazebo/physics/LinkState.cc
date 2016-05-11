@@ -14,8 +14,7 @@
  * limitations under the License.
  *
  */
-
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/World.hh"
@@ -32,34 +31,36 @@ LinkState::LinkState()
 
 /////////////////////////////////////////////////
 LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
-                  const common::Time &_simTime, const uint64_t _iterations)
-  : State(_link->GetName(), _realTime, _simTime, _iterations)
+    const common::Time &_simTime, const uint64_t _iterations)
+: State(_link->Name(), _realTime, _simTime, _iterations)
 {
-  this->pose = _link->GetWorldPose();
-  this->velocity = math::Pose(_link->GetWorldLinearVel(),
-                   math::Quaternion(_link->GetWorldAngularVel()));
-  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
-                       math::Quaternion(_link->GetWorldAngularAccel()));
-  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
+  this->pose = _link->WorldPose();
+  this->velocity = ignition::math::Pose3d(_link->WorldLinearVel(),
+                   ignition::math::Quaterniond(_link->WorldAngularVel()));
+  this->acceleration = ignition::math::Pose3d(_link->WorldLinearAccel(),
+                       ignition::math::Quaterniond(_link->WorldAngularAccel()));
+  this->wrench = ignition::math::Pose3d(_link->WorldForce(),
+      ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////
 LinkState::LinkState(const LinkPtr _link)
-  : State(_link->GetName(), _link->GetWorld()->GetRealTime(),
-          _link->GetWorld()->GetSimTime(), _link->GetWorld()->GetIterations())
+  : State(_link->Name(), _link->World()->RealTime(),
+          _link->World()->SimTime(), _link->World()->Iterations())
 {
-  this->pose = _link->GetWorldPose();
-  this->velocity = math::Pose(_link->GetWorldLinearVel(),
-                   math::Quaternion(_link->GetWorldAngularVel()));
-  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
-                       math::Quaternion(_link->GetWorldAngularAccel()));
-  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
+  this->pose = _link->WorldPose();
+  this->velocity = ignition::math::Pose3d(_link->WorldLinearVel(),
+      ignition::math::Quaterniond(_link->WorldAngularVel()));
+  this->acceleration = ignition::math::Pose3d(_link->WorldLinearAccel(),
+      ignition::math::Quaterniond(_link->WorldAngularAccel()));
+  this->wrench = ignition::math::Pose3d(_link->WorldForce(),
+      ignition::math::Quaterniond::Identity);
 
   // Disabling CollisionStates to improve performance. This information is
   // probably not required.
   //
   // // Create all the collision states.
-  // Collision_V collisions = _link->GetCollisions();
+  // Collision_V collisions = _link->Collisions();
   // for (Collision_V::const_iterator iter = collisions.begin();
   //      iter != collisions.end(); ++iter)
   // {
@@ -83,18 +84,18 @@ LinkState::~LinkState()
 void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
     const common::Time &_simTime, const uint64_t _iterations)
 {
-  this->name = _link->GetName();
+  this->name = _link->Name();
   this->wallTime = common::Time::GetWallTime();
   this->realTime = _realTime;
   this->simTime = _simTime;
   this->iterations = _iterations;
 
-  this->pose = _link->GetWorldPose();
-  this->velocity.Set(_link->GetWorldLinearVel(),
-                     _link->GetWorldAngularVel());
-  this->acceleration.Set(_link->GetWorldLinearAccel(),
-                         _link->GetWorldAngularAccel());
-  this->wrench.Set(_link->GetWorldForce(), math::Quaternion());
+  this->pose = _link->WorldPose();
+  this->velocity.Set(_link->WorldLinearVel(),
+                     _link->WorldAngularVel());
+  this->acceleration.Set(_link->WorldLinearAccel(),
+                         _link->WorldAngularAccel());
+  this->wrench.Set(_link->WorldForce(), ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -105,49 +106,73 @@ void LinkState::Load(const sdf::ElementPtr _elem)
 
   // Set the link name
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link velocity
   if (_elem->HasElement("velocity"))
-    this->velocity = _elem->Get<math::Pose>("velocity");
+    this->velocity = _elem->Get<ignition::math::Pose3d>("velocity");
   else
     this->velocity.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link acceleration
   if (_elem->HasElement("acceleration"))
-    this->acceleration = _elem->Get<math::Pose>("acceleration");
+    this->acceleration = _elem->Get<ignition::math::Pose3d>("acceleration");
   else
     this->acceleration.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link wrench
   if (_elem->HasElement("wrench"))
-    this->wrench = _elem->Get<math::Pose>("wrench");
+    this->wrench = _elem->Get<ignition::math::Pose3d>("wrench");
   else
     this->wrench.Set(0, 0, 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetPose() const
+math::Pose LinkState::GetPose() const
+{
+  return this->Pose();
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &LinkState::Pose() const
 {
   return this->pose;
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetVelocity() const
+math::Pose LinkState::GetVelocity() const
+{
+  return this->Velocity();
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &LinkState::Velocity() const
 {
   return this->velocity;
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetAcceleration() const
+math::Pose LinkState::GetAcceleration() const
+{
+  return this->Acceleration();
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &LinkState::Acceleration() const
 {
   return this->acceleration;
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetWrench() const
+math::Pose LinkState::GetWrench() const
+{
+  return this->Wrench();
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &LinkState::Wrench() const
 {
   return this->wrench;
 }
@@ -155,16 +180,30 @@ const math::Pose &LinkState::GetWrench() const
 /////////////////////////////////////////////////
 unsigned int LinkState::GetCollisionStateCount() const
 {
+  return this->CollisionStateCount();
+}
+
+/////////////////////////////////////////////////
+unsigned int LinkState::CollisionStateCount() const
+{
   return this->collisionStates.size();
 }
 
 /////////////////////////////////////////////////
 CollisionState LinkState::GetCollisionState(unsigned int _index) const
 {
+  return this->CollisionStateByIndex(_index);
+}
+
+/////////////////////////////////////////////////
+CollisionState LinkState::CollisionStateByIndex(
+    const unsigned int _index) const
+{
   if (_index < this->collisionStates.size())
     return this->collisionStates[_index];
 
-  gzthrow("Index is out of range");
+  gzerr << "Index is out of range\n";
+
   return CollisionState();
 }
 
@@ -172,20 +211,33 @@ CollisionState LinkState::GetCollisionState(unsigned int _index) const
 CollisionState LinkState::GetCollisionState(
     const std::string &_collisionName) const
 {
+  return this->CollisionStateByName(_collisionName);
+}
+
+/////////////////////////////////////////////////
+CollisionState LinkState::CollisionStateByName(
+    const std::string &_collisionName) const
+{
   for (std::vector<CollisionState>::const_iterator
        iter = this->collisionStates.begin();
        iter != this->collisionStates.end(); ++iter)
   {
-    if ((*iter).GetName() == _collisionName)
+    if ((*iter).Name() == _collisionName)
       return *iter;
   }
 
-  gzthrow("Invalid collision name[" + _collisionName + "]");
+  gzerr << "Invalid collision name[" << _collisionName << "]\n";
   return CollisionState();
 }
 
 /////////////////////////////////////////////////
 const std::vector<CollisionState> &LinkState::GetCollisionStates() const
+{
+  return this->CollisionStates();
+}
+
+/////////////////////////////////////////////////
+const std::vector<CollisionState> &LinkState::CollisionStates() const
 {
   return this->collisionStates;
 }
@@ -202,9 +254,9 @@ bool LinkState::IsZero() const
   //   result = result && (*iter).IsZero();
   // }
 
-  // return result && this->pose == math::Pose::Zero;
+  // return result && this->pose == ignition::math::Pose3d::Zero;
 
-  return this->pose == math::Pose::Zero;
+  return this->pose == ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -245,8 +297,8 @@ LinkState LinkState::operator-(const LinkState &_state) const
 
   result.name = this->name;
 
-  result.pose.pos = this->pose.pos - _state.pose.pos;
-  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() - _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot().Inverse() * this->pose.Rot();
 
   result.velocity = this->velocity - _state.velocity;
   result.acceleration = this->acceleration - _state.acceleration;
@@ -259,7 +311,7 @@ LinkState LinkState::operator-(const LinkState &_state) const
   //      iter != _state.collisionStates.end(); ++iter)
   // {
   //   CollisionState state =
-  //   this->GetCollisionState((*iter).GetName()) - *iter;
+  //   this->CollisionState((*iter).GetName()) - *iter;
   //   if (!state.IsZero())
   //     result.collisionStates.push_back(state);
   // }
@@ -274,8 +326,8 @@ LinkState LinkState::operator+(const LinkState &_state) const
 
   result.name = this->name;
 
-  result.pose.pos = this->pose.pos + _state.pose.pos;
-  result.pose.rot = _state.pose.rot * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() + _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot() * this->pose.Rot();
 
   result.velocity = this->velocity + _state.velocity;
   result.acceleration = this->acceleration + _state.acceleration;
@@ -288,7 +340,7 @@ LinkState LinkState::operator+(const LinkState &_state) const
   //      iter != _state.collisionStates.end(); ++iter)
   // {
   //   CollisionState state =
-  //   this->GetCollisionState((*iter).GetName()) + *iter;
+  //   this->CollisionState((*iter).GetName()) + *iter;
   //   result.collisionStates.push_back(state);
   // }
 

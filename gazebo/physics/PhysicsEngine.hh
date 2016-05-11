@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_PHYSICSENGINE_HH_
-#define _GAZEBO_PHYSICS_PHYSICSENGINE_HH_
+#ifndef GAZEBO_PHYSICS_PHYSICSENGINE_HH_
+#define GAZEBO_PHYSICS_PHYSICSENGINE_HH_
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
+#include <mutex>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -31,6 +32,9 @@ namespace gazebo
   namespace physics
   {
     class ContactManager;
+
+    // Forward declare private data class
+    class PhysicsEnginePrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -57,7 +61,7 @@ namespace gazebo
       public: virtual void Fini();
 
       /// \brief Rest the physics engine.
-      public: virtual void Reset() {}
+      public: virtual void Reset();
 
       /// \brief Init the engine for threads.
       public: virtual void InitForThread() = 0;
@@ -76,19 +80,34 @@ namespace gazebo
 
       /// \brief Set the random number seed for the physics engine.
       /// \param[in] _seed The random number seed.
-      public: virtual void SetSeed(uint32_t _seed) = 0;
+      public: virtual void SetSeed(const uint32_t _seed) = 0;
 
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
-      public: double GetUpdatePeriod();
+      /// \deprecated See double UpdatePeriod() const
+      public: double GetUpdatePeriod() GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the simulation update period.
+      /// \return Simulation update period.
+      public: double UpdatePeriod() const;
 
       /// \brief Get target real time factor
       /// \return Target real time factor
-      public: double GetTargetRealTimeFactor() const;
+      /// \deprecated See double TargetRealTimeFactor() const
+      public: double GetTargetRealTimeFactor() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get target real time factor
+      /// \return Target real time factor
+      public: double TargetRealTimeFactor() const;
 
       /// \brief Get real time update rate
       /// \return Update rate
-      public: double GetRealTimeUpdateRate() const;
+      /// \deprecated See double RealTimeUpdateRate() const
+      public: double GetRealTimeUpdateRate() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get real time update rate
+      /// \return Update rate
+      public: double RealTimeUpdateRate() const;
 
       /// \brief Get max step size.
       /// \return Max step size.
@@ -100,18 +119,18 @@ namespace gazebo
 
       /// \brief Set target real time factor
       /// \param[in] _factor Target real time factor
-      public: void SetTargetRealTimeFactor(double _factor);
+      public: void SetTargetRealTimeFactor(const double _factor);
 
       /// \brief Set real time update rate
       /// \param[in] _rate Update rate
-      public: void SetRealTimeUpdateRate(double _rate);
+      public: void SetRealTimeUpdateRate(const double _rate);
 
       /// \brief Set max step size.
       /// \param[in] _stepSize Max step size.
-      public: void SetMaxStepSize(double _stepSize);
+      public: void SetMaxStepSize(const double _stepSize);
 
       /// \brief Update the physics engine.
-      public: virtual void UpdatePhysics() {}
+      public: virtual void UpdatePhysics();
 
       /// \brief Create a new model.
       /// \param[in] _base Boost shared pointer to a new model.
@@ -147,7 +166,12 @@ namespace gazebo
 
       /// \brief Return the gravity vector.
       /// \return The gravity vector.
-      public: virtual math::Vector3 GetGravity() const;
+      /// \deprecated See ignition::math::Vector3d Gravity() const
+      public: virtual math::Vector3 GetGravity() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Return the gravity vector.
+      /// \return The gravity vector.
+      public: virtual ignition::math::Vector3d Gravity() const;
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
@@ -168,19 +192,26 @@ namespace gazebo
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _autoDisable True to enable auto disabling of bodies.
-      public: virtual void SetAutoDisableFlag(bool _autoDisable);
+      public: virtual void SetAutoDisableFlag(const bool _autoDisable);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief access functions to set ODE parameters
       /// \param[in] _maxContacts Maximum number of contacts.
-      public: virtual void SetMaxContacts(unsigned int _maxContacts);
+      public: virtual void SetMaxContacts(const unsigned int _maxContacts);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief access functions to set ODE parameters..
       /// \return Auto disable flag.
-      public: virtual bool GetAutoDisableFlag() {return 0;}
+      /// \deprecated See bool AutoDisableFlag()  const
+      public: virtual bool GetAutoDisableFlag() GAZEBO_DEPRECATED(8.0);
+
+      /// \TODO: Remove this function, and replace it with a more generic
+      /// property map
+      /// \brief access functions to set ODE parameters..
+      /// \return Auto disable flag.
+      public: virtual bool AutoDisableFlag() const;
 
       /// \brief Set a parameter of the physics engine.
       /// See SetParam documentation for descriptions of duplicate parameters.
@@ -214,20 +245,38 @@ namespace gazebo
       /// \param[in] _value The value to set to
       /// \return true if SetParam is successful, false if operation fails.
       public: virtual bool SetParam(const std::string &_key,
-                  const boost::any &_value);
+                                    const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
       /// \sa SetParam
       /// \return The value of the parameter
-      public: virtual boost::any GetParam(const std::string &_key) const;
+      /// \deprecated See boost::any Param(const std::string &_key) const
+      public: virtual boost::any GetParam(const std::string &_key) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get an parameter of the physics engine
+      /// \param[in] _attr String key
+      /// \sa SetParam
+      /// \return The value of the parameter
+      public: virtual boost::any Param(const std::string &_key) const;
 
       /// \brief Get a parameter from the physics engine with a boolean to
       /// indicate success or failure
       /// \param[in] _key Key of the accessed param
       /// \param[out] _value Value of the accessed param
       /// \return True if the parameter was successfully retrieved
+      /// \deprecated See bool Param(const std::string &_key,
+      /// boost::any &_value) const
       public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a parameter from the physics engine with a boolean to
+      /// indicate success or failure
+      /// \param[in] _key Key of the accessed param
+      /// \param[out] _value Value of the accessed param
+      /// \return True if the parameter was successfully retrieved
+      public: virtual bool Param(const std::string &_key,
                   boost::any &_value) const;
 
       /// \brief Debug print out of the physic engine state.
@@ -239,16 +288,39 @@ namespace gazebo
 
       /// \brief Get a pointer to the contact manger.
       /// \return Pointer to the contact manager.
-      public: ContactManager *GetContactManager() const;
+      /// \deprecated See ContactMgr() const
+      public: ContactManager *GetContactManager() const GAZEBO_DEPRECATED(8.0);
 
-      /// \brief returns a pointer to the PhysicsEngine#physicsUpdateMutex.
-      /// \return Pointer to the physics mutex.
+      /// \brief Get a pointer to the contact manger.
+      /// \return Pointer to the contact manager.
+      public: ContactManager *ContactMgr() const;
+
+      /// \brief DO NOT USE. This function is here
+      /// for backward compatibility when compiling. Use
+      /// std::recursive_mutex &PhysicsUpdateMutex() const.
+      /// \return NULL
+      /// \deprecated See std::recursive_mutex &PhysicsUpdateMutex() const
       public: boost::recursive_mutex *GetPhysicsUpdateMutex() const
-              {return this->physicsUpdateMutex;}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Returns a reference to the PhysicsEngine#physicsUpdateMutex.
+      /// \return Reference to the physics mutex.
+      public: std::recursive_mutex &PhysicsUpdateMutex() const;
 
       /// \brief Get a pointer to the SDF element for this physics engine.
       /// \return Pointer to the physics SDF element.
-      public: sdf::ElementPtr GetSDF() const;
+      /// \deprecated See sdf::ElementPtr SDF() const;
+      public: sdf::ElementPtr GetSDF() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a pointer to the SDF element for this physics engine.
+      /// \return Pointer to the physics SDF element.
+      public: sdf::ElementPtr SDF() const;
+
+      /// \internal
+      /// \brief Constructor used by inherited classes.
+      /// \param[in] _dataPtr Protected data class
+      /// \param[in] _parent Pointer to the world.
+      protected: PhysicsEngine(PhysicsEnginePrivate &_dataPtr, WorldPtr _world);
 
       /// \brief virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.
@@ -258,39 +330,12 @@ namespace gazebo
       /// \param[in] _msg Physics message.
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
-      /// \brief Pointer to the world.
-      protected: WorldPtr world;
+      /// \brief Shared construction code.
+      private: void ConstructionHelper();
 
-      /// \brief Our SDF values.
-      protected: sdf::ElementPtr sdf;
-
-      /// \brief Node for communication.
-      protected: transport::NodePtr node;
-
-      /// \brief Response publisher.
-      protected: transport::PublisherPtr responsePub;
-
-      /// \brief Subscribe to the physics topic.
-      protected: transport::SubscriberPtr physicsSub;
-
-      /// \brief Subscribe to the request topic.
-      protected: transport::SubscriberPtr requestSub;
-
-      /// \brief Mutex to protect the update cycle.
-      protected: boost::recursive_mutex *physicsUpdateMutex;
-
-      /// \brief Class that handles all contacts generated by the physics
-      /// engine.
-      protected: ContactManager *contactManager;
-
-      /// \brief Real time update rate.
-      protected: double realTimeUpdateRate;
-
-      /// \brief Target real time factor.
-      protected: double targetRealTimeFactor;
-
-      /// \brief Real time update rate.
-      protected: double maxStepSize;
+      /// \internal
+      /// \brief Private data pointer
+      protected: PhysicsEnginePrivate *physicsEngineDPtr;
     };
     /// \}
   }

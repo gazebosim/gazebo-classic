@@ -93,12 +93,8 @@ namespace gazebo
       /// \brief Set the velocity of an axis(index).
       /// \param[in] _index Axis index.
       /// \param[in] _vel Velocity to apply to the joint axis.
-      public: virtual void Velocity(const unsigned int _index,
-                  const double _vel);
-
-      // Documentation inherited
       public: virtual void SetVelocity(const unsigned int _index,
-                  const double _angle);
+                  const double _vel);
 
       /// \brief Get the axis of rotation
       /// \param[in] _index Axis index.

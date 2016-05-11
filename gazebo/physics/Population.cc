@@ -40,24 +40,27 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Population::Population(sdf::ElementPtr _sdf, std::shared_ptr<World> _world)
-  : dataPtr(new PopulationPrivate)
+  : populationDPtr(new PopulationPrivate)
 {
-  this->dataPtr->world = _world;
+  this->populationDPtr->world = _world;
   if (_sdf->HasElement("population"))
-    this->dataPtr->populationElem = _sdf->GetElement("population");
+    this->populationDPtr->populationElem = _sdf->GetElement("population");
 }
 
 //////////////////////////////////////////////////
 Population::~Population()
 {
+  delete this->populationDPtr;
+  this->populationDPtr;
 }
 
 //////////////////////////////////////////////////
 bool Population::PopulateAll()
 {
-  GZ_ASSERT(this->dataPtr->populationElem, "<population> SDF element is NULL");
+  GZ_ASSERT(this->populationDPtr->populationElem,
+      "<population> SDF element is NULL");
 
-  sdf::ElementPtr popElem = this->dataPtr->populationElem;
+  sdf::ElementPtr popElem = this->populationDPtr->populationElem;
   bool result = true;
 
   // Iterate through all the population elements in the sdf.
@@ -133,7 +136,7 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
       boost::lexical_cast<std::string>(p.z) + " 0 0 0</pose>";
     cloneSdf.insert(last + endDelim.size(), pose);
 
-    this->dataPtr->world->InsertModelString(cloneSdf);
+    this->populationDPtr->world->InsertModelString(cloneSdf);
   }
 
   return true;

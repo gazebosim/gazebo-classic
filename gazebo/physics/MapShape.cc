@@ -43,7 +43,7 @@ unsigned int MapShapePrivate::collisionCounter = 0;
 //////////////////////////////////////////////////
 MapShape::MapShape(CollisionPtr _parent)
 : Shape(*new MapShapePrivate, _parent),
-  mapShapeDPtr(static_cast<MapShapePrivate*>(this->shapeDPtr)
+  mapShapeDPtr(static_cast<MapShapePrivate*>(this->shapeDPtr))
 {
   this->AddType(Base::MAP_SHAPE);
 
@@ -73,9 +73,9 @@ void MapShape::Load(sdf::ElementPtr _sdf)
   // Make sure they are ok
   if (_sdf->Get<double>("scale") <= 0)
     _sdf->GetElement("scale")->Set(0.1);
-  if (this->sdf->Get<int>("threshold") <= 0)
+  if (this->mapShapeDPtr->sdf->Get<int>("threshold") <= 0)
     _sdf->GetElement("threshold")->Set(200);
-  if (this->sdf->Get<double>("height") <= 0)
+  if (this->mapShapeDPtr->sdf->Get<double>("height") <= 0)
     _sdf->GetElement("height")->Set(1.0);
 
   // Load the image
@@ -111,13 +111,12 @@ void MapShape::Init()
 void MapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
-  _msg.mutable_image()->set_uri(this->GetURI());
+  _msg.mutable_image()->set_uri(this->URI());
   _msg.mutable_image()->set_scale(this->Scale().X());
-  _msg.mutable_image()->set_threshold(this->GetThreshold());
-  _msg.mutable_image()->set_height(this->GetHeight());
-  _msg.mutable_image()->set_granularity(this->GetGranularity());
+  _msg.mutable_image()->set_threshold(this->Threshold());
+  _msg.mutable_image()->set_height(this->Height());
+  _msg.mutable_image()->set_granularity(this->Granularity());
 }
-
 
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
@@ -128,7 +127,7 @@ std::string MapShape::GetURI() const
 //////////////////////////////////////////////////
 std::string MapShape::URI() const
 {
-  return this->sdf->Get<std::string>("uri");
+  return this->mapShapeDPtr->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
@@ -140,12 +139,12 @@ void MapShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 void MapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (this->scale == _scale)
+  if (this->mapShapeDPtr->scale == _scale)
     return;
 
-  this->scale = _scale;
+  this->mapShapeDPtr->scale = _scale;
 
-  this->sdf->GetElement("scale")->Set(_scale);
+  this->mapShapeDPtr->sdf->GetElement("scale")->Set(_scale);
 
   /// TODO MapShape::SetScale not yet implemented.
 }
@@ -159,7 +158,7 @@ math::Vector3 MapShape::GetScale() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d MapShape::Scale() const
 {
-  double mapScale = this->sdf->Get<double>("scale");
+  double mapScale = this->mapShapeDPtr->sdf->Get<double>("scale");
   return ignition::math::Vector3d(mapScale, mapScale, mapScale);
 }
 
@@ -172,7 +171,7 @@ int MapShape::GetThreshold() const
 //////////////////////////////////////////////////
 int MapShape::Threshold() const
 {
-  return this->sdf->Get<int>("threshold");
+  return this->mapShapeDPtr->sdf->Get<int>("threshold");
 }
 
 //////////////////////////////////////////////////
@@ -184,7 +183,7 @@ double MapShape::GetHeight() const
 //////////////////////////////////////////////////
 double MapShape::Height() const
 {
-  return this->sdf->Get<double>("height");
+  return this->mapShapeDPtr->sdf->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
@@ -196,7 +195,7 @@ int MapShape::GetGranularity() const
 //////////////////////////////////////////////////
 int MapShape::Granularity() const
 {
-  return this->sdf->Get<int>("granularity");
+  return this->mapShapeDPtr->sdf->Get<int>("granularity");
 }
 
 //////////////////////////////////////////////////
@@ -211,17 +210,17 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     std::ostringstream stream;
 
     // Create the box geometry
-    CollisionPtr collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision("box", this->collisionParent->GetLink());
+    CollisionPtr collision = this->GetWorld()->Physics()->CreateCollision("box", this->collisionParent->GetLink());
     collision->SetSaveable(false);
 
     stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";
 
-    float x = (node->x + node->width / 2.0) * this->sdf->Get<double>("scale");
-    float y = (node->y + node->height / 2.0) * this->sdf->Get<double>("scale");
-    float z = this->sdf->Get<double>("height") / 2.0;
-    float xSize = (node->width) * this->sdf->Get<double>("scale");
-    float ySize = (node->height) * this->sdf->Get<double>("scale");
-    float zSize = this->sdf->Get<double>("height");
+    float x = (node->x + node->width / 2.0) * this->mapShapeDPtr->sdf->Get<double>("scale");
+    float y = (node->y + node->height / 2.0) * this->mapShapeDPtr->sdf->Get<double>("scale");
+    float z = this->mapShapeDPtr->sdf->Get<double>("height") / 2.0;
+    float xSize = (node->width) * this->mapShapeDPtr->sdf->Get<double>("scale");
+    float ySize = (node->height) * this->mapShapeDPtr->sdf->Get<double>("scale");
+    float zSize = this->mapShapeDPtr->sdf->Get<double>("height");
 
     char collisionName[256];
     sprintf(collisionName, "map_collision_%d", collisionCounter++);
@@ -375,7 +374,7 @@ void MapShape::BuildTree(QuadNode *_node)
   // int diff = labs(freePixels - occPixels);
 
   if (static_cast<int>(_node->width*_node->height) >
-      this->sdf->Get<int>("granularity"))
+      this->mapShapeDPtr->sdf->Get<int>("granularity"))
   {
     float newX, newY;
     float newW, newH;
@@ -460,10 +459,10 @@ void MapShape::PixelCount(const unsigned int xStart,
 
       v = (unsigned char)(255 *
           ((pixColor.r + pixColor.g + pixColor.b) / 3.0));
-      // if (this->sdf->Get<bool>("negative"))
+      // if (this->mapShapeDPtr->sdf->Get<bool>("negative"))
         // v = 255 - v;
 
-      if (v > this->sdf->Get<int>("threshold"))
+      if (v > this->mapShapeDPtr->sdf->Get<int>("threshold"))
         freePixels++;
       else
         occPixels++;

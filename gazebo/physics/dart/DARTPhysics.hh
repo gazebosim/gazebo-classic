@@ -105,7 +105,7 @@ namespace gazebo
       public: virtual std::string GetType() const;
 
       // Documentation inherited
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(const uint32_t _seed);
 
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);

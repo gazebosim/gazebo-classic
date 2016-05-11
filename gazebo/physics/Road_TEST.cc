@@ -48,18 +48,18 @@ TEST_F(RoadTest, Texture)
   ASSERT_TRUE(scriptElem != NULL);
   road->Load(roadSDF);
 
-  EXPECT_STREQ(road->GetName().c_str(), "my_road");
-  EXPECT_STREQ(road->GetSDF()->GetElement("material")->
+  EXPECT_STREQ(road->Name().c_str(), "my_road");
+  EXPECT_STREQ(road->SDF()->GetElement("material")->
       GetElement("script")->Get<std::string>("name").c_str(), "primary");
 
   scriptElem->GetElement("name")->Set("lanes_2");
   road->Load(roadSDF);
-  EXPECT_STREQ(road->GetSDF()->GetElement("material")->
+  EXPECT_STREQ(road->SDF()->GetElement("material")->
       GetElement("script")->Get<std::string>("name").c_str(), "lanes_2");
 
   scriptElem->GetElement("name")->Set("motorway");
   road->Load(roadSDF);
-  EXPECT_STREQ(road->GetSDF()->GetElement("material")->
+  EXPECT_STREQ(road->SDF()->GetElement("material")->
       GetElement("script")->Get<std::string>("name").c_str(), "motorway");
 }
 

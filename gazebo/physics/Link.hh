@@ -112,7 +112,7 @@ namespace gazebo
 
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
-      public: virtual bool GravityMode() const;
+      public: virtual bool GravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
@@ -524,12 +524,12 @@ namespace gazebo
 
       /// \brief Get the model that this body belongs to.
       /// \return Model that this body belongs to.
-      /// \deprecated See Model()
+      /// \deprecated See ParentModel()
       public: ModelPtr GetModel() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the model that this body belongs to.
       /// \return Model that this body belongs to.
-      public: ModelPtr Model() const;
+      public: Model *ParentModel() const;
 
       /// \brief Get the inertia of the link.
       /// \return Inertia of the link.
@@ -538,7 +538,11 @@ namespace gazebo
 
       /// \brief Get the inertia of the link.
       /// \return Inertia of the link.
-      public: InertialPtr Inertial() const;
+      public: const Inertial &Inertia() const;
+
+      /// \brief Get the inertia of the link.
+      /// \return Inertia of the link.
+      public: Inertial &Inertia();
 
       /// \brief Set the mass of the link.
       /// \parma[in] _inertial Inertial value for the link.
@@ -593,26 +597,26 @@ namespace gazebo
       /// \brief Get a child collision by name
       /// \param[in] _name Name of the collision object.
       /// \return Pointer to the collision, NULL if the name was not found.
-      /// \deprecated See Collision(const std::string &_name)
+      /// \deprecated See CollisionByName(const std::string &_name)
       public: CollisionPtr GetCollision(const std::string &_name)
               GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a child collision by name
       /// \param[in] _name Name of the collision object.
       /// \return Pointer to the collision, NULL if the name was not found.
-      public: CollisionPtr Collision(const std::string &_name) const;
+      public: CollisionPtr CollisionByName(const std::string &_name) const;
 
       /// \brief Get a child collision by index
       /// \param[in] _index Index of the collision object.
       /// \return Pointer to the collision, NULL if the name was not found.
-      /// \deprecated See Collision(const unsigned int) const;
+      /// \deprecated See CollisionByIndex(const unsigned int) const;
       public: CollisionPtr GetCollision(unsigned int _index) const
               GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a child collision by index
       /// \param[in] _index Index of the collision object.
       /// \return Pointer to the collision, NULL if the name was not found.
-      public: CollisionPtr Collision(const unsigned int _index) const;
+      public: CollisionPtr CollisionByIndex(const unsigned int _index) const;
 
       /// \brief Get all the child collisions.
       /// \return A std::vector of all the child collisions.
@@ -966,6 +970,9 @@ namespace gazebo
       /// \param[in] _dataPtr Protected data class
       /// \param[in] _parent Pointer to parent entity.
       protected: Link(LinkPrivate &_dataPtr, EntityPtr _parent);
+
+      /// \brief Shared construction code.
+      private: void ConstructionHelper();
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();

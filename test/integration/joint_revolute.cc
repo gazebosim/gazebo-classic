@@ -61,18 +61,18 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   {
     SpawnJointOptions opt;
     opt.type = "revolute";
     opt.worldParent = true;
     double Am = M_PI / 4;
-    opt.modelPose.rot.SetFromEuler(0, 0, Am);
-    opt.childLinkPose.pos.z = 3.0;
-    opt.jointPose.pos.y = 1.5;
+    opt.modelPose.Rot().Euler(0, 0, Am);
+    opt.childLinkPose.Pos().Z() = 3.0;
+    opt.jointPose.Pos().Y() = 1.5;
     opt.axis.Set(1, 0, 0);
 
     gzdbg << "SpawnJoint " << opt.type << " child world" << std::endl;
@@ -80,20 +80,20 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     // Get initial energy
-    physics::LinkPtr link = joint->GetChild();
+    physics::LinkPtr link = joint->Child();
     ASSERT_TRUE(link != NULL);
-    physics::ModelPtr model = link->GetModel();
+    physics::ModelPtr model(link->ParentModel());
     ASSERT_TRUE(model != NULL);
 
-    double energy0 = model->GetWorldEnergy();
-    EXPECT_NEAR(model->GetWorldEnergyKinetic(), 0.0, g_tolerance);
+    double energy0 = model->WorldEnergy();
+    EXPECT_NEAR(model->WorldEnergyKinetic(), 0.0, g_tolerance);
 
     unsigned int stepSize = 5;
     unsigned int stepCount = 500;
     for (unsigned int i = 0; i < stepCount; ++i)
     {
       world->Step(stepSize);
-      double energy = model->GetWorldEnergy();
+      double energy = model->WorldEnergy();
       EXPECT_NEAR(energy / energy0, 1.0, g_tolerance);
     }
   }
@@ -108,12 +108,12 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   {
     std::string jointType = "revolute";
@@ -126,7 +126,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     double vel = 2*M_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
-    double dt = physics->GetMaxStepSize();
+    double dt = physics->MaxStepSize();
 
     // Verify that the joint should make more than 1 revolution
     EXPECT_GT(vel * stepSize * stepCount * dt, 1.25 * 2 * M_PI);
@@ -139,9 +139,9 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     for (unsigned int i = 0; i < stepCount; ++i)
     {
       world->Step(stepSize);
-      EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
-      double time = world->GetSimTime().Double();
-      angleErrorMax.InsertData(joint->GetAngle(0).Radian() - time*vel);
+      EXPECT_NEAR(joint->Velocity(0), vel, g_tolerance);
+      double time = world->SimTime().Double();
+      angleErrorMax.InsertData(joint->Angle(0).Radian() - time*vel);
     }
 #ifndef LIBBULLET_VERSION_GT_282
     if (_physicsEngine == "bullet")
@@ -169,9 +169,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Set solver type
   physics->SetParam("solver_type", _solverType);
@@ -189,15 +189,15 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
   // Global axis
   double sqrt1_2 = sqrt(2.0) / 2.0;
-  std::vector<math::Vector3> globalAxes;
-  globalAxes.push_back(math::Vector3(1, 0, 0));
-  globalAxes.push_back(math::Vector3(sqrt1_2, sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(0, 1, 0));
-  globalAxes.push_back(math::Vector3(-sqrt1_2, sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(-1, 0, 0));
-  globalAxes.push_back(math::Vector3(-sqrt1_2, -sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(0, -1, 0));
-  globalAxes.push_back(math::Vector3(sqrt1_2, -sqrt1_2, 0));
+  std::vector<ignition::math::Vector3d> globalAxes;
+  globalAxes.push_back(ignition::math::Vector3d(1, 0, 0));
+  globalAxes.push_back(ignition::math::Vector3d(sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3d(0, 1, 0));
+  globalAxes.push_back(ignition::math::Vector3d(-sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3d(-1, 0, 0));
+  globalAxes.push_back(ignition::math::Vector3d(-sqrt1_2, -sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3d(0, -1, 0));
+  globalAxes.push_back(ignition::math::Vector3d(sqrt1_2, -sqrt1_2, 0));
 
   // Link names
   std::vector<std::string> linkNames;
@@ -216,27 +216,27 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
   double energy0 = 1.0;
   // Check global axes before simulation starts
-  std::vector<math::Vector3>::iterator axisIter;
+  std::vector<ignition::math::Vector3d>::iterator axisIter;
   axisIter = globalAxes.begin();
-  for (modelIter  = modelNames.begin();
+  for (modelIter = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
-      energy0 = model->GetWorldEnergy();
+      energy0 = model->WorldEnergy();
       gzdbg << "Check global axes of model " << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
            jointIter != jointNames.end(); ++jointIter)
       {
-        joint = model->GetJoint(*jointIter);
+        joint = model->JointByName(*jointIter);
         if (joint)
         {
-          math::Vector3 axis = joint->GetGlobalAxis(0);
-          EXPECT_NEAR(axis.x, (*axisIter).x, g_tolerance);
-          EXPECT_NEAR(axis.y, (*axisIter).y, g_tolerance);
-          EXPECT_NEAR(axis.z, (*axisIter).z, g_tolerance);
+          ignition::math::Vector3d axis = joint->GlobalAxis(0);
+          EXPECT_NEAR(axis.X(), (*axisIter).X(), g_tolerance);
+          EXPECT_NEAR(axis.Y(), (*axisIter).Y(), g_tolerance);
+          EXPECT_NEAR(axis.Z(), (*axisIter).Z(), g_tolerance);
         }
         else
         {
@@ -255,29 +255,29 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   }
 
   // Step forward 0.75 seconds
-  double dt = physics->GetMaxStepSize();
+  double dt = physics->MaxStepSize();
   ASSERT_GT(dt, 0);
   int steps = ceil(0.75 / dt);
   world->Step(steps);
 
   // Get global angular velocity of each link
-  math::Vector3 angVel;
+  ignition::math::Vector3d angVel;
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
-      EXPECT_NEAR(model->GetWorldEnergy() / energy0, 1.0, g_tolerance);
+      EXPECT_NEAR(model->WorldEnergy() / energy0, 1.0, g_tolerance);
       gzdbg << "Check angular velocity of model " << *modelIter << '\n';
-      link = model->GetLink("base");
+      link = model->LinkByName("base");
       if (link)
       {
         // Expect stationary base
-        angVel = link->GetWorldAngularVel();
-        EXPECT_NEAR(angVel.x, 0, g_tolerance*10);
-        EXPECT_NEAR(angVel.y, 0, g_tolerance*10);
-        EXPECT_NEAR(angVel.z, 0, g_tolerance*10);
+        angVel = link->WorldAngularVel();
+        EXPECT_NEAR(angVel.X(), 0, g_tolerance*10);
+        EXPECT_NEAR(angVel.Y(), 0, g_tolerance*10);
+        EXPECT_NEAR(angVel.Z(), 0, g_tolerance*10);
       }
       else
       {
@@ -289,15 +289,15 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
       for (linkIter  = linkNames.begin();
            linkIter != linkNames.end(); ++linkIter)
       {
-        link = model->GetLink(*linkIter);
+        link = model->LinkByName(*linkIter);
         if (link)
         {
           // Expect relative angular velocity of pendulum links to be negative
           // and along x axis.
-          angVel = link->GetRelativeAngularVel().Normalize();
-          EXPECT_NEAR(angVel.x, -1, g_tolerance);
-          EXPECT_NEAR(angVel.y,  0, 2*g_tolerance);
-          EXPECT_NEAR(angVel.z,  0, 2*g_tolerance);
+          angVel = link->RelativeAngularVel().Normalize();
+          EXPECT_NEAR(angVel.X(), -1, g_tolerance);
+          EXPECT_NEAR(angVel.Y(),  0, 2*g_tolerance);
+          EXPECT_NEAR(angVel.Z(),  0, 2*g_tolerance);
         }
         else
         {
@@ -319,10 +319,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
-      EXPECT_NEAR(model->GetWorldEnergy() / energy0, 1.0, g_tolerance);
+      EXPECT_NEAR(model->WorldEnergy() / energy0, 1.0, g_tolerance);
       double jointVel1, jointVel2;
       double angle1, angle2, angle3;
 
@@ -331,30 +331,30 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
       for (jointIter  = jointNames.begin();
            jointIter != jointNames.end(); ++jointIter)
       {
-        joint = model->GetJoint(*jointIter);
+        joint = model->JointByName(*jointIter);
         if (joint)
         {
           // Get first joint angle
-          angle1 = joint->GetAngle(0).Radian();
+          angle1 = joint->Angle(0).Radian();
 
           // Get joint velocity and assume it is not too small
-          jointVel1 = joint->GetVelocity(0);
+          jointVel1 = joint->Velocity(0);
           EXPECT_GT(fabs(jointVel1), 1e-1);
 
           // Take 1 step and measure again
           world->Step(1);
 
           // Expect angle change in direction of joint velocity
-          angle2 = joint->GetAngle(0).Radian();
+          angle2 = joint->Angle(0).Radian();
           EXPECT_GT((angle2 - angle1) * math::clamp(jointVel1*1e4, -1.0, 1.0)
                     , 0);
 
-          jointVel2 = joint->GetVelocity(0);
+          jointVel2 = joint->Velocity(0);
           EXPECT_GT(fabs(jointVel2), 1e-1);
 
           // Take 1 step and measure the last angle, expect decrease
           world->Step(1);
-          angle3 = joint->GetAngle(0).Radian();
+          angle3 = joint->Angle(0).Radian();
           EXPECT_GT((angle3 - angle2) * math::clamp(jointVel2*1e4, -1.0, 1.0)
                     , 0);
         }
@@ -380,18 +380,18 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
            jointIter != jointNames.end(); ++jointIter)
       {
-        joint = model->GetJoint(*jointIter);
+        joint = model->JointByName(*jointIter);
         if (joint)
         {
-          joint->SetLowStop(0, math::Angle(-0.1));
-          joint->SetHighStop(0, math::Angle(0.1));
+          joint->SetLowStop(0, ignition::math::Angle(-0.1));
+          joint->SetHighStop(0, ignition::math::Angle(0.1));
         }
         else
         {
@@ -414,7 +414,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       gzdbg << "Check angle limits and velocity of joints of model "
@@ -423,10 +423,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
       for (jointIter  = jointNames.begin();
            jointIter != jointNames.end(); ++jointIter)
       {
-        joint = model->GetJoint(*jointIter);
+        joint = model->JointByName(*jointIter);
         if (joint)
         {
-          EXPECT_NEAR(joint->GetAngle(0).Radian(), 0, 0.11);
+          EXPECT_NEAR(joint->Angle(0).Radian(), 0, 0.11);
         }
         else
         {
@@ -446,16 +446,16 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   // Reset world again, disable gravity, detach upper_joint
   // Then apply torque at lower_joint and verify motion
   world->Reset();
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       gzdbg << "Check SetForce for model " << *modelIter << '\n';
 
-      joint = model->GetJoint("upper_joint");
+      joint = model->JointByName("upper_joint");
       if (joint)
       {
         if (_physicsEngine == "simbody" ||
@@ -468,7 +468,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         joint->Detach();
         // Simbody and DART will not easily detach joints,
         // consider freezing joint limit instead
-        // math::Angle curAngle = joint->GetAngle(0u);
+        // ignition::math::Angle curAngle = joint->Angle(0u);
         // joint->SetLowStop(0, curAngle);
         // joint->SetHighStop(0, curAngle);
       }
@@ -482,11 +482,11 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
       // Step forward and let things settle a bit.
       world->Step(100);
 
-      joint = model->GetJoint("lower_joint");
+      joint = model->JointByName("lower_joint");
       if (joint)
       {
         double oldVel, newVel, force;
-        oldVel = joint->GetVelocity(0);
+        oldVel = joint->Velocity(0);
         // Apply positive torque to the lower_joint and step forward.
         force = 1;
 
@@ -498,30 +498,30 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           world->Step(1);
           joint->SetForce(0, force);
           world->Step(1);
-          newVel = joint->GetVelocity(0);
+          newVel = joint->Velocity(0);
 
           // gzdbg << "model " << *modelIter
           //       << "  i " << i
           //       << "  oldVel " << oldVel
           //       << "  newVel " << newVel
           //       << "  upper joint v "
-          //       << model->GetJoint("upper_joint")->GetVelocity(0)
-          //       << " joint " << joint->GetName() <<  "\n";
+          //       << model->JointByName("upper_joint")->Velocity(0)
+          //       << " joint " << joint->Name() <<  "\n";
 
           // Expect increasing velocities
           EXPECT_GT(newVel, oldVel);
           oldVel = newVel;
 
-          // Check that GetForce returns what we set
-          EXPECT_NEAR(joint->GetForce(0u), force, g_tolerance);
+          // Check that Force returns what we set
+          EXPECT_NEAR(joint->Force(0u), force, g_tolerance);
 
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
-          double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
-          angVel  = joint->GetChild()->GetWorldAngularVel();
-          angVel -= joint->GetParent()->GetWorldAngularVel();
+          double jointVel = joint->Velocity(0);
+          ignition::math::Vector3d axis = joint->GlobalAxis(0);
+          angVel  = joint->Child()->WorldAngularVel();
+          angVel -= joint->Parent()->WorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), g_tolerance);
         }
         // Apply negative torque to lower_joint
@@ -534,29 +534,29 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           world->Step(1);
           joint->SetForce(0, force);
           world->Step(1);
-          newVel = joint->GetVelocity(0);
+          newVel = joint->Velocity(0);
 
           // gzdbg << "model " << *modelIter
           //       << "  i " << i
           //       << "  oldVel " << oldVel
           //       << "  newVel " << newVel
           //       << "  upper joint v "
-          //       << model->GetJoint("upper_joint")->GetVelocity(0)
-          //       << " joint " << joint->GetName() <<  "\n";
+          //       << model->JointByName("upper_joint")->Velocity(0)
+          //       << " joint " << joint->Name() <<  "\n";
 
           // Expect decreasing velocities
           EXPECT_LT(newVel, oldVel);
 
-          // Check that GetForce returns what we set
-          EXPECT_NEAR(joint->GetForce(0u), force, g_tolerance);
+          // Check that Force returns what we set
+          EXPECT_NEAR(joint->Force(0u), force, g_tolerance);
 
           // Expect joint velocity to be near angular velocity difference
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
-          double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
-          angVel  = joint->GetChild()->GetWorldAngularVel();
-          angVel -= joint->GetParent()->GetWorldAngularVel();
+          double jointVel = joint->Velocity(0);
+          ignition::math::Vector3d axis = joint->GlobalAxis(0);
+          angVel  = joint->Child()->WorldAngularVel();
+          angVel -= joint->Parent()->WorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), g_tolerance);
         }
       }
@@ -582,9 +582,9 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   int i = 0;
   while (!this->HasEntity("model_1") && i < 20)
@@ -596,11 +596,13 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
   if (i > 20)
     gzthrow("Unable to get model_1");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
   EXPECT_TRUE(physicsEngine != NULL);
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   EXPECT_TRUE(model != NULL);
-  physics::LinkPtr link = model->GetLink("link_2");  // sphere link at end
+
+  // sphere link at end
+  physics::LinkPtr link = model->LinkByName("link_2");
   EXPECT_TRUE(link != NULL);
 
   double g = 9.81;
@@ -611,15 +613,15 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
 
   {
     // check velocity / energy
-    math::Vector3 vel = link->GetWorldLinearVel();
-    math::Pose pos = link->GetWorldPose();
-    double pe = g * m * pos.pos.z;
-    double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+    ignition::math::Vector3d vel = link->WorldLinearVel();
+    ignition::math::Pose3d pos = link->WorldPose();
+    double pe = g * m * pos.Pos().Z();
+    double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() + vel.Z()*vel.Z());
     e_start = pe + ke;
     // gzdbg << "total energy [" << e_start
     //       << "] pe[" << pe
     //       << "] ke[" << ke
-    //       << "] p[" << pos.pos.z
+    //       << "] p[" << pos.Pos().z
     //       << "] v[" << vel
     //       << "]\n";
   }
@@ -636,17 +638,18 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->GetWorldPose();
-        double pe = g * m * pos.pos.z;
-        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        ignition::math::Vector3d vel = link->WorldLinearVel();
+        ignition::math::Pose3d pos = link->WorldPose();
+        double pe = g * m * pos.Pos().Z();
+        double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() +
+            vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
         // gzdbg << "total energy [" << e
         //       << "] pe[" << pe
         //       << "] ke[" << ke
-        //       << "] p[" << pos.pos.z
+        //       << "] p[" << pos.Pos().z
         //       << "] v[" << vel
         //       << "] error[" << e - e_start
         //       << "] tol[" << e_tol
@@ -655,17 +658,17 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         EXPECT_LT(fabs(e - e_start), e_tol);
       }
 
-      physics::JointPtr joint = model->GetJoint("joint_0");
+      physics::JointPtr joint = model->JointByName("joint_0");
       if (joint)
       {
         double integ_theta = (
-          PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
+          PendulumAngle(g, l, 1.57079633, 0.0, world->SimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).Radian();
-        // gzdbg << "time [" << world->GetSimTime().Double()
+        double actual_theta = joint->Angle(0).Radian();
+        // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
-        //       << "] pose [" << model->GetWorldPose()
+        //       << "] pose [" << model->WorldPose()
         //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
@@ -681,23 +684,25 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     if (_physicsEngine == "ode")
       EXPECT_TRUE(physicsEngine->SetParam("contact_max_correcting_vel", 100.0));
 
-    int steps = 10;  // @todo: make this more general
+    // @todo: make this more general
+    int steps = 10;
     for (int i = 0; i < steps; i ++)
     {
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->GetWorldPose();
-        double pe = g * m * pos.pos.z;
-        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        ignition::math::Vector3d vel = link->WorldLinearVel();
+        ignition::math::Pose3d pos = link->WorldPose();
+        double pe = g * m * pos.Pos().Z();
+        double ke = 0.5 * m *
+          (vel.X()*vel.X() + vel.Y()*vel.Y() + vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
         // gzdbg << "total energy [" << e
         //       << "] pe[" << pe
         //       << "] ke[" << ke
-        //       << "] p[" << pos.pos.z
+        //       << "] p[" << pos.Pos().z
         //       << "] v[" << vel
         //       << "] error[" << e - e_start
         //       << "] tol[" << e_tol
@@ -706,17 +711,17 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         EXPECT_LT(fabs(e - e_start), e_tol);
       }
 
-      physics::JointPtr joint = model->GetJoint("joint_0");
+      physics::JointPtr joint = model->JointByName("joint_0");
       if (joint)
       {
         double integ_theta = (
-          PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
+          PendulumAngle(g, l, 1.57079633, 0.0, world->SimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).Radian();
-        // gzdbg << "time [" << world->GetSimTime().Double()
+        double actual_theta = joint->Angle(0).Radian();
+        // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
-        //       << "] pose [" << model->GetWorldPose()
+        //       << "] pose [" << model->WorldPose()
         //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }

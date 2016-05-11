@@ -36,8 +36,8 @@ void MultirayShapeTest::Standalone(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   gazebo::physics::MultiRayShapePtr rays =
-    boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
-        world->GetPhysicsEngine()->CreateShape("multiray",
+    std::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
+        world->Physics()->CreateShape("multiray",
           gazebo::physics::CollisionPtr()));
   ASSERT_TRUE(rays != NULL);
 
@@ -60,19 +60,19 @@ void MultirayShapeTest::Standalone(const std::string &_physicsEngine)
   double dist;
   std::string entity;
 
-  rays->Ray(0)->GetIntersection(dist, entity);
+  rays->Ray(0)->Intersection(dist, entity);
   EXPECT_NEAR(dist, 0.5, 1e-4);
   EXPECT_EQ(entity, "box::link::collision");
 
-  rays->Ray(1)->GetIntersection(dist, entity);
+  rays->Ray(1)->Intersection(dist, entity);
   EXPECT_NEAR(dist, 0.5, 1e-4);
   EXPECT_EQ(entity, "sphere::link::collision");
 
-  rays->Ray(2)->GetIntersection(dist, entity);
+  rays->Ray(2)->Intersection(dist, entity);
   EXPECT_NEAR(dist, 0.5, 1e-4);
   EXPECT_EQ(entity, "cylinder::link::collision");
 
-  rays->Ray(3)->GetIntersection(dist, entity);
+  rays->Ray(3)->Intersection(dist, entity);
   EXPECT_NEAR(dist, 1000, 1e-4);
   EXPECT_TRUE(entity.empty());
 }

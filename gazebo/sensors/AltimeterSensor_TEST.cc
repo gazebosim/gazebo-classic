@@ -111,9 +111,9 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Spawn an altimeter
   std::string modelName = "altModel";
@@ -138,7 +138,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
 
   // The altimeter should have a velocity of v = g * dt
   EXPECT_FLOAT_EQ(altSensor->VerticalVelocity(),
-      physics->GetGravity().z * (physics->GetMaxStepSize()*steps));
+      physics->Gravity().Z() * (physics->MaxStepSize()*steps));
 }
 
 /////////////////////////////////////////////////
@@ -151,14 +151,14 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
-  physics::JointPtr joint = model->GetJoint("joint");
+  physics::JointPtr joint = model->JointByName("joint");
   ASSERT_TRUE(joint != NULL);
 
   sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
@@ -175,8 +175,8 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
   altSensor->Update(true);
 
   // Get the link's angular velocity
-  ignition::math::Vector3d avel =
-    model->GetLink("link")->GetRelativeAngularVel().Ign();
+  ignition::math::Vector3d avel = model->LinkByName(
+      "link")->RelativeAngularVel();
 
   // Expect the altimeter's velocity to equal the angular velocity at the
   // end of the rod.
@@ -193,14 +193,14 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
-  physics::JointPtr joint = model->GetJoint("joint");
+  physics::JointPtr joint = model->JointByName("joint");
   ASSERT_TRUE(joint != NULL);
 
   sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
@@ -218,13 +218,13 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
 
   // Angular velocity of the rod
   ignition::math::Vector3d avel =
-    model->GetLink("link")->GetRelativeAngularVel().Ign();
+    model->LinkByName("link")->RelativeAngularVel();
 
   // Linear velocity of the rod at the location that is attached to
   // the prismatic joint.
   ignition::math::Vector3d lvel =
-    model->GetLink("link")->GetWorldLinearVel(
-        ignition::math::Vector3d(0, -5, 0)).Ign();
+    model->LinkByName("link")->WorldLinearVel(
+        ignition::math::Vector3d(0, -5, 0));
 
   // Expect the altimeter's velocity to equal the angular velocity at the
   // end of the rod + the rod's linear velocity.
@@ -242,9 +242,9 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Spawn an altimeter sensor at a height of 10m
   std::string modelName = "altModel";

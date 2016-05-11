@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_JOINTCONTROLLER_HH_
-#define _GAZEBO_JOINTCONTROLLER_HH_
+#ifndef _GAZEBO_PHYSICS_JOINTCONTROLLER_HH_
+#define _GAZEBO_PHYSICS_JOINTCONTROLLER_HH_
 
 #include <map>
 #include <string>

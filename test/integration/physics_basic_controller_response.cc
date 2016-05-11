@@ -74,13 +74,13 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   if (i > 20)
     gzthrow("Unable to get model [" << modelName << "].");
 
-  physics::ModelPtr model = world->GetModel(modelName);
+  physics::ModelPtr model = world->ModelByName(modelName);
   EXPECT_TRUE(model != NULL);
 
   // get joints
-  physics::JointPtr joint1 = model->GetJoint("wheel1_joint");
-  physics::JointPtr joint2 = model->GetJoint("wheel2_joint");
-  physics::JointPtr joint3 = model->GetJoint("wheel3_joint");
+  physics::JointPtr joint1 = model->JointByName("wheel1_joint");
+  physics::JointPtr joint2 = model->JointByName("wheel2_joint");
+  physics::JointPtr joint3 = model->JointByName("wheel3_joint");
   ASSERT_TRUE(joint1 != NULL);
   ASSERT_TRUE(joint2 != NULL);
   ASSERT_TRUE(joint3 != NULL);
@@ -105,17 +105,17 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   // step for some time and expect all three joints to behave
   // the same way (check joint velocity and position).
   double test_duration = 1.5;
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->MaxStepSize();
   int steps = test_duration/dt;
 
-  double t0 = world->GetSimTime().Double();
+  double t0 = world->SimTime().Double();
 
   // for (int j = 0; j < 1000; ++j) //  for debug
   for (int i = 0; i < steps; ++i)
   {
-    double pos1 = joint1->GetAngle(0).Radian();
-    double pos2 = joint2->GetAngle(0).Radian();
-    double pos3 = joint3->GetAngle(0).Radian();
+    double pos1 = joint1->Angle(0).Radian();
+    double pos2 = joint2->Angle(0).Radian();
+    double pos3 = joint3->Angle(0).Radian();
     double error1 = pos1 - cmdPos;
     double error2 = pos2 - cmdPos;
     double error3 = pos3 - cmdPos;
@@ -125,13 +125,13 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
     joint1->SetForce(0, force1);
     joint2->SetForce(0, force2);
     joint3->SetForce(0, force3);
-    EXPECT_DOUBLE_EQ(world->GetSimTime().Double(), t0 + dt * i);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint3->GetAngle(0).Radian(), TOL);
+    EXPECT_DOUBLE_EQ(world->SimTime().Double(), t0 + dt * i);
+    EXPECT_NEAR(joint1->Velocity(0), joint2->Velocity(0), TOL);
+    EXPECT_NEAR(joint1->Velocity(0), joint3->Velocity(0), TOL);
+    EXPECT_NEAR(joint1->Angle(0).Radian(),
+                joint2->Angle(0).Radian(), TOL);
+    EXPECT_NEAR(joint1->Angle(0).Radian(),
+                joint3->Angle(0).Radian(), TOL);
     world->Step(1);
   }
 }

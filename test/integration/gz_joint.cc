@@ -34,15 +34,15 @@ TEST_F(GzJoint, Force)
   ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
-  physics::JointPtr joint = model->GetJoint("joint");
+  physics::JointPtr joint = model->JointByName("joint");
   ASSERT_TRUE(joint != NULL);
 
   // Make sure the joint is at the correct initial pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
+  EXPECT_NEAR(joint->Angle(0).Radian(), 0.0, 1e-3);
 
   world->SetPaused(true);
 
@@ -52,7 +52,7 @@ TEST_F(GzJoint, Force)
   world->Step(100);
 
   // Make sure the joint has moved.
-  EXPECT_GT(joint->GetAngle(0).Radian(), 0.1);
+  EXPECT_GT(joint->Angle(0).Radian(), 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -66,20 +66,20 @@ TEST_F(GzJoint, PositionPID)
   ASSERT_TRUE(world != NULL);
 
   // Disable gravity to simplify PID control
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
-  physics::JointPtr joint = model->GetJoint("joint");
+  physics::JointPtr joint = model->JointByName("joint");
   ASSERT_TRUE(joint != NULL);
 
   // Make sure the joint is at the correct initial pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
+  EXPECT_NEAR(joint->Angle(0).Radian(), 0.0, 1e-3);
 
   world->SetPaused(true);
 
@@ -94,7 +94,7 @@ TEST_F(GzJoint, PositionPID)
   world->Step(5000);
 
   // Make sure the joint is at the specified pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), targetAngle, 0.2);
+  EXPECT_NEAR(joint->Angle(0).Radian(), targetAngle, 0.2);
 }
 
 /////////////////////////////////////////////////
@@ -108,15 +108,15 @@ TEST_F(GzJoint, VelocityPID)
   ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
-  physics::JointPtr joint = model->GetJoint("joint");
+  physics::JointPtr joint = model->JointByName("joint");
   ASSERT_TRUE(joint != NULL);
 
   // Make sure the joint is at the correct initial pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
+  EXPECT_NEAR(joint->Angle(0).Radian(), 0.0, 1e-3);
 
   world->SetPaused(true);
 
@@ -127,7 +127,7 @@ TEST_F(GzJoint, VelocityPID)
   world->Step(800);
 
   // Make sure the joint has the specified velocity
-  EXPECT_NEAR(joint->GetVelocity(0), 0.5, 0.1);
+  EXPECT_NEAR(joint->Velocity(0), 0.5, 0.1);
 }
 
 /////////////////////////////////////////////////

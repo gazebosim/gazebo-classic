@@ -138,7 +138,7 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 
   this->simbodyPhysicsDPtr->stepTimeDouble = this->MaxStepSize();
 
-  sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
+  sdf::ElementPtr simbodyElem = this->simbodyPhysicsDPtr->sdf->GetElement("simbody");
 
   // Set integrator accuracy (measured with Richardson Extrapolation)
   this->simbodyPhysicsDPtr->integ->setAccuracy(
@@ -189,19 +189,21 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(this->MaxStepSize());
     physicsMsg.set_enable_physics(
-        this->world->GetEnablePhysicsEngine());
+        this->simbodyPhysicsDPtr->world->PhysicsEngineEnabled());
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->world->Gravity()));
+      msgs::Convert(this->simbodyPhysicsDPtr->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->MagneticField()));
-    physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
-    physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
-    physicsMsg.set_max_step_size(this->maxStepSize);
+    physicsMsg.set_real_time_update_rate(
+        this->simbodyPhysicsDPtr->realTimeUpdateRate);
+    physicsMsg.set_real_time_factor(
+        this->simbodyPhysicsDPtr->targetRealTimeFactor);
+    physicsMsg.set_max_step_size(this->simbodyPhysicsDPtr->maxStepSize);
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
-    this->responsePub->Publish(response);
+    this->simbodyPhysicsDPtr->responsePub->Publish(response);
   }
 }
 
@@ -214,7 +216,10 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   PhysicsEngine::OnPhysicsMsg(_msg);
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+  {
+    this->simbodyPhysicsDPtr->world->SetPhysicsEngineEnabled(
+        _msg->enable_physics());
+  }
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
@@ -244,7 +249,7 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   */
 
   /// Make sure all models get at least on update cycle.
-  this->world->EnableAllModels();
+  this->simbodyPhysicsDPtr->world->EnableAllModels();
 }
 
 //////////////////////////////////////////////////
@@ -254,7 +259,7 @@ void SimbodyPhysics::Reset()
       this->simbodyPhysicsDPtr->system.getDefaultState());
 
   // restore potentially user run-time modified gravity
-  this->SetGravity(this->world->Gravity());
+  this->SetGravity(this->simbodyPhysicsDPtr->world->Gravity());
 }
 
 //////////////////////////////////////////////////
@@ -276,7 +281,7 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
   if (currentState.getSystemStage() != SimTK::Stage::Empty)
   {
     stateTime = currentState.getTime();
-    physics::Model_V models = this->world->GetModels();
+    physics::Model_V models = this->simbodyPhysicsDPtr->world->Models();
     for (physics::Model_V::iterator mi = models.begin();
          mi != models.end(); ++mi)
     {
@@ -348,7 +353,7 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
     // set/retsore state time.
     state.setTime(stateTime);
 
-    physics::Model_V models = this->world->GetModels();
+    physics::Model_V models = this->simbodyPhysicsDPtr->world->Models();
     for (physics::Model_V::iterator mi = models.begin();
          mi != models.end(); ++mi)
     {
@@ -412,9 +417,10 @@ void SimbodyPhysics::InitForThread()
 //////////////////////////////////////////////////
 void SimbodyPhysics::UpdateCollision()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+  std::lock_guard<std::recursive_mutex> lock(
+      this->simbodyPhysicsDPtr->physicsUpdateMutex);
 
-  this->contactManager->ResetCount();
+  this->simbodyPhysicsDPtr->contactManager->ResetCount();
 
   // Get all contacts from Simbody
   const SimTK::State &state = this->simbodyPhysicsDPtr->integ->getState();
@@ -454,7 +460,7 @@ void SimbodyPhysics::UpdateCollision()
       /// this is going to be very very slow, we'll need
       /// something with a void* pointer in simbody
       /// to support something like this.
-      physics::Model_V models = this->world->GetModels();
+      physics::Model_V models = this->simbodyPhysicsDPtr->world->Models();
       for (physics::Model_V::iterator mi = models.begin();
            mi != models.end(); ++mi)
       {
@@ -486,8 +492,8 @@ void SimbodyPhysics::UpdateCollision()
       // add contacts to the manager. This will return NULL if no one is
       // listening for contact information.
       Contact *contactFeedback =
-        this->contactManager->NewContact(collision1,
-          collision2, this->world->GetSimTime());
+        this->simbodyPhysicsDPtr->contactManager->NewContact(collision1,
+          collision2, this->simbodyPhysicsDPtr->world->SimTime());
 
       if (contactFeedback)
       {
@@ -642,20 +648,21 @@ void SimbodyPhysics::UpdateCollision()
 void SimbodyPhysics::UpdatePhysics()
 {
   // need to lock, otherwise might conflict with world resetting
-  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+  std::lock_guard<std::recursive_mutex> lock(
+      this->simbodyPhysicsDPtr->physicsUpdateMutex);
 
-  common::Time currTime = this->world->GetRealTime();
+  common::Time currTime = this->simbodyPhysicsDPtr->world->RealTime();
 
   bool trying = true;
   while (trying &&
       this->simbodyPhysicsDPtr->integ->getTime() <
-      this->world->GetSimTime().Double())
+      this->simbodyPhysicsDPtr->world->SimTime().Double())
   {
     try
     {
       this->simbodyPhysicsDPtr->integ->stepTo(
-          this->world->GetSimTime().Double(),
-          this->world->GetSimTime().Double());
+          this->simbodyPhysicsDPtr->world->SimTime().Double(),
+          this->simbodyPhysicsDPtr->world->SimTime().Double());
     }
     catch(const std::exception& e)
     {
@@ -673,12 +680,12 @@ void SimbodyPhysics::UpdatePhysics()
   //       << "] q [" << s.getQ()
   //       << "] u [" << s.getU()
   //       << "] dt [" << this->simbodyPhysicsDPtr->stepTimeDouble
-  //       << "] t [" << this->world->GetSimTime().Double()
+  //       << "] t [" << this->simbodyPhysicsDPtr->world->SimTime().Double()
   //       << "]\n";
   // this->lastUpdateTime = currTime;
 
   // pushing new entity pose into dirtyPoses for visualization
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->simbodyPhysicsDPtr->world->Models();
   for (physics::Model_V::iterator mi = models.begin();
        mi != models.end(); ++mi)
   {
@@ -691,7 +698,7 @@ void SimbodyPhysics::UpdatePhysics()
       ignition::math::Pose3d pose = SimbodyPhysics::Transform2PoseIgn(
         simbodyLink->MobilizedBody().getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
-      this->world->dataPtr->dirtyPoses.push_back(
+      this->simbodyPhysicsDPtr->world->dataPtr->dirtyPoses.push_back(
         std::static_pointer_cast<Entity>(*lx).get());
     }
 
@@ -770,7 +777,7 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new SimbodyRayShape(_collision));
     else
-      shape.reset(new SimbodyRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new SimbodyRayShape(this->simbodyPhysicsDPtr->world->Physics()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -830,12 +837,13 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 //////////////////////////////////////////////////
 void SimbodyPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity);
+  this->simbodyPhysicsDPtr->world->SetGravitySDF(_gravity);
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+    std::lock_guard<std::recursive_mutex> lock(
+        this->simbodyPhysicsDPtr->physicsUpdateMutex);
     if (this->simbodyPhysicsDPtr->simbodyPhysicsInitialized &&
-        this->world->GetModelCount() > 0)
+        this->simbodyPhysicsDPtr->world->ModelCount() > 0)
     {
       this->simbodyPhysicsDPtr->gravity.setGravityVector(
           this->simbodyPhysicsDPtr->integ->updAdvancedState(),
@@ -888,7 +896,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
     // gzerr << "debug : " << (*li)->Name() << "\n";
 
     if (simbodyLink)
-      _mbgraph.addBody((*li)->Name(), (*li)->Inertial()->Mass(),
+      _mbgraph.addBody((*li)->Name(), (*li)->Inertia().Mass(),
                       simbodyLink->MustBeBaseLink(), (*li).get());
     else
       gzerr << "simbodyLink [" << (*li)->Name()
@@ -942,9 +950,9 @@ void SimbodyPhysics::InitSimbodySystem()
   // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->world->Gravity().Length(), 0.0))
+  if (!math::equal(this->simbodyPhysicsDPtr->world->Gravity().Length(), 0.0))
     this->simbodyPhysicsDPtr->gravity.setDefaultGravityVector(
-      SimbodyPhysics::Vector3ToVec3(this->world->Gravity()));
+      SimbodyPhysics::Vector3ToVec3(this->simbodyPhysicsDPtr->world->Gravity()));
   else
     this->simbodyPhysicsDPtr->gravity.setDefaultMagnitude(0.0);
 }
@@ -1040,23 +1048,25 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             parentMobod,  Transform(),
             massProps,    Transform());
 
-        SimTK::Transform inboard_X_ML;
+        SimTK::Transform inboardXML;
         if (gzInb == NULL)
         {
           // GZ_ASSERT(gzOutb, "must be here");
-          physics::ModelPtr model = gzOutb->ParentModel();
-          inboard_X_ML =
+          physics::Model *model = gzOutb->ParentModel();
+          inboardXML =
             ~SimbodyPhysics::Pose2Transform(model->WorldPose());
         }
         else
-          inboard_X_ML =
+        {
+          inboardXML =
             SimbodyPhysics::Pose2Transform(gzInb->RelativePose());
+        }
 
-        SimTK::Transform outboard_X_ML =
+        SimTK::Transform outboardXML =
           SimbodyPhysics::Pose2Transform(gzOutb->RelativePose());
 
         // defX_ML link frame specified in model frame
-        freeJoint.setDefaultTransform(~inboard_X_ML*outboard_X_ML);
+        freeJoint.setDefaultTransform(~inboardXML * outboardXML);
         mobod = freeJoint;
       }
     }
@@ -1141,7 +1151,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         gzJoint->SetSpring(0,
           Force::MobilityLinearSpring(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
-              gzJoint->GetStiffness(0),
+              gzJoint->SpringStiffness(0),
               gzJoint->SpringReferencePosition(0)));
       }
       else if (type == "universal")
@@ -1198,7 +1208,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           gzJoint->SetSpring(nj,
             Force::MobilityLinearSpring(
                 this->simbodyPhysicsDPtr->forces, mobod, nj,
-                gzJoint->GetStiffness(nj),
+                gzJoint->SpringStiffness(nj),
                 gzJoint->SpringReferencePosition(nj)));
         }
       }
@@ -1257,7 +1267,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         gzJoint->SetSpring(0,
           Force::MobilityLinearSpring(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
-              gzJoint->GetStiffness(0),
+              gzJoint->SpringStiffness(0),
               gzJoint->SpringReferencePosition(0)));
       }
       else if (type == "prismatic")
@@ -1297,7 +1307,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         gzJoint->SetSpring(0,
           Force::MobilityLinearSpring(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
-              gzJoint->GetStiffness(0),
+              gzJoint->SpringStiffness(0),
               gzJoint->SpringReferencePosition(0)));
       }
       else if (type == "ball")
@@ -1341,7 +1351,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
   }
 
   // Weld the slaves to their masters.
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->simbodyPhysicsDPtr->world->Models();
   for (physics::Model_V::iterator mi = models.begin();
        mi != models.end(); ++mi)
   {
@@ -1442,7 +1452,7 @@ std::string SimbodyPhysics::TypeString(physics::Base::EntityType _type)
 }
 
 /////////////////////////////////////////////////
-void SimbodyPhysics::SetSeed(uint32_t /*_seed*/)
+void SimbodyPhysics::SetSeed(const uint32_t /*_seed*/)
 {
   gzerr << "SimbodyPhysics::SetSeed not implemented\n";
 }
@@ -1516,7 +1526,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       {
         std::shared_ptr<physics::SphereShape> s =
           std::dynamic_pointer_cast<physics::SphereShape>((*ci)->Shape());
-        double r = s->GetRadius();
+        double r = s->Radius();
         ContactSurface surface(ContactGeometry::Sphere(r), material);
         if (addModelClique)
             surface.joinClique(_modelClique);
@@ -1728,7 +1738,7 @@ bool SimbodyPhysics::Param(const std::string &_key, boost::any &_value) const
   }
   else
   {
-    return PhysicsEngine::GetParam(_key, _value);
+    return PhysicsEngine::Param(_key, _value);
   }
   return true;
 }

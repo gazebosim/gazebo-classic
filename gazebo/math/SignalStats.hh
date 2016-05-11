@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+#include <ignition/math/SignalStats.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -126,6 +127,9 @@ namespace gazebo
       /// \brief Constructor
       public: SignalStats();
 
+      /// \brief Ignition math constructor
+      public: SignalStats(const ignition::math::SignalStats &_s);
+
       /// \brief Destructor
       public: ~SignalStats();
 
@@ -168,6 +172,10 @@ namespace gazebo
 
       /// \brief Forget all previous data.
       public: void Reset();
+
+      /// \brief Get this object as an ignition::math::SignalStats.
+      /// \return This as an ignition math object.
+      public: ignition::math::SignalStats Ign() const;
 
       /// \brief Pointer to private data.
       protected: SignalStatsPrivate *dataPtr;

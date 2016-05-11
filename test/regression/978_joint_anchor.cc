@@ -44,9 +44,9 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   std::string _jointType = "revolute";
   {
@@ -56,23 +56,23 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
     opt.worldChild = false;
     opt.worldParent = false;
     opt.noLinkPose = true;
-    opt.modelPose = math::Pose(1, 2, 3, 0, 0, 0);
+    opt.modelPose = ignition::math::Pose3d(1, 2, 3, 0, 0, 0);
 
     physics::JointPtr joint = SpawnJoint(opt);
     ASSERT_TRUE(joint != NULL);
 
     // Check child and parent links
-    physics::LinkPtr child = joint->GetChild();
-    physics::LinkPtr parent = joint->GetParent();
+    physics::LinkPtr child = joint->Child();
+    physics::LinkPtr parent = joint->Parent();
     ASSERT_TRUE(child != NULL);
-    EXPECT_EQ(child->GetParentJoints().size(), 1u);
-    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    EXPECT_EQ(child->ParentJoints().size(), 1u);
+    EXPECT_EQ(child->ChildJoints().size(), 0u);
     ASSERT_TRUE(parent != NULL);
-    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
-    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    EXPECT_EQ(parent->ChildJoints().size(), 1u);
+    EXPECT_EQ(parent->ParentJoints().size(), 0u);
 
     // Check anchor location
-    EXPECT_EQ(joint->GetAnchor(0), opt.modelPose.pos);
+    EXPECT_EQ(joint->Anchor(0), opt.modelPose.Pos());
   }
 }
 

@@ -27,18 +27,18 @@ class ModelTest : public ServerFixture
 TEST_F(ModelTest, GetLinksV)
 {
   Load("worlds/joint_test.world");
-  physics::ModelPtr model = GetModel("model_1");
+  physics::ModelPtr model = this->GetModel("model_1");
 
   // This for-loop would cause a seg-fault in gazebo 3.0 and before.
-  for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
-       iter != model->GetLinks().end(); ++iter)
+  for (physics::Link_V::const_iterator iter = model->Links().begin();
+       iter != model->Links().end(); ++iter)
   {
     EXPECT_TRUE(*iter != NULL);
-    EXPECT_FALSE((*iter)->GetName().empty());
-    EXPECT_STREQ((*iter)->GetName().c_str(), "link_1");
+    EXPECT_FALSE((*iter)->Name().empty());
+    EXPECT_STREQ((*iter)->Name().c_str(), "link_1");
   }
 
-  EXPECT_EQ(model->GetLinks().size(), 1u);
+  EXPECT_EQ(model->Links().size(), 1u);
 }
 
 /////////////////////////////////////////////////
@@ -47,12 +47,12 @@ TEST_F(ModelTest, GetScopedName)
 {
   Load("worlds/simple_arm_test.world");
 
-  physics::ModelPtr model = GetModel("simple_arm");
+  physics::ModelPtr model = this->GetModel("simple_arm");
 
-  std::string modelName = model->GetScopedName();
+  std::string modelName = model->ScopedName();
   EXPECT_EQ(modelName, std::string("simple_arm"));
 
-  modelName = model->GetScopedName(true);
+  modelName = model->ScopedName(true);
   EXPECT_EQ(modelName, std::string("default::simple_arm"));
 }
 
@@ -61,20 +61,20 @@ TEST_F(ModelTest, GetScopedName)
 TEST_F(ModelTest, CreateLink)
 {
   Load("worlds/joint_test.world");
-  physics::ModelPtr model = GetModel("model_1");
+  physics::ModelPtr model = this->GetModel("model_1");
 
   const std::string linkName = "link_name";
   physics::LinkPtr link = model->CreateLink(linkName);
   ASSERT_TRUE(link != NULL);
-  EXPECT_EQ(link->GetName(), linkName);
-  EXPECT_EQ(link, model->GetLink(linkName));
+  EXPECT_EQ(link->Name(), linkName);
+  EXPECT_EQ(link, model->LinkByName(linkName));
 
   // Make sure we cannot create a second link with the same name
   physics::LinkPtr link2 = model->CreateLink(linkName);
   EXPECT_TRUE(link2 == NULL);
 
-  // GetLink should still return the original link
-  EXPECT_EQ(link, model->GetLink(linkName));
+  // LinkByName should still return the original link
+  EXPECT_EQ(link, model->LinkByName(linkName));
 }
 
 int main(int argc, char **argv)

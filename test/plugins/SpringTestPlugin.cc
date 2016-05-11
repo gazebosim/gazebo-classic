@@ -50,8 +50,8 @@ void SpringTestPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void SpringTestPlugin::Init()
 {
-  this->jointImplicit = this->model->GetJoint(this->jointImplicitName);
-  this->jointExplicit = this->model->GetJoint(this->jointExplicitName);
+  this->jointImplicit = this->model->JointByName(this->jointImplicitName);
+  this->jointExplicit = this->model->JointByName(this->jointExplicitName);
 
   this->jointImplicit->SetStiffnessDamping(0, this->kpImplicit,
     this->kdImplicit);
@@ -63,12 +63,12 @@ void SpringTestPlugin::Init()
 /////////////////////////////////////////////////
 void SpringTestPlugin::ExplicitUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->World()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
-  double pos = this->jointExplicit->GetAngle(0).Radian();
-  double vel = this->jointExplicit->GetVelocity(0);
+  double pos = this->jointExplicit->Angle(0).Radian();
+  double vel = this->jointExplicit->Velocity(0);
   double force = -this->kpExplicit * pos
                  -this->kdExplicit * vel;
   this->jointExplicit->SetForce(0, force);

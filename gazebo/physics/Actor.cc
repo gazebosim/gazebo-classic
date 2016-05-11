@@ -215,7 +215,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
     /// we are ready to load the links
     Model::Load(_sdf);
-    LinkPtr actorLinkPtr = Model::Link(actorLinkName);
+    LinkPtr actorLinkPtr(Model::LinkByName(actorLinkName));
     if (actorLinkPtr)
     {
        msgs::Visual actorVisualMsg = actorLinkPtr->VisualMessage(
@@ -432,7 +432,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Actor::Init()
 {
-  this->actorDPtr->prevFrameTime = this->actorDPtr->world->GetSimTime();
+  this->actorDPtr->prevFrameTime = this->actorDPtr->world->SimTime();
   if (this->actorDPtr->autoStart)
     this->Play();
   this->actorDPtr->mainLink = this->ChildLink(this->Name() + "_pose");
@@ -442,7 +442,7 @@ void Actor::Init()
 void Actor::Play()
 {
   this->actorDPtr->active = true;
-  this->actorDPtr->playStartTime = this->actorDPtr->world->GetSimTime();
+  this->actorDPtr->playStartTime = this->actorDPtr->world->SimTime();
   this->actorDPtr->lastScriptTime = std::numeric_limits<double>::max();
 }
 
@@ -464,7 +464,7 @@ void Actor::Update()
   if (!this->actorDPtr->active)
     return;
 
-  common::Time currentTime = this->actorDPtr->world->GetSimTime();
+  common::Time currentTime = this->actorDPtr->world->SimTime();
 
   /// do not refresh animation more faster the 30 Hz sim time
   /// TODO: Reducing to 20 Hz. Because there were memory corruption

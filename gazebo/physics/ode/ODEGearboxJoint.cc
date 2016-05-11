@@ -43,7 +43,7 @@ ODEGearboxJoint::~ODEGearboxJoint()
 void ODEGearboxJoint::Init()
 {
   Joint::Init();
-  LinkPtr link = this->jointDPtr->model->Link(this->referenceBody);
+  LinkPtr link = this->jointDPtr->model->LinkByName(this->referenceBody);
   this->SetReferenceBody(link);
 }
 

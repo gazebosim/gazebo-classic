@@ -109,7 +109,7 @@ namespace gazebo
       {
         ignition::math::Vector3d q(_state.pose.Rot().Euler());
         _out << std::fixed <<std::setprecision(3)
-          << "<light name='" << _state.GetName() << "'>"
+          << "<light name='" << _state.Name() << "'>"
           << "<pose>"
           << _state.pose.Pos().X() << " "
           << _state.pose.Pos().Y() << " "

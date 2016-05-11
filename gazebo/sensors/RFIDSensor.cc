@@ -68,11 +68,11 @@ void RFIDSensor::Load(const std::string &_worldName)
         this->sdf->GetElement("topic")->Get<std::string>());
   }
 
-  this->dataPtr->entity = this->world->GetEntity(this->ParentName());
+  this->dataPtr->entity = this->world->EntityByName(this->ParentName());
 
   // this->sdf->PrintDescription("something");
   /*std::cout << " setup ray" << std::endl;
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
   //trying to use just "ray" gives a seg fault
   this->laserCollision = physicsEngine->CreateCollision("multiray",
@@ -93,13 +93,13 @@ void RFIDSensor::Load(const std::string &_worldName)
        which is understandable */
 
   /**
-    rendering::ScenePtr scene = rendering::get_scene(this->world->GetName());
+    rendering::ScenePtr scene = rendering::get_scene(this->world->Name());
     if (!scene)
     {
-    scene = rendering::create_scene(this->world->GetName(), false);
+    scene = rendering::create_scene(this->world->Name(), false);
     }
 
-    manager = rendering::get_scene(this->world->GetName())->OgreSceneManager();
+    manager = rendering::get_scene(this->world->Name())->OgreSceneManager();
 
     query = manager->createRayQuery(Ogre::Ray());
 
@@ -122,12 +122,12 @@ void RFIDSensor::Init()
 bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
   this->EvaluateTags();
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
 
   if (this->dataPtr->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, this->dataPtr->entity->GetWorldPose().Ign());
+    msgs::Set(&msg, this->dataPtr->entity->WorldPose());
     this->dataPtr->scanPub->Publish(msg);
   }
 
@@ -156,7 +156,7 @@ bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
 {
   // copy sensor vector pos into a temp var
   ignition::math::Vector3d v;
-  v = _pose.Pos() - this->dataPtr->entity->GetWorldPose().Ign().Pos();
+  v = _pose.Pos() - this->dataPtr->entity->WorldPose().Pos();
 
   // std::cout << v.GetLength() << std::endl;
 

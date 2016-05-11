@@ -44,7 +44,7 @@ BulletRayShape::BulletRayShape(CollisionPtr _parent)
 {
   this->SetName("Bullet Ray Shape");
   this->physicsEngine = std::static_pointer_cast<BulletPhysics>(
-      this->rayShapeDPtr->collisionParent->World()->GetPhysicsEngine());
+      this->rayShapeDPtr->collisionParent->World()->Physics());
 }
 
 //////////////////////////////////////////////////
@@ -82,8 +82,8 @@ void BulletRayShape::Update()
   rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
   rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
 
-  boost::recursive_mutex::scoped_lock lock(
-      *this->physicsEngine->GetPhysicsUpdateMutex());
+  std::lock_guard<std::recursive_mutex> lock(
+      this->physicsEngine->PhysicsUpdateMutex());
 
   this->physicsEngine->DynamicsWorld()->rayTest(
       start, end, rayCallback);

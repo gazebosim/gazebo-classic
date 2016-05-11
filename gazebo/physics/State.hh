@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A generic physics state
- * Author: Nate Koenig
- */
-
-#ifndef _STATE_HH_
-#define _STATE_HH_
+#ifndef GAZEBO_PHYSICS_STATE_HH_
+#define GAZEBO_PHYSICS_STATE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -86,7 +82,13 @@ namespace gazebo
       /// \brief Get the name associated with this State
       /// \return Name associated with this state information. Typically
       /// a name of an Entity.
-      public: std::string GetName() const;
+      /// \deprecated See std::string GetName() const
+      public: std::string GetName() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the name associated with this State
+      /// \return Name associated with this state information. Typically
+      /// a name of an Entity.
+      public: std::string Name() const;
 
       /// \brief Set the name associated with this State.
       /// \param[in] _name Name associated with this state information.
@@ -95,19 +97,39 @@ namespace gazebo
 
       /// \brief Get the wall time when this state was generated
       /// \return The absolute clock time when the State data was recorded.
-      public: common::Time GetWallTime() const;
+      /// \deprecated See common::Time GetWallTime() const
+      public: common::Time GetWallTime() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the wall time when this state was generated
+      /// \return The absolute clock time when the State data was recorded.
+      public: common::Time WallTime() const;
 
       /// \brief Get the real time when this state was generated
       /// \return Clock time since simulation was stated.
-      public: common::Time GetRealTime() const;
+      /// \deprecated See common::Time RealTime() const
+      public: common::Time GetRealTime() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the real time when this state was generated
+      /// \return Clock time since simulation was stated.
+      public: common::Time RealTime() const;
 
       /// \brief Get the sim time when this state was generated
       /// \return Simulation time when the data was recorded.
-      public: common::Time GetSimTime() const;
+      /// \deprecated See common::Time SimTime() const
+      public: common::Time GetSimTime() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the sim time when this state was generated
+      /// \return Simulation time when the data was recorded.
+      public: common::Time SimTime() const;
 
       /// \brief Get the iterations when this state was generated
       /// \return Iterations when the data was recorded
-      public: uint64_t GetIterations() const;
+      /// \deprecated See uint64_t Iterations() const
+      public: uint64_t GetIterations() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the iterations when this state was generated
+      /// \return Iterations when the data was recorded
+      public: uint64_t Iterations() const;
 
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State

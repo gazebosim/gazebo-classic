@@ -49,7 +49,7 @@ void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void InRegionEventSource::Init()
 {
-  this->model = this->world->GetModel(this->modelName);
+  this->model = this->world->ModelByName(this->modelName);
   if (!model)
   {
     gzerr << this->name << ": Model '" << this->modelName

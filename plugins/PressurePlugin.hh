@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Pressure Sensor Plugin
- * Author: Steve Peters
- */
-#ifndef _GAZEBO_PRESSURE_PLUGIN_HH_
-#define _GAZEBO_PRESSURE_PLUGIN_HH_
+#ifndef GAZEBO_PRESSURE_PLUGIN_HH_
+#define GAZEBO_PRESSURE_PLUGIN_HH_
 
 #include <string>
 #include <boost/unordered_map.hpp>
