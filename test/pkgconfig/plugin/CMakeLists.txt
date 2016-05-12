@@ -13,5 +13,5 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CFLAGS}")
 
-add_library(hello_world SHARED ../../testfiles/hello_world.cc)
+add_library(hello_world MODULE ../../testfiles/hello_world.cc)
 target_link_libraries(hello_world ${GAZEBO_LIBRARIES})

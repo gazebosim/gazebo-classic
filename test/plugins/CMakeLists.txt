@@ -30,6 +30,6 @@ set (plugins
 )
 
 foreach (src ${plugins})
-  add_library(${src} SHARED ${src}.cc)
+  add_library(${src} MODULE ${src}.cc)
   target_link_libraries(${src} libgazebo ${ogre_libraries})
 endforeach (src ${plugins})
