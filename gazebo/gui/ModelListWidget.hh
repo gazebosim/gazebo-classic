@@ -54,7 +54,7 @@ namespace gazebo
 
       /// \brief Ignition callback notifying an entity was deleted.
       /// \param[in] _msg Message containing data about the deleted entity.
-      private: void OnNotification(const msgs::Operation &_msg);
+      private: void OnNotification(const ignition::msgs::Operation &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
 

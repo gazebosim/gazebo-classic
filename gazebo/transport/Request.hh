@@ -21,8 +21,8 @@
 
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/msgs.hh>
 
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -69,11 +69,11 @@ namespace gazebo
 
     /// \brief Helper class to create requests for ignition transport.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestInsert(const msgs::Light &_msg);
+    size_t RequestInsert(const ignition::msgs::Light &_msg);
 
     /// \brief Helper class to create requests for ignition transport.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestInsert(const msgs::Factory &_msg);
+    size_t RequestInsert(const ignition::msgs::EntityFactory &_msg);
   }
 }
 #endif

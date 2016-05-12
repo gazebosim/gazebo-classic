@@ -24,6 +24,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Plane.hh>
+#include <ignition/msgs.hh>
 
 #include "gazebo/math/Quaternion.hh"
 
@@ -195,6 +196,14 @@ namespace gazebo
     GAZEBO_VISIBLE
     ignition::math::Planed ConvertIgn(const msgs::PlaneGeom &_p);
 
+    /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
+    /// \param[in] _v The vector to convert
+    /// \return A msgs::Vector3d object
+    GAZEBO_VISIBLE
+    msgs::Light Convert(const ignition::msgs::Light &_msg);
+    GAZEBO_VISIBLE
+    msgs::Pose Convert(const ignition::msgs::Pose &_msg);
+
     /// \brief Set a msgs::Image from a common::Image
     /// \param[out] _msg A msgs::Image pointer
     /// \param[in] _i A common::Image reference
@@ -230,6 +239,12 @@ namespace gazebo
     /// \param[in] _v A common::Color reference
     GAZEBO_VISIBLE
     void Set(msgs::Color *_c, const common::Color &_v);
+
+    /// \brief Set a msgs::Color from a common::Color
+    /// \param[out] _p A msgs::Color pointer
+    /// \param[in] _v A common::Color reference
+    GAZEBO_VISIBLE
+    void Set(ignition::msgs::Color *_c, const common::Color &_v);
 
     /// \brief Set a msgs::Time from a common::Time
     /// \param[out] _p A msgs::Time pointer

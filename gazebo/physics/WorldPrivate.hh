@@ -26,7 +26,8 @@
 #include <sdf/sdf.hh>
 #include <string>
 
-#include <ignition/transport.hh>
+#include <ignition/msgs.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
@@ -334,7 +335,7 @@ namespace gazebo
       public: std::mutex requestsMutex;
 
       /// \brief Request queue.
-      public: std::vector<msgs::Operation> requests;
+      public: std::vector<ignition::msgs::Operation> requests;
     };
   }
 }

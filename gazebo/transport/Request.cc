@@ -15,16 +15,17 @@
  *
 */
 
+#include <ignition/math/Rand.hh>
 #include <ignition/transport/Node.hh>
 
-#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/transport/Request.hh"
 
 using namespace gazebo;
 
 // Unused callback
-std::function<void(const msgs::Empty &, const bool)> unused =
-  [](const msgs::Empty &, const bool &)
+std::function<void(const ignition::msgs::Empty &, const bool)> unused =
+  [](const ignition::msgs::Empty &, const bool &)
 {
 };
 
@@ -35,8 +36,8 @@ size_t transport::RequestDelete(const std::string &_name)
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
   // Operation msg
-  msgs::Operation req;
-  req.set_type(msgs::Operation::DELETE_ENTITY);
+  ignition::msgs::Operation req;
+  req.set_type(ignition::msgs::Operation::DELETE_ENTITY);
   req.set_id(id);
   req.set_uri(_name);
 
@@ -54,18 +55,18 @@ size_t transport::RequestInsertSDF(const std::string &_sdf,
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
-  // Factory msg
-  msgs::Factory msg;
+  // EntityFactory msg
+  ignition::msgs::EntityFactory msg;
   msg.set_sdf(_sdf);
   if (_pose != ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                       0, 0, 0))
   {
-    msgs::Set(msg.mutable_pose(), _pose);
+    ignition::msgs::Set(msg.mutable_pose(), _pose);
   }
 
   // Operation msg
-  msgs::Operation req;
-  req.set_type(msgs::Operation::INSERT_ENTITY);
+  ignition::msgs::Operation req;
+  req.set_type(ignition::msgs::Operation::INSERT_ENTITY);
   req.set_id(id);
   req.mutable_factory()->CopyFrom(msg);
 
@@ -83,18 +84,18 @@ size_t transport::RequestInsertFile(const std::string &_filename,
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
-  // Factory msg
-  msgs::Factory msg;
+  // EntityFactory msg
+  ignition::msgs::EntityFactory msg;
   msg.set_sdf_filename(_filename);
   if (_pose != ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                       0, 0, 0))
   {
-    msgs::Set(msg.mutable_pose(), _pose);
+    ignition::msgs::Set(msg.mutable_pose(), _pose);
   }
 
   // Operation msg
-  msgs::Operation req;
-  req.set_type(msgs::Operation::INSERT_ENTITY);
+  ignition::msgs::Operation req;
+  req.set_type(ignition::msgs::Operation::INSERT_ENTITY);
   req.set_id(id);
   req.mutable_factory()->CopyFrom(msg);
 
@@ -112,18 +113,18 @@ size_t transport::RequestClone(const std::string &_name,
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
-  // Factory msg
-  msgs::Factory msg;
+  // EntityFactory msg
+  ignition::msgs::EntityFactory msg;
   msg.set_clone_model_name(_name);
   if (_pose != ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                       0, 0, 0))
   {
-    msgs::Set(msg.mutable_pose(), _pose);
+    ignition::msgs::Set(msg.mutable_pose(), _pose);
   }
 
   // Operation msg
-  msgs::Operation req;
-  req.set_type(msgs::Operation::INSERT_ENTITY);
+  ignition::msgs::Operation req;
+  req.set_type(ignition::msgs::Operation::INSERT_ENTITY);
   req.set_id(id);
   req.mutable_factory()->CopyFrom(msg);
 
@@ -135,17 +136,17 @@ size_t transport::RequestClone(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-size_t transport::RequestInsert(const msgs::Light &_msg)
+size_t transport::RequestInsert(const ignition::msgs::Light &_msg)
 {
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
   // Operation msg
-  msgs::Factory fac;
+  ignition::msgs::EntityFactory fac;
   fac.mutable_light()->CopyFrom(_msg);
 
-  msgs::Operation req;
-  req.set_type(msgs::Operation::INSERT_LIGHT);
+  ignition::msgs::Operation req;
+  req.set_type(ignition::msgs::Operation::INSERT_LIGHT);
   req.set_id(id);
   req.mutable_factory()->CopyFrom(fac);
 
@@ -157,14 +158,14 @@ size_t transport::RequestInsert(const msgs::Light &_msg)
 }
 
 /////////////////////////////////////////////////
-size_t transport::RequestInsert(const msgs::Factory &_msg)
+size_t transport::RequestInsert(const ignition::msgs::EntityFactory &_msg)
 {
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
   // Operation msg
-  msgs::Operation req;
-  req.set_type(msgs::Operation::INSERT_LIGHT);
+  ignition::msgs::Operation req;
+  req.set_type(ignition::msgs::Operation::INSERT_LIGHT);
   req.set_id(id);
   req.mutable_factory()->CopyFrom(_msg);
 

@@ -2664,9 +2664,9 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnNotification(const msgs::Operation &_msg)
+void ModelListWidget::OnNotification(const ignition::msgs::Operation &_msg)
 {
-  if (!(_msg.type() == msgs::Operation::DELETE_ENTITY &&
+  if (!(_msg.type() == ignition::msgs::Operation::DELETE_ENTITY &&
       _msg.has_uri()))
   {
     return;

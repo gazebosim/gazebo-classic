@@ -3567,10 +3567,10 @@ void Scene::ToggleLayer(const int32_t _layer)
 }
 
 //////////////////////////////////////////////////
-void Scene::OnNotification(const msgs::Operation &_msg)
+void Scene::OnNotification(const ignition::msgs::Operation &_msg)
 {
   // Deletion
-  if (_msg.type() == msgs::Operation::DELETE_ENTITY &&
+  if (_msg.type() == ignition::msgs::Operation::DELETE_ENTITY &&
       _msg.has_uri())
   {
     std::string name = _msg.uri();
@@ -3602,10 +3602,11 @@ void Scene::OnNotification(const msgs::Operation &_msg)
   }
 
   // Light insertion
-  if (_msg.type() == msgs::Operation::INSERT_LIGHT &&
+  if (_msg.type() == ignition::msgs::Operation::INSERT_LIGHT &&
       _msg.has_factory() && _msg.factory().has_light())
   {
-    boost::shared_ptr<msgs::Light> fac(new msgs::Light(_msg.factory().light()));
+    auto gzMsg = msgs::Convert(_msg.factory().light());
+    boost::shared_ptr<msgs::Light> fac(new msgs::Light(gzMsg));
 
     std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
     this->dataPtr->lightFactoryMsgs.push_back(fac);

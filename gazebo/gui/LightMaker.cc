@@ -85,7 +85,8 @@ bool LightMaker::InitFromLight(const std::string &_lightName)
   }
 
   this->dataPtr->lightTypename =  this->dataPtr->light->Type();
-  this->dataPtr->light->FillMsg(this->dataPtr->msg);
+  auto msg = msgs::Convert(this->dataPtr->msg);
+  this->dataPtr->light->FillMsg(msg);
 
   std::string newName = _lightName + "_clone";
   int i = 0;
@@ -148,9 +149,9 @@ void LightMaker::Stop()
 /////////////////////////////////////////////////
 void LightMaker::CreateTheEntity()
 {
-  msgs::Set(this->dataPtr->msg.mutable_pose()->mutable_position(),
+  ignition::msgs::Set(this->dataPtr->msg.mutable_pose()->mutable_position(),
             this->dataPtr->light->Position());
-  msgs::Set(this->dataPtr->msg.mutable_pose()->mutable_orientation(),
+  ignition::msgs::Set(this->dataPtr->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
 
   transport::RequestInsert(this->dataPtr->msg);
@@ -171,7 +172,7 @@ void LightMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 /////////////////////////////////////////////////
 PointLightMaker::PointLightMaker() : LightMaker()
 {
-  this->dataPtr->msg.set_type(msgs::Light::POINT);
+  this->dataPtr->msg.set_type(ignition::msgs::Light::POINT);
   this->dataPtr->msg.set_cast_shadows(false);
   this->dataPtr->lightTypename = "point";
 }
@@ -179,8 +180,8 @@ PointLightMaker::PointLightMaker() : LightMaker()
 /////////////////////////////////////////////////
 SpotLightMaker::SpotLightMaker() : LightMaker()
 {
-  this->dataPtr->msg.set_type(msgs::Light::SPOT);
-  msgs::Set(this->dataPtr->msg.mutable_direction(),
+  this->dataPtr->msg.set_type(ignition::msgs::Light::SPOT);
+  ignition::msgs::Set(this->dataPtr->msg.mutable_direction(),
             ignition::math::Vector3d(0, 0, -1));
   this->dataPtr->msg.set_cast_shadows(false);
 
@@ -193,8 +194,8 @@ SpotLightMaker::SpotLightMaker() : LightMaker()
 /////////////////////////////////////////////////
 DirectionalLightMaker::DirectionalLightMaker() : LightMaker()
 {
-  this->dataPtr->msg.set_type(msgs::Light::DIRECTIONAL);
-  msgs::Set(this->dataPtr->msg.mutable_direction(),
+  this->dataPtr->msg.set_type(ignition::msgs::Light::DIRECTIONAL);
+  ignition::msgs::Set(this->dataPtr->msg.mutable_direction(),
             ignition::math::Vector3d(.1, .1, -0.9));
   this->dataPtr->msg.set_cast_shadows(true);
 

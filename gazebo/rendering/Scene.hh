@@ -29,6 +29,7 @@
 
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/msgs.hh>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
@@ -828,7 +829,7 @@ namespace gazebo
 
       /// \brief Ignition callback with a notification.
       /// \param[in] _msg Message containing an operation.
-      private: void OnNotification(const msgs::Operation &_msg);
+      private: void OnNotification(const ignition::msgs::Operation &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

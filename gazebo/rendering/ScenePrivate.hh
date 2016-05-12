@@ -25,6 +25,7 @@
 
 #include <boost/unordered/unordered_map.hpp>
 
+#include <ignition/msgs.hh>
 #include <ignition/transport/Node.hh>
 
 #include <sdf/sdf.hh>

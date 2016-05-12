@@ -66,7 +66,7 @@ TEST_F(WorldTest, AllowRenaming)
   EXPECT_EQ(world->UniqueModelName(modelName), modelName + "_0");
 
   // Try to spawn with same name without allowing renaming
-  msgs::Factory facMsg;
+  ignition::msgs::EntityFactory facMsg;
   facMsg.set_sdf(modelSDFStr);
   facMsg.set_allow_renaming(false);
   transport::RequestInsert(facMsg);
@@ -158,7 +158,7 @@ TEST_F(WorldTest, EditName)
       + msgs::ModelToSDF(msg)->ToString("")
       + "</sdf>");
 
-    msgs::Factory facMsg;
+    ignition::msgs::EntityFactory facMsg;
     facMsg.set_sdf(modelSDFStr);
     facMsg.set_edit_name("box");
     transport::RequestInsert(facMsg);

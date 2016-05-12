@@ -65,10 +65,10 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
       &SimEventsPlugin::OnModelInfo, this);
 
   // detect model deletion
-  std::function<void(const msgs::Operation &)> onNotification =
-              [this](const msgs::Operation &_msg)
+  std::function<void(const ignition::msgs::Operation &)> onNotification =
+              [this](const ignition::msgs::Operation &_msg)
   {
-    if (!(_msg.type() == msgs::Operation::DELETE_ENTITY &&
+    if (!(_msg.type() == ignition::msgs::Operation::DELETE_ENTITY &&
         _msg.has_uri()))
     {
       return;

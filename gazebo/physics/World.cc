@@ -251,16 +251,16 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/light/modify");
 
   // Ignition transport
-  std::function<void(const msgs::Operation &, msgs::Empty &, bool &)>
-      requestService = [this]
-      (const msgs::Operation &_req, msgs::Empty &, bool &)
+  std::function<void(const ignition::msgs::Operation &,
+      ignition::msgs::Empty &, bool &)>requestService = [this]
+      (const ignition::msgs::Operation &_req, ignition::msgs::Empty &, bool &)
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
     this->dataPtr->requests.push_back(_req);
   };
   this->dataPtr->ignNode.Advertise("/request", requestService);
 
-  this->dataPtr->ignNode.Advertise<msgs::Operation>("/notification");
+  this->dataPtr->ignNode.Advertise<ignition::msgs::Operation>("/notification");
 
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
@@ -1388,8 +1388,8 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
       << "transport::RequestInsertSDF() instead." << std::endl;
 
   // TODO: Converting to operation on Gazebo8, remove on Gazebo9
-  msgs::Operation msg;
-  msg.set_type(msgs::Operation::INSERT_ENTITY);
+  ignition::msgs::Operation msg;
+  msg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
   msg.mutable_factory()->CopyFrom(*_msg);
 
   {
@@ -1669,8 +1669,8 @@ void World::ProcessRequestMsgs()
           << "transport::RequestDelete(<entity uri>)"
           << " instead." << std::endl;
 
-      msgs::Operation msg;
-      msg.set_type(msgs::Operation::DELETE_ENTITY);
+      ignition::msgs::Operation msg;
+      msg.set_type(ignition::msgs::Operation::DELETE_ENTITY);
       msg.set_uri(requestMsg.data());
 
       {
@@ -1893,12 +1893,13 @@ void World::ProcessLightModifyMsgs()
 }
 
 //////////////////////////////////////////////////
-std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
+std::string World::ProcessInsertLightRequest(
+    const ignition::msgs::EntityFactory &_msg)
 {
   if (!_msg.has_light())
     return "";
 
-  msgs::Light lightMsg;
+  ignition::msgs::Light lightMsg;
   lightMsg.CopyFrom(_msg.light());
 
   auto name = lightMsg.name();
@@ -1924,7 +1925,7 @@ std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
   }
 
   // Add to world SDF
-  sdf::ElementPtr lightSDF = msgs::LightToSDF(lightMsg);
+  sdf::ElementPtr lightSDF = msgs::LightToSDF(msgs::Convert(lightMsg));
   lightSDF->SetParent(this->dataPtr->sdf);
   lightSDF->GetParent()->InsertElement(lightSDF);
 
@@ -1935,7 +1936,8 @@ std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
 }
 
 //////////////////////////////////////////////////
-std::string World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
+std::string World::ProcessInsertEntityRequest(
+    const ignition::msgs::EntityFactory &_msg)
 {
   this->dataPtr->factorySDF->Root()->ClearElements();
 
@@ -2053,7 +2055,7 @@ std::string World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     elem->GetParent()->InsertElement(elem);
     if (_msg.has_pose())
     {
-      elem->GetElement("pose")->Set(msgs::ConvertIgn(_msg.pose()));
+      elem->GetElement("pose")->Set(msgs::ConvertIgn(msgs::Convert(_msg.pose())));
     }
 
     if (isActor)
@@ -2295,8 +2297,8 @@ void World::InsertModelFile(const std::string &_sdfFilename)
   msgs::Factory msg;
   msg.set_sdf_filename(_sdfFilename);
 
-  msgs::Operation opMsg;
-  opMsg.set_type(msgs::Operation::INSERT_ENTITY);
+  ignition::msgs::Operation opMsg;
+  opMsg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
   opMsg.mutable_factory()->CopyFrom(msg);
 
   {
@@ -2311,8 +2313,8 @@ void World::InsertModelSDF(const sdf::SDF &_sdf)
   msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
 
-  msgs::Operation opMsg;
-  opMsg.set_type(msgs::Operation::INSERT_ENTITY);
+  ignition::msgs::Operation opMsg;
+  opMsg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
   opMsg.mutable_factory()->CopyFrom(msg);
 
   {
@@ -2327,8 +2329,8 @@ void World::InsertModelString(const std::string &_sdfString)
   msgs::Factory msg;
   msg.set_sdf(_sdfString);
 
-  msgs::Operation opMsg;
-  opMsg.set_type(msgs::Operation::INSERT_ENTITY);
+  ignition::msgs::Operation opMsg;
+  opMsg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
   opMsg.mutable_factory()->CopyFrom(msg);
 
   {
@@ -2846,8 +2848,8 @@ void World::OnLightFactoryMsg(ConstLightPtr &_msg)
   msgs::Factory fac;
   fac.mutable_light()->CopyFrom(*_msg);
 
-  msgs::Operation msg;
-  msg.set_type(msgs::Operation::INSERT_LIGHT);
+  ignition::msgs::Operation msg;
+  msg.set_type(ignition::msgs::Operation::INSERT_LIGHT);
   msg.mutable_factory()->CopyFrom(fac);
 
   {
@@ -2939,12 +2941,12 @@ void World::ProcessRequests()
   for (const auto &request : this->dataPtr->requests)
   {
     // Entity delete
-    if (request.type() == msgs::Operation::DELETE_ENTITY &&
+    if (request.type() == ignition::msgs::Operation::DELETE_ENTITY &&
         request.has_uri())
     {
       // Notify whether deletion succeeded or failed
-      msgs::Operation msg;
-      msg.set_type(msgs::Operation::DELETE_ENTITY);
+      ignition::msgs::Operation msg;
+      msg.set_type(ignition::msgs::Operation::DELETE_ENTITY);
       msg.set_uri(request.uri());
       msg.set_id(request.id());
 
@@ -2962,12 +2964,12 @@ void World::ProcessRequests()
       this->dataPtr->ignNode.Publish("/notification", msg);
     }
     // Entity insert
-    else if (request.type() == msgs::Operation::INSERT_ENTITY &&
+    else if (request.type() == ignition::msgs::Operation::INSERT_ENTITY &&
         request.has_factory())
     {
       // Notify whether insertion succeeded or failed
-      msgs::Operation msg;
-      msg.set_type(msgs::Operation::INSERT_ENTITY);
+      ignition::msgs::Operation msg;
+      msg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
       msg.mutable_factory()->CopyFrom(request.factory());
       msg.set_id(request.id());
 
@@ -2988,12 +2990,12 @@ void World::ProcessRequests()
       this->dataPtr->ignNode.Publish("/notification", msg);
     }
     // Light insert
-    else if (request.type() == msgs::Operation::INSERT_LIGHT &&
+    else if (request.type() == ignition::msgs::Operation::INSERT_LIGHT &&
         request.has_factory() && request.factory().has_light())
     {
       // Notify whether insertion succeeded or failed
-      msgs::Operation msg;
-      msg.set_type(msgs::Operation::INSERT_LIGHT);
+      ignition::msgs::Operation msg;
+      msg.set_type(ignition::msgs::Operation::INSERT_LIGHT);
       msg.set_id(request.id());
       msg.mutable_factory()->CopyFrom(request.factory());
 

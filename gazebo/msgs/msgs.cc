@@ -16,6 +16,7 @@
 */
 
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/text_format.h>
 #include <algorithm>
 #include <ignition/math/Rand.hh>
 
@@ -161,6 +162,15 @@ namespace gazebo
 
     /////////////////////////////////////////////
     void Set(msgs::Color *_c, const common::Color &_v)
+    {
+      _c->set_r(_v.r);
+      _c->set_g(_v.g);
+      _c->set_b(_v.b);
+      _c->set_a(_v.a);
+    }
+
+    /////////////////////////////////////////////
+    void Set(ignition::msgs::Color *_c, const common::Color &_v)
     {
       _c->set_r(_v.r);
       _c->set_g(_v.g);
@@ -550,6 +560,44 @@ namespace gazebo
       return ignition::math::Planed(ConvertIgn(_p.normal()),
           ignition::math::Vector2d(_p.size().x(), _p.size().y()),
           _p.d());
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Light Convert(const ignition::msgs::Light &_msg)
+    {
+      auto newMsg = new msgs::Light();
+      auto msgData = new std::string();
+      if (!google::protobuf::TextFormat::PrintToString(_msg, msgData))
+      {
+        gzerr << "Cannot print message to string:" << std::endl
+            << _msg.DebugString() << std::endl;
+        return *newMsg;
+      }
+      if (!google::protobuf::TextFormat::ParseFromString(*msgData, newMsg))
+      {
+        gzerr << "Cannot parse into message:" << std::endl
+            << msgData << std::endl;
+      }
+      return *newMsg;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Pose Convert(const ignition::msgs::Pose &_msg)
+    {
+      auto newMsg = new msgs::Pose();
+      auto msgData = new std::string();
+      if (!google::protobuf::TextFormat::PrintToString(_msg, msgData))
+      {
+        gzerr << "Cannot print message to string:" << std::endl
+            << _msg.DebugString() << std::endl;
+        return *newMsg;
+      }
+      if (!google::protobuf::TextFormat::ParseFromString(*msgData, newMsg))
+      {
+        gzerr << "Cannot parse into message:" << std::endl
+            << msgData << std::endl;
+      }
+      return *newMsg;
     }
 
     /////////////////////////////////////////////
@@ -3098,3 +3146,4 @@ namespace gazebo
     }
   }
 }
+

@@ -2449,12 +2449,12 @@ void MainWindow::OnWindowMode(const std::string &_mode)
 }
 
 //////////////////////////////////////////////////
-void MainWindow::OnNotification(const msgs::Operation &_msg)
+void MainWindow::OnNotification(const ignition::msgs::Operation &_msg)
 {
   // Light insertion
-  if (_msg.type() == msgs::Operation::INSERT_LIGHT &&
+  if (_msg.type() == ignition::msgs::Operation::INSERT_LIGHT &&
       _msg.has_factory() && _msg.factory().has_light())
   {
-    gui::Events::lightUpdate(_msg.factory().light());
+    gui::Events::lightUpdate(msgs::Convert(_msg.factory().light()));
   }
 }

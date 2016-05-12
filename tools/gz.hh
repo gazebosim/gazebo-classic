@@ -23,6 +23,7 @@
 #include <boost/program_options.hpp>
 
 #include <ignition/math/Pose3.hh>
+#include <ignition/msgs.hh>
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/transport.hh"
@@ -154,7 +155,7 @@ namespace gazebo
                  const std::string &_name, const ignition::math::Pose3d &_pose);
 
     /// \brief Spawn helper function.
-    private: void OnNotification(const msgs::Operation &_msg);
+    private: void OnNotification(const ignition::msgs::Operation &_msg);
 
     private: size_t requestId;
     private: ignition::transport::Node ignNode;

@@ -592,7 +592,7 @@ bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
 }
 
 //////////////////////////////////////////////////
-void ModelCommand::OnNotification(const msgs::Operation &_msg)
+void ModelCommand::OnNotification(const ignition::msgs::Operation &_msg)
 {
   if (_msg.has_id() && _msg.id() == this->requestId && _msg.has_msg())
   {

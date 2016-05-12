@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <ignition/msgs.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/CommonTypes.hh"
@@ -325,7 +326,7 @@ namespace gazebo
 
       /// \brief Ignition callback with a notification.
       /// \param[in] _msg Message containing an operation.
-      private: void OnNotification(const msgs::Operation &_msg);
+      private: void OnNotification(const ignition::msgs::Operation &_msg);
 
       /// \internal
       /// \brief Private data pointer

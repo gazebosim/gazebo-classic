@@ -19,8 +19,8 @@
 #define GAZEBO_GUI_LIGHTMAKER_PRIVATE_HH_
 
 #include <string>
+#include <ignition/msgs.hh>
 
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -31,7 +31,7 @@ namespace gazebo
     class LightMakerPrivate
     {
       /// \brief Message that holds all the light information.
-      public: msgs::Light msg;
+      public: ignition::msgs::Light msg;
 
       /// \brief Type of the light being spawned.
       public: std::string lightTypename;

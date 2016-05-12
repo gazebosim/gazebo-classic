@@ -553,10 +553,10 @@ namespace gazebo
 
       /// \brief
       private: std::string ProcessInsertEntityRequest(
-          const msgs::Factory &_msg);
+          const ignition::msgs::EntityFactory &_msg);
 
       /// \brief
-      private: std::string ProcessInsertLightRequest(const msgs::Factory &_msg);
+      private: std::string ProcessInsertLightRequest(const ignition::msgs::EntityFactory &_msg);
 
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.

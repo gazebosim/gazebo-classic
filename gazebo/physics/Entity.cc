@@ -84,7 +84,7 @@ Entity::Entity(BasePtr _parent)
   this->scale = ignition::math::Vector3d::One;
 
   // Ignition transport
-  this->ignNode.Advertise<msgs::Operation>("/notification");
+  this->ignNode.Advertise<ignition::msgs::Operation>("/notification");
 }
 
 //////////////////////////////////////////////////
@@ -584,8 +584,8 @@ void Entity::Fini()
 
   // Notify that deletion was completed
   {
-    msgs::Operation msg;
-    msg.set_type(msgs::Operation::DELETE_ENTITY);
+    ignition::msgs::Operation msg;
+    msg.set_type(ignition::msgs::Operation::DELETE_ENTITY);
     msg.set_uri(this->GetScopedName());
     msg.set_success(true);
 
