@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief Triangle mesh helper class.
     class GZ_PHYSICS_VISIBLE ODEMesh
     {
@@ -80,6 +83,7 @@ namespace gazebo
       /// \brief The collision id that this mesh is attached to.
       private: dGeomID collisionId;
     };
+    /// \}
   }
 }
 #endif

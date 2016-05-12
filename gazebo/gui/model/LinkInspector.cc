@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,6 +175,8 @@ void LinkInspector::SetLinkId(const std::string &_id)
 /////////////////////////////////////////////////
 void LinkInspector::Open()
 {
+  emit this->Opened();
+
   this->dataPtr->linkConfig->Init();
   this->dataPtr->visualConfig->Init();
   this->dataPtr->collisionConfig->Init();

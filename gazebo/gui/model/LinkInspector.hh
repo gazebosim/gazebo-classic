@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,9 @@ namespace gazebo
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
       // public: void SetName(const std::string &_name);
+
+      /// \brief Qt signal emitted to indicate that the inspector was opened.
+      Q_SIGNALS: void Opened();
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();

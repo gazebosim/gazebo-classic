@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,24 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldUpdateBegin(
                   ConnectionPtr _subscriber);
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the before physics update signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      ///
+      /// The signal is called after collision detection has finished and before
+      /// the physics update step. So you can e.g. change some forces depending
+      /// on the collisions that have occured.
+      public: template<typename T>
+              static ConnectionPtr ConnectBeforePhysicsUpdate(T _subscriber)
+              { return beforePhysicsUpdate.Connect(_subscriber); }
+
+      /// \brief Disconnect a boost::slot from the before physics update signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectBeforePhysicsUpdate(
+                ConnectionPtr _subscriber)
+              { beforePhysicsUpdate.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update end signal
@@ -305,6 +323,10 @@ namespace gazebo
 
       /// \brief World update has started
       public: static EventT<void (const common::UpdateInfo &)> worldUpdateBegin;
+
+      /// \brief Collision detection has been done, physics update not yet
+      public: static EventT<void (const common::UpdateInfo &)>
+                beforePhysicsUpdate;
 
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;

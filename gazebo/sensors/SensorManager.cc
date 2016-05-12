@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -484,6 +484,11 @@ void SensorManager::SensorContainer::RunLoop()
 
   engine->InitForThread();
 
+  // The original value was hardcode to 1.0. Changed the value to
+  // 1000 * MaxStepSize in order to handle simulation with a
+  // large step size.
+  double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
+
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
 
@@ -542,7 +547,8 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    GZ_ASSERT(diffTime.sec < 1, "Took over 1.0 seconds to update a sensor.");
+    GZ_ASSERT(diffTime.sec < maxSensorUpdate,
+        "Took over 1000*max_step_size to update a sensor.");
 
     // Make sure eventTime is not negative.
     GZ_ASSERT(eventTime >= common::Time::Zero,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,6 +164,10 @@ namespace gazebo
       /// \brief Get a list of all the models.
       /// \return A list of all the Models in the world.
       public: Model_V GetModels() const;
+
+      /// \brief Get the number of lights.
+      /// \return The number of lights in the World.
+      public: unsigned int LightCount() const;
 
       /// \brief Get a list of all the lights.
       /// \return A list of all the Lights in the world.

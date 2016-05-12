@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,25 @@ class ModelListWidget_TEST : public QTestFixture
   /// \brief _msg Message containing the response data
   private: void OnResponse(ConstResponsePtr &_msg);
 
+  /// \brief Verify vector3 attributes and values.
+  /// \param[in] _properties Vector3 properties.
+  /// \param[in] _xyz Expected vector3 values.
+  private: void CheckVector3Property(QList<QtProperty *> _properties,
+      const ignition::math::Vector3d &_xyz);
+
   /// \brief Verify pose attributes and values.
   /// \param[in] _properties Pose properties.
   /// \param[in] _pose Expected pose values.
   private: void CheckPoseProperty(QList<QtProperty *> _properties,
       const gazebo::math::Pose &_pose);
+
+  /// \brief Set vector3 values.
+  /// \param[in] _propTreeBrowser Property browser.
+  /// \param[in] _properties Vector3 properties.
+  /// \param[in] _xyz Expected vector3 values.
+  private: void SetVector3Property(QtTreePropertyBrowser *propTreeBrowser,
+      QList<QtProperty *> _properties,
+      const ignition::math::Vector3d &_xyz);
 
   /// \brief Set pose values.
   /// \param[in] _propTreeBrowser Property browser.
@@ -89,6 +103,10 @@ class ModelListWidget_TEST : public QTestFixture
   /// now only displays link properties as the result of directly clicking on
   /// the link item in the models tree widget.
   private slots: void LinkProperties();
+
+  /// \brief Test that the property browser displays correct physics properties
+  /// and allows modification of physics properties.
+  private slots: void PhysicsProperties();
 };
 
 #endif

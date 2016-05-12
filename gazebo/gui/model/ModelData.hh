@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,12 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+
+      /// \internal
+      /// \brief Update visual's render group. This is needed to fix an
+      /// alpha compositing issue in ogre when transparent objects overlap.
+      /// \param[in] _visual Visual to update
+      public: static void UpdateRenderGroup(rendering::VisualPtr _visual);
     };
 
     /// \brief Helper class to store nested models data.
@@ -168,6 +174,9 @@ namespace gazebo
       /// \param[in] _name Name of collision.
       private slots: void OnRemoveCollision(const std::string &_name);
 
+      /// \brief Qt callback when the inspector is opened.
+      private slots: void OnInspectorOpened();
+
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
@@ -198,6 +207,9 @@ namespace gazebo
       /// \brief Visuals of the link.
       public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
 
+      /// \brief Deleted visuals of the link.
+      public: std::map<rendering::VisualPtr, msgs::Visual> deletedVisuals;
+
       /// \brief Msgs for updating visuals.
       public: std::vector<msgs::Visual *> visualUpdateMsgs;
 
@@ -206,6 +218,9 @@ namespace gazebo
 
       /// \brief Collisions of the link.
       public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
+
+      /// \brief Deleted collisions of the link.
+      public: std::map<rendering::VisualPtr, msgs::Collision> deletedCollisions;
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;

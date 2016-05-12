@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,11 @@ namespace gazebo
   namespace event
   {
     /// \addtogroup gazebo_event Events
+    /// \brief Signals and connections to send and receive event-based
+    /// triggers.
     /// \{
 
-    /// \internal
+    /// \cond
     // Private data members for Event class.
     // This must be in the header due to templatization.
     class GZ_COMMON_VISIBLE EventPrivate
@@ -55,6 +57,7 @@ namespace gazebo
       /// \brief True if the event has been signaled.
       public: bool signaled;
     };
+    /// \endcond
 
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
@@ -86,7 +89,7 @@ namespace gazebo
       protected: EventPrivate *dataPtr;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for Connection class.
     class GZ_COMMON_VISIBLE ConnectionPrivate
     {
@@ -107,6 +110,7 @@ namespace gazebo
       /// \brief set during the constructor
       public: common::Time creationTime;
     };
+    /// \endcond
 
     /// \brief A class that encapsulates a connection.
     class GZ_COMMON_VISIBLE Connection
@@ -154,7 +158,7 @@ namespace gazebo
       public: std::shared_ptr<boost::function<T> > callback;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for EventT<T> class.
     template< typename T>
     class EventTPrivate : public EventPrivate
@@ -174,6 +178,7 @@ namespace gazebo
       public: std::list<typename EvtConnectionMap::const_iterator>
               connectionsToRemove;
     };
+    /// \endcond
 
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.

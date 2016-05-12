@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,12 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
   if (deviceName == "default")
     this->dataPtr->audioDevice = alcOpenDevice(NULL);
   else
+  {
+    auto deviceList = this->DeviceList();
+    if (deviceList.empty() || deviceList.find(deviceName) == deviceList.end())
+      return false;
     this->dataPtr->audioDevice = alcOpenDevice(deviceName.c_str());
+  }
 
   // Make sure that we could open the audio device
   if (this->dataPtr->audioDevice == NULL)
@@ -162,6 +167,20 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
 
   // Return a pointer to the source
   return source;
+}
+
+/////////////////////////////////////////////////
+std::set<std::string> OpenAL::DeviceList() const
+{
+  std::set<std::string> deviceList;
+  const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+  while (*devices != '\0')
+  {
+    std::string str(devices);
+    deviceList.emplace(str);
+    devices += str.size() + 1;
+  }
+  return deviceList;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

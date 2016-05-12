@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2515,10 +2515,10 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       VisualPtr visPtr;
       try
       {
-        Visual_M::iterator iter;
-        iter = this->dataPtr->visuals.find(
+        auto iter = this->dataPtr->visuals.find(
             boost::lexical_cast<uint32_t>(_msg->data()));
-        visPtr = iter->second;
+        if (iter != this->dataPtr->visuals.end())
+          visPtr = iter->second;
       } catch(...)
       {
         visPtr = this->GetVisual(_msg->data());

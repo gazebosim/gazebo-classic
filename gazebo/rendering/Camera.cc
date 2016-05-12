@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,15 +125,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 //////////////////////////////////////////////////
 Camera::~Camera()
 {
-  delete [] this->saveFrameBuffer;
-  this->saveFrameBuffer = NULL;
-  delete [] this->bayerFrameBuffer;
-  this->bayerFrameBuffer = NULL;
-
   this->Fini();
-
-  this->sdf->Reset();
-  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
@@ -220,8 +212,23 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  if (this->saveFrameBuffer)
+    delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
+
+  if (this->bayerFrameBuffer)
+    delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
+
   this->initialized = false;
+
+  this->dataPtr->cmdSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+
+  this->dataPtr->distortion.reset();
+  this->dataPtr->trackedVisual.reset();
 
   if (this->viewport && this->scene)
     RTShaderSystem::DetachViewport(this->viewport, this->scene);
@@ -245,6 +252,10 @@ void Camera::Fini()
 
   this->scene.reset();
   this->connections.clear();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
@@ -321,10 +332,6 @@ void Camera::Update()
   // Update animations
   if (this->animState)
   {
-    this->animState->addTime(
-        (common::Time::GetWallTime() - this->prevAnimTime).Double());
-    this->prevAnimTime = common::Time::GetWallTime();
-
     if (this->animState->hasEnded())
     {
       try
@@ -348,6 +355,12 @@ void Camera::Update()
                              this->dataPtr->moveToPositionQueue[0].second);
         this->dataPtr->moveToPositionQueue.pop_front();
       }
+    }
+    else
+    {
+      common::Time wallTime = common::Time::GetWallTime();
+      this->animState->addTime((wallTime - this->prevAnimTime).Double());
+      this->prevAnimTime = wallTime;
     }
   }
   else if (this->dataPtr->trackedVisual)

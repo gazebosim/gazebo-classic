@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_EDITOR_EVENTS_HH_
-#define _MODEL_EDITOR_EVENTS_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 
 #include <string>
-#include "gazebo/math/Pose.hh"
+
 #include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,22 @@
 using namespace gazebo;
 using namespace physics;
 
+// Class used to initialize an sdf element pointer from "collision.sdf".
+// This is then used in the Collision constructor to improve performance.
+class SDFCollisionInitializer
+{
+  // Constructor that create the collision sdf element
+  public: SDFCollisionInitializer()
+  {
+    sdf::initFile("collision.sdf", collisionSDF);
+  }
+
+  // Pointer the collision sdf element
+  public: sdf::ElementPtr collisionSDF = std::make_shared<sdf::Element>();
+};
+static SDFCollisionInitializer g_SDFInit;
+
+
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
     : Entity(_link), maxContacts(1)
@@ -55,7 +71,7 @@ Collision::Collision(LinkPtr _link)
 
   this->placeable = false;
 
-  sdf::initFile("collision.sdf", this->sdf);
+  this->sdf->Copy(g_SDFInit.collisionSDF);
 
   this->collisionVisualId = physics::getUniqueId();
 }

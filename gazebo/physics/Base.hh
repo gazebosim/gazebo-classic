@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
