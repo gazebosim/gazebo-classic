@@ -76,8 +76,8 @@ struct CollisionFilter : public btOverlapFilterCallback
   virtual bool needBroadphaseCollision(btBroadphaseProxy *_proxy0,
       btBroadphaseProxy *_proxy1) const
     {
-      GZ_ASSERT(_proxy0 != NULL && _proxy1 != NULL,
-          "Bullet broadphase overlapping pair proxies are NULL");
+      GZ_ASSERT(_proxy0 != nullptr && _proxy1 != nullptr,
+          "Bullet broadphase overlapping pair proxies are null");
 
       bool collide = (_proxy0->m_collisionFilterGroup
           & _proxy1->m_collisionFilterMask) != 0;
@@ -96,11 +96,11 @@ struct CollisionFilter : public btOverlapFilterCallback
 
       BulletLink *link0 = static_cast<BulletLink *>(
           rb0->getUserPointer());
-      GZ_ASSERT(link0 != NULL, "Link0 in collision pair is NULL");
+      GZ_ASSERT(link0 != nullptr, "Link0 in collision pair is null");
 
       BulletLink *link1 = static_cast<BulletLink *>(
           rb1->getUserPointer());
-      GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+      GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is null");
 
       if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
       {
@@ -129,11 +129,11 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     BulletLink *link1 = static_cast<BulletLink *>(
         obA->getUserPointer());
-    GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+    GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is null");
 
     BulletLink *link2 = static_cast<BulletLink *>(
         obB->getUserPointer());
-    GZ_ASSERT(link2 != NULL, "Link2 in collision pair is NULL");
+    GZ_ASSERT(link2 != nullptr, "Link2 in collision pair is null");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = link1->GetCollision(colIndex);
@@ -146,7 +146,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     BulletPhysicsPtr bulletPhysics =
           boost::static_pointer_cast<BulletPhysics>(engine);
 
-    // Add a new contact to the manager. This will return NULL if no one is
+    // Add a new contact to the manager. This will return nullptr if no one is
     // listening for contact information.
     Contact *contactFeedback = bulletPhysics->GetContactManager()->NewContact(
         collisionPtr1.get(), collisionPtr2.get(),
@@ -266,8 +266,8 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 
   btOverlapFilterCallback *filterCallback = new CollisionFilter();
   btOverlappingPairCache* pairCache = this->dynamicsWorld->getPairCache();
-  GZ_ASSERT(pairCache != NULL,
-      "Bullet broadphase overlapping pair cache is NULL");
+  GZ_ASSERT(pairCache != nullptr,
+      "Bullet broadphase overlapping pair cache is null");
   pairCache->setOverlapFilterCallback(filterCallback);
 
   // TODO: Enable this to do custom contact setting
@@ -392,7 +392,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.mutable_gravity()->CopyFrom(
       msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-        msgs::Convert(this->MagneticField()));
+        msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -477,23 +477,23 @@ void BulletPhysics::Fini()
   // Delete in reverse-order of creation
   if (this->dynamicsWorld)
     delete this->dynamicsWorld;
-  this->dynamicsWorld = NULL;
+  this->dynamicsWorld = nullptr;
 
   if (this->solver)
     delete this->solver;
-  this->solver = NULL;
+  this->solver = nullptr;
 
   if (this->broadPhase)
     delete this->broadPhase;
-  this->broadPhase = NULL;
+  this->broadPhase = nullptr;
 
   if (this->dispatcher)
     delete this->dispatcher;
-  this->dispatcher = NULL;
+  this->dispatcher = nullptr;
 
   if (this->collisionConfig)
     delete this->collisionConfig;
-  this->collisionConfig = NULL;
+  this->collisionConfig = nullptr;
 
   PhysicsEngine::Fini();
 }
@@ -525,7 +525,7 @@ void BulletPhysics::SetSORPGSIters(unsigned int _iters)
 bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
-  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
+  GZ_ASSERT(bulletElem != nullptr, "Bullet SDF element does not exist");
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
@@ -627,7 +627,7 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
 bool BulletPhysics::GetParam(const std::string &_key, boost::any &_value) const
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
-  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
+  GZ_ASSERT(bulletElem != nullptr, "Bullet SDF element does not exist");
 
   if (_key == "solver_type")
     _value = bulletElem->GetElement("solver")->Get<std::string>("type");
@@ -666,7 +666,7 @@ bool BulletPhysics::GetParam(const std::string &_key, boost::any &_value) const
 //////////////////////////////////////////////////
 LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
     gzthrow("Link must have a parent\n");
 
   BulletLinkPtr link(new BulletLink(_parent));

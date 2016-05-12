@@ -50,7 +50,7 @@ namespace gazebo
           boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         // Create the sphere geometry
-        if (oParent->GetCollisionId() == NULL)
+        if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreateSphere(0, _radius), true);
         else
           dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
