@@ -142,6 +142,42 @@ namespace gazebo
                 }
               }
 
+#ifdef __APPLE__
+              // This is a deprecated hack to work around issue #800,
+              // plugins should now be compiled as MODULE libraries,
+              // which have a .so extension on __APPLE__
+              // instead of SHARED libraries, which have .dylib
+              if (!found)
+              {
+                size_t soSuffix = filename.rfind(".so");
+                const std::string macSuffix(".dylib");
+                std::string fileDylib(filename);
+                if (soSuffix != std::string::npos)
+                {
+                  fileDylib.replace(soSuffix, macSuffix.length(), macSuffix);
+
+                  for (const auto path : pluginPaths)
+                  {
+                    fullname = path+std::string("/")+fileDylib;
+                    if (stat(fullname.c_str(), &st) == 0)
+                    {
+                      found = true;
+                      gzwarn << "Found plugin ["
+                             << fileDylib
+                             << "] with deprecated .dylib extension"
+                             << std::endl;
+                      gzwarn << "Please use MODULE instead of SHARED when"
+                             << " calling add_library() in cmake"
+                             << std::endl;
+                      gzwarn << "See gazebo issue #800 for more info"
+                             << std::endl;
+                      break;
+                    }
+                  }
+                }
+              }
+#endif  // ifdef __APPLE__
+
               if (!found)
                 fullname = filename;
 
