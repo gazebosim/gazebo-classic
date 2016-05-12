@@ -27,6 +27,13 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **Plugins with .dylib extension**
+    + ***Deprecation:*** plugins built as SHARED libraries
+    + ***Replacement:*** plugins built as MODULE libraries
+    + On OSX, libraries using the SHARED keyword in the cmake add_library()
+      function have a .dylib extension.
+      The MODULE keyword should be used instead, which will append .so
+
 1. **gazebo/common/Event.hh**
     + ***Deprecation:*** public: bool Event::GetSignaled() const;
     + ***Replacement:*** public: bool Event::Signaled() const;
