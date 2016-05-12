@@ -153,7 +153,7 @@ ignition::math::Angle RaySensor::AngleMin() const
   if (this->dataPtr->laserShape)
     return this->dataPtr->laserShape->GetMinAngle().Ign();
   else
-    return -1;
+    return ignition::math::Angle(-1);
 }
 
 //////////////////////////////////////////////////
@@ -165,7 +165,7 @@ ignition::math::Angle RaySensor::AngleMax() const
         this->dataPtr->laserShape->GetMaxAngle().Radian());
   }
   else
-    return -1;
+    return ignition::math::Angle(-1);
 }
 
 //////////////////////////////////////////////////
@@ -299,7 +299,7 @@ ignition::math::Angle RaySensor::VerticalAngleMin() const
         this->dataPtr->laserShape->GetVerticalMinAngle().Radian());
   }
   else
-    return -1;
+    return ignition::math::Angle(-1);
 }
 
 //////////////////////////////////////////////////
@@ -311,7 +311,7 @@ ignition::math::Angle RaySensor::VerticalAngleMax() const
         this->dataPtr->laserShape->GetVerticalMaxAngle().Radian());
   }
   else
-    return -1;
+    return ignition::math::Angle(-1);
 }
 
 //////////////////////////////////////////////////
