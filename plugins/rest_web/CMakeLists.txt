@@ -1,14 +1,8 @@
-link_directories(
-  ${GAZEBO_LIBRARY_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  )
-
 set (server_inc
   RestApi.hh
   RestException.hh
   RestWebPlugin.hh
   )
-
 
 set (server_src
   RestApi.cc
@@ -20,7 +14,6 @@ set (client_inc
   RestUiPlugin.hh
   RestUiWidget.hh
   )
-
 
 set (client_src
   RestUiLoginDialog.cc
@@ -39,20 +32,12 @@ add_definitions(${QT_DEFINITIONS})
 
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 
-
-
-include_directories(
-  ${GAZEBO_INCLUDE_DIRS}
-  )
-
-
-
 add_library(RestWebPlugin MODULE ${server_src} )
-target_link_libraries(RestWebPlugin ${GAZEBO_libraries} gazebo_msgs)
+target_link_libraries(RestWebPlugin libgazebo gazebo_msgs)
 install (TARGETS RestWebPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins" ${server_inc})
 
 add_library(RestUiPlugin MODULE ${client_src} ${headers_MOC})
-target_link_libraries(RestUiPlugin ${GAZEBO_libraries} gazebo_msgs)
+target_link_libraries(RestUiPlugin gazebo_gui gazebo_msgs)
 install (TARGETS RestUiPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins" ${client_inc})
