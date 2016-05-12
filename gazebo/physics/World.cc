@@ -2046,7 +2046,7 @@ void World::ProcessFactoryMsgs()
           if (this->GetModel(entityName))
           {
             // If allow renaming is disabled
-            if (factoryMsg.has_allow_renaming() && !factoryMsg.allow_renaming())
+            if (!factoryMsg.allow_renaming())
             {
               gzwarn << "A model named [" << entityName << "] already exists "
                     << "and allow_renaming is false. Model won't be inserted."

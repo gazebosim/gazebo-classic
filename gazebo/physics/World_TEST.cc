@@ -27,7 +27,7 @@ class WorldTest : public ServerFixture {};
 //////////////////////////////////////////////////
 /// \brief Test the factory message's allow_renaming flag and unique model name
 /// generation.
-TEST_F(WorldTest, AllowRenaming)
+TEST_F(WorldTest, UniqueModelName)
 {
   // Load a blank world
   this->Load("worlds/blank.world", true);

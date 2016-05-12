@@ -38,5 +38,5 @@ message Factory
 
   /// \brief Whether the server is allowed to rename the model in case of
   /// overlap with existing models.
-  optional bool allow_renaming              = 6;
+  optional bool allow_renaming = 6 [default = true];
 }
