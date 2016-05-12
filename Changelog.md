@@ -23,6 +23,11 @@
 1. Register Qt metatypes in gui tests
     * [Pull request 2273](https://bitbucket.org/osrf/gazebo/pull-request/2273)
 
+1. Fix resetting model to initial pose
+    * [Pull request 2307](https://bitbucket.org/osrf/gazebo/pull-request/2307)
+    * [Issue #1960](https://bitbucket.org/osrf/gazebo/issues/1960)
+
+
 ### Gazebo 6.6.0 (2016-04-07)
 
 1. fix: remove back projection
