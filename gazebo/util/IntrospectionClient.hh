@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
-#define _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
+#ifndef GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
+#define GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
 
 #include <chrono>
 #include <functional>
