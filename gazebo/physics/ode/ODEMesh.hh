@@ -27,6 +27,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief Triangle mesh helper class.
     class GZ_PHYSICS_VISIBLE ODEMesh
     {
@@ -80,6 +83,7 @@ namespace gazebo
       /// \brief The collision id that this mesh is attached to.
       private: dGeomID collisionId;
     };
+    /// \}
   }
 }
 #endif

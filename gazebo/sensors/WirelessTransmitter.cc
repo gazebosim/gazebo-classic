@@ -76,7 +76,7 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 
   this->pub =
     this->node->Advertise<msgs::PropagationGrid>(this->Topic(), 30);
-  GZ_ASSERT(this->pub != NULL,
+  GZ_ASSERT(this->pub != nullptr,
       "wirelessTransmitterSensor did not get a valid publisher pointer");
 }
 

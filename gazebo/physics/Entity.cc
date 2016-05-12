@@ -87,16 +87,7 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
-
-  delete this->visualMsg;
-  this->visualMsg = NULL;
-
-  this->visPub.reset();
-  this->requestPub.reset();
-  this->poseSub.reset();
-  this->node.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -585,19 +576,39 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
+  // TODO: put this back in
+  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+
   if (this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        this->GetScopedName());
+    auto msg = msgs::CreateRequest("entity_delete", this->GetScopedName());
     this->requestPub->Publish(*msg, true);
     delete msg;
   }
 
-  this->parentEntity.reset();
-  Base::Fini();
+  // Clean transport
+  {
+    this->posePub.reset();
+    this->requestPub.reset();
+    this->visPub.reset();
 
+    this->poseSub.reset();
+
+    if (this->node)
+      this->node->Fini();
+    this->node.reset();
+  }
+
+  this->animationConnection.reset();
   this->connections.clear();
-  this->node->Fini();
+
+  if (this->visualMsg)
+    delete this->visualMsg;
+  this->visualMsg = NULL;
+
+  this->parentEntity.reset();
+
+  Base::Fini();
 }
 
 //////////////////////////////////////////////////
