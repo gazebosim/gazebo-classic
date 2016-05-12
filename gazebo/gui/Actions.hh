@@ -81,6 +81,9 @@ namespace gazebo
     /// \brief Action to show/hide link frame visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showLinkFrameAct;
 
+    /// \brief Action to show/hide skeleton visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showSkeletonAct;
+
     extern GZ_GUI_VISIBLE QAction *g_transparentAct;
 
     extern GZ_GUI_VISIBLE QAction *g_resetAct;

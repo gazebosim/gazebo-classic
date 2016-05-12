@@ -234,6 +234,11 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->jointMaker = new gui::JointMaker();
   this->dataPtr->userCmdManager.reset(new MEUserCmdManager());
 
+  // Give the joint maker a pointer to the user cmd manager, but we're still
+  // responsible for its lifetime.
+  this->dataPtr->jointMaker->SetUserCmdManager(
+      this->dataPtr->userCmdManager.get());
+
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->dataPtr->inspectAct = new QAction(tr("Open Link Inspector"), this);
@@ -323,6 +328,15 @@ ModelCreator::ModelCreator(QObject *_parent)
       std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelRemoval(
+      std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelInsertion(
+      std::bind(&ModelCreator::InsertNestedModelFromSDF, this,
+      std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestLinkRemoval(
       std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
 
@@ -368,6 +382,8 @@ ModelCreator::ModelCreator(QObject *_parent)
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
+  this->DisableEventHandlers();
+
   while (!this->dataPtr->allLinks.empty())
     this->RemoveLinkImpl(this->dataPtr->allLinks.begin()->first);
 
@@ -395,33 +411,12 @@ void ModelCreator::OnEdit(const bool _checked)
   if (_checked)
   {
     this->dataPtr->active = true;
-    KeyEventHandler::Instance()->AddPressFilter("model_creator",
-        std::bind(&ModelCreator::OnKeyPress, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddPressFilter("model_creator",
-        std::bind(&ModelCreator::OnMousePress, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseRelease, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddMoveFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseMove, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseDoubleClick, this,
-        std::placeholders::_1));
-
-    this->dataPtr->jointMaker->EnableEventHandlers();
+    this->EnableEventHandlers();
   }
   else
   {
     this->dataPtr->active = false;
-    KeyEventHandler::Instance()->RemovePressFilter("model_creator");
-    MouseEventHandler::Instance()->RemovePressFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
-    this->dataPtr->jointMaker->DisableEventHandlers();
+    this->DisableEventHandlers();
     this->dataPtr->jointMaker->Stop();
 
     this->DeselectAll();
@@ -429,6 +424,39 @@ void ModelCreator::OnEdit(const bool _checked)
 
   this->dataPtr->userCmdManager->Reset();
   this->dataPtr->userCmdManager->SetActive(this->dataPtr->active);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::EnableEventHandlers()
+{
+  KeyEventHandler::Instance()->AddPressFilter("model_creator",
+      std::bind(&ModelCreator::OnKeyPress, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddPressFilter("model_creator",
+      std::bind(&ModelCreator::OnMousePress, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseRelease, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseMove, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseDoubleClick, this,
+      std::placeholders::_1));
+
+  this->dataPtr->jointMaker->EnableEventHandlers();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DisableEventHandlers()
+{
+  KeyEventHandler::Instance()->RemovePressFilter("model_creator");
+  MouseEventHandler::Instance()->RemovePressFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
+  this->dataPtr->jointMaker->DisableEventHandlers();
 }
 
 /////////////////////////////////////////////////
@@ -515,10 +543,17 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     const sdf::ElementPtr &_modelElem, const rendering::VisualPtr &_parentVis,
     const bool _emit)
 {
+  auto modelData = new NestedModelData();
+
+  if (!_modelElem)
+  {
+    gzerr << "No sdf element given, can't create model" << std::endl;
+    return modelData;
+  }
+
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
   std::string nestedModelName;
-  NestedModelData *modelData = new NestedModelData();
 
   // If no parent vis, this is the root model
   if (!_parentVis)
@@ -1158,6 +1193,15 @@ void ModelCreator::InsertLinkFromSDF(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::InsertNestedModelFromSDF(sdf::ElementPtr _sdf)
+{
+  if (!_sdf)
+    return;
+
+  this->CreateModelFromSDF(_sdf, this->dataPtr->previewVisual);
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
@@ -1246,7 +1290,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   // Link
   std::stringstream linkNameStream;
-  std::string leafName = link->GetName();
+  std::string leafName = link->Name();
   linkNameStream << _parentVis->GetName() << "::";
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
@@ -1753,18 +1797,45 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
+  // if it's a nestedModel
+  auto nestedModel = this->dataPtr->allNestedModels.find(_entity);
+  if (nestedModel != this->dataPtr->allNestedModels.end())
+  {
+    // Get data to use after the model has been deleted
+    auto name = nestedModel->second->Name();
+    auto sdf = nestedModel->second->modelSDF;
+    auto scopedName = nestedModel->second->modelVisual->GetName();
+
+    this->RemoveNestedModelImpl(_entity);
+
+    // Register command
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Delete [" + name + "]",
+        MEUserCmd::DELETING_NESTED_MODEL);
+    cmd->SetSDF(sdf);
+    cmd->SetScopedName(scopedName);
+
+    return;
+  }
+
   // If it's a link
   auto link = this->dataPtr->allLinks.find(_entity);
   if (link != this->dataPtr->allLinks.end())
   {
-    // Register command
+    // First delete joints
+    if (this->dataPtr->jointMaker)
+      this->dataPtr->jointMaker->RemoveJointsByLink(_entity);
+
+    // Then register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
-        "Delete [" + link->second->GetName() + "]", MEUserCmd::DELETING_LINK);
+        "Delete [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(this->GenerateLinkSDF(link->second));
     cmd->SetScopedName(link->second->linkVisual->GetName());
-  }
 
-  this->RemoveEntity(_entity);
+    // Then delete link
+    this->RemoveLinkImpl(_entity);
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1937,7 +2008,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       gui::model::Events::linkInserted(this->dataPtr->mouseVisual->GetName());
 
       auto cmd = this->dataPtr->userCmdManager->NewCmd(
-          "Insert [" + link->GetName() + "]",
+          "Insert [" + link->Name() + "]",
           MEUserCmd::INSERTING_LINK);
       cmd->SetSDF(this->GenerateLinkSDF(link));
       cmd->SetScopedName(link->linkVisual->GetName());
@@ -1953,6 +2024,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
             this->dataPtr->modelPose);
 
         this->EmitNestedModelInsertedEvent(this->dataPtr->mouseVisual);
+
+        auto cmd = this->dataPtr->userCmdManager->NewCmd(
+            "Insert [" + modelData->Name() + "]",
+            MEUserCmd::INSERTING_NESTED_MODEL);
+        cmd->SetSDF(modelData->modelSDF);
+        cmd->SetScopedName(modelData->modelVisual->GetName());
       }
     }
 
@@ -2252,7 +2329,9 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
       userCamera, _event).Ign();
 
-  if (!_event.Shift())
+  // there is a problem detecting control key from common::MouseEvent, so
+  // check using Qt for now
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
     pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
   }

@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_MAJOR_VERSION 7)
-set (GAZEBO_MINOR_VERSION 0)
+set (GAZEBO_MINOR_VERSION 1)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -252,9 +252,7 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM
-  ${IGNITION-MATH_INCLUDE_DIRS}
-)
+include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -393,8 +391,6 @@ else (build_errors)
   if (NOT CCD_FOUND)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
-
-  set(PKG_DEPENDS Boost Protobuf SDFormat OGRE)
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   set(cmake_conf_version_file "cmake/gazebo-config-version.cmake")

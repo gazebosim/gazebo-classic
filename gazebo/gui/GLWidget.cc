@@ -920,7 +920,7 @@ std::string GLWidget::OgreHandle() const
   ogreHandle = std::to_string(this->winId());
 #elif defined(WIN32)
   ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
+      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
 #else
   QWidget *qParent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
   GZ_ASSERT(qParent, "qParent is null");

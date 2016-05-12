@@ -32,6 +32,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTCollisionPrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief Base class for all DART collisions.
     class GZ_PHYSICS_VISIBLE DARTCollision : public Collision
     {
@@ -93,6 +96,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTCollisionPrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

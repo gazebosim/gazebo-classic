@@ -30,8 +30,8 @@ TEST_F(FileHandling, Save)
 {
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
-  boost::filesystem::create_directories(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
+  boost::filesystem::create_directories(paths->DefaultTestPath());
 
   Load("worlds/empty.world");
 
@@ -48,7 +48,7 @@ TEST_F(FileHandling, Save)
   do
   {
     filename.str("");
-    filename << paths->GetDefaultTestPath() << "/test_" << i << ".world";
+    filename << paths->DefaultTestPath() << "/test_" << i << ".world";
     i++;
   } while ((file = fopen(filename.str().c_str(), "r")) != NULL);
 
@@ -75,7 +75,7 @@ TEST_F(FileHandling, Save)
   EXPECT_LT(i, 10);
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
 }
 
 int main(int argc, char **argv)

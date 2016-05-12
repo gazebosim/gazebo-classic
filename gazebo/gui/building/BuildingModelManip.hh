@@ -141,12 +141,12 @@ namespace gazebo
       /// \brief Qt signal emitted when the manip's color has changed from the
       /// 3D view.
       /// \param[in] _color New color.
-      Q_SIGNALS: void ColorChanged(QColor _color);
+      Q_SIGNALS: void ColorChanged(const common::Color &_color);
 
       /// \brief Qt signal emitted when the manip's texture has changed from the
       /// 3D view.
       /// \param[in] _texture New texture.
-      Q_SIGNALS: void TextureChanged(QString _texture);
+      Q_SIGNALS: void TextureChanged(const std::string &_texture);
 
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
@@ -236,12 +236,12 @@ namespace gazebo
       /// \brief Qt callback when the 3D visual's color has been changed from
       /// the associated editor item.
       /// \param[in] _color New color.
-      private slots: void OnColorChanged(QColor _color);
+      private slots: void OnColorChanged(const common::Color &_color);
 
       /// \brief Qt callback when the 3D visual's texture has been changed from
       /// the associated editor item.
       /// \param[in] _texture New texture.
-      private slots: void OnTextureChanged(QString _texture);
+      private slots: void OnTextureChanged(const std::string &_texture);
 
       /// \brief Qt callback when the 3D visual's transparency has been changed
       /// from the associated editor item.

@@ -138,8 +138,10 @@ if (PKG_CONFIG_FOUND)
   #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (Simbody_FOUND)
+    message (STATUS "Looking for Simbody - found")
     set (HAVE_SIMBODY TRUE)
   else()
+    message (STATUS "Looking for Simbody - not found")
     BUILD_WARNING ("Simbody not found, for simbody physics engine option, please install libsimbody-dev.")
     set (HAVE_SIMBODY FALSE)
   endif()
@@ -197,26 +199,20 @@ if (PKG_CONFIG_FOUND)
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
     message (STATUS "Skipping search for tinyxml")
-    set (tinyxml_INCLUDE_DIRS "")
+    set (tinyxml_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/win/tinyxml")
     set (tinyxml_LIBRARIES "")
     set (tinyxml_LIBRARY_DIRS "")
   endif()
 
   #################################################
-  # Find tinyxml2. TinyXML version < 3 contains a bug that prevents large log
-  # files from being parsed. By default, we use Gazebo's internal version
-  # of tinyxml2 to overcome this problem.
+  # Find tinyxml2. Only debian distributions package tinyxml with a pkg-config
+  # Use pkg_check_modules and fallback to manual detection
+  # (needed, at least, for MacOS)
 
   # Use system installation on UNIX and Apple, and internal copy on Windows
   if (UNIX OR APPLE)
+    message (STATUS "Using system tinyxml2.")
     set (USE_EXTERNAL_TINYXML2 True)
-    pkg_check_modules(TINYXML2_VERSION_3 tinyxml2>=3)
-    if (TINYXML2_VERSION_3_FOUND)
-      message (STATUS "Using system tinyxml2.")
-    else()
-      message (STATUS "Using internal tinyxml2.")
-      set (USE_EXTERNAL_TINYXML2 False)
-    endif()
   elseif(WIN32)
     message (STATUS "Using internal tinyxml2.")
     set (USE_EXTERNAL_TINYXML2 False)
@@ -248,9 +244,6 @@ if (PKG_CONFIG_FOUND)
     if (tinyxml2_FAIL)
       message (STATUS "Looking for tinyxml2.h - not found")
       BUILD_ERROR("Missing: tinyxml2")
-    else()
-      include_directories(${tinyxml2_INCLUDE_DIRS})
-      link_directories(${tinyxml2_LIBRARY_DIRS})
     endif()
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
@@ -538,7 +531,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 4.0.0)
+set (SDFormat_MIN_VERSION 4.1.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -695,9 +688,15 @@ endif()
 # Find the Ignition_Transport library
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-transport0 QUIET)
-  if (NOT ignition-transport0_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport0-dev)")
+  find_package(ignition-transport1 QUIET)
+
+  if (NOT ignition-transport1_FOUND)
+
+    find_package(ignition-transport0 QUIET)
+    if (NOT ignition-transport0_FOUND)
+      BUILD_WARNING ("Missing: Ignition Transport (libignition-transport1-dev or libignition-transport0-dev)")
+    endif()
+
   else()
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
     include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})

@@ -291,8 +291,8 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       {
         StairsItem *stairsItem = dynamic_cast<StairsItem *>(
             this->currentMouseItem);
-        stairsItem->Set3dTexture(QString(""));
-        stairsItem->Set3dColor(Qt::white);
+        stairsItem->SetTexture3d("");
+        stairsItem->SetColor3d(common::Color::White);
         this->stairsList.push_back(stairsItem);
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
@@ -352,19 +352,19 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                 (*it);
             if (anotherWall && anotherWall != wallSegmentItem)
             {
-              if (QVector2D(p2 - anotherWall->GetStartPoint()).length() <=
-                  distanceToClose)
+              if (ignition::math::Vector2d(Conversions::Convert(p2) -
+                  anotherWall->StartPoint()).Length() <= distanceToClose)
               {
-                pf = anotherWall->GetStartPoint();
+                pf = Conversions::Convert(anotherWall->StartPoint());
                 this->snapGrabberOther = anotherWall->Grabbers()[0];
                 this->snapGrabberCurrent = wallSegmentItem->Grabbers()[1];
                 this->snapToGrabber = true;
                 break;
               }
-              else if (QVector2D(p2 - anotherWall->GetEndPoint()).length() <=
-                  distanceToClose)
+              else if (ignition::math::Vector2d(Conversions::Convert(p2) -
+                  anotherWall->EndPoint()).Length() <= distanceToClose)
               {
-                pf = anotherWall->GetEndPoint();
+                pf = Conversions::Convert(anotherWall->EndPoint());
                 this->snapGrabberOther = anotherWall->Grabbers()[1];
                 this->snapGrabberCurrent = wallSegmentItem->Grabbers()[1];
                 this->snapToGrabber = true;
@@ -388,15 +388,15 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
             // Snap to length increments
             double newLength = newLine.length();
             double lengthIncrement = SegmentItem::SnapLength /
-                wallSegmentItem->GetScale();
+                wallSegmentItem->Scale();
             newLength  = round(newLength/lengthIncrement)*lengthIncrement-
-                wallSegmentItem->GetThickness();
+                wallSegmentItem->Thickness();
 
             pf.setX(p1.x() + qCos(angle)*newLength);
             pf.setY(p1.y() + qSin(angle)*newLength);
           }
         }
-        wallSegmentItem->SetEndPoint(pf);
+        wallSegmentItem->SetEndPoint(Conversions::Convert(pf));
         wallSegmentItem->Update();
       }
       QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
@@ -430,8 +430,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
   if (!grabber)
     grabber = this->currentMouseItem;
   RectItem *editorItem = dynamic_cast<RectItem *>(grabber);
-  if (grabber && editorItem && (editorItem->GetType() == "Window"
-      || editorItem->GetType() == "Door") )
+  if (grabber && editorItem && (editorItem->ItemType() == "Window"
+      || editorItem->ItemType() == "Door") )
   {
     if (grabber->parentItem())
     {
@@ -461,9 +461,9 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachFromParent(
               this->itemToVisualMap[editorItem]);
-          editorItem->SetRotation(editorItem->GetRotation()
+          editorItem->SetRotation(editorItem->Rotation()
             - this->mousePressRotation);
-          editorItem->SetPosition(mousePoint);
+          editorItem->SetPosition(Conversions::Convert(mousePoint));
         }
         else
         {
@@ -502,7 +502,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
             this->buildingMaker->AttachManip(
                 this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
-            editorItem->SetPosition(wallSegmentItem->mapFromScene(scenePos));
+            editorItem->SetPosition(
+                Conversions::Convert(wallSegmentItem->mapFromScene(scenePos)));
             this->mousePressRotation = -wallSegmentItem->line().angle();
             editorItem->SetRotation(this->mousePressRotation);
 
@@ -621,7 +622,7 @@ void EditorView::DeleteItem(EditorItem *_item)
 
   _item->SetHighlighted(false);
 
-  if (_item->GetType() == "WallSegment")
+  if (_item->ItemType() == "WallSegment")
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
 
@@ -645,25 +646,25 @@ void EditorView::DeleteItem(EditorItem *_item)
         this->wallSegmentList.end(), dynamic_cast<WallSegmentItem *>(_item)),
         this->wallSegmentList.end());
   }
-  else if (_item->GetType() == "Window")
+  else if (_item->ItemType() == "Window")
   {
     this->windowList.erase(std::remove(this->windowList.begin(),
         this->windowList.end(), dynamic_cast<WindowItem *>(_item)),
         this->windowList.end());
   }
-  else if (_item->GetType() == "Door")
+  else if (_item->ItemType() == "Door")
   {
     this->doorList.erase(std::remove(this->doorList.begin(),
         this->doorList.end(), dynamic_cast<DoorItem *>(_item)),
         this->doorList.end());
   }
-  else if (_item->GetType() == "Stairs")
+  else if (_item->ItemType() == "Stairs")
   {
     this->stairsList.erase(std::remove(this->stairsList.begin(),
         this->stairsList.end(), dynamic_cast<StairsItem *>(_item)),
         this->stairsList.end());
   }
-  else if (_item->GetType() == "Floor")
+  else if (_item->ItemType() == "Floor")
   {
     this->floorList.erase(std::remove(this->floorList.begin(),
         this->floorList.end(), dynamic_cast<FloorItem *>(_item)),
@@ -682,8 +683,8 @@ void EditorView::DrawWall(const QPoint &_pos)
   // First point on the chain
   if (!this->drawInProgress)
   {
-    QPointF pointStart = mapToScene(_pos);
-    QPointF pointEnd = pointStart + QPointF(1, 0);
+    auto pointStart = Conversions::Convert(this->mapToScene(_pos));
+    auto pointEnd = pointStart + ignition::math::Vector2d(1, 0);
 
     wallSegmentItem = new WallSegmentItem(pointStart, pointEnd,
         this->levelDefaultHeight);
@@ -694,28 +695,28 @@ void EditorView::DrawWall(const QPoint &_pos)
 
       // Snap to other walls' points
       QList<QGraphicsItem *> itemsList = this->scene()->items(QRectF(
-          QPointF(pointStart.x() - distanceToClose/2,
-                  pointStart.y() - distanceToClose/2),
-          QPointF(pointStart.x() + distanceToClose/2,
-                  pointStart.y() + distanceToClose/2)));
+          QPointF(pointStart.X() - distanceToClose/2,
+                  pointStart.Y() - distanceToClose/2),
+          QPointF(pointStart.X() + distanceToClose/2,
+                  pointStart.Y() + distanceToClose/2)));
       for (QList<QGraphicsItem *>::iterator it = itemsList.begin();
           it  != itemsList.end(); ++it)
       {
         WallSegmentItem *anotherWall = dynamic_cast<WallSegmentItem *>(*it);
         if (anotherWall)
         {
-          if (QVector2D(pointStart - anotherWall->GetStartPoint()).length()
-              <= distanceToClose)
+          if (ignition::math::Vector2d(pointStart -
+              anotherWall->StartPoint()).Length() <= distanceToClose)
           {
-            wallSegmentItem->SetStartPoint(anotherWall->GetStartPoint());
+            wallSegmentItem->SetStartPoint(anotherWall->StartPoint());
             this->LinkGrabbers(anotherWall->Grabbers()[0],
                 wallSegmentItem->Grabbers()[0]);
             break;
           }
-          else if (QVector2D(pointStart - anotherWall->GetEndPoint()).length()
-              <= distanceToClose)
+          else if (ignition::math::Vector2d(pointStart -
+              anotherWall->EndPoint()).Length() <= distanceToClose)
           {
-            wallSegmentItem->SetStartPoint(anotherWall->GetEndPoint());
+            wallSegmentItem->SetStartPoint(anotherWall->EndPoint());
             this->LinkGrabbers(anotherWall->Grabbers()[1],
                 wallSegmentItem->Grabbers()[0]);
             break;
@@ -747,19 +748,19 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->snapGrabberCurrent = NULL;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
-    wallSegmentItem->Set3dTexture(QString(""));
-    wallSegmentItem->Set3dColor(Qt::white);
+    wallSegmentItem->SetTexture3d("");
+    wallSegmentItem->SetColor3d(common::Color::White);
     wallSegmentItem->SetHighlighted(false);
     this->wallSegmentList.push_back(wallSegmentItem);
-    if (wallSegmentItem->GetLevel() > 0)
+    if (wallSegmentItem->Level() > 0)
     {
-      floorList[wallSegmentItem->GetLevel()-1]->AttachWallSegment(
+      floorList[wallSegmentItem->Level()-1]->AttachWallSegment(
           wallSegmentItem);
     }
 
     // Start from previous segment's end
-    QPointF newPointStart = wallSegmentItem->GetEndPoint();
-    QPointF newPointEnd = newPointStart + QPointF(1, 0);
+    auto newPointStart = wallSegmentItem->EndPoint();
+    auto newPointEnd = newPointStart + ignition::math::Vector2d(1, 0);
     GrabberHandle *grabberStart = wallSegmentItem->Grabbers()[1];
 
     wallSegmentItem = new WallSegmentItem(newPointStart,
@@ -850,44 +851,44 @@ void EditorView::DrawStairs(const QPoint &_pos)
 /////////////////////////////////////////////////
 void EditorView::Create3DVisual(EditorItem *_item)
 {
-  QVector3D itemPosition = _item->GetScenePosition();
-  itemPosition.setZ(_item->GetLevelBaseHeight() + itemPosition.z());
-  QVector3D itemSize = _item->GetSize();
+  QVector3D itemPosition = Conversions::Convert(_item->ScenePosition());
+  itemPosition.setZ(_item->LevelBaseHeight() + itemPosition.z());
+  QVector3D itemSize = Conversions::Convert(_item->Size());
   std::string itemName;
 
-  if (_item->GetType() == "Stairs")
+  if (_item->ItemType() == "Stairs")
   {
     StairsItem *stairsItem = dynamic_cast<StairsItem *>(_item);
     itemName = this->buildingMaker->AddStairs(
-        itemSize, itemPosition, _item->GetSceneRotation(),
-        stairsItem->GetSteps());
-    if (stairsItem->GetLevel() < static_cast<int>(floorList.size()))
+        itemSize, itemPosition, _item->SceneRotation(),
+        stairsItem->Steps());
+    if (stairsItem->Level() < static_cast<int>(floorList.size()))
     {
       this->buildingMaker->AttachManip(itemName,
-          this->itemToVisualMap[floorList[stairsItem->GetLevel()]]);
+          this->itemToVisualMap[floorList[stairsItem->Level()]]);
     }
   }
-  else if (_item->GetType() == "WallSegment")
+  else if (_item->ItemType() == "WallSegment")
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
-    itemSize.setZ(wallSegmentItem->GetHeight());
+    itemSize.setZ(wallSegmentItem->Height());
     itemName = this->buildingMaker->AddWall(
-        itemSize, itemPosition, _item->GetSceneRotation());
+        itemSize, itemPosition, _item->SceneRotation());
   }
-  else if (_item->GetType() == "Window")
+  else if (_item->ItemType() == "Window")
   {
     itemName = this->buildingMaker->AddWindow(
-        itemSize, itemPosition, _item->GetSceneRotation());
+        itemSize, itemPosition, _item->SceneRotation());
   }
-  else if (_item->GetType() == "Door")
+  else if (_item->ItemType() == "Door")
   {
     itemName = this->buildingMaker->AddDoor(
-        itemSize, itemPosition, _item->GetSceneRotation());
+        itemSize, itemPosition, _item->SceneRotation());
   }
-  else if (_item->GetType() == "Floor")
+  else if (_item->ItemType() == "Floor")
   {
     itemName = this->buildingMaker->AddFloor(
-        itemSize, _item->GetScenePosition(), 0);
+        itemSize, Conversions::Convert(_item->ScenePosition()), 0);
   }
   this->buildingMaker->ConnectItem(itemName, _item);
   this->itemToVisualMap[_item] = itemName;
@@ -1056,18 +1057,18 @@ void EditorView::OnAddLevel()
 
   std::vector<WallSegmentItem *>::iterator wallIt =
       this->wallSegmentList.begin();
-  double wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
+  double wallHeight = (*wallIt)->Height() + (*wallIt)->LevelBaseHeight();
   double maxHeight = wallHeight;
   int wallLevel = 0;
 
   ++wallIt;
   for (wallIt; wallIt != this->wallSegmentList.end(); ++wallIt)
   {
-    wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
+    wallHeight = (*wallIt)->Height() + (*wallIt)->LevelBaseHeight();
     if ( wallHeight > maxHeight)
     {
       maxHeight = wallHeight;
-      wallLevel = (*wallIt)->GetLevel();
+      wallLevel = (*wallIt)->Level();
     }
   }
   newLevel->baseHeight = maxHeight;
@@ -1079,7 +1080,7 @@ void EditorView::OnAddLevel()
   for (std::vector<WallSegmentItem *>::iterator it = wallSegmentList.begin();
       it  != this->wallSegmentList.end(); ++it)
   {
-    if ((*it)->GetLevel() != wallLevel)
+    if ((*it)->Level() != wallLevel)
       continue;
 
     WallSegmentItem *wallSegmentItem = (*it)->Clone();
@@ -1093,8 +1094,8 @@ void EditorView::OnAddLevel()
     this->Create3DVisual(wallSegmentItem);
 
     floorItem->AttachWallSegment(wallSegmentItem);
-    wallSegmentItem->Set3dTexture(QString(""));
-    wallSegmentItem->Set3dColor(Qt::white);
+    wallSegmentItem->SetTexture3d("");
+    wallSegmentItem->SetColor3d(common::Color::White);
     wallSegmentItem->SetHighlighted(false);
   }
 
@@ -1131,16 +1132,16 @@ void EditorView::OnAddLevel()
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
-    if ((*it)->GetLevel() == (newLevelNum - 1))
+    if ((*it)->Level() == (newLevelNum - 1))
     {
       buildingMaker->AttachManip(this->itemToVisualMap[(*it)],
-          floorItem->GetName());
+          floorItem->Name());
     }
   }
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
-  floorItem->Set3dTexture(QString(""));
-  floorItem->Set3dColor(Qt::white);
+  floorItem->SetTexture3d("");
+  floorItem->SetColor3d(common::Color::White);
   floorItem->SetHighlighted(false);
 }
 
@@ -1176,48 +1177,48 @@ void EditorView::DeleteLevel(int _level)
   for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
       it != this->windowList.end(); ++it)
   {
-    if ((*it)->GetLevel() == _level)
+    if ((*it)->Level() == _level)
       toBeDeleted.push_back(*it);
-    else if ((*it)->GetLevel() > _level)
+    else if ((*it)->Level() > _level)
     {
-      (*it)->SetLevel((*it)->GetLevel()-1);
-      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight() - deletedHeight);
+      (*it)->SetLevel((*it)->Level()-1);
+      (*it)->SetLevelBaseHeight((*it)->LevelBaseHeight() - deletedHeight);
       (*it)->WindowChanged();
     }
   }
   for (std::vector<DoorItem *>::iterator it = this->doorList.begin();
       it != this->doorList.end(); ++it)
   {
-    if ((*it)->GetLevel() == _level)
+    if ((*it)->Level() == _level)
       toBeDeleted.push_back(*it);
-    else if ((*it)->GetLevel() > _level)
+    else if ((*it)->Level() > _level)
     {
-      (*it)->SetLevel((*it)->GetLevel()-1);
-      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->SetLevel((*it)->Level()-1);
+      (*it)->SetLevelBaseHeight((*it)->LevelBaseHeight()-deletedHeight);
       (*it)->DoorChanged();
     }
   }
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
-    if ((*it)->GetLevel() == _level)
+    if ((*it)->Level() == _level)
       toBeDeleted.push_back(*it);
-    else if ((*it)->GetLevel() > _level)
+    else if ((*it)->Level() > _level)
     {
-      (*it)->SetLevel((*it)->GetLevel()-1);
-      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->SetLevel((*it)->Level()-1);
+      (*it)->SetLevelBaseHeight((*it)->LevelBaseHeight()-deletedHeight);
       (*it)->StairsChanged();
     }
   }
   for (std::vector<FloorItem *>::iterator it = this->floorList.begin();
       it != this->floorList.end(); ++it)
   {
-    if ((*it)->GetLevel() == _level)
+    if ((*it)->Level() == _level)
       toBeDeleted.push_back(*it);
-    else if ((*it)->GetLevel() > _level)
+    else if ((*it)->Level() > _level)
     {
-      (*it)->SetLevel((*it)->GetLevel()-1);
-      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->SetLevel((*it)->Level()-1);
+      (*it)->SetLevelBaseHeight((*it)->LevelBaseHeight()-deletedHeight);
       (*it)->FloorChanged();
     }
   }
@@ -1225,12 +1226,12 @@ void EditorView::DeleteLevel(int _level)
       this->wallSegmentList.begin();
       it != this->wallSegmentList.end(); ++it)
   {
-    if ((*it)->GetLevel() == _level)
+    if ((*it)->Level() == _level)
       toBeDeleted.push_back(*it);
-    else if ((*it)->GetLevel() > _level)
+    else if ((*it)->Level() > _level)
     {
-      (*it)->SetLevel((*it)->GetLevel()-1);
-      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->SetLevel((*it)->Level()-1);
+      (*it)->SetLevelBaseHeight((*it)->LevelBaseHeight()-deletedHeight);
       (*it)->WallSegmentChanged();
     }
   }
@@ -1291,9 +1292,8 @@ void EditorView::OnOpenLevelInspector()
   if (floorItem)
   {
     this->levelInspector->ShowFloorWidget(true);
-    this->levelInspector->SetColor(Conversions::Convert(
-        floorItem->Get3dColor()));
-    this->levelInspector->SetTexture(floorItem->Get3dTexture().toStdString());
+    this->levelInspector->SetColor(floorItem->Color3d());
+    this->levelInspector->SetTexture(floorItem->Texture3d());
   }
   else
   {
@@ -1314,8 +1314,8 @@ void EditorView::OnLevelApply()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    floorItem->Set3dTexture(QString::fromStdString(dialog->Texture()));
-    floorItem->Set3dColor(Conversions::Convert(dialog->Color()));
+    floorItem->SetTexture3d(dialog->Texture());
+    floorItem->SetColor3d(dialog->Color());
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();
   }
@@ -1375,7 +1375,7 @@ void EditorView::ShowCurrentLevelItems()
   for (std::vector<WallSegmentItem *>::iterator it =
       this->wallSegmentList.begin(); it != this->wallSegmentList.end(); ++it)
   {
-    if ((*it)->GetLevel() != this->currentLevel)
+    if ((*it)->Level() != this->currentLevel)
       (*it)->setVisible(false);
     else
       (*it)->setVisible(this->elementsVisible);
@@ -1383,7 +1383,7 @@ void EditorView::ShowCurrentLevelItems()
   for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
       it != this->windowList.end(); ++it)
   {
-    if ((*it)->GetLevel() != this->currentLevel)
+    if ((*it)->Level() != this->currentLevel)
       (*it)->setVisible(false);
     else
       (*it)->setVisible(this->elementsVisible);
@@ -1391,7 +1391,7 @@ void EditorView::ShowCurrentLevelItems()
   for (std::vector<DoorItem *>::iterator it = this->doorList.begin();
       it != this->doorList.end(); ++it)
   {
-    if ((*it)->GetLevel() != this->currentLevel)
+    if ((*it)->Level() != this->currentLevel)
       (*it)->setVisible(false);
     else
       (*it)->setVisible(this->elementsVisible);
@@ -1399,7 +1399,7 @@ void EditorView::ShowCurrentLevelItems()
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
   {
-    if ((*it)->GetLevel() != this->currentLevel && (*it)->GetLevel() !=
+    if ((*it)->Level() != this->currentLevel && (*it)->Level() !=
         (this->currentLevel - 1))
       (*it)->setVisible(false);
     else
@@ -1408,7 +1408,7 @@ void EditorView::ShowCurrentLevelItems()
   for (std::vector<FloorItem *>::iterator it = this->floorList.begin();
       it != this->floorList.end(); ++it)
   {
-    if ((*it)->GetLevel() != this->currentLevel)
+    if ((*it)->Level() != this->currentLevel)
       (*it)->setVisible(false);
     else
       (*it)->setVisible(this->elementsVisible);

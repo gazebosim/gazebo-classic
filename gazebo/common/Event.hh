@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_EVENT_HH_
-#define _GAZEBO_EVENT_HH_
+#ifndef GAZEBO_COMMON_EVENT_HH_
+#define GAZEBO_COMMON_EVENT_HH_
 
 #include <atomic>
-#include <iostream>
-#include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -32,7 +29,6 @@
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
-#include <gazebo/math/Helpers.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -42,19 +38,9 @@ namespace gazebo
   namespace event
   {
     /// \addtogroup gazebo_event Events
+    /// \brief Signals and connections to send and receive event-based
+    /// triggers.
     /// \{
-
-    /// \internal
-    // Private data members for Event class.
-    // This must be in the header due to templatization.
-    class GZ_COMMON_VISIBLE EventPrivate
-    {
-      // \brief Constructor
-      public: EventPrivate();
-
-      /// \brief True if the event has been signaled.
-      public: bool signaled;
-    };
 
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
@@ -76,23 +62,25 @@ namespace gazebo
 
       /// \brief Get whether this event has been signaled.
       /// \return True if the event has been signaled.
-      public: bool GetSignaled() const;
+      /// \deprecated See bool Signaled() const;
+      public: bool GetSignaled() const GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Allow subclasses to initialize their own data pointer.
-      /// \param[in] _d Reference to data pointer.
-      protected: Event(EventPrivate &_d);
+      /// \brief Get whether this event has been signaled.
+      /// \return True if the event has been signaled.
+      public: bool Signaled() const;
 
-      /// \brief Data pointer.
-      protected: EventPrivate *dataPtr;
+      /// \brief Set whether this event has been signaled.
+      /// \param[in] _sig True if the event has been signaled.
+      public: void SetSignaled(const bool _sig);
+
+      /// \brief True if the event has been signaled.
+      private: bool signaled;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for Connection class.
-    class GZ_COMMON_VISIBLE ConnectionPrivate
+    class ConnectionPrivate
     {
-      /// \brief Constructor.
-      public: ConnectionPrivate();
-
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with
       /// \param[in] _i Unique id
@@ -107,27 +95,30 @@ namespace gazebo
       /// \brief set during the constructor
       public: common::Time creationTime;
     };
+    /// \endcond
 
     /// \brief A class that encapsulates a connection.
     class GZ_COMMON_VISIBLE Connection
     {
       /// \brief Constructor.
-      public: Connection();
-
-      /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
       /// \param[in] _i Unique id.
-      public: Connection(Event *_e, int _i);
+      public: Connection(Event *_e, const int _i);
 
       /// \brief Destructor.
       public: ~Connection();
 
       /// \brief Get the id of this connection.
       /// \return The id of this connection.
-      public: int GetId() const;
+      /// \deprecated See const Id() const;
+      public: int GetId() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the id of this connection.
+      /// \return The id of this connection.
+      public: int Id() const;
 
       /// \brief Private data pointer.
-      private: ConnectionPrivate *dataPtr;
+      private: std::unique_ptr<ConnectionPrivate> dataPtr;
 
       /// \brief Friend class.
       public: template<typename T> friend class EventT;
@@ -138,8 +129,7 @@ namespace gazebo
     class EventConnection
     {
       /// \brief Constructor
-      public: EventConnection(const bool _on,
-                  boost::function<T> *_cb)
+      public: EventConnection(const bool _on, boost::function<T> _cb)
               : callback(_cb)
       {
         // Windows Visual Studio 2012 does not have atomic_bool constructor,
@@ -151,13 +141,13 @@ namespace gazebo
       public: std::atomic_bool on;
 
       /// \brief Callback function
-      public: std::shared_ptr<boost::function<T> > callback;
+      public: boost::function<T> callback;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for EventT<T> class.
     template< typename T>
-    class EventTPrivate : public EventPrivate
+    class EventTPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
@@ -174,10 +164,11 @@ namespace gazebo
       public: std::list<typename EvtConnectionMap::const_iterator>
               connectionsToRemove;
     };
+    /// \endcond
 
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
-    template< typename T>
+    template<typename T>
     class EventT : public Event
     {
       /// \brief Constructor.
@@ -358,11 +349,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)();
+            iter.second->callback();
         }
       }
 
@@ -373,11 +364,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p);
+            iter.second->callback(_p);
         }
       }
 
@@ -389,11 +380,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2);
+            iter.second->callback(_p1, _p2);
         }
       }
 
@@ -406,11 +397,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3);
+            iter.second->callback(_p1, _p2, _p3);
         }
       }
 
@@ -425,11 +416,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4);
+            iter.second->callback(_p1, _p2, _p3, _p4);
         }
       }
 
@@ -446,11 +437,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5);
         }
       }
 
@@ -468,11 +459,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
         }
       }
 
@@ -491,11 +482,11 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections.begin())
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
         }
       }
 
@@ -516,12 +507,12 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
           {
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
           }
         }
       }
@@ -545,12 +536,12 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
           {
-            (*iter.second->callback)(
+            iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
           }
         }
@@ -576,12 +567,12 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
           {
-            (*iter.second->callback)(
+            iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
           }
         }
@@ -593,15 +584,14 @@ namespace gazebo
       private: void Cleanup();
 
       /// \brief Private data pointer.
-      private: EventTPrivate<T> *myDataPtr;
+      private: std::unique_ptr<EventTPrivate<T>> myDataPtr;
     };
 
     /// \brief Constructor.
     template<typename T>
     EventT<T>::EventT()
-    : Event(*(new EventTPrivate<T>()))
+    : Event(), myDataPtr(new EventTPrivate<T>())
     {
-      this->myDataPtr = static_cast<EventTPrivate<T>*>(this->dataPtr);
     }
 
     /// \brief Destructor. Deletes all the associated connections.
@@ -623,7 +613,7 @@ namespace gazebo
         index = iter->first + 1;
       }
       this->myDataPtr->connections[index].reset(new EventConnection<T>(true,
-          new boost::function<T>(_subscriber)));
+          _subscriber));
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -635,8 +625,8 @@ namespace gazebo
       if (!_c)
         return;
 
-      this->Disconnect(_c->GetId());
-      _c->dataPtr->event = NULL;
+      this->Disconnect(_c->Id());
+      _c->dataPtr->event = nullptr;
       _c->dataPtr->id = -1;
     }
 
@@ -673,7 +663,6 @@ namespace gazebo
         this->myDataPtr->connections.erase(conn);
       this->myDataPtr->connectionsToRemove.clear();
     }
-
     /// \}
   }
 }

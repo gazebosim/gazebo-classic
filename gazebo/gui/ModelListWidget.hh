@@ -139,6 +139,9 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Physics &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Wind &_msg,
+                                     QtProperty *_parent);
+
       /// \brief Fill the property tree with atmosphere info.
       /// \param[in] _msg The atmosphere message.
       /// \param[in] _parent Pointer to the qtproperty which will receive
@@ -188,6 +191,10 @@ namespace gazebo
       /// \brief Called when a physics property is changed by the user.
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a wind property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void WindPropertyChanged(QtProperty *_item);
 
       /// \brief Called when an atmosphere property is changed by the user.
       /// \param[in] _item The item that was changed.

@@ -51,6 +51,11 @@ CameraLens::CameraLens()
 }
 
 //////////////////////////////////////////////////
+CameraLens::~CameraLens()
+{
+}
+
+//////////////////////////////////////////////////
 void CameraLens::Init(const double _c1, const double _c2,
                       const std::string &_fun, const double _f,
                       const double _c3)

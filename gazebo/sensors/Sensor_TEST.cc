@@ -55,7 +55,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // Load in a world with lasers
   Load("worlds/ray_test.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   unsigned int i;
   double updateRateHokuyo, updateRateImu, now, then;
@@ -67,11 +67,11 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // get the hokuyo sensor
   sensors::SensorPtr sensor;
   sensor = mgr->GetSensor("default::hokuyo::link::laser");
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
   sensors::SensorPtr imuSensor;
   imuSensor = mgr->GetSensor("default::box_model::box_link::box_imu_sensor");
-  ASSERT_TRUE(imuSensor != NULL);
+  ASSERT_TRUE(imuSensor != nullptr);
 
   // set update rate to 30 Hz
   updateRateHokuyo = 30.0;
