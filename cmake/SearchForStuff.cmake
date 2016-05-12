@@ -670,6 +670,20 @@ if (NOT WIN32)
 endif()
 
 ########################################
+# Find the Ignition_Msgs library
+# In Windows we expect a call from configure.bat script with the paths
+if (NOT WIN32)
+  find_package(ignition-msgs0 QUIET)
+  if (NOT ignition-msgs0_FOUND)
+    BUILD_ERROR ("Missing: Ignition Msgs (libignition-msgs0-dev)")
+  else()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-MSGS_CXX_FLAGS}")
+    include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
+    link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
+  endif()
+endif()
+
+########################################
 # Find the Ignition_Transport library
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)

@@ -104,41 +104,41 @@ TEST_F(MsgsTest, BadPackage)
 
 TEST_F(MsgsTest, ConvertDoubleToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(1.0);
-  EXPECT_EQ(msg.type(), msgs::Any::DOUBLE);
+  ignition::msgs::Any msg = msgs::ConvertAny(1.0);
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::DOUBLE);
   ASSERT_TRUE(msg.has_double_value());
   EXPECT_DOUBLE_EQ(1, msg.double_value());
 }
 
 TEST_F(MsgsTest, ConvertIntToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(2);
-  EXPECT_EQ(msg.type(), msgs::Any::INT32);
+  ignition::msgs::Any msg = msgs::ConvertAny(2);
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::INT32);
   ASSERT_TRUE(msg.has_int_value());
   EXPECT_DOUBLE_EQ(2, msg.int_value());
 }
 
 TEST_F(MsgsTest, ConvertStringToAny)
 {
-  msgs::Any msg = msgs::ConvertAny("test_string");
-  EXPECT_EQ(msg.type(), msgs::Any::STRING);
+  ignition::msgs::Any msg = msgs::ConvertAny("test_string");
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::STRING);
   ASSERT_TRUE(msg.has_string_value());
   EXPECT_EQ("test_string", msg.string_value());
 }
 
 TEST_F(MsgsTest, ConvertBoolToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(true);
+  ignition::msgs::Any msg = msgs::ConvertAny(true);
 
-  EXPECT_EQ(msg.type(), msgs::Any::BOOLEAN);
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::BOOLEAN);
   ASSERT_TRUE(msg.has_bool_value());
   EXPECT_TRUE(msg.bool_value());
 }
 
 TEST_F(MsgsTest, ConvertVector3dToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(ignition::math::Vector3d(1, 2, 3));
-  EXPECT_EQ(msg.type(), msgs::Any::VECTOR3D);
+  ignition::msgs::Any msg = msgs::ConvertAny(ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::VECTOR3D);
   ASSERT_TRUE(msg.has_vector3d_value());
 
   EXPECT_DOUBLE_EQ(1, msg.vector3d_value().x());
@@ -148,8 +148,8 @@ TEST_F(MsgsTest, ConvertVector3dToAny)
 
 TEST_F(MsgsTest, ConvertColorToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(common::Color(.1, .2, .3, 1.0));
-  EXPECT_EQ(msg.type(), msgs::Any::COLOR);
+  ignition::msgs::Any msg = msgs::ConvertAny(common::Color(.1, .2, .3, 1.0));
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::COLOR);
   ASSERT_TRUE(msg.has_color_value());
 
   EXPECT_DOUBLE_EQ(0.1f, msg.color_value().r());
@@ -160,11 +160,11 @@ TEST_F(MsgsTest, ConvertColorToAny)
 
 TEST_F(MsgsTest, ConvertPose3dToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(ignition::math::Pose3d(
+  ignition::msgs::Any msg = msgs::ConvertAny(ignition::math::Pose3d(
       ignition::math::Vector3d(1, 2, 3),
       ignition::math::Quaterniond(4, 5, 6, 7)));
 
-  EXPECT_EQ(msg.type(), msgs::Any::POSE3D);
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::POSE3D);
   ASSERT_TRUE(msg.has_pose3d_value());
 
   EXPECT_DOUBLE_EQ(1, msg.pose3d_value().position().x());
@@ -179,10 +179,10 @@ TEST_F(MsgsTest, ConvertPose3dToAny)
 
 TEST_F(MsgsTest, ConvertQuaternionToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(
+  ignition::msgs::Any msg = msgs::ConvertAny(
       ignition::math::Quaterniond(1, 2, 3, 4));
 
-  EXPECT_EQ(msg.type(), msgs::Any::QUATERNIOND);
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::QUATERNIOND);
   ASSERT_TRUE(msg.has_quaternion_value());
 
   EXPECT_TRUE(math::equal(msg.quaternion_value().w(), 1.0));
@@ -193,9 +193,9 @@ TEST_F(MsgsTest, ConvertQuaternionToAny)
 
 TEST_F(MsgsTest, ConvertTimeToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(common::Time(2, 123));
+  ignition::msgs::Any msg = msgs::ConvertAny(common::Time(2, 123));
 
-  EXPECT_EQ(msg.type(), msgs::Any::TIME);
+  EXPECT_EQ(msg.type(), ignition::msgs::Any::TIME);
   ASSERT_TRUE(msg.has_time_value());
 
   EXPECT_EQ(2, msg.time_value().sec());

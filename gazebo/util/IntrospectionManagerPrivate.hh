@@ -23,8 +23,6 @@
 #include <set>
 #include <string>
 #include <ignition/transport.hh>
-#include "gazebo/msgs/any.pb.h"
-#include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
 
 namespace gazebo
@@ -39,14 +37,14 @@ namespace gazebo
 
       /// \brief Message containing the next update. A message is a collection
       /// of items and values.
-      msgs::Param_V msg;
+      ignition::msgs::Param_V msg;
     };
 
     /// \brief Todo.
     struct ObservedItem
     {
       /// \brief ToDo.
-      gazebo::msgs::Any lastValue;
+      ignition::msgs::Any lastValue;
 
       /// \brief ToDo.
       std::set<std::string> filters;
@@ -64,8 +62,8 @@ namespace gazebo
       /// The key contains the item name.
       /// The value contains the string representation of the protobuf type
       /// that stores the value.
-      /// E.g.: allItems["model1::pose"] = "gazebo::msgs::Pose"
-      public: std::map<std::string, std::function <gazebo::msgs::Any ()>>
+      /// E.g.: allItems["model1::pose"] = "ignition::msgs::Pose"
+      public: std::map<std::string, std::function <ignition::msgs::Any ()>>
           allItems;
 
       /// \brief List of items that have at least one active observer.

@@ -235,92 +235,92 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const double _d)
+    ignition::msgs::Any ConvertAny(const double _d)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::DOUBLE);
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::DOUBLE);
       result.set_double_value(_d);
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const int _i)
+    ignition::msgs::Any ConvertAny(const int _i)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::INT32);
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::INT32);
       result.set_int_value(_i);
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const std::string &_s)
+    ignition::msgs::Any ConvertAny(const std::string &_s)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::STRING);
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::STRING);
       result.set_string_value(_s);
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const char *_s)
+    ignition::msgs::Any ConvertAny(const char *_s)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::STRING);
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::STRING);
       result.set_string_value(std::string(_s));
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const bool _b)
+    ignition::msgs::Any ConvertAny(const bool _b)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::BOOLEAN);
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::BOOLEAN);
       result.set_bool_value(_b);
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const ignition::math::Vector3d &_v)
+    ignition::msgs::Any ConvertAny(const ignition::math::Vector3d &_v)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::VECTOR3D);
-      result.mutable_vector3d_value()->CopyFrom(Convert(_v));
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::VECTOR3D);
+      result.mutable_vector3d_value()->CopyFrom(ignition::msgs::Convert(_v));
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const common::Color &_c)
+    ignition::msgs::Any ConvertAny(const common::Color &_c)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::COLOR);
-      result.mutable_color_value()->CopyFrom(Convert(_c));
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::COLOR);
+      result.mutable_color_value()->CopyFrom(ConvertIgnMsg(_c));
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const ignition::math::Pose3d &_p)
+    ignition::msgs::Any ConvertAny(const ignition::math::Pose3d &_p)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::POSE3D);
-      result.mutable_pose3d_value()->CopyFrom(Convert(_p));
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::POSE3D);
+      result.mutable_pose3d_value()->CopyFrom(ignition::msgs::Convert(_p));
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const ignition::math::Quaterniond &_q)
+    ignition::msgs::Any ConvertAny(const ignition::math::Quaterniond &_q)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::QUATERNIOND);
-      result.mutable_quaternion_value()->CopyFrom(Convert(_q));
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::QUATERNIOND);
+      result.mutable_quaternion_value()->CopyFrom(ignition::msgs::Convert(_q));
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const common::Time &_t)
+    ignition::msgs::Any ConvertAny(const common::Time &_t)
     {
-      msgs::Any result;
-      result.set_type(msgs::Any::TIME);
-      result.mutable_time_value()->CopyFrom(Convert(_t));
+      ignition::msgs::Any result;
+      result.set_type(ignition::msgs::Any::TIME);
+      result.mutable_time_value()->CopyFrom(ConvertIgnMsg(_t));
       return result;
     }
 
@@ -378,6 +378,26 @@ namespace gazebo
     msgs::Time Convert(const common::Time &_t)
     {
       msgs::Time result;
+      result.set_sec(_t.sec);
+      result.set_nsec(_t.nsec);
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    ignition::msgs::Color ConvertIgnMsg(const common::Color &_c)
+    {
+      ignition::msgs::Color result;
+      result.set_r(_c.r);
+      result.set_g(_c.g);
+      result.set_b(_c.b);
+      result.set_a(_c.a);
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    ignition::msgs::Time ConvertIgnMsg(const common::Time &_t)
+    {
+      ignition::msgs::Time result;
       result.set_sec(_t.sec);
       result.set_nsec(_t.nsec);
       return result;

@@ -21,14 +21,10 @@
 #include <memory>
 #include <set>
 #include <string>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/msgs/any.pb.h"
-#include "gazebo/msgs/empty.pb.h"
-#include "gazebo/msgs/gz_string.pb.h"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/msgs/param.pb.h"
-#include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -106,7 +102,7 @@ namespace gazebo
       /// \result True when the registration succeed or false otherwise
       /// (item already existing).
       private: bool Register(const std::string &_item,
-                             const std::function <gazebo::msgs::Any()> &_cb);
+                             const std::function <ignition::msgs::Any()> &_cb);
 
       /// \brief Create a new filter for observing item updates. This function
       /// will create a new topic for sending periodic updates of the items
@@ -140,8 +136,8 @@ namespace gazebo
       /// the filter ID created.
       /// \param[out] _result True when the operation succeed or false
       ///  otherwise. _rep should be ignored when _result is false.
-      private: void NewFilter(const gazebo::msgs::Param_V &_req,
-                              gazebo::msgs::GzString &_rep,
+      private: void NewFilter(const ignition::msgs::Param_V &_req,
+                              ignition::msgs::StringMsg &_rep,
                               bool &_result);
 
       /// \brief Internal callback for updating a filter via service request.
@@ -153,8 +149,8 @@ namespace gazebo
       /// \param[out] _rep Not used.
       /// \param[out] _result True when the filter was successfully updated or
       /// false otherwise.
-      private: void UpdateFilter(const gazebo::msgs::Param_V &_req,
-                                 gazebo::msgs::Empty &_rep,
+      private: void UpdateFilter(const ignition::msgs::Param_V &_req,
+                                 ignition::msgs::Empty &_rep,
                                  bool &_result);
 
       /// \brief Internal callback for removing a filter via service request.
@@ -164,8 +160,8 @@ namespace gazebo
       /// \param[out] _rep Not used.
       /// \param[out] _result True when the filter was successfully removed or
       /// false otherwise.
-      private: void RemoveFilter(const gazebo::msgs::Param_V &_req,
-                                 gazebo::msgs::Empty &_rep,
+      private: void RemoveFilter(const ignition::msgs::Param_V &_req,
+                                 ignition::msgs::Empty &_rep,
                                  bool &_result);
 
       /// \brief Internal callback for listing all the items registered in the
@@ -175,8 +171,8 @@ namespace gazebo
       /// registered. Each parameter should have a name "item", followed by a
       /// value of type STRING.
       /// \param[out] _result True when the request succeeded.
-      private: void Items(const gazebo::msgs::Empty &_req,
-                          gazebo::msgs::Param_V &_rep,
+      private: void Items(const ignition::msgs::Empty &_req,
+                          ignition::msgs::Param_V &_rep,
                           bool &_result);
 
       /// \brief Helper function for creating a random string identifier.
@@ -191,7 +187,7 @@ namespace gazebo
       /// message.
       /// \return True when the message contains only allowed parameter names,
       /// its values are STRING and the values exist.
-      private: bool ValidateParameter(const gazebo::msgs::Param &_msg,
+      private: bool ValidateParameter(const ignition::msgs::Param &_msg,
                              const std::set<std::string> &_allowedValues) const;
 
       /// \brief This is a singleton.

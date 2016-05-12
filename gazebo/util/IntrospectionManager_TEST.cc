@@ -18,9 +18,10 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 #include <gtest/gtest.h>
-#include "gazebo/msgs/any.pb.h"
+#include "gazebo/common/Color.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "test/util.hh"
 
@@ -188,9 +189,9 @@ TEST_F(IntrospectionManagerTest, UpdateItems)
   };
 
   bool executed = false;
-  gazebo::msgs::Param_V items;
-  std::function<void(const gazebo::msgs::Param_V&)> subCb =
-    [&executed, &items](const gazebo::msgs::Param_V &_msg)
+  ignition::msgs::Param_V items;
+  std::function<void(const ignition::msgs::Param_V&)> subCb =
+    [&executed, &items](const ignition::msgs::Param_V &_msg)
     {
       items.CopyFrom(_msg);
       executed = true;

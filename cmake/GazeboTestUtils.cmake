@@ -111,6 +111,7 @@ if (VALID_DISPLAY)
       gazebo_gui
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
+      ${IGNITION-MSGS_LIBRARIES}
       )
 
     # QTest need and extra -o parameter to write logging information to a file

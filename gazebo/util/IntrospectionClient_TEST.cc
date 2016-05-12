@@ -17,12 +17,10 @@
 
 #include <set>
 #include <string>
+#include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 #include <gtest/gtest.h>
 #include "gazebo/common/Exception.hh"
-#include "gazebo/msgs/any.pb.h"
-#include "gazebo/msgs/gz_string.pb.h"
-#include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionClient.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "test/util.hh"
@@ -41,7 +39,7 @@ class IntrospectionClientTest : public ::testing::Test
   }
 
   /// \brief Function called each time a topic update is received.
-  public: void MyCb(const gazebo::msgs::Param_V &_msg)
+  public: void MyCb(const ignition::msgs::Param_V &_msg)
   {
     ASSERT_EQ(_msg.param_size(), 2);
     std::map<std::string, double> receivedItems;
@@ -51,7 +49,7 @@ class IntrospectionClientTest : public ::testing::Test
       auto param = _msg.param(i);
       ASSERT_TRUE(param.has_value());
       auto value = param.value();
-      EXPECT_EQ(value.type(), gazebo::msgs::Any::DOUBLE);
+      EXPECT_EQ(value.type(), ignition::msgs::Any::DOUBLE);
       ASSERT_TRUE(value.has_double_value());
       receivedItems[param.name()] = value.double_value();
     }

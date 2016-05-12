@@ -26,12 +26,9 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <ignition/msgs.hh>
+
 #include "gazebo/common/Console.hh"
-#include "gazebo/msgs/any.pb.h"
-#include "gazebo/msgs/empty.pb.h"
-#include "gazebo/msgs/gz_string.pb.h"
-#include "gazebo/msgs/param.pb.h"
-#include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionClient.hh"
 #include "gazebo/util/IntrospectionClientPrivate.hh"
 
@@ -110,8 +107,8 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
     return false;
   }
 
-  gazebo::msgs::Param_V req;
-  gazebo::msgs::GzString rep;
+  ignition::msgs::Param_V req;
+  ignition::msgs::StringMsg rep;
   bool result;
 
   // Add to the message the list of items to include in the filter.
@@ -119,7 +116,7 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
   {
     auto nextParam = req.add_param();
     nextParam->set_name("item");
-    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
     nextParam->mutable_value()->set_string_value(itemName);
   }
 
@@ -163,8 +160,8 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
 
   // Create a lambda function that will add the new filter when the request
   // is received and invoke the user callback with the new filter ID and topic.
-  std::function<void(const gazebo::msgs::GzString&, const bool)> f =
-    [this, _managerId, &_cb](const gazebo::msgs::GzString &_rep,
+  std::function<void(const ignition::msgs::StringMsg&, const bool)> f =
+    [this, _managerId, &_cb](const ignition::msgs::StringMsg &_rep,
                              const bool _result)
   {
     std::string filterId;
@@ -183,21 +180,21 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
     _cb(filterId, newTopic, _result);
   };
 
-  gazebo::msgs::Param_V req;
+  ignition::msgs::Param_V req;
 
   // Add to the message the list of items to include in the filter.
   for (auto const &itemName : _newItems)
   {
     auto nextParam = req.add_param();
     nextParam->set_name("item");
-    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
     nextParam->mutable_value()->set_string_value(itemName);
   }
 
   // Request the service.
   auto service = "/introspection/" + _managerId + "/filter_new";
   if (!this->dataPtr->node.Request<
-    gazebo::msgs::Param_V, gazebo::msgs::GzString>(service, req, f))
+    ignition::msgs::Param_V, ignition::msgs::StringMsg>(service, req, f))
   {
     gzerr << "Unable to create a remote introspection filter on manager ["
           << _managerId << "]" << std::endl;
@@ -219,14 +216,14 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     return false;
   }
 
-  gazebo::msgs::Param_V req;
-  gazebo::msgs::Empty rep;
+  ignition::msgs::Param_V req;
+  ignition::msgs::Empty rep;
   bool result;
 
   // Add the filter_id to the message.
   auto nextParam = req.add_param();
   nextParam->set_name("filter_id");
-  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
   nextParam->mutable_value()->set_string_value(_filterId);
 
   // Add to the message the list of items to include in the filter.
@@ -234,7 +231,7 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
   {
     nextParam = req.add_param();
     nextParam->set_name("item");
-    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
     nextParam->mutable_value()->set_string_value(itemName);
   }
 
@@ -272,18 +269,18 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     return false;
   }
 
-  std::function<void(const gazebo::msgs::Empty&, const bool)> f =
-    [=](const gazebo::msgs::Empty &/*_rep*/, const bool _result)
+  std::function<void(const ignition::msgs::Empty&, const bool)> f =
+    [=](const ignition::msgs::Empty &/*_rep*/, const bool _result)
   {
     _cb(_result);
   };
 
-  gazebo::msgs::Param_V req;
+  ignition::msgs::Param_V req;
 
   // Add the filter_id to the message.
   auto nextParam = req.add_param();
   nextParam->set_name("filter_id");
-  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
   nextParam->mutable_value()->set_string_value(_filterId);
 
   // Add to the message the list of items to include in the filter.
@@ -291,14 +288,14 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
   {
     nextParam = req.add_param();
     nextParam->set_name("item");
-    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
     nextParam->mutable_value()->set_string_value(itemName);
   }
 
   // Request the service.
   auto service = "/introspection/" + _managerId + "/filter_update";
   if (!this->dataPtr->node.Request<
-    gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
+    ignition::msgs::Param_V, ignition::msgs::Empty>(service, req, f))
   {
     gzerr << "Unable to request an introspection filter update on manager ["
           << _managerId << "] and filter ID [" << _filterId << "]" << std::endl;
@@ -337,14 +334,14 @@ bool IntrospectionClient::RemoveAllFilters() const
 bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
     const std::string &_filterId) const
 {
-  gazebo::msgs::Param_V req;
-  gazebo::msgs::Empty rep;
+  ignition::msgs::Param_V req;
+  ignition::msgs::Empty rep;
   bool result;
 
   // Add the filter_id to the message.
   auto nextParam = req.add_param();
   nextParam->set_name("filter_id");
-  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
   nextParam->mutable_value()->set_string_value(_filterId);
 
   // Request the service.
@@ -382,8 +379,8 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
     return false;
   }
 
-  std::function<void(const gazebo::msgs::Empty&, const bool)> f =
-    [this, _filterId, &_cb](const gazebo::msgs::Empty &/*_rep*/,
+  std::function<void(const ignition::msgs::Empty&, const bool)> f =
+    [this, _filterId, &_cb](const ignition::msgs::Empty &/*_rep*/,
                             const bool _result)
   {
     if (_result)
@@ -396,18 +393,18 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
     _cb(_result);
   };
 
-  gazebo::msgs::Param_V req;
+  ignition::msgs::Param_V req;
 
   // Add the filter_id to the message.
   auto nextParam = req.add_param();
   nextParam->set_name("filter_id");
-  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
   nextParam->mutable_value()->set_string_value(_filterId);
 
   // Request the service.
   auto service = "/introspection/" + _managerId + "/filter_remove";
   if (!this->dataPtr->node.Request<
-    gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
+    ignition::msgs::Param_V, ignition::msgs::Empty>(service, req, f))
   {
     gzerr << "Unable to request an introspection filter removal on manager ["
           << _managerId << "] and filter ID [" << _filterId << "]" << std::endl;
@@ -421,8 +418,8 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
 bool IntrospectionClient::Items(const std::string &_managerId,
     std::set<std::string> &_items) const
 {
-  gazebo::msgs::Empty req;
-  gazebo::msgs::Param_V rep;
+  ignition::msgs::Empty req;
+  ignition::msgs::Param_V rep;
   bool result;
 
   // Request the service.
@@ -448,8 +445,8 @@ bool IntrospectionClient::Items(const std::string &_managerId,
     const std::function<void(const std::set<std::string> &_items,
                              const bool _result)> &_cb) const
 {
-  std::function<void(const gazebo::msgs::Param_V&, const bool)> f =
-    [=](const gazebo::msgs::Param_V &_rep, const bool _result)
+  std::function<void(const ignition::msgs::Param_V&, const bool)> f =
+    [=](const ignition::msgs::Param_V &_rep, const bool _result)
   {
     std::set<std::string> items;
     if (_result)
@@ -464,7 +461,7 @@ bool IntrospectionClient::Items(const std::string &_managerId,
     _cb(items, _result);
   };
 
-  gazebo::msgs::Empty req;
+  ignition::msgs::Empty req;
 
   // Request the service.
   auto service = "/introspection/" + _managerId + "/items";

@@ -24,14 +24,9 @@
 #include <set>
 #include <string>
 #include <ignition/math/Rand.hh>
+#include <ignition/msgs.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/msgs/any.pb.h"
-#include "gazebo/msgs/empty.pb.h"
-#include "gazebo/msgs/gz_string.pb.h"
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/msgs/param.pb.h"
-#include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/IntrospectionManagerPrivate.hh"
 
@@ -84,7 +79,7 @@ IntrospectionManager::IntrospectionManager()
   // Advertise the topic for notifying changes in the registered items.
   std::string topic = "/introspection/" + this->dataPtr->managerId +
       "/items_update";
-  if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topic))
+  if (!this->dataPtr->node.Advertise<ignition::msgs::Param_V>(topic))
   {
     gzerr << "Error advertising topic [" << topic << "]" << std::endl;
   }
@@ -103,7 +98,7 @@ std::string IntrospectionManager::Id() const
 
 //////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
-    const std::function <gazebo::msgs::Any ()> &_cb)
+    const std::function <ignition::msgs::Any ()> &_cb)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -168,7 +163,7 @@ std::set<std::string> IntrospectionManager::Items() const
 void IntrospectionManager::Update()
 {
   std::map<std::string, IntrospectionFilter> filtersCopy;
-  std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
+  std::map<std::string, std::function <ignition::msgs::Any ()>> allItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
 
   {
@@ -194,7 +189,7 @@ void IntrospectionManager::Update()
     try
     {
       // Update the values of the items under observation.
-      gazebo::msgs::Any value = itemIter->second();
+      ignition::msgs::Any value = itemIter->second();
       auto &lastValue = observedItem.second.lastValue;
       lastValue.CopyFrom(value);
     }
@@ -222,7 +217,7 @@ void IntrospectionManager::Update()
       // Sanity check: Make sure that the value was updated.
       // (e.g.: an exception was not raised).
       auto &lastValue = observedItemsCopy[item].lastValue;
-      if (lastValue.type() == gazebo::msgs::Any::NONE)
+      if (lastValue.type() == ignition::msgs::Any::NONE)
         continue;
 
       auto nextParam = nextMsg.add_param();
@@ -259,9 +254,9 @@ void IntrospectionManager::NotifyUpdates()
 
   if (itemsUpdatedCopy)
   {
-    gazebo::msgs::Empty req;
+    ignition::msgs::Empty req;
     bool result;
-    gazebo::msgs::Param_V currentItems;
+    ignition::msgs::Param_V currentItems;
     // Prepare the list of items to be sent.
     this->Items(req, currentItems, result);
 
@@ -290,7 +285,7 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_newItems,
   std::string topicName = this->dataPtr->prefix + "filter/" + _filterId;
 
   // Advertise the new topic.
-  if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topicName))
+  if (!this->dataPtr->node.Advertise<ignition::msgs::Param_V>(topicName))
   {
     gzerr << "Error advertising topic [" << topicName << "]." << std::endl;
     gzerr << "Ignoring request." << std::endl;
@@ -407,8 +402,8 @@ bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
-    gazebo::msgs::GzString &_rep, bool &_result)
+void IntrospectionManager::NewFilter(const ignition::msgs::Param_V &_req,
+    ignition::msgs::StringMsg &_rep, bool &_result)
 {
   _rep.set_data("");
   _result = false;
@@ -451,8 +446,8 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
-    gazebo::msgs::Empty &/*_rep*/, bool &_result)
+void IntrospectionManager::UpdateFilter(const ignition::msgs::Param_V &_req,
+    ignition::msgs::Empty &/*_rep*/, bool &_result)
 {
   _result = false;
 
@@ -517,8 +512,8 @@ void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
-    gazebo::msgs::Empty &/*_rep*/, bool &_result)
+void IntrospectionManager::RemoveFilter(const ignition::msgs::Param_V &_req,
+    ignition::msgs::Empty &/*_rep*/, bool &_result)
 {
   _result = false;
 
@@ -546,8 +541,8 @@ void IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
-    gazebo::msgs::Param_V &_rep, bool &_result)
+void IntrospectionManager::Items(const ignition::msgs::Empty &/*_req*/,
+    ignition::msgs::Param_V &_rep, bool &_result)
 {
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -555,7 +550,7 @@ void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
     {
       auto nextParam = _rep.add_param();
       nextParam->set_name("item");
-      nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+      nextParam->mutable_value()->set_type(ignition::msgs::Any::STRING);
       nextParam->mutable_value()->set_string_value(item.first);
     }
   }
@@ -580,7 +575,7 @@ std::string IntrospectionManager::CreateRandomId(
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionManager::ValidateParameter(const gazebo::msgs::Param &_msg,
+bool IntrospectionManager::ValidateParameter(const ignition::msgs::Param &_msg,
     const std::set<std::string> &_allowedValues) const
 {
   if (_allowedValues.find(_msg.name()) == _allowedValues.end())
@@ -599,7 +594,7 @@ bool IntrospectionManager::ValidateParameter(const gazebo::msgs::Param &_msg,
   }
 
   auto value = _msg.value();
-  if (value.type() != gazebo::msgs::Any::STRING)
+  if (value.type() != ignition::msgs::Any::STRING)
   {
     gzwarn << "Expected a parameter with STRING value. Instead, I received ["
           << value.type() << "]." << std::endl;

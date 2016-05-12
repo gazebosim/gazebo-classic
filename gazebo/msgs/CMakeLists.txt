@@ -1,9 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include_directories(${IGNITION-MATH_INCLUDE_DIRS})
+include_directories(${IGNITION-MATH_INCLUDE_DIRS} ${IGNITION-MSGS_INCLUDE_DIRS})
+
+link_directories(${PROJECT_BINARY_DIR}/src ${IGNITION-MSGS_LIBRARY_DIRS})
 
 set (msgs
   altimeter.proto
-  any.proto
   atmosphere.proto
   axis.proto
   battery.proto
@@ -21,7 +22,6 @@ set (msgs
   density.proto
   diagnostics.proto
   distortion.proto
-  empty.proto
   factory.proto
   fluid.proto
   fog.proto
@@ -69,8 +69,6 @@ set (msgs
   model_v.proto
   packet.proto
   physics.proto
-  param.proto
-  param_v.proto
   planegeom.proto
   pid.proto
   plugin.proto
@@ -141,7 +139,7 @@ gz_build_tests(${msgs_tests_sources} EXTRA_LIBS gazebo_msgs)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
-target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC_LIBRARY})
+target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC_LIBRARY} ${IGNITION-MSGS_LIBRARIES})
 if (UNIX)
   target_link_libraries(gazebomsgs_out pthread)
 endif()
@@ -208,6 +206,7 @@ target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
   ${GZ_PROTOBUF_LIBRARY}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
