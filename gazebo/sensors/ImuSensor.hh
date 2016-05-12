@@ -89,10 +89,18 @@ namespace gazebo
       public: ignition::math::Quaterniond Orientation() const;
 
       /// \brief Sets the current pose as the IMU reference pose
-      public: void SetReferencePose();
+      /// deprecated by SetReferenceOrientation
+      public: void SetReferencePose() GAZEBO_DEPRECATED(7.0);
 
       // Documentation inherited.
       public: virtual bool IsActive() const;
+
+      /// \brief Sets the current reported pose of the IMU
+      /// Replaces SetReferencePose.
+      /// \param _orientation current IMU orientation
+      public: void SetReferenceOrientation(
+        const ignition::math::Quaterniond &_orientation =
+        ignition::math::Quaterniond());
 
       /// \brief Callback when link data is received
       /// \param[in] _msg Message containing link data

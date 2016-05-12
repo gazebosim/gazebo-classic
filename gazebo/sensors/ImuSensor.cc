@@ -278,6 +278,16 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
+void ImuSensor::SetReferenceOrientation(
+  const ignition::math::Quaterniond &_orientation)
+{
+  // such that imuPose - referencePose = _orientation
+  // or, that referencePose = -_orientation + imuPose
+  this->dataPtr->referenceOrientation = _orientation.Inverse() *
+    (this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign()).Rot();
+}
+
+//////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
   msgs::LinkData msg;

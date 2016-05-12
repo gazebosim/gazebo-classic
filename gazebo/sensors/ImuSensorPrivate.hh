@@ -33,8 +33,11 @@ namespace gazebo
     /// \brief Imu sensor private data.
     class ImuSensorPrivate
     {
-      /// \brief Imu reference pose
+      /// \brief Imu reference pose, deprecated by referenceOrientation
       public: ignition::math::Pose3d referencePose;
+
+      /// \brief Imu reference orientation, this will replace referencePose
+      public: ignition::math::Quaterniond referenceOrientation;
 
       /// \brief Save previous imu linear velocity for computing acceleration.
       public: ignition::math::Vector3d lastLinearVel;
