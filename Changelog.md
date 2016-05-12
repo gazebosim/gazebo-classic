@@ -12,7 +12,6 @@
     * [Pull request #2298](https://bitbucket.org/osrf/gazebo/pull-request/2298)
     * [Pull request #2302](https://bitbucket.org/osrf/gazebo/pull-request/2302)
     * [Pull request #2295](https://bitbucket.org/osrf/gazebo/pull-request/2295)
-    * [Pull request #2299](https://bitbucket.org/osrf/gazebo/pull-request/2299)
     * [Pull request #2300](https://bitbucket.org/osrf/gazebo/pull-request/2300)
 
 1. Fix memory and other issues found from running Coverity.
