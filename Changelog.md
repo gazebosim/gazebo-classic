@@ -6,6 +6,10 @@
     * [Pull request 2305](https://bitbucket.org/osrf/gazebo/pull-request/2305)
     * [Issue #1956](https://bitbucket.org/osrf/gazebo/issue/1956)
 
+1. Backport fix for DepthCamera visibility mask
+    * [Pull request 2286](https://bitbucket.org/osrf/gazebo/pull-request/2286)
+    * [Pull request 2287](https://bitbucket.org/osrf/gazebo/pull-request/2287)
+
 1. Backport sensor reset fix
     * [Pull request 2272](https://bitbucket.org/osrf/gazebo/pull-request/2272)
     * [Issue #1917](https://bitbucket.org/osrf/gazebo/issue/1917)
