@@ -20,6 +20,9 @@
     * [Pull request 2258](https://bitbucket.org/osrf/gazebo/pull-request/2258)
     * [Issue #1925](https://bitbucket.org/osrf/gazebo/issues/1925)
 
+1. Register Qt metatypes in gui tests
+    * [Pull request 2273](https://bitbucket.org/osrf/gazebo/pull-request/2273)
+
 ### Gazebo 6.6.0 (2016-04-07)
 
 1. fix: remove back projection
@@ -506,6 +509,10 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Backport fix for DepthCamera visibility mask
+    * [Pull request 2286](https://bitbucket.org/osrf/gazebo/pull-request/2286)
+    * [Pull request 2287](https://bitbucket.org/osrf/gazebo/pull-request/2287)
 
 1. Backport sensor reset fix
     * [Pull request 2272](https://bitbucket.org/osrf/gazebo/pull-request/2272)
