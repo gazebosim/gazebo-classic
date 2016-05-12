@@ -18,6 +18,9 @@
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
 
+1. Model Editor: Select and align nested models
+    * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)
+
 ## Gazebo 7.1.0 (2016-04-07)
 
 1. fix: remove back projection

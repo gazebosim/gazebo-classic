@@ -401,41 +401,72 @@ void SchematicViewWidget::OnDeselectAll(const std::string &/*_name*/,
 /////////////////////////////////////////////////
 void SchematicViewWidget::OnSelectionChanged()
 {
-  QList<QGraphicsItem *> newlySelected = this->scene->selectedItems();
+  QList<QGraphicsItem *> currentlySelected = this->scene->selectedItems();
+
+  // Check if the selection change was deselection
+  std::string lastTopLevel("");
+  std::string lastType("");
+  bool lastIsSelected = true;
+  if (this->view->lastClickedItem)
+  {
+    lastType = this->view->lastClickedItem->data(1).toString().toStdString();
+
+    auto id = this->view->lastClickedItem->data(0).toString().toStdString();
+    lastTopLevel = this->TopLevelName(id);
+
+    lastIsSelected = this->view->lastClickedItem->isSelected();
+  }
 
   // Create list of top level names so we can also select siblings
-  QList<std::string> newTopLevel;
-  for (auto &item : newlySelected)
+  QList<std::string> currentTopLevel;
+  for (auto &item : currentlySelected)
   {
     auto id = item->data(0).toString().toStdString();
     auto topLevel = this->TopLevelName(id);
-    if (!newTopLevel.contains(topLevel))
-      newTopLevel.push_back(topLevel);
+
+    auto type = item->data(1).toString().toStdString();
+
+    // If it is a deselection, skip sibling links
+    if (!lastIsSelected && lastType == "Link" && type == "Link" &&
+        lastTopLevel == topLevel)
+    {
+      continue;
+    }
+
+    if (!currentTopLevel.contains(topLevel))
+      currentTopLevel.push_back(topLevel);
   }
 
   // Update all items
   for (auto &item : this->scene->items())
   {
-    std::string id = item->data(0).toString().toStdString();
-    std::string type = item->data(1).toString().toStdString();
-
-    bool selected = newlySelected.contains(item);
-
-    // Add sibling links
-    if (!newlySelected.contains(item) &&
-        newTopLevel.contains(this->TopLevelName(id)) &&
-        type == "Link")
-    {
-      selected = true;
-    }
+    auto id = item->data(0).toString().toStdString();
+    auto type = item->data(1).toString().toStdString();
 
     if (type == "Link")
+    {
+      bool selected;
+
+      // Select if top level matches
+      if (lastType == "Link")
+      {
+        auto topLevelId = this->TopLevelName(id);
+        selected = currentTopLevel.contains(topLevelId);
+      }
+      else
+        selected = currentlySelected.contains(item);
+
       gui::model::Events::setSelectedLink(id, selected);
+    }
     else if (type == "Joint")
+    {
+      // Select if whole item matches
+      bool selected = currentlySelected.contains(item);
       gui::model::Events::setSelectedJoint(id, selected);
+    }
     else
       gzwarn << "Unknown type [" << type << "]" << std::endl;
   }
 
-  this->selectedItems = newlySelected;
+  this->selectedItems = currentlySelected;
 }
