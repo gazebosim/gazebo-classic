@@ -211,7 +211,6 @@ void MousePickingTest::Transparency()
   QVERIFY(!model02Vis->GetHighlighted() && !model02LinkVis->GetHighlighted());
   QVERIFY(!model03Vis->GetHighlighted() && !model03LinkVis->GetHighlighted());
 
-
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
