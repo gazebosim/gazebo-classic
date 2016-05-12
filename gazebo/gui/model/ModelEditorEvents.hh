@@ -374,14 +374,15 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showModelPluginContextMenu.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the set selected link signal.
+        /// \brief Connect a Gazebo event to the set selected entity signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
             ConnectSetSelectedLink(T _subscriber)
           { return setSelectedLink.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the set selected link signal.
+        /// \brief Disconnect a Gazebo event from the set selected entity
+        /// signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSetSelectedLink(
             event::ConnectionPtr _subscriber)

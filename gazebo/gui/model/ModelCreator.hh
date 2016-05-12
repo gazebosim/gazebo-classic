@@ -305,17 +305,17 @@ namespace gazebo
       /// \param[in] _mode New manipulation mode.
       private: void OnManipMode(const std::string &_mode);
 
-      /// \brief Callback when an entity is selected.
+      /// \brief Callback when an entity is selected outside of the editor.
       /// \param[in] _name Name of entity.
       /// \param[in] _mode Select mode
-      private: void OnSetSelectedEntity(const std::string &_name,
+      private: void OnDeselectAll(const std::string &_name,
           const std::string &_mode);
 
       /// \brief Callback when a model editor entity is selected.
       /// \param[in] _name Name of entity.
       /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelectedLink(const std::string &_name,
+      private: void OnSetSelectedEntity(const std::string &_name,
           const bool _selected);
 
       /// \brief Callback when a model plugin is selected.
@@ -402,11 +402,8 @@ namespace gazebo
       /// links and model plugins.
       private: void DeselectAll();
 
-      /// \brief Deselect all currently selected links.
-      private: void DeselectAllLinks();
-
-      /// \brief Deselect all currently selected nested models.
-      private: void DeselectAllNestedModels();
+      /// \brief Deselect all currently selected entities.
+      private: void DeselectAllEntities();
 
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
