@@ -906,7 +906,7 @@ void World::Fini()
 void World::Clear()
 {
   g_clearModels = true;
-  // \todo Clear lights too?
+  /// \todo Clear lights too?
 }
 
 //////////////////////////////////////////////////

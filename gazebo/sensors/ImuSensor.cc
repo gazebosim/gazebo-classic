@@ -218,18 +218,18 @@ void ImuSensor::Init()
 //////////////////////////////////////////////////
 void ImuSensor::Fini()
 {
+  // Clean transport
+  {
+    this->dataPtr->pub.reset();
+    this->dataPtr->linkDataSub.reset();
+  }
+
   if (this->dataPtr->parentEntity)
     this->dataPtr->parentEntity->SetPublishData(false);
   this->dataPtr->parentEntity.reset();
 
   this->dataPtr->incomingLinkData[0].reset();
   this->dataPtr->incomingLinkData[1].reset();
-
-  // Clean transport
-  {
-    this->dataPtr->pub.reset();
-    this->dataPtr->linkDataSub.reset();
-  }
 
   Sensor::Fini();
 }

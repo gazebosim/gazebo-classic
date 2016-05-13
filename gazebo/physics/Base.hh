@@ -216,8 +216,7 @@ namespace gazebo
       /// \param[in] _child Child entity.
       public: void AddChild(BasePtr _child);
 
-      /// \brief Remove a child from this entity, but don't destroy it, since it
-      /// can be given to another entity.
+      /// \brief Remove a child from this entity.
       /// \param[in] _id ID of the child to remove.
       public: virtual void RemoveChild(unsigned int _id);
 
@@ -255,6 +254,8 @@ namespace gazebo
       /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
 
+      /// \brief Remove a child by pointer.
+      /// \param[in] _child Pointer to the child.
       public: void RemoveChild(physics::BasePtr _child);
 
       /// \brief Add a type specifier.
