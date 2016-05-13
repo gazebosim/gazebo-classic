@@ -62,7 +62,7 @@ ModelSnap::~ModelSnap()
   delete this->dataPtr->updateMutex;
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -95,27 +95,27 @@ void ModelSnap::Init()
 /////////////////////////////////////////////////
 void ModelSnap::Fini()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  if (this->dataPtr->renderConnection)
   {
-    if (this->dataPtr->snapVisual)
-    {
-      this->dataPtr->snapVisual->DeleteDynamicLine(this->dataPtr->snapLines);
-      this->dataPtr->snapLines = NULL;
-      this->dataPtr->snapVisual->Fini();
-      this->dataPtr->snapVisual.reset();
-    }
-    if (this->dataPtr->highlightVisual)
-    {
-      this->dataPtr->highlightVisual->DeleteDynamicLine(
-          this->dataPtr->snapHighlight);
-      this->dataPtr->snapHighlight = NULL;
-      this->dataPtr->highlightVisual->Fini();
-      this->dataPtr->highlightVisual.reset();
-    }
+    event::Events::DisconnectRender(this->dataPtr->renderConnection);
+    this->dataPtr->renderConnection.reset();
   }
 
-  event::Events::DisconnectRender(this->dataPtr->renderConnection);
-  this->dataPtr->renderConnection.reset();
+  if (this->dataPtr->snapVisual)
+  {
+    this->dataPtr->snapVisual->DeleteDynamicLine(this->dataPtr->snapLines);
+    this->dataPtr->snapLines = nullptr;
+    this->dataPtr->snapVisual->Fini();
+    this->dataPtr->snapVisual.reset();
+  }
+  if (this->dataPtr->highlightVisual)
+  {
+    this->dataPtr->highlightVisual->DeleteDynamicLine(
+        this->dataPtr->snapHighlight);
+    this->dataPtr->snapHighlight = nullptr;
+    this->dataPtr->highlightVisual->Fini();
+    this->dataPtr->highlightVisual.reset();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -143,8 +143,11 @@ void ModelSnap::Reset()
       this->dataPtr->highlightVisual->SetVisible(false);
   }
 
-  event::Events::DisconnectRender(this->dataPtr->renderConnection);
-  this->dataPtr->renderConnection.reset();
+  if (this->dataPtr->renderConnection)
+  {
+    event::Events::DisconnectRender(this->dataPtr->renderConnection);
+    this->dataPtr->renderConnection.reset();
+  }
 }
 
 /////////////////////////////////////////////////
