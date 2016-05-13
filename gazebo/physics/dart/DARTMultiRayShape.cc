@@ -42,6 +42,7 @@ DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
 DARTMultiRayShape::~DARTMultiRayShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

@@ -198,6 +198,9 @@ void CollisionConfig_TEST::Restore()
   // Remove a collision and restore
   auto button = cc.findChild<QToolButton *>("removeCollisionButton_0");
   QVERIFY(button);
+
+  // Press enter to close the confirmation dialog
+  QTimer::singleShot(1000, this, SLOT(PressEnter()));
   button->click();
 
   QCOMPARE(cc.GetCollisionCount(), 1u);
@@ -210,6 +213,14 @@ void CollisionConfig_TEST::Restore()
   QVERIFY(cc.GetData("c1") != NULL);
   QVERIFY(cc.GetData("c2") != NULL);
   QVERIFY(cc.GetData("c3") == NULL);
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig_TEST::PressEnter()
+{
+  auto focusedWidget = QApplication::focusWidget();
+  if (focusedWidget)
+    QTest::keyClick(focusedWidget, Qt::Key_Enter);
 }
 
 // Generate a main function for the test
