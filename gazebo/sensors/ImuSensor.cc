@@ -61,6 +61,20 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
+  // get type of IMU
+  // reference frame options are listed in
+  // http://bitbucket.org/sdformat/src/default/sdf/1.6/imu.sdf
+  // for example: local, world, NED, NWU, optical
+  this->dataPtr->referenceFrame = "local";
+  if (this->sdf->HasElement("imu") &&
+      this->sdf->GetElement("imu")->HasAttribute("reference_frame") &&
+      this->sdf->GetElement("imu")->Get<std::string>("reference_frame")
+      != "__default_reference_frame__")
+  {
+    this->dataPtr->referenceFrame =
+      this->sdf->GetElement("imu")->Get<std::string>("reference_frame");
+  }
+
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
@@ -204,10 +218,47 @@ void ImuSensor::Load(const std::string &_worldName)
   // define starting pose of imu as the reference frame of the imu
   // note this is not always the case, and we should extend this per
   // issue #1959
-  this->dataPtr->worldToReference = this->pose +
-    this->dataPtr->parentEntity->GetWorldPose().Ign();
+  if (this->dataPtr->referenceFrame == "local")
+  {
+    this->dataPtr->worldToReference = this->pose +
+      this->dataPtr->parentEntity->GetWorldPose().Ign();
+  }
+  else if (this->dataPtr->referenceFrame == "world")
+  {
+    // do nothing
+    // this->dataPtr->worldToReference is identity
+  }
+  else if (this->dataPtr->referenceFrame == "NED")
+  {
+    this->dataPtr->worldToReference =
+      ignition::math::Pose3d(
+      ignition::math::Vector3d(0, 0, 0),
+      ignition::math::Quaterniond(M_PI, 0, 0));
+  }
+  else if (this->dataPtr->referenceFrame == "NWU")
+  {
+     // this->dataPtr->worldToReference is identity
+  }
+  else if (this->dataPtr->referenceFrame == "optical")
+  {
+    this->dataPtr->worldToReference =
+      ignition::math::Pose3d(
+      ignition::math::Vector3d(0, 0, 0),
+      ignition::math::Quaterniond(-0.5*M_PI, 0, -0.5*M_PI));
+  }
+  else
+  {
+    gzerr << "IMU reference_frame ["
+          << this->dataPtr->referenceFrame
+          << "] is unknown, using IMU local frame.\n";
+    this->dataPtr->worldToReference = this->pose +
+      this->dataPtr->parentEntity->GetWorldPose().Ign();
+  }
 
-  // get the last linear veloicty of the imu in the imu local frame
+  /////////////////////////////////////////////////////////////////
+  // compute the last linear veloicty of the imu in the world frame
+  // for computing acceleartion based on finite differencing
+  /////////////////////////////////////////////////////////////////
   // first get parent link linear vel in world frame
   ignition::math::Vector3d linkWorldLinearVel
       = this->dataPtr->parentEntity->GetWorldLinearVel().Ign();
@@ -218,11 +269,8 @@ void ImuSensor::Load(const std::string &_worldName)
   ignition::math::Pose3d parentEntityPose =
     this->dataPtr->parentEntity->GetWorldPose().Ign();
   ignition::math::Pose3d imuWorldPose = this->pose + parentEntityPose;
-  ignition::math::Vector3d imuWorldLinearVel = linkWorldLinearVel +
+  this->dataPtr->lastImuWorldLinearVel = linkWorldLinearVel +
       linkWorldAngularVel.Cross(parentEntityPose.Pos() - imuWorldPose.Pos());
-  // lastly, rotate linear vel into imu local frame
-  this->dataPtr->lastLinearVel =
-    imuWorldPose.Rot().RotateVector(imuWorldLinearVel);
 }
 
 //////////////////////////////////////////////////
@@ -350,24 +398,29 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     ignition::math::Vector3d linkWorldAngularVel = msgs::ConvertIgn(
         msg.angular_velocity());
 
+    /////////////////////////////////////////////////////////////////////
     // Set the IMU angular velocity (defined in imu's local frame)
+    /////////////////////////////////////////////////////////////////////
     this->dataPtr->angularVel = imuWorldPose.Rot().Inverse().RotateVector(
         linkWorldAngularVel);
     msgs::Set(this->dataPtr->imuMsg.mutable_angular_velocity(),
         this->dataPtr->angularVel);
 
+    /////////////////////////////////////////////////////////////////////
     // Compute and set the IMU linear acceleration in the imu local frame
+    /////////////////////////////////////////////////////////////////////
     // first get imu link's linear velocity in world frame
     ignition::math::Vector3d linkWorldLinearVel
         = msgs::ConvertIgn(msg.linear_velocity());
     // next, account for vel in world frame of the imu
     // given the imu frame is offset from link frame, and link is rotating
+    // compute the velocity of the imu axis origin in world frame
     ignition::math::Vector3d imuWorldLinearVel = linkWorldLinearVel +
         linkWorldAngularVel.Cross(parentEntityPose.Pos() - imuWorldPose.Pos());
-    // compute acceleration by differentiating velocity, and rotate into
-    // imu local frame
+    // compute acceleration by differentiating velocity in world frame,
+    // and rotate into imu local frame
     this->dataPtr->linearAcc = imuWorldPose.Rot().Inverse().RotateVector(
-      (imuWorldLinearVel - this->dataPtr->lastLinearVel) / dt);
+      (imuWorldLinearVel - this->dataPtr->lastImuWorldLinearVel) / dt);
 
     // Add contribution from gravity
     this->dataPtr->linearAcc -= imuWorldPose.Rot().Inverse().RotateVector(
@@ -382,7 +435,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
       imuReferenceOrientation);
 
-    this->dataPtr->lastLinearVel = imuWorldLinearVel;
+    this->dataPtr->lastImuWorldLinearVel = imuWorldLinearVel;
 
     // Apply noise models
     for (auto const &keyNoise : this->noises)

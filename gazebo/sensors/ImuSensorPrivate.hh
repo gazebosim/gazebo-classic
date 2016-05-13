@@ -33,12 +33,16 @@ namespace gazebo
     /// \brief Imu sensor private data.
     class ImuSensorPrivate
     {
+      /// \brief type of IMU. Options are specified in:
+      /// http://bitbucket.org/sdformat/src/default/sdf/1.6/imu.sdf
+      public: std::string referenceFrame;
+
       /// \brief transform from world frame to Imu reference frame.
       public: ignition::math::Pose3d worldToReference;
 
       /// \brief Save previous imu linear velocity in the xxx frame
       /// for computing acceleration in xxx frame
-      public: ignition::math::Vector3d lastLinearVel;
+      public: ignition::math::Vector3d lastImuWorldLinearVel;
 
       /// \brief Noise free linear acceleration
       public: ignition::math::Vector3d linearAcc;
