@@ -180,7 +180,7 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
   double simTime = world->GetSimTime().Double();
   EXPECT_NEAR(simTime, dt*steps, dt);
 
-  ignition::math::Pose3d initialPose(1, 2, 0.0, 0, 0, 1.57);
+  ignition::math::Pose3d initialPose(1, 2, 0.5, 0, 0, 1.57);
 
   // spawn a box with known initial pose
   math::Vector3 size(1, 1, 1);
