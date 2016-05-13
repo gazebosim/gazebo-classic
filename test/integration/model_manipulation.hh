@@ -31,7 +31,6 @@ class ModelManipulationTest : public QTestFixture
 
   /// \brief Test switching modes using keyboard shortcuts.
   private slots: void Shortcuts();
-
 };
 
 #endif
