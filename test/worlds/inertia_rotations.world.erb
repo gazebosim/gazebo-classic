@@ -9,15 +9,21 @@
     </include>
 <%
   boxes = {}
-  boxes["ref"] = {:ixx => 0.97, :iyy => 0.82, :izz => 0.17, :rpy => "0 0 0"}
-  boxes["x90"] = {:ixx => 0.97, :iyy => 0.17, :izz => 0.82, :rpy => "#{Math::PI/2} 0 0"}
-  boxes["y90"] = {:ixx => 0.17, :iyy => 0.82, :izz => 0.97, :rpy => "0 #{Math::PI/2} 0"}
-  boxes["z90"] = {:ixx => 0.82, :iyy => 0.97, :izz => 0.17, :rpy => "0 0 #{Math::PI/2}"}
+  boxes["ref"] = {:ixx => 0.97,  :iyy => 0.82,  :izz => 0.17,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 0 0"}
+  boxes["x90"] = {:ixx => 0.97,  :iyy => 0.17,  :izz => 0.82,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "#{Math::PI/2} 0 0"}
+  boxes["y90"] = {:ixx => 0.17,  :iyy => 0.82,  :izz => 0.97,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 #{Math::PI/2} 0"}
+  boxes["z90"] = {:ixx => 0.82,  :iyy => 0.97,  :izz => 0.17,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 0 #{Math::PI/2}"}
+  boxes["x45"] = {:ixx => 0.97,  :iyy => 0.495, :izz => 0.495, :ixy => 0, :ixz => 0, :iyz => 0.325, :rpy => "#{-Math::PI/4} 0 0"}
+  boxes["y45"] = {:ixx => 0.57,  :iyy => 0.82,  :izz => 0.57,  :ixy => 0, :ixz => -0.40, :iyz => 0, :rpy => "0 #{-Math::PI/4} 0"}
+  boxes["z45"] = {:ixx => 0.895, :iyy => 0.895, :izz => 0.17,  :ixy => 0.075, :ixz => 0, :iyz => 0, :rpy => "0 0 #{-Math::PI/4}"}
   boxes.keys.each_with_index { |k,i|
     rpy = boxes[k][:rpy]
     ixx = boxes[k][:ixx]
     iyy = boxes[k][:iyy]
     izz = boxes[k][:izz]
+    ixy = boxes[k][:ixy]
+    ixz = boxes[k][:ixz]
+    iyz = boxes[k][:iyz]
 %>
     <model name="box010409_<%= k %>">
       <pose>0 <%= i %> 0.45  0 0 0</pose>
@@ -29,9 +35,9 @@
             <ixx><%= ixx %></ixx>
             <iyy><%= iyy %></iyy>
             <izz><%= izz %></izz>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyz>0</iyz>
+            <ixy><%= ixy %></ixy>
+            <ixz><%= ixz %></ixz>
+            <iyz><%= iyz %></iyz>
           </inertia>
         </inertial>
         <collision name="collision">
