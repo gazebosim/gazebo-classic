@@ -207,6 +207,9 @@ void VisualConfig_TEST::Restore()
   // Remove a visual and restore
   auto button = vc.findChild<QToolButton *>("removeVisualButton_0");
   QVERIFY(button);
+
+  // Press enter to close the confirmation dialog
+  QTimer::singleShot(1000, this, SLOT(PressEnter()));
   button->click();
 
   QCOMPARE(vc.GetVisualCount(), 1u);
@@ -219,6 +222,14 @@ void VisualConfig_TEST::Restore()
   QVERIFY(vc.GetData("v1") != NULL);
   QVERIFY(vc.GetData("v2") != NULL);
   QVERIFY(vc.GetData("v3") == NULL);
+}
+
+/////////////////////////////////////////////////
+void VisualConfig_TEST::PressEnter()
+{
+  auto focusedWidget = QApplication::focusWidget();
+  if (focusedWidget)
+    QTest::keyClick(focusedWidget, Qt::Key_Enter);
 }
 
 // Generate a main function for the test

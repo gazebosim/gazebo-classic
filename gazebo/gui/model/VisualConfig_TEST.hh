@@ -43,6 +43,9 @@ class VisualConfig_TEST : public QTestFixture
   /// \brief Slot that receives Applied signals.
   private slots: void OnApply();
 
+  /// \brief Key click enter on the currently focused widget.
+  private slots: void PressEnter();
+
   /// \brief Test restoring original data.
   private slots: void Restore();
 
