@@ -323,6 +323,10 @@ namespace gazebo
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
+
+      /// \brief Transform from world frame to NED frame. See SetNEDWorldPose
+      /// for details of NED frame.
+      public: ignition::math::Pose3d nedPose;
     };
   }
 }

@@ -401,6 +401,26 @@ namespace gazebo
       /// \param[in] _init True if sensors have been initialized.
       public: void _SetSensorsInitialized(const bool _init);
 
+      /// \brief As we move forward with more realistic simulation of
+      /// real world localization sensor devices, we need a way to define
+      /// orientation of the earth frame. This new API call allows users to
+      /// set the transform from Gazebo World Frame to NED Frame.
+      /// Where NED frame is the conventional north-east-down frame
+      /// (ref https://en.wikipedia.org/wiki/North_east_down) with
+      /// X-axis denoting North, Y-axis points East and Z-axis points Down.
+      /// This function call simply defines a NED frame for the world,
+      /// and keeps in memory. How the NED frame definition is used
+      /// is up to individual users.
+      /// \param _pose transform from world to NED frame.
+      public: void SetNEDWorldPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Sets the transform from Gazebo World Frame to NED Frame
+      /// Where NED frame is the conventional north-east-down frame
+      /// (ref https://en.wikipedia.org/wiki/North_east_down)
+      /// with X points North, Y points East and Z points Down.
+      /// \return transform from world to NED frame.
+      public: const ignition::math::Pose3d NEDWorldPose();
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.

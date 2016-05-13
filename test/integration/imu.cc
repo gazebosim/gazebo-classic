@@ -163,6 +163,18 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(ballNoFrictionImu != NULL);
   ballNoFrictionImu->Init();
 
+  // get floating ball
+  std::string ballFloatingName = "model_floating_imu";
+  physics::ModelPtr ballFloatingModel = world->GetModel(ballFloatingName);
+  ASSERT_TRUE(ballFloatingModel != NULL);
+
+  std::string ballFloatingSensorName = "ball_floating_imu_sensor";
+  sensors::ImuSensorPtr ballFloatingImu =
+    std::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(ballFloatingSensorName));
+  ASSERT_TRUE(ballFloatingImu != NULL);
+  ballFloatingImu->Init();
+
   // get gravity
   math::Vector3 g = physics->GetGravity();
 
@@ -338,7 +350,46 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         EXPECT_NEAR(worldLinearAccel.z, 0, IMU_TOL);
       }
     }
+
   }
+
+  // floating ball
+  // test that SetReferencePose resets orientation to identity
+  ballFloatingImu->SetReferencePose();
+  ignition::math::Quaterniond imuOrientation = ballFloatingImu->Orientation();
+  // note this test fails without normailzation because
+  // quaternion returned is unnormalized(0, 0, 0, 0),
+  // not default value of (1, 0, 0, 0)
+  imuOrientation.Normalize();
+  EXPECT_NEAR(ignition::math::Quaterniond().W(), imuOrientation.W(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond().X(), imuOrientation.X(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond().Y(), imuOrientation.Y(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond().Z(), imuOrientation.Z(), IMU_TOL);
+
+  // test that SetReferenceOrientation sets orientation to argument
+  // in this test case, assume world is NWU (X-North, Y-West, Z-Up),
+  // then transform from NWU to NED is below:
+  ignition::math::Pose3d nwuToNEDReference =
+    ignition::math::Pose3d(ignition::math::Vector3d(0, 0, 0),
+    ignition::math::Quaterniond(M_PI, 0, 0));
+  // declare NED frame the reference frame for this IMU
+  ballFloatingImu->SetWorldToReferencePose(nwuToNEDReference);
+  world->Step(1000);
+  // orientation of the imu in NED frame
+  imuOrientation = ballFloatingImu->Orientation();
+  EXPECT_NEAR(imuOrientation.W(), 0, IMU_TOL);
+  EXPECT_NEAR(imuOrientation.X(), -1, IMU_TOL);
+  EXPECT_NEAR(imuOrientation.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(imuOrientation.Z(), 0, IMU_TOL);
+
+  // imu orientation in world frame
+  ignition::math::Quaterniond imuWorldOrientation =
+    imuOrientation * nwuToNEDReference.Rot();
+
+  EXPECT_NEAR(imuWorldOrientation.W(), 1, IMU_TOL);
+  EXPECT_NEAR(imuWorldOrientation.X(), 0, IMU_TOL);
+  EXPECT_NEAR(imuWorldOrientation.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(imuWorldOrientation.Z(), 0, IMU_TOL);
 }
 
 TEST_P(ImuTest, ImuSensorTestWorld)
