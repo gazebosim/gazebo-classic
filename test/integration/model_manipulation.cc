@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -103,6 +104,95 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
 
   QVERIFY(gazebo::gui::g_arrowAct->isChecked());
   QVERIFY(pose != linkVis->GetWorldPose());
+
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelManipulationTest::Shortcuts()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  // Load a world which has moving models
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get camera
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  gazebo::rendering::VisualPtr boxVis = scene->GetVisual("box");
+  QVERIFY(boxVis != nullptr);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  // verify actions are not null
+  QVERIFY(gazebo::gui::g_arrowAct != NULL);
+  QVERIFY(gazebo::gui::g_rotateAct != NULL);
+  QVERIFY(gazebo::gui::g_translateAct != NULL);
+  QVERIFY(gazebo::gui::g_scaleAct != NULL);
+
+  // verify initial action state
+  QVERIFY(gazebo::gui::g_arrowAct->isChecked());
+  QVERIFY(!gazebo::gui::g_rotateAct->isChecked());
+  QVERIFY(!gazebo::gui::g_translateAct->isChecked());
+  QVERIFY(!gazebo::gui::g_scaleAct->isChecked());
+
+  // select a model in arrow mode
+  QTest::mouseMove(glWidget,
+      QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
+  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+      QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
+  QVERIFY(boxVis->GetHighlighted());
+
+  // switch to translate mode
+  QTest::keyClick(glWidget, 't', Qt::NoModifier, 100);
+
+  // verify translate action is checked
+  QVERIFY(!gazebo::gui::g_arrowAct->isChecked());
+  QVERIFY(gazebo::gui::g_translateAct->isChecked());
+  QVERIFY(!gazebo::gui::g_rotateAct->isChecked());
+  QVERIFY(!gazebo::gui::g_scaleAct->isChecked());
+
+  // switch to rotate mode
+  QTest::keyClick(glWidget, 'r', Qt::NoModifier, 100);
+
+  // verify rotate action is checked
+  QVERIFY(!gazebo::gui::g_arrowAct->isChecked());
+  QVERIFY(!gazebo::gui::g_translateAct->isChecked());
+  QVERIFY(gazebo::gui::g_rotateAct->isChecked());
+  QVERIFY(!gazebo::gui::g_scaleAct->isChecked());
+
+  // switch to scale mode
+  QTest::keyClick(glWidget, 's', Qt::NoModifier, 100);
+
+  // verify scale action is checked
+  QVERIFY(!gazebo::gui::g_arrowAct->isChecked());
+  QVERIFY(!gazebo::gui::g_translateAct->isChecked());
+  QVERIFY(!gazebo::gui::g_rotateAct->isChecked());
+  QVERIFY(gazebo::gui::g_scaleAct->isChecked());
+
+  // try a reset and make sure the rotate mode is not triggered
+  QTest::keyClick(glWidget, 'r', Qt::ControlModifier, 100);
+
+  // verify rotate action is not checked
+  QVERIFY(!gazebo::gui::g_arrowAct->isChecked());
+  QVERIFY(!gazebo::gui::g_translateAct->isChecked());
+  QVERIFY(!gazebo::gui::g_rotateAct->isChecked());
+  QVERIFY(gazebo::gui::g_scaleAct->isChecked());
 
   delete mainWindow;
   mainWindow = NULL;
