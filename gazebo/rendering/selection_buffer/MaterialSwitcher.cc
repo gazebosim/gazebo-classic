@@ -25,7 +25,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 MaterialSwitcher::MaterialSwitcher()
-: lastTechnique(NULL)
+: lastTechnique(nullptr)
 {
   this->currentColor = common::Color(0.0, 0.0, 0.1);
 }
@@ -53,7 +53,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       {
         const_cast<Ogre::SubEntity *>(subEntity)->setCustomParameter(1,
             Ogre::Vector4(0, 0, 0, 0));
-        return NULL;
+        return nullptr;
       }
 
       if (this->lastEntity == subEntity->getParent()->getName())
@@ -93,6 +93,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
           {
             gzerr << "Problem creating the selection buffer overlay material"
                 << std::endl;
+            return nullptr;
           }
           Ogre::Pass *overlayPass = this->overlayTechnique->getPass(0);
           overlayPass->setDepthCheckEnabled(false);
@@ -140,7 +141,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
   // else
   //  gzerr << "Rendering scheme without a Renderable: " << _schemeName
   //        << ", " + _originalMaterial->getName() << std::endl;
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
