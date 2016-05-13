@@ -19,6 +19,8 @@
 
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/util/system.hh"
+
 namespace gazebo
 {
   /// \ingroup gazebo_gui
