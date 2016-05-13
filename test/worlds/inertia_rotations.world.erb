@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="inertia_rotations">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+<%
+  boxes = {}
+  boxes["ref"] = {:ixx => 0.97, :iyy => 0.82, :izz => 0.17, :rpy => "0 0 0"}
+  boxes["x90"] = {:ixx => 0.97, :iyy => 0.17, :izz => 0.82, :rpy => "#{Math::PI/2} 0 0"}
+  boxes["y90"] = {:ixx => 0.17, :iyy => 0.82, :izz => 0.97, :rpy => "0 #{Math::PI/2} 0"}
+  boxes["z90"] = {:ixx => 0.82, :iyy => 0.97, :izz => 0.17, :rpy => "0 0 #{Math::PI/2}"}
+  boxes.keys.each_with_index { |k,i|
+    rpy = boxes[k][:rpy]
+    ixx = boxes[k][:ixx]
+    iyy = boxes[k][:iyy]
+    izz = boxes[k][:izz]
+%>
+    <model name="box010409_<%= k %>">
+      <pose>0 <%= i %> 0.45  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>0 0 0  <%= rpy %></pose>
+          <mass>12</mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.1 0.4 0.9</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.4 0.9</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+  }
+%>
+  </world>
+</sdf>
