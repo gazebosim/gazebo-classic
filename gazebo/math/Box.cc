@@ -31,7 +31,7 @@ Box::Box()
 
 //////////////////////////////////////////////////
 Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)
-  : extent(EXTENT_FINITE)
+  : extent(EXTENT_NULL)
 {
   this->min = _vec1;
   this->min.SetToMin(_vec2);
