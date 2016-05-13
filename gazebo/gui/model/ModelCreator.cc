@@ -182,6 +182,8 @@ namespace gazebo
       public: std::map<std::string, ignition::math::Vector3d> linkScaleUpdate;
 
       /// \brief A list of link data whose pose has changed externally.
+      /// Note that LinkData stores the local pose, while this list
+      /// stores the world pose.
       public: std::map<LinkData *, ignition::math::Pose3d> linkPoseUpdate;
 
       /// \brief A list of nested model data whose pose has changed externally.
@@ -2058,9 +2060,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Move [" + link.first->Name() + "]", MEUserCmd::MOVING_LINK);
     cmd->SetScopedName(link.first->linkVisual->GetName());
-    cmd->SetPoseChange(link.first->Pose(), link.second);
 
-    link.first->SetPose(link.second);
+    auto linkLocalPose = this->WorldToLocal(link.second);
+    cmd->SetPoseChange(link.first->Pose(), linkLocalPose);
+    link.first->SetPose(linkLocalPose);
   }
   if (!this->dataPtr->linkPoseUpdate.empty())
     this->ModelChanged();
@@ -2073,9 +2076,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         "Move [" + nestedModel.first->Name() + "]",
         MEUserCmd::MOVING_NESTED_MODEL);
     cmd->SetScopedName(nestedModel.first->modelVisual->GetName());
-    cmd->SetPoseChange(nestedModel.first->Pose(), nestedModel.second);
 
-    nestedModel.first->SetPose(nestedModel.second);
+    auto nestedModelLocalPose = this->WorldToLocal(nestedModel.second);
+    cmd->SetPoseChange(nestedModel.first->Pose(), nestedModelLocalPose);
+    nestedModel.first->SetPose(nestedModelLocalPose);
   }
   if (!this->dataPtr->nestedModelPoseUpdate.empty())
     this->ModelChanged();
@@ -2946,9 +2950,10 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
         auto cmd = this->dataPtr->userCmdManager->NewCmd(
             "Move [" + linksIt.second->Name() + "]", MEUserCmd::MOVING_LINK);
         cmd->SetScopedName(linksIt.second->linkVisual->GetName());
-        cmd->SetPoseChange(linksIt.second->Pose(), _pose);
 
-        linksIt.second->SetPose(_pose);
+        auto localPose = this->WorldToLocal(_pose);
+        cmd->SetPoseChange(linksIt.second->Pose(), localPose);
+        linksIt.second->SetPose(localPose);
         this->ModelChanged();
       }
       // Only register command on MouseRelease
@@ -2956,7 +2961,6 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
       {
         this->dataPtr->linkPoseUpdate[linksIt.second] = _pose;
       }
-
       break;
     }
   }
@@ -2969,7 +2973,24 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
     if (_name == nestedModelsIt.first ||
         nestedModelName == nestedModelsIt.first)
     {
-      this->dataPtr->nestedModelPoseUpdate[nestedModelsIt.second] = _pose;
+      // Register user command
+      if (_isFinal)
+      {
+        auto cmd = this->dataPtr->userCmdManager->NewCmd(
+            "Move [" + nestedModelsIt.second->Name() + "]",
+            MEUserCmd::MOVING_NESTED_MODEL);
+        cmd->SetScopedName(nestedModelsIt.second->modelVisual->GetName());
+
+        auto localPose = this->WorldToLocal(_pose);
+        cmd->SetPoseChange(nestedModelsIt.second->Pose(), localPose);
+        nestedModelsIt.second->SetPose(localPose);
+        this->ModelChanged();
+      }
+      // Only register command on MouseRelease
+      else
+      {
+        this->dataPtr->nestedModelPoseUpdate[nestedModelsIt.second] = _pose;
+      }
       break;
     }
   }
@@ -3130,4 +3151,19 @@ void ModelCreator::OnRequestNestedModelMove(const std::string &_name,
 
   nestedModel->second->modelVisual->SetPose(_pose);
   nestedModel->second->SetPose(_pose);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d ModelCreator::WorldToLocal(
+    const ignition::math::Pose3d &_world) const
+{
+  // Transform from the parent model to the world (w_T_p)
+  ignition::math::Matrix4d parentModelWorld(this->dataPtr->modelPose);
+
+  // Given pose as matrix (w_T_t)
+  ignition::math::Matrix4d targetWorld(_world);
+
+  // Calculate target pose in parent model local frame
+  // p_T_t = w_T_p^-1 * w_T_t
+  return (parentModelWorld.Inverse() * targetWorld).Pose();
 }

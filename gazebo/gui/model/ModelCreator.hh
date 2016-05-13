@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
-#define _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+#define GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
 #include <memory>
 #include <mutex>
@@ -225,6 +225,13 @@ namespace gazebo
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
 
+      /// \brief Convert a given pose from the world frame to the local frame
+      /// of the model being edited.
+      /// \param[in] _world Pose in world frame.
+      /// \return Pose in model local frame.
+      public: ignition::math::Pose3d WorldToLocal(
+          const ignition::math::Pose3d &_world) const;
+
       /// \brief Helper function to generate link sdf from link data.
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
@@ -427,11 +434,15 @@ namespace gazebo
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
 
-      /// \brief
+      /// \brief Callback when receiving a request to move a link.
+      /// \param[in] _name Link name.
+      /// \param[in] _pose New link pose.
       private: void OnRequestLinkMove(const std::string &_name,
           const ignition::math::Pose3d &_pose);
 
-      /// \brief
+      /// \brief Callback when receiving a request to move a nested model.
+      /// \param[in] _name Nested model name.
+      /// \param[in] _pose New nested model pose.
       private: void OnRequestNestedModelMove(const std::string &_name,
           const ignition::math::Pose3d &_pose);
 

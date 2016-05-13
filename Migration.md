@@ -25,6 +25,14 @@ release will remove the deprecated code.
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
 
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** ConnectSetSelectedLink
+    + ***Replacement:*** ConnectSetSelectedEntity
+    + ***Removed:*** DisconnectSetSelectedLink
+    + ***Replacement:*** DisconnectSetSelectedEntity
+    + ***Removed:*** setSelectedLink
+    + ***Replacement:*** setSelectedEntity
+
 ### Deprecations
 
 1. **gazebo/common/Event.hh**

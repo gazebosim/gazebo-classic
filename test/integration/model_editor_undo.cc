@@ -24,6 +24,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/model/JointMaker.hh"
@@ -601,7 +602,7 @@ void ModelEditorUndoTest::LinkTranslation()
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -610,20 +611,20 @@ void ModelEditorUndoTest::LinkTranslation()
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   auto scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Enter the model editor to edit the box model
-  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
   gazebo::gui::Events::editModel("box");
 
   // Check undo/redo are disabled
-  QVERIFY(gazebo::gui::g_undoAct != NULL);
-  QVERIFY(gazebo::gui::g_undoHistoryAct != NULL);
-  QVERIFY(gazebo::gui::g_redoAct != NULL);
-  QVERIFY(gazebo::gui::g_redoHistoryAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
   QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
@@ -632,7 +633,7 @@ void ModelEditorUndoTest::LinkTranslation()
   // Get link initial pose
   std::string linkVisName = "ModelPreview_1::link";
   auto linkVis = scene->GetVisual(linkVisName);
-  QVERIFY(linkVis != NULL);
+  QVERIFY(linkVis != nullptr);
   auto initialPose = linkVis->GetWorldPose().Ign();
 
   // Move camera closer to model so we can easily click on it
@@ -694,7 +695,103 @@ void ModelEditorUndoTest::LinkTranslation()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorUndoTest::NestedModelAlign()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  // Load a world with a deeply nested model
+  this->Load("test/worlds/deeply_nested_models.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera, scene and GLWidget
+  auto cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  auto scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  // Enter the model editor to edit the nested model
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
+  gazebo::gui::g_editModelAct->trigger();
+  gazebo::gui::Events::editModel("model_00");
+
+  // Check undo/redo are disabled
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
+  QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+  // Visuals to be aligned
+  std::vector<gazebo::rendering::VisualPtr> visuals;
+
+  // Get link which will be the alignment target
+  auto linkVis = scene->GetVisual("ModelPreview_1::link_00");
+  QVERIFY(linkVis != nullptr);
+  visuals.push_back(linkVis);
+
+  // Get nested model initial pose
+  auto nestedVis = scene->GetVisual("ModelPreview_1::model_01");
+  QVERIFY(nestedVis != nullptr);
+  visuals.push_back(nestedVis);
+
+  auto initialPose = nestedVis->GetWorldPose().Ign();
+
+  // Align
+  gazebo::gui::ModelAlign::Instance()->Init();
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      visuals, "x", "min", "first", true);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Undo -> Redo a few times
+  for (unsigned int j = 0; j < 3; ++j)
+  {
+    // Check undo is enabled
+    QVERIFY(gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check nested pose has changed
+    QVERIFY(nestedVis->GetWorldPose().Ign() != initialPose);
+
+    // Undo
+    gzmsg << "Undo moving [" << nestedVis->GetName() << "]" << std::endl;
+    gazebo::gui::g_undoAct->trigger();
+
+    // Check redo is enabled
+    QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check it's back to initial pose
+    QVERIFY(initialPose == nestedVis->GetWorldPose().Ign());
+
+    // Redo
+    gzmsg << "Redo moving [" << nestedVis->GetName() << "]" << std::endl;
+    gazebo::gui::g_redoAct->trigger();
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
 }
 
 // Generate a main function for the test

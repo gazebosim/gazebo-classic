@@ -110,7 +110,8 @@ namespace gazebo
       /// \param[in] _id Unique id of joint.
       public: void SetJointId(const std::string &_id);
 
-      /// \brief Set the pose before and after the command.
+      /// \brief Set the pose before and after the command. These are local
+      /// poses with respect to the parent model.
       /// \param[in] _before Pose before the command, to be used by undo.
       /// \param[in] _after Pose after the command, to be used by redo.
       public: void SetPoseChange(const ignition::math::Pose3d &_before,
