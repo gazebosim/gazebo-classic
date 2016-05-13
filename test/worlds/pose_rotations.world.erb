@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="pose_rotations">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+<%
+  require "matrix"
+  boxes = {}
+  boxes["ref"] = {:rpy => Vector[0, 0, 0]}
+  boxes["x90"] = {:rpy => Vector[Math::PI/2, 0, 0]}
+  boxes["y90"] = {:rpy => Vector[0, Math::PI/2, 0]}
+  boxes["z90"] = {:rpy => Vector[0, 0, Math::PI/2]}
+  boxes.keys.each_with_index { |k,i|
+    rpy1 = boxes[k][:rpy].to_a.join(" ")
+    rpy2 = (-1 * boxes[k][:rpy]).to_a.join(" ")
+%>
+    <model name="box010409_<%= k %>">
+      <pose>0 <%= i %> 0.45  <%= rpy1 %></pose>
+      <link name="link">
+        <inertial>
+          <pose>0 0 0  <%= rpy2 %></pose>
+          <mass>12</mass>
+          <inertia>
+            <ixx>0.97</ixx>
+            <iyy>0.82</iyy>
+            <izz>0.17</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0 0 0  <%= rpy2 %></pose>
+          <geometry>
+            <box>
+              <size>0.1 0.4 0.9</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0  <%= rpy2 %></pose>
+          <geometry>
+            <box>
+              <size>0.1 0.4 0.9</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+  }
+%>
+  </world>
+</sdf>
