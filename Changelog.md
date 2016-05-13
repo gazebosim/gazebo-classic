@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Handle model manipulation tool RTS shortcuts in keyPress
+    * [Pull request 2312](https://bitbucket.org/osrf/gazebo/pull-request/2312)
+
 1. Reset ODE joint force feedback after world reset
     * [Pull request 2255](https://bitbucket.org/osrf/gazebo/pull-request/2255)
 
