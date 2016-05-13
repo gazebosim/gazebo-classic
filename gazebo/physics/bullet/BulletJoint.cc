@@ -155,6 +155,7 @@ bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
+  this->applyDamping.reset();
   this->childLink.reset();
   this->parentLink.reset();
   if (this->constraint && this->bulletWorld)
