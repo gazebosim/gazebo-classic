@@ -26,6 +26,8 @@
 #include <sstream>
 #include <functional>
 
+#include <ignition/math/MassMatrix3.hh>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportIface.hh"
@@ -1284,6 +1286,36 @@ void Link::SetScale(const math::Vector3 &_scale)
     if ((*biter)->HasType(Base::COLLISION))
     {
       boost::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
+    }
+  }
+
+  // re-scale inertia
+  ignition::math::MassMatrix3d m(this->inertial->GetMass(),
+      this->inertial->GetPrincipalMoments().Ign(),
+      this->inertial->GetProductsofInertia().Ign());
+  ignition::math::Vector3d oldSize;
+  ignition::math::Quaterniond rot;
+  if (!m.EquivalentBox(oldSize, rot))
+  {
+    gzerr << "Current inertia is invalid, not re-scaling" << std::endl;
+  }
+  else
+  {
+    // TODO: not sure if this rotation is correct
+    // need to write a test with off-diagonal inertia
+    // inertial pose rotations
+    ignition::math::Vector3d newSize = rot.RotateVector(_scale.Ign());
+    if (!m.SetFromBox(newSize, rot))
+    {
+      gzerr << "Error computing inertia, not re-scaling" << std::endl;
+    }
+    else
+    {
+      this->inertial->SetInertiaMatrix(m.IXX(), m.IYY(), m.IZZ(),
+                                       m.IXY(), m.IXZ(), m.IYZ());
+      // Only update the Center of Mass if object is dynamic
+      if (!this->GetKinematic())
+        this->UpdateMass();
     }
   }
 
