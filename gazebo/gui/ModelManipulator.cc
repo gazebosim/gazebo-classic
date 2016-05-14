@@ -532,10 +532,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   if (!_vis)
     return;
 
-  // If the root visual's ID can't be found, we're probably in the model editor
-  if (!gui::get_entity_id(_vis->GetRootVisual()->GetName()))
-    return;
-
   // Register user command on server
   std::string description;
   if (this->dataPtr->manipMode == "translate")
@@ -599,10 +595,6 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
   {
     return;
   }
-
-  // If the root visual's ID can't be found, we're probably in the model editor
-  if (!gui::get_entity_id(_vis->GetRootVisual()->GetName()))
-    return;
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;
