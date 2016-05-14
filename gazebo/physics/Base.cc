@@ -326,7 +326,6 @@ std::string Base::GetScopedName(bool _prependWorldName) const
     return this->scopedName;
 }
 
-
 //////////////////////////////////////////////////
 common::URI Base::URI() const
 {
