@@ -66,6 +66,8 @@ void BulletJoint::Fini()
   if (this->feedback)
     delete this->feedback;
   this->feedback = NULL;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////

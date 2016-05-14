@@ -45,6 +45,8 @@ CollisionConfig::CollisionConfig()
   // Add Collision button
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
   addCollisionButton->setMaximumWidth(200);
+  addCollisionButton->setDefault(false);
+  addCollisionButton->setAutoDefault(false);
   connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
   // Main layout
@@ -70,6 +72,12 @@ CollisionConfig::~CollisionConfig()
     delete config->second;
     this->configs.erase(config);
   }
+  while (!this->deletedConfigs.empty())
+  {
+    auto config = this->deletedConfigs.begin();
+    delete config->second;
+    this->deletedConfigs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +89,13 @@ void CollisionConfig::Init()
     CollisionConfigData *configData = it.second;
     configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
+
+  // Clear lists
+  for (auto &it : this->deletedConfigs)
+    delete it.second->widget;
+  this->deletedConfigs.clear();
+
+  this->addedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -147,6 +162,8 @@ void CollisionConfig::AddCollision(const std::string &_name,
 
   // Remove button
   QToolButton *removeCollisionButton = new QToolButton(this);
+  removeCollisionButton->setObjectName(
+      "removeCollisionButton_" + QString::number(this->counter));
   removeCollisionButton->setFixedSize(QSize(30, 30));
   removeCollisionButton->setToolTip("Remove " + QString(_name.c_str()));
   removeCollisionButton->setIcon(QPixmap(":/images/trashcan.png"));
@@ -250,6 +267,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
+  this->addedConfigs[this->counter] = configData;
 
   this->counter++;
 }
@@ -294,15 +312,26 @@ void CollisionConfig::OnRemoveCollision(int _id)
   msgBox.setDefaultButton(removeButton);
   msgBox.setEscapeButton(cancelButton);
   msgBox.exec();
-  if (msgBox.clickedButton() != removeButton)
+  if (msgBox.clickedButton() && msgBox.clickedButton() != removeButton)
     return;
 
   // Remove
   this->listLayout->removeWidget(configData->widget);
-  delete configData->widget;
+  configData->widget->hide();
 
   emit CollisionRemoved(configData->name);
-  this->configs.erase(it);
+
+  // Add to delete list only if this existed from the beginning
+  auto itAdded = this->addedConfigs.find(_id);
+  if (itAdded == this->addedConfigs.end())
+  {
+    this->deletedConfigs[_id] = configData;
+    this->configs.erase(it);
+  }
+  else
+  {
+    this->addedConfigs.erase(itAdded);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -377,10 +406,36 @@ void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
 /////////////////////////////////////////////////
 void CollisionConfig::RestoreOriginalData()
 {
+  // Remove added configs
+  for (auto &it : this->addedConfigs)
+  {
+    auto configData = it.second;
+
+    this->listLayout->removeWidget(configData->widget);
+    delete configData->widget;
+
+    emit CollisionRemoved(configData->name);
+
+    this->configs.erase(it.first);
+  }
+  this->addedConfigs.clear();
+
+  // Restore previously existing configs
   for (auto &it : this->configs)
   {
     it.second->RestoreOriginalData();
   }
+
+  // Reinsert deleted configs
+  for (auto &it : this->deletedConfigs)
+  {
+    this->listLayout->addWidget(it.second->widget);
+    it.second->widget->show();
+
+    this->configs[it.first] = it.second;
+    emit CollisionAdded(it.second->name);
+  }
+  this->deletedConfigs.clear();
 }
 
 /////////////////////////////////////////////////

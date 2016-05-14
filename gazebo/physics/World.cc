@@ -907,6 +907,7 @@ void World::Fini()
 void World::Clear()
 {
   g_clearModels = true;
+  /// \todo Clear lights too?
 }
 
 //////////////////////////////////////////////////
@@ -916,13 +917,9 @@ void World::ClearModels()
   bool pauseState = this->IsPaused();
   this->SetPaused(true);
 
-  this->dataPtr->publishModelPoses.clear();
-  this->dataPtr->publishModelScales.clear();
-
-  // Remove all models
-  for (auto &model : this->dataPtr->models)
+  while (!this->dataPtr->models.empty())
   {
-    this->dataPtr->rootElement->RemoveChild(model->GetId());
+    this->RemoveModel(this->dataPtr->models[0]);
   }
   this->dataPtr->models.clear();
 

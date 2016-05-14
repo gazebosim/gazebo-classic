@@ -43,7 +43,8 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
@@ -252,6 +253,10 @@ namespace gazebo
       /// \brief Remove a child by name.
       /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
+
+      /// \brief Remove a child by pointer.
+      /// \param[in] _child Pointer to the child.
+      public: void RemoveChild(physics::BasePtr _child);
 
       /// \brief Add a type specifier.
       /// \param[in] _type New type to append to this objects type

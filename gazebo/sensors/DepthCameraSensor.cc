@@ -58,6 +58,7 @@ DepthCameraSensor::DepthCameraSensor()
 //////////////////////////////////////////////////
 DepthCameraSensor::~DepthCameraSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -133,10 +134,12 @@ void DepthCameraSensor::Init()
 //////////////////////////////////////////////////
 void DepthCameraSensor::Fini()
 {
-  Sensor::Fini();
-  this->scene->RemoveCamera(this->dataPtr->camera->Name());
-  this->dataPtr->camera.reset();
+  if (this->scene && this->dataPtr->camera)
+    this->scene->RemoveCamera(this->dataPtr->camera->Name());
   this->scene.reset();
+  this->dataPtr->camera.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
