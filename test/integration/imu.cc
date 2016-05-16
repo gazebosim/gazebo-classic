@@ -433,17 +433,17 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   const double imu2Angle = 1.8;
   imuOrientation2 = ballFloatingImu2->Orientation();
   ignition::math::Vector3d rpy2 = imuOrientation2.Euler();
-  EXPECT_NEAR(rpy2.X(), cos(imu2Angle), IMU_TOL);
-  EXPECT_NEAR(rpy2.Y(), sin(imu2Angle), IMU_TOL);
-  EXPECT_NEAR(rpy2.Z(), 0, IMU_TOL);
+  EXPECT_NEAR(rpy2.X(), M_PI, IMU_TOL);
+  EXPECT_NEAR(rpy2.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(rpy2.Z(), -imu2Angle, IMU_TOL);
 
   // imu orientation in world frame
   ignition::math::Quaterniond imuWorldOrientation2 =
     imuOrientation2 * nwuToNEDReference2.Rot();
   ignition::math::Vector3d rpyWorld2 = imuWorldOrientation2.Euler();
-  EXPECT_NEAR(rpyWorld2.X(), cos(imu2Angle), IMU_TOL);
+  EXPECT_NEAR(rpyWorld2.X(), 0, IMU_TOL);
   EXPECT_NEAR(rpyWorld2.Y(), 0, IMU_TOL);
-  EXPECT_NEAR(rpyWorld2.Z(), sin(imu2Angle), IMU_TOL);
+  EXPECT_NEAR(rpyWorld2.Z(), -imu2Angle, IMU_TOL);
 
 }
 
