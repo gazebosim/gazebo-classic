@@ -27,7 +27,7 @@ TEST_F(BatteryTest, Construction)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
   EXPECT_EQ(battery->PowerLoads().size(), 0u);
@@ -38,7 +38,7 @@ TEST_F(BatteryTest, AddConsumer)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   uint32_t consumerId = battery->AddConsumer();
   EXPECT_EQ(consumerId, 0u);
@@ -66,7 +66,7 @@ TEST_F(BatteryTest, RemoveConsumer)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   uint32_t consumerId = battery->AddConsumer();
   EXPECT_EQ(consumerId, 0u);
@@ -103,7 +103,7 @@ TEST_F(BatteryTest, SetPowerLoad)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   // Add two consumers
   uint32_t consumerId1 = battery->AddConsumer();
@@ -158,16 +158,16 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   sdf::ElementPtr elem = batterySDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("battery");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   battery->Load(elem);
 
   battery->Init();

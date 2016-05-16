@@ -30,7 +30,7 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTModelPrivate()
-        : dtSkeleton(NULL),
+        : dtSkeleton(nullptr),
           dtConfig(),
           dtVelocity()
       {
