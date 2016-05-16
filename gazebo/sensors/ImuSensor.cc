@@ -423,8 +423,12 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
       (imuWorldLinearVel - this->dataPtr->lastImuWorldLinearVel) / dt);
 
     // Add contribution from gravity
-    this->dataPtr->linearAcc -= imuWorldPose.Rot().Inverse().RotateVector(
-        this->dataPtr->gravity);
+    if (this->dataPtr->parentEntity->GetGravityMode())
+    {
+      this->dataPtr->linearAcc -= imuWorldPose.Rot().Inverse().RotateVector(
+          this->dataPtr->gravity);
+    }
+    // publish linear acceleration
     msgs::Set(this->dataPtr->imuMsg.mutable_linear_acceleration(),
         this->dataPtr->linearAcc);
 

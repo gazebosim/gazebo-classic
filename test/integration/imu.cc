@@ -176,6 +176,11 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   ballFloatingImu->Init();
 
   // get floating ball 2
+  std::string ballFloatingName2 = "link_floating_imu_2";
+  physics::LinkPtr ballFloatingLink2 =
+    ballFloatingModel->GetLink(ballFloatingName2);
+  ASSERT_TRUE(ballFloatingLink2 != NULL);
+
   std::string ballFloatingSensorName2 = "ball_floating_imu_sensor_2";
   sensors::ImuSensorPtr ballFloatingImu2 =
     std::static_pointer_cast<sensors::ImuSensor>(
@@ -389,6 +394,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // orientation of the imu in NED frame
   imuOrientation = ballFloatingImu->Orientation();
+
   EXPECT_NEAR(imuOrientation.W(), 0, IMU_TOL);
   EXPECT_NEAR(imuOrientation.X(), -1, IMU_TOL);
   EXPECT_NEAR(imuOrientation.Y(), 0, IMU_TOL);
@@ -433,7 +439,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   const double imu2Angle = 1.8;
   imuOrientation2 = ballFloatingImu2->Orientation();
   ignition::math::Vector3d rpy2 = imuOrientation2.Euler();
-  EXPECT_NEAR(rpy2.X(), M_PI, IMU_TOL);
+  EXPECT_NEAR(fabs(rpy2.X()), M_PI, IMU_TOL);
   EXPECT_NEAR(rpy2.Y(), 0, IMU_TOL);
   EXPECT_NEAR(rpy2.Z(), -imu2Angle, IMU_TOL);
 
@@ -445,6 +451,82 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(rpyWorld2.Y(), 0, IMU_TOL);
   EXPECT_NEAR(rpyWorld2.Z(), -imu2Angle, IMU_TOL);
 
+  // turn floating ball 2 by -1.8 rad yaw, and see if two floating
+  // balls orientation match
+  ballFloatingLink2->SetWorldPose(math::Pose(3.0, -3.40, 0.95, 0.0, 0.0, 0.0));
+
+  // let messages propagate asynchronously
+  world->Step(1000);
+
+  // get orientation of two floating balls and compare them
+  imuOrientation = ballFloatingImu->Orientation();
+  ignition::math::Vector3d rpy = imuOrientation.Euler();
+
+  imuOrientation2 = ballFloatingImu2->Orientation();
+  rpy2 = imuOrientation2.Euler();
+
+  EXPECT_NEAR(fabs(rpy.X()), fabs(rpy2.X()), IMU_TOL);
+  EXPECT_NEAR(rpy.Y(), rpy2.Y(), IMU_TOL);
+  EXPECT_NEAR(rpy.Z(), rpy2.Z(), IMU_TOL);
+
+  // turn floating ball 2 by 0.6 rad yaw, apply torque about imu local Y-axis
+  // and test AngularVelocity is expressed in local frame.
+  const double yaw = 0.6;
+  ballFloatingLink2->SetWorldPose(math::Pose(3.0, -3.40, 0.95, 0.0, 0.0, yaw));
+  world->Step(100);
+
+  ballFloatingLink2->AddRelativeTorque(math::Vector3(0, 150.0, 0));
+
+  // expected velocity calculation
+  const double iyy = 0.1;  // kg*m^2
+  const double tau = 150.0;  // Nm
+  const double dt = 0.001;  // sec
+  const double pDot = tau / iyy * dt;  // 1.5 m/s  // pitch rate
+  const int nsteps = 1000;
+  const double p = pDot * (nsteps-1) * dt;
+
+  // let messages propagate asynchronously
+  world->Step(nsteps);
+
+  // get orientation of two floating balls and compare them
+  imuOrientation2 = ballFloatingImu2->Orientation();
+  rpy2 = imuOrientation2.Euler();
+  ignition::math::Vector3d rpyDot2 = ballFloatingImu2->AngularVelocity();
+
+  // grab from running test, but we should be able to compute this too
+  EXPECT_NEAR(fabs(rpy2.X()), M_PI, IMU_TOL);  // because NED
+  EXPECT_NEAR(rpy2.Y(), -p, IMU_TOL);
+  EXPECT_NEAR(rpy2.Z(), -yaw, IMU_TOL);
+
+  EXPECT_NEAR(rpyDot2.X(), 0, IMU_TOL);
+  EXPECT_NEAR(rpyDot2.Y(), pDot, IMU_TOL);
+  EXPECT_NEAR(rpyDot2.Z(), 0, IMU_TOL);
+
+  // turn floating ball 2 by 0.5 rad pitch, apply force about
+  // positive world z-axis
+  // and test if LinearAcceleration is expressed in local frame.
+  const double pit = 0.5;
+  ballFloatingLink2->Reset();
+  ballFloatingLink2->SetWorldPose(math::Pose(3.0, -3.40, 0.95, 0.0, pit, 0.0));
+  world->Step(100);
+  for (int i = 0; i < 1000; ++i)
+  {
+    const double f = 13.8;
+    ballFloatingLink2->AddForce(math::Vector3(0, 0, f));
+    world->Step(1);
+    const double m = 5.0;
+    const double a = f / m;
+    ignition::math::Vector3d linAcc2 = ballFloatingImu2->LinearAcceleration();
+    if (i > 100)
+    {
+      // THERE MUST BE A BETTER WAY TO DO THIS...
+      // need to take 100 stesps to ensure that
+      // imu readings are passed through from asynchronous transport
+      EXPECT_NEAR(linAcc2.X(), -a*sin(pit), IMU_TOL);
+      EXPECT_NEAR(linAcc2.Y(), 0, IMU_TOL);
+      EXPECT_NEAR(linAcc2.Z(), a*cos(pit), IMU_TOL);
+    }
+  }
 }
 
 TEST_P(ImuTest, ImuSensorTestWorld)
