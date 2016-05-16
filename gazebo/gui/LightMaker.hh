@@ -22,6 +22,7 @@
 #include <string>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/msgs/light.pb.h"
 #include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
@@ -64,9 +65,15 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void CreateTheEntity();
 
+      /// \brief Message that holds all the light information.
+      protected: msgs::Light msg;
+
+      /// \brief Type of the light being spawned.
+      protected: std::string lightTypename;
+
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<LightMakerPrivate> dataPtr;
+      private: std::unique_ptr<LightMakerPrivate> dataPtr;
     };
 
     /// \brief Used to insert a new point light into the scene.

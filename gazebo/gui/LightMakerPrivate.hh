@@ -18,9 +18,6 @@
 #ifndef GAZEBO_GUI_LIGHTMAKER_PRIVATE_HH_
 #define GAZEBO_GUI_LIGHTMAKER_PRIVATE_HH_
 
-#include <string>
-
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -34,14 +31,8 @@ namespace gazebo
       /// \brief Node to publish messages and spawn the entity.
       public: transport::NodePtr node;
 
-      /// \brief Message that holds all the light information.
-      public: msgs::Light msg;
-
       /// \brief Publisher used to spawn a new light.
       public: transport::PublisherPtr lightPub;
-
-      /// \brief Type of the light being spawned.
-      public: std::string lightTypename;
 
       /// \brief Pointer to the light being spawned.
       public: rendering::LightPtr light;

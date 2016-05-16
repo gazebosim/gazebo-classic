@@ -89,7 +89,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<ModelMakerPrivate> dataPtr;
+      private: std::unique_ptr<ModelMakerPrivate> dataPtr;
     };
   }
 }

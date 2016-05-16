@@ -45,15 +45,15 @@ LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
   this->dataPtr->lightPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
 
-  msgs::Set(this->dataPtr->msg.mutable_diffuse(),
+  msgs::Set(this->msg.mutable_diffuse(),
       common::Color(0.5, 0.5, 0.5, 1));
-  msgs::Set(this->dataPtr->msg.mutable_specular(),
+  msgs::Set(this->msg.mutable_specular(),
       common::Color(0.1, 0.1, 0.1, 1));
 
-  this->dataPtr->msg.set_attenuation_constant(0.5);
-  this->dataPtr->msg.set_attenuation_linear(0.01);
-  this->dataPtr->msg.set_attenuation_quadratic(0.001);
-  this->dataPtr->msg.set_range(20);
+  this->msg.set_attenuation_constant(0.5);
+  this->msg.set_attenuation_linear(0.01);
+  this->msg.set_attenuation_quadratic(0.001);
+  this->msg.set_range(20);
 }
 
 //////////////////////////////////////////////////
@@ -91,8 +91,8 @@ bool LightMaker::InitFromLight(const std::string &_lightName)
     return false;
   }
 
-  this->dataPtr->lightTypename =  this->dataPtr->light->Type();
-  this->dataPtr->light->FillMsg(this->dataPtr->msg);
+  this->lightTypename =  this->dataPtr->light->Type();
+  this->dataPtr->light->FillMsg(this->msg);
 
   std::string newName = _lightName + "_clone";
   int i = 0;
@@ -103,7 +103,7 @@ bool LightMaker::InitFromLight(const std::string &_lightName)
     i++;
   }
 
-  this->dataPtr->msg.set_name(newName);
+  this->msg.set_name(newName);
 
   return true;
 }
@@ -119,9 +119,9 @@ bool LightMaker::Init()
   this->dataPtr->light->Load();
   scene->AddLight(this->dataPtr->light);
 
-  this->dataPtr->light->SetLightType(this->dataPtr->lightTypename);
+  this->dataPtr->light->SetLightType(this->lightTypename);
   this->dataPtr->light->SetPosition(ignition::math::Vector3d(0, 0, 1));
-  if (this->dataPtr->lightTypename == "directional")
+  if (this->lightTypename == "directional")
     this->dataPtr->light->SetDirection(ignition::math::Vector3d(.1, .1, -0.9));
 
   // Unique name
@@ -129,10 +129,10 @@ bool LightMaker::Init()
   std::string lightName;
   do
   {
-    lightName = "user_" + this->dataPtr->lightTypename + "_light_" +
+    lightName = "user_" + this->lightTypename + "_light_" +
         std::to_string(counter++);
   } while (scene->GetLight(lightName));
-  this->dataPtr->msg.set_name(lightName);
+  this->msg.set_name(lightName);
 
   return true;
 }
@@ -162,11 +162,11 @@ void LightMaker::Stop()
 /////////////////////////////////////////////////
 void LightMaker::CreateTheEntity()
 {
-  msgs::Set(this->dataPtr->msg.mutable_pose()->mutable_position(),
+  msgs::Set(this->msg.mutable_pose()->mutable_position(),
             this->dataPtr->light->Position());
-  msgs::Set(this->dataPtr->msg.mutable_pose()->mutable_orientation(),
+  msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
-  this->dataPtr->lightPub->Publish(this->dataPtr->msg);
+  this->dataPtr->lightPub->Publish(this->msg);
 }
 
 /////////////////////////////////////////////////
@@ -184,32 +184,32 @@ void LightMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 /////////////////////////////////////////////////
 PointLightMaker::PointLightMaker() : LightMaker()
 {
-  this->dataPtr->msg.set_type(msgs::Light::POINT);
-  this->dataPtr->msg.set_cast_shadows(false);
-  this->dataPtr->lightTypename = "point";
+  this->msg.set_type(msgs::Light::POINT);
+  this->msg.set_cast_shadows(false);
+  this->lightTypename = "point";
 }
 
 /////////////////////////////////////////////////
 SpotLightMaker::SpotLightMaker() : LightMaker()
 {
-  this->dataPtr->msg.set_type(msgs::Light::SPOT);
-  msgs::Set(this->dataPtr->msg.mutable_direction(),
+  this->msg.set_type(msgs::Light::SPOT);
+  msgs::Set(this->msg.mutable_direction(),
             ignition::math::Vector3d(0, 0, -1));
-  this->dataPtr->msg.set_cast_shadows(false);
+  this->msg.set_cast_shadows(false);
 
-  this->dataPtr->msg.set_spot_inner_angle(0.6);
-  this->dataPtr->msg.set_spot_outer_angle(1.0);
-  this->dataPtr->msg.set_spot_falloff(1.0);
-  this->dataPtr->lightTypename  = "spot";
+  this->msg.set_spot_inner_angle(0.6);
+  this->msg.set_spot_outer_angle(1.0);
+  this->msg.set_spot_falloff(1.0);
+  this->lightTypename  = "spot";
 }
 
 /////////////////////////////////////////////////
 DirectionalLightMaker::DirectionalLightMaker() : LightMaker()
 {
-  this->dataPtr->msg.set_type(msgs::Light::DIRECTIONAL);
-  msgs::Set(this->dataPtr->msg.mutable_direction(),
+  this->msg.set_type(msgs::Light::DIRECTIONAL);
+  msgs::Set(this->msg.mutable_direction(),
             ignition::math::Vector3d(.1, .1, -0.9));
-  this->dataPtr->msg.set_cast_shadows(true);
+  this->msg.set_cast_shadows(true);
 
-  this->dataPtr->lightTypename  = "directional";
+  this->lightTypename  = "directional";
 }
