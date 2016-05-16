@@ -506,6 +506,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   // positive world z-axis
   // and test if LinearAcceleration is expressed in local frame.
   const double pit = 0.5;
+  ballFloatingImu2->SetWorldToReferencePose(ignition::math::Pose3d());
   ballFloatingLink2->Reset();
   ballFloatingLink2->SetWorldPose(math::Pose(3.0, -3.40, 0.95, 0.0, pit, 0.0));
   world->Step(100);
@@ -517,14 +518,15 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     const double m = 5.0;
     const double a = f / m;
     ignition::math::Vector3d linAcc2 = ballFloatingImu2->LinearAcceleration();
+    this->GetGravity(ballFloatingImu2->Orientation(), g);
     if (i > 100)
     {
       // THERE MUST BE A BETTER WAY TO DO THIS...
       // need to take 100 stesps to ensure that
       // imu readings are passed through from asynchronous transport
-      EXPECT_NEAR(linAcc2.X(), -a*sin(pit), IMU_TOL);
-      EXPECT_NEAR(linAcc2.Y(), 0, IMU_TOL);
-      EXPECT_NEAR(linAcc2.Z(), a*cos(pit), IMU_TOL);
+      EXPECT_NEAR(linAcc2.X(), -a*sin(pit) - g.x, IMU_TOL);
+      EXPECT_NEAR(linAcc2.Y(), 0 - g.y, IMU_TOL);
+      EXPECT_NEAR(linAcc2.Z(), a*cos(pit) - g.z, IMU_TOL);
     }
   }
 }
