@@ -21,6 +21,9 @@
 1. Fix mouse focus during view control in model editor
     * [Pull request 2XXX](https://bitbucket.org/osrf/gazebo/pull-request/2XXX)
 
+1. Model Editor: Select and align nested models
+    * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)
+
 ## Gazebo 7.1.0 (2016-04-07)
 
 1. fix: remove back projection
