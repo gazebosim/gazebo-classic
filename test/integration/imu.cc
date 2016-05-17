@@ -363,7 +363,6 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         EXPECT_NEAR(worldLinearAccel.z, 0, IMU_TOL);
       }
     }
-
   }
 
   // floating ball

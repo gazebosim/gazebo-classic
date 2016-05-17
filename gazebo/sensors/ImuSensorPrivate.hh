@@ -19,6 +19,7 @@
 
 #include <array>
 #include <mutex>
+#include <string>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
