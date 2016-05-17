@@ -2895,9 +2895,9 @@ TEST_F(MsgsTest, AddBoxLink)
     EXPECT_DOUBLE_EQ(ixz, 0.0);
     EXPECT_DOUBLE_EQ(iyz, 0.0);
     // triangle inequality
-    EXPECT_GT(ixx + iyy, izz);
-    EXPECT_GT(iyy + izz, ixx);
-    EXPECT_GT(izz + ixx, iyy);
+    EXPECT_GE(ixx + iyy, izz);
+    EXPECT_GE(iyy + izz, ixx);
+    EXPECT_GE(izz + ixx, iyy);
 
     EXPECT_EQ(link.collision_size(), 1);
     {
@@ -2964,9 +2964,9 @@ TEST_F(MsgsTest, AddCylinderLink)
     EXPECT_DOUBLE_EQ(ixz, 0.0);
     EXPECT_DOUBLE_EQ(iyz, 0.0);
     // triangle inequality
-    EXPECT_GT(ixx + iyy, izz);
-    EXPECT_GT(iyy + izz, ixx);
-    EXPECT_GT(izz + ixx, iyy);
+    EXPECT_GE(ixx + iyy, izz);
+    EXPECT_GE(iyy + izz, ixx);
+    EXPECT_GE(izz + ixx, iyy);
 
     EXPECT_EQ(link.collision_size(), 1);
     {
@@ -3034,9 +3034,9 @@ TEST_F(MsgsTest, AddSphereLink)
     EXPECT_DOUBLE_EQ(ixz, 0.0);
     EXPECT_DOUBLE_EQ(iyz, 0.0);
     // triangle inequality
-    EXPECT_GT(ixx + iyy, izz);
-    EXPECT_GT(iyy + izz, ixx);
-    EXPECT_GT(izz + ixx, iyy);
+    EXPECT_GE(ixx + iyy, izz);
+    EXPECT_GE(iyy + izz, ixx);
+    EXPECT_GE(izz + ixx, iyy);
 
     EXPECT_EQ(link.collision_size(), 1);
     {
