@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ bool LightMaker::InitFromLight(const std::string &_lightName)
     return false;
   }
 
-  dPtr->lightTypename =  dPtr->light->GetType();
+  dPtr->lightTypename =  dPtr->light->Type();
   dPtr->light->FillMsg(dPtr->msg);
 
   std::string newName = _lightName + "_clone";
@@ -116,9 +116,9 @@ bool LightMaker::Init()
   scene->AddLight(dPtr->light);
 
   dPtr->light->SetLightType(dPtr->lightTypename);
-  dPtr->light->SetPosition(math::Vector3(0, 0, 1));
+  dPtr->light->SetPosition(ignition::math::Vector3d(0, 0, 1));
   if (dPtr->lightTypename == "directional")
-    dPtr->light->SetDirection(math::Vector3(.1, .1, -0.9));
+    dPtr->light->SetDirection(ignition::math::Vector3d(.1, .1, -0.9));
 
   // Unique name
   int counter = 0;
@@ -168,7 +168,7 @@ void LightMaker::CreateTheEntity()
       reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
   msgs::Set(dPtr->msg.mutable_pose()->mutable_position(),
-            dPtr->light->GetPosition().Ign());
+            dPtr->light->Position());
   msgs::Set(dPtr->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
   dPtr->lightPub->Publish(dPtr->msg);
@@ -180,7 +180,7 @@ ignition::math::Vector3d LightMaker::EntityPosition() const
   LightMakerPrivate *dPtr =
       reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
-  return dPtr->light->GetPosition().Ign();
+  return dPtr->light->Position();
 }
 
 /////////////////////////////////////////////////
@@ -233,4 +233,3 @@ DirectionalLightMaker::DirectionalLightMaker() : LightMaker()
 
   dPtr->lightTypename  = "directional";
 }
-

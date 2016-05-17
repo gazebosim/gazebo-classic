@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,60 @@ void JointInspector_TEST::AddRemoveLink()
 
   // Send link removed event
   gazebo::gui::model::Events::linkRemoved("model::link1");
+
+  // Check parent and child combo boxes
+  QCOMPARE(parentBox->count(), 1);
+  QCOMPARE(childBox->count(), 1);
+  QVERIFY(parentBox->itemText(0) == "link2");
+  QVERIFY(childBox->itemText(0) == "link2");
+
+  delete jointInspector;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointInspector_TEST::AddRemoveNestedLink()
+{
+  // Create a joint maker
+  gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Create a joint inspector
+  gazebo::gui::JointInspector *jointInspector =
+      new gazebo::gui::JointInspector(jointMaker);
+  QVERIFY(jointInspector != NULL);
+
+  // Get combo boxes
+  QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
+  unsigned int boxCount = comboBoxes.size();
+  QVERIFY(boxCount >= 5);
+
+  // Check parent and child combo boxes
+  QComboBox *parentBox = comboBoxes[boxCount-2];
+  QComboBox *childBox = comboBoxes[boxCount-1];
+  QCOMPARE(parentBox->count(), 0);
+  QCOMPARE(childBox->count(), 0);
+
+  // Send link inserted event
+  gazebo::gui::model::Events::linkInserted("model::model_0::link1");
+
+  // Check parent and child combo boxes
+  QCOMPARE(parentBox->count(), 1);
+  QCOMPARE(childBox->count(), 1);
+  QVERIFY(parentBox->itemText(0) == "model_0::link1");
+  QVERIFY(childBox->itemText(0) == "model_0::link1");
+
+  // Send link inserted event
+  gazebo::gui::model::Events::linkInserted("model::link2");
+
+  // Check parent and child combo boxes
+  QCOMPARE(parentBox->count(), 2);
+  QCOMPARE(childBox->count(), 2);
+  QVERIFY(parentBox->itemText(1) == "link2");
+  QVERIFY(childBox->itemText(1) == "link2");
+
+  // Send link removed event
+  gazebo::gui::model::Events::linkRemoved("model::model_0::link1");
 
   // Check parent and child combo boxes
   QCOMPARE(parentBox->count(), 1);

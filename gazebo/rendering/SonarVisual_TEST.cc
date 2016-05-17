@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ TEST_F(SonarVisual_TEST, SonarVisualTest)
   // there are no segfaults
   gazebo::rendering::VisualPtr sonarVis(
       new gazebo::rendering::SonarVisual(
-      "world_GUIONLY_sonar_vis", scene->GetWorldVisual(), ""));
+      "world_GUIONLY_sonar_vis", scene->WorldVisual(), ""));
   sonarVis->Load();
 }
 

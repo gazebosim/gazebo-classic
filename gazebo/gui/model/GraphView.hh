@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,9 @@ namespace gazebo
       /// \brief Qt signal emitted when an item is double clicked.
       /// \param[in] _id Unique id of an item.
       Q_SIGNALS: void itemDoubleClicked(QString _id);
+
+      /// \brief Store which item was clicked last.
+      public: QGraphicsItem *lastClickedItem = nullptr;
 
       /// \brief Scale (zoom level) of the editor view.
       private: double viewScale;

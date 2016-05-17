@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ namespace gazebo
 
       /// \brief Get a mesh by name.
       /// \param[in] _name the name of the mesh to look for
-      /// \return the mesh or NULL if not found
+      /// \return the mesh or nullptr if not found
       public: const Mesh *GetMesh(const std::string &_name) const;
 
       /// \brief Return true if the mesh exists.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
     // create extra joint visual for axis1
     VisualPtr parentVis;
     if (_msg->has_parent() && _msg->parent() == "world")
-      parentVis = this->GetScene()->GetWorldVisual();
+      parentVis = this->GetScene()->WorldVisual();
     else if (_msg->has_parent_id())
       parentVis = this->GetScene()->GetVisual(_msg->parent_id());
 
@@ -268,7 +268,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     {
       VisualPtr parentVis;
       if (_msg->has_parent() && _msg->parent() == "world")
-        parentVis = this->GetScene()->GetWorldVisual();
+        parentVis = this->GetScene()->WorldVisual();
       else if (_msg->has_parent_id())
         parentVis = this->GetScene()->GetVisual(_msg->parent_id());
 

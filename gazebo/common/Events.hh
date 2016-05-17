@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _EVENTS_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/UpdateInfo.hh"
@@ -143,6 +144,24 @@ namespace gazebo
                   ConnectionPtr _subscriber);
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the before physics update signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      ///
+      /// The signal is called after collision detection has finished and before
+      /// the physics update step. So you can e.g. change some forces depending
+      /// on the collisions that have occured.
+      public: template<typename T>
+              static ConnectionPtr ConnectBeforePhysicsUpdate(T _subscriber)
+              { return beforePhysicsUpdate.Connect(_subscriber); }
+
+      /// \brief Disconnect a boost::slot from the before physics update signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectBeforePhysicsUpdate(
+                ConnectionPtr _subscriber)
+              { beforePhysicsUpdate.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update end signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
@@ -166,6 +185,45 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectWorldReset(ConnectionPtr _subscriber)
               { worldReset.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect to the time reset signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectTimeReset(T _subscriber)
+              { return timeReset.Connect(_subscriber); }
+
+      /// \brief Disconnect from the time reset signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectTimeReset(ConnectionPtr _subscriber)
+              { timeReset.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect to the remove sensor signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectRemoveSensor(T _subscriber)
+              { return removeSensor.Connect(_subscriber); }
+
+      /// \brief Disconnect from the remove sensor signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectRemoveSensor(ConnectionPtr _subscriber)
+              { removeSensor.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect to the create sensor signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectCreateSensor(T _subscriber)
+              { return createSensor.Connect(_subscriber); }
+
+      /// \brief Disconnect from the create sensor signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectCreateSensor(ConnectionPtr _subscriber)
+              { createSensor.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
@@ -211,6 +269,7 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectDiagTimerStart(ConnectionPtr _subscriber)
               { diagTimerStart.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the diagnostic timer stop signal
       /// \param[in] _subscriber the subscriber to this event
@@ -265,11 +324,18 @@ namespace gazebo
       /// \brief World update has started
       public: static EventT<void (const common::UpdateInfo &)> worldUpdateBegin;
 
+      /// \brief Collision detection has been done, physics update not yet
+      public: static EventT<void (const common::UpdateInfo &)>
+                beforePhysicsUpdate;
+
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;
 
       /// \brief World reset signal
       public: static EventT<void ()> worldReset;
+
+      /// \brief Time reset signal
+      public: static EventT<void ()> timeReset;
 
       /// \brief Pre-render
       public: static EventT<void ()> preRender;
@@ -285,6 +351,24 @@ namespace gazebo
 
       /// \brief Diagnostic timer stop
       public: static EventT<void (std::string)> diagTimerStop;
+
+      /// \brief Remove a sensor
+      ///
+      ///  * Parameter 1 (string): Name of the sensor to remove.
+      public: static EventT<void (std::string)> removeSensor;
+
+      /// \brief Create a sensor
+      /// * Parameter 1 (sdf::ElementPtr): The SDF element that describes
+      ///   the sensor.
+      /// * Parameter 2 (std::string): Name of the world in which to create
+      ///   the sensor.
+      /// * Parameter 3 (std::string): The scoped parent name
+      ///   (model::link).
+      /// * Parameter 4 (uint32_t): ID of the sensor
+      public: static EventT<void (sdf::ElementPtr,
+                  const std::string &,
+                  const std::string &,
+                  const uint32_t)> createSensor;
     };
     /// \}
   }

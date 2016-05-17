@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -40,15 +39,14 @@ GZ_REGISTER_STATIC_SENSOR("magnetometer", MagnetometerSensor)
 
 /////////////////////////////////////////////////
 MagnetometerSensor::MagnetometerSensor()
-  : Sensor(sensors::OTHER), dataPtr(new MagnetometerSensorPrivate)
+: Sensor(sensors::OTHER),
+  dataPtr(new MagnetometerSensorPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 MagnetometerSensor::~MagnetometerSensor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -61,7 +59,7 @@ void MagnetometerSensor::Load(const std::string &_worldName,
 /////////////////////////////////////////////////
 std::string MagnetometerSensor::GetTopic() const
 {
-  std::string topicName = "~/" + this->parentName + '/' + this->GetName();
+  std::string topicName = "~/" + this->ParentName() + '/' + this->Name();
   if (this->sdf->HasElement("topic"))
     topicName += '/' + this->sdf->Get<std::string>("topic");
   boost::replace_all(topicName, "::", "/");
@@ -74,7 +72,8 @@ void MagnetometerSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
+  physics::EntityPtr parentEntity =
+    this->world->GetEntity(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -87,7 +86,7 @@ void MagnetometerSensor::Load(const std::string &_worldName)
   if (!magElem)
   {
     gzerr << "Missing <magnetometer> element in sensor["
-      << this->GetName() << "]\n";
+      << this->Name() << "]\n";
   }
   else
   // Load magnetic field noise parameters
@@ -95,22 +94,25 @@ void MagnetometerSensor::Load(const std::string &_worldName)
     if (magElem->HasElement("x") &&
         magElem->GetElement("x")->HasElement("noise"))
     {
-      this->noises[MAGNETOMETER_X_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-          magElem->GetElement("x")->GetElement("noise"));
+      this->noises[MAGNETOMETER_X_NOISE_TESLA] =
+        NoiseFactory::NewNoiseModel(
+            magElem->GetElement("x")->GetElement("noise"));
     }
 
     if (magElem->HasElement("y") &&
         magElem->GetElement("y")->HasElement("noise"))
     {
-      this->noises[MAGNETOMETER_Y_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-          magElem->GetElement("y")->GetElement("noise"));
+      this->noises[MAGNETOMETER_Y_NOISE_TESLA] =
+        NoiseFactory::NewNoiseModel(
+            magElem->GetElement("y")->GetElement("noise"));
     }
 
     if (magElem->HasElement("z") &&
         magElem->GetElement("z")->HasElement("noise"))
     {
-      this->noises[MAGNETOMETER_Z_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-          magElem->GetElement("z")->GetElement("noise"));
+      this->noises[MAGNETOMETER_Z_NOISE_TESLA] =
+        NoiseFactory::NewNoiseModel(
+            magElem->GetElement("z")->GetElement("noise"));
     }
   }
 }
@@ -129,7 +131,7 @@ void MagnetometerSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
+bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -142,25 +144,40 @@ bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
 
     // Get the reference magnetic field
     ignition::math::Vector3d field =
-      this->world->GetPhysicsEngine()->MagneticField();
+      this->world->MagneticField();
 
     // Rotate the magnetic field into the body frame
     field = magPose.Rot().Inverse().RotateVector(field);
 
     // Apply magnetometer noise after converting to body frame
-    if (this->noises.find(MAGNETOMETER_X_NOISE_TESLA) != this->noises.end())
-      field.X(this->noises[MAGNETOMETER_X_NOISE_TESLA]->Apply(field.X()));
-    if (this->noises.find(MAGNETOMETER_Y_NOISE_TESLA) != this->noises.end())
-      field.Y(this->noises[MAGNETOMETER_Y_NOISE_TESLA]->Apply(field.Y()));
-    if (this->noises.find(MAGNETOMETER_Z_NOISE_TESLA) != this->noises.end())
-      field.Z(this->noises[MAGNETOMETER_Z_NOISE_TESLA]->Apply(field.Z()));
+    if (this->noises.find(MAGNETOMETER_X_NOISE_TESLA) !=
+        this->noises.end())
+    {
+      field.X(
+          this->noises[MAGNETOMETER_X_NOISE_TESLA]->Apply(field.X()));
+    }
+
+    if (this->noises.find(MAGNETOMETER_Y_NOISE_TESLA) !=
+        this->noises.end())
+    {
+      field.Y(
+          this->noises[MAGNETOMETER_Y_NOISE_TESLA]->Apply(field.Y()));
+    }
+
+    if (this->noises.find(MAGNETOMETER_Z_NOISE_TESLA) !=
+        this->noises.end())
+    {
+      field.Z(
+          this->noises[MAGNETOMETER_Z_NOISE_TESLA]->Apply(field.Z()));
+    }
 
     // Set the body-frame magnetic field strength
     msgs::Set(this->dataPtr->magMsg.mutable_field_tesla(), field);
   }
 
   // Save the time of the measurement
-  msgs::Set(this->dataPtr->magMsg.mutable_time(), this->world->GetSimTime());
+  msgs::Set(this->dataPtr->magMsg.mutable_time(),
+            this->world->GetSimTime());
 
   // Publish the message if needed
   if (this->dataPtr->magPub)

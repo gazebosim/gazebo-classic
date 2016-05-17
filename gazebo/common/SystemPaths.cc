@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ SystemPaths::SystemPaths()
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = this->GetTmpPath() + "/gazebo";
+    home = this->TmpPath() + "/gazebo";
   else
     home = homePath;
 
@@ -81,7 +81,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != this->GetTmpPath() + "/gazebo")
+    if (home != this->TmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -93,7 +93,7 @@ SystemPaths::SystemPaths()
   if (!dir)
   {
 #ifdef _WIN32
-    mkdir(fullPath.c_str());
+    _mkdir(fullPath.c_str());
 #else
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
 #endif
@@ -161,11 +161,23 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 /////////////////////////////////////////////////
 std::string SystemPaths::GetTmpPath()
 {
+  return this->TmpPath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpPath() const
+{
   return this->tmpPath.string();
 }
 
 /////////////////////////////////////////////////
 std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->TmpInstancePath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpInstancePath() const
 {
   return this->tmpInstancePath.string();
 }
@@ -173,7 +185,13 @@ std::string SystemPaths::GetTmpInstancePath()
 /////////////////////////////////////////////////
 std::string SystemPaths::GetDefaultTestPath()
 {
-  return this->GetTmpInstancePath() + "/gazebo_test";
+  return this->DefaultTestPath();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::DefaultTestPath() const
+{
+  return this->TmpInstancePath() + "/gazebo_test";
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,12 +72,12 @@ namespace gazebo
 
       /// \brief Find a node
       /// \param[in] _name the name of the node to look for
-      /// \return the node, or NULL if not found
+      /// \return the node, or nullptr if not found
       public: SkeletonNode* GetNodeByName(std::string _name);
 
       /// \brief Find node by index
       /// \param[in] _id the index
-      /// \return the node, or NULL if not found
+      /// \return the node, or nullptr if not found
       public: SkeletonNode* GetNodeById(std::string _id);
 
       /// \brief Find or create node with handle
@@ -141,7 +141,7 @@ namespace gazebo
 
       /// \brief Find animation
       /// \param[in] _i the animation index
-      /// \return the animation, or NULL if _i is out of bounds
+      /// \return the animation, or nullptr if _i is out of bounds
       public: SkeletonAnimation* GetAnimation(const unsigned int _i);
 
       /// \brief Add an animation. The skeleton does not take ownership of the
@@ -272,12 +272,12 @@ namespace gazebo
 
       /// \brief Get child by name
       /// \param[in] _name the name of the child skeleton
-      /// \return the skeleton, or NULL if not found
+      /// \return the skeleton, or nullptr if not found
       public: SkeletonNode* GetChildByName(std::string _name);
 
       /// \brief Get child by string id
       /// \param[in] _id the string id
-      /// \return the child skeleton or NULL if not found
+      /// \return the child skeleton or nullptr if not found
       public: SkeletonNode* GetChildById(std::string _id);
 
       /// \brief Assign a handle number

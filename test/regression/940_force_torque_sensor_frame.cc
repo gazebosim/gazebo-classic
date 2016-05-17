@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   world->Step(20);
 
   // Assume gravity on z axis
-  Vector3 grav = physics->GetGravity();
+  auto grav = world->Gravity();
   EXPECT_NEAR(grav[0], 0, TOL_GRAVITY);
   EXPECT_NEAR(grav[1], 0, TOL_GRAVITY);
 
@@ -123,7 +123,7 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string &_sensorName,
                                             sensors::SensorManager *_mgr)
 {
   sensors::ForceTorqueSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         _mgr->GetSensor(_sensorName));
 
   // Make sure the above dynamic cast worked.

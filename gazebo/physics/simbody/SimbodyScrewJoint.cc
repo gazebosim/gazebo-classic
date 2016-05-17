@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,7 +305,7 @@ bool SimbodyScrewJoint::SetHighStop(
       // check if limitForce is initialized
       if (this->limitForce[_index].isEmptyHandle())
       {
-        gzerr << "child link is NULL, force element not initialized, "
+        gzerr << "child link is null, force element not initialized, "
               << "SetHighStop failed. Please file a report on issue tracker.\n";
         return false;
       }
@@ -382,7 +382,7 @@ bool SimbodyScrewJoint::SetLowStop(
       // check if limitForce is initialized
       if (this->limitForce[_index].isEmptyHandle())
       {
-        gzerr << "child link is NULL, force element not initialized, "
+        gzerr << "child link is null, force element not initialized, "
               << "SetHighStop failed. Please file a report on issue tracker.\n";
         return false;
       }

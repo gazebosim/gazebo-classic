@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,7 @@ void ModelMaker_TEST::SimpleShape()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's no box in the left panel yet
   bool hasBox = mainWindow->HasEntityName("unit_box_0");
@@ -104,13 +98,7 @@ void ModelMaker_TEST::SimpleShape()
   vis = scene->GetVisual("unit_box_0");
   QVERIFY(vis == NULL);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a box in the scene -- this is the final model
   vis = scene->GetVisual("unit_box_0");
@@ -140,13 +128,7 @@ void ModelMaker_TEST::FromFile()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's no box in the left panel yet
   bool hasBox = mainWindow->HasEntityName("box");
@@ -207,13 +189,7 @@ void ModelMaker_TEST::FromFile()
   vis = scene->GetVisual("box");
   QVERIFY(vis == NULL);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a box in the scene -- this is the final model
   vis = scene->GetVisual("box");
@@ -243,13 +219,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's no model in the left panel yet
   bool hasModel = mainWindow->HasEntityName("model_00");
@@ -269,7 +239,8 @@ void ModelMaker_TEST::FromNestedModelFile()
 
   // Model data
   boost::filesystem::path path;
-  path = path / TEST_PATH / "models" / "deeply_nested_model.sdf";
+  path = path / TEST_PATH / "models" / "testdb" / "deeply_nested_model" /
+      "model.sdf";
 
   // Start the maker to make a model
   modelMaker->InitFromFile(path.string());
@@ -325,13 +296,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   vis = scene->GetVisual("model_00::model_01::model_02::model_03");
   QVERIFY(vis == NULL);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a model in the scene -- this is the final model
   vis = scene->GetVisual("model_00");
@@ -367,13 +332,7 @@ void ModelMaker_TEST::FromModel()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a model but not its copy
   bool hasModel = mainWindow->HasEntityName("box");
@@ -440,13 +399,7 @@ void ModelMaker_TEST::FromModel()
   vis = scene->GetVisual("box_clone_tmp");
   QVERIFY(vis == NULL);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a clone in the scene -- this is the final model
   vis = scene->GetVisual("box_clone");
@@ -476,13 +429,7 @@ void ModelMaker_TEST::FromNestedModel()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a model but not its copy
   bool hasModel = mainWindow->HasEntityName("model_00");
@@ -572,13 +519,7 @@ void ModelMaker_TEST::FromNestedModel()
   // vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
   // QVERIFY(vis == NULL);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a clone in the scene -- this is the final model
   vis = scene->GetVisual("model_00_clone");

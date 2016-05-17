@@ -68,15 +68,11 @@
             <image>
               <width>640</width>
               <height>480</height>
-              <format>R8G8B8</format>
             </image>
             <clip>
               <near>0.1</near>
               <far>20</far>
             </clip>
-            <save enabled="true">
-              <path>/tmp/camera</path>
-            </save>
           </camera>
           <plugin filename="libDepthCameraPlugin.so" name="depth_camera_plugin" />
           <always_on>true</always_on>

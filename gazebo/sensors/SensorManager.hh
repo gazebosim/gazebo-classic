@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 
 #include <sdf/sdf.hh>
 
@@ -129,9 +130,21 @@ namespace gazebo
                                        const std::string &_parentName,
                                        uint32_t _parentId);
 
+      /// \brief Add a sensor from an SDF element. This function will also Load
+      /// and Init the sensor.
+      /// \param[in] _elem The SDF element that describes the sensor
+      /// \param[in] _worldName Name of the world in which to create the sensor
+      /// \param[in] _parentName The name of the parent link which the sensor is
+      /// attached to.
+      /// \param[in] _parentId Unique id of the sensor to create.
+      public: void OnCreateSensor(sdf::ElementPtr _elem,
+                                  const std::string &_worldName,
+                                  const std::string &_parentName,
+                                  const uint32_t _parentId);
+
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.
-      /// \return A pointer to the sensor. NULL if not found.
+      /// \return A pointer to the sensor. nullptr if not found.
       public: SensorPtr GetSensor(const std::string &_name) const;
 
       /// \brief Get all the sensors.
@@ -194,7 +207,7 @@ namespace gazebo
                  /// \brief Get a sensor by name.
                  /// \param[in] _useLeafName False indicates that _name
                  /// should be compared against the scoped name of a sensor.
-                 /// \return Pointer to the matching sensor. NULL if no
+                 /// \return Pointer to the matching sensor. nullptr if no
                  /// sensor is found.
                  public: SensorPtr GetSensor(const std::string &_name,
                                              bool _useLeafName = false) const;
@@ -278,6 +291,18 @@ namespace gazebo
 
       /// \brief Pointer to the sim time event handler.
       private: SimTimeEventHandler *simTimeEventHandler;
+
+      /// \brief All the worlds that have sensors.
+      private: std::map<std::string, physics::WorldPtr> worlds;
+
+      /// \brief Connect to the time reset event.
+      private: event::ConnectionPtr timeResetConnection;
+
+      /// \brief Connect to the create sensor event.
+      private: event::ConnectionPtr createSensorConnection;
+
+      /// \brief Connect to the remove sensor event.
+      private: event::ConnectionPtr removeSensorConnection;
     };
     /// \}
   }

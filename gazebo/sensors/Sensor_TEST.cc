@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <condition_variable>
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -25,8 +26,8 @@ class Sensor_TEST : public ServerFixture
 {
 };
 
-boost::condition_variable g_hokuyoCountCondition;
-boost::condition_variable g_imuCountCondition;
+std::condition_variable g_hokuyoCountCondition;
+std::condition_variable g_imuCountCondition;
 
 // global variable and callback for tracking hokuyo sensor messages
 unsigned int g_hokuyoMsgCount;
@@ -54,7 +55,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // Load in a world with lasers
   Load("worlds/ray_test.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   unsigned int i;
   double updateRateHokuyo, updateRateImu, now, then;
@@ -66,22 +67,22 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // get the hokuyo sensor
   sensors::SensorPtr sensor;
   sensor = mgr->GetSensor("default::hokuyo::link::laser");
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
   sensors::SensorPtr imuSensor;
   imuSensor = mgr->GetSensor("default::box_model::box_link::box_imu_sensor");
-  ASSERT_TRUE(imuSensor != NULL);
+  ASSERT_TRUE(imuSensor != nullptr);
 
   // set update rate to 30 Hz
   updateRateHokuyo = 30.0;
   updateRateImu = 1000.0;
   sensor->SetUpdateRate(updateRateHokuyo);
   imuSensor->SetUpdateRate(updateRateImu);
-  gzdbg << sensor->GetScopedName() << " loaded with update rate of "
-        << sensor->GetUpdateRate() << " Hz"
+  gzdbg << sensor->ScopedName() << " loaded with update rate of "
+        << sensor->UpdateRate() << " Hz"
         << std::endl;
-  gzdbg << imuSensor->GetScopedName() << " loaded with update rate of "
-        << imuSensor->GetUpdateRate() << " Hz"
+  gzdbg << imuSensor->ScopedName() << " loaded with update rate of "
+        << imuSensor->UpdateRate() << " Hz"
         << std::endl;
 
   g_hokuyoMsgCount = 0;
@@ -97,8 +98,8 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   // Wait for messages to arrive
   {
-    boost::mutex countMutex;
-    boost::mutex::scoped_lock lock(countMutex);
+    std::mutex countMutex;
+    std::unique_lock<std::mutex> lock(countMutex);
     g_hokuyoCountCondition.wait(lock);
     g_imuCountCondition.wait(lock);
   }

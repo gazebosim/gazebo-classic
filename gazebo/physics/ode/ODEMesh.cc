@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ using namespace physics;
 //////////////////////////////////////////////////
 ODEMesh::ODEMesh()
 {
-  this->odeData = NULL;
-  this->vertices = NULL;
-  this->indices = NULL;
+  this->odeData = nullptr;
+  this->vertices = nullptr;
+  this->indices = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -89,8 +89,8 @@ void ODEMesh::Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision,
   unsigned int numVertices = _subMesh->GetVertexCount();
   unsigned int numIndices = _subMesh->GetIndexCount();
 
-  this->vertices = NULL;
-  this->indices = NULL;
+  this->vertices = nullptr;
+  this->indices = nullptr;
 
   // Get all the vertex and index data
   _subMesh->FillArrays(&this->vertices, &this->indices);
@@ -110,8 +110,8 @@ void ODEMesh::Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
   unsigned int numVertices = _mesh->GetVertexCount();
   unsigned int numIndices = _mesh->GetIndexCount();
 
-  this->vertices = NULL;
-  this->indices = NULL;
+  this->vertices = nullptr;
+  this->indices = nullptr;
 
   // Get all the vertex and index data
   _mesh->FillArrays(&this->vertices, &this->indices);
@@ -125,7 +125,7 @@ void ODEMesh::CreateMesh(unsigned int _numVertices, unsigned int _numIndices,
     ODECollisionPtr _collision, const math::Vector3 &_scale)
 {
   /// This will hold the vertex data of the triangle mesh
-  if (this->odeData == NULL)
+  if (this->odeData == nullptr)
     this->odeData = dGeomTriMeshDataCreate();
 
   // Scale the vertex data
@@ -141,7 +141,7 @@ void ODEMesh::CreateMesh(unsigned int _numVertices, unsigned int _numIndices,
       this->vertices, 3*sizeof(this->vertices[0]), _numVertices,
       this->indices, _numIndices, 3*sizeof(this->indices[0]));
 
-  if (_collision->GetCollisionId() == NULL)
+  if (_collision->GetCollisionId() == nullptr)
   {
     _collision->SetSpaceId(dSimpleSpaceCreate(_collision->GetSpaceId()));
     _collision->SetCollision(dCreateTriMesh(_collision->GetSpaceId(),

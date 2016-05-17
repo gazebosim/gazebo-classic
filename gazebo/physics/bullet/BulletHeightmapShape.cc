@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,8 @@ void BulletHeightmapShape::Init()
   BulletCollisionPtr bParent;
   bParent = boost::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
 
-  GZ_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
+  GZ_ASSERT(bParent != nullptr,
+      "Bullet collision parent of a heightmap is null");
 
   bParent->SetCollisionShape(this->heightFieldShape, false);
 
@@ -83,11 +84,11 @@ void BulletHeightmapShape::Init()
   BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());
 
-  GZ_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");
+  GZ_ASSERT(bLink != nullptr, "Bullet heightmap does not have a link.");
 
   BulletMotionStatePtr motionState = bLink->motionState;
 
-  GZ_ASSERT(motionState != NULL, "Invalid motion state for heightmap.");
+  GZ_ASSERT(motionState != nullptr, "Invalid motion state for heightmap.");
 
   btTransform tr;
   tr.setIdentity();

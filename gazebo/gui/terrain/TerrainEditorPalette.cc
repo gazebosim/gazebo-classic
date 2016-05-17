@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,7 +265,7 @@ void TerrainEditorPalette::OnSave()
 
   // Get a pointer to the heightmap, if the scen is valid.
   rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
-  common::Image img = heightmap->GetImage();
+  common::Image img = heightmap->Image();
 
   // Get a filename to save to.
   // Note that file dialog static functions seem to be broken (issue #1514)

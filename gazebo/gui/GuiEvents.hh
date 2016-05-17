@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -228,7 +228,7 @@ namespace gazebo
 
       /// \brief indicates the user is aligning objects
       public: static event::EventT<void (std::string,
-                  std::string, std::string, bool)> alignMode;
+                  std::string, std::string, bool, bool)> alignMode;
 
       /// \brief indicates an entity has been created
       public: static event::EventT<void (std::string,

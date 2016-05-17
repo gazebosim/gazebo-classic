@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,15 @@ class ModelCreator_TEST : public QTestFixture
 
   /// \brief Tests selecting links in the model editor
   private slots: void Selection();
+
+  /// \brief Tests adding and removing model plugins
+  private slots: void ModelPlugin();
+
+  /// \brief Tests selecting nested models in the model editor
+  private slots: void NestedModelSelection();
+
+  // \brief Test copy and pasting entites in the model editor.
+  private slots: void CopyPaste();
 };
 
 #endif

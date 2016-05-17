@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ GLWidget::GLWidget(QWidget *_parent)
       gui::Events::ConnectAlignMode(
         std::bind(&GLWidget::OnAlignMode, this, std::placeholders::_1,
           std::placeholders::_2, std::placeholders::_3,
-          std::placeholders::_4)));
+          std::placeholders::_4, std::placeholders::_5)));
 
   this->dataPtr->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -183,7 +183,7 @@ GLWidget::GLWidget(QWidget *_parent)
     //
     // All of this means that we must have a GL Context by this point. So,
     // we have to create a dummy 1x1 window in RenderEngine::Load.
-    this->OnCreateScene(this->dataPtr->scene->GetName());
+    this->OnCreateScene(this->dataPtr->scene->Name());
   }
 }
 
@@ -269,7 +269,7 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  if (cam && cam->GetInitialized())
+  if (cam && cam->Initialized())
   {
     event::Events::preRender();
 
@@ -566,15 +566,16 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
   {
     if (vis->IsPlane())
     {
-      math::Pose pose, camPose;
-      camPose = this->dataPtr->userCamera->GetWorldPose();
-      if (this->dataPtr->scene->GetFirstContact(this->dataPtr->userCamera,
-            this->dataPtr->mouseEvent.Pos(), pose.pos))
+      ignition::math::Pose3d pose;
+      ignition::math::Pose3d camPose;
+      camPose = this->dataPtr->userCamera->WorldPose();
+      if (this->dataPtr->scene->FirstContact(this->dataPtr->userCamera,
+            this->dataPtr->mouseEvent.Pos(), pose.Pos()))
       {
-        this->dataPtr->userCamera->SetFocalPoint(pose.pos);
-        math::Vector3 dir = pose.pos - camPose.pos;
-        pose.pos = camPose.pos + (dir * 0.8);
-        pose.rot = this->dataPtr->userCamera->GetWorldRotation();
+        this->dataPtr->userCamera->SetFocalPoint(pose.Pos());
+        ignition::math::Vector3d dir = pose.Pos() - camPose.Pos();
+        pose.Pos() = camPose.Pos() + (dir * 0.8);
+        pose.Rot() = this->dataPtr->userCamera->WorldRotation();
         this->dataPtr->userCamera->MoveToPosition(pose, 0.5);
       }
     }
@@ -849,7 +850,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   else
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
-  if (_scene->GetUserCameraCount() == 0)
+  if (_scene->UserCameraCount() == 0)
   {
     this->dataPtr->userCamera = _scene->CreateUserCamera(cameraName,
         gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
@@ -916,7 +917,7 @@ std::string GLWidget::OgreHandle() const
   ogreHandle = std::to_string(this->winId());
 #elif defined(WIN32)
   ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
+      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
@@ -934,7 +935,7 @@ std::string GLWidget::OgreHandle() const
 /////////////////////////////////////////////////
 void GLWidget::OnRemoveScene(const std::string &_name)
 {
-  if (this->dataPtr->scene && this->dataPtr->scene->GetName() == _name)
+  if (this->dataPtr->scene && this->dataPtr->scene->Name() == _name)
   {
     this->Clear();
   }
@@ -1126,6 +1127,17 @@ void GLWidget::OnManipMode(const std::string &_mode)
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     ModelManipulator::Instance()->SetAttachedVisual(
         this->dataPtr->selectedVisuals.back());
+
+    if (_mode == "select")
+    {
+      this->dataPtr->scene->SelectVisual("", "select");
+    }
+    else
+    {
+      // Make sure model is not updated by server during manipulation
+      this->dataPtr->scene->SelectVisual(
+          this->dataPtr->selectedVisuals.back()->GetName(), "move");
+    }
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
@@ -1281,10 +1293,10 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 
 /////////////////////////////////////////////////
 void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
-    const std::string &_target, bool _preview)
+    const std::string &_target, const bool _preview, const bool _inverted)
 {
   ModelAlign::Instance()->AlignVisuals(this->dataPtr->selectedVisuals, _axis,
-      _config, _target, !_preview);
+      _config, _target, !_preview, _inverted);
 }
 
 /////////////////////////////////////////////////

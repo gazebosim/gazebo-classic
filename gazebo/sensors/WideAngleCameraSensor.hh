@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
-#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
 
 #include <memory>
 #include <string>
@@ -27,7 +26,6 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/util/system.hh"
-
 
 namespace gazebo
 {
@@ -49,7 +47,7 @@ namespace gazebo
       public: WideAngleCameraSensor();
 
       /// \brief Destructor
-      public: virtual ~WideAngleCameraSensor() = default;
+      public: virtual ~WideAngleCameraSensor();
 
       // Documentation inherited
       public: void Load(const std::string &_worldName) override;
@@ -61,7 +59,7 @@ namespace gazebo
       protected: void Fini() override;
 
       // Documentation inherited
-      protected: bool UpdateImpl(bool _force) override;
+      protected: bool UpdateImpl(const bool _force) override;
 
       /// \brief Handle incoming control message
       /// \param[in] _msg Message received from topic
@@ -74,5 +72,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif

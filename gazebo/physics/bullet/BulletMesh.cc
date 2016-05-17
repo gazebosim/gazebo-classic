@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ void BulletMesh::Init(const common::SubMesh *_subMesh,
                       BulletCollisionPtr _collision,
                       const math::Vector3 &_scale)
 {
-  float *vertices = NULL;
-  int *indices = NULL;
+  float *vertices = nullptr;
+  int *indices = nullptr;
 
   unsigned int numVertices = _subMesh->GetVertexCount();
   unsigned int numIndices = _subMesh->GetIndexCount();
@@ -61,8 +61,8 @@ void BulletMesh::Init(const common::Mesh *_mesh,
                       BulletCollisionPtr _collision,
                       const math::Vector3 &_scale)
 {
-  float *vertices = NULL;
-  int *indices = NULL;
+  float *vertices = nullptr;
+  int *indices = nullptr;
 
   unsigned int numVertices = _mesh->GetVertexCount();
   unsigned int numIndices = _mesh->GetIndexCount();

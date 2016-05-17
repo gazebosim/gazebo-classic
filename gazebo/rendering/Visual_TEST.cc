@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -386,7 +386,7 @@ TEST_F(Visual_TEST, ChildTransparency)
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -813,7 +813,7 @@ TEST_F(Visual_TEST, ChildMaterial)
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -986,7 +986,7 @@ TEST_F(Visual_TEST, ChildColor)
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -1239,12 +1239,12 @@ TEST_F(Visual_TEST, GetAncestors)
   ASSERT_TRUE(scene != NULL);
 
   // Get world visual
-  gazebo::rendering::VisualPtr world = scene->GetWorldVisual();
+  gazebo::rendering::VisualPtr world = scene->WorldVisual();
   ASSERT_TRUE(world != NULL);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -1729,12 +1729,12 @@ TEST_F(Visual_TEST, Clone)
   ASSERT_TRUE(scene != NULL);
 
   // Get world visual
-  gazebo::rendering::VisualPtr world = scene->GetWorldVisual();
+  gazebo::rendering::VisualPtr world = scene->WorldVisual();
   ASSERT_TRUE(world != NULL);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1

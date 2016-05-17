@@ -144,9 +144,11 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources)
+set (gtest_sources
+  RenderingConversions_TEST.cc
+)
 
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_rendering)
 
 set (gtest_sources_dri
   COMVisual_TEST.cc
@@ -162,7 +164,8 @@ set (gtest_sources_dri
   Visual_TEST.cc
 )
 
-gz_build_dri_tests(${gtest_sources_dri})
+gz_build_dri_tests(${gtest_sources_dri}
+  EXTRA_LIBS gazebo_rendering gazebo_test_fixture)
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})

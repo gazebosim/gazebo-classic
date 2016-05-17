@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,37 @@ TEST_F(OpenAL, DefaultDevice)
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->Root()));
   EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->Root()->GetElement("audio")));
+}
+
+/////////////////////////////////////////////////
+TEST_F(OpenAL, DeviceList)
+{
+  common::load();
+
+  // retrieve audio devices and try opening them.
+  std::set<std::string> devices = util::OpenAL::Instance()->DeviceList();
+  EXPECT_FALSE(devices.empty());
+
+  for (const auto &d : devices)
+  {
+    sdf::SDFPtr sdf(new sdf::SDF);
+    sdf::initFile("world.sdf", sdf->Root());
+
+    std::string sdfString = "<sdf version='1.4'>"
+      "<world name='default'>"
+      "<audio>"
+      "<device>" + d + "</device>"
+      "</audio>"
+      "</world>"
+      "</sdf>";
+
+    EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
+
+    EXPECT_TRUE(util::OpenAL::Instance()->Load(
+        sdf->Root()->GetElement("audio")));
+  }
+
+  ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
 }
 
 /////////////////////////////////////////////////
@@ -162,11 +193,11 @@ TEST_F(OpenAL, SourcePlay)
   source = util::OpenAL::Instance()->CreateSource(sdf->Root());
   EXPECT_TRUE(source != NULL);
 
-  EXPECT_TRUE(source->GetOnContact());
+  EXPECT_TRUE(source->OnContact());
 
-  EXPECT_EQ(source->GetCollisionNames().size(), 2u);
-  EXPECT_EQ(source->GetCollisionNames()[0], "name");
-  EXPECT_EQ(source->GetCollisionNames()[1], "name2");
+  EXPECT_EQ(source->CollisionNames().size(), 2u);
+  EXPECT_EQ(source->CollisionNames()[0], "name");
+  EXPECT_EQ(source->CollisionNames()[1], "name2");
   EXPECT_TRUE(source->HasCollisionName("name2"));
   EXPECT_TRUE(source->HasCollisionName("name"));
 
@@ -224,7 +255,7 @@ TEST_F(OpenAL, SourceVelPose)
   source = util::OpenAL::Instance()->CreateSource(sdf->Root());
   EXPECT_TRUE(source != NULL);
 
-  EXPECT_FALSE(source->GetOnContact());
+  EXPECT_FALSE(source->OnContact());
   EXPECT_TRUE(source->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
   EXPECT_TRUE(source->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 }
