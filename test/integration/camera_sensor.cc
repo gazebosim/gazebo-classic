@@ -99,9 +99,8 @@ TEST_F(CameraSensor, WorldReset)
   // reset the world and verify
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  common::Time simTime;
+  common::Time simTime = world->GetSimTime().Double();
   world->Reset();
-  simTime = world->GetSimTime().Double();
   EXPECT_TRUE(world->GetSimTime() == common::Time(0.0) ||
       world->GetSimTime() < simTime);
 
