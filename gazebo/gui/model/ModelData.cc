@@ -322,13 +322,19 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
         colOldSizes[it->first->GetName()];
     if (geomStr == "sphere")
     {
-      // solve for r^2
-      double r2 = ixx / (oldMass * 0.4);
-
-      // compute new inertia values based on new mass and radius
-      newIxx = newMass * 0.4 * (dInertiaScale.X() * dInertiaScale.X()) * r2;
-      newIyy = newIxx;
-      newIzz = newIxx;
+      double r = newSize.X() * 0.5;
+      // Get inertia properties of uniform box
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromSphere(newMass, r))
+      {
+        gzerr << "Error computing inertia, not re-scaling" << std::endl;
+      }
+      else
+      {
+        newIxx = m.IXX();
+        newIyy = m.IYY();
+        newIzz = m.IZZ();
+      }
     }
     else if (geomStr == "cylinder")
     {

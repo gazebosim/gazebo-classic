@@ -2498,15 +2498,22 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      const double ixx = _mass * 0.4 * _radius * _radius;
-      inertial->set_ixx(ixx);
-      inertial->set_iyy(ixx);
-      inertial->set_izz(ixx);
-      inertial->set_ixy(0.0);
-      inertial->set_ixz(0.0);
-      inertial->set_iyz(0.0);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromSphere(_mass, _radius))
+      {
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        auto inertial = link->mutable_inertial();
+        inertial->set_mass(_mass);
+        inertial->set_ixx(m.IXX());
+        inertial->set_iyy(m.IYY());
+        inertial->set_izz(m.IZZ());
+        inertial->set_ixy(0.0);
+        inertial->set_ixz(0.0);
+        inertial->set_iyz(0.0);
+      }
     }
 
     ////////////////////////////////////////////////////////
