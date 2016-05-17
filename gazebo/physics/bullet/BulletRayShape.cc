@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ void BulletRayShape::Update()
         boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
     LinkPtr link = this->collisionParent->GetLink();
-    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+    GZ_ASSERT(link != nullptr, "Bullet link is null");
 
     this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
           this->relativeStartPos);
@@ -109,7 +109,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
         boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
     LinkPtr link = this->collisionParent->GetLink();
-    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+    GZ_ASSERT(link != nullptr, "Bullet link is null");
 
     this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
           this->relativeStartPos);
@@ -139,7 +139,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 
       BulletLink *link = static_cast<BulletLink *>(
           rayCallback.m_collisionObject->getUserPointer());
-      GZ_ASSERT(link != NULL, "Bullet link is NULL");
+      GZ_ASSERT(link != nullptr, "Bullet link is null");
       _entity = link->GetScopedName();
     }
   }

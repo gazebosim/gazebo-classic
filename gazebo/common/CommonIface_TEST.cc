@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,40 @@ TEST_F(CommonIface_TEST, GetSHA1)
     std::string sha = common::get_sha1<std::string>(stream.str());
     EXPECT_EQ(sha.length(), 40u);
   }
+}
+
+/////////////////////////////////////////////////
+/// \brief Test the string tokenizer split() function.
+TEST_F(CommonIface_TEST, split)
+{
+  auto tokens = common::split("abc/def", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("abc/def/", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("//abc/def///", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("abc", "/");
+  ASSERT_EQ(tokens.size(), 1u);
+  EXPECT_EQ(tokens.at(0), "abc");
+
+  tokens = common::split("//abc/def::123::567///", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def::123::567");
+  tokens = common::split("//abc/def::123::567///", "::");
+  ASSERT_EQ(tokens.size(), 3u);
+  EXPECT_EQ(tokens.at(0), "//abc/def");
+  EXPECT_EQ(tokens.at(1), "123");
+  EXPECT_EQ(tokens.at(2), "567///");
 }
 
 /////////////////////////////////////////////////

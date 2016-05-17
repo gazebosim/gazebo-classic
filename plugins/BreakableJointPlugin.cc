@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #endif
 
 #include "gazebo/physics/PhysicsIface.hh"
-#include "BreakableJointPlugin.hh"
+#include "plugins/BreakableJointPlugin.hh"
 
 using namespace gazebo;
 
@@ -37,19 +37,33 @@ BreakableJointPlugin::BreakableJointPlugin()
 /////////////////////////////////////////////////
 BreakableJointPlugin::~BreakableJointPlugin()
 {
+  this->parentSensor->DisconnectUpdate(this->connection);
+  this->parentSensor.reset();
 }
 
 /////////////////////////////////////////////////
 void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
     sdf::ElementPtr _sdf)
 {
-  ForceTorquePlugin::Load(_parent, _sdf);
+  this->parentSensor =
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
+
+  if (!this->parentSensor)
+  {
+    gzerr << "BreakableJointPlugin requires a "
+      << "force_torque sensor as its parent.\n";
+    return;
+  }
+
+  this->connection = this->parentSensor->ConnectUpdate(
+      std::bind(&BreakableJointPlugin::OnUpdate,
+        this, std::placeholders::_1));
 
   std::string paramName = "breaking_force_N";
   if (_sdf->HasElement(paramName))
     this->breakingForce = _sdf->Get<double>(paramName);
 
-  this->parentJoint = this->parentSensor->GetJoint();
+  this->parentJoint = this->parentSensor->Joint();
 }
 
 /////////////////////////////////////////////////

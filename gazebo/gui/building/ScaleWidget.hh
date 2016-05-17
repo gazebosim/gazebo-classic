@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,22 @@
  *
 */
 
-#ifndef _RULER_WIDGET_HH_
-#define _RULER_WIDGET_HH_
+#ifndef _GAZEBO_GUI_BUILDING_SCALEWIDGET_HH_
+#define _GAZEBO_GUI_BUILDING_SCALEWIDGET_HH_
 
-#include <string>
-#include <vector>
+#include <memory>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class ScaleWidgetPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -50,13 +53,11 @@ namespace gazebo
 
       /// \brief Callback received when the zoom level has changed.
       /// \param[in] _zoomFactor New zoom factor.
-      private: void OnChangeZoom(double _zoomFactor);
+      private: void OnChangeZoom(const double _zoomFactor);
 
-      /// \brief Text displaying the scale.
-      private: std::string scaleText;
-
-      /// \brief A list of gui editor events connected to this widget.
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ScaleWidgetPrivate> dataPtr;
     };
     /// \}
   }

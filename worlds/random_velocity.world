@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.5">
+<sdf version="1.6">
   <world name="default">
     <!-- A global light source -->
     <include>
@@ -10,8 +10,19 @@
       <uri>model://ground_plane</uri>
     </include>
 
+    <gui>
+      <camera name="user_camera">
+        <track_visual>
+          <static>true</static>
+          <use_model_frame>false</use_model_frame>
+          <name>box</name>
+          <xyz>-3 0 1</xyz>
+        </track_visual>
+      </camera>
+    </gui>
+
     <model name="box">
-      <pose>0 0 0.5 0 0 0</pose>
+      <pose>4 4 0.5 0 0 0</pose>
       <link name="link">
         <kinematic>true</kinematic>
         <collision name="collision">

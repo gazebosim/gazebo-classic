@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ using namespace common;
 Dem::Dem()
   : dataPtr(new DemPrivate)
 {
-  this->dataPtr->dataSet = NULL;
+  this->dataPtr->dataSet = nullptr;
   GDALAllRegister();
 }
 
@@ -55,7 +55,7 @@ Dem::~Dem()
     GDALClose(reinterpret_cast<GDALDataset *>(this->dataPtr->dataSet));
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -83,7 +83,7 @@ int Dem::Load(const std::string &_filename)
   this->dataPtr->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
     fullName.c_str(), GA_ReadOnly));
 
-  if (this->dataPtr->dataSet == NULL)
+  if (this->dataPtr->dataSet == nullptr)
   {
     gzerr << "Unable to open DEM file[" << fullName
           << "]. Format not recognised as a supported dataset." << std::endl;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // Look through a camera to ensure visuals are generated
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
-  rendering::CameraPtr camera = scene->GetCamera("camera");
+  rendering::CameraPtr camera = scene->GetCamera("camera::link::camera");
   ASSERT_TRUE(camera != NULL);
   int sleep = 0;
   int maxSleep = 5;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,17 @@
  *
 */
 
-#ifndef _SEGMENT_ITEM_HH_
-#define _SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
+#define _GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
 
+#include <memory>
 #include <vector>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -28,7 +33,9 @@ namespace gazebo
   namespace gui
   {
     class GrabberHandle;
-    class EditorItem;
+
+    // Forward declare private data.
+    class SegmentItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -48,59 +55,64 @@ namespace gazebo
       /// \brief Set the segment's line.
       /// \param[in] _start Start position of the line in pixel coordinates.
       /// \param[in] _end End position of the line in pixel coordinates.
-      public: void SetLine(const QPointF &_start, const QPointF &_end);
+      public: void SetLine(const ignition::math::Vector2d &_start,
+          const ignition::math::Vector2d &_end);
 
       /// \brief Set the start point of the segment.
       /// \param[in] _start Start point of the segment in pixel coordinates.
-      public: void SetStartPoint(const QPointF &_start);
+      public: void SetStartPoint(const ignition::math::Vector2d &_start);
 
       /// \brief Get the start point of the segment.
       /// \return Start point of the segment in pixel coordinates.
-      public: QPointF GetStartPoint() const;
+      public: ignition::math::Vector2d StartPoint() const;
 
       /// \brief Set the end point of the segment.
       /// \param[in] _end End point of the segment in pixel coordinates.
-      public: void SetEndPoint(const QPointF &_end);
+      public: void SetEndPoint(const ignition::math::Vector2d &_end);
 
       /// \brief Get the end point of the segment.
       /// \return End point of the segment in pixel coordinates.
-      public: QPointF GetEndPoint() const;
+      public: ignition::math::Vector2d EndPoint() const;
 
       /// \brief Set the thickness of the segment item on the 2d view.
       /// \param[in] _thickness Thickness in pixels.
-      public: void SetThickness(double _thickness);
+      public: void SetThickness(const double _thickness);
 
       /// \brief Get the thickness of the segment item.
       /// \return Thickness in pixels.
-      public: double GetThickness() const;
+      public: double Thickness() const;
 
       /// \brief Get the scale of the segment item.
       /// \return Scale of the segment item in px/m.
-      public: double GetScale() const;
+      public: double Scale() const;
 
       /// \brief Set the scale of the segment item.
       /// param[in] _scale Scale of the segment item in px/m.
-      public: void SetScale(double _scale);
+      public: void SetScale(const double _scale);
 
       /// \brief Set the color of the segment item.
       /// \param[in] _color Color.
-      public: void SetColor(QColor _color);
+      public: void SetColor(const common::Color &_color);
 
       /// \brief Show the grabber handles of the segment item.
       /// \param[in] _show True to draw the handles, and false to hide them.
-      public: void ShowHandles(bool _show);
+      public: void ShowHandles(const bool _show);
 
       /// \brief Emit segment changed Qt signals.
       public: void SegmentChanged();
 
       // Documentation Inherited
-      public: QVector3D GetSize() const;
+      public: ignition::math::Vector3d Size() const;
 
       // Documentation Inherited
-      public: QVector3D GetScenePosition() const;
+      public: ignition::math::Vector3d ScenePosition() const;
 
       // Documentation Inherited
-      public: double GetSceneRotation() const;
+      public: double SceneRotation() const;
+
+      /// \brief Get the grabber handles.
+      /// \return Vector of grabber pointers.
+      public: std::vector<GrabberHandle *>Grabbers() const;
 
       /// \brief Update item.
       protected: virtual void SegmentUpdated();
@@ -109,7 +121,7 @@ namespace gazebo
       /// \param[in] _grabber Original grabber.
       /// \param[in] _pos New position.
       protected: void UpdateLinkedGrabbers(GrabberHandle *_grabber,
-          const QPointF &_pos);
+          const ignition::math::Vector2d &_pos);
 
       /// \brief Filter Qt events and redirect them to the another item.
       /// \param[in] _watched Item that watches and will handle the event.
@@ -156,33 +168,19 @@ namespace gazebo
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      /// \brief A list of grabber handles for this item. One grabber for each
-      /// endpoint.
-      public: std::vector<GrabberHandle *> grabbers;
-
       /// \brief Angle to snap in degrees.
       public: static const double SnapAngle;
 
       /// \brief Length to snap in meters.
       public: static const double SnapLength;
 
-      /// \brief Segment's start position in pixel coordinates.
-      private: QPointF start;
+      /// \brief A list of grabber handles for this item. One grabber for each
+      /// endpoint.
+      protected: std::vector<GrabberHandle *> grabbers;
 
-      /// \brief Segment's end position in pixel coordinates.
-      private: QPointF end;
-
-      /// \brief Keep track of mouse press position for translation.
-      private: QPointF segmentMouseMove;
-
-      /// \brief Thickness of the segment on the 2d view, in pixels.
-      private: double thickness;
-
-      /// \brief Width of grabbers in pixels.
-      private: double grabberWidth;
-
-      /// \brief Height of grabbers in pixels.
-      private: double grabberHeight;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<SegmentItemPrivate> dataPtr;
     };
     /// \}
   }

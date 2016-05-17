@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
     : Collision(_parent)
 {
   this->SetName("Bullet_Collision");
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   this->surface.reset(new BulletSurfaceParams());
 }
 
@@ -39,7 +39,7 @@ BulletCollision::~BulletCollision()
 {
   /*
   delete this->collisionShape;
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   */
 }
 

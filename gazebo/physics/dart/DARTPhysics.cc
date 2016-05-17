@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
 DARTPhysics::~DARTPhysics()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -80,11 +81,11 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   PhysicsEngine::Load(_sdf);
 
   // Gravity
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
+  this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
 
   // Time step
   // double timeStep = this->sdf->GetValueDouble("time_step");
@@ -120,7 +121,7 @@ void DARTPhysics::Reset()
   {
     dartModelIt =
       boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
-    GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is NULL");
+    GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is null");
 
     dartModelIt->RestoreState();
   }
@@ -152,14 +153,16 @@ void DARTPhysics::UpdateCollision()
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
 
-    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pare is NULL");
-    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pare is NULL");
+    GZ_ASSERT(dartLink1.get() != nullptr,
+        "dartLink1 in collision pare is null");
+    GZ_ASSERT(dartLink2.get() != nullptr,
+        "dartLink2 in collision pare is null");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
     CollisionPtr collisionPtr2 = dartLink2->GetCollision(colIndex);
 
-    // Add a new contact to the manager. This will return NULL if no one is
+    // Add a new contact to the manager. This will return nullptr if no one is
     // listening for contact information.
     Contact *contactFeedback = this->GetContactManager()->NewContact(
                                  collisionPtr1.get(), collisionPtr2.get(),
@@ -274,7 +277,7 @@ ModelPtr DARTPhysics::CreateModel(BasePtr _parent)
 //////////////////////////////////////////////////
 LinkPtr DARTPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
   {
     gzerr << "Link must have a parent in DART.\n";
     return LinkPtr();
@@ -362,7 +365,7 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 //////////////////////////////////////////////////
 void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   this->dataPtr->dtWorld->setGravity(
     Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
@@ -390,7 +393,7 @@ bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
   }
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
   // physics dart element not yet added to sdformat
-  // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  // GZ_ASSERT(dartElem != nullptr, "DART SDF element does not exist");
 
   if (_key == "max_contacts")
   {
@@ -464,9 +467,9 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::DART);
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);

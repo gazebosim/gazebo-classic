@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ namespace gazebo
 
       /// \brief Get a key frame using an index value
       /// \param[in] _index The index of the key frame
-      /// \return A pointer the keyframe, NULL if the _index is invalid
+      /// \return A pointer the keyframe, nullptr if the _index is invalid
       public: KeyFrame* GetKeyFrame(unsigned int _index) const;
 
       /// \brief Get the two key frames that bound a time value

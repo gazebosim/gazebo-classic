@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in axispliance with the License.
@@ -41,7 +41,7 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
   linkVis.reset(
-      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("link", scene->WorldVisual()));
 
   // create frame visual for the link
   gazebo::rendering::LinkFrameVisualPtr linkFrameVis(

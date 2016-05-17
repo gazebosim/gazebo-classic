@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,9 +122,9 @@ void NoNoise(sensors::NoisePtr _noise, unsigned int _count)
 void GaussianNoise(sensors::NoisePtr _noise, unsigned int _count)
 {
   sensors::GaussianNoiseModelPtr noiseModel =
-      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(_noise);
+      std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(_noise);
 
-  ASSERT_TRUE(noiseModel != NULL);
+  ASSERT_TRUE(noiseModel != nullptr);
 
   // Use constant input and repeatedly add noise to it.
   double x = 42.0;
@@ -194,7 +194,7 @@ TEST_F(NoiseTest, ApplyGaussian)
     sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
     sensors::GaussianNoiseModelPtr gaussianNoise =
-      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+      std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
     EXPECT_NEAR(gaussianNoise->GetBias(), 0.0, 1e-6);
     GaussianNoise(noise, g_applyCount);
   }
@@ -225,7 +225,7 @@ TEST_F(NoiseTest, ApplyGaussian)
       sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
           NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
       sensors::GaussianNoiseModelPtr gaussianNoise =
-        boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+        std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
       acc(gaussianNoise->GetBias());
     }
 
@@ -271,7 +271,7 @@ TEST_F(NoiseTest, ApplyGaussianQuantized)
         NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
         biasStddev, precision));
     sensors::GaussianNoiseModelPtr gaussianNoise =
-      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+      std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
     EXPECT_NEAR(gaussianNoise->GetBias(), 0.0, 1e-6);
 
     GaussianNoise(noise, g_applyCount);
@@ -309,7 +309,7 @@ TEST_F(NoiseTest, ApplyGaussianQuantized)
           NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
           biasStddev, precision));
       sensors::GaussianNoiseModelPtr gaussianNoise =
-        boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+        std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
       acc(gaussianNoise->GetBias());
     }
 
@@ -360,7 +360,7 @@ TEST_F(NoiseTest, OnApplyNoise)
   // Verify that the custom callback function is called if noise type is
   // set to CUSTOM
   sensors::NoisePtr noise(new sensors::Noise(sensors::Noise::CUSTOM));
-  ASSERT_TRUE(noise != NULL);
+  ASSERT_TRUE(noise != nullptr);
   EXPECT_TRUE(noise->GetNoiseType() == sensors::Noise::CUSTOM);
 
   noise->SetCustomNoiseCallback(

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
   // Bytes per pixel
   unsigned int bpp = pitch / imgWidth;
 
-  unsigned char *data = NULL;
+  unsigned char *data = nullptr;
   unsigned int count;
   this->img.GetData(&data, count);
 

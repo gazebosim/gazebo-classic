@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
 #ifdef HAVE_GRAPHVIZ
-  RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
+  RenderWidget *renderWidget = _mainWindow->RenderWidget();
   this->dataPtr->svWidget = new SchematicViewWidget(renderWidget);
   this->dataPtr->svWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
@@ -128,7 +128,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->showJointsAct->setCheckable(true);
   this->dataPtr->showJointsAct->setChecked(true);
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
-      this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+      this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
 
   // Clone actions from main window
@@ -152,15 +152,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       tr("Joint"), this);
   this->dataPtr->jointAct->setCheckable(true);
   this->dataPtr->jointAct->setObjectName("modelEditorJointAct");
-
-  // set up the action group so that only one action is active at one time.
-  QActionGroup *actionGroup = g_arrowAct->actionGroup();
-  if (actionGroup)
-  {
-    this->dataPtr->jointAct->setActionGroup(actionGroup);
-    connect(actionGroup, SIGNAL(triggered(QAction *)),
-        this, SLOT(OnAction(QAction *)));
-  }
 
   QToolButton *jointButton = new QToolButton();
   jointButton->setObjectName("jointToolButton");
@@ -207,7 +198,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(fixedJointAct);
   jointActionGroup->setExclusive(true);
 
-  TopToolbar *topToolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
+  TopToolbar *topToolbar = this->mainWindow->RenderWidget()->GetToolbar();
 
   // Separator
   QAction *jointSeparatorAct =
@@ -271,7 +262,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->jointAct, SIGNAL(triggered()), this,
       SLOT(OnAddSelectedJoint()));
 
-  connect(this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+  connect(this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 
   this->dataPtr->connections.push_back(
@@ -285,8 +276,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 /////////////////////////////////////////////////
 ModelEditor::~ModelEditor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 ////////////////////////////////////////////////
@@ -379,6 +368,7 @@ void ModelEditor::CreateMenus()
 /////////////////////////////////////////////////
 void ModelEditor::OnAddSelectedJoint()
 {
+  g_arrowAct->trigger();
   this->OnAddJoint(tr(this->dataPtr->selectedJointType.c_str()));
 }
 
@@ -395,7 +385,8 @@ void ModelEditor::OnAddJoint(const QString &_type)
 /////////////////////////////////////////////////
 void ModelEditor::OnJointAdded()
 {
-  if (this->dataPtr->jointAct->isChecked())
+  if (this->dataPtr && this->dataPtr->jointAct &&
+      this->dataPtr->jointAct->isChecked())
   {
     this->dataPtr->jointAct->setChecked(false);
     g_arrowAct->trigger();
@@ -413,13 +404,13 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
     if (!g_showToolbarsAct->isChecked())
       g_showToolbarsAct->trigger();
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
+    this->mainWindow->RenderWidget()->ShowTimePanel(false);
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->ShowMenuBar();
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
+    this->mainWindow->RenderWidget()->ShowTimePanel(true);
   }
 
 #ifdef HAVE_GRAPHVIZ
@@ -497,13 +488,6 @@ void ModelEditor::OnFinish()
 }
 
 /////////////////////////////////////////////////
-void ModelEditor::OnAction(QAction *_action)
-{
-  if (_action != this->dataPtr->jointAct)
-    this->dataPtr->modelPalette->CreateJoint("none");
-}
-
-/////////////////////////////////////////////////
 void ModelEditor::ToggleMaterialScheme()
 {
   if (this->dataPtr->active)
@@ -556,5 +540,5 @@ void ModelEditor::AddEntity(sdf::ElementPtr _sdf)
 {
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
-  this->dataPtr->modelPalette->GetModelCreator()->AddEntity(_sdf);
+  this->dataPtr->modelPalette->ModelCreator()->AddEntity(_sdf);
 }

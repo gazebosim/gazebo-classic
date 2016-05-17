@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ using namespace common;
 Mesh::Mesh()
 {
   this->name = "unknown";
-  this->skeleton = NULL;
+  this->skeleton = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -227,7 +227,7 @@ const SubMesh *Mesh::GetSubMesh(const std::string &_name) const
       return *iter;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -256,7 +256,7 @@ const Material *Mesh::GetMaterial(int index) const
   if (index >= 0 && index < static_cast<int>(this->materials.size()))
     return this->materials[index];
 
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -305,8 +305,8 @@ void Mesh::FillArrays(float **_vertArr, int **_indArr) const
     if ((*iter)->GetVertexCount() <= 2)
       continue;
 
-    float *vertTmp = NULL;
-    int *indTmp = NULL;
+    float *vertTmp = nullptr;
+    int *indTmp = nullptr;
     (*iter)->FillArrays(&vertTmp, &indTmp);
 
     memcpy(vPtr, vertTmp, sizeof(vertTmp[0])*(*iter)->GetVertexCount()*3);
@@ -418,7 +418,7 @@ SubMesh::SubMesh(const SubMesh *_mesh)
 {
   if (!_mesh)
   {
-    gzerr << "Submesh is NULL." << std::endl;
+    gzerr << "Submesh is null." << std::endl;
     return;
   }
 

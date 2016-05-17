@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ DARTBoxShape::DARTBoxShape(DARTCollisionPtr _parent)
 DARTBoxShape::~DARTBoxShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -77,7 +78,7 @@ void DARTBoxShape::SetSize(const math::Vector3 &_size)
   DARTCollisionPtr dartCollisionParent =
       boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
-  if (dartCollisionParent->GetDARTCollisionShape() == NULL)
+  if (dartCollisionParent->GetDARTCollisionShape() == nullptr)
   {
     dart::dynamics::BodyNode *dtBodyNode =
         dartCollisionParent->GetDARTBodyNode();

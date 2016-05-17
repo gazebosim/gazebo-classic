@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
 
@@ -360,8 +360,7 @@ TEST_F(gzTest, Model)
     boost::algorithm::trim(modelInfo);
 
     // Split the string into parts p.
-    std::vector<std::string> p;
-    boost::split(p, modelInfo, boost::is_any_of(" "));
+    auto p = common::split(modelInfo, " ");
 
     // Make sure we have the right number of parts.
     // Don't ASSERT_EQ, because we need to run fini at end of test

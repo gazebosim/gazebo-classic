@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_COLLISION_CONFIG_HH_
-#define _GAZEBO_COLLISION_CONFIG_HH_
+#ifndef GAZEBO_GUI_MODEL_COLLISIONCONFIG_HH_
+#define GAZEBO_GUI_MODEL_COLLISIONCONFIG_HH_
 
 #include <map>
 #include <string>
@@ -45,6 +45,15 @@ namespace gazebo
       /// \brief Qt callback when this item's button has been pressed.
       /// \param[in] _checked Whether it was checked or unchecked.
       private slots: void OnToggleItem(bool _checked);
+
+      /// \brief Callback for geometry changes.
+      private slots: void OnGeometryChanged();
+
+      /// \brief Signal to indicate a collision change.
+      /// \param[in] _name Name of the collision changed.
+      /// \param[in] _type Type of change ("geometry", etc).
+      Q_SIGNALS: void CollisionChanged(const std::string &_name,
+          const std::string &_type);
 
       /// \brief Unique ID of this collision config.
       public: int id;
@@ -150,6 +159,18 @@ namespace gazebo
       private slots: void OnPoseChanged(const QString &_name,
           const ignition::math::Pose3d &_value);
 
+      /// \brief Callback for handling collision changes.
+      /// \param[in] _name Name of collision changed.
+      /// \param[in] _type Type of change.
+      private slots: void OnCollisionChanged(
+          const std::string &_name, const std::string &_type);
+
+      /// \brief Signal to indicate a collision change.
+      /// \param[in] _name Name of collision changed.
+      /// \param[in] _type Type of change.
+      Q_SIGNALS: void CollisionChanged(
+          const std::string &_name, const std::string &_type);
+
       /// \brief Qt callback when a geometry value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
@@ -163,6 +184,12 @@ namespace gazebo
 
       /// \brief Map of id to collision config widget.
       private: std::map<int, CollisionConfigData *> configs;
+
+      /// \brief Map of collision config widgets which were deleted.
+      private: std::map<int, CollisionConfigData *> deletedConfigs;
+
+      /// \brief Map of collision config widgets which were added.
+      private: std::map<int, CollisionConfigData *> addedConfigs;
 
       /// \brief Counter for the number of collisions.
       private: int counter;

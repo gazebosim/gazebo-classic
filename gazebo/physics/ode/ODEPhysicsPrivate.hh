@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace gazebo
     /// \brief Data structure for contact feedbacks
     class ODEJointFeedback
     {
-      public: ODEJointFeedback() : contact(NULL), count(0) {}
+      public: ODEJointFeedback() : contact(nullptr), count(0) {}
 
       /// \brief Contact information.
       public: Contact *contact;

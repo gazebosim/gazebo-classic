@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -443,11 +443,8 @@ void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 //////////////////////////////////////////////////
 void TopicManager::ClearBuffers()
 {
-  PublicationPtr_M::iterator iter;
-  for (iter = this->advertisedTopics.begin();
-       iter != this->advertisedTopics.end(); ++iter)
-  {
-  }
+  for (auto iter : this->advertisedTopics)
+    iter.second->ClearPrevMsgs();
 }
 
 //////////////////////////////////////////////////

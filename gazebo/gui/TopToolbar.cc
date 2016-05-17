@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,10 +206,27 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
         acts[i] == g_copyAct ||
         acts[i] == g_pasteAct ||
         acts[i] == g_alignButtonAct ||
-        acts[i] == g_snapAct)
+        acts[i] == g_snapAct ||
+        acts[i] == g_undoAct ||
+        acts[i] == g_undoHistoryAct ||
+        acts[i] == g_redoAct ||
+        acts[i] == g_redoHistoryAct)
     {
       acts[i]->setVisible(modelEditor || simulation);
-      acts[i]->setEnabled(modelEditor || simulation);
+
+      // Some actions start disabled in the editor
+      if (modelEditor && (
+          acts[i] == g_copyAct ||
+          acts[i] == g_pasteAct ||
+          acts[i] == g_undoAct ||
+          acts[i] == g_undoHistoryAct ||
+          acts[i] == g_redoAct ||
+          acts[i] == g_redoHistoryAct))
+      {
+        acts[i]->setEnabled(false);
+      }
+      else
+        acts[i]->setEnabled(modelEditor || simulation);
 
       // Change preceding separator as well
       if (i > 0 && acts[i-1]->isSeparator())

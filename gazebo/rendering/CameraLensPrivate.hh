@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,24 @@ namespace gazebo
                 /// \param[in] str Function name 'sin', 'tan' or 'id'
                 public: explicit MapFunctionEnum(const std::string &_str)
                 {
+                  variants.push_back(std::make_tuple("sin",
+                        ignition::math::Vector3d::UnitX,
+                        std::function<float (float)>(
+                          static_cast<float (*)(float)>(&std::sin))));
+
+                  variants.push_back(std::make_tuple("tan",
+                        ignition::math::Vector3d::UnitY,
+                        std::function<float (float)>(
+                          static_cast<float (*)(float)>(&std::tan))));
+
+                  variants.push_back(std::make_tuple("id",
+                        ignition::math::Vector3d::UnitZ,
+                        std::function<float (float)>(
+                          [](float t) -> float
+                          {
+                          return t;
+                          })));
+
                   for (auto item : variants)
                   {
                     if (std::get<0>(item) == _str)
@@ -110,24 +128,9 @@ namespace gazebo
 
                 /// \brief List of all available functions
                 ///   and its associated representations
-                private: const std::vector<
-                    std::tuple<std::string, ignition::math::Vector3d,
-                        std::function<float (float)> > > variants = {
-                          std::make_tuple("sin",
-                              ignition::math::Vector3d::UnitX,
-                              std::function<float (float)>(
-                                  static_cast<float (*)(float)>(&std::sin))),
-                          std::make_tuple("tan",
-                              ignition::math::Vector3d::UnitY,
-                              std::function<float (float)>(
-                                  static_cast<float (*)(float)>(&std::tan))),
-                          std::make_tuple("id",
-                              ignition::math::Vector3d::UnitZ,
-                              std::function<float (float)>(
-                                  [](float t) -> float
-                                  {
-                                    return t;
-                                  }))};
+                private: std::vector<std::tuple<std::string,
+                         ignition::math::Vector3d,
+                           std::function<float (float)> > > variants;
 
                 /// \brief Current value of enumeration
                 private: decltype(variants)::value_type value;

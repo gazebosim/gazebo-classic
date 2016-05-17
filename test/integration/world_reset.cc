@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,13 @@ class WorldResetTest : public ServerFixture,
   public: void ModelPose(const std::string &_physicsEngine,
                          const std::string &_world, const int _resets);
 
+  /// \brief Test to see if nested model pose is reset when the world is reset
+  /// \param[in] _physicsEngine Physics engine type.
+  /// \param[in] _world Name of world to load
+  /// \param[in] _resets Number of resets to perform in the test
+  public: void NestedModelPose(const std::string &_physicsEngine,
+                         const std::string &_world, const int _resets);
+
   /// \brief Test resetting different worlds
   /// \param[in] _physicsEngine Physics engine type.
   /// \param[in] _world Name of world to load
@@ -50,6 +57,13 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
       _world.find("pr2") != std::string::npos)
   {
     gzerr << "Simbody fails this test with the PR2 due to issue #1672"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "simbody" &&
+      _world.find("nested_model") != std::string::npos)
+  {
+    gzerr << "Simbody fails this test with nested models due to issue #1718"
           << std::endl;
     return;
   }
@@ -126,6 +140,108 @@ TEST_P(WorldResetTest, ModelPose)
 }
 
 /////////////////////////////////////////////////
+void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
+                                     const std::string &_world,
+                                     const int _resets)
+{
+  if (_physicsEngine == "simbody")
+  {
+    gzerr  << "Nested models are not working in simbody yet, issue #1718"
+        << std::endl;
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr  << "Nested models are not working in dart yet, issue #1833"
+        << std::endl;
+    return;
+  }
+
+  if (_world != "worlds/nested_model.world")
+    return;
+
+  Load(_world, true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  double dt = physics->GetMaxStepSize();
+  unsigned int steps = 250;
+
+  // Step forward, verify time increasing
+  world->Step(steps);
+  double simTime = world->GetSimTime().Double();
+  EXPECT_NEAR(simTime, dt*steps, dt);
+
+  physics::ModelPtr model = world->GetModel("model_00");
+  ASSERT_TRUE(model != NULL);
+
+  // store all initial pose
+  std::list<ignition::math::Pose3d> modelPoses;
+  std::list<physics::ModelPtr> models;
+  models.push_back(model);
+  while (!models.empty())
+  {
+    physics::ModelPtr m = models.front();
+    modelPoses.push_back(m->GetWorldPose().Ign());
+    models.pop_front();
+    for (const auto &nested : m->NestedModels())
+      models.push_back(nested);
+  }
+
+  // move model to new pose
+  ignition::math::Pose3d newPose(9, 5, 2.5, 0, 0, 0);
+  model->SetWorldPose(newPose);
+  EXPECT_EQ(model->GetWorldPose(), newPose);
+
+  // Reset world repeatedly
+  for (int i = 0; i < _resets; ++i)
+  {
+    // Reset world, verify time == 0
+    world->Reset();
+    simTime = world->GetSimTime().Double();
+    EXPECT_NEAR(simTime, 0.0, dt);
+
+    // Step forward, verify time increasing
+    world->Step(steps);
+    simTime = world->GetSimTime().Double();
+    EXPECT_NEAR(simTime, dt*steps, dt);
+
+    // verify all nested models have moved back to initial pose
+    models.clear();
+    models.push_back(model);
+    auto modelPosesCopy = modelPoses;
+    while (!models.empty())
+    {
+      physics::ModelPtr m = models.front();
+      EXPECT_EQ(m->GetWorldPose(), modelPosesCopy.front());
+      models.pop_front();
+      modelPosesCopy.pop_front();
+      for (const auto &nested : m->NestedModels())
+        models.push_back(nested);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldResetTest, NestedModelPose)
+{
+  std::string physics = std::tr1::get<0>(GetParam());
+
+  std::string worldName = std::tr1::get<1>(GetParam());
+  int resets = std::tr1::get<2>(GetParam());
+  gzdbg << "Physics engine [" << physics << "] "
+        << "world name [" << worldName << "] "
+        << "reset count [" << resets << "]"
+        << std::endl;
+  NestedModelPose(physics, worldName, resets);
+}
+
+/////////////////////////////////////////////////
 void WorldResetTest::WorldName(const std::string &_physicsEngine,
                                const std::string &_world, const int _resets)
 {
@@ -133,6 +249,13 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
       _world.find("pr2") != std::string::npos)
   {
     gzerr << "Simbody fails this test with the PR2 due to issue #1672"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "simbody" &&
+      _world.find("nested_model") != std::string::npos)
+  {
+    gzerr << "Simbody fails this test with nested models due to issue #1718"
           << std::endl;
     return;
   }
@@ -190,8 +313,9 @@ TEST_P(WorldResetTest, WorldName)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldResetTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("worlds/empty.world"
-                  , "worlds/pr2.world"),
+  ::testing::Values("worlds/empty.world",
+                    "worlds/pr2.world",
+                    "worlds/nested_model.world"),
   ::testing::Range(1, 3)));
 
 /////////////////////////////////////////////////

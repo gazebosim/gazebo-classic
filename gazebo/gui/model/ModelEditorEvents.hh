@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_EDITOR_EVENTS_HH_
-#define _MODEL_EDITOR_EVENTS_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 
 #include <string>
-#include "gazebo/math/Pose.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -163,6 +165,38 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { newModel.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request nested model removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelRemoval(
+            T _subscriber)
+          { return requestNestedModelRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model
+        /// removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelRemoval.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request nested model insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelInsertion(
+            T _subscriber)
+          { return requestNestedModelInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model
+        /// insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelInsertion.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the nested model inserted signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -231,6 +265,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { nestedModelRemoved.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request link insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkInsertion(
+            T _subscriber)
+          { return requestLinkInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestLinkInsertion.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the request link removal signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -258,6 +307,36 @@ namespace gazebo
         public: static void DisconnectLinkRemoved(
             event::ConnectionPtr _subscriber)
           { linkRemoved.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request joint removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestJointRemoval(
+            T _subscriber)
+          { return requestJointRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request joint removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestJointRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestJointRemoval.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request joint insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestJointInsertion(
+            T _subscriber)
+          { return requestJointInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request joint insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestJointInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestJointInsertion.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the joint removed signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -373,14 +452,15 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showModelPluginContextMenu.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the set selected link signal.
+        /// \brief Connect a Gazebo event to the set selected entity signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
             ConnectSetSelectedLink(T _subscriber)
           { return setSelectedLink.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the set selected link signal.
+        /// \brief Disconnect a Gazebo event from the set selected entity
+        /// signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSetSelectedLink(
             event::ConnectionPtr _subscriber)
@@ -460,6 +540,22 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { requestModelPluginRemoval.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request model plugin insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestModelPluginInsertion(
+            T _subscriber)
+          { return requestModelPluginInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request model plugin
+        /// insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestModelPluginInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestModelPluginInsertion.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -503,8 +599,27 @@ namespace gazebo
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
 
+        /// \brief Request to insert a link.
+        public: static event::EventT<void (sdf::ElementPtr)>
+            requestLinkInsertion;
+
+        /// \brief Request to remove a nested model.
+        public: static event::EventT<void (std::string)>
+            requestNestedModelRemoval;
+
+        /// \brief Request to insert a nested model.
+        public: static event::EventT<void (sdf::ElementPtr)>
+            requestNestedModelInsertion;
+
         /// \brief Request to remove a link.
         public: static event::EventT<void (std::string)> requestLinkRemoval;
+
+        /// \brief Request to remove a joint.
+        public: static event::EventT<void (std::string)> requestJointRemoval;
+
+        /// \brief Request to insert a joint.
+        public: static event::EventT<void (sdf::ElementPtr, std::string)>
+            requestJointInsertion;
 
         /// \brief Notify that a joint has been inserted. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and
@@ -566,6 +681,10 @@ namespace gazebo
         /// \brief Request to remove a model plugin.
         public: static event::EventT<void (std::string)>
             requestModelPluginRemoval;
+
+        /// \brief Request to insert a model plugin.
+        public: static event::EventT<void (std::string, std::string,
+            std::string)> requestModelPluginInsertion;
       };
     }
   }

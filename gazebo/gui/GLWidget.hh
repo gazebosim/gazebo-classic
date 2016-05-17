@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,11 +185,12 @@ namespace gazebo
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
       /// \param[in] _target Target of alignment: first or last.
-      /// \param[in] _bool True to preview alignment without publishing
+      /// \param[in] _preview True to preview alignment without publishing
       /// to server.
+      /// \param[in] _inverted True to invert the alignment direction.
       private: void OnAlignMode(const std::string &_axis,
           const std::string &_config, const std::string &_target,
-          bool _preview);
+          const bool _preview, const bool _inverted = false);
 
       /// \brief Copy an entity by name
       /// \param[in] _name Name of entity to be copied.
