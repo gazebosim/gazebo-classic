@@ -393,6 +393,10 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
+
   // Remove all the sensors attached to the joint
   for (auto const &sensor : this->sensors)
   {
@@ -401,7 +405,6 @@ void Joint::Fini()
   this->sensors.clear();
 
   this->anchorLink.reset();
-  this->applyDamping.reset();
   this->childLink.reset();
   this->parentLink.reset();
   this->model.reset();
