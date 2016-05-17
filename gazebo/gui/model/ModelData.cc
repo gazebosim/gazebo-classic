@@ -22,6 +22,7 @@
 #endif
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/MassMatrix3.hh>
 
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -244,10 +245,11 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   double volumeRatio = 1;
   double newVol = 0;
   double oldVol = 0;
+  ignition::math::Vector3d newSize;
   for (auto const &it : this->collisions)
   {
     ignition::math::Vector3d oldSize = colOldSizes[it.first->GetName()];
-    ignition::math::Vector3d newSize = colNewSizes[it.first->GetName()];
+    newSize = colNewSizes[it.first->GetName()];
     std::string geomStr = it.first->GetGeometryType();
     if (geomStr == "sphere")
     {
@@ -352,26 +354,18 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 
   if (boxInertia)
   {
-    // solve for box inertia size: dx^2, dy^2, dz^2,
-    // assuming solid box with uniform density
-    double mc = 12.0 / oldMass;
-    double ixxMc = ixx * mc;
-    double iyyMc = iyy * mc;
-    double izzMc = izz * mc;
-    double dz2 = (iyyMc - izzMc + ixxMc) * 0.5;
-    double dx2 = izzMc - (ixxMc - dz2);
-    double dy2 = ixxMc - dz2;
-
-    // scale inertia size
-    double newDx2 = dInertiaScale.X() * dInertiaScale.X() * dx2;
-    double newDy2 = dInertiaScale.Y() * dInertiaScale.Y() * dy2;
-    double newDz2 = dInertiaScale.Z() * dInertiaScale.Z() * dz2;
-
-    // compute new inertia values based on new inertia size
-    double newMassConstant = newMass / 12.0;
-    newIxx = newMassConstant * (newDy2 + newDz2);
-    newIyy = newMassConstant * (newDx2 + newDz2);
-    newIzz = newMassConstant * (newDx2 + newDy2);
+    // Get inertia properties of uniform box
+    ignition::math::MassMatrix3d m;
+    if (!m.SetFromBox(newMass, newSize, ignition::math::Quaterniond::Identity))
+    {
+      gzerr << "Error computing inertia, not re-scaling" << std::endl;
+    }
+    else
+    {
+      newIxx = m.IXX();
+      newIyy = m.IYY();
+      newIzz = m.IZZ();
+    }
   }
 
   // update inspector inertia

@@ -17,6 +17,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
+#include <ignition/math/MassMatrix3.hh>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/common/CommonIface.hh"
@@ -2439,18 +2440,18 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromBox(_mass, _size, ignition::math::Quaterniond::Identity))
       {
-        double dx = _size.X();
-        double dy = _size.Y();
-        double dz = _size.Z();
-        double ixx = _mass/12.0 * (dy*dy + dz*dz);
-        double iyy = _mass/12.0 * (dz*dz + dx*dx);
-        double izz = _mass/12.0 * (dx*dx + dy*dy);
-        inertial->set_ixx(ixx);
-        inertial->set_iyy(iyy);
-        inertial->set_izz(izz);
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        auto inertial = link->mutable_inertial();
+        inertial->set_mass(_mass);
+        inertial->set_ixx(m.IXX());
+        inertial->set_iyy(m.IYY());
+        inertial->set_izz(m.IZZ());
         inertial->set_ixy(0.0);
         inertial->set_ixz(0.0);
         inertial->set_iyz(0.0);
