@@ -136,18 +136,20 @@ namespace gazebo
               // error loading plugin libraries with different extensions
               {
                 size_t soSuffix = filename.rfind(".so");
-                const std::string macSuffix(".dylib");
                 if (soSuffix != std::string::npos)
+                {
+                  const std::string macSuffix(".dylib");
                   filename.replace(soSuffix, macSuffix.length(), macSuffix);
+                }
               }
 #elif _WIN32
               // Corresponding windows hack
               {
                 //replace .so with .dll
                 size_t soSuffix = filename.rfind(".so");
-                const std::string winSuffix(".dll");
                 if (soSuffix != std::string::npos)
                 {
+                  const std::string winSuffix(".dll");
                   filename.replace(soSuffix, winSuffix.length(), winSuffix);
                 }
                 //remove the lib prefix
