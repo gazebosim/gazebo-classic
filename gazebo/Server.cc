@@ -328,8 +328,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Get the physics plugin name specified from the command line, or use ""
     // if no physics plugin is specified.
     std::string physicsPlugin;
-    if (this->vm.count("physics-plugin"))
-      physicsPlugin = this->vm["physics-plugin"].as<std::string>();
+    if (this->dataPtr->vm.count("physics-plugin"))
+      physicsPlugin = this->dataPtr->vm["physics-plugin"].as<std::string>();
 
     // Load the server
     if (!this->LoadFile(configFilename, physics, physicsPlugin))

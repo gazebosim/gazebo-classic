@@ -54,7 +54,8 @@ SET (headers
 set (gtest_sources
   PluginPhysics_TEST.cc
 )
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources}
+  EXTRA_LIBS gazebo_physics gazebo_test_fixture)
 
 # gz_add_library(gazebo_physics_plugin ${headers} ${sources})
 # target_link_libraries(gazebo_physics_plugin
