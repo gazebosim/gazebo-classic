@@ -15,6 +15,7 @@
     * [Pull request #2298](https://bitbucket.org/osrf/gazebo/pull-request/2298)
     * [Pull request #2302](https://bitbucket.org/osrf/gazebo/pull-request/2302)
     * [Pull request #2295](https://bitbucket.org/osrf/gazebo/pull-request/2295)
+    * [Pull request #2300](https://bitbucket.org/osrf/gazebo/pull-request/2300)
 
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
@@ -86,6 +87,9 @@
 
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
+
+1. Model Editor: Select and align nested models
+    * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)
 
 ## Gazebo 7.1.0 (2016-04-07)
 
@@ -220,6 +224,11 @@
 1. Model editor: Fix inserting custom links
     * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
     * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
+
+1. Model editor: Reset visual / collision insertion / deletion
+        * [Pull request #2254](https://bitbucket.org/osrf/gazebo/pull-request/2254)
+        * [Issue #1777](https://bitbucket.org/osrf/gazebo/issues/1777)
+        * [Issue #1852](https://bitbucket.org/osrf/gazebo/issues/1852)
 
 1. Building editor: Add layers to building levels
     * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
