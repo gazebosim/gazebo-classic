@@ -600,7 +600,7 @@ void BulletJoint::ApplyStiffnessDamping()
 
           // find pose transform from x-axis to axisChild,
           // then confirm that y-axis = axis2.
-          math::Pose xToAxisChild;
+          // math::Pose xToAxisChild,
           BulletTypes::ConvertPose(
             math::Pose(axisChild, math::Vector3()) + childPose),
           RO_XYZ
