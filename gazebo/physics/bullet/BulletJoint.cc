@@ -582,9 +582,12 @@ void BulletJoint::ApplyStiffnessDamping()
       }
       else if (bulletChildLink)
       {
+        childPose = this->childLink->GetInertial()->GetPose();
+        gzerr << "childPose [" << childPose << "]\n";
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
-          BulletTypes::ConvertPose(childPose),
+          //BulletTypes::ConvertPose(childPose),
+          BulletTypes::ConvertPose(math::Pose()),
           RO_XYZ
           );
       }
@@ -596,8 +599,15 @@ void BulletJoint::ApplyStiffnessDamping()
           RO_XYZ
           );
       }
-      for (unsigned int l = 0; l < 3; ++l)
+      for (unsigned int l = 0; l < 6; ++l)
       {
+        // not limited
+        this->stiffnessDampingConstraint->setLimit(l, 1e16, -1e16);
+        this->stiffnessDampingConstraint->enableSpring(l, true);
+        this->stiffnessDampingConstraint->setStiffness(l, 100);
+        this->stiffnessDampingConstraint->setEquilibriumPoint(l, 0.0);
+        this->stiffnessDampingConstraint->setDamping(l, 0);
+/*
         this->stiffnessDampingConstraint->setParam(
           BT_CONSTRAINT_STOP_ERP, 0, l);
         this->stiffnessDampingConstraint->setParam(
@@ -606,7 +616,9 @@ void BulletJoint::ApplyStiffnessDamping()
           BT_CONSTRAINT_ERP, 0, l);
         this->stiffnessDampingConstraint->setParam(
           BT_CONSTRAINT_CFM, 100.0, l);
+*/
       }
+      this->bulletWorld->addConstraint(this->stiffnessDampingConstraint, true);
       // this->stiffnessDampingConstraint->setAngularLowerLimit
       /*
       btGeneric6DofConstraint(
