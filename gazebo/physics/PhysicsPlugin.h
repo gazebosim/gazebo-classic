@@ -111,8 +111,8 @@ struct _Vector3
 
 struct _Pose
 {
-  _Vector3 pos;
-  _Quaternion rot;
+  struct _Vector3 pos;
+  struct _Quaternion rot;
 };
 
 /* \brief The physics plugin structure
@@ -171,7 +171,7 @@ struct _PhysicsPlugin
   /* \brief data structure holding state information
    * that needs to be passed between gazebo and plugin.
    */
-  _Pose *pose;
+  struct _Pose *pose;
 };
 typedef struct _PhysicsPlugin PhysicsPlugin;
 
