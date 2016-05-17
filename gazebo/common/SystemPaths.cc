@@ -93,7 +93,7 @@ SystemPaths::SystemPaths()
   if (!dir)
   {
 #ifdef _WIN32
-    mkdir(fullPath.c_str());
+    _mkdir(fullPath.c_str());
 #else
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
 #endif

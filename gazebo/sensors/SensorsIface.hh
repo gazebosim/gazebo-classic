@@ -86,9 +86,9 @@ namespace gazebo
     /// \param[in] _name Name of the sensor. This name should be fully scoped.
     /// This means _name = world_name::model_name::link_name::sensor_name.
     /// You may use the unscoped sensor name if that name is unique within
-    /// the entire simulation. If the name is not unique a NULL pointer is
+    /// the entire simulation. If the name is not unique a nullptr pointer is
     /// returned.
-    /// \return Pointer to the sensor, NULL if the sensor could not be
+    /// \return Pointer to the sensor, nullptr if the sensor could not be
     /// found.
     GAZEBO_VISIBLE
     SensorPtr get_sensor(const std::string &_name);

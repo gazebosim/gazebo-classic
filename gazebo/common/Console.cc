@@ -256,7 +256,7 @@ std::string FileLogger::GetLogDirectory() const
 
 /////////////////////////////////////////////////
 FileLogger::Buffer::Buffer(const std::string &_filename)
-  : stream(NULL)
+  : stream(nullptr)
 {
   if (!_filename.empty())
   {

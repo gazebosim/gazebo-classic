@@ -144,7 +144,7 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 
     // Get the reference magnetic field
     ignition::math::Vector3d field =
-      this->world->GetPhysicsEngine()->MagneticField();
+      this->world->MagneticField();
 
     // Rotate the magnetic field into the body frame
     field = magPose.Rot().Inverse().RotateVector(field);

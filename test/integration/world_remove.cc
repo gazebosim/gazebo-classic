@@ -58,10 +58,6 @@ unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
 /////////////////////////////////////////////////
 void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
 {
-  // Issue #1471: Simbody crashes in blank world
-  if (_physicsEngine == "simbody")
-    return;
-
   // Load a blank world
   this->Load("worlds/blank.world", false, _physicsEngine);
 

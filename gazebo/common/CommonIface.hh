@@ -72,7 +72,7 @@ namespace gazebo
 
     /// \brief Cross platform retrieval of an environment variable.
     /// \param[in] _name Name of the environment variable to get.
-    /// \return Environment variable contents, or NULL on error.
+    /// \return Environment variable contents, or nullptr on error.
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
 
@@ -97,7 +97,7 @@ namespace gazebo
 
     if (_buffer.size() == 0)
     {
-      sha1.process_bytes(NULL, 0);
+      sha1.process_bytes(nullptr, 0);
     }
     else
     {

@@ -38,6 +38,7 @@ DARTModel::DARTModel(BasePtr _parent)
 DARTModel::~DARTModel()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -86,7 +87,7 @@ void DARTModel::Init()
     dart::dynamics::BodyNode *dtBodyNode
         = boost::static_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
 
-    if (dtBodyNode->getParentJoint() == NULL)
+    if (dtBodyNode->getParentJoint() == nullptr)
     {
       dart::dynamics::FreeJoint *newFreeJoint = new dart::dynamics::FreeJoint;
 

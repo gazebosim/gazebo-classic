@@ -94,7 +94,7 @@ void AltimeterSensor_TEST::BasicAltimeterSensorCheck(
       (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   // By default the altitude of the sensor should be zero
   EXPECT_DOUBLE_EQ(sensor->Altitude(), 0.0);
@@ -108,11 +108,11 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Spawn an altimeter
@@ -127,7 +127,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
   sensors::SensorPtr sensor = sensors::get_sensor("altSensor");
   sensors::AltimeterSensorPtr altSensor =
       std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
-  ASSERT_TRUE(altSensor != NULL);
+  ASSERT_TRUE(altSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   altSensor->SetActive(true);
@@ -138,7 +138,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
 
   // The altimeter should have a velocity of v = g * dt
   EXPECT_FLOAT_EQ(altSensor->VerticalVelocity(),
-      physics->GetGravity().z * (physics->GetMaxStepSize()*steps));
+      world->Gravity().Z() * (physics->GetMaxStepSize()*steps));
 }
 
 /////////////////////////////////////////////////
@@ -148,24 +148,24 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
 {
   Load("worlds/test_altimeter_rotation.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   physics::ModelPtr model = world->GetModel("model");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model != nullptr);
 
   physics::JointPtr joint = model->GetJoint("joint");
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != nullptr);
 
   sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
   sensors::AltimeterSensorPtr altSensor =
       std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
 
-  ASSERT_TRUE(altSensor != NULL);
+  ASSERT_TRUE(altSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   altSensor->SetActive(true);
@@ -190,24 +190,24 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
 {
   Load("worlds/test_altimeter_linear_angular.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   physics::ModelPtr model = world->GetModel("model");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model != nullptr);
 
   physics::JointPtr joint = model->GetJoint("joint");
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != nullptr);
 
   sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
   sensors::AltimeterSensorPtr altSensor =
       std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
 
-  ASSERT_TRUE(altSensor != NULL);
+  ASSERT_TRUE(altSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   altSensor->SetActive(true);
@@ -239,11 +239,11 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Spawn an altimeter sensor at a height of 10m
@@ -258,7 +258,7 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   sensors::AltimeterSensorPtr altSensor =
       std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
 
-  ASSERT_TRUE(altSensor != NULL);
+  ASSERT_TRUE(altSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   altSensor->SetActive(true);
