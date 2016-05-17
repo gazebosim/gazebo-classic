@@ -571,13 +571,13 @@ void BulletJoint::ApplyStiffnessDamping()
 
       if (bulletChildLink && bulletParentLink)
       {
+        // both parent and child links exist, so we'll get the
+        // global pose of both of theses to construct the constraint
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
           *(bulletParentLink->GetBulletLink()),
-          BulletTypes::ConvertPose(childPose),
-          BulletTypes::ConvertPose(parentPose),
-          // BulletTypes::ConvertVector3(axisChild),
-          // BulletTypes::ConvertVector3(axisParent)
+          BulletTypes::ConvertPose(math::Pose(axisChild, math::Vector3()) /*+ childPose*/),
+          BulletTypes::ConvertPose(math::Pose(axisParent, math::Vector3()) /*+ parentPose*/),
           RO_XYZ
           );
       }
@@ -585,7 +585,12 @@ void BulletJoint::ApplyStiffnessDamping()
       {
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
-          BulletTypes::ConvertPose(childPose),
+
+          // find pose transform from x-axis to axisChild,
+          // then confirm that y-axis = axis2.
+          math::Pose xToAxisChild;
+          BulletTypes::ConvertPose(
+            math::Pose(axisChild, math::Vector3()) + childPose),
           RO_XYZ
           );
       }
@@ -593,22 +598,34 @@ void BulletJoint::ApplyStiffnessDamping()
       {
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletParentLink->GetBulletLink()),
-          BulletTypes::ConvertPose(parentPose),
+          BulletTypes::ConvertPose(math::Pose(axisParent, math::Vector3()) /*+ parentPose*/),
           RO_XYZ
           );
       }
 
-      for (unsigned int l = 0; l < 6; ++l)
+      for (unsigned int l = i; l < 6; ++l)
       {
-        this->stiffnessDampingConstraint->setLimit(l,
-          SIMD_INFINITY, -SIMD_INFINITY);
-        this->stiffnessDampingConstraint->enableSpring(l, true);
-        this->stiffnessDampingConstraint->setStiffness(l,
-          this->stiffnessCoefficient[i]);
-        this->stiffnessDampingConstraint->setDamping(l,
-          this->dissipationCoefficient[i]);
-        this->stiffnessDampingConstraint->setEquilibriumPoint(l,
-          this->springReferencePosition[i]);
+        if (l == i)
+        {
+          // assuming axis is lined up with constraint frame
+          // this may be true for axis, but we need to double check.
+          // and we need to check for axis2 as well.
+          this->stiffnessDampingConstraint->setLimit(l,
+            SIMD_INFINITY, -SIMD_INFINITY);
+          this->stiffnessDampingConstraint->enableSpring(l, true);
+          this->stiffnessDampingConstraint->setStiffness(l,
+            this->stiffnessCoefficient[i]);
+          this->stiffnessDampingConstraint->setDamping(l,
+            this->dissipationCoefficient[i]);
+          this->stiffnessDampingConstraint->setEquilibriumPoint(l,
+            this->springReferencePosition[i]);
+        }
+        else
+        {
+          this->stiffnessDampingConstraint->setLimit(l,
+            SIMD_INFINITY, -SIMD_INFINITY);
+          this->stiffnessDampingConstraint->enableSpring(l, false);
+        }
       }
       this->bulletWorld->addConstraint(this->stiffnessDampingConstraint, true);
  
