@@ -26,6 +26,9 @@ namespace gazebo
   {
     class ODEMesh;
 
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE polyline shape
     class GZ_PHYSICS_VISIBLE ODEPolylineShape : public PolylineShape
     {
@@ -48,6 +51,7 @@ namespace gazebo
       /// \brief ODE collsion mesh helper class.
       private: ODEMesh *odeMesh;
     };
+    /// \}
   }
 }
 #endif

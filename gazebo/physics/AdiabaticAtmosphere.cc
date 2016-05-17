@@ -23,13 +23,28 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/transport/Publisher.hh"
-
 #include "gazebo/physics/AdiabaticAtmosphere.hh"
-#include "gazebo/physics/AdiabaticAtmospherePrivate.hh"
 #include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
+
+#include "gazebo/transport/Publisher.hh"
+
+namespace gazebo
+{
+  namespace physics
+  {
+    /// \internal
+    /// \brief Private data for AdiabaticAtmosphere.
+    class AdiabaticAtmospherePrivate
+    {
+      /// \brief Adiabatic atmosphere power parameter used to calculate
+      /// pressure and density of air.
+      /// See https://en.wikipedia.org/wiki/Density_of_air#Altitude
+      public: double adiabaticPower;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace physics;
@@ -37,9 +52,10 @@ using namespace physics;
 GZ_REGISTER_ATMOSPHERE_MODEL("adiabatic", AdiabaticAtmosphere)
 
 //////////////////////////////////////////////////
-AdiabaticAtmosphere::AdiabaticAtmosphere(WorldPtr _world)
+AdiabaticAtmosphere::AdiabaticAtmosphere(physics::World &_world)
   : Atmosphere(_world), dataPtr(new AdiabaticAtmospherePrivate)
 {
+  this->ComputeAdiabaticPower();
 }
 
 //////////////////////////////////////////////////
@@ -51,11 +67,6 @@ AdiabaticAtmosphere::~AdiabaticAtmosphere()
 void AdiabaticAtmosphere::Load(sdf::ElementPtr _sdf)
 {
   Atmosphere::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
-void AdiabaticAtmosphere::Init()
-{
   this->ComputeAdiabaticPower();
 }
 
@@ -78,8 +89,7 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Atmosphere atmosphereMsg;
     atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
-    atmosphereMsg.set_enable_atmosphere(
-            this->World()->AtmosphereEnabled());
+    atmosphereMsg.set_enable_atmosphere(this->World().AtmosphereEnabled());
     atmosphereMsg.set_temperature(Atmosphere::Temperature());
     atmosphereMsg.set_pressure(Atmosphere::Pressure());
     atmosphereMsg.set_mass_density(Atmosphere::MassDensity());
@@ -120,6 +130,8 @@ double AdiabaticAtmosphere::Pressure(const double _altitude) const
   if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
   {
     // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
+    // or equation (18) from Manual of the ICAO Standard Atmosphere.
+    // http://ntrs.nasa.gov/search.jsp?R=19930083952
     return Atmosphere::Pressure() *
         pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
             Atmosphere::Temperature(), this->dataPtr->adiabaticPower);
@@ -136,6 +148,8 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
   if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
   {
     // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
+    // or equation (33) from Manual of the ICAO Standard Atmosphere.
+    // http://ntrs.nasa.gov/search.jsp?R=19930083952
     return Atmosphere::MassDensity() *
       pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
           Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
@@ -149,7 +163,9 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::ComputeAdiabaticPower()
 {
+  // See equation (17) from Manual of the ICAO Standard Atmosphere.
+  // http://ntrs.nasa.gov/search.jsp?R=19930083952
   this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
-      this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
+      this->World().Gravity().Length() /
       (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
 }

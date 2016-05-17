@@ -30,7 +30,7 @@ using namespace physics;
 ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
 : BallJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateBall(_worldId, NULL);
+  this->jointId = dJointCreateBall(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -47,7 +47,10 @@ math::Vector3 ODEBallJoint::GetAnchor(unsigned int /*_index*/) const
   if (this->jointId)
     dJointGetBallAnchor(jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }

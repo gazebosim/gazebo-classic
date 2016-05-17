@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_BUILDING_MEASUREITEM_HH_
 
 #include <memory>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/SegmentItem.hh"
@@ -45,7 +46,8 @@ namespace gazebo
       /// param[in] _start Start position of the measure item in pixel
       /// coordinates.
       /// param[in] _end End position of the measure item in pixel coordinates.
-      public: MeasureItem(const QPointF &_start, const QPointF &_end);
+      public: MeasureItem(const ignition::math::Vector2d &_start,
+          const ignition::math::Vector2d &_end);
 
       /// \brief Destructor
       public: ~MeasureItem();
@@ -56,7 +58,7 @@ namespace gazebo
 
       /// \brief Get distance between end points
       /// \return Distance between end points.
-      public: double GetDistance() const;
+      public: double Distance() const;
 
       /// \brief Set value in meters
       /// \param[in] _value Value measured in meters.

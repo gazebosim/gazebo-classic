@@ -28,7 +28,7 @@ ODESurfaceParams::ODESurfaceParams()
     bounce(0), bounceThreshold(100000),
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
-    slip1(0), slip2(0),
+    slip1(0), slip2(0), slipTorsion(0),
     frictionPyramid(new physics::FrictionPyramid())
 {
 }
@@ -45,13 +45,13 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
   SurfaceParams::Load(_sdf);
 
   if (!_sdf)
-    gzerr << "Surface _sdf is NULL" << std::endl;
+    gzerr << "Surface _sdf is null" << std::endl;
   else
   {
     {
       sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
       if (!bounceElem)
-        gzerr << "Surface bounce sdf member is NULL" << std::endl;
+        gzerr << "Surface bounce sdf member is null" << std::endl;
       else
       {
         this->bounce = bounceElem->Get<double>("restitution_coefficient");
@@ -76,7 +76,7 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
       if (!frictionElem)
-        gzerr << "Surface friction sdf member is NULL" << std::endl;
+        gzerr << "Surface friction sdf member is null" << std::endl;
       else
       {
         sdf::ElementPtr torsionalElem = frictionElem->GetElement("torsional");
@@ -98,7 +98,7 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 
         sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
         if (!frictionOdeElem)
-          gzerr << "Surface friction ode sdf member is NULL" << std::endl;
+          gzerr << "Surface friction ode sdf member is null" << std::endl;
         else
         {
           this->frictionPyramid->SetMuPrimary(
@@ -117,12 +117,12 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr contactElem = _sdf->GetElement("contact");
       if (!contactElem)
-        gzerr << "Surface contact sdf member is NULL" << std::endl;
+        gzerr << "Surface contact sdf member is null" << std::endl;
       else
       {
         sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
         if (!contactOdeElem)
-          gzerr << "Surface contact ode sdf member is NULL" << std::endl;
+          gzerr << "Surface contact ode sdf member is null" << std::endl;
         {
           this->kp = contactOdeElem->Get<double>("kp");
           this->kd = contactOdeElem->Get<double>("kd");

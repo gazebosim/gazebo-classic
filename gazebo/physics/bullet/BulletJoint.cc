@@ -38,9 +38,9 @@ using namespace physics;
 BulletJoint::BulletJoint(BasePtr _parent)
   : Joint(_parent)
 {
-  this->constraint = NULL;
-  this->bulletWorld = NULL;
-  this->feedback = NULL;
+  this->constraint = nullptr;
+  this->bulletWorld = nullptr;
+  this->feedback = nullptr;
   this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
@@ -50,11 +50,23 @@ BulletJoint::BulletJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
-  delete this->constraint;
-  this->constraint = NULL;
-  delete this->feedback;
-  this->feedback = NULL;
-  this->bulletWorld = NULL;
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::Fini()
+{
+  if (this->constraint && this->bulletWorld)
+  {
+    this->bulletWorld->removeConstraint(this->constraint);
+    delete this->constraint;
+  }
+  this->constraint = nullptr;
+  this->bulletWorld = nullptr;
+
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -110,7 +122,7 @@ LinkPtr BulletJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
 
-  if (this->constraint == NULL)
+  if (this->constraint == nullptr)
     gzthrow("Attach bodies to the joint first");
 
   if (_index == 0 || _index == 1)
@@ -149,7 +161,7 @@ void BulletJoint::Detach()
   if (this->constraint && this->bulletWorld)
     this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
-  this->constraint = NULL;
+  this->constraint = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -251,7 +263,7 @@ void BulletJoint::CacheForceTorque()
   // convert torque from about parent CG to joint anchor location
   if (this->parentLink)
   {
-    // get child pose, or it's the inertial world if childLink is NULL
+    // get child pose, or it's the inertial world if childLink is nullptr
     math::Pose childPose;
     if (this->childLink)
       childPose = this->childLink->GetWorldPose();
@@ -348,7 +360,7 @@ void BulletJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
-  GZ_ASSERT(this->constraint != NULL, "constraint should be valid");
+  GZ_ASSERT(this->constraint != nullptr, "constraint should be valid");
   return this->wrench;
 }
 
@@ -357,7 +369,7 @@ void BulletJoint::SetupJointFeedback()
 {
   if (this->provideFeedback)
   {
-    if (this->feedback == NULL)
+    if (this->feedback == nullptr)
     {
       this->feedback = new btJointFeedback;
       this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
@@ -568,26 +580,29 @@ void BulletJoint::ApplyStiffnessDamping()
         axisChild = childPose.rot.RotateVectorReverse(axis);
         axisChild = axisChild.Normalize();
       }
+
       if (bulletChildLink && bulletParentLink)
       {
+        // both parent and child links exist, so we'll get the
+        // global pose of both of theses to construct the constraint
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
           *(bulletParentLink->GetBulletLink()),
-          BulletTypes::ConvertPose(childPose),
-          BulletTypes::ConvertPose(parentPose),
-          // BulletTypes::ConvertVector3(axisChild),
-          // BulletTypes::ConvertVector3(axisParent)
+          BulletTypes::ConvertPose(math::Pose(axisChild, math::Vector3()) /*+ childPose*/),
+          BulletTypes::ConvertPose(math::Pose(axisParent, math::Vector3()) /*+ parentPose*/),
           RO_XYZ
           );
       }
       else if (bulletChildLink)
       {
-        childPose = this->childLink->GetInertial()->GetPose();
-        gzerr << "childPose [" << childPose << "]\n";
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
-          //BulletTypes::ConvertPose(childPose),
-          BulletTypes::ConvertPose(math::Pose()),
+
+          // find pose transform from x-axis to axisChild,
+          // then confirm that y-axis = axis2.
+          // math::Pose xToAxisChild,
+          BulletTypes::ConvertPose(
+            math::Pose(axisChild, math::Vector3()) + childPose),
           RO_XYZ
           );
       }
@@ -595,19 +610,40 @@ void BulletJoint::ApplyStiffnessDamping()
       {
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletParentLink->GetBulletLink()),
-          BulletTypes::ConvertPose(parentPose),
+          BulletTypes::ConvertPose(math::Pose(axisParent, math::Vector3()) /*+ parentPose*/),
           RO_XYZ
           );
       }
-      for (unsigned int l = 0; l < 6; ++l)
+
+      for (unsigned int l = i; l < 6; ++l)
       {
-        // not limited
-        this->stiffnessDampingConstraint->setLimit(l, 1e16, -1e16);
-        this->stiffnessDampingConstraint->enableSpring(l, true);
-        this->stiffnessDampingConstraint->setStiffness(l, 100);
-        this->stiffnessDampingConstraint->setEquilibriumPoint(l, 0.0);
-        this->stiffnessDampingConstraint->setDamping(l, 0);
-/*
+        if (l == i)
+        {
+          // assuming axis is lined up with constraint frame
+          // this may be true for axis, but we need to double check.
+          // and we need to check for axis2 as well.
+          this->stiffnessDampingConstraint->setLimit(l,
+            SIMD_INFINITY, -SIMD_INFINITY);
+          this->stiffnessDampingConstraint->enableSpring(l, true);
+          this->stiffnessDampingConstraint->setStiffness(l,
+            this->stiffnessCoefficient[i]);
+          this->stiffnessDampingConstraint->setDamping(l,
+            this->dissipationCoefficient[i]);
+          this->stiffnessDampingConstraint->setEquilibriumPoint(l,
+            this->springReferencePosition[i]);
+        }
+        else
+        {
+          this->stiffnessDampingConstraint->setLimit(l,
+            SIMD_INFINITY, -SIMD_INFINITY);
+          this->stiffnessDampingConstraint->enableSpring(l, false);
+        }
+      }
+      this->bulletWorld->addConstraint(this->stiffnessDampingConstraint, true);
+ 
+      /*
+      for (unsigned int l = 0; l < 3; ++l)
+      {
         this->stiffnessDampingConstraint->setParam(
           BT_CONSTRAINT_STOP_ERP, 0, l);
         this->stiffnessDampingConstraint->setParam(
@@ -616,11 +652,8 @@ void BulletJoint::ApplyStiffnessDamping()
           BT_CONSTRAINT_ERP, 0, l);
         this->stiffnessDampingConstraint->setParam(
           BT_CONSTRAINT_CFM, 100.0, l);
-*/
       }
-      this->bulletWorld->addConstraint(this->stiffnessDampingConstraint, true);
       // this->stiffnessDampingConstraint->setAngularLowerLimit
-      /*
       btGeneric6DofConstraint(
           btRigidBody& rbA,
           btRigidBody& rbB,
@@ -628,7 +661,7 @@ void BulletJoint::ApplyStiffnessDamping()
           const btTransform& frameInB,
           bool useLinearReferenceFrameA);
       */
-      gzerr << "damping done\n";
+      // gzerr << "damping done\n";
     }
   }
 }

@@ -57,6 +57,7 @@
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 
 namespace gazebo
@@ -137,14 +138,15 @@ namespace gazebo
       /// \brief Joint maker.
       public: JointMaker *jointMaker;
 
+      /// \brief User command manager.
+      public: std::unique_ptr<MEUserCmdManager> userCmdManager;
+
       /// \brief origin of the model.
       public: ignition::math::Pose3d origin;
 
-      /// \brief A list of selected link visuals.
-      public: std::vector<rendering::VisualPtr> selectedLinks;
-
-      /// \brief A list of selected nested model visuals.
-      public: std::vector<rendering::VisualPtr> selectedNestedModels;
+      /// \brief A list of selected entity visuals, for both links and nested
+      /// models.
+      public: std::vector<rendering::VisualPtr> selectedEntities;
 
       /// \brief A list of selected model plugins.
       public: std::vector<std::string> selectedModelPlugins;
@@ -228,6 +230,12 @@ ModelCreator::ModelCreator(QObject *_parent)
       this->dataPtr->node->Advertise<msgs::Request>("~/request");
 
   this->dataPtr->jointMaker = new gui::JointMaker();
+  this->dataPtr->userCmdManager.reset(new MEUserCmdManager());
+
+  // Give the joint maker a pointer to the user cmd manager, but we're still
+  // responsible for its lifetime.
+  this->dataPtr->jointMaker->SetUserCmdManager(
+      this->dataPtr->userCmdManager.get());
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -290,12 +298,12 @@ ModelCreator::ModelCreator(QObject *_parent)
 
   this->dataPtr->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
-      std::bind(&ModelCreator::OnSetSelectedEntity, this,
+      std::bind(&ModelCreator::OnDeselectAll, this,
       std::placeholders::_1, std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectSetSelectedLink(
-      std::bind(&ModelCreator::OnSetSelectedLink, this, std::placeholders::_1,
+      std::bind(&ModelCreator::OnSetSelectedEntity, this, std::placeholders::_1,
       std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
@@ -318,8 +326,22 @@ ModelCreator::ModelCreator(QObject *_parent)
       std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelRemoval(
+      std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelInsertion(
+      std::bind(&ModelCreator::InsertNestedModelFromSDF, this,
+      std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestLinkRemoval(
       std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestLinkInsertion(
+      std::bind(&ModelCreator::InsertLinkFromSDF, this,
+      std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginRemoval(
@@ -358,6 +380,8 @@ ModelCreator::ModelCreator(QObject *_parent)
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
+  this->DisableEventHandlers();
+
   while (!this->dataPtr->allLinks.empty())
     this->RemoveLinkImpl(this->dataPtr->allLinks.begin()->first);
 
@@ -385,37 +409,52 @@ void ModelCreator::OnEdit(const bool _checked)
   if (_checked)
   {
     this->dataPtr->active = true;
-    KeyEventHandler::Instance()->AddPressFilter("model_creator",
-        std::bind(&ModelCreator::OnKeyPress, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddPressFilter("model_creator",
-        std::bind(&ModelCreator::OnMousePress, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseRelease, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddMoveFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseMove, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseDoubleClick, this,
-        std::placeholders::_1));
-
-    this->dataPtr->jointMaker->EnableEventHandlers();
+    this->EnableEventHandlers();
   }
   else
   {
     this->dataPtr->active = false;
-    KeyEventHandler::Instance()->RemovePressFilter("model_creator");
-    MouseEventHandler::Instance()->RemovePressFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
-    this->dataPtr->jointMaker->DisableEventHandlers();
+    this->DisableEventHandlers();
     this->dataPtr->jointMaker->Stop();
 
     this->DeselectAll();
   }
+
+  this->dataPtr->userCmdManager->Reset();
+  this->dataPtr->userCmdManager->SetActive(this->dataPtr->active);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::EnableEventHandlers()
+{
+  KeyEventHandler::Instance()->AddPressFilter("model_creator",
+      std::bind(&ModelCreator::OnKeyPress, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddPressFilter("model_creator",
+      std::bind(&ModelCreator::OnMousePress, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseRelease, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseMove, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseDoubleClick, this,
+      std::placeholders::_1));
+
+  this->dataPtr->jointMaker->EnableEventHandlers();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DisableEventHandlers()
+{
+  KeyEventHandler::Instance()->RemovePressFilter("model_creator");
+  MouseEventHandler::Instance()->RemovePressFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
+  this->dataPtr->jointMaker->DisableEventHandlers();
 }
 
 /////////////////////////////////////////////////
@@ -502,10 +541,17 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     const sdf::ElementPtr &_modelElem, const rendering::VisualPtr &_parentVis,
     const bool _emit)
 {
+  auto modelData = new NestedModelData();
+
+  if (!_modelElem)
+  {
+    gzerr << "No sdf element given, can't create model" << std::endl;
+    return modelData;
+  }
+
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
   std::string nestedModelName;
-  NestedModelData *modelData = new NestedModelData();
 
   // If no parent vis, this is the root model
   if (!_parentVis)
@@ -895,6 +941,22 @@ void ModelCreator::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::AddCustomLink(const EntityType _type,
+    const ignition::math::Vector3d &_size, const ignition::math::Pose3d &_pose,
+    const std::string &_uri, const unsigned int _samples)
+{
+  this->Stop();
+
+  this->dataPtr->addEntityType = _type;
+  if (_type != ENTITY_NONE)
+  {
+    auto linkData = this->AddShape(_type, _size, _pose, _uri, _samples);
+    if (linkData)
+      this->dataPtr->mouseVisual = linkData->linkVisual;
+  }
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::AddShape(const EntityType _type,
     const ignition::math::Vector3d &_size, const ignition::math::Pose3d &_pose,
     const std::string &_uri, const unsigned int _samples)
@@ -1120,6 +1182,24 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::InsertLinkFromSDF(sdf::ElementPtr _sdf)
+{
+  if (!_sdf)
+    return;
+
+  this->CreateLinkFromSDF(_sdf, this->dataPtr->previewVisual);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::InsertNestedModelFromSDF(sdf::ElementPtr _sdf)
+{
+  if (!_sdf)
+    return;
+
+  this->CreateModelFromSDF(_sdf, this->dataPtr->previewVisual);
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
@@ -1190,6 +1270,12 @@ NestedModelData *ModelCreator::CloneNestedModel(
 LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     const rendering::VisualPtr &_parentVis)
 {
+  if (_linkElem == NULL)
+  {
+    gzwarn << "NULL SDF pointer, not creating link." << std::endl;
+    return NULL;
+  }
+
   LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
@@ -1202,7 +1288,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   // Link
   std::stringstream linkNameStream;
-  std::string leafName = link->GetName();
+  std::string leafName = link->Name();
   linkNameStream << _parentVis->GetName() << "::";
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
@@ -1467,7 +1553,7 @@ void ModelCreator::Reset()
   this->dataPtr->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
   this->dataPtr->jointMaker->Reset();
-  this->dataPtr->selectedLinks.clear();
+  this->dataPtr->selectedEntities.clear();
 
   if (g_copyAct)
     g_copyAct->setEnabled(false);
@@ -1521,6 +1607,8 @@ void ModelCreator::Reset()
   this->dataPtr->previewVisual->Load();
   this->dataPtr->modelPose = ignition::math::Pose3d::Zero;
   this->dataPtr->previewVisual->SetPose(this->dataPtr->modelPose);
+
+  this->dataPtr->userCmdManager->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -1707,7 +1795,45 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  this->RemoveEntity(_entity);
+  // if it's a nestedModel
+  auto nestedModel = this->dataPtr->allNestedModels.find(_entity);
+  if (nestedModel != this->dataPtr->allNestedModels.end())
+  {
+    // Get data to use after the model has been deleted
+    auto name = nestedModel->second->Name();
+    auto sdf = nestedModel->second->modelSDF;
+    auto scopedName = nestedModel->second->modelVisual->GetName();
+
+    this->RemoveNestedModelImpl(_entity);
+
+    // Register command
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Delete [" + name + "]",
+        MEUserCmd::DELETING_NESTED_MODEL);
+    cmd->SetSDF(sdf);
+    cmd->SetScopedName(scopedName);
+
+    return;
+  }
+
+  // If it's a link
+  auto link = this->dataPtr->allLinks.find(_entity);
+  if (link != this->dataPtr->allLinks.end())
+  {
+    // First delete joints
+    if (this->dataPtr->jointMaker)
+      this->dataPtr->jointMaker->RemoveJointsByLink(_entity);
+
+    // Then register command
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Delete [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
+    cmd->SetSDF(this->GenerateLinkSDF(link->second));
+    cmd->SetScopedName(link->second->linkVisual->GetName());
+
+    // Then delete link
+    this->RemoveLinkImpl(_entity);
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1791,14 +1917,9 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    for (const auto &nestedModelVis : this->dataPtr->selectedNestedModels)
+    for (const auto &vis : this->dataPtr->selectedEntities)
     {
-      this->OnDelete(nestedModelVis->GetName());
-    }
-
-    for (const auto &linkVis : this->dataPtr->selectedLinks)
-    {
-      this->OnDelete(linkVis->GetName());
+      this->OnDelete(vis->GetName());
     }
 
     for (const auto &plugin : this->dataPtr->selectedModelPlugins)
@@ -1878,6 +1999,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       link->SetPose(this->dataPtr->mouseVisual->GetWorldPose().Ign() -
           this->dataPtr->modelPose);
       gui::model::Events::linkInserted(this->dataPtr->mouseVisual->GetName());
+
+      auto cmd = this->dataPtr->userCmdManager->NewCmd(
+          "Insert [" + link->Name() + "]",
+          MEUserCmd::INSERTING_LINK);
+      cmd->SetSDF(this->GenerateLinkSDF(link));
+      cmd->SetScopedName(link->linkVisual->GetName());
     }
     else
     {
@@ -1890,6 +2017,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
             this->dataPtr->modelPose);
 
         this->EmitNestedModelInsertedEvent(this->dataPtr->mouseVisual);
+
+        auto cmd = this->dataPtr->userCmdManager->NewCmd(
+            "Insert [" + modelData->Name() + "]",
+            MEUserCmd::INSERTING_NESTED_MODEL);
+        cmd->SetSDF(modelData->modelSDF);
+        cmd->SetScopedName(modelData->modelVisual->GetName());
       }
     }
 
@@ -1913,21 +2046,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     bool isNestedModel = this->dataPtr->allNestedModels.find(
         topLevelVis->GetName()) != this->dataPtr->allNestedModels.end();
 
-    bool isSelectedLink = false;
-    bool isSelectedNestedModel = false;
-    if (isLink)
-    {
-      isSelectedLink = std::find(this->dataPtr->selectedLinks.begin(),
-          this->dataPtr->selectedLinks.end(), topLevelVis) !=
-          this->dataPtr->selectedLinks.end();
-    }
-    else if (isNestedModel)
-    {
-      isSelectedNestedModel = std::find(
-          this->dataPtr->selectedNestedModels.begin(),
-          this->dataPtr->selectedNestedModels.end(), topLevelVis) !=
-          this->dataPtr->selectedNestedModels.end();
-    }
+    bool isSelected = std::find(this->dataPtr->selectedEntities.begin(),
+        this->dataPtr->selectedEntities.end(), topLevelVis) !=
+        this->dataPtr->selectedEntities.end();
 
     // trigger context menu on right click
     if (_event.Button() == common::MouseEvent::RIGHT)
@@ -1945,7 +2066,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
       // if right clicked on entity that's not previously selected then
       // select it
-      if (!isSelectedLink && !isSelectedNestedModel)
+      if (!isSelected)
       {
         this->DeselectAll();
         this->SetSelected(topLevelVis, true);
@@ -1976,7 +2097,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->DeselectAllModelPlugins();
 
         // Highlight and select clicked entity if not already selected
-        if (!isSelectedLink && !isSelectedNestedModel)
+        if (!isSelected)
         {
           this->SetSelected(topLevelVis, true);
         }
@@ -2002,8 +2123,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       this->DeselectAll();
 
       g_alignAct->setEnabled(false);
-      g_copyAct->setEnabled(!this->dataPtr->selectedLinks.empty() ||
-          !this->dataPtr->selectedNestedModels.empty());
+      g_copyAct->setEnabled(!this->dataPtr->selectedEntities.empty());
 
       if (!vis->IsPlane())
         return true;
@@ -2033,6 +2153,7 @@ void ModelCreator::EmitNestedModelInsertedEvent(
 void ModelCreator::ShowContextMenu(const std::string &_entity)
 {
   QMenu menu;
+  menu.setObjectName("ModelEditorContextMenu");
   auto linkIt = this->dataPtr->allLinks.find(_entity);
   bool isLink = linkIt != this->dataPtr->allLinks.end();
   bool isNestedModel = false;
@@ -2188,7 +2309,9 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
       userCamera, _event).Ign();
 
-  if (!_event.Shift())
+  // there is a problem detecting control key from common::MouseEvent, so
+  // check using Qt for now
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
     pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
   }
@@ -2257,19 +2380,14 @@ void ModelCreator::OnCopy()
   if (!g_editModelAct->isChecked())
     return;
 
-  if (this->dataPtr->selectedLinks.empty() &&
-      this->dataPtr->selectedNestedModels.empty())
+  if (this->dataPtr->selectedEntities.empty())
   {
     return;
   }
 
   this->dataPtr->copiedNames.clear();
 
-  for (auto vis : this->dataPtr->selectedLinks)
-  {
-    this->dataPtr->copiedNames.push_back(vis->GetName());
-  }
-  for (auto vis : this->dataPtr->selectedNestedModels)
+  for (auto vis : this->dataPtr->selectedEntities)
   {
     this->dataPtr->copiedNames.push_back(vis->GetName());
   }
@@ -2558,43 +2676,32 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, const bool _preview,
     const bool _inverted)
 {
-  ModelAlign::Instance()->AlignVisuals(this->dataPtr->selectedLinks, _axis,
+  ModelAlign::Instance()->AlignVisuals(this->dataPtr->selectedEntities, _axis,
       _config, _target, !_preview, _inverted);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAll()
 {
-  this->DeselectAllLinks();
-  this->DeselectAllNestedModels();
+  this->DeselectAllEntities();
   this->DeselectAllModelPlugins();
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::DeselectAllLinks()
+void ModelCreator::DeselectAllEntities()
 {
-  while (!this->dataPtr->selectedLinks.empty())
+  while (!this->dataPtr->selectedEntities.empty())
   {
-    rendering::VisualPtr vis = this->dataPtr->selectedLinks[0];
+    auto vis = this->dataPtr->selectedEntities[0];
     vis->SetHighlighted(false);
-    this->dataPtr->selectedLinks.erase(this->dataPtr->selectedLinks.begin());
-    model::Events::setSelectedLink(vis->GetName(), false);
-  }
-  this->dataPtr->selectedLinks.clear();
-}
 
-/////////////////////////////////////////////////
-void ModelCreator::DeselectAllNestedModels()
-{
-  while (!this->dataPtr->selectedNestedModels.empty())
-  {
-    rendering::VisualPtr vis = this->dataPtr->selectedNestedModels[0];
-    vis->SetHighlighted(false);
-    this->dataPtr->selectedNestedModels.erase(
-        this->dataPtr->selectedNestedModels.begin());
+    this->dataPtr->selectedEntities.erase(
+        this->dataPtr->selectedEntities.begin());
+
+    // Notify other widgets
     model::Events::setSelectedLink(vis->GetName(), false);
   }
-  this->dataPtr->selectedNestedModels.clear();
+  this->dataPtr->selectedEntities.clear();
 }
 
 /////////////////////////////////////////////////
@@ -2612,16 +2719,30 @@ void ModelCreator::DeselectAllModelPlugins()
 /////////////////////////////////////////////////
 void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 {
+  rendering::VisualPtr topLevelVis;
+
+  // If it's a link
   auto it = this->dataPtr->allLinks.find(_name);
   if (it != this->dataPtr->allLinks.end())
   {
-    this->SetSelected((*it).second->linkVisual, _selected);
+    // For nested links, get parent model
+    topLevelVis = (*it).second->linkVisual->GetNthAncestor(2);
   }
   else
   {
     auto itNestedModel = this->dataPtr->allNestedModels.find(_name);
     if (itNestedModel != this->dataPtr->allNestedModels.end())
-      this->SetSelected((*itNestedModel).second->modelVisual, _selected);
+    {
+      topLevelVis = (*itNestedModel).second->modelVisual->GetNthAncestor(2);
+    }
+  }
+
+  if (topLevelVis)
+    this->SetSelected(topLevelVis, _selected);
+  else
+  {
+    gzwarn << "Couldn't find top level visual for [" << _name << "]. "
+        << "Not selecting in 3D scene." << std::endl;
   }
 }
 
@@ -2638,47 +2759,36 @@ void ModelCreator::SetSelected(const rendering::VisualPtr &_entityVis,
   auto itNestedModel =
       this->dataPtr->allNestedModels.find(_entityVis->GetName());
 
-  auto itLinkSelected = std::find(this->dataPtr->selectedLinks.begin(),
-      this->dataPtr->selectedLinks.end(), _entityVis);
-  auto itNestedModelSelected = std::find(
-      this->dataPtr->selectedNestedModels.begin(),
-      this->dataPtr->selectedNestedModels.end(), _entityVis);
+  auto itSelected = std::find(this->dataPtr->selectedEntities.begin(),
+      this->dataPtr->selectedEntities.end(), _entityVis);
 
-  if (_selected)
+  // If it's not link or nested model
+  if (itLink == this->dataPtr->allLinks.end() &&
+      itNestedModel == this->dataPtr->allNestedModels.end())
   {
-    if (itLink != this->dataPtr->allLinks.end() &&
-        itLinkSelected == this->dataPtr->selectedLinks.end())
-    {
-      this->dataPtr->selectedLinks.push_back(_entityVis);
-      model::Events::setSelectedLink(_entityVis->GetName(), _selected);
-    }
-    else if (itNestedModel != this->dataPtr->allNestedModels.end() &&
-             itNestedModelSelected == this->dataPtr->selectedNestedModels.end())
-    {
-      this->dataPtr->selectedNestedModels.push_back(_entityVis);
-      model::Events::setSelectedLink(_entityVis->GetName(), _selected);
-    }
-  }
-  else
-  {
-    if (itLink != this->dataPtr->allLinks.end() &&
-        itLinkSelected != this->dataPtr->selectedLinks.end())
-    {
-      this->dataPtr->selectedLinks.erase(itLinkSelected);
-      model::Events::setSelectedLink(_entityVis->GetName(), _selected);
-    }
-    else if (itNestedModel != this->dataPtr->allNestedModels.end() &&
-             itNestedModelSelected != this->dataPtr->selectedNestedModels.end())
-    {
-      this->dataPtr->selectedNestedModels.erase(itNestedModelSelected);
-      model::Events::setSelectedLink(_entityVis->GetName(), _selected);
-    }
+    gzwarn << "Entity [" << _entityVis->GetName() << "] is not a link or "
+        << "nested model. Can't select." << std::endl;
+    return;
   }
 
-  g_copyAct->setEnabled(this->dataPtr->selectedLinks.size() +
-      this->dataPtr->selectedNestedModels.size() > 0u);
-  g_alignAct->setEnabled(this->dataPtr->selectedLinks.size() +
-      this->dataPtr->selectedNestedModels.size() > 1u);
+  // Only selecting top level visual for now
+  auto topLevelVis = _entityVis->GetNthAncestor(2);
+
+  // Selecting something which wasn't selected yet
+  if (_selected && itSelected == this->dataPtr->selectedEntities.end())
+  {
+    this->dataPtr->selectedEntities.push_back(topLevelVis);
+    model::Events::setSelectedLink(topLevelVis->GetName(), _selected);
+  }
+  // Deselecting
+  else if (!_selected && itSelected != this->dataPtr->selectedEntities.end())
+  {
+    this->dataPtr->selectedEntities.erase(itSelected);
+    model::Events::setSelectedLink(topLevelVis->GetName(), _selected);
+  }
+
+  g_copyAct->setEnabled(!this->dataPtr->selectedEntities.empty());
+  g_alignAct->setEnabled(this->dataPtr->selectedEntities.size() > 1u);
 }
 
 /////////////////////////////////////////////////
@@ -2689,42 +2799,35 @@ void ModelCreator::OnManipMode(const std::string &_mode)
 
   this->dataPtr->manipMode = _mode;
 
-  if (!this->dataPtr->selectedLinks.empty())
+  if (!this->dataPtr->selectedEntities.empty())
   {
     ModelManipulator::Instance()->SetAttachedVisual(
-        this->dataPtr->selectedLinks.back());
+        this->dataPtr->selectedEntities.back());
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
   ModelSnap::Instance()->Reset();
 
   // deselect 0 to n-1 models.
-  if (!this->dataPtr->selectedLinks.empty())
+  if (!this->dataPtr->selectedEntities.empty())
   {
-    rendering::VisualPtr link =
-        this->dataPtr->selectedLinks[this->dataPtr->selectedLinks.size()-1];
+    rendering::VisualPtr entity =
+        this->dataPtr->selectedEntities[
+        this->dataPtr->selectedEntities.size()-1];
     this->DeselectAll();
-    this->SetSelected(link, true);
-  }
-  else if (!this->dataPtr->selectedNestedModels.empty())
-  {
-    rendering::VisualPtr nestedModel =
-        this->dataPtr->selectedNestedModels[
-        this->dataPtr->selectedNestedModels.size()-1];
-    this->DeselectAll();
-    this->SetSelected(nestedModel, true);
+    this->SetSelected(entity, true);
   }
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
+void ModelCreator::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   this->DeselectAll();
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnSetSelectedLink(const std::string &_name,
+void ModelCreator::OnSetSelectedEntity(const std::string &_name,
     const bool _selected)
 {
   this->SetSelected(_name, _selected);
