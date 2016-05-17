@@ -1301,10 +1301,10 @@ void Link::SetScale(const math::Vector3 &_scale)
   }
   else
   {
-    // TODO: not sure if this rotation is correct
-    // need to write a test with off-diagonal inertia
     // inertial pose rotations
-    ignition::math::Vector3d newSize = rot.RotateVector(_scale.Ign());
+    auto rot2 = this->inertial->GetPose().rot.Ign() * rot;
+    auto newSize =
+      (rot2.RotateVector(_scale.Ign() / this->scale) * oldSize).Abs();
     if (!m.SetFromBox(newSize, rot))
     {
       gzerr << "Error computing inertia, not re-scaling" << std::endl;
