@@ -324,8 +324,8 @@ namespace gazebo
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
 
-      /// \brief Transform from world frame to NED frame. See SetNEDWorldPose
-      /// for details of NED frame.
+      /// \brief Transform from world frame to NED frame (North/East/Down).
+      /// See World::SetNEDWorldPose() documentation for details of NED frame.
       public: ignition::math::Pose3d nedPose;
     };
   }
