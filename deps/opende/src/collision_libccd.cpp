@@ -1,5 +1,5 @@
-#include <ode/collision.h>
-#include <ode/odemath.h>
+#include <gazebo/ode/collision.h>
+#include <gazebo/ode/odemath.h>
 #include <ccd/ccd.h>
 #include <ccd/quat.h>
 #include "collision_libccd.h"

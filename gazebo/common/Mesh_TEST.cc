@@ -125,12 +125,12 @@ TEST_F(MeshTest, Mesh)
 {
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
-  boost::filesystem::create_directories(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
+  boost::filesystem::create_directories(paths->DefaultTestPath());
 
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.mesh"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.3ds"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.xml"));
 
   const common::Mesh *mesh =
     common::MeshManager::Instance()->GetMesh("unit_box");
@@ -146,8 +146,8 @@ TEST_F(MeshTest, Mesh)
   EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
   EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
 
-  float *vertArray = NULL;
-  int *indArray = NULL;
+  float *vertArray = nullptr;
+  int *indArray = nullptr;
   mesh->FillArrays(&vertArray, &indArray);
 
   int i = 0;
@@ -228,24 +228,24 @@ TEST_F(MeshTest, Mesh)
   newMesh->GenSphericalTexCoord(ignition::math::Vector3d(0, 0, 0));
   delete newMesh;
 
-  std::ofstream stlFile((paths->GetDefaultTestPath() +
+  std::ofstream stlFile((paths->DefaultTestPath() +
       "/gazebo_stl_test.stl").c_str(), std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
   mesh = common::MeshManager::Instance()->Load(
-      paths->GetDefaultTestPath() + "/gazebo_stl_test-bad.stl");
-  EXPECT_EQ(NULL, mesh);
+      paths->DefaultTestPath() + "/gazebo_stl_test-bad.stl");
+  EXPECT_EQ(nullptr, mesh);
 
   mesh = common::MeshManager::Instance()->Load(
-      paths->GetDefaultTestPath() + "/gazebo_stl_test.stl");
+      paths->DefaultTestPath() + "/gazebo_stl_test.stl");
   mesh->GetAABB(center, min, max);
   EXPECT_TRUE(center == ignition::math::Vector3d(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == ignition::math::Vector3d(0, 0, 0));
   EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
 }
 
 /////////////////////////////////////////////////

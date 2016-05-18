@@ -638,6 +638,21 @@ namespace gazebo
       if (_sdf->HasElement("max_dist"))
         result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
+      if (_sdf->HasElement("static"))
+        result.set_static_(_sdf->Get<bool>("static"));
+
+      if (_sdf->HasElement("use_model_frame"))
+        result.set_use_model_frame(_sdf->Get<bool>("use_model_frame"));
+
+      if (_sdf->HasElement("inherit_yaw"))
+        result.set_inherit_yaw(_sdf->Get<bool>("inherit_yaw"));
+
+      if (_sdf->HasElement("xyz"))
+      {
+        msgs::Set(result.mutable_xyz(),
+            _sdf->Get<ignition::math::Vector3d>("xyz"));
+      }
+
       return result;
     }
 
@@ -1650,10 +1665,94 @@ namespace gazebo
         result.mutable_contact()->CopyFrom(
           msgs::ContactSensorFromSDF(_sdf->GetElement("contact")));
       }
+      else if (type == "gps")
+      {
+        result.mutable_gps()->CopyFrom(
+          msgs::GPSSensorFromSDF(_sdf->GetElement("gps")));
+      }
+      else if (type == "logical_camera")
+      {
+        result.mutable_logical_camera()->CopyFrom(
+          msgs::LogicalCameraSensorFromSDF(_sdf->GetElement("logical_camera")));
+      }
+      else if (type == "imu")
+      {
+        result.mutable_imu()->CopyFrom(
+          msgs::IMUSensorFromSDF(_sdf->GetElement("imu")));
+      }
       else
       {
         gzwarn << "Conversion of sensor type[" << type << "] not suppported."
           << std::endl;
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::IMUSensor IMUSensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::IMUSensor result;
+
+      std::array<std::string, 2> senses =
+        {{"angular_velocity", "linear_acceleration"}};
+
+      std::array<std::string, 3> dimensions = {{"x", "y", "z"}};
+
+      for (auto const &sense : senses)
+      {
+        if (_sdf->HasElement(sense))
+        {
+          auto senseElem = _sdf->GetElement(sense);
+          for (auto const &dim : dimensions)
+          {
+            if (senseElem->HasElement(dim))
+            {
+              auto dimElem = senseElem->GetElement(dim);
+              auto noiseElem = dimElem->GetElement("noise");
+              msgs::SensorNoise *noiseMsg;
+
+              if (sense == "angular_velocity")
+              {
+                if (dim == "x")
+                {
+                  noiseMsg = result.mutable_angular_velocity()->
+                    mutable_x_noise();
+                }
+                else if (dim == "y")
+                {
+                  noiseMsg = result.mutable_angular_velocity()->
+                    mutable_y_noise();
+                }
+                else
+                {
+                  noiseMsg = result.mutable_angular_velocity()->
+                    mutable_z_noise();
+                }
+              }
+              else
+              {
+                if (dim == "x")
+                {
+                  noiseMsg = result.mutable_linear_acceleration()->
+                    mutable_x_noise();
+                }
+                else if (dim == "y")
+                {
+                  noiseMsg = result.mutable_linear_acceleration()->
+                    mutable_y_noise();
+                }
+                else
+                {
+                  noiseMsg = result.mutable_linear_acceleration()->
+                    mutable_z_noise();
+                }
+              }
+
+              noiseMsg->CopyFrom(SensorNoiseFromSDF(noiseElem));
+            }
+          }
+        }
       }
 
       return result;
@@ -1754,6 +1853,87 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::GPSSensor GPSSensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::GPSSensor result;
+
+      // The two types of sensing
+      std::array<std::string, 2> sensing =
+        {{"position_sensing", "velocity_sensing"}};
+
+      // The two dimensions for each of sensing types.
+      std::array<std::string, 2> dimensions = {{"horizontal", "vertical"}};
+
+      // Process each sensing
+      for (auto const &sense : sensing)
+      {
+        // Make sure the element exists
+        if (_sdf->HasElement(sense))
+        {
+          auto senseElem = _sdf->GetElement(sense);
+
+          // Process each dimension
+          for (auto const &dim : dimensions)
+          {
+            if (senseElem->HasElement(dim))
+            {
+              auto dimElem = senseElem->GetElement(dim);
+
+              // Add noise
+              if (dimElem->HasElement("noise"))
+              {
+                auto noiseElem = dimElem->GetElement("noise");
+                msgs::SensorNoise *noiseMsg;
+
+                if (sense == "position_sensing")
+                {
+                  if (dim == "horizontal")
+                  {
+                    noiseMsg = result.mutable_position()->
+                      mutable_horizontal_noise();
+                  }
+                  else
+                  {
+                    noiseMsg = result.mutable_position()->
+                      mutable_vertical_noise();
+                  }
+                }
+                else
+                {
+                  if (dim == "horizontal")
+                  {
+                    noiseMsg = result.mutable_velocity()->
+                      mutable_horizontal_noise();
+                  }
+                  else
+                  {
+                    noiseMsg = result.mutable_velocity()->
+                      mutable_vertical_noise();
+                  }
+                }
+
+                noiseMsg->CopyFrom(SensorNoiseFromSDF(noiseElem));
+              }
+            }
+          }
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::LogicalCameraSensor LogicalCameraSensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::LogicalCameraSensor result;
+      result.set_near_clip(_sdf->Get<double>("near"));
+      result.set_far_clip(_sdf->Get<double>("far"));
+      result.set_horizontal_fov(_sdf->Get<double>("horizontal_fov"));
+      result.set_aspect_ratio(_sdf->Get<double>("aspect_ratio"));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr lightSDF;
@@ -1842,6 +2022,198 @@ namespace gazebo
         elem->GetElement("falloff")->Set(_msg.spot_falloff());
       }
       return lightSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr SensorNoiseToSDF(const msgs::SensorNoise &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr noiseSDF;
+
+      if (_sdf)
+      {
+        noiseSDF = _sdf;
+      }
+      else
+      {
+        noiseSDF.reset(new sdf::Element);
+        sdf::initFile("noise.sdf", noiseSDF);
+      }
+
+      if (_msg.type() == msgs::SensorNoise::NONE)
+      {
+        noiseSDF->GetAttribute("type")->Set("none");
+      }
+      else if (_msg.type() == msgs::SensorNoise::GAUSSIAN)
+      {
+        noiseSDF->GetAttribute("type")->Set("gaussian");
+      }
+      else if (_msg.type() == msgs::SensorNoise::GAUSSIAN_QUANTIZED)
+      {
+        noiseSDF->GetAttribute("type")->Set("gaussian_quantized");
+      }
+
+      if (_msg.has_mean())
+        noiseSDF->GetElement("mean")->Set(_msg.mean());
+
+      if (_msg.has_stddev())
+        noiseSDF->GetElement("stddev")->Set(_msg.stddev());
+
+      if (_msg.has_bias_mean())
+        noiseSDF->GetElement("bias_mean")->Set(_msg.bias_mean());
+
+      if (_msg.has_bias_stddev())
+        noiseSDF->GetElement("bias_stddev")->Set(_msg.bias_stddev());
+
+      if (_msg.has_precision())
+        noiseSDF->GetElement("precision")->Set(_msg.precision());
+
+      return noiseSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr GPSSensorToSDF(const msgs::GPSSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr gpsSDF;
+
+      if (_sdf)
+      {
+        gpsSDF = _sdf;
+      }
+      else
+      {
+        gpsSDF.reset(new sdf::Element);
+        sdf::initFile("gps.sdf", gpsSDF);
+      }
+
+      if (_msg.has_position())
+      {
+        if (_msg.position().has_horizontal_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("position_sensing")->GetElement(
+              "horizontal")->GetElement("noise");
+          noiseElem->PrintValues("  ");
+          SensorNoiseToSDF(_msg.position().horizontal_noise(), noiseElem);
+        }
+
+        if (_msg.position().has_vertical_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("position_sensing")->GetElement(
+              "vertical")->GetElement("noise");
+          SensorNoiseToSDF(_msg.position().vertical_noise(), noiseElem);
+        }
+      }
+
+      if (_msg.has_velocity())
+      {
+        if (_msg.velocity().has_horizontal_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("velocity_sensing")->GetElement(
+              "horizontal")->GetElement("noise");
+          SensorNoiseToSDF(_msg.velocity().horizontal_noise(), noiseElem);
+        }
+
+        if (_msg.velocity().has_vertical_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("velocity_sensing")->GetElement(
+              "vertical")->GetElement("noise");
+          SensorNoiseToSDF(_msg.velocity().vertical_noise(), noiseElem);
+        }
+      }
+
+      return gpsSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr IMUSensorToSDF(const msgs::IMUSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr imuSDF;
+
+      if (_sdf)
+      {
+        imuSDF = _sdf;
+      }
+      else
+      {
+        imuSDF.reset(new sdf::Element);
+        sdf::initFile("imu.sdf", imuSDF);
+      }
+
+      if (_msg.has_angular_velocity())
+      {
+        if (_msg.angular_velocity().has_x_noise())
+        {
+          auto noiseElem = imuSDF->GetElement("angular_velocity")->GetElement(
+              "x")->GetElement("noise");
+          SensorNoiseToSDF(_msg.angular_velocity().x_noise(), noiseElem);
+        }
+
+        if (_msg.angular_velocity().has_y_noise())
+        {
+          auto noiseElem = imuSDF->GetElement("angular_velocity")->GetElement(
+              "y")->GetElement("noise");
+          SensorNoiseToSDF(_msg.angular_velocity().y_noise(), noiseElem);
+        }
+
+        if (_msg.angular_velocity().has_z_noise())
+        {
+          auto noiseElem = imuSDF->GetElement("angular_velocity")->GetElement(
+              "z")->GetElement("noise");
+          SensorNoiseToSDF(_msg.angular_velocity().z_noise(), noiseElem);
+        }
+      }
+
+      if (_msg.has_linear_acceleration())
+      {
+        if (_msg.linear_acceleration().has_x_noise())
+        {
+          auto noiseElem = imuSDF->GetElement(
+              "linear_acceleration")->GetElement("x")->GetElement("noise");
+          SensorNoiseToSDF(_msg.linear_acceleration().x_noise(), noiseElem);
+        }
+
+        if (_msg.linear_acceleration().has_y_noise())
+        {
+          auto noiseElem = imuSDF->GetElement(
+              "linear_acceleration")->GetElement("y")->GetElement("noise");
+          SensorNoiseToSDF(_msg.linear_acceleration().y_noise(), noiseElem);
+        }
+
+        if (_msg.linear_acceleration().has_z_noise())
+        {
+          auto noiseElem = imuSDF->GetElement(
+              "linear_acceleration")->GetElement("z")->GetElement("noise");
+          SensorNoiseToSDF(_msg.linear_acceleration().z_noise(), noiseElem);
+        }
+      }
+
+      return imuSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr LogicalCameraSensorToSDF(
+        const msgs::LogicalCameraSensor &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr logicalSDF;
+
+      if (_sdf)
+      {
+        logicalSDF = _sdf;
+      }
+      else
+      {
+        logicalSDF.reset(new sdf::Element);
+        sdf::initFile("logical_camera.sdf", logicalSDF);
+      }
+
+      logicalSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
+      logicalSDF->GetElement("aspect_ratio")->Set(_msg.aspect_ratio());
+      logicalSDF->GetElement("near")->Set(_msg.near_clip());
+      logicalSDF->GetElement("far")->Set(_msg.far_clip());
+
+      return logicalSDF;
     }
 
     /////////////////////////////////////////////////
@@ -1982,6 +2354,8 @@ namespace gazebo
         linkSDF->GetElement("self_collide")->Set(_msg.self_collide());
       if (_msg.has_kinematic())
         linkSDF->GetElement("kinematic")->Set(_msg.kinematic());
+      if (_msg.has_enable_wind())
+        linkSDF->GetElement("enable_wind")->Set(_msg.enable_wind());
       if (_msg.has_pose())
         linkSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       if (_msg.has_inertial())
@@ -2528,6 +2902,8 @@ namespace gazebo
       // ignore the id field, since it's not used in sdformat
       if (_msg.has_is_static())
         modelSDF->GetElement("static")->Set(_msg.is_static());
+      if (_msg.has_enable_wind())
+        modelSDF->GetElement("enable_wind")->Set(_msg.enable_wind());
       if (_msg.has_pose())
         modelSDF->GetElement("pose")->Set(msgs::ConvertIgn(_msg.pose()));
 
@@ -2680,6 +3056,45 @@ namespace gazebo
         if (_msg.has_limit_velocity())
           limitElem->GetElement("velocity")->Set(_msg.limit_velocity());
       }
+    }
+
+    /////////////////////////////////////////////
+    msgs::SensorNoise SensorNoiseFromSDF(sdf::ElementPtr _elem)
+    {
+      msgs::SensorNoise result;
+
+      auto noiseType = _elem->Get<std::string>("type");
+
+      if (noiseType == "none")
+        result.set_type(msgs::SensorNoise::NONE);
+      else if (noiseType == "gaussian")
+        result.set_type(msgs::SensorNoise::GAUSSIAN);
+      else if (noiseType == "gaussian_quantized")
+        result.set_type(msgs::SensorNoise::GAUSSIAN_QUANTIZED);
+      else
+      {
+        gzerr << "Invalid sensor noise type["
+          << noiseType << "]. Using 'none'.\n";
+
+        result.set_type(msgs::SensorNoise::NONE);
+      }
+
+      if (_elem->HasElement("mean"))
+        result.set_mean(_elem->Get<double>("mean"));
+
+      if (_elem->HasElement("stddev"))
+        result.set_stddev(_elem->Get<double>("stddev"));
+
+      if (_elem->HasElement("bias_mean"))
+        result.set_bias_mean(_elem->Get<double>("bias_mean"));
+
+      if (_elem->HasElement("bias_stddev"))
+        result.set_bias_stddev(_elem->Get<double>("bias_stddev"));
+
+      if (_elem->HasElement("precision"))
+        result.set_precision(_elem->Get<double>("precision"));
+
+      return result;
     }
   }
 }

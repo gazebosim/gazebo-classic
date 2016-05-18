@@ -161,6 +161,21 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ModelDatabaseTest, Version)
+{
+  // add test model cococan to path so that the model database
+  // can pick it up
+  gazebo::common::SystemPaths::Instance()->AddModelPaths(
+    CMAKE_SOURCE_DIR "/test/models/testdb");
+
+  std::string uri = "model://cococan";
+  std::string model;
+  model = gazebo::common::ModelDatabase::Instance()->GetModelFile(uri);
+  // this model hias multiple sdf files. 1_4 is the correct one
+  EXPECT_TRUE(model.find("model-1_4.sdf") != std::string::npos);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

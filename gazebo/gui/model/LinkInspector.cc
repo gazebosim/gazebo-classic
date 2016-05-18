@@ -158,7 +158,7 @@ void LinkInspector::OnRemove()
 /////////////////////////////////////////////////
 void LinkInspector::OnCancel()
 {
-  this->close();
+  this->reject();
 }
 
 /////////////////////////////////////////////////
@@ -188,6 +188,8 @@ void LinkInspector::SetLinkId(const std::string &_id)
 /////////////////////////////////////////////////
 void LinkInspector::Open()
 {
+  emit this->Opened();
+
   this->dataPtr->linkConfig->Init();
   this->dataPtr->visualConfig->Init();
   this->dataPtr->collisionConfig->Init();
@@ -298,3 +300,8 @@ void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
   }
 }
 
+////////////////////////////////////////////////
+void LinkInspector::closeEvent(QCloseEvent *_event)
+{
+  _event->accept();
+}

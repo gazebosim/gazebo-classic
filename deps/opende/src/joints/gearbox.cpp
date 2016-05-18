@@ -21,8 +21,8 @@
  *************************************************************************/
 
 
-#include <ode/misc.h>
-#include <ode/odeconfig.h>
+#include <gazebo/ode/misc.h>
+#include <gazebo/ode/odeconfig.h>
 #include "config.h"
 #include "gearbox.h"
 #include "joint_internal.h"

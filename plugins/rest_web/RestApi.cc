@@ -65,7 +65,7 @@ static void DumpRequest(const char *_text,
 
   for (i = 0; i < _size; i += width)
   {
-    fprintf(_stream, "%4.4lx: ", i);
+    fprintf(_stream, "%4.4zu: ", i);
     if (!_nohex)
     {
       // hex not disabled, show it

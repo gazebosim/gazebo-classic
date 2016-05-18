@@ -151,12 +151,12 @@ void DataLogger_TEST::StressTest()
         gazebo::common::SystemPaths::Instance();
 
     // Cleanup test directory.
-    boost::filesystem::remove_all(paths->GetDefaultTestPath());
+    boost::filesystem::remove_all(paths->DefaultTestPath());
 
     this->Load("worlds/empty.world");
 
     // Cleanup test directory.
-    boost::filesystem::remove_all(paths->GetDefaultTestPath());
+    boost::filesystem::remove_all(paths->DefaultTestPath());
 
     gazebo::transport::NodePtr node;
     gazebo::transport::PublisherPtr pub;
@@ -167,7 +167,7 @@ void DataLogger_TEST::StressTest()
     pub = node->Advertise<gazebo::msgs::LogControl>("~/log/control");
 
     gazebo::msgs::LogControl msg;
-    msg.set_base_path(paths->GetDefaultTestPath());
+    msg.set_base_path(paths->DefaultTestPath());
     pub->Publish(msg);
 
     // Create a new data logger widget
@@ -192,13 +192,13 @@ void DataLogger_TEST::StressTest()
     // due to the record button being toggled.
     unsigned int dirCount = 0;
     for (boost::filesystem::directory_iterator
-          iter(paths->GetDefaultTestPath());
+          iter(paths->DefaultTestPath());
           iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount)
     {
     }
 
     // Cleanup after ourselves.
-    boost::filesystem::remove_all(paths->GetDefaultTestPath());
+    boost::filesystem::remove_all(paths->DefaultTestPath());
 
     QVERIFY(dirCount == count / 2);
   }

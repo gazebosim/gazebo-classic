@@ -78,7 +78,7 @@ TEST_F(Exception, GZASSERT_Enabled_ThrowAssertion)
 {
     ASSERT_DEATH(
       GZ_ASSERT(true == false, "Assert thrown"),
-      ".*Internal Program Error - assertion.*");
+      ".*Assertion.*failed.*|.*Internal Program Error - assertion.*");
 }
 #endif
 

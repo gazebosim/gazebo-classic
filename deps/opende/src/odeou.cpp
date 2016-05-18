@@ -32,8 +32,8 @@ ODE interface to OU library implementation.
 */
 
 
-#include <ode/common.h>
-#include <ode/memory.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/memory.h>
 #include "config.h"
 #include "odeou.h"
 

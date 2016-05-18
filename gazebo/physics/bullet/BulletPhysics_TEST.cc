@@ -46,15 +46,15 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   std::string physicsEngineStr = "bullet";
   Load("worlds/empty.world", true, physicsEngineStr);
   WorldPtr world = get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), physicsEngineStr);
 
   BulletPhysicsPtr bulletPhysics
       = boost::static_pointer_cast<BulletPhysics>(physics);
-  ASSERT_TRUE(bulletPhysics != NULL);
+  ASSERT_TRUE(bulletPhysics != nullptr);
 
   std::string type = "sequential_impulse";
   int iters = 45;
@@ -196,10 +196,10 @@ void BulletPhysics_TEST::PhysicsMsgParam()
   std::string physicsEngineStr = "bullet";
   Load("worlds/empty.world", false, physicsEngineStr);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
-  ASSERT_TRUE(engine != NULL);
+  ASSERT_TRUE(engine != nullptr);
 
   transport::NodePtr phyNode;
   phyNode = transport::NodePtr(new transport::Node());

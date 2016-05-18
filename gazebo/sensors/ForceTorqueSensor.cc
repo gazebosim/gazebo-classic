@@ -51,6 +51,7 @@ ForceTorqueSensor::ForceTorqueSensor()
 //////////////////////////////////////////////////
 ForceTorqueSensor::~ForceTorqueSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -115,7 +116,8 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
     (this->pose +
      this->dataPtr->parentJoint->GetInitialAnchorPose().Ign()).Rot();
 
-  this->dataPtr->rotationSensorChild = rotationChildSensor.Inverse();
+  this->dataPtr->rotationSensorChild =
+    ignition::math::Matrix3d(rotationChildSensor.Inverse());
 
   // Handle measure direction
   bool defaultDirectionIsParentToChild = false;
@@ -150,7 +152,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
 void ForceTorqueSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  GZ_ASSERT(this->world != NULL,
+  GZ_ASSERT(this->world != nullptr,
       "ForceTorqueSensor did not get a valid World pointer");
 
   this->dataPtr->parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
@@ -178,6 +180,8 @@ void ForceTorqueSensor::Init()
 void ForceTorqueSensor::Fini()
 {
   this->dataPtr->wrenchPub.reset();
+  this->dataPtr->parentJoint.reset();
+
   Sensor::Fini();
 }
 

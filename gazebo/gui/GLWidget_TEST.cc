@@ -58,13 +58,7 @@ void GLWidget_TEST::SelectObject()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
@@ -92,13 +86,7 @@ void GLWidget_TEST::SelectObject()
     std::string name = selectedVisuals.back()->GetName();
     gazebo::transport::requestNoReply(node, "entity_delete", name);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
   }
 
   mainWindow->close();

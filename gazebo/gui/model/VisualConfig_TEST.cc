@@ -174,5 +174,63 @@ void VisualConfig_TEST::OnApply()
   g_appliedSignalCount++;
 }
 
+/////////////////////////////////////////////////
+void VisualConfig_TEST::Restore()
+{
+  VisualConfig vc;
+  msgs::Visual v1, v2, v3;
+
+  vc.AddVisual("v1", &v1);
+  vc.AddVisual("v2", &v2);
+
+  QCOMPARE(vc.GetVisualCount(), 2u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
+
+  // Set this as the original data
+  vc.Init();
+
+  // Add a visual and restore
+  vc.AddVisual("v3", &v3);
+  QCOMPARE(vc.GetVisualCount(), 3u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") != NULL);
+
+  vc.RestoreOriginalData();
+  QCOMPARE(vc.GetVisualCount(), 2u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
+
+  // Remove a visual and restore
+  auto button = vc.findChild<QToolButton *>("removeVisualButton_0");
+  QVERIFY(button);
+
+  // Press enter to close the confirmation dialog
+  QTimer::singleShot(1000, this, SLOT(PressEnter()));
+  button->click();
+
+  QCOMPARE(vc.GetVisualCount(), 1u);
+  QVERIFY(vc.GetData("v1") == NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
+
+  vc.RestoreOriginalData();
+  QCOMPARE(vc.GetVisualCount(), 2u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
+}
+
+/////////////////////////////////////////////////
+void VisualConfig_TEST::PressEnter()
+{
+  auto focusedWidget = QApplication::focusWidget();
+  if (focusedWidget)
+    QTest::keyClick(focusedWidget, Qt::Key_Enter);
+}
+
 // Generate a main function for the test
 QTEST_MAIN(VisualConfig_TEST)

@@ -38,13 +38,7 @@ void ModelEditor_TEST::AddItemToPalette()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify we have a model editor widget
   gui::ModelEditor *modelEditor =
@@ -83,13 +77,7 @@ void ModelEditor_TEST::OnEdit()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify we have a model editor widget
   gui::ModelEditor *modelEditor =
@@ -172,13 +160,7 @@ void ModelEditor_TEST::InsertTab()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the main tab
   auto mainTab = mainWindow->findChild<QTabWidget *>("mainTab");

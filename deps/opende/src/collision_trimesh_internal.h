@@ -34,7 +34,7 @@
 
 #include "collision_kernel.h"
 #include "collision_trimesh_colliders.h"
-#include <ode/collision_trimesh.h>
+#include <gazebo/ode/collision_trimesh.h>
 
 #if dTRIMESH_OPCODE
 #define BAN_OPCODE_AUTOLINK

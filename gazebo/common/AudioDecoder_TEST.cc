@@ -35,7 +35,7 @@ TEST_F(AudioDecoder, FileNotSet)
 {
   common::AudioDecoder audio;
   unsigned int dataBufferSize;
-  uint8_t *dataBuffer = NULL;
+  uint8_t *dataBuffer = nullptr;
   EXPECT_FALSE(audio.Decode(&dataBuffer, &dataBufferSize));
 }
 
@@ -44,7 +44,7 @@ TEST_F(AudioDecoder, MissingFile)
 {
   common::AudioDecoder audio;
   unsigned int dataBufferSize;
-  uint8_t *dataBuffer = NULL;
+  uint8_t *dataBuffer = nullptr;
   EXPECT_FALSE(audio.Decode(&dataBuffer, &dataBufferSize));
 }
 
@@ -60,8 +60,8 @@ TEST_F(AudioDecoder, BufferSizeInvalid)
   path /= "media/audio/cheer.wav";
   EXPECT_TRUE(audio.SetFile(path.string()));
 
-  unsigned int *dataBufferSize = NULL;
-  uint8_t *dataBuffer = NULL;
+  unsigned int *dataBufferSize = nullptr;
+  uint8_t *dataBuffer = nullptr;
   EXPECT_FALSE(audio.Decode(&dataBuffer, dataBufferSize));
 }
 
@@ -78,7 +78,7 @@ TEST_F(AudioDecoder, DataBuffer)
   EXPECT_TRUE(audio.SetFile(path.string()));
 
   unsigned int dataBufferSize;
-  uint8_t *dataBuffer = NULL;
+  uint8_t *dataBuffer = nullptr;
   EXPECT_TRUE(audio.Decode(&dataBuffer, &dataBufferSize));
 
   unsigned int dataBufferSize2;
@@ -122,7 +122,7 @@ TEST_F(AudioDecoder, CheerFile)
   EXPECT_FALSE(audio.SetFile(path.string()));
 
   unsigned int dataBufferSize;
-  uint8_t *dataBuffer = NULL;
+  uint8_t *dataBuffer = nullptr;
 
   // WAV
   {
@@ -160,7 +160,11 @@ TEST_F(AudioDecoder, CheerFile)
     EXPECT_EQ(audio.GetSampleRate(), 44100);
 
     audio.Decode(&dataBuffer, &dataBufferSize);
-    EXPECT_EQ(dataBufferSize, 4995072u);
+
+    // later versions of ffmpeg produces a different buffer size probably due to
+    // underlying changes in the decoder. The size of the first decoded frame
+    // is much smaller than all other frames.
+    EXPECT_TRUE(dataBufferSize == 4995072u || dataBufferSize == 4987612u);
   }
 }
 
