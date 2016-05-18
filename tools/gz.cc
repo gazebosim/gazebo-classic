@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <tinyxml.h>
 
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
