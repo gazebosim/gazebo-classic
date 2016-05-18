@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,11 @@ namespace gazebo
 
       /// \brief Keep track whether to align with first or last selected entity.
       public: int alignRelativeTarget;
+
+      /// \brief Keep track whether to align in the default direction (min to
+      /// min, max to max) or in the inverted direction (min to max). It doesn't
+      /// affect center align.
+      public: bool inverted = false;
     };
   }
 }

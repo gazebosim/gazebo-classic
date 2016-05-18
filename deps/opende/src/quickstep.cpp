@@ -70,19 +70,19 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       //
       // tmp1 = M*v/h + fe
       //
-      dReal *tmp1cur = tmp1;
+      dReal *tmp1curr = tmp1;
       const dReal *MOIrow = MOI;
       dxBody *const *const bodyend = body + nb;
       for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-           tmp1cur+=6, MOIrow+=12, bodycurr++) {
+           tmp1curr+=6, MOIrow+=12, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         // dReal body_mass = b_ptr->mass.mass;
         for (int j=0; j<3; j++)
-          tmp1cur[j] = b_ptr->facc[j];
+          tmp1curr[j] = b_ptr->facc[j];
         dReal tmpa[3];
         for (int j=0; j<3; j++) tmpa[j] = 0;
-        dMultiply0_331 (tmp1cur + 3,MOIrow,tmpa);
-        for (int k=0; k<3; k++) tmp1cur[3+k] += b_ptr->tacc[k];
+        dMultiply0_331 (tmp1curr + 3,MOIrow,tmpa);
+        for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->tacc[k];
       }
       //
       // rhs_precon = - J * (M*v/h + fe)
@@ -269,11 +269,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
  // load lambda from the value saved on the previous iteration,
  // need access to lambda in dxUpdateBodies()
   dReal *lambda = context->AllocateArray<dReal> (m);
+  dReal *mg_e = context->AllocateArray<dReal> (m);
   dReal *lambda_erp = context->AllocateArray<dReal> (m);
 
   dSetZero(caccel, nb*6);
   dSetZero(caccel_erp, nb*6);
   dSetZero(lambda, m);
+  dSetZero(mg_e, m);
   dSetZero(lambda_erp, m);
 
   // Get Joint Information, setup Jacobians by calling getInfo2.
@@ -331,9 +333,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // format:
         //
         //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 \    .
-        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2  )- jac for j0, b1, b2 (3 rows)
+        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2  )-- jacobian for joint 0, body 1 and body 2 (3 rows)
         //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 /
-        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 )-- jac for j1, b1, b2 (3 rows)
+        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 )--- jacobian for joint 1, body 1 and body 2 (3 rows)
         //   etc...
         //
         //   (lll) = linear jacobian data
@@ -420,18 +422,18 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dReal *tmp1 = context->AllocateArray<dReal> (nb*6);
         dSetZero(tmp1,nb*6);
         // put v/h + invM*fe into tmp1
-        dReal *tmp1cur = tmp1;
+        dReal *tmp1curr = tmp1;
         const dReal *invMOIrow = invMOI;
         dxBody *const *const bodyend = body + nb;
         for (dxBody *const *bodycurr = body;
              bodycurr != bodyend;
-             tmp1cur+=6, invMOIrow+=12, bodycurr++) {
+             tmp1curr+=6, invMOIrow+=12, bodycurr++) {
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
           for (int j=0; j<3; j++)
-            tmp1cur[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
-          dMultiply0_331 (tmp1cur + 3,invMOIrow,b_ptr->tacc);
-          for (int k=0; k<3; k++) tmp1cur[3+k] += b_ptr->avel[k] * stepsize1;
+            tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
+          dMultiply0_331 (tmp1curr + 3,invMOIrow,b_ptr->tacc);
+          for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
         }
 
         // put J*tmp1 into rhs
@@ -513,6 +515,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
     else
     {
       dSetZero (lambda,m);
+      dSetZero (mg_e,m);
       dSetZero (lambda_erp,m);
     }
 
@@ -525,7 +528,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                stepsize,
 #endif
                jb,body,
-               invMOI,MOI,lambda,lambda_erp,
+               invMOI,MOI,lambda,mg_e,lambda_erp,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
                lo,hi,cfm,findex,
@@ -632,6 +635,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
         }
 
         size_t sub2_res2 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for lambda
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for mg_e
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for lambda_erp
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for cforce
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel

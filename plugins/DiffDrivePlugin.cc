@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   double vr, va;
 
   vr = _msg->position().x();
-  va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
+  va =  msgs::ConvertIgn(_msg->orientation()).Euler().Z();
 
   this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2.0;
   this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2.0;

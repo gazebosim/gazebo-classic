@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  * Desc: Projector
  * Author: Jared Duke, John Hsu, Nate Koenig
  */
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 
 #include "gazebo/rendering/RTShaderSystem.hh"
 
@@ -38,7 +40,7 @@ Projector::Projector(rendering::VisualPtr _parent)
   this->visual = _parent;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->visual->GetScene()->GetName());
+  this->node->Init(this->visual->GetScene()->Name());
 }
 
 /////////////////////////////////////////////////
@@ -126,14 +128,14 @@ void Projector::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Projector::Load(const msgs::Projector &_msg)
 {
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
   if (_msg.has_pose())
-    pose = msgs::Convert(_msg.pose());
+    pose = msgs::ConvertIgn(_msg.pose());
 
   if (_msg.has_texture())
     textureName = _msg.texture();
@@ -253,7 +255,7 @@ void Projector::ProjectorFrameListener::Init(VisualPtr _visual,
   this->filterFrustum = new Ogre::Frustum();
   this->filterFrustum->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
 
-  this->sceneMgr = this->visual->GetScene()->GetManager();
+  this->sceneMgr = this->visual->GetScene()->OgreSceneManager();
   this->projectorQuery = this->sceneMgr->createPlaneBoundedVolumeQuery(
       Ogre::PlaneBoundedVolumeList());
 

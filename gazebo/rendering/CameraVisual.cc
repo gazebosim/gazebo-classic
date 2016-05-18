@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Camera.hh"
@@ -52,11 +55,11 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
-  math::Vector2d imageSize = msgs::Convert(_msg.image_size());
+  ignition::math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
 
   double dist = 2.0;
   double width = 1.0;
-  double height = imageSize.y / static_cast<double>(imageSize.x);
+  double height = imageSize.Y() / imageSize.X();
 
   dPtr->camera = dPtr->scene->CreateCamera(this->GetName(), false);
 
@@ -91,7 +94,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   }
 
   Ogre::Entity *planeEnt =
-    dPtr->scene->GetManager()->createEntity(this->GetName() + "__plane",
+    dPtr->scene->OgreSceneManager()->createEntity(this->GetName() + "__plane",
         this->GetName() + "__floor");
   planeEnt->setMaterialName(this->GetName()+"_RTT_material");
   planeEnt->setCastShadows(false);
@@ -99,17 +102,17 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, -width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, -width*0.5, -height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, width*0.5, -height*0.5));
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -155,7 +158,7 @@ void CameraVisual::Fini()
   this->DetachObjects();
   if (this->dataPtr->scene)
   {
-    this->dataPtr->scene->GetManager()->destroyEntity(
+    this->dataPtr->scene->OgreSceneManager()->destroyEntity(
         this->GetName() + "__plane");
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,29 @@
  *
 */
 
-#ifndef _LEVEL_WIDGET_HH_
-#define _LEVEL_WIDGET_HH_
+#ifndef _GAZEBO_GUI_LEVEL_WIDGET_HH_
+#define _GAZEBO_GUI_LEVEL_WIDGET_HH_
 
+#include <memory>
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class LevelWidgetPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class GridLines GridLines.hh
+    /// \class LevelWidget LevelWidget.hh
     /// \brief A widget for adding and changing building levels.
-    class GZ_GUI_BUILDING_VISIBLE LevelWidget : public QWidget
+    class GZ_GUI_VISIBLE LevelWidget : public QWidget
     {
       Q_OBJECT
 
@@ -46,6 +50,7 @@ namespace gazebo
 
       /// \brief Qt callback when the selection of the level combo box has been
       /// changed.
+      /// \param[in] _level Chosen level.
       public slots: void OnCurrentLevelChanged(int _level);
 
       /// \brief Qt callback when the add level button has been pressed.
@@ -67,26 +72,17 @@ namespace gazebo
       public slots: void OnTriggerShowElements();
 
       /// \brief Callback received when levels are changed externally.
+      /// \param[in] _level Level number.
+      /// \param[in] _newName New level name.
       private: void OnUpdateLevelWidget(int _level,
           const std::string &_newName);
 
       /// \brief Callback received when the widget must be reset.
       private: void OnDiscard();
 
-      /// \brief Combo box for selecting the current level.
-      private: QComboBox *levelComboBox;
-
-      /// \brief A list of gui editor events connected to this widget
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Counter for the total number of levels.
-      private: int levelCounter;
-
-      /// \brief Action to show floorplan.
-      private: QAction *showFloorplanAct;
-
-      /// \brief Action to show elements.
-      private: QAction *showElementsAct;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LevelWidgetPrivate> dataPtr;
     };
     /// \}
   }

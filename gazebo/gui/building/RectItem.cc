@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,21 @@
  *
 */
 
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
-#include "gazebo/gui/building/RotateHandle.hh"
-#include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
+#include "gazebo/gui/building/RectItemPrivate.hh"
+#include "gazebo/gui/building/RotateHandle.hh"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-RectItem::RectItem()
+RectItem::RectItem() : EditorItem(), dataPtr(new RectItemPrivate())
 {
   this->editorType = "Rect";
 
@@ -37,8 +40,8 @@ RectItem::RectItem()
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
 
-  this->positionOnWall = 0;
-  this->angleOnWall = 0;
+  this->dataPtr->positionOnWall = 0;
+  this->dataPtr->angleOnWall = 0;
 
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
@@ -48,9 +51,9 @@ RectItem::RectItem()
   for (int i = 0; i < 8; ++i)
   {
     GrabberHandle *grabber = new GrabberHandle(this, i);
-    this->grabbers.push_back(grabber);
+    this->dataPtr->grabbers.push_back(grabber);
   }
-  this->rotateHandle = new RotateHandle(this);
+  this->dataPtr->rotateHandle = new RotateHandle(this);
 
   this->setSelected(false);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
@@ -59,10 +62,10 @@ RectItem::RectItem()
   this->UpdateCornerPositions();
   this->setAcceptHoverEvents(true);
 
-  this->cursors.push_back(Qt::SizeFDiagCursor);
-  this->cursors.push_back(Qt::SizeVerCursor);
-  this->cursors.push_back(Qt::SizeBDiagCursor);
-  this->cursors.push_back(Qt::SizeHorCursor);
+  this->dataPtr->cursors.push_back(Qt::SizeFDiagCursor);
+  this->dataPtr->cursors.push_back(Qt::SizeVerCursor);
+  this->dataPtr->cursors.push_back(Qt::SizeBDiagCursor);
+  this->dataPtr->cursors.push_back(Qt::SizeHorCursor);
 
   this->setCursor(Qt::SizeAllCursor);
 
@@ -89,12 +92,14 @@ RectItem::~RectItem()
 {
   for (int i = 0; i < 8; ++i)
   {
-    this->grabbers[i]->setParentItem(NULL);
-    delete this->grabbers[i];
+    this->dataPtr->grabbers[i]->setParentItem(NULL);
+    delete this->dataPtr->grabbers[i];
   }
-  this->rotateHandle->setParentItem(NULL);
-  delete this->rotateHandle;
-  if (!this->measures.empty())
+
+  this->dataPtr->rotateHandle->setParentItem(NULL);
+  delete this->dataPtr->rotateHandle;
+
+  if (!this->parentItem() && !this->measures.empty())
   {
     delete this->measures[0];
     delete this->measures[1];
@@ -106,9 +111,10 @@ void RectItem::ShowHandles(bool _show)
 {
   for (int i = 0; i < 8; ++i)
   {
-    this->grabbers[i]->setVisible(_show && this->grabbers[i]->isEnabled());
+    this->dataPtr->grabbers[i]->setVisible(_show &&
+        this->dataPtr->grabbers[i]->isEnabled());
   }
-  this->rotateHandle->setVisible(_show);
+  this->dataPtr->rotateHandle->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -142,34 +148,34 @@ void RectItem::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
-    this->setZValue(zValueSelected);
+    this->setZValue(this->ZValueSelected());
     WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
         this->parentItem());
     if (wallItem)
-      wallItem->setZValue(wallItem->zValueSelected);
+      wallItem->setZValue(wallItem->ZValueSelected());
 
     for (int i = 0; i < 8; ++i)
     {
-      if (this->grabbers[i]->isEnabled())
-        this->grabbers[i]->installSceneEventFilter(this);
+      if (this->dataPtr->grabbers[i]->isEnabled())
+        this->dataPtr->grabbers[i]->installSceneEventFilter(this);
     }
-    this->rotateHandle->installSceneEventFilter(this);
+    this->dataPtr->rotateHandle->installSceneEventFilter(this);
     this->Set3dTransparency(0.0);
   }
   else
   {
-    this->setZValue(zValueIdle);
+    this->setZValue(this->ZValueIdle());
     WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
         this->parentItem());
     if (wallItem)
-      wallItem->setZValue(wallItem->zValueIdle);
+      wallItem->setZValue(wallItem->ZValueIdle());
 
     for (int i = 0; i < 8; ++i)
     {
-      if (this->grabbers[i]->isEnabled())
-        this->grabbers[i]->removeSceneEventFilter(this);
+      if (this->dataPtr->grabbers[i]->isEnabled())
+        this->dataPtr->grabbers[i]->removeSceneEventFilter(this);
     }
-    this->rotateHandle->removeSceneEventFilter(this);
+    this->dataPtr->rotateHandle->removeSceneEventFilter(this);
     this->Set3dTransparency(0.4);
   }
   this->highlighted = _highlighted;
@@ -238,7 +244,7 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (!mouseEvent)
     return false;
 
-  if (_rotate->GetMouseState()
+  if (_rotate->MouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
@@ -311,7 +317,7 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     case QEvent::GraphicsSceneHoverMove:
     {
       double angle = this->rotationAngle
-          - static_cast<int>(rotationAngle/360) * 360;
+          - static_cast<int>(this->rotationAngle/360) * 360;
       double range = 22.5;
       if (angle < 0)
         angle += 360;
@@ -320,24 +326,24 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
           || ((angle <= (180 + range)) && (angle > (180 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[_grabber->GetIndex() % 4]));
+            QCursor(this->dataPtr->cursors[_grabber->Index() % 4]));
       }
       else if (((angle <= (360 - range)) && (angle > (270 + range)))
           || ((angle <= (180 - range)) && (angle > (90 + range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 3) % 4]));
+            QCursor(this->dataPtr->cursors[(_grabber->Index() + 3) % 4]));
       }
       else if (((angle <= (270 + range)) && (angle > (270 - range)))
           || ((angle <= (90 + range)) && (angle > (90 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 2) % 4]));
+            QCursor(this->dataPtr->cursors[(_grabber->Index() + 2) % 4]));
       }
       else
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 1) % 4]));
+            QCursor(this->dataPtr->cursors[(_grabber->Index() + 1) % 4]));
       }
       return true;
     }
@@ -354,7 +360,7 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     return false;
 
 
-  if (_grabber->GetMouseState()
+  if (_grabber->MouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     double xPos = mouseEvent->pos().x();
@@ -366,7 +372,7 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 
     int xAxisSign = 0;
     int yAxisSign = 0;
-    switch (_grabber->GetIndex())
+    switch (_grabber->Index())
     {
       // corners
       case 0:
@@ -425,8 +431,8 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     // if the mouse is being dragged, calculate a new size and also position
     // for resizing the box
 
-    double xMoved = _grabber->GetMouseDownX() - xPos;
-    double yMoved = _grabber->GetMouseDownY() - yPos;
+    double xMoved = _grabber->MouseDownX() - xPos;
+    double yMoved = _grabber->MouseDownY() - yPos;
 
     double newWidth = this->width + (xAxisSign * xMoved);
     if (newWidth < 20)
@@ -444,10 +450,10 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     deltaWidth *= (-1);
     deltaHeight *= (-1);
 
-    double angle = rotationAngle / 360.0 * (2 * M_PI);
+    double angle = this->rotationAngle / 360.0 * (2 * M_PI);
     double dx = 0;
     double dy = 0;
-    switch (_grabber->GetIndex())
+    switch (_grabber->Index())
     {
       // grabbers
       case 0:
@@ -507,12 +513,12 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
           {
             if (this->GetAngleOnWall() < 90)
             {
-              this->positionOnWall -= deltaWidth /
+              this->dataPtr->positionOnWall -= deltaWidth /
                   (2*wallItem->line().length());
             }
             else
             {
-              this->positionOnWall += deltaWidth /
+              this->dataPtr->positionOnWall += deltaWidth /
                   (2*wallItem->line().length());
             }
           }
@@ -539,12 +545,12 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
           {
             if (this->GetAngleOnWall() < 90)
             {
-              this->positionOnWall += deltaWidth /
+              this->dataPtr->positionOnWall += deltaWidth /
                   (2*wallItem->line().length());
             }
             else
             {
-              this->positionOnWall -= deltaWidth /
+              this->dataPtr->positionOnWall -= deltaWidth /
                   (2*wallItem->line().length());
             }
           }
@@ -569,7 +575,7 @@ void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
   this->location.setY( (static_cast<int>(this->location.y())
       / this->gridSpace) * this->gridSpace);*/
 
-  this->mousePressPos = QPointF(0, 0);
+  this->dataPtr->mousePressPos = QPointF(0, 0);
   _event->setAccepted(true);
 }
 
@@ -581,7 +587,7 @@ void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 
 //  this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
-  this->mousePressPos = this->mapFromScene(_event->scenePos());
+  this->dataPtr->mousePressPos = this->mapFromScene(_event->scenePos());
   _event->setAccepted(true);
 }
 
@@ -593,18 +599,19 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 
 //  QPointF delta = _event->scenePos() - _event->lastScenePos();
 //  this->SetPosition(this->scenePos() + delta);
-//  this->location += delta;
-//  this->SetPosition(this->location);
+//  this->dataPtr->location += delta;
+//  this->SetPosition(this->dataPtr->location);
 
   // keep track of mouse press pos for more accurate mouse movements than
   // purely relying on mouse translations because we expect items to rotate
   // arbitrary (snap to parent items) when dragged
-  QPointF trans = this->mapFromScene(_event->scenePos()) - this->mousePressPos;
+  QPointF trans = this->mapFromScene(_event->scenePos()) -
+      this->dataPtr->mousePressPos;
   QPointF rotatedTrans;
-  rotatedTrans.setX(cos(GZ_DTOR(this->rotationAngle))*-trans.x()
-    - sin(GZ_DTOR(this->rotationAngle))*-trans.y());
-  rotatedTrans.setY(sin(GZ_DTOR(this->rotationAngle))*-trans.x()
-    + cos(GZ_DTOR(this->rotationAngle))*-trans.y());
+  rotatedTrans.setX(cos(IGN_DTOR(this->rotationAngle))*-trans.x()
+    - sin(IGN_DTOR(this->rotationAngle))*-trans.y());
+  rotatedTrans.setY(sin(IGN_DTOR(this->rotationAngle))*-trans.x()
+    + cos(IGN_DTOR(this->rotationAngle))*-trans.y());
 
   this->SetPosition(this->pos() - rotatedTrans);
 }
@@ -628,10 +635,10 @@ void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 
   for (int i = 0; i < 8; ++i)
   {
-    if (this->grabbers[i]->isEnabled())
-      this->grabbers[i]->removeSceneEventFilter(this);
+    if (this->dataPtr->grabbers[i]->isEnabled())
+      this->dataPtr->grabbers[i]->removeSceneEventFilter(this);
   }
-  this->rotateHandle->removeSceneEventFilter(this);
+  this->dataPtr->rotateHandle->removeSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -657,45 +664,47 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 
-  for (unsigned int i = 0; i < this->grabbers.size(); ++i)
+  for (unsigned int i = 0; i < this->dataPtr->grabbers.size(); ++i)
   {
-    if (this->grabbers[i]->isEnabled())
-      this->grabbers[i]->installSceneEventFilter(this);
+    if (this->dataPtr->grabbers[i]->isEnabled())
+      this->dataPtr->grabbers[i]->installSceneEventFilter(this);
   }
-  this->rotateHandle->installSceneEventFilter(this);
+  this->dataPtr->rotateHandle->installSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
 void RectItem::UpdateCornerPositions()
 {
-  int grabberWidth = (this->grabbers[0]->boundingRect().width())/2;
-  int grabberHeight = (this->grabbers[0]->boundingRect().height())/2;
+  int grabberWidth = (this->dataPtr->grabbers[0]->boundingRect().width())/2;
+  int grabberHeight = (this->dataPtr->grabbers[0]->boundingRect().height())/2;
 
-  this->grabbers[0]->setPos(
+  this->dataPtr->grabbers[0]->setPos(
       this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
       this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
-  this->grabbers[2]->setPos(
+  this->dataPtr->grabbers[2]->setPos(
       this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
       this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
-  this->grabbers[4]->setPos(
+  this->dataPtr->grabbers[4]->setPos(
       this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
       this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
-  this->grabbers[6]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
+  this->dataPtr->grabbers[6]->setPos(
+      this->drawingOriginX - this->drawingWidth/2 -grabberWidth,
       this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
 
-  this->grabbers[1]->setPos(this->drawingOriginX - grabberWidth,
+  this->dataPtr->grabbers[1]->setPos(
+      this->drawingOriginX - grabberWidth,
       this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
-  this->grabbers[3]->setPos(
+  this->dataPtr->grabbers[3]->setPos(
       this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
       this->drawingOriginY - grabberHeight);
-  this->grabbers[5]->setPos(this->drawingOriginX - grabberWidth,
+  this->dataPtr->grabbers[5]->setPos(
+      this->drawingOriginX - grabberWidth,
       this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
-  this->grabbers[7]->setPos(
+  this->dataPtr->grabbers[7]->setPos(
       this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
       this->drawingOriginY - grabberHeight);
 
-  this->rotateHandle->setPos(this->drawingOriginX,
+  this->dataPtr->rotateHandle->setPos(this->drawingOriginX,
       this->drawingOriginY - this->drawingHeight/2);
 
   this->SizeChanged();
@@ -755,27 +764,27 @@ double RectItem::GetHeight() const
 /////////////////////////////////////////////////
 void RectItem::SetPositionOnWall(double _positionOnWall)
 {
-  this->positionOnWall = _positionOnWall;
+  this->dataPtr->positionOnWall = _positionOnWall;
   this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetPositionOnWall() const
 {
-  return this->positionOnWall;
+  return this->dataPtr->positionOnWall;
 }
 
 /////////////////////////////////////////////////
 void RectItem::SetAngleOnWall(double _angleOnWall)
 {
-  this->angleOnWall = _angleOnWall;
+  this->dataPtr->angleOnWall = _angleOnWall;
   this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetAngleOnWall() const
 {
-  return this->angleOnWall;
+  return this->dataPtr->angleOnWall;
 }
 
 /////////////////////////////////////////////////
@@ -829,12 +838,12 @@ void RectItem::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
       this->drawingOriginY - this->drawingHeight/2);
   QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY + this->drawingHeight/2);
-  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
+  QPointF bottomRight(this->drawingOriginX + this->drawingWidth/2,
       this->drawingOriginY + this->drawingHeight/2);
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(borderColor);
+  rectPen.setColor(this->borderColor);
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);
@@ -915,30 +924,30 @@ void RectItem::SizeChanged()
 /////////////////////////////////////////////////
 void RectItem::SetResizeFlag(unsigned int _flag)
 {
-  if (this->resizeFlag == _flag)
+  if (this->dataPtr->resizeFlag == _flag)
     return;
 
-  this->resizeFlag = _flag;
+  this->dataPtr->resizeFlag = _flag;
   for (int i = 0; i < 8; ++i)
-    this->grabbers[i]->setEnabled(false);
+    this->dataPtr->grabbers[i]->setEnabled(false);
 
-
-  if (resizeFlag & ITEM_WIDTH)
+  if (this->dataPtr->resizeFlag & ITEM_WIDTH)
   {
-    this->grabbers[3]->setEnabled(true);
-    this->grabbers[7]->setEnabled(true);
+    this->dataPtr->grabbers[3]->setEnabled(true);
+    this->dataPtr->grabbers[7]->setEnabled(true);
   }
-  if (resizeFlag & ITEM_HEIGHT)
+  if (this->dataPtr->resizeFlag & ITEM_HEIGHT)
   {
-    this->grabbers[1]->setEnabled(true);
-    this->grabbers[5]->setEnabled(true);
+    this->dataPtr->grabbers[1]->setEnabled(true);
+    this->dataPtr->grabbers[5]->setEnabled(true);
   }
-  if ((resizeFlag & ITEM_WIDTH) && (resizeFlag & ITEM_HEIGHT))
+  if ((this->dataPtr->resizeFlag & ITEM_WIDTH) &&
+      (this->dataPtr->resizeFlag & ITEM_HEIGHT))
   {
-    this->grabbers[0]->setEnabled(true);
-    this->grabbers[2]->setEnabled(true);
-    this->grabbers[4]->setEnabled(true);
-    this->grabbers[6]->setEnabled(true);
+    this->dataPtr->grabbers[0]->setEnabled(true);
+    this->dataPtr->grabbers[2]->setEnabled(true);
+    this->dataPtr->grabbers[4]->setEnabled(true);
+    this->dataPtr->grabbers[6]->setEnabled(true);
   }
 }
 
@@ -979,7 +988,7 @@ void RectItem::UpdateMeasures()
     // Half the RectItem's length
     double w = this->drawingWidth/2;
     // This item's angle on the scene
-    double angle = GZ_DTOR(this->rotationAngle);
+    double angle = IGN_DTOR(this->rotationAngle);
     // Free vector of t on wall direction, for the extremes
     QPointF tVec(t*qCos(angle), t*qSin(angle));
     // Free vector of d perpendicular to the wall
@@ -1014,4 +1023,12 @@ void RectItem::UpdateMeasures()
     this->measures[1]->SetValue(
         (this->measures[1]->line().length())*this->itemScale);
   }
+}
+
+/////////////////////////////////////////////////
+void RectItem::DetachFromParent()
+{
+  this->setParentItem(NULL);
+  for (unsigned int i = 0; i < this->measures.size(); i++)
+    this->measures[i]->setParentItem(NULL);
 }

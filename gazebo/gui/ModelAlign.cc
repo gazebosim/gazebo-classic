@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,10 +61,9 @@ ModelAlign::~ModelAlign()
 void ModelAlign::Clear()
 {
   this->dataPtr->targetVis.reset();
-  this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
   this->dataPtr->node.reset();
-  this->dataPtr->modelPub.reset();
+  this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectedVisuals.clear();
   this->dataPtr->connections.clear();
   this->dataPtr->originalVisualPose.clear();
@@ -79,18 +78,24 @@ void ModelAlign::Init()
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (!cam)
-    return;
+  {
+    this->dataPtr->scene = rendering::get_scene();
+  }
+  else
+  {
+    this->dataPtr->scene = cam->GetScene();
+  }
 
-  if (!cam->GetScene())
-    return;
-
-  this->dataPtr->userCamera = cam;
-  this->dataPtr->scene = cam->GetScene();
+  if (!this->dataPtr->scene)
+  {
+    gzerr << "Unable to initialize Model Align tool, scene is NULL"
+        << std::endl;
+  }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->initialized = true;
 }
@@ -181,7 +186,7 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     const std::string &_axis, const std::string &_config,
-    const std::string &_target, bool _publish)
+    const std::string &_target, const bool _publish, const bool _inverted)
 {
   if (_config == "reset" || _publish)
   {
@@ -234,6 +239,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   math::Vector3 targetMax;
   this->GetMinMax(targetVertices, targetMin, targetMax);
 
+  std::vector<rendering::VisualPtr> visualsToPublish;
   for (unsigned i = start; i < end; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
@@ -251,12 +257,27 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->GetMinMax(vertices, min, max);
 
     math::Vector3 trans;
-    if (_config == "min")
-      trans = targetMin - min;
-    else if (_config == "center")
+    if (_config == "center")
+    {
       trans = (targetMin + (targetMax-targetMin)/2) - (min + (max-min)/2);
-    else if (_config == "max")
-      trans = targetMax - max;
+    }
+    else
+    {
+      if (!_inverted)
+      {
+        if (_config == "min")
+          trans = targetMin - min;
+        else if (_config == "max")
+          trans = targetMax - max;
+      }
+      else
+      {
+        if (_config == "min")
+          trans = targetMin - max;
+        else if (_config == "max")
+          trans = targetMax - min;
+      }
+    }
 
     if (!_publish)
     {
@@ -288,25 +309,36 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     }
 
     if (_publish)
-      this->PublishVisualPose(vis);
+      visualsToPublish.push_back(vis);
   }
-}
-
-/////////////////////////////////////////////////
-void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
-{
-  if (!_vis)
-    return;
-
-  // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
+  // Register user command on server
+  if (_publish)
   {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
-    msg.set_name(_vis->GetName());
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_description(
+        "Align to [" + this->dataPtr->targetVis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
-    this->dataPtr->modelPub->Publish(msg);
+    for (const auto &vis : visualsToPublish)
+    {
+      // Only publish for models
+      if (vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
+      {
+        msgs::Model msg;
+
+        auto id = gui::get_entity_id(vis->GetName());
+        if (id)
+          msg.set_id(id);
+
+        msg.set_name(vis->GetName());
+        msgs::Set(msg.mutable_pose(), vis->GetWorldPose().Ign());
+
+        auto modelMsg = userCmdMsg.add_model();
+        modelMsg->CopyFrom(msg);
+      }
+    }
+
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 

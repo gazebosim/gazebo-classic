@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -272,12 +272,6 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   {
     /// \TODO skipping bullet, see issue #1081
     gzerr << "BulletScrewJoint::GetAngle() is one step behind (issue #1081).\n";
-    return;
-  }
-
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issues #1096.\n";
     return;
   }
 

@@ -7,4 +7,4 @@ Description: Gazebo Transport Library
 Version: @GAZEBO_VERSION_FULL@
 Requires:
 Libs: -L${libdir} -lgazebo_transport -lgazebo_msgs 
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@
+CFlags: -I${includedir}/gazebo-@GAZEBO_MAJOR_VERSION@

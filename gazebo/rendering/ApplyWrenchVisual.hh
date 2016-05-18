@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,18 @@ namespace gazebo
     /// \brief Visualization for the apply wrench GUI
     class GAZEBO_VISIBLE ApplyWrenchVisual : public Visual
     {
+      /// \enum Modes
+      /// \brief Visual is in one of these modes at each time.
+      public: enum Mode
+      {
+        /// \brief None
+        NONE = 0,
+        /// \brief Force
+        FORCE = 1,
+        /// \brief Torque
+        TORQUE = 2
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual
       /// \param[in] _parentVis Pointer to the parent visual
@@ -50,20 +62,56 @@ namespace gazebo
       /// \brief Set the CoM vector and update the position of the torque
       /// visual.
       /// \param[in] _comVector New vector.
-      public: void SetCoM(const math::Vector3 &_comVector);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetCoM(const math::Vector3 &_comVector)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the CoM vector and update the position of the torque
+      /// visual.
+      /// \param[in] _comVector New vector.
+      public: void SetCoM(const ignition::math::Vector3d &_comVector);
 
       /// \brief Set the force position vector and update the position of the
       /// force visual.
       /// \param[in] _forcePosVector New vector.
-      public: void SetForcePos(const math::Vector3 &_forcePosVector);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetForcePos(const math::Vector3 &_forcePosVector)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the force position vector and update the position of the
+      /// force visual.
+      /// \param[in] _forcePosVector New vector.
+      public: void SetForcePos(const ignition::math::Vector3d &_forcePosVector);
 
       /// \brief Update force vector, force text and mode.
       /// \param[in] _forceVector New vector.
-      public: void SetForce(const math::Vector3 &_forceVector);
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetForce(const math::Vector3 &_forceVector,
+          const bool _rotatedByMouse) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Update force vector, force text and mode.
+      /// \param[in] _forceVector New vector.
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      public: void SetForce(const ignition::math::Vector3d &_forceVector,
+          const bool _rotatedByMouse);
 
       /// \brief Update torque vector, torque text and mode.
       /// \param[in] _torqueVector New vector.
-      public: void SetTorque(const math::Vector3 &_torqueVector);
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetTorque(const math::Vector3 &_torqueVector,
+          const bool _rotatedByMouse) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Update torque vector, torque text and mode.
+      /// \param[in] _torqueVector New vector.
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      public: void SetTorque(const ignition::math::Vector3d &_torqueVector,
+          const bool _rotatedByMouse);
 
       /// \brief Update the force visual according to the force and force
       /// position vectors.
@@ -84,12 +132,21 @@ namespace gazebo
       /// \return Pointer to torque visual.
       public: rendering::VisualPtr GetTorqueVisual() const;
 
+      /// \brief Returns the rotation tool.
+      /// \return Pointer to rotation tool.
+      public: rendering::SelectionObjPtr GetRotTool() const;
+
+      /// \brief Set the mode to force, torque or none, update colors
+      /// and visibility accordingly.
+      /// \param[in] _mode New mode.
+      public: void SetMode(Mode _mode);
+
       /// \brief Get the rotation to point the positive Z axis to the
       /// given direction.
       /// \param[in] _dir Direction vector.
       /// \return Resulting quaternion
-      private: math::Quaternion GetQuaternionFromVector(
-          const math::Vector3 &_dir);
+      private: ignition::math::Quaterniond QuaternionFromVector(
+          const ignition::math::Vector3d &_dir);
     };
     /// \}
   }

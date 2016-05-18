@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,8 +50,8 @@ Grid::Grid(Scene *_scene, unsigned int _cellCount, float _cellLength,
 //////////////////////////////////////////////////
 Grid::~Grid()
 {
-  this->scene->GetManager()->destroySceneNode(this->sceneNode->getName());
-  this->scene->GetManager()->destroyManualObject(this->manualObject);
+  this->scene->OgreSceneManager()->destroySceneNode(this->sceneNode->getName());
+  this->scene->OgreSceneManager()->destroyManualObject(this->manualObject);
   this->material->unload();
 }
 
@@ -111,7 +111,7 @@ void Grid::SetHeight(uint32_t _height)
 void Grid::Init()
 {
   this->manualObject =
-    this->scene->GetManager()->createManualObject(this->name);
+    this->scene->OgreSceneManager()->createManualObject(this->name);
   this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->manualObject->setDynamic(false);
@@ -119,7 +119,8 @@ void Grid::Init()
   //    Ogre::RENDER_QUEUE_SKIES_EARLY+3);
   //    Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
-  Ogre::SceneNode *parent_node = this->scene->GetManager()->getRootSceneNode();
+  Ogre::SceneNode *parent_node =
+      this->scene->OgreSceneManager()->getRootSceneNode();
 
   this->sceneNode = parent_node->createChildSceneNode(this->name);
   this->sceneNode->attachObject(this->manualObject);

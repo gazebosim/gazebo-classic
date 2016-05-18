@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/math/Vector3.hh"
@@ -37,7 +39,11 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _camera Pointer to the camera to control.
-      public: OrbitViewController(UserCameraPtr _camera);
+      /// \param[in] _name Name of the view controller. A subclass of
+      /// OrbitViewController should use a name other than
+      /// "OrbitViewController".
+      public: OrbitViewController(UserCameraPtr _camera,
+                  const std::string &_name = "OrbitViewController");
 
       /// \brief Destructor.
       public: virtual ~OrbitViewController();
@@ -132,7 +138,7 @@ namespace gazebo
       protected: bool init;
 
       /// \brief The focal point.
-      protected: math::Vector3 focalPoint;
+      protected: ignition::math::Vector3d focalPoint;
     };
     /// \}
   }

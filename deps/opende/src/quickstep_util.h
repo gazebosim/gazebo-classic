@@ -89,10 +89,6 @@ typedef dReal *dRealMutablePtr;
 // #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
 
-/// scale SOR for contact to reduce overshoot in solution for contacts
-/// \TODO: make this a parameter
-#define CONTACT_SOR_SCALE 0.25
-
 //***************************************************************************
 // testing stuff
 
@@ -153,15 +149,19 @@ struct dxPGSLCPParameters {
     dRealPtr Adcfm_precon;
     dRealPtr J;
     dRealPtr iMJ;
-    dRealPtr rhs_precon ;
     dRealPtr J_precon ;
     dRealPtr J_orig ;
+    dRealMutablePtr rhs_precon ;
     dRealMutablePtr cforce ;
 
     dRealPtr rhs;
     dRealMutablePtr caccel;
     dRealMutablePtr lambda;
-    dRealMutablePtr mg_mu;
+
+    /// MG
+    dRealMutablePtr mg_B;
+    dRealMutablePtr mg_r;
+    dRealMutablePtr mg_e;
 
     /// Only used if THREAD_POSITION_CORRECTION is not active,
     /// in that case, compute both updates in the same
@@ -172,7 +172,8 @@ struct dxPGSLCPParameters {
 
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda;
-    dRealMutablePtr last_mg_mu;
+    dRealMutablePtr last_lambda_erp;
+    dRealMutablePtr last_mg_e;
 #endif
 };
 // ****************************************************************

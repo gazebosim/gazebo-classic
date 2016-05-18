@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,28 +32,28 @@ TEST_F(GTSMeshUtils, DelaunayTriangulation)
   // a smaller square inside a bigger square.
   // The smaller square should be treated as a hole inside the bigger square.
 
-  std::vector<math::Vector2d> vertices;
+  std::vector<ignition::math::Vector2d> vertices;
   // outside square
-  vertices.push_back(math::Vector2d(0, 0));
-  vertices.push_back(math::Vector2d(1, 0));
-  vertices.push_back(math::Vector2d(1, 1));
-  vertices.push_back(math::Vector2d(0, 1));
+  vertices.push_back(ignition::math::Vector2d(0, 0));
+  vertices.push_back(ignition::math::Vector2d(1, 0));
+  vertices.push_back(ignition::math::Vector2d(1, 1));
+  vertices.push_back(ignition::math::Vector2d(0, 1));
   // inside square
-  vertices.push_back(math::Vector2d(0.25, 0.25));
-  vertices.push_back(math::Vector2d(0.25, 0.75));
-  vertices.push_back(math::Vector2d(0.75, 0.75));
-  vertices.push_back(math::Vector2d(0.75, 0.25));
+  vertices.push_back(ignition::math::Vector2d(0.25, 0.25));
+  vertices.push_back(ignition::math::Vector2d(0.25, 0.75));
+  vertices.push_back(ignition::math::Vector2d(0.75, 0.75));
+  vertices.push_back(ignition::math::Vector2d(0.75, 0.25));
 
-  std::vector<math::Vector2i> edges;
-  edges.push_back(math::Vector2i(0, 1));
-  edges.push_back(math::Vector2i(1, 2));
-  edges.push_back(math::Vector2i(2, 3));
-  edges.push_back(math::Vector2i(3, 0));
+  std::vector<ignition::math::Vector2i> edges;
+  edges.push_back(ignition::math::Vector2i(0, 1));
+  edges.push_back(ignition::math::Vector2i(1, 2));
+  edges.push_back(ignition::math::Vector2i(2, 3));
+  edges.push_back(ignition::math::Vector2i(3, 0));
 
-  edges.push_back(math::Vector2i(4, 5));
-  edges.push_back(math::Vector2i(5, 6));
-  edges.push_back(math::Vector2i(6, 7));
-  edges.push_back(math::Vector2i(7, 4));
+  edges.push_back(ignition::math::Vector2i(4, 5));
+  edges.push_back(ignition::math::Vector2i(5, 6));
+  edges.push_back(ignition::math::Vector2i(6, 7));
+  edges.push_back(ignition::math::Vector2i(7, 4));
 
   common::Mesh *mesh = new common::Mesh();
   mesh->SetName("extruded");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
@@ -47,7 +48,7 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->wrenchSub = dPtr->node->Subscribe(_topicName,
       &WrenchVisual::OnMsg, this, true);
@@ -55,17 +56,17 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   // Make sure the meshes are in Ogre
   this->InsertMesh("unit_cone");
   Ogre::MovableObject *coneXObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__WRENCH_X_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneXObj)->setMaterialName("__GAZEBO_TRANS_RED_MATERIAL__");
 
   Ogre::MovableObject *coneYObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__WRENCH_Y_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneYObj)->setMaterialName("__GAZEBO_TRANS_GREEN_MATERIAL__");
 
   Ogre::MovableObject *coneZObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__WRENCH_Z_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneZObj)->setMaterialName("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
@@ -93,8 +94,8 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   dPtr->coneZNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->forceLine = new DynamicLines(RENDERING_LINE_LIST);
-  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
-  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
   dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   dPtr->forceNode = dPtr->sceneNode->createChildSceneNode(this->GetName() +
@@ -128,8 +129,8 @@ WrenchVisual::~WrenchVisual()
 void WrenchVisual::Load(ConstJointPtr &_msg)
 {
   Visual::Load();
-  this->SetPosition(msgs::Convert(_msg->pose().position()));
-  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+  this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
+  this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
 }
 
 /////////////////////////////////////////////////
@@ -160,9 +161,10 @@ void WrenchVisual::Update()
       exp(-dPtr->wrenchMsg->wrench().torque().z() / magScale)) - offset;
 
   magScale = 50000;
-  math::Vector3 force = msgs::Convert(dPtr->wrenchMsg->wrench().force());
+  ignition::math::Vector3d force =
+    msgs::ConvertIgn(dPtr->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
-      exp(force.GetSquaredLength() / magScale)) - offset;
+      exp(force.SquaredLength() / magScale)) - offset;
 
   dPtr->forceLine->SetPoint(1, force*forceScale);
   dPtr->forceLine->Update();

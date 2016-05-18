@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the DataLogger widget.
+/// \brief A test class for the main window class.
 class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
@@ -55,6 +55,15 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test Set user camera pose via SDF
   private slots: void SetUserCameraPoseSDF();
+
+  /// \brief Test that menus are created in the main window menu bar.
+  private slots: void MenuBar();
+
+  /// \brief Test different window modes.
+  private slots: void WindowModes();
+
+  /// \brief Test that the minimum size of the window is reasonable.
+  private slots: void MinimumSize();
 };
 
 #endif

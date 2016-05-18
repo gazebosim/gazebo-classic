@@ -17,7 +17,6 @@ set (server_src
 
 set (client_inc
   RestUiLoginDialog.hh
-  RestUiLogoutDialog.hh
   RestUiPlugin.hh
   RestUiWidget.hh
   )
@@ -25,7 +24,6 @@ set (client_inc
 
 set (client_src
   RestUiLoginDialog.cc
-  RestUiLogoutDialog.cc
   RestUiPlugin.cc
   RestUiWidget.cc
   )
@@ -33,7 +31,6 @@ set (client_src
 set (qt_headers
     RestUiWidget.hh
     RestUiLoginDialog.hh
-    RestUiLogoutDialog.hh
 )
 
 include ( ${QT_USE_FILE} )

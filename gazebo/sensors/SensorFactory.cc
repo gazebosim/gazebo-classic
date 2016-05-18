@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,20 +30,24 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/Sensor.hh"
 
+void RegisterAltimeterSensor();
 void RegisterCameraSensor();
 void RegisterContactSensor();
 void RegisterDepthCameraSensor();
-void RegisterMultiCameraSensor();
+void RegisterForceTorqueSensor();
 void RegisterGpsSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
+void RegisterLogicalCameraSensor();
+void RegisterMagnetometerSensor();
+void RegisterMultiCameraSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
 void RegisterSonarSensor();
-void RegisterForceTorqueSensor();
-void RegisterWirelessTransmitter();
+void RegisterWideAngleCameraSensor();
 void RegisterWirelessReceiver();
+void RegisterWirelessTransmitter();
 
 using namespace gazebo;
 using namespace sensors;
@@ -53,20 +57,24 @@ std::map<std::string, SensorFactoryFn> SensorFactory::sensorMap;
 /////////////////////////////////////////////////
 void SensorFactory::RegisterAll()
 {
+  RegisterAltimeterSensor();
   RegisterCameraSensor();
   RegisterContactSensor();
   RegisterDepthCameraSensor();
-  RegisterMultiCameraSensor();
+  RegisterForceTorqueSensor();
   RegisterGpsSensor();
   RegisterGpuRaySensor();
   RegisterImuSensor();
+  RegisterLogicalCameraSensor();
+  RegisterMagnetometerSensor();
+  RegisterMultiCameraSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
   RegisterSonarSensor();
-  RegisterForceTorqueSensor();
-  RegisterWirelessTransmitter();
+  RegisterWideAngleCameraSensor();
   RegisterWirelessReceiver();
+  RegisterWirelessTransmitter();
 }
 
 /////////////////////////////////////////////////

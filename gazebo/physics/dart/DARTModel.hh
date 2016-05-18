@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTModelPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
     /// \brief dart physics engine wrapper
@@ -70,14 +73,9 @@ namespace gazebo
       /// \brief
       public: dart::simulation::World *GetDARTWorld(void) const;
 
-      /// \brief
-      protected: dart::dynamics::Skeleton *dtSkeleton;
-
-      /// \brief
-      protected: Eigen::VectorXd dtConfig;
-
-      /// \brief
-      protected: Eigen::VectorXd dtVelocity;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTModelPrivate *dataPtr;
     };
     /// \}
   }

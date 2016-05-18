@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,10 @@ class JointTest : public ServerFixture,
   /// \brief Create and destroy joints repeatedly, monitors memory usage.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void JointCreationDestructionTest(const std::string &_physicsEngine);
+
+  /// \brief Create joints dynamically and verify that they will be visualized.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void DynamicJointVisualization(const std::string &_physicsEngine);
 
   // Documentation inherited.
   public: virtual void SetUp()
@@ -148,7 +152,7 @@ class JointTest : public ServerFixture,
             msgs::Model msg;
             std::string modelName = this->GetUniqueString("joint_model");
             msg.set_name(modelName);
-            msgs::Set(msg.mutable_pose(), _opt.modelPose);
+            msgs::Set(msg.mutable_pose(), _opt.modelPose.Ign());
 
             if (!_opt.worldParent)
             {
@@ -159,7 +163,7 @@ class JointTest : public ServerFixture,
               link->set_name("parent");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.parentLinkPose);
+                msgs::Set(link->mutable_pose(), _opt.parentLinkPose.Ign());
               }
             }
             if (!_opt.worldChild)
@@ -171,14 +175,14 @@ class JointTest : public ServerFixture,
               link->set_name("child");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.childLinkPose);
+                msgs::Set(link->mutable_pose(), _opt.childLinkPose.Ign());
               }
             }
             msg.add_joint();
             auto jointMsg = msg.mutable_joint(0);
             jointMsg->set_name("joint");
             jointMsg->set_type(msgs::ConvertJointType(_opt.type));
-            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
+            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose.Ign());
             if (_opt.worldParent)
             {
               jointMsg->set_parent("world");
@@ -198,14 +202,15 @@ class JointTest : public ServerFixture,
 
             {
               auto axis = jointMsg->mutable_axis1();
-              msgs::Set(axis->mutable_xyz(), _opt.axis);
+              msgs::Set(axis->mutable_xyz(), _opt.axis.Ign());
               axis->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
             // Hack: hardcode a second axis for universal joints
             if (_opt.type == "universal")
             {
               auto axis2 = jointMsg->mutable_axis2();
-              msgs::Set(axis2->mutable_xyz(), math::Vector3(0, 1, 0));
+              msgs::Set(axis2->mutable_xyz(),
+                  ignition::math::Vector3d(0, 1, 0));
               axis2->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
 

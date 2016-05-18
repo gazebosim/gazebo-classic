@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * Date: 2 March 2006
  */
 
+#include <boost/algorithm/string.hpp>
 #include <math.h>
 #include <iostream>
 
@@ -197,8 +198,8 @@ void LaserInterface::OnScan(ConstLaserScanStampedPtr &_msg)
 
   this->data.pose.px = _msg->scan().world_pose().position().x();
   this->data.pose.py = _msg->scan().world_pose().position().y();
-  this->data.pose.pa = gazebo::msgs::Convert(
-      _msg->scan().world_pose().orientation()).GetAsEuler().z;
+  this->data.pose.pa = gazebo::msgs::ConvertIgn(
+      _msg->scan().world_pose().orientation()).Euler().Z();
 
   if (this->data.scan.ranges_count > 0)
   {

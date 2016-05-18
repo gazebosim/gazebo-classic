@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <mutex>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 
 namespace gazebo
 {
@@ -97,8 +99,9 @@ namespace gazebo
       /// \brief Torque vector.
       public: math::Vector3 torqueVector;
 
-      /// \brief Publishes the wrench message.
-      public: transport::PublisherPtr wrenchPub;
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
 
       /// \brief Visual of the targeted link.
       public: rendering::VisualPtr linkVisual;
@@ -111,6 +114,27 @@ namespace gazebo
 
       /// \brief Interactive visual which represents the wrench to be applied.
       public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
+
+      /// \brief Indicate whether mouse is dragging on top the
+      /// rotation tool or not.
+      public: bool draggingTool;
+
+      /// \brief World pose of the rotation tool the moment dragging
+      /// started.
+      public: math::Pose dragStartPose;
+
+      /// \brief State of the manipulation tool, here only using "rot_y"
+      /// and "rot_z".
+      public: std::string manipState;
+
+      /// \brief Current mode, either force, torque or none.
+      public: ApplyWrenchDialog::Mode mode;
+
+      /// \brief Mutex to protect variables.
+      public: std::mutex mutex;
+
+      /// \brief Pointer to the main window.
+      public: MainWindow *mainWindow;
     };
   }
 }

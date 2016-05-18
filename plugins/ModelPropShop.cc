@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/program_options.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -150,7 +156,7 @@ void ModelPropShop::Update()
     this->camera->SetCaptureData(true);
     this->camera->Load(cameraSDF);
     this->camera->Init();
-    this->camera->SetHFOV(GZ_DTOR(60));
+    this->camera->SetHFOV(static_cast<ignition::math::Angle>(IGN_DTOR(60)));
     this->camera->SetImageWidth(960);
     this->camera->SetImageHeight(540);
     this->camera->CreateRenderTexture("ModelPropShop_RttTex");
@@ -164,7 +170,7 @@ void ModelPropShop::Update()
     gazebo::msgs::Set(lightMsg.mutable_specular(),
                       gazebo::common::Color(.2, .2, .2, 1));
     gazebo::msgs::Set(lightMsg.mutable_direction(),
-                      gazebo::math::Vector3(-0.5, 0.1, -0.9));
+                      ignition::math::Vector3d(-0.5, 0.1, -0.9));
     lightMsg.set_cast_shadows(false);
     lightMsg.set_range(1000);
     lightMsg.set_attenuation_constant(1);
@@ -180,8 +186,8 @@ void ModelPropShop::Update()
   if (this->camera && this->scene)
     event::Events::preRender();
 
-  if (this->camera && this->scene->GetInitialized() &&
-      this->camera->GetInitialized())
+  if (this->camera && this->scene->Initialized() &&
+      this->camera->Initialized())
   {
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
@@ -202,12 +208,12 @@ void ModelPropShop::Update()
       // Place the visual at the origin
       bbox = vis->GetBoundingBox();
 
-      math::Pose pose;
+      ignition::math::Pose3d pose;
 
       // Perspective view
-      pose.pos.Set(1.6, -1.6, 1.2);
-      pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-225));
-      this->light->SetDirection(math::Vector3(-0.4, 0.4, -0.4));
+      pose.Pos().Set(1.6, -1.6, 1.2);
+      pose.Rot().Euler(0, IGN_DTOR(30), IGN_DTOR(-225));
+      this->light->SetDirection(ignition::math::Vector3d(-0.4, 0.4, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -215,9 +221,9 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "1.png").string());
 
       // Top view
-      pose.pos.Set(0, 0, 2.2);
-      pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
-      this->light->SetDirection(math::Vector3(0, 0, -1.0));
+      pose.Pos().Set(0, 0, 2.2);
+      pose.Rot().Euler(0, IGN_DTOR(90), 0);
+      this->light->SetDirection(ignition::math::Vector3d(0, 0, -1.0));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -225,9 +231,9 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "2.png").string());
 
       // Front view
-      pose.pos.Set(2.2, 0, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
-      this->light->SetDirection(math::Vector3(-0.6, 0.0, -0.4));
+      pose.Pos().Set(2.2, 0, 0);
+      pose.Rot().Euler(0, 0, IGN_DTOR(-180));
+      this->light->SetDirection(ignition::math::Vector3d(-0.6, 0.0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -235,9 +241,9 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "3.png").string());
 
       // Side view
-      pose.pos.Set(0, 2.2, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
-      this->light->SetDirection(math::Vector3(0, -0.6, -0.4));
+      pose.Pos().Set(0, 2.2, 0);
+      pose.Rot().Euler(0, 0, IGN_DTOR(-90));
+      this->light->SetDirection(ignition::math::Vector3d(0, -0.6, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -245,9 +251,9 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "4.png").string());
 
       // Back view
-      pose.pos.Set(-2.2, 0, 0);
-      pose.rot.SetFromEuler(0, 0, 0);
-      this->light->SetDirection(math::Vector3(0.6, 0, -0.4));
+      pose.Pos().Set(-2.2, 0, 0);
+      pose.Rot().Euler(0, 0, 0);
+      this->light->SetDirection(ignition::math::Vector3d(0.6, 0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);

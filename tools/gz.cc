@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -469,7 +469,7 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     if (!sdf::init(sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed" << std::endl;
@@ -495,7 +495,7 @@ bool ModelCommand::RunImpl()
       sdfString += input;
     }
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     if (!sdf::init(sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed" << std::endl;
@@ -523,7 +523,7 @@ bool ModelCommand::RunImpl()
       if (this->vm.count("info"))
         std::cout << modelMsg.DebugString() << std::endl;
       else if (this->vm.count("pose"))
-        std::cout << gazebo::msgs::Convert(modelMsg.pose()) << std::endl;
+        std::cout << gazebo::msgs::ConvertIgn(modelMsg.pose()) << std::endl;
     }
     else
     {
@@ -540,7 +540,7 @@ bool ModelCommand::RunImpl()
 
     msgs::Model msg;
     msg.set_name(modelName);
-    msgs::Set(msg.mutable_pose(), pose);
+    msgs::Set(msg.mutable_pose(), pose.Ign());
     pub->Publish(msg, true);
   }
 
@@ -548,7 +548,7 @@ bool ModelCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
-bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
+bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
     const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
 {
   sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
@@ -568,7 +568,7 @@ bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
 
   msgs::Factory msg;
   msg.set_sdf(_sdf->ToString());
-  msgs::Set(msg.mutable_pose(), _pose);
+  msgs::Set(msg.mutable_pose(), _pose.Ign());
   pub->Publish(msg, true);
 
   return true;
@@ -790,6 +790,8 @@ bool CameraCommand::RunImpl()
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
 
+  boost::replace_all(cameraName, "::", "/");
+
   transport::PublisherPtr pub =
     node->Advertise<msgs::CameraCmd>(
         std::string("~/") + cameraName + "/cmd");
@@ -962,7 +964,7 @@ bool SDFCommand::RunImpl()
     std::cerr << "Error initializing log file" << std::endl;
   }
 
-  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+  sdf::SDFPtr sdf(new sdf::SDF());
 
   if (this->vm.count("version"))
   {

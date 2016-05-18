@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class JointVisual_TEST : public ServerFixture
+class JointVisual_TEST : public RenderingFixture
 {
 };
 
@@ -42,23 +42,24 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // create a fake child visual where the joint visual will be attached to
   gazebo::rendering::VisualPtr childVis;
   childVis.reset(
-      new gazebo::rendering::Visual("child", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("child", scene->WorldVisual()));
 
   // create a joint message for testing
   gazebo::msgs::JointPtr jointMsg;
   jointMsg.reset(new gazebo::msgs::Joint);
-  jointMsg->set_parent(scene->GetWorldVisual()->GetName());
-  jointMsg->set_parent_id(scene->GetWorldVisual()->GetId());
+  jointMsg->set_parent(scene->WorldVisual()->GetName());
+  jointMsg->set_parent_id(scene->WorldVisual()->GetId());
   jointMsg->set_child(childVis->GetName());
   jointMsg->set_child_id(childVis->GetId());
   jointMsg->set_name("test_joint");
   jointMsg->set_id(11111);
-  msgs::Set(jointMsg->mutable_pose(), math::Pose(1, 2, 3, 1.57, 1.57, 0));
+  msgs::Set(jointMsg->mutable_pose(),
+      ignition::math::Pose3d(1, 2, 3, 1.57, 1.57, 0));
   jointMsg->set_type(msgs::Joint::REVOLUTE2);
   jointMsg->add_angle(1.2);
   {
     msgs::Axis *axis1 = jointMsg->mutable_axis1();
-    msgs::Set(axis1->mutable_xyz(), gazebo::math::Vector3(0, 1, 0));
+    msgs::Set(axis1->mutable_xyz(), ignition::math::Vector3d(0, 1, 0));
     axis1->set_limit_lower(-1.2);
     axis1->set_limit_upper(2.3);
     axis1->set_limit_effort(6);
@@ -70,7 +71,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointMsg->add_angle(-1.2);
   {
     msgs::Axis *axis2 = jointMsg->mutable_axis2();
-    msgs::Set(axis2->mutable_xyz(), gazebo::math::Vector3(0, 0, 1));
+    msgs::Set(axis2->mutable_xyz(), ignition::math::Vector3d(0, 0, 1));
     axis2->set_limit_lower(-1.2);
     axis2->set_limit_upper(-0.3);
     axis2->set_limit_effort(3);
@@ -102,7 +103,8 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // update pose from a message
   jointMsg.reset(new gazebo::msgs::Joint);
   jointMsg->set_name("test_joint");
-  msgs::Set(jointMsg->mutable_pose(), math::Pose(3, 2, 1, 0, 1.57, 0));
+  msgs::Set(jointMsg->mutable_pose(),
+      ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
   jointVis->UpdateFromMsg(jointMsg);
 
   // pose properly updated
@@ -124,7 +126,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointMsg->add_angle(2.5);
   {
     msgs::Axis *axis1 = jointMsg->mutable_axis1();
-    msgs::Set(axis1->mutable_xyz(), gazebo::math::Vector3(1, 0, 0));
+    msgs::Set(axis1->mutable_xyz(), ignition::math::Vector3d(1, 0, 0));
     axis1->set_limit_lower(-1.2);
     axis1->set_limit_upper(2.3);
     axis1->set_limit_effort(6);
@@ -150,7 +152,8 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // update joint type and pose from a message
   jointMsg.reset(new gazebo::msgs::Joint);
   jointMsg->set_name("test_joint");
-  msgs::Set(jointMsg->mutable_pose(), math::Pose(0, -2, 1, -1.57, 1.57, 0));
+  msgs::Set(jointMsg->mutable_pose(),
+      ignition::math::Pose3d(0, -2, 1, -1.57, 1.57, 0));
   jointMsg->set_type(msgs::Joint::BALL);
   jointVis->UpdateFromMsg(jointMsg);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,8 +243,8 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
   rightPaddle->set_button_center(this->buttons[12]);
   rightPaddle->set_button_joy(this->buttons[13]);
 
-  msgs::Set(rightPaddle->mutable_pose(), grabRight);
-  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
+  msgs::Set(rightPaddle->mutable_pose(), grabRight.Ign());
+  msgs::Set(leftPaddle->mutable_pose(), grabLeft.Ign());
 
   this->pub->Publish(msg);
 }

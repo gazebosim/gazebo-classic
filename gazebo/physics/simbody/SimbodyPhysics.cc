@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@
 #include "gazebo/physics/simbody/SimbodySliderJoint.hh"
 #include "gazebo/physics/simbody/SimbodyHinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyScrewJoint.hh"
+#include "gazebo/physics/simbody/SimbodyFixedJoint.hh"
 
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -190,7 +191,10 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->world->Gravity()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+      msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -213,7 +217,7 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -249,7 +253,7 @@ void SimbodyPhysics::Reset()
   this->integ->initialize(this->system.getDefaultState());
 
   // restore potentially user run-time modified gravity
-  this->SetGravity(this->GetGravity());
+  this->SetGravity(this->world->Gravity());
 }
 
 //////////////////////////////////////////////////
@@ -778,6 +782,8 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
     joint.reset(new SimbodyHinge2Joint(this->dynamicsWorld, _parent));
   else if (_type == "screw")
     joint.reset(new SimbodyScrewJoint(this->dynamicsWorld, _parent));
+  else if (_type == "fixed")
+    joint.reset(new SimbodyFixedJoint(this->dynamicsWorld, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -787,7 +793,7 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 //////////////////////////////////////////////////
 void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
@@ -817,6 +823,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
   _mbgraph.addJointType(GetTypeString(physics::Base::SLIDER_JOINT), 1);
   _mbgraph.addJointType(GetTypeString(physics::Base::UNIVERSAL_JOINT), 2);
   _mbgraph.addJointType(GetTypeString(physics::Base::SCREW_JOINT), 1);
+  _mbgraph.addJointType(GetTypeString(physics::Base::FIXED_JOINT), 0);
 
   // Simbody has a Ball constraint that is a good choice if you need to
   // break a loop at a ball joint.
@@ -881,9 +888,9 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->GetGravity().GetLength(), 0.0))
+  if (!math::equal(this->world->Gravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
-      SimbodyPhysics::Vector3ToVec3(this->GetGravity()));
+      SimbodyPhysics::Vector3ToVec3(this->world->Gravity()));
   else
     this->gravity.setDefaultMagnitude(0.0);
 }
@@ -1240,6 +1247,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         ballJoint.setDefaultRotation(defR_FM);
         mobod = ballJoint;
       }
+      else if (type == "fixed")
+      {
+        MobilizedBody::Weld fixedJoint(
+            parentMobod,  X_IF0,
+            massProps,    X_OM0);
+        mobod = fixedJoint;
+      }
       else
       {
         gzerr << "Simbody joint type [" << type << "] not implemented.\n";
@@ -1352,6 +1366,8 @@ std::string SimbodyPhysics::GetTypeString(physics::Base::EntityType _type)
       return "screw";
   else if (_type & physics::Base::UNIVERSAL_JOINT)
       return "universal";
+  else if (_type & physics::Base::FIXED_JOINT)
+      return "fixed";
 
   gzerr << "Unrecognized joint type\n";
   return "UNRECOGNIZED";

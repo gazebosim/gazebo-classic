@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,15 @@ namespace gazebo
       /// \brief Set the pose in the world coordinate frame.
       /// \param[in] _pose New pose of the camera.
       public: virtual void SetWorldPose(const math::Pose &_pose);
+
+      /// \brief Set the default pose in the world coordinate frame and set
+      /// that as the current camera world pose.
+      /// \param[in] _pose New default pose of the camera.
+      public: void SetDefaultPose(const math::Pose &_pose);
+
+      /// \brief Get the default pose in the world coordinate frame.
+      /// \return Default pose of the camera.
+      public: math::Pose DefaultPose() const;
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.

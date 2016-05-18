@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/gazebo_config.h"
@@ -161,7 +162,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
                                       const std::string &_solverType)
 {
-  math::Rand::SetSeed(0);
+  ignition::math::Rand::Seed(0);
   // Load world
   Load("worlds/revolute_joint_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");

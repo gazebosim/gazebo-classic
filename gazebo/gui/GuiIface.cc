@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/gui/SplashScreen.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -61,6 +62,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
+gui::SplashScreen *g_splashScreen = NULL;
 gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
@@ -257,6 +259,8 @@ bool gui::load()
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<common::Time>();
 
+  g_splashScreen = new gui::SplashScreen();
+
   g_main_win = new gui::MainWindow();
 
   g_main_win->Load();
@@ -268,7 +272,7 @@ bool gui::load()
 unsigned int gui::get_entity_id(const std::string &_name)
 {
   if (g_main_win)
-    return g_main_win->GetEntityId(_name);
+    return g_main_win->EntityId(_name);
   else
     return 0;
 }
@@ -297,7 +301,10 @@ bool gui::run(int _argc, char **_argv)
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
+  sigact.sa_flags = 0;
   sigact.sa_handler = signal_handler;
+  if (sigemptyset(&sigact.sa_mask) != 0)
+    std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -310,6 +317,7 @@ bool gui::run(int _argc, char **_argv)
   gazebo::gui::fini();
   gazebo::client::shutdown();
 
+  delete g_splashScreen;
   delete g_main_win;
   return true;
 }

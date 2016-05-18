@@ -93,7 +93,7 @@ static void* ComputeRows(void *p)
   dRealPtr        Adcfm_precon = params->Adcfm_precon;
   dRealPtr        J            = params->J;
   dRealPtr        iMJ          = params->iMJ;
-  dRealPtr        rhs_precon   = params->rhs_precon;
+  dRealMutablePtr rhs_precon   = params->rhs_precon;
   dRealPtr        J_precon     = params->J_precon;
   dRealPtr        J_orig       = params->J_orig;
   dRealMutablePtr cforce       = params->cforce;
@@ -102,8 +102,14 @@ static void* ComputeRows(void *p)
   dRealMutablePtr caccel       = params->caccel;
   dRealMutablePtr lambda       = params->lambda;
 
-  /// MG
-  dRealMutablePtr mg_mu       = params->mg_mu;
+  /// MG solve Be = r for e, then
+  /// update solution u = lambda-e
+  /// MG RHS
+  dRealMutablePtr mg_B          = params->mg_B;
+  /// MG residual (residue) r=A*lambda -f
+  dRealMutablePtr mg_r          = params->mg_r;
+  /// MG error term obtained by solving Be=r
+  dRealMutablePtr mg_e          = params->mg_e;
 
   /// THREAD_POSITION_CORRECTION
   dRealPtr rhs_erp             = params->rhs_erp;
@@ -113,7 +119,7 @@ static void* ComputeRows(void *p)
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params->last_lambda;
   /// MG
-  dRealMutablePtr last_mg_mu   = params->last_mg_mu;
+  dRealMutablePtr last_mg_e   = params->last_mg_e;
 #endif
 
   //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
@@ -133,17 +139,8 @@ static void* ComputeRows(void *p)
   }
   printf("\n");
 
-  // print J, J_precon (already premultiplied by inverse of diagonal of LHS)
-  // and rhs_precon and rhs
-  printf("J_precon\n");
-  for (int i=startRow; i<startRow+nRows; i++) {
-    for (int j=0; j < 12 ; j++) {
-      printf("  %12.6f",J_precon[i*12+j]);
-    }
-    printf("\n");
-  }
-  printf("\n");
-
+  // print J (already premultiplied by inverse of diagonal of LHS)
+  // and rhs
   printf("J\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
@@ -182,7 +179,6 @@ static void* ComputeRows(void *p)
   dSetZero(rms_error, 4);
 
   int num_iterations = qs->num_iterations;
-  int precon_iterations = qs->precon_iterations;
   dReal pgs_lcp_tolerance = qs->pgs_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
   Friction_Model friction_model = qs->friction_model;
@@ -200,7 +196,7 @@ static void* ComputeRows(void *p)
   dReal Jvnew_final = 0;
 #endif
 #ifdef HDF5_INSTRUMENT
-  errors.resize(num_iterations + precon_iterations + friction_iterations);
+  errors.resize(num_iterations + friction_iterations);
 #endif
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
@@ -211,8 +207,7 @@ static void* ComputeRows(void *p)
 
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  int total_iterations = precon_iterations + num_iterations +
-    friction_iterations;
+  int total_iterations = num_iterations + friction_iterations;
   for (int iteration = 0; iteration < total_iterations; ++iteration)
   {
     // reset rms_dlambda at beginning of iteration
@@ -220,7 +215,7 @@ static void* ComputeRows(void *p)
     // reset rms_error at beginning of iteration
     rms_error[2] = 0;
     m_rms_dlambda[2] = 0;
-    if (iteration < num_iterations + precon_iterations)
+    if (iteration < num_iterations)
     {
       // skip resetting rms_dlambda and rms_error for bilateral constraints
       // and contact normals during extra friction iterations.
@@ -323,8 +318,7 @@ static void* ComputeRows(void *p)
       // check if we are doing extra friction_iterations, if so, only solve
       // friction force constraints and nothing else.
       // i.e. skip bilateral and contact normal constraints.
-      if (iteration >= (num_iterations + precon_iterations) &&
-          constraint_index < 0)
+      if ((iteration >= num_iterations) && constraint_index < 0)
         continue;
 
 
@@ -333,8 +327,6 @@ static void* ComputeRows(void *p)
 
       // THREAD_POSITION_CORRECTION
       dReal delta_erp = 0;
-      // precon does not support split position correction right now.
-      // dReal delta_precon_erp = 0;
 
       // setup pointers
       int b1 = jb[index*2];
@@ -353,7 +345,7 @@ static void* ComputeRows(void *p)
         }
       }
 
-      // for non-precon
+      // constraint accelerations
       {
         caccel_ptr1 = caccel + 6*b1;
         if (b2 >= 0)
@@ -393,133 +385,17 @@ static void* ComputeRows(void *p)
 
 
       //
-      // caccel is the constraint accel in the non-precon case
-      // cforce is the constraint force in the     precon case
+      // caccel is the constraint acceleration
+      //
+      // cforce is the constraint force used only for the precon case
       // J_precon and J differs essentially in Ad and Ad_precon,
       //  Ad is derived from diagonal of J inv(M) J'
       //  Ad_precon is derived from diagonal of J J'
       //
-      if (iteration < precon_iterations)
-      {
-        // preconditioning
-
-        // update delta_precon
-        delta_precon = rhs_precon[index] - old_lambda*Adcfm_precon[index];
-
-        dRealPtr J_ptr = J_precon + index*12;
-
-        // for preconditioned case, update delta using cforce, not caccel
-
-        delta_precon -= quickstep::dot6(cforce_ptr1, J_ptr);
-        if (cforce_ptr2)
-          delta_precon -= quickstep::dot6(cforce_ptr2, J_ptr + 6);
-
-        // set the limits for this constraint.
-        // this is the place where the QuickStep method differs from the
-        // direct LCP solving method, since that method only performs this
-        // limit adjustment once per time step, whereas this method performs
-        // once per iteration per constraint row.
-        // the constraints are ordered so that all lambda[] values needed have
-        // already been computed.
-        dReal hi_act, lo_act;
-        if (constraint_index >= 0) {
-          hi_act = dFabs (hi[index] * lambda[constraint_index]);
-          lo_act = -hi_act;
-        } else {
-          hi_act = hi[index];
-          lo_act = lo[index];
-        }
-
-        // compute lambda and clamp it to [lo,hi].
-        // @@@ SSE is used to speed up vector math
-        // operations with gcc compiler when defined
-        // but SSE is not a win here, #undef for now
-#undef SSE_CLAMP
-#ifndef SSE_CLAMP
-        lambda[index] = old_lambda+ delta_precon;
-        if (lambda[index] < lo_act) {
-          delta_precon = lo_act-old_lambda;
-          lambda[index] = lo_act;
-        }
-        else if (lambda[index] > hi_act) {
-          delta_precon = hi_act-old_lambda;
-          lambda[index] = hi_act;
-        }
-#else
-        dReal nl = old_lambda+ delta_precon;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
-          _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-        lambda[index] = nl;
-        delta_precon = nl - old_lambda;
-#endif
-
-        // update cforce (this is strictly for the precon case)
-        {
-          // for preconditioning case, compute cforce
-          // FIXME: need un-altered unscaled J, not J_precon!!
-          J_ptr = J_orig + index*12;
-
-          // update cforce.
-          quickstep::sum6(cforce_ptr1, delta_precon, J_ptr);
-          if (cforce_ptr2)
-            quickstep::sum6(cforce_ptr2, delta_precon, J_ptr + 6);
-        }
-
-        // record residual (error) (for the non-erp version)
-        // given
-        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
-        // define scalar Ad:
-        //   Ad = sor / (A_ii + cfm)
-        // then
-        //   dlambda = Ad  * (b_i - A_ij * lambda_j)
-        // thus, to get residual from dlambda,
-        //   residual = dlambda / Ad
-        // or
-        //   residual = sqrt(sum( Ad2 * dlambda_i * dlambda_i))
-        //   where Ad2 = 1/(Ad * Ad)
-        dReal Ad2 = 0.0;
-        if (!_dequal(Ad[index], 0.0))
-        {
-          // Ad[i] = sor_w / (sum + cfm[i]);
-          Ad2 = 1.0 / (Ad[index] * Ad[index]);
-        }
-        else
-        {
-          // TODO: Usually, this means qs->w (SOR param) is zero.
-          // Residual calculation is wrong when SOR (w) is zero
-          // Given SOR is rarely 0, we'll set residual as 0 for now.
-          // To do this properly, we should compute dlambda without sor
-          // then use the Ad without SOR to back out residual.
-        }
-
-        dReal delta_precon2 = delta_precon*delta_precon;
-        if (constraint_index == -1)  // bilateral
-        {
-          rms_dlambda[0] += delta_precon2;
-          rms_error[0] += delta_precon2*Ad2;
-          m_rms_dlambda[0]++;
-        }
-        else if (constraint_index == -2)  // contact normal
-        {
-          rms_dlambda[1] += delta_precon2;
-          rms_error[1] += delta_precon2*Ad2;
-          m_rms_dlambda[1]++;
-        }
-        else  // friction forces
-        {
-          rms_dlambda[2] += delta_precon2;
-          rms_error[2] += delta_precon2*Ad2;
-          m_rms_dlambda[2]++;
-        }
-
-        // initialize position correction terms (_erp) with precon results
-        if (inline_position_correction)
-        {
-          old_lambda_erp = old_lambda;
-          lambda_erp[index] = lambda[index];
-        }
-      }
-      else
+      // The reason cforce is used insteady of caccel for the precon
+      // case is because M is identify for the precon case, therefor
+      // accel computed by M of identity is actually force.
+      //
       {
         if (!skip_friction || constraint_index < 0)
         {
@@ -549,62 +425,85 @@ static void* ComputeRows(void *p)
               delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
           }
 
-        // set the limits for this constraint.
-        // this is the place where the QuickStep method differs from the
-        // direct LCP solving method, since that method only performs this
-        // limit adjustment once per time step, whereas this method performs
-        // once per iteration per constraint row.
-        // the constraints are ordered so that all lambda[] values needed have
-        // already been computed.
-        dReal hi_act, lo_act;
-        /// THREAD_POSITION_CORRECTION
-        dReal hi_act_erp, lo_act_erp;
-        if (constraint_index >= 0)
-        {
-          if (friction_model == pyramid_friction)
+          // set the limits for this constraint.
+          // this is the place where the QuickStep method differs from the
+          // direct LCP solving method, since that method only performs this
+          // limit adjustment once per time step, whereas this method performs
+          // once per iteration per constraint row.
+          // the constraints are ordered so that all lambda[] values needed have
+          // already been computed.
+          dReal hi_act, lo_act;
+          /// THREAD_POSITION_CORRECTION
+          dReal hi_act_erp, lo_act_erp;
+          if (constraint_index >= 0)
           {
-            // FOR erp throttled by info.c_v_max or info.c
-            hi_act = dFabs (hi[index] * lambda[constraint_index]);
-            lo_act = -hi_act;
-            if (inline_position_correction)
+            if (index - constraint_index >= 3)
             {
-              hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
-              lo_act_erp = -hi_act_erp;
+              // torsional friction should have been added as the third row from
+              // contact normal constraint
+              // this_is_torsional_friction
+              hi_act = dFabs (hi[index] * lambda[constraint_index]);
+              lo_act = -hi_act;
+              if (inline_position_correction)
+              {
+                hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+                lo_act_erp = -hi_act_erp;
+              }
             }
-          }
-          else if (friction_model == cone_friction)
-          {
-            quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
-                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
-          }
-          else if(friction_model == box_friction)
-          {
-            hi_act = hi[index];
-            lo_act = -hi_act;
-            hi_act_erp = hi[index];
-            lo_act_erp = -hi_act_erp;
+            else
+            {
+              // deal with non-torsional frictions
+              if (friction_model == pyramid_friction)
+              {
+                // FOR erp throttled by info.c_v_max or info.c
+                hi_act = dFabs (hi[index] * lambda[constraint_index]);
+                lo_act = -hi_act;
+                if (inline_position_correction)
+                {
+                  hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+                  lo_act_erp = -hi_act_erp;
+                }
+              }
+              else if (friction_model == cone_friction)
+              {
+                quickstep::dxConeFrictionModel(
+                  lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                  constraint_index, startRow, nRows, nb, body, i, order,
+                  findex, NULL, hi, lambda, lambda_erp);
+              }
+              else if(friction_model == box_friction)
+              {
+                hi_act = hi[index];
+                lo_act = -hi_act;
+                hi_act_erp = hi[index];
+                lo_act_erp = -hi_act_erp;
+              }
+              else
+              {
+                  // initialize the hi and lo to get rid of warnings
+                  hi_act = dInfinity;
+                  lo_act = -dInfinity;
+                  hi_act_erp = dInfinity;
+                  lo_act_erp = -dInfinity;
+                  dMessage (d_ERR_UASSERT,
+                    "internal error, undefined friction model");
+              }
+            }
           }
           else
           {
-              // initialize the hi and lo to get rid of warnings
-              hi_act = dInfinity;
-              lo_act = -dInfinity;
-              hi_act_erp = dInfinity;
-              lo_act_erp = -dInfinity;
-              dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
-          }
-        } else {
-              // FOR erp throttled by info.c_v_max or info.c
+            // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
             if (inline_position_correction)
             {
               hi_act_erp = hi[index];
               lo_act_erp = lo[index];
-             }
-           }
-        // compute lambda and clamp it to [lo,hi].
-        // @@@ SSE not a win here
+            }
+          }
+
+          // compute lambda and clamp it to [lo,hi].
+          // @@@ SSE not a win here
 #undef SSE_CLAMP
 #ifndef SSE_CLAMP
           // FOR erp throttled by info.c_v_max or info.c
@@ -789,6 +688,217 @@ static void* ComputeRows(void *p)
         }
       } // end of non-precon
 
+
+
+
+      //////////////////////////////////////////////////////
+      //                                                  //
+      // IMPLEMENT MG                                     //
+      //                                                  //
+      // personal note:                                   //
+      // using the precon case repeated below for _mg     //
+      // except here:                                     //
+      //    rhs_precon --> mg_r (residual)                //
+      //    lambda     --> mg_e (correction)              //
+      //                                                  //
+      // Then, we correct lambda with the correction      //
+      //    lambda = lambda - mg_e                        //
+      //                                                  //
+      //////////////////////////////////////////////////////
+      {
+        /// save last correction
+        dReal old_mg_e = mg_e[index];
+
+        // preconditioning --> mg
+        // Precon was solving for the case where M is identity,
+        // pretty much what we need for _mg.
+
+
+        // @TODO:
+        // fill rhs_precon with residue:
+        //   rhs_precon = J inv(M) J^T lambda - rhs
+        rhs_precon[index] = 0;
+
+
+        // update delta_precon
+        delta_precon = rhs_precon[index] - old_mg_e*Adcfm_precon[index];
+
+        if (dFabs(delta_precon) > 0.00001) // debug
+        {
+          printf("1 delta_precon [%f]\n", delta_precon);
+          printf("index[%d] type[%d] rhs[%f] mg_e[%f] delta[%f]\n",
+                 index, constraint_index, rhs_precon[index],
+                 mg_e, delta_precon);
+          getchar();
+        }
+
+        dRealPtr J_ptr = J_precon + index*12;
+
+        // for preconditioned case, update delta using cforce, not caccel
+
+        delta_precon -= quickstep::dot6(cforce_ptr1, J_ptr);
+        if (cforce_ptr2)
+          delta_precon -= quickstep::dot6(cforce_ptr2, J_ptr + 6);
+
+        if (dFabs(delta_precon) > 0.00001) // debug
+        {
+          printf("2 delta_precon [%f]\n", delta_precon);
+          printf("index[%d] type[%d] rhs[%f] mg_e[%f] delta[%f]\n",
+                 index, constraint_index, rhs_precon[index],
+                 mg_e, delta_precon);
+
+          printf("cf [");
+          for (unsigned int iii = 0; iii < 6; ++iii)
+          {
+            printf("%f, ", cforce_ptr1[iii]);
+            if (cforce_ptr2)
+              printf("%f, ", cforce_ptr2[iii]);
+          }
+          printf("]\n");
+
+          getchar();
+        }
+
+        // debug
+        if (constraint_index == -1)  // bilateral
+        {
+        }
+        else if (constraint_index == -2)  // contact normal
+        {
+        }
+        else  // friction forces
+        {
+        }
+        if (dFabs(mg_e[index]) > 0.00001) // debug
+        {
+        // if (dFabs(rhs_precon[index]) > 0.00001)
+          printf("index[%d] type[%d] rhs[%f] mg_e[%f] delta[%f]\n",
+                 index, constraint_index, rhs_precon[index],
+                 mg_e, delta_precon);
+        }
+
+        // set the limits for this constraint.
+        // this is the place where the QuickStep method differs from the
+        // direct LCP solving method, since that method only performs this
+        // limit adjustment once per time step, whereas this method performs
+        // once per iteration per constraint row.
+        // the constraints are ordered so that all mg_e[] values needed have
+        // already been computed.
+        dReal hi_act, lo_act;
+        if (constraint_index >= 0) {
+          hi_act = dFabs (hi[index] * mg_e[constraint_index]);
+          lo_act = -hi_act;
+        } else {
+          hi_act = hi[index];
+          lo_act = lo[index];
+        }
+
+        // compute mg_e and clamp it to [lo,hi].
+        // @@@ SSE is used to speed up vector math
+        // operations with gcc compiler when defined
+        // but SSE is not a win here, #undef for now
+#undef SSE_CLAMP
+#ifndef SSE_CLAMP
+        mg_e[index] = old_mg_e+ delta_precon;
+        if (mg_e[index] < lo_act) {
+          delta_precon = lo_act-old_mg_e;
+          mg_e[index] = lo_act;
+        }
+        else if (mg_e[index] > hi_act) {
+          delta_precon = hi_act-old_mg_e;
+          mg_e[index] = hi_act;
+        }
+        // printf("m %d index %d oldmge %f mg_e %20.16f delta %f\n",
+        //   params->m, index, old_mg_e, mg_e[index], delta_precon);
+#else
+        dReal nl = old_mg_e+ delta_precon;
+        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+          _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+        mg_e[index] = nl;
+        delta_precon = nl - old_mg_e;
+#endif
+
+        // update cforce (this is strictly for the precon case)
+        {
+          // for preconditioning case, compute cforce
+          // use un-altered unscaled original J, not J_precon
+          J_ptr = J_orig + index*12;
+
+          // update cforce.
+          quickstep::sum6(cforce_ptr1, delta_precon, J_ptr);
+          if (cforce_ptr2)
+            quickstep::sum6(cforce_ptr2, delta_precon, J_ptr + 6);
+
+          printf("0 cf [");
+          for (unsigned int iii = 0; iii < 6; ++iii)
+          {
+            printf("%f, ", cforce_ptr1[iii]);
+            if (cforce_ptr2)
+              printf("%f, ", cforce_ptr2[iii]);
+          }
+          printf("]\n");
+        }
+
+        // record residual (error) (for the non-erp version)
+        // given
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        // define scalar Ad:
+        //   Ad = sor / (A_ii + cfm)
+        // then
+        //   dlambda = Ad  * (b_i - A_ij * lambda_j)
+        // thus, to get residual from dlambda,
+        //   residual = dlambda / Ad
+        // or
+        //   residual = sqrt(sum( Ad2 * dlambda_i * dlambda_i))
+        //   where Ad2 = 1/(Ad * Ad)
+        dReal Ad2 = 0.0;
+        if (!_dequal(Ad[index], 0.0))
+        {
+          // Ad[i] = sor_w / (sum + cfm[i]);
+          Ad2 = 1.0 / (Ad[index] * Ad[index]);
+        }
+        else
+        {
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
+        }
+
+        dReal delta_precon2 = delta_precon*delta_precon;
+        if (constraint_index == -1)  // bilateral
+        {
+          rms_dlambda[0] += delta_precon2;
+          rms_error[0] += delta_precon2*Ad2;
+          m_rms_dlambda[0]++;
+        }
+        else if (constraint_index == -2)  // contact normal
+        {
+          rms_dlambda[1] += delta_precon2;
+          rms_error[1] += delta_precon2*Ad2;
+          m_rms_dlambda[1]++;
+        }
+        else  // friction forces
+        {
+          rms_dlambda[2] += delta_precon2;
+          rms_error[2] += delta_precon2*Ad2;
+          m_rms_dlambda[2]++;
+        }
+
+        // // initialize position correction terms (_erp) with precon results
+        // if (inline_position_correction)
+        // {
+        //   old_lambda_erp = old_lambda;
+        //   lambda_erp[index] = lambda[index];
+        // }
+
+        // add correction to lambda
+        lambda[index] = lambda[index] - mg_e[index];
+        // printf("\tindex %d lambda %f mg_e %20.16f\n",
+        //   index, lambda[index], mg_e[index]);
+      }
+
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
       //delta *= ramp;
@@ -874,8 +984,7 @@ static void* ComputeRows(void *p)
 #endif
 
     // option to stop when tolerance has been met
-    if (iteration >= precon_iterations &&
-        qs->rms_constraint_residual[3] < pgs_lcp_tolerance)
+    if (qs->rms_constraint_residual[3] < pgs_lcp_tolerance)
     {
       #ifdef DEBUG_CONVERGENCE_TOLERANCE
         printf("CONVERGED: id: %d steps: %d,"
@@ -960,6 +1069,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #endif
   int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr mg_e,
   dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
@@ -980,7 +1090,11 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     // warm starting
     // compute cforce=(inv(M)*J')*lambda
     if (qs->precon_iterations > 0)
-      multiply_invM_JT (m,nb,J,jb,lambda,cforce);
+    {
+      multiply_invM_JT (m,nb,J,jb,mg_e,cforce);
+      printf("%f\n", qs->precon_iterations);
+      getchar();
+    }
 
     // re-compute caccel=(inv(M)*J')*lambda with new iMJ
     // seems much better than using stored caccel's
@@ -990,11 +1104,12 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   else
   {
     // no warm starting
-    if (qs->precon_iterations > 0)
+    // if (qs->precon_iterations > 0)
       dSetZero (cforce,nb*6);
     dSetZero (caccel,nb*6);
     dSetZero (caccel_erp,nb*6);
   }
+  dSetZero (cforce,nb*6);
 
   dReal *Ad = context->AllocateArray<dReal> (m);
 
@@ -1012,7 +1127,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       if (findex[i] < 0)
         Ad[i] = sor_w / (sum + cfm[i]);
       else
-        Ad[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
+        Ad[i] = qs->contact_sor_scale * sor_w / (sum + cfm[i]);
     }
   }
 
@@ -1020,7 +1135,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   //   whereas Ad is 1 over diagonals of J inv(M) J'
   //    Ad_precon is 1 over diagonals of J J'
   dReal *Adcfm_precon = NULL;
-  if (qs->precon_iterations > 0)
+  // if (qs->precon_iterations > 0)
   {
     dReal *Ad_precon = context->AllocateArray<dReal> (m);
 
@@ -1038,7 +1153,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
         if (findex[i] < 0)
           Ad_precon[i] = sor_w / (sum + cfm[i]);
         else
-          Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
+          Ad_precon[i] = qs->contact_sor_scale * sor_w / (sum + cfm[i]);
       }
     }
 
@@ -1225,6 +1340,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   //   - solve lambda_erp and caccel_erp using rhs_erp
   // these two solves can be performed simultaneously.
 
+  std::thread params_erp_thread;
+
   IFTIMING (dTimerNow ("start pgs rows"));
   for (int i=0; i<m; i+= chunk,thread_id++)
   {
@@ -1234,8 +1351,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     int nStart = i - qs->num_overlap < 0 ? 0 : i - qs->num_overlap;
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
-
-    std::thread params_erp_thread;
 
     if (qs->thread_position_correction && params_erp != NULL)
     {
@@ -1280,6 +1395,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].J_orig  = J_orig;
       params_erp[thread_id].cforce  = cforce;
 
+      params_erp[thread_id].mg_e  = mg_e;
       params_erp[thread_id].rhs = rhs_erp;
       params_erp[thread_id].caccel = caccel_erp;
       params_erp[thread_id].lambda = lambda_erp;
@@ -1348,6 +1464,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].J_orig  = J_orig;
     params[thread_id].cforce  = cforce;
 
+    params[thread_id].mg_e  = mg_e;
     params[thread_id].rhs = rhs;
     params[thread_id].caccel = caccel;
     params[thread_id].lambda = lambda;
@@ -1388,7 +1505,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp_thread.join();
       IFTIMING (dTimerNow ("params_erp threads done"));
     }
-  }
+  }  // end of for loop on m
 
 
   // check time for scheduling, this is usually very quick
@@ -1486,11 +1603,13 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   if (i == startRow)
   {
     prev_constraint_index = -100;
-    next_constraint_index = constraint_index;
+    nextindex = order[i+1].index;
+    next_constraint_index = findex[nextindex];
   }
   else if (i == startRow+nRows-1)
   {
-    prev_constraint_index = constraint_index;
+    previndex = order[i-1].index;
+    prev_constraint_index = findex[previndex];
     next_constraint_index = -100;
   }
   else
@@ -1501,18 +1620,24 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
     next_constraint_index = findex[nextindex];
   }
 
-  if (constraint_index == next_constraint_index)
+  // use previndex and nextindex to see if this is part of the same
+  // contact constraint.  The problem is that with torsional friction,
+  // there are 3 consecutive constraints sharing the same constraint index.
+  // But we want to ignore anything to do with the third torsional
+  // friction constraint row here.
+  // So we need to check against previous constraint row first:
+  if (constraint_index == prev_constraint_index)
+  {
+    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr+6, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
+  }
+  else if (constraint_index == next_constraint_index)
   {
     // body1 was always the 1st body in the body pair
     dRealPtr J_next_ptr =  J_orig + index*12 + 12;
     v_f1 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
     v_f2 = quickstep::dot6(J_next_ptr, body1_vel) + quickstep::dot6(J_next_ptr+6, body2_vel);
-  }
-  else if (constraint_index == prev_constraint_index)
-  {
-    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
-    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
-    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
   }
   else
   {
@@ -1527,20 +1652,20 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   }
   else
   {
-    if (constraint_index == next_constraint_index)
-    {
-      // first direction  ---> corresponds to the primary friction direction
-      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
-      lo_act = -hi_act;
-      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
-      lo_act_erp = -hi_act;
-    }
-    else if (constraint_index == prev_constraint_index)
+    if (constraint_index == prev_constraint_index)
     {
       // second-direction  ---> corresponds to the secondary friction direction
       hi_act = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda[constraint_index]);
       lo_act = -hi_act;
       hi_act_erp = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
+      lo_act_erp = -hi_act;
+    }
+    else if (constraint_index == next_constraint_index)
+    {
+      // first direction  ---> corresponds to the primary friction direction
+      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
+      lo_act = -hi_act;
+      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
       lo_act_erp = -hi_act;
     }
     else
