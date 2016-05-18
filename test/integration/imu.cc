@@ -511,15 +511,16 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     const double m = 5.0;
     const double a = f / m;
     ignition::math::Vector3d linAcc2 = ballFloatingImu2->LinearAcceleration();
-    this->GetGravity(ballFloatingImu2->Orientation(), g);
+    math::Vector3 gravity;
+    this->GetGravity(ballFloatingImu2->Orientation(), gravity);
     if (i > 100)
     {
       // THERE MUST BE A BETTER WAY TO DO THIS...
       // need to take 100 stesps to ensure that
       // imu readings are passed through from asynchronous transport
-      EXPECT_NEAR(linAcc2.X(), -a*sin(pit) - g.x, IMU_TOL);
-      EXPECT_NEAR(linAcc2.Y(), 0 - g.y, IMU_TOL);
-      EXPECT_NEAR(linAcc2.Z(), a*cos(pit) - g.z, IMU_TOL);
+      EXPECT_NEAR(linAcc2.X(), -a*sin(pit) - gravity.x, IMU_TOL);
+      EXPECT_NEAR(linAcc2.Y(), 0 - gravity.y, IMU_TOL);
+      EXPECT_NEAR(linAcc2.Z(), a*cos(pit) - gravity.z, IMU_TOL);
     }
   }
 }
