@@ -16,6 +16,7 @@
 */
 #include <string.h>
 
+#include <ignition/math/MassMatrix3.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
@@ -467,12 +468,13 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   world->Step(100);
 
   // Verify the initial model pose is where we set it to be.
+  // For boxes, verify that inertia matches the size.
   for (auto const &iter : modelPos)
   {
     std::string name = iter.first;
     // Make sure the model is loaded
     model = world->GetModel(name);
-    EXPECT_TRUE(model != NULL);
+    ASSERT_NE(model, nullptr);
 
     pose1 = model->GetWorldPose();
     x0 = modelPos[name].x;
@@ -481,6 +483,24 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
     EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
     EXPECT_NEAR(pose1.pos.z, z0, PHYSICS_TOL);
+
+    if (name.find("box") != std::string::npos)
+    {
+      auto link = model->GetLink();
+      ASSERT_NE(link, nullptr);
+
+      auto inertial = link->GetInertial();
+      ASSERT_NE(inertial, nullptr);
+
+      ignition::math::MassMatrix3d m(inertial->GetMass(),
+        inertial->GetPrincipalMoments().Ign(),
+        inertial->GetProductsofInertia().Ign());
+      ignition::math::Vector3d inertialSize;
+      ignition::math::Quaterniond inertialRot;
+      EXPECT_TRUE(m.EquivalentBox(inertialSize, inertialRot));
+      EXPECT_EQ(inertialSize, modelSize[name].Ign());
+      EXPECT_EQ(inertialRot, ignition::math::Quaterniond::Identity);
+    }
   }
 
   // resize model to half of it's size
@@ -553,6 +573,24 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       EXPECT_NEAR(pose1.pos.x, x0, xTolerance);
       EXPECT_NEAR(pose1.pos.y, y0, yTolerance);
       EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
+
+      if (name.find("box") != std::string::npos)
+      {
+        auto link = model->GetLink();
+        ASSERT_NE(link, nullptr);
+
+        auto inertial = link->GetInertial();
+        ASSERT_NE(inertial, nullptr);
+
+        ignition::math::MassMatrix3d m(inertial->GetMass(),
+          inertial->GetPrincipalMoments().Ign(),
+          inertial->GetProductsofInertia().Ign());
+        ignition::math::Vector3d inertialSize;
+        ignition::math::Quaterniond inertialRot;
+        EXPECT_TRUE(m.EquivalentBox(inertialSize, inertialRot));
+        EXPECT_EQ(inertialSize, scaleFactor * modelSize[name].Ign());
+        EXPECT_EQ(inertialRot, ignition::math::Quaterniond::Identity);
+      }
     }
     else
     {
@@ -622,6 +660,22 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
               modelSize[name].z * scaleFactor);
         }
       }
+
+      // verify inertial msgs for boxes
+      if (name.find("box") != std::string::npos)
+      {
+        auto inertial = linkMsg.inertial();
+        ignition::math::Vector3d Ixxyyzz(
+          inertial.ixx(), inertial.iyy(), inertial.izz());
+        ignition::math::Vector3d Ixyxzyz(
+          inertial.ixy(), inertial.ixz(), inertial.iyz());
+        ignition::math::MassMatrix3d m(inertial.mass(), Ixxyyzz, Ixyxzyz);
+        ignition::math::Vector3d inertialSize;
+        ignition::math::Quaterniond inertialRot;
+        EXPECT_TRUE(m.EquivalentBox(inertialSize, inertialRot));
+        EXPECT_EQ(inertialSize, scaleFactor * modelSize[name].Ign());
+        EXPECT_EQ(inertialRot, ignition::math::Quaterniond::Identity);
+      }
     }
   }
 
@@ -636,6 +690,32 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     sdf::ElementPtr linkElem = modelElem->GetElement("link");
     while (linkElem)
     {
+      // verify inertial sdf for boxes
+      if (name.find("box") != std::string::npos)
+      {
+        EXPECT_TRUE(linkElem->HasElement("inertial"));
+        sdf::ElementPtr inertialElem = linkElem->GetElement("inertial");
+
+        double mass = inertialElem->Get<double>("mass");
+        EXPECT_TRUE(inertialElem->HasElement("inertia"));
+        sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+        ignition::math::Vector3d Ixxyyzz(
+            inertiaElem->Get<double>("ixx"),
+            inertiaElem->Get<double>("iyy"),
+            inertiaElem->Get<double>("izz"));
+        ignition::math::Vector3d Ixyxzyz(
+            inertiaElem->Get<double>("ixy"),
+            inertiaElem->Get<double>("ixz"),
+            inertiaElem->Get<double>("iyz"));
+
+        ignition::math::MassMatrix3d m(mass, Ixxyyzz, Ixyxzyz);
+        ignition::math::Vector3d inertialSize;
+        ignition::math::Quaterniond inertialRot;
+        EXPECT_TRUE(m.EquivalentBox(inertialSize, inertialRot));
+        EXPECT_EQ(inertialSize, scaleFactor * modelSize[name].Ign());
+        EXPECT_EQ(inertialRot, ignition::math::Quaterniond::Identity);
+      }
+
       // verify visual geom sdf
       EXPECT_TRUE(linkElem->HasElement("visual"));
       sdf::ElementPtr visualElem = linkElem->GetElement("visual");
