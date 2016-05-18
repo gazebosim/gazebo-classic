@@ -133,7 +133,7 @@ class Colliders_TBB
 ODEPhysics::ODEPhysics(WorldPtr _world)
     : PhysicsEngine(_world), dataPtr(new ODEPhysicsPrivate)
 {
-  this->dataPtr->physicsStepFunc = NULL;
+  this->dataPtr->physicsStepFunc = nullptr;
   this->dataPtr->maxContacts = 0;
 
   // Collision detection init
@@ -161,7 +161,7 @@ ODEPhysics::~ODEPhysics()
   this->Fini();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -231,7 +231,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   // Set the physics update function
   this->SetStepType(this->dataPtr->stepType);
-  if (this->dataPtr->physicsStepFunc == NULL)
+  if (this->dataPtr->physicsStepFunc == nullptr)
     gzthrow(std::string("Invalid step type[") + this->dataPtr->stepType);
 }
 
@@ -418,8 +418,8 @@ void ODEPhysics::UpdatePhysics()
       Collision *col1 = contactFeedback->collision1;
       Collision *col2 = contactFeedback->collision2;
 
-      GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
-      GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
+      GZ_ASSERT(col1 != nullptr, "Collision 1 is null");
+      GZ_ASSERT(col2 != nullptr, "Collision 2 is null");
 
       for (int j = 0; j < this->dataPtr->jointFeedbacks[i]->count; ++j)
       {
@@ -468,9 +468,9 @@ void ODEPhysics::Fini()
 
   if (this->dataPtr->worldId)
     dWorldDestroy(this->dataPtr->worldId);
-  this->dataPtr->worldId = NULL;
+  this->dataPtr->worldId = nullptr;
 
-  this->dataPtr->spaceId = NULL;
+  this->dataPtr->spaceId = nullptr;
 
   PhysicsEngine::Fini();
 }
@@ -486,7 +486,7 @@ void ODEPhysics::Reset()
 //////////////////////////////////////////////////
 LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
     gzthrow("Link must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
@@ -950,8 +950,8 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
   else
   {
-    ODECollision *collision1 = NULL;
-    ODECollision *collision2 = NULL;
+    ODECollision *collision1 = nullptr;
+    ODECollision *collision2 = nullptr;
 
     // Exit if both bodies are not enabled
     if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
@@ -1235,12 +1235,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
-  // Add a new contact to the manager. This will return NULL if no one is
+  // Add a new contact to the manager. This will return nullptr if no one is
   // listening for contact information.
   Contact *contactFeedback = this->contactManager->NewContact(_collision1,
       _collision2, this->world->GetSimTime());
 
-  ODEJointFeedback *jointFeedback = NULL;
+  ODEJointFeedback *jointFeedback = nullptr;
 
   // Create a joint feedback mechanism
   if (contactFeedback)
@@ -1394,7 +1394,7 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+  GZ_ASSERT(odeElem != nullptr, "ODE SDF element does not exist");
 
   try
   {
@@ -1540,7 +1540,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
 bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+  GZ_ASSERT(odeElem != nullptr, "ODE SDF element does not exist");
 
   if (_key == "solver_type")
   {

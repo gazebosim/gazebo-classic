@@ -333,7 +333,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
       TiXmlElement *_skelXml,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
+  Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, nullptr));
   _mesh->SetSkeleton(skeleton);
 
   TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
@@ -568,8 +568,8 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
           }
         }
 
-      TiXmlElement *frameTimesXml = NULL;
-      TiXmlElement *frameTransXml = NULL;
+      TiXmlElement *frameTimesXml = nullptr;
+      TiXmlElement *frameTransXml = nullptr;
 
       TiXmlElement *sampXml = this->GetElementId("sampler", sourceURL);
       TiXmlElement *inputXml = sampXml->FirstChildElement("input");
@@ -847,7 +847,7 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
     elem = elem->NextSiblingElement();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -1216,7 +1216,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 
   TiXmlElement *matXml = this->GetElementId("material", _name);
   if (!matXml || !matXml->FirstChildElement("instance_effect"))
-    return NULL;
+    return nullptr;
 
   Material *mat = new Material();
   std::string effectName =
@@ -1326,7 +1326,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   else if (typeElem->FirstChildElement("texture"))
   {
     _mat->SetLighting(true);
-    TiXmlElement *imageXml = NULL;
+    TiXmlElement *imageXml = nullptr;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
     TiXmlElement *textureXml = this->GetElementId("newparam", textureName);

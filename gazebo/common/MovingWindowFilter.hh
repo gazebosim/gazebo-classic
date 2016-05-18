@@ -129,7 +129,7 @@ namespace gazebo
     {
       this->dataPtr->valHistory.clear();
       delete this->dataPtr;
-      this->dataPtr = NULL;
+      this->dataPtr = nullptr;
     }
 
     //////////////////////////////////////////////////

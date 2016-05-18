@@ -283,7 +283,7 @@ namespace gazebo
 
       /// \brief Editor item currently attached to the mouse during a drawing
       /// operation.
-      private: QGraphicsItem *currentMouseItem;
+      private: QGraphicsItem *currentMouseItem = nullptr;
 
       /// \brief Currently selected editor item.
       private: QGraphicsItem *currentSelectedItem = nullptr;

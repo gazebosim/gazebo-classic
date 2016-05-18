@@ -55,6 +55,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetClipDist(float _near, float _far);
+      using Camera::SetClipDist;
 
       /// \brief Generic load function
       public: void Load();
