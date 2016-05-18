@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Information about a trajectory for an Actor.
-    class GAZEBO_VISIBLE TrajectoryInfo
+    class GZ_PHYSICS_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor.
       public: TrajectoryInfo();
@@ -68,8 +68,12 @@ namespace gazebo
     /// \class Actor Actor.hh physics/physics.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
     /// scriptable animation.
-    class GAZEBO_VISIBLE Actor : public Model
+    class GZ_PHYSICS_VISIBLE Actor : public Model
     {
+      /// \brief Typedef the skeleton animation map.
+      public: typedef std::map<std::string, common::SkeletonAnimation*>
+              SkeletonAnimation_M;
+
       /// \brief Constructor
       /// \param[in] _parent Parent object
       public: explicit Actor(BasePtr _parent);
@@ -107,24 +111,50 @@ namespace gazebo
       /// \return Pointer to the SDF values.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Set the current script time.
+      /// \param[in] _time Current script time.
+      public: void SetScriptTime(const double _time);
+
+      /// \brief Get the current script time.
+      /// \return Script time.
+      public: double ScriptTime() const;
+
+      /// \brief Returns a dictionary of all the skeleton animations associated
+      /// with the actor.
+      /// \return a map of SkeletonAnimation, indexed by their name.
+      public: const SkeletonAnimation_M &SkeletonAnimations() const;
+
+      /// \brief Set a custom trajectory for the actor.
+      /// \param[in] _trajInfo Information about custom trajectory.
+      public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
+
+      /// \brief Reset custom trajectory of the actor.
+      public: void ResetCustomTrajectory();
+
+      // Documentation inherited
+      public: virtual bool GetSelfCollide() const;
+
+      // Documentation inherited
+      public: virtual void SetSelfCollide(bool _self_collide);
+
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.
       /// \param[in] _mass Mass of the inertia.
-      /// \param[in] _radiau Radius of the sphere.
-      private: void AddSphereInertia(sdf::ElementPtr _linkSdf,
-                                     const math::Pose &_pose,
-                                     double _mass, double _radius);
+      /// \param[in] _radius Radius of the sphere.
+      private: void AddSphereInertia(const sdf::ElementPtr &_linkSdf,
+                   const ignition::math::Pose3d &_pose,
+                   const double _mass, const double _radius);
 
       /// \brief Add a spherical collision object.
       /// \param[in] _linkSdf Link to add the collision to.
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
       /// \param[in] _radius Radius of the collision object.
-      private: void AddSphereCollision(sdf::ElementPtr _linkSdf,
-                                       const std::string &_name,
-                                       const math::Pose &_pose,
-                                       double _radius);
+      private: void AddSphereCollision(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose,
+                   const double _radius);
 
       /// \brief Add a spherical visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -133,12 +163,10 @@ namespace gazebo
       /// \param[in] _radius Radius of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddSphereVisual(sdf::ElementPtr _linkSdf,
-                                    const std::string &_name,
-                                    const math::Pose &_pose,
-                                    double _radius,
-                                    const std::string &_material,
-                                    const common::Color &_ambient);
+      private: void AddSphereVisual(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose, const double _radius,
+                   const std::string &_material, const common::Color &_ambient);
 
       /// \brief Add a box visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -147,20 +175,20 @@ namespace gazebo
       /// \param[in] _size Dimensions of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddBoxVisual(sdf::ElementPtr _linkSdf,
-                                 const std::string &_name,
-                                 const math::Pose &_pose,
-                                 const math::Vector3 &_size,
-                                 const std::string &_material,
-                                 const common::Color &_ambient);
+      private: void AddBoxVisual(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_size,
+                   const std::string &_material,
+                   const common::Color &_ambient);
 
       /// \brief Add an actor visual to a link.
       /// \param[in] _linkSdf Link to add the visual to.
       /// \param[in] _name Name of the visual.
       /// \param[in] _pose Pose of the visual.
-      private: void AddActorVisual(sdf::ElementPtr _linkSdf,
-                                   const std::string &_name,
-                                   const math::Pose &_pose);
+      private: void AddActorVisual(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose);
 
       /// \brief Load an animation from SDF.
       /// \param[in] _sdf SDF element containing the animation.
@@ -174,8 +202,9 @@ namespace gazebo
       /// \param[in] _frame Each frame name and transform.
       /// \param[in] _skelMap Map of bone relationships.
       /// \param[in] _time Time over which to animate the set pose.
-      private: void SetPose(std::map<std::string, math::Matrix4> _frame,
-                     std::map<std::string, std::string> _skelMap, double _time);
+      private: void SetPose(
+                   std::map<std::string, ignition::math::Matrix4d> _frame,
+                   std::map<std::string, std::string> _skelMap, double _time);
 
       /// \brief Pointer to the actor's mesh.
       protected: const common::Mesh *mesh;
@@ -194,9 +223,6 @@ namespace gazebo
 
       /// \brief Time length of a scipt.
       protected: double scriptLength;
-
-      /// \brief Time the scipt was last updated.
-      protected: double lastScriptTime;
 
       /// \brief True if the animation should loop.
       protected: bool loop;
@@ -223,10 +249,9 @@ namespace gazebo
       protected: std::vector<TrajectoryInfo> trajInfo;
 
       /// \brief Skeleton animations
-      protected: std::map<std::string, common::SkeletonAnimation*>
-                                                            skelAnimation;
+      protected: SkeletonAnimation_M skelAnimation;
 
-      /// \brief Skeleton to naode map
+      /// \brief Skeleton to node map
       protected: std::map<std::string, std::map<std::string, std::string> >
                                                             skelNodesMap;
 
@@ -234,7 +259,7 @@ namespace gazebo
       protected: std::map<std::string, bool> interpolateX;
 
       /// \brief Last position of the actor
-      protected: math::Vector3 lastPos;
+      protected: ignition::math::Vector3d lastPos;
 
       /// \brief Length of the actor's path.
       protected: double pathLength;
@@ -251,8 +276,12 @@ namespace gazebo
       /// \brief Where to send bone info.
       protected: transport::PublisherPtr bonePosePub;
 
-      /// \brief THe old action.
-      protected: std::string oldAction;
+      /// \brief Current script time
+      private: double scriptTime;
+
+      /// \brief Custom trajectory.
+      /// Used to control an actor with a plugin.
+      private: TrajectoryInfoPtr customTrajectoryInfo;
     };
     /// \}
   }

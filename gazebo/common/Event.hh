@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,21 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_COMMON_EVENT_HH_
+#define GAZEBO_COMMON_EVENT_HH_
 
-#ifndef _EVENT_HH_
-#define _EVENT_HH_
-
-#include <iostream>
-#include <vector>
+#include <atomic>
 #include <map>
+#include <memory>
+#include <mutex>
+#include <list>
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
-#include <gazebo/math/Helpers.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -40,23 +38,13 @@ namespace gazebo
   namespace event
   {
     /// \addtogroup gazebo_event Events
+    /// \brief Signals and connections to send and receive event-based
+    /// triggers.
     /// \{
-
-    /// \internal
-    // Private data members for Event class.
-    // This must be in the header due to templatization.
-    class GAZEBO_VISIBLE EventPrivate
-    {
-      // \brief Constructor
-      public: EventPrivate();
-
-      /// \brief True if the event has been signaled.
-      public: bool signaled;
-    };
 
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
-    class GAZEBO_VISIBLE Event
+    class GZ_COMMON_VISIBLE Event
     {
       /// \brief Constructor
       public: Event();
@@ -74,23 +62,25 @@ namespace gazebo
 
       /// \brief Get whether this event has been signaled.
       /// \return True if the event has been signaled.
-      public: bool GetSignaled() const;
+      /// \deprecated See bool Signaled() const;
+      public: bool GetSignaled() const GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Allow subclasses to initialize their own data pointer.
-      /// \param[in] _d Reference to data pointer.
-      protected: Event(EventPrivate &_d);
+      /// \brief Get whether this event has been signaled.
+      /// \return True if the event has been signaled.
+      public: bool Signaled() const;
 
-      /// \brief Data pointer.
-      protected: EventPrivate *dataPtr;
+      /// \brief Set whether this event has been signaled.
+      /// \param[in] _sig True if the event has been signaled.
+      public: void SetSignaled(const bool _sig);
+
+      /// \brief True if the event has been signaled.
+      private: bool signaled;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for Connection class.
-    class GAZEBO_VISIBLE ConnectionPrivate
+    class ConnectionPrivate
     {
-      /// \brief Constructor.
-      public: ConnectionPrivate();
-
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with
       /// \param[in] _i Unique id
@@ -105,60 +95,82 @@ namespace gazebo
       /// \brief set during the constructor
       public: common::Time creationTime;
     };
+    /// \endcond
 
     /// \brief A class that encapsulates a connection.
-    class GAZEBO_VISIBLE Connection
+    class GZ_COMMON_VISIBLE Connection
     {
-      /// \brief Constructor.
-      public: Connection();
-
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
       /// \param[in] _i Unique id.
-      public: Connection(Event *_e, int _i);
+      public: Connection(Event *_e, const int _i);
 
       /// \brief Destructor.
       public: ~Connection();
 
       /// \brief Get the id of this connection.
       /// \return The id of this connection.
-      public: int GetId() const;
+      /// \deprecated See const Id() const;
+      public: int GetId() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the id of this connection.
+      /// \return The id of this connection.
+      public: int Id() const;
 
       /// \brief Private data pointer.
-      private: ConnectionPrivate *dataPtr;
+      private: std::unique_ptr<ConnectionPrivate> dataPtr;
 
       /// \brief Friend class.
       public: template<typename T> friend class EventT;
     };
 
     /// \internal
+    template<typename T>
+    class EventConnection
+    {
+      /// \brief Constructor
+      public: EventConnection(const bool _on, boost::function<T> _cb)
+              : callback(_cb)
+      {
+        // Windows Visual Studio 2012 does not have atomic_bool constructor,
+        // so we have to set "on" using operator=
+        this->on = _on;
+      }
+
+      /// \brief On/off value for the event callback
+      public: std::atomic_bool on;
+
+      /// \brief Callback function
+      public: boost::function<T> callback;
+    };
+
+    /// \cond
     // Private data members for EventT<T> class.
     template< typename T>
-    class GAZEBO_VISIBLE EventTPrivate : public EventPrivate
+    class EventTPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
-      typedef std::map<int, boost::function<T>*> EvtConnectionMap;
+      typedef std::map<int, std::shared_ptr<EventConnection<T> > >
+        EvtConnectionMap;
 
       /// \brief Array of connection callbacks.
       public: EvtConnectionMap connections;
 
-      /// \brief Set of connections to erased.
-      public: std::vector<int> connectionsToErase;
-
       /// \brief A thread lock.
-      public: boost::mutex connectionsEraseMutex;
+      public: std::mutex mutex;
+
+      /// \brief List of connections to remove
+      public: std::list<typename EvtConnectionMap::const_iterator>
+              connectionsToRemove;
     };
+    /// \endcond
 
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
-    template< typename T>
-    class GAZEBO_VISIBLE EventT : public Event
+    template<typename T>
+    class EventT : public Event
     {
-      /// \def EvtConnectionMap.
-      /// \brief Event Connection map typedef.
-      typedef std::map<int, boost::function<T>*> EvtConnectionMap;
-
       /// \brief Constructor.
       public: EventT();
 
@@ -187,31 +199,22 @@ namespace gazebo
       public: void operator()()
               {this->Signal();}
 
-      /// \brief Signal the event for all subscribers.
-      public: void Signal()
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)();
-                }
-              }
-
       /// \brief Signal the event with one parameter.
       /// \param[in] _p the parameter.
       public: template< typename P >
               void operator()(const P &_p)
-              { this->Signal(_p); }
+      {
+        this->Signal(_p);
+      }
 
       /// \brief Signal the event with two parameters.
       /// \param[in] _p1 the first parameter.
       /// \param[in] _p2 the second parameter.
       public: template< typename P1, typename P2 >
               void operator()(const P1 &_p1, const P2 &_p2)
-              { this->Signal(_p1, _p2); }
+      {
+        this->Signal(_p1, _p2);
+      }
 
       /// \brief Signal the event with three parameters.
       /// \param[in] _p1 the first parameter.
@@ -219,7 +222,9 @@ namespace gazebo
       /// \param[in] _p3 the second parameter.
       public: template< typename P1, typename P2, typename P3 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3)
-              { this->Signal(_p1, _p2, _p3); }
+      {
+        this->Signal(_p1, _p2, _p3);
+      }
 
       /// \brief Signal the event with four parameters.
       /// \param[in] _p1 the first parameter.
@@ -229,7 +234,9 @@ namespace gazebo
       public: template< typename P1, typename P2, typename P3, typename P4 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4)
-              { this->Signal(_p1, _p2, _p3, _p4); }
+      {
+        this->Signal(_p1, _p2, _p3, _p4);
+      }
 
       /// \brief Signal the event with five parameters.
       /// \param[in] _p1 the first parameter.
@@ -241,7 +248,9 @@ namespace gazebo
                         typename P5 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4, const P5 &_p5)
-              { this->Signal(_p1, _p2, _p3, _p4, _p5); }
+      {
+        this->Signal(_p1, _p2, _p3, _p4, _p5);
+      }
 
       /// \brief Signal the event with six parameters.
       /// \param[in] _p1 the first parameter.
@@ -254,7 +263,9 @@ namespace gazebo
                         typename P5, typename P6 >
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4, const P5 &_p5, const P6 &_p6)
-              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6); }
+      {
+        this->Signal(_p1, _p2, _p3, _p4, _p5, _p6);
+      }
 
       /// \brief Signal the event with seven parameters.
       /// \param[in] _p1 the first parameter.
@@ -269,7 +280,9 @@ namespace gazebo
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4, const P5 &_p5, const P6 &_p6,
                               const P7 &_p7)
-              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7); }
+      {
+        this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+      }
 
       /// \brief Signal the event with eight parameters.
       /// \param[in] _p1 the first parameter.
@@ -285,7 +298,9 @@ namespace gazebo
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4, const P5 &_p5, const P6 &_p6,
                               const P7 &_p7, const P8 &_p8)
-              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8); }
+      {
+        this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+      }
 
       /// \brief Signal the event with nine parameters.
       /// \param[in] _p1 the first parameter.
@@ -303,7 +318,9 @@ namespace gazebo
               void operator()(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                               const P4 &_p4, const P5 &_p5, const P6 &_p6,
                               const P7 &_p7, const P8 &_p8, const P9 &_p9)
-              { this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9); }
+      {
+        this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+      }
 
       /// \brief Signal the event with ten parameters.
       /// \param[in] _p1 the first parameter.
@@ -323,40 +340,53 @@ namespace gazebo
                               const P4 &_p4, const P5 &_p5, const P6 &_p6,
                               const P7 &_p7, const P8 &_p8, const P9 &_p9,
                               const P10 &_p10)
-              {
-                this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
-              }
+      {
+        this->Signal(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+      }
+
+      /// \brief Signal the event for all subscribers.
+      public: void Signal()
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback();
+        }
+      }
 
       /// \brief Signal the event with one parameter.
       /// \param[in] _p parameter.
       public: template< typename P >
               void Signal(const P &_p)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p);
-                }
-              }
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback(_p);
+        }
+      }
 
       /// \brief Signal the event with two parameter.
       /// \param[in] _p1 the first parameter.
       /// \param[in] _p2 the second parameter.
       public: template< typename P1, typename P2 >
               void Signal(const P1 &_p1, const P2 &_p2)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2);
-                }
-              }
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback(_p1, _p2);
+        }
+      }
 
       /// \brief Signal the event with three parameter.
       /// \param[in] _p1 the first parameter.
@@ -364,16 +394,16 @@ namespace gazebo
       /// \param[in] _p3 the second parameter.
       public: template< typename P1, typename P2, typename P3 >
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                      iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2, _p3);
-                }
-              }
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback(_p1, _p2, _p3);
+        }
+      }
 
       /// \brief Signal the event with four parameter.
       /// \param[in] _p1 the first parameter.
@@ -383,16 +413,16 @@ namespace gazebo
       public: template<typename P1, typename P2, typename P3, typename P4>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                        iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2, _p3, _p4);
-                }
-              }
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback(_p1, _p2, _p3, _p4);
+        }
+      }
 
       /// \brief Signal the event with five parameter.
       /// \param[in] _p1 the first parameter.
@@ -404,17 +434,16 @@ namespace gazebo
                        typename P5>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4, const P5 &_p5)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                          iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2, _p3, _p4, _p5);
-                }
-              }
+      {
+        this->Cleanup();
 
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5);
+        }
+      }
 
       /// \brief Signal the event with six parameter.
       /// \param[in] _p1 the first parameter.
@@ -427,16 +456,16 @@ namespace gazebo
                        typename P5, typename P6>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6);
-                }
-              }
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
+        }
+      }
 
       /// \brief Signal the event with seven parameter.
       /// \param[in] _p1 the first parameter.
@@ -450,16 +479,16 @@ namespace gazebo
                        typename P5, typename P6, typename P7>
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
-                }
-              }
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+        }
+      }
 
       /// \brief Signal the event with eight parameter.
       /// \param[in] _p1 the first parameter.
@@ -475,16 +504,18 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
-                }
-              }
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+          {
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+          }
+        }
+      }
 
       /// \brief Signal the event with nine parameter.
       /// \param[in] _p1 the first parameter.
@@ -502,16 +533,19 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9)
+      {
+        this->Cleanup();
+
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
           {
-            this->myDataPtr->signaled = true;
-            this->Cleanup();
-            for (typename EvtConnectionMap::iterator iter =
-                this->myDataPtr->connections.begin();
-                iter != this->myDataPtr->connections.end(); ++iter)
-            {
-              (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
-            }
+            iter.second->callback(
+                _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
           }
+        }
+      }
 
       /// \brief Signal the event with ten parameter.
       /// \param[in] _p1 the first parameter.
@@ -530,44 +564,40 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9, const P10 &_p10)
-              {
-                this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
-                {
-                  (*iter->second)(_p1, _p2, _p3, _p4, _p5,
-                      _p6, _p7, _p8, _p9, _p10);
-                }
-              }
+      {
+        this->Cleanup();
 
-      /// \brief Cleanup disconnected connections.
+        this->SetSignaled(true);
+        for (auto iter: this->myDataPtr->connections)
+        {
+          if (iter.second->on)
+          {
+            iter.second->callback(
+                _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+          }
+        }
+      }
+
+      /// \internal
+      /// \brief Removes queued connections.
+      /// We assume that this function is called from a Signal function.
       private: void Cleanup();
 
       /// \brief Private data pointer.
-      private: EventTPrivate<T> *myDataPtr;
+      private: std::unique_ptr<EventTPrivate<T>> myDataPtr;
     };
 
     /// \brief Constructor.
     template<typename T>
     EventT<T>::EventT()
-    : Event(*(new EventTPrivate<T>()))
+    : Event(), myDataPtr(new EventTPrivate<T>())
     {
-      this->myDataPtr = static_cast<EventTPrivate<T>*>(this->dataPtr);
     }
 
     /// \brief Destructor. Deletes all the associated connections.
     template<typename T>
     EventT<T>::~EventT()
     {
-      for (typename EvtConnectionMap::iterator iter =
-          this->myDataPtr->connections.begin();
-          iter != this->myDataPtr->connections.end(); ++iter)
-      {
-        delete iter->second;
-      }
-
       this->myDataPtr->connections.clear();
     }
 
@@ -579,11 +609,11 @@ namespace gazebo
       int index = 0;
       if (!this->myDataPtr->connections.empty())
       {
-        typename EvtConnectionMap::reverse_iterator iter =
-          this->myDataPtr->connections.rbegin();
+        auto const &iter = this->myDataPtr->connections.rbegin();
         index = iter->first + 1;
       }
-      this->myDataPtr->connections[index] = new boost::function<T>(_subscriber);
+      this->myDataPtr->connections[index].reset(new EventConnection<T>(true,
+          _subscriber));
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -595,8 +625,8 @@ namespace gazebo
       if (!_c)
         return;
 
-      this->Disconnect(_c->GetId());
-      _c->dataPtr->event = NULL;
+      this->Disconnect(_c->Id());
+      _c->dataPtr->event = nullptr;
       _c->dataPtr->id = -1;
     }
 
@@ -613,31 +643,25 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
-      boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
-      this->myDataPtr->connectionsToErase.push_back(_id);
+      // Find the connection
+      auto const &it = this->myDataPtr->connections.find(_id);
+
+      if (it != this->myDataPtr->connections.end())
+      {
+        it->second->on = false;
+        this->myDataPtr->connectionsToRemove.push_back(it);
+      }
     }
 
-    /// \brief Cleanup disconnected connections.
+    /////////////////////////////////////////////
     template<typename T>
     void EventT<T>::Cleanup()
     {
-      if (this->myDataPtr->connectionsToErase.empty())
-        return;
-      boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
-
-      for (std::vector<int>::iterator iter =
-          this->myDataPtr->connectionsToErase.begin();
-          iter != this->myDataPtr->connectionsToErase.end(); ++iter)
-      {
-        typename EvtConnectionMap::iterator iter2 =
-          this->myDataPtr->connections.find(*iter);
-        if (iter2 != this->myDataPtr->connections.end())
-        {
-          delete iter2->second;
-          this->myDataPtr->connections.erase(iter2);
-        }
-      }
-      this->myDataPtr->connectionsToErase.clear();
+      std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
+      // Remove all queue connections.
+      for (auto &conn : this->myDataPtr->connectionsToRemove)
+        this->myDataPtr->connections.erase(conn);
+      this->myDataPtr->connectionsToRemove.clear();
     }
     /// \}
   }

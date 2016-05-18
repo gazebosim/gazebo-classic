@@ -34,10 +34,9 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-PluginScrewJoint::PluginScrewJoint(dWorldID _worldId, BasePtr _parent)
+PluginScrewJoint::PluginScrewJoint(BasePtr _parent)
     : ScrewJoint<PluginJoint>(_parent)
 {
-  this->jointId = dJointCreateScrew(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -57,48 +56,26 @@ void PluginScrewJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 math::Vector3 PluginScrewJoint::GetAnchor(unsigned int /*index*/) const
 {
-  dVector3 result;
-  // initialize to 0
-  result[0] = result[1] = result[2] = 0.0;
-
-  if (this->jointId)
-    dJointGetScrewAnchor(this->jointId, result);
-  else
-    gzerr << "Plugin Joint ID is invalid, returning 0 vector.\n";
-
-  return math::Vector3(result[0], result[1], result[2]);
+  gzerr << "not implemented\n";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 void PluginScrewJoint::SetAnchor(unsigned int /*index*/,
     const math::Vector3 &_anchor)
 {
-  if (!this->jointId)
-  {
-    gzerr << "Plugin Joint ID is invalid, anchor not set.\n";
-    return;
-  }
-
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
-
-  if (this->jointId)
-    dJointSetScrewAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 PluginScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  dVector3 result;
-
-  if (this->jointId)
-    dJointGetScrewAxis(this->jointId, result);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
-  return math::Vector3(result[0], result[1], result[2]);
+  gzerr << "not implemented\n";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -109,44 +86,14 @@ void PluginScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_ax
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  /// Plugin needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-
-  if (this->jointId)
-    dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 math::Angle PluginScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
-  if (this->jointId)
-  {
-    if (_index < this->GetAngleCount())
-    {
-      if (_index == 0)
-        result = dJointGetScrewAngle(this->jointId);
-      else if (_index == 1)
-        result = dJointGetScrewPosition(this->jointId);
-    }
-    else
-    {
-      gzwarn << "PluginScrewJoint::GetAngleImpl(" << _index
-             << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
-    }
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "not implemented\n";
   return result;
 }
 
@@ -154,58 +101,26 @@ math::Angle PluginScrewJoint::GetAngleImpl(unsigned int _index) const
 double PluginScrewJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0;
-
-  if (this->jointId)
-  {
-    if (_index < this->GetAngleCount())
-    {
-      if (_index == 0)
-        result = dJointGetScrewAngleRate(this->jointId);
-      else if (_index == 1)
-        result = dJointGetScrewPositionRate(this->jointId);
-    }
-    else
-    {
-      gzwarn << "PluginScrewJoint::GetAngleImpl(" << _index
-             << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
-    }
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "not implemented\n";
   return result;
 }
 
 //////////////////////////////////////////////////
 void PluginScrewJoint::SetVelocity(unsigned int /*index*/, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void PluginScrewJoint::SetThreadPitch(unsigned int /*_index*/, double _threadPitch)
 {
-  if (this->jointId)
-  {
-    /// \TODO: create an issue on making thread pitch = translation / angle
-    /// \TODO: create an issue on making thread pitch = translation / angle
-    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void PluginScrewJoint::SetThreadPitch(double _threadPitch)
 {
-  if (this->jointId)
-  {
-    /// \TODO: create an issue on making thread pitch = translation / angle
-    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
@@ -223,49 +138,34 @@ double PluginScrewJoint::GetThreadPitch()
 //////////////////////////////////////////////////
 void PluginScrewJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
-  if (this->jointId)
-  {
-    // dJointAddScrewForce(this->jointId, _effort);
-    dJointAddScrewTorque(this->jointId, _effort);
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void PluginScrewJoint::SetParam(unsigned int _parameter, double _value)
 {
   PluginJoint::SetParam(_parameter, _value);
-
-  if (this->jointId)
-    dJointSetScrewParam(this->jointId, _parameter, _value);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 double PluginScrewJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
-
-  if (this->jointId)
-    result = dJointGetScrewParam(this->jointId, _parameter);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "not implemented\n";
   return result;
 }
 
 //////////////////////////////////////////////////
 void PluginScrewJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 {
-  this->SetParam(dParamFMax, _t);
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 double PluginScrewJoint::GetMaxForce(unsigned int /*_index*/)
 {
-  return this->GetParam(dParamFMax);
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////

@@ -34,7 +34,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Base class for all Plugin collisions.
-    class GAZEBO_VISIBLE PluginCollision : public Collision
+    class GZ_PHYSICS_VISIBLE PluginCollision : public Collision
     {
       /// \brief Constructor.
       /// \param[in] _link Parent Link

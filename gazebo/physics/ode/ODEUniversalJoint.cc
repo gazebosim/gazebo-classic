@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ using namespace physics;
 ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
     : UniversalJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateUniversal(_worldId, NULL);
+  this->jointId = dJointCreateUniversal(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -47,7 +47,10 @@ math::Vector3 ODEUniversalJoint::GetAnchor(unsigned int /*index*/) const
   if (this->jointId)
     dJointGetUniversalAnchor(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -78,10 +81,16 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
     else if (_index == UniversalJoint::AXIS_PARENT)
       dJointGetUniversalAxis2(this->jointId, result);
     else
+    {
       gzerr << "Joint index out of bounds.\n";
+      return math::Vector3::Zero;
+    }
   }
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -177,31 +186,6 @@ void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
-}
-
-//////////////////////////////////////////////////
-void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
-{
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    this->SetParam(dParamFMax, _t);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    this->SetParam(dParamFMax2, _t);
-  else
-    gzerr << "Joint index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-double ODEUniversalJoint::GetMaxForce(unsigned int _index)
-{
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    return ODEJoint::GetParam(dParamFMax);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    return ODEJoint::GetParam(dParamFMax2);
-
-  gzerr << "Joint index out of bounds.\n";
-  return 0;
 }
 
 //////////////////////////////////////////////////

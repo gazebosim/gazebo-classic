@@ -27,12 +27,12 @@ namespace gazebo
   namespace physics
   {
     /// \brief A screw joint.
-    class GAZEBO_VISIBLE PluginScrewJoint : public ScrewJoint<PluginJoint>
+    class GZ_PHYSICS_VISIBLE PluginScrewJoint : public ScrewJoint<PluginJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId Plugin world id.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
-      public: PluginScrewJoint(dWorldID _worldId, BasePtr _parent);
+      public: PluginScrewJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~PluginScrewJoint();

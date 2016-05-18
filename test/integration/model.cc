@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
  *
 */
 #include <string.h>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
+using namespace gazebo;
 class ModelTest : public ServerFixture
 {
 };
@@ -32,7 +33,7 @@ TEST_F(ModelTest, GetLinksV)
   for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
        iter != model->GetLinks().end(); ++iter)
   {
-    EXPECT_TRUE(*iter);
+    EXPECT_TRUE(*iter != NULL);
     EXPECT_FALSE((*iter)->GetName().empty());
     EXPECT_STREQ((*iter)->GetName().c_str(), "link_1");
   }
@@ -53,6 +54,27 @@ TEST_F(ModelTest, GetScopedName)
 
   modelName = model->GetScopedName(true);
   EXPECT_EQ(modelName, std::string("default::simple_arm"));
+}
+
+/////////////////////////////////////////////////
+// This tests creating new links within a model.
+TEST_F(ModelTest, CreateLink)
+{
+  Load("worlds/joint_test.world");
+  physics::ModelPtr model = GetModel("model_1");
+
+  const std::string linkName = "link_name";
+  physics::LinkPtr link = model->CreateLink(linkName);
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->GetName(), linkName);
+  EXPECT_EQ(link, model->GetLink(linkName));
+
+  // Make sure we cannot create a second link with the same name
+  physics::LinkPtr link2 = model->CreateLink(linkName);
+  EXPECT_TRUE(link2 == NULL);
+
+  // GetLink should still return the original link
+  EXPECT_EQ(link, model->GetLink(linkName));
 }
 
 int main(int argc, char **argv)

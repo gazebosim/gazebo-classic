@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
@@ -35,11 +36,11 @@ using namespace physics;
 ODEJoint::ODEJoint(BasePtr _parent)
   : Joint(_parent)
 {
-  this->jointId = NULL;
+  this->jointId = nullptr;
   this->implicitDampingState[0] = ODEJoint::NONE;
   this->implicitDampingState[1] = ODEJoint::NONE;
   this->stiffnessDampingInitialized = false;
-  this->feedback = NULL;
+  this->feedback = nullptr;
   this->currentKd[0] = 0;
   this->currentKd[1] = 0;
   this->currentKp[0] = 0;
@@ -54,14 +55,27 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::Fini()
+{
   if (this->applyDamping)
     physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 
-  delete this->feedback;
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = nullptr;
+
   this->Detach();
 
   if (this->jointId)
     dJointDestroy(this->jointId);
+  this->jointId = nullptr;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +149,7 @@ LinkPtr ODEJoint::GetJointLink(unsigned int _index) const
   {
     ODELinkPtr odeLink1 = boost::static_pointer_cast<ODELink>(this->childLink);
     ODELinkPtr odeLink2 = boost::static_pointer_cast<ODELink>(this->parentLink);
-    if (odeLink1 != NULL &&
+    if (odeLink1 != nullptr &&
         dJointGetBody(this->jointId, _index) == odeLink1->GetODEId())
       result = this->childLink;
     else if (odeLink2)
@@ -151,7 +165,7 @@ bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
   ODELinkPtr odeLink1 = boost::dynamic_pointer_cast<ODELink>(_one);
   ODELinkPtr odeLink2 = boost::dynamic_pointer_cast<ODELink>(_two);
 
-  if (odeLink1 == NULL || odeLink2 == NULL)
+  if (odeLink1 == nullptr || odeLink2 == nullptr)
     gzthrow("ODEJoint requires ODE bodies\n");
 
   return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
@@ -172,14 +186,14 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
   ODELinkPtr odechild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
   ODELinkPtr odeparent = boost::dynamic_pointer_cast<ODELink>(this->parentLink);
 
-  if (odechild == NULL && odeparent == NULL)
+  if (odechild == nullptr && odeparent == nullptr)
     gzthrow("ODEJoint requires at least one ODE link\n");
 
   if (!this->jointId)
     gzerr << "ODE Joint ID is invalid\n";
 
   if (this->HasType(Base::HINGE2_JOINT) &&
-      (odechild == NULL || odeparent == NULL))
+      (odechild == nullptr || odeparent == nullptr))
     gzthrow("ODEHinge2Joint cannot be connected to the world");
 
   if (!odechild && odeparent)
@@ -202,9 +216,20 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
+  auto odeChild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
+  auto odeParent = boost::dynamic_pointer_cast<ODELink>(this->parentLink);
+
   Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
+
+  // By the time we get here, links and ODEIds might have already been
+  // cleaned up
+  if ((odeParent == nullptr || odeParent->GetODEId() == nullptr) ||
+      (odeChild == nullptr || odeChild->GetODEId() == nullptr))
+  {
+    return;
+  }
 
   if (this->jointId)
     dJointAttach(this->jointId, 0, 0);
@@ -253,7 +278,7 @@ dJointFeedback *ODEJoint::GetFeedback()
     return dJointGetFeedback(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -345,6 +370,11 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
   }
 
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
+  if (!jointFeedback)
+  {
+    gzerr << "Joint feedback uninitialized" << std::endl;
+    return result;
+  }
 
   if (_index == 0)
     result.Set(jointFeedback->t1[0], jointFeedback->t1[1],
@@ -424,10 +454,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
     else if (_key == "friction")
@@ -440,10 +466,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
     }
     else if (_key == "hi_stop")
@@ -458,7 +480,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       ScrewJoint<ODEJoint>* screwJoint =
         dynamic_cast<ScrewJoint<ODEJoint>* >(this);
-      if (screwJoint != NULL)
+      if (screwJoint != nullptr)
       {
         screwJoint->SetThreadPitch(boost::any_cast<double>(_value));
       }
@@ -473,7 +495,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       GearboxJoint<ODEJoint>* gearboxJoint =
         dynamic_cast<GearboxJoint<ODEJoint>* >(this);
-      if (gearboxJoint != NULL)
+      if (gearboxJoint != nullptr)
       {
         gearboxJoint->SetGearboxRatio(boost::any_cast<double>(_value));
       }
@@ -554,10 +576,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamFMax | group);
     }
     else if (_key == "friction")
@@ -566,10 +584,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamVel | group);
     }
     else if (_key == "hi_stop")
@@ -584,7 +598,7 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     {
       ScrewJoint<ODEJoint>* screwJoint =
         dynamic_cast<ScrewJoint<ODEJoint>* >(this);
-      if (screwJoint != NULL)
+      if (screwJoint != nullptr)
       {
           return screwJoint->GetThreadPitch();
       }
@@ -599,7 +613,7 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     {
       GearboxJoint<ODEJoint>* gearboxJoint =
         dynamic_cast<GearboxJoint<ODEJoint>* >(this);
-      if (gearboxJoint != NULL)
+      if (gearboxJoint != nullptr)
       {
         return gearboxJoint->GetGearboxRatio();
       }
@@ -632,7 +646,15 @@ void ODEJoint::Reset()
   else
     gzerr << "ODE Joint ID is invalid\n";
 
+  this->forceAppliedTime = common::Time::Zero;
+
   Joint::Reset();
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::CacheForceTorque()
+{
+  // Does nothing for now, will add when recovering pull request #1721
 }
 
 //////////////////////////////////////////////////
@@ -673,6 +695,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
     }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
+    }
     else
     {
       /// \TODO: fix for multi-axis joints
@@ -687,7 +713,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
       // convert torque from about child CG to joint anchor location
       // cg position specified in child link frame
-      math::Pose cgPose = this->childLink->GetInertial()->GetPose();
+      math::Pose cgPose;
+      auto inertial = this->childLink->GetInertial();
+      if (inertial)
+        cgPose = inertial->GetPose();
 
       // anchorPose location of joint in child frame
       // childMomentArm: from child CG to joint location in child link frame
@@ -717,7 +746,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     // convert torque from about parent CG to joint anchor location
     if (this->parentLink)
     {
-      // get child pose, or it's the inertial world if childLink is NULL
+      // get child pose, or it's the inertial world if childLink is nullptr
       math::Pose childPose;
       if (this->childLink)
         childPose = this->childLink->GetWorldPose();
@@ -730,7 +759,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       // CG to joint anchor location
 
       // parent cg specified in parent link frame
-      math::Pose cgPose = this->parentLink->GetInertial()->GetPose();
+      math::Pose cgPose;
+      auto inertial = this->parentLink->GetInertial();
+      if (inertial)
+        cgPose = inertial->GetPose();
 
       // get parent CG pose in child link frame
       math::Pose parentCGInChildLink =
@@ -1073,19 +1105,22 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 
   if (this->provideFeedback)
   {
-    this->feedback = new dJointFeedback;
-    this->feedback->f1[0] = 0;
-    this->feedback->f1[1] = 0;
-    this->feedback->f1[2] = 0;
-    this->feedback->t1[0] = 0;
-    this->feedback->t1[1] = 0;
-    this->feedback->t1[2] = 0;
-    this->feedback->f2[0] = 0;
-    this->feedback->f2[1] = 0;
-    this->feedback->f2[2] = 0;
-    this->feedback->t2[0] = 0;
-    this->feedback->t2[1] = 0;
-    this->feedback->t2[2] = 0;
+    if (this->feedback == nullptr)
+    {
+      this->feedback = new dJointFeedback;
+      this->feedback->f1[0] = 0;
+      this->feedback->f1[1] = 0;
+      this->feedback->f1[2] = 0;
+      this->feedback->t1[0] = 0;
+      this->feedback->t1[1] = 0;
+      this->feedback->t1[2] = 0;
+      this->feedback->f2[0] = 0;
+      this->feedback->f2[1] = 0;
+      this->feedback->f2[2] = 0;
+      this->feedback->t2[0] = 0;
+      this->feedback->t2[1] = 0;
+      this->feedback->t2[2] = 0;
+    }
 
     if (this->jointId)
       dJointSetFeedback(this->jointId, this->feedback);

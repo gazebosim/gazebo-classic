@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,23 @@
  *
  */
 
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <boost/filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+#include <boost/filesystem.hpp>
 #include <sdf/sdf.hh>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+
+// See below for Windows dirent include. cpplint complains about system
+// header order if "win_dirent.h" is in the wrong location.
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  #include "win_dirent.h"
+#endif
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -33,7 +40,6 @@
 
 using namespace gazebo;
 using namespace common;
-
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
@@ -63,7 +69,7 @@ SystemPaths::SystemPaths()
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = this->GetTmpPath() + "/gazebo";
+    home = this->TmpPath() + "/gazebo";
   else
     home = homePath;
 
@@ -75,7 +81,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != this->GetTmpPath() + "/gazebo")
+    if (home != this->TmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -86,7 +92,11 @@ SystemPaths::SystemPaths()
   DIR *dir = opendir(fullPath.c_str());
   if (!dir)
   {
+#ifdef _WIN32
+    _mkdir(fullPath.c_str());
+#else
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+#endif
   }
   else
     closedir(dir);
@@ -151,11 +161,23 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 /////////////////////////////////////////////////
 std::string SystemPaths::GetTmpPath()
 {
+  return this->TmpPath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpPath() const
+{
   return this->tmpPath.string();
 }
 
 /////////////////////////////////////////////////
 std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->TmpInstancePath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpInstancePath() const
 {
   return this->tmpInstancePath.string();
 }
@@ -163,7 +185,13 @@ std::string SystemPaths::GetTmpInstancePath()
 /////////////////////////////////////////////////
 std::string SystemPaths::GetDefaultTestPath()
 {
-  return this->GetTmpInstancePath() + "/gazebo_test";
+  return this->DefaultTestPath();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::DefaultTestPath() const
+{
+  return this->TmpInstancePath() + "/gazebo_test";
 }
 
 /////////////////////////////////////////////////
@@ -487,6 +515,13 @@ void SystemPaths::AddModelPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddModelPathsUpdate(const std::string &_path)
+{
+  this->AddModelPaths(_path);
+  updateModelRequest(_path);
 }
 
 /////////////////////////////////////////////////

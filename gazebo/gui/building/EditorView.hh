@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,14 @@ namespace gazebo
 
     /// \class Level EditorView.hh
     /// \brief A convenient structure for storing level information
-    class GAZEBO_VISIBLE Level
+    class GZ_GUI_VISIBLE Level
     {
       /// \brief Constructor
       public: Level() : level(0), name("level"), baseHeight(0),
               // 2.4384m == 8ft, standard room height in US
               height(2.4384),
-              backgroundPixmap(NULL) {}
+              backgroundPixmap(nullptr),
+              floorItem(nullptr) {}
 
       /// \brief Level number
       public: int level;
@@ -64,6 +65,9 @@ namespace gazebo
 
       /// \brief Background pixmap for a level
       public: QGraphicsPixmapItem *backgroundPixmap;
+
+      /// \brief Level's floor item
+      public: FloorItem *floorItem;
     };
 
     /// \addtogroup gazebo_gui
@@ -71,7 +75,7 @@ namespace gazebo
 
     /// \class EditorView EditorView.hh
     /// \brief Control the editor view and manage contents in the editor scene.
-    class GAZEBO_VISIBLE EditorView : public QGraphicsView
+    class GZ_GUI_VISIBLE EditorView : public QGraphicsView
     {
       Q_OBJECT
 
@@ -87,7 +91,11 @@ namespace gazebo
                   /// \brief Door mode
                   DOOR,
                   /// \brief Stairs mode
-                  STAIRS
+                  STAIRS,
+                  /// \brief Color mode
+                  COLOR,
+                  /// \brief Texture mode
+                  TEXTURE
                 };
 
       /// \brief Constructor
@@ -143,6 +151,10 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       private: void mouseDoubleClickEvent(QMouseEvent *_event);
 
+      /// \brief Qt leave event.
+      /// \param[in] _event Qt mouse event.
+      private: void leaveEvent(QEvent *_event);
+
       /// \brief Qt key press event.
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
@@ -171,8 +183,15 @@ namespace gazebo
       /// \param[in] _type Type of editor item to be created.
       private: void OnCreateEditorItem(const std::string &_type);
 
-      // private: void OnSaveModel(const std::string &_modelName,
-      //     const std::string &_savePath);
+      /// \brief Callback triggered when the user chooses a color on the
+      /// palette.
+      /// \param[in] _color Selected color.
+      private: void OnColorSelected(QColor _color);
+
+      /// \brief Callback triggered when the user chooses a texture on the
+      /// palette.
+      /// \param[in] _texture Selected texture.
+      private: void OnTextureSelected(QString _texture);
 
       /// \brief Callback received when the model has been completed and
       /// uploaded onto the server.
@@ -196,6 +215,7 @@ namespace gazebo
 
       /// \brief Callback received when a level on a building model is to
       /// be changed.
+      /// \param[in] _level The level that is currently being edited.
       private: void OnChangeLevel(int _level);
 
       /// \brief Delete a level from the building model
@@ -226,7 +246,7 @@ namespace gazebo
       /// \param[in] _grabber1 First grabber to be unliked.
       /// \param[in] _grabber2 Second grabber to be unliked.
       private: void UnlinkGrabbers(GrabberHandle *_grabber1,
-          GrabberHandle *_grabber2 = NULL);
+          GrabberHandle *_grabber2 = nullptr);
 
       /// \brief Current draw mode
       private: int drawMode;
@@ -266,23 +286,23 @@ namespace gazebo
       private: QGraphicsItem *currentMouseItem;
 
       /// \brief Currently selected editor item.
-      private: QGraphicsItem *currentSelectedItem;
+      private: QGraphicsItem *currentSelectedItem = nullptr;
 
       /// \brief Building maker manages the creation of 3D visuals
-      private: BuildingMaker *buildingMaker;
+      private: BuildingMaker *buildingMaker = nullptr;
 
       /// \brief Current building level associated to the view.
-      private: int currentLevel;
+      private: int currentLevel = 0;
 
       /// \brief A list of building levels in the scene.
       private: std::vector<Level *> levels;
 
       /// \brief A counter that holds the total number of levels in the building
       /// model.
-      private: int levelCounter;
+      private: int levelCounter = 0;
 
       /// \brief Default height for levels
-      private: double levelDefaultHeight;
+      private: double levelDefaultHeight = 0.0;
 
       /// \brief Qt action for opening a building level inspector.
       private: QAction *openLevelInspectorAct;
@@ -308,13 +328,16 @@ namespace gazebo
 
       /// \brief Indicate whether or not the wall will snap to a grabber
       /// during a draw wall operation.
-      private: bool snapToGrabber;
+      private: bool snapToGrabber = false;
 
       /// \brief Existing grabber to snap towards.
-      private: GrabberHandle *snapGrabberOther;
+      private: GrabberHandle *snapGrabberOther = nullptr;
 
       /// \brief Currently held grabber which will be snapped.
-      private: GrabberHandle *snapGrabberCurrent;
+      private: GrabberHandle *snapGrabberCurrent = nullptr;
+
+      /// \brief Text tooltip to follow the mouse.
+      private: QGraphicsTextItem *mouseTooltip;
     };
     /// \}
   }

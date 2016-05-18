@@ -11,6 +11,9 @@
           </plane>
         </geometry>
         <surface>
+          <contact>
+             <collide_bitmask>0xffff</collide_bitmask>
+          </contact>
           <friction>
             <ode>
               <mu>100</mu>

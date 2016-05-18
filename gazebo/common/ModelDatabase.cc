@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,18 @@
 */
 
 #include <tinyxml.h>
+#ifndef _WIN32
 #include <libtar.h>
+#endif
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <iostream>
 
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -35,6 +39,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabasePrivate.hh"
 #include "gazebo/common/ModelDatabase.hh"
+#include "gazebo/common/SemanticVersion.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -64,7 +69,7 @@ size_t get_models_cb(void *_buffer, size_t _size, size_t _nmemb, void *_userp)
 ModelDatabase::ModelDatabase()
   : dataPtr(new ModelDatabasePrivate)
 {
-  this->dataPtr->updateCacheThread = NULL;
+  this->dataPtr->updateCacheThread = nullptr;
   this->Start();
 }
 
@@ -73,7 +78,7 @@ ModelDatabase::~ModelDatabase()
 {
   this->Fini();
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -105,7 +110,7 @@ void ModelDatabase::Fini()
     if (this->dataPtr->updateCacheThread)
       this->dataPtr->updateCacheThread->join();
     delete this->dataPtr->updateCacheThread;
-    this->dataPtr->updateCacheThread = NULL;
+    this->dataPtr->updateCacheThread = nullptr;
   }
 }
 
@@ -244,7 +249,7 @@ bool ModelDatabase::UpdateModelCacheImpl()
 
     TiXmlElement *uriElem;
     for (uriElem = modelsElem->FirstChildElement("uri");
-         uriElem != NULL && !this->dataPtr->stop;
+         uriElem != nullptr && !this->dataPtr->stop;
          uriElem = uriElem->NextSiblingElement("uri"))
     {
       std::string uri = uriElem->GetText();
@@ -290,7 +295,8 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
     else
     {
       boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
-
+      if (this->dataPtr->stop)
+        break;
       this->dataPtr->modelDBUpdated(this->dataPtr->modelCache);
     }
     this->dataPtr->updateCacheCompleteCondition.notify_all();
@@ -501,9 +507,10 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
         continue;
       }
 
+#ifndef _WIN32
       TAR *tar;
       tar_open(&tar, const_cast<char*>(tarfilename.c_str()),
-          NULL, O_RDONLY, 0644, TAR_GNU);
+          nullptr, O_RDONLY, 0644, TAR_GNU);
 
       std::string outputPath = getenv("HOME");
       outputPath += "/.gazebo/models";
@@ -512,6 +519,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       path = outputPath + "/" + modelName;
 
       ModelDatabase::DownloadDependencies(path);
+#endif
     }
 
     curl_easy_cleanup(curl);
@@ -605,6 +613,8 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
   }
 
   TiXmlDocument xmlDoc;
+  SemanticVersion sdfParserVersion(SDF_VERSION);
+  std::string bestVersionStr = "0.0";
   if (xmlDoc.LoadFile(manifestPath.string()))
   {
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
@@ -614,15 +624,33 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
       TiXmlElement *sdfSearch = sdfXML;
 
       // Find the SDF element that matches our current SDF version.
+      // If a match is not found, use the latest version of the element
+      // that is not older than the SDF parser.
       while (sdfSearch)
       {
-        if (sdfSearch->Attribute("version") &&
-            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+        if (sdfSearch->Attribute("version"))
         {
-          sdfXML = sdfSearch;
-          break;
+          std::string version = std::string(sdfSearch->Attribute("version"));
+          SemanticVersion modelVersion(version);
+          SemanticVersion bestVersion(bestVersionStr);
+          if (modelVersion > bestVersion)
+          {
+            // this model is better than the previous one
+            if (modelVersion <= sdfParserVersion)
+            {
+              // the parser can read it
+              sdfXML = sdfSearch;
+              bestVersionStr = version;
+            }
+            else
+            {
+              gzwarn << "Ignoring version " << version
+                << " for model " << _uri
+                << " because Gazebo is using an older sdf parser (version "
+                << SDF_VERSION << ")" << std::endl;
+            }
+          }
         }
-
         sdfSearch = sdfSearch->NextSiblingElement("sdf");
       }
 

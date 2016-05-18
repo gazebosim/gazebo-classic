@@ -27,10 +27,9 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-PluginUniversalJoint::PluginUniversalJoint(dWorldID _worldId, BasePtr _parent)
+PluginUniversalJoint::PluginUniversalJoint(BasePtr _parent)
     : UniversalJoint<PluginJoint>(_parent)
 {
-  this->jointId = 0;
 }
 
 //////////////////////////////////////////////////
@@ -43,11 +42,8 @@ PluginUniversalJoint::~PluginUniversalJoint()
 //////////////////////////////////////////////////
 math::Vector3 PluginUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
-  dVector3 result;
-
-  // get joint anchor
-
-  return math::Vector3(result[0], result[1], result[2]);
+  gzerr << "not implemented\n";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -58,21 +54,14 @@ void PluginUniversalJoint::SetAnchor(unsigned int /*index*/,
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
   // set joint anchor
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 PluginUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
-  dVector3 result;
-
-  if (this->jointId)
-  {
-    // get joint axis
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
-  return math::Vector3(result[0], result[1], result[2]);
+  gzerr << "not implemented\n";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -83,30 +72,14 @@ void PluginUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_ax
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  /// Plugin needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(_index);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
-
-  if (this->jointId)
-  {
-    // set joint axis
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 math::Angle PluginUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
-
-  if (this->jointId)
-  {
-    // get joint angle
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "not implemented\n";
   return result;
 }
 
@@ -114,38 +87,20 @@ math::Angle PluginUniversalJoint::GetAngleImpl(unsigned int _index) const
 double PluginUniversalJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0;
-
-  if (this->jointId)
-  {
-    // get joint velocity
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "not implemented\n";
   return result;
 }
 
 //////////////////////////////////////////////////
 void PluginUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    this->SetParam(dParamVel, _angle);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    this->SetParam(dParamVel2, _angle);
-  else
-    gzerr << "Joint index out of bounds.\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void PluginUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
-  if (this->jointId)
-  {
-    // set joint force
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
@@ -183,27 +138,7 @@ bool PluginUniversalJoint::SetLowStop(
 bool PluginUniversalJoint::SetParam(
   const std::string &_key, unsigned int _index, const boost::any &_value)
 {
-  if (_key == "stop_erp")
-  {
-    // set joint stop erp
-  }
-  else if (_key == "stop_cfm")
-  {
-    // set joint stop erp
-  }
-  else if (_key == "hi_stop")
-  {
-    // set high stop
-  }
-  else if (_key == "lo_stop")
-  {
-    // set low stop
-  }
-  else
-  {
-    // Overload because we switched axis orders
-    return PluginJoint::SetParam(_key, _index, _value);
-  }
+  gzerr << "not implemented\n";
   return true;
 }
 
@@ -211,19 +146,6 @@ bool PluginUniversalJoint::SetParam(
 double PluginUniversalJoint::GetParam(
   const std::string &_key, unsigned int _index)
 {
-  // Overload because we switched axis orders
-  if (_key == "hi_stop")
-  {
-    // return joint high stop
-    return 0;
-  }
-  else if (_key == "lo_stop")
-  {
-    // return joint low stop
-    return 0;
-  }
-  else
-  {
-    return PluginJoint::GetParam(_key, _index);
-  }
+  gzerr << "not implemented\n";
+  return PluginJoint::GetParam(_key, _index);
 }

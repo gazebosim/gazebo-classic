@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Plugin Link class.
-    class GAZEBO_VISIBLE PluginLink : public Link
+    class GZ_PHYSICS_VISIBLE PluginLink : public Link
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent model.
@@ -139,8 +139,18 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
 
-      /// \brief Plugin link handle
-      private: int linkId;
+      // Documentation inherited
+      public: virtual void SetGravityMode(bool _mode);
+
+      // Documentation inherited
+      public: virtual bool GetGravityMode() const;
+
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
+      // Documentation inherited
+      public: virtual void SetSelfCollide(bool _collide);
 
       /// \brief Pointer to the Plugin Physics engine
       private: PluginPhysicsPtr pluginPhysics;

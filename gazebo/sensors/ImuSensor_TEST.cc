@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <sys/time.h>
 #include <gtest/gtest.h>
 
-#include "test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
 #define TOL 1e-4
@@ -64,15 +64,15 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
   mgr->Update();
 
   // Get a pointer to the IMU sensor
-  sensors::ImuSensorPtr sensor = boost::dynamic_pointer_cast<sensors::ImuSensor>
+  sensors::ImuSensorPtr sensor = std::dynamic_pointer_cast<sensors::ImuSensor>
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
-  EXPECT_EQ(sensor->GetAngularVelocity(), math::Vector3::Zero);
-  EXPECT_EQ(sensor->GetLinearAcceleration(), math::Vector3::Zero);
-  EXPECT_EQ(sensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+  EXPECT_EQ(sensor->AngularVelocity(), ignition::math::Vector3d::Zero);
+  EXPECT_EQ(sensor->LinearAcceleration(), ignition::math::Vector3d::Zero);
+  EXPECT_EQ(sensor->Orientation(), ignition::math::Quaterniond(0, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
@@ -81,48 +81,54 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  if (_physicsEngine == "simbody")
+  {
+    // default accuracy flunks this test, increase accuracy setting
+    physics->SetParam("accuracy", 0.0001);
+  }
+
   double z = 3;
-  double gravityZ = physics->GetGravity().z;
+  double gravityZ = world->Gravity().Z();
   double stepSize = physics->GetMaxStepSize();
 
   std::string modelName = "imuModel";
   std::string imuSensorName = "imuSensor";
-  math::Pose modelPose(0, 0, z, 0, 0, 0);
+  ignition::math::Pose3d modelPose(0, 0, z, 0, 0, 0);
 
   std::string topic = "~/" + imuSensorName + "_" + _physicsEngine;
   // spawn imu sensor
   SpawnUnitImuSensor(modelName, imuSensorName,
-      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
   sensors::ImuSensorPtr imuSensor =
-      boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
 
-  ASSERT_TRUE(imuSensor);
+  ASSERT_TRUE(imuSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   imuSensor->SetActive(true);
 
-  EXPECT_EQ(imuSensor->GetAngularVelocity(), math::Vector3::Zero);
-  EXPECT_EQ(imuSensor->GetLinearAcceleration(), math::Vector3::Zero);
-  EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+  EXPECT_EQ(imuSensor->AngularVelocity(), ignition::math::Vector3d::Zero);
+  EXPECT_EQ(imuSensor->LinearAcceleration(), ignition::math::Vector3d::Zero);
+  EXPECT_EQ(imuSensor->Orientation(), ignition::math::Quaterniond(0, 0, 0, 0));
 
   // step world and verify imu's linear acceleration is zero on free fall
   world->Step(200);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().X(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Y(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Z(), 0, TOL);
   world->Step(1);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().X(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Y(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Z(), 0, TOL);
 
   // Predict time of contact with ground plane.
   double tHit = sqrt((z-0.5) / (-gravityZ));
@@ -133,9 +139,9 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->Step(steps);
 
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, 0.4);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().X(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Y(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Z(), -gravityZ, 0.4);
 }
 
 /////////////////////////////////////////////////

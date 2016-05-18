@@ -38,7 +38,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class GAZEBO_VISIBLE PluginJointFeedback
+    class GZ_PHYSICS_VISIBLE PluginJointFeedback
     {
       public: PluginJointFeedback() : contact(NULL), count(0) {}
 
@@ -57,7 +57,7 @@ namespace gazebo
     };
 
     /// \brief Plugin physics engine.
-    class GAZEBO_VISIBLE PluginPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE PluginPhysics : public PhysicsEngine
     {
       /// \enum PluginParam
       /// \brief Plugin Physics parameter types.
@@ -145,10 +145,10 @@ namespace gazebo
       public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
       // Documentation inherited
-      public: virtual void SetWorldCFM(double cfm);
+      // public: virtual void SetWorldCFM(double cfm);
 
       // Documentation inherited
-      public: virtual void SetWorldERP(double erp);
+      // public: virtual void SetWorldERP(double erp);
 
       // Documentation inherited
       public: virtual void SetMaxContacts(unsigned int max_contacts);

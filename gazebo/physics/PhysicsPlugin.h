@@ -52,6 +52,13 @@ typedef int (*InitPhysicsFnPtr)(void);
  */
 typedef int (*LoadModelFnPtr)(void);
 
+/* \brief InitModel function pointer.
+ * This function is called after the model has been loaded (LoadModel).
+ * Use this function to set the model configuration.
+ * \return 0 on success, -1 on error.
+ */
+typedef int (*InitModelFnPtr)(void);
+
 /* \brief SetState function pointer.
  * This function is called after the model has been loaded (LoadModel).
  * Use this function to instantiate or set the state for the model.
@@ -87,6 +94,27 @@ typedef int (*SetPhysicsParamsFnPtr)(void);
  */
 typedef int (*DestroyPhysicsFnPtr)(void);
 
+struct _Quaternion
+{
+  double w;
+  double x;
+  double y;
+  double z;
+};
+
+struct _Vector3
+{
+  double x;
+  double y;
+  double z;
+};
+
+struct _Pose
+{
+  struct _Vector3 pos;
+  struct _Quaternion rot;
+};
+
 /* \brief The physics plugin structure
  * This structure defines all the functions necessary to create and control
  * a physics engine.
@@ -102,7 +130,12 @@ struct _PhysicsPlugin
   /*
    *
    */
-  LoadModelFnPtr initModel;
+  LoadModelFnPtr loadModel;
+
+  /*
+   *
+   */
+  InitModelFnPtr initModel;
 
   /*
    *
@@ -129,6 +162,16 @@ struct _PhysicsPlugin
    * \sa DestroyPhysicsFnPtr
    */
   DestroyPhysicsFnPtr destroyPhysics;
+
+  /* \brief data structure holding model information
+   * that needs to be passed between gazebo and plugin.
+   */
+  int lotOfModelData;
+
+  /* \brief data structure holding state information
+   * that needs to be passed between gazebo and plugin.
+   */
+  struct _Pose *pose;
 };
 typedef struct _PhysicsPlugin PhysicsPlugin;
 

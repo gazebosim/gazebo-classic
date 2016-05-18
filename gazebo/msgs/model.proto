@@ -22,4 +22,11 @@ message Model
   optional bool deleted        = 7;
   repeated Visual visual       = 8;
   optional Vector3d scale      = 9;
+  optional bool self_collide   = 10;
+
+  /// \brief Enable/disable wind effect on this model.
+  optional bool enable_wind    = 11;
+
+  /// \brief An array of nested models.
+  repeated Model model         = 12;
 }

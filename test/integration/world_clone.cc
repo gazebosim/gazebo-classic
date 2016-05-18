@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 
+using namespace gazebo;
 class WorldClone : public ServerFixture
 {
 };
@@ -72,7 +73,7 @@ TEST_F(WorldClone, CloneUnknownWorld)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -108,9 +109,16 @@ TEST_F(WorldClone, CloneUnknownWorld)
   std::string output = custom_exec_str("gz topic -l");
   EXPECT_EQ(output.find("/gazebo/default/"), std::string::npos);
 
-  // Restore GAZEBO_MASTER_URI (if needed)
+  // Restore GAZEBO_MASTER_URI
   if (master)
     setenv("GAZEBO_MASTER_URI", master, 1);
+  // Use default if not available
+  else
+  {
+    std::string port = "http://localhost:" +
+        std::to_string(GAZEBO_DEFAULT_MASTER_PORT);
+    setenv("GAZEBO_MASTER_URI", port.c_str(), 1);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -118,7 +126,7 @@ TEST_F(WorldClone, CloneEmptyPort)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -149,7 +157,7 @@ TEST_F(WorldClone, Clone)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -184,6 +192,7 @@ TEST_F(WorldClone, Clone)
     common::Time::MSleep(20);
 
   ASSERT_EQ(world->GetModelCount(), 0u);
+  common::Time::MSleep(500);
 
   // Check that the original world does not contain the camera topics.
   std::string output = custom_exec_str("gz topic -l");
@@ -192,8 +201,16 @@ TEST_F(WorldClone, Clone)
   // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
   setenv("GAZEBO_MASTER_URI", "http://localhost:11347", 1);
 
-  // Check that the cloned world contains the camera topics.
+  // Give cloned world enough time to initialize transport and then
+  // check that it contains the camera topics.
+  retries = 0;
   output = custom_exec_str("gz topic -l");
+  while (output.find("/gazebo/default/camera/") == std::string::npos
+      && retries++ < 100)
+  {
+    common::Time::MSleep(20);
+    output = custom_exec_str("gz topic -l");
+  }
   EXPECT_NE(output.find("/gazebo/default/camera/"), std::string::npos);
 
   // Kill the cloned server. In the case of no presence of gzserver ps will

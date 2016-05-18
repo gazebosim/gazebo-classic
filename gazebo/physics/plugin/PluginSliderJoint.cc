@@ -32,10 +32,9 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-PluginSliderJoint::PluginSliderJoint(dWorldID _worldId, BasePtr _parent)
+PluginSliderJoint::PluginSliderJoint(BasePtr _parent)
     : SliderJoint<PluginJoint>(_parent)
 {
-  this->jointId = dJointCreateSlider(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -54,24 +53,15 @@ void PluginSliderJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 math::Vector3 PluginSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  dVector3 result;
-  if (this->jointId)
-    dJointGetSliderAxis(this->jointId, result);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
-  return math::Vector3(result[0], result[1], result[2]);
+  gzerr << "Not impelemented\n";
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Angle PluginSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
-  if (this->jointId)
-    result = dJointGetSliderPosition(this->jointId);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "Not impelemented\n";
   return result;
 }
 
@@ -79,18 +69,14 @@ math::Angle PluginSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 double PluginSliderJoint::GetVelocity(unsigned int /*index*/) const
 {
   double result = 0;
-  if (this->jointId)
-    result = dJointGetSliderPositionRate(this->jointId);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "Not impelemented\n";
   return result;
 }
 
 //////////////////////////////////////////////////
 void PluginSliderJoint::SetVelocity(unsigned int /*index*/, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  gzerr << "Not impelemented\n";
 }
 
 //////////////////////////////////////////////////
@@ -101,66 +87,47 @@ void PluginSliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_ax
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  // Plugin needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(0);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
-
-  if (this->jointId)
-  {
-    dJointSetSliderAxis(this->jointId,
-                        globalAxis.x, globalAxis.y, globalAxis.z);
-  }
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "Not impelemented\n";
 }
 
 //////////////////////////////////////////////////
 void PluginSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
-  if (this->jointId)
-    dJointAddSliderForce(this->jointId, _effort);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
+  gzerr << "Not impelemented\n";
 }
 
 //////////////////////////////////////////////////
 void PluginSliderJoint::SetParam(unsigned int _parameter, double _value)
 {
   PluginJoint::SetParam(_parameter, _value);
-  dJointSetSliderParam(this->jointId, _parameter, _value);
+  gzerr << "Not impelemented\n";
 }
 
 //////////////////////////////////////////////////
 double PluginSliderJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
-
-  if (this->jointId)
-    result = dJointGetSliderParam(this->jointId, _parameter);
-  else
-    gzerr << "Plugin Joint ID is invalid\n";
-
+  gzerr << "Not impelemented\n";
   return result;
 }
 
 //////////////////////////////////////////////////
 void PluginSliderJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 {
-  this->SetParam(dParamFMax, _t);
+  gzerr << "Not impelemented\n";
 }
 
 //////////////////////////////////////////////////
 double PluginSliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
-  return this->GetParam(dParamFMax);
+  gzerr << "Not impelemented\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 PluginSliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  dVector3 result;
   gzlog << "PluginSliderJoint::GetAnchor not implemented.\n";
-  return math::Vector3(result[0], result[1], result[2]);
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////

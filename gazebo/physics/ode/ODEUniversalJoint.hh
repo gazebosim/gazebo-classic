@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,12 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A universal joint.
-    class GAZEBO_VISIBLE ODEUniversalJoint : public UniversalJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODEUniversalJoint :
+      public UniversalJoint<ODEJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId ODE world id.
@@ -64,12 +68,6 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited
       public: virtual void SetParam(unsigned int _parameter, double _value);
 
       // Documentation inherited.
@@ -95,6 +93,7 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
+    /// \}
   }
 }
 #endif

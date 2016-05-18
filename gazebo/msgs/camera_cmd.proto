@@ -4,8 +4,6 @@ package gazebo.msgs;
 /// \interface CameraCmd
 /// \brief Message for camera command
 
-import "pose.proto";
-
 message CameraCmd
 {
   optional string follow_model   = 1;

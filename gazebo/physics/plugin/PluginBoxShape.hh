@@ -32,7 +32,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Plugin Box shape
-    class GAZEBO_VISIBLE PluginBoxShape : public BoxShape
+    class GZ_PHYSICS_VISIBLE PluginBoxShape : public BoxShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

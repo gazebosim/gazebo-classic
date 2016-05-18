@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ using namespace physics;
 BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world,
   BasePtr _parent) : UniversalJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
-  this->bulletUniversal = NULL;
+  this->bulletUniversal = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -126,7 +126,7 @@ void BulletUniversalJoint::Init()
   this->SetLowStop(1, this->GetLowerLimit(1));
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->bulletUniversal, true);
 
   // Allows access to impulse
@@ -231,41 +231,6 @@ void BulletUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
   }
   else
     gzerr << "Trying to set force on a joint that has not been created\n";
-}
-
-//////////////////////////////////////////////////
-void BulletUniversalJoint::SetMaxForce(unsigned int _index, double _t)
-{
-  if (this->bulletUniversal)
-  {
-    if (_index == 0)
-      this->bulletUniversal->setMaxMotorImpulse1(_t);
-    else if (_index == 1)
-      this->bulletUniversal->setMaxMotorImpulse2(_t);
-    else
-      gzerr << "Invalid axis index[" << _index << "]\n";
-  }
-  else
-    gzerr << "bulletUniversal does not yet exist" << std::endl;
-}
-
-//////////////////////////////////////////////////
-double BulletUniversalJoint::GetMaxForce(unsigned int _index)
-{
-  double result = 0;
-  if (this->bulletUniversal)
-  {
-    if (_index == 0)
-      result = this->bulletUniversal->getMaxMotorImpulse1();
-    else if (_index == 1)
-      result = this->bulletUniversal->getMaxMotorImpulse2();
-    else
-      gzerr << "Invalid axis index[" << _index << "]\n";
-  }
-  else
-    gzerr << "bulletUniversal does not yet exist" << std::endl;
-
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -446,4 +411,31 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
     gzlog << "bulletUniversal does not yet exist" << std::endl;
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool BulletUniversalJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletUniversalJoint::GetParam(const std::string &_key,
+                                      unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  return BulletJoint::GetParam(_key, _index);
 }

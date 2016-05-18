@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
 #define _QTESTFIXTURE_HH_
 
 #include <string>
-#include <boost/thread.hpp>
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <boost/thread.hpp>
 # include "gazebo/Server.hh"
+# include "gazebo/physics/physics.hh"
+# include "gazebo/rendering/rendering.hh"
 #endif
 
-#include "gazebo/physics/physics.hh"
-#include "gazebo/rendering/rendering.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/qt_test.h"
 
@@ -51,6 +51,14 @@ class QTestFixture : public QObject
   /// \brief Pause or unpause the world.
   /// \param[in] _pause True to pause the world
   protected: void SetPause(bool _pause);
+
+  /// \brief Give the GUI time to process events and trigger main window repaint
+  /// \param[in] _mainWindow Pointer to the main window. If left void, repaint
+  /// won't be triggered.
+  /// \param[in] _repeat Number of times to repeat the loop.
+  /// \param[in] _ms Time to sleep for each loop in milliseconds.
+  protected: void ProcessEventsAndDraw(QMainWindow *_mainWindow = NULL,
+      const unsigned int _repeat = 10, const unsigned int _ms = 30);
 
   /// \brief Get memory information about the current process.
   /// \param[out] _resident Resident size, in Kb.

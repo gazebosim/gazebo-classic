@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,14 +40,14 @@ using namespace physics;
 BulletLink::BulletLink(EntityPtr _parent)
     : Link(_parent)
 {
-  this->rigidLink = NULL;
-  this->compoundShape = NULL;
+  this->rigidLink = nullptr;
+  this->compoundShape = nullptr;
 }
 
 //////////////////////////////////////////////////
 BulletLink::~BulletLink()
 {
-  delete this->compoundShape;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -56,7 +56,7 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
   this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
-  if (this->bulletPhysics == NULL)
+  if (this->bulletPhysics == nullptr)
     gzthrow("Not using the bullet physics engine");
 
   Link::Load(_sdf);
@@ -71,10 +71,10 @@ void BulletLink::Init()
 
   Link::Init();
 
-  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Unable to initialize link, SDF is null");
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
-  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   btScalar mass = this->inertial->GetMass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
@@ -108,8 +108,13 @@ void BulletLink::Init()
       collision = boost::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
 
-      hackMu1 = collision->GetBulletSurface()->frictionPyramid.GetMuPrimary();
-      hackMu2 = collision->GetBulletSurface()->frictionPyramid.GetMuSecondary();
+      SurfaceParamsPtr surface = collision->GetSurface();
+      GZ_ASSERT(surface, "Surface pointer for is invalid");
+      FrictionPyramidPtr friction = surface->FrictionPyramid();
+      GZ_ASSERT(friction, "Friction pointer is invalid");
+
+      hackMu1 = friction->MuPrimary();
+      hackMu2 = friction->MuSecondary();
       // gzerr << "link[" << this->GetName()
       //       << "] mu[" << hackMu1
       //       << "] mu2[" << hackMu2 << "]\n";
@@ -147,6 +152,7 @@ void BulletLink::Init()
   this->rigidLink->setUserPointer(this);
   this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
       btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+  this->rigidLink->setFlags(BT_ENABLE_GYROPSCOPIC_FORCE);
 
   /// \TODO: get friction from collision object
   this->rigidLink->setAnisotropicFriction(btVector3(1, 1, 1),
@@ -162,7 +168,7 @@ void BulletLink::Init()
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+  GZ_ASSERT(bulletWorld != nullptr, "Bullet dynamics world is null");
 
   // bullet supports setting bits to a rigid body but not individual
   // shapes/collisions so find the first child collision and set rigid body to
@@ -203,10 +209,32 @@ void BulletLink::Init()
 //////////////////////////////////////////////////
 void BulletLink::Fini()
 {
+  if (this->bulletPhysics && this->rigidLink)
+  {
+    btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+    if (bulletWorld)
+      bulletWorld->removeRigidBody(this->rigidLink);
+
+    delete this->rigidLink;
+  }
+  this->bulletPhysics.reset();
+  this->rigidLink = nullptr;
+
+  if (this->compoundShape)
+    delete this->compoundShape;
+  this->compoundShape = nullptr;
+
   Link::Fini();
-  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
-  bulletWorld->removeRigidBody(this->rigidLink);
+}
+
+/////////////////////////////////////////////////////////////////////
+void BulletLink::UpdateMass()
+{
+  if (this->rigidLink && this->inertial)
+  {
+    this->rigidLink->setMassProps(this->inertial->GetMass(),
+        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -224,8 +252,8 @@ void BulletLink::SetGravityMode(bool _mode)
     // this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
   else
   {
-    math::Vector3 g = this->bulletPhysics->GetGravity();
-    this->rigidLink->setGravity(btVector3(g.x, g.y, g.z));
+    auto g = this->world->Gravity();
+    this->rigidLink->setGravity(btVector3(g.X(), g.Y(), g.Z()));
     /*btScalar btMass = this->mass.GetAsDouble();
     btmath::Vector3 fallInertia(0, 0, 0);
 
@@ -265,7 +293,7 @@ void BulletLink::SetSelfCollide(bool _collide)
 
   BulletCollision *bcollision = dynamic_cast<BulletCollision*>(_collision);
 
-  if (_collision == NULL)
+  if (_collision == nullptr)
     gzthrow("requires BulletCollision");
 
   btTransform trans;
@@ -362,7 +390,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
   }
 
   math::Pose wPose = this->GetWorldPose();
-  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 offsetFromCoG = wPose.rot*(_offset - this->inertial->GetCoG());
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
@@ -383,7 +411,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset,
   }
 
   math::Pose wPose = this->GetWorldPose();
-  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 offsetFromCoG = _q*_offset
         - wPose.rot*this->inertial->GetCoG();
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
@@ -490,7 +518,7 @@ void BulletLink::ClearCollisionCache()
   }
 
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+  GZ_ASSERT(bulletWorld != nullptr, "Bullet dynamics world is null");
 
   bulletWorld->updateSingleAabb(this->rigidLink);
   bulletWorld->getBroadphase()->getOverlappingPairCache()->
@@ -573,6 +601,14 @@ void BulletLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
                   const math::Vector3 &/*_relpos*/)
 {
   gzlog << "BulletLink::AddForceAtRelativePosition not yet implemented."
+        << std::endl;
+}
+
+//////////////////////////////////////////////////
+void BulletLink::AddLinkForce(const math::Vector3 &/*_force*/,
+    const math::Vector3 &/*_offset*/)
+{
+  gzlog << "BulletLink::AddLinkForce not yet implemented (#1476)."
         << std::endl;
 }
 

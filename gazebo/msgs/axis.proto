@@ -8,11 +8,12 @@ import "vector3d.proto";
 
 message Axis
 {
-  required Vector3d xyz          = 1;
-  required double limit_lower    = 2;
-  required double limit_upper    = 3;
-  required double limit_effort   = 4;
-  required double limit_velocity = 5;
-  required double damping        = 6;
-  required double friction       = 7;
+  required Vector3d xyz                = 1;
+  required double limit_lower          = 2;
+  required double limit_upper          = 3;
+  required double limit_effort         = 4;
+  required double limit_velocity       = 5;
+  required double damping              = 6;
+  required double friction             = 7;
+  required bool use_parent_model_frame = 8;
 }

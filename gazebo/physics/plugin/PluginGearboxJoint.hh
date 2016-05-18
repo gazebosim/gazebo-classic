@@ -31,7 +31,7 @@ namespace gazebo
   {
     /// \class PluginGearboxJoint PluginGearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint.
-    class GAZEBO_VISIBLE PluginGearboxJoint : public GearboxJoint<PluginJoint>
+    class GZ_PHYSICS_VISIBLE PluginGearboxJoint : public GearboxJoint<PluginJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID Plugin id of the world.

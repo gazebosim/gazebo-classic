@@ -78,21 +78,13 @@ void PluginSurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface friction sdf member is NULL" << std::endl;
       else
       {
-        sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("plugin");
-        if (!frictionOdeElem)
-          gzerr << "Surface friction plugin sdf member is NULL" << std::endl;
-        else
-        {
-          this->frictionPyramid.SetMuPrimary(
-            frictionOdeElem->Get<double>("mu"));
-          this->frictionPyramid.SetMuSecondary(
-            frictionOdeElem->Get<double>("mu2"));
-          this->frictionPyramid.direction1 =
-            frictionOdeElem->Get<math::Vector3>("fdir1");
-
-          this->slip1 = frictionOdeElem->Get<double>("slip1");
-          this->slip2 = frictionOdeElem->Get<double>("slip2");
-        }
+        gzerr << "Surface friction plugin physics sdf member is"
+              << " not defined." << std::endl;
+        this->frictionPyramid->SetMuPrimary(1);
+        this->frictionPyramid->SetMuSecondary(1);
+        this->frictionPyramid->direction1 = math::Vector3(1, 0, 0);
+        this->slip1 = 0;
+        this->slip2 = 0;
       }
     }
 
@@ -102,17 +94,14 @@ void PluginSurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface contact sdf member is NULL" << std::endl;
       else
       {
-        sdf::ElementPtr contactOdeElem = contactElem->GetElement("plugin");
-        if (!contactOdeElem)
-          gzerr << "Surface contact plugin sdf member is NULL" << std::endl;
-        {
-          this->kp = contactOdeElem->Get<double>("kp");
-          this->kd = contactOdeElem->Get<double>("kd");
-          this->cfm = contactOdeElem->Get<double>("soft_cfm");
-          this->erp = contactOdeElem->Get<double>("soft_erp");
-          this->maxVel = contactOdeElem->Get<double>("max_vel");
-          this->minDepth = contactOdeElem->Get<double>("min_depth");
-        }
+        gzerr << "Surface contact plugin physics sdf member is "
+              << "not defined." << std::endl;
+        this->kp = 1e6;
+        this->kd = 1.0;
+        this->cfm = 0.0;
+        this->erp = 0.2;
+        this->maxVel = 100.0;
+        this->minDepth = 0.0;
       }
     }
   }
@@ -123,12 +112,12 @@ void PluginSurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMuSecondary());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
-            this->frictionPyramid.direction1);
+            this->frictionPyramid->direction1.Ign());
 
   _msg.set_restitution_coefficient(this->bounce);
   _msg.set_bounce_threshold(this->bounceThreshold);
@@ -149,16 +138,16 @@ void PluginSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_friction())
   {
     if (_msg.friction().has_mu())
-      this->frictionPyramid.SetMuPrimary(_msg.friction().mu());
+      this->frictionPyramid->SetMuPrimary(_msg.friction().mu());
     if (_msg.friction().has_mu2())
-      this->frictionPyramid.SetMuSecondary(_msg.friction().mu2());
+      this->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())
       this->slip2 = _msg.friction().slip2();
     if (_msg.friction().has_fdir1())
-      this->frictionPyramid.direction1 =
-        msgs::Convert(_msg.friction().fdir1());
+      this->frictionPyramid->direction1 =
+        msgs::ConvertIgn(_msg.friction().fdir1());
   }
 
   if (_msg.has_restitution_coefficient())

@@ -34,7 +34,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A single axis hinge joint.
-    class GAZEBO_VISIBLE PluginHingeJoint : public HingeJoint<PluginJoint>
+    class GZ_PHYSICS_VISIBLE PluginHingeJoint : public HingeJoint<PluginJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID Plugin id of the world.

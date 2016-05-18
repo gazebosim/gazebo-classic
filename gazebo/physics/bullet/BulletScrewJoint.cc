@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,9 +97,9 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
-    : ScrewJoint<BulletJoint>(_parent), bulletScrew(NULL)
+    : ScrewJoint<BulletJoint>(_parent), bulletScrew(nullptr)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
 }
 
@@ -235,7 +235,7 @@ void BulletScrewJoint::Init()
 
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Joint sdf member is null");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   // joint limit is set on the revolute dof in sdf,
@@ -266,7 +266,7 @@ void BulletScrewJoint::Init()
   this->constraint = this->bulletScrew;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse
@@ -389,26 +389,6 @@ void BulletScrewJoint::SetForceImpl(unsigned int _index, double _force)
   }
   else
     gzerr << "bulletScrew not created yet.\n";
-}
-
-//////////////////////////////////////////////////
-void BulletScrewJoint::SetMaxForce(unsigned int /*_index*/, double _force)
-{
-  if (this->bulletScrew)
-    this->bulletScrew->setMaxLinMotorForce(_force);
-  else
-    gzerr << "bulletScrew not created yet\n";
-}
-
-//////////////////////////////////////////////////
-double BulletScrewJoint::GetMaxForce(unsigned int /*index*/)
-{
-  double result = 0;
-  if (this->bulletScrew)
-    result = this->bulletScrew->getMaxLinMotorForce();
-  else
-    gzerr << "bulletScrew not created yet\n";
-  return result;
 }
 
 //////////////////////////////////////////////////

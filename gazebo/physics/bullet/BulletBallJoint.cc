@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ using namespace physics;
 BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
     : BallJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
-  this->bulletBall = NULL;
+  this->bulletBall = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -126,7 +126,7 @@ void BulletBallJoint::Init()
   this->constraint = this->bulletBall;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse
@@ -153,20 +153,6 @@ double BulletBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
-}
-
-/////////////////////////////////////////////////
-double BulletBallJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented\n";
-  return 0;
-}
-
-/////////////////////////////////////////////////
-void BulletBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented\n";
-  return;
 }
 
 /////////////////////////////////////////////////

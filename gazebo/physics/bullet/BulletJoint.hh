@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all joints
-    class GAZEBO_VISIBLE BulletJoint : public Joint
+    class GZ_PHYSICS_VISIBLE BulletJoint : public Joint
     {
       /// \brief Constructor
       public: BulletJoint(BasePtr _parent);
@@ -48,6 +48,9 @@ namespace gazebo
 
       /// \brief Load a BulletJoint
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Fini();
 
       /// \brief Reset the joint
       public: virtual void Reset();
@@ -91,10 +94,6 @@ namespace gazebo
       /// \param index The index of the body(0 or 1)
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
-      /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute(Attribute, unsigned int _index,
-                                        double _value);
-
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
@@ -109,6 +108,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual math::Angle GetLowStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual void SetProvideFeedback(bool _enable);
 
       // Documentation inherited.
       public: virtual void CacheForceTorque();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <math.h>
 #include <sstream>
 
@@ -28,6 +23,7 @@
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
@@ -41,7 +37,7 @@ using namespace physics;
 ODELink::ODELink(EntityPtr _parent)
     : Link(_parent)
 {
-  this->linkId = NULL;
+  this->linkId = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -49,7 +45,7 @@ ODELink::~ODELink()
 {
   if (this->linkId)
     dBodyDestroy(this->linkId);
-  this->linkId = NULL;
+  this->linkId = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -58,7 +54,7 @@ void ODELink::Load(sdf::ElementPtr _sdf)
   this->odePhysics = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
-  if (this->odePhysics == NULL)
+  if (this->odePhysics == nullptr)
     gzthrow("Not using the ode physics engine");
 
   Link::Load(_sdf);
@@ -86,7 +82,7 @@ void ODELink::Init()
     }
   }
 
-  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Unable to initialize link, SDF is null");
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
@@ -97,42 +93,16 @@ void ODELink::Init()
 
   if (this->linkId)
   {
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     math::Vector3 cogVec = this->inertial->GetCoG();
-    Base_V::iterator iter;
-    for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+    for (auto const &child : this->children)
     {
-      if ((*iter)->HasType(Base::COLLISION))
+      if (child->HasType(Base::COLLISION))
       {
-        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
+        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
         if (g->IsPlaceable() && g->GetCollisionId())
         {
           dGeomSetBody(g->GetCollisionId(), this->linkId);
-
-          // update pose immediately
-          math::Pose localPose = g->GetRelativePose();
-          localPose.pos -= cogVec;
-
-          dQuaternion q;
-          q[0] = localPose.rot.w;
-          q[1] = localPose.rot.x;
-          q[2] = localPose.rot.y;
-          q[3] = localPose.rot.z;
-
-          // Set the pose of the encapsulated collision; this is always relative
-          // to the CoM
-          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
-              localPose.pos.y, localPose.pos.z);
-          dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
-
-          // Set max_vel and min_depth
-          if (g->GetODESurface()->maxVel < 0)
-          {
-            g->GetODESurface()->maxVel =
-             this->GetWorld()->GetPhysicsEngine()->GetContactMaxCorrectingVel();
-          }
-          dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
-          dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
         }
       }
     }
@@ -144,8 +114,12 @@ void ODELink::Init()
           << " in ODELink::Init" << std::endl;
   }
 
-  // Update the Center of Mass.
-  this->UpdateMass();
+  // Update the Collision Offsets, Surface, and Center of Mass.
+  this->UpdateCollisionOffsets();
+  this->UpdateSurface();
+  // Only update the Center of Mass if object is dynamic
+  if (!this->GetKinematic())
+    this->UpdateMass();
 
   if (this->linkId)
   {
@@ -180,16 +154,26 @@ void ODELink::MoveCallback(dBodyID _id)
   self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
-  GZ_ASSERT(self->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(self->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 cog = self->dirtyPose.rot.RotateVector(
       self->inertial->GetCoG());
 
   self->dirtyPose.pos -= cog;
 
-  // TODO: this is an ugly line of code. It's like this for speed.
-  self->world->dirtyPoses.push_back(self);
+  // Tell the world that our pose has changed.
+  self->world->_AddDirty(self);
 
   // self->poseMutex->unlock();
+
+  // get force and applied to this body
+  if (_id)
+  {
+    const dReal *dforce = dBodyGetForce(_id);
+    self->force.Set(dforce[0], dforce[1], dforce[2]);
+
+    const dReal *dtorque = dBodyGetTorque(_id);
+    self->torque.Set(dtorque[0], dtorque[1], dtorque[2]);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -198,7 +182,7 @@ void ODELink::Fini()
   Link::Fini();
   if (this->linkId)
     dBodyDestroy(this->linkId);
-  this->linkId = NULL;
+  this->linkId = nullptr;
 
   this->odePhysics.reset();
 }
@@ -262,7 +246,7 @@ void ODELink::OnPoseChange()
 
   const math::Pose myPose = this->GetWorldPose();
 
-  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
@@ -323,17 +307,69 @@ bool ODELink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////////////////////////
+void ODELink::UpdateCollisionOffsets()
+{
+  if (this->linkId)
+  {
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
+    math::Vector3 cogVec = this->inertial->GetCoG();
+    for (auto const &child : this->children)
+    {
+      if (child->HasType(Base::COLLISION))
+      {
+        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
+        if (g->IsPlaceable() && g->GetCollisionId())
+        {
+          // update pose immediately
+          math::Pose localPose = g->GetRelativePose();
+          localPose.pos -= cogVec;
+
+          dQuaternion q;
+          q[0] = localPose.rot.w;
+          q[1] = localPose.rot.x;
+          q[2] = localPose.rot.y;
+          q[3] = localPose.rot.z;
+
+          // Set the pose of the encapsulated collision; this is always relative
+          // to the CoM
+          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
+              localPose.pos.y, localPose.pos.z);
+          dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
+        }
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
 void ODELink::UpdateSurface()
 {
-  Base_V::iterator iter;
-  Base_V::iterator iter_end = this->children.end();
-  for (iter = this->children.begin(); iter != iter_end; ++iter)
+  if (!this->linkId)
   {
-    if ((*iter)->HasType(Base::COLLISION))
+    return;
+  }
+
+  for (auto const &child : this->children)
+  {
+    if (child->HasType(Base::COLLISION))
     {
-      ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
+      ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
       if (g->IsPlaceable() && g->GetCollisionId())
       {
+        // Set max_vel and min_depth
+        boost::any value;
+        if (g->GetODESurface()->maxVel < 0 && this->GetWorld()->
+            GetPhysicsEngine()->GetParam("contact_max_correcting_vel", value))
+        {
+          try
+          {
+            g->GetODESurface()->maxVel = boost::any_cast<double>(value);
+          }
+          catch(boost::bad_any_cast &_e)
+          {
+            gzerr << "Failed boost::any_cast in ODELink.cc: " << _e.what();
+          }
+        }
         // Set surface properties max_vel and min_depth
         dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
         dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
@@ -341,6 +377,7 @@ void ODELink::UpdateSurface()
     }
   }
 }
+
 /////////////////////////////////////////////////////////////////////
 void ODELink::UpdateMass()
 {
@@ -358,7 +395,7 @@ void ODELink::UpdateMass()
   // The CoG must always be (0, 0, 0)
   math::Vector3 cog(0, 0, 0);
 
-  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   // give ODE un-rotated inertia
   math::Matrix3 moi = this->inertial->GetMOI(
     math::Pose(this->inertial->GetCoG(), math::Quaternion()));
@@ -374,6 +411,10 @@ void ODELink::UpdateMass()
     dBodySetMass(this->linkId, &odeMass);
   else
     gzthrow("Setting custom link " + this->GetScopedName() + "mass to zero!");
+
+  // In case the center of mass changed:
+  this->UpdateCollisionOffsets();
+  this->OnPoseChange();
 }
 
 //////////////////////////////////////////////////
@@ -396,7 +437,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
   if (this->linkId)
   {
     dVector3 dvel;
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     math::Vector3 offsetFromCoG = _offset - this->inertial->GetCoG();
     dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
         offsetFromCoG.z, dvel);
@@ -421,7 +462,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
   {
     dVector3 dvel;
     math::Pose wPose = this->GetWorldPose();
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     math::Vector3 offsetFromCoG =
         wPose.rot.RotateVectorReverse(_q * _offset)
         - this->inertial->GetCoG();
@@ -583,6 +624,31 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
   }
 }
 
+//////////////////////////////////////////////////
+void ODELink::AddLinkForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+  if (this->linkId)
+  {
+    // Force vector represents a direction only, so it should be rotated but
+    // not translated
+    math::Vector3 forceWorld = this->GetWorldPose().rot.RotateVector(_force);
+    // Does this need to be rotated?
+    math::Vector3 offsetCoG = _offset - this->inertial->GetCoG();
+
+    this->SetEnabled(true);
+    dBodyAddForceAtRelPos(this->linkId,
+        forceWorld.x, forceWorld.y, forceWorld.z,
+        offsetCoG.x, offsetCoG.y, offsetCoG.z);
+  }
+  else if (!this->IsStatic())
+  {
+    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
+          << " does not exist, unable to AddLinkForce"
+          << std::endl;
+  }
+}
+
 /////////////////////////////////////////////////
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {
@@ -612,51 +678,13 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 /////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldForce() const
 {
-  math::Vector3 force;
-
-  if (this->linkId)
-  {
-    const dReal *dforce;
-
-    dforce = dBodyGetForce(this->linkId);
-
-    force.x = dforce[0];
-    force.y = dforce[1];
-    force.z = dforce[2];
-  }
-  else if (!this->IsStatic() && this->initialized)
-  {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, GetWorldForce returns default of "
-          << force << std::endl;
-  }
-
-  return force;
+  return this->force;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldTorque() const
 {
-  math::Vector3 torque;
-
-  if (this->linkId)
-  {
-    const dReal *dtorque;
-
-    dtorque = dBodyGetTorque(this->linkId);
-
-    torque.x = dtorque[0];
-    torque.y = dtorque[1];
-    torque.z = dtorque[2];
-  }
-  else if (!this->IsStatic() && this->initialized)
-  {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, GetWorldTorque returns default of "
-          << torque << std::endl;
-  }
-
-  return torque;
+  return this->torque;
 }
 
 //////////////////////////////////////////////////

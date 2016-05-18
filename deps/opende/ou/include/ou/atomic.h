@@ -98,7 +98,7 @@
 #include <ou/namespace.h>
 #include <ou/platform.h>
 
-#include <gazebo/util/system.hh>
+#include <ou/ou_dll.h>
 
 
 /**
@@ -412,32 +412,32 @@ typedef PVOID atomicptr;
 
 #define __OU_ATOMIC_ORD32_FUNCTIONS_DEFINED
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicIncrement(volatile atomicord32 *paoDestination)
 {
 	return ::InterlockedIncrement((__ou_intlck_target_t)paoDestination);
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicDecrement(volatile atomicord32 *paoDestination)
 {
 	return ::InterlockedDecrement((__ou_intlck_target_t)paoDestination);
 }
 
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicExchange(volatile atomicord32 *paoDestination, atomicord32 aoExchange)
 {
 	return ::InterlockedExchange((__ou_intlck_target_t)paoDestination, aoExchange);
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicExchangeAdd(volatile atomicord32 *paoDestination, atomicord32 aoAddend)
 {
 	return ::InterlockedExchangeAdd((__ou_xchgadd_target_t)paoDestination, aoAddend);
 }
 
-static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*bool */AtomicCompareExchange(volatile atomicord32 *paoDestination, atomicord32 aoComparand, atomicord32 aoExchange)
 {
 	return (aoComparand == (atomicord32)::InterlockedCompareExchange((__ou_cmpxchg_target_t)paoDestination, (__ou_cmpxchg_value_t)aoExchange, (__ou_cmpxchg_value_t)aoComparand));
@@ -446,7 +446,7 @@ static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_V
 
 #define __OU_ATOMIC_BIT_FUNCTIONS_DEFINED
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicAnd(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	atomicord32 aoOldValue = *paoDestination;
@@ -466,7 +466,7 @@ static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API G
     return aoOldValue;
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicOr(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	atomicord32 aoOldValue = *paoDestination;
@@ -486,7 +486,7 @@ static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API G
     return aoOldValue;
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicXor(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	atomicord32 aoOldValue = *paoDestination;
@@ -509,7 +509,7 @@ static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API G
 
 #define __OU_ATOMIC_PTR_FUNCTIONS_DEFINED
 
-static _OU_ALWAYSINLINE_PRE atomicptr _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE
+static _OU_ALWAYSINLINE_PRE atomicptr _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicptr */AtomicExchangePointer(volatile atomicptr *papDestination, atomicptr apExchange)
 {
 #if _OU_TARGET_BITS == _OU_TARGET_BITS_32
@@ -525,7 +525,7 @@ static _OU_ALWAYSINLINE_PRE atomicptr _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZ
 #endif // #if _OU_TARGET_BITS == ...
 }
 
-static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE
+static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*bool */AtomicCompareExchangePointer(volatile atomicptr *papDestination, atomicptr apComparand, atomicptr apExchange)
 {
 #if _OU_TARGET_BITS == _OU_TARGET_BITS_32
@@ -572,32 +572,32 @@ typedef void *atomicptr;
 
 #define __OU_ATOMIC_ORD32_FUNCTIONS_DEFINED
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicIncrement(volatile atomicord32 *paoDestination)
 {
 	return (atomic_add_value(paoDestination, 1U) + 1U);
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicDecrement(volatile atomicord32 *paoDestination)
 {
 	return (atomic_sub_value(paoDestination, 1U) - 1U);
 }
 
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicExchange(volatile atomicord32 *paoDestination, atomicord32 aoExchange)
 {
 	return _smp_xchg(paoDestination, aoExchange);
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicExchangeAdd(volatile atomicord32 *paoDestination, atomicord32 aoAddend)
 {
 	return atomic_add_value(paoDestination, aoAddend);
 }
 
-static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*bool */AtomicCompareExchange(volatile atomicord32 *paoDestination, atomicord32 aoComparand, atomicord32 aoExchange)
 {
 	return (aoComparand == (atomicord32)_smp_cmpxchg(paoDestination, aoComparand, aoExchange));
@@ -606,19 +606,19 @@ static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_V
 
 #define __OU_ATOMIC_BIT_FUNCTIONS_DEFINED
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicAnd(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	return atomic_clr_value(paoDestination, ~aoBitMask);
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicOr(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	return atomic_set_value(paoDestination, aoBitMask);
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicXor(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	return atomic_toggle_value(paoDestination, aoBitMask);
@@ -627,37 +627,37 @@ static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API G
 
 #define __OU_ATOMIC_ORD32_NORESULT_FUNCTIONS_DEFINED
 
-static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*void */AtomicIncrementNoResult(volatile atomicord32 *paoDestination)
 {
 	atomic_add(paoDestination, 1U);
 }
 
-static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*void */AtomicDecrementNoResult(volatile atomicord32 *paoDestination)
 {
 	atomic_sub(paoDestination, 1U);
 }
 
-static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*void */AtomicExchangeAddNoResult(volatile atomicord32 *paoDestination, atomicord32 aoAddend)
 {
 	atomic_add(paoDestination, aoAddend);
 }
 
-static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*void */AtomicAndNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	atomic_clr(paoDestination, ~aoBitMask);
 }
 
-static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*void */AtomicOrNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	atomic_set(paoDestination, aoBitMask);
 }
 
-static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*void */AtomicXorNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask)
 {
 	atomic_toggle(paoDestination, aoBitMask);
@@ -693,20 +693,20 @@ typedef void *atomicptr;
 
 #define __OU_ATOMIC_ORD32_FUNCTIONS_DEFINED
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicIncrement(volatile atomicord32 *paoDestination)
 {
 	return OSAtomicIncrement32Barrier(paoDestination);
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicDecrement(volatile atomicord32 *paoDestination)
 {
 	return OSAtomicDecrement32Barrier(paoDestination);
 }
 
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicExchange(volatile atomicord32 *paoDestination, atomicord32 aoExchange)
 {
 	atomicord32 aoOldValue = *paoDestination;
@@ -728,13 +728,13 @@ static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API G
 	return aoOldValue;
 }
 
-static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE atomicord32 _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*atomicord32 */AtomicExchangeAdd(volatile atomicord32 *paoDestination, atomicord32 aoAddend)
 {
 	return (OSAtomicAdd32Barrier(aoAddend, paoDestination) - aoAddend);
 }
 
-static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API GAZEBO_VISIBLE 
+static _OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 /*bool */AtomicCompareExchange(volatile atomicord32 *paoDestination, atomicord32 aoComparand, atomicord32 aoExchange)
 {
 	return OSAtomicCompareAndSwap32Barrier(aoComparand, aoExchange, paoDestination);
@@ -1502,19 +1502,19 @@ atomicord32 _OU_CONVENTION_API AtomicXor(volatile atomicord32 *paoDestination, a
 
 #if !defined(__OU_ATOMIC_PTR_FUNCTIONS_DEFINED)
 
-atomicptr _OU_CONVENTION_API GAZEBO_VISIBLE AtomicExchangePointer(volatile atomicptr *papDestination, atomicptr apExchange);
-bool _OU_CONVENTION_API GAZEBO_VISIBLE AtomicCompareExchangePointer(volatile atomicptr *papDestination, atomicptr apComparand, atomicptr apExchange);
+atomicptr _OU_CONVENTION_API OU_VISIBLE AtomicExchangePointer(volatile atomicptr *papDestination, atomicptr apExchange);
+bool _OU_CONVENTION_API OU_VISIBLE AtomicCompareExchangePointer(volatile atomicptr *papDestination, atomicptr apComparand, atomicptr apExchange);
 
 
 #if defined(__OU_DOXYGEN__) 
 
 // Doxygen fooling declarations (used for documentation generation only)
-void _OU_CONVENTION_API GAZEBO_VISIBLE AtomicIncrementNoResult(volatile atomicord32 *paoDestination);
-void _OU_CONVENTION_API GAZEBO_VISIBLE AtomicDecrementNoResult(volatile atomicord32 *paoDestination);
-void _OU_CONVENTION_API GAZEBO_VISIBLE AtomicExchangeAddNoResult(volatile atomicord32 *paoDestination, atomicord32 aoAddend);
-void _OU_CONVENTION_API GAZEBO_VISIBLE AtomicAndNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask);
-void _OU_CONVENTION_API GAZEBO_VISIBLE AtomicOrNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask);
-void _OU_CONVENTION_API GAZEBO_VISIBLE AtomicXorNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask);
+void _OU_CONVENTION_API OU_VISIBLE AtomicIncrementNoResult(volatile atomicord32 *paoDestination);
+void _OU_CONVENTION_API OU_VISIBLE AtomicDecrementNoResult(volatile atomicord32 *paoDestination);
+void _OU_CONVENTION_API OU_VISIBLE AtomicExchangeAddNoResult(volatile atomicord32 *paoDestination, atomicord32 aoAddend);
+void _OU_CONVENTION_API OU_VISIBLE AtomicAndNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask);
+void _OU_CONVENTION_API OU_VISIBLE AtomicOrNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask);
+void _OU_CONVENTION_API OU_VISIBLE AtomicXorNoResult(volatile atomicord32 *paoDestination, atomicord32 aoBitMask);
 
 
 #endif // #if defined(__OU_DOXYGEN__)
@@ -1524,8 +1524,8 @@ void _OU_CONVENTION_API GAZEBO_VISIBLE AtomicXorNoResult(volatile atomicord32 *p
 #define __OU_ATOMIC_INITIALIZATION_FUNCTIONS_REQUIRED
 
 // Initialization must be performed from main thread
-bool _OU_CONVENTION_API GAZEBO_VISIBLE InitializeAtomicAPI();
-void _OU_CONVENTION_API GAZEBO_VISIBLE FinalizeAtomicAPI();
+bool _OU_CONVENTION_API OU_VISIBLE InitializeAtomicAPI();
+void _OU_CONVENTION_API OU_VISIBLE FinalizeAtomicAPI();
 
 
 #endif // #if !defined(__OU_ATOMIC_PTR_FUNCTIONS_DEFINED)
@@ -1582,14 +1582,14 @@ static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
 #if !defined(__OU_ATOMIC_INITIALIZATION_FUNCTIONS_REQUIRED)
 
 // Initialization must be performed from main thread
-static _OU_INLINE bool _OU_CONVENTION_API GAZEBO_VISIBLE InitializeAtomicAPI()
+static _OU_INLINE bool _OU_CONVENTION_API InitializeAtomicAPI()
 {
 	// Do nothing
 	
 	return true;
 }
 
-static _OU_INLINE void _OU_CONVENTION_API GAZEBO_VISIBLE FinalizeAtomicAPI()
+static _OU_INLINE void _OU_CONVENTION_API FinalizeAtomicAPI()
 {
 	// Do nothing
 }

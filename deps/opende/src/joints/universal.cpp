@@ -21,7 +21,7 @@
  *************************************************************************/
 
 
-#include <ode/misc.h>
+#include <gazebo/ode/misc.h>
 #include "config.h"
 #include "universal.h"
 #include "joint_internal.h"
@@ -321,8 +321,6 @@ dxJointUniversal::getInfo2( dxJoint::Info2 *info )
       info->cfm[1] = cfm;
       info->cfm[2] = cfm;
       info->cfm[3] = cfm;
-      info->cfm[4] = cfm;
-      info->cfm[5] = cfm;
     }
 
     // set the three ball-and-socket rows

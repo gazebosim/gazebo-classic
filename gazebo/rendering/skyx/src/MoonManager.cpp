@@ -222,7 +222,10 @@ namespace SkyX
         center += radius_add;
 
         radius = -radius;
-        center = center;
+        // clang warning: explicitly assigning value of variable of type
+        // 'Ogre::Real' (aka 'float') to itself
+        //
+        // center = center;
       }
       // [0.5, 1]
       else

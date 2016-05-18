@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,75 +15,90 @@
  *
 */
 
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector2.hh>
+
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WallInspectorDialog.hh"
-#include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
+#include "gazebo/gui/building/WallSegmentItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
-    const double _height) : SegmentItem(), BuildingItem()
+WallSegmentItem::WallSegmentItem(const ignition::math::Vector2d &_start,
+    const ignition::math::Vector2d &_end, const double _height)
+  : SegmentItem(), dataPtr(new WallSegmentItemPrivate())
 {
   this->editorType = "WallSegment";
-  this->scale = BuildingMaker::conversionScale;
+
+  this->dataPtr->measure = new MeasureItem(this->StartPoint(),
+                                           this->EndPoint());
+  this->dataPtr->measure->setParentItem(this);
+  this->SegmentUpdated();
 
   this->level = 0;
 
-  this->wallThickness = 15;
-  this->wallHeight = _height;
+  this->dataPtr->wallThickness = 15;
+  this->dataPtr->wallHeight = _height;
 
-  this->SetThickness(this->wallThickness);
+  this->SetThickness(this->dataPtr->wallThickness);
   this->SetLine(_start, _end);
-  this->SetColor(QColor(247, 142, 30));
+  this->SetColor(common::Color(247, 142, 30));
+
+  this->zValueIdle = 0;
+  this->zValueSelected = 5;
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
 
-  this->inspector = new WallInspectorDialog();
-  this->inspector->setModal(false);
-  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+  this->dataPtr->inspector = new WallInspectorDialog();
+  this->dataPtr->inspector->setModal(false);
+  connect(this->dataPtr->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
-  this->openInspectorAct = new QAction(tr("&Open Wall Inspector"), this);
-  this->openInspectorAct->setStatusTip(tr("Open Wall Inspector"));
-  connect(this->openInspectorAct, SIGNAL(triggered()),
+  this->dataPtr->openInspectorAct =
+      new QAction(tr("&Open Wall Inspector"), this);
+  this->dataPtr->openInspectorAct->setStatusTip(tr("Open Wall Inspector"));
+  connect(this->dataPtr->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
-  this->deleteItemAct = new QAction(tr("&Delete"), this);
-  this->deleteItemAct->setStatusTip(tr("Delete"));
-  connect(this->deleteItemAct, SIGNAL(triggered()),
+  this->dataPtr->deleteItemAct = new QAction(tr("&Delete"), this);
+  this->dataPtr->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(this->dataPtr->deleteItemAct, SIGNAL(triggered()),
     this, SLOT(OnDeleteItem()));
 }
 
 /////////////////////////////////////////////////
 WallSegmentItem::~WallSegmentItem()
 {
-  delete this->inspector;
+  delete this->dataPtr->inspector;
 }
 
 /////////////////////////////////////////////////
-double WallSegmentItem::GetHeight() const
+double WallSegmentItem::Height() const
 {
-  return this->wallHeight;
+  return this->dataPtr->wallHeight;
 }
 
 /////////////////////////////////////////////////
-void WallSegmentItem::SetHeight(double _height)
+void WallSegmentItem::SetHeight(const double _height)
 {
-  this->wallHeight = _height;
+  this->dataPtr->wallHeight = _height;
 }
 
 /////////////////////////////////////////////////
 WallSegmentItem *WallSegmentItem::Clone() const
 {
-  WallSegmentItem *wallSegmentItem = new WallSegmentItem(this->GetStartPoint(),
-      this->GetEndPoint(), this->wallHeight);
+  WallSegmentItem *wallSegmentItem = new WallSegmentItem(this->StartPoint(),
+      this->EndPoint(), this->dataPtr->wallHeight);
 
   wallSegmentItem->SetLevel(this->level);
-  wallSegmentItem->SetThickness(this->wallThickness);
+  wallSegmentItem->SetThickness(this->dataPtr->wallThickness);
 
   return wallSegmentItem;
 }
@@ -98,8 +113,8 @@ void WallSegmentItem::Update()
 /////////////////////////////////////////////////
 void WallSegmentItem::WallSegmentChanged()
 {
-  emit DepthChanged(this->wallThickness);
-  emit HeightChanged(this->wallHeight);
+  emit DepthChanged(this->dataPtr->wallThickness);
+  emit HeightChanged(this->dataPtr->wallHeight);
   emit PosZChanged(this->levelBaseHeight);
   this->SegmentUpdated();
 }
@@ -107,25 +122,46 @@ void WallSegmentItem::WallSegmentChanged()
 /////////////////////////////////////////////////
 void WallSegmentItem::UpdateInspector()
 {
-  double segmentLength = this->line().length() + this->wallThickness;
+  double segmentLength = this->line().length() + this->dataPtr->wallThickness;
   QPointF segmentStartPoint = this->mapToScene(this->line().p1());
   QPointF segmentEndPoint = this->mapToScene(this->line().p2());
 
-  this->inspector->SetName(this->GetName());
-  this->inspector->SetThickness(this->wallThickness * this->scale);
-  this->inspector->SetHeight(this->wallHeight * this->scale);
-  this->inspector->SetLength(segmentLength * this->scale);
-  QPointF startPos = segmentStartPoint * this->scale;
+  this->dataPtr->inspector->SetName(this->Name());
+  this->dataPtr->inspector->SetThickness(
+      this->dataPtr->wallThickness * this->itemScale);
+  this->dataPtr->inspector->SetHeight(
+      this->dataPtr->wallHeight * this->itemScale);
+  this->dataPtr->inspector->SetLength(segmentLength * this->itemScale);
+  QPointF startPos = segmentStartPoint * this->itemScale;
   startPos.setY(-startPos.y());
-  this->inspector->SetStartPosition(startPos);
-  QPointF endPos = segmentEndPoint * this->scale;
+  this->dataPtr->inspector->SetStartPosition(Conversions::Convert(startPos));
+  QPointF endPos = segmentEndPoint * this->itemScale;
   endPos.setY(-endPos.y());
-  this->inspector->SetEndPosition(endPos);
+  this->dataPtr->inspector->SetEndPosition(Conversions::Convert(endPos));
+  this->dataPtr->inspector->SetColor(this->visual3dColor);
+  this->dataPtr->inspector->SetTexture(this->visual3dTexture);
 }
 
 /////////////////////////////////////////////////
 void WallSegmentItem::SegmentUpdated()
 {
+  // distance in px between wall and measure line
+  double d = 20;
+  double t = this->Thickness()/2;
+
+  auto p1 = this->StartPoint();
+  auto p2 = this->EndPoint();
+  double angle = IGN_DTOR(this->line().angle());
+
+  this->dataPtr->measure->SetStartPoint(ignition::math::Vector2d(
+      p1.X()+(d+t)*qCos(angle+M_PI/2.0)+t*qCos(angle+M_PI),
+      p1.Y()-(d+t)*qSin(angle+M_PI/2.0)-t*qSin(angle+M_PI)));
+  this->dataPtr->measure->SetEndPoint(ignition::math::Vector2d(
+      p2.X()+(d+t)*qCos(angle+M_PI/2.0)-t*qCos(angle+M_PI),
+      p2.Y()-(d+t)*qSin(angle+M_PI/2.0)+t*qSin(angle+M_PI)));
+  this->dataPtr->measure->SetValue(
+      (this->line().length()+2*t)*this->itemScale);
+
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
   for (int j = 0; j < children.size(); ++j)
@@ -135,9 +171,9 @@ void WallSegmentItem::SegmentUpdated()
     RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
     if (rectItem)
     {
-      rectItem->SetRotation(-this->line().angle());
+      rectItem->SetRotation(-this->line().angle() + rectItem->AngleOnWall());
       QPointF segLine = this->line().p2() - this->line().p1();
-      rectItem->setPos(this->line().p1() + rectItem->GetPositionOnWall()*
+      rectItem->setPos(this->line().p1() + rectItem->PositionOnWall()*
           segLine);
     }
   }
@@ -149,8 +185,8 @@ void WallSegmentItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
   this->scene()->clearSelection();
   this->setSelected(true);
   QMenu menu;
-  menu.addAction(this->openInspectorAct);
-  menu.addAction(this->deleteItemAct);
+  menu.addAction(this->dataPtr->openInspectorAct);
+  menu.addAction(this->dataPtr->deleteItemAct);
   menu.exec(dynamic_cast<QGraphicsSceneContextMenuEvent *>(
       _event)->screenPos());
 }
@@ -174,21 +210,30 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
 {
   if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
   {
-    if (_value.toBool())
-    {
-      this->ShowHandles(true);
-      this->setZValue(5);
-      this->SetColor(QColor(247, 142, 30));
-    }
-    else
-    {
-      this->ShowHandles(false);
-      this->setZValue(0);
-      this->SetColor(Qt::black);
-    }
-    this->WallSegmentChanged();
+    this->SetHighlighted(_value.toBool());
   }
   return QGraphicsItem::itemChange(_change, _value);
+}
+
+/////////////////////////////////////////////////
+void WallSegmentItem::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->ShowHandles(true);
+    this->dataPtr->measure->setVisible(true);
+    this->setZValue(this->zValueSelected);
+    this->SetColor(Conversions::Convert(QColor(247, 142, 30)));
+    this->Set3dTransparency(0.0);
+  }
+  else
+  {
+    this->ShowHandles(false);
+    this->dataPtr->measure->setVisible(false);
+    this->setZValue(this->zValueIdle);
+    this->SetColor(common::Color::Black);
+    this->Set3dTransparency(0.4);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -197,36 +242,39 @@ void WallSegmentItem::OnApply()
   WallInspectorDialog *dialog =
       qobject_cast<WallInspectorDialog *>(QObject::sender());
 
-  double segmentLength = this->line().length() + this->wallThickness;
-  this->wallThickness = dialog->GetThickness() / this->scale;
-  this->SetThickness(this->wallThickness);
-  this->wallHeight = dialog->GetHeight() / this->scale;
+  double segmentLength = this->line().length() + this->dataPtr->wallThickness;
+  this->dataPtr->wallThickness = dialog->Thickness() / this->itemScale;
+  this->SetThickness(this->dataPtr->wallThickness);
+  this->dataPtr->wallHeight = dialog->Height() / this->itemScale;
+  this->SetTexture3d(dialog->Texture());
+  this->SetColor3d(dialog->Color());
   this->WallSegmentChanged();
 
-  double newLength = dialog->GetLength() / this->scale;
+  double newLength = dialog->Length() / this->itemScale;
 
   // The if statement below limits the change to either the length of
   // the wall segment or its start/end pos.
   // Comparison between doubles up to 1 decimal place
   if (fabs(newLength - segmentLength) > 0.1)
   {
-    newLength = std::max(newLength - this->wallThickness, 1.0);
+    newLength = std::max(newLength - this->dataPtr->wallThickness, 1.0);
     QLineF newLine = this->line();
     newLine.setLength(newLength);
-    this->SetEndPoint(this->mapToScene(newLine.p2()));
+    this->SetEndPoint(Conversions::Convert(this->mapToScene(newLine.p2())));
   }
   else
   {
-    QPointF newStartPoint = dialog->GetStartPosition() / this->scale;
-    newStartPoint.setY(-newStartPoint.y());
-    QPointF newEndPoint = dialog->GetEndPosition() / this->scale;
-    newEndPoint.setY(-newEndPoint.y());
+    auto newStartPoint = dialog->StartPosition() / this->itemScale;
+    newStartPoint.Y(-newStartPoint.Y());
+
+    auto newEndPoint = dialog->EndPosition() / this->itemScale;
+    newEndPoint.Y(-newEndPoint.Y());
 
     this->SetStartPoint(newStartPoint);
     this->SetEndPoint(newEndPoint);
   }
-  this->UpdateLinkedGrabbers(this->grabbers[0], this->GetStartPoint());
-  this->UpdateLinkedGrabbers(this->grabbers[1], this->GetEndPoint());
+  this->UpdateLinkedGrabbers(this->grabbers[0], this->StartPoint());
+  this->UpdateLinkedGrabbers(this->grabbers[1], this->EndPoint());
   this->update();
   this->UpdateInspector();
 }
@@ -235,8 +283,8 @@ void WallSegmentItem::OnApply()
 void WallSegmentItem::OnOpenInspector()
 {
   this->UpdateInspector();
-  this->inspector->move(QCursor::pos());
-  this->inspector->show();
+  this->dataPtr->inspector->move(QCursor::pos());
+  this->dataPtr->inspector->show();
 }
 
 /////////////////////////////////////////////////

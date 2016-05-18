@@ -33,7 +33,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Ray collision
-    class GAZEBO_VISIBLE PluginRayShape : public RayShape
+    class GZ_PHYSICS_VISIBLE PluginRayShape : public RayShape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.
@@ -53,6 +53,7 @@ namespace gazebo
       /// \param[out] _dist Distance to the intersection.
       /// \param[out] _entity Name of the entity that was hit.
       public: virtual void GetIntersection(double &_dist, std::string &_entity);
+    };
   }
 }
 #endif

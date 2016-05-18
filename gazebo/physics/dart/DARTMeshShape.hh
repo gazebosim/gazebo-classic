@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,14 @@ namespace gazebo
 {
   namespace physics
   {
-    class DARTMesh;
+    /// Forward declare private data class
+    class DARTMeshShapePrivate;
+
+    /// \addtogroup gazebo_physics_dart
+    /// \{
 
     /// \brief Triangle mesh collision.
-    class GAZEBO_VISIBLE DARTMeshShape : public MeshShape
+    class GZ_PHYSICS_VISIBLE DARTMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -46,9 +50,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief DART collision mesh helper class
-      private: DARTMesh *dartMesh;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTMeshShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

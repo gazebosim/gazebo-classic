@@ -29,10 +29,10 @@ transform is the identity.
 
 */
 
-#include <ode/ode.h>
-#include <ode/odemath.h>
-#include <ode/rotation.h>
-#include <ode/matrix.h>
+#include <gazebo/ode/ode.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/rotation.h>
+#include <gazebo/ode/matrix.h>
 #include "config.h"
 #include "joint.h"
 #include "joint_internal.h"
@@ -58,10 +58,6 @@ dxJoint::dxJoint( dxWorld *w ) :
 
     w->nj++;
     feedback = 0;
-
-    // joint damping
-    use_damping = false;
-    damping_coefficient = 0.0;
 
     // Moved here by OSRF
     // Default to negative value, which means the current global value

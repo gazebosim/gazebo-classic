@@ -1,7 +1,10 @@
 set (files
   beigeWall.jpg
+  building_frame.png
+  bricks.png
   ceiling_tiled.jpg
   clouds.jpg
+  com.png
   dirt_diffusespecular.png
   dirt_normal.png
   flat_normal.png
@@ -22,6 +25,7 @@ set (files
   random.png
   residential.jpg
   road1.jpg
+  runway.png
   secondary.jpg
   sidewalk.jpg
   steps.jpeg
@@ -37,4 +41,4 @@ set (files
 )
 
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/textures/)
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/materials/textures/)

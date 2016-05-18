@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,37 +22,45 @@
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTMesh.hh"
 
+#include "gazebo/physics/dart/DARTMeshPrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor of aiScene is missing so we define it here.
+// Constructor of aiScene is missing so we define it here. This is temporary
+// workaround. For further discussion, please see:
+// https://github.com/dartsim/dart/issues/451
+// https://github.com/dartsim/dart/issues/452
+// https://github.com/dartsim/dart/issues/453
 aiScene::aiScene()
 {
   mFlags = 0;
-  mRootNode = NULL;
+  mRootNode = nullptr;
   mNumMeshes = 0;
-  mMeshes = NULL;
+  mMeshes = nullptr;
   mNumMaterials = 0;
-  mMaterials = NULL;
+  mMaterials = nullptr;
   mNumAnimations = 0;
-  mAnimations = NULL;
+  mAnimations = nullptr;
   mNumTextures = 0;
-  mTextures = NULL;
+  mTextures = nullptr;
   mNumLights = 0;
-  mLights = NULL;
+  mLights = nullptr;
   mNumCameras = 0;
-  mCameras = NULL;
+  mCameras = nullptr;
 }
 
 //////////////////////////////////////////////////
-DARTMesh::DARTMesh()
+DARTMesh::DARTMesh() : dataPtr(new DARTMeshPrivate())
 {
 }
 
 //////////////////////////////////////////////////
 DARTMesh::~DARTMesh()
 {
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -60,8 +68,8 @@ void DARTMesh::Init(const common::SubMesh *_subMesh,
                     DARTCollisionPtr _collision,
                     const math::Vector3 &_scale)
 {
-  float *vertices = NULL;
-  int *indices = NULL;
+  float *vertices = nullptr;
+  int *indices = nullptr;
 
   unsigned int numVertices = _subMesh->GetVertexCount();
   unsigned int numIndices = _subMesh->GetIndexCount();
@@ -81,8 +89,8 @@ void DARTMesh::Init(const common::Mesh *_mesh,
                     DARTCollisionPtr _collision,
                     const math::Vector3 &_scale)
 {
-  float *vertices = NULL;
-  int *indices = NULL;
+  float *vertices = nullptr;
+  int *indices = nullptr;
 
   unsigned int numVertices = _mesh->GetVertexCount();
   unsigned int numIndices = _mesh->GetIndexCount();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 */
 
 #include <boost/filesystem.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 class PR2Test : public ServerFixture,
@@ -41,8 +41,8 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
 
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
-  boost::filesystem::create_directories(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
+  boost::filesystem::create_directories(paths->DefaultTestPath());
 
   ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
   SpawnModel("model://pr2");
@@ -59,13 +59,13 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  EXPECT_TRUE(camSensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != NULL);
 
-  while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
+  while (!camSensor->SaveFrame(paths->DefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
@@ -73,13 +73,13 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
-    filename << paths->GetDefaultTestPath() << "/frame_" << i << ".jpg";
+    filename << paths->DefaultTestPath() << "/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
     common::Time::MSleep(100);
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
 }
 
 TEST_P(PR2Test, LoadPR2)
@@ -153,8 +153,10 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
+    gzerr << "Abort test since simbody does not support static models "
+          << "with pose offsets, "
+          << "please see issue #860."
+          << std::endl;
     return;
   }
   if (_physicsEngine == "dart")

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <sstream>
 
@@ -39,9 +45,25 @@
 using namespace gazebo;
 using namespace physics;
 
+// Class used to initialize an sdf element pointer from "collision.sdf".
+// This is then used in the Collision constructor to improve performance.
+class SDFCollisionInitializer
+{
+  // Constructor that create the collision sdf element
+  public: SDFCollisionInitializer()
+  {
+    sdf::initFile("collision.sdf", collisionSDF);
+  }
+
+  // Pointer the collision sdf element
+  public: sdf::ElementPtr collisionSDF = std::make_shared<sdf::Element>();
+};
+static SDFCollisionInitializer g_SDFInit;
+
+
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link), maxContacts(1)
+: Entity(_link), maxContacts(1)
 {
   this->AddType(Base::COLLISION);
 
@@ -49,7 +71,7 @@ Collision::Collision(LinkPtr _link)
 
   this->placeable = false;
 
-  sdf::initFile("collision.sdf", this->sdf);
+  this->sdf->Copy(g_SDFInit.collisionSDF);
 
   this->collisionVisualId = physics::getUniqueId();
 }
@@ -67,6 +89,7 @@ void Collision::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         this->GetScopedName()+"__COLLISION_VISUAL__");
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
   Entity::Fini();
@@ -94,12 +117,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
-
-  if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
-      !this->shape->HasType(Base::RAY_SHAPE))
-  {
-    this->visPub->Publish(this->CreateCollisionVisual());
-  }
 }
 
 //////////////////////////////////////////////////
@@ -266,7 +283,7 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::FillMsg(msgs::Collision &_msg)
 {
-  msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
+  msgs::Set(_msg.mutable_pose(), this->GetRelativePose().Ign());
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
@@ -274,11 +291,13 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->shape->FillMsg(*_msg.mutable_geometry());
   this->surface->FillMsg(*_msg.mutable_surface());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
 
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
     _msg.add_visual()->CopyFrom(*this->visualMsg);
+    // TODO remove the need to create the special collision visual msg and
+    // let the gui handle this.
     _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
   }
 }
@@ -299,7 +318,7 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
   if (_msg.has_pose())
   {
     this->link->SetEnabled(true);
-    this->SetRelativePose(msgs::Convert(_msg.pose()));
+    this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
   }
 
   if (_msg.has_geometry())
@@ -327,7 +346,8 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
-  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
+  msg.set_type(msgs::Visual::COLLISION);
+  msgs::Set(msg.mutable_pose(), this->GetRelativePose().Ign());
   msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
   msg.mutable_material()->mutable_script()->set_name(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,18 @@
  *
 */
 
-#ifndef _JOINT_INSPECTOR_HH_
-#define _JOINT_INSPECTOR_HH_
+#ifndef _GAZEBO_GUI_JOINT_INSPECTOR_HH_
+#define _GAZEBO_GUI_JOINT_INSPECTOR_HH_
 
+#include <memory>
 #include <string>
-#include <vector>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
-
 
 namespace gazebo
 {
@@ -32,120 +34,124 @@ namespace gazebo
   {
     class JointMaker;
 
+    // Forward declare private data.
+    class JointInspectorPrivate;
+
     /// \class JointInspector gui/JointInspector.hh
     /// \brief A class to inspect and modify joints.
-    class GAZEBO_VISIBLE JointInspector : public QDialog
+    class GZ_GUI_VISIBLE JointInspector : public QDialog
     {
       Q_OBJECT
 
       /// \brief Constructor
-      /// \param[in] _mode Dialog mode
+      /// \param[in] _jointMaker Pointer to joint maker.
       /// \param[in] _parent Parent QWidget.
-      public: JointInspector(JointMaker::JointType _jointType,
-          QWidget *_parent = 0);
+      public: JointInspector(JointMaker *_jointMaker, QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~JointInspector();
 
-      /// \brief Get anchor position.
-      /// \param[in] _index Index of anchor
-      /// \return Anchor position.
-      public: math::Vector3 GetAnchor(unsigned int _index) const;
+      /// \brief Update the joint config widget with a joint msg.
+      /// \param[in] _jointMsg Joint message.
+      public: void Update(ConstJointPtr _jointMsg);
 
-      /// \brief Get axis.
-      /// \param[in] _index Index of axis
-      /// \return Axis direction.
-      public: math::Vector3 GetAxis(unsigned int _index) const;
+      /// \brief Get the msg containing all joint data.
+      /// \return Joint msg.
+      public: msgs::Joint *Data() const;
 
-      /// \brief Get axis lower limit.
-      /// \param[in] _index Index of axis
-      /// \return Lower limit.
-      public: double GetLowerLimit(unsigned int _index) const;
+      /// \brief Set the pose of the joint.
+      /// \param[in] _pose Pose to set the joint to.
+      public: void SetPose(const ignition::math::Pose3d &_pose);
 
-      /// \brief Get axis upper limit.
-      /// \param[in] _index Index of axis
-      /// \return Upper limit.
-      public: double GetUpperLimit(unsigned int _index) const;
+      /// \brief Open the inspector.
+      public: void Open();
 
-      /// \brief Get joint type.
-      /// \return Joint type.
-      public: JointMaker::JointType GetType() const;
+      /// \brief Set the unique id for the joint this inspector is attached to.
+      /// The ID might be generated after the inspector.
+      /// \param[in] _id Unique id.
+      public: void SetJointId(const std::string &_id);
 
-      /// \brief Set the item name.
-      /// \param[in] _name Name to set to.
-      public: void SetName(const std::string &_name);
+      /// \brief Qt event emiited when the mouse enters this widget.
+      /// \param[in] _event Qt event.
+      protected: virtual void enterEvent(QEvent *_event);
 
-      /// \brief Set anchor position.
-      /// \param[in] _index Index of anchor.
-      /// \param[in] _anchor Anchor position.
-      public: void SetAnchor(unsigned int _index, const math::Vector3 &_anchor);
+      /// \brief Qt callback when an enum value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value in string.
+      private slots: void OnEnumChanged(const QString &_name,
+          const QString &_value);
 
-      /// \brief Set axis.
-      /// \param[in] _index Index of axis.
-      /// \param[in] _axis Axis direction.
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      /// \brief Qt callback when a pose value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnPoseChanged(const QString &_name,
+          const ignition::math::Pose3d &_value);
 
-      /// \brief Set axis lower limit.
-      /// \param[in] _index Index of axis.
-      /// \param[in] _lower Lower limit.
-      public: void SetLowerLimit(unsigned int _index, double _lower);
+      /// \brief Qt callback when a Vector3d value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnVector3dChanged(const QString &_name,
+          const ignition::math::Vector3d &_value);
 
-      /// \brief Set axis upper limit.
-      /// \param[in] _index Index of axis.
-      /// \param[in] _upper Upper limit.
-      public: void SetUpperLimit(unsigned int _index, double _upper);
+      /// \brief Qt callback when a string value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnStringChanged(const QString &_name,
+          const std::string &_value);
 
-      /// \brief Set joint type.
-      /// \param[in] _type joint type.
-      public: void SetType(JointMaker::JointType _type);
+      /// \brief Callback when the joint type has changed.
+      /// \param[in] _value New joint type.
+      private: void OnJointTypeChanged(const QString &_value);
+
+      /// \brief Callback when the joint parent or child link has changed.
+      /// \param[in] _linkName New link's name.
+      private: void OnLinksChanged(const QString &_linkName = "");
+
+      /// \brief Callback when the swap button is pressed.
+      private slots: void OnSwap();
+
+      /// \brief Add a link to the parent and child lists.
+      /// \param[in] _linkName Scoped link name.
+      private slots: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Remove a link from the parent and child lists.
+      /// \param[in] _linkName Link name.
+      private slots: void OnLinkRemoved(const std::string &_linkName);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
+      /// \brief Qt callback when the Remove button is pressed.
+      private slots: void OnRemove();
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
 
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Label that displays the name of the joint.
-      private: QLabel* jointNameLabel;
+      /// \brief Restore the widget's data to how it was when first opened.
+      private slots: void RestoreOriginalData();
 
-      /// \brief Label that displays the type of the joint.
-      private: QLabel *jointTypeLabel;
+      /// \brief Qt key press event.
+      /// \param[in] _event Qt key event.
+      private: void keyPressEvent(QKeyEvent *_event);
 
-      /// \brief Spin box for configuring the X position of the anchor.
-      private: QDoubleSpinBox *anchorXSpinBox;
+      /// \brief Enable ok button if all values in the dialog are valid.
+      /// \return True if all values are valid.
+      private: bool CheckValid();
 
-      /// \brief Spin box for configuring the Y position of the anchor.
-      private: QDoubleSpinBox *anchorYSpinBox;
+      /// \brief Qt close event
+      /// \param[in] _event Qt close event pointer
+      private: void closeEvent(QCloseEvent *_event);
 
-      /// \brief Spin box for configuring the Z position of the anchor.
-      private: QDoubleSpinBox *anchorZSpinBox;
-
-      /// \brief Spin box for configuring the X direction of the axis.
-      private: std::vector<QDoubleSpinBox *> axisXSpinBoxes;
-
-      /// \brief Spin box for configuring the Y direction of the axis.
-      private: std::vector<QDoubleSpinBox *> axisYSpinBoxes;
-
-      /// \brief Spin box for configuring the Z direction of the axis.
-      private: std::vector<QDoubleSpinBox *> axisZSpinBoxes;
-
-      /// \brief Spin box for configuring the lower limit of the axis.
-      private: std::vector<QDoubleSpinBox *> lowerLimitSpinBoxes;
-
-      /// \brief Spin box for configuring the upper limit of the axis.
-      private: std::vector<QDoubleSpinBox *> upperLimitSpinBoxes;
-
-      /// \brief Type of joint.
-      private: JointMaker::JointType jointType;
-
-      /// \brief A list of group boxes for configuring joint axis properties.
-      private: std::vector<QGroupBox *> axisGroupBoxes;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<JointInspectorPrivate> dataPtr;
     };
     /// \}
   }

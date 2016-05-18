@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,21 @@
  *
 */
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/math/Angle.hh"
-#include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/EditorItem.hh"
+#include <iomanip>
+#include <sstream>
+
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/gui/building/MeasureItem.hh"
+#include "gazebo/gui/building/MeasureItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
-    : SegmentItem()
+MeasureItem::MeasureItem(const ignition::math::Vector2d &_start,
+    const ignition::math::Vector2d &_end)
+    : SegmentItem(), dataPtr(new MeasureItemPrivate())
 {
   this->editorType = "Measure";
 
@@ -34,10 +37,11 @@ MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
   this->setAcceptHoverEvents(true);
 
   this->SetLine(_start, _end);
-  this->setZValue(5);
+  this->zValueSelected = 8;
+  this->setZValue(this->zValueSelected);
   this->ShowHandles(false);
 
-  this->value = 0;
+  this->dataPtr->value = 0;
 }
 
 /////////////////////////////////////////////////
@@ -51,11 +55,11 @@ void MeasureItem::paint(QPainter *_painter,
 {
   QPointF p1 = this->line().p1();
   QPointF p2 = this->line().p2();
-  double angle = GZ_DTOR(this->line().angle());
+  double angle = IGN_DTOR(this->line().angle());
 
   QPen measurePen;
   measurePen.setStyle(Qt::SolidLine);
-  measurePen.setColor(QColor(247, 142, 30));
+  measurePen.setColor(QColor(247, 142, 30, 120));
   double tipLength = 10;
   measurePen.setWidth(3);
   _painter->setPen(measurePen);
@@ -76,8 +80,8 @@ void MeasureItem::paint(QPainter *_painter,
 
   // Value
   std::ostringstream stream;
-  stream << std::fixed << std::setprecision(4)
-         << this->value << " m";
+  stream << std::fixed << std::setprecision(3)
+         << this->dataPtr->value << " m";
 
   double margin = 10;
   float textWidth = _painter->fontMetrics().width(stream.str().c_str());
@@ -117,7 +121,7 @@ void MeasureItem::paint(QPainter *_painter,
 }
 
 /////////////////////////////////////////////////
-double MeasureItem::GetDistance() const
+double MeasureItem::Distance() const
 {
   return this->line().length();
 }
@@ -125,5 +129,5 @@ double MeasureItem::GetDistance() const
 /////////////////////////////////////////////////
 void MeasureItem::SetValue(double _value)
 {
-  this->value = _value;
+  this->dataPtr->value = _value;
 }

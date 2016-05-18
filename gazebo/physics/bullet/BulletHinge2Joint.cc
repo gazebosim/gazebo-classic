@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -35,9 +31,11 @@ using namespace physics;
 BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world, BasePtr _parent)
     : Hinge2Joint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
-  this->bulletHinge2 = NULL;
+  this->bulletHinge2 = nullptr;
+  this->angleOffset[0] = 0.0;
+  this->angleOffset[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -85,7 +83,7 @@ void BulletHinge2Joint::Init()
   this->constraint = this->bulletHinge2;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->constraint, true);
 
   // Allows access to impulse
@@ -158,19 +156,6 @@ void BulletHinge2Joint::SetForceImpl(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-double BulletHinge2Joint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
@@ -211,8 +196,12 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
     return math::Angle();
   }
 
-  btRotationalLimitMotor *motor =
-    this->bulletHinge2->getRotationalLimitMotor(_index);
+#ifndef LIBBULLET_VERSION_GT_282
+  btRotationalLimitMotor *motor;
+#else
+  btRotationalLimitMotor2 *motor;
+#endif
+  motor = this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_hiLimit;
 
@@ -229,8 +218,12 @@ math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
     return math::Angle(0.0);
   }
 
-  btRotationalLimitMotor *motor =
-    this->bulletHinge2->getRotationalLimitMotor(_index);
+#ifndef LIBBULLET_VERSION_GT_282
+  btRotationalLimitMotor *motor;
+#else
+  btRotationalLimitMotor2 *motor;
+#endif
+  motor = this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_loLimit;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,16 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <stdio.h>
 #include <signal.h>
+#include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -37,6 +46,7 @@ Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
+    ("verbose", "Print extra information")
     ("help,h", "Print this help message");
 }
 
@@ -65,7 +75,7 @@ void Command::ListOptions()
   {
     pieces.clear();
     std::string formatName = (*iter)->format_name();
-    boost::split(pieces, formatName, boost::is_any_of(" "));
+    pieces = common::split(formatName, " ");
 
     if (pieces.empty())
     {
@@ -137,7 +147,11 @@ bool Command::Run(int _argc, char **_argv)
   {
     int argvLen = strlen(_argv[i]) + 1;
     this->argv[i] = new char[argvLen];
+    #ifndef _WIN32
     snprintf(this->argv[i], argvLen, "%s", _argv[i]);
+    #else
+    sprintf_s(this->argv[i], argvLen, "%s", _argv[i]);
+    #endif
   }
 
   // The SDF find file callback.
@@ -173,6 +187,11 @@ bool Command::Run(int _argc, char **_argv)
   {
     this->Help();
     return true;
+  }
+
+  if (this->vm.count("verbose"))
+  {
+    gazebo::common::Console::SetQuiet(false);
   }
 
   if (!this->TransportInit())
@@ -289,7 +308,8 @@ PhysicsCommand::PhysicsCommand()
      "eg: -g 0,0,-9.8")
     ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
     ("iters,i", po::value<double>(), "Number of iterations.")
-    ("update-rate,u", po::value<double>(), "Target real-time update rate.");
+    ("update-rate,u", po::value<double>(), "Target real-time update rate.")
+    ("profile,o", po::value<std::string>(), "Preset physics profile.");
 }
 
 /////////////////////////////////////////////////
@@ -341,13 +361,18 @@ bool PhysicsCommand::RunImpl()
 
   if (this->vm.count("gravity"))
   {
-    std::vector<std::string> values;
-    boost::split(values, this->vm["gravity"].as<std::string>(),
-        boost::is_any_of(","));
+    auto values = common::split(this->vm["gravity"].as<std::string>(), ",");
 
     msg.mutable_gravity()->set_x(boost::lexical_cast<double>(values[0]));
     msg.mutable_gravity()->set_y(boost::lexical_cast<double>(values[1]));
     msg.mutable_gravity()->set_z(boost::lexical_cast<double>(values[2]));
+    good = true;
+  }
+
+  if (this->vm.count("profile") &&
+      this->vm["profile"].as<std::string>().size() > 0)
+  {
+    msg.set_profile_name(this->vm["profile"].as<std::string>());
     good = true;
   }
 
@@ -449,7 +474,7 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     if (!sdf::init(sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed" << std::endl;
@@ -475,7 +500,7 @@ bool ModelCommand::RunImpl()
       sdfString += input;
     }
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     if (!sdf::init(sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed" << std::endl;
@@ -503,7 +528,7 @@ bool ModelCommand::RunImpl()
       if (this->vm.count("info"))
         std::cout << modelMsg.DebugString() << std::endl;
       else if (this->vm.count("pose"))
-        std::cout << gazebo::msgs::Convert(modelMsg.pose()) << std::endl;
+        std::cout << gazebo::msgs::ConvertIgn(modelMsg.pose()) << std::endl;
     }
     else
     {
@@ -520,7 +545,7 @@ bool ModelCommand::RunImpl()
 
     msgs::Model msg;
     msg.set_name(modelName);
-    msgs::Set(msg.mutable_pose(), pose);
+    msgs::Set(msg.mutable_pose(), pose.Ign());
     pub->Publish(msg, true);
   }
 
@@ -528,10 +553,10 @@ bool ModelCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
-bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
+bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
     const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
 {
-  sdf::ElementPtr modelElem = _sdf->root->GetElement("model");
+  sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
 
   if (!modelElem)
   {
@@ -548,7 +573,7 @@ bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
 
   msgs::Factory msg;
   msg.set_sdf(_sdf->ToString());
-  msgs::Set(msg.mutable_pose(), _pose);
+  msgs::Set(msg.mutable_pose(), _pose.Ign());
   pub->Publish(msg, true);
 
   return true;
@@ -738,8 +763,7 @@ bool CameraCommand::RunImpl()
 
         if (topicInfo.msg_type() == "gazebo.msgs.CameraCmd")
         {
-          std::vector<std::string> parts;
-          boost::split(parts, topics.data(i), boost::is_any_of("/"));
+          auto parts = common::split(topics.data(i), "/");
           std::cout << parts[parts.size()-2] << std::endl;
         }
       }
@@ -769,6 +793,8 @@ bool CameraCommand::RunImpl()
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
+
+  boost::replace_all(cameraName, "::", "/");
 
   transport::PublisherPtr pub =
     node->Advertise<msgs::CameraCmd>(
@@ -929,7 +955,7 @@ bool SDFCommand::TransportRequired()
 /////////////////////////////////////////////////
 bool SDFCommand::RunImpl()
 {
-  sdf::SDF::version = SDF_VERSION;
+  sdf::SDF::Version(SDF_VERSION);
 
   try
   {
@@ -942,14 +968,14 @@ bool SDFCommand::RunImpl()
     std::cerr << "Error initializing log file" << std::endl;
   }
 
-  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+  sdf::SDFPtr sdf(new sdf::SDF());
 
   if (this->vm.count("version"))
   {
     try
     {
-      sdf::SDF::version = boost::lexical_cast<std::string>(
-          this->vm["version"].as<std::string>());
+      sdf::SDF::Version(boost::lexical_cast<std::string>(
+          this->vm["version"].as<std::string>()));
     }
     catch(...)
     {
@@ -995,27 +1021,14 @@ bool SDFCommand::RunImpl()
     if (!boost::filesystem::exists(path))
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
 
-    TiXmlDocument xmlDoc;
-    if (xmlDoc.LoadFile(path.string()))
+    if (sdf::convertFile(path.string(), sdf::SDF::Version(), sdf))
     {
-      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::version, true))
-      {
-        // Create an XML printer to control formatting
-        TiXmlPrinter printer;
-        printer.SetIndent("  ");
-        xmlDoc.Accept(&printer);
-
-        // Output the XML
-        std::ofstream stream(path.string().c_str(), std::ios_base::out);
-        stream << printer.Str();
-        stream.close();
-
-        std::cout << "Success\n";
-      }
+      sdf->Write(path.string());
+      std::cout << "Success\n";
     }
     else
     {
-      std::cerr << "Unable to load file[" << path.string() << "]\n";
+      std::cerr << "Unable to convert file[" << path.string() << "]\n";
       return false;
     }
   }

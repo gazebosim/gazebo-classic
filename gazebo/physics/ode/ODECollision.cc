@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,12 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <sstream>
 
@@ -38,7 +44,7 @@ ODECollision::ODECollision(LinkPtr _link)
 : Collision(_link)
 {
   this->SetName("ODE_Collision");
-  this->collisionId = NULL;
+  this->collisionId = nullptr;
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
@@ -52,7 +58,7 @@ ODECollision::~ODECollision()
 {
   if (this->collisionId)
     dGeomDestroy(this->collisionId);
-  this->collisionId = NULL;
+  this->collisionId = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -80,11 +86,11 @@ void ODECollision::Fini()
   /*
      if (this->collisionId)
      dGeomDestroy(this->collisionId);
-     this->collisionId = NULL;
+     this->collisionId = nullptr;
 
      if (this->spaceId)
      dSpaceDestroy(this->spaceId);
-     this->spaceId = NULL;
+     this->spaceId = nullptr;
      */
 
   Collision::Fini();
@@ -113,7 +119,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
   if (dGeomGetSpace(this->collisionId) == 0)
   {
     dSpaceAdd(this->spaceId, this->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
+    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is null");
   }
 
   if (this->collisionId && this->placeable)
@@ -206,6 +212,10 @@ ODESurfaceParamsPtr ODECollision::GetODESurface() const
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeGlobal()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
+  if (!this->link)
+    return;
+
   dQuaternion q;
 
   // Transform into global pose since a static collision does not have a link
@@ -228,6 +238,10 @@ void ODECollision::OnPoseChangeGlobal()
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeRelative()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
+  if (!this->link)
+    return;
+
   dQuaternion q;
   // Transform into CoM relative Pose
   math::Pose localPose = this->GetRelativePose();

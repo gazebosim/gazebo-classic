@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ using namespace physics;
 ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
     : HingeJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateHinge(_worldId, NULL);
+  this->jointId = dJointCreateHinge(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -59,7 +59,10 @@ math::Vector3 ODEHingeJoint::GetAnchor(unsigned int /*index*/) const
   if (this->jointId)
     dJointGetHingeAnchor(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -87,7 +90,10 @@ math::Vector3 ODEHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
   if (this->jointId)
     dJointGetHingeAxis(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -141,18 +147,6 @@ double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
 void ODEHingeJoint::SetVelocity(unsigned int _index, double _angle)
 {
   this->SetVelocityMaximal(_index, _angle);
-}
-
-//////////////////////////////////////////////////
-void ODEHingeJoint::SetMaxForce(unsigned int /*index*/, double _t)
-{
-  return this->SetParam(dParamFMax, _t);
-}
-
-//////////////////////////////////////////////////
-double ODEHingeJoint::GetMaxForce(unsigned int /*index*/)
-{
-  return this->GetParam(dParamFMax);
 }
 
 //////////////////////////////////////////////////

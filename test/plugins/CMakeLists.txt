@@ -1,3 +1,7 @@
+if (WIN32)
+    add_definitions(-DBUILDING_DLL)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -7,6 +11,8 @@ include_directories(
 
 link_directories(
   ${SDFormat_LIBRARY_DIRS}
+  ${CURL_LIBDIR}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -14,6 +20,9 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  ExceptionModelPluginConstructor
+  ExceptionModelPluginInit
+  ExceptionModelPluginLoad
   ForceTorqueModelRemovalTestPlugin
   Issue1208Plugin
   ModelTrajectoryTestPlugin
@@ -22,5 +31,5 @@ set (plugins
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
 endforeach (src ${plugins})

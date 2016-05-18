@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@
  * Date: 15 May 2009
  */
 
+#include <boost/bind.hpp>
 #include <string>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -36,9 +38,9 @@ using namespace physics;
 BulletJoint::BulletJoint(BasePtr _parent)
   : Joint(_parent)
 {
-  this->constraint = NULL;
-  this->bulletWorld = NULL;
-  this->feedback = NULL;
+  this->constraint = nullptr;
+  this->bulletWorld = nullptr;
+  this->feedback = nullptr;
   this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
@@ -47,8 +49,23 @@ BulletJoint::BulletJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
-  delete this->constraint;
-  this->bulletWorld = NULL;
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::Fini()
+{
+  if (this->constraint && this->bulletWorld)
+  {
+    this->bulletWorld->removeConstraint(this->constraint);
+    delete this->constraint;
+  }
+  this->constraint = nullptr;
+  this->bulletWorld = nullptr;
+
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -104,7 +121,7 @@ LinkPtr BulletJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
 
-  if (this->constraint == NULL)
+  if (this->constraint == nullptr)
     gzthrow("Attach bodies to the joint first");
 
   if (_index == 0 || _index == 1)
@@ -143,6 +160,15 @@ void BulletJoint::Detach()
   if (this->constraint && this->bulletWorld)
     this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
+  this->constraint = nullptr;
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetProvideFeedback(bool _enable)
+{
+  Joint::SetProvideFeedback(_enable);
+
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
@@ -194,6 +220,7 @@ void BulletJoint::CacheForceTorque()
   else
   {
     /// \TODO: implement for other joint types
+    // note that for fixed joint no further modification is needed
     // gzerr << "force torque for joint type [" << this->GetType()
     //       << "] not implemented, returns false results!!\n";
   }
@@ -235,7 +262,7 @@ void BulletJoint::CacheForceTorque()
   // convert torque from about parent CG to joint anchor location
   if (this->parentLink)
   {
-    // get child pose, or it's the inertial world if childLink is NULL
+    // get child pose, or it's the inertial world if childLink is nullptr
     math::Pose childPose;
     if (this->childLink)
       childPose = this->childLink->GetWorldPose();
@@ -332,6 +359,7 @@ void BulletJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
+  GZ_ASSERT(this->constraint != nullptr, "constraint should be valid");
   return this->wrench;
 }
 
@@ -340,19 +368,19 @@ void BulletJoint::SetupJointFeedback()
 {
   if (this->provideFeedback)
   {
-    this->feedback = new btJointFeedback;
-    this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+    if (this->feedback == nullptr)
+    {
+      this->feedback = new btJointFeedback;
+      this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
+      this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
+      this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
+      this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+    }
 
     if (this->constraint)
       this->constraint->setJointFeedback(this->feedback);
     else
-    {
       gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
-      getchar();
-    }
   }
 }
 
@@ -526,13 +554,6 @@ math::Vector3 BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
-    double /*_value*/)
-{
-  gzdbg << "Not implement in Bullet\n";
-}
-
-//////////////////////////////////////////////////
 bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
     const boost::any &/*_value*/)
@@ -545,19 +566,7 @@ bool BulletJoint::SetParam(const std::string &/*_key*/,
 double BulletJoint::GetParam(const std::string &_key,
     unsigned int _index)
 {
-  if (_key == "hi_stop")
-  {
-    return this->GetHighStop(_index).Radian();
-  }
-  else if (_key == "lo_stop")
-  {
-    return this->GetLowStop(_index).Radian();
-  }
-  gzerr << "GetParam unrecognized parameter ["
-        << _key
-        << "]"
-        << std::endl;
-  return 0;
+  return Joint::GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

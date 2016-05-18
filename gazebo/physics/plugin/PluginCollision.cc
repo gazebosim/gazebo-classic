@@ -85,12 +85,12 @@ void PluginCollision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void PluginCollision::SetCategoryBits(unsigned int _bits)
+void PluginCollision::SetCategoryBits(unsigned int /*_bits*/)
 {
 }
 
 //////////////////////////////////////////////////
-void PluginCollision::SetCollideBits(unsigned int _bits)
+void PluginCollision::SetCollideBits(unsigned int /*_bits*/)
 {
 }
 

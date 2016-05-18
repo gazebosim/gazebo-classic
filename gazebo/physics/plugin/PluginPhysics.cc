@@ -122,11 +122,10 @@ void PluginPhysics::OnRequest(ConstRequestPtr &_msg)
   if (_msg->request() == "physics_info")
   {
     msgs::Physics physicsMsg;
-    physicsMsg.set_min_step_size(
-        boost::any_cast<double>(this->GetParam("min_step_size")));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
+    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
@@ -293,19 +292,19 @@ JointPtr PluginPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
   JointPtr joint;
 
   if (_type == "prismatic")
-    joint.reset(new PluginSliderJoint(this->worldId, _parent));
+    joint.reset(new PluginSliderJoint(_parent));
   else if (_type == "screw")
-    joint.reset(new PluginScrewJoint(this->worldId, _parent));
+    joint.reset(new PluginScrewJoint(_parent));
   else if (_type == "revolute")
-    joint.reset(new PluginHingeJoint(this->worldId, _parent));
+    joint.reset(new PluginHingeJoint(_parent));
   else if (_type == "gearbox")
-    joint.reset(new PluginGearboxJoint(this->worldId, _parent));
+    joint.reset(new PluginGearboxJoint(_parent));
   else if (_type == "revolute2")
-    joint.reset(new PluginHinge2Joint(this->worldId, _parent));
+    joint.reset(new PluginHinge2Joint(_parent));
   else if (_type == "ball")
-    joint.reset(new PluginBallJoint(this->worldId, _parent));
+    joint.reset(new PluginBallJoint(_parent));
   else if (_type == "universal")
-    joint.reset(new PluginUniversalJoint(this->worldId, _parent));
+    joint.reset(new PluginUniversalJoint(_parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -316,7 +315,7 @@ JointPtr PluginPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void PluginPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  dWorldSetGravity(this->worldId, _gravity.x, _gravity.y, _gravity.z);
+  gzerr << "not implemented\n";
 }
 
 /////////////////////////////////////////////////
@@ -327,59 +326,20 @@ void PluginPhysics::DebugPrint() const
 /////////////////////////////////////////////////
 void PluginPhysics::SetSeed(uint32_t _seed)
 {
+  gzdbg << "Nothing here\n";
 }
 
 //////////////////////////////////////////////////
 bool PluginPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  sdf::ElementPtr odeElem = this->sdf->GetElement("plugin");
-  GZ_ASSERT(odeElem != NULL, "Plugin SDF element does not exist");
-
-  if (_key == "my_solver_string_param")
-  {
-    std::string value;
-    try
-    {
-      value = boost::any_cast<std::string>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    // set solver string param to value
-  }
-  else if (_key == "max_step_size")
-  {
-    this->SetMaxStepSize(boost::any_cast<double>(_value));
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in plugin" << std::endl;
-    return false;
-  }
+  gzdbg << "Nothing here\n";
   return true;
 }
 
 //////////////////////////////////////////////////
 boost::any PluginPhysics::GetParam(const std::string &_key) const
 {
-  sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-  GZ_ASSERT(pluginElem != NULL, "Plugin SDF element does not exist");
-
-  if (_key == "my_solver_param_key")
-  {
-    return pluginElem->GetElement("solver")->Get<std::string>("my_param_key");
-  }
-  else if (_key == "max_contacts")
-    return this->sdf->Get<int>("max_contacts");
-  else if (_key == "min_step_size")
-    return pluginElem->GetElement("solver")->Get<double>("min_step_size");
-  else if (_key == "max_step_size")
-    return this->GetMaxStepSize();
-  else
-  {
-    gzwarn << _key << " is not supported in plugin" << std::endl;
-    return 0;
-  }
+  gzdbg << "Nothing here\n";
+  gzwarn << _key << " is not supported in plugin" << std::endl;
+  return 0;
 }

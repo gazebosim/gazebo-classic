@@ -1,0 +1,284 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- Disable shadows for now since they make the interiors
+         look awful -->
+    <scene>
+      <shadows>0</shadows>
+    </scene>
+
+    <!-- Position the user camera -->
+    <gui>
+      <camera name="user_camera">
+        <pose>16 -30 17 0 0.5235 2.09</pose>
+      </camera>
+    </gui>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- The OSRF building with a fictitious elevator shaft -->
+    <include>
+      <uri>model://osrf_elevator</uri>
+    </include>
+
+    <!-- World plugin that publishes event messages.
+         The topics used in these messages match up with topics used by the
+         plugin in the elevator car model below.
+    -->
+    <plugin filename="libSimEventsPlugin.so" name="elevator_event_plugin">
+      <!-- Region on the ground floor, in front of the elevator -->
+      <region>
+        <name>region1</name>
+        <volume>
+          <min>-0.223 -4.75 0.15</min>
+          <max>1.92 -3.75 1.15</max>
+        </volume>
+      </region>
+
+      <!-- Region on the first floor, in front of the elevator -->
+      <region>
+        <name>region2</name>
+        <volume>
+          <min>-0.223 -4.75 2.808107</min>
+          <max>1.92 -3.75 3.808107</max>
+        </volume>
+      </region>
+
+      <!-- Event publisher for ground floor-->
+      <event>
+        <name>region1_event</name>
+        <type>occupied</type>
+        <region>region1</region>
+        <topic>~/elevator</topic>
+        <msg_data>0</msg_data>
+      </event>
+
+      <!-- Event publisher for first floor-->
+      <event>
+        <name>region2_event</name>
+        <type>occupied</type>
+        <region>region2</region>
+        <topic>~/elevator</topic>
+        <msg_data>1</msg_data>
+      </event>
+    </plugin>
+
+    <!-- Some interior lights -->
+    <light name='light1' type='point'>
+      <pose>-2.41401 -7 2.65437 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.5</constant>
+        <linear>0.3</linear>
+        <quadratic>0.1</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+    </light>
+    <light name='light2' type='point'>
+      <pose>3.46981 -7 2.65437 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.5</constant>
+        <linear>0.3</linear>
+        <quadratic>0.1</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+    </light>
+    <light name='light3' type='point'>
+      <pose>0 4.56036 2.65437 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.5</constant>
+        <linear>0.3</linear>
+        <quadratic>0.1</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+    </light>
+    <light name='light4' type='point'>
+      <pose>-5 -3.54017 2.65437 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.5</constant>
+        <linear>0.3</linear>
+        <quadratic>0.1</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+    </light>
+
+    <!-- The elevator car -->
+    <model name="elevator">
+      <pose>0.781821 -2.6219 0.075 0 0  -1.570796</pose>
+      <link name="link">
+        <inertial>
+          <mass>800</mass>
+        </inertial>
+  
+        <collision name="floor_collision">
+          <geometry>
+            <box>
+              <size>2.25 2.25 0.15</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>0x02</collide_bitmask>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="floor_visual">
+          <geometry>
+            <box>
+              <size>2.25 2.25 0.15</size>
+            </box>
+          </geometry>
+        </visual>
+  
+        <!-- wall1_collision is the wall to the right of the door, when
+             facing the door -->
+        <collision name="wall1_collision">
+          <pose>1.0745 0.5725 1.125 0 0 0</pose> 
+          <geometry>
+            <box>
+              <size>0.1 1.15 2.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>0x02</collide_bitmask>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="wall1_visual">
+          <pose>1.0745 0.5725 1.125 0 0 0</pose> 
+          <geometry>
+            <box>
+              <size>0.1 1.15 2.25</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+  
+        <!-- wall2_collision is the wall to the left of the door, when
+             facing the door -->
+        <collision name="wall2_collision">
+          <pose>1.0745 -1.0625 1.125 0 0 0</pose> 
+          <geometry>
+            <box>
+              <size>0.1 0.125 2.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>0x02</collide_bitmask>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="wall2_visual">
+          <pose>1.0745 -1.0625 1.125 0 0 0</pose> 
+          <geometry>
+            <box>
+              <size>0.1 0.125 2.25</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+  
+      <link name="door">
+        <pose>1.0745 -0.5 1.125 0 0 0</pose> 
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.08 1.0 2.25</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>0x02</collide_bitmask>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.08 1.0 2.25</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    
+      <joint name="door" type="prismatic">
+        <parent>link</parent>
+        <child>door</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>1</upper>
+            <effort>10</effort>
+          </limit>
+
+          <dynamics>
+            <damping>2</damping>
+          </dynamics>
+        </axis>
+      </joint>
+
+      <joint name="lift" type="prismatic">
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>10</upper>
+            <effort>100000</effort>
+          </limit>
+  
+          <dynamics>
+            <damping>50</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+      </joint>
+
+      <!-- Plugin to control the elevator -->
+      <plugin filename="libElevatorPlugin.so" name="elevator_plugin">
+        <lift_joint>elevator::lift</lift_joint>
+        <door_joint>elevator::door</door_joint>
+        <floor_height>2.675</floor_height>
+
+        <!-- This topic is used to control the elevator -->
+        <topic>~/elevator</topic>
+      </plugin>
+    </model>
+  </world>
+</sdf>
