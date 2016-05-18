@@ -321,7 +321,8 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
 
     this->dataPtr->imuMsg.set_entity_name(this->ParentName());
 
-    this->dataPtr->gravity = this->world->Gravity();
+    this->dataPtr->gravity =
+      this->world->GetPhysicsEngine()->GetGravity().Ign();
 
     msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 
