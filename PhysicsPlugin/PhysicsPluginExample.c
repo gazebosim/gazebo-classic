@@ -22,8 +22,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gazebo/physics/PhysicsPlugin.h"
+#include <sdf.hh>
 
 PhysicsPlugin *g_plugin = NULL;
+
+/************************************************/
+int load_sdf(sdf::ElementPtr _sdf)
+{
+  /* Functions required to initialize the model upon load completion. */
+  printf("Initialize models\n");
+
+  return 0;
+}
 
 /************************************************/
 int init_physics(void)
@@ -37,19 +47,19 @@ int init_physics(void)
 }
 
 /************************************************/
-int load_model(void)
+int update_collision(void)
 {
-  /* Add in any functions required to load models into physics engine. */
-  printf("Load models\n");
+  /* Add in any functions required to update collision engine. */
+  printf("Check collisions\n");
 
   return 0;
 }
 
 /************************************************/
-int init_model(void)
+int update_constraints(void)
 {
-  /* Functions required to initialize the model upon load completion. */
-  printf("Initialize models\n");
+  /* update constraints for collision or custom constraints. */
+  printf("update constraints\n");
 
   return 0;
 }
@@ -59,6 +69,32 @@ int update_physics(void)
 {
   /* Add in any functions required to update/step physics engine. */
   printf("Update/step physcis engine\n");
+
+  // get data from gazebo (e.g. gui commands, sensor data, other commands?)
+
+  // send data back to gazebo
+
+  return 0;
+}
+
+/************************************************/
+int set_state(const gazebo::physics::WorldState &_state)
+{
+  /* Add in any functions required to update/step physics engine. */
+  printf("get state\n");
+
+  // get data from gazebo (e.g. gui commands, sensor data, other commands?)
+
+  // send data back to gazebo
+
+  return 0;
+}
+
+/************************************************/
+int get_state(gazebo::physics::WorldState &_state)
+{
+  /* Add in any functions required to update/step physics engine. */
+  printf("get state\n");
 
   // get data from gazebo (e.g. gui commands, sensor data, other commands?)
 
@@ -87,18 +123,26 @@ PhysicsPlugin *create()
   // create a pointer to physics plugin
   g_plugin = (PhysicsPlugin*)malloc(sizeof(PhysicsPlugin));
 
-  // link initPhysics to init_physics, this function is called at the end
-  // of World::Load
+  // load sdf
+  g_plugin->loadSDF = load_sdf;
+
+  // link initPhysics
   g_plugin->initPhysics = init_physics;
 
-  // link model loading module
-  g_plugin->loadModel = load_model;
+  // set state, can call during load or at runtime
+  g_plugin->setState = set_state;
 
-  // link model init module
-  g_plugin->initModel = init_model;
+  // update collision
+  g_plugin->updateCollision = update_collision;
 
-  // update physics, or should we call this stepPhysics?
+  // update constraints
+  g_plugin->updateConstraints = update_constraints;
+
+  // update physics, or effectively step physics
   g_plugin->updatePhysics = update_physics;
+
+  // get state, can call during load or at runtime
+  g_plugin->getState = get_state;
 
   // link destroyPhysics to destroy_physics, this function is called
   // at the beginning of World::Fini

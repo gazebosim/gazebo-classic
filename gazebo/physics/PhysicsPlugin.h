@@ -18,6 +18,8 @@
 #define _GAZEBO_PHYSICS_PLUGIN_H_
 
 // #include <gazebo/physics/physics.hh>
+#include <gazebo/physics/WorldState.hh>
+#include <sdf/sdf.hh>
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,18 +27,27 @@ extern "C" {
 
 /* Basic functions needed to use the C-API for loading a physics engine
  *
- *  0. Gazebo should have loaded params via sdf.
- *  1. InitPhysics - initialize physics engine
- *  2. [LoadModel] - initialize model(s)
- *  3. [SetState] - initialize states(s)
- *  4. Loop below if necessary:
- *  5.     UpdatePhysics - advance in time
- *  6.     GetState - get model states from physics engine, update Gazebo
- *  7.     [SetPhysicsParams] - modify physics solver
- *  8.     [LoadModel] - modify model
- *  9.     [SetState] - modify state, set force
+ *  * - optional function
+ *
+ *  1. Load World
+ *    - LoadSDF - load world / models sdf
+ *    - InitPhysics* - custom initialization for physics engine
+ *    - SetState* - custom call to set state of the world/models
+ *  2. Simulation Update
+ *    - SetState* - custom call to set state of the world/models
+ *    - UpdateCollision
+ *    - UpdateConstraints - for contacts or anything else
+ *    - UpdatePhysics
+ *    - GetState - get model states from physics engine, update Gazebo
  * 10. DestroyPhysics
  */
+
+/* \brief LoadModel function pointer.
+ * This function is called after the physics has been initialized (InitPhysics).
+ * Use this function to instantiate or set the model in the physics engine.
+ * \return 0 on success, -1 on error.
+ */
+typedef int (*LoadSDFFnPtr)(sdf::ElementPtr _sdf);
 
 /* \brief InitPhysics function pointer.
  * This function is called after the plugin has been created. Use this
@@ -45,26 +56,26 @@ extern "C" {
  */
 typedef int (*InitPhysicsFnPtr)(void);
 
-/* \brief LoadModel function pointer.
- * This function is called after the physics has been initialized (InitPhysics).
- * Use this function to instantiate or set the model in the physics engine.
- * \return 0 on success, -1 on error.
- */
-typedef int (*LoadModelFnPtr)(void);
-
-/* \brief InitModel function pointer.
- * This function is called after the model has been loaded (LoadModel).
- * Use this function to set the model configuration.
- * \return 0 on success, -1 on error.
- */
-typedef int (*InitModelFnPtr)(void);
-
 /* \brief SetState function pointer.
  * This function is called after the model has been loaded (LoadModel).
  * Use this function to instantiate or set the state for the model.
  * \return 0 on success, -1 on error.
  */
-typedef int (*SetStateFnPtr)(void);
+typedef int (*SetStateFnPtr)(const gazebo::physics::WorldState &_state);
+
+/* \brief UpdateConstraints function pointer.
+ * This function is called after 
+ * Use this function to 
+ * \return 0 on success, -1 on error.
+ */
+typedef int (*UpdateCollisionFnPtr)(void);
+
+/* \brief UpdateConstraints function pointer.
+ * This function is called after 
+ * Use this function to 
+ * \return 0 on success, -1 on error.
+ */
+typedef int (*UpdateConstraintsFnPtr)(void);
 
 /* \brief UpdatePhysics function pointer.
  * This function is called after 
@@ -78,14 +89,7 @@ typedef int (*UpdatePhysicsFnPtr)(void);
  * Use this function to get the state for the model.
  * \return 0 on success, -1 on error.
  */
-typedef int (*GetStateFnPtr)(void);
-
-/* \brief SetPhysicsParams function pointer.
- * This function is called after the InitPhysics.
- * Use this function to modify physics parameters.
- * \return 0 on success, -1 on error.
- */
-typedef int (*SetPhysicsParamsFnPtr)(void);
+typedef int (*GetStateFnPtr)(gazebo::physics::WorldState &_state);
 
 /* \brief DestroyPhysics function pointer.
  * This function is called when the plugin is deleted. Use this function
@@ -121,26 +125,30 @@ struct _Pose
  */
 struct _PhysicsPlugin
 {
+  /*
+   *
+   */
+  LoadSDFFnPtr loadSDF;
+
   /* \brief Pointer to the initialize function.
    * This function must be implemented by a physics plugin.
-   * \sa InitPhysicsFnPtr
    */
   InitPhysicsFnPtr initPhysics;
 
   /*
    *
    */
-  LoadModelFnPtr loadModel;
-
-  /*
-   *
-   */
-  InitModelFnPtr initModel;
-
-  /*
-   *
-   */
   SetStateFnPtr setState;
+
+  /*
+   *
+   */
+  UpdateCollisionFnPtr updateCollision;
+
+  /*
+   *
+   */
+  UpdateConstraintsFnPtr updateConstraints;
 
   /*
    *
@@ -152,14 +160,8 @@ struct _PhysicsPlugin
    */
   GetStateFnPtr getState;
 
-  /*
-   *
-   */
-  SetPhysicsParamsFnPtr setPhysicsParams;
-
   /* \brief Pointer to the destroy physics function.
    * This function must be implemented by a physics plugin.
-   * \sa DestroyPhysicsFnPtr
    */
   DestroyPhysicsFnPtr destroyPhysics;
 
