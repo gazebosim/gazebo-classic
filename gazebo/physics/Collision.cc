@@ -198,7 +198,10 @@ ShapePtr Collision::GetShape() const
 //////////////////////////////////////////////////
 void Collision::SetScale(const math::Vector3 &_scale)
 {
-  this->shape->SetScale(_scale);
+  // Rotate _scale by relative pose
+  auto rot = this->GetInitialRelativePose().Ign().Rot();
+  auto scaleRot = rot.RotateVector(_scale.Ign()).Abs();
+  this->shape->SetScale(scaleRot);
 }
 
 //////////////////////////////////////////////////

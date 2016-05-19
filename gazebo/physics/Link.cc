@@ -1278,12 +1278,16 @@ void Link::RemoveCollision(const std::string &_name)
 /////////////////////////////////////////////////
 void Link::SetScale(const math::Vector3 &_scale)
 {
-  Base_V::const_iterator biter;
-  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+  // Rotate _scale by relative pose before passing to children
   {
-    if ((*biter)->HasType(Base::COLLISION))
+    auto rot = this->GetInitialRelativePose().Ign().Rot();
+    auto scaleRot = rot.RotateVector(_scale.Ign()).Abs();
+    for (auto child : this->children)
     {
-      boost::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
+      if (child->HasType(Base::COLLISION))
+      {
+        boost::static_pointer_cast<Collision>(child)->SetScale(scaleRot);
+      }
     }
   }
 
