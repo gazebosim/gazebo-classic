@@ -183,10 +183,8 @@ if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-  if (USE_PCH)
-    add_pch(gazebo_physics physics_pch.hh)
-  endif()
+if (USE_PCH)
+  add_pch(gazebo_physics physics_pch.hh)
 endif()
 
 gz_install_library(gazebo_physics)

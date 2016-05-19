@@ -67,10 +67,8 @@ if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
 endif()
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-  if (USE_PCH)
-    add_pch(gazebo_transport transport_pch.hh)
-  endif()
+if (USE_PCH)
+  add_pch(gazebo_transport transport_pch.hh)
 endif()
 
 gz_install_library(gazebo_transport)

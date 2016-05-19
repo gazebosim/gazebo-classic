@@ -78,10 +78,8 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MATH")
 gz_add_library(gazebo_math ${sources})
 target_link_libraries(gazebo_math ${Boost_LIBRARIES} ${IGNITION-MATH_LIBRARIES})
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-  if (USE_PCH)
-    add_pch(gazebo_math math_pch.hh)
-  endif()
+if (USE_PCH)
+  add_pch(gazebo_math math_pch.hh)
 endif()
 
 gz_install_library(gazebo_math)
