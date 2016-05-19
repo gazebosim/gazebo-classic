@@ -129,6 +129,7 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  mouse_pick.cc
 )
 
 gz_build_qt_tests(${qt_tests})
@@ -139,4 +140,3 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
 endif()
-
