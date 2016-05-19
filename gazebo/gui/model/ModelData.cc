@@ -289,7 +289,6 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   volumeRatio = newVol / oldVol;
 
   // set new mass
-  double oldMass = this->mass;
   double newMass = this->mass * volumeRatio;
   this->mass = newMass;
   linkConfig->SetMass(newMass);
@@ -307,71 +306,54 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   double newIxx = ixx;
   double newIyy = iyy;
   double newIzz = izz;
-
-  ignition::math::Vector3d dInertiaScale;
+  ignition::math::MassMatrix3d m;
 
   // we can compute better estimates of inertia values if the link only has
   // one collision made up of a simple shape
   // otherwise assume box geom
-  bool boxInertia = false;
+  bool boxInertia = true;
   if (this->collisions.size() == 1u)
   {
     auto const &it = this->collisions.begin();
     std::string geomStr = it->first->GetGeometryType();
-    dInertiaScale = colNewSizes[it->first->GetName()] /
-        colOldSizes[it->first->GetName()];
     if (geomStr == "sphere")
     {
+      boxInertia = false;
       double r = newSize.X() * 0.5;
-      // Get inertia properties of uniform box
-      ignition::math::MassMatrix3d m;
+      // Get inertia properties of uniform sphere
       if (!m.SetFromSphere(newMass, r))
       {
         gzerr << "Error computing inertia, not re-scaling" << std::endl;
       }
-      else
-      {
-        newIxx = m.IXX();
-        newIyy = m.IYY();
-        newIzz = m.IZZ();
-      }
     }
     else if (geomStr == "cylinder")
     {
-      // solve for r^2 and l^2
-      double r2 = izz / (oldMass * 0.5);
-      double l2 = (ixx / oldMass - 0.25 * r2) * 12.0;
-
-      // compute new inertia values based on new mass, radius and length
-      newIxx = newMass * (0.25 * (dInertiaScale.X() * dInertiaScale.X() * r2) +
-          (dInertiaScale.Z() * dInertiaScale.Z() * l2) / 12.0);
-      newIyy = newIxx;
-      newIzz = newMass * 0.5 * (dInertiaScale.X() * dInertiaScale.X() * r2);
+      boxInertia = false;
+      double newL = newSize.Z();
+      double newR = newSize.X() * 0.5;
+      // Get inertia properties of uniform cylinder
+      if (!m.SetFromCylinderZ(newMass, newL, newR,
+                              ignition::math::Quaterniond::Identity))
+      {
+        gzerr << "Error computing inertia, not re-scaling" << std::endl;
+      }
     }
-    else
-    {
-      boxInertia = true;
-    }
-  }
-  else
-  {
-    boxInertia = true;
   }
 
   if (boxInertia)
   {
     // Get inertia properties of uniform box
-    ignition::math::MassMatrix3d m;
     if (!m.SetFromBox(newMass, newSize, ignition::math::Quaterniond::Identity))
     {
       gzerr << "Error computing inertia, not re-scaling" << std::endl;
     }
-    else
-    {
-      newIxx = m.IXX();
-      newIyy = m.IYY();
-      newIzz = m.IZZ();
-    }
+  }
+
+  if (m.IsValid())
+  {
+    newIxx = m.IXX();
+    newIyy = m.IYY();
+    newIzz = m.IZZ();
   }
 
   // update inspector inertia
