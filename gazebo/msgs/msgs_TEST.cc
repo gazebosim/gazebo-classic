@@ -2198,6 +2198,7 @@ TEST_F(MsgsTest, MeshToSDF)
   sdf::ElementPtr meshSDF = msgs::MeshToSDF(msg);
 
   EXPECT_STREQ(meshSDF->Get<std::string>("uri").c_str(), "test_filename");
+  EXPECT_TRUE(meshSDF->HasElement("scale"));
   math::Vector3 scale = meshSDF->Get<math::Vector3>("scale");
   EXPECT_DOUBLE_EQ(scale.x, 0.1);
   EXPECT_DOUBLE_EQ(scale.y, 0.2);
@@ -2206,6 +2207,22 @@ TEST_F(MsgsTest, MeshToSDF)
   sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(), "test_submesh");
   EXPECT_TRUE(submeshElem->Get<bool>("center"));
+
+  // no submesh
+  msgs::MeshGeom msg2;
+  msg2.set_filename("test_filename2");
+  msgs::Set(msg2.mutable_scale(), ignition::math::Vector3d(1, 2, 3));
+
+  sdf::ElementPtr meshSDF2 = msgs::MeshToSDF(msg2);
+
+  EXPECT_STREQ(meshSDF2->Get<std::string>("uri").c_str(), "test_filename2");
+  EXPECT_TRUE(meshSDF2->HasElement("scale"));
+  math::Vector3 scale2 = meshSDF2->Get<math::Vector3>("scale");
+  EXPECT_DOUBLE_EQ(scale2.x, 1);
+  EXPECT_DOUBLE_EQ(scale2.y, 2);
+  EXPECT_DOUBLE_EQ(scale2.z, 3);
+
+  EXPECT_FALSE(meshSDF2->HasElement("submesh"));
 }
 
 /////////////////////////////////////////////////
