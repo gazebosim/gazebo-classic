@@ -627,6 +627,7 @@ void BulletJoint::ApplyStiffnessDamping()
           this->stiffnessDampingConstraint->enableSpring(l, true);
           this->stiffnessDampingConstraint->setStiffness(l,
             this->stiffnessCoefficient[i]);
+          this->stiffnessDampingConstraint->setStiffness(l, 1000.0);
           this->stiffnessDampingConstraint->setDamping(l,
             this->dissipationCoefficient[i]);
           this->stiffnessDampingConstraint->setEquilibriumPoint(l,
@@ -636,7 +637,9 @@ void BulletJoint::ApplyStiffnessDamping()
         {
           this->stiffnessDampingConstraint->setLimit(l,
             SIMD_INFINITY, -SIMD_INFINITY);
-          this->stiffnessDampingConstraint->enableSpring(l, false);
+          this->stiffnessDampingConstraint->enableSpring(l, true);
+          this->stiffnessDampingConstraint->setStiffness(l, 1000.0);
+          this->stiffnessDampingConstraint->setDamping(l, 0.0);
         }
       }
       this->bulletWorld->addConstraint(this->stiffnessDampingConstraint, true);
