@@ -201,7 +201,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint viscous damping coefficient for this joint.
-      public: double Damping(const unsigned int _index) const ;
+      public: double Damping(const unsigned int _index) const;
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.

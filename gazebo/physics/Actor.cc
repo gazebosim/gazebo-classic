@@ -248,8 +248,9 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     sdf::ElementPtr trajSdf = _sdf->GetElement("trajectory");
     while (trajSdf)
     {
-      if (this->actorDPtr->skelAnimation.find(trajSdf->Get<std::string>("type")) ==
-              this->actorDPtr->skelAnimation.end())
+      if (this->actorDPtr->skelAnimation.find(
+            trajSdf->Get<std::string>("type")) ==
+          this->actorDPtr->skelAnimation.end())
       {
         gzwarn << "Resource not found for trajectory of type " <<
                   trajSdf->Get<std::string>("type") << "\n";
@@ -259,7 +260,8 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
       TrajectoryInfo tinfo;
       tinfo.id = trajSdf->Get<int>("id");
       tinfo.type = trajSdf->Get<std::string>("type");
-      std::vector<TrajectoryInfo>::iterator iter = this->actorDPtr->trajInfo.begin();
+      std::vector<TrajectoryInfo>::iterator iter =
+        this->actorDPtr->trajInfo.begin();
       while (iter != this->actorDPtr->trajInfo.end())
       {
         if (iter->id > tinfo.id)
@@ -312,7 +314,8 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
       else
       {
         this->actorDPtr->trajInfo[idx].duration =
-                this->actorDPtr->skelAnimation[this->actorDPtr->trajInfo[idx].type]->GetLength();
+                this->actorDPtr->skelAnimation[
+                this->actorDPtr->trajInfo[idx].type]->GetLength();
         this->actorDPtr->trajInfo[idx].translated = false;
       }
 
@@ -508,11 +511,13 @@ void Actor::Update()
   scriptTime = scriptTime - tinfo.startTime;
 
   SkeletonAnimation *skelAnim = this->actorDPtr->skelAnimation[tinfo.type];
-  std::map<std::string, std::string> skelMap = this->actorDPtr->skelNodesMap[tinfo.type];
+  std::map<std::string, std::string> skelMap =
+    this->actorDPtr->skelNodesMap[tinfo.type];
 
   ignition::math::Pose3d modelPose;
   std::map<std::string, ignition::math::Matrix4d> frame;
-  if (this->actorDPtr->trajectories.find(tinfo.id) != this->actorDPtr->trajectories.end())
+  if (this->actorDPtr->trajectories.find(tinfo.id) !=
+      this->actorDPtr->trajectories.end())
   {
     common::PoseKeyFrame posFrame(0.0);
     this->actorDPtr->trajectories[tinfo.id]->SetTime(scriptTime);
@@ -646,7 +651,7 @@ void Actor::SetPose(
   }
 
   msgs::Time *stamp = msg.add_time();
-  stamp->CopyFrom(msgs::Convert(_time));
+  stamp->CopyFrom(msgs::Convert(common::Time(_time)));
 
   msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->ScopedName());

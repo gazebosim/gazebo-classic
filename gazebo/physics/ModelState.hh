@@ -57,7 +57,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
       /// \param[in] _iterations Simulation iterations.
-      public: ModelState(const ModelPtr _model, const common::Time &_realTime,
+      public: ModelState(ModelPtr _model, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
@@ -65,7 +65,7 @@ namespace gazebo
       /// Build a ModelState from an existing Model.
       /// \param[in] _model Pointer to the model from which to gather state
       /// info.
-      public: explicit ModelState(const ModelPtr _model);
+      public: explicit ModelState(ModelPtr _model);
 
       /// \brief Constructor
       ///
@@ -84,7 +84,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
       /// \param[in] _iterations Simulation iterations.
-      public: void Load(const ModelPtr _model, const common::Time &_realTime,
+      public: void Load(ModelPtr _model, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Load state from SDF element.

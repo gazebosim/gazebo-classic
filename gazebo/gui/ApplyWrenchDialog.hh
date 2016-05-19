@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_HH_
-#define _GAZEBO_APPLY_WRENCH_DIALOG_HH_
+#ifndef GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
+#define GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
 
 #include <string>
 
@@ -54,7 +53,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
-      public: ApplyWrenchDialog(QWidget *_parent = 0);
+      public: explicit ApplyWrenchDialog(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: ~ApplyWrenchDialog();

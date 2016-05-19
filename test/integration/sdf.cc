@@ -32,7 +32,8 @@ TEST_F(PR2Test, Param)
   sdf::ParamT<std::string> stringP("s", "default", 0);
   sdf::ParamT<common::Color> colorP("c", common::Color(.1, .2, .3, 1), 0);
   sdf::ParamT<math::Vector3> vec3P("v3", ignition::math::Vector3d(1, 2, 3), 0);
-  sdf::ParamT<math::Pose> poseP("v3", ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+  sdf::ParamT<math::Pose> poseP("v3",
+      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
         ignition::math::Quaterniond(0, 0, M_PI)), 0);
 
   EXPECT_TRUE(boolP.IsBool());

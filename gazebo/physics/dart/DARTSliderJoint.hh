@@ -31,7 +31,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the Link that is the joint' parent
-      public: DARTSliderJoint(BasePtr _parent);
+      public: explicit DARTSliderJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~DARTSliderJoint();

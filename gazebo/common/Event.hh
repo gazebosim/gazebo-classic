@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_EVENT_HH_
-#define _GAZEBO_EVENT_HH_
+#ifndef GAZEBO_COMMON_EVENT_HH_
+#define GAZEBO_COMMON_EVENT_HH_
 
 #include <atomic>
 #include <iostream>
@@ -80,7 +79,7 @@ namespace gazebo
 
       /// \brief Allow subclasses to initialize their own data pointer.
       /// \param[in] _d Reference to data pointer.
-      protected: Event(EventPrivate &_d);
+      protected: explicit Event(EventPrivate &_d);
 
       /// \brief Data pointer.
       protected: EventPrivate *dataPtr;

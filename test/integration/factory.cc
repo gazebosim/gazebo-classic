@@ -128,9 +128,12 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
         ignition::math::Quaterniond(0, 0, 0));
     SpawnSphere(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = EntityPose(name.str());
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().X(),
+          setPose.Pos().X(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Y(),
+          setPose.Pos().Y(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Z(),
+          setPose.Pos().Z(), 0.1));
   }
 }
 

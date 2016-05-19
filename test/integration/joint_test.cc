@@ -209,9 +209,11 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   // All models should oscillate with the same frequency
   physics::ModelPtr modelPrismatic = world->ModelByName("model_3_prismatic");
   physics::ModelPtr modelRevolute = world->ModelByName("model_3_revolute");
-  physics::ModelPtr modelPlugin = world->ModelByName("model_4_prismatic_plugin");
+  physics::ModelPtr modelPlugin =
+    world->ModelByName("model_4_prismatic_plugin");
   physics::ModelPtr modelContact = world->ModelByName("model_5_soft_contact");
-  physics::ModelPtr modelPrismatic2 = world->ModelByName("model_6_prismatic_sdf");
+  physics::ModelPtr modelPrismatic2 =
+    world->ModelByName("model_6_prismatic_sdf");
   physics::ModelPtr modelRevolute2 = world->ModelByName("model_7_revolute_sdf");
 
   ASSERT_TRUE(modelPrismatic != NULL);
@@ -416,9 +418,11 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Spawn two boxes
-  SpawnBox("box1", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(1, 0, 0.5),
+  SpawnBox("box1", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(1, 0, 0.5),
       ignition::math::Vector3d::Zero, false);
-  SpawnBox("box2", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(-1, 0, 0.5),
+  SpawnBox("box2", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(-1, 0, 0.5),
       ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model  = world->ModelByName("box1");
   physics::ModelPtr model2 = world->ModelByName("box2");

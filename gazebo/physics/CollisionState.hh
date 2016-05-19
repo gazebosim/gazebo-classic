@@ -45,7 +45,7 @@ namespace gazebo
       /// Build a CollisionState from an existing Collision.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
-      public: explicit CollisionState(const CollisionPtr _collision);
+      public: explicit CollisionState(CollisionPtr _collision);
 
       /// \brief Constructor
       ///

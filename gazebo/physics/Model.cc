@@ -75,7 +75,8 @@ void Model::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->modelDPtr->jointPub = this->modelDPtr->node->Advertise<msgs::Joint>("~/joint");
+  this->modelDPtr->jointPub =
+    this->modelDPtr->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->modelDPtr->sdf->Get<bool>("static"));
   if (this->modelDPtr->sdf->HasElement("static"))
@@ -282,8 +283,9 @@ void Model::Init()
     this->modelDPtr->jointPub->Publish(msg);
   }
 
-  for (std::vector<GripperPtr>::iterator iter = this->modelDPtr->grippers.begin();
-       iter != this->modelDPtr->grippers.end(); ++iter)
+  for (std::vector<GripperPtr>::iterator iter =
+      this->modelDPtr->grippers.begin();
+      iter != this->modelDPtr->grippers.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -379,7 +381,8 @@ void Model::RemoveChild(EntityPtr _child)
     {
       done = true;
 
-      for (jiter = this->modelDPtr->joints.begin(); jiter != this->modelDPtr->joints.end(); ++jiter)
+      for (jiter = this->modelDPtr->joints.begin();
+          jiter != this->modelDPtr->joints.end(); ++jiter)
       {
         if (!(*jiter))
           continue;
@@ -509,7 +512,8 @@ const sdf::ElementPtr Model::UnscaledSDF()
               geomElem->GetElement("cylinder")->Get<double>("radius");
           double length =
               geomElem->GetElement("cylinder")->Get<double>("length");
-          double radiusScale = std::max(this->modelDPtr->scale.X(), this->modelDPtr->scale.Y());
+          double radiusScale = std::max(this->modelDPtr->scale.X(),
+              this->modelDPtr->scale.Y());
 
           geomElem->GetElement("cylinder")->GetElement("radius")->Set(
               radius/radiusScale);
@@ -553,7 +557,8 @@ const sdf::ElementPtr Model::UnscaledSDF()
               geomElem->GetElement("cylinder")->Get<double>("radius");
           double length =
               geomElem->GetElement("cylinder")->Get<double>("length");
-          double radiusScale = std::max(this->modelDPtr->scale.X(), this->modelDPtr->scale.Y());
+          double radiusScale = std::max(this->modelDPtr->scale.X(),
+              this->modelDPtr->scale.Y());
 
           geomElem->GetElement("cylinder")->GetElement("radius")->Set(
               radius/radiusScale);
@@ -591,7 +596,8 @@ void Model::Reset()
 
   // Reset plugins after links and joints,
   // so that plugins can restore initial conditions
-  for (std::vector<ModelPluginPtr>::iterator iter = this->modelDPtr->plugins.begin();
+  for (std::vector<ModelPluginPtr>::iterator iter =
+      this->modelDPtr->plugins.begin();
        iter != this->modelDPtr->plugins.end(); ++iter)
   {
     (*iter)->Reset();

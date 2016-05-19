@@ -105,7 +105,7 @@ TEST_F(CameraSensor, WorldReset)
   // reset the world and verify
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  common::Time simTime = world->SimTime().Double();
+  common::Time simTime = world->SimTime();
   world->Reset();
   EXPECT_TRUE(world->SimTime() == common::Time(0.0) ||
       world->SimTime() < simTime);
@@ -292,7 +292,9 @@ TEST_F(CameraSensor, FillMsg)
   unsigned int height = 240;
   double updateRate = 0;
   ignition::math::Pose3d setPose(
-      ignition::math::Vector3d(-5, 0, 5), ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -358,7 +360,8 @@ TEST_F(CameraSensor, UnlimitedTest)
   unsigned int height = 240;
   double updateRate = 0;
   ignition::math::Pose3d setPose(
-      ignition::math::Vector3d(-5, 0, 5), ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -521,7 +524,9 @@ TEST_F(CameraSensor, CheckNoise)
   double noiseMean = 0.1;
   double noiseStdDev = 0.01;
   ignition::math::Pose3d setPose(
-      ignition::math::Vector3d(-5, 0, 5), ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   SpawnCamera(modelNameNoisy, cameraNameNoisy, setPose.Pos(),
@@ -590,7 +595,9 @@ TEST_F(CameraSensor, CheckDistortion)
   double updateRate = 10;
 
   ignition::math::Pose3d setPose(
-      ignition::math::Vector3d(-5, 0, 5), ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   // spawn a camera with barrel distortion
@@ -693,9 +700,13 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   double updateRate = 10;
 
   ignition::math::Pose3d testPose(
-      ignition::math::Vector3d(0, 0, 0.5), ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Vector3d(0, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
+
   ignition::math::Pose3d testPose2(
-      ignition::math::Vector3d(0, 2, 0.5), ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Vector3d(0, 2, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
+
   SpawnCamera(modelName, cameraName, testPose.Pos(),
       testPose.Rot().Euler(), width, height, updateRate);
   SpawnCamera(modelName2, cameraName2, testPose2.Pos(),

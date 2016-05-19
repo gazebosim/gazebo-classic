@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_VIEWERS_IMAGEFRAME_HH_
-#define _GAZEBO_GUI_VIEWERS_IMAGEFRAME_HH_
+#ifndef GAZEBO_GUI_VIEWERS_IMAGEFRAME_HH_
+#define GAZEBO_GUI_VIEWERS_IMAGEFRAME_HH_
 
 #include <memory>
 
@@ -35,7 +35,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Qt widget
-      public: ImageFrame(QWidget *_parent);
+      public: explicit ImageFrame(QWidget *_parent);
 
       /// \brief Destructor
       public: virtual ~ImageFrame();

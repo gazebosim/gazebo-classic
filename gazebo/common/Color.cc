@@ -177,7 +177,7 @@ ignition::math::Vector3d Color::HSV() const
 //////////////////////////////////////////////////
 math::Vector3 Color::GetAsYUV() const
 {
-  return this->YUV();
+  return gazebo::math::Vector3(this->YUV());
 }
 
 //////////////////////////////////////////////////

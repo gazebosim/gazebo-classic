@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_GLWIDGET_HH_
-#define _GAZEBO_GUI_GLWIDGET_HH_
+#ifndef GAZEBO_GUI_GLWIDGET_HH_
+#define GAZEBO_GUI_GLWIDGET_HH_
 
 #include <memory>
 #include <string>
@@ -50,7 +50,7 @@ namespace gazebo
                   LINK
                 };
 
-      public: GLWidget(QWidget *_parent = 0);
+      public: explicit GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
       /// \brief View a scene in this widget.

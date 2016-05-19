@@ -2190,7 +2190,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
   if (!_event.Shift())
   {
-    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
+    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
   pose.Pos().Z(this->dataPtr->mouseVisual->GetWorldPose().Ign().Pos().Z());
 

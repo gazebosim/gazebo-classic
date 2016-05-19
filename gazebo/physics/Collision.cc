@@ -225,7 +225,6 @@ ShapePtr Collision::GetShape() const
 //////////////////////////////////////////////////
 ShapePtr Collision::Shape() const
 {
-
   return this->collDPtr->shape;
 }
 

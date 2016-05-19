@@ -34,7 +34,8 @@ TEST_F(CameraTest, Follow)
   ASSERT_TRUE(world != NULL);
 
   // Spawn a box to follow.
-  SpawnBox("box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(10, 10, 1),
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(10, 10, 1),
       ignition::math::Vector3d(0, 0, 0));
 
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
@@ -90,7 +91,8 @@ TEST_F(CameraTest, Visible)
   ASSERT_TRUE(world != NULL);
 
   // Spawn a box.
-  SpawnBox("box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(1, 0, 0.5),
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(1, 0, 0.5),
       ignition::math::Vector3d(0, 0, 0));
 
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);

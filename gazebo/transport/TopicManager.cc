@@ -38,7 +38,8 @@ class NodeProcess_TBB
 {
   /// \brief Constructor.
   /// \param[in] _nodes List of nodes to process.
-  public: NodeProcess_TBB(std::vector<NodePtr> *_nodes) : nodes(_nodes) {}
+  public: explicit NodeProcess_TBB(std::vector<NodePtr> *_nodes)
+          : nodes(_nodes) {}
 
   /// \brief Used by TBB during parallel execution.
   /// \param[in] _r Range within this->nodes to process.

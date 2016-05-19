@@ -107,10 +107,11 @@ void SimbodyHingeJoint::SetForceImpl(
 {
   if (_index < this->AngleCount() && this->simbodyJointDPtr->physicsInitialized)
   {
-    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces(
-        ).setOneMobilityForce(
-      this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
-      this->simbodyJointDPtr->mobod, SimTK::MobilizerUIndex(_index), _torque);
+    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces().
+      setOneMobilityForce(
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
+          this->simbodyJointDPtr->mobod,
+          SimTK::MobilizerUIndex(_index), _torque);
   }
 }
 

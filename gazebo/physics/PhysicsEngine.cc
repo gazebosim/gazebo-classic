@@ -73,7 +73,8 @@ void PhysicsEngine::ConstructionHelper()
 
   this->physicsEngineDPtr->node = transport::NodePtr(new transport::Node());
   this->physicsEngineDPtr->node->Init(this->physicsEngineDPtr->world->Name());
-  this->physicsEngineDPtr->physicsSub = this->physicsEngineDPtr->node->Subscribe("~/physics",
+  this->physicsEngineDPtr->physicsSub =
+    this->physicsEngineDPtr->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
   this->physicsEngineDPtr->responsePub =

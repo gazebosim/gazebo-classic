@@ -230,7 +230,10 @@ void ODELink::SetSelfCollide(const bool _collide)
 {
   this->odeLinkDPtr->sdf->GetElement("self_collide")->Set(_collide);
   if (_collide)
-    this->odeLinkDPtr->spaceId = dSimpleSpaceCreate(this->odeLinkDPtr->odePhysics->GetSpaceId());
+  {
+    this->odeLinkDPtr->spaceId =
+      dSimpleSpaceCreate(this->odeLinkDPtr->odePhysics->GetSpaceId());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -565,7 +568,8 @@ void ODELink::SetForce(const ignition::math::Vector3d &_force)
   if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodySetForce(this->odeLinkDPtr->linkId, _force.X(), _force.Y(), _force.Z());
+    dBodySetForce(this->odeLinkDPtr->linkId,
+        _force.X(), _force.Y(), _force.Z());
   }
   else if (!this->IsStatic())
   {
@@ -596,7 +600,8 @@ void ODELink::AddForce(const ignition::math::Vector3d &_force)
   if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddForce(this->odeLinkDPtr->linkId, _force.X(), _force.Y(), _force.Z());
+    dBodyAddForce(this->odeLinkDPtr->linkId,
+        _force.X(), _force.Y(), _force.Z());
   }
   else if (!this->IsStatic())
   {
@@ -611,7 +616,8 @@ void ODELink::AddRelativeForce(const ignition::math::Vector3d &_force)
   if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddRelForce(this->odeLinkDPtr->linkId, _force.X(), _force.Y(), _force.Z());
+    dBodyAddRelForce(this->odeLinkDPtr->linkId,
+        _force.X(), _force.Y(), _force.Z());
   }
   else if (!this->IsStatic())
   {

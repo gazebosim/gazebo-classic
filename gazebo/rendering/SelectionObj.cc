@@ -147,7 +147,7 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
 
   dPtr->parent = _vis;
   dPtr->parent->AttachVisual(shared_from_this());
-  this->SetPosition(math::Vector3(0, 0, 0));
+  this->SetPosition(ignition::math::Vector3d::Zero);
 
   this->UpdateSize();
 }
@@ -185,7 +185,7 @@ void SelectionObj::UpdateSize()
     this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat, false);
     this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat, false);
   }
-  this->SetScale(math::Vector3(max, max, max));
+  this->SetScale(ignition::math::Vector3d(max, max, max));
 }
 
 /////////////////////////////////////////////////
@@ -467,7 +467,7 @@ void SelectionObj::CreateTranslateVisual()
   this->SetHandleMaterial(TRANS_Y, dPtr->yAxisMatOverlay);
   this->SetHandleMaterial(TRANS_Z, dPtr->zAxisMatOverlay);
 
-  dPtr->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->transVisual->SetScale(ignition::math::Vector3d(5.0, 5.0, 5.0));
 
   dPtr->transXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -550,7 +550,7 @@ void SelectionObj::CreateRotateVisual()
   this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat);
   this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat);
 
-  dPtr->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  dPtr->rotVisual->SetScale(ignition::math::Vector3d::One);
 
   dPtr->rotXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -672,7 +672,7 @@ void SelectionObj::CreateScaleVisual()
   this->SetHandleMaterial(SCALE_Y, dPtr->yAxisMatOverlay);
   this->SetHandleMaterial(SCALE_Z, dPtr->zAxisMatOverlay);
 
-  dPtr->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->scaleVisual->SetScale(ignition::math::Vector3d(5.0, 5.0, 5.0));
 
   dPtr->scaleXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);

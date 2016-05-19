@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_DIAGNOSTICS_HH_
-#define _GAZEBO_GUI_DIAGNOSTICS_HH_
+#ifndef GAZEBO_GUI_DIAGNOSTICS_HH_
+#define GAZEBO_GUI_DIAGNOSTICS_HH_
 
 #include <memory>
 
@@ -37,7 +37,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent widget.
-      public: Diagnostics(QWidget *_parent);
+      public: explicit Diagnostics(QWidget *_parent);
 
       /// \brief Destructor.
       public: virtual ~Diagnostics();

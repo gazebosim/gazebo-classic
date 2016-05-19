@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_RAYSHAPEPRIVATE_HH_
-#define _GAZEBO_PHYSICS_RAYSHAPEPRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_RAYSHAPEPRIVATE_HH_
+#define GAZEBO_PHYSICS_RAYSHAPEPRIVATE_HH_
+
+#include <string>
 
 #include <ignition/math/Vector3.hh>
 #include "gazebo/physics/ShapePrivate.hh"

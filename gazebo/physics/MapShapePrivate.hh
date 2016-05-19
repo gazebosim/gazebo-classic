@@ -14,8 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_MAPSHAPEPRIVATE_HH_
-#define _GAZEBO_PHYSICS_MAPSHAPEPRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_MAPSHAPEPRIVATE_HH_
+#define GAZEBO_PHYSICS_MAPSHAPEPRIVATE_HH_
+
+#include <string>
+#include <deque>
 
 #include "gazebo/common/Image.hh"
 #include "gazebo/physics/ShapePrivate.hh"
@@ -30,7 +33,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent quad tree node.
-      public: QuadNode(QuadNode *_parent)
+      public: explicit QuadNode(QuadNode *_parent)
               : x(0), y(0), width(0), height(0)
               {
                 parent = _parent;

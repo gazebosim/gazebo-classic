@@ -90,7 +90,7 @@ bool g_clearModels;
 
 class ModelUpdate_TBB
 {
-  public: ModelUpdate_TBB(Model_V *_models) : models(_models) {}
+  public: explicit ModelUpdate_TBB(Model_V *_models) : models(_models) {}
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
     for (size_t i = _r.begin(); i != _r.end(); i++)
@@ -345,7 +345,7 @@ void World::Save(const std::string &_filename)
 void World::Init()
 {
   // Initialize all the entities (i.e. Model)
-  for (unsigned int i = 0;i < this->dataPtr->rootElement->ChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); i++)
     this->dataPtr->rootElement->Child(i)->Init();
 
   // Initialize the physics engine
@@ -638,7 +638,7 @@ void World::Step()
   common::Time sleepTime = this->dataPtr->prevStepWallTime +
     common::Time(updatePeriod) - tmpTime - this->dataPtr->sleepOffset;
 
-  common::Time actualSleep = 0;
+  common::Time actualSleep;
   if (sleepTime > 0)
   {
     common::Time::Sleep(sleepTime);

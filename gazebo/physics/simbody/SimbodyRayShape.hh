@@ -34,11 +34,11 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _physicsEngine Pointer to the physics engine.
-      public: SimbodyRayShape(PhysicsEnginePtr _physicsEngine);
+      public: explicit SimbodyRayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Constructor
       /// \param[in] _collision Collision the ray is attached to.
-      public: SimbodyRayShape(CollisionPtr _collision);
+      public: explicit SimbodyRayShape(CollisionPtr _collision);
 
       /// \brief Destructor
       public: virtual ~SimbodyRayShape();

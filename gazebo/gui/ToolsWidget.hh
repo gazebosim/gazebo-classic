@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _TOOLS_WIDGET_HH_
-#define _TOOLS_WIDGET_HH_
+#ifndef GAZEBO_GUI_TOOLS_WIDGET_HH_
+#define GAZEBO_GUI_TOOLS_WIDGET_HH_
 
 #include <vector>
 #include <string>
@@ -42,7 +42,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget pointer.
-      public: ToolsWidget(QWidget *_parent = 0);
+      public: explicit ToolsWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~ToolsWidget();

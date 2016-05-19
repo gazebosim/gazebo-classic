@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ACTORPRIVATE_HH_
-#define _GAZEBO_PHYSICS_ACTORPRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_ACTORPRIVATE_HH_
+#define GAZEBO_PHYSICS_ACTORPRIVATE_HH_
 
 #include <map>
+#include <string>
 #include <vector>
 
 #include "gazebo/common/Time.hh"
@@ -112,7 +113,7 @@ namespace gazebo
       public: std::map<std::string, bool> interpolateX;
 
       /// \brief Last position of the actor
-      public: math::Vector3 lastPos;
+      public: ignition::math::Vector3d lastPos;
 
       /// \brief Length of the actor's path.
       public: double pathLength;

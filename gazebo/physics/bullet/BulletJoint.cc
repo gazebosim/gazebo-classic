@@ -379,7 +379,8 @@ void BulletJoint::CacheForceTorque()
         this->bulletJointDPtr->wrench.body1Torque);
     }
   }
-  this->bulletJointDPtr->wrench = this->bulletJointDPtr->wrench - wrenchAppliedWorld;
+  this->bulletJointDPtr->wrench =
+    this->bulletJointDPtr->wrench - wrenchAppliedWorld;
 }
 
 //////////////////////////////////////////////////

@@ -35,7 +35,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletLink::BulletLink(EntityPtr _parent)
-: Link(*new BulletLinkPrivate,_parent),
+: Link(*new BulletLinkPrivate, _parent),
   bulletLinkDPtr(static_cast<BulletLinkPrivate*>(this->linkDPtr))
 {
   this->bulletLinkDPtr->rigidLink = NULL;
@@ -171,7 +171,8 @@ void BulletLink::Init()
   // Setup motion clamping to prevent objects from moving too fast.
   // this->bulletLinkDPtr->rigidLink->setCcdMotionThreshold(1);
   // ignition::math::Vector3d size = this->GetBoundingBox().GetSize();
-  // this->bulletLinkDPtr->rigidLink->setCcdSweptSphereRadius(size.GetMax()*0.8);
+  // this->bulletLinkDPtr->rigidLink->setCcdSweptSphereRadius(
+  // size.GetMax()*0.8);
 
   if (mass <= 0.0)
   {
@@ -369,7 +370,8 @@ void BulletLink::SetLinearVel(const ignition::math::Vector3d &_vel)
     return;
   }
 
-  this->bulletLinkDPtr->rigidLink->setLinearVelocity(BulletTypes::ConvertVector3(_vel));
+  this->bulletLinkDPtr->rigidLink->setLinearVelocity(
+      BulletTypes::ConvertVector3(_vel));
 }
 
 //////////////////////////////////////////////////
@@ -441,7 +443,8 @@ void BulletLink::SetAngularVel(const ignition::math::Vector3d &_vel)
     return;
   }
 
-  this->bulletLinkDPtr->rigidLink->setAngularVelocity(BulletTypes::ConvertVector3(_vel));
+  this->bulletLinkDPtr->rigidLink->setAngularVelocity(
+      BulletTypes::ConvertVector3(_vel));
 }
 
 //////////////////////////////////////////////////
@@ -493,7 +496,8 @@ void BulletLink::SetTorque(const ignition::math::Vector3d &_torque)
     return;
   }
 
-  this->bulletLinkDPtr->rigidLink->applyTorque(BulletTypes::ConvertVector3(_torque));
+  this->bulletLinkDPtr->rigidLink->applyTorque(
+      BulletTypes::ConvertVector3(_torque));
 }
 
 //////////////////////////////////////////////////

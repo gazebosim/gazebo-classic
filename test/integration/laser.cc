@@ -211,11 +211,15 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   std::string box03 = "box_03";
 
   // box in front of ray sensor
-  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
   // box on the right of ray sensor
-  ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d box02Pose(
+      ignition::math::Vector3d(0, -1, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
   // box on the left of the ray sensor but out of range
-  ignition::math::Pose3d box03Pose(ignition::math::Vector3d(0, maxRange + 1, 0.5),
+  ignition::math::Pose3d box03Pose(
+      ignition::math::Vector3d(0, maxRange + 1, 0.5),
       ignition::math::Quaterniond(0, 0, 0));
 
   SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
@@ -251,7 +255,8 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   // Move all boxes out of range
   world->ModelByName(box01)->SetWorldPose(
-      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0), ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond(0, 0, 0)));
   world->ModelByName(box02)->SetWorldPose(
       ignition::math::Pose3d(ignition::math::Vector3d(0, -(maxRange + 1), 0),
       ignition::math::Quaterniond(0, 0, 0)));
@@ -314,7 +319,8 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   std::string box01 = "box_01";
 
   // box in front of ray sensor
-  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
   SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
       box01Pose.Rot().Euler());

@@ -138,7 +138,8 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 
   this->simbodyPhysicsDPtr->stepTimeDouble = this->MaxStepSize();
 
-  sdf::ElementPtr simbodyElem = this->simbodyPhysicsDPtr->sdf->GetElement("simbody");
+  sdf::ElementPtr simbodyElem =
+    this->simbodyPhysicsDPtr->sdf->GetElement("simbody");
 
   // Set integrator accuracy (measured with Richardson Extrapolation)
   this->simbodyPhysicsDPtr->integ->setAccuracy(
@@ -774,12 +775,21 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
   else if (_type == "multiray")
     shape.reset(new SimbodyMultiRayShape(collision));
   else if (_type == "ray")
+  {
     if (_collision)
+    {
       shape.reset(new SimbodyRayShape(_collision));
+    }
     else
-      shape.reset(new SimbodyRayShape(this->simbodyPhysicsDPtr->world->Physics()));
+    {
+      shape.reset(new SimbodyRayShape(
+            this->simbodyPhysicsDPtr->world->Physics()));
+    }
+  }
   else
+  {
     gzerr << "Unable to create collision of type[" << _type << "]\n";
+  }
 
   // else if (_type == "map" || _type == "image")
   //   shape.reset(new MapShape(collision));
@@ -951,10 +961,15 @@ void SimbodyPhysics::InitSimbodySystem()
 
   // Specify gravity (read in above from world).
   if (!math::equal(this->simbodyPhysicsDPtr->world->Gravity().Length(), 0.0))
+  {
     this->simbodyPhysicsDPtr->gravity.setDefaultGravityVector(
-      SimbodyPhysics::Vector3ToVec3(this->simbodyPhysicsDPtr->world->Gravity()));
+      SimbodyPhysics::Vector3ToVec3(
+        this->simbodyPhysicsDPtr->world->Gravity()));
+  }
   else
+  {
     this->simbodyPhysicsDPtr->gravity.setDefaultMagnitude(0.0);
+  }
 }
 
 //////////////////////////////////////////////////

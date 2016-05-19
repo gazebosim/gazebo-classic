@@ -182,7 +182,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
       // and we should assume support for backwards compatibility
       if (axisElem->HasElement(param))
       {
-        this->jointDPtr->axisParentModelFrame[index] = axisElem->Get<bool>(param);
+        this->jointDPtr->axisParentModelFrame[index] =
+          axisElem->Get<bool>(param);
       }
 
       // Axis dynamics
@@ -217,11 +218,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
       this->jointDPtr->upperLimit[index] = limitElem->Get<double>("upper");
       this->jointDPtr->lowerLimit[index] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
-      this->jointDPtr->stopStiffness[index] = limitElem->Get<double>("stiffness");
-      this->jointDPtr->stopDissipation[index] = limitElem->Get<double>("dissipation");
+      this->jointDPtr->stopStiffness[index] =
+        limitElem->Get<double>("stiffness");
+      this->jointDPtr->stopDissipation[index] =
+        limitElem->Get<double>("dissipation");
       // store joint effort and velocity limits
       this->jointDPtr->effortLimit[index] = limitElem->Get<double>("effort");
-      this->jointDPtr->velocityLimit[index] = limitElem->Get<double>("velocity");
+      this->jointDPtr->velocityLimit[index] =
+        limitElem->Get<double>("velocity");
     }
   }
 
@@ -262,7 +266,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (!this->jointDPtr->parentLink && parentName != std::string("world"))
   {
     BasePtr parentModel = this->jointDPtr->model;
-    while (!this->jointDPtr->parentLink && parentModel && parentModel->HasType(MODEL))
+    while (!this->jointDPtr->parentLink &&
+           parentModel && parentModel->HasType(MODEL))
     {
       std::string scopedParentName =
           parentModel->ScopedName() + "::" + parentName;
@@ -289,7 +294,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
   {
     BasePtr parentModel = this->jointDPtr->model;
 
-    while (!this->jointDPtr->childLink && parentModel && parentModel->HasType(MODEL))
+    while (!this->jointDPtr->childLink && parentModel &&
+           parentModel->HasType(MODEL))
     {
       std::string scopedChildName =
           parentModel->ScopedName() + "::" + childName;
@@ -1596,14 +1602,15 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
   }
   else
   {
-    // add this->jointDPtr->childLink to the list of descendent child links (should be
-    // the very first one added).
+    // add this->jointDPtr->childLink to the list of descendent child links
+    // (should be the very first one added).
     _connectedLinks.push_back(this->jointDPtr->childLink);
 
-    // START RECURSIVE SEARCH, start adding child links of this->jointDPtr->childLink
+    // START RECURSIVE SEARCH, start adding child links of
+    // this->jointDPtr->childLink
     // to the collection of _connectedLinks.
-    return this->jointDPtr->childLink->FindAllConnectedLinksHelper(_originalParentLink,
-      _connectedLinks, true);
+    return this->jointDPtr->childLink->FindAllConnectedLinksHelper(
+        _originalParentLink, _connectedLinks, true);
   }
 }
 

@@ -61,7 +61,6 @@
 #include "gazebo/physics/ode/ODEHingeJoint.hh"
 #include "gazebo/physics/ode/ODEGearboxJoint.hh"
 #include "gazebo/physics/ode/ODEHinge2Joint.hh"
-#include "gazebo/physics/ode/ODEScrewJoint.hh"
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
 #include "gazebo/physics/ode/ODEUniversalJoint.hh"
@@ -906,14 +905,16 @@ dSpaceID ODEPhysics::GetSpaceId() const
 //////////////////////////////////////////////////
 std::string ODEPhysics::GetStepType() const
 {
-  sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("ode")->GetElement("solver");
+  sdf::ElementPtr elem =
+    this->dataPtr->sdf->GetElement("ode")->GetElement("solver");
   return elem->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetStepType(const std::string &_type)
 {
-  sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("ode")->GetElement("solver");
+  sdf::ElementPtr elem =
+    this->dataPtr->sdf->GetElement("ode")->GetElement("solver");
   elem->GetElement("type")->Set(_type);
   this->dataPtr->stepType = _type;
 

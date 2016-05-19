@@ -57,7 +57,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp
       /// \param[in] _iterations Simulation iterations.
-      public: LinkState(const LinkPtr _link, const common::Time &_realTime,
+      public: LinkState(LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor
@@ -65,7 +65,7 @@ namespace gazebo
       /// Build a LinkState from an existing Link.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
-      public: explicit LinkState(const LinkPtr _link);
+      public: explicit LinkState(LinkPtr _link);
 
       /// \brief Constructor
       ///
@@ -84,7 +84,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
       /// \param[in] _iterations Simulation iterations.
-      public: void Load(const LinkPtr _link, const common::Time &_realTime,
+      public: void Load(LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Load state from SDF element.

@@ -47,7 +47,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
       /// \param[in] _iterations Simulation iterations.
-      public: LightState(const LightPtr _light, const common::Time &_realTime,
+      public: LightState(LightPtr _light, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor
@@ -70,7 +70,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
       /// \param[in] _iterations Simulation iterations.
-      public: void Load(const LightPtr _light, const common::Time &_realTime,
+      public: void Load(LightPtr _light, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Get the stored light pose.

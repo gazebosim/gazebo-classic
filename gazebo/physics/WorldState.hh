@@ -49,7 +49,7 @@ namespace gazebo
       ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
-      public: explicit WorldState(const WorldPtr _world);
+      public: explicit WorldState(WorldPtr _world);
 
       /// \brief Constructor
       ///
@@ -64,7 +64,7 @@ namespace gazebo
       ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
-      public: void Load(const WorldPtr _world);
+      public: void Load(WorldPtr _world);
 
       /// \brief Load state from SDF element.
       ///
@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Set the world.
       /// \param[in] _world Pointer to the world.
-      public: void SetWorld(const WorldPtr _world);
+      public: void SetWorld(WorldPtr _world);
 
       /// \brief Get model states based on a regular expression.
       /// \param[in] _regex The regular expression.

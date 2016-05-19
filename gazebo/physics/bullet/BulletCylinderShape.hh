@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
-#define _GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/util/system.hh"
@@ -32,7 +32,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
-      public: BulletCylinderShape(CollisionPtr _parent);
+      public: explicit BulletCylinderShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletCylinderShape();

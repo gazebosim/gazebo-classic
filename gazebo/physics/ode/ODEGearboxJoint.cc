@@ -20,7 +20,6 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODELink.hh"
-#include "gazebo/physics/GearboxJointPrivate.hh"
 #include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEGearboxJoint.hh"
 

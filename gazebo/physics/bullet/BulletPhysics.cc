@@ -491,7 +491,7 @@ void BulletPhysics::UpdatePhysics()
   std::lock_guard<std::recursive_mutex> lock(
       this->physicsEngineDPtr->physicsUpdateMutex);
 
-  this->dynamicsWorld->stepSimulation( this->physicsEngineDPtr->maxStepSize, 1,
+  this->dynamicsWorld->stepSimulation(this->physicsEngineDPtr->maxStepSize, 1,
     this->physicsEngineDPtr->maxStepSize);
 }
 
@@ -527,7 +527,8 @@ void BulletPhysics::SetSORPGSIters(unsigned int _iters)
 //////////////////////////////////////////////////
 bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  sdf::ElementPtr bulletElem = this->physicsEngineDPtr->sdf->GetElement("bullet");
+  sdf::ElementPtr bulletElem =
+    this->physicsEngineDPtr->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
@@ -595,7 +596,8 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     {
       /// TODO: Implement max contacts param
       int value = boost::any_cast<int>(_value);
-      this->physicsEngineDPtr->sdf->GetElement("max_contacts")->GetValue()->Set(value);
+      this->physicsEngineDPtr->sdf->GetElement(
+          "max_contacts")->GetValue()->Set(value);
     }
     else if (_key == "min_step_size")
     {
@@ -629,7 +631,8 @@ boost::any BulletPhysics::Param(const std::string &_key) const
 //////////////////////////////////////////////////
 bool BulletPhysics::Param(const std::string &_key, boost::any &_value) const
 {
-  sdf::ElementPtr bulletElem = this->physicsEngineDPtr->sdf->GetElement("bullet");
+  sdf::ElementPtr bulletElem =
+    this->physicsEngineDPtr->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   if (_key == "solver_type")
@@ -656,9 +659,14 @@ bool BulletPhysics::Param(const std::string &_key, boost::any &_value) const
       "split_impulse_penetration_threshold");
   }
   else if (_key == "max_contacts")
-    _value = this->physicsEngineDPtr->sdf->GetElement("max_contacts")->Get<int>();
+  {
+    _value = this->physicsEngineDPtr->sdf->GetElement(
+        "max_contacts")->Get<int>();
+  }
   else if (_key == "min_step_size")
+  {
     _value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
+  }
   else
   {
     return PhysicsEngine::Param(_key, _value);
@@ -714,10 +722,17 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
   else if (_type == "multiray")
     shape.reset(new BulletMultiRayShape(collision));
   else if (_type == "ray")
+  {
     if (_collision)
+    {
       shape.reset(new BulletRayShape(_collision));
+    }
     else
-      shape.reset(new BulletRayShape(this->physicsEngineDPtr->world->Physics()));
+    {
+      shape.reset(new BulletRayShape(
+            this->physicsEngineDPtr->world->Physics()));
+    }
+  }
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 

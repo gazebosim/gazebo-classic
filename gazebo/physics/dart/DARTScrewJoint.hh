@@ -33,7 +33,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
-      public: DARTScrewJoint(BasePtr _parent);
+      public: explicit DARTScrewJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTScrewJoint();

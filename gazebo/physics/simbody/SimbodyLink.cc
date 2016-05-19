@@ -174,10 +174,10 @@ bool SimbodyLink::GravityMode() const
 {
   if (this->simbodyLinkDPtr->physicsInitialized)
   {
-    return this->simbodyLinkDPtr->simbodyPhysics->SimbodyGravity(
-        ).getBodyIsExcluded(
-      this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
-      this->simbodyLinkDPtr->masterMobod);
+    return this->simbodyLinkDPtr->simbodyPhysics->SimbodyGravity().
+      getBodyIsExcluded(
+          this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
+          this->simbodyLinkDPtr->masterMobod);
   }
   else
   {

@@ -14,14 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _LINK_HH_
-#define _LINK_HH_
+#ifndef GAZEBO_PHYSICS_LINK_HH_
+#define GAZEBO_PHYSICS_LINK_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <string>
 
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/util/system.hh"
@@ -183,7 +185,7 @@ namespace gazebo
 
       /// \brief Set the linear acceleration of the body.
       /// \param[in] _accel Linear acceleration.
-      public: void SetLinearAccel(const ignition::math::Vector3d &_accel) ;
+      public: void SetLinearAccel(const ignition::math::Vector3d &_accel);
 
       /// \brief Set the angular acceleration of the body.
       /// \param[in] _accel Angular acceleration.

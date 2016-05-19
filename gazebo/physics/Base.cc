@@ -127,9 +127,12 @@ void Base::Fini()
 {
   Base_V::iterator iter;
 
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+      iter != this->baseDPtr->children.end(); ++iter)
+  {
     if (*iter)
       (*iter)->Fini();
+  }
 
   this->baseDPtr->children.clear();
 
@@ -146,7 +149,8 @@ void Base::Reset()
 void Base::Reset(Base::EntityType _resetType)
 {
   Base_V::iterator iter;
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+      iter != this->baseDPtr->children.end(); ++iter)
   {
     if ((*iter)->HasType(_resetType))
       (*iter)->Reset();
@@ -435,8 +439,11 @@ bool Base::SetSelected(const bool _s)
   this->baseDPtr->selected = _s;
 
   Base_V::iterator iter;
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+      iter != this->baseDPtr->children.end(); ++iter)
+  {
     (*iter)->SetSelected(_s);
+  }
 
   return true;
 }

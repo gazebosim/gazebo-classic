@@ -262,8 +262,10 @@ void HeightmapShape::Init()
       this->heightmapShapeDPtr->heightmapData->GetWidth() *
       this->heightmapShapeDPtr->subSampling)-1;
 
-  this->heightmapShapeDPtr->scale.X(terrainSize.X() / this->heightmapShapeDPtr->vertSize);
-  this->heightmapShapeDPtr->scale.Y(terrainSize.Y() / this->heightmapShapeDPtr->vertSize);
+  this->heightmapShapeDPtr->scale.X(
+      terrainSize.X() / this->heightmapShapeDPtr->vertSize);
+  this->heightmapShapeDPtr->scale.Y(
+      terrainSize.Y() / this->heightmapShapeDPtr->vertSize);
 
   if (ignition::math::equal(
         this->heightmapShapeDPtr->heightmapData->GetMaxElevation(), 0.0f))

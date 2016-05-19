@@ -221,7 +221,7 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
       ignition::math::Vector3d(2, 0, 3.65), ignition::math::Vector3d(0, 0, 0));
 
   // Wait for elevator to move. 10 seconds is more than long enough.
-  common::Time::Sleep(10);
+  std::this_thread::sleep_for(std::chrono::seconds(10));
 
   gzdbg << "Elevator Pose2["
         << elevatorModel->WorldPose().Pos() << "]\n";

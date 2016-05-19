@@ -347,7 +347,7 @@ namespace gazebo
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
       /// \deprecated See ModelPtr ModelBelowPoint(
-      //const ignition::math::Vector3d &_pt)
+      /// const ignition::math::Vector3d &_pt)
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt)
               GAZEBO_DEPRECATED(8.0);
 

@@ -146,8 +146,8 @@ void SimbodyScrewJoint::SetForceImpl(const unsigned int _index,
   if (_index < this->AngleCount() &&
       this->simbodyJointDPtr->physicsInitialized)
   {
-    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces(
-        ).setOneMobilityForce(
+    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces().
+      setOneMobilityForce(
           this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
           this->simbodyJointDPtr->mobod,
           SimTK::MobilizerUIndex(_index), _torque);

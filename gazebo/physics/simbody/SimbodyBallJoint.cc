@@ -22,7 +22,6 @@
 #include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
-#include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyBallJoint.hh"
 
 using namespace gazebo;

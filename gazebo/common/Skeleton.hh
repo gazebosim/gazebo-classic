@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SKELETON_HH_
-#define _GAZEBO_SKELETON_HH_
+#ifndef GAZEBO_COMMON_SKELETON_HH_
+#define GAZEBO_COMMON_SKELETON_HH_
 
 #include <vector>
 #include <string>
@@ -57,7 +57,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _root node
-      public: Skeleton(SkeletonNode *_root);
+      public: explicit Skeleton(SkeletonNode *_root);
 
       /// \brief Destructor
       public: virtual ~Skeleton();
@@ -178,7 +178,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent The parent node
-      public: SkeletonNode(SkeletonNode* _parent);
+      public: explicit SkeletonNode(SkeletonNode* _parent);
 
       /// \brief Constructor
       /// \param[in] _parent the parent node
@@ -365,7 +365,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _type the type of transform
-      public: NodeTransform(TransformType _type = MATRIX);
+      public: explicit NodeTransform(TransformType _type = MATRIX);
 
       /// \brief Constructor
       /// \param[in] _mat the matrix

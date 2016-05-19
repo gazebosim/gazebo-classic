@@ -106,7 +106,8 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     // Expect constant torque to give quadratic response in position
     {
       // Expected max joint angle (quatratic in time)
-      ignition::math::Angle maxAngle(0.5 * torque * stepTime*stepTime / inertia);
+      ignition::math::Angle maxAngle(
+          0.5 * torque * stepTime*stepTime / inertia);
       // Verify that the joint should make more than 1 revolution
       EXPECT_GT(maxAngle.Radian(), 1.25 * 2 * M_PI);
     }
@@ -204,8 +205,10 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 
   // move child link 45deg about x
   double pitch00 = joint00->Param("thread_pitch", 0);
-  ignition::math::Pose3d pose00 = ignition::math::Pose3d(-0.25*M_PI/pitch00, 0, 2, 0.25*M_PI, 0, 0);
-  ignition::math::Pose3d pose01 = ignition::math::Pose3d(0, 0, -1, 0, 0, 0) + pose00;
+  ignition::math::Pose3d pose00 =
+    ignition::math::Pose3d(-0.25*M_PI/pitch00, 0, 2, 0.25*M_PI, 0, 0);
+  ignition::math::Pose3d pose01 = ignition::math::Pose3d(0, 0, -1, 0, 0, 0) +
+    pose00;
   link00->SetWorldPose(pose00);
   link01->SetWorldPose(pose01);
   EXPECT_EQ(joint00->Angle(0), 0.25*M_PI);
@@ -223,7 +226,8 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   double pitch01 = joint01->Param("thread_pitch", 0);
   link00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0.25*M_PI, 0));
   pose00 = ignition::math::Pose3d(-0.25*M_PI/pitch00, 0, 2, 0.25*M_PI, 0, 0);
-  pose01 = ignition::math::Pose3d(-0.3*M_PI/pitch01, 0, -1, 0.3*M_PI, 0, 0) + pose00;
+  pose01 = ignition::math::Pose3d(-0.3*M_PI/pitch01, 0, -1, 0.3*M_PI, 0, 0) +
+    pose00;
   link00->SetWorldPose(pose00);
   link01->SetWorldPose(pose01);
   EXPECT_EQ(joint00->Angle(0), 0.25*M_PI);
@@ -332,7 +336,8 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     double angle01_linear = joint01->Angle(1).Radian();
     ignition::math::Pose3d pose01 = link01->WorldPose();
     EXPECT_EQ(link00->WorldPose(),
-      ignition::math::Pose3d(-angle00_angular / pitch00, 0, 2, angle00_angular, 0, 0));
+      ignition::math::Pose3d(-angle00_angular / pitch00, 0, 2,
+        angle00_angular, 0, 0));
 
     if (_physicsEngine == "simbody")
     {

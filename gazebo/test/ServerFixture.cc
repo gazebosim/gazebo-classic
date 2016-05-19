@@ -790,7 +790,7 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
-  this->SpawnGpuRaySensor(_modelName,_raySensorName,
+  this->SpawnGpuRaySensor(_modelName, _raySensorName,
     _pos.Ign(), _rpy.Ign(), _hMinAngle, _hMaxAngle,
     _minRange, _maxRange, _rangeResolution, _samples,
     _noiseType, _noiseMean, _noiseStdDev);
@@ -1281,7 +1281,6 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
 {
   this->SpawnWirelessTransmitterSensor(_name, _sensorName,
     _pos.Ign(), _rpy.Ign(), _essid, _freq, _power, _gain, _visualize);
-
 }
 
 /////////////////////////////////////////////////

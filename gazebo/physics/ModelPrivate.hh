@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_MODELPRIVATE_HH_
-#define _GAZEBO_PHYSICS_MODELPRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_MODELPRIVATE_HH_
+#define GAZEBO_PHYSICS_MODELPRIVATE_HH_
 
 #include <vector>
 #include <mutex>
 #include <map>
+#include <string>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/transport/TransportTypes.hh"

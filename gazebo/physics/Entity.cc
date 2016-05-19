@@ -268,8 +268,9 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
   this->entityDPtr->prevAnimationTime = this->entityDPtr->world->SimTime();
   this->entityDPtr->animation = _anim;
   this->entityDPtr->onAnimationComplete = NULL;
-  this->entityDPtr->animationConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&Entity::UpdateAnimation, this, std::placeholders::_1));
+  this->entityDPtr->animationConnection =
+    event::Events::ConnectWorldUpdateBegin(
+        std::bind(&Entity::UpdateAnimation, this, std::placeholders::_1));
 }
 
 //////////////////////////////////////////////////
@@ -327,7 +328,8 @@ ignition::math::Pose3d Entity::RelativePose() const
   }
   else if (this->entityDPtr->parent && this->entityDPtr->parentEntity)
   {
-    return this->entityDPtr->worldPose - this->entityDPtr->parentEntity->WorldPose();
+    return this->entityDPtr->worldPose -
+      this->entityDPtr->parentEntity->WorldPose();
   }
   else
   {
@@ -450,7 +452,6 @@ void Entity::SetWorldPoseModel(const ignition::math::Pose3d &_pose,
                 std::static_pointer_cast<Collision>((*iter)->Child(childIndex));
             entityC->SetWorldPoseDirty();
           }
-
         }
       }
       else if (entity->HasType(MODEL))
@@ -829,7 +830,6 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
 void Entity::NearestEntityBelow(double &_distBelow,
                                    std::string &_entityName) const
 {
-
   this->World()->Physics()->InitForThread();
   RayShapePtr rayShape = std::dynamic_pointer_cast<RayShape>(
     this->World()->Physics()->CreateShape("ray", CollisionPtr()));

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_HOTKEY_DIALOG_HH_
-#define _GAZEBO_HOTKEY_DIALOG_HH_
+#ifndef GAZEBO_GUI_HOTKEY_DIALOG_HH_
+#define GAZEBO_GUI_HOTKEY_DIALOG_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -35,7 +34,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
-      public: HotkeyDialog(QWidget *_parent = 0);
+      public: explicit HotkeyDialog(QWidget *_parent = 0);
 
       /// \brief Qt callback when a link is clicked on the dialog's QWebView
       /// \param[in] Clicked url

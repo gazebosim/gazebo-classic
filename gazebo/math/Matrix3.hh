@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MATRIX3_HH_
-#define _MATRIX3_HH_
+#ifndef GAZEBO_MATH_MATRIX3_HH_
+#define GAZEBO_MATH_MATRIX3_HH_
 
 #include <assert.h>
 #include <ignition/math/Matrix3.hh>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_ALIGN_WIDGET_HH_
-#define _GAZEBO_ALIGN_WIDGET_HH_
+#ifndef GAZEBO_GUI_ALIGNWIDGET_HH_
+#define GAZEBO_GUI_ALIGNWIDGET_HH_
 
 #include <string>
 
@@ -56,7 +56,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Qt widget.
-      public: AlignWidget(QWidget *_parent = 0);
+      public: explicit AlignWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~AlignWidget();

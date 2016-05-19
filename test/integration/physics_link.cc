@@ -111,10 +111,12 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   EXPECT_EQ(oneStepAngularAccel, _link->WorldAngularAccel());
 
   // Check velocity in world frame
-  ignition::math::Vector3d oneStepLinearVel = linearVelWorld0 + dt*oneStepLinearAccel;
+  ignition::math::Vector3d oneStepLinearVel =
+    linearVelWorld0 + dt*oneStepLinearAccel;
   EXPECT_EQ(oneStepLinearVel, _link->WorldCoGLinearVel());
 
-  ignition::math::Vector3d oneStepAngularVel = angularVelWorld0 + dt*oneStepAngularAccel;
+  ignition::math::Vector3d oneStepAngularVel =
+    angularVelWorld0 + dt*oneStepAngularAccel;
   EXPECT_EQ(oneStepAngularVel, _link->WorldAngularVel());
 
   // Step forward and check again
@@ -176,7 +178,8 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 
   // Spawn a box
   ignition::math::Vector3d size(1, 1, 1);
-  SpawnBox("box", size, ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero, false);
+  SpawnBox("box", size,
+      ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->LinkByName();
@@ -559,7 +562,8 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
 
   // Spawn a box
   ignition::math::Vector3d size(1, 1, 1);
-  SpawnBox("box", size, ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero, false);
+  SpawnBox("box", size,
+      ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->LinkByName();

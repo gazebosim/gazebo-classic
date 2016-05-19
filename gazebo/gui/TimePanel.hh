@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _TIME_PANEL_HH_
-#define _TIME_PANEL_HH_
+#ifndef GAZEBO_GUI_TIME_PANEL_HH_
+#define GAZEBO_GUI_TIME_PANEL_HH_
 
 #include <vector>
 #include <list>
@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget.
-      public: TimePanel(QWidget *_parent = 0);
+      public: explicit TimePanel(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~TimePanel();

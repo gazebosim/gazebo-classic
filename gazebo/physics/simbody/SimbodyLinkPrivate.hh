@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYLINKPRIVATE_HH_
-#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYLINKPRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_SIMBODY_SIMBODYLINKPRIVATE_HH_
+#define GAZEBO_PHYSICS_SIMBODY_SIMBODYLINKPRIVATE_HH_
+
+#include <vector>
 
 #include "gazebo/physics/LinkPrivate.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"

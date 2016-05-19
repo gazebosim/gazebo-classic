@@ -228,9 +228,8 @@ void Link::Load(sdf::ElementPtr _sdf)
       }
 
       std::string topic =
-        this->linkDPtr->world->Physics()->ContactMgr(
-            )->CreateFilter(this->ScopedName() + "/audio_collision",
-              collisionNames);
+        this->linkDPtr->world->Physics()->ContactMgr()->CreateFilter(
+            this->ScopedName() + "/audio_collision", collisionNames);
 
       this->linkDPtr->audioContactsSub = this->linkDPtr->node->Subscribe(topic,
           &Link::OnCollision, this);

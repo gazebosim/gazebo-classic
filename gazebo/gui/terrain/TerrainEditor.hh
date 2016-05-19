@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_TERRAINEDITOR_HH_
-#define _GAZEBO_GUI_TERRAINEDITOR_HH_
+#ifndef GAZEBO_GUI_TERRAIN_TERRAINEDITOR_HH_
+#define GAZEBO_GUI_TERRAIN_TERRAINEDITOR_HH_
 
 #include <memory>
 
@@ -37,7 +37,7 @@ namespace gazebo
 
       /// \brief Constuctor.
       /// \param[in] _mainWindow Pointer to the mainwindow.
-      public: TerrainEditor(MainWindow *_mainWindow);
+      public: explicit TerrainEditor(MainWindow *_mainWindow);
 
       /// \brief Destuctor.
       public: virtual ~TerrainEditor();

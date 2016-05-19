@@ -127,10 +127,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1), modelPos["test_box"],
       ignition::math::Vector3d::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"],
+      ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       ignition::math::Vector3d::Zero);
-  SpawnEmptyLink("test_empty", modelPos["test_empty"], ignition::math::Vector3d::Zero);
+  SpawnEmptyLink("test_empty", modelPos["test_empty"],
+      ignition::math::Vector3d::Zero);
 
   std::ostringstream linkOffsetStream;
   ignition::math::Pose3d linkOffsetPose1(0, 0, z0, 0, 0, 0);
@@ -171,7 +173,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   // std::string trimeshPath =
   //    "file://media/models/cube_20k/meshes/cube_20k.stl";
-  // SpawnTrimesh("test_trimesh", trimeshPath, ignition::math::Vector3d(0.5, 0.5, 0.5),
+  // SpawnTrimesh("test_trimesh", trimeshPath,
+  // ignition::math::Vector3d(0.5, 0.5, 0.5),
   //    modelPos["test_trimesh"], ignition::math::Vector3d::Zero);
 
   int steps = 2;
@@ -182,8 +185,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   double t, x0 = 0;
   // This loop steps the world forward and makes sure that each model falls,
   // expecting downward z velocity and decreasing z position.
-  for (std::map<std::string, ignition::math::Vector3d>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (std::map<std::string, ignition::math::Vector3d>::iterator iter =
+      modelPos.begin(); iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
@@ -204,7 +207,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       x0 = modelPos[name].X();
       EXPECT_EQ(pose1.Pos().X(), x0);
       EXPECT_EQ(pose1.Pos().Y(), 0);
-      EXPECT_NEAR(pose1.Pos().Z(), z0 + g.Z()/2*t*t, (z0+g.Z()/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().Z(), z0 + g.Z()/2*t*t,
+          (z0+g.Z()/2*t*t)*PHYSICS_TOL);
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->WorldLinearVel();
@@ -265,8 +269,8 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The velocity is expected
   // to be small, and the pose is expected to be underneath the initial pose.
-  for (std::map<std::string, ignition::math::Vector3d>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (std::map<std::string, ignition::math::Vector3d>::iterator iter =
+      modelPos.begin(); iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
@@ -584,7 +588,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
       ignition::math::Vector3d vel3 = model->LinkByName()->WorldLinearVel(
-          ignition::math::Vector3d(0, 0, -radius), ignition::math::Quaterniond(0, 0, 0));
+          ignition::math::Vector3d(0, 0, -radius),
+          ignition::math::Quaterniond(0, 0, 0));
       EXPECT_NEAR(vel3.X(), 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.Y(), 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.Z(), 0, PHYSICS_TOL);
@@ -716,7 +721,8 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
   if (i > 20)
     gzthrow("Unable to get model_4_mass_1_ixx_1_damping_10");
 
-  physics::ModelPtr model = world->ModelByName("model_4_mass_1_ixx_1_damping_10");
+  physics::ModelPtr model =
+    world->ModelByName("model_4_mass_1_ixx_1_damping_10");
   EXPECT_TRUE(model != NULL);
 
   {
@@ -982,7 +988,8 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 
         if (i == 0)
         {
-          box_model->LinkByName("link")->SetForce(ignition::math::Vector3d(f, 0, 0));
+          box_model->LinkByName("link")->SetForce(
+              ignition::math::Vector3d(f, 0, 0));
           // The following has been failing since pull request #1284,
           // so it has been disabled.
           // See bitbucket.org/osrf/gazebo/issue/1394

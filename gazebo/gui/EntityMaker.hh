@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_ENTITYMAKER_HH_
-#define _GAZEBO_ENTITYMAKER_HH_
+#ifndef GAZEBO_GUI_ENTITYMAKER_HH_
+#define GAZEBO_GUI_ENTITYMAKER_HH_
 
 #include <boost/function.hpp>
 #include <ignition/math/Vector3.hh>
@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
-      protected: EntityMaker(EntityMakerPrivate &_dataPtr);
+      protected: explicit EntityMaker(EntityMakerPrivate &_dataPtr);
 
       /// \brief Creates the entity
       protected: virtual void CreateTheEntity() = 0;

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_VIEW_ANGLE_WIDGET_HH_
-#define _GAZEBO_VIEW_ANGLE_WIDGET_HH_
+#ifndef GAZEBO_GUI_VIEW_ANGLE_WIDGET_HH_
+#define GAZEBO_GUI_VIEW_ANGLE_WIDGET_HH_
 
 #include <string>
 
@@ -57,7 +56,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Qt widget.
-      public: ViewAngleWidget(QWidget *_parent = 0);
+      public: explicit ViewAngleWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~ViewAngleWidget();

@@ -17,6 +17,8 @@
 #ifndef GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICSPRIVATE_HH
 #define GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICSPRIVATE_HH
 
+#include <string>
+
 #include "gazebo/physics/PhysicsEnginePrivate.hh"
 
 namespace gazebo
@@ -37,9 +39,9 @@ namespace gazebo
       }
 
       /// \brief true if initialized
-      public: bool simbodyPhysicsInitialized;
+      public: bool simbodyPhysicsInitialized = false;
 
-      public: bool simbodyPhysicsStepped;
+      public: bool simbodyPhysicsStepped = false;
 
       public: SimTK::MultibodySystem system;
       public: SimTK::SimbodyMatterSubsystem matter;

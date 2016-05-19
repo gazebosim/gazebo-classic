@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_RAYQUERY_HH_
-#define _GAZEBO_RAYQUERY_HH_
+#ifndef GAZEBO_RENDERING_RAYQUERY_HH_
+#define GAZEBO_RENDERING_RAYQUERY_HH_
 
 #include <vector>
 
@@ -43,7 +42,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _camera Pointer to camera used for ray casting.
-      public: RayQuery(CameraPtr _camera);
+      public: explicit RayQuery(CameraPtr _camera);
 
       /// \brief Destructor
       public: ~RayQuery();
