@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Windows plugins (with .dll extension) now accepted
+    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311/ensure-plugin-and-plugin-macros-are-always/)
+    * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
+
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
