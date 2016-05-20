@@ -205,7 +205,7 @@ include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
 #################################################
 # Enable tests compilation by default
 if (NOT DEFINED ENABLE_TESTS_COMPILATION)
-  set (ENABLE_TESTS_COMPILATION True)
+  set (ENABLE_TESTS_COMPILATION false)
 endif()
 
 # Define testing macros as empty and redefine them if support is found and 

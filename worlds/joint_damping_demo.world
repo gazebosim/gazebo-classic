@@ -3,7 +3,7 @@
   <world name="default">
     <gui>
       <camera name="user_camera">
-        <pose>-60 0 5 0 0 0</pose>
+        <pose>-30 0 10 0 0 0</pose>
       </camera>
     </gui>
     <scene>
@@ -31,21 +31,23 @@
       </ode>
       <max_step_size>0.001</max_step_size>
     </physics>
-    <model name="model_1_mass_1_damping_10000">
+
+    <!-- next few models test the effects of different masses -->
+    <model name="mass_test_0p01_damping_10">
       <pose>0.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-5</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-5</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-5</izz>
           </inertia>
-          <mass>1.0</mass>
+          <mass>0.01</mass>
         </inertial>
         <velocity_decay>
           <linear>0.0</linear>
@@ -60,7 +62,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -84,7 +86,7 @@
         <axis>
           <xyz>1.0 0.0 0.0</xyz>
           <dynamics>
-            <damping>10000.0</damping>
+            <damping>10.0</damping>
             <friction>0.0</friction>
           </dynamics>
           <use_parent_model_frame>true</use_parent_model_frame>
@@ -92,19 +94,19 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_2_mass_01_damping_10">
+    <model name="mass_test_0p1_damping_10">
       <pose>1.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-3</izz>
           </inertia>
           <mass>0.1</mass>
         </inertial>
@@ -121,7 +123,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -153,19 +155,19 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_3_mass_1_damping_10">
+    <model name="mass_test_1_damping_10">
       <pose>2.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-3</izz>
           </inertia>
           <mass>1.0</mass>
         </inertial>
@@ -182,7 +184,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -214,21 +216,21 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_4_mass_1_ixx_1_damping_10">
+    <model name="mass_test_10_damping_10">
       <pose>3.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1.0</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1.0</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1.0</izz>
+            <izz>1e-3</izz>
           </inertia>
-          <mass>1.0</mass>
+          <mass>10.0</mass>
         </inertial>
         <velocity_decay>
           <linear>0.0</linear>
@@ -243,7 +245,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -275,19 +277,84 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_5_mass_1_damping_1">
+    <model name="mass_test_100_damping_10">
       <pose>4.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-3</izz>
+          </inertia>
+          <mass>100.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+          <dynamics>
+            <damping>10.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <static>false</static>
+    </model>
+
+
+
+    <!-- next few models test different damping coefficients -->
+    <model name="damping_test_mass_1_damping_1">
+      <pose>5.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+      <link name="link_1">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-3</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-3</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-3</izz>
           </inertia>
           <mass>1.0</mass>
         </inertial>
@@ -304,7 +371,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Yellow</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -336,19 +403,19 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_6_mass_1_damping_10">
-      <pose>5.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+    <model name="damping_test_mass_1_damping_10">
+      <pose>6.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-3</izz>
           </inertia>
           <mass>1.0</mass>
         </inertial>
@@ -365,7 +432,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Yellow</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -397,19 +464,19 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_7_mass_1_damping_100">
-      <pose>6.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+    <model name="damping_test_mass_1_damping_100">
+      <pose>7.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-3</izz>
           </inertia>
           <mass>1.0</mass>
         </inertial>
@@ -426,7 +493,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Yellow</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -458,19 +525,19 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_8_mass_1_damping_1000">
-      <pose>7.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+    <model name="damping_test_mass_1_damping_1000">
+      <pose>8.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-3</izz>
           </inertia>
           <mass>1.0</mass>
         </inertial>
@@ -487,7 +554,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Yellow</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -519,19 +586,22 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_9_mass_1_damping_0">
-      <pose>8.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+
+
+    <!-- next two models have large MOI, different damping -->
+    <model name="moi_test_mass_1_moi_1_damping_1">
+      <pose>9.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1.0</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1.0</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1.0</izz>
           </inertia>
           <mass>1.0</mass>
         </inertial>
@@ -548,7 +618,133 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Green</name></script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+          <dynamics>
+            <damping>1.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <static>false</static>
+    </model>
+    <model name="moi_test_mass_1_moi_1_damping_10">
+      <pose>10.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+      <link name="link_1">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1.0</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1.0</iyy>
+            <iyz>0.0</iyz>
+            <izz>1.0</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Green</name></script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+          <dynamics>
+            <damping>10.0</damping>
+            <friction>0.0</friction>
+          </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <static>false</static>
+    </model>
+
+
+    <!-- next two models have different point masses, but should oscillate
+         synchronously if physics solver is doing the right thing -->
+    <model name="freq_test_mass_1_damping_0">
+      <pose>11.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+      <link name="link_1">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-3</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-3</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-3</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Red</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">
@@ -580,19 +776,19 @@
       </joint>
       <static>false</static>
     </model>
-    <model name="model_10_mass_10_damping_0">
-      <pose>9.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+    <model name="freq_test_mass_10_damping_0">
+      <pose>12.0 0.0 10.1 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>1e-16</ixx>
+            <ixx>1e-3</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>1e-16</iyy>
+            <iyy>1e-3</iyy>
             <iyz>0.0</iyz>
-            <izz>1e-16</izz>
+            <izz>1e-3</izz>
           </inertia>
           <mass>10.0</mass>
         </inertial>
@@ -609,7 +805,7 @@
             </cylinder>
           </geometry>
           <material>
-            <script>Gazebo/Green</script>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Red</name></script>
           </material>
         </visual>
         <collision name="collision_cylinder">

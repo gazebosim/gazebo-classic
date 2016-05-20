@@ -588,36 +588,33 @@ void BulletJoint::ApplyStiffnessDamping()
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
           *(bulletParentLink->GetBulletLink()),
-          BulletTypes::ConvertPose(math::Pose(axisChild, math::Vector3()) /*+ childPose*/),
-          BulletTypes::ConvertPose(math::Pose(axisParent, math::Vector3()) /*+ parentPose*/),
+          BulletTypes::ConvertPose(math::Pose(pivotChild, math::Vector3())),
+          BulletTypes::ConvertPose(math::Pose(pivotParent, math::Vector3())),
           RO_XYZ
           );
       }
       else if (bulletChildLink)
       {
+        // pivotChild = math::Vector3();
+        gzerr << this->GetName() << "\n";
+        gzerr << pivotChild << "\n";
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
-
-          // find pose transform from x-axis to axisChild,
-          // then confirm that y-axis = axis2.
-          // math::Pose xToAxisChild,
-          BulletTypes::ConvertPose(
-            math::Pose(axisChild, math::Vector3()) + childPose),
-          RO_XYZ
-          );
+          BulletTypes::ConvertPose(math::Pose(pivotChild, math::Vector3())),
+          RO_XYZ);
       }
       else if (bulletParentLink)
       {
+        gzerr << this->GetName() << "\n";
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletParentLink->GetBulletLink()),
-          BulletTypes::ConvertPose(math::Pose(axisParent, math::Vector3()) /*+ parentPose*/),
-          RO_XYZ
-          );
+          BulletTypes::ConvertPose(math::Pose(pivotParent, math::Vector3())),
+          RO_XYZ);
       }
 
-      for (unsigned int l = i; l < 6; ++l)
+      for (unsigned int l = 0; l < 6; ++l)
       {
-        if (l == i)
+        if (l == 3)  // for x-axis rotation?
         {
           // assuming axis is lined up with constraint frame
           // this may be true for axis, but we need to double check.
@@ -627,7 +624,6 @@ void BulletJoint::ApplyStiffnessDamping()
           this->stiffnessDampingConstraint->enableSpring(l, true);
           this->stiffnessDampingConstraint->setStiffness(l,
             this->stiffnessCoefficient[i]);
-          this->stiffnessDampingConstraint->setStiffness(l, 1000.0);
           this->stiffnessDampingConstraint->setDamping(l,
             this->dissipationCoefficient[i]);
           this->stiffnessDampingConstraint->setEquilibriumPoint(l,
@@ -637,8 +633,8 @@ void BulletJoint::ApplyStiffnessDamping()
         {
           this->stiffnessDampingConstraint->setLimit(l,
             SIMD_INFINITY, -SIMD_INFINITY);
-          this->stiffnessDampingConstraint->enableSpring(l, true);
-          this->stiffnessDampingConstraint->setStiffness(l, 1000.0);
+          this->stiffnessDampingConstraint->enableSpring(l, false);
+          this->stiffnessDampingConstraint->setStiffness(l, 0.0);
           this->stiffnessDampingConstraint->setDamping(l, 0.0);
         }
       }
