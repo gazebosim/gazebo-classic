@@ -61,11 +61,11 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
     if (line.find("HIERARCHY") == std::string::npos)
     {
       file.close();
-      return NULL;
+      return nullptr;
     }
 
-    SkeletonNode *parent = NULL;
-    SkeletonNode *node = NULL;
+    SkeletonNode *parent = nullptr;
+    SkeletonNode *node = nullptr;
     while (!file.eof())
     {
       getline(file, line);
@@ -77,7 +77,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
         if (words.size() < 2)
         {
           file.close();
-          return NULL;
+          return nullptr;
         }
         SkeletonNode::SkeletonNodeType type = SkeletonNode::JOINT;
         std::string name = words[1];
@@ -91,7 +91,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
           if (words.size() < 4)
           {
             file.close();
-            return NULL;
+            return nullptr;
           }
           ignition::math::Vector3d offset = ignition::math::Vector3d(
               ignition::math::parseFloat(words[1]) * _scale,
@@ -110,7 +110,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
                  words.size())
             {
               file.close();
-              return NULL;
+              return nullptr;
             }
             nodeChannels.push_back(words);
             totalChannels += ignition::math::parseInt(words[1]);
@@ -135,7 +135,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
                   if (nodes.empty())
                   {
                     file.close();
-                    return NULL;
+                    return nullptr;
                   }
                   skeleton.reset(new Skeleton(nodes[0]));
                   break;
@@ -151,7 +151,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
   if (words[0] != "Frames:" || words.size() < 2)
   {
     file.close();
-    return NULL;
+    return nullptr;
   }
   else
     frameCount = ignition::math::parseInt(words[1]);
@@ -164,7 +164,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
   if (words.size() < 3 || words[0] != "Frame" || words[1] != "Time:")
   {
     file.close();
-    return NULL;
+    return nullptr;
   }
   else
     frameTime = ignition::math::parseFloat(words[2]);
