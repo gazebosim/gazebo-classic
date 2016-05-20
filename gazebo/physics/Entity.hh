@@ -327,9 +327,6 @@ namespace gazebo
       /// \brief Scale of the entity
       protected: ignition::math::Vector3d scale;
 
-      /// \brief All the introspection items regsitered for this.
-      protected: std::vector<common::URI> introspectionItems;
-
       /// \brief True if the object is static.
       private: bool isStatic;
 
