@@ -6,6 +6,9 @@
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
 
+1. Remove EntityMakerPrivate and move its members to derived classes
+    * [Pull request #2310](https://bitbucket.org/osrf/gazebo/pull-request/2310)
+
 1. Change NULL to nullptr.
     * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
     * [Pull request #2297](https://bitbucket.org/osrf/gazebo/pull-request/2297)

@@ -50,6 +50,11 @@ release will remove the deprecated code.
     + Event(EventPrivate&) constructor
     + Connection() constructor
 
+1. **gazebo/gui/EntityMaker.hh**
+    + EntityMakerPrivate class
+    + Entity(EntityMakerPrivate&) constructor
+    + EntityMakerPrivate *dataPtr
+
 ## Gazebo 7.1.0 to 7.X
 
 ### Additions
