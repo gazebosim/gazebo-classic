@@ -52,6 +52,16 @@ namespace gazebo
     /// \brief A model is a collection of links, joints, and plugins.
     class GZ_PHYSICS_VISIBLE Model : public Entity
     {
+      private: transport::PublisherPtr responsePub;
+      private: transport::SubscriberPtr requestSub;
+
+      /// \brief Mutex to protect incoming message buffers.
+      public: boost::recursive_mutex *receiveMutex;
+
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
       public: explicit Model(BasePtr _parent);

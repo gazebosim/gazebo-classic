@@ -3469,9 +3469,9 @@ TEST_F(MsgsTest, ModelToSDF)
   model.add_plugin();
   ASSERT_EQ(model.plugin_size(), 1);
   auto plugin = model.mutable_plugin(0);
-  plugin.set_name("plugin_name");
-  plugin.set_filename("plugin_filename");
-  plugin.set_innerxml("<plugin_param>param</plugin_param>");
+  plugin->set_name("plugin_name");
+  plugin->set_filename("plugin_filename");
+  plugin->set_innerxml("<plugin_param>param</plugin_param>");
 
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
   EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
@@ -3506,8 +3506,8 @@ TEST_F(MsgsTest, ModelToSDF)
   sdf::ElementPtr pluginElem1 = modelSDF->GetElement("plugin");
   EXPECT_EQ(pluginElem1->Get<std::string>("name"), "plugin_name");
   EXPECT_EQ(pluginElem1->Get<std::string>("filename"), "plugin_filename");
-  EXPECT_TRUE(sdf2->HasElement("plugin_param"));
-  EXPECT_EQ(sdf2->Get<std::string>("plugin_param"), "param");
+  EXPECT_TRUE(pluginElem1->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem1->Get<std::string>("plugin_param"), "param");
 }
 
 /////////////////////////////////////////////////

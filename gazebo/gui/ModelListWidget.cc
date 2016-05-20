@@ -339,6 +339,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     {
       if (this->dataPtr->requestPub)
       {
+        qDebug() << this->dataPtr->selectedEntityName.c_str();
         this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
             this->dataPtr->selectedEntityName);
         this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
@@ -380,6 +381,8 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->dataPtr->linkMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Joint")
       this->FillPropertyTree(this->dataPtr->jointMsg, NULL);
+    else if (this->dataPtr->fillTypes[0] == "Plugin")
+      this->FillPropertyTree(this->dataPtr->pluginMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Scene")
       this->FillPropertyTree(this->dataPtr->sceneMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Physics")
@@ -430,6 +433,8 @@ void ModelListWidget::OnLightUpdate(const msgs::Light &_msg)
 void ModelListWidget::ProcessModelMsgs()
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+  QFont subheaderFont;
+  subheaderFont.setBold(true);
 
   for (auto iter = this->dataPtr->modelMsgs.begin();
        iter != this->dataPtr->modelMsgs.end(); ++iter)
@@ -451,6 +456,17 @@ void ModelListWidget::ProcessModelMsgs()
         topItem->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
         this->dataPtr->modelTreeWidget->addTopLevelItem(topItem);
 
+
+        if ((*iter).link_size() > 0)
+        {
+          // Create subheader for links
+          QTreeWidgetItem *linkheaderItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(QString::fromStdString("LINKS"))));
+          linkheaderItem->setFont(0, subheaderFont);
+          linkheaderItem->setFlags(Qt::ItemIsEnabled);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(linkheaderItem);
+        }
+
         for (int i = 0; i < (*iter).link_size(); i++)
         {
           std::string linkName = (*iter).link(i).name();
@@ -469,6 +485,16 @@ void ModelListWidget::ProcessModelMsgs()
           this->dataPtr->modelTreeWidget->addTopLevelItem(linkItem);
         }
 
+        if ((*iter).joint_size() > 0)
+        {
+          // Create subheader for joints
+          QTreeWidgetItem *jointheaderItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(QString::fromStdString("JOINTS"))));
+          jointheaderItem->setFont(0, subheaderFont);
+          jointheaderItem->setFlags(Qt::ItemIsEnabled);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(jointheaderItem);
+        }
+
         for (int i = 0; i < (*iter).joint_size(); i++)
         {
           std::string jointName = (*iter).joint(i).name();
@@ -484,6 +510,29 @@ void ModelListWidget::ProcessModelMsgs()
           jointItem->setData(0, Qt::UserRole, QVariant(jointName.c_str()));
           jointItem->setData(3, Qt::UserRole, QVariant("Joint"));
           this->dataPtr->modelTreeWidget->addTopLevelItem(jointItem);
+        }
+
+        if ((*iter).plugin_size() > 0)
+        {
+          // Create subheader for plugins
+          QTreeWidgetItem *pluginheaderItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(QString::fromStdString("PLUGINS"))));
+          pluginheaderItem->setFont(0, subheaderFont);
+          pluginheaderItem->setFlags(Qt::ItemIsEnabled);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(pluginheaderItem);
+        }
+
+        for (int i = 0; i < (*iter).plugin_size(); i++)
+        {
+          std::string pluginName = (*iter).plugin(i).name();
+
+          QTreeWidgetItem *pluginItem = new QTreeWidgetItem(topItem,
+              QStringList(QString("%1").arg(
+                  QString::fromStdString(pluginName))));
+
+          pluginItem->setData(0, Qt::UserRole, QVariant(pluginName.c_str()));
+          pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
+          this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
         }
       }
     }
@@ -511,8 +560,15 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
       this->dataPtr->requestMsg->id())
     return;
 
+  qDebug() << "OnResponse";
+
+  //qDebug() << _msg->type().c_str();
+
+  //qDebug() << this->dataPtr->pluginMsg.GetTypeName().c_str();
+
   if (_msg->has_type() && _msg->type() == this->dataPtr->modelMsg.GetTypeName())
   {
+    qDebug() << "OnResponse Model";
     this->dataPtr->propMutex->lock();
     this->dataPtr->modelMsg.ParseFromString(_msg->serialized_data());
     this->dataPtr->fillTypes.push_back("Model");
@@ -523,6 +579,9 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->dataPtr->propMutex->lock();
     this->dataPtr->linkMsg.ParseFromString(_msg->serialized_data());
+
+  qDebug() << _msg->serialized_data().c_str();
+
     this->dataPtr->fillTypes.push_back("Link");
     this->dataPtr->propMutex->unlock();
   }
@@ -532,6 +591,15 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->dataPtr->propMutex->lock();
     this->dataPtr->jointMsg.ParseFromString(_msg->serialized_data());
     this->dataPtr->fillTypes.push_back("Joint");
+    this->dataPtr->propMutex->unlock();
+  }
+    else if (_msg->has_type() && _msg->type() ==
+      this->dataPtr->pluginMsg.GetTypeName())
+  {
+    qDebug() << "plugin response";
+    this->dataPtr->propMutex->lock();
+    this->dataPtr->pluginMsg.ParseFromString(_msg->serialized_data());
+    this->dataPtr->fillTypes.push_back("Plugin");
     this->dataPtr->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() ==
@@ -1017,6 +1085,7 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
 
     // set link id and strip link name.
     msgs::Link *linkMsg = msg.add_link();
+    qDebug() << "linkMsg";
     linkMsg->set_id(this->dataPtr->linkMsg.id());
     std::string linkName = this->dataPtr->linkMsg.name();
     size_t index = linkName.find_last_of("::");
@@ -1024,6 +1093,25 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
       linkName = linkName.substr(index+1);
     linkMsg->set_name(linkName);
     fillMsg = linkMsg;
+  }
+    // check if it's a plugin
+  else if (currentItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
+  {
+    // this->dataPtr->modelMsg may not have been set
+    // so get the model name from the current item
+    msg.set_name(currentItem->data(1, Qt::UserRole).toString().toStdString());
+    msg.set_id(currentItem->data(2, Qt::UserRole).toInt());
+
+    // set link id and strip link name.
+    msgs::Plugin *pluginMsg = msg.add_plugin();
+    qDebug() << "pluginMsg";
+    //pluginMsg->set_id(this->dataPtr->pluginMsg.id());
+    std::string pluginName = this->dataPtr->pluginMsg.name();
+    size_t index = pluginName.find_last_of("::");
+    if (index != std::string::npos)
+      pluginName = pluginName.substr(index+1);
+    pluginMsg->set_name(pluginName);
+    fillMsg = pluginMsg;
   }
   else
   {
@@ -2540,6 +2628,45 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
     this->FillPropertyTree(_msg.link(i), prop);
   }
+/*
+  for (int i = 0; i < _msg.plugin_size(); ++i)
+  {
+    QtVariantProperty *prop;
+    prop = this->dataPtr->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("plugin"));
+    prop->setToolTip(tr(_msg.plugin(i).name().c_str()));
+
+    bItem = this->dataPtr->propTreeBrowser->addProperty(prop);
+    this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
+
+    this->FillPropertyTree(_msg.plugin(i), prop);
+  }*/
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Plugin &_msg,
+                                       QtProperty *_parent)
+{
+  QtVariantProperty *item = NULL;
+
+  // name
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+      tr("name"));
+  item->setValue(_msg.name().c_str());
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+
+  // filename
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+    tr("filename"));
+  item->setValue(_msg.filename().c_str());
+  this->AddProperty(item, _parent);
+
+  // innerxml
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+    tr("innerxml"));
+  item->setValue(_msg.innerxml().c_str());
+  this->AddProperty(item, _parent);
 }
 
 /////////////////////////////////////////////////

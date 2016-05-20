@@ -73,6 +73,11 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
+  this->requestSub = this->node->Subscribe("~/request",
+                                           &Model::OnRequest, this, true);
+  this->responsePub = this->node->Advertise<msgs::Response>(
+      "~/response");
+
   this->SetStatic(this->sdf->Get<bool>("static"));
   if (this->sdf->HasElement("static"))
   {
@@ -102,6 +107,58 @@ void Model::Load(sdf::ElementPtr _sdf)
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
+}
+
+//////////////////////////////////////////////////
+void Model::OnRequest(ConstRequestPtr &_msg)
+{
+  //boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Response response;
+
+  std::list<msgs::Request> requestMsgs;
+
+  requestMsgs.push_back(*_msg);
+
+  //auto const &requestMsg = _msg;
+
+  for (auto const &requestMsg : requestMsgs)
+  {
+
+  bool send = true;
+  //response.set_id(_msg.id());
+  response.set_request(requestMsg.request());
+  response.set_response("success");
+
+    if (requestMsg.request() == "entity_info")
+    {
+      //BasePtr entity = this->dataPtr->rootElement->GetByName(requestMsg.data());
+
+      printf("%s\n", requestMsg.data().c_str());
+
+      printf("%s\n", "Plugin");
+
+      msgs::Plugin pluginMsg;
+
+      ModelPluginPtr plugin;  // = boost::dynamic_pointer_cast<Plugin>(entity);
+
+      pluginMsg.set_name(requestMsg.data().c_str());
+      pluginMsg.set_filename(requestMsg.data().c_str());
+      //pluginMsg.set_type("Plugin");
+
+      std::string *serializedData = response.mutable_serialized_data();
+      //printf("%s\n", serializedData->c_str());
+      pluginMsg.SerializeToString(serializedData);
+
+      printf("%s\n", "model msg type");
+      printf("%s\n", pluginMsg.GetTypeName().c_str());
+
+      //response.set_type(MODEL_PLUGIN);
+    }
+        if (send)
+    {
+      this->responsePub->Publish(response);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
