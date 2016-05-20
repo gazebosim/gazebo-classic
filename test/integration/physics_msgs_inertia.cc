@@ -32,6 +32,11 @@ class InertiaMsgsTest : public ServerFixture,
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void InertialAccessors(const std::string &_physicsEngine);
 
+  /// \brief Resize boxes and expect updated inertia.
+  /// Also set lateral gravity and expect rate at which it tips over.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void ResizeBoxes(const std::string &_physicsEngine);
+
   /// \brief Set center of mass of link over ~/model/modify
   /// and verify that it causes a seesaw to unbalance.
   /// \param[in] _physicsEngine Type of physics engine to use.
@@ -120,6 +125,127 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
 TEST_P(InertiaMsgsTest, InertialAccessors)
 {
   InertialAccessors(GetParam());
+}
+
+/////////////////////////////////////////////////
+void InertiaMsgsTest::ResizeBoxes(const std::string &_physicsEngine)
+{
+  this->Load("worlds/inertia_rotations.world", true, _physicsEngine);
+  auto world = physics::get_world("inertia_rotations");
+  ASSERT_NE(world, nullptr);
+
+  // check the gravity vector
+  auto g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
+
+  std::vector<std::string> modelNames;
+  std::vector<physics::ModelPtr> models;
+  std::vector<physics::LinkPtr> links;
+  for (auto const &model : world->GetModels())
+  {
+    ASSERT_NE(model, nullptr);
+    std::string name = model->GetName();
+    if (name.find("box010409_") == 0)
+    {
+      modelNames.push_back(name);
+      models.push_back(model);
+      auto link = model->GetLink();
+      ASSERT_NE(link, nullptr);
+      links.push_back(link);
+    }
+  }
+  ASSERT_EQ(modelNames.size(), 7u);
+
+  // Check that inertia of each box is equal
+  for (auto const &link : links)
+  {
+    auto inertial = link->GetInertial();
+    ASSERT_NE(inertial, nullptr);
+    EXPECT_DOUBLE_EQ(inertial->GetMass(), 12.0);
+
+    const ignition::math::Matrix3d inertiaRef(
+      0.97, 0, 0,
+      0, 0.82, 0,
+      0, 0, 0.17);
+    // EXPECT_EQ(link->GetWorldInertiaMatrix().Ign(), inertiaRef);
+    EXPECT_TRUE(link->GetWorldInertiaMatrix().Ign().Equal(inertiaRef, 1e-5));
+  }
+
+  // Set lateral gravity component and expect boxes to tip over.
+  gzdbg << "Set lateral gravity and expect boxes to tip over" << std::endl;
+  world->SetGravity(ignition::math::Vector3d(2, 0, -9.8));
+  world->Step(900);
+  for (auto const &model : models)
+  {
+    // Check pitch angle and rate
+    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().X(), 0.0, 1e-4);
+    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().Y(), 1.5303, 1e-4);
+    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().Z(), 0.0, 1e-4);
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().X(), 0.0, 1e-4);
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().Y(), 5.3640, 1e-4);
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().Z(), 0.0, 1e-4);
+  }
+
+  // Reset and resize boxes
+  gzdbg << "Reset and resize boxes, expect slower tip over" << std::endl;
+  world->Reset();
+  for (auto const &model : models)
+  {
+    // Check pitch angle and rate
+    EXPECT_EQ(model->GetWorldPose().Ign().Rot(),
+              ignition::math::Quaterniond());
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().Y(), 0, 1e-4);
+
+    // Resize boxes
+    model->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.5));
+    const ignition::math::Matrix3d inertiaRef(
+      1.9825, 0, 0,
+      0, 1.8325, 0,
+      0, 0, 0.17);
+    auto link = model->GetLink();
+    // EXPECT_EQ(link->GetWorldInertiaMatrix().Ign(), inertiaRef);
+    EXPECT_TRUE(link->GetWorldInertiaMatrix().Ign().Equal(inertiaRef, 1e-5));
+  }
+
+  world->Step(900);
+  for (auto const &model : models)
+  {
+    // Check pitch angle and rate
+    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().X(), 0.0, 1e-3);
+    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().Y(), 1.0375, 1e-4);
+    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().Z(), 0.0, 1e-3);
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().X(), 0.0, 3e-2);
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().Y(), 3.51, 1e-2);
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().Z(), 0.0, 2e-2);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_P(InertiaMsgsTest, ResizeBoxes)
+{
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "bullet")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support off-axis inertia terms"
+          << std::endl;
+    return;
+  }
+  else if (physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing moment of inertia"
+          << std::endl;
+    return;
+  }
+  else if (physicsEngine == "dart")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support rotated inertia frame"
+          << std::endl;
+    return;
+  }
+  ResizeBoxes(GetParam());
 }
 
 /////////////////////////////////////////////////
