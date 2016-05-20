@@ -16,6 +16,7 @@
 */
 #include <string.h>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/MassMatrix3.hh>
 
 #include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -391,7 +392,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
   const double mass = 10.0;
   const double angle = M_PI / 3.0;
 
-  const unsigned int testCases = 4;
+  const unsigned int testCases = 5;
   for (unsigned int i = 0; i < testCases; ++i)
   {
     // Use msgs::AddBoxLink
@@ -421,9 +422,24 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
     {
       inertialPose.rot.SetFromEuler(0.0, 0.0, angle);
     }
-    // i=3: offset inertial pose
+    // i=3: off-diagonal terms in inertia matrix
     //  expect inertial pose to differ from link pose
     else if (i == 3)
+    {
+      ignition::math::MassMatrix3d m;
+      m.SetFromBox(mass, ignition::math::Vector3d(dx, dy, dz),
+          ignition::math::Quaterniond(0, 0, angle));
+      auto msgInertial = msgModel.mutable_link(0)->mutable_inertial();
+      msgInertial->set_ixx(m.IXX());
+      msgInertial->set_iyy(m.IYY());
+      msgInertial->set_izz(m.IZZ());
+      msgInertial->set_ixy(m.IXY());
+      msgInertial->set_ixz(m.IXZ());
+      msgInertial->set_iyz(m.IYZ());
+    }
+    // i=4: offset inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 4)
     {
       inertialPose.pos.Set(1, 1, 1);
     }
@@ -469,9 +485,16 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       EXPECT_EQ(link->GetWorldPose().pos,
                 link->GetWorldInertialPose().pos);
     }
-    // i=3: offset inertial pose
-    //  expect inertial pose to differ from link pose
+    // i=3: off-diagonal inertia matrix terms
+    //  expect inertial pose to match link pose
     else if (i == 3)
+    {
+      EXPECT_EQ(link->GetWorldPose(),
+                link->GetWorldInertialPose());
+    }
+    // i=4: offset inertial pose
+    //  expect inertial pose to differ from link pose
+    else if (i == 4)
     {
       EXPECT_EQ(link->GetWorldPose().pos + inertialPose.pos,
                 link->GetWorldInertialPose().pos);
@@ -479,7 +502,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
 
     // Expect rotated inertia matrix
     math::Matrix3 inertia = link->GetWorldInertiaMatrix();
-    if (i == 3)
+    if (i == 4)
     {
       EXPECT_NEAR(inertia[0][0], 80.8333, 1e-4);
       EXPECT_NEAR(inertia[1][1], 68.3333, 1e-4);
@@ -502,8 +525,8 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       EXPECT_NEAR(inertia[2][1], 0, g_tolerance);
     }
 
-    // For 0-2, apply torque and expect equivalent response
-    if (i <= 2)
+    // For 0-3, apply torque and expect equivalent response
+    if (i <= 3)
     {
       for (int step = 0; step < 50; ++step)
       {

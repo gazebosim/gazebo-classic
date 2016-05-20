@@ -19,6 +19,8 @@
  * Date: 13 Feb 2006
  */
 
+#include <ignition/math/MassMatrix3.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
