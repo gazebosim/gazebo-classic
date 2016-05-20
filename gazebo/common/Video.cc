@@ -42,12 +42,12 @@ using namespace common;
 /////////////////////////////////////////////////
 Video::Video()
 {
-  this->formatCtx = NULL;
-  this->codecCtx = NULL;
-  this->swsCtx = NULL;
-  this->avFrame = NULL;
+  this->formatCtx = nullptr;
+  this->codecCtx = nullptr;
+  this->swsCtx = nullptr;
+  this->avFrame = nullptr;
   this->videoStream = -1;
-  this->avFrameDst = NULL;
+  this->avFrameDst = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -77,7 +77,7 @@ void Video::Cleanup()
 #ifdef HAVE_FFMPEG
 bool Video::Load(const std::string &_filename)
 {
-  AVCodec *codec = NULL;
+  AVCodec *codec = nullptr;
   this->videoStream = -1;
 
   if (this->formatCtx || this->avFrame || this->codecCtx)
@@ -86,14 +86,15 @@ bool Video::Load(const std::string &_filename)
   this->avFrame = common::AVFrameAlloc();
 
   // Open video file
-  if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)
+  if (avformat_open_input(&this->formatCtx, _filename.c_str(),
+        nullptr, nullptr) < 0)
   {
     gzerr << "Unable to read video file[" << _filename << "]\n";
     return false;
   }
 
   // Retrieve stream information
-  if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
+  if (avformat_find_stream_info(this->formatCtx, nullptr) < 0)
   {
     gzerr << "Couldn't find stream information\n";
     return false;
@@ -120,7 +121,7 @@ bool Video::Load(const std::string &_filename)
 
   // Find the decoder for the video stream
   codec = avcodec_find_decoder(this->codecCtx->codec_id);
-  if (codec == NULL)
+  if (codec == nullptr)
   {
     gzerr << "Codec not found\n";
     return false;
@@ -132,7 +133,7 @@ bool Video::Load(const std::string &_filename)
     this->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
 
   // Open codec
-  if (avcodec_open2(this->codecCtx, codec, NULL) < 0)
+  if (avcodec_open2(this->codecCtx, codec, nullptr) < 0)
   {
     gzerr << "Could not open codec\n";
     return false;
@@ -145,9 +146,9 @@ bool Video::Load(const std::string &_filename)
       this->codecCtx->width,
       this->codecCtx->height,
       AV_PIX_FMT_RGB24,
-      SWS_BICUBIC, NULL, NULL, NULL);
+      SWS_BICUBIC, nullptr, nullptr, nullptr);
 
-  if (this->swsCtx == NULL)
+  if (this->swsCtx == nullptr)
   {
     gzerr << "Error while calling sws_getContext\n";
     return false;

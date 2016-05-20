@@ -280,7 +280,7 @@ const unsigned char *CameraSensor::ImageData() const
   if (this->camera)
     return this->camera->ImageData(0);
   else
-    return NULL;
+    return nullptr;
 }
 
 //////////////////////////////////////////////////

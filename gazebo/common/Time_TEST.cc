@@ -29,7 +29,7 @@ class TimeTest : public gazebo::testing::AutoLogFixture { };
 TEST_F(TimeTest, Time)
 {
   struct timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
   common::Time time(tv);
   EXPECT_EQ(time.sec, tv.tv_sec);
   EXPECT_EQ(time.nsec, tv.tv_usec * 1000);

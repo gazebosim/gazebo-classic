@@ -44,15 +44,15 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   std::string physicsEngineStr = "ode";
   Load("worlds/empty.world", true, physicsEngineStr);
   WorldPtr world = get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), physicsEngineStr);
 
   ODEPhysicsPtr odePhysics
       = boost::static_pointer_cast<ODEPhysics>(physics);
-  ASSERT_TRUE(odePhysics != NULL);
+  ASSERT_TRUE(odePhysics != nullptr);
 
   std::string type = "quick";
   int preconIters = 5;
@@ -351,10 +351,10 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   std::string physicsEngineStr = "ode";
   Load("worlds/empty.world", false, physicsEngineStr);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
-  ASSERT_TRUE(engine != NULL);
+  ASSERT_TRUE(engine != nullptr);
 
   transport::NodePtr phyNode;
   phyNode = transport::NodePtr(new transport::Node());

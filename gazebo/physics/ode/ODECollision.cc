@@ -44,7 +44,7 @@ ODECollision::ODECollision(LinkPtr _link)
 : Collision(_link)
 {
   this->SetName("ODE_Collision");
-  this->collisionId = NULL;
+  this->collisionId = nullptr;
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
@@ -58,7 +58,7 @@ ODECollision::~ODECollision()
 {
   if (this->collisionId)
     dGeomDestroy(this->collisionId);
-  this->collisionId = NULL;
+  this->collisionId = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -86,11 +86,11 @@ void ODECollision::Fini()
   /*
      if (this->collisionId)
      dGeomDestroy(this->collisionId);
-     this->collisionId = NULL;
+     this->collisionId = nullptr;
 
      if (this->spaceId)
      dSpaceDestroy(this->spaceId);
-     this->spaceId = NULL;
+     this->spaceId = nullptr;
      */
 
   Collision::Fini();
@@ -119,7 +119,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
   if (dGeomGetSpace(this->collisionId) == 0)
   {
     dSpaceAdd(this->spaceId, this->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
+    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is null");
   }
 
   if (this->collisionId && this->placeable)
