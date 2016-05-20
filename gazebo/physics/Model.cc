@@ -1567,15 +1567,6 @@ void Model::RegisterIntrospectionItems()
 }
 
 /////////////////////////////////////////////////
-void Model::UnregisterIntrospectionItems()
-{
-  for (auto &item : this->introspectionItems)
-    util::IntrospectionManager::Instance()->Unregister(item.Str());
-
-  this->introspectionItems.clear();
-}
-
-/////////////////////////////////////////////////
 LinkPtr Model::CreateLink(const std::string &_name)
 {
   LinkPtr link;

@@ -26,6 +26,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -351,6 +352,21 @@ common::URI Base::URI() const
   uri.Path().PushFront("world");
 
   return uri;
+}
+
+/////////////////////////////////////////////////
+void Base::RegisterIntrospectionItems()
+{
+  // nothing for now
+}
+
+/////////////////////////////////////////////////
+void Base::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
 }
 
 //////////////////////////////////////////////////

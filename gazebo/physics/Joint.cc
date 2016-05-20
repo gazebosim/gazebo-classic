@@ -1495,12 +1495,3 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
   gazebo::util::IntrospectionManager::Instance()->Register
       <double>(uri.Str(), f);
 }
-
-/////////////////////////////////////////////////
-void Joint::UnregisterIntrospectionItems()
-{
-  for (auto &item : this->introspectionItems)
-    util::IntrospectionManager::Instance()->Unregister(item.Str());
-
-  this->introspectionItems.clear();
-}

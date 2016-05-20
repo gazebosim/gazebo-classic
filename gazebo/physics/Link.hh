@@ -661,10 +661,7 @@ namespace gazebo
       private: void LoadBattery(const sdf::ElementPtr _sdf);
 
       /// \brief Register items in the introspection service.
-      private: void RegisterIntrospectionItems();
-
-      /// \brief Unregister items in the introspection service.
-      private: void UnregisterIntrospectionItems();
+      protected: virtual void RegisterIntrospectionItems();
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;

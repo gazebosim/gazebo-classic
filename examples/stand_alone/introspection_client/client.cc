@@ -17,7 +17,6 @@
 
 #include <chrono>
 #include <iostream>
-#include <thread>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/util/IntrospectionClient.hh>
 #include <ignition/transport.hh>
@@ -77,7 +76,7 @@ int main(int _argc, char **_argv)
   node.Subscribe(topic, cb);
 
   /// zZZZ.
-  getchar();
+  ignition::transport::waitForShutdown();
 
   return 0;
 }

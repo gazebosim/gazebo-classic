@@ -1758,12 +1758,3 @@ void Link::RegisterIntrospectionItems()
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(angAccURI.Str(), fLinkAngAcc);
 }
-
-/////////////////////////////////////////////////
-void Link::UnregisterIntrospectionItems()
-{
-  for (auto &item : this->introspectionItems)
-    util::IntrospectionManager::Instance()->Unregister(item.Str());
-
-  this->introspectionItems.clear();
-}
