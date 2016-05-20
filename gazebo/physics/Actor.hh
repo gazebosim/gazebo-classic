@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ACTOR_HH_
-#define _GAZEBO_PHYSICS_ACTOR_HH_
+#ifndef GAZEBO_PHYSICS_ACTOR_HH_
+#define GAZEBO_PHYSICS_ACTOR_HH_
 
 #include <string>
 #include <map>
@@ -43,6 +43,10 @@ namespace gazebo
     /// scriptable animation.
     class GZ_PHYSICS_VISIBLE Actor : public Model
     {
+      /// \brief Typedef the skeleton animation map.
+      public: typedef std::map<std::string, common::SkeletonAnimation*>
+              SkeletonAnimation_M;
+
       /// \brief Constructor
       /// \param[in] _parent Parent object
       public: explicit Actor(BasePtr _parent);
@@ -75,6 +79,32 @@ namespace gazebo
       /// \brief update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+
+      /// \brief Set the current script time.
+      /// \param[in] _time Current script time.
+      public: void SetScriptTime(const double _time);
+
+      /// \brief Get the current script time.
+      /// \return Script time.
+      public: double ScriptTime() const;
+
+      /// \brief Returns a dictionary of all the skeleton animations associated
+      /// with the actor.
+      /// \return a map of SkeletonAnimation, indexed by their name.
+      public: const SkeletonAnimation_M &SkeletonAnimations() const;
+
+      /// \brief Set a custom trajectory for the actor.
+      /// \param[in] _trajInfo Information about custom trajectory.
+      public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
+
+      /// \brief Reset custom trajectory of the actor.
+      public: void ResetCustomTrajectory();
+
+      // Documentation inherited
+      public: virtual bool GetSelfCollide() const;
+
+      // Documentation inherited
+      public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.

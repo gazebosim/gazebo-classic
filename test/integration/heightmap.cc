@@ -78,7 +78,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   common::Image testImage = shape->Image();
 
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  testImage.SavePNG(paths->GetTmpPath() + "/test_shape.png");
+  testImage.SavePNG(paths->TmpPath() + "/test_shape.png");
 
   EXPECT_EQ(trueImage.GetWidth(), testImage.GetWidth());
   EXPECT_EQ(trueImage.GetHeight(), testImage.GetHeight());

@@ -47,13 +47,23 @@ BulletJoint::BulletJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
-  delete this->bulletJointDPtr->constraint;
-  this->bulletJointDPtr->constraint = NULL;
-  delete this->bulletJointDPtr->feedback;
-  this->bulletJointDPtr->feedback = NULL;
-  this->bulletJointDPtr->bulletWorld = NULL;
+  this->Fini();
+}
 
-  delete this->bulletJointDPtr;
+//////////////////////////////////////////////////
+void BulletJoint::Fini()
+{
+  if (this->constraint && this->bulletWorld)
+  {
+    this->bulletWorld->removeConstraint(this->constraint);
+    delete this->constraint;
+  }
+  this->constraint = NULL;
+  this->bulletWorld = NULL;
+
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = NULL;
 }
 
 //////////////////////////////////////////////////

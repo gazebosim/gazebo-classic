@@ -78,6 +78,8 @@ void ModelEditorTest::EditModel()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Make sure we have the tmp box visual in model editor
+  QVERIFY(scene->VisualCount() > visualCount);
+
   gazebo::rendering::VisualPtr editorBoxLink =
       scene->GetVisual("ModelPreview_1::link");
   QVERIFY(editorBoxLink != NULL);

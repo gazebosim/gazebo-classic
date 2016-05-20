@@ -45,6 +45,22 @@
 using namespace gazebo;
 using namespace physics;
 
+// Class used to initialize an sdf element pointer from "collision.sdf".
+// This is then used in the Collision constructor to improve performance.
+class SDFCollisionInitializer
+{
+  // Constructor that create the collision sdf element
+  public: SDFCollisionInitializer()
+  {
+    sdf::initFile("collision.sdf", collisionSDF);
+  }
+
+  // Pointer the collision sdf element
+  public: sdf::ElementPtr collisionSDF = std::make_shared<sdf::Element>();
+};
+static SDFCollisionInitializer g_SDFInit;
+
+
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
 : Entity(*new CollisionPrivate, _link),
@@ -70,7 +86,9 @@ void Collision::ConstructionHelper(LinkPtr _link)
 
   this->collDPtr->placeable = false;
 
-  sdf::initFile("collision.sdf", this->collDPtr->sdf);
+  this->collDPtr->maxContacts = -1;
+
+  this->collDPtr->sdf->Copy(g_SDFInit.collisionSDF);
 
   this->collDPtr->collisionVisualId = physics::getUniqueId();
 }
@@ -88,6 +106,7 @@ void Collision::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         this->ScopedName()+"__COLLISION_VISUAL__");
     this->collDPtr->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
   Entity::Fini();

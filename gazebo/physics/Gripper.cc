@@ -44,8 +44,7 @@ using namespace physics;
 Gripper::Gripper(ModelPtr _model)
 {
   this->model = _model;
-  this->world = _model->World();
-  this->physics = this->world->Physics();
+  this->world = this->model->World();
 
   this->diffs.resize(10);
   this->diffIndex = 0;
@@ -79,7 +78,9 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   this->node->Init(this->world->Name());
 
   this->name = _sdf->Get<std::string>("name");
-  this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
+  this->fixedJoint =
+      this->world->GetPhysicsEngine()->CreateJoint("fixed", this->model);
+  this->fixedJoint->SetName(this->model->GetName() + "__gripper_fixed_joint__");
 
   sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
   this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");
@@ -236,8 +237,6 @@ void Gripper::HandleAttach()
           this->fixedJoint->Load(this->palmLink,
               cc[iter->first]->Link(), ignition::math::Pose3d());
           this->fixedJoint->Init();
-          this->fixedJoint->SetHighStop(0, ignition::math::Angle::Zero);
-          this->fixedJoint->SetLowStop(0, ignition::math::Angle::Zero);
         }
 
         this->diffIndex = (this->diffIndex+1) % 10;

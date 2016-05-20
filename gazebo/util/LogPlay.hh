@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_UTIL_LOGPLAY_HH_
 #define _GAZEBO_UTIL_LOGPLAY_HH_
 
-#include <tinyxml2.h>
+#include <memory>
 #include <string>
 
 #include "gazebo/common/SingletonT.hh"
@@ -157,13 +157,6 @@ namespace gazebo
       /// \return True if <iterations> was found in the log file or
       /// false otherwise.
       public: bool HasIterations() const;
-
-      /// \brief Helper function to get chunk data from XML.
-      /// \param[in] _xml Pointer to an xml block that has state data.
-      /// \param[out] _data Storage for the chunk's data.
-      /// \return True if the chunk was successfully parsed.
-      private: bool ChunkData(tinyxml2::XMLElement *_xml,
-                              std::string &_data) const;
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();

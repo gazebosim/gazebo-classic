@@ -45,7 +45,7 @@ BulletLink::BulletLink(EntityPtr _parent)
 //////////////////////////////////////////////////
 BulletLink::~BulletLink()
 {
-  delete this->bulletLinkDPtr->compoundShape;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -224,12 +224,22 @@ void BulletLink::Init()
 //////////////////////////////////////////////////
 void BulletLink::Fini()
 {
-  Link::Fini();
-  btDynamicsWorld *bulletWorld =
-    this->bulletLinkDPtr->bulletPhysics->DynamicsWorld();
+  if (this->bulletPhysics && this->rigidLink)
+  {
+    btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+    if (bulletWorld)
+      bulletWorld->removeRigidBody(this->rigidLink);
 
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
-  bulletWorld->removeRigidBody(this->bulletLinkDPtr->rigidLink);
+    delete this->rigidLink;
+  }
+  this->bulletPhysics.reset();
+  this->rigidLink = NULL;
+
+  if (this->compoundShape)
+    delete this->compoundShape;
+  this->compoundShape = NULL;
+
+  Link::Fini();
 }
 
 /////////////////////////////////////////////////////////////////////

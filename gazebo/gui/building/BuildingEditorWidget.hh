@@ -43,7 +43,7 @@ namespace gazebo
       public: explicit BuildingEditorWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~BuildingEditorWidget() = default;
+      public: ~BuildingEditorWidget();
 
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.

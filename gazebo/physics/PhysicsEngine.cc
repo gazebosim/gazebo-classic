@@ -107,20 +107,39 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
-  this->physicsEngineDPtr->world.reset();
-  this->physicsEngineDPtr->node->Fini();
+  // Clean up transport
+  {
+    this->responsePub.reset();
+    this->requestSub.reset();
+
+    this->node.reset();
+  }
+
+  if (this->sdf)
+  {
+    this->sdf->Reset();
+    this->sdf.reset();
+  }
+
+  if (this->contactManager)
+  {
+    delete this->contactManager;
+    this->contactManager = NULL;
+  }
+
+  if (this->physicsUpdateMutex)
+  {
+    delete this->physicsUpdateMutex;
+    this->physicsUpdateMutex = NULL;
+  }
+
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////
 PhysicsEngine::~PhysicsEngine()
 {
-  this->physicsEngineDPtr->sdf->Reset();
-  this->physicsEngineDPtr->sdf.reset();
-  this->physicsEngineDPtr->responsePub.reset();
-  this->physicsEngineDPtr->requestSub.reset();
-  this->physicsEngineDPtr->node.reset();
-
-  delete this->physicsEngineDPtr->contactManager;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////

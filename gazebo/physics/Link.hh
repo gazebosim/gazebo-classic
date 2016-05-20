@@ -63,6 +63,7 @@ namespace gazebo
 
       /// \brief Reset the link.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of link.
       public: void ResetPhysicsStates();
@@ -115,6 +116,14 @@ namespace gazebo
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
       public: virtual bool GravityMode() const = 0;
+
+      /// \brief Set whether wind affects this body.
+      /// \param[in] _mode True to enable wind.
+      public: virtual void SetWindMode(const bool _mode);
+
+      /// \brief Get the wind mode.
+      /// \return True if wind is enabled.
+      public: virtual bool WindMode() const;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
@@ -931,6 +940,23 @@ namespace gazebo
       public: bool FindAllConnectedLinksHelper(
         const LinkPtr &_originalParentLink,
         Link_V &_connectedLinks, bool _fistLink = false);
+
+      /// \brief Enable/disable wind for this link.
+      /// \param[in] _enable True to enable the wind.
+      public: void SetWindEnabled(const bool _enable);
+
+      /// \brief Returns this link's wind velocity in the world coordinate
+      /// frame.
+      /// \return this link's wind velocity.
+      public: const ignition::math::Vector3d WorldWindLinearVel() const;
+
+      /// \brief Returns this link's wind velocity.
+      /// \return this link's wind velocity.
+      public: const ignition::math::Vector3d RelativeWindLinearVel() const;
+
+      /// \brief Update the wind.
+      /// \param[in] _info Update information.
+      public: void UpdateWind(const common::UpdateInfo &_info);
 
       /// \brief Get a battery by name.
       /// \param[in] _name Name of the battery to get.

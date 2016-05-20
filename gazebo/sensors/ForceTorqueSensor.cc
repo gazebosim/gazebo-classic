@@ -51,6 +51,7 @@ ForceTorqueSensor::ForceTorqueSensor()
 //////////////////////////////////////////////////
 ForceTorqueSensor::~ForceTorqueSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -179,6 +180,8 @@ void ForceTorqueSensor::Init()
 void ForceTorqueSensor::Fini()
 {
   this->dataPtr->wrenchPub.reset();
+  this->dataPtr->parentJoint.reset();
+
   Sensor::Fini();
 }
 

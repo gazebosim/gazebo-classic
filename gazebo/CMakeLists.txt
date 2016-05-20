@@ -7,6 +7,7 @@ include_directories(SYSTEM
   ${IGNITION-MATH_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
+  ${tinyxml2_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -16,6 +17,7 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
   ${TBB_LIBRARY_DIR}
   ${CURL_LIBDIR}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 if (WIN32)

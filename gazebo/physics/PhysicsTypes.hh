@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_PHYSICSTYPES_HH_
-#define _GAZEBO_PHYSICS_PHYSICSTYPES_HH_
+#ifndef GAZEBO_PHYSICS_PHYSICSTYPES_HH_
+#define GAZEBO_PHYSICS_PHYSICSTYPES_HH_
 
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
 #include <memory>
+
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -67,6 +68,7 @@ namespace gazebo
     class LightState;
     class LinkState;
     class JointState;
+    class TrajectoryInfo;
 
     /// \def BasePtr
     /// \brief Shared pointer to a Base object
@@ -91,6 +93,10 @@ namespace gazebo
     /// \def Actor
     /// \brief Shared pointer to an Actor object
     typedef std::shared_ptr<Actor> ActorPtr;
+
+    /// \def TrajectoryInfoPtr
+    /// \brief Shared pointer to a TrajectoryInfo object
+    typedef std::shared_ptr<TrajectoryInfo> TrajectoryInfoPtr;
 
     /// \def LightPtr
     /// \brief Shared pointer to a Light object
