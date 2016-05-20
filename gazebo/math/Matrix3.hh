@@ -18,6 +18,7 @@
 #define _MATRIX3_HH_
 
 #include <assert.h>
+#include <ignition/math/Matrix3.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
@@ -79,6 +80,10 @@ namespace gazebo
       /// \brief Return the inverse matrix
       /// \return Inverse of this matrix.
       public: Matrix3 Inverse() const;
+
+      /// \brief Convert this matrix to an ignition::math::Matrix3d.
+      /// \return This matrix as an ignition::math::Matrix3d.
+      public: ignition::math::Matrix3d Ign() const;
 
       /// \brief returns the element wise difference of two matrices
       public: Matrix3 operator-(const Matrix3 &_m) const

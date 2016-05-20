@@ -129,6 +129,15 @@ Matrix3 Matrix3::Inverse() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Matrix3d Matrix3::Ign() const
+{
+  return ignition::math::Matrix3d(
+      this->m[0][0], this->m[0][1], this->m[0][2],
+      this->m[1][0], this->m[1][1], this->m[1][2],
+      this->m[2][0], this->m[2][1], this->m[2][2]);
+}
+
+//////////////////////////////////////////////////
 bool Matrix3::operator==(const Matrix3 &_m) const
 {
   return math::equal(this->m[0][0], _m[0][0]) &&
