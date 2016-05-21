@@ -739,7 +739,7 @@ bool Server::OpenWorld(const std::string &_filename)
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
   {
-    gzerr << "Could not open file[" << _filename << "]\n";
+    gzerr << "Could not open file [" << _filename << "]\n";
     return false;
   }
   fclose(test);
@@ -768,9 +768,7 @@ bool Server::OpenWorld(const std::string &_filename)
   // Stop and remove current worlds
   physics::remove_worlds();
 
-  // Sleep for a long time to make sure all the messages were properly sent back
-  // and forth. For example, to unadvertise a topic, it goes
-  // transport::ConnectionManager -> Master -> transport::ConnectionManager
+  // TODO: Find a way to check if the worlds have been completely destroyed
   common::Time::MSleep(1000);
 
   // Keep sensor manager but make sure it is clear.
@@ -785,13 +783,13 @@ bool Server::OpenWorld(const std::string &_filename)
   // Sleep for a long time to make sure sensors and transport are clear.
   common::Time::MSleep(1000);
 
-  // TODO: Notify clients that world has been removed
-/*
-  msgs::WorldModify worldMsg;
-  worldMsg.set_world_name("default");
-  worldMsg.set_remove(true);
-  this->worldModPub->Publish(worldMsg);
-*/
+  // Notify clients that world has been removed
+  {
+    msgs::WorldModify worldMsg;
+    worldMsg.set_world_name("default");
+    worldMsg.set_remove(true);
+    this->dataPtr->worldModPub->Publish(worldMsg);
+  }
 
   auto world = physics::create_world("default");
   if (!world)
@@ -806,12 +804,12 @@ bool Server::OpenWorld(const std::string &_filename)
   common::Time::MSleep(1000);
 
   // TODO: Notify clients that a new world is available
-/*
-  msgs::WorldModify worldMsg;
-  worldMsg.set_world_name("default");
-  worldMsg.set_create(true);
-  this->dataPtr->worldModPub->Publish(worldMsg);
-*/
+  {
+    msgs::WorldModify worldMsg;
+    worldMsg.set_world_name("default");
+    worldMsg.set_create(true);
+    this->dataPtr->worldModPub->Publish(worldMsg);
+  }
 
   gzmsg << "- Opened world file [" << _filename << "]" << std::endl;
   return true;

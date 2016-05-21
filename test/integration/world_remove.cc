@@ -38,6 +38,10 @@ class WorldRemoveTest : public ServerFixture,
   /// joints.
   /// \param[in] _physicsEngines Physics engine to be tested.
   public: void RemoveWorldWithEntities(const std::string &_physicsEngine);
+
+  /// \brief Test removing a world which contains sensors.
+  /// \param[in] _physicsEngines Physics engine to be tested.
+  public: void RemoveWorldWithSensors(const std::string &_physicsEngine);
 };
 
 /// \brief Test removing worlds with joints. Inherits from JointTest to make
@@ -329,6 +333,125 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+void WorldRemoveTest::RemoveWorldWithSensors(const std::string &_physicsEngine)
+{
+  // Load a world with sensors
+  this->Load("worlds/camera.world", false, _physicsEngine);
+
+  // Give time for everything to be created
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(300);
+    sleep++;
+  }
+
+  // Check there are worlds running
+  EXPECT_TRUE(physics::worlds_running());
+
+  // Get world pointer
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  auto worldPtrCount = world.use_count();
+  EXPECT_GT(worldPtrCount, 1);
+
+  // Get physics engine pointer
+  auto physicsEngine = world->GetPhysicsEngine();
+  ASSERT_TRUE(physicsEngine != NULL);
+
+  auto physicsEnginePtrCount = physicsEngine.use_count();
+  EXPECT_GT(physicsEnginePtrCount, 1);
+
+  // Check advertised topics
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  auto worldTopicCount = WorldTopicCount(msgTypes);
+  EXPECT_GT(worldTopicCount, 0u);
+
+  // Get sensor pointers
+  auto camera = gazebo::sensors::get_sensor("default::camera::link::camera");
+  ASSERT_TRUE(camera != nullptr);
+
+  auto camera2 = gazebo::sensors::get_sensor("default::camera 2::link::camera");
+  ASSERT_TRUE(camera2 != nullptr);
+
+  // Stats before removing world
+  gzmsg << "Stats before removing world:" << std::endl;
+  gzmsg << "- [WorldPtr] use count: [" << world.use_count() << "]"
+        << std::endl;
+  gzmsg << "- [PhysicsEnginePtr] use count: [" << physicsEngine.use_count()
+        << "]" << std::endl;
+  gzmsg << "- Topics in this world: [" << worldTopicCount << "]"
+        << std::endl;
+  gzmsg << "- [camera] ptr use count: [" << camera.use_count() << "]"
+        << std::endl;
+  gzmsg << "- [camera2] ptr use count: [" << camera2.use_count() << "]"
+        << std::endl;
+
+  // Remove world
+  physics::remove_worlds();
+
+  // Give time for everything to be removed
+  sleep = 0;
+  while (sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(300);
+    sleep++;
+  }
+
+  // Check there are no worlds running
+  EXPECT_FALSE(physics::worlds_running());
+
+  // Check the only shared pointers to sensors left are the ones we're holding
+  EXPECT_EQ(camera.use_count(), 1);
+  EXPECT_EQ(camera2.use_count(), 1);
+
+  // Release entity pointers
+  camera.reset();
+  camera2.reset();
+
+  // Check the only shared pointer left to the physics engine is this one
+  EXPECT_LT(physicsEngine.use_count(), physicsEnginePtrCount);
+  EXPECT_EQ(physicsEngine.use_count(), 1);
+
+  // Release the last physics engine pointer
+  physicsEngine.reset();
+
+  // Check the only pointer left to the world is this one
+  EXPECT_LT(world.use_count(), worldPtrCount);
+  EXPECT_EQ(world.use_count(), 1);
+
+  // Release the last world pointer
+  world.reset();
+
+  // Check we can't get the world pointer
+  gzmsg << "Expect exception when trying to get removed world:" << std::endl;
+  EXPECT_THROW(world = physics::get_world("default"), common::Exception);
+  EXPECT_TRUE(world == NULL);
+
+  // Check all topics related to that world are gone
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
+  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
+
+  // Stats after removing world
+  gzmsg << "Stats after removing world:" << std::endl;
+  gzmsg << "- WorldPtr use count: [" << world.use_count() << "]"
+        << std::endl;
+  gzmsg << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count() << "]"
+        << std::endl;
+  gzmsg << "- Topics in this world: [" << WorldTopicCount(msgTypes) << "]"
+        << std::endl;
+  gzmsg << "- [camera] ptr use count: [" << camera.use_count() << "]"
+        << std::endl;
+  gzmsg << "- [camera2] ptr use count: [" << camera2.use_count() << "]"
+        << std::endl;
+}
+
+/////////////////////////////////////////////////
 TEST_P(WorldRemoveTest, RemoveBlankWorld)
 {
   RemoveBlankWorld(GetParam());
@@ -338,6 +461,12 @@ TEST_P(WorldRemoveTest, RemoveBlankWorld)
 TEST_P(WorldRemoveTest, RemoveWorldWithEntities)
 {
   RemoveWorldWithEntities(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldRemoveTest, RemoveWorldWithSensors)
+{
+  RemoveWorldWithSensors(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(WorldRemoveTest, WorldRemoveTest,
