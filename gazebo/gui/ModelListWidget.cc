@@ -562,9 +562,11 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
 
   qDebug() << "OnResponse";
 
-  //qDebug() << _msg->type().c_str();
+  qDebug() << _msg->type().c_str();
 
   //qDebug() << this->dataPtr->pluginMsg.GetTypeName().c_str();
+
+  std::cout << _msg->DebugString() << std::endl;
 
   if (_msg->has_type() && _msg->type() == this->dataPtr->modelMsg.GetTypeName())
   {

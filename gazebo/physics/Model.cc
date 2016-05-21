@@ -123,7 +123,6 @@ void Model::OnRequest(ConstRequestPtr &_msg)
 
   for (auto const &requestMsg : requestMsgs)
   {
-
   bool send = true;
   //response.set_id(_msg.id());
   response.set_request(requestMsg.request());
@@ -139,24 +138,33 @@ void Model::OnRequest(ConstRequestPtr &_msg)
 
       msgs::Plugin pluginMsg;
 
-      ModelPluginPtr plugin;  // = boost::dynamic_pointer_cast<Plugin>(entity);
+      if (this->sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          //auto pluginMsg = _msg.add_plugin();
+          std::string pluginName = pluginElem->Get<std::string>("name");
 
-      pluginMsg.set_name(requestMsg.data().c_str());
-      pluginMsg.set_filename(requestMsg.data().c_str());
-      //pluginMsg.set_type("Plugin");
+          if(pluginName == requestMsg.data().c_str())
+          {
+            pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
+            std::string *serializedData = response.mutable_serialized_data();
+            //printf("%s\n", serializedData->c_str());
+            pluginMsg.SerializeToString(serializedData);
+            response.set_type(pluginMsg.GetTypeName());
 
-      std::string *serializedData = response.mutable_serialized_data();
-      //printf("%s\n", serializedData->c_str());
-      pluginMsg.SerializeToString(serializedData);
+            std::cout << pluginMsg.DebugString() << std::endl;
+            std::cout << response.DebugString() << std::endl;
 
-      printf("%s\n", "model msg type");
-      printf("%s\n", pluginMsg.GetTypeName().c_str());
-
-      //response.set_type(MODEL_PLUGIN);
-    }
-        if (send)
-    {
-      this->responsePub->Publish(response);
+            if (send)
+            {
+              this->responsePub->Publish(response);
+            }
+          }
+          pluginElem = pluginElem->GetNextElement("plugin");
+          }
+      }
     }
   }
 }
