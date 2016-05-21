@@ -55,6 +55,10 @@ namespace gazebo
                       double _v10, double _v11, double _v12,
                       double _v20, double _v21, double _v22);
 
+      /// \brief Ignition math copy constructor
+      /// \param[in] _v a vector
+      public: Matrix3(const ignition::math::Matrix3d &_m);
+
       /// \brief Desctructor
       public: virtual ~Matrix3();
 
