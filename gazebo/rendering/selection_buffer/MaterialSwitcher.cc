@@ -25,7 +25,7 @@ using namespace rendering;
 
 /////////////////////////////////////////////////
 MaterialSwitcher::MaterialSwitcher()
-: lastTechnique(NULL)
+: lastTechnique(nullptr)
 {
   this->currentColor = common::Color(0.0, 0.0, 0.1);
 }
@@ -53,7 +53,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       {
         const_cast<Ogre::SubEntity *>(subEntity)->setCustomParameter(1,
             Ogre::Vector4(0, 0, 0, 0));
-        return NULL;
+        return nullptr;
       }
 
       if (this->lastEntity == subEntity->getParent()->getName())
@@ -64,33 +64,60 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       }
       else
       {
-        Ogre::ResourcePtr res =
-          Ogre::MaterialManager::getSingleton().load("gazebo/plain_color",
-              Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        // load the selection buffer material
+        if (this->plainTechnique == nullptr)
+        {
+          // plain opaque material
+          Ogre::ResourcePtr res =
+            Ogre::MaterialManager::getSingleton().load("gazebo/plain_color",
+                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-        // OGRE 1.9 changes the shared pointer definition
-        // But the 1.9 RC, which we're using on Windows, doesn't have the
-        // staticCast change.  It will be in the final release.
-        #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
+          // OGRE 1.9 changes the shared pointer definition
+          // But the 1.9 RC, which we're using on Windows, doesn't have the
+          // staticCast change.  It will be in the final release.
+          #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
+          Ogre::MaterialPtr plainMaterial = static_cast<Ogre::MaterialPtr>(res);
+          #else
+          Ogre::MaterialPtr plainMaterial = res.staticCast<Ogre::Material>();
+          #endif
+
+          this->plainTechnique = plainMaterial->getTechnique(0);
+          Ogre::Pass *plainPass = this->plainTechnique->getPass(0);
+          plainPass->setDepthCheckEnabled(true);
+          plainPass->setDepthWriteEnabled(true);
+
+          // overlay material
+          Ogre::MaterialPtr overlayMaterial =
+              plainMaterial->clone("plain_color_overlay");
+          this->overlayTechnique =
+              overlayMaterial->getTechnique(0);
+          if (!this->overlayTechnique || !this->overlayTechnique->getPass(0))
+          {
+            gzerr << "Problem creating the selection buffer overlay material"
+                << std::endl;
+            return nullptr;
+          }
+          Ogre::Pass *overlayPass = this->overlayTechnique->getPass(0);
+          overlayPass->setDepthCheckEnabled(false);
+          overlayPass->setDepthWriteEnabled(false);
+        }
+
         // Make sure we keep the same depth properties so that
         // certain overlay objects can be picked by the mouse.
-        Ogre::Technique *newTechnique =
-            static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
-        #else
-        Ogre::Technique *newTechnique =
-            res.staticCast<Ogre::Material>()->getTechnique(0);
-        #endif
+        Ogre::Technique *newTechnique = this->plainTechnique;
 
         Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
         if (originalTechnique)
         {
           Ogre::Pass *originalPass = originalTechnique->getPass(0);
-          Ogre::Pass *newPass = newTechnique->getPass(0);
-          if (originalPass && newPass)
+          if (originalPass)
           {
-            newPass->setDepthCheckEnabled(originalPass->getDepthCheckEnabled());
-            newPass->setDepthWriteEnabled(originalPass->getDepthWriteEnabled());
-            newPass->setLightingEnabled(originalPass->getLightingEnabled());
+            // check if it's an overlay material by assuming the
+            // depth check and depth write properties are off.
+            bool depthCheck = originalPass->getDepthCheckEnabled();
+            bool depthWrite = originalPass->getDepthWriteEnabled();
+            if (!depthCheck && !depthWrite)
+              newTechnique = this->overlayTechnique;
           }
         }
 
@@ -116,7 +143,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
   // else
   //  gzerr << "Rendering scheme without a Renderable: " << _schemeName
   //        << ", " + _originalMaterial->getName() << std::endl;
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

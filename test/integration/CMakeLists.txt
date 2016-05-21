@@ -145,6 +145,7 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  mouse_pick.cc
   view_angle.cc
 )
 
