@@ -134,6 +134,17 @@ void BulletLink::Init()
   if (!this->compoundShape)
     this->compoundShape = new btEmptyShape();
 
+  // diagonalize inertia matrix and add inertial pose rotation
+  {
+    ignition::math::MassMatrix3d m(this->inertial->GetMass(),
+      this->inertial->GetPrincipalMoments().Ign(),
+      this->inertial->GetProductsofInertia().Ign());
+    auto inertialPose = this->inertial->GetPose().Ign();
+    auto Idiag = m.PrincipalMoments();
+    this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
+    inertialPose.Rot() = inertialPose.Rot() * m.PrincipalAxesOffset();
+    this->inertial->SetCoG(inertialPose);
+  }
   // this->compoundShape->calculateLocalInertia(mass, fallInertia);
   fallInertia = BulletTypes::ConvertVector3(
     this->inertial->GetPrincipalMoments());
