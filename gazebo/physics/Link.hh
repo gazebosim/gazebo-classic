@@ -739,9 +739,6 @@ namespace gazebo
       /// \brief All the attached batteries.
       private: std::vector<common::BatteryPtr> batteries;
 
-      /// \brief All the introspection items regsitered for this.
-      private: std::vector<common::URI> introspectionItems;
-
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
       private: std::vector<util::OpenALSourcePtr> audioSources;

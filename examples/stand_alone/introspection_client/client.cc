@@ -76,7 +76,7 @@ int main(int _argc, char **_argv)
   node.Subscribe(topic, cb);
 
   /// zZZZ.
-  ignition::transport::waitForShutdown();
+  getchar();
 
   return 0;
 }
