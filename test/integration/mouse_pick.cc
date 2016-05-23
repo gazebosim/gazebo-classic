@@ -51,13 +51,7 @@ void MousePickingTest::Transparency()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   gazebo::rendering::VisualPtr model01Vis = scene->GetVisual(model01Name);
   QVERIFY(model01Vis != NULL);
@@ -90,13 +84,7 @@ void MousePickingTest::Transparency()
       gazebo::math::Vector3(0, 3.0, 0.5),
       gazebo::math::Vector3(0, 0, -1.57)));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
@@ -119,26 +107,14 @@ void MousePickingTest::Transparency()
       gazebo::math::Vector3(0, -3.0, 0.5),
       gazebo::math::Vector3(0, 0, 1.57)));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
   QTest::mouseClick(glWidget, Qt::LeftButton, 0,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(model01Vis->GetHighlighted());
   QVERIFY(!model02Vis->GetHighlighted());
@@ -151,26 +127,14 @@ void MousePickingTest::Transparency()
       gazebo::math::Vector3(0.1, 3.0, 0.6),
       gazebo::math::Vector3(0, 0, -1.57)));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
   QTest::mouseClick(glWidget, Qt::LeftButton, 0,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // TODO ModelManipulator uses gui::get_entity_id to differentiate between
   // model and link but because g_main_win is not available in QTestFixture
@@ -183,26 +147,14 @@ void MousePickingTest::Transparency()
       gazebo::math::Vector3(0.1, -3.0, 0.6),
       gazebo::math::Vector3(0, 0, 1.57)));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QTest::mouseMove(glWidget,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
   QTest::mouseClick(glWidget, Qt::LeftButton, 0,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // TODO ModelManipulator uses gui::get_entity_id to differentiate between
   // model and link but because g_main_win is not available in QTestFixture

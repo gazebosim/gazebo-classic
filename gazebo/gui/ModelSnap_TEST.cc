@@ -98,13 +98,7 @@ void ModelSnap_TEST::Highlight()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(!FindRedColor(cam));
 
@@ -135,13 +129,7 @@ void ModelSnap_TEST::Highlight()
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
       QPoint(spherePt.x, spherePt.y));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify that a triangle is highlighted by checking for red pixels.
   QVERIFY(FindRedColor(cam));
@@ -153,13 +141,7 @@ void ModelSnap_TEST::Highlight()
     // cancel and reset snap
     gazebo::gui::g_arrowAct->trigger();
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // verify that no triangles are highlighted
     QVERIFY(!FindRedColor(cam));
@@ -173,13 +155,7 @@ void ModelSnap_TEST::Highlight()
 
     QTest::mouseRelease(glWidget, Qt::LeftButton, 0, QPoint(boxPt.x, boxPt.y));
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // verify that a triangle is highlighted
     QVERIFY(FindRedColor(cam));
