@@ -207,8 +207,6 @@ void Link::Load(sdf::ElementPtr _sdf)
   std::string topicName = "~/" + this->GetScopedName() + "/wrench";
   boost::replace_all(topicName, "::", "/");
   this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
-
-  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -306,8 +304,6 @@ void Link::Fini()
   this->audioSink.reset();
   this->audioSources.clear();
 #endif
-
-  this->UnregisterIntrospectionItems();
 
   // Clean transport
   {

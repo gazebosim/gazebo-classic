@@ -335,7 +335,6 @@ void Joint::LoadImpl(const math::Pose &_pose)
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
-  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -409,8 +408,6 @@ void Joint::Fini()
   this->model.reset();
   this->parentLink.reset();
   this->sdfJoint.reset();
-
-  this->UnregisterIntrospectionItems();
 
   Base::Fini();
 }

@@ -95,6 +95,8 @@ void Base::Load(sdf::ElementPtr _sdf)
   }
 
   this->ComputeScopedName();
+
+  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -108,6 +110,8 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
+  this->UnregisterIntrospectionItems();
+
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)

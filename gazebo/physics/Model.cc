@@ -104,8 +104,6 @@ void Model::Load(sdf::ElementPtr _sdf)
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
-
-  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -424,8 +422,6 @@ void Model::Fini()
   this->links.clear();
   this->models.clear();
   this->plugins.clear();
-
-  this->UnregisterIntrospectionItems();
 
   Entity::Fini();
 }
