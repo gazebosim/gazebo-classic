@@ -47,7 +47,7 @@ DARTJoint::~DARTJoint()
   this->Detach();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

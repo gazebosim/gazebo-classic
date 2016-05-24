@@ -393,8 +393,6 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
   this->applyDamping.reset();
 
   // Remove all the sensors attached to the joint

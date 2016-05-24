@@ -89,14 +89,14 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
 
   // Get world pointer
   auto world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   auto worldPtrCount = world.use_count();
   EXPECT_GT(worldPtrCount, 1);
 
   // Get physics engine pointer
   auto physicsEngine = world->GetPhysicsEngine();
-  ASSERT_TRUE(physicsEngine != NULL);
+  ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
   EXPECT_GT(physicsEnginePtrCount, 1);
@@ -146,7 +146,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   // Check we can't get the world pointer
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
-  EXPECT_TRUE(world == NULL);
+  EXPECT_TRUE(world == nullptr);
 
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();
@@ -181,14 +181,14 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
 
   // Get world pointer
   auto world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   auto worldPtrCount = world.use_count();
   EXPECT_GT(worldPtrCount, 1);
 
   // Get physics engine pointer
   auto physicsEngine = world->GetPhysicsEngine();
-  ASSERT_TRUE(physicsEngine != NULL);
+  ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
   EXPECT_GT(physicsEnginePtrCount, 1);
@@ -211,7 +211,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   for (auto &name : modelNames)
   {
     auto model = world->GetModel(name);
-    ASSERT_TRUE(model != NULL);
+    ASSERT_TRUE(model != nullptr);
     modelPtrs.push_back(model);
   }
 
@@ -223,7 +223,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   for (auto &name : lightNames)
   {
     auto light = world->Light(name);
-    ASSERT_TRUE(light != NULL);
+    ASSERT_TRUE(light != nullptr);
     lightPtrs.push_back(light);
   }
 
@@ -299,7 +299,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   // Check we can't get the world pointer
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
-  EXPECT_TRUE(world == NULL);
+  EXPECT_TRUE(world == nullptr);
 
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();
@@ -367,18 +367,18 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
 
   // Spawn a model with a joint
   auto joint = SpawnJoint(_jointType, false, false);
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != nullptr);
 
   // Get world pointer
   auto world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   auto worldPtrCount = world.use_count();
   EXPECT_GT(worldPtrCount, 1);
 
   // Get model pointer
   auto model = world->GetModel("joint_model0");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model != nullptr);
 
   // Check model has the joint
   EXPECT_EQ(model->GetJointCount(), 1u);
@@ -386,14 +386,14 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
 
   // Get link pointers
   auto parentLink = model->GetLink("parent");
-  ASSERT_TRUE(parentLink != NULL);
+  ASSERT_TRUE(parentLink != nullptr);
 
   auto childLink = model->GetLink("child");
-  ASSERT_TRUE(childLink != NULL);
+  ASSERT_TRUE(childLink != nullptr);
 
   // Get physics engine pointer
   auto physicsEngine = world->GetPhysicsEngine();
-  ASSERT_TRUE(physicsEngine != NULL);
+  ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
   EXPECT_GT(physicsEnginePtrCount, 1);
@@ -467,7 +467,7 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   // Check we can't get the world pointer
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
-  EXPECT_TRUE(world == NULL);
+  EXPECT_TRUE(world == nullptr);
 
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();

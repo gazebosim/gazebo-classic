@@ -72,7 +72,7 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
 DARTPhysics::~DARTPhysics()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

@@ -61,8 +61,6 @@ ODEJoint::~ODEJoint()
 //////////////////////////////////////////////////
 void ODEJoint::Fini()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
   this->applyDamping.reset();
 
   if (this->feedback)
