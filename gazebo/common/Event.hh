@@ -288,7 +288,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback();
@@ -303,7 +303,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p);
@@ -319,7 +319,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2);
@@ -336,7 +336,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3);
@@ -355,7 +355,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4);
@@ -376,7 +376,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5);
@@ -398,7 +398,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
@@ -421,7 +421,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
@@ -446,7 +446,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
           {
@@ -475,7 +475,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
           {
@@ -506,7 +506,7 @@ namespace gazebo
         this->Cleanup();
 
         this->SetSignaled(true);
-        for (auto iter: this->connections)
+        for (const auto &iter: this->connections)
         {
           if (iter.second->on)
           {
