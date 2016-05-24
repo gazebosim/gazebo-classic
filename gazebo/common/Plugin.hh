@@ -88,7 +88,7 @@ namespace gazebo
     /// \brief Constructor
     public: PluginT()
             {
-              this->dlHandle = NULL;
+              this->dlHandle = nullptr;
             }
 
     /// \brief Destructor
@@ -314,7 +314,7 @@ namespace gazebo
     /// Called before Gazebo is loaded. Must not block.
     /// \param _argc Number of command line arguments.
     /// \param _argv Array of command line arguments.
-    public: virtual void Load(int _argc = 0, char **_argv = NULL) = 0;
+    public: virtual void Load(int _argc = 0, char **_argv = nullptr) = 0;
 
     /// \brief Initialize the plugin
     ///

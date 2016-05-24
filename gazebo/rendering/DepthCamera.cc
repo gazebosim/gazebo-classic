@@ -393,7 +393,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     this->depthViewport->setBackgroundColour(
         Conversions::Convert(this->scene->BackgroundColor()));
     this->depthViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     double ratio = static_cast<double>(this->depthViewport->getActualWidth()) /
                    static_cast<double>(this->depthViewport->getActualHeight());

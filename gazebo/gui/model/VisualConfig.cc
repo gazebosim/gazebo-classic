@@ -47,6 +47,8 @@ VisualConfig::VisualConfig()
   // Add Visual button
   QPushButton *addVisualButton = new QPushButton(tr("+ &Another Visual"));
   addVisualButton->setMaximumWidth(200);
+  addVisualButton->setDefault(false);
+  addVisualButton->setAutoDefault(false);
   connect(addVisualButton, SIGNAL(clicked()), this, SLOT(OnAddVisual()));
 
   // Main layout
@@ -72,6 +74,12 @@ VisualConfig::~VisualConfig()
     delete config->second;
     this->configs.erase(config);
   }
+  while (!this->deletedConfigs.empty())
+  {
+    auto config = this->deletedConfigs.begin();
+    delete config->second;
+    this->deletedConfigs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -83,6 +91,13 @@ void VisualConfig::Init()
     VisualConfigData *configData = it.second;
     configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
+
+  // Clear lists
+  for (auto &it : this->deletedConfigs)
+    delete it.second->widget;
+  this->deletedConfigs.clear();
+
+  this->addedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -134,6 +149,8 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   // Remove button
   QToolButton *removeVisualButton = new QToolButton(this);
+  removeVisualButton->setObjectName(
+      "removeVisualButton_" + QString::number(this->counter));
   removeVisualButton->setFixedSize(QSize(30, 30));
   removeVisualButton->setToolTip("Remove " + QString(_name.c_str()));
   removeVisualButton->setIcon(QPixmap(":/images/trashcan.png"));
@@ -234,6 +251,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
+  this->addedConfigs[this->counter] = configData;
 
   this->counter++;
 }
@@ -293,15 +311,25 @@ void VisualConfig::OnRemoveVisual(int _id)
   msgBox.setDefaultButton(removeButton);
   msgBox.setEscapeButton(cancelButton);
   msgBox.exec();
-  if (msgBox.clickedButton() != removeButton)
+  if (msgBox.clickedButton() && msgBox.clickedButton() != removeButton)
     return;
 
   // Remove
   this->listLayout->removeWidget(configData->widget);
-  delete configData->widget;
+  configData->widget->hide();
 
   emit VisualRemoved(configData->name);
-  this->configs.erase(it);
+  // Add to delete list only if this existed from the beginning
+  auto itAdded = this->addedConfigs.find(_id);
+  if (itAdded == this->addedConfigs.end())
+  {
+    this->deletedConfigs[_id] = configData;
+    this->configs.erase(it);
+  }
+  else
+  {
+    this->addedConfigs.erase(itAdded);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -423,10 +451,36 @@ void VisualConfig::OnStringChanged(const QString &_name,
 /////////////////////////////////////////////////
 void VisualConfig::RestoreOriginalData()
 {
+  // Remove added configs
+  for (auto &it : this->addedConfigs)
+  {
+    auto configData = it.second;
+
+    this->listLayout->removeWidget(configData->widget);
+    delete configData->widget;
+
+    emit VisualRemoved(configData->name);
+
+    this->configs.erase(it.first);
+  }
+  this->addedConfigs.clear();
+
+  // Restore previously existing configs
   for (auto &it : this->configs)
   {
     it.second->RestoreOriginalData();
   }
+
+  // Reinsert deleted configs
+  for (auto &it : this->deletedConfigs)
+  {
+    this->listLayout->addWidget(it.second->widget);
+    it.second->widget->show();
+
+    this->configs[it.first] = it.second;
+    emit VisualAdded(it.second->name);
+  }
+  this->deletedConfigs.clear();
 }
 
 /////////////////////////////////////////////////

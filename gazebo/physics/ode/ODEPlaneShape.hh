@@ -49,7 +49,7 @@ namespace gazebo
         math::Pose pose = oParent->GetWorldPose();
         double altitude = pose.pos.z;
         math::Vector3 n = this->GetNormal();
-        if (oParent->GetCollisionId() == NULL)
+        if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
                 n.x, n.y, n.z, altitude), false);
         else
