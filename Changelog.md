@@ -71,6 +71,12 @@
     1. Undo / redo inserting and deleting nested models
         * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
 
+    1. Undo insert / delete joints
+        * [Pull request #2266](https://bitbucket.org/osrf/gazebo/pull-request/2266)
+
+    1. Undo translate, rotate, snap and align links and nested models
+        * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
+
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
