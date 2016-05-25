@@ -53,6 +53,7 @@
 #include "gazebo/gui/MainWindow.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
+#include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
@@ -178,15 +179,16 @@ namespace gazebo
       /// \brief Mutex to protect updates
       public: std::recursive_mutex updateMutex;
 
+      /// \todo add this back when undo scaling is implemented
       /// \brief A list of link names whose scale has changed externally.
-      public: std::map<std::string, ignition::math::Vector3d> linkScaleUpdate;
+      // public: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
 
       /// \brief A list of link data whose pose has changed externally.
-      /// Note that LinkData stores the local pose, while this list
-      /// stores the world pose.
+      /// This is the link's local pose.
       public: std::map<LinkData *, ignition::math::Pose3d> linkPoseUpdate;
 
       /// \brief A list of nested model data whose pose has changed externally.
+      /// This is the model's local pose.
       public: std::map<NestedModelData *, ignition::math::Pose3d>
           nestedModelPoseUpdate;
 
@@ -2054,16 +2056,19 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
+  /// \todo End scaling links
+
   // End moving links
   for (auto link : this->dataPtr->linkPoseUpdate)
   {
+    // Register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Move [" + link.first->Name() + "]", MEUserCmd::MOVING_LINK);
     cmd->SetScopedName(link.first->linkVisual->GetName());
+    cmd->SetPoseChange(link.first->Pose(), link.second);
 
-    auto linkLocalPose = this->WorldToLocal(link.second);
-    cmd->SetPoseChange(link.first->Pose(), linkLocalPose);
-    link.first->SetPose(linkLocalPose);
+    // Update data and inspector
+    link.first->SetPose(link.second);
   }
   if (!this->dataPtr->linkPoseUpdate.empty())
     this->ModelChanged();
@@ -2072,14 +2077,15 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   // End moving nested models
   for (auto nestedModel : this->dataPtr->nestedModelPoseUpdate)
   {
+    // Register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Move [" + nestedModel.first->Name() + "]",
         MEUserCmd::MOVING_NESTED_MODEL);
     cmd->SetScopedName(nestedModel.first->modelVisual->GetName());
+    cmd->SetPoseChange(nestedModel.first->Pose(), nestedModel.second);
 
-    auto nestedModelLocalPose = this->WorldToLocal(nestedModel.second);
-    cmd->SetPoseChange(nestedModel.first->Pose(), nestedModelLocalPose);
-    nestedModel.first->SetPose(nestedModelLocalPose);
+    // Update data and inspector
+    nestedModel.first->SetPose(nestedModel.second);
   }
   if (!this->dataPtr->nestedModelPoseUpdate.empty())
     this->ModelChanged();
@@ -2925,7 +2931,8 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
-      this->dataPtr->linkScaleUpdate[linksIt.first] = _scale.Ign();
+      // Update data
+      linksIt.second->SetScale(_scale.Ign());
       break;
     }
   }
@@ -2959,7 +2966,14 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
       // Only register command on MouseRelease
       else
       {
-        this->dataPtr->linkPoseUpdate[linksIt.second] = _pose;
+        // Get local pose
+        auto linkLocalPose = this->WorldToLocal(_pose);
+
+        // Update inspector only
+        linksIt.second->inspector->GetLinkConfig()->SetPose(linkLocalPose);
+
+        // Queue to register command once it is finalized
+        this->dataPtr->linkPoseUpdate[linksIt.second] = linkLocalPose;
       }
       break;
     }
@@ -2989,7 +3003,12 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
       // Only register command on MouseRelease
       else
       {
-        this->dataPtr->nestedModelPoseUpdate[nestedModelsIt.second] = _pose;
+        // Get local pose
+        auto nestedModelLocalPose = this->WorldToLocal(_pose);
+
+        // Queue to register command once it is finalized
+        this->dataPtr->nestedModelPoseUpdate[nestedModelsIt.second] =
+            nestedModelLocalPose;
       }
       break;
     }
