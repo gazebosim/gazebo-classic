@@ -41,6 +41,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -425,6 +426,10 @@ namespace gazebo
       /// \param[in] _init True if sensors have been initialized.
       public: void _SetSensorsInitialized(const bool _init);
 
+      /// \brief Return the URI of the world.
+      /// \return URI of this world.
+      public: common::URI URI() const;
+
       /// \brief Get a model name which doesn't equal any existing
       /// model's name, by appending numbers to the given name. If _name is
       /// already unique, the returned value is the same.
@@ -576,6 +581,12 @@ namespace gazebo
 
       /// \brief Thread function for logging state data.
       private: void LogWorker();
+
+      /// \brief Register items in the introspection service.
+      private: void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      private: void UnregisterIntrospectionItems();
 
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
