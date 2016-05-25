@@ -1709,15 +1709,15 @@ bool Model::RemoveJoint(const std::string &_name)
 /////////////////////////////////////////////////
 void Model::SetWindMode(const bool _enable)
 {
-  this->sdf->GetElement("enable_wind")->Set(_enable);
-  for (auto &link : this->links)
+  this->modelDPtr->sdf->GetElement("enable_wind")->Set(_enable);
+  for (auto &link : this->modelDPtr->links)
     link->SetWindMode(_enable);
 }
 
 /////////////////////////////////////////////////
 bool Model::WindMode() const
 {
-  return this->sdf->Get<bool>("enable_wind");
+  return this->modelDPtr->sdf->Get<bool>("enable_wind");
 }
 
 /////////////////////////////////////////////////

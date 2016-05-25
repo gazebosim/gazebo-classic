@@ -697,7 +697,8 @@ void Entity::Fini()
 
   if (this->entityDPtr->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", this->GetScopedName());
+    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+        this->ScopedName());
     this->entityDPtr->requestPub->Publish(*msg, true);
     delete msg;
   }
@@ -722,7 +723,7 @@ void Entity::Fini()
     delete this->entityDPtr->visualMsg;
   this->entityDPtr->visualMsg = NULL;
 
-  this->parentEntity.reset();
+  this->entityDPtr->parentEntity.reset();
 
   Base::Fini();
 }

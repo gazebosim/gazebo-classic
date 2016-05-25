@@ -129,6 +129,13 @@ namespace gazebo
 
       /// \brief Where to send bone info.
       public: transport::PublisherPtr bonePosePub;
+
+      /// \brief Current script time.
+      public: double scriptTime;
+
+      /// \brief Custom trajectory.
+      /// Used to control an actor with a plugin.
+      public: TrajectoryInfoPtr customTrajectoryInfo;
     };
   }
 }

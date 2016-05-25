@@ -106,6 +106,12 @@ namespace gazebo
       /// \brief All the attached batteries.
       public: std::vector<common::BatteryPtr> batteries;
 
+      /// \brief Wind velocity.
+      public: ignition::math::Vector3d windLinearVel;
+
+      /// \brief Update connection to calculate wind velocity.
+      public: event::ConnectionPtr updateConnection;
+
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
       public: std::vector<util::OpenALSourcePtr> audioSources;

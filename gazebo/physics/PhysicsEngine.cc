@@ -109,31 +109,25 @@ void PhysicsEngine::Fini()
 {
   // Clean up transport
   {
-    this->responsePub.reset();
-    this->requestSub.reset();
+    this->physicsEngineDPtr->responsePub.reset();
+    this->physicsEngineDPtr->requestSub.reset();
 
-    this->node.reset();
+    this->physicsEngineDPtr->node.reset();
   }
 
-  if (this->sdf)
+  if (this->physicsEngineDPtr->sdf)
   {
-    this->sdf->Reset();
-    this->sdf.reset();
+    this->physicsEngineDPtr->sdf->Reset();
+    this->physicsEngineDPtr->sdf.reset();
   }
 
-  if (this->contactManager)
+  if (this->physicsEngineDPtr->contactManager)
   {
-    delete this->contactManager;
-    this->contactManager = NULL;
+    delete this->physicsEngineDPtr->contactManager;
+    this->physicsEngineDPtr->contactManager = NULL;
   }
 
-  if (this->physicsUpdateMutex)
-  {
-    delete this->physicsUpdateMutex;
-    this->physicsUpdateMutex = NULL;
-  }
-
-  this->world.reset();
+  this->physicsEngineDPtr->world.reset();
 }
 
 //////////////////////////////////////////////////

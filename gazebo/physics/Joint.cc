@@ -450,12 +450,12 @@ void Joint::Fini()
   }
   this->jointDPtr->sensors.clear();
 
-  this->anchorLink.reset();
-  this->applyDamping.reset();
-  this->childLink.reset();
-  this->model.reset();
-  this->parentLink.reset();
-  this->sdfJoint.reset();
+  this->jointDPtr->anchorLink.reset();
+  this->jointDPtr->applyDamping.reset();
+  this->jointDPtr->childLink.reset();
+  this->jointDPtr->model.reset();
+  this->jointDPtr->parentLink.reset();
+  this->jointDPtr->sdfJoint.reset();
 
   Base::Fini();
 }

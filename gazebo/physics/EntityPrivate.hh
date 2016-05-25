@@ -47,6 +47,9 @@ namespace gazebo
       /// \brief Visual publisher.
       public: transport::PublisherPtr visPub;
 
+      /// \brief Pose publisher.
+      public: transport::PublisherPtr posePub;
+
       /// \brief Request publisher.
       public: transport::PublisherPtr requestPub;
 

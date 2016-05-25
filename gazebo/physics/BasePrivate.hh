@@ -55,6 +55,9 @@ namespace gazebo
       /// \brief The type of this object.
       public: unsigned int type;
 
+      /// \brief The string representation of the type of this object.
+      public: std::string typeStr;
+
       /// \brief True if selected.
       public: bool selected;
 

@@ -775,7 +775,7 @@ void World::Update()
 
   // Give clients a possibility to react to collisions before the physics
   // gets updated.
-  this->dataPtr->updateInfo.realTime = this->GetRealTime();
+  this->dataPtr->updateInfo.realTime = this->RealTime();
   event::Events::beforePhysicsUpdate(this->dataPtr->updateInfo);
 
   DIAG_TIMER_LAP("World::Update", "Events::beforePhysicsUpdate");
@@ -898,31 +898,6 @@ void World::Fini()
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
   this->dataPtr->physicsEngine.reset();
-
-  // Clean mutexes
-  if (this->dataPtr->receiveMutex)
-  {
-    delete this->dataPtr->receiveMutex;
-    this->dataPtr->receiveMutex = NULL;
-  }
-
-  if (this->dataPtr->loadModelMutex)
-  {
-    delete this->dataPtr->loadModelMutex;
-    this->dataPtr->loadModelMutex = NULL;
-  }
-
-  if (this->dataPtr->setWorldPoseMutex)
-  {
-    delete this->dataPtr->setWorldPoseMutex;
-    this->dataPtr->setWorldPoseMutex = NULL;
-  }
-
-  if (this->dataPtr->worldUpdateMutex)
-  {
-    delete this->dataPtr->worldUpdateMutex;
-    this->dataPtr->worldUpdateMutex = NULL;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -2266,7 +2241,7 @@ void World::SetState(const WorldState &_state)
     {
       try
       {
-        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+        std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
         model->Init();
@@ -2282,7 +2257,7 @@ void World::SetState(const WorldState &_state)
     {
       try
       {
-        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+        std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
         LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
       }
@@ -2920,7 +2895,7 @@ void World::SetWindEnabled(const bool _enable)
 
   for (auto const &model : this->dataPtr->models)
   {
-    Link_V links = model->GetLinks();
+    Link_V links = model->Links();
     for (auto const &link : links)
     {
       if (link->WindMode())
