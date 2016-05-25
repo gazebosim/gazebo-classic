@@ -138,7 +138,7 @@ TEST_F(CameraSensor, Timestamp)
   std::string boxName = "box_0";
   double initDist = -3;
   ignition::math::Pose3d boxPose(0, initDist, 0.0, 0, 0, 0);
-  SpawnBox(boxName, ignition::math::Vector3d(0.01, 0.01, 0.1), boxPose.Pos(),
+  SpawnBox(boxName, ignition::math::Vector3d(0.005, 0.005, 0.1), boxPose.Pos(),
       boxPose.Rot().Euler());
 
   gazebo::physics::ModelPtr boxModel = world->GetModel(boxName);
