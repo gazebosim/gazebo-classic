@@ -14,6 +14,8 @@ link_directories(${tinyxml2_LIBRARY_DIRS})
 
 set (sources
   Diagnostics.cc
+  IntrospectionClient.cc
+  IntrospectionManager.cc
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
@@ -33,6 +35,8 @@ endif()
 
 set (headers
   Diagnostics.hh
+  IntrospectionClient.hh
+  IntrospectionManager.hh
   LogPlay.hh
   LogRecord.hh
   OpenAL.hh
@@ -42,6 +46,8 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  IntrospectionClient_TEST.cc
+  IntrospectionManager_TEST.cc
   LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
@@ -70,6 +76,7 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)

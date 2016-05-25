@@ -412,7 +412,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           cachePath = stream.str();
           // Create the directory
 #ifdef _WIN32
-          if (mkdir(cachePath.c_str()) != 0)
+          if (_mkdir(cachePath.c_str()) != 0)
 #else
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
 #endif
