@@ -29,6 +29,7 @@ set (sources
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
+  Futures.cc
   GLWidget.cc
   GuiEvents.cc
   GuiIface.cc
@@ -77,6 +78,7 @@ set (qt_headers
   ConfigWidget.hh
   DataLogger.hh
   Editor.hh
+  Futures.hh
   GLWidget.hh
   HotkeyDialog.hh
   InsertModelWidget.hh
@@ -141,6 +143,7 @@ set (qt_tests
   BuildingEditor_TEST.cc
   ConfigWidget_TEST.cc
   DataLogger_TEST.cc
+  Futures_TEST.cc
   GLWidget_TEST.cc
   GLWidget_TEST2.cc
   GuiIface_TEST.cc
@@ -164,6 +167,7 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
+add_subdirectory(plot)
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
