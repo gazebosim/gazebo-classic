@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,18 @@
  *
 */
 
-#ifndef _MODELSNAP_TEST_HH_
-#define _MODELSNAP_TEST_HH_
+#ifndef GAZEBO_TEST_INTEGRATION_VIEW_ANGLE_HH
+#define GAZEBO_TEST_INTEGRATION_VIEW_ANGLE_HH
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the model snap tool.
-class ModelSnap_TEST : public QTestFixture
+/// \brief A test class for the view angle widget
+class ViewAngleTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Verify highlights when snapping models
-  private slots: void Highlight();
-
-  /// \brief Test snapping models.
-  private slots: void Snap();
+  /// \brief Test setting view angle in orthographic view
+  private slots: void OrthoProjection();
 };
 
 #endif
