@@ -168,7 +168,9 @@ set(qt_tests
   insert_model.cc
   model_editor.cc
   model_manipulation.cc
+  mouse_pick.cc
   undo.cc
+  view_angle.cc
   view_control.cc
   visual_pose.cc
 )
