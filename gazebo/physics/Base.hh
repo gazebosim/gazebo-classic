@@ -318,6 +318,12 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      protected: virtual void UnregisterIntrospectionItems();
+
       /// \brief Compute the scoped name of this object based on its
       /// parents.
       /// \sa Base::GetScopedName
@@ -334,6 +340,9 @@ namespace gazebo
 
       /// \brief Pointer to the world.
       protected: WorldPtr world;
+
+      /// \brief All the introspection items regsitered for this.
+      protected: std::vector<common::URI> introspectionItems;
 
       /// \brief Set to true if the object should be saved.
       private: bool saveable;
