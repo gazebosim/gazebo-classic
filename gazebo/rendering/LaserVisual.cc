@@ -163,29 +163,49 @@ void LaserVisual::Update()
       {
         dPtr->rayLines[j]->AddPoint(offset.Pos());
         if (std::isinf(r))
-          dPtr->rayLines[j]->AddPoint(noHitPt);
+        {
+          if (r > 0)
+            dPtr->rayLines[j]->AddPoint(noHitPt);
+          else
+            dPtr->rayLines[j]->AddPoint(offset.Pos());
+        }
         else
+        {
           dPtr->rayLines[j]->AddPoint(pt);
+        }
       }
       else
       {
         dPtr->rayLines[j]->SetPoint(i*2, offset.Pos());
         if (std::isinf(r))
-          dPtr->rayLines[j]->SetPoint(i*2+1, noHitPt);
+        {
+          if (r > 0)
+            dPtr->rayLines[j]->SetPoint(i*2+1, noHitPt);
+          else
+            dPtr->rayLines[j]->SetPoint(i*2+1, offset.Pos());
+        }
         else
+        {
           dPtr->rayLines[j]->SetPoint(i*2+1, pt);
+        }
       }
 
       // Draw the triangle fan that fill in the gaps for the laser rays
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
       {
         dPtr->rayFans[j]->AddPoint(pt);
-        dPtr->noHitRayFans[j]->AddPoint(noHitPt);
+        if (r > 0)
+          dPtr->noHitRayFans[j]->AddPoint(noHitPt);
+        else
+          dPtr->noHitRayFans[j]->AddPoint(offset.Pos());
       }
       else
       {
         dPtr->rayFans[j]->SetPoint(i+1, pt);
-        dPtr->noHitRayFans[j]->SetPoint(i+1, noHitPt);
+        if (r > 0)
+          dPtr->noHitRayFans[j]->SetPoint(i+1, noHitPt);
+        else
+          dPtr->noHitRayFans[j]->SetPoint(i+1, offset.Pos());
       }
 
       angle += dPtr->laserMsg->scan().angle_step();

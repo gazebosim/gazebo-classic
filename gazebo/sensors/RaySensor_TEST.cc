@@ -190,7 +190,7 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
-    EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(ranges[i], -GZ_DBL_INF);
     EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
     EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
     EXPECT_EQ(sensor->Fiducial(i), -1);

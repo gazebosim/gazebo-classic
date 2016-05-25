@@ -106,7 +106,7 @@ void MultiRayShape::Init()
       ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
       axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
-      start = (axis * this->minRange) + this->offset.pos;
+      start = this->offset.pos;
       end = (axis * this->maxRange) + this->offset.pos;
 
       this->AddRay(start, end);
@@ -140,7 +140,7 @@ double MultiRayShape::GetRange(unsigned int _index)
   }
 
   // Add min range, because we measured from min range.
-  return this->GetMinRange() + this->rays[_index]->GetLength();
+  return this->rays[_index]->GetLength();
 }
 
 //////////////////////////////////////////////////
@@ -174,15 +174,12 @@ int MultiRayShape::GetFiducial(unsigned int _index)
 //////////////////////////////////////////////////
 void MultiRayShape::Update()
 {
-  // The measurable range is (max-min)
-  double fullRange = this->GetMaxRange() - this->GetMinRange();
-
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
   unsigned int raySize = this->rays.size();
   for (unsigned int i = 0; i < raySize; ++i)
   {
-    this->rays[i]->SetLength(fullRange);
+    this->rays[i]->SetLength(this->maxRange);
     this->rays[i]->SetRetro(0.0);
 
     // Get the global points of the line
