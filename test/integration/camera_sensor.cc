@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <ignition/math/Rand.hh>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
@@ -42,6 +43,24 @@ int imageCount = 0;
 int imageCount2 = 0;
 std::string pixelFormat = "";
 
+std::vector<gazebo::msgs::ImageStamped> imagesStamped;
+
+/////////////////////////////////////////////////
+ignition::math::Vector2i GetScreenSpaceCoords(ignition::math::Vector3d _pt,
+    gazebo::rendering::CameraPtr _cam)
+{
+  // Convert from 3D world pos to 2D screen pos
+  Ogre::Vector3 pos = _cam->OgreCamera()->getProjectionMatrix() *
+      _cam->OgreCamera()->getViewMatrix() *
+      gazebo::rendering::Conversions::Convert(_pt);
+
+  ignition::math::Vector2i screenPos;
+  screenPos.X() = ((pos.x / 2.0) + 0.5) * _cam->ViewportWidth();
+  screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * _cam->ViewportHeight();
+
+  return screenPos;
+}
+
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
@@ -53,6 +72,243 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   pixelFormat = _format;
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
+}
+
+/////////////////////////////////////////////////
+void OnImage(ConstImageStampedPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  gazebo::msgs::ImageStamped imgStamped;
+  imgStamped.CopyFrom(*_msg.get());
+  imagesStamped.push_back(imgStamped);
+}
+
+/////////////////////////////////////////////////
+// Move a tall thin box across the center of the camera image
+// (from -y to +y) over time and collect camera sensor timestamped images.
+// For every image collected, extract center of box from image, and compare it
+// against analytically computed box position.
+TEST_F(CameraSensor, Timestamp)
+{
+  Load("worlds/empty_test.world", true);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // variables for testing
+  // camera image width
+  unsigned int width  = 640;
+  // camera image height
+  unsigned int height = 480;
+  // camera sensor update rate
+  double sensorUpdateRate = 30;
+  // Speed at which the box is moved, in meters per second
+  double boxMoveVel = 1.0;
+
+  // world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // set gravity to 0, 0, 0
+  world->SetGravity(ignition::math::Vector3d::Zero);
+  EXPECT_EQ(world->Gravity(), ignition::math::Vector3d::Zero);
+
+  // spawn camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(-5, 0, 0), ignition::math::Quaterniond(0, 0, 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, sensorUpdateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(camSensor != NULL);
+  camSensor->SetActive(true);
+  EXPECT_TRUE(camSensor->IsActive());
+
+  // spawn a tall thin box in front of camera but out of its view at neg y;
+  std::string boxName = "box_0";
+  double initDist = -3;
+  ignition::math::Pose3d boxPose(0, initDist, 0.0, 0, 0, 0);
+  SpawnBox(boxName, ignition::math::Vector3d(0.01, 0.01, 0.1), boxPose.Pos(),
+      boxPose.Rot().Euler());
+
+  gazebo::physics::ModelPtr boxModel = world->GetModel(boxName);
+  EXPECT_TRUE(boxModel != NULL);
+
+  // step 100 times - this will be the start time for our experiment
+  int startTimeIt = 100;
+  world->Step(startTimeIt);
+
+  // clear the list of timestamp images
+  imagesStamped.clear();
+
+  // verify that time moves forward
+  double t = world->GetSimTime().Double();
+  EXPECT_GT(t, 0);
+
+  // Initialize gazebo transport layer
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  // subscribe to camera topic and collect timestamp images
+  std::string cameraTopic = camSensor->Topic();
+  EXPECT_TRUE(!cameraTopic.empty());
+  transport::SubscriberPtr sub = node->Subscribe(cameraTopic, OnImage);
+
+  // get physics engine
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+
+  // move the box for a period of 6 seconds along +y
+  unsigned int period = 6;
+  double stepSize = physics->GetMaxStepSize();
+  unsigned int iterations = static_cast<unsigned int>(period*(1.0/stepSize));
+
+  for (unsigned int i = 0; i < iterations; ++i)
+  {
+    double dist = (i+1)*(boxMoveVel*stepSize);
+    // move the box along y
+    boxModel->SetWorldPose(
+        ignition::math::Pose3d(0, initDist+ dist, 0, 0, 0, 0));
+    world->Step(1);
+    EXPECT_EQ(boxModel->GetWorldPose().pos.y, initDist + dist);
+  }
+
+  // wait until we get all timestamp images
+  int sleep = 0;
+  int maxSleep = 20;
+  unsigned int imgSampleSize = period / (1.0 / sensorUpdateRate);
+  while (sleep < maxSleep)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (imagesStamped.size() >= imgSampleSize)
+      break;
+    sleep++;
+    gazebo::common::Time::MSleep(10);
+  }
+
+  EXPECT_GE(imagesStamped.size(), imgSampleSize);
+
+  // stop the camera subscriber
+  sub.reset();
+
+  // compute expected 2D pos of box and compare it against the
+  // actual pos of the box found in the timestamp images.
+  unsigned int imgSize = width * height * 3;
+  img = new unsigned char[imgSize];
+  double prevTime = startTimeIt*stepSize;
+  for (auto &msg : imagesStamped)
+  {
+    // time t
+    gazebo::common::Time timestamp = gazebo::msgs::Convert(msg.time());
+    double t = timestamp.Double();
+
+    // verify sensor update rate
+    /* double dt = t - prevTime;
+    if (dt < 1.0/sensorUpdateRate)
+    {
+
+      gzdbg << "Camera update occurred earlier than expected. "
+          << "It's probably trying to catch up to the target framerate."
+          << std::endl;
+      gzdbg << " dt: " << dt << " vs update period: " <<
+          1.0/sensorUpdateRate << std::endl;
+
+    }
+    else
+    {
+      // that's a generous tolerance to account for the sensor update
+      // catch-up strategy - maybe we should be stricter on the timestamp.
+      EXPECT_NEAR(dt, 1.0/sensorUpdateRate, 2*stepSize)
+          << dt << " vs " << 1.0/sensorUpdateRate << std::endl;
+    }
+    prevTime = t;*/
+
+    // calculate expected box pose at time=t
+    int it = t * (1.0 / stepSize) - startTimeIt;
+    double dist = it*(boxMoveVel*stepSize);
+    // project box 3D pos to screen space
+    ignition::math::Vector2i p2 = GetScreenSpaceCoords(
+        ignition::math::Vector3d(0, initDist + dist, 0), camSensor->Camera());
+
+    // find actual box pose at time=t
+    // walk along the middle row of the img and identify center of box
+    int left = -1;
+    int right = -1;
+    bool transition = false;
+    unsigned int halfHeight = height * 0.5;
+    memcpy(img, msg.image().data().c_str(), imgSize);
+    for (unsigned int i = 0; i < width; ++i)
+    {
+      int row = halfHeight * width * 3;
+      int r = img[row + i*3];
+      int g = img[row + i*3+1];
+      int b = img[row + i*3+2];
+
+      // bg color determined experimentally
+      int bgColor = 178;
+
+      if (r < bgColor && g < bgColor && b < bgColor)
+      {
+        if (!transition)
+        {
+          left = i;
+          transition = true;
+        }
+      }
+      else if (transition)
+      {
+        right = i-1;
+        break;
+      }
+    }
+
+    // if box is out of camera view, expect no box found in image
+    if (p2.X() < 0 || p2.X () > static_cast<int>(width))
+    {
+      EXPECT_TRUE(left < 0 || right < 0)
+          << "Expected box pos: " << p2 << "\n"
+          << "Actual box left: " << left << ", right: " << right;
+    }
+    else
+    {
+      double mid = -1;
+      // left and right of box found in image
+      if (left >= 0 && right >= 0)
+      {
+        mid = (left + right) * 0.5;
+      }
+      // edge case - box at edge of image
+      else if ((left < 0 || right < 0) && left != right)
+      {
+        mid = (left > right) ? left : right;
+      }
+      else
+      {
+        FAIL() << "No box found in image.\n"
+               << "time: " << t << "\n"
+               << "Expected box pos: " << p2 << "\n"
+               << "Actual box left: " << left << ", right: " << right;
+      }
+
+      EXPECT_GE(mid, 0);
+
+      // expected box pos should roughly be equal to actual box pos +- 1 pixel
+      EXPECT_NEAR(mid, p2.X(), 1.0) << "Expected box pos: " << p2 << "\n"
+          << "Actual box left: " << left << ", right: " << right;
+    }
+  }
+
+  delete [] img;
 }
 
 
