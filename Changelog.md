@@ -5,8 +5,12 @@
 1. Include basic support for GNU Precompiled Headers to reduce compile time
     * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
 
+1. Add Introspection Manager and Client util
+    * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
+
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
+    * [Pull request #2317](https://bitbucket.org/osrf/gazebo/pull-request/2317)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
 
 1. Remove EntityMakerPrivate and move its members to derived classes
@@ -70,6 +74,12 @@
 
     1. Undo / redo inserting and deleting nested models
         * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
+
+    1. Undo insert / delete joints
+        * [Pull request #2266](https://bitbucket.org/osrf/gazebo/pull-request/2266)
+
+    1. Undo translate, rotate, snap and align links and nested models
+        * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
 
 ## Gazebo 7
 

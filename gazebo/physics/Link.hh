@@ -660,6 +660,9 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadBattery(const sdf::ElementPtr _sdf);
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
