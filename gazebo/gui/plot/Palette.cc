@@ -771,8 +771,8 @@ void Palette::FillModels()
 
   if (managerIds.empty())
   {
-    std::cerr << "No introspection managers detected." << std::endl;
-    std::cerr << "Is a gzserver running?" << std::endl;
+    gzerr << "No introspection managers detected." << std::endl;
+    gzerr << "Is a gzserver running?" << std::endl;
     return;
   }
 
