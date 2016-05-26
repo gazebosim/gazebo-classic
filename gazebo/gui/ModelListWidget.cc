@@ -339,9 +339,16 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     {
       if (this->dataPtr->requestPub)
       {
-        qDebug() << this->dataPtr->selectedEntityName.c_str();
-        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+        if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
+        {
+          this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
             this->dataPtr->selectedEntityName);
+        }
+        else
+        {
+          this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+           this->dataPtr->selectedEntityName);
+        }
         this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
@@ -560,17 +567,8 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
       this->dataPtr->requestMsg->id())
     return;
 
-  qDebug() << "OnResponse";
-
-  qDebug() << _msg->type().c_str();
-
-  //qDebug() << this->dataPtr->pluginMsg.GetTypeName().c_str();
-
-  std::cout << _msg->DebugString() << std::endl;
-
   if (_msg->has_type() && _msg->type() == this->dataPtr->modelMsg.GetTypeName())
   {
-    qDebug() << "OnResponse Model";
     this->dataPtr->propMutex->lock();
     this->dataPtr->modelMsg.ParseFromString(_msg->serialized_data());
     this->dataPtr->fillTypes.push_back("Model");
@@ -598,7 +596,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     else if (_msg->has_type() && _msg->type() ==
       this->dataPtr->pluginMsg.GetTypeName())
   {
-    qDebug() << "plugin response";
     this->dataPtr->propMutex->lock();
     this->dataPtr->pluginMsg.ParseFromString(_msg->serialized_data());
     this->dataPtr->fillTypes.push_back("Plugin");

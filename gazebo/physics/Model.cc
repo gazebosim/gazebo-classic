@@ -58,6 +58,7 @@ Model::Model(BasePtr _parent)
   : Entity(_parent)
 {
   this->AddType(MODEL);
+  this->receiveMutex = new boost::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
@@ -112,30 +113,22 @@ void Model::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::OnRequest(ConstRequestPtr &_msg)
 {
-  //boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Response response;
 
   std::list<msgs::Request> requestMsgs;
 
   requestMsgs.push_back(*_msg);
 
-  //auto const &requestMsg = _msg;
-
   for (auto const &requestMsg : requestMsgs)
   {
   bool send = true;
-  //response.set_id(_msg.id());
+  response.set_id(requestMsg.id());
   response.set_request(requestMsg.request());
   response.set_response("success");
 
-    if (requestMsg.request() == "entity_info")
+    if (requestMsg.request() == "model_plugin_info")
     {
-      //BasePtr entity = this->dataPtr->rootElement->GetByName(requestMsg.data());
-
-      printf("%s\n", requestMsg.data().c_str());
-
-      printf("%s\n", "Plugin");
-
       msgs::Plugin pluginMsg;
 
       if (this->sdf->HasElement("plugin"))
@@ -143,14 +136,12 @@ void Model::OnRequest(ConstRequestPtr &_msg)
         sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
         while (pluginElem)
         {
-          //auto pluginMsg = _msg.add_plugin();
           std::string pluginName = pluginElem->Get<std::string>("name");
 
           if(pluginName == requestMsg.data().c_str())
           {
             pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
             std::string *serializedData = response.mutable_serialized_data();
-            //printf("%s\n", serializedData->c_str());
             pluginMsg.SerializeToString(serializedData);
             response.set_type(pluginMsg.GetTypeName());
 
