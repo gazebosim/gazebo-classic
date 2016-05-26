@@ -68,7 +68,8 @@ void help()
 }
 
 /////////////////////////////////////////////////
-static void kill_one_process(int _pid, bool *_killed, int *_status, double _waittime, std::string _name)
+static void kill_one_process(int _pid, bool *_killed, int *_status,
+                             double _waittime, std::string _name)
 {
   kill(_pid, SIGINT);
   double sleepSecs = 0.001;
@@ -120,7 +121,7 @@ int main(int _argc, char **_argv)
   if (sigaction(SIGINT, &sigact, NULL))
   {
     std::cerr << "Stopping. Unable to catch SIGINT.\n"
-          << " Please visit http://gazebosim.org/support.html for help.\n";
+              << " Please visit http://gazebosim.org/support.html for help.\n";
     return 0;
   }
 
