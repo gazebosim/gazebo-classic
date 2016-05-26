@@ -62,16 +62,18 @@ ModelManipulator::~ModelManipulator()
 /////////////////////////////////////////////////
 void ModelManipulator::Clear()
 {
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
-  this->dataPtr->node.reset();
   this->dataPtr->mouseMoveVis.reset();
   this->dataPtr->mouseChildVisualScale.clear();
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
   this->dataPtr->initialized = false;
+  this->dataPtr->node.reset();
 }
 
 /////////////////////////////////////////////////

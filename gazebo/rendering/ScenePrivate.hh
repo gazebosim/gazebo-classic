@@ -19,6 +19,7 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <mutex>
@@ -329,6 +330,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Pointer to road renderer.
+      public: std::unique_ptr<Road2d> road;
     };
   }
 }

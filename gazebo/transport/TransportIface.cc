@@ -136,6 +136,8 @@ void transport::stop()
 /////////////////////////////////////////////////
 void transport::fini()
 {
+  transport::TopicManager::Instance()->Fini();
+  transport::ConnectionManager::Instance()->Fini();
   transport::stop();
   if (g_runThread)
   {
@@ -143,8 +145,6 @@ void transport::fini()
     delete g_runThread;
     g_runThread = NULL;
   }
-  transport::TopicManager::Instance()->Fini();
-  transport::ConnectionManager::Instance()->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -231,6 +231,7 @@ boost::shared_ptr<msgs::Response> transport::request(
     }
   }
 
+  node->Fini();
   requestPub.reset();
   responseSub.reset();
   node.reset();

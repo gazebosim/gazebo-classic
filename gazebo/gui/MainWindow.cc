@@ -243,9 +243,9 @@ MainWindow::MainWindow()
           this, SLOT(OnTrackVisual(const std::string &)), Qt::QueuedConnection);
 
   // Create data logger dialog
-  this->dataPtr->dataLogger = new gui::DataLogger(this);
-  connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
-    OnDataLoggerClosed()));
+  this->dataPtr->dataLogger.reset(new gui::DataLogger(this));
+  connect(this->dataPtr->dataLogger.get(), SIGNAL(rejected()), this, SLOT(
+              OnDataLoggerClosed()));
 
   // Hotkey dialog
   this->dataPtr->hotkeyDialog = NULL;
@@ -372,6 +372,23 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->tabWidget->hide();
   this->dataPtr->toolsWidget->hide();
 
+  this->dataPtr->node->Fini();
+  this->dataPtr->pluginMsgs.clear();
+
+  this->dataPtr->worldControlPub.reset();
+  this->dataPtr->serverControlPub.reset();
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->scenePub.reset();
+  this->dataPtr->userCmdPub.reset();
+  this->dataPtr->responseSub.reset();
+  this->dataPtr->guiSub.reset();
+  this->dataPtr->newEntitySub.reset();
+  this->dataPtr->worldModSub.reset();
+  this->dataPtr->lightModifySub.reset();
+  this->dataPtr->lightFactorySub.reset();
+
+  this->dataPtr->node.reset();
+
   this->dataPtr->connections.clear();
 
 #ifdef HAVE_OCULUS
@@ -388,8 +405,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->spacenav = NULL;
 
   emit Close();
-
-  gazebo::client::shutdown();
 }
 
 /////////////////////////////////////////////////

@@ -392,10 +392,10 @@ ModelCreator::~ModelCreator()
   this->dataPtr->allLinks.clear();
   this->dataPtr->allModelPlugins.clear();
   this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
   this->dataPtr->modelTemplateSDF.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->makerPub.reset();
+  this->dataPtr->node.reset();
   this->dataPtr->connections.clear();
 
   delete this->dataPtr->saveDialog;
