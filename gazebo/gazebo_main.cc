@@ -25,8 +25,10 @@
 
 bool sig_killed = false;
 int status1, status2;
-pid_t pid1;  // pid of server process
-pid_t pid2;  // pid of client process
+// pid of server process
+pid_t pid1;
+// pid of client process
+pid_t pid2;
 bool killed1 = false;
 bool killed2 = false;
 
