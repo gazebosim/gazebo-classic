@@ -6,7 +6,7 @@
     * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
 
 1. Add plotting utility palatte
-    * [Pull request #2XXX](https://bitbucket.org/osrf/gazebo/pull-request/2XXX)
+    * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
 
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
