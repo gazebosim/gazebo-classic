@@ -218,7 +218,7 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
        boost::bind(&ModelTreeWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedLink(
+     gui::model::Events::ConnectSetSelectedEntity(
        boost::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
@@ -285,9 +285,9 @@ void ModelTreeWidget::OnItemSelectionChanged()
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
     if (type == "Link")
-      gui::model::Events::setSelectedLink(name, true);
+      gui::model::Events::setSelectedEntity(name, true);
     if (type == "Nested Model")
-      gui::model::Events::setSelectedLink(name, true);
+      gui::model::Events::setSelectedEntity(name, true);
     else if (type == "Joint")
       gui::model::Events::setSelectedJoint(name, true);
     else if (type == "Model Plugin")
@@ -303,9 +303,9 @@ void ModelTreeWidget::OnItemSelectionChanged()
       std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
       if (type == "Link")
-        gui::model::Events::setSelectedLink(name, false);
+        gui::model::Events::setSelectedEntity(name, false);
       if (type == "Nested Model")
-        gui::model::Events::setSelectedLink(name, false);
+        gui::model::Events::setSelectedEntity(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
     else if (type == "Model Plugin")
@@ -413,9 +413,9 @@ void ModelTreeWidget::DeselectType(const std::string &_type)
       (*it)->setSelected(false);
       it = this->selected.erase(it);
       if (type == "Link")
-        gui::model::Events::setSelectedLink(name, false);
+        gui::model::Events::setSelectedEntity(name, false);
       if (type == "Nested Model")
-        gui::model::Events::setSelectedLink(name, false);
+        gui::model::Events::setSelectedEntity(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
       else if (type == "Model Plugin")

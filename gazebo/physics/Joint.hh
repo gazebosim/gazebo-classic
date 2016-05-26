@@ -593,6 +593,17 @@ namespace gazebo
       protected: math::Pose ComputeChildLinkPose(unsigned int _index,
           double _position);
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Register position items in the introspection service.
+      /// \param[in] _index Axis index.
+      private: void RegisterIntrospectionPosition(const unsigned int _index);
+
+      /// \brief Register velocity items in the introspection service.
+      /// \param[in] _index Axis index.
+      private: void RegisterIntrospectionVelocity(const unsigned int _index);
+
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
