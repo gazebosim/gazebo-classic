@@ -77,7 +77,7 @@
     1. Undo translate, rotate, snap and align links and nested models
         * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
 
-    1. Undo scale links, remove all ign-math
+    1. Undo scale links, remove all gazebo math
         * [Pull request #2324](https://bitbucket.org/osrf/gazebo/pull-request/2324)
 
 ## Gazebo 7
