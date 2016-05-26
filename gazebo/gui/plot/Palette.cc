@@ -758,7 +758,7 @@ void Palette::FillTopics()
 /////////////////////////////////////////////////
 void Palette::FillModels()
 {
-  // TODO re-enble once Futures is integrated
+  // TODO re-enable once Futures is integrated
   // Make sure that the managers have been retreived.
   // if (Futures::introspectionClientFuture.valid())
   //   Futures::introspectionClientFuture.get();

@@ -5,6 +5,9 @@
 1. Add Introspection Manager and Client util
     * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
 
+1. Add plotting utility palatte
+    * [Pull request #2XXX](https://bitbucket.org/osrf/gazebo/pull-request/2XXX)
+
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
