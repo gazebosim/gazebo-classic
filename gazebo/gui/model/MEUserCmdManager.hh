@@ -70,7 +70,10 @@ namespace gazebo
         MOVING_LINK = 6,
 
         /// \brief Move a nested model.
-        MOVING_NESTED_MODEL = 7
+        MOVING_NESTED_MODEL = 7,
+
+        /// \brief Scale a link.
+        SCALING_LINK = 8
       };
 
       /// \brief Constructor
@@ -116,6 +119,12 @@ namespace gazebo
       /// \param[in] _after Pose after the command, to be used by redo.
       public: void SetPoseChange(const ignition::math::Pose3d &_before,
           const ignition::math::Pose3d &_after);
+
+      /// \brief Set the scale before and after the command.
+      /// \param[in] _before Scale before the command, to be used by undo.
+      /// \param[in] _after Scale after the command, to be used by redo.
+      public: void SetScaleChange(const ignition::math::Vector3d &_before,
+          const ignition::math::Vector3d &_after);
 
       /// \internal
       /// \brief Pointer to private data.

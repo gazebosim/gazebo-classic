@@ -408,15 +408,15 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       return;
     }
 
-    math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
+    auto newScale = this->dataPtr->mouseVisualScale.Ign() * scale.Ign().Abs();
 
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
-      newScale = SnapPoint(newScale);
+      newScale = SnapPoint(newScale).Ign();
       // prevent setting zero scale
-      newScale.x = std::max(1e-4, newScale.x);
-      newScale.y = std::max(1e-4, newScale.y);
-      newScale.z = std::max(1e-4, newScale.z);
+      newScale.X(std::max(1e-4, newScale.X()));
+      newScale.Y(std::max(1e-4, newScale.Y()));
+      newScale.Z(std::max(1e-4, newScale.Z()));
     }
     _vis->SetScale(newScale);
     Events::scaleEntity(_vis->GetName(), newScale);
@@ -448,16 +448,16 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           geomScale = this->UpdateScale(_axis, scale, geomType);
         }
 
-        math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
-            * geomScale.GetAbs();
+        auto newScale = this->dataPtr->mouseChildVisualScale[i].Ign()
+            * geomScale.Ign().Abs();
 
         if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         {
-          newScale = SnapPoint(newScale);
+          newScale = SnapPoint(newScale).Ign();
           // prevent setting zero scale
-          newScale.x = std::max(1e-4, newScale.x);
-          newScale.y = std::max(1e-4, newScale.y);
-          newScale.z = std::max(1e-4, newScale.z);
+          newScale.X(std::max(1e-4, newScale.X()));
+          newScale.Y(std::max(1e-4, newScale.Y()));
+          newScale.Z(std::max(1e-4, newScale.Z()));
         }
 
         childVis->SetScale(newScale);

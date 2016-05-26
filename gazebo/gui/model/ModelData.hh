@@ -125,7 +125,16 @@ namespace gazebo
       /// \return Scale of link.
       public: ignition::math::Vector3d Scale() const;
 
-      /// \brief Set the scale of the link.
+      /// \brief Set the scale of all the inspectors, making the necessary
+      /// conversions to update inertial information.
+      /// This does not alter the internal scale value returned by Scale().
+      /// \sa SetScale
+      /// \param[in] _scale Scale of link.
+      public: void SetInspectorScale(const ignition::math::Vector3d &_scale);
+
+      /// \brief Set the scale of the link. This function calls
+      /// SetInspectorScale.
+      /// \sa SetInspectorScale
       /// \param[in] _scale Scale of link.
       public: void SetScale(const ignition::math::Vector3d &_scale);
 

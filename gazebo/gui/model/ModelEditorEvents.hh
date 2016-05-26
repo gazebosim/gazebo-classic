@@ -197,6 +197,20 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { requestNestedModelInsertion.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request link scale signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkScale(
+            T _subscriber)
+          { return requestLinkScale.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link scale signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkScale(
+            event::ConnectionPtr _subscriber)
+          { requestLinkScale.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the request link move signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -716,6 +730,10 @@ namespace gazebo
         /// \brief Request to insert a model plugin.
         public: static event::EventT<void (std::string, std::string,
             std::string)> requestModelPluginInsertion;
+
+        /// \brief Request to scale a link.
+        public: static event::EventT<void (std::string,
+            ignition::math::Vector3d)> requestLinkScale;
 
         /// \brief Request to move a link.
         public: static event::EventT<void (std::string, ignition::math::Pose3d)>

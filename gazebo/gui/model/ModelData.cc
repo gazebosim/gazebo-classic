@@ -218,12 +218,12 @@ void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 }
 
 /////////////////////////////////////////////////
-void LinkData::SetScale(const ignition::math::Vector3d &_scale)
+void LinkData::SetInspectorScale(const ignition::math::Vector3d &_scale)
 {
   GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
-  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
-  ignition::math::Vector3d dScale = _scale / this->scale;
+  // Update visual config
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   for (auto const &it : this->visuals)
   {
     std::string name = it.first->GetName();
@@ -237,6 +237,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     visualConfig->SetGeometry(leafName, visNewSize);
   }
 
+  // Update collision config
   std::map<std::string, ignition::math::Vector3d> colOldSizes;
   std::map<std::string, ignition::math::Vector3d> colNewSizes;
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
@@ -414,10 +415,18 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   sdf::ElementPtr inertialPoseElem = inertialElem->GetElement("pose");
   ignition::math::Pose3d newPose =
       inertialPoseElem->Get<ignition::math::Pose3d>();
+
+  ignition::math::Vector3d dScale = _scale / this->scale;
   newPose.Pos() *= dScale;
 
   inertialPoseElem->Set(newPose);
   linkConfig->SetInertialPose(newPose);
+}
+
+/////////////////////////////////////////////////
+void LinkData::SetScale(const ignition::math::Vector3d &_scale)
+{
+  this->SetInspectorScale(_scale);
 
   this->scale = _scale;
 }

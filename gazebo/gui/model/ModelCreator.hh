@@ -414,7 +414,7 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _scale New scale.
       private: void OnEntityScaleChanged(const std::string &_name,
-          const gazebo::math::Vector3 &_scale);
+          const ignition::math::Vector3d &_scale);
 
       /// \brief Callback when an entity's pose has changed.
       /// \param[in] _name Name of entity.
@@ -433,6 +433,12 @@ namespace gazebo
 
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
+
+      /// \brief Callback when receiving a request to scale a link.
+      /// \param[in] _name Link name.
+      /// \param[in] _scale New link scale.
+      private: void OnRequestLinkScale(const std::string &_name,
+          const ignition::math::Vector3d &_scale);
 
       /// \brief Callback when receiving a request to move a link.
       /// \param[in] _name Link name.

@@ -53,6 +53,12 @@ namespace gazebo
 
       /// \brief Pose after the command (to be used by redo).
       public: ignition::math::Pose3d poseAfter;
+
+      /// \brief Scale before the command (to be used by undo).
+      public: ignition::math::Vector3d scaleBefore;
+
+      /// \brief Scale after the command (to be used by redo).
+      public: ignition::math::Vector3d scaleAfter;
     };
 
     /// \internal
@@ -150,6 +156,13 @@ void MEUserCmd::Undo()
     model::Events::requestNestedModelMove(this->dataPtr->scopedName,
         this->dataPtr->poseBefore);
   }
+  // Scaling a link
+  else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkScale(this->dataPtr->scopedName,
+        this->dataPtr->scaleBefore);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -210,6 +223,13 @@ void MEUserCmd::Redo()
     model::Events::requestNestedModelMove(this->dataPtr->scopedName,
         this->dataPtr->poseAfter);
   }
+  // Scaling a link
+  else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkScale(this->dataPtr->scopedName,
+        this->dataPtr->scaleAfter);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -248,6 +268,14 @@ void MEUserCmd::SetPoseChange(const ignition::math::Pose3d &_before,
 {
   this->dataPtr->poseBefore = _before;
   this->dataPtr->poseAfter = _after;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetScaleChange(const ignition::math::Vector3d &_before,
+    const ignition::math::Vector3d &_after)
+{
+  this->dataPtr->scaleBefore = _before;
+  this->dataPtr->scaleAfter = _after;
 }
 
 /////////////////////////////////////////////////

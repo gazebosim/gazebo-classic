@@ -179,9 +179,8 @@ namespace gazebo
       /// \brief Mutex to protect updates
       public: std::recursive_mutex updateMutex;
 
-      /// \todo add this back when undo scaling is implemented
       /// \brief A list of link names whose scale has changed externally.
-      // public: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
+      public: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
 
       /// \brief A list of link data whose pose has changed externally.
       /// This is the link's local pose.
@@ -373,6 +372,11 @@ ModelCreator::ModelCreator(QObject *_parent)
       gui::model::Events::ConnectRequestModelPluginInsertion(
       std::bind(&ModelCreator::OnAddModelPlugin, this,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestLinkScale(
+      std::bind(&ModelCreator::OnRequestLinkScale, this, std::placeholders::_1,
+      std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestLinkMove(
@@ -2056,7 +2060,21 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  /// \todo End scaling links
+  // End scaling links
+  for (auto link : this->dataPtr->linkScaleUpdate)
+  {
+    // Register command
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Scale [" + link.first->Name() + "]", MEUserCmd::SCALING_LINK);
+    cmd->SetScopedName(link.first->linkVisual->GetName());
+    cmd->SetScaleChange(link.first->Scale(), link.second);
+
+    // Update data and inspector
+    link.first->SetScale(link.second);
+  }
+  if (!this->dataPtr->linkScaleUpdate.empty())
+    this->ModelChanged();
+  this->dataPtr->linkScaleUpdate.clear();
 
   // End moving links
   for (auto link : this->dataPtr->linkPoseUpdate)
@@ -2920,7 +2938,7 @@ void ModelCreator::ModelChanged()
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
-  const gazebo::math::Vector3 &_scale)
+  const ignition::math::Vector3d &_scale)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   for (auto linksIt : this->dataPtr->allLinks)
@@ -2931,8 +2949,12 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
-      // Update data
-      linksIt.second->SetScale(_scale.Ign());
+      // Update inspector only
+      linksIt.second->SetInspectorScale(_scale);
+
+      // Queue to register command once it is finalized
+      this->dataPtr->linkScaleUpdate[linksIt.second] = _scale;
+
       break;
     }
   }
@@ -3146,6 +3168,29 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   ModelPluginData *modelPlugin = it->second;
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnRequestLinkScale(const std::string &_name,
+    const ignition::math::Vector3d &_scale)
+{
+  auto link = this->dataPtr->allLinks.find(_name);
+  if (link == this->dataPtr->allLinks.end())
+    return;
+
+  auto vis = link->second->linkVisual;
+  for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
+  {
+    auto childVis = vis->GetChild(i);
+    auto geomType = childVis->GetGeometryType();
+    if (geomType != "" && geomType != "mesh")
+    {
+      /// \todo Different geoms might be scaled differently
+      childVis->SetScale(_scale);
+    }
+  }
+
+  link->second->SetScale(_scale);
 }
 
 /////////////////////////////////////////////////
