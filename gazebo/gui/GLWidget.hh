@@ -170,7 +170,7 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: bool eventFilter(QObject *_obj, QEvent *_event);
+      //private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       private: void ClearSelection();
 

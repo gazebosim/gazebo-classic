@@ -71,24 +71,29 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->copyEntityName = "";
   this->dataPtr->modelEditorEnabled = false;
 
-  this->setFocusPolicy(Qt::StrongFocus);
 
   this->dataPtr->windowId = -1;
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
-  this->dataPtr->renderFrame = new QFrame;
+  /*this->dataPtr->renderFrame = new QFrame;
   this->dataPtr->renderFrame->setFrameShape(QFrame::NoFrame);
   this->dataPtr->renderFrame->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
   this->dataPtr->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->dataPtr->renderFrame->show();
+  this->dataPtr->renderFrame->setMouseTracking(true);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->dataPtr->renderFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
+  */
+
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -125,9 +130,6 @@ GLWidget::GLWidget(QWidget *_parent)
         std::bind(&GLWidget::OnAlignMode, this, std::placeholders::_1,
           std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5)));
-
-  this->dataPtr->renderFrame->setMouseTracking(true);
-  this->setMouseTracking(true);
 
   this->dataPtr->entityMaker = NULL;
 
@@ -215,22 +217,22 @@ GLWidget::~GLWidget()
 }
 
 /////////////////////////////////////////////////
-bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
-{
-  if (_event->type() == QEvent::Enter)
-  {
-    this->setFocus(Qt::OtherFocusReason);
-    return true;
-  }
-
-  return false;
-}
+//bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
+//{
+//  if (_event->type() == QEvent::Enter)
+//  {
+//    this->setFocus(Qt::OtherFocusReason);
+//    return true;
+//  }
+//
+//  return false;
+//}
 
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
   // These two functions are most applicable for Linux.
-  QApplication::flush();
+  //QApplication::flush();
 
   // Get the window handle in a form that OGRE can use.
   std::string winHandle = this->OgreHandle();
@@ -248,7 +250,7 @@ void GLWidget::showEvent(QShowEvent *_event)
   QWidget::showEvent(_event);
 
   // Grab focus.
-  this->setFocus();
+  //this->setFocus();
 }
 
 /////////////////////////////////////////////////
@@ -274,12 +276,13 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->Initialized())
   {
-    event::Events::preRender();
+    /*event::Events::preRender();
 
     // Tell all the cameras to render
     event::Events::render();
 
     event::Events::postRender();
+    */
   }
   else
   {
@@ -918,18 +921,22 @@ std::string GLWidget::OgreHandle() const
 
 #if defined(__APPLE__)
   ogreHandle = std::to_string(this->winId());
-#elif defined(WIN32)
-  ogreHandle = std::to_string(
+/*#elif defined(WIN32)
+ ogreHandle = std::to_string(
       reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
+      */
 #else
-  QWidget *qParent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
+  ogreHandle = std::to_string(static_cast<uint64_t>(this->winId()));
+  /*QWidget *qParent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
   GZ_ASSERT(qParent, "qParent is null");
 
   ogreHandle =
     std::to_string(reinterpret_cast<uint64_t>(QX11Info::display())) + ":" +
     std::to_string(static_cast<uint32_t>(QX11Info::appScreen())) + ":" +
     std::to_string(static_cast<uint64_t>(qParent->winId()));
+    */
 #endif
+  std::cout << "Ogre handle[" << ogreHandle << "]\n";
 
   return ogreHandle;
 }
@@ -1333,7 +1340,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

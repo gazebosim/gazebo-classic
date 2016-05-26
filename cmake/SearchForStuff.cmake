@@ -545,8 +545,19 @@ endif()
 # Find QT
 find_package (Qt5Widgets)
 if (NOT Qt5Widgets_FOUND)
-  BUILD_ERROR("Missing: Qt5")
+  BUILD_ERROR("Missing: Qt5Widgets")
 endif()
+
+find_package (Qt5Core)
+if (NOT Qt5Core_FOUND)
+  BUILD_ERROR("Missing: Qt5Core")
+endif()
+
+find_package (Qt5OpenGL)
+if (NOT Qt5OpenGL_FOUND)
+  BUILD_ERROR("Missing: Qt5OpenGL")
+endif()
+
 # Only look for Qt5X11Extras on Unix.
 if (UNIX AND NOT APPLE)
   find_package (Qt5X11Extras)

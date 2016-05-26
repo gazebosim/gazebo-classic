@@ -20,6 +20,7 @@
 
 #pragma GCC system_header
 
+#include <QtGui/QWindow>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QPushButton>
 #include <QtCore/QtCore>
