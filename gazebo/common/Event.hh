@@ -18,10 +18,11 @@
 #define GAZEBO_COMMON_EVENT_HH_
 
 #include <atomic>
-#include <map>
-#include <mutex>
-#include <list>
 #include <functional>
+#include <list>
+#include <map>
+#include <memory>
+#include <mutex>
 
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>
@@ -542,7 +543,7 @@ namespace gazebo
 
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
-      typedef std::map<int, std::shared_ptr<EventConnection>> EvtConnectionMap;
+      typedef std::map<int, std::unique_ptr<EventConnection>> EvtConnectionMap;
 
       /// \brief Array of connection callbacks.
       private: EvtConnectionMap connections;
