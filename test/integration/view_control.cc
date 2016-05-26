@@ -29,15 +29,21 @@ void MouseZoom(QWidget *_widget)
 {
   // There seem to be a problem simulating mouse drag using QTest
   // so use raw QMouseEvent.
+
+  // move the mouse cursor to the center of the widget
   QPoint midPt(_widget->width()*0.5, _widget->height()*0.5);
   QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, midPt,
       _widget->mapToGlobal(midPt), Qt::RightButton, Qt::RightButton,
       Qt::NoModifier);
   QApplication::postEvent(_widget, pressEvent);
 
-  for (unsigned int i = 0; i < 10; ++i)
+  // move the cursor in y for a quarter of the widget height
+  double destY = 0.25;
+  unsigned int steps = 10;
+  for (unsigned int i = 0; i < steps; ++i)
   {
-    double dy = 0.5 - (0.25 * 0.1 * (i+1));
+    // compute the next y pos to move the mouse cursor to.
+    double dy = 0.5 - (destY * (1.0 / steps) * (i+1));
 
     QPoint movePt(_widget->width()*0.5, _widget->height()*dy);
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, movePt,
@@ -49,7 +55,7 @@ void MouseZoom(QWidget *_widget)
     QCoreApplication::processEvents();
   }
 
-  QPoint releasePt(_widget->width()*0.5, _widget->height()*0.25);
+  QPoint releasePt(_widget->width()*0.5, _widget->height()*destY);
   QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
       releasePt, _widget->mapToGlobal(releasePt), Qt::RightButton,
       Qt::RightButton, Qt::NoModifier);
