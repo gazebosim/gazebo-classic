@@ -67,6 +67,15 @@ void QTestFixture::initTestCase()
 /////////////////////////////////////////////////
 void QTestFixture::init()
 {
+  // Set environment variable
+  char *env = getenv("IN_TESTSUITE");
+  QVERIFY(env == nullptr);
+
+  setenv("IN_TESTSUITE", "1", 1);
+
+  env = getenv("IN_TESTSUITE");
+  QVERIFY(env != nullptr);
+
   this->resMaxPercentChange = 3.0;
   this->shareMaxPercentChange = 1.0;
 
@@ -177,6 +186,15 @@ void QTestFixture::cleanup()
   // Make sure the percent change values are reasonable.
   QVERIFY(resPercentChange < this->resMaxPercentChange);
   QVERIFY(sharePercentChange < this->shareMaxPercentChange);
+
+  // Unset environment variable
+  char *env = getenv("IN_TESTSUITE");
+  QVERIFY(env != nullptr);
+
+  unsetenv("IN_TESTSUITE");
+
+  env = getenv("IN_TESTSUITE");
+  QVERIFY(env == nullptr);
 }
 
 /////////////////////////////////////////////////

@@ -197,6 +197,36 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { requestNestedModelInsertion.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request link move signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkMove(
+            T _subscriber)
+          { return requestLinkMove.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link move signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkMove(
+            event::ConnectionPtr _subscriber)
+          { requestLinkMove.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request nested model move
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelMove(
+            T _subscriber)
+          { return requestNestedModelMove.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model move
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelMove(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelMove.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the nested model inserted signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -456,15 +486,15 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectSetSelectedLink(T _subscriber)
-          { return setSelectedLink.Connect(_subscriber); }
+            ConnectSetSelectedEntity(T _subscriber)
+          { return setSelectedEntity.Connect(_subscriber); }
 
         /// \brief Disconnect a Gazebo event from the set selected entity
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSetSelectedLink(
+        public: static void DisconnectSetSelectedEntity(
             event::ConnectionPtr _subscriber)
-          { setSelectedLink.Disconnect(_subscriber); }
+          { setSelectedEntity.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the set selected joint signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -662,8 +692,9 @@ namespace gazebo
         public: static event::EventT<void (std::string)>
             showModelPluginContextMenu;
 
-        /// \brief Request to select or deselect a link.
-        public: static event::EventT<void (std::string, bool)> setSelectedLink;
+        /// \brief Request to select or deselect an entity.
+        public: static event::EventT<void (std::string, bool)>
+            setSelectedEntity;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string, bool)> setSelectedJoint;
@@ -685,6 +716,14 @@ namespace gazebo
         /// \brief Request to insert a model plugin.
         public: static event::EventT<void (std::string, std::string,
             std::string)> requestModelPluginInsertion;
+
+        /// \brief Request to move a link.
+        public: static event::EventT<void (std::string, ignition::math::Pose3d)>
+            requestLinkMove;
+
+        /// \brief Request to move a nestedModel.
+        public: static event::EventT<void (std::string, ignition::math::Pose3d)>
+            requestNestedModelMove;
       };
     }
   }
