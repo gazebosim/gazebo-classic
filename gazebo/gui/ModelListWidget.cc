@@ -579,9 +579,6 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   {
     this->dataPtr->propMutex->lock();
     this->dataPtr->linkMsg.ParseFromString(_msg->serialized_data());
-
-  qDebug() << _msg->serialized_data().c_str();
-
     this->dataPtr->fillTypes.push_back("Link");
     this->dataPtr->propMutex->unlock();
   }
@@ -1084,7 +1081,6 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
 
     // set link id and strip link name.
     msgs::Link *linkMsg = msg.add_link();
-    qDebug() << "linkMsg";
     linkMsg->set_id(this->dataPtr->linkMsg.id());
     std::string linkName = this->dataPtr->linkMsg.name();
     size_t index = linkName.find_last_of("::");
@@ -1103,7 +1099,6 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
 
     // set link id and strip link name.
     msgs::Plugin *pluginMsg = msg.add_plugin();
-    qDebug() << "pluginMsg";
     //pluginMsg->set_id(this->dataPtr->pluginMsg.id());
     std::string pluginName = this->dataPtr->pluginMsg.name();
     size_t index = pluginName.find_last_of("::");
