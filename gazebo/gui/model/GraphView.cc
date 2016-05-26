@@ -115,6 +115,7 @@ void GraphView::mouseReleaseEvent(QMouseEvent *_event)
 
   QGraphicsItem *item = this->scene()->itemAt(
       this->mapToScene(_event->pos()), this->transform());
+  this->lastClickedItem = item;
   if (item)
   {
     // multi-selection

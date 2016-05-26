@@ -109,15 +109,25 @@ namespace gazebo
       public: void FitInView();
 
       /// \brief Helper function to get the unscoped name from a scoped name.
+      /// For example, for `Preview::Model1::Model2::Link`, we get
+      /// `Model1::Model2::Link`
       /// \param[in] _scopedName Scoped name.
       /// \return Unscoped name.
-      private: std::string UnscopedName(const std::string &_scopedName);
+      private: std::string UnscopedName(const std::string &_scopedName) const;
 
-      /// \brief Callback when a link is selected.
-      /// \param[in] _name Name of link.
-      /// \param[in] _selected True if the link is selected, false if
+      /// \brief Helper function to get the top level name from a scoped name.
+      /// For example, for `Preview::Model1::Model2::Link`, we get
+      /// `Preview::Model1`
+      /// \param[in] _scopedName Scoped name.
+      /// \return Top level name.
+      private: std::string TopLevelName(const std::string &_scopedName) const;
+
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+      private: void OnSetSelectedEntity(const std::string &_name,
+          bool _selected);
 
       /// \brief Callback when a joint is selected.
       /// \param[in] _name Joint Id.
@@ -126,10 +136,10 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_id,
           bool _selected);
 
-      /// \brief Callback when an entity is selected.
+      /// \brief Callback when an entity is selected outside of the editor.
       /// \param[in] _name Name of entity.
       /// \param[in] _mode Select mode
-      private: void OnSetSelectedEntity(const std::string &_name,
+      private: void OnDeselectAll(const std::string &_name,
           const std::string &_mode);
 
       /// \brief Qt event received when the widget is being resized

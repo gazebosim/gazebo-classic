@@ -36,8 +36,8 @@ namespace gazebo
         : forceApplied {0.0, 0.0},
           forceAppliedTime(),
           dartPhysicsEngine(_dartPhysicsEngine),
-          dtJoint(NULL),
-          dtChildBodyNode(NULL)
+          dtJoint(nullptr),
+          dtChildBodyNode(nullptr)
       {
       }
 
