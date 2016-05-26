@@ -27,6 +27,7 @@ class RaySensor_TEST : public ServerFixture
 static std::string raySensorString =
 "<sdf version='1.3'>"
 "  <sensor name='laser' type='ray'>"
+"    <pose>0 0 20 0 0 0</pose>"
 "    <always_on>1</always_on>"
 "    <visualize>1</visualize>"
 "    <update_rate>20.000000</update_rate>"
@@ -51,6 +52,7 @@ static std::string raySensorString =
 static std::string raySensorScanResString =
 "<sdf version='1.3'>"
 "  <sensor name='laser' type='ray'>"
+"    <pose>0 0 20 0 0 0</pose>"
 "    <always_on>1</always_on>"
 "    <visualize>1</visualize>"
 "    <update_rate>20.000000</update_rate>"
@@ -190,7 +192,7 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
-    EXPECT_DOUBLE_EQ(ranges[i], -GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
     EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
     EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
     EXPECT_EQ(sensor->Fiducial(i), -1);
