@@ -145,14 +145,14 @@ namespace gazebo
 #elif _WIN32
               // Corresponding windows hack
               {
-                //replace .so with .dll
+                // replace .so with .dll
                 size_t soSuffix = filename.rfind(".so");
                 if (soSuffix != std::string::npos)
                 {
                   const std::string winSuffix(".dll");
                   filename.replace(soSuffix, winSuffix.length(), winSuffix);
                 }
-                //remove the lib prefix
+                // remove the lib prefix
                 filename.erase(0, 3);
               }
 #endif  // ifdef __APPLE__
