@@ -27,7 +27,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
