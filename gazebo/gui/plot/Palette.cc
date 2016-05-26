@@ -25,7 +25,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/URI.hh"
 
-#include "gazebo/gui/Futures.hh"
+// #include "gazebo/gui/Futures.hh"
+
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
@@ -757,11 +758,13 @@ void Palette::FillTopics()
 /////////////////////////////////////////////////
 void Palette::FillModels()
 {
+  // TODO re-enble once Futures is integrated
   // Make sure that the managers have been retreived.
-  if (Futures::introspectionClientFuture.valid())
-    Futures::introspectionClientFuture.get();
+  // if (Futures::introspectionClientFuture.valid())
+  //   Futures::introspectionClientFuture.get();
 
   gazebo::util::IntrospectionClient client;
+  client.WaitForManagers(std::chrono::seconds(2));
 
   // Get the managers
   auto managerIds = client.Managers();
