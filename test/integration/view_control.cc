@@ -80,12 +80,13 @@ void ViewControlTest::MouseZoomSimulation()
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
 
-  // Get camera
+  // Get camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != nullptr);
 
+  // Get box visual and position it
   gazebo::rendering::VisualPtr boxVis = scene->GetVisual("box");
   QVERIFY(boxVis != nullptr);
 
@@ -99,6 +100,7 @@ void ViewControlTest::MouseZoomSimulation()
   // make sure the box is visible
   QVERIFY(cam->IsVisible(boxVis));
 
+  // Get the glwidget
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != nullptr);
 
@@ -135,7 +137,7 @@ void ViewControlTest::MouseZoomModelEditor()
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
 
-  // Get camera
+  // Get camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
@@ -163,19 +165,20 @@ void ViewControlTest::MouseZoomModelEditor()
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
 
-  // make sure the box is visible
+  // make sure the cylinder is visible
   QVERIFY(cam->IsVisible(cylinder));
 
+  // Get the glwidget
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != nullptr);
 
-  // Zoom in on the model.
+  // Zoom in on the link.
   MouseZoom(glWidget);
 
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
 
-  // verify the camera did not zoom past the model
+  // verify the camera did not zoom past the link
   QVERIFY(cam->IsVisible(cylinder));
 
   // Clean up
