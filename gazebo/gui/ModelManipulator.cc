@@ -68,12 +68,12 @@ void ModelManipulator::Clear()
   this->dataPtr->selectionObj.reset();
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
+  this->dataPtr->node.reset();
   this->dataPtr->mouseMoveVis.reset();
   this->dataPtr->mouseChildVisualScale.clear();
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
   this->dataPtr->initialized = false;
-  this->dataPtr->node.reset();
 }
 
 /////////////////////////////////////////////////
