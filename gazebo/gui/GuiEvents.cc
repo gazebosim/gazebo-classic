@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,3 +40,5 @@ event::EventT<void (const std::string &)> Events::editModel;
 event::EventT<void (const std::string &)> Events::windowMode;
 event::EventT<void (const std::string &, const math::Vector3 &)>
     Events::scaleEntity;
+event::EventT<void (const std::string &, const ignition::math::Pose3d &,
+    const bool)> Events::moveEntity;

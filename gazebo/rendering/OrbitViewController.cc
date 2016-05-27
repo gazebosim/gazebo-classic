@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 //////////////////////////////////////////////////
 OrbitViewController::OrbitViewController(UserCameraPtr _camera,
     const std::string &_name)
-  : ViewController(_camera), distance(5.0f)
+  : ViewController(_camera), yaw(0.0f), pitch(0.0f), distance(5.0f)
 {
   this->typeString = TYPE_STRING;
   this->init = false;

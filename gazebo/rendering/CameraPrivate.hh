@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +95,27 @@ namespace gazebo
 
       /// \brief Mutex to lock the various message buffers.
       public: std::mutex receiveMutex;
+
+      /// \brief If set to true, the position of the camera is static.
+      public: bool trackIsStatic;
+
+      /// \brief If set to true, the camera inherits the yaw rotation of the
+      /// tracked model.
+      public: bool trackInheritYaw;
+
+      /// \brief If set to true, the position of the camera is relative to the
+      /// tracked model, otherwise it's relative to the world origin. In either
+      /// case, the track position is expressed in the world frame.
+      public: bool trackUseModelFrame;
+
+      /// \brief Position of the camera when tracking a model.
+      public: ignition::math::Vector3d trackPos;
+
+      /// \brief Minimum distance between the camera and tracked model.
+      public: double trackMinDistance;
+
+      /// \brief Maximum distance between the camera and tracked model.
+      public: double trackMaxDistance;
     };
   }
 }

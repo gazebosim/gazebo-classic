@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_TEST_UTIL_HH_
 #define _GAZEBO_TEST_UTIL_HH_
 
+#include <fstream>
 #include <gtest/gtest.h>
 #include <string>
 

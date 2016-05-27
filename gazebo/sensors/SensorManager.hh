@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ namespace gazebo
 
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.
-      /// \return A pointer to the sensor. NULL if not found.
+      /// \return A pointer to the sensor. nullptr if not found.
       public: SensorPtr GetSensor(const std::string &_name) const;
 
       /// \brief Get all the sensors.
@@ -207,7 +207,7 @@ namespace gazebo
                  /// \brief Get a sensor by name.
                  /// \param[in] _useLeafName False indicates that _name
                  /// should be compared against the scoped name of a sensor.
-                 /// \return Pointer to the matching sensor. NULL if no
+                 /// \return Pointer to the matching sensor. nullptr if no
                  /// sensor is found.
                  public: SensorPtr GetSensor(const std::string &_name,
                                              bool _useLeafName = false) const;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -634,16 +634,16 @@ void JointCreationDialog::SetParent(const std::string &_linkName)
     return;
   }
 
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    unscopedName = _linkName.substr(idx+2);
 
   this->dataPtr->configWidget->blockSignals(true);
   if (!this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo",
-      leafName))
+      unscopedName))
   {
-    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    gzerr << "Requested link [" << unscopedName << "] not found" << std::endl;
     return;
   }
   this->dataPtr->configWidget->blockSignals(false);
@@ -667,15 +667,16 @@ void JointCreationDialog::SetChild(const std::string &_linkName)
   }
 
   // Update child combo box
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    unscopedName = _linkName.substr(idx+2);
 
   this->dataPtr->configWidget->blockSignals(true);
-  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", leafName))
+  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo",
+      unscopedName))
   {
-    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    gzerr << "Requested link [" << unscopedName << "] not found" << std::endl;
     return;
   }
   this->dataPtr->configWidget->blockSignals(false);
@@ -721,8 +722,8 @@ void JointCreationDialog::OnChildImpl(const std::string &_linkName)
   this->dataPtr->swapButton->setEnabled(true);
   this->dataPtr->configWidget->SetWidgetReadOnly("axis1", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("axis2", false);
-  this->dataPtr->configWidget->SetWidgetReadOnly("align", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("align", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose", false);
 
   // Remove empty option
@@ -771,9 +772,12 @@ void JointCreationDialog::UpdateRelativePose(
   this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose", _pose);
 
   if (this->dataPtr->alignPending)
+  {
     this->dataPtr->alignPending = false;
-  else
-    this->UncheckAllAlign();
+    return;
+  }
+
+  this->UncheckAllAlign(true);
 }
 
 /////////////////////////////////////////////////
@@ -830,6 +834,19 @@ void JointCreationDialog::CheckLinksValid()
     }
   }
 
+  // Disable align and relative_pose widgets if parent or child link
+  // is a nested link
+  // TODO: re-enable once pose of nested model links can be updated
+  if (currentParent.find("::") != std::string::npos ||
+      currentChild.find("::") != std::string::npos)
+  {
+    this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
+    this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose", true);
+    gzwarn << "Pose updates for nested model links are not yet supported. "
+        << "The Align and Relative Pose widgets will be disabled for now."
+        << std::endl;
+  }
+
   this->CheckValid();
 }
 
@@ -848,9 +865,66 @@ bool JointCreationDialog::CheckValid()
 /////////////////////////////////////////////////
 void JointCreationDialog::OnAlign(const int _int)
 {
-  // Reset pose
-  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
-      true);
+  // Button groups
+  std::vector<std::string> axes = {"x", "y", "z"};
+  std::vector<std::string> configs = {"min", "center", "max"};
+
+  // Find out which axis was changed
+  QButtonGroup *group = NULL;
+  unsigned int g;
+  QObject *senderObject = this->sender();
+  if (senderObject == this->dataPtr->reverseXBox)
+  {
+    g = 0;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else if (senderObject == this->dataPtr->reverseYBox)
+  {
+    g = 1;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else if (senderObject == this->dataPtr->reverseZBox)
+  {
+    g = 2;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else
+  {
+    for (g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+    {
+      group = this->dataPtr->alignGroups[g];
+
+      if (senderObject == group)
+      {
+        break;
+      }
+    }
+  }
+
+  // When changing target, reset everything
+  if (senderObject == this->dataPtr->alignCombo)
+  {
+    this->dataPtr->jointMaker->SetLinksRelativePose(
+        ignition::math::Pose3d::Zero, true);
+  }
+  // Reset only the axis which was changed
+  else
+  {
+    this->dataPtr->jointMaker->SetLinksRelativePose(
+        ignition::math::Pose3d::Zero, false, g);
+  }
+
+  // Uncheck other buttons in the same group
+  if (group && qobject_cast<QButtonGroup *>(senderObject))
+  {
+    for (int i = 0; i < group->buttons().size(); ++i)
+    {
+      if (i != _int)
+      {
+        group->buttons()[i]->setChecked(false);
+      }
+    }
+  }
 
   // Reference link
   bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
@@ -861,29 +935,16 @@ void JointCreationDialog::OnAlign(const int _int)
   reverse.push_back(this->dataPtr->reverseYBox->isChecked());
   reverse.push_back(this->dataPtr->reverseZBox->isChecked());
 
-  // Button groups
-  std::vector<std::string> axes = {"x", "y", "z"};
-  std::vector<std::string> configs = {"min", "center", "max"};
-  for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+  // Go through all groups and align
+  for (g = 0; g < this->dataPtr->alignGroups.size(); ++g)
   {
-    auto group = this->dataPtr->alignGroups[g];
+    group = this->dataPtr->alignGroups[g];
 
-    // Uncheck other buttons in the same group
-    if (this->sender() == group)
-    {
-      for (int i = 0; i < group->buttons().size(); ++i)
-      {
-        if (i != _int)
-        {
-          group->buttons()[i]->setChecked(false);
-        }
-      }
-    }
-
-    // Align for the checked button of each group
+    // Align if there is a checked button
     int checked = group->checkedId();
     if (checked >= 0 && checked <=2)
     {
+      // Align
       this->dataPtr->jointMaker->AlignLinks(childToParent, axes[g],
           configs[checked], reverse[g]);
     }
@@ -893,17 +954,33 @@ void JointCreationDialog::OnAlign(const int _int)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::UncheckAllAlign()
+void JointCreationDialog::UncheckAllAlign(const bool _blockSignals)
 {
   for (auto group : this->dataPtr->alignGroups)
   {
     for (auto button : group->buttons())
+    {
+      bool blocked = button->signalsBlocked();
+      button->blockSignals(_blockSignals);
       button->setChecked(false);
+      button->blockSignals(blocked);
+    }
   }
 
+  bool blocked = this->dataPtr->reverseXBox->signalsBlocked();
+  this->dataPtr->reverseXBox->blockSignals(_blockSignals);
   this->dataPtr->reverseXBox->setChecked(false);
+  this->dataPtr->reverseXBox->blockSignals(blocked);
+
+  blocked = this->dataPtr->reverseYBox->signalsBlocked();
+  this->dataPtr->reverseYBox->blockSignals(_blockSignals);
   this->dataPtr->reverseYBox->setChecked(false);
+  this->dataPtr->reverseYBox->blockSignals(blocked);
+
+  blocked = this->dataPtr->reverseZBox->signalsBlocked();
+  this->dataPtr->reverseZBox->blockSignals(_blockSignals);
   this->dataPtr->reverseZBox->setChecked(false);
+  this->dataPtr->reverseZBox->blockSignals(blocked);
 }
 
 /////////////////////////////////////////////////

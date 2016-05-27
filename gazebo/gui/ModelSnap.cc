@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -307,6 +307,9 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
   _visualSrc->SetWorldPose(
       math::Pose(_visualSrc->GetWorldPose().pos + translation,
       rotation * _visualSrc->GetWorldPose().rot));
+
+  Events::moveEntity(_visualSrc->GetName(), _visualSrc->GetWorldPose().Ign(),
+      true);
 
   this->PublishVisualPose(_visualSrc);
 }

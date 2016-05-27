@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,17 +85,17 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
     std::dynamic_pointer_cast<sensors::SonarSensor>(mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
   // Update the sensor
   sensor->Update(true);
 
   EXPECT_TRUE(sensor->IsActive());
 
-  EXPECT_DOUBLE_EQ(sensor->GetRangeMin(), 0.0);
-  EXPECT_DOUBLE_EQ(sensor->GetRangeMax(), 1.0);
-  EXPECT_DOUBLE_EQ(sensor->GetRadius(), 0.3);
-  EXPECT_DOUBLE_EQ(sensor->GetRange(), 1.0);
+  EXPECT_DOUBLE_EQ(sensor->RangeMin(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->RangeMax(), 1.0);
+  EXPECT_DOUBLE_EQ(sensor->Radius(), 0.3);
+  EXPECT_DOUBLE_EQ(sensor->Range(), 1.0);
 
   EXPECT_TRUE(sensor->IsActive());
 }
@@ -108,7 +108,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   world->Step(100);
 
   // Sonar sensor name
@@ -122,18 +122,18 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
     std::dynamic_pointer_cast<sensors::SonarSensor>(mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
   // Update the sensor
   sensor->Update(true);
 
   EXPECT_TRUE(sensor->IsActive());
 
-  EXPECT_DOUBLE_EQ(sensor->GetRangeMin(), 0.0);
-  EXPECT_DOUBLE_EQ(sensor->GetRangeMax(), 2.0);
-  EXPECT_DOUBLE_EQ(sensor->GetRadius(), 0.3);
+  EXPECT_DOUBLE_EQ(sensor->RangeMin(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->RangeMax(), 2.0);
+  EXPECT_DOUBLE_EQ(sensor->Radius(), 0.3);
   if (_physicsEngine == "ode")
-    EXPECT_NEAR(sensor->GetRange(), 1.4999, 1e-3);
+    EXPECT_NEAR(sensor->Range(), 1.4999, 1e-3);
   else
   {
     gzerr << "Sonar range sensing only works in ODE, issue #1038"
@@ -154,21 +154,21 @@ void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
 
   Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   sensors::SonarSensorPtr sonar = SpawnSonar("sonar", "sonar",
       ignition::math::Pose3d(0, 0, 1, 0, 0, 0), 0, 2, 0.2);
-  ASSERT_TRUE(sonar != NULL);
+  ASSERT_TRUE(sonar != nullptr);
 
   physics::ModelPtr model = world->GetModel("sonar");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model != nullptr);
 
   // Wait for collision engine to turn over
   common::Time::MSleep(1000);
 
   // Sonar should detect the ground plane
   sonar->Update(true);
-  EXPECT_NEAR(sonar->GetRange(), 1.0, 0.01);
+  EXPECT_NEAR(sonar->Range(), 1.0, 0.01);
 
   // Rotate the model, and the sonar should not see the ground plane
   model->SetWorldPose(ignition::math::Pose3d(0, 0, 1, 0, 1.5707, 0));
@@ -177,7 +177,7 @@ void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
   common::Time::MSleep(1000);
 
   sonar->Update(true);
-  EXPECT_NEAR(sonar->GetRange(), 2.0, 0.01);
+  EXPECT_NEAR(sonar->Range(), 2.0, 0.01);
 }
 
 TEST_P(SonarSensor_TEST, CreateSonar)

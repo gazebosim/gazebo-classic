@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world), system(), matter(system), forces(system),
       gravity(forces, matter, -SimTK::ZAxis, 0),
       discreteForces(forces, matter),
-      tracker(system), contact(system, tracker),  integ(NULL)
+      tracker(system), contact(system, tracker),  integ(nullptr)
       , contactMaterialStiffness(0.0)
       , contactMaterialDissipation(0.0)
       , contactMaterialPlasticCoefRestitution(0.0)
@@ -83,7 +83,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       , contactMaterialViscousFriction(0.0)
       , contactImpactCaptureVelocity(0.0)
       , contactStictionTransitionVelocity(0.0)
-      , dynamicsWorld(NULL)
+      , dynamicsWorld(nullptr)
       , stepTimeDouble(0.0)
 {
   // Instantiate the Multibody System
@@ -194,7 +194,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.mutable_gravity()->CopyFrom(
       msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -417,6 +417,10 @@ void SimbodyPhysics::UpdateCollision()
   // Get all contacts from Simbody
   const SimTK::State &state = this->integ->getState();
 
+  // The tracker cannot generate a snapshot without a subsystem
+  if (state.getNumSubsystems() == 0)
+    return;
+
   // get contact snapshot
   const SimTK::ContactSnapshot &contactSnapshot =
     this->tracker.getActiveContacts(state);
@@ -436,10 +440,10 @@ void SimbodyPhysics::UpdateCollision()
 
       /// \TODO: See issue #1584
       /// \TODO: below, get collision data from simbody contacts
-      Collision *collision1 = NULL;
-      Collision *collision2 = NULL;
-      physics::LinkPtr link1 = NULL;
-      physics::LinkPtr link2 = NULL;
+      Collision *collision1 = nullptr;
+      Collision *collision2 = nullptr;
+      physics::LinkPtr link1 = nullptr;
+      physics::LinkPtr link2 = nullptr;
 
       /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
       const SimTK::ContactGeometry &cg1 = cs1.getShape();
@@ -479,7 +483,7 @@ void SimbodyPhysics::UpdateCollision()
         }
       }
 
-      // add contacts to the manager. This will return NULL if no one is
+      // add contacts to the manager. This will return nullptr if no one is
       // listening for contact information.
       Contact *contactFeedback = this->contactManager->NewContact(collision1,
           collision2, this->world->GetSimTime());
@@ -638,6 +642,10 @@ void SimbodyPhysics::UpdatePhysics()
 
   common::Time currTime =  this->world->GetRealTime();
 
+  // Simbody cannot step the integrator without a subsystem
+  const SimTK::State &s = this->integ->getState();
+  if (s.getNumSubsystems() == 0)
+    return;
 
   bool trying = true;
   while (trying && integ->getTime() < this->world->GetSimTime().Double())
@@ -656,7 +664,6 @@ void SimbodyPhysics::UpdatePhysics()
   }
 
   this->simbodyPhysicsStepped = true;
-  const SimTK::State &s = this->integ->getState();
 
   // debug
   // gzerr << "time [" << s.getTime()
@@ -708,7 +715,7 @@ void SimbodyPhysics::Fini()
 //////////////////////////////////////////////////
 LinkPtr SimbodyPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
     gzthrow("Link must have a parent\n");
 
   SimbodyLinkPtr link(new SimbodyLink(_parent));
@@ -968,7 +975,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     MobilizedBody mobod;
 
     MobilizedBody parentMobod =
-      gzInb == NULL ? this->matter.Ground() : gzInb->masterMobod;
+      gzInb == nullptr ? this->matter.Ground() : gzInb->masterMobod;
 
     if (mob.isAddedBaseMobilizer())
     {
@@ -984,7 +991,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             massProps,    Transform());
 
         SimTK::Transform inboard_X_ML;
-        if (gzInb == NULL)
+        if (gzInb == nullptr)
         {
           // GZ_ASSERT(gzOutb, "must be here");
           physics::ModelPtr model = gzOutb->GetParentModel();

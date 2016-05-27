@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)
 
 //////////////////////////////////////////////////
 Box::Box(const ignition::math::Box &_box)
-  : min(_box.Min()), max(_box.Max())
+  : min(_box.Min()), max(_box.Max()), extent(EXTENT_FINITE)
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ Battery::Battery()
 Battery::~Battery()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -57,8 +57,14 @@ void Battery::Load(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Battery::Init()
 {
-  this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->initVoltage);
+  this->ResetVoltage();
   this->InitConsumers();
+}
+
+/////////////////////////////////////////////////
+void Battery::ResetVoltage()
+{
+  this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->initVoltage);
 }
 
 //////////////////////////////////////////////////

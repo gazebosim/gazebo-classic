@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -273,8 +273,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
       && --steps > 0)
   {
     world->Step(1);
-    contacts01 = contactSensor01->GetContacts();
-    contacts02 = contactSensor02->GetContacts();
+    contacts01 = contactSensor01->Contacts();
+    contacts02 = contactSensor02->Contacts();
     // gzdbg << "steps[" << steps
     //       << "] contacts01[" << contacts01.contact_size()
     //       << "] contacts02[" << contacts02.contact_size()
@@ -485,12 +485,12 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   while (contacts.contact_size() == 0 && --steps > 0)
   {
     world->Step(1);
-    contacts = contactSensor->GetContacts();
+    contacts = contactSensor->Contacts();
   }
 
   EXPECT_GT(steps, 0);
 
-  contacts = contactSensor->GetContacts();
+  contacts = contactSensor->Contacts();
 
   unsigned int ColInd = 0;
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);

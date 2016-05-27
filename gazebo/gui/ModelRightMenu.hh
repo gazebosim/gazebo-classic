@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,8 +89,6 @@ namespace gazebo
       /// \brief QT callback when snap below has been selected.
       // private slots: void OnSnapBelow();
 
-      // private slots: void OnSkeleton();
-
       /// \brief Key release callback.
       /// \param[in] _event The key event.
       /// \return True if the key press was handled.
@@ -134,7 +132,6 @@ namespace gazebo
       /// \brief Action for snapping an object to another object below the
       /// first.
       // private: QAction *snapBelowAct;
-      // private: QAction *skeletonAct;
 
       /// \brief The various view states
       private: std::vector<ViewState*> viewStates;

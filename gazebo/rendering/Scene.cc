@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@
 #include "gazebo/rendering/RFIDTagVisual.hh"
 #include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -109,6 +110,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->showCOMs = false;
   this->dataPtr->showInertias = false;
   this->dataPtr->showLinkFrames = false;
+  this->dataPtr->showSkeleton = false;
   this->dataPtr->showCollisions = false;
   this->dataPtr->showJoints = false;
   this->dataPtr->transparent = false;
@@ -731,8 +733,7 @@ UserCameraPtr Scene::GetUserCamera(const uint32_t index) const
 //////////////////////////////////////////////////
 void Scene::RemoveCamera(const std::string &_name)
 {
-  std::vector<CameraPtr>::iterator iter;
-  for (iter = this->dataPtr->cameras.begin();
+  for (auto iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
     if ((*iter)->Name() == _name)
@@ -1302,6 +1303,8 @@ bool Scene::FirstContact(CameraPtr _camera,
           }
         }
       }
+      delete [] vertices;
+      delete [] indices;
     }
   }
 
@@ -2704,10 +2707,39 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "show_skeleton")
   {
-    VisualPtr vis = this->GetVisual(_msg->data());
-    bool show = (math::equal(_msg->dbl_data(), 1.0)) ? true : false;
+    if (_msg->data() == "all")
+    {
+      this->ShowSkeleton(true);
+    }
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
       if (vis)
-        vis->ShowSkeleton(show);
+      {
+        vis->ShowSkeleton(true);
+      }
+      else
+      {
+        gzerr << "Unable to find link frame visual[" << _msg->data() << "]\n";
+      }
+    }
+  }
+  else if (_msg->request() == "hide_skeleton")
+  {
+    if (_msg->data() == "all")
+      this->ShowSkeleton(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+      {
+        vis->ShowSkeleton(false);
+      }
+      else
+      {
+        gzerr << "Unable to find link frame visual[" << _msg->data() << "]\n";
+      }
+    }
   }
 }
 
@@ -2818,6 +2850,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       visual->ShowCOM(this->dataPtr->showCOMs);
       visual->ShowInertia(this->dataPtr->showInertias);
       visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
+      visual->ShowSkeleton(this->dataPtr->showSkeleton);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
       if (visual->GetType() == Visual::VT_MODEL)
@@ -2864,7 +2897,7 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
   SkeletonPoseMsgs_L::iterator iter;
 
   // Find an old model message, and remove them
@@ -3200,7 +3233,6 @@ void Scene::RemoveVisual(uint32_t _id)
       else
         ++piter;
     }
-
     this->dataPtr->visuals.erase(iter);
     vis->Fini();
 
@@ -3356,8 +3388,13 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
     rendering::VisualPtr childVis = _vis->GetChild(i);
     Visual::VisualType visType = childVis->GetType();
     if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
-       || visType == Visual::VT_GUI)
+        || visType == Visual::VT_GUI)
     {
+      // do not remove ModelManipulator's SelectionObj
+      // FIXME remove this hardcoded check, issue #1832
+      if (std::dynamic_pointer_cast<SelectionObj>(childVis) != NULL)
+        continue;
+
       toRemove.push_back(childVis);
     }
   }
@@ -3416,6 +3453,16 @@ void Scene::ShowLinkFrames(const bool _show)
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ShowLinkFrame(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowSkeleton(const bool _show)
+{
+  this->dataPtr->showSkeleton = _show;
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ShowSkeleton(_show);
   }
 }
 

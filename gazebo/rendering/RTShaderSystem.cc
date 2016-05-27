@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -402,7 +402,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           if (!tmpdir)
           {
             common::SystemPaths *paths = common::SystemPaths::Instance();
-            tmpdir = const_cast<char*>(paths->GetTmpPath().c_str());
+            tmpdir = const_cast<char*>(paths->TmpPath().c_str());
           }
           // Get the user
           user = getenv("USER");
@@ -412,7 +412,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           cachePath = stream.str();
           // Create the directory
 #ifdef _WIN32
-          if (mkdir(cachePath.c_str()) != 0)
+          if (_mkdir(cachePath.c_str()) != 0)
 #else
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
 #endif

@@ -215,14 +215,14 @@ bool FollowerPlugin::FindSensor(const physics::ModelPtr &_model)
       if (!sensor)
         continue;
 
-      if (sensor->GetType() == "depth")
+      if (sensor->Type() == "depth")
       {
         sensors::DepthCameraSensorPtr depthSensor =
             std::dynamic_pointer_cast<sensors::DepthCameraSensor>(sensor);
         if (depthSensor)
         {
           rendering::DepthCameraPtr camera =
-              depthSensor->GetDepthCamera();
+              depthSensor->DepthCamera();
           if (camera)
           {
             this->dataPtr->depthCamera = camera;

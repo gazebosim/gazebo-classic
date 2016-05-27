@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   EXPECT_EQ(sensor->Torque(), ignition::math::Vector3d(0, 0, 0));
   EXPECT_EQ(sensor->Force(), ignition::math::Vector3d(0, 0, 0));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,11 +98,11 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&SchematicViewWidget::OnSetSelectedLink, this, _1, _2)));
+     gui::model::Events::ConnectSetSelectedEntity(
+       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
@@ -110,24 +110,43 @@ void SchematicViewWidget::Init()
 }
 
 /////////////////////////////////////////////////
-std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
+std::string SchematicViewWidget::UnscopedName(
+    const std::string &_scopedName) const
 {
   if (_scopedName.empty())
     return "";
 
-  std::string leafName = _scopedName;
-  size_t idx = _scopedName.rfind("::");
+  std::string unscopedName = _scopedName;
+  size_t idx = _scopedName.find("::");
   if (idx != std::string::npos)
-    leafName = _scopedName.substr(idx+2);
-  return leafName;
+    unscopedName = _scopedName.substr(idx+2);
+
+  return unscopedName;
+}
+
+/////////////////////////////////////////////////
+std::string SchematicViewWidget::TopLevelName(
+    const std::string &_scopedName) const
+{
+  if (_scopedName.empty())
+    return "";
+
+  auto unscopedPos = _scopedName.find("::");
+
+  std::string topLevelName = _scopedName;
+  auto secondScopePos = topLevelName.find("::", unscopedPos + 2);
+  if (secondScopePos != std::string::npos)
+    topLevelName = topLevelName.substr(0, secondScopePos);
+
+  return topLevelName;
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
-  std::string name = this->GetLeafName(_node);
+  std::string name = this->UnscopedName(_node);
 
-  if (this->scene->HasNode(name))
+  if (name.empty() || this->scene->HasNode(name))
     return;
 
   // this must be called before making changes to the graph
@@ -137,7 +156,6 @@ void SchematicViewWidget::AddNode(const std::string &_node)
   node->setData(0, tr(_node.c_str()));
   node->setData(1, tr("Link"));
   this->nodes[_node] = node;
-
   this->scene->applyLayout();
 
   this->FitInView();
@@ -155,9 +173,9 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
   auto it = this->nodes.find(_node);
   if (it != this->nodes.end())
   {
-    std::string node = this->GetLeafName(_node);
+    std::string node = this->UnscopedName(_node);
 
-    if (!this->scene->HasNode(node))
+    if (node.empty() || !this->scene->HasNode(node))
       return;
 
     // this must be called before making changes to the graph
@@ -182,8 +200,11 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     const std::string &/*_name*/, const std::string &_type,
     const std::string &_parent, const std::string &_child)
 {
-  std::string parentNode = this->GetLeafName(_parent);
-  std::string childNode = this->GetLeafName(_child);
+  std::string parentNode = this->UnscopedName(_parent);
+  std::string childNode = this->UnscopedName(_child);
+
+  if (parentNode.empty() || childNode.empty())
+    return;
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
@@ -300,7 +321,7 @@ void SchematicViewWidget::OnCustomContextMenu(const QString &_id)
   std::string itemId = _id.toStdString();
   if (this->edges.find(itemId) != this->edges.end())
     gui::model::Events::showJointContextMenu(itemId);
-  else if (this->scene->HasNode(this->GetLeafName(itemId)))
+  else if (this->scene->HasNode(this->UnscopedName(itemId)))
     gui::model::Events::showLinkContextMenu(itemId);
 }
 
@@ -315,72 +336,137 @@ void SchematicViewWidget::OnItemDoubleClicked(const QString &_id)
 }
 
 /////////////////////////////////////////////////
-void SchematicViewWidget::OnSetSelectedLink(const std::string &_name,
+void SchematicViewWidget::OnSetSelectedEntity(const std::string &_name,
     bool _selected)
 {
-  auto it = this->nodes.find(_name);
-  if (it != this->nodes.end())
-    it->second->setSelected(_selected);
+  this->scene->blockSignals(true);
+
+  // Select all nodes with the same top level name, so we select all links of a
+  // nested model.
+  for (auto &node : this->nodes)
+  {
+    auto topLevelName = this->TopLevelName(node.first);
+    if (topLevelName == _name)
+    {
+      node.second->setSelected(_selected);
+
+      if (!this->selectedItems.contains(node.second))
+      {
+        this->selectedItems.push_back(node.second);
+      }
+    }
+  }
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::OnSetSelectedJoint(const std::string &_id,
     bool _selected)
 {
+  this->scene->blockSignals(true);
+
   auto it = this->edges.find(_id);
   if (it != this->edges.end())
+  {
     it->second->setSelected(_selected);
+
+    if (!this->selectedItems.contains(it->second))
+    {
+      this->selectedItems.push_back(it->second);
+    }
+  }
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
-void SchematicViewWidget::OnSetSelectedEntity(const std::string &/*_name*/,
+void SchematicViewWidget::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
+  this->scene->blockSignals(true);
+
   // deselect all
   for (auto &node : this->nodes)
     node.second->setSelected(false);
 
   for (auto &edge : this->edges)
     edge.second->setSelected(false);
+
+  this->selectedItems.clear();
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::OnSelectionChanged()
 {
-  QList<QGraphicsItem *> items = this->scene->selectedItems();
+  QList<QGraphicsItem *> currentlySelected = this->scene->selectedItems();
 
-  // update and signal new selection
-  for (auto const item : items)
+  // Check if the selection change was deselection
+  std::string lastTopLevel("");
+  std::string lastType("");
+  bool lastIsSelected = true;
+  if (this->view->lastClickedItem)
   {
-    int idx = this->selectedItems.indexOf(item);
-    if (idx >= 0)
+    lastType = this->view->lastClickedItem->data(1).toString().toStdString();
+
+    auto id = this->view->lastClickedItem->data(0).toString().toStdString();
+    lastTopLevel = this->TopLevelName(id);
+
+    lastIsSelected = this->view->lastClickedItem->isSelected();
+  }
+
+  // Create list of top level names so we can also select siblings
+  QList<std::string> currentTopLevel;
+  for (auto &item : currentlySelected)
+  {
+    auto id = item->data(0).toString().toStdString();
+    auto topLevel = this->TopLevelName(id);
+
+    auto type = item->data(1).toString().toStdString();
+
+    // If it is a deselection, skip sibling links
+    if (!lastIsSelected && lastType == "Link" && type == "Link" &&
+        lastTopLevel == topLevel)
     {
-      this->selectedItems.removeAt(idx);
       continue;
     }
-    std::string id = item->data(0).toString().toStdString();
-    std::string type = item->data(1).toString().toStdString();
+
+    if (!currentTopLevel.contains(topLevel))
+      currentTopLevel.push_back(topLevel);
+  }
+
+  // Update all items
+  for (auto &item : this->scene->items())
+  {
+    auto id = item->data(0).toString().toStdString();
+    auto type = item->data(1).toString().toStdString();
 
     if (type == "Link")
-      gui::model::Events::setSelectedLink(id, true);
-    else if (type == "Joint")
-      gui::model::Events::setSelectedJoint(id, true);
-  }
-
-  // deselect
-  for (auto const &item : this->selectedItems)
-  {
-    if (item)
     {
-      std::string id = item->data(0).toString().toStdString();
-      std::string type = item->data(1).toString().toStdString();
+      bool selected;
 
-      if (type == "Link")
-        gui::model::Events::setSelectedLink(id, false);
-      else if (type == "Joint")
-        gui::model::Events::setSelectedJoint(id, false);
+      // Select if top level matches
+      if (lastType == "Link")
+      {
+        auto topLevelId = this->TopLevelName(id);
+        selected = currentTopLevel.contains(topLevelId);
+      }
+      else
+        selected = currentlySelected.contains(item);
+
+      gui::model::Events::setSelectedEntity(id, selected);
     }
+    else if (type == "Joint")
+    {
+      // Select if whole item matches
+      bool selected = currentlySelected.contains(item);
+      gui::model::Events::setSelectedJoint(id, selected);
+    }
+    else
+      gzwarn << "Unknown type [" << type << "]" << std::endl;
   }
 
-  this->selectedItems = items;
+  this->selectedItems = currentlySelected;
 }

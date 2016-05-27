@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,17 @@
  * limitations under the License.
  *
 */
+#include <memory>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gazebo::Server *server = NULL;
+  std::unique_ptr<gazebo::Server> server;
 
   try
   {
@@ -33,21 +35,25 @@ int main(int argc, char **argv)
     // Initialize the data logger. This will log state information.
     gazebo::util::LogRecord::Instance()->Init("gzserver");
 
-    server = new gazebo::Server();
+    server.reset(new gazebo::Server());
     if (!server->ParseArgs(argc, argv))
       return -1;
 
     server->Run();
     server->Fini();
-
-    delete server;
   }
   catch(gazebo::common::Exception &_e)
   {
     _e.Print();
 
     server->Fini();
-    delete server;
+    return -1;
+  }
+  catch(Ogre::Exception &_e)
+  {
+    gzerr << "Ogre Error:" << _e.getFullDescription() << "\n";
+
+    server->Fini();
     return -1;
   }
 

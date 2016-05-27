@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@
   #define GZ_MSGS_VISIBLE
   #define GZ_RENDERING_VISIBLE
   #define GZ_UTIL_VISIBLE
-  #define GZ_PLUGIN_VISIBLE
   #define GZ_PHYSICS_VISIBLE
   #define GZ_GUI_VISIBLE
   #define GAZEBO_HIDDEN
@@ -83,31 +82,6 @@
     #else
       #define GZ_COMMON_VISIBLE
       #define GZ_COMMON_HIDDEN
-    #endif
-  #endif
-
-  #if defined _WIN32 || defined __CYGWIN__
-    #ifdef BUILDING_DLL_GZ_PLUGIN
-      #ifdef __GNUC__
-        #define GZ_PLUGIN_VISIBLE __attribute__ ((dllexport))
-      #else
-        #define GZ_PLUGIN_VISIBLE __declspec(dllexport)
-      #endif
-    #else
-      #ifdef __GNUC__
-        #define GZ_PLUGIN_VISIBLE __attribute__ ((dllimport))
-      #else
-        #define GZ_PLUGIN_VISIBLE __declspec(dllimport)
-      #endif
-    #endif
-    #define GZ_PLUGIN_HIDDEN
-  #else
-    #if __GNUC__ >= 4
-      #define GZ_PLUGIN_VISIBLE __attribute__ ((visibility ("default")))
-      #define GZ_PLUGIN_HIDDEN  __attribute__ ((visibility ("hidden")))
-    #else
-      #define GZ_PLUGIN_VISIBLE
-      #define GZ_PLUGIN_HIDDEN
     #endif
   #endif
 
@@ -288,6 +262,25 @@
 
 // BUILDING_STATIC_LIBS
 #endif
+
+// Plugins are always visible
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef __GNUC__
+    #define GZ_PLUGIN_VISIBLE __attribute__ ((dllexport))
+  #else
+    #define GZ_PLUGIN_VISIBLE __declspec(dllexport)
+  #endif
+  #define GZ_PLUGIN_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_PLUGIN_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_PLUGIN_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_PLUGIN_VISIBLE
+    #define GZ_PLUGIN_HIDDEN
+  #endif
+#endif
+
 
 // _GAZEBO_VISIBLE_HH_
 #endif

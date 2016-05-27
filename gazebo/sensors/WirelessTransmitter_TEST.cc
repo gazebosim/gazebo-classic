@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class WirelessTransmitter_TEST : public ServerFixture
     public: void TestInvalidFreq();
     private: void TxMsg(const ConstPropagationGridPtr &_msg);
 
-    private: boost::mutex mutex;
+    private: std::mutex mutex;
     private: bool receivedMsg;
     private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
     private: sensors::WirelessTransmitterPtr tx;
@@ -58,7 +58,7 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   Load("worlds/empty.world");
 
   std::string txModelName = "tx";
-  std::string txSensorName = "wirelessTransmitter";
+  std::string txSensorName = "wirelessTransmitterConstructor";
   std::string txEssid = "GzTest";
   double freq = 2442.0;
   double power = 14.5;
@@ -104,12 +104,12 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
-  EXPECT_EQ("GzTest", sensor->GetESSID());
-  EXPECT_DOUBLE_EQ(sensor->GetFreq(), 2442.0);
-  EXPECT_DOUBLE_EQ(sensor->GetPower(), 14.5);
-  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.6);
+  EXPECT_EQ("GzTest", sensor->ESSID());
+  EXPECT_DOUBLE_EQ(sensor->Freq(), 2442.0);
+  EXPECT_DOUBLE_EQ(sensor->Power(), 14.5);
+  EXPECT_DOUBLE_EQ(sensor->Gain(), 2.6);
 
   EXPECT_TRUE(sensor->IsActive());
 }
@@ -132,7 +132,7 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   sdf::readString(transmitterSensorStringCopy, sdf);
 
   // Create the wireless receiver sensor
-  ASSERT_ANY_THROW(mgr->CreateSensor(sdf, "default", "ground_plane::link", 0));
+  ASSERT_NO_THROW(mgr->CreateSensor(sdf, "default", "ground_plane::link", 0));
 }
 
 /////////////////////////////////////////////////
@@ -152,18 +152,18 @@ void WirelessTransmitter_TEST::TestSignalStrength()
   for (int i = 0; i < samples; ++i)
   {
     this->tx->Update(true);
-    signStrengthAvg += this->tx->SignalStrength(txPose, tx->GetGain());
+    signStrengthAvg += this->tx->SignalStrength(txPose, tx->Gain());
   }
   signStrengthAvg /= samples;
 
-  EXPECT_NEAR(signStrengthAvg, -62.0, this->tx->ModelStdDesv);
+  EXPECT_NEAR(signStrengthAvg, -62.0, this->tx->ModelStdDev());
 }
 
 /////////////////////////////////////////////////
 /// \brief Callback executed for every propagation grid message received
 void WirelessTransmitter_TEST::TxMsg(const ConstPropagationGridPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   // Just copy the message
   this->gridMsg = _msg;
   this->receivedMsg = true;
@@ -178,7 +178,7 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
   node->Init("default");
 
   std::string txTopic =
-      "/gazebo/default/tx/link/wirelessTransmitter/transceiver";
+      "/gazebo/default/tx/link/wirelessTransmitterConstructor/transceiver";
   transport::SubscriberPtr sub = node->Subscribe(txTopic,
       &WirelessTransmitter_TEST::TxMsg, this);
 
@@ -189,7 +189,7 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
     common::Time::MSleep(100);
   }
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   EXPECT_TRUE(this->receivedMsg);
 }
 
@@ -221,7 +221,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
   node->Init("default");
 
   std::string txTopic =
-      "/gazebo/default/txNoVisual/link/wirelessTransmitter/transceiver";
+      "/gazebo/default/txNoVisual/link/wirelessTransmitterNoVisual/transceiver";
   transport::SubscriberPtr sub = node->Subscribe(txTopic,
       &WirelessTransmitter_TEST::TxMsg, this);
 
@@ -232,7 +232,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
     common::Time::MSleep(100);
   }
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   EXPECT_FALSE(this->receivedMsg);
 }
 

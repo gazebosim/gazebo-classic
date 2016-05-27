@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,28 +28,19 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/EntityMakerPrivate.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 //////////////////////////////////////////////////
-EntityMaker::EntityMaker(EntityMakerPrivate &_dataPtr)
-  : dataPtr(&_dataPtr)
+EntityMaker::EntityMaker()
 {
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
 }
 
 //////////////////////////////////////////////////
 EntityMaker::~EntityMaker()
 {
-  this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -87,7 +78,7 @@ void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
 
   if (_event.Control())
   {
-    pos = ModelManipulator::SnapPoint(math::Vector3(pos)).Ign();
+    pos = ModelManipulator::SnapPoint(pos).Ign();
   }
   pos.Z(this->EntityPosition().Z());
 

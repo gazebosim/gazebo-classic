@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,6 +220,17 @@ namespace gazebo
               event::ConnectionPtr _subscriber)
               { scaleEntity.Disconnect(_subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the move entity event.
+      public: template<typename T>
+              static event::ConnectionPtr ConnectMoveEntity(T _subscriber)
+              { return moveEntity.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the move entity event.
+      public: static void DisconnectMoveEntity(
+              event::ConnectionPtr _subscriber)
+              { moveEntity.Disconnect(_subscriber); }
+
       /// \brief Indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
 
@@ -279,6 +290,11 @@ namespace gazebo
       /// \brief Scale entity event.
       public: static event::EventT<void (const std::string &,
           const math::Vector3 &)> scaleEntity;
+
+      /// \brief Move entity event. Parameters: Entity name, new pose, flag
+      /// indicating whether the pose is final.
+      public: static event::EventT<void (const std::string &,
+          const ignition::math::Pose3d &, const bool)> moveEntity;
     };
   }
 }

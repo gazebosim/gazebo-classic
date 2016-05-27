@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,23 @@
 #ifndef _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
 #define _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class.
+    class MultiCameraSensorPrivate;
+
     /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
     /// \{
@@ -52,35 +56,73 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      public: virtual std::string Topic() const;
 
       /// \brief Get the number of cameras.
       /// \return The number of cameras.
-      public: unsigned int GetCameraCount() const;
+      /// \deprecated See CameraCount()
+      public: unsigned int GetCameraCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of cameras.
+      /// \return The number of cameras.
+      public: unsigned int CameraCount() const;
 
       /// \brief Returns a pointer to a rendering::Camera.
       /// \param[in] _index Index of the camera to get
       /// \return The Pointer to the camera sensor.
-      /// \sa MultiCameraSensor::GetCameraCount
-      public: rendering::CameraPtr GetCamera(unsigned int _index) const;
+      /// \sa MultiCameraSensor::CameraCount
+      /// \deprecated See Camera(unsiged int _index)
+      public: rendering::CameraPtr GetCamera(unsigned int _index) const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns a pointer to a rendering::Camera.
+      /// \param[in] _index Index of the camera to get
+      /// \return The Pointer to the camera sensor, nullptr if the _index
+      /// is invalid.
+      /// \sa MultiCameraSensor::CameraCount
+      public: rendering::CameraPtr Camera(const unsigned int _index) const;
 
       /// \brief Gets the width of the image in pixels.
       /// \param[in] _index Index of the camera
       /// \return The image width in pixels.
-      /// \sa MultiCameraSensor::GetCameraCount
-      public: unsigned int GetImageWidth(unsigned int _index) const;
+      /// \sa MultiCameraSensor::CameraCount
+      /// \deprecated See ImageWidth(unsigned int _index)
+      public: unsigned int GetImageWidth(unsigned int _index) const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets the width of the image in pixels.
+      /// \param[in] _index Index of the camera
+      /// \return The image width in pixels.
+      /// \sa MultiCameraSensor::CameraCount
+      public: unsigned int ImageWidth(const unsigned int _index) const;
 
       /// \brief Gets the height of the image in pixels.
       /// \param[in] _index Index of the camera
       /// \return The image height in pixels.
       /// \sa MultiCameraSensor::GetCameraCount
-      public: unsigned int GetImageHeight(unsigned int _index) const;
+      /// \deprecated See ImageHeight(unsigned int _index)
+      public: unsigned int GetImageHeight(
+                  unsigned int _index) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets the height of the image in pixels.
+      /// \param[in] _index Index of the camera
+      /// \return The image height in pixels.
+      /// \sa MultiCameraSensor::GetCameraCount
+      public: unsigned int ImageHeight(const unsigned int _index) const;
 
       /// \brief Gets the raw image data from the sensor.
       /// \param[in] _index Index of the camera
       /// \return The pointer to the image data array.
       /// \sa MultiCameraSensor::GetCameraCount
-      public: const unsigned char *GetImageData(unsigned int _index);
+      /// \deprecated See ImageData
+      public: const unsigned char *GetImageData(unsigned int _index)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets the raw image data from the sensor.
+      /// \param[in] _index Index of the camera
+      /// \return The pointer to the image data array.
+      /// \sa MultiCameraSensor::GetCameraCount
+      public: const unsigned char *ImageData(const unsigned int _index);
 
       /// \brief Saves the camera image(s) to the disk.
       /// \param[in] _filenames The name of the files for each camera.
@@ -100,20 +142,9 @@ namespace gazebo
       /// \brief Handle the render event.
       private: void Render();
 
-      /// \brief All the cameras.
-      private: std::vector<rendering::CameraPtr> cameras;
-
-      /// \brief Mutex to protect the cameras list.
-      private: mutable boost::mutex cameraMutex;
-
-      /// \brief Publishes messages of type msgs::ImagesStamped.
-      private: transport::PublisherPtr imagePub;
-
-      /// \brief The images msg.
-      private: msgs::ImagesStamped msg;
-
-      /// \brief True if the sensor was rendered.
-      private: bool rendered;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<MultiCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

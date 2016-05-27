@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,15 @@ class ModelEditorTest : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test editing and saving existing model
+  private slots: void EditModel();
+
   /// \brief Test pose of model links and joints before and after saving
   private slots: void SaveModelPose();
+
+  /// \brief Test pose of joint hotspot visual when parent or child link is
+  /// changed via the joint inspector
+  private slots: void JointInspectorUpdate();
 };
 
 #endif

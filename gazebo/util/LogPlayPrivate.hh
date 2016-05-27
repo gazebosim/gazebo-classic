@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,14 @@
 #ifndef _GAZEBO_UTIL_LOGPLAY_PRIVATE_HH_
 #define _GAZEBO_UTIL_LOGPLAY_PRIVATE_HH_
 
+#include <gazebo/gazebo_config.h>
+
+#ifndef USE_EXTERNAL_TINYXML2
+#include <gazebo/tinyxml2.h>
+#else
 #include <tinyxml2.h>
+#endif
+
 #include <mutex>
 #include <string>
 
@@ -32,6 +39,14 @@ namespace gazebo
     /// \brief Private data for log play
     class LogPlayPrivate
     {
+      /// \brief Helper function to get chunk data from XML.
+      /// \param[in] _xml Pointer to an xml block that has state data.
+      /// \param[out] _data Storage for the chunk's data.
+      /// \return True if the chunk was successfully parsed.
+      public: bool ChunkData(
+                  tinyxml2::XMLElement *_xml,
+                  std::string &_data);
+
       /// \brief Max number of chunks to inspect when looking for XML elements.
       public: const unsigned int kNumChunksToTry = 2u;
 
@@ -51,10 +66,10 @@ namespace gazebo
       public: tinyxml2::XMLDocument xmlDoc;
 
       /// \brief Start of the log.
-      public: tinyxml2::XMLElement *logStartXml;
+      public: tinyxml2::XMLElement *logStartXml = nullptr;
 
       /// \brief Current position in the log file.
-      public: tinyxml2::XMLElement *logCurrXml;
+      public: tinyxml2::XMLElement *logCurrXml = nullptr;
 
       /// \brief Name of the log file.
       public: std::string filename;
@@ -67,7 +82,7 @@ namespace gazebo
       public: std::string gazeboVersion;
 
       /// \brief The random number seed recorded in the open log file.
-      public: uint32_t randSeed;
+      public: uint32_t randSeed = 0;
 
       /// \brief Log start time (simulation time).
       public: common::Time logStartTime;
@@ -83,18 +98,18 @@ namespace gazebo
 
       /// \brief The current chunk might contain multiple frames.
       /// This variable points to the beginning of the last frame dispatched.
-      public: size_t start;
+      public: size_t start = 0;
 
       /// \brief The current chunk might contain multiple frames.
       /// This variable points to the end of the last frame dispatched.
-      public: size_t end;
+      public: size_t end = 0;
 
       /// \brief Initial simulation iteration contained in the log file.
-      public: uint64_t initialIterations;
+      public: uint64_t initialIterations = 0;
 
       /// \brief True if <iterations> is found in the log file. Old log versions
       /// may not include this tag in the log files.
-      public: bool iterationsFound;
+      public: bool iterationsFound = false;
 
       /// \brief A mutex to avoid race conditions.
       public: std::mutex mutex;

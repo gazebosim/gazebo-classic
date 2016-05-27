@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,14 @@ class JointForceTorqueTest : public ServerFixture,
   /// Measure / verify static force torques against analytical answers.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void GetForceTorqueWithAppliedForce(
+    const std::string &_physicsEngine);
+
+  /// \brief Load example world with a few joints.
+  /// Servo the joints to a fixed target position using simple PID controller.
+  /// Measure / verify static force torques against analytical answers.
+  /// Reset world and measure the force torques again.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void GetForceTorqueWithAppliedForceReset(
     const std::string &_physicsEngine);
 
   /// \brief Create a hinge joint between link and world.
@@ -435,6 +443,107 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   }
 }
 
+/////////////////////////////////////////////////
+void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
+  const std::string &_physicsEngine)
+{
+  // Explicit joint damping in bullet is causing this test to fail.
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test for bullet, see issue #619.\n";
+    return;
+  }
+
+  // Load our force torque test world
+  Load("worlds/force_torque_test2.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics->SetGravity(math::Vector3(0, 0, -50));
+
+  // simulate 1 step
+  world->Step(1);
+  double t = world->GetSimTime().Double();
+
+  // get time step size
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+  gzlog << "dt : " << dt << "\n";
+
+  // verify that time moves forward
+  EXPECT_GT(t, 0);
+  gzlog << "t after one step : " << t << "\n";
+
+  // get joint and get force torque
+  physics::ModelPtr model_1 = world->GetModel("boxes");
+  physics::JointPtr joint_01 = model_1->GetJoint("joint1");
+  physics::JointPtr joint_12 = model_1->GetJoint("joint2");
+
+  gzlog << "------------------- PD CONTROL -------------------\n";
+  static const double kp1 = 50000.0;
+  static const double kp2 = 10000.0;
+  static const double target1 = 0.0;
+  static const double target2 = -0.25*M_PI;
+
+  for (unsigned int j = 0; j < 2; ++j)
+  {
+    for (unsigned int i = 0; i < 3388; ++i)
+    {
+      // pd control
+      double j1State = joint_01->GetAngle(0u).Radian();
+      double j2State = joint_12->GetAngle(0u).Radian();
+      double p1Error = target1 - j1State;
+      double p2Error = target2 - j2State;
+      double effort1 = kp1 * p1Error;
+      double effort2 = kp2 * p2Error;
+      joint_01->SetForce(0u, effort1);
+      joint_12->SetForce(0u, effort2);
+
+      world->Step(1);
+      // test joint_01 wrench
+      physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
+
+      if (i < 3387)
+        continue;
+
+      EXPECT_NEAR(wrench_01.body1Force.x,     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.y,     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.z,   300.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.x,   25.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.y, -175.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.z,    0.0, TOL_CONT);
+
+      EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.y,  -wrench_01.body1Force.y,  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.z,  -wrench_01.body1Force.z,  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.x, -wrench_01.body1Torque.x, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL_CONT);
+
+      gzlog << "joint_01 force torque : "
+            << "step [" << i
+            << "] GetForce [" << joint_01->GetForce(0u)
+            << "] command [" << effort1
+            << "] force1 [" << wrench_01.body1Force
+            << "] torque1 [" << wrench_01.body1Torque
+            << "] force2 [" << wrench_01.body2Force
+            << "] torque2 [" << wrench_01.body2Torque
+            << "]\n";
+    }
+
+    world->Reset();
+    double simTime = world->GetSimTime().Double();
+    EXPECT_NEAR(simTime, 0.0, dt);
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////
 // Create a joint between link and world
 // Apply force and check acceleration for correctness
@@ -513,6 +622,11 @@ TEST_P(JointForceTorqueTest, ForceTorque2)
 TEST_P(JointForceTorqueTest, GetForceTorqueWithAppliedForce)
 {
   GetForceTorqueWithAppliedForce(GetParam());
+}
+
+TEST_P(JointForceTorqueTest, GetForceTorqueWithAppliedForceReset)
+{
+  GetForceTorqueWithAppliedForceReset(GetParam());
 }
 
 TEST_P(JointForceTorqueTest, JointTorqueTest)

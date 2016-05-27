@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ TEST_F(ImageTest, Image)
   EXPECT_TRUE(img.GetFilename().find("materials/textures/wood.jpg") !=
       std::string::npos);
 
-  unsigned char *data = NULL;
+  unsigned char *data = nullptr;
   unsigned int size = 0;
   img.GetData(&data, size);
   EXPECT_EQ(static_cast<unsigned int>(489552), size);

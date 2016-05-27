@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -148,13 +142,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   spins[3]->setValue(1000.0);
   applyForceButton->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that force spin was updated according to magnitude
   QCOMPARE(spins[0]->value(), 1000.0);
@@ -174,13 +162,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   spins[10]->setValue(1000.0);
   applyTorqueButton->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that torque spin was updated according to magnitude
   QCOMPARE(spins[9]->value(), -1000.0);
@@ -198,13 +180,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   // Apply force and torque
   applyAllButton->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that link translated and rotated
   QVERIFY(boxLinkPose.pos != boxLinkVis->GetWorldPose().pos);
@@ -231,13 +207,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   // Apply zero force and torque
   applyAllButton->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that link didn't move
   QVERIFY(sphereLinkPose.pos == sphereLinkVis->GetWorldPose().pos);
@@ -248,13 +218,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   spins[4]->setValue(1.0);
   applyForceButton->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that link translated and rotated
   QVERIFY(sphereLinkPose.pos != sphereLinkVis->GetWorldPose().pos);
@@ -263,13 +227,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   // Select CoM as application point
   radioButtons[0]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that force offset spins were updated
   QCOMPARE(spins[4]->value(), 0.0);
@@ -279,13 +237,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   // Close dialog
   cancelButton->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   delete applyWrenchDialog;
 
@@ -310,13 +262,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -351,26 +297,14 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   QTest::mouseMove(glWidget, QPoint(-glWidget->width()*0.5,
                                     -glWidget->height()*0.5));
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Initialize dialog for the box link
   gazebo::gui::ApplyWrenchDialog *applyWrenchDialogBox =
       new gazebo::gui::ApplyWrenchDialog();
   applyWrenchDialogBox->Init("multilink", "multilink::box_link");
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that box dialog has focus
   QVERIFY(applyWrenchDialogBox->isActiveWindow());
@@ -411,13 +345,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
       new gazebo::gui::ApplyWrenchDialog();
   applyWrenchDialogSphere->Init("multilink", "multilink::sphere_link");
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that sphere dialog has focus
   QVERIFY(!applyWrenchDialogBox->isActiveWindow());
@@ -459,13 +387,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   mainWindow->raise();
   mainWindow->activateWindow();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that main window has focus
   QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
@@ -509,13 +431,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
       100);
   QCoreApplication::processEvents();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that box dialog has focus
   QVERIFY(applyWrenchDialogBox->isActiveWindow());
@@ -567,13 +483,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   QPoint pressPoint(mousePoint.x, mousePoint.y);
   QTest::mouseMove(glWidget, pressPoint);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that rot tool is highlighted
   QVERIFY(boxApplyWrenchVis->GetRotTool()->GetState() ==
@@ -597,13 +507,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   }
   events.simulate(glWidget);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check mode
   QVERIFY(applyWrenchDialogBox->GetMode() ==

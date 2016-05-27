@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <signal.h>
+#include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -45,6 +46,7 @@ Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
+    ("verbose", "Print extra information")
     ("help,h", "Print this help message");
 }
 
@@ -73,7 +75,7 @@ void Command::ListOptions()
   {
     pieces.clear();
     std::string formatName = (*iter)->format_name();
-    boost::split(pieces, formatName, boost::is_any_of(" "));
+    pieces = common::split(formatName, " ");
 
     if (pieces.empty())
     {
@@ -185,6 +187,11 @@ bool Command::Run(int _argc, char **_argv)
   {
     this->Help();
     return true;
+  }
+
+  if (this->vm.count("verbose"))
+  {
+    gazebo::common::Console::SetQuiet(false);
   }
 
   if (!this->TransportInit())
@@ -354,9 +361,7 @@ bool PhysicsCommand::RunImpl()
 
   if (this->vm.count("gravity"))
   {
-    std::vector<std::string> values;
-    boost::split(values, this->vm["gravity"].as<std::string>(),
-        boost::is_any_of(","));
+    auto values = common::split(this->vm["gravity"].as<std::string>(), ",");
 
     msg.mutable_gravity()->set_x(boost::lexical_cast<double>(values[0]));
     msg.mutable_gravity()->set_y(boost::lexical_cast<double>(values[1]));
@@ -758,8 +763,7 @@ bool CameraCommand::RunImpl()
 
         if (topicInfo.msg_type() == "gazebo.msgs.CameraCmd")
         {
-          std::vector<std::string> parts;
-          boost::split(parts, topics.data(i), boost::is_any_of("/"));
+          auto parts = common::split(topics.data(i), "/");
           std::cout << parts[parts.size()-2] << std::endl;
         }
       }
@@ -789,6 +793,8 @@ bool CameraCommand::RunImpl()
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
+
+  boost::replace_all(cameraName, "::", "/");
 
   transport::PublisherPtr pub =
     node->Advertise<msgs::CameraCmd>(
@@ -1015,27 +1021,14 @@ bool SDFCommand::RunImpl()
     if (!boost::filesystem::exists(path))
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
 
-    TiXmlDocument xmlDoc;
-    if (xmlDoc.LoadFile(path.string()))
+    if (sdf::convertFile(path.string(), sdf::SDF::Version(), sdf))
     {
-      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::Version(), true))
-      {
-        // Create an XML printer to control formatting
-        TiXmlPrinter printer;
-        printer.SetIndent("  ");
-        xmlDoc.Accept(&printer);
-
-        // Output the XML
-        std::ofstream stream(path.string().c_str(), std::ios_base::out);
-        stream << printer.Str();
-        stream.close();
-
-        std::cout << "Success\n";
-      }
+      sdf->Write(path.string());
+      std::cout << "Success\n";
     }
     else
     {
-      std::cerr << "Unable to load file[" << path.string() << "]\n";
+      std::cerr << "Unable to convert file[" << path.string() << "]\n";
       return false;
     }
   }

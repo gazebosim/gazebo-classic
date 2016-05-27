@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,9 +102,9 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   // Noise rate value also taken directly from plugin.
   double fixedNoiseRate = 0.005;
   double noise = maxRange*fixedNoiseRate;
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (int i = 0; i < raySensor->RayCount(); ++i)
   {
-    double range = raySensor->GetRange(i);
+    double range = raySensor->Range(i);
     if (std::isinf(range))
     {
       continue;

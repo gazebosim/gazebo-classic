@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/math/Vector3.hh"
 
@@ -63,6 +64,7 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
@@ -70,11 +72,14 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Atmosphere.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Wind.hh"
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
@@ -112,6 +117,8 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
+  // Keep this in the constructor for performance.
+  // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->dataPtr->factorySDF);
 
@@ -141,6 +148,8 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableWind = true;
+  this->dataPtr->enableAtmosphere = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -159,25 +168,7 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
-  this->dataPtr->presetManager.reset();
-  this->dataPtr->userCmdManager.reset();
-  delete this->dataPtr->receiveMutex;
-  this->dataPtr->receiveMutex = NULL;
-  delete this->dataPtr->loadModelMutex;
-  this->dataPtr->loadModelMutex = NULL;
-  delete this->dataPtr->setWorldPoseMutex;
-  this->dataPtr->setWorldPoseMutex = NULL;
-  delete this->dataPtr->worldUpdateMutex;
-  this->dataPtr->worldUpdateMutex = NULL;
-
-  this->dataPtr->connections.clear();
   this->Fini();
-
-  this->dataPtr->sdf->Reset();
-  this->dataPtr->rootElement.reset();
-  this->dataPtr->node.reset();
-
-  this->dataPtr->testRay.reset();
 
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -273,6 +264,28 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->physicsEngine->Load(physicsElem);
 
+  // This should come before loading of entities
+  sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
+
+  this->dataPtr->wind.reset(new physics::Wind(*this,
+                            this->dataPtr->sdf->GetElement("wind")));
+
+  if (this->dataPtr->wind == NULL)
+    gzthrow("Unable to create wind\n");
+
+  this->dataPtr->wind->Load(windElem);
+
+  // This should come after loading physics engine
+  sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
+
+  type = atmosphereElem->Get<std::string>("type");
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type, *this);
+
+  if (this->dataPtr->atmosphere == NULL)
+    gzerr << "Unable to create atmosphere model\n";
+
+  this->dataPtr->atmosphere->Load(atmosphereElem);
+
   // This should also come before loading of entities
   {
     sdf::ElementPtr spherical = this->dataPtr->sdf->GetElement(
@@ -320,6 +333,14 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->userCmdManager = UserCmdManagerPtr(
       new UserCmdManager(shared_from_this()));
+
+  // Initialize the world URI.
+  this->dataPtr->uri.Clear();
+  this->dataPtr->uri.SetScheme("data");
+  this->dataPtr->uri.Path().PushFront(this->GetName());
+  this->dataPtr->uri.Path().PushFront("world");
+
+  this->RegisterIntrospectionItems();
 
   this->dataPtr->loaded = true;
 }
@@ -685,6 +706,8 @@ void World::Step()
     }
   }
 
+  gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
+
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
@@ -766,6 +789,13 @@ void World::Update()
     }
   }
 
+  // Give clients a possibility to react to collisions before the physics
+  // gets updated.
+  this->dataPtr->updateInfo.realTime = this->GetRealTime();
+  event::Events::beforePhysicsUpdate(this->dataPtr->updateInfo);
+
+  DIAG_TIMER_LAP("World::Update", "Events::beforePhysicsUpdate");
+
   // Update the physics engine
   if (this->dataPtr->enablePhysicsEngine && this->dataPtr->physicsEngine)
   {
@@ -805,6 +835,8 @@ void World::Update()
 
   event::Events::worldUpdateEnd();
 
+  gazebo::util::IntrospectionManager::Instance()->Update();
+
   DIAG_TIMER_STOP("World::Update");
 }
 
@@ -812,33 +844,105 @@ void World::Update()
 void World::Fini()
 {
   this->Stop();
+
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Fini();
+#endif
+
+  // Clean transport
+  {
+    this->dataPtr->deleteEntity.clear();
+    this->dataPtr->requestMsgs.clear();
+    this->dataPtr->factoryMsgs.clear();
+    this->dataPtr->modelMsgs.clear();
+    this->dataPtr->lightFactoryMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+
+    this->dataPtr->poseLocalPub.reset();
+    this->dataPtr->posePub.reset();
+    this->dataPtr->guiPub.reset();
+    this->dataPtr->responsePub.reset();
+    this->dataPtr->statPub.reset();
+    this->dataPtr->modelPub.reset();
+    this->dataPtr->lightPub.reset();
+
+    this->dataPtr->factorySub.reset();
+    this->dataPtr->controlSub.reset();
+    this->dataPtr->playbackControlSub.reset();
+    this->dataPtr->requestSub.reset();
+    this->dataPtr->jointSub.reset();
+    this->dataPtr->lightSub.reset();
+    this->dataPtr->lightFactorySub.reset();
+    this->dataPtr->lightModifySub.reset();
+    this->dataPtr->modelSub.reset();
+
+    this->dataPtr->node.reset();
+  }
+
+  this->dataPtr->connections.clear();
+
+  this->dataPtr->sdf.reset();
+
+  this->dataPtr->testRay.reset();
   this->dataPtr->plugins.clear();
 
   this->dataPtr->publishModelPoses.clear();
   this->dataPtr->publishModelScales.clear();
   this->dataPtr->publishLightPoses.clear();
 
-  this->dataPtr->node->Fini();
+  // Clean entities
+  for (auto &model : this->dataPtr->models)
+  {
+    if (model)
+      model->Fini();
+  }
+  this->dataPtr->models.clear();
+
+  for (auto &light : this->dataPtr->lights)
+  {
+    if (light)
+      light->Fini();
+  }
+  this->dataPtr->lights.clear();
 
   if (this->dataPtr->rootElement)
   {
     this->dataPtr->rootElement->Fini();
     this->dataPtr->rootElement.reset();
   }
-
-  if (this->dataPtr->physicsEngine)
-  {
-    this->dataPtr->physicsEngine->Fini();
-    this->dataPtr->physicsEngine.reset();
-  }
-
-  this->dataPtr->models.clear();
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
-#ifdef HAVE_OPENAL
-  util::OpenAL::Instance()->Fini();
-#endif
+  this->dataPtr->presetManager.reset();
+  this->dataPtr->userCmdManager.reset();
+  this->dataPtr->physicsEngine.reset();
+
+  // Clean mutexes
+  if (this->dataPtr->receiveMutex)
+  {
+    delete this->dataPtr->receiveMutex;
+    this->dataPtr->receiveMutex = NULL;
+  }
+
+  if (this->dataPtr->loadModelMutex)
+  {
+    delete this->dataPtr->loadModelMutex;
+    this->dataPtr->loadModelMutex = NULL;
+  }
+
+  if (this->dataPtr->setWorldPoseMutex)
+  {
+    delete this->dataPtr->setWorldPoseMutex;
+    this->dataPtr->setWorldPoseMutex = NULL;
+  }
+
+  if (this->dataPtr->worldUpdateMutex)
+  {
+    delete this->dataPtr->worldUpdateMutex;
+    this->dataPtr->worldUpdateMutex = NULL;
+  }
+
+  this->UnregisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -877,6 +981,18 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->dataPtr->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+Wind &World::Wind() const
+{
+  return *this->dataPtr->wind;
+}
+
+//////////////////////////////////////////////////
+Atmosphere &World::Atmosphere() const
+{
+  return *this->dataPtr->atmosphere;
 }
 
 //////////////////////////////////////////////////
@@ -1006,6 +1122,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
+  light->SetStatic(true);
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);
@@ -1094,6 +1211,12 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 unsigned int World::GetModelCount() const
 {
   return this->dataPtr->models.size();
+}
+
+//////////////////////////////////////////////////
+unsigned int World::LightCount() const
+{
+  return this->dataPtr->lights.size();
 }
 
 //////////////////////////////////////////////////
@@ -1888,6 +2011,13 @@ void World::ProcessFactoryMsgs()
 
         sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
 
+        if (!elem)
+        {
+          gzerr << "Invalid SDF:";
+          this->dataPtr->factorySDF->Root()->PrintValues("");
+          continue;
+        }
+
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
 
@@ -1909,13 +2039,6 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        if (!elem)
-        {
-          gzerr << "Invalid SDF:";
           this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
@@ -1987,8 +2110,6 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 
   if (entity)
     model = entity->GetParentModel();
-  else
-    gzerr << "Unable to find entity below point[" << _pt << "]\n";
 
   return model;
 }
@@ -2016,7 +2137,88 @@ void World::SetState(const WorldState &_state)
   this->dataPtr->logRealTime = _state.GetRealTime();
   this->dataPtr->iterations = _state.GetIterations();
 
-  // Models
+  // Insertions (adapted from ProcessFactoryMsgs)
+  auto insertions = _state.Insertions();
+  for (auto const &insertion : insertions)
+  {
+    this->dataPtr->factorySDF->Root()->ClearElements();
+
+    // SDF Parsing happens here
+    if (!sdf::readString(insertion, this->dataPtr->factorySDF))
+    {
+      gzerr << "Unable to read sdf string[" << insertion << "]" << std::endl;
+      continue;
+    }
+
+    // Get entity being inserted
+    bool isModel = false;
+    bool isLight = false;
+
+    auto elem = this->dataPtr->factorySDF->Root()->Clone();
+
+    if (!elem)
+    {
+      gzerr << "Invalid SDF:" << std::endl;
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+      continue;
+    }
+
+    if (elem->HasElement("world"))
+      elem = elem->GetElement("world");
+
+    if (elem->HasElement("model"))
+    {
+      elem = elem->GetElement("model");
+      isModel = true;
+    }
+    else if (elem->HasElement("light"))
+    {
+      elem = elem->GetElement("light");
+      isLight = true;
+    }
+    else
+    {
+      gzerr << "Unable to find a model or light in:" << std::endl;
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+      continue;
+    }
+
+    elem->SetParent(this->dataPtr->sdf);
+    elem->GetParent()->InsertElement(elem);
+
+    if (isModel)
+    {
+      try
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+        model->Init();
+        model->LoadPlugins();
+      }
+      catch(...)
+      {
+        gzerr << "Loading model from world state insertion failed" <<
+            std::endl;
+      }
+    }
+    else if (isLight)
+    {
+      try
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      }
+      catch(...)
+      {
+        gzerr << "Loading light from world state insertion failed." <<
+            std::endl;
+      }
+    }
+  }
+
+  // Model updates
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
   {
@@ -2027,7 +2229,7 @@ void World::SetState(const WorldState &_state)
       gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
   }
 
-  // Lights
+  // Light updates
   const LightState_M lightStates = _state.LightStates();
   for (auto const &lightState : lightStates)
   {
@@ -2039,6 +2241,14 @@ void World::SetState(const WorldState &_state)
       gzerr << "Unable to find light[" << lightState.second.GetName() << "]"
             << std::endl;
     }
+  }
+
+  // Deletions
+  auto deletions = _state.Deletions();
+  for (auto const &deletion : deletions)
+  {
+    // This works for models and lights
+    this->RemoveModel(deletion);
   }
 }
 
@@ -2589,6 +2799,43 @@ void World::EnablePhysicsEngine(bool _enable)
 }
 
 /////////////////////////////////////////////////
+bool World::WindEnabled() const
+{
+  return this->dataPtr->enableWind;
+}
+
+/////////////////////////////////////////////////
+void World::SetWindEnabled(const bool _enable)
+{
+  if (this->dataPtr->enableWind == _enable)
+    return;
+
+  this->dataPtr->enableWind = _enable;
+
+  for (auto const &model : this->dataPtr->models)
+  {
+    Link_V links = model->GetLinks();
+    for (auto const &link : links)
+    {
+      if (link->WindMode())
+        link->SetWindEnabled(this->dataPtr->enableWind);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+bool World::AtmosphereEnabled() const
+{
+  return this->dataPtr->enableAtmosphere;
+}
+
+/////////////////////////////////////////////////
+void World::SetAtmosphereEnabled(const bool _enable)
+{
+  this->dataPtr->enableAtmosphere = _enable;
+}
+
+/////////////////////////////////////////////////
 void World::_AddDirty(Entity *_entity)
 {
   GZ_ASSERT(_entity != NULL, "_entity is NULL");
@@ -2600,4 +2847,32 @@ void World::ResetPhysicsStates()
 {
   for (auto &model : this->dataPtr->models)
     model->ResetPhysicsStates();
+}
+
+/////////////////////////////////////////////////
+common::URI World::URI() const
+{
+  return this->dataPtr->uri;
+}
+
+/////////////////////////////////////////////////
+void World::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  common::URI timeURI(uri);
+  timeURI.Query().Insert("p", "time/sim_time");
+  this->dataPtr->introspectionItems.push_back(timeURI);
+  // Add here all the items that might be introspected.
+  gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
+      timeURI.Str(), std::bind(&World::GetSimTime, this));
+}
+
+/////////////////////////////////////////////////
+void World::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->dataPtr->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->dataPtr->introspectionItems.clear();
 }

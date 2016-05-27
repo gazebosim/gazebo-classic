@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,43 +38,43 @@ EditorItem::~EditorItem()
 }
 
 /////////////////////////////////////////////////
-QVector3D EditorItem::GetSize() const
+ignition::math::Vector3d EditorItem::Size() const
 {
-  return QVector3D(0, 0, 0);
+  return ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
-QVector3D EditorItem::GetScenePosition() const
+ignition::math::Vector3d EditorItem::ScenePosition() const
 {
-  return QVector3D(0, 0, 0);
+  return ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
-double EditorItem::GetSceneRotation() const
+double EditorItem::SceneRotation() const
 {
   return 0;
 }
 
 /////////////////////////////////////////////////
-std::string EditorItem::GetType() const
+std::string EditorItem::ItemType() const
 {
   return this->editorType;
 }
 
 /////////////////////////////////////////////////
-std::string EditorItem::GetName() const
+std::string EditorItem::Name() const
 {
   return this->name;
 }
 
 /////////////////////////////////////////////////
-QColor EditorItem::Get3dColor() const
+common::Color EditorItem::Color3d() const
 {
   return this->visual3dColor;
 }
 
 /////////////////////////////////////////////////
-QString EditorItem::Get3dTexture() const
+std::string EditorItem::Texture3d() const
 {
   return this->visual3dTexture;
 }
@@ -86,65 +86,65 @@ void EditorItem::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void EditorItem::Set3dColor(QColor _color)
+void EditorItem::SetColor3d(const common::Color &_color)
 {
   this->visual3dColor = _color;
   emit ColorChanged(this->visual3dColor);
 }
 
 /////////////////////////////////////////////////
-void EditorItem::OnColorChanged(QColor _color)
+void EditorItem::OnColorChanged(const common::Color &_color)
 {
   this->visual3dColor = _color;
 }
 
 /////////////////////////////////////////////////
-void EditorItem::Set3dTexture(QString _texture)
+void EditorItem::SetTexture3d(const std::string &_texture)
 {
   this->visual3dTexture = _texture;
   emit TextureChanged(this->visual3dTexture);
 }
 
 /////////////////////////////////////////////////
-void EditorItem::OnTextureChanged(QString _texture)
+void EditorItem::OnTextureChanged(const std::string &_texture)
 {
   this->visual3dTexture = _texture;
 }
 
 /////////////////////////////////////////////////
-void EditorItem::Set3dTransparency(float _transparency)
+void EditorItem::Set3dTransparency(const float _transparency)
 {
   this->visual3dTransparency = _transparency;
   emit TransparencyChanged(this->visual3dTransparency);
 }
 
 /////////////////////////////////////////////////
-int EditorItem::GetLevel() const
+int EditorItem::Level() const
 {
   return this->level;
 }
 
 /////////////////////////////////////////////////
-void EditorItem::SetLevel(int _level)
+void EditorItem::SetLevel(const int _level)
 {
   this->level = _level;
   this->LevelChanged(this->level);
 }
 
 /////////////////////////////////////////////////
-double EditorItem::GetLevelBaseHeight() const
+double EditorItem::LevelBaseHeight() const
 {
   return this->levelBaseHeight;
 }
 
 /////////////////////////////////////////////////
-void EditorItem::SetLevelBaseHeight(double _height)
+void EditorItem::SetLevelBaseHeight(const double _height)
 {
   this->levelBaseHeight = _height;
 }
 
 /////////////////////////////////////////////////
-void EditorItem::SetHighlighted(bool /*_highlighted*/)
+void EditorItem::SetHighlighted(const bool /*_highlighted*/)
 {
 }
 

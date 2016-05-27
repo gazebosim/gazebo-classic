@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ CollisionConfig::CollisionConfig()
   // Add Collision button
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
   addCollisionButton->setMaximumWidth(200);
+  addCollisionButton->setDefault(false);
+  addCollisionButton->setAutoDefault(false);
   connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
   // Main layout
@@ -70,6 +72,12 @@ CollisionConfig::~CollisionConfig()
     delete config->second;
     this->configs.erase(config);
   }
+  while (!this->deletedConfigs.empty())
+  {
+    auto config = this->deletedConfigs.begin();
+    delete config->second;
+    this->deletedConfigs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +89,13 @@ void CollisionConfig::Init()
     CollisionConfigData *configData = it.second;
     configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
+
+  // Clear lists
+  for (auto &it : this->deletedConfigs)
+    delete it.second->widget;
+  this->deletedConfigs.clear();
+
+  this->addedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -147,6 +162,8 @@ void CollisionConfig::AddCollision(const std::string &_name,
 
   // Remove button
   QToolButton *removeCollisionButton = new QToolButton(this);
+  removeCollisionButton->setObjectName(
+      "removeCollisionButton_" + QString::number(this->counter));
   removeCollisionButton->setFixedSize(QSize(30, 30));
   removeCollisionButton->setToolTip("Remove " + QString(_name.c_str()));
   removeCollisionButton->setIcon(QPixmap(":/images/trashcan.png"));
@@ -247,9 +264,20 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configData->id =  this->counter;
   configData->widget = item;
   configData->name = _name;
-  connect(headerButton, SIGNAL(toggled(bool)), configData,
-           SLOT(OnToggleItem(bool)));
+
+  this->connect(headerButton, SIGNAL(toggled(bool)), configData,
+      SLOT(OnToggleItem(bool)));
+
+  this->connect(configWidget, SIGNAL(GeometryChanged()), configData,
+      SLOT(OnGeometryChanged()));
+
+  this->connect(configData, SIGNAL(CollisionChanged(
+      const std::string &, const std::string &)),
+      this, SLOT(OnCollisionChanged(
+      const std::string &, const std::string &)));
+
   this->configs[this->counter] = configData;
+  this->addedConfigs[this->counter] = configData;
 
   this->counter++;
 }
@@ -267,42 +295,58 @@ void CollisionConfig::OnRemoveCollision(int _id)
   CollisionConfigData *configData = this->configs[_id];
 
   // Ask for confirmation
-  std::string msg;
-
-  if (this->configs.size() == 1)
+  // Don't open the dialog during tests, see issue #1963
+  auto inTest = getenv("IN_TESTSUITE");
+  if (!inTest)
   {
-    msg = "Are you sure you want to remove " +
-        configData->name + "?\n\n" +
-        "This is the only collision. \n" +
-        "Without collisions, this link won't collide with anything.\n";
-  }
-  else
-  {
-    msg = "Are you sure you want to remove " +
-        configData->name + "?\n";
-  }
+    std::string msg;
 
-  QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
-      QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
-      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+    if (this->configs.size() == 1)
+    {
+      msg = "Are you sure you want to remove " +
+          configData->name + "?\n\n" +
+          "This is the only collision. \n" +
+          "Without collisions, this link won't collide with anything.\n";
+    }
+    else
+    {
+      msg = "Are you sure you want to remove " +
+          configData->name + "?\n";
+    }
 
-  QPushButton *cancelButton =
-      msgBox.addButton("Cancel", QMessageBox::RejectRole);
-  QPushButton *removeButton = msgBox.addButton("Remove",
-      QMessageBox::AcceptRole);
-  msgBox.setDefaultButton(removeButton);
-  msgBox.setEscapeButton(cancelButton);
-  msgBox.exec();
-  if (msgBox.clickedButton() != removeButton)
-    return;
+    QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
+        QString(msg.c_str()));
+    msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+    QPushButton *cancelButton =
+        msgBox.addButton("Cancel", QMessageBox::RejectRole);
+    QPushButton *removeButton = msgBox.addButton("Remove",
+        QMessageBox::AcceptRole);
+    msgBox.setDefaultButton(removeButton);
+    msgBox.setEscapeButton(cancelButton);
+    msgBox.exec();
+    if (msgBox.clickedButton() && msgBox.clickedButton() != removeButton)
+      return;
+  }
 
   // Remove
   this->listLayout->removeWidget(configData->widget);
-  delete configData->widget;
+  configData->widget->hide();
 
   emit CollisionRemoved(configData->name);
-  this->configs.erase(it);
+
+  // Add to delete list only if this existed from the beginning
+  auto itAdded = this->addedConfigs.find(_id);
+  if (itAdded == this->addedConfigs.end())
+  {
+    this->deletedConfigs[_id] = configData;
+    this->configs.erase(it);
+  }
+  else
+  {
+    this->addedConfigs.erase(itAdded);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -377,10 +421,43 @@ void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
 /////////////////////////////////////////////////
 void CollisionConfig::RestoreOriginalData()
 {
+  // Remove added configs
+  for (auto &it : this->addedConfigs)
+  {
+    auto configData = it.second;
+
+    this->listLayout->removeWidget(configData->widget);
+    delete configData->widget;
+
+    emit CollisionRemoved(configData->name);
+
+    this->configs.erase(it.first);
+  }
+  this->addedConfigs.clear();
+
+  // Restore previously existing configs
   for (auto &it : this->configs)
   {
     it.second->RestoreOriginalData();
   }
+
+  // Reinsert deleted configs
+  for (auto &it : this->deletedConfigs)
+  {
+    this->listLayout->addWidget(it.second->widget);
+    it.second->widget->show();
+
+    this->configs[it.first] = it.second;
+    emit CollisionAdded(it.second->name);
+  }
+  this->deletedConfigs.clear();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnCollisionChanged(const std::string &_name,
+    const std::string &_type)
+{
+  emit CollisionChanged(_name, _type);
 }
 
 /////////////////////////////////////////////////
@@ -390,6 +467,12 @@ void CollisionConfigData::OnToggleItem(bool _checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::OnGeometryChanged()
+{
+  emit CollisionChanged(this->name, "geometry");
 }
 
 /////////////////////////////////////////////////

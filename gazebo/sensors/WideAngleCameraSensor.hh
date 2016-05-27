@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace gazebo
       public: WideAngleCameraSensor();
 
       /// \brief Destructor
-      public: virtual ~WideAngleCameraSensor() = default;
+      public: virtual ~WideAngleCameraSensor();
 
       // Documentation inherited
       public: void Load(const std::string &_worldName) override;

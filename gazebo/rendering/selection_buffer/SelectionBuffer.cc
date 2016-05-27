@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,10 @@ void SelectionBuffer::DeleteRTTBuffer()
   if (!this->dataPtr->texture.isNull() && this->dataPtr->texture->isLoaded())
     this->dataPtr->texture->unload();
   if (this->dataPtr->buffer)
+  {
     delete [] this->dataPtr->buffer;
+    this->dataPtr->buffer = nullptr;
+  }
   if (this->dataPtr->pixelBox)
     delete this->dataPtr->pixelBox;
 }
@@ -205,6 +208,11 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
   size_t posInStream = (this->dataPtr->pixelBox->getWidth() * _y) * 4;
   posInStream += _x * 4;
   common::Color::BGRA color(0);
+  if (!this->dataPtr->buffer)
+  {
+    gzerr << "Selection buffer is null.\n";
+    return nullptr;
+  }
   memcpy(static_cast<void *>(&color), this->dataPtr->buffer + posInStream, 4);
   common::Color cv;
   cv.SetFromARGB(color);

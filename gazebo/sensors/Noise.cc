@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ using namespace sensors;
 NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     const std::string &_sensorType)
 {
-  GZ_ASSERT(_sdf != NULL, "noise sdf is NULL");
+  GZ_ASSERT(_sdf != nullptr, "noise sdf is null");
   GZ_ASSERT(_sdf->GetName() == "noise", "Not a noise SDF element");
 
   std::string typeString = _sdf->Get<std::string>("type");
@@ -79,8 +79,7 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
 
 //////////////////////////////////////////////////
 Noise::Noise(NoiseType _type)
-  : type(_type),
-    customNoiseCallback(NULL)
+  : type(_type)
 {
 }
 
@@ -93,7 +92,7 @@ Noise::~Noise()
 void Noise::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
-  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "this->sdf is null");
 }
 
 //////////////////////////////////////////////////
@@ -145,7 +144,7 @@ void Noise::SetCustomNoiseCallback(boost::function<double (double)> _cb)
 //////////////////////////////////////////////////
 void Noise::Fini()
 {
-  this->customNoiseCallback = NULL;
+  this->customNoiseCallback = nullptr;
 }
 
 //////////////////////////////////////////////////

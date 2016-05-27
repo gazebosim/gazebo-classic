@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_MAKER_HH_
-#define _GAZEBO_MODEL_MAKER_HH_
+#ifndef GAZEBO_GUI_MODELMAKER_HH_
+#define GAZEBO_GUI_MODELMAKER_HH_
 
 #include <list>
+#include <memory>
 #include <string>
 #include <sdf/sdf.hh>
 
@@ -85,6 +86,10 @@ namespace gazebo
 
       /// \brief Publish a factory message to create the entity.
       private: virtual void CreateTheEntity();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelMakerPrivate> dataPtr;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -50,6 +49,9 @@
 
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/util/IntrospectionManager.hh"
+#include "gazebo/util/OpenAL.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -63,6 +65,7 @@ Model::Model(BasePtr _parent)
 //////////////////////////////////////////////////
 Model::~Model()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -82,6 +85,11 @@ void Model::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("self_collide"))
   {
     this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+
+  if (this->sdf->HasElement("enable_wind"))
+  {
+    this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
   }
 
   if (this->sdf->HasElement("allow_auto_disable"))
@@ -407,14 +415,15 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
-  Entity::Fini();
-
-  this->plugins.clear();
   this->attachedModels.clear();
+  this->canonicalLink.reset();
+  this->jointController.reset();
   this->joints.clear();
   this->links.clear();
-  this->canonicalLink.reset();
   this->models.clear();
+  this->plugins.clear();
+
+  Entity::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -1088,6 +1097,7 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
+  _msg.set_enable_wind(this->WindMode());
   msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale);
@@ -1141,6 +1151,9 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   if (_msg.has_scale())
     this->SetScale(msgs::ConvertIgn(_msg.scale()));
+
+  if (_msg.has_enable_wind())
+    this->SetWindMode(_msg.enable_wind());
 }
 
 //////////////////////////////////////////////////
@@ -1470,4 +1483,101 @@ bool Model::RemoveJoint(const std::string &_name)
            << "], not removed.\n";
     return false;
   }
+}
+
+/////////////////////////////////////////////////
+void Model::SetWindMode(const bool _enable)
+{
+  this->sdf->GetElement("enable_wind")->Set(_enable);
+  for (auto &link : this->links)
+    link->SetWindMode(_enable);
+}
+
+/////////////////////////////////////////////////
+bool Model::WindMode() const
+{
+  return this->sdf->Get<bool>("enable_wind");
+}
+
+/////////////////////////////////////////////////
+void Model::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  // Callbacks.
+  auto fModelPose = [this]()
+  {
+    return this->GetWorldPose().Ign();
+  };
+
+  auto fModelLinVel = [this]()
+  {
+    return this->GetWorldLinearVel().Ign();
+  };
+
+  auto fModelAngVel = [this]()
+  {
+    return this->GetWorldAngularVel().Ign();
+  };
+
+  auto fModelLinAcc = [this]()
+  {
+    return this->GetWorldLinearAccel().Ign();
+  };
+
+  auto fModelAngAcc = [this]()
+  {
+    return this->GetWorldAngularAccel().Ign();
+  };
+
+  // Register items.
+  common::URI poseURI(uri);
+  poseURI.Query().Insert("p", "pose3d/world_pose");
+  this->introspectionItems.push_back(poseURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
+
+  common::URI linVelURI(uri);
+  linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  this->introspectionItems.push_back(linVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
+
+  common::URI angVelURI(uri);
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  this->introspectionItems.push_back(angVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angVelURI.Str(), fModelAngVel);
+
+  common::URI linAccURI(uri);
+  linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  this->introspectionItems.push_back(linAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linAccURI.Str(), fModelLinAcc);
+
+  common::URI angAccURI(uri);
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  this->introspectionItems.push_back(angAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angAccURI.Str(), fModelAngAcc);
+}
+
+/////////////////////////////////////////////////
+LinkPtr Model::CreateLink(const std::string &_name)
+{
+  LinkPtr link;
+  if (this->GetLink(_name))
+  {
+    gzwarn << "Model [" << this->GetName()
+      << "] already has a link named [" << _name
+      << "], skipping creating link.\n";
+    return link;
+  }
+
+  link = this->world->GetPhysicsEngine()->CreateLink(shared_from_this());
+
+  link->SetName(_name);
+  this->links.push_back(link);
+
+  return link;
 }

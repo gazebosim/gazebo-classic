@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,85 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture
+class WorldTest : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
 {
+  /// \brief Test clearing an empty (blank) world.
+  /// \param[in] _physicsEngine Name of physics engine.
+  public: void ClearEmptyWorld(const std::string &_physicsEngine);
+
+  /// \brief Test Gravity, SetGravity
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void Gravity(const std::string &_physicsEngine);
+
+  /// \brief Test MagneticField, SetMagneticField
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MagneticField(const std::string &_physicsEngine);
 };
 
-/////////////////////////////////////////////////
-TEST_F(WorldTest, ClearEmptyWorld)
+/// \brief Pose after physics update
+ignition::math::Pose3d g_poseAfterUpdate;
+
+/// \brief Pose before physics update
+ignition::math::Pose3d g_poseBeforeUpdate;
+
+/// \brief Has the WorldUpdateBegin event been called
+bool g_updateBeginCalled = false;
+
+/// \brief Has the BeforePhysicsUpdate event been called
+bool g_beforePhysicsUpdateCalled = false;
+
+/// \brief Has the WorldUpdateEnd event been called
+bool g_updateEndCalled = false;
+
+/// \brief Callback for WorldUpdateBegin event, just records it's been called.
+/// \param[in] _updateInfo Information about the event time and world.
+void onWorldUpdateBegin(const common::UpdateInfo & /*_updateInfo*/)
 {
-  Load("worlds/blank.world");
+  g_updateBeginCalled = true;
+}
+
+/// \brief Callback for BeforePhysicsUpdate event.
+/// Record that it has been called, and also record the reported ball
+/// position.
+/// \param[in] updateInfo Information about the event time and world.
+void beforePhysicsUpdate(const common::UpdateInfo &_updateInfo)
+{
+  g_beforePhysicsUpdateCalled = true;
+
+  physics::WorldPtr world = physics::get_world(_updateInfo.worldName);
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  g_poseBeforeUpdate = link->GetWorldPose().Ign();
+}
+
+/// \brief Callback for WorldUpdateEnd event, just records it's been called.
+void onWorldUpdateEnd()
+{
+  g_updateEndCalled = true;
+}
+
+/////////////////////////////////////////////////
+void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
+{
+  this->Load("worlds/blank.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  gzdbg << "Engine: " << _physicsEngine << std::endl;
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -43,6 +110,12 @@ TEST_F(WorldTest, ClearEmptyWorld)
   // Now spawn something, and the model count should increase
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, ClearEmptyWorld)
+{
+  ClearEmptyWorld(GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -63,6 +136,81 @@ TEST_F(WorldTest, Clear)
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
 
   EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
+void WorldTest::Gravity(const std::string &_physicsEngine)
+{
+  this->Load("worlds/friction_demo.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  double dt = physics->GetMaxStepSize();
+
+  // expect value from world file
+  EXPECT_EQ(ignition::math::Vector3d(0, -1, -1), world->Gravity());
+
+  // set gravity to point up
+  const ignition::math::Vector3d gravity(0, 0, 10);
+  world->SetGravity(gravity);
+  EXPECT_EQ(gravity, world->Gravity());
+
+  // get initial pose and velocity of a box
+  auto model = world->GetModel("box_01_model");
+  ASSERT_TRUE(model != NULL);
+  auto initialPose = model->GetWorldPose().Ign();
+  auto initialVelocity = model->GetWorldLinearVel().Ign();
+  EXPECT_EQ(ignition::math::Vector3d::Zero, initialVelocity);
+
+  // step simulation and verify that box moves upwards
+  const int steps = 100;
+  world->Step(steps);
+  auto expectedVelocity = dt * steps * gravity;
+  auto velocity = model->GetWorldLinearVel().Ign();
+  auto expectedPosition = initialPose.Pos() + 0.5*(dt*steps) * expectedVelocity;
+  EXPECT_GT(velocity.Z(), 0.95*expectedVelocity.Z());
+  EXPECT_GT(model->GetWorldPose().Ign().Pos().Z(), 0.95*expectedPosition.Z());
+
+  // set gravity back to zero
+  world->SetGravity(ignition::math::Vector3d::Zero);
+  EXPECT_EQ(ignition::math::Vector3d::Zero, world->Gravity());
+
+  // step simulation and verify that velocity stays constant
+  world->Step(steps);
+  EXPECT_EQ(velocity, model->GetWorldLinearVel().Ign());
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, Gravity)
+{
+  Gravity(GetParam());
+}
+
+/////////////////////////////////////////////////
+void WorldTest::MagneticField(const std::string &_physicsEngine)
+{
+  this->Load("worlds/magnetometer.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // expect value from world file
+  EXPECT_EQ(ignition::math::Vector3d(1, 0, 0), world->MagneticField());
+
+  // set magnetic field to zero
+  world->SetMagneticField(ignition::math::Vector3d::Zero);
+  EXPECT_EQ(ignition::math::Vector3d::Zero, world->MagneticField());
+
+  // set magnetic field to ones
+  world->SetMagneticField(ignition::math::Vector3d::One);
+  EXPECT_EQ(ignition::math::Vector3d::One, world->MagneticField());
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, MagneticField)
+{
+  MagneticField(GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -303,7 +451,6 @@ TEST_F(WorldTest, ModifyLight)
   }
 }
 
-
 /////////////////////////////////////////////////
 TEST_F(WorldTest, RemoveModelPaused)
 {
@@ -350,6 +497,125 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   EXPECT_FALSE(sphereModel != NULL);
   EXPECT_FALSE(boxModel != NULL);
 }
+
+/////////////////////////////////////////////////
+/// \brief Check if WorldUpdateBegin, BeforePhysicsUpdate and WorldUpdateEnd
+/// events are called, and if the BeforePhysicsUpdate event is really called
+/// before the physics engine update happens
+TEST_F(WorldTest, CheckWorldEventsWork)
+{
+  Load("worlds/shapes.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  // run the world for a while just to stabilize
+  world->Step(10);
+
+  // initial pose of the link
+  ignition::math::Pose3d initialPose = link->GetWorldPose().Ign();
+
+  // connect to the world events
+  event::ConnectionPtr worldUpdateBeginEventConnection =
+    event::Events::ConnectWorldUpdateBegin(&onWorldUpdateBegin);
+
+  event::ConnectionPtr beforePhysicsUpdateConnection =
+    event::Events::ConnectBeforePhysicsUpdate(&beforePhysicsUpdate);
+
+  event::ConnectionPtr worldUpdateEndEventConnection =
+    event::Events::ConnectWorldUpdateEnd(&onWorldUpdateEnd);
+
+  // iterate for a while pushing to the ball and check the events get called
+  // and that the pose changes only after BeforePhysicUpdate is called.
+  for (size_t i = 0; i < 100; ++i)
+  {
+    ASSERT_FALSE(g_updateBeginCalled);
+    ASSERT_FALSE(g_beforePhysicsUpdateCalled);
+    ASSERT_FALSE(g_updateEndCalled);
+
+    // push to the ball
+    link->AddForce(ignition::math::Vector3d(1000, 0, 0));
+
+    world->Step(1);
+
+    // pose after the physics update
+    ignition::math::Pose3d poseAfterUpdate = link->GetWorldPose().Ign();
+
+    // initial pose and pose before physics update should be the same
+    EXPECT_EQ(initialPose.Pos(), g_poseBeforeUpdate.Pos());
+
+    // pose before physics update and after it should be different
+    EXPECT_GT((g_poseAfterUpdate - g_poseBeforeUpdate).Pos().Abs().Sum(), 1e-9);
+
+    // the events should get called
+    EXPECT_TRUE(g_updateBeginCalled);
+    EXPECT_TRUE(g_beforePhysicsUpdateCalled);
+    EXPECT_TRUE(g_updateEndCalled);
+
+    g_updateBeginCalled = false;
+    g_beforePhysicsUpdateCalled = false;
+    g_updateEndCalled = false;
+
+    // remember the current pose to compare it in the next iteration
+    initialPose = poseAfterUpdate;
+  }
+
+  // disconnect from world events
+  event::Events::DisconnectWorldUpdateBegin(worldUpdateBeginEventConnection);
+  event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
+  event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
+}
+
+/////////////////////////////////////////////////
+TEST_F(WorldTest, URI)
+{
+  Load("worlds/nested_model.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  EXPECT_EQ(world->URI().Str(), "data://world/default");
+
+  // Check a light.
+  auto light = world->Light("sun");
+  ASSERT_TRUE(light != NULL);
+  EXPECT_EQ(light->URI().Str(), "data://world/default/light/sun");
+
+  // Check a model.
+  auto model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model != NULL);
+  EXPECT_EQ(model->URI().Str(), "data://world/default/model/ground_plane");
+
+  auto link = model->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->URI().Str(),
+      "data://world/default/model/ground_plane/link/link");
+
+  // Check a nested model.
+  model = world->GetModel("model_00");
+  ASSERT_TRUE(model != NULL);
+  EXPECT_EQ(model->URI().Str(), "data://world/default/model/model_00");
+
+  link = model->GetLink("link_00");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->URI().Str(),
+      "data://world/default/model/model_00/link/link_00");
+
+  auto nestedModel = model->NestedModel("model_01");
+  ASSERT_TRUE(nestedModel != NULL);
+  EXPECT_EQ(nestedModel->URI().Str(),
+      "data://world/default/model/model_00/model/model_01");
+
+  link = nestedModel->GetLink("link_01");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->URI().Str(),
+      "data://world/default/model/model_00/model/model_01/link/link_01");
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

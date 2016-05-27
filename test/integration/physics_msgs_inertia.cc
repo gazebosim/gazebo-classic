@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,8 +133,8 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
+  auto g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
 
   const std::string modelName("plank");
   auto model = world->GetModel(modelName);
@@ -207,8 +207,8 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
+  auto g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
 
   const std::string modelName("cube1");
   auto model = world->GetModel(modelName);
@@ -280,8 +280,8 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
+  auto g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
   double dt = physics->GetMaxStepSize();
   EXPECT_NEAR(dt, 1e-3, 1e-6);
 
@@ -373,7 +373,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     auto cycles = cycleCount[i];
     // expected natural frequency for box pendulum (Hz)
     // see physics_msgs_inertia.ipynb for derivation
-    double freq = 0.5 * M_1_PI * sqrt(300.0 / 401.0 * g.GetLength() / length);
+    double freq = 0.5 * M_1_PI * sqrt(300.0 / 401.0 * g.Length() / length);
     // 2 cycles counted per oscillation
     double expectedCycles = 2 * freq * timeStepped;
     EXPECT_EQ(cycles, static_cast<int>(expectedCycles));
@@ -455,7 +455,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     auto cycles = cycleCount[i];
     // expected natural frequency for box pendulum (Hz)
     // see physics_msgs_inertia.ipynb for derivation
-    double freq = 0.5 * M_1_PI * sqrt(150.0 / 251.0 * g.GetLength() / length);
+    double freq = 0.5 * M_1_PI * sqrt(150.0 / 251.0 * g.Length() / length);
     // 2 cycles counted per oscillation
     double expectedCycles = 2 * freq * timeStepped;
     EXPECT_EQ(cycles, static_cast<int>(expectedCycles));

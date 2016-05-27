@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
@@ -559,7 +560,7 @@ std::string Visual::GetName() const
 void Visual::AttachVisual(VisualPtr _vis)
 {
   if (!_vis)
-    gzerr << "Visual is null\n";
+    gzerr << "Visual is null" << std::endl;
   else
   {
     if (_vis->GetSceneNode()->getParentSceneNode())
@@ -671,6 +672,7 @@ void Visual::DetachObjects()
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
   this->dataPtr->myMaterialName = "";
+  this->dataPtr->skeleton = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -759,6 +761,19 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(math::Vector3(this->dataPtr->scale)));
+
+  // Scale selection object in case we have one attached. Other children were
+  // scaled from UpdateGeomSize
+  for (auto child : this->dataPtr->children)
+  {
+    auto selectionObj = std::dynamic_pointer_cast<SelectionObj>(child);
+
+    if (selectionObj)
+    {
+      selectionObj->UpdateSize();
+      break;
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1725,12 +1740,16 @@ void Visual::SetPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetPosition() const
 {
+  if (!this->dataPtr->sceneNode)
+    return math::Vector3::Zero;
   return Conversions::Convert(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+  if (!this->dataPtr->sceneNode)
+    return math::Vector3::Zero;
   return Conversions::Convert(this->dataPtr->sceneNode->getOrientation());
 }
 
@@ -1753,12 +1772,16 @@ void Visual::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+  if (!this->dataPtr->sceneNode)
+    return;
   this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
+  if (!this->dataPtr->sceneNode)
+    return;
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
@@ -2348,10 +2371,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
       this->DetachObjects();
 
+      Ogre::MovableObject *obj = NULL;
       if (newGeometryType == "box" || newGeometryType == "cylinder" ||
           newGeometryType == "sphere" || newGeometryType == "plane")
       {
-        this->AttachMesh("unit_" + newGeometryType);
+        obj = this->AttachMesh("unit_" + newGeometryType);
         sdf::ElementPtr shapeElem = geomElem->AddElement(newGeometryType);
         if (newGeometryType == "sphere" || newGeometryType == "cylinder")
           shapeElem->GetElement("radius")->Set(0.5);
@@ -2376,7 +2400,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
             centerSubmesh= _msg->geometry().mesh().center_submesh();
         }
 
-        this->AttachMesh(meshName, submeshName, centerSubmesh);
+        obj = this->AttachMesh(meshName, submeshName, centerSubmesh);
 
         sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
         if (!filename.empty())
@@ -2388,6 +2412,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           submeshElem->GetElement("center")->Set(centerSubmesh);
         }
       }
+      Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
+      if (ent && ent->hasSkeleton())
+        this->dataPtr->skeleton = ent->getSkeleton();
       this->SetTransparency(origTransparency);
       this->SetMaterial(origMaterial);
     }
@@ -2705,7 +2732,11 @@ std::string Visual::GetMeshName() const
         meshManager->CreateExtrudedPolyline(polyLineName, polylines,
             geomElem->GetElement("polyline")->Get<double>("height"));
       }
-      return polyLineName;
+
+      if (meshManager->HasMesh(polyLineName))
+        return polyLineName;
+      else
+        return std::string();
     }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {

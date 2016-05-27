@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -466,7 +466,7 @@ void Heightmap::Load()
                            sqrt(delta.X() * delta.X() + delta.Y() * delta.Y()));
 
       userCam->SetWorldPose(ignition::math::Pose3d(camPos,
-          ignition::math::Vector3d(0, pitch, yaw)));
+          ignition::math::Quaterniond(0.0, pitch, yaw)));
     }
   }
 

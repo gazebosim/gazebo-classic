@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ void PhysicsThreadSafeTest::BlankWorld(const std::string &_physicsEngine)
 
   // The following lines cause a seg-fault on revision 031749b
   // This test passes if it doesn't seg-fault.
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   physics->SetGravity(g);
 }
 

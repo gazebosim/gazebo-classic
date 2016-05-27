@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,15 @@ namespace gazebo
 
       /// \brief Count of data values in mean.
       public: unsigned int count;
+
+      /// \brief Clone the SignalStatisticPrivate object. Used for implementing
+      /// copy semantics.
+      public: std::unique_ptr<SignalStatisticPrivate> Clone() const
+      {
+        std::unique_ptr<SignalStatisticPrivate> dataPtr(
+            new SignalStatisticPrivate(*this));
+        return dataPtr;
+      }
     };
 
     class SignalStatistic;
@@ -49,6 +58,15 @@ namespace gazebo
     {
       /// \brief Vector of `SignalStatistic`s.
       public: SignalStatistic_V stats;
+
+      /// \brief Clone the SignalStatsPrivate object. Used for implementing
+      /// copy semantics.
+      public: std::unique_ptr<SignalStatsPrivate> Clone() const
+      {
+        std::unique_ptr<SignalStatsPrivate> dataPtr(
+            new SignalStatsPrivate(*this));
+        return dataPtr;
+      }
     };
   }
 }

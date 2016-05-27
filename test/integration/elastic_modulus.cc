@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,6 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   Load("worlds/elastic_modulus_contact_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
 
   int i = 0;
   while (!this->HasEntity("sphere") && i < 20)
@@ -131,7 +130,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   double eStar = 1.0 / ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
   double rStar = 1.0 / (1.0/r1 + 1.0/r2);
   // contact force
-  double f1 = -physics->GetGravity().x * m1;
+  double f1 = -world->Gravity().X() * m1;
 
   for (int n = 0; n < 10; ++n)
   {

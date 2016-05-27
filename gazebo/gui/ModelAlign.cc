@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -336,6 +336,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
         auto modelMsg = userCmdMsg.add_model();
         modelMsg->CopyFrom(msg);
       }
+
+      Events::moveEntity(vis->GetName(), vis->GetWorldPose().Ign(), true);
     }
 
     this->dataPtr->userCmdPub->Publish(userCmdMsg);

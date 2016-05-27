@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/sensors/WirelessReceiver.hh"
-#include "gazebo/sensors/WirelessTransmitter.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
+
+#include "gazebo/sensors/WirelessReceiverPrivate.hh"
+#include "gazebo/sensors/WirelessReceiver.hh"
+#include "gazebo/sensors/WirelessTransmitter.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -37,11 +39,9 @@ GZ_REGISTER_STATIC_SENSOR("wireless_receiver", WirelessReceiver)
 
 /////////////////////////////////////////////////
 WirelessReceiver::WirelessReceiver()
-: WirelessTransceiver()
+: WirelessTransceiver(),
+  dataPtr(new WirelessReceiverPrivate)
 {
-  this->minFreq = 2412.0;
-  this->maxFreq = 2484.0;
-  this->sensitivity = -90.0;
 }
 
 //////////////////////////////////////////////////
@@ -60,39 +60,48 @@ void WirelessReceiver::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
 
-  this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
-  GZ_ASSERT(this->pub != NULL,
+  this->pub = this->node->Advertise<msgs::WirelessNodes>(
+      this->Topic(), 30);
+  GZ_ASSERT(this->pub != nullptr,
       "wirelessReceiverSensor did not get a valid publisher pointer");
 
-  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
+  sdf::ElementPtr transceiverElem =
+    this->sdf->GetElement("transceiver");
 
-  this->minFreq = transceiverElem->Get<double>("min_frequency");
-  this->maxFreq = transceiverElem->Get<double>("max_frequency");
-  this->sensitivity = transceiverElem->Get<double>("sensitivity");
+  this->dataPtr->minFreq = transceiverElem->Get<double>("min_frequency");
+  this->dataPtr->maxFreq = transceiverElem->Get<double>("max_frequency");
+  this->dataPtr->sensitivity = transceiverElem->Get<double>("sensitivity");
 
-  if (this->minFreq <= 0)
+  if (this->dataPtr->minFreq <= 0)
   {
-    gzthrow("Wireless receiver min. frequency must be > 0. Current value is ["
-      << this->minFreq << "]");
+    gzerr << "Attempting to set a wireless receiver min frequency"
+      << "of [" << this->dataPtr->minFreq << "]. Value must be > 0, "
+      << "using a value of 1.0\n";
+    this->dataPtr->minFreq = 1.0;
   }
 
-  if (this->maxFreq <= 0)
+  if (this->dataPtr->maxFreq <= 0)
   {
-    gzthrow("Wireless receiver max. frequency must be > 0. Current value is ["
-      << this->maxFreq << "]");
+    gzerr << "Attempting to set a wireless receiver max frequency"
+      << "of [" << this->dataPtr->maxFreq << "]. Value must be > 0, "
+      << "using a value of 1.0\n";
+    this->dataPtr->maxFreq = 1.0;
   }
 
-  if (this->minFreq > this->maxFreq)
+  if (this->dataPtr->minFreq > this->dataPtr->maxFreq)
   {
-    gzthrow("Wireless receiver min. frequency must be less or equal than max. "
-        << "frequency. Current min. frequency is [" << this->minFreq <<
-        "] and max frequency is [" << this->maxFreq << "]");
+    gzerr << "Wireless receiver min frequency[" << this->dataPtr->minFreq << "]"
+      << " is greater than max frequency[" << this->dataPtr->maxFreq << "]."
+      << " Swapping the values.\n";
+    std::swap(this->dataPtr->maxFreq, this->dataPtr->minFreq);
   }
 
-  if (this->sensitivity >= 0)
+  if (this->dataPtr->sensitivity >= 0)
   {
-    gzthrow("Wireless receiver sensitivity must be < 0. Current value is ["
-      << this->sensitivity << "]");
+    gzerr << "Attempting to set a wireless sensitivity "
+      << "of [" << this->dataPtr->sensitivity << "]. Value must be > 0, "
+      << "using a value of 1.0\n";
+    this->dataPtr->sensitivity = 1.0;
   }
 }
 
@@ -104,31 +113,31 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
   double rxPower;
   double txFreq;
 
-  this->referencePose =
-      this->pose + this->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose +
+    this->parentEntity.lock()->GetWorldPose().Ign();
 
   ignition::math::Pose3d myPos = this->referencePose;
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
   for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
   {
-    if ((*it)->GetType() == "wireless_transmitter")
+    if ((*it)->Type() == "wireless_transmitter")
     {
       std::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
           std::static_pointer_cast<WirelessTransmitter>(*it);
 
-      txFreq = transmitter->GetFreq();
-      rxPower = transmitter->SignalStrength(myPos, this->GetGain());
+      txFreq = transmitter->Freq();
+      rxPower = transmitter->SignalStrength(myPos, this->Gain());
 
       // Discard if the frequency received is out of our frequency range,
       // or if the received signal strengh is lower than the sensivity
-      if ((txFreq < this->GetMinFreqFiltered()) ||
-          (txFreq > this->GetMaxFreqFiltered()) ||
-          (rxPower < this->GetSensitivity()))
+      if ((txFreq < this->MinFreqFiltered()) ||
+          (txFreq > this->MaxFreqFiltered()) ||
+          (rxPower < this->Sensitivity()))
       {
         continue;
       }
 
-      txEssid = transmitter->GetESSID();
+      txEssid = transmitter->ESSID();
 
       msgs::WirelessNode *wirelessNode = msg.add_node();
       wirelessNode->set_essid(txEssid);
@@ -147,19 +156,37 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 /////////////////////////////////////////////////
 double WirelessReceiver::GetMinFreqFiltered() const
 {
-  return this->minFreq;
+  return this->MinFreqFiltered();
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::MinFreqFiltered() const
+{
+  return this->dataPtr->minFreq;
 }
 
 /////////////////////////////////////////////////
 double WirelessReceiver::GetMaxFreqFiltered() const
 {
-  return this->maxFreq;
+  return this->MaxFreqFiltered();
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::MaxFreqFiltered() const
+{
+  return this->dataPtr->maxFreq;
 }
 
 /////////////////////////////////////////////////
 double WirelessReceiver::GetSensitivity() const
 {
-  return this->sensitivity;
+  return this->Sensitivity();
+}
+
+/////////////////////////////////////////////////
+double WirelessReceiver::Sensitivity() const
+{
+  return this->dataPtr->sensitivity;
 }
 
 //////////////////////////////////////////////////

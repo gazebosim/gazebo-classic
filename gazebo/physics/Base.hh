@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,8 @@
  *
 */
 
-/* Desc: Base class shared by all classes in Gazebo.
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
- */
-
-#ifndef _GAZEBO_PHYSICS_BASE_HH_
-#define _GAZEBO_PHYSICS_BASE_HH_
+#ifndef GAZEBO_PHYSICS_BASE_HH_
+#define GAZEBO_PHYSICS_BASE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -31,10 +26,12 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
+#include <vector>
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -43,7 +40,8 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
@@ -92,8 +90,6 @@ namespace gazebo
                 LINK            = 0x00000004,
                 /// \brief Collision type
                 COLLISION       = 0x00000008,
-                /// \brief Actor type
-                ACTOR           = 0x00000016,
                 /// \brief Light type
                 LIGHT           = 0x00000010,
                 /// \brief Visual type
@@ -117,6 +113,9 @@ namespace gazebo
                 GEARBOX_JOINT   = 0x00002000,
                 /// \brief FixedJoint type
                 FIXED_JOINT     = 0x00004000,
+
+                /// \brief Actor type
+                ACTOR           = 0x00008000,
 
                 /// \brief Shape type
                 SHAPE           = 0x00010000,
@@ -268,6 +267,10 @@ namespace gazebo
       /// \return The full type definition.
       public: unsigned int GetType() const;
 
+      /// \brief Get the string name for the entity type.
+      /// \return The string name for this entity.
+      public: std::string TypeStr() const;
+
       /// \brief Return the name of this entity with the model scope
       /// model1::...::modelN::entityName
       /// \param[in] _prependWorldName True to prended the returned string
@@ -275,6 +278,14 @@ namespace gazebo
       /// world::model1::...::modelN::entityName.
       /// \return The scoped name.
       public: std::string GetScopedName(bool _prependWorldName = false) const;
+
+      /// \brief Return the common::URI of this entity.
+      /// The URI includes the world where the entity is contained and all the
+      /// hierarchy of sub-entities that can compose this entity.
+      /// E.g.: A link entity contains the name of the link and the model where
+      /// the link is contained.
+      /// \return The URI of this entity.
+      public: common::URI URI() const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.
@@ -308,6 +319,12 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      protected: virtual void UnregisterIntrospectionItems();
+
       /// \brief Compute the scoped name of this object based on its
       /// parents.
       /// \sa Base::GetScopedName
@@ -325,6 +342,9 @@ namespace gazebo
       /// \brief Pointer to the world.
       protected: WorldPtr world;
 
+      /// \brief All the introspection items regsitered for this.
+      protected: std::vector<common::URI> introspectionItems;
+
       /// \brief Set to true if the object should be saved.
       private: bool saveable;
 
@@ -333,6 +353,9 @@ namespace gazebo
 
       /// \brief The type of this object.
       private: unsigned int type;
+
+      /// \brief The string representation of the type of this object.
+      private: std::string typeStr;
 
       /// \brief True if selected.
       private: bool selected;

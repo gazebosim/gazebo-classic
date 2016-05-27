@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 #ifndef _GAZEBO_GUI_BUILDING_DOORITEM_PRIVATE_HH_
 #define _GAZEBO_GUI_BUILDING_DOORITEM_PRIVATE_HH_
+
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 
@@ -42,7 +44,7 @@ namespace gazebo
       public: double doorElevation;
 
       /// \brief Door scene position in pixel coordinates.
-      public: QPointF doorPos;
+      public: ignition::math::Vector2d doorPos;
 
       /// \brief Inspector for configuring the door item.
       public: WindowDoorInspectorDialog *inspector;
