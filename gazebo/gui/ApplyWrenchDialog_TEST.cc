@@ -468,7 +468,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
     gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint, manipState);
     if (!vis && manipState == "rot_y")
     {
-      mousePoint.y += 20;
+      mousePoint.y += 15;
       break;
     }
     mousePoint.y += 5;
@@ -478,12 +478,19 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   {
     return;
   }
-
   // Move mouse to the rot tool
   QPoint pressPoint(mousePoint.x, mousePoint.y);
-  QTest::mouseMove(glWidget, pressPoint);
 
-  this->ProcessEventsAndDraw(mainWindow);
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    QTest::mouseMove(glWidget, pressPoint + QPoint(0, i));
+    this->ProcessEventsAndDraw(mainWindow);
+  }
+
+  gzerr << " mousePoint " << mousePoint << std::endl;
+  gzerr << " glWidget " << glWidget->width() << " " << glWidget->height() << std::endl;
+  gzerr << " manipState " << manipState << std::endl;
+  gzerr << " state " << boxApplyWrenchVis->GetRotTool()->GetState() << std::endl;
 
   // Check that rot tool is highlighted
   QVERIFY(boxApplyWrenchVis->GetRotTool()->GetState() ==
