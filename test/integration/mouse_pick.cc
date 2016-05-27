@@ -20,9 +20,143 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/model/ModelEditorPalette.hh"
+#include "gazebo/gui/model/ModelCreator.hh"
+
 #include "mouse_pick.hh"
 
 #include "test_config.h"
+
+/////////////////////////////////////////////////
+void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
+    const ignition::math::Vector2d &_start,
+    const ignition::math::Vector2d &_end)
+{
+  // move the mouse cursor to the _start pos
+  QTest::mouseMove(_widget,
+      QPoint(_widget->width()*_start.X(), _widget->height()*_start.Y()));
+
+  // There seem to be a problem simulating mouse drag using QTest
+  // so use raw QMouseEvent.
+  QPoint startPt(_widget->width()*_start.X(), _widget->height()*_start.Y());
+  QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, startPt,
+      _widget->mapToGlobal(startPt), _button, _button, Qt::NoModifier);
+  QApplication::postEvent(_widget, pressEvent);
+
+  ignition::math::Vector2d dist = _end - _start;
+
+  // move the cursor to _end pos over 10 steps
+  unsigned int steps = 10;
+  for (unsigned int i = 0; i < steps; ++i)
+  {
+    // compute next pos to move the cursor to
+    ignition::math::Vector2d nextPos = _start + dist * (1.0 / steps) * (i+1);
+
+    QPoint movePt(_widget->width()*nextPos.X(), _widget->height()*nextPos.Y());
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, movePt,
+        _widget->mapToGlobal(movePt), _button, _button, Qt::NoModifier);
+    QApplication::postEvent(_widget, moveEvent);
+
+    gazebo::common::Time::MSleep(10);
+    QCoreApplication::processEvents();
+  }
+
+  QPoint releasePt(_widget->width()*_end.X(), _widget->height()*_end.Y());
+  QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
+      releasePt, _widget->mapToGlobal(releasePt), _button, _button,
+      Qt::NoModifier);
+  QApplication::postEvent(_widget, releaseEvent);
+}
+
+/////////////////////////////////////////////////
+void MousePickingTest::Selection()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get camera
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+
+  // switch to editor mode
+  gazebo::gui::g_editModelAct->toggle();
+
+  // get the model creator
+  auto modelEditorPalette =
+      mainWindow->findChild<gazebo::gui::ModelEditorPalette *>();
+  QVERIFY(modelEditorPalette != nullptr);
+  gazebo::gui::ModelCreator *modelCreator = modelEditorPalette->ModelCreator();
+  QVERIFY(modelCreator != nullptr);
+
+  // insert a cylinder link
+  modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
+  gazebo::rendering::VisualPtr cylinder =
+      scene->GetVisual("ModelPreview_0::link_0");
+  QVERIFY(cylinder != nullptr);
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // move camera to look at cylinder
+  cam->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(-5, 0.0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0)));
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != nullptr);
+
+  // click on the cylinder
+  QTest::mouseMove(glWidget,
+      QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
+  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+      QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // make sure the cylinder is selected
+  QVERIFY(cylinder->GetHighlighted());
+
+  // pan the camera by dragging over the ground plane in x
+  double dragHeight = 0.99;
+  MouseDrag(glWidget, Qt::LeftButton,
+      ignition::math::Vector2d(0.5, dragHeight),
+      ignition::math::Vector2d(0.25, dragHeight));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // verify the cylinder is still selected.
+  QVERIFY(cylinder->GetHighlighted());
+
+  // Clean up
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
 
 /////////////////////////////////////////////////
 void MousePickingTest::Transparency()
