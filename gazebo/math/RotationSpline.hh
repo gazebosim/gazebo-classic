@@ -48,7 +48,8 @@ namespace gazebo
         /// \param[in] _index the index of the control point.
         /// \remarks This point must already exist in the spline.
         /// \return a quaternion (out of bound index result in assertion)
-        public: const Quaternion &GetPoint(unsigned int _index) const GAZEBO_DEPRECATED(8.0);
+        public: const Quaternion &GetPoint(unsigned int _index) const
+            GAZEBO_DEPRECATED(8.0);
 
         /// \brief Gets the number of control points in the spline.
         /// \return the count
@@ -61,7 +62,8 @@ namespace gazebo
         /// \remarks This point must already exist in the spline.
         /// \param[in] _index index
         /// \param[in] _value the new control point value
-        public: void UpdatePoint(unsigned int _index, const Quaternion &_value) GAZEBO_DEPRECATED(8.0);
+        public: void UpdatePoint(unsigned int _index, const Quaternion &_value)
+            GAZEBO_DEPRECATED(8.0);
 
         /// \brief Returns an interpolated point based on a parametric
         ///        value over the whole series.
@@ -72,7 +74,8 @@ namespace gazebo
         /// \param[in] _useShortestPath Defines if rotation should take the
         ///        shortest possible path
         /// \return the rotation
-        public: Quaternion Interpolate(double _t, bool _useShortestPath = true) GAZEBO_DEPRECATED(8.0);
+        public: Quaternion Interpolate(double _t, bool _useShortestPath = true)
+            GAZEBO_DEPRECATED(8.0);
 
         /// \brief Interpolates a single segment of the spline
         ///        given a parametric value.

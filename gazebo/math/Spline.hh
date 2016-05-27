@@ -61,7 +61,8 @@ namespace gazebo
       /// \param[in] _index the control point index
       /// \return the control point, or [0,0,0] and a message on the error
       /// stream
-      public: Vector3 GetPoint(unsigned int _index) const GAZEBO_DEPRECATED(8.0);
+      public: Vector3 GetPoint(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief  Gets the number of control points in the spline.
       /// \return the count
@@ -69,7 +70,8 @@ namespace gazebo
 
       /// \brief Get the tangent value for a point
       /// \param[in] _index the control point index
-      public: Vector3 GetTangent(unsigned int _index) const GAZEBO_DEPRECATED(8.0);
+      public: Vector3 GetTangent(unsigned int _index) const
+           GAZEBO_DEPRECATED(8.0);
 
       /// \brief  Clears all the points in the spline.
       public: void Clear() GAZEBO_DEPRECATED(8.0);
@@ -79,7 +81,8 @@ namespace gazebo
       /// out of bounds
       /// \param[in] _index the control point index
       /// \param[in] _value the new position
-      public: void UpdatePoint(unsigned int _index, const Vector3 &_value) GAZEBO_DEPRECATED(8.0);
+      public: void UpdatePoint(unsigned int _index, const Vector3 &_value)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns an interpolated point based on a parametric value
       ///        over the whole series.
@@ -91,8 +94,8 @@ namespace gazebo
       /// \param[in] _fromIndex The point index to treat as t = 0.
       ///        fromIndex + 1 is deemed to be t = 1
       /// \param[in] _t Parametric value
-      public: Vector3 Interpolate(unsigned int _fromIndex, double _t) const GAZEBO_DEPRECATED(8.0);
-
+      public: Vector3 Interpolate(unsigned int _fromIndex, double _t) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Tells the spline whether it should automatically
       ///        calculate tangents on demand as points are added.
