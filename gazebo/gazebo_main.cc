@@ -69,28 +69,36 @@ void help()
   << "\n";
 }
 
-/////////////////////////////////////////////////
-static void kill_one_process(int _pid, bool *_killed, int *_status,
-                             double _waittime, std::string _name)
+/// \brief Try to kill a single process.
+/// \param[in] _pid Process ID.
+/// \param[in] _name Process name.
+/// \param[in] _waittime Total time to wait in seconds.
+/// \param[in,out] _killed Set to true if process was successfully killed.
+/// \param[in,out] _status Store status information for that process.
+static void kill_one_process(const int _pid, const std::string &_name,
+                             const double _waittime, bool &_killed,
+                             int &_status)
 {
   kill(_pid, SIGINT);
   double sleepSecs = 0.001;
   // Wait some time and if not dead, escalate to SIGKILL
   for (unsigned int i = 0; i < (unsigned int)(_waittime / sleepSecs); ++i)
   {
-    if (*_killed == false )
+    if (!_killed)
     {
-      int p = waitpid(_pid, _status, WNOHANG);
+      int p = waitpid(_pid, &_status, WNOHANG);
       if (p == _pid)
       {
-        *_killed = true;
+        _killed = true;
         break;
       }
     }
+    if (_killed)
+      break;
     // Sleep briefly
     gazebo::common::Time::Sleep(gazebo::common::Time(sleepSecs));
   }
-  if (*_killed == false)
+  if (!_killed)
   {
     std::cerr << "escalating to SIGKILL on " << _name << std::endl;
     kill(_pid, SIGKILL);
@@ -101,9 +109,9 @@ static void kill_one_process(int _pid, bool *_killed, int *_status,
 void sig_handler(int /*signo*/)
 {
   sig_killed = true;
-  kill_one_process(pid2, &killed2, &status2, 5.0, "client");
-  kill_one_process(pid1, &killed1, &status1, 5.0, "server");
- }
+  kill_one_process(pid2, "client", 5.0, killed2, status2);
+  kill_one_process(pid1, "server", 5.0, killed1, status1);
+}
 
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
