@@ -372,7 +372,8 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->tabWidget->hide();
   this->dataPtr->toolsWidget->hide();
 
-  this->dataPtr->node->Fini();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->pluginMsgs.clear();
 
   this->dataPtr->worldControlPub.reset();
