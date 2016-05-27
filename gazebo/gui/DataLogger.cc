@@ -273,6 +273,11 @@ DataLogger::DataLogger(QWidget *_parent)
 /////////////////////////////////////////////////
 DataLogger::~DataLogger()
 {
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->pub.reset();
+  this->dataPtr->sub.reset();
+  this->dataPtr->node.reset();
 }
 
 /////////////////////////////////////////////////
