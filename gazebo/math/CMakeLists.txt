@@ -73,9 +73,7 @@ endforeach()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gzmath.hh.in
                ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MATH")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MATH -Wno-deprecated-declarations")
 
 gz_add_library(gazebo_math ${sources})
 target_link_libraries(gazebo_math ${Boost_LIBRARIES} ${IGNITION-MATH_LIBRARIES})

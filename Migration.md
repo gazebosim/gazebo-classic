@@ -51,6 +51,14 @@ release will remove the deprecated code.
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
+1. **gazebo/math/Spline.hh**
+    + ***Deprecation:*** public: gazebo::math::Spline
+    + ***Replacement:*** public: ignition::math::Spline
+
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
+
 ### Deletions
 
 1. **gazebo/common/Event.hh**
