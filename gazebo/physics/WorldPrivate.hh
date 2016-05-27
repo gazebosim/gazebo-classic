@@ -21,6 +21,7 @@
 #include <deque>
 #include <vector>
 #include <list>
+#include <memory>
 #include <set>
 #include <boost/thread.hpp>
 #include <sdf/sdf.hh>
@@ -28,6 +29,7 @@
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -94,9 +96,6 @@ namespace gazebo
 
       /// \brief Publisher for world statistics messages.
       public: transport::PublisherPtr statPub;
-
-      /// \brief Publisher for publishing clock
-      public: transport::PublisherPtr clockPub;
 
       /// \brief Publisher for request response messages.
       public: transport::PublisherPtr responsePub;
@@ -340,9 +339,11 @@ namespace gazebo
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
 
-      /// \brief Transform from world frame to NED frame (North/East/Down).
-      /// See World::SetNEDWorldPose() documentation for details of NED frame.
-      public: ignition::math::Pose3d nedPose;
+      /// \brief URI of this world.
+      public: common::URI uri;
+
+      /// \brief All the introspection items regsitered for this.
+      public: std::vector<common::URI> introspectionItems;
     };
   }
 }

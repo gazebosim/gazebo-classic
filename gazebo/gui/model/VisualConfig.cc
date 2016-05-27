@@ -284,35 +284,40 @@ void VisualConfig::OnRemoveVisual(int _id)
   VisualConfigData *configData = this->configs[_id];
 
   // Ask for confirmation
-  std::string msg;
-
-  if (this->configs.size() == 1)
+  // Don't open the dialog during tests, see issue #1963
+  auto inTest = getenv("IN_TESTSUITE");
+  if (!inTest)
   {
-    msg = "Are you sure you want to remove " +
-        configData->name + "?\n\n" +
-        "This is the only visual. \n" +
-        "Without visuals, this link won't be visible.\n";
-  }
-  else
-  {
-    msg = "Are you sure you want to remove " +
-        configData->name + "?\n";
-  }
+    std::string msg;
 
-  QMessageBox msgBox(QMessageBox::Warning, QString("Remove visual?"),
-      QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
-      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+    if (this->configs.size() == 1)
+    {
+      msg = "Are you sure you want to remove " +
+          configData->name + "?\n\n" +
+          "This is the only visual. \n" +
+          "Without visuals, this link won't be visible.\n";
+    }
+    else
+    {
+      msg = "Are you sure you want to remove " +
+          configData->name + "?\n";
+    }
 
-  QPushButton *cancelButton =
-      msgBox.addButton("Cancel", QMessageBox::RejectRole);
-  QPushButton *removeButton = msgBox.addButton("Remove",
-      QMessageBox::AcceptRole);
-  msgBox.setDefaultButton(removeButton);
-  msgBox.setEscapeButton(cancelButton);
-  msgBox.exec();
-  if (msgBox.clickedButton() && msgBox.clickedButton() != removeButton)
-    return;
+    QMessageBox msgBox(QMessageBox::Warning, QString("Remove visual?"),
+        QString(msg.c_str()));
+    msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+    QPushButton *cancelButton =
+        msgBox.addButton("Cancel", QMessageBox::RejectRole);
+    QPushButton *removeButton = msgBox.addButton("Remove",
+        QMessageBox::AcceptRole);
+    msgBox.setDefaultButton(removeButton);
+    msgBox.setEscapeButton(cancelButton);
+    msgBox.exec();
+    if (msgBox.clickedButton() && msgBox.clickedButton() != removeButton)
+      return;
+  }
 
   // Remove
   this->listLayout->removeWidget(configData->widget);

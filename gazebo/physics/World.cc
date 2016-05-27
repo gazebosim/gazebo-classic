@@ -56,6 +56,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/math/Vector3.hh"
 
@@ -63,6 +64,7 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
@@ -335,6 +337,14 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->userCmdManager = UserCmdManagerPtr(
       new UserCmdManager(shared_from_this()));
+
+  // Initialize the world URI.
+  this->dataPtr->uri.Clear();
+  this->dataPtr->uri.SetScheme("data");
+  this->dataPtr->uri.Path().PushFront(this->GetName());
+  this->dataPtr->uri.Path().PushFront("world");
+
+  this->RegisterIntrospectionItems();
 
   this->dataPtr->loaded = true;
 }
@@ -714,6 +724,8 @@ void World::Step()
     DIAG_TIMER_LAP("World::Step", "update");
   }
 
+  gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
+
   this->ProcessMessages();
   DIAG_TIMER_LAP("World::Step", "processMessages");
 
@@ -847,6 +859,8 @@ void World::Update()
   event::Events::worldUpdateEnd();
   DIAG_TIMER_LAP("World::Update", "endEvent");
 
+  gazebo::util::IntrospectionManager::Instance()->Update();
+
   DIAG_TIMER_STOP("World::Update");
 }
 
@@ -951,6 +965,8 @@ void World::Fini()
     delete this->dataPtr->worldUpdateMutex;
     this->dataPtr->worldUpdateMutex = NULL;
   }
+
+  this->UnregisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -2866,4 +2882,32 @@ void World::ResetPhysicsStates()
 {
   for (auto &model : this->dataPtr->models)
     model->ResetPhysicsStates();
+}
+
+/////////////////////////////////////////////////
+common::URI World::URI() const
+{
+  return this->dataPtr->uri;
+}
+
+/////////////////////////////////////////////////
+void World::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  common::URI timeURI(uri);
+  timeURI.Query().Insert("p", "time/sim_time");
+  this->dataPtr->introspectionItems.push_back(timeURI);
+  // Add here all the items that might be introspected.
+  gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
+      timeURI.Str(), std::bind(&World::GetSimTime, this));
+}
+
+/////////////////////////////////////////////////
+void World::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->dataPtr->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->dataPtr->introspectionItems.clear();
 }

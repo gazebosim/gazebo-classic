@@ -45,6 +45,7 @@ set(tests
   gz_physics.cc
   gz_world.cc
   imu.cc
+  introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc

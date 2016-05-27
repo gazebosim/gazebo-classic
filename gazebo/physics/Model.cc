@@ -30,7 +30,6 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-#include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
@@ -50,6 +49,9 @@
 #include "gazebo/physics/Contact.hh"
 
 #include "gazebo/transport/Node.hh"
+
+#include "gazebo/util/IntrospectionManager.hh"
+#include "gazebo/util/OpenAL.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -383,43 +385,16 @@ void Model::Update()
 void Model::SetJointPosition(
   const std::string &_jointName, double _position, int _index)
 {
-  JointPtr joint = this->GetJoint(_jointName);
-  if (joint)
-  {
-    joint->SetPosition(_index, _position);
-  }
-  else
-  {
-    gzerr << "Joint [" << _jointName << "] not found.\n";
-  }
+  if (this->jointController)
+    this->jointController->SetJointPosition(_jointName, _position, _index);
 }
 
 //////////////////////////////////////////////////
 void Model::SetJointPositions(
     const std::map<std::string, double> &_jointPositions)
 {
-  // go through all joints in this model and update each one
-  //   for each joint update, recursively update all children
-  for (std::map<std::string, double>::const_iterator
-       jiter = _jointPositions.begin();
-       jiter != _jointPositions.end();
-       ++jiter)
-  {
-    // First try name without scope, i.e. joint_name
-    JointPtr joint = this->GetJoint(jiter->first);
-
-    if (joint)
-    {
-      // assume joint index is 0
-      // FIXME: get index from user for multi dof joints.
-      const unsigned int jid = 0;
-      joint->SetPosition(jid, jiter->second);
-    }
-    else
-    {
-      gzerr << "Joint [" << jiter->first << "] not found.\n";
-    }
-  }
+  if (this->jointController)
+    this->jointController->SetJointPositions(_jointPositions);
 }
 
 //////////////////////////////////////////////////
@@ -1557,6 +1532,69 @@ void Model::SetWindMode(const bool _enable)
 bool Model::WindMode() const
 {
   return this->sdf->Get<bool>("enable_wind");
+}
+
+/////////////////////////////////////////////////
+void Model::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  // Callbacks.
+  auto fModelPose = [this]()
+  {
+    return this->GetWorldPose().Ign();
+  };
+
+  auto fModelLinVel = [this]()
+  {
+    return this->GetWorldLinearVel().Ign();
+  };
+
+  auto fModelAngVel = [this]()
+  {
+    return this->GetWorldAngularVel().Ign();
+  };
+
+  auto fModelLinAcc = [this]()
+  {
+    return this->GetWorldLinearAccel().Ign();
+  };
+
+  auto fModelAngAcc = [this]()
+  {
+    return this->GetWorldAngularAccel().Ign();
+  };
+
+  // Register items.
+  common::URI poseURI(uri);
+  poseURI.Query().Insert("p", "pose3d/world_pose");
+  this->introspectionItems.push_back(poseURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
+
+  common::URI linVelURI(uri);
+  linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  this->introspectionItems.push_back(linVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
+
+  common::URI angVelURI(uri);
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  this->introspectionItems.push_back(angVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angVelURI.Str(), fModelAngVel);
+
+  common::URI linAccURI(uri);
+  linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  this->introspectionItems.push_back(linAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linAccURI.Str(), fModelLinAcc);
+
+  common::URI angAccURI(uri);
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  this->introspectionItems.push_back(angAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angAccURI.Str(), fModelAngAcc);
 }
 
 /////////////////////////////////////////////////

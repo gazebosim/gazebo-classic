@@ -441,6 +441,9 @@ namespace gazebo
       /// \brief Publish the scale.
       private: virtual void PublishScale();
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
