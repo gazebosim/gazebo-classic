@@ -151,7 +151,7 @@ namespace gazebo
       public: QSplitter *splitter;
 
       /// \brief Data logger dialog.
-      public: std::shared_ptr<gui::DataLogger> dataLogger;
+      public: DataLogger *dataLogger;
 
       /// \brief Hotkey chart dialog.
       public: HotkeyDialog *hotkeyDialog;

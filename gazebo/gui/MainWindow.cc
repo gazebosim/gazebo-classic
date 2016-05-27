@@ -243,9 +243,9 @@ MainWindow::MainWindow()
           this, SLOT(OnTrackVisual(const std::string &)), Qt::QueuedConnection);
 
   // Create data logger dialog
-  this->dataPtr->dataLogger.reset(new gui::DataLogger(this));
-  connect(this->dataPtr->dataLogger.get(), SIGNAL(rejected()), this, SLOT(
-              OnDataLoggerClosed()));
+  this->dataPtr->dataLogger = new gui::DataLogger(this);
+  connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
+    OnDataLoggerClosed()));
 
   // Hotkey dialog
   this->dataPtr->hotkeyDialog = NULL;
