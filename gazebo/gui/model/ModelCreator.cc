@@ -1907,6 +1907,17 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
 /////////////////////////////////////////////////
 void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 {
+  // User request from right-click menu
+  auto it = this->dataPtr->allModelPlugins.find(_name.toStdString());
+  if (it != this->dataPtr->allModelPlugins.end())
+  {
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Delete plugin [" + _name.toStdString() + "]",
+        MEUserCmd::DELETING_MODEL_PLUGIN);
+    cmd->SetSDF(it->second->modelPluginSDF);
+    cmd->SetScopedName(_name.toStdString());
+  }
+
   this->RemoveModelPlugin(_name.toStdString());
 }
 
@@ -3185,4 +3196,10 @@ ignition::math::Pose3d ModelCreator::WorldToLocal(
   // Calculate target pose in parent model local frame
   // p_T_t = w_T_p^-1 * w_T_t
   return (parentModelWorld.Inverse() * targetWorld).Pose();
+}
+
+/////////////////////////////////////////////////
+MEUserCmdManager *ModelCreator::UserCmdManager() const
+{
+  return this->dataPtr->userCmdManager.get();
 }

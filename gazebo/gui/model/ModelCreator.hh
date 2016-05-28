@@ -45,6 +45,7 @@ namespace gazebo
   {
     class JointMaker;
     class LinkData;
+    class MEUserCmdManager;
     class ModelPluginData;
     class NestedModelData;
 
@@ -231,6 +232,10 @@ namespace gazebo
       /// \return Pose in model local frame.
       public: ignition::math::Pose3d WorldToLocal(
           const ignition::math::Pose3d &_world) const;
+
+      /// \brief Get a pointer to the user command manager.
+      /// \return Pointer to the user command manager.
+      public: MEUserCmdManager *UserCmdManager() const;
 
       /// \brief Helper function to generate link sdf from link data.
       /// \param[in] _link Link data used to generate the sdf.

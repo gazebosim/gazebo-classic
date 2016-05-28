@@ -150,6 +150,21 @@ void MEUserCmd::Undo()
     model::Events::requestNestedModelMove(this->dataPtr->scopedName,
         this->dataPtr->poseBefore);
   }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName);
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -209,6 +224,21 @@ void MEUserCmd::Redo()
   {
     model::Events::requestNestedModelMove(this->dataPtr->scopedName,
         this->dataPtr->poseAfter);
+  }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml());
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName);
   }
 }
 
