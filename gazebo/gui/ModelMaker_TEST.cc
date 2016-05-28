@@ -32,7 +32,7 @@ void ModelMaker_TEST::SimpleShape()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -119,7 +119,7 @@ void ModelMaker_TEST::FromFile()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -210,7 +210,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -323,7 +323,7 @@ void ModelMaker_TEST::FromModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/box.world");
+  this->Load("worlds/box.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -420,7 +420,7 @@ void ModelMaker_TEST::FromNestedModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("test/worlds/deeply_nested_models.world");
+  this->Load("test/worlds/deeply_nested_models.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();

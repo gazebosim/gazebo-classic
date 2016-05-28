@@ -123,8 +123,7 @@ namespace gazebo
 
       private: void Create();
 
-      //private: Ogre::SceneNode *sceneNode;
-
+      /// \brief Grid visual that contains the grid lines
       private: VisualPtr gridVis;
 
       private: Ogre::ManualObject *manualObject;

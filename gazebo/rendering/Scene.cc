@@ -3234,6 +3234,8 @@ void Scene::RemoveVisual(uint32_t _id)
         ++piter;
     }
     this->dataPtr->visuals.erase(iter);
+
+    this->RemoveVisualizations(vis);
     vis->Fini();
 
     if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
@@ -3382,24 +3384,16 @@ void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
 {
-  std::vector<VisualPtr> toRemove;
   for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
-    Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
-        || visType == Visual::VT_GUI)
-    {
-      // do not remove ModelManipulator's SelectionObj
-      // FIXME remove this hardcoded check, issue #1832
-      if (std::dynamic_pointer_cast<SelectionObj>(childVis) != NULL)
-        continue;
 
-      toRemove.push_back(childVis);
-    }
+    // do not remove ModelManipulator's SelectionObj
+    // FIXME remove this hardcoded check, issue #1832
+    SelectionObjPtr vis = std::dynamic_pointer_cast<SelectionObj>(childVis);
+    if (vis != NULL)
+      vis->Detach();
   }
-  for (auto vis : toRemove)
-    this->RemoveVisual(vis);
 }
 
 /////////////////////////////////////////////////

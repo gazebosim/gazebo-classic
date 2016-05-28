@@ -1046,38 +1046,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
           simpleRenderable->setMaterial(this->dataPtr->myMaterialName);
       }
     }
-
-    /*// Apply material to all child scene nodes
-    for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
-    {
-      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
-          this->dataPtr->sceneNode->getChild(i));
-      for (int j = 0; j < sn->numAttachedObjects(); ++j)
-      {
-        Ogre::MovableObject *obj = sn->getAttachedObject(j);
-
-        MovableText *text = dynamic_cast<MovableText *>(obj);
-        if (text)
-        {
-          common::Color ambient, diffuse, specular, emissive;
-          bool matFound = rendering::Material::GetMaterialAsColor(
-              this->dataPtr->myMaterialName, ambient, diffuse, specular,
-              emissive);
-
-          if (matFound)
-          {
-            text->SetColor(ambient);
-          }
-        }
-        else if (dynamic_cast<Ogre::Entity *>(obj))
-          ((Ogre::Entity *)obj)->setMaterialName(this->dataPtr->myMaterialName);
-        else
-        {
-          ((Ogre::SimpleRenderable *)obj)->setMaterial(
-              this->dataPtr->myMaterialName);
-        }
-      }
-    }*/
   }
   catch(Ogre::Exception &e)
   {

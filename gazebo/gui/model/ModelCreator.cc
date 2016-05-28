@@ -1944,12 +1944,12 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
     {
       this->OnDelete(vis->GetName());
     }
+    this->dataPtr->selectedEntities.clear();
 
     for (const auto &plugin : this->dataPtr->selectedModelPlugins)
     {
       this->RemoveModelPlugin(plugin);
     }
-    this->DeselectAll();
   }
   else if (_event.control)
   {

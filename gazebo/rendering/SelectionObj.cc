@@ -83,6 +83,7 @@ void SelectionObj::Load()
   this->SetHandleVisible(SCALE, false);
 
   this->GetSceneNode()->setInheritScale(false);
+  this->SetInheritTransparency(false);
 }
 
 /////////////////////////////////////////////////
@@ -416,8 +417,15 @@ void SelectionObj::CreateTranslateVisual()
   this->SetHandleMaterial(TRANS_Y, dPtr->yAxisMatOverlay);
   this->SetHandleMaterial(TRANS_Z, dPtr->zAxisMatOverlay);
 
+  dPtr->transVisual->SetInheritTransparency(false);
   dPtr->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+
+  // set transparency once and make sure they do not inherit
+  // transparency anymore
   dPtr->transVisual->SetTransparency(0.5);
+  dPtr->transXVisual->SetInheritTransparency(false);
+  dPtr->transYVisual->SetInheritTransparency(false);
+  dPtr->transZVisual->SetInheritTransparency(false);
 
   dPtr->transXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -501,7 +509,13 @@ void SelectionObj::CreateRotateVisual()
   this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat);
 
   dPtr->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
+
+  // set transparency once and make sure they do not inherit
+  // transparency anymore
   dPtr->rotVisual->SetTransparency(0.5);
+  dPtr->rotXVisual->SetInheritTransparency(false);
+  dPtr->rotYVisual->SetInheritTransparency(false);
+  dPtr->rotZVisual->SetInheritTransparency(false);
 
   dPtr->rotXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -627,7 +641,13 @@ void SelectionObj::CreateScaleVisual()
   this->SetHandleMaterial(SCALE_Z, dPtr->zAxisMatOverlay);
 
   dPtr->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+
+  // set transparency once and make sure they do not inherit
+  // transparency anymore
   dPtr->scaleVisual->SetTransparency(0.5);
+  dPtr->scaleXVisual->SetInheritTransparency(false);
+  dPtr->scaleYVisual->SetInheritTransparency(false);
+  dPtr->scaleZVisual->SetInheritTransparency(false);
 
   dPtr->scaleXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
