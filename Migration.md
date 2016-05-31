@@ -33,6 +33,16 @@ release will remove the deprecated code.
     + ***Removed:*** setSelectedLink
     + ***Replacement:*** setSelectedEntity
 
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_DEPRECATED
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_DEPRECATED
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_FORCEINLINE
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_FORCEINLINE
+
 ### Deprecations
 
 1. **gazebo/common/Event.hh**
