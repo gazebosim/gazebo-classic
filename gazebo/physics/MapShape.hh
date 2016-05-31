@@ -24,7 +24,7 @@
 #include <deque>
 #include <string>
 
-#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Image.hh"
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
