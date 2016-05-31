@@ -17,13 +17,22 @@ release will remove the deprecated code.
 ### Modifications
 
 1. **gazebo/common/Event.hh**
-    + ConnectionPrivate made not visible
     + Connection(Event*, int) constructor changed to
       Connection(Event*, const int)
     + EventTPrivate no longer inherits from EventPrivate
+    + EventT::Connect(const boost::function<T> &) changed to
+      EventT::Connect(const std::function<T> &)
 
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** ConnectSetSelectedLink
+    + ***Replacement:*** ConnectSetSelectedEntity
+    + ***Removed:*** DisconnectSetSelectedLink
+    + ***Replacement:*** DisconnectSetSelectedEntity
+    + ***Removed:*** setSelectedLink
+    + ***Replacement:*** setSelectedEntity
 
 ### Deprecations
 
@@ -46,9 +55,10 @@ release will remove the deprecated code.
 ### Deletions
 
 1. **gazebo/common/Event.hh**
+    + ConnectionPrivate class
+    + Connection() constructor
     + EventPrivate class
     + Event(EventPrivate&) constructor
-    + Connection() constructor
 
 1. **gazebo/gui/EntityMaker.hh**
     + EntityMakerPrivate class
