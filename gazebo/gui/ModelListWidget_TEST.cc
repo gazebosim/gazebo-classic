@@ -726,8 +726,10 @@ void ModelListWidget_TEST::LinkProperties()
   }
   QVERIFY(propTreeBrowser->properties().size() > 0);
 
+
+
   // select the box link
-  QTreeWidgetItem *boxLinkItem = modelItem->child(0);
+  QTreeWidgetItem *boxLinkItem = modelItem->child(1);
   QVERIFY(boxLinkItem != NULL);
   std::string boxLinkName = "box_link";
   QCOMPARE(boxLinkItem->text(0), tr(boxLinkName.c_str()));

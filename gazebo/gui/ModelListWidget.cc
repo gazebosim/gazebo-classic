@@ -470,7 +470,7 @@ void ModelListWidget::ProcessModelMsgs()
           QTreeWidgetItem *linkheaderItem = new QTreeWidgetItem(topItem,
           QStringList(QString("%1").arg(QString::fromStdString("LINKS"))));
           linkheaderItem->setFont(0, subheaderFont);
-          linkheaderItem->setFlags(Qt::ItemIsEnabled);
+          linkheaderItem->setFlags(!Qt::ItemIsEnabled);
           this->dataPtr->modelTreeWidget->addTopLevelItem(linkheaderItem);
         }
 
@@ -590,8 +590,8 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->dataPtr->fillTypes.push_back("Joint");
     this->dataPtr->propMutex->unlock();
   }
-    else if (_msg->has_type() && _msg->type() ==
-      this->dataPtr->pluginMsg.GetTypeName())
+  else if (_msg->has_type() && _msg->type() ==
+    this->dataPtr->pluginMsg.GetTypeName())
   {
     this->dataPtr->propMutex->lock();
     this->dataPtr->pluginMsg.ParseFromString(_msg->serialized_data());
@@ -1092,14 +1092,11 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     // check if it's a plugin
   else if (currentItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
   {
-    // this->dataPtr->modelMsg may not have been set
-    // so get the model name from the current item
     msg.set_name(currentItem->data(1, Qt::UserRole).toString().toStdString());
     msg.set_id(currentItem->data(2, Qt::UserRole).toInt());
 
-    // set link id and strip link name.
+    // set plugin id and strip plugin name.
     msgs::Plugin *pluginMsg = msg.add_plugin();
-    //pluginMsg->set_id(this->dataPtr->pluginMsg.id());
     std::string pluginName = this->dataPtr->pluginMsg.name();
     size_t index = pluginName.find_last_of("::");
     if (index != std::string::npos)
@@ -2622,19 +2619,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
     this->FillPropertyTree(_msg.link(i), prop);
   }
-/*
-  for (int i = 0; i < _msg.plugin_size(); ++i)
-  {
-    QtVariantProperty *prop;
-    prop = this->dataPtr->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("plugin"));
-    prop->setToolTip(tr(_msg.plugin(i).name().c_str()));
-
-    bItem = this->dataPtr->propTreeBrowser->addProperty(prop);
-    this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
-
-    this->FillPropertyTree(_msg.plugin(i), prop);
-  }*/
 }
 
 /////////////////////////////////////////////////

@@ -52,16 +52,6 @@ namespace gazebo
     /// \brief A model is a collection of links, joints, and plugins.
     class GZ_PHYSICS_VISIBLE Model : public Entity
     {
-      private: transport::PublisherPtr responsePub;
-      private: transport::SubscriberPtr requestSub;
-
-      /// \brief Mutex to protect incoming message buffers.
-      public: boost::recursive_mutex *receiveMutex;
-
-      /// \brief Called when a request message is received.
-      /// \param[in] _msg The request message.
-      private: void OnRequest(ConstRequestPtr &_msg);
-
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
       public: explicit Model(BasePtr _parent);
@@ -425,6 +415,9 @@ namespace gazebo
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
+      /// \brief Publisher for joint info.
+      protected: transport::PublisherPtr jointPub;
+
       /// \brief Load all the links.
       private: void LoadLinks();
 
@@ -451,6 +444,10 @@ namespace gazebo
       /// \brief Publish the scale.
       private: virtual void PublishScale();
 
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
 
@@ -459,9 +456,6 @@ namespace gazebo
 
       /// used by Model::AttachStaticModel
       protected: std::vector<math::Pose> attachedModelsOffset;
-
-      /// \brief Publisher for joint info.
-      protected: transport::PublisherPtr jointPub;
 
       /// \brief The canonical link of the model.
       private: LinkPtr canonicalLink;
@@ -491,8 +485,18 @@ namespace gazebo
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;
 
+      /// \brief Mutex to protect incoming message buffers.
+      private: mutable std::mutex *receiveMutex;
+
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
     };
     /// \}
   }

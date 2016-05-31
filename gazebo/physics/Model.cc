@@ -60,7 +60,7 @@ Model::Model(BasePtr _parent)
   : Entity(_parent)
 {
   this->AddType(MODEL);
-  this->receiveMutex = new boost::recursive_mutex();
+  this->receiveMutex = new std::mutex();
 }
 
 //////////////////////////////////////////////////
@@ -115,7 +115,7 @@ void Model::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::OnRequest(ConstRequestPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  std::lock_guard<std::mutex> lock(*this->receiveMutex);
   msgs::Response response;
 
   std::list<msgs::Request> requestMsgs;
@@ -124,10 +124,9 @@ void Model::OnRequest(ConstRequestPtr &_msg)
 
   for (auto const &requestMsg : requestMsgs)
   {
-  bool send = true;
-  response.set_id(requestMsg.id());
-  response.set_request(requestMsg.request());
-  response.set_response("success");
+    response.set_id(requestMsg.id());
+    response.set_request(requestMsg.request());
+    response.set_response("success");
 
     if (requestMsg.request() == "model_plugin_info")
     {
@@ -147,13 +146,7 @@ void Model::OnRequest(ConstRequestPtr &_msg)
             pluginMsg.SerializeToString(serializedData);
             response.set_type(pluginMsg.GetTypeName());
 
-            std::cout << pluginMsg.DebugString() << std::endl;
-            std::cout << response.DebugString() << std::endl;
-
-            if (send)
-            {
-              this->responsePub->Publish(response);
-            }
+            this->responsePub->Publish(response);
           }
           pluginElem = pluginElem->GetNextElement("plugin");
           }

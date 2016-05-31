@@ -3007,8 +3007,11 @@ namespace gazebo
       }
 
       if (_msg.plugin_size() > 0)
+      {
         while (modelSDF->HasElement("plugin"))
           modelSDF->GetElement("plugin")->RemoveFromParent();
+      }
+
       for (int i = 0; i < _msg.plugin_size(); ++i)
       {
         sdf::ElementPtr pluginElem = modelSDF->AddElement("plugin");
