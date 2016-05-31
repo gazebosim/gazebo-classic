@@ -24,14 +24,17 @@
 #include <deque>
 #include <string>
 
-#include "gazebo/common/Image.hh"
-
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Image;
+  }
+
   namespace physics
   {
     class SpaceTree;
