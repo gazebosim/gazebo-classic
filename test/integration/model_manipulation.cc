@@ -26,7 +26,8 @@
 /////////////////////////////////////////////////
 void ModelManipulationTest::StopProcessingPoseMsgs()
 {
-  this->resMaxPercentChange = 5.0;
+  // increased from 5.0 to 8.0 per issue #1911
+  this->resMaxPercentChange = 8.0;
   this->shareMaxPercentChange = 2.0;
 
   // Load a world which has moving models
