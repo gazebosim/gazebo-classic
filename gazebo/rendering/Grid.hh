@@ -16,40 +16,43 @@
 */
 // This was leveraged from rviz.
 
-#ifndef _GRID_HH_
-#define _GRID_HH_
+#ifndef GAZEBO_RENDERING_GRID_HH_
+#define GAZEBO_RENDERING_GRID_HH_
 
-#include <stdint.h>
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
-// TODO: remove this line
-#include "gazebo/rendering/ogre_gazebo.h"
-
-#include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class ManualObject;
   class SceneNode;
   class Any;
 }
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace rendering
   {
     class Scene;
 
+    // Forward declare provate data
+    class GridPrivate;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
-    ///  \class Grid Grid.hh rendering/rendering.hh
-    ///  \brief Displays a grid of cells, drawn with lines
+    /// \class Grid Grid.hh rendering/rendering.hh
+    /// \brief Displays a grid of cells, drawn with lines
     ///
-    ///  Displays a grid of cells, drawn with lines.  A grid with an
-    ///  identity orientation is drawn along the XY plane.
+    /// Displays a grid of cells, drawn with lines.  A grid with an
+    /// identity orientation is drawn along the XY plane.
     class GZ_RENDERING_VISIBLE Grid
     {
       /// \brief Constructor
@@ -76,7 +79,12 @@ namespace gazebo
 
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
-      public: Ogre::SceneNode *GetSceneNode() { return this->sceneNode; }
+      /// \deprecated See SceneNode()
+      public: Ogre::SceneNode *GetSceneNode() GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the Ogre scene node associated with this grid
+      /// \return The Ogre scene node associated with this grid
+      public: Ogre::SceneNode *SceneNode() const;
 
       /// \brief Sets user data on all ogre objects we own
       /// \param[in] _data The user data
@@ -88,14 +96,25 @@ namespace gazebo
 
       /// \brief Return the grid color
       /// \return The grid color
-      public: common::Color GetColor() const {return this->color;}
+      /// \deprecated See Color()
+      public: common::Color GetColor() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Return the grid color
+      /// \return The grid color
+      public: common::Color Color() const;
 
       /// \brief Set the number of cells
       /// \param[in] _count The number of cells
       public: void SetCellCount(uint32_t _count);
 
       /// \brief Get the number of cells
-      public: uint32_t GetCellCount() const {return this->cellCount;}
+      /// \return The number of cells in each direction.
+      /// \deprecated See CellCount()
+      public: uint32_t GetCellCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the number of cells
+      /// \return The number of cells in each direction.
+      public: uint32_t CellCount() const;
 
       /// \brief Set the cell length
       /// \param[in] _len The cell length
@@ -103,7 +122,12 @@ namespace gazebo
 
       /// \brief Get the cell length
       /// \return The cell length
-      public: float GetCellLength() const {return this->cellLength;}
+      /// \deprecated See CellLength()
+      public: float GetCellLength() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the cell length
+      /// \return The cell length
+      public: float CellLength() const;
 
       /// \brief Set the line width
       /// \param[in] _width The width of the grid
@@ -111,7 +135,12 @@ namespace gazebo
 
       /// \brief Get the width of the grid line
       /// \return The line width
-      public: float GetLineWidth() const {return this->lineWidth;}
+      /// \deprecated See LineWidth()
+      public: float GetLineWidth() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the width of the grid line
+      /// \return The line width
+      public: float LineWidth() const;
 
       /// \brief Set the height of the grid
       /// \param[in] _count Grid height
@@ -119,25 +148,19 @@ namespace gazebo
 
       /// \brief Get the height of the grid
       /// \return The height
-      public: uint32_t GetHeight() const {return this->height;}
+      /// \deprecated See Height()
+      public: uint32_t GetHeight() const GAZEBO_DEPRECATED(8.0);
 
+      /// \brief Get the height of the grid
+      /// \return The height
+      public: uint32_t Height() const;
+
+      /// \brief Create the grid.
       private: void Create();
 
-      private: Ogre::SceneNode *sceneNode;
-      private: Ogre::ManualObject *manualObject;
-
-      private: Ogre::MaterialPtr material;
-
-      private: unsigned int cellCount;
-      private: float cellLength;
-      private: float lineWidth;
-      private: common::Color color;
-      private: float heightOffset;
-
-      private: std::string name;
-      private: unsigned int height;
-
-      private: Scene *scene;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<GridPrivate> dataPtr;
     };
     /// \}
   }

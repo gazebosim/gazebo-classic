@@ -23,58 +23,112 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Grid.hh"
 
+namespace gazebo
+{
+  namespace rendering
+  {
+    /// \internal
+    /// \class Grid Grid.hh
+    /// \brief Private data for the Grid class.
+    class GridPrivate
+    {
+      /// \brief Pointer to the scene node
+      public: Ogre::SceneNode *sceneNode;
+
+      /// \brief Pointer to the manual object.
+      public: Ogre::ManualObject *manualObject;
+
+      /// \brief Pointer to the material.
+      public: Ogre::MaterialPtr material;
+
+      /// \brief Number of cells in each direction.
+      public: uint32_t cellCount;
+
+      /// \brief Length of each cell in each direction.
+      public: float cellLength;
+
+      /// \brief Width of the lines.
+      public: float lineWidth;
+
+      /// \brief Line color.
+      public: common::Color color;
+
+      /// \brief Height offset.
+      public: float heightOffset;
+
+      /// \brief Grid name.
+      public: std::string name;
+
+      /// \brief Number of cells in the normal direction.
+      public: uint32_t height;
+
+      /// \brief Pointer ot the scene.
+      public: Scene *scene;
+    };
+  }
+}
+
 using namespace gazebo;
 using namespace rendering;
 
-
 //////////////////////////////////////////////////
-Grid::Grid(Scene *_scene, unsigned int _cellCount, float _cellLength,
-           float _lineWidth, const common::Color& _color)
-: scene(_scene)
+Grid::Grid(Scene *_scene, const unsigned int _cellCount,
+    const float _cellLength, const float _lineWidth,
+    const common::Color &_color)
+: dataPtr(new GridPrivate)
 {
-  this->height = 0;
+  this->dataPtr->scene = _scene;
+  this->dataPtr->height = 0;
 
-  this->cellCount = _cellCount;
-  this->cellLength = _cellLength;
-  this->lineWidth = _lineWidth;
-  this->color = _color;
-  this->heightOffset = 0.015;
+  this->dataPtr->cellCount = _cellCount;
+  this->dataPtr->cellLength = _cellLength;
+  this->dataPtr->lineWidth = _lineWidth;
+  this->dataPtr->color = _color;
+  this->dataPtr->heightOffset = 0.015;
 
   static uint32_t gridCount = 0;
   std::stringstream ss;
   ss << "Grid" << gridCount++;
 
-  this->name = ss.str();
+  this->dataPtr->name = ss.str();
 }
 
 //////////////////////////////////////////////////
 Grid::~Grid()
 {
-  this->scene->OgreSceneManager()->destroySceneNode(this->sceneNode->getName());
-  this->scene->OgreSceneManager()->destroyManualObject(this->manualObject);
-  this->material->unload();
+  if (this->dataPtr->scene && this->dataPtr->sceneNode)
+  {
+    this->dataPtr->scene->OgreSceneManager()->destroySceneNode(
+        this->dataPtr->sceneNode->getName());
+  }
+  if (this->dataPtr->scene && this->dataPtr->manualObject)
+  {
+    this->dataPtr->scene->OgreSceneManager()->destroyManualObject(
+        this->dataPtr->manualObject);
+  }
+  this->dataPtr->material->unload();
 }
 
 //////////////////////////////////////////////////
-void Grid::SetCellCount(uint32_t _count)
+void Grid::SetCellCount(const uint32_t _count)
 {
-  this->cellCount = _count;
+  this->dataPtr->cellCount = _count;
 
   this->Create();
 }
 
 //////////////////////////////////////////////////
-void Grid::SetCellLength(float _len)
+void Grid::SetCellLength(const float _len)
 {
-  this->cellLength = _len;
+  this->dataPtr->cellLength = _len;
 
   this->Create();
 }
 
 //////////////////////////////////////////////////
-void Grid::SetLineWidth(float _width)
+void Grid::SetLineWidth(const float _width)
 {
-  this->lineWidth = _width;
+  this->dataPtr->lineWidth = _width;
 
   this->Create();
 }
@@ -82,27 +136,26 @@ void Grid::SetLineWidth(float _width)
 //////////////////////////////////////////////////
 void Grid::SetColor(const common::Color &_color)
 {
-  this->color = _color;
+  this->dataPtr->color = _color;
 
-  this->material->setDiffuse(_color.r, _color.g, _color.b, _color.a);
-  this->material->setAmbient(_color.r, _color.g, _color.b);
+  this->dataPtr->material->setDiffuse(_color.r, _color.g, _color.b, _color.a);
+  this->dataPtr->material->setAmbient(_color.r, _color.g, _color.b);
 
-  if ((this->color).a < 0.9998)
-    this->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+  if ((this->dataPtr->color).a < 0.9998)
+    this->dataPtr->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   else
-    this->material->setSceneBlending(Ogre::SBT_REPLACE);
+    this->dataPtr->material->setSceneBlending(Ogre::SBT_REPLACE);
 
-  this->material->setDepthWriteEnabled(false);
-  this->material->setDepthCheckEnabled(true);
+  this->dataPtr->material->setDepthWriteEnabled(false);
+  this->dataPtr->material->setDepthCheckEnabled(true);
 
   this->Create();
 }
 
-
 //////////////////////////////////////////////////
-void Grid::SetHeight(uint32_t _height)
+void Grid::SetHeight(const uint32_t _height)
 {
-  this->height = _height;
+  this->dataPtr->height = _height;
 
   this->Create();
 }
@@ -110,30 +163,32 @@ void Grid::SetHeight(uint32_t _height)
 //////////////////////////////////////////////////
 void Grid::Init()
 {
-  this->manualObject =
-    this->scene->OgreSceneManager()->createManualObject(this->name);
-  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->dataPtr->manualObject =
+      this->dataPtr->scene->OgreSceneManager()->createManualObject(
+      this->dataPtr->name);
+  this->dataPtr->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  this->manualObject->setDynamic(false);
-  // this->manualObject->setRenderQueueGroup(
+  this->dataPtr->manualObject->setDynamic(false);
+  // this->dataPtr->manualObject->setRenderQueueGroup(
   //    Ogre::RENDER_QUEUE_SKIES_EARLY+3);
   //    Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
   Ogre::SceneNode *parent_node =
-      this->scene->OgreSceneManager()->getRootSceneNode();
+      this->dataPtr->scene->OgreSceneManager()->getRootSceneNode();
 
-  this->sceneNode = parent_node->createChildSceneNode(this->name);
-  this->sceneNode->attachObject(this->manualObject);
+  this->dataPtr->sceneNode = parent_node->createChildSceneNode(
+      this->dataPtr->name);
+  this->dataPtr->sceneNode->attachObject(this->dataPtr->manualObject);
 
   std::stringstream ss;
-  ss << this->name << "Material";
-  this->material =
+  ss << this->dataPtr->name << "Material";
+  this->dataPtr->material =
     Ogre::MaterialManager::getSingleton().create(ss.str(),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-  this->material->setReceiveShadows(false);
-  this->material->getTechnique(0)->setLightingEnabled(false);
+  this->dataPtr->material->setReceiveShadows(false);
+  this->dataPtr->material->getTechnique(0)->setLightingEnabled(false);
 
-  this->SetColor(this->color);
+  this->SetColor(this->dataPtr->color);
 
   this->Create();
 }
@@ -141,74 +196,156 @@ void Grid::Init()
 //////////////////////////////////////////////////
 void Grid::Create()
 {
-  this->manualObject->clear();
+  this->dataPtr->manualObject->clear();
 
-  float extent = (this->cellLength * static_cast<double>(this->cellCount))/2;
+  float extent = (this->dataPtr->cellLength *
+      static_cast<double>(this->dataPtr->cellCount))/2;
 
-  this->manualObject->setCastShadows(false);
-  this->manualObject->estimateVertexCount(
-      this->cellCount * 4 * this->height +
-      ((this->cellCount + 1) * (this->cellCount + 1)));
+  this->dataPtr->manualObject->setCastShadows(false);
+  this->dataPtr->manualObject->estimateVertexCount(
+      this->dataPtr->cellCount * 4 * this->dataPtr->height +
+      ((this->dataPtr->cellCount + 1) * (this->dataPtr->cellCount + 1)));
 
-  this->manualObject->begin(this->material->getName(),
+  this->dataPtr->manualObject->begin(this->dataPtr->material->getName(),
       Ogre::RenderOperation::OT_LINE_LIST);
 
-  for (uint32_t h = 0; h <= this->height; ++h)
+  for (uint32_t h = 0; h <= this->dataPtr->height; ++h)
   {
-    float h_real = this->heightOffset +
-      (this->height / 2.0f - static_cast<float>(h)) * this->cellLength;
-    for (uint32_t i = 0; i <= this->cellCount; i++)
+    float h_real = this->dataPtr->heightOffset +
+      (this->dataPtr->height / 2.0f - static_cast<float>(h)) *
+      this->dataPtr->cellLength;
+
+    for (uint32_t i = 0; i <= this->dataPtr->cellCount; i++)
     {
-      float inc = extent - (i * this->cellLength);
+      float inc = extent - (i * this->dataPtr->cellLength);
 
       Ogre::Vector3 p1(inc, -extent, h_real);
       Ogre::Vector3 p2(inc, extent , h_real);
       Ogre::Vector3 p3(-extent, inc, h_real);
       Ogre::Vector3 p4(extent, inc, h_real);
 
-      this->manualObject->position(p1);
-      this->manualObject->colour(Conversions::Convert(this->color));
-      this->manualObject->position(p2);
-      this->manualObject->colour(Conversions::Convert(this->color));
+      this->dataPtr->manualObject->position(p1);
+      this->dataPtr->manualObject->colour(Conversions::Convert(
+          this->dataPtr->color));
+      this->dataPtr->manualObject->position(p2);
+      this->dataPtr->manualObject->colour(Conversions::Convert(
+          this->dataPtr->color));
 
-      this->manualObject->position(p3);
-      this->manualObject->colour(Conversions::Convert(this->color));
-      this->manualObject->position(p4);
-      this->manualObject->colour(Conversions::Convert(this->color));
+      this->dataPtr->manualObject->position(p3);
+      this->dataPtr->manualObject->colour(Conversions::Convert(
+          this->dataPtr->color));
+      this->dataPtr->manualObject->position(p4);
+      this->dataPtr->manualObject->colour(Conversions::Convert(
+          this->dataPtr->color));
     }
   }
 
-  if (this->height > 0)
+  if (this->dataPtr->height > 0)
   {
-    for (uint32_t x = 0; x <= this->cellCount; ++x)
+    for (uint32_t x = 0; x <= this->dataPtr->cellCount; ++x)
     {
-      for (uint32_t y = 0; y <= this->cellCount; ++y)
+      for (uint32_t y = 0; y <= this->dataPtr->cellCount; ++y)
       {
-        float x_real = extent - x * this->cellLength;
-        float y_real = extent - y * this->cellLength;
+        float x_real = extent - x * this->dataPtr->cellLength;
+        float y_real = extent - y * this->dataPtr->cellLength;
 
-        float z_top = (this->height / 2.0f) * this->cellLength;
+        float z_top =
+            (this->dataPtr->height / 2.0f) * this->dataPtr->cellLength;
         float z_bottom = -z_top;
 
-        this->manualObject->position(x_real, y_real, z_bottom);
-        this->manualObject->colour(Conversions::Convert(this->color));
-        this->manualObject->position(x_real, y_real, z_bottom);
-        this->manualObject->colour(Conversions::Convert(this->color));
+        this->dataPtr->manualObject->position(x_real, y_real, z_bottom);
+        this->dataPtr->manualObject->colour(Conversions::Convert(
+            this->dataPtr->color));
+        this->dataPtr->manualObject->position(x_real, y_real, z_bottom);
+        this->dataPtr->manualObject->colour(Conversions::Convert(
+            this->dataPtr->color));
       }
     }
   }
 
-  this->manualObject->end();
+  this->dataPtr->manualObject->end();
 }
 
 //////////////////////////////////////////////////
 void Grid::SetUserData(const Ogre::Any &_data)
 {
-  this->manualObject->getUserObjectBindings().setUserAny(_data);
+  this->dataPtr->manualObject->getUserObjectBindings().setUserAny(_data);
 }
 
 //////////////////////////////////////////////////
-void Grid::Enable(bool _enable)
+void Grid::Enable(const bool _enable)
 {
-  this->sceneNode->setVisible(_enable);
+  this->dataPtr->sceneNode->setVisible(_enable);
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Grid::GetSceneNode()
+{
+  return this->SceneNode();
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Grid::SceneNode() const
+{
+  return this->dataPtr->sceneNode;
+}
+
+//////////////////////////////////////////////////
+common::Color Grid::GetColor() const
+{
+  return this->Color();
+}
+
+//////////////////////////////////////////////////
+common::Color Grid::Color() const
+{
+  return this->dataPtr->color;
+}
+
+//////////////////////////////////////////////////
+uint32_t Grid::GetCellCount() const
+{
+  return this->CellCount();
+}
+
+//////////////////////////////////////////////////
+uint32_t Grid::CellCount() const
+{
+  return this->dataPtr->cellCount;
+}
+
+//////////////////////////////////////////////////
+float Grid::GetCellLength() const
+{
+  return this->CellLength();
+}
+
+//////////////////////////////////////////////////
+float Grid::CellLength() const
+{
+  return this->dataPtr->cellLength;
+}
+
+//////////////////////////////////////////////////
+float Grid::GetLineWidth() const
+{
+  return this->LineWidth();
+}
+
+//////////////////////////////////////////////////
+float Grid::LineWidth() const
+{
+  return this->dataPtr->lineWidth;
+}
+
+//////////////////////////////////////////////////
+uint32_t Grid::GetHeight() const
+{
+  return this->Height();
+}
+
+//////////////////////////////////////////////////
+uint32_t Grid::Height() const
+{
+  return this->dataPtr->height;
 }
