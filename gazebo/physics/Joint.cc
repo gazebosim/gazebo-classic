@@ -342,9 +342,9 @@ void Joint::LoadImpl(const math::Pose &_pose)
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
     // clamp initial position between joint limits
-    double position = math::clamp(this->initialPosition[i],
+    math::Angle position = math::clamp(this->initialPosition[i],
       this->GetLowerLimit(i), this->GetUpperLimit(i));
-    this->SetPosition(i, position);
+    this->SetPosition(i, position.Radian());
   }
 }
 
@@ -368,7 +368,7 @@ void Joint::Init()
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
-    if (axisElem->HasElement("initial_position")
+    if (axisElem->HasElement("initial_position"))
       this->SetInitialPosition(0, axisElem->Get<double>("initial_position"));
     if (axisElem->HasElement("limit"))
     {
@@ -387,7 +387,7 @@ void Joint::Init()
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
-    if (axisElem->HasElement("initial_position")
+    if (axisElem->HasElement("initial_position"))
       this->SetInitialPosition(1, axisElem->Get<double>("initial_position"));
     if (axisElem->HasElement("limit"))
     {
@@ -1509,7 +1509,7 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
 }
 
 /////////////////////////////////////////////////
-void Joint::SetInitialPosition(unsigned int _index, double _position)
+void Joint::SetInitialPosition(unsigned int _index, math::Angle _position)
 {
   if (_index >= this->GetAngleCount())
   {
@@ -1522,7 +1522,7 @@ void Joint::SetInitialPosition(unsigned int _index, double _position)
 }
 
 /////////////////////////////////////////////////
-double InitialPosition(unsigned int _index)
+math::Angle Joint::InitialPosition(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
