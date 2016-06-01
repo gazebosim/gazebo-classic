@@ -337,15 +337,6 @@ void Joint::LoadImpl(const math::Pose &_pose)
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
-
-  // set joint initial position
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-  {
-    // clamp initial position between joint limits
-    math::Angle position = math::clamp(this->initialPosition[i],
-      this->GetLowerLimit(i), this->GetUpperLimit(i));
-    this->SetPosition(i, position.Radian());
-  }
 }
 
 //////////////////////////////////////////////////
@@ -369,7 +360,9 @@ void Joint::Init()
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("initial_position"))
+    {
       this->SetInitialPosition(0, axisElem->Get<double>("initial_position"));
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -388,7 +381,9 @@ void Joint::Init()
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
     if (axisElem->HasElement("initial_position"))
+    {
       this->SetInitialPosition(1, axisElem->Get<double>("initial_position"));
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
