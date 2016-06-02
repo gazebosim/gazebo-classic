@@ -748,7 +748,8 @@ namespace gazebo
 
       /// \brief Disconnect from an image frame
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c);
+      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer
