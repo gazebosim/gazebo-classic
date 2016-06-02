@@ -91,8 +91,6 @@ MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
   this->dataPtr->renderWidget = NULL;
-  this->dataPtr->menuLayout = NULL;
-  this->dataPtr->menuBar = NULL;
   this->setObjectName("mainWindow");
 
   // Do these things first.
@@ -832,7 +830,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->showFullScreen();
     this->dataPtr->leftColumn->hide();
     this->dataPtr->toolsWidget->hide();
-    this->dataPtr->menuBar->hide();
     this->setContentsMargins(0, 0, 0, 0);
     this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
   }
@@ -841,7 +838,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->showNormal();
     this->dataPtr->leftColumn->show();
     this->dataPtr->toolsWidget->show();
-    this->dataPtr->menuBar->show();
   }
   g_fullScreenAct->setChecked(_value);
   g_fullscreen = _value;
@@ -1583,59 +1579,8 @@ void MainWindow::CreateActions()
 /////////////////////////////////////////////////
 void MainWindow::ShowMenuBar(QMenuBar *_bar)
 {
-  if (!this->dataPtr->menuLayout)
-    this->dataPtr->menuLayout = new QHBoxLayout;
-
-  // Remove all widgets from the menuLayout
-  while (this->dataPtr->menuLayout->takeAt(0) != 0)
-  {
-  }
-
-  if (!this->dataPtr->menuBar)
-  {
-    // create the native menu bar
-    this->dataPtr->menuBar = new QMenuBar;
-    this->dataPtr->menuBar->setSizePolicy(QSizePolicy::Fixed,
-      QSizePolicy::Fixed);
-    this->setMenuBar(this->dataPtr->menuBar);
-
-    // populate main window's menu bar with menus from normal simulation mode
-    this->CreateMenuBar();
-  }
-
-  this->dataPtr->menuBar->clear();
-
-  QMenuBar *newMenuBar = NULL;
-  if (!_bar)
-  {
-    // Get the main window's menubar
-    // Note: for some reason we can not call menuBar() again,
-    // so manually retrieving the menubar from the mainwindow.
-    QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
-    if (!menuBars.empty())
-      newMenuBar = menuBars[0];
-  }
-  else
-  {
-    newMenuBar = _bar;
-  }
-
-  if (!newMenuBar)
-  {
-    gzerr << "Unable to set NULL menu bar" << std::endl;
-    return;
-  }
-
-  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
-  for (int i = 0; i < menus.size(); ++i)
-  {
-    this->dataPtr->menuBar->addMenu(menus[i]);
-  }
-
-  this->dataPtr->menuLayout->addWidget(this->dataPtr->menuBar);
-
-  this->dataPtr->menuLayout->addStretch(5);
-  this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
+  // populate main window's menu bar with menus from normal simulation mode
+  this->CreateMenuBar();
 }
 
 /////////////////////////////////////////////////
@@ -1924,12 +1869,6 @@ void MainWindow::AddMenu(QMenu *_menu)
 void MainWindow::CreateMenus()
 {
   this->ShowMenuBar();
-
-  QFrame *frame = new QFrame;
-  frame->setLayout(this->dataPtr->menuLayout);
-  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-  this->setMenuWidget(frame);
 }
 
 /////////////////////////////////////////////////

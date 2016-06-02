@@ -109,7 +109,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
@@ -125,7 +125,7 @@ void Collision::Init()
   this->shape->Init();
 
   this->SetRelativePose(
-    this->sdf->Get<math::Pose>("pose"));
+    this->sdf->Get<ignition::math::Pose3d>("pose"));
 }
 
 //////////////////////////////////////////////////

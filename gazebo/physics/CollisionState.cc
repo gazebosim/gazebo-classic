@@ -64,7 +64,7 @@ void CollisionState::Load(const sdf::ElementPtr _elem)
 
   // Set the pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 }

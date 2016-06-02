@@ -276,13 +276,12 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->Initialized())
   {
-    /*event::Events::preRender();
+    event::Events::preRender();
 
     // Tell all the cameras to render
     event::Events::render();
 
     event::Events::postRender();
-    */
   }
   else
   {
@@ -546,18 +545,24 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 {
   // Update the view depending on the current GUI state
-  if (this->dataPtr->state == "make_entity")
-    this->OnMouseMoveMakeEntity();
-  else if (this->dataPtr->state == "select")
+  if (this->dataPtr->state == "select")
+  {
     this->OnMouseMoveNormal();
+  }
   else if (this->dataPtr->state == "translate" ||
            this->dataPtr->state == "rotate"    ||
            this->dataPtr->state == "scale")
   {
     ModelManipulator::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
   }
+  else if (this->dataPtr->state == "make_entity")
+  {
+   this->OnMouseMoveMakeEntity();
+  }
   else if (this->dataPtr->state == "snap")
+  {
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
+  }
 
   return true;
 }
@@ -688,6 +693,7 @@ void GLWidget::OnMouseMoveNormal()
   if (!this->dataPtr->userCamera)
     return;
 
+  this->dataPtr->prevMouseMoveTime = currentTime;
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
       this->dataPtr->mouseEvent.Pos());
 

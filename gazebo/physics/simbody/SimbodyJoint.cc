@@ -106,9 +106,9 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  math::Pose childPose = _sdf->Get<math::Pose>("pose");
+  ignition::math::Pose3d childPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (_sdf->GetElement("child")->HasElement("pose"))
-    childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
+    childPose = _sdf->GetElement("child")->Get<ignition::math::Pose3d>("pose");
 
   this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
@@ -268,16 +268,16 @@ void SimbodyJoint::Detach()
 //////////////////////////////////////////////////
 void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
 {
-  math::Pose parentModelPose;
+  ignition::math::Pose3d parentModelPose;
   if (this->parentLink)
-    parentModelPose = this->parentLink->GetModel()->GetWorldPose();
+    parentModelPose = this->parentLink->GetModel()->GetWorldPose().Ign();
 
   // Set joint axis
   // assuming incoming axis is defined in the model frame, so rotate them
   // into the inertial frame
   // TODO: switch so the incoming axis is defined in the child frame.
-  math::Vector3 axis = parentModelPose.rot.RotateVector(
-    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+  ignition::math::Vector3d axis = parentModelPose.Rot().RotateVector(
+    this->sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
 
   if (_index == 0)
     this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);

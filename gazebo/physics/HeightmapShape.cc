@@ -97,7 +97,7 @@ int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
   }
 
   this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
-  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+  this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
 
   return 0;
 }
@@ -114,7 +114,7 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (this->sdf->HasElement("size"))
   {
-    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+    this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
   }
   else
   {
@@ -276,7 +276,7 @@ math::Vector3 HeightmapShape::GetSize() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+  return this->sdf->Get<ignition::math::Vector3d>("pos");
 }
 
 //////////////////////////////////////////////////

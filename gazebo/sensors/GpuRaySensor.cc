@@ -436,7 +436,8 @@ double GpuRaySensor::RangeCountRatio() const
 //////////////////////////////////////////////////
 ignition::math::Angle GpuRaySensor::AngleMin() const
 {
-  return this->dataPtr->horzElem->Get<ignition::math::Angle>("min_angle");
+  return ignition::math::Angle(
+      this->dataPtr->horzElem->Get<double>("min_angle"));
 }
 
 //////////////////////////////////////////////////
@@ -448,7 +449,8 @@ void GpuRaySensor::SetAngleMin(double _angle)
 //////////////////////////////////////////////////
 ignition::math::Angle GpuRaySensor::AngleMax() const
 {
-  return this->dataPtr->horzElem->Get<ignition::math::Angle>("max_angle");
+  return ignition::math::Angle(
+      this->dataPtr->horzElem->Get<double>("max_angle"));
 }
 
 //////////////////////////////////////////////////
@@ -571,7 +573,10 @@ int GpuRaySensor::VerticalRangeCount() const
 ignition::math::Angle GpuRaySensor::VerticalAngleMin() const
 {
   if (this->dataPtr->scanElem->HasElement("vertical"))
-    return this->dataPtr->vertElem->Get<ignition::math::Angle>("min_angle");
+  {
+    return ignition::math::Angle(
+        this->dataPtr->vertElem->Get<double>("min_angle"));
+  }
   else
     return ignition::math::Angle(0);
 }
@@ -587,7 +592,8 @@ void GpuRaySensor::SetVerticalAngleMin(const double _angle)
 ignition::math::Angle GpuRaySensor::VerticalAngleMax() const
 {
   if (this->dataPtr->scanElem->HasElement("vertical"))
-    return this->dataPtr->vertElem->Get<ignition::math::Angle>("max_angle");
+    return ignition::math::Angle(
+        this->dataPtr->vertElem->Get<double>("max_angle"));
   else
     return ignition::math::Angle(0);
 }

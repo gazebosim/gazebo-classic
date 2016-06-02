@@ -333,7 +333,7 @@ void Visual::Load()
     this->dataPtr->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->dataPtr->sdf->Get<math::Pose>("pose");
+  pose = this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
 
   std::string mesh = this->GetMeshName();
   std::string subMesh = this->GetSubMeshName();
@@ -400,9 +400,9 @@ void Visual::Load()
     }
     else if (geomElem->HasElement("plane"))
     {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      geometrySize.Set(size.x, size.y, 1);
+      ignition::math::Vector2d size =
+        geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
+      geometrySize.Set(size.X(), size.Y(), 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
@@ -459,14 +459,34 @@ void Visual::Load()
         this->SetMaterial(matName);
     }
 
+
     if (matElemClone->HasElement("ambient"))
-      this->SetAmbient(matElemClone->Get<common::Color>("ambient"));
+    {
+      sdf::Color color = matElemClone->Get<sdf::Color>("ambient");
+      common::Color gzColor(color.r, color.g, color.b, color.a);
+      this->SetAmbient(gzColor);
+    }
+
     if (matElemClone->HasElement("diffuse"))
-      this->SetDiffuse(matElemClone->Get<common::Color>("diffuse"));
+    {
+      sdf::Color color = matElemClone->Get<sdf::Color>("diffuse");
+      common::Color gzColor(color.r, color.g, color.b, color.a);
+      this->SetDiffuse(gzColor);
+    }
+
     if (matElemClone->HasElement("specular"))
-      this->SetSpecular(matElemClone->Get<common::Color>("specular"));
+    {
+      sdf::Color color = matElemClone->Get<sdf::Color>("specular");
+      common::Color gzColor(color.r, color.g, color.b, color.a);
+      this->SetSpecular(gzColor);
+    }
+
     if (matElemClone->HasElement("emissive"))
-      this->SetEmissive(matElemClone->Get<common::Color>("emissive"));
+    {
+      sdf::Color color = matElemClone->Get<sdf::Color>("emissive");
+      common::Color gzColor(color.r, color.g, color.b, color.a);
+      this->SetEmissive(gzColor);
+    }
 
     if (matElem->HasElement("lighting"))
     {

@@ -774,14 +774,16 @@ namespace gazebo
 
       if (_sdf->HasElement("diffuse"))
       {
-        result.mutable_diffuse()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("diffuse")));
+        sdf::Color color = _sdf->Get<sdf::Color>("diffuse");
+        common::Color gzClr(color.r, color.g, color.b, color.a);
+        result.mutable_diffuse()->CopyFrom(Convert(gzClr));
       }
 
       if (_sdf->HasElement("specular"))
       {
-        result.mutable_specular()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("specular")));
+        sdf::Color color = _sdf->Get<sdf::Color>("specular");
+        common::Color gzClr(color.r, color.g, color.b, color.a);
+        result.mutable_specular()->CopyFrom(Convert(gzClr));
       }
 
       if (_sdf->HasElement("attenuation"))
@@ -1049,17 +1051,33 @@ namespace gazebo
         }
 
         if (elem->HasElement("ambient"))
-          msgs::Set(matMsg->mutable_ambient(),
-              elem->Get<common::Color>("ambient"));
+        {
+          sdf::Color color = elem->Get<sdf::Color>("ambient");
+          common::Color gzClr(color.r, color.g, color.b, color.a);
+
+          msgs::Set(matMsg->mutable_ambient(), gzClr);
+        }
         if (elem->HasElement("diffuse"))
-          msgs::Set(matMsg->mutable_diffuse(),
-              elem->Get<common::Color>("diffuse"));
+        {
+          sdf::Color color = elem->Get<sdf::Color>("diffuse");
+          common::Color gzClr(color.r, color.g, color.b, color.a);
+
+          msgs::Set(matMsg->mutable_diffuse(), gzClr);
+        }
         if (elem->HasElement("specular"))
-          msgs::Set(matMsg->mutable_specular(),
-              elem->Get<common::Color>("specular"));
+        {
+          sdf::Color color = elem->Get<sdf::Color>("specular");
+          common::Color gzClr(color.r, color.g, color.b, color.a);
+
+          msgs::Set(matMsg->mutable_specular(), gzClr);
+        }
         if (elem->HasElement("emissive"))
-          msgs::Set(matMsg->mutable_emissive(),
-              elem->Get<common::Color>("emissive"));
+        {
+          sdf::Color color = elem->Get<sdf::Color>("emissive");
+          common::Color gzClr(color.r, color.g, color.b, color.a);
+
+          msgs::Set(matMsg->mutable_emissive(), gzClr);
+        }
       }
 
       // Set the origin of the visual
@@ -1649,8 +1667,9 @@ namespace gazebo
       else
         gzthrow(std::string("Unknown fog type[") + type + "]");
 
-      result.mutable_color()->CopyFrom(
-          Convert(_sdf->Get<common::Color>("color")));
+      sdf::Color color = _sdf->Get<sdf::Color>("color");
+      common::Color gzClr(color.r, color.g, color.b, color.a);
+      result.mutable_color()->CopyFrom(Convert(gzClr));
 
       result.set_density(_sdf->Get<double>("density"));
       result.set_start(_sdf->Get<double>("start"));
@@ -1676,13 +1695,19 @@ namespace gazebo
         result.set_origin_visual(true);
 
       if (_sdf->HasElement("ambient"))
-        result.mutable_ambient()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("ambient")));
+      {
+        sdf::Color color = _sdf->Get<sdf::Color>("ambient");
+        common::Color gzClr(color.r, color.g, color.b, color.a);
+
+        result.mutable_ambient()->CopyFrom(Convert(gzClr));
+      }
 
       if (_sdf->HasElement("background"))
       {
-        result.mutable_background()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("background")));
+        sdf::Color color = _sdf->Get<sdf::Color>("background");
+        common::Color gzClr(color.r, color.g, color.b, color.a);
+
+        result.mutable_background()->CopyFrom(Convert(gzClr));
       }
 
       if (_sdf->HasElement("sky"))
@@ -1700,8 +1725,11 @@ namespace gazebo
           skyMsg->set_wind_direction(cloudsElem->Get<double>("direction"));
           skyMsg->set_humidity(cloudsElem->Get<double>("humidity"));
           skyMsg->set_mean_cloud_size(cloudsElem->Get<double>("mean_size"));
-          msgs::Set(skyMsg->mutable_cloud_ambient(),
-                    cloudsElem->Get<common::Color>("ambient"));
+
+          sdf::Color color = cloudsElem->Get<sdf::Color>("ambient");
+          common::Color gzClr(color.r, color.g, color.b, color.a);
+
+          msgs::Set(skyMsg->mutable_cloud_ambient(), gzClr);
         }
       }
 
@@ -1899,9 +1927,9 @@ namespace gazebo
         if (distElem->HasElement("center"))
         {
           distortionMsg->mutable_center()->set_x(
-              distElem->Get<math::Vector2d>("center").x);
+              distElem->Get<ignition::math::Vector2d>("center").X());
           distortionMsg->mutable_center()->set_y(
-              distElem->Get<math::Vector2d>("center").y);
+              distElem->Get<ignition::math::Vector2d>("center").Y());
         }
       }
 

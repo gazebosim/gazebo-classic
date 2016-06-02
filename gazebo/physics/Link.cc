@@ -218,8 +218,8 @@ void Link::Init()
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
-  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
+  this->SetInitialRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -1378,7 +1378,7 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
       if (geomElem->HasElement("box"))
       {
         math::Vector3 size =
-            geomElem->GetElement("box")->Get<math::Vector3>("size");
+            geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
         geomElem->GetElement("box")->GetElement("size")->Set(
             _scale/this->scale*size);
       }

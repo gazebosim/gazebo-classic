@@ -56,7 +56,8 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->k3 = this->sdf->Get<double>("k3");
   this->dataPtr->p1 = this->sdf->Get<double>("p1");
   this->dataPtr->p2 = this->sdf->Get<double>("p2");
-  this->dataPtr->lensCenter = this->sdf->Get<math::Vector2d>("center");
+  this->dataPtr->lensCenter =
+    this->sdf->Get<ignition::math::Vector2d>("center");
 
   if (this->dataPtr->k1 >= 0)
   {

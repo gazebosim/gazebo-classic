@@ -358,8 +358,10 @@ void Scene::Init()
   if (this->dataPtr->sdf->HasElement("fog"))
   {
     sdf::ElementPtr fogElem = this->dataPtr->sdf->GetElement("fog");
+    sdf::Color color = fogElem->Get<sdf::Color>("color");
+    common::Color gzColor(color.r, color.g, color.b, color.a);
     this->SetFog(fogElem->Get<std::string>("type"),
-                 fogElem->Get<common::Color>("color"),
+                 gzColor,
                  fogElem->Get<double>("density"),
                  fogElem->Get<double>("start"),
                  fogElem->Get<double>("end"));
@@ -507,7 +509,8 @@ common::Color Scene::GetAmbientColor() const
 //////////////////////////////////////////////////
 common::Color Scene::AmbientColor() const
 {
-  return this->dataPtr->sdf->Get<common::Color>("ambient");
+  sdf::Color color = this->dataPtr->sdf->Get<sdf::Color>("ambient");
+  return common::Color(color.r, color.g, color.b, color.a);
 }
 
 //////////////////////////////////////////////////
@@ -546,7 +549,8 @@ common::Color Scene::GetBackgroundColor() const
 //////////////////////////////////////////////////
 common::Color Scene::BackgroundColor() const
 {
-  return this->dataPtr->sdf->Get<common::Color>("background");
+  sdf::Color color = this->dataPtr->sdf->Get<sdf::Color>("background");
+  return common::Color(color.r, color.g, color.b, color.a);
 }
 
 //////////////////////////////////////////////////
@@ -1698,8 +1702,10 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       elem->GetElement("type")->Set(type);
     }
 
+    sdf::Color color = elem->Get<sdf::Color>("color");
+    common::Color gzColor(color.r, color.g, color.b, color.a);
     this->SetFog(elem->Get<std::string>("type"),
-                 elem->Get<common::Color>("color"),
+                 gzColor,
                  elem->Get<double>("density"),
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));

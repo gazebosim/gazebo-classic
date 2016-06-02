@@ -65,7 +65,7 @@ void InertiaVisual::Fini()
 void InertiaVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
-  math::Pose pose = _elem->Get<math::Pose>("origin");
+  math::Pose pose = _elem->Get<ignition::math::Pose3d>("origin");
   this->Load(pose);
 }
 

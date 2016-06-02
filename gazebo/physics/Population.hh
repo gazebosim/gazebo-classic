@@ -42,7 +42,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE PopulationParams
     {
       /// \brief The three side lengths of the box.
-      public: math::Vector3 size;
+      public: ignition::math::Vector3d size;
 
       /// \brief Number of rows used when models are distributed as a grid.
       public: int rows;
@@ -51,10 +51,10 @@ namespace gazebo
       public: int cols;
 
       /// \brief Distance between models when they are distributed as a grid.
-      public: math::Vector3 step;
+      public: ignition::math::Vector3d step;
 
       /// The reference frame of the population's region.
-      public: math::Pose pose;
+      public: ignition::math::Pose3d pose;
 
       /// \brief Radius of the cylinder's base containing the models.
       public: double radius;
@@ -151,7 +151,7 @@ namespace gazebo
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void CreatePosesBoxRandom(const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// uniformly distributed within a box. We use k-means to split the
@@ -162,7 +162,7 @@ namespace gazebo
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void CreatePosesBoxUniform(const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \brief Populate a vector of poses evenly placed in a 2D grid pattern.
       /// \param[in] _min Minimum corner of the box containing the models.
@@ -175,7 +175,7 @@ namespace gazebo
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void CreatePosesBoxGrid(const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global x-axis.
@@ -185,7 +185,7 @@ namespace gazebo
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void CreatePosesBoxLinearX(const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global y-axis.
@@ -195,7 +195,7 @@ namespace gazebo
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void CreatePosesBoxLinearY(const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global z-axis.
@@ -205,7 +205,7 @@ namespace gazebo
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void CreatePosesBoxLinearZ(const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// randomly distributed within a cylinder.
@@ -219,7 +219,7 @@ namespace gazebo
       /// populate models.
       private: void CreatePosesCylinderRandom(
         const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// uniformly distributed within a cylinder. We use k-means to split the
@@ -234,7 +234,7 @@ namespace gazebo
       /// populate models.
       private: void CreatePosesCylinderUniform(
         const PopulationParams &_populParams,
-        std::vector<math::Vector3> &_poses);
+        std::vector<ignition::math::Vector3d> &_poses);
 
       /// \internal
       /// \brief Pointer to private data.

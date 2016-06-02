@@ -105,12 +105,16 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->Get<math::Pose>("pose") +
-                        this->parentEntity->worldPose;
+    {
+      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose") +
+                        this->parentEntity->worldPose.Ign();
+    }
     else
-      this->worldPose = this->sdf->Get<math::Pose>("pose");
+    {
+      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose");
+    }
 
-    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
+    this->initialRelativePose = this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->parent)
@@ -626,7 +630,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->Get<math::Pose>("pose");
+  math::Pose newPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);

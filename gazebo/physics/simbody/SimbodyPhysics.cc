@@ -1591,7 +1591,7 @@ math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
 /////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 {
-  const math::Pose pose = _element->Get<math::Pose>("pose");
+  const math::Pose pose = _element->Get<ignition::math::Pose3d>("pose");
   return Pose2Transform(pose);
 }
 
