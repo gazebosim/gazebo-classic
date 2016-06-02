@@ -583,8 +583,7 @@ void Visual::DetachVisual(VisualPtr _vis)
 //////////////////////////////////////////////////
 void Visual::DetachVisual(const std::string &_name)
 {
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
+  for (auto iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
@@ -593,7 +592,6 @@ void Visual::DetachVisual(const std::string &_name)
       this->dataPtr->children.erase(iter);
       if (this->dataPtr->sceneNode)
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
-      childVis->GetParent().reset();
       break;
     }
   }

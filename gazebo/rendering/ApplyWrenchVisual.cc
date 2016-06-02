@@ -121,7 +121,7 @@ void ApplyWrenchVisual::Load()
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
   VisualPtr forceTextVisual(new rendering::Visual(
-      this->GetName() + "_FORCE_TEXT_", dPtr->forceVisual));
+      this->GetName() + "_FORCE_TEXT_", dPtr->forceVisual, false));
   forceTextVisual->Load();
   forceTextVisual->GetSceneNode()->attachObject(&(dPtr->forceText));
   forceTextVisual->GetSceneNode()->setInheritScale(false);
