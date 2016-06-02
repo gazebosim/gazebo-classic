@@ -360,6 +360,7 @@ void ModelListWidget_TEST::ModelProperties()
   gazebo::gui::ModelListWidget *modelListWidget
       = new gazebo::gui::ModelListWidget;
   modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 800);
   QCoreApplication::processEvents();
 
   this->Load("worlds/multilink_shape.world");
