@@ -62,7 +62,8 @@ ModelManipulator::~ModelManipulator()
 /////////////////////////////////////////////////
 void ModelManipulator::Clear()
 {
-  this->dataPtr->selectionObj->Fini();
+  if (this->dataPtr->selectionObj)
+    this->dataPtr->selectionObj->Fini();
 
   this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();

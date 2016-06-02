@@ -47,7 +47,7 @@ void ModelSnap_TEST::Snap()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -97,9 +97,13 @@ void ModelSnap_TEST::Snap()
   rayQuery.SelectMeshTriangle(destPt.x, destPt.y, model02Vis, intersect,
       verticesDest);
 
+  this->ProcessEventsAndDraw(mainWindow);
+
   // Snap the sphere to the front face of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
       verticesSrc, verticesDest, model03Vis);
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   double xDiff = 0;
   double yDiff = 0;
