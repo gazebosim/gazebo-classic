@@ -400,7 +400,8 @@ namespace gazebo
 
       /// \brief Disconnect Laser Frame.
       /// \param[in,out] _conn Connection pointer to disconnect.
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
+              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       public: virtual bool IsActive() const;

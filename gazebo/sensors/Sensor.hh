@@ -214,7 +214,8 @@ namespace gazebo
       /// \brief Disconnect from a the updated signal.
       /// \param[in] _c The connection to disconnect
       /// \sa Sensor::ConnectUpdated
-      public: void DisconnectUpdated(event::ConnectionPtr &_c);
+      public: void DisconnectUpdated(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the category of the sensor.
       /// \return The category of the sensor.
