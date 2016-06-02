@@ -63,7 +63,7 @@ WrenchVisual::~WrenchVisual()
   dPtr->node.reset();
   dPtr->connections.clear();
 
-  delete dPtr->forceLine;
+  this->DeleteDynamicLine(dPtr->forceLine);
   dPtr->forceLine = NULL;
 }
 
