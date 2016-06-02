@@ -426,7 +426,8 @@ namespace gazebo
       /// \brief Disconnect to the add entity signal.
       /// \param[in] _conn Connection pointer to disconnect.
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
-              {enabledSignal.Disconnect(_conn);}
+              GAZEBO_DEPRECATED(8.0)
+              {enabledSignal.Disconnect(_conn->Id());}
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill

@@ -152,7 +152,8 @@ namespace gazebo
       /// \brief Disconnect from the new laser scans signal.
       /// \param[in] _conn Connection to remove.
       public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
-              {this->newLaserScans.Disconnect(_conn);}
+              GAZEBO_DEPRECATED(8.0)
+              {this->newLaserScans.Disconnect(_conn->Id());}
 
       /// \brief Method for updating the rays. This function is normally
       /// called automatically, such as when a laser sensor is updated.
