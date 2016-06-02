@@ -102,9 +102,9 @@ TEST_F(CameraSensor, Timestamp)
 
   // variables for testing
   // camera image width
-  unsigned int width  = 640;
+  unsigned int width  = 320;
   // camera image height
-  unsigned int height = 480;
+  unsigned int height = 240;
   // camera sensor update rate
   double sensorUpdateRate = 30;
   // Speed at which the box is moved, in meters per second
@@ -138,7 +138,7 @@ TEST_F(CameraSensor, Timestamp)
   std::string boxName = "box_0";
   double initDist = -3;
   ignition::math::Pose3d boxPose(0, initDist, 0.0, 0, 0, 0);
-  SpawnBox(boxName, ignition::math::Vector3d(0.005, 0.005, 0.1), boxPose.Pos(),
+  SpawnBox(boxName, ignition::math::Vector3d(0.008, 0.008, 0.1), boxPose.Pos(),
       boxPose.Rot().Euler());
 
   gazebo::physics::ModelPtr boxModel = world->GetModel(boxName);
@@ -295,6 +295,28 @@ TEST_F(CameraSensor, Timestamp)
       }
       else
       {
+        unsigned char *img2 = new unsigned char[imgSize];
+
+        memcpy(img2, img, imgSize);
+        common::Image ii;
+        ii.SetFromData(img2, width, height, common::Image::RGB_INT8);
+        ii.SavePNG("test.png");
+    for (unsigned int i = 0; i < width; ++i)
+    {
+      int row = halfHeight * width * 3;
+      int r = img[row + i*3];
+      int g = img[row + i*3+1];
+      int b = img[row + i*3+2];
+      std::cerr << r << " " << g << " " << b << std::endl;
+
+    }
+
+
+
+//        Ogre::Image aa;
+//        aa.loadDynamicImage(img, width, height, Ogre::PF_R8G8B8);
+ //       aa.save("aa.png");
+
         FAIL() << "No box found in image.\n"
                << "time: " << t << "\n"
                << "Expected box pos: " << p2 << "\n"
