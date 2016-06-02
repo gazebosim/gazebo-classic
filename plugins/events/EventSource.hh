@@ -100,7 +100,8 @@ namespace gazebo
     /// \param[in] _subscriber the subscriber to this event
     public: static void DisconnectSpawnModel(
         event::ConnectionPtr _subscriber)
-      { spawnModel.Disconnect(_subscriber); }
+        GAZEBO_DEPRECATED(8.0)
+      { spawnModel.Disconnect(_subscriber->Id()); }
 
     /// \brief A model has been completed and uploaded onto the server.
     public: static event::EventT<void (std::string, bool)> spawnModel;
