@@ -47,10 +47,49 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo/common/Event.hh**
+    + ***Deprecation:*** public: void Event::Disconnect(ConnectionPtr);
+    + ***Deprecation:*** public: void EventT::Disconnect(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
     + ***Deprecation:*** public: bool Event::GetSignaled() const;
     + ***Replacement:*** public: bool Event::Signaled() const;
     + ***Deprecation:*** public: bool Connection::GetId() const;
     + ***Replacement:*** public: bool Connection::Id() const;
+
+1. **gazebo/common/Events.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/building/BuildingEditorEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation:*** public: void Joint::DisconnectJointUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/Link.hh**
+    + ***Deprecation:*** public: void Link::DisconnectEnabled(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/MultiRayShape.hh**
+    + ***Deprecation:*** public: void MultiRayShape::DisconnectNewLaserScans(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
 
 1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation:*** public: math::Vector3 GetGravity const
@@ -61,6 +100,52 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: void Camera::DisconnectNewImageFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Deprecation:*** public: void DepthCamera::DisconnectNewDepthFrame(ConnectionPtr);
+    + ***Deprecation:*** public: void DepthCamera::DisconnectNewRGBPointCloud(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Deprecation:*** public: void GpuLaser::DisconnectNewLaserFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + ***Deprecation:*** public: void ForceTorqueSensor::DisconnectUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + ***Deprecation:*** public: void GpuRaySensor::DisconnectNewLaserFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/Sensor.hh**
+    + ***Deprecation:*** public: void Sensor::DisconnectUpdated(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/SonarSensor.hh**
+    + ***Deprecation:*** public: void SonarSensor::DisconnectUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/transport/Connection.hh**
+    + ***Deprecation:*** public: void Connection::DisconnectShutdown(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **plugins/events/EventSource.hh**
+    + ***Deprecation:*** public: void SimEventConnector::DisconnectSpawnModel(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
 
 1. **gazebo/math/Spline.hh**
     + ***Deprecation:*** public: gazebo::math::Spline
