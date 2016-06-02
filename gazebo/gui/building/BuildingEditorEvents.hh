@@ -42,7 +42,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectToggleEditMode(
             event::ConnectionPtr _subscriber)
-          { toggleEditMode.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { toggleEditMode.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the create editor item signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -56,7 +57,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectCreateBuildingEditorItem(
             event::ConnectionPtr _subscriber)
-          { createBuildingEditorItem.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { createBuildingEditorItem.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the color selected signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -70,7 +72,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectColorSelected(
             event::ConnectionPtr _subscriber)
-          { colorSelected.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { colorSelected.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the texture selected signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -84,7 +87,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectTextureSelected(
             event::ConnectionPtr _subscriber)
-          { textureSelected.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { textureSelected.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the save model signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -97,7 +101,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSaveBuildingModel(
             event::ConnectionPtr _subscriber)
-          { saveBuildingModel.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { saveBuildingModel.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -111,7 +116,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectFinishBuildingModel(
             event::ConnectionPtr _subscriber)
-          { finishBuildingModel.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { finishBuildingModel.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the new model signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -125,7 +131,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectNewBuildingModel(
             event::ConnectionPtr _subscriber)
-          { newBuildingModel.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { newBuildingModel.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the change model signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -139,7 +146,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectChangeBuildingLevel(
             event::ConnectionPtr _subscriber)
-          { changeBuildingLevel.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { changeBuildingLevel.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the add level signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -152,7 +160,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectAddBuildingLevel(
             event::ConnectionPtr _subscriber)
-          { addBuildingLevel.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { addBuildingLevel.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the delete level signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -166,7 +175,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectDeleteBuildingLevel(
               event::ConnectionPtr _subscriber)
-          { deleteBuildingLevel.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { deleteBuildingLevel.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the show floorplan signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -179,7 +189,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectShowFloorplan(
               event::ConnectionPtr _subscriber)
-          { showFloorplan.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { showFloorplan.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the trigger show floorplan
         /// signal.
@@ -195,7 +206,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectTriggerShowFloorplan(
               event::ConnectionPtr _subscriber)
-          { triggerShowFloorplan.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { triggerShowFloorplan.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the show elements signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -208,7 +220,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectShowElements(
               event::ConnectionPtr _subscriber)
-          { showElements.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { showElements.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the trigger show elements
         /// signal.
@@ -224,7 +237,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectTriggerShowElements(
               event::ConnectionPtr _subscriber)
-          { triggerShowElements.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { triggerShowElements.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the update level widget signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -238,7 +252,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectUpdateLevelWidget(
               event::ConnectionPtr _subscriber)
-          { updateLevelWidget.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { updateLevelWidget.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the change zoom signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -252,7 +267,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectChangeBuildingEditorZoom(
             event::ConnectionPtr _subscriber)
-          { changeBuildingEditorZoom.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { changeBuildingEditorZoom.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the save signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -265,7 +281,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSaveBuildingEditor(
             event::ConnectionPtr _subscriber)
-          { saveBuildingEditor.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { saveBuildingEditor.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the save as signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -279,7 +296,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSaveAsBuildingEditor(
             event::ConnectionPtr _subscriber)
-          { saveAsBuildingEditor.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { saveAsBuildingEditor.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the new signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -293,7 +311,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectNewBuildingEditor(
               event::ConnectionPtr _subscriber)
-          { newBuildingEditor.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { newBuildingEditor.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the exit signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -306,7 +325,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectExitBuildingEditor(
             event::ConnectionPtr _subscriber)
-          { exitBuildingEditor.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { exitBuildingEditor.Disconnect(_subscriber->Id()); }
 
         /// \brief Connect a Gazebo event to the name changed signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -320,7 +340,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectBuildingNameChanged(
             event::ConnectionPtr _subscriber)
-          { buildingNameChanged.Disconnect(_subscriber); }
+            GAZEBO_DEPRECATED(8.0)
+          { buildingNameChanged.Disconnect(_subscriber->Id()); }
 
         /// \brief Toggle if the edit mode was checked or not.
         public: static event::EventT<void (bool)> toggleEditMode;

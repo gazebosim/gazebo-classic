@@ -93,8 +93,6 @@ void ModelSnap::Clear()
     this->dataPtr->highlightVisual.reset();
   }
 
-  if (this->dataPtr->renderConnection)
-    event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
 
   delete this->dataPtr->updateMutex;
@@ -170,7 +168,6 @@ void ModelSnap::Reset()
     }
   }
 
-  event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
 }
 
