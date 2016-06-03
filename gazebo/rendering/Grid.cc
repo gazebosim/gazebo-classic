@@ -27,8 +27,6 @@ namespace gazebo
 {
   namespace rendering
   {
-    /// \internal
-    /// \class Grid Grid.hh
     /// \brief Private data for the Grid class.
     class GridPrivate
     {
