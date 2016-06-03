@@ -415,9 +415,6 @@ namespace gazebo
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
-      /// \brief Publisher for joint info.
-      protected: transport::PublisherPtr jointPub;
-
       /// \brief Load all the links.
       private: void LoadLinks();
 
@@ -457,6 +454,9 @@ namespace gazebo
       /// used by Model::AttachStaticModel
       protected: std::vector<math::Pose> attachedModelsOffset;
 
+      /// \brief Publisher for joint info.
+      protected: transport::PublisherPtr jointPub;
+
       /// \brief The canonical link of the model.
       private: LinkPtr canonicalLink;
 
@@ -482,12 +482,6 @@ namespace gazebo
       /// \brief Callback used when a joint animation completes.
       private: boost::function<void()> onJointAnimationComplete;
 
-      /// \brief Mutex used during the update cycle.
-      private: mutable boost::recursive_mutex updateMutex;
-
-      /// \brief Mutex to protect incoming message buffers.
-      private: mutable std::mutex *receiveMutex;
-
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
 
@@ -497,6 +491,11 @@ namespace gazebo
       /// \brief Subscriber to request messages.
       private: transport::SubscriberPtr requestSub;
 
+      /// \brief Mutex used during the update cycle.
+      private: mutable boost::recursive_mutex updateMutex;
+
+      /// \brief Mutex to protect incoming message buffers.
+      private: mutable std::mutex *receiveMutex;
     };
     /// \}
   }

@@ -1681,7 +1681,6 @@ void World::ProcessRequestMsgs()
     else if (requestMsg.request() == "entity_info")
     {
       BasePtr entity = this->dataPtr->rootElement->GetByName(requestMsg.data());
-      //printf("%s\n", requestMsg.data().c_str());
       if (entity)
       {
         if (entity->HasType(Base::MODEL))
@@ -1693,19 +1692,7 @@ void World::ProcessRequestMsgs()
           std::string *serializedData = response.mutable_serialized_data();
           modelMsg.SerializeToString(serializedData);
           response.set_type(modelMsg.GetTypeName());
-        }/*
-        else if(requestMsg.data().c_str() == "buoyancy")
-        {
-          printf("%s\n", "Plugin");
-          msgs::Model modelMsg;
-          PluginPtr model = boost::dynamic_pointer_cast<Plugin>(entity);
-          model->FillMsg(modelMsg);
-
-          std::string *serializedData = response.mutable_serialized_data();
-          printf("%s\n", serializedData->c_str());
-          modelMsg.SerializeToString(serializedData);
-          response.set_type(modelMsg.GetTypeName());
-        }*/
+        }
         else if (entity->HasType(Base::LINK))
         {
           msgs::Link linkMsg;

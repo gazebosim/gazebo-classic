@@ -149,7 +149,7 @@ void Model::OnRequest(ConstRequestPtr &_msg)
             this->responsePub->Publish(response);
           }
           pluginElem = pluginElem->GetNextElement("plugin");
-          }
+        }
       }
     }
   }

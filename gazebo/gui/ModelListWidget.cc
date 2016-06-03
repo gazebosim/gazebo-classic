@@ -208,17 +208,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       this->dataPtr->requestMsg = msgs::CreateRequest("wind_info",
                                              this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
-    }
-    else if (name == "Spherical Coordinates")
-    {
-      this->dataPtr->requestMsg = msgs::CreateRequest(
-          "spherical_coordinates_info",
-          this->dataPtr->selectedEntityName);
-      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
-    }
-    else if (name == "GUI")
-    {
-      QtVariantProperty *item = NULL;
+    }VariantProperty *item = NULL;
 
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (!cam)
@@ -470,7 +460,7 @@ void ModelListWidget::ProcessModelMsgs()
           QTreeWidgetItem *linkheaderItem = new QTreeWidgetItem(topItem,
           QStringList(QString("%1").arg(QString::fromStdString("LINKS"))));
           linkheaderItem->setFont(0, subheaderFont);
-          linkheaderItem->setFlags(!Qt::ItemIsEnabled);
+          linkheaderItem->setFlags(Qt::NoItemFlags);
           this->dataPtr->modelTreeWidget->addTopLevelItem(linkheaderItem);
         }
 

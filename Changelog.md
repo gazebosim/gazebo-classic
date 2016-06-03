@@ -85,8 +85,8 @@
 1. Google Summer of Code Graphical interface for inserting plugins during simulation.
 
     1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
-        * [Pull request #2323](https://bitbucket.org/osrf/gazebo/pull-request/2290)
-        * [Issue #1698](https://bitbucket.org/osrf/gazebo/pull-request/2290)
+        * [Pull request #2323](https://bitbucket.org/osrf/gazebo/pull-request/2323)
+        * [Issue #1698](https://bitbucket.org/osrf/gazebo/pull-request/1698)
 
 ## Gazebo 7
 
