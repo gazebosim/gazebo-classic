@@ -31,10 +31,10 @@ namespace gazebo
     class GridPrivate
     {
       /// \brief Pointer to the scene node
-      public: Ogre::SceneNode *sceneNode;
+      public: Ogre::SceneNode *sceneNode = nullptr;
 
       /// \brief Pointer to the manual object.
-      public: Ogre::ManualObject *manualObject;
+      public: Ogre::ManualObject *manualObject = nullptr;
 
       /// \brief Pointer to the material.
       public: Ogre::MaterialPtr material;
@@ -61,7 +61,7 @@ namespace gazebo
       public: uint32_t height;
 
       /// \brief Pointer to the scene.
-      public: Scene *scene;
+      public: Scene *scene = nullptr;
     };
   }
 }
