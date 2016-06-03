@@ -131,7 +131,7 @@ namespace gazebo
 
       /// \brief Set the line width
       /// \param[in] _width The width of the grid
-      public: void SetLineWidth(float _width);
+      public: void SetLineWidth(const float _width);
 
       /// \brief Get the width of the grid line
       /// \return The line width
@@ -144,14 +144,14 @@ namespace gazebo
 
       /// \brief Set the height of the grid
       /// \param[in] _count Grid height
-      public: void SetHeight(uint32_t _count);
+      public: void SetHeight(const uint32_t _count);
 
       /// \brief Get the height of the grid
       /// \return The height
       /// \deprecated See Height()
       public: uint32_t GetHeight() const GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Get the height of the grid
+      /// \brief Get the number of cells in the normal direction of the grid.
       /// \return The height
       public: uint32_t Height() const;
 
