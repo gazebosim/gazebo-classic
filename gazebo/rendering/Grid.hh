@@ -62,8 +62,9 @@ namespace gazebo
       /// \param[in] _cellLength The size of each cell
       /// \param[in] _lineWidth The width of the lines to use
       /// \param[in] _color The color of the grid
-      public: Grid(Scene *_scene, uint32_t _cellCount, float _cellLength,
-                   float _lineWidth, const common::Color &_color);
+      public: Grid(Scene *_scene, const uint32_t _cellCount,
+          const float _cellLength, const float _lineWidth,
+          const common::Color &_color);
 
       /// \brief Destructor
       public: ~Grid();
@@ -75,7 +76,7 @@ namespace gazebo
       ///
       /// \param[in] _enable Set to true to view the grid, false to make
       /// invisible.
-      public: void Enable(bool _enable);
+      public: void Enable(const bool _enable);
 
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
@@ -105,7 +106,7 @@ namespace gazebo
 
       /// \brief Set the number of cells
       /// \param[in] _count The number of cells
-      public: void SetCellCount(uint32_t _count);
+      public: void SetCellCount(const uint32_t _count);
 
       /// \brief Get the number of cells
       /// \return The number of cells in each direction.
@@ -118,7 +119,7 @@ namespace gazebo
 
       /// \brief Set the cell length
       /// \param[in] _len The cell length
-      public: void SetCellLength(float _len);
+      public: void SetCellLength(const float _len);
 
       /// \brief Get the cell length
       /// \return The cell length

@@ -62,7 +62,7 @@ namespace gazebo
       /// \brief Number of cells in the normal direction.
       public: uint32_t height;
 
-      /// \brief Pointer ot the scene.
+      /// \brief Pointer to the scene.
       public: Scene *scene;
     };
   }

@@ -49,6 +49,9 @@
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
 
+1. PIMPLize rendering/Grid
+    * [Pull request 2330](https://bitbucket.org/osrf/gazebo/pull-request/2330)
+
 1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
     * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
 
