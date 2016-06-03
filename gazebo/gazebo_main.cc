@@ -84,7 +84,11 @@ static void kill_one_process(const int _pid, const std::string &_name,
   // Wait some time and if not dead, escalate to SIGKILL
   for (unsigned int i = 0; i < (unsigned int)(_waittime / sleepSecs); ++i)
   {
-    if (!_killed)
+    if (_killed)
+    {
+      break;
+    }
+    else
     {
       int p = waitpid(_pid, &_status, WNOHANG);
       if (p == _pid)
@@ -93,8 +97,6 @@ static void kill_one_process(const int _pid, const std::string &_name,
         break;
       }
     }
-    if (_killed)
-      break;
     // Sleep briefly
     gazebo::common::Time::Sleep(gazebo::common::Time(sleepSecs));
   }
