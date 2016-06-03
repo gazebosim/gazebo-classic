@@ -54,7 +54,7 @@ release will remove the deprecated code.
 
 1. **gazebo/rendering/Grid.hh**
     + ***Deprecation:*** public: public: Ogre::SceneNode *GetSceneNode()
-    + ***Replacement:*** public: public: Ogre::SceneNode *SceneNode()
+    + ***Replacement:*** public: public: Ogre::SceneNode *SceneNode() const
     + ***Deprecation:*** public: common::Color GetColor() const
     + ***Replacement:*** public: common::Color Color() const
     + ***Deprecation:*** public: uint32_t GetCellCount() const
