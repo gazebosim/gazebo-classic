@@ -80,6 +80,7 @@ class QT_QTPROPERTYBROWSER_EXPORT QtProperty
     virtual ~QtProperty();
 
     QList<QtProperty *> subProperties() const;
+    QList<QtProperty *> parentProperties() const;
 
     QtAbstractPropertyManager *propertyManager() const;
 

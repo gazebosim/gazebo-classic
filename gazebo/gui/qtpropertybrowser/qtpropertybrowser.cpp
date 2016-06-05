@@ -158,11 +158,24 @@ QtProperty::~QtProperty()
   Note that subproperties are not owned by \e this property, but by
   the manager that created them.
 
-  \sa insertSubProperty(), removeSubProperty()
+  \sa insertSubProperty(), removeSubProperty(), parentProperties()
   */
 QList<QtProperty *> QtProperty::subProperties() const
 {
   return d_ptr->m_subItems;
+}
+
+/*!
+  Returns the set of parent properties.
+
+  Note that this is not owned by \e the properties, but by
+  the manager that created this.
+
+  \sa subProperties()
+  */
+QList<QtProperty *> QtProperty::parentProperties() const
+{
+  return d_ptr->m_parentItems.toList();
 }
 
 /*!

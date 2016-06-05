@@ -205,6 +205,15 @@ namespace gazebo
       /// \brief Called when a GUI property is changed by the user.
       /// \param[in] _item The item that was changed.
       private: void GUIPropertyChanged(QtProperty *_item);
+      private: void GUICameraPropertyChanged(QtProperty *_cameraItem,
+          QtProperty *_changedItem);
+      private: void GUIGridPropertyChanged(QtProperty *_gridtem,
+          QtProperty *_changedItem);
+
+      /// \brief Called when a GUI property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void FillUserCamera();
+      private: void FillGrid();
 
       /// \internal
       /// \brief Pointer to private data.
