@@ -2,11 +2,16 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Windows plugins (with .dll extension) now accepted
+    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311/ensure-plugin-and-plugin-macros-are-always/)
+    * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
+
 1. Add Introspection Manager and Client util
     * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
 
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
+    * [Pull request #2317](https://bitbucket.org/osrf/gazebo/pull-request/2317)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
 
 1. Remove EntityMakerPrivate and move its members to derived classes
@@ -27,6 +32,9 @@
     * [Pull request #2243](https://bitbucket.org/osrf/gazebo/pull-request/2243)
     * [Pull request #2244](https://bitbucket.org/osrf/gazebo/pull-request/2244)
     * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
+
+1. Deprecate gazebo::math
+    * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
@@ -74,6 +82,12 @@
 
     1. Undo / redo inserting and deleting nested models
         * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
+
+    1. Undo insert / delete joints
+        * [Pull request #2266](https://bitbucket.org/osrf/gazebo/pull-request/2266)
+
+    1. Undo translate, rotate, snap and align links and nested models
+        * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
 
 ## Gazebo 7
 

@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -232,7 +233,8 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   // Move a link to have unsaved changes
-  cylinder->SetWorldPose(math::Pose(1, 2, 3, 4, 5, 6));
+  gazebo::gui::Events::moveEntity(cylinder->GetName(),
+      ignition::math::Pose3d(1, 2, 3, 4, 5, 6), true);
 
   this->ProcessEventsAndDraw(mainWindow);
 
