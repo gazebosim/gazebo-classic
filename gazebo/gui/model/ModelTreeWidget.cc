@@ -74,7 +74,7 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
 
   // Model tree
   this->modelTreeWidget = new QTreeWidget();
-  this->modelTreeWidget->setObjectName("modelTreeWidget");
+  this->modelTreeWidget->setObjectName("modelEditorTreeWidget");
   this->modelTreeWidget->setColumnCount(1);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();

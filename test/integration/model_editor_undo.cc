@@ -28,6 +28,7 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -561,6 +562,114 @@ void ModelEditorUndoTest::JointInsertionByDialog()
 
     // Redo
     gzmsg << "Redo inserting [" << visNames[0] << "]" << std::endl;
+    gazebo::gui::g_redoAct->trigger();
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorUndoTest::ModelPluginInsertion()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Enter the model editor
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
+  gazebo::gui::g_editModelAct->trigger();
+
+  // Check undo/redo are disabled
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
+  QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+  // Check there are no model plugins yet (only child is the Add button)
+  auto modelTree = mainWindow->findChild<QTreeWidget *>(
+      "modelEditorTreeWidget");
+  QVERIFY(modelTree != nullptr);
+
+  auto pluginsItem = modelTree->topLevelItem(0);
+  QVERIFY(pluginsItem != nullptr);
+  QCOMPARE(pluginsItem->childCount(), 1);
+
+  // Plugin info
+  std::string pluginName = "plugin-name";
+  std::string pluginFileName = "plugin-filename.so";
+  std::string pluginInnerXml = "<inner>xml</inner>";
+
+  /// \todo Generating user command directly here instead of triggering the
+  /// model plugin inspector because gui::get_main_window returns nullptr
+  /// during tests. See ModelTreeWidget::OnModelPluginApply.
+  {
+    sdf::ElementPtr sdf(new sdf::Element());
+    sdf::initFile("plugin.sdf", sdf);
+    QVERIFY(sdf::readString(
+        "<sdf version='" SDF_VERSION "'>\
+           <plugin name='"  + pluginName + "' filename='" + pluginFileName +
+           "'>" + pluginInnerXml +
+           "</plugin>\
+         </sdf>", sdf));
+
+    auto modelCreator = mainWindow->findChild<gazebo::gui::ModelCreator *>();
+    QVERIFY(modelCreator != nullptr);
+
+    auto cmd = modelCreator->UserCmdManager()->NewCmd(
+        "Inserted plugin [" + pluginName + "]",
+        gazebo::gui::MEUserCmd::INSERTING_MODEL_PLUGIN);
+    cmd->SetSDF(sdf);
+    cmd->SetScopedName(pluginName);
+
+    gazebo::gui::model::Events::requestModelPluginInsertion(pluginName,
+        pluginFileName, pluginInnerXml);
+  }
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Undo -> Redo a few times
+  for (unsigned int j = 0; j < 3; ++j)
+  {
+    // Check undo is enabled
+    QVERIFY(gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check the plugin has been inserted
+    QCOMPARE(pluginsItem->childCount(), 2);
+
+    // Undo
+    gzmsg << "Undo inserting plugin [" << pluginName << "]" << std::endl;
+    gazebo::gui::g_undoAct->trigger();
+
+    // Check redo is enabled
+    QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check the plugin has been removed
+    QCOMPARE(pluginsItem->childCount(), 1);
+
+    // Redo
+    gzmsg << "Redo inserting plugin [" << pluginName << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 
