@@ -2,11 +2,16 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Windows plugins (with .dll extension) now accepted
+    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311/ensure-plugin-and-plugin-macros-are-always/)
+    * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
+
 1. Add Introspection Manager and Client util
     * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
 
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
+    * [Pull request #2317](https://bitbucket.org/osrf/gazebo/pull-request/2317)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
 
 1. Remove EntityMakerPrivate and move its members to derived classes
