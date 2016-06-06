@@ -326,7 +326,8 @@ namespace gazebo
               { return this->shutdown.Connect(_subscriber); }
 
       /// \brief Unregister a function to be called when the connection is
-      /// shut down \param[in] _subscriber Handle previously returned by
+      /// shut down
+      /// \param[in] _subscriber Handle previously returned by
       /// ConnectToShutdown()
       public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
