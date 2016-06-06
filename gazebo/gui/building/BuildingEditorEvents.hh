@@ -40,6 +40,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the toggle edit mode signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectToggleEditMode(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -55,6 +56,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the create editor item signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectCreateBuildingEditorItem(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -70,6 +72,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the color selected signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectColorSelected(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -85,6 +88,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the texture selected signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectTextureSelected(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -99,6 +103,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the save model signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSaveBuildingModel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -114,6 +119,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectFinishBuildingModel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -129,6 +135,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the new model signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectNewBuildingModel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -144,6 +151,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the change level signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectChangeBuildingLevel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -158,6 +166,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the add level signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectAddBuildingLevel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -173,6 +182,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the delete level signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectDeleteBuildingLevel(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -187,6 +197,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the show floorplan signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectShowFloorplan(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -204,6 +215,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the trigger show floorplan
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectTriggerShowFloorplan(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -218,6 +230,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the show elements signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectShowElements(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -235,6 +248,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the trigger show elements
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectTriggerShowElements(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -250,6 +264,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the update level widget signal
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectUpdateLevelWidget(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -265,6 +280,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the change zoom level signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectChangeBuildingEditorZoom(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -279,6 +295,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the save signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSaveBuildingEditor(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -294,6 +311,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the save as signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSaveAsBuildingEditor(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -309,6 +327,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the new signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectNewBuildingEditor(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -323,6 +342,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the exit signal
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectExitBuildingEditor(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -338,6 +358,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the name changed signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectBuildingNameChanged(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)

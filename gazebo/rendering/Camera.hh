@@ -748,6 +748,7 @@ namespace gazebo
 
       /// \brief Disconnect from an image frame
       /// \param[in] _c The connection to disconnect
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
               GAZEBO_DEPRECATED(8.0);
 

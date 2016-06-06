@@ -42,6 +42,7 @@ namespace gazebo
 
       /// \brief Disconnect from a scene created event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectCreateScene(
                   event::ConnectionPtr _connection)
                   GAZEBO_DEPRECATED(8.0)
@@ -56,6 +57,7 @@ namespace gazebo
 
       /// \brief Disconnect from a scene removed event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectRemoveScene(
                   event::ConnectionPtr _connection)
                   GAZEBO_DEPRECATED(8.0)
@@ -70,6 +72,7 @@ namespace gazebo
 
       /// \brief Disconnect from a layer toggle event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectToggleLayer(
                   event::ConnectionPtr _connection)
                   GAZEBO_DEPRECATED(8.0)
@@ -84,6 +87,7 @@ namespace gazebo
 
       /// \brief Disconnect from a new layer event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectNewLayer(
                   event::ConnectionPtr _connection)
                   GAZEBO_DEPRECATED(8.0)

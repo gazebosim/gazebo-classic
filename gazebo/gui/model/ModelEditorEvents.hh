@@ -41,6 +41,7 @@ namespace gazebo
 
         /// \brief Disconnect a boost::slot to the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectFinishModel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -55,6 +56,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the save signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSaveModelEditor(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -69,6 +71,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the save as signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSaveAsModelEditor(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -83,6 +86,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the new signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectNewModelEditor(
               event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -97,6 +101,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the exit signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectExitModelEditor(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -111,6 +116,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the model changed signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectModelChanged(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -125,6 +131,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the name changed signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectModelNameChanged(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -142,6 +149,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the model properties changed
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectModelPropertiesChanged(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -156,6 +164,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the save model signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSaveModel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -170,6 +179,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the new model signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectNewModel(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -187,6 +197,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request nested model
         /// removal signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestNestedModelRemoval(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -204,6 +215,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request nested model
         /// insertion signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestNestedModelInsertion(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -219,6 +231,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the request link move signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestLinkMove(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -236,6 +249,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request nested model move
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestNestedModelMove(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -252,6 +266,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the nested model inserted
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectNestedModelInserted(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -266,6 +281,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the link inserted signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectLinkInserted(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -280,6 +296,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the joint inserted signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectJointInserted(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -294,6 +311,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the joint changed signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectJointChanged(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -309,6 +327,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the nested model removed
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectNestedModelRemoved(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -325,6 +344,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request link insertion
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestLinkInsertion(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -341,6 +361,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request link removal
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestLinkRemoval(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -355,6 +376,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the link removed signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectLinkRemoved(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -371,6 +393,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request joint removal
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestJointRemoval(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -387,6 +410,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request joint insertion
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestJointInsertion(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -401,6 +425,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the joint removed signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectJointRemoved(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -416,6 +441,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the open link inspector
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectOpenLinkInspector(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -434,6 +460,7 @@ namespace gazebo
         /// inspector
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectOpenModelPluginInspector(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -449,6 +476,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the open joint inspector
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectOpenJointInspector(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -463,6 +491,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the joint name changed signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectJointNameChanged(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -478,6 +507,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the show link context menu
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectShowLinkContextMenu(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -493,6 +523,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the show joint context menu
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectShowJointContextMenu(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -509,6 +540,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the show model plugin context
         /// menu signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectShowModelPluginContextMenu(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -524,6 +556,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the set selected entity
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSetSelectedEntity(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -538,6 +571,7 @@ namespace gazebo
 
         /// \brief Disconnect a Gazebo event from the set selected joint signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSetSelectedJoint(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -554,6 +588,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the set selected model plugin
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectSetSelectedModelPlugin(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -570,6 +605,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the model plugin inserted
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectModelPluginInserted(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -586,6 +622,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the model plugin removed
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectModelPluginRemoved(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -603,6 +640,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request model plugin
         /// removal signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestModelPluginRemoval(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
@@ -620,6 +658,7 @@ namespace gazebo
         /// \brief Disconnect a Gazebo event from the request model plugin
         /// insertion signal.
         /// \param[in] _subscriber the subscriber to this event
+        /// \deprecated Use event::~Connection to disconnect
         public: static void DisconnectRequestModelPluginInsertion(
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)

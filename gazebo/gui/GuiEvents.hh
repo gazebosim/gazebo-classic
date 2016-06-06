@@ -35,6 +35,7 @@ namespace gazebo
               { return createEntity.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from add entity signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectCreateEntity(
                   event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -47,6 +48,7 @@ namespace gazebo
               { return moveMode.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the move mode signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectMoveMode(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { moveMode.Disconnect(_subscriber->Id()); }
@@ -58,6 +60,7 @@ namespace gazebo
               {return manipMode.Connect(_subscriber);}
 
       /// \brief Disconnect a signal from the manip mode signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectManipMode(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               {manipMode.Disconnect(_subscriber->Id());}
@@ -69,6 +72,7 @@ namespace gazebo
               {return alignMode.Connect(_subscriber);}
 
       /// \brief Disconnect a signal from the align mode signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectAlignMode(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               {alignMode.Disconnect(_subscriber->Id());}
@@ -80,6 +84,7 @@ namespace gazebo
               { return fullScreen.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the fullscreen signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectFullScreen(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { fullScreen.Disconnect(_subscriber->Id()); }
@@ -91,6 +96,7 @@ namespace gazebo
               { return showToolbars.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the show toolbars signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectShowToolbars(event::ConnectionPtr
           _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -103,6 +109,7 @@ namespace gazebo
               { return fps.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the view FPS signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectFPS(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { fps.Disconnect(_subscriber->Id()); }
@@ -114,6 +121,7 @@ namespace gazebo
               { return orbit.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the view Orbit signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectOrbit(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { orbit.Disconnect(_subscriber->Id()); }
@@ -125,6 +133,7 @@ namespace gazebo
               { return keyPress.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the view KeyPress signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectKeyPress(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { keyPress.Disconnect(_subscriber->Id()); }
@@ -136,6 +145,7 @@ namespace gazebo
               { return lightUpdate.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the light update signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectLightUpdate(
                   event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -148,6 +158,7 @@ namespace gazebo
               { return modelUpdate.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the model update signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectModelUpdate(
                   event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -160,6 +171,7 @@ namespace gazebo
               { return inputStepSize.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the input step size signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectInputStepSize(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -172,6 +184,7 @@ namespace gazebo
               { return follow.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the follow signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectFollow(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -184,6 +197,7 @@ namespace gazebo
               { return editModel.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the edit model signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectEditModel(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -196,6 +210,7 @@ namespace gazebo
               { return windowMode.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the window mode signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectWindowMode(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -208,6 +223,7 @@ namespace gazebo
               { return mainWindowReady.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the main window ready signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectMainWindowReady(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -221,6 +237,7 @@ namespace gazebo
                 { return leftPaneVisibility.Connect(_subscriber); }
 
       /// \brief Disconnect a signal to toggle the GUI's left hand pane signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectLeftPaneVisibility(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -233,6 +250,7 @@ namespace gazebo
               { return scaleEntity.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the scale entity signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectScaleEntity(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -245,6 +263,7 @@ namespace gazebo
               { return moveEntity.Connect(_subscriber); }
 
       /// \brief Disconnect a signal from the move entity event.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectMoveEntity(
               event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)

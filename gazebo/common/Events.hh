@@ -46,6 +46,7 @@ namespace gazebo
 
       /// \brief Disconnect a callback from the pause signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectPause(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { pause.Disconnect(_subscriber->Id()); }
@@ -59,6 +60,7 @@ namespace gazebo
               { return step.Connect(_subscriber); }
       /// \brief Disconnect a callback from the step signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectStep(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { step.Disconnect(_subscriber->Id()); }
@@ -72,6 +74,7 @@ namespace gazebo
               { return stop.Connect(_subscriber); }
       /// \brief Disconnect a callback from the stop signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectStop(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { stop.Disconnect(_subscriber->Id()); }
@@ -84,6 +87,7 @@ namespace gazebo
               static ConnectionPtr ConnectWorldCreated(T _subscriber)
               { return worldCreated.Connect(_subscriber); }
       /// \brief Disconnect a callback from the world created signal
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectWorldCreated(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { worldCreated.Disconnect(_subscriber->Id()); }
@@ -97,6 +101,7 @@ namespace gazebo
               { return entityCreated.Connect(_subscriber); }
       /// \brief Disconnect a callback from the add entity signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectCreateEntity(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { entityCreated.Disconnect(_subscriber->Id()); }
@@ -110,6 +115,7 @@ namespace gazebo
               { return setSelectedEntity.Connect(_subscriber); }
       /// \brief Disconnect a callback from the set selected entity signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectSetSelectedEntity(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { setSelectedEntity.Disconnect(_subscriber->Id()); }
@@ -122,6 +128,7 @@ namespace gazebo
               { return deleteEntity.Connect(_subscriber); }
       /// \brief Disconnect a callback from the delete entity signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectDeleteEntity(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { deleteEntity.Disconnect(_subscriber->Id()); }
@@ -134,6 +141,7 @@ namespace gazebo
               { return addEntity.Connect(_subscriber); }
       /// \brief Disconnect a callback from the add entity signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectAddEntity(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { addEntity.Disconnect(_subscriber->Id()); }
@@ -148,6 +156,7 @@ namespace gazebo
 
       /// \brief Disconnect a callback from the world update start signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectWorldUpdateBegin(
                   ConnectionPtr _subscriber) GAZEBO_DEPRECATED(8.0);
 
@@ -165,6 +174,7 @@ namespace gazebo
 
       /// \brief Disconnect a callback from the before physics update signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectBeforePhysicsUpdate(
                 ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
@@ -179,6 +189,7 @@ namespace gazebo
               { return worldUpdateEnd.Connect(_subscriber); }
       /// \brief Disconnect a callback from the world update end signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectWorldUpdateEnd(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { worldUpdateEnd.Disconnect(_subscriber->Id()); }
@@ -193,6 +204,7 @@ namespace gazebo
 
       /// \brief Disconnect from the world reset signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectWorldReset(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { worldReset.Disconnect(_subscriber->Id()); }
@@ -207,6 +219,7 @@ namespace gazebo
 
       /// \brief Disconnect from the time reset signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectTimeReset(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { timeReset.Disconnect(_subscriber->Id()); }
@@ -221,6 +234,7 @@ namespace gazebo
 
       /// \brief Disconnect from the remove sensor signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectRemoveSensor(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { removeSensor.Disconnect(_subscriber->Id()); }
@@ -235,6 +249,7 @@ namespace gazebo
 
       /// \brief Disconnect from the create sensor signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectCreateSensor(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { createSensor.Disconnect(_subscriber->Id()); }
@@ -248,6 +263,7 @@ namespace gazebo
               { return preRender.Connect(_subscriber); }
       /// \brief Disconnect a render start signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectPreRender(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { preRender.Disconnect(_subscriber->Id()); }
@@ -260,6 +276,7 @@ namespace gazebo
               { return render.Connect(_subscriber); }
       /// \brief Disconnect a callback from the render update signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectRender(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { render.Disconnect(_subscriber->Id()); }
@@ -272,6 +289,7 @@ namespace gazebo
               { return postRender.Connect(_subscriber); }
       /// \brief Disconnect a callback from the post render update signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectPostRender(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { postRender.Disconnect(_subscriber->Id()); }
@@ -284,6 +302,7 @@ namespace gazebo
               { return diagTimerStart.Connect(_subscriber); }
       /// \brief Disconnect a callback from the diagnostic timer start signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectDiagTimerStart(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { diagTimerStart.Disconnect(_subscriber->Id()); }
@@ -297,6 +316,7 @@ namespace gazebo
               { return diagTimerStop.Connect(_subscriber); }
       /// \brief Disconnect a callback from the diagnostic timer stop signal
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectDiagTimerStop(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { diagTimerStop.Disconnect(_subscriber->Id()); }
@@ -310,6 +330,7 @@ namespace gazebo
               { return sigInt.Connect(_subscriber); }
       /// \brief Disconnect a callback from the sigint event
       /// \param[in] _subscriber the subscriber to this event
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectSigInt(ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               { sigInt.Disconnect(_subscriber->Id()); }

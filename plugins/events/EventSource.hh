@@ -98,6 +98,7 @@ namespace gazebo
 
     /// \brief Disconnect a boost::slot to the spawn model event
     /// \param[in] _subscriber the subscriber to this event
+    /// \deprecated Use event::~Connection to disconnect
     public: static void DisconnectSpawnModel(
         event::ConnectionPtr _subscriber)
         GAZEBO_DEPRECATED(8.0)

@@ -329,6 +329,7 @@ namespace gazebo
       /// shut down
       /// \param[in] _subscriber Handle previously returned by
       /// ConnectToShutdown()
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
               GAZEBO_DEPRECATED(8.0)
               {this->shutdown.Disconnect(_subscriber->Id());}

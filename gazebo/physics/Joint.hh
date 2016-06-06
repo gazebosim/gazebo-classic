@@ -215,6 +215,7 @@ namespace gazebo
 
       /// \brief Disconnect a boost::slot the the joint update signal.
       /// \param[in] _conn Connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectJointUpdate(event::ConnectionPtr &_conn)
               GAZEBO_DEPRECATED(8.0)
               {jointUpdate.Disconnect(_conn->Id());}

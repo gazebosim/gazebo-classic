@@ -102,6 +102,7 @@ namespace gazebo
 
       /// \brief Disconnect from an depth image singal
       /// \param[in] _c The connection to disconnect
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectNewDepthFrame(event::ConnectionPtr &_c)
               GAZEBO_DEPRECATED(8.0);
 
@@ -114,6 +115,7 @@ namespace gazebo
 
       /// \brief Disconnect from an rgb point cloud singal
       /// \param[in] _c The connection to disconnect
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
               GAZEBO_DEPRECATED(8.0);
 

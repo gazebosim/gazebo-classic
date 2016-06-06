@@ -106,6 +106,7 @@ namespace gazebo
 
       /// \brief Disconnect from a laser frame signal
       /// \param[in] _c The connection to disconnect
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_c)
               GAZEBO_DEPRECATED(8.0);
 

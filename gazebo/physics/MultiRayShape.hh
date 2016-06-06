@@ -151,6 +151,7 @@ namespace gazebo
 
       /// \brief Disconnect from the new laser scans signal.
       /// \param[in] _conn Connection to remove.
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
               GAZEBO_DEPRECATED(8.0)
               {this->newLaserScans.Disconnect(_conn->Id());}

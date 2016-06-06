@@ -214,6 +214,7 @@ namespace gazebo
       /// \brief Disconnect from a the updated signal.
       /// \param[in] _c The connection to disconnect
       /// \sa Sensor::ConnectUpdated
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectUpdated(event::ConnectionPtr &_c)
               GAZEBO_DEPRECATED(8.0);
 
