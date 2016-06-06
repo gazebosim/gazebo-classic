@@ -360,6 +360,7 @@ void ModelListWidget_TEST::ModelProperties()
   gazebo::gui::ModelListWidget *modelListWidget
       = new gazebo::gui::ModelListWidget;
   modelListWidget->show();
+  modelListWidget->setMinimumHeight(2000);
   QCoreApplication::processEvents();
 
   this->Load("worlds/multilink_shape.world");
@@ -801,7 +802,7 @@ void ModelListWidget_TEST::LinkProperties()
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
   // select the sphere link
-  QTreeWidgetItem *sphereLinkItem = modelItem->child(1);
+  QTreeWidgetItem *sphereLinkItem = modelItem->child(2);
   QVERIFY(sphereLinkItem != NULL);
   std::string sphereLinkName = "sphere_link";
   QCOMPARE(sphereLinkItem->text(0), tr(sphereLinkName.c_str()));

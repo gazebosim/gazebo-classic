@@ -463,7 +463,6 @@ void ModelListWidget::ProcessModelMsgs()
         topItem->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
         this->dataPtr->modelTreeWidget->addTopLevelItem(topItem);
 
-
         if ((*iter).link_size() > 0)
         {
           // Create subheader for links
