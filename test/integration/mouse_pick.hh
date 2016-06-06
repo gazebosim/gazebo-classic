@@ -26,7 +26,7 @@ class MousePickingTest : public QTestFixture
   Q_OBJECT
 
   /// \brief Verify camera movement does not affect entity selection
-  private slots: void Selection();
+  private slots: void ModelEditorSelection();
 
   /// \brief Verify models can be picked.
   private slots: void Transparency();

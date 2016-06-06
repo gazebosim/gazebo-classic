@@ -71,7 +71,7 @@ void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
 }
 
 /////////////////////////////////////////////////
-void MousePickingTest::Selection()
+void MousePickingTest::ModelEditorSelection()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
