@@ -2325,6 +2325,7 @@ void ModelCreator::ShowModelPluginContextMenu(const std::string &_name)
 
   // Menu
   QMenu menu;
+  menu.setObjectName("ModelEditorContextMenu");
   menu.addAction(inspectorAct);
   menu.addAction(deleteAct);
 

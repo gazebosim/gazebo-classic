@@ -679,6 +679,92 @@ void ModelEditorUndoTest::ModelPluginInsertion()
 }
 
 /////////////////////////////////////////////////
+void ModelEditorUndoTest::ModelPluginDeletionByContextMenu()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  // Load a world with simple shape models
+  this->Load("worlds/underwater.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Enter the model editor to edit the model
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
+  gazebo::gui::g_editModelAct->trigger();
+  gazebo::gui::Events::editModel("submarine_buoyant");
+
+  // Check undo/redo are disabled
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
+  QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+  // Check the model plugin is listed in the editor
+  // 2 children: Add button and plugin
+  auto modelTree = mainWindow->findChild<QTreeWidget *>(
+      "modelEditorTreeWidget");
+  QVERIFY(modelTree != nullptr);
+
+  auto pluginsItem = modelTree->topLevelItem(0);
+  QVERIFY(pluginsItem != nullptr);
+  QCOMPARE(pluginsItem->childCount(), 2);
+
+  // Open the context menu and trigger the delete action
+  QTimer::singleShot(500, this, SLOT(TriggerDelete()));
+  gazebo::gui::model::Events::showModelPluginContextMenu("buoyancy");
+
+  // Undo -> Redo a few times
+  for (unsigned int j = 0; j < 3; ++j)
+  {
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check undo is enabled
+    QVERIFY(gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check the plugin has been removed
+    QCOMPARE(pluginsItem->childCount(), 1);
+
+    // Undo
+    gzmsg << "Undo deleting plugin [buoyancy]" << std::endl;
+    gazebo::gui::g_undoAct->trigger();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Check redo is enabled
+    QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check the plugin has been inserted
+    QCOMPARE(pluginsItem->childCount(), 2);
+
+    // Redo
+    gzmsg << "Redo deleting plugin [buoyancy]" << std::endl;
+    gazebo::gui::g_redoAct->trigger();
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
+}
+
+/////////////////////////////////////////////////
 void ModelEditorUndoTest::TriggerDelete()
 {
   auto allToplevelWidgets = QApplication::topLevelWidgets();
