@@ -191,11 +191,11 @@ bool ContactSensor::UpdateImpl(bool /*_force*/)
   this->incomingContacts.clear();
 
   this->lastMeasurementTime = this->world->GetSimTime();
+  msgs::Set(this->contactsMsg.mutable_time(), this->lastMeasurementTime);
 
   // Generate a outgoing message only if someone is listening.
   if (this->contactsPub && this->contactsPub->HasConnections())
   {
-    msgs::Set(this->contactsMsg.mutable_time(), this->lastMeasurementTime);
     this->contactsPub->Publish(this->contactsMsg);
   }
 
