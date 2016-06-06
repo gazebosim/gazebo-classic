@@ -22,7 +22,6 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"

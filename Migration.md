@@ -17,10 +17,11 @@ release will remove the deprecated code.
 ### Modifications
 
 1. **gazebo/common/Event.hh**
-    + ConnectionPrivate made not visible
     + Connection(Event*, int) constructor changed to
       Connection(Event*, const int)
     + EventTPrivate no longer inherits from EventPrivate
+    + EventT::Connect(const boost::function<T> &) changed to
+      EventT::Connect(const std::function<T> &)
 
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
@@ -36,6 +37,16 @@ release will remove the deprecated code.
 1. **gazebo/gui/GuiEvents.hh**
     + ***Removed:*** event::EventT<void (const std::string &, const gazebo::math::Vector3 &)> Events::scaleEntity
     + ***Replacement:*** event::EventT<void (const std::string &, const ignition::math::Vector3d &)> Events::scaleEntity
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_DEPRECATED
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_DEPRECATED
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_FORCEINLINE
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_FORCEINLINE
 
 ### Deprecations
 
@@ -55,12 +66,21 @@ release will remove the deprecated code.
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
+1. **gazebo/math/Spline.hh**
+    + ***Deprecation:*** public: gazebo::math::Spline
+    + ***Replacement:*** public: ignition::math::Spline
+
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
+
 ### Deletions
 
 1. **gazebo/common/Event.hh**
+    + ConnectionPrivate class
+    + Connection() constructor
     + EventPrivate class
     + Event(EventPrivate&) constructor
-    + Connection() constructor
 
 1. **gazebo/gui/EntityMaker.hh**
     + EntityMakerPrivate class
