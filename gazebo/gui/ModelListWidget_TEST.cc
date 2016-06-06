@@ -432,7 +432,7 @@ void ModelListWidget_TEST::ModelProperties()
   // select the multi-link model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center() );
+      modelRect.center());
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -725,8 +725,6 @@ void ModelListWidget_TEST::LinkProperties()
     sleep++;
   }
   QVERIFY(propTreeBrowser->properties().size() > 0);
-
-
 
   // select the box link
   QTreeWidgetItem *boxLinkItem = modelItem->child(1);

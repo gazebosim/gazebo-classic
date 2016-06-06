@@ -121,7 +121,7 @@ namespace gazebo
       /// \param[in] _msg The plugin message.
       /// \param[in] _parent Pointer to the qtproperty which will receive
       /// the message data.
-	    private: void FillPropertyTree(const msgs::Plugin &_msg,
+      private: void FillPropertyTree(const msgs::Plugin &_msg,
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Link &_msg,
