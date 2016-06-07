@@ -16,6 +16,7 @@
 */
 #include <string.h>
 
+#include <ignition/math/SignalStats.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"

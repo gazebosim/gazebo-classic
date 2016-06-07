@@ -50,8 +50,8 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/SignalStats.hh"
-#include "gazebo/math/Vector3Stats.hh"
+#include "ignition/math/SignalStats.hh"
+#include "ignition/math/Vector3Stats.hh"
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
@@ -653,13 +653,13 @@ namespace gazebo
     /// \param[in] _prefix Prefix string for data names.
     /// \param[in] _stats Signal statistics to store.
     protected: void Record(const std::string &_prefix,
-                           const math::SignalStats &_stats);
+                           const ignition::math::SignalStats &_stats);
 
     /// \brief Helper to record Vector3 signal statistics to gtest xml output.
     /// \param[in] _prefix Prefix string for data names.
     /// \param[in] _stats Vector3 signal statistics to store.
     protected: void Record(const std::string &_prefix,
-                           const math::Vector3Stats &_stats);
+                           const ignition::math::Vector3Stats &_stats);
 
     /// \brief Pointer the Gazebo server.
     protected: Server *server;

@@ -16,8 +16,8 @@
 */
 #include <string.h>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Vector3Stats.hh>
 
-#include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -298,7 +298,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   ASSERT_EQ(H0, link->GetWorldAngularMomentum());
   const double H0mag = H0.GetLength();
 
-  math::Vector3Stats angularMomentumError;
+  ignition::math::Vector3Stats angularMomentumError;
   const std::string stat("maxAbs");
   EXPECT_TRUE(angularMomentumError.InsertStatistic(stat));
   const int steps = 5000;
