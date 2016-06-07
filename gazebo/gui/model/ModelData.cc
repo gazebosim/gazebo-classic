@@ -224,7 +224,7 @@ void LinkData::SetInspectorScale(const ignition::math::Vector3d &_scale)
 
   // Update visual config
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
-  for (auto const &it : this->visuals)
+  for (auto &it : this->visuals)
   {
     std::string name = it.first->GetName();
     std::string linkName = this->linkVisual->GetName();
@@ -235,13 +235,17 @@ void LinkData::SetInspectorScale(const ignition::math::Vector3d &_scale)
     visualConfig->Geometry(leafName,  visOldSize, uri);
     ignition::math::Vector3d visNewSize = it.first->GetGeometrySize();
     visualConfig->SetGeometry(leafName, visNewSize);
+
+    auto visMsg = visualConfig->GetData(leafName);
+    if (visMsg)
+      it.second.CopyFrom(*visMsg);
   }
 
   // Update collision config
   std::map<std::string, ignition::math::Vector3d> colOldSizes;
   std::map<std::string, ignition::math::Vector3d> colNewSizes;
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
-  for (auto const &it : this->collisions)
+  for (auto &it : this->collisions)
   {
     std::string name = it.first->GetName();
     std::string linkName = this->linkVisual->GetName();
@@ -255,6 +259,10 @@ void LinkData::SetInspectorScale(const ignition::math::Vector3d &_scale)
     collisionConfig->SetGeometry(leafName, colNewSize);
     colOldSizes[name] = colOldSize;
     colNewSizes[name] = colNewSize;
+
+    auto colMsg = collisionConfig->GetData(leafName);
+    if (colMsg)
+      it.second.CopyFrom(*colMsg);
   }
 
   if (this->collisions.empty())

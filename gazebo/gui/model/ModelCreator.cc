@@ -490,7 +490,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   if (!gui::get_active_camera() ||
       !gui::get_active_camera()->GetScene())
   {
-    gzerr << "Unable to edit model. GUI camera or scene is NULL"
+    gzerr << "Unable to edit model. GUI camera or scene is nullptr"
         << std::endl;
     return;
   }
@@ -1036,7 +1036,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
     if (!info.isFile() || info.completeSuffix().toLower() != "svg")
     {
       gzerr << "File [" << _uri << "] not found or invalid!" << std::endl;
-      return NULL;
+      return nullptr;
     }
 
     common::SVGLoader svgLoader(_samples);
@@ -1046,7 +1046,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
     if (paths.empty())
     {
       gzerr << "No paths found on file [" << _uri << "]" << std::endl;
-      return NULL;
+      return nullptr;
     }
 
     // SVG paths do not map to sdf polylines, because we now allow a contour
@@ -1060,7 +1060,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
     {
       gzerr << "No closed polylines found on file [" << _uri << "]"
         << std::endl;
-      return NULL;
+      return nullptr;
     }
     if (!openPolys.empty())
     {
@@ -1235,7 +1235,7 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
   if (it == this->dataPtr->allLinks.end())
   {
     gzerr << "No link with name: " << _linkName << " found."  << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   // generate unique name.
@@ -1274,7 +1274,7 @@ NestedModelData *ModelCreator::CloneNestedModel(
   {
     gzerr << "No nested model with name: " << _nestedModelName <<
         " found."  << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   std::string newName = _nestedModelName + "_clone";
@@ -1297,10 +1297,10 @@ NestedModelData *ModelCreator::CloneNestedModel(
 LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     const rendering::VisualPtr &_parentVis)
 {
-  if (_linkElem == NULL)
+  if (_linkElem == nullptr)
   {
-    gzwarn << "NULL SDF pointer, not creating link." << std::endl;
-    return NULL;
+    gzwarn << "Null SDF pointer, not creating link." << std::endl;
+    return nullptr;
   }
 
   LinkData *link = new LinkData();
@@ -1467,7 +1467,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
     return;
   }
 
-  NestedModelData *modelData = NULL;
+  NestedModelData *modelData = nullptr;
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     if (this->dataPtr->allNestedModels.find(_nestedModelName) ==
@@ -1529,7 +1529,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
     return;
   }
 
-  LinkData *link = NULL;
+  LinkData *link = nullptr;
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     auto linkIt = this->dataPtr->allLinks.find(_linkName);
@@ -2733,6 +2733,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
     msgs::Visual visualMsg = it.second;
     sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
 
+    // The rest of the visual msg is being ignored?
     visualElem->GetElement("transparency")->Set<double>(
         visualMsg.transparency());
     newLinkElem->InsertElement(visualElem);
@@ -3144,7 +3145,7 @@ ModelPluginData *ModelCreator::ModelPlugin(const std::string &_name)
   auto it = this->dataPtr->allModelPlugins.find(_name);
   if (it != this->dataPtr->allModelPlugins.end())
     return it->second;
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -3176,7 +3177,10 @@ void ModelCreator::OnRequestLinkScale(const std::string &_name,
 {
   auto link = this->dataPtr->allLinks.find(_name);
   if (link == this->dataPtr->allLinks.end())
+  {
+    gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
+  }
 
   auto vis = link->second->linkVisual;
   for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
