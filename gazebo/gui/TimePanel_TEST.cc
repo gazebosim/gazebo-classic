@@ -80,7 +80,6 @@ void TimePanel_TEST::SpaceBar()
 // disabling for now
 #ifndef __linux__
   QVERIFY(timePanel->IsPaused());
-// ifndef __linux__
 #endif
 
   // Press space bar
