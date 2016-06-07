@@ -344,6 +344,9 @@ namespace gazebo
 
       /// \brief All the introspection items regsitered for this.
       public: std::vector<common::URI> introspectionItems;
+
+      /// \brief Publisher for publishing clock
+      public: transport::PublisherPtr clockPub;
     };
   }
 }
