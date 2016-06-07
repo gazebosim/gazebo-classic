@@ -101,6 +101,20 @@ release will remove the deprecated code.
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
+1. **gazebo/rendering/Grid.hh**
+    + ***Deprecation:*** public: public: Ogre::SceneNode *GetSceneNode()
+    + ***Replacement:*** public: public: Ogre::SceneNode *SceneNode() const
+    + ***Deprecation:*** public: common::Color GetColor() const
+    + ***Replacement:*** public: common::Color Color() const
+    + ***Deprecation:*** public: uint32_t GetCellCount() const
+    + ***Replacement:*** public: uint32_t CellCount() const
+    + ***Deprecation:*** public: float GetCellLength() const
+    + ***Replacement:*** public: float CellLength() const
+    + ***Deprecation:*** public: float GetLineWidth() const
+    + ***Replacement:*** public: float LineWidth() const
+    + ***Deprecation:*** public: uint32_t GetHeight() const
+    + ***Replacement:*** public: uint32_t Height() const
+
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: void Camera::DisconnectNewImageFrame(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
