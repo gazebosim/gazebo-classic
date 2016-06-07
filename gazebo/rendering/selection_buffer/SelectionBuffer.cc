@@ -197,7 +197,6 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
       || _y >= static_cast<int>(targetHeight))
     return nullptr;
 
-
   // 1x1 selection buffer, adapted from rviz
   // http://docs.ros.org/indigo/api/rviz/html/c++/selection__manager_8cpp.html
   unsigned int width = 1;
