@@ -79,6 +79,9 @@
     1. Undo insert / delete joints
         * [Pull request #2266](https://bitbucket.org/osrf/gazebo/pull-request/2266)
 
+    1. Undo insert / delete model plugins
+        * [Pull request #2334](https://bitbucket.org/osrf/gazebo/pull-request/2334)
+
     1. Undo translate, rotate, snap and align links and nested models
         * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
 
