@@ -137,13 +137,13 @@ void ModelManipulationTest::Shortcuts()
   QVERIFY(boxVis != nullptr);
 
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   // verify actions are not null
-  QVERIFY(gazebo::gui::g_arrowAct != NULL);
-  QVERIFY(gazebo::gui::g_rotateAct != NULL);
-  QVERIFY(gazebo::gui::g_translateAct != NULL);
-  QVERIFY(gazebo::gui::g_scaleAct != NULL);
+  QVERIFY(gazebo::gui::g_arrowAct != nullptr);
+  QVERIFY(gazebo::gui::g_rotateAct != nullptr);
+  QVERIFY(gazebo::gui::g_translateAct != nullptr);
+  QVERIFY(gazebo::gui::g_scaleAct != nullptr);
 
   // verify initial action state
   QVERIFY(gazebo::gui::g_arrowAct->isChecked());
@@ -195,7 +195,7 @@ void ModelManipulationTest::Shortcuts()
   QVERIFY(gazebo::gui::g_scaleAct->isChecked());
 
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 // Generate a main function for the test
