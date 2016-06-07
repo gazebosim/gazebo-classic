@@ -22,6 +22,11 @@
 #include <string>
 #include "gazebo/util/system.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace gazebo
 {
   namespace math
@@ -37,7 +42,8 @@ namespace gazebo
     class GZ_MATH_VISIBLE SignalStatistic
     {
       /// \brief Constructor
-      public: SignalStatistic();
+      /// \deprecated See ignition::math::SignalStatistic
+      public: SignalStatistic() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~SignalStatistic();
@@ -129,7 +135,8 @@ namespace gazebo
     class GZ_MATH_VISIBLE SignalStats
     {
       /// \brief Constructor
-      public: SignalStats();
+      /// \deprecated See ignition::math::SignalStats
+      public: SignalStats() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: ~SignalStats();
@@ -184,5 +191,8 @@ namespace gazebo
     /// \}
   }
 }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 #endif
 
