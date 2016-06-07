@@ -52,6 +52,20 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: bool Connection::GetId() const;
     + ***Replacement:*** public: bool Connection::Id() const;
 
+1. **gazebo/rendering/Grid.hh**
+    + ***Deprecation:*** public: public: Ogre::SceneNode *GetSceneNode()
+    + ***Replacement:*** public: public: Ogre::SceneNode *SceneNode() const
+    + ***Deprecation:*** public: common::Color GetColor() const
+    + ***Replacement:*** public: common::Color Color() const
+    + ***Deprecation:*** public: uint32_t GetCellCount() const
+    + ***Replacement:*** public: uint32_t CellCount() const
+    + ***Deprecation:*** public: float GetCellLength() const
+    + ***Replacement:*** public: float CellLength() const
+    + ***Deprecation:*** public: float GetLineWidth() const
+    + ***Replacement:*** public: float LineWidth() const
+    + ***Deprecation:*** public: uint32_t GetHeight() const
+    + ***Replacement:*** public: uint32_t Height() const
+
 1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation:*** public: math::Vector3 GetGravity const
 1. **gazebo/physics/World.hh**
