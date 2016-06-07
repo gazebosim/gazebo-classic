@@ -23,7 +23,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"

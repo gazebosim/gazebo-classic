@@ -34,6 +34,16 @@ release will remove the deprecated code.
     + ***Removed:*** setSelectedLink
     + ***Replacement:*** setSelectedEntity
 
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_DEPRECATED
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_DEPRECATED
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_FORCEINLINE
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_FORCEINLINE
+
 ### Deprecations
 
 1. **gazebo/common/Event.hh**
@@ -51,6 +61,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
+1. **gazebo/math/Spline.hh**
+    + ***Deprecation:*** public: gazebo::math::Spline
+    + ***Replacement:*** public: ignition::math::Spline
+
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
 
 ### Deletions
 
