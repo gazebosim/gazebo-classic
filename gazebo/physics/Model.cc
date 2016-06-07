@@ -60,7 +60,6 @@ Model::Model(BasePtr _parent)
   : Entity(_parent)
 {
   this->AddType(MODEL);
-  this->receiveMutex = new std::mutex();
 }
 
 //////////////////////////////////////////////////
@@ -115,42 +114,38 @@ void Model::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::OnRequest(ConstRequestPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(*this->receiveMutex);
-  msgs::Response response;
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
 
-  std::list<msgs::Request> requestMsgs;
-
-  requestMsgs.push_back(*_msg);
-
-  for (auto const &requestMsg : requestMsgs)
+  // Only handle requests for model plugin info
+  if (_msg->request() == "model_plugin_info" && this->sdf->HasElement("plugin"))
   {
-    response.set_id(requestMsg.id());
-    response.set_request(requestMsg.request());
-    response.set_response("success");
-
-    if (requestMsg.request() == "model_plugin_info")
+    // Check if requested plugin is within this model
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
     {
-      msgs::Plugin pluginMsg;
+      std::string pluginName = pluginElem->Get<std::string>("name");
 
-      if (this->sdf->HasElement("plugin"))
+      if (pluginName == _msg->data().c_str())
       {
-        sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-        while (pluginElem)
-        {
-          std::string pluginName = pluginElem->Get<std::string>("name");
+        // Get plugin info from SDF
+        msgs::Plugin pluginMsg;
+        pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
 
-          if(pluginName == requestMsg.data().c_str())
-          {
-            pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
-            std::string *serializedData = response.mutable_serialized_data();
-            pluginMsg.SerializeToString(serializedData);
-            response.set_type(pluginMsg.GetTypeName());
+        // Publish response with plugin info
+        msgs::Response response;
+        response.set_id(_msg->id());
+        response.set_request(_msg->request());
+        response.set_response("success");
+        response.set_type(pluginMsg.GetTypeName());
 
-            this->responsePub->Publish(response);
-          }
-          pluginElem = pluginElem->GetNextElement("plugin");
-        }
+        std::string *serializedData = response.mutable_serialized_data();
+        pluginMsg.SerializeToString(serializedData);
+
+        this->responsePub->Publish(response);
+
+        return;
       }
+      pluginElem = pluginElem->GetNextElement("plugin");
     }
   }
 }

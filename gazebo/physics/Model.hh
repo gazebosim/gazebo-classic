@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -32,6 +33,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -495,7 +497,7 @@ namespace gazebo
       private: mutable boost::recursive_mutex updateMutex;
 
       /// \brief Mutex to protect incoming message buffers.
-      private: mutable std::mutex *receiveMutex;
+      private: std::mutex receiveMutex;
     };
     /// \}
   }

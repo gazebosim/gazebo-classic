@@ -3603,11 +3603,11 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
       ignition::math::Pose3d());
 
-  sdf::ElementPtr pluginElem1 = modelSDF->GetElement("plugin");
-  EXPECT_EQ(pluginElem1->Get<std::string>("name"), "plugin_name");
-  EXPECT_EQ(pluginElem1->Get<std::string>("filename"), "plugin_filename");
-  EXPECT_TRUE(pluginElem1->HasElement("plugin_param"));
-  EXPECT_EQ(pluginElem1->Get<std::string>("plugin_param"), "param");
+  sdf::ElementPtr pluginElem = modelSDF->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), "plugin_name");
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), "plugin_filename");
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }
 
 /////////////////////////////////////////////////

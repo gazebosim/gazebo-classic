@@ -208,7 +208,17 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       this->dataPtr->requestMsg = msgs::CreateRequest("wind_info",
                                              this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
-    }VariantProperty *item = NULL;
+    }
+    else if (name == "Spherical Coordinates")
+    {
+      this->dataPtr->requestMsg = msgs::CreateRequest(
+          "spherical_coordinates_info",
+          this->dataPtr->selectedEntityName);
+      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+    }
+    else if (name == "GUI")
+    {
+      QtVariantProperty *item = NULL;
 
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (!cam)
@@ -453,18 +463,17 @@ void ModelListWidget::ProcessModelMsgs()
         topItem->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
         this->dataPtr->modelTreeWidget->addTopLevelItem(topItem);
 
-
         if ((*iter).link_size() > 0)
         {
           // Create subheader for links
-          QTreeWidgetItem *linkheaderItem = new QTreeWidgetItem(topItem,
+          QTreeWidgetItem *linkHeaderItem = new QTreeWidgetItem(topItem,
           QStringList(QString("%1").arg(QString::fromStdString("LINKS"))));
-          linkheaderItem->setFont(0, subheaderFont);
-          linkheaderItem->setFlags(Qt::NoItemFlags);
-          this->dataPtr->modelTreeWidget->addTopLevelItem(linkheaderItem);
+          linkHeaderItem->setFont(0, subheaderFont);
+          linkHeaderItem->setFlags(Qt::NoItemFlags);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(linkHeaderItem);
         }
 
-        for (int i = 0; i < (*iter).link_size(); i++)
+        for (int i = 0; i < (*iter).link_size(); ++i)
         {
           std::string linkName = (*iter).link(i).name();
           int index = linkName.rfind("::") + 2;
@@ -485,14 +494,14 @@ void ModelListWidget::ProcessModelMsgs()
         if ((*iter).joint_size() > 0)
         {
           // Create subheader for joints
-          QTreeWidgetItem *jointheaderItem = new QTreeWidgetItem(topItem,
+          QTreeWidgetItem *jointHeaderItem = new QTreeWidgetItem(topItem,
           QStringList(QString("%1").arg(QString::fromStdString("JOINTS"))));
-          jointheaderItem->setFont(0, subheaderFont);
-          jointheaderItem->setFlags(Qt::ItemIsEnabled);
-          this->dataPtr->modelTreeWidget->addTopLevelItem(jointheaderItem);
+          jointHeaderItem->setFont(0, subheaderFont);
+          jointHeaderItem->setFlags(Qt::ItemIsEnabled);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(jointHeaderItem);
         }
 
-        for (int i = 0; i < (*iter).joint_size(); i++)
+        for (int i = 0; i < (*iter).joint_size(); ++i)
         {
           std::string jointName = (*iter).joint(i).name();
 
@@ -512,14 +521,14 @@ void ModelListWidget::ProcessModelMsgs()
         if ((*iter).plugin_size() > 0)
         {
           // Create subheader for plugins
-          QTreeWidgetItem *pluginheaderItem = new QTreeWidgetItem(topItem,
+          QTreeWidgetItem *pluginHeaderItem = new QTreeWidgetItem(topItem,
           QStringList(QString("%1").arg(QString::fromStdString("PLUGINS"))));
-          pluginheaderItem->setFont(0, subheaderFont);
-          pluginheaderItem->setFlags(Qt::ItemIsEnabled);
-          this->dataPtr->modelTreeWidget->addTopLevelItem(pluginheaderItem);
+          pluginHeaderItem->setFont(0, subheaderFont);
+          pluginHeaderItem->setFlags(Qt::ItemIsEnabled);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(pluginHeaderItem);
         }
 
-        for (int i = 0; i < (*iter).plugin_size(); i++)
+        for (int i = 0; i < (*iter).plugin_size(); ++i)
         {
           std::string pluginName = (*iter).plugin(i).name();
 
@@ -1079,13 +1088,14 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     linkMsg->set_name(linkName);
     fillMsg = linkMsg;
   }
-    // check if it's a plugin
-  else if (currentItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
+  // check if it's a plugin
+  else if (currentItem->data(3, Qt::UserRole).toString().toStdString() ==
+      "Plugin")
   {
     msg.set_name(currentItem->data(1, Qt::UserRole).toString().toStdString());
     msg.set_id(currentItem->data(2, Qt::UserRole).toInt());
 
-    // set plugin id and strip plugin name.
+    // strip plugin name.
     msgs::Plugin *pluginMsg = msg.add_plugin();
     std::string pluginName = this->dataPtr->pluginMsg.name();
     size_t index = pluginName.find_last_of("::");
@@ -2615,25 +2625,27 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 void ModelListWidget::FillPropertyTree(const msgs::Plugin &_msg,
                                        QtProperty *_parent)
 {
-  QtVariantProperty *item = NULL;
+  QtVariantProperty *item = nullptr;
 
   // name
   item = this->dataPtr->variantManager->addProperty(QVariant::String,
       tr("name"));
   item->setValue(_msg.name().c_str());
-  this->AddProperty(item, _parent);
   item->setEnabled(false);
+  this->AddProperty(item, _parent);
 
   // filename
   item = this->dataPtr->variantManager->addProperty(QVariant::String,
     tr("filename"));
   item->setValue(_msg.filename().c_str());
+  item->setEnabled(false);
   this->AddProperty(item, _parent);
 
   // innerxml
   item = this->dataPtr->variantManager->addProperty(QVariant::String,
     tr("innerxml"));
   item->setValue(_msg.innerxml().c_str());
+  item->setEnabled(false);
   this->AddProperty(item, _parent);
 }
 
