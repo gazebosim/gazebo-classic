@@ -125,18 +125,18 @@ void ModelPluginInspector::OnRemove()
 
   // User request from inspector
   auto mainWindow = gui::get_main_window();
-  if (!mainWindow)
-    return;
-
-  auto modelCreator = mainWindow->findChild<ModelCreator *>();
-  if (!modelCreator)
-    return;
-
-  auto cmd = modelCreator->UserCmdManager()->NewCmd(
-      "Deleted plugin [" + pluginName + "]",
-      MEUserCmd::DELETING_MODEL_PLUGIN);
-  cmd->SetSDF(msgs::PluginToSDF(*pluginMsg));
-  cmd->SetScopedName(pluginName);
+  if (mainWindow)
+  {
+    auto modelCreator = mainWindow->findChild<ModelCreator *>();
+    if (modelCreator)
+    {
+      auto cmd = modelCreator->UserCmdManager()->NewCmd(
+          "Deleted plugin [" + pluginName + "]",
+          MEUserCmd::DELETING_MODEL_PLUGIN);
+      cmd->SetSDF(msgs::PluginToSDF(*pluginMsg));
+      cmd->SetScopedName(pluginName);
+    }
+  }
 
   this->OnCancel();
   model::Events::requestModelPluginRemoval(pluginName);
