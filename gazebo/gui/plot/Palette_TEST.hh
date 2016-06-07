@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_PALETTE_TEST_HH_
-#define _GAZEBO_GUI_PLOT_PALETTE_TEST_HH_
+#ifndef GAZEBO_GUI_PLOT_PALETTE_TEST_HH_
+#define GAZEBO_GUI_PLOT_PALETTE_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
