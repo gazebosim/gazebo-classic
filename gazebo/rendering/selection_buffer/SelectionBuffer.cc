@@ -143,12 +143,12 @@ void SelectionBuffer::DeleteRTTBuffer()
 /////////////////////////////////////////////////
 void SelectionBuffer::CreateRTTBuffer()
 {
-  // 1x1 pixel buffer
-  unsigned int width = 1;
-  unsigned int height = 1;
-
   try
   {
+    // 1x1 pixel buffer
+    unsigned int width = 1;
+    unsigned int height = 1;
+
     this->dataPtr->texture = Ogre::TextureManager::getSingleton().createManual(
         "SelectionPassTex",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
