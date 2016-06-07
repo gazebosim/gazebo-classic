@@ -21,6 +21,10 @@
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
 
+1. Fix view control mouse focus in model editor
+    * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)
+    * [Issue #1791](https://bitbucket.org/osrf/gazebo/issues/1791)
+
 1. Model Editor: Select and align nested models
     * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)
 
