@@ -173,6 +173,7 @@ set(qt_tests
   model_editor.cc
   model_editor_undo.cc
   model_manipulation.cc
+  mouse_pick.cc
   track_visual.cc
   undo.cc
   visual_pose.cc
