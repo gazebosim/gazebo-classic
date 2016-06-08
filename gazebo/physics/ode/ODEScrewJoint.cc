@@ -43,8 +43,7 @@ ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEScrewJoint::~ODEScrewJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

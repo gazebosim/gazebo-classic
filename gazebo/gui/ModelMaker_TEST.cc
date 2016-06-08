@@ -44,7 +44,7 @@ void ModelMaker_TEST::SimpleShape()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's no box in the left panel yet
-  bool hasBox = mainWindow->HasEntityName("unit_box_0");
+  bool hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(!hasBox);
 
   // Get scene
@@ -52,7 +52,7 @@ void ModelMaker_TEST::SimpleShape()
   QVERIFY(scene != NULL);
 
   // Check there's no box in the scene yet
-  gazebo::rendering::VisualPtr vis = scene->GetVisual("unit_box_0");
+  gazebo::rendering::VisualPtr vis = scene->GetVisual("unit_box");
   QVERIFY(vis == NULL);
 
   // Create a model maker
@@ -64,11 +64,11 @@ void ModelMaker_TEST::SimpleShape()
   modelMaker->Start();
 
   // Check there's still no box in the left panel
-  hasBox = mainWindow->HasEntityName("unit_box_0");
+  hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(!hasBox);
 
   // Check there's a box in the scene -- this is the preview
-  vis = scene->GetVisual("unit_box_0");
+  vis = scene->GetVisual("unit_box");
   QVERIFY(vis != NULL);
 
   // Check that the box appeared in the center of the screen
@@ -95,17 +95,17 @@ void ModelMaker_TEST::SimpleShape()
   modelMaker->OnMouseRelease(mouseEvent);
 
   // Check there's no box in the scene -- the preview is gone
-  vis = scene->GetVisual("unit_box_0");
+  vis = scene->GetVisual("unit_box");
   QVERIFY(vis == NULL);
 
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a box in the scene -- this is the final model
-  vis = scene->GetVisual("unit_box_0");
+  vis = scene->GetVisual("unit_box");
   QVERIFY(vis != NULL);
 
   // Check the box is in the left panel
-  hasBox = mainWindow->HasEntityName("unit_box_0");
+  hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(hasBox);
 
   // Terminate

@@ -30,7 +30,7 @@ ImuSensorPlugin::ImuSensorPlugin()
 /////////////////////////////////////////////////
 ImuSensorPlugin::~ImuSensorPlugin()
 {
-  this->parentSensor->DisconnectUpdated(this->connection);
+  this->connection.reset();
   this->parentSensor.reset();
 }
 

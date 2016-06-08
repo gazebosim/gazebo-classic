@@ -219,11 +219,7 @@ void Visual::Fini()
     this->dataPtr->sceneNode = NULL;
   }
 
-  if (this->dataPtr->preRenderConnection)
-  {
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
-    this->dataPtr->preRenderConnection.reset();
-  }
+  this->dataPtr->preRenderConnection.reset();
 
   if (this->dataPtr->scene->GetVisual(this->dataPtr->id))
     this->dataPtr->scene->RemoveVisual(this->dataPtr->id);

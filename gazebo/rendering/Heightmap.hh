@@ -25,7 +25,6 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
 

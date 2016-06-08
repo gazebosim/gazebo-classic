@@ -154,6 +154,7 @@ set (gtest_sources_dri
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
   GpuLaser_TEST.cc
+  Grid_TEST.cc
   Heightmap_TEST.cc
   InertiaVisual_TEST.cc
   JointVisual_TEST.cc

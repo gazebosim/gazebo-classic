@@ -19,7 +19,6 @@
 
 #include <string>
 #include <sdf/sdf.hh>
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
 

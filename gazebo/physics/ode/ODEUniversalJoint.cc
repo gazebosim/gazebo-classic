@@ -36,8 +36,7 @@ ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEUniversalJoint::~ODEUniversalJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////
