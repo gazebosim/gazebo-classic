@@ -45,6 +45,10 @@ TEST_F(SonarVisual_TEST, SonarVisualTest)
       new gazebo::rendering::SonarVisual(
       "world_GUIONLY_sonar_vis", scene->WorldVisual(), ""));
   sonarVis->Load();
+
+  // test destroying the visual
+  sonarVis->Fini();
+  EXPECT_EQ(sonarVis->GetChildCount(), 0u);
 }
 
 /////////////////////////////////////////////////

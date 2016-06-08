@@ -79,6 +79,10 @@ TEST_F(COMVisual_TEST, COMVisualTest)
 
   EXPECT_EQ(comVis->GetInertiaPose().pos, pos);
   EXPECT_EQ(comVis->GetInertiaPose().rot, quat);
+
+  // test destroying the visual
+  comVis->Fini();
+  EXPECT_EQ(comVis->GetChildCount(), 0u);
 }
 
 /////////////////////////////////////////////////

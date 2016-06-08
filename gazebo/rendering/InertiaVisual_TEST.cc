@@ -51,6 +51,10 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
   EXPECT_EQ(inertiaVis->GetName(), "inertia_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
   EXPECT_TRUE(scene->GetVisual(inertiaVis->GetName()) != NULL);
+
+  // test destroying the visual
+  inertiaVis->Fini();
+  EXPECT_EQ(inertiaVis->GetChildCount(), 0u);
 }
 
 /////////////////////////////////////////////////

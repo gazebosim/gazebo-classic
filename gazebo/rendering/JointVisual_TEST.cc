@@ -168,6 +168,10 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
   EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
   EXPECT_FALSE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
+
+  // test destroying the visual
+  jointVis->Fini();
+  EXPECT_EQ(jointVis->GetChildCount(), 0u);
 }
 
 /////////////////////////////////////////////////

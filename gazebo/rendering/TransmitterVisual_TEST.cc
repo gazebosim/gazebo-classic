@@ -45,6 +45,10 @@ TEST_F(TransmitterVisual_TEST, TransmitterVisualTest)
       new gazebo::rendering::TransmitterVisual(
       "world_GUIONLY_transmitter_vis", scene->WorldVisual(), ""));
   transmitterVis->Load();
+
+  // test destroying the visual
+  transmitterVis->Fini();
+  EXPECT_EQ(transmitterVis->GetChildCount(), 0u);
 }
 
 /////////////////////////////////////////////////

@@ -30,9 +30,6 @@ namespace gazebo
     /// \brief Private data for the Grid class.
     class GridPrivate
     {
-      /// \brief Pointer to the scene node
-      public: Ogre::SceneNode *sceneNode = nullptr;
-
       /// \brief Pointer to the manual object.
       public: Ogre::ManualObject *manualObject = nullptr;
 
@@ -273,13 +270,13 @@ void Grid::Enable(const bool _enable)
 //////////////////////////////////////////////////
 Ogre::SceneNode *Grid::GetSceneNode()
 {
-  return this->SceneNode();
+  return this->dataPtr->gridVis->GetSceneNode();
 }
 
 //////////////////////////////////////////////////
-Ogre::SceneNode *Grid::SceneNode() const
+VisualPtr Grid::GridVisual() const
 {
-  return this->dataPtr->sceneNode;
+  return this->dataPtr->gridVis;
 }
 
 //////////////////////////////////////////////////

@@ -1950,6 +1950,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
     {
       this->RemoveModelPlugin(plugin);
     }
+    this->dataPtr->selectedModelPlugins.clear();
   }
   else if (_event.control)
   {
