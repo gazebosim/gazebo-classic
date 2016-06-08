@@ -83,11 +83,7 @@ void ModelSnap::Clear()
   this->dataPtr->node.reset();
   this->dataPtr->userCmdPub.reset();
 
-  if (this->dataPtr->renderConnection)
-  {
-    event::Events::DisconnectRender(this->dataPtr->renderConnection);
-    this->dataPtr->renderConnection.reset();
-  }
+  this->dataPtr->renderConnection.reset();
 
   if (this->dataPtr->snapVisual)
   {
@@ -169,11 +165,7 @@ void ModelSnap::Reset()
       this->dataPtr->highlightVisual->SetVisible(false);
   }
 
-  if (this->dataPtr->renderConnection)
-  {
-    event::Events::DisconnectRender(this->dataPtr->renderConnection);
-    this->dataPtr->renderConnection.reset();
-  }
+  this->dataPtr->renderConnection.reset();
 }
 
 /////////////////////////////////////////////////
