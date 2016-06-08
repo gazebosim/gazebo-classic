@@ -180,8 +180,6 @@ TEST_F(JointVisual_TEST, JointVisualTest)
 
   // verify scene's child count is the same as before the visual was created
   EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
-
-
 }
 
 /////////////////////////////////////////////////
