@@ -13,7 +13,7 @@ PREFIX=/data_fast/scpeters/ws/tmp
 timestamp=`eval date +%Y_%m_%d_%R:%S`
 logfile="${PREFIX}/gazebo_test-$timestamp.txt"
 logfileSummary="${PREFIX}/gazebo_test-$timestamp-summary.txt"
-logfileVerbose="${PREFIX}/gazebo_test-$timestamp-verbose.txt"
+junit_prefix="${PREFIX}/gazebo_test-$timestamp"
 BUILD_ROOT=${PREFIX}/gazebo_build
 logfileRaw=$BUILD_ROOT/raw.log
 testCount=18
@@ -80,7 +80,7 @@ do
 
   echo "Code Check Results" >> $logfile
   # Run code checker
-  cd $BUILD_ROOT/source
+  cd $BUILD_ROOT/src/gazebo
   sh tools/code_check.sh >> $logfile
 
   # Run make test many times, only capture failures
@@ -91,22 +91,35 @@ do
     cd $BUILD_ROOT/build/gazebo
 
     # make test with verbose output
+    rm -rf test_results
+    mkdir test_results
     make test ARGS="-VV" &> $logfileRaw
     grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw >> $logfile
     echo make test try $i of $testCount, \
       `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | wc -l` \
       tests failed
 
+    junit_prefix_try="${junit_prefix}-try-$i"
+    tar cfz ${junit_prefix_try}-test_results.tar.gz test_results
+
     # for each failed test
     for f in `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | \
       sed -e 's@^ *\([0-9]*\)/.*@\1@'`
     do
-      # output some brief info
-      echo Branch "$branch" try $i of $testCount, failed test $f >> $logfileVerbose
+      junit_prefix_try_test="${junit_prefix_try}-test-$f"
       # then send the raw output of both the test and its companion test_ran
-      # to the logfile for perusal
-      grep '^ *'`echo "(($f-1)/2)*2+1" | bc`':' $logfileRaw | grep -v YANKING >> $logfileVerbose
-      grep '^ *'`echo "(($f-1)/2)*2+2" | bc`':' $logfileRaw | grep -v YANKING >> $logfileVerbose
+      # to *-console.txt
+      grep '^ *'$(echo "(($f-1)/2)*2+1" | bc)':' $logfileRaw >  ${junit_prefix_try_test}-console.txt
+      grep '^ *'$(echo "(($f-1)/2)*2+2" | bc)':' $logfileRaw >> ${junit_prefix_try_test}-console.txt
+      # save junit of failed tests
+      JUNIT=$(grep '^ *'$(echo "(($f-1)/2)*2+1" | bc)': Test command' $logfileRaw | \
+              tr -d '"' | \
+              grep xml$ | \
+              sed -e 's@.*-xml -o @@' \
+                  -e 's@.*--gtest_output=xml:@@' \
+                  -e 's@.*check_test_ran.py @@' \
+      )
+      cp ${JUNIT} ${junit_prefix_try_test}-$(basename ${JUNIT})
     done
 
     # update summary file
