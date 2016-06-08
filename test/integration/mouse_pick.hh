@@ -25,6 +25,9 @@ class MousePickingTest : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Verify simple shapes can be picked.
+  private slots: void Shapes();
+
   /// \brief Verify models can be picked.
   private slots: void Transparency();
 };

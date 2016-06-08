@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Backport single pixel selection buffer for mouse picking
+    * [Pull request 2XXXX](https://bitbucket.org/osrf/gazebo/pull-request/2XXXX)
+
 1. Handle model manipulation tool RTS shortcuts in keyPress
     * [Pull request 2312](https://bitbucket.org/osrf/gazebo/pull-request/2312)
 
