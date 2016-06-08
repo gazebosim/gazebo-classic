@@ -37,6 +37,10 @@ TEST_F(OriginVisual_TEST, Load)
 
   EXPECT_TRUE(scene != NULL);
 
+  // get scene visual child count before we create any visuals
+  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  unsigned int count = scene->WorldVisual()->GetChildCount();
+
   // Create and load visual
   rendering::OriginVisualPtr origin;
   origin.reset(new rendering::OriginVisual("origin", scene->WorldVisual()));
@@ -55,6 +59,9 @@ TEST_F(OriginVisual_TEST, Load)
   // Reset pointer
   origin.reset();
   EXPECT_TRUE(origin == NULL);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

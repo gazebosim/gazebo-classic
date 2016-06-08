@@ -56,6 +56,9 @@ TEST_F(WrenchVisual_TEST, WrenchVisualTest)
   // test destroying the visual
   wrenchVis->Fini();
   EXPECT_EQ(wrenchVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

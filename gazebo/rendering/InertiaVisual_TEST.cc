@@ -55,6 +55,9 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
   // test destroying the visual
   inertiaVis->Fini();
   EXPECT_EQ(inertiaVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

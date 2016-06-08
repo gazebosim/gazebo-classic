@@ -56,6 +56,9 @@ TEST_F(ContactVisual_TEST, ContactVisualTest)
   // test destroying the visual
   contactVis->Fini();
   EXPECT_EQ(contactVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////
