@@ -171,6 +171,7 @@ set(qt_tests
   mouse_pick.cc
   undo.cc
   view_angle.cc
+  view_control.cc
   visual_pose.cc
 )
 
