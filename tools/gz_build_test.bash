@@ -9,14 +9,14 @@ else
 fi
 
 # Create a logfile based on the current time
-PREFIX=$HOME/ws/tmp
+PREFIX=/data_fast/scpeters/ws/tmp
 timestamp=`eval date +%Y_%m_%d_%R:%S`
 logfile="${PREFIX}/gazebo_test-$timestamp.txt"
 logfileSummary="${PREFIX}/gazebo_test-$timestamp-summary.txt"
 logfileVerbose="${PREFIX}/gazebo_test-$timestamp-verbose.txt"
 BUILD_ROOT=${PREFIX}/gazebo_build
 logfileRaw=$BUILD_ROOT/raw.log
-testCount=20
+testCount=18
 
 # Create catkin workspace
 cd 
@@ -24,25 +24,27 @@ rm -rf $BUILD_ROOT
 mkdir -p $BUILD_ROOT/src
 
 # Clone
+CATKIN_ORIGIN=https://github.com/ros/catkin.git
 GAZEBO_ORIGIN=https://bitbucket.org/osrf/gazebo
-SDFORMAT_ORIGIN=https://bitbucket.org/osrf/sdformat
+#SDFORMAT_ORIGIN=https://bitbucket.org/osrf/sdformat
 if [ `hostname` == t2 ]
 then
   hg clone $HOME/osrf/gazebo $BUILD_ROOT/src/gazebo
   cd $BUILD_ROOT/src/gazebo
   hg pull $GAZEBO_ORIGIN
-  hg clone $HOME/osrf/sdformat $BUILD_ROOT/src/sdformat
-  cd $BUILD_ROOT/src/sdformat
-  hg pull $ORIGIN
-  hg pull $SDFORMAT_ORIGIN
+#  hg clone $HOME/osrf/sdformat $BUILD_ROOT/src/sdformat
+#  cd $BUILD_ROOT/src/sdformat
+#  hg pull $SDFORMAT_ORIGIN
+  hg up default
 else
   hg clone $GAZEBO_ORIGIN $BUILD_ROOT/src/gazebo
-  hg clone $SDFORMAT_ORIGIN $BUILD_ROOT/src/sdformat
+#  hg clone $SDFORMAT_ORIGIN $BUILD_ROOT/src/sdformat
 fi
+git clone $CATKIN_ORIGIN $BUILD_ROOT/src/catkin
 
 # get package.xml files
 curl https://bitbucket.org/scpeters/unix-stuff/raw/master/package_xml/package_gazebo.xml > $BUILD_ROOT/src/gazebo/package.xml
-curl https://bitbucket.org/scpeters/unix-stuff/raw/master/package_xml/package_sdformat.xml > $BUILD_ROOT/src/sdformat/package.xml
+#curl https://bitbucket.org/scpeters/unix-stuff/raw/master/package_xml/package_sdformat.xml > $BUILD_ROOT/src/sdformat/package.xml
 cd $BUILD_ROOT && catkin init
 
 start_time=`eval date +%s`
@@ -64,6 +66,7 @@ do
 
   # Build
   catkin clean -a
+#    -DGAZEBO_RUN_VALGRIND_TESTS:BOOL=True \
   catkin config --cmake-args \
     -DENABLE_SCREEN_TESTS:BOOL=True \
     -DFORCE_GRAPHIC_TESTS_COMPILATION:BOOL=True
@@ -108,7 +111,7 @@ do
 
     # update summary file
     grep 'Test *#' $logfile  | \
-      sed -e 's@[0-9]*\.[0-9]* *sec$@@' -e 's@.*Test@failures:@' | \
+      sed -e 's@ *[0-9]*\.[0-9]* *sec$@@' -e 's@.*Test@failures:@' | \
       sort | uniq -c | sort -rg > $logfileSummary
   done
 done
