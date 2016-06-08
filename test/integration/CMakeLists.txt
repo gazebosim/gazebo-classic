@@ -177,6 +177,7 @@ set(qt_tests
   track_visual.cc
   undo.cc
   view_angle.cc
+  view_control.cc
   visual_pose.cc
 )
 

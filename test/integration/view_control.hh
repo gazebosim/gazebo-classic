@@ -15,22 +15,21 @@
  *
 */
 
-#ifndef _TEST_INTEGRATION_MODELMANIPULATION_HH_
-#define _TEST_INTEGRATION_MODELMANIPULATION_HH_
+#ifndef GAZEBO_TEST_INTEGRATION_VIEWCONTROLTEST_HH
+#define GAZEBO_TEST_INTEGRATION_VIEWCONTROLTEST_HH
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief Integration test for manipulating models through the GUI.
-class ModelManipulationTest : public QTestFixture
+/// \brief A test class for the view controller
+class ViewControlTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Verify that model pose stops being updated while it is being
-  /// manipulated.
-  private slots: void StopProcessingPoseMsgs();
+  /// \brief Test zooming in on a model in simulation
+  private slots: void MouseZoomSimulation();
 
-  /// \brief Test switching modes using keyboard shortcuts.
-  private slots: void Shortcuts();
+  /// \brief Test zooming in on a model in model editor
+  private slots: void MouseZoomModelEditor();
 };
 
 #endif
