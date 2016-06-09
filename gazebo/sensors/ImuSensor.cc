@@ -294,8 +294,7 @@ void ImuSensor::SetReferencePose()
 void ImuSensor::SetWorldToReferencePose(
   const ignition::math::Pose3d &_pose)
 {
-  // _orientation: rotations from NED frame to imu frame
-  // worldToReference: from world frame to NED frame.
+  // worldToReference: from world frame to IMU Reference frame.
   this->dataPtr->worldToReference = _pose;
 }
 
