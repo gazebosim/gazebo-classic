@@ -100,6 +100,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Handle model manipulation tool RTS shortcuts in keyPress
+    * [Pull request 2312](https://bitbucket.org/osrf/gazebo/pull-request/2312)
+
 1. Reset ODE joint force feedback after world reset
     * [Pull request 2255](https://bitbucket.org/osrf/gazebo/pull-request/2255)
 
@@ -115,6 +118,10 @@
 
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
+
+1. Fix view control mouse focus in model editor
+    * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)
+    * [Issue #1791](https://bitbucket.org/osrf/gazebo/issues/1791)
 
 1. Model Editor: Select and align nested models
     * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)
@@ -1101,6 +1108,22 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Fix mouse picking with transparent visuals
+    * [Pull request 2305](https://bitbucket.org/osrf/gazebo/pull-request/2305)
+    * [Issue #1956](https://bitbucket.org/osrf/gazebo/issue/1956)
+
+1. Backport fix for DepthCamera visibility mask
+    * [Pull request 2286](https://bitbucket.org/osrf/gazebo/pull-request/2286)
+    * [Pull request 2287](https://bitbucket.org/osrf/gazebo/pull-request/2287)
+
+1. Backport sensor reset fix
+    * [Pull request 2272](https://bitbucket.org/osrf/gazebo/pull-request/2272)
+    * [Issue #1917](https://bitbucket.org/osrf/gazebo/issue/1917)
+
+1. Fix model snap tool highlighting
+    * [Pull request 2293](https://bitbucket.org/osrf/gazebo/pull-request/2293)
+    * [Issue #1955](https://bitbucket.org/osrf/gazebo/issue/1955)
 
 ### Gazebo 5.3.0 (2015-04-07)
 

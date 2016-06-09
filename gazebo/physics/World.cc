@@ -755,6 +755,7 @@ void World::Update()
     else if (this->dataPtr->resetModelOnly)
       this->ResetEntities(Base::MODEL);
     this->dataPtr->needsReset = false;
+    return;
   }
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
