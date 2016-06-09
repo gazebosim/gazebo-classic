@@ -586,18 +586,6 @@ void World::_SetSensorsInitialized(const bool _init)
 }
 
 //////////////////////////////////////////////////
-void World::SetNEDWorldPose(const ignition::math::Pose3d &_pose)
-{
-  this->dataPtr->nedPose = _pose;
-}
-
-//////////////////////////////////////////////////
-const ignition::math::Pose3d World::NEDWorldPose()
-{
-  return this->dataPtr->nedPose;
-}
-
-//////////////////////////////////////////////////
 bool World::SensorsInitialized() const
 {
   return this->dataPtr->sensorsInitialized;

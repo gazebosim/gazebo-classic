@@ -61,20 +61,6 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
-  // get type of IMU
-  // reference frame options are listed in
-  // http://bitbucket.org/sdformat/src/default/sdf/1.6/imu.sdf
-  // for example: local, world, NED, NWU, optical
-  this->dataPtr->referenceFrame = "local";
-  if (this->sdf->HasElement("imu") &&
-      this->sdf->GetElement("imu")->HasAttribute("reference_frame") &&
-      this->sdf->GetElement("imu")->Get<std::string>("reference_frame")
-      != "__default_reference_frame__")
-  {
-    this->dataPtr->referenceFrame =
-      this->sdf->GetElement("imu")->Get<std::string>("reference_frame");
-  }
-
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
@@ -214,45 +200,6 @@ void ImuSensor::Load(const std::string &_worldName)
   {
     gzthrow("IMU has invalid parent[" + this->ParentName() +
             "]. Must be a link\n");
-  }
-  // define starting pose of imu as the reference frame of the imu
-  // note this is not always the case, and we should extend this per
-  // issue #1959
-  if (this->dataPtr->referenceFrame == "local")
-  {
-    this->dataPtr->worldToReference = this->pose +
-      this->dataPtr->parentEntity->GetWorldPose().Ign();
-  }
-  else if (this->dataPtr->referenceFrame == "world")
-  {
-    // do nothing
-    // this->dataPtr->worldToReference is identity
-  }
-  else if (this->dataPtr->referenceFrame == "NED")
-  {
-    this->dataPtr->worldToReference =
-      ignition::math::Pose3d(
-      ignition::math::Vector3d(0, 0, 0),
-      ignition::math::Quaterniond(M_PI, 0, 0));
-  }
-  else if (this->dataPtr->referenceFrame == "NWU")
-  {
-     // this->dataPtr->worldToReference is identity
-  }
-  else if (this->dataPtr->referenceFrame == "optical")
-  {
-    this->dataPtr->worldToReference =
-      ignition::math::Pose3d(
-      ignition::math::Vector3d(0, 0, 0),
-      ignition::math::Quaterniond(-0.5*M_PI, 0, -0.5*M_PI));
-  }
-  else
-  {
-    gzerr << "IMU reference_frame ["
-          << this->dataPtr->referenceFrame
-          << "] is unknown, using IMU local frame.\n";
-    this->dataPtr->worldToReference = this->pose +
-      this->dataPtr->parentEntity->GetWorldPose().Ign();
   }
 
   /////////////////////////////////////////////////////////////////

@@ -34,10 +34,6 @@ namespace gazebo
     /// \brief Imu sensor private data.
     class ImuSensorPrivate
     {
-      /// \brief type of IMU. Options are specified in:
-      /// http://bitbucket.org/sdformat/src/default/sdf/1.6/imu.sdf
-      public: std::string referenceFrame;
-
       /// \brief transform from world frame to Imu reference frame.
       public: ignition::math::Pose3d worldToReference;
 
