@@ -2219,7 +2219,7 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 //////////////////////////////////////////////////
 void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 {
-  this->newImageFrame.Disconnect(_c);
+  this->newImageFrame.Disconnect(_c->Id());
 }
 
 /////////////////////////////////////////////////

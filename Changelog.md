@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Use single pixel selection buffer for mouse picking
+    * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
+
 1. Windows plugins (with .dll extension) now accepted
     * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311/ensure-plugin-and-plugin-macros-are-always/)
     * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
@@ -12,6 +15,7 @@
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
     * [Pull request #2317](https://bitbucket.org/osrf/gazebo/pull-request/2317)
+    * [Pull request #2329](https://bitbucket.org/osrf/gazebo/pull-request/2329)
     * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
 
 1. Remove EntityMakerPrivate and move its members to derived classes
@@ -40,6 +44,10 @@
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
     * A contribution from Olivier Crave
 
+1. Server generates unique model names in case of overlap, and added allow_renaming field to factory message.
+    * [Pull request 2301](https://bitbucket.org/osrf/gazebo/pull-request/2301)
+    * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
+
 1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
     * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
 
@@ -48,6 +56,9 @@
 
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
+
+1. PIMPLize rendering/Grid
+    * [Pull request 2330](https://bitbucket.org/osrf/gazebo/pull-request/2330)
 
 1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
     * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)

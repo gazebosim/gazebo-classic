@@ -770,7 +770,6 @@ void Link::SetWindEnabled(const bool _enable)
   }
   else
   {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
     this->updateConnection.reset();
     // Make sure wind velocity is null
     this->windLinearVel.Set(0, 0, 0);
