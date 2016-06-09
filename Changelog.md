@@ -5,6 +5,9 @@
 1. Backport single pixel selection buffer for mouse picking
     * [Pull request 2XXXX](https://bitbucket.org/osrf/gazebo/pull-request/2XXXX)
 
+1. Prevent mouse pan and orbit from deselecting entities in model editor
+    * [Pull request 2333](https://bitbucket.org/osrf/gazebo/pull-request/2333)
+
 1. Handle model manipulation tool RTS shortcuts in keyPress
     * [Pull request 2312](https://bitbucket.org/osrf/gazebo/pull-request/2312)
 

@@ -28,6 +28,9 @@ class MousePickingTest : public QTestFixture
   /// \brief Verify simple shapes can be picked.
   private slots: void Shapes();
 
+  /// \brief Verify camera movement does not affect entity selection
+  private slots: void ModelEditorSelection();
+
   /// \brief Verify models can be picked.
   private slots: void Transparency();
 };
