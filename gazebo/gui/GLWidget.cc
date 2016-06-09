@@ -693,7 +693,6 @@ void GLWidget::OnMouseMoveNormal()
   if (!this->dataPtr->userCamera)
     return;
 
-  this->dataPtr->prevMouseMoveTime = currentTime;
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
       this->dataPtr->mouseEvent.Pos());
 

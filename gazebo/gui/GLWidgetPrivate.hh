@@ -111,8 +111,6 @@ namespace gazebo
 
       /// \brief Mutex to protect selectedVisuals array.
       public: std::mutex selectedVisMutex;
-
-      public: common::Time prevMouseMoveTime;
     };
   }
 }

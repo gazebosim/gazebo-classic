@@ -1577,7 +1577,7 @@ void MainWindow::CreateActions()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ShowMenuBar(QMenuBar *_bar)
+void MainWindow::ShowMenuBar(QMenuBar * /*_bar*/)
 {
   // populate main window's menu bar with menus from normal simulation mode
   this->CreateMenuBar();
