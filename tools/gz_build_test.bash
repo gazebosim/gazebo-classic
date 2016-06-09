@@ -106,11 +106,11 @@ do
     for f in `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | \
       sed -e 's@^ *\([0-9]*\)/.*@\1@'`
     do
-      junit_prefix_try_test="${junit_prefix_try}-test-$f"
+      junit_prefix_test_try="${junit_prefix}-test-$f-try-$i"
       # then send the raw output of both the test and its companion test_ran
       # to *-console.txt
-      grep '^ *'$(echo "(($f-1)/2)*2+1" | bc)':' $logfileRaw >  ${junit_prefix_try_test}-console.txt
-      grep '^ *'$(echo "(($f-1)/2)*2+2" | bc)':' $logfileRaw >> ${junit_prefix_try_test}-console.txt
+      grep '^ *'$(echo "(($f-1)/2)*2+1" | bc)':' $logfileRaw >  ${junit_prefix_test_try}-console.txt
+      grep '^ *'$(echo "(($f-1)/2)*2+2" | bc)':' $logfileRaw >> ${junit_prefix_test_try}-console.txt
       # save junit of failed tests
       JUNIT=$(grep '^ *'$(echo "(($f-1)/2)*2+1" | bc)': Test command' $logfileRaw | \
               tr -d '"' | \
@@ -119,7 +119,7 @@ do
                   -e 's@.*--gtest_output=xml:@@' \
                   -e 's@.*check_test_ran.py @@' \
       )
-      cp ${JUNIT} ${junit_prefix_try_test}-$(basename ${JUNIT})
+      cp ${JUNIT} ${junit_prefix_test_try}-$(basename ${JUNIT})
     done
 
     # update summary file
