@@ -42,9 +42,9 @@ using namespace gazebo;
 using namespace common;
 
 #ifdef _WIN32
-	const std::string SystemPaths::PATH_DELIMITER = ";";
+  const std::string SystemPaths::PATH_DELIMITER = ";";
 #else
-	const std::string SystemPaths::PATH_DELIMITER = ":";
+  const std::string SystemPaths::PATH_DELIMITER = ":";
 #endif
 
 //////////////////////////////////////////////////
@@ -467,7 +467,7 @@ void SystemPaths::ClearModelPaths()
 /////////////////////////////////////////////////
 void SystemPaths::AddGazeboPaths(const std::string &_path)
 {
-	std::string delim(SystemPaths::PATH_DELIMITER);
+  std::string delim(SystemPaths::PATH_DELIMITER);
 
   size_t pos1 = 0;
   size_t pos2 = _path.find(delim);
@@ -483,7 +483,7 @@ void SystemPaths::AddGazeboPaths(const std::string &_path)
 /////////////////////////////////////////////////
 void SystemPaths::AddOgrePaths(const std::string &_path)
 {
-	std::string delim(SystemPaths::PATH_DELIMITER);
+  std::string delim(SystemPaths::PATH_DELIMITER);
   size_t pos1 = 0;
   size_t pos2 = _path.find(delim);
   while (pos2 != std::string::npos)
@@ -498,7 +498,7 @@ void SystemPaths::AddOgrePaths(const std::string &_path)
 /////////////////////////////////////////////////
 void SystemPaths::AddPluginPaths(const std::string &_path)
 {
-	std::string delim(SystemPaths::PATH_DELIMITER);
+  std::string delim(SystemPaths::PATH_DELIMITER);
   size_t pos1 = 0;
   size_t pos2 = _path.find(delim);
   while (pos2 != std::string::npos)
@@ -513,7 +513,7 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
 /////////////////////////////////////////////////
 void SystemPaths::AddModelPaths(const std::string &_path)
 {
-	std::string delim(SystemPaths::PATH_DELIMITER);
+  std::string delim(SystemPaths::PATH_DELIMITER);
   size_t pos1 = 0;
   size_t pos2 = _path.find(delim);
   while (pos2 != std::string::npos)

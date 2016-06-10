@@ -429,8 +429,8 @@ void RenderEngine::LoadPlugins()
     std::string prefix = "lib";
     std::string extension = ".dylib";
 #elif defined(_WIN32)
-	std::string prefix = "";
-	std::string extension = ".dll";
+    std::string prefix = "";
+    std::string extension = ".dll";
 #else
     std::string prefix = "";
     std::string extension = ".so";
