@@ -207,21 +207,13 @@ void ImuSensor::Load(const std::string &_worldName)
   }
 
   /////////////////////////////////////////////////////////////////
-  // compute the last linear veloicty of the imu in the world frame
-  // for computing acceleartion based on finite differencing
+  // compute the last linear velocity of the imu in the world frame
+  // for computing acceleration based on finite differencing
   /////////////////////////////////////////////////////////////////
-  // first get parent link linear vel in world frame
-  ignition::math::Vector3d linkWorldLinearVel
-      = this->dataPtr->parentEntity->GetWorldLinearVel().Ign();
-  ignition::math::Vector3d linkWorldAngularVel
-      = this->dataPtr->parentEntity->GetWorldAngularVel().Ign();
   // next, account for vel in world frame of the imu
   // given the imu frame is offset from link frame, and link is rotating
-  ignition::math::Pose3d parentEntityPose =
-    this->dataPtr->parentEntity->GetWorldPose().Ign();
-  ignition::math::Pose3d imuWorldPose = this->pose + parentEntityPose;
-  this->dataPtr->lastImuWorldLinearVel = linkWorldLinearVel +
-      linkWorldAngularVel.Cross(parentEntityPose.Pos() - imuWorldPose.Pos());
+  this->dataPtr->lastImuWorldLinearVel =
+      this->dataPtr->parentEntity->GetWorldLinearVel(this->pose.Pos()).Ign();
 }
 
 //////////////////////////////////////////////////
@@ -366,7 +358,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     // given the imu frame is offset from link frame, and link is rotating
     // compute the velocity of the imu axis origin in world frame
     ignition::math::Vector3d imuWorldLinearVel = linkWorldLinearVel +
-        linkWorldAngularVel.Cross(parentEntityPose.Pos() - imuWorldPose.Pos());
+        linkWorldAngularVel.Cross(imuWorldPose.Pos() - parentEntityPose.Pos());
     // compute acceleration by differentiating velocity in world frame,
     // and rotate into imu local frame
     this->dataPtr->linearAcc = imuWorldPose.Rot().Inverse().RotateVector(

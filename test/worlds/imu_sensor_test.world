@@ -354,7 +354,7 @@
           </material>
         </visual>
         <visual name="visual_x">
-          <pose>0.11 0.0 0.0 0.0 1.5708 0.0</pose>
+          <pose>0.15 0.1 0.0 0.0 1.5708 0.0</pose>
           <geometry>
             <cylinder>
               <length>0.30</length>
@@ -366,7 +366,7 @@
           </material>
         </visual>
         <visual name="visual_y">
-          <pose>0.0 0.11 0.0 1.5708 0.0 0.0</pose>
+          <pose>0.0 0.25 0.0 1.5708 0.0 0.0</pose>
           <geometry>
             <cylinder>
               <length>0.30</length>
@@ -378,7 +378,7 @@
           </material>
         </visual>
         <visual name="visual_z">
-          <pose>0.0 0.0 0.11 0.0 0.0 0.0</pose>
+          <pose>0.0 0.1 0.15 0.0 0.0 0.0</pose>
           <geometry>
             <cylinder>
               <length>0.30</length>
@@ -402,6 +402,7 @@
         <self_collide>false</self_collide>
         <kinematic>false</kinematic>
         <sensor name="ball_floating_imu_sensor" type="imu">
+          <pose>0 0.1 0 0 0 0</pose>
           <always_on>1</always_on>
           <plugin name="ball_floating_imu_sensor_plugin" filename="libImuSensorPlugin.so">
             <custom>1</custom>
@@ -446,7 +447,7 @@
           </material>
         </visual>
         <visual name="visual_x">
-          <pose>0.11 0.0 0.0 0.0 1.5708 0.0</pose>
+          <pose>0.21 0.0 0.0 0.0 1.5708 0.0</pose>
           <geometry>
             <cylinder>
               <length>0.30</length>
@@ -458,7 +459,7 @@
           </material>
         </visual>
         <visual name="visual_y">
-          <pose>0.0 0.11 0.0 1.5708 0.0 0.0</pose>
+          <pose>0.1 0.15 0.0 1.5708 0.0 0.0</pose>
           <geometry>
             <cylinder>
               <length>0.30</length>
@@ -470,7 +471,7 @@
           </material>
         </visual>
         <visual name="visual_z">
-          <pose>0.0 0.0 0.11 0.0 0.0 0.0</pose>
+          <pose>0.1 0.0 0.15 0.0 0.0 0.0</pose>
           <geometry>
             <cylinder>
               <length>0.30</length>
@@ -494,6 +495,7 @@
         <self_collide>false</self_collide>
         <kinematic>false</kinematic>
         <sensor name="ball_floating_imu_sensor_2" type="imu">
+          <pose>0.10 0 0 0 0 0</pose>
           <always_on>1</always_on>
           <plugin name="ball_floating_imu_sensor_plugin_2" filename="libImuSensorPlugin.so">
             <custom>1</custom>
