@@ -320,8 +320,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   event::Events::worldCreated(this->Name());
 
-  this->dataPtr->userCmdManager = UserCmdManagerPtr(
-      new UserCmdManager(shared_from_this()));
+  this->dataPtr->userCmdManager = UserCmdManagerPtr(new UserCmdManager(*this));
 
   this->dataPtr->loaded = true;
 }
@@ -361,8 +360,8 @@ void World::Init()
   this->dataPtr->testRay = std::dynamic_pointer_cast<RayShape>(
       this->Physics()->CreateShape("ray", CollisionPtr()));
 
-  this->dataPtr->prevStates[0].SetWorld(shared_from_this());
-  this->dataPtr->prevStates[1].SetWorld(shared_from_this());
+  this->dataPtr->prevStates[0].SetWorld(*this);
+  this->dataPtr->prevStates[1].SetWorld(*this);
 
   this->dataPtr->prevStates[0].SetName(this->Name());
   this->dataPtr->prevStates[1].SetName(this->Name());
@@ -472,8 +471,8 @@ void World::RunLoop()
   this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
   // Get the first state
-  this->dataPtr->prevStates[0] = WorldState(shared_from_this());
-  this->dataPtr->prevStates[1] = WorldState(shared_from_this());
+  this->dataPtr->prevStates[0] = WorldState(*this);
+  this->dataPtr->prevStates[1] = WorldState(*this);
   this->dataPtr->stateToggle = 0;
 
   this->dataPtr->logThread =
@@ -892,8 +891,6 @@ void World::Fini()
     this->dataPtr->rootElement->Fini();
     this->dataPtr->rootElement.reset();
   }
-  this->dataPtr->prevStates[0].SetWorld(WorldPtr());
-  this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
@@ -2364,7 +2361,7 @@ void World::UpdateStateSDF()
   sdf::ElementPtr stateElem = this->dataPtr->sdf->GetElement("state");
   stateElem->ClearElements();
 
-  WorldState currentState(shared_from_this());
+  WorldState currentState(*this);
   currentState.FillSDF(stateElem);
 }
 
@@ -2647,7 +2644,7 @@ void World::LogWorker()
   {
     int currState = (this->dataPtr->stateToggle + 1) % 2;
 
-    this->dataPtr->prevStates[currState].Load(self);
+    this->dataPtr->prevStates[currState].Load(*this);
     WorldState diffState = this->dataPtr->prevStates[currState] -
       this->dataPtr->prevStates[this->dataPtr->stateToggle];
     this->dataPtr->logPrevIteration = this->dataPtr->iterations;

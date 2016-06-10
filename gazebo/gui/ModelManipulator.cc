@@ -370,7 +370,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const ignition::math::Vector3d &_axis, bool _local)
 {
-
   ignition::math::Box bbox = this->dataPtr->mouseVisualBbox;
   ignition::math::Pose3d pose = _vis->GetWorldPose().Ign();
   ignition::math::Vector3d distance =

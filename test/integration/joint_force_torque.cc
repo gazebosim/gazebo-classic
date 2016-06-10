@@ -468,18 +468,18 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->PhysicsEngine()->MaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -488,9 +488,9 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
-  physics::ModelPtr model_1 = world->GetModel("boxes");
-  physics::JointPtr joint_01 = model_1->GetJoint("joint1");
-  physics::JointPtr joint_12 = model_1->GetJoint("joint2");
+  physics::ModelPtr model_1 = world->ModelByName("boxes");
+  physics::JointPtr joint_01 = model_1->JointByName("joint1");
+  physics::JointPtr joint_12 = model_1->JointByName("joint2");
 
   gzlog << "------------------- PD CONTROL -------------------\n";
   static const double kp1 = 50000.0;
@@ -503,8 +503,8 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
     for (unsigned int i = 0; i < 3388; ++i)
     {
       // pd control
-      double j1State = joint_01->GetAngle(0u).Radian();
-      double j2State = joint_12->GetAngle(0u).Radian();
+      double j1State = joint_01->Angle(0u).Radian();
+      double j2State = joint_12->Angle(0u).Radian();
       double p1Error = target1 - j1State;
       double p2Error = target2 - j2State;
       double effort1 = kp1 * p1Error;
@@ -514,24 +514,27 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
 
       world->Step(1);
       // test joint_01 wrench
-      physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
+      physics::JointWrench wrench_01 = joint_01->ForceTorque(0u);
 
       if (i < 3387)
         continue;
 
-      EXPECT_NEAR(wrench_01.body1Force.x,     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Force.y,     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Force.z,   300.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.x,   25.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.y, -175.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.z,    0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.X(),     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.Y(),     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.Z(),   300.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.X(),   25.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.Y(), -175.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.Z(),    0.0, TOL_CONT);
 
-      EXPECT_NEAR(wrench_01.body2Force.x,  -wrench_01.body1Force.x,  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.y,  -wrench_01.body1Force.y,  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.z,  -wrench_01.body1Force.z,  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.x, -wrench_01.body1Torque.x, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.X(), -wrench_01.body1Force.x,  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Y(), -wrench_01.body1Force.y,  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Z(), -wrench_01.body1Force.z,  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.X(),
+          -wrench_01.body1Torque.x, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Y(),
+          -wrench_01.body1Torque.y, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Z(),
+          -wrench_01.body1Torque.z, TOL_CONT);
 
       gzlog << "joint_01 force torque : "
             << "step [" << i
@@ -545,7 +548,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
     }
 
     world->Reset();
-    double simTime = world->GetSimTime().Double();
+    double simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, 0.0, dt);
   }
 }

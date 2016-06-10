@@ -81,19 +81,19 @@ void Actor::Load(sdf::ElementPtr _sdf)
   common::MeshManager::Instance()->Load(this->actorDPtr->skinFile);
   std::string actorName = _sdf->Get<std::string>("name");
 
-/*  double radius = 1.0;
-  unsigned int pointNum = 32;
-  for (unsigned int i = 0; i < pointNum; i++)
-  {
-    double angle = (2 * i * M_PI) / pointNum;
-    double x = radius * sin(angle);
-    double y = radius * cos(angle);
-    if (ignition::math::equal(x, 0.0))
-      x = 0;
-    if (ignition::math::equal(y, 0.0))
-      y = 0;
-    std::cerr << x << " " << y << " 0 0 0 " << angle << "\n";
-  }   */
+  // double radius = 1.0;
+  // unsigned int pointNum = 32;
+  // for (unsigned int i = 0; i < pointNum; i++)
+  // {
+  //   double angle = (2 * i * M_PI) / pointNum;
+  //   double x = radius * sin(angle);
+  //   double y = radius * cos(angle);
+  //   if (ignition::math::equal(x, 0.0))
+  //     x = 0;
+  //   if (ignition::math::equal(y, 0.0))
+  //     y = 0;
+  //   std::cerr << x << " " << y << " 0 0 0 " << angle << "\n";
+  // }
 
   if (common::MeshManager::Instance()->HasMesh(this->actorDPtr->skinFile))
   {
@@ -481,8 +481,8 @@ void Actor::Update()
 
   if (!this->actorDPtr->customTrajectoryInfo)
   {
-    this->actorDPtr->scriptTime = currentTime.Double() - this->actorDPtr->startDelay -
-              this->actorDPtr->playStartTime.Double();
+    this->actorDPtr->scriptTime = currentTime.Double() -
+      this->actorDPtr->startDelay - this->actorDPtr->playStartTime.Double();
 
     /// waiting for delayed start
     if (this->actorDPtr->scriptTime < 0)
@@ -496,14 +496,17 @@ void Actor::Update()
       }
       else
       {
-        this->actorDPtr->scriptTime = this->actorDPtr->scriptTime - this->actorDPtr->scriptLength;
-        this->actorDPtr->playStartTime = currentTime - this->actorDPtr->scriptTime;
+        this->actorDPtr->scriptTime = this->actorDPtr->scriptTime -
+          this->actorDPtr->scriptLength;
+        this->actorDPtr->playStartTime = currentTime -
+          this->actorDPtr->scriptTime;
       }
     }
 
     for (unsigned int i = 0; i < this->actorDPtr->trajInfo.size(); ++i)
     {
-      if (this->actorDPtr->trajInfo[i].startTime <= this->actorDPtr->scriptTime &&
+      if (this->actorDPtr->trajInfo[i].startTime <=
+          this->actorDPtr->scriptTime &&
           this->actorDPtr->trajInfo[i].endTime >= this->actorDPtr->scriptTime)
       {
         tinfo = &this->actorDPtr->trajInfo[i];
@@ -513,11 +516,13 @@ void Actor::Update()
 
     if (tinfo == NULL)
     {
-      gzerr << "Trajectory not found at " << this->actorDPtr->scriptTime << "\n";
+      gzerr << "Trajectory not found at "
+        << this->actorDPtr->scriptTime << "\n";
       return;
     }
 
-    this->actorDPtr->scriptTime = this->actorDPtr->scriptTime - tinfo->startTime;
+    this->actorDPtr->scriptTime =
+      this->actorDPtr->scriptTime - tinfo->startTime;
   }
   else
   {

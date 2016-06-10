@@ -37,13 +37,12 @@ using namespace physics;
 
 /////////////////////////////////////////////////
 UserCmd::UserCmd(const unsigned int _id,
-                 physics::WorldPtr _world,
+                 physics::World &_world,
                  const std::string &_description,
                  const msgs::UserCmd::Type &_type)
-  : dataPtr(new UserCmdPrivate())
+  : dataPtr(new UserCmdPrivate(_world))
 {
   this->dataPtr->id = _id;
-  this->dataPtr->world = _world;
   this->dataPtr->description = _description;
   this->dataPtr->type = _type;
 
@@ -54,8 +53,6 @@ UserCmd::UserCmd(const unsigned int _id,
 /////////////////////////////////////////////////
 UserCmd::~UserCmd()
 {
-  this->dataPtr->world.reset();
-
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -67,20 +64,20 @@ void UserCmd::Undo()
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
   // Reset physics states for the whole world
-  this->dataPtr->world->ResetPhysicsStates();
+  this->dataPtr->world.ResetPhysicsStates();
 
   // Set state to the moment the command was executed
-  this->dataPtr->world->SetState(this->dataPtr->startState);
+  this->dataPtr->world.SetState(this->dataPtr->startState);
 }
 
 /////////////////////////////////////////////////
 void UserCmd::Redo()
 {
   // Reset physics states for the whole world
-  this->dataPtr->world->ResetPhysicsStates();
+  this->dataPtr->world.ResetPhysicsStates();
 
   // Set state to the moment undo was triggered
-  this->dataPtr->world->SetState(this->dataPtr->endState);
+  this->dataPtr->world.SetState(this->dataPtr->endState);
 }
 
 /////////////////////////////////////////////////
@@ -102,11 +99,9 @@ msgs::UserCmd::Type UserCmd::Type() const
 }
 
 /////////////////////////////////////////////////
-UserCmdManager::UserCmdManager(const WorldPtr _world)
-  : dataPtr(new UserCmdManagerPrivate())
+UserCmdManager::UserCmdManager(World &_world)
+  : dataPtr(new UserCmdManagerPrivate(_world))
 {
-  this->dataPtr->world = _world;
-
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
@@ -134,8 +129,6 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 /////////////////////////////////////////////////
 UserCmdManager::~UserCmdManager()
 {
-  this->dataPtr->world.reset();
-
   // Clean transport
   {
     this->dataPtr->lightModifyPub.reset();
@@ -358,5 +351,3 @@ void UserCmdManager::PublishCurrentStats()
 
   this->dataPtr->userCmdStatsPub->Publish(statsMsg);
 }
-
-

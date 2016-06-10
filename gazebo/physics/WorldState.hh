@@ -43,13 +43,20 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE WorldState : public State
     {
       /// \brief Default constructor
-      public: WorldState();
+      public: WorldState() = delete;
 
       /// \brief Constructor.
       ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
-      public: explicit WorldState(WorldPtr _world);
+      /// \deprecated See version that accepts a reference to a World.
+      public: explicit WorldState(WorldPtr _world) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      ///
+      /// Generate a WorldState from an instance of a World.
+      /// \param[in] _world Pointer to a world
+      public: explicit WorldState(const World &_world);
 
       /// \brief Constructor
       ///
@@ -64,7 +71,14 @@ namespace gazebo
       ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
-      public: void Load(WorldPtr _world);
+      /// \deprecated See version that accepts a reference to a World
+      public: void Load(WorldPtr _world) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Load from a World pointer.
+      ///
+      /// Generate a WorldState from an instance of a World.
+      /// \param[in] _world Pointer to a world
+      public: void Load(const World &_world);
 
       /// \brief Load state from SDF element.
       ///
@@ -74,7 +88,12 @@ namespace gazebo
 
       /// \brief Set the world.
       /// \param[in] _world Pointer to the world.
-      public: void SetWorld(WorldPtr _world);
+      /// \deprecated See version that accepts a reference to a World.
+      public: void SetWorld(WorldPtr _world) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the world.
+      /// \param[in] _world Reference to the world.
+      public: void SetWorld(const World &_world);
 
       /// \brief Get model states based on a regular expression.
       /// \param[in] _regex The regular expression.
@@ -300,7 +319,7 @@ namespace gazebo
       private: std::vector<std::string> deletions;
 
       /// \brief Pointer to the world.
-      private: WorldPtr world;
+      private: const World &world;
     };
     /// \}
   }

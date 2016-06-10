@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A world state
- * Author: Nate Koenig
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -35,17 +31,17 @@ using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
-WorldState::WorldState()
+/*WorldState::WorldState()
   : State()
 {
-}
+}*/
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
   : State(_world->Name(), _world->RealTime(), _world->SimTime(),
       _world->Iterations())
 {
-  this->world = _world;
+  this->world = *(_world.get());
 
   // Add a state for all the models
   Model_V models = _world->Models();
@@ -65,6 +61,30 @@ WorldState::WorldState(const WorldPtr _world)
 }
 
 /////////////////////////////////////////////////
+WorldState::WorldState(const World &_world)
+  : State(_world.Name(), _world.RealTime(), _world.SimTime(),
+      _world.Iterations())
+{
+  this->world = _world;
+
+  // Add a state for all the models
+  Model_V models = _world.Models();
+  for (Model_V::const_iterator iter = models.begin();
+       iter != models.end(); ++iter)
+  {
+    this->modelStates.insert(std::make_pair((*iter)->Name(),
+          ModelState(*iter, this->realTime, this->simTime, this->iterations)));
+  }
+
+  // Add states for all the lights
+  for (const auto &light : _world.Lights())
+  {
+    this->lightStates.insert(std::make_pair(light->Name(),
+          LightState(light, this->realTime, this->simTime, this->iterations)));
+  }
+}
+
+/////////////////////////////////////////////////
 WorldState::WorldState(const sdf::ElementPtr _sdf)
   : State()
 {
@@ -74,16 +94,21 @@ WorldState::WorldState(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 WorldState::~WorldState()
 {
-  this->world.reset();
   this->modelStates.clear();
   this->lightStates.clear();
 }
 
 /////////////////////////////////////////////////
-void WorldState::Load(const WorldPtr _world)
+void WorldState::Load(WorldPtr _world)
+{
+  this->Load(*(_world.get()));
+}
+
+/////////////////////////////////////////////////
+void WorldState::Load(const World &_world)
 {
   this->world = _world;
-  this->name = _world->Name();
+  this->name = _world.Name();
   this->wallTime = common::Time::GetWallTime();
   this->simTime = _world->SimTime();
   this->realTime = _world->RealTime();
@@ -173,6 +198,12 @@ void WorldState::Load(const sdf::ElementPtr _elem)
 
 /////////////////////////////////////////////////
 void WorldState::SetWorld(const WorldPtr _world)
+{
+  this->SetWorld(*(_world.get()));
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetWorld(const World &_world)
 {
   this->world = _world;
 }
@@ -422,9 +453,9 @@ WorldState WorldState::operator-(const WorldState &_state) const
   for (ModelState_M::const_iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
   {
-    if (!_state.HasModelState(iter->second.Name()) && this->world)
+    if (!_state.HasModelState(iter->second.Name()))
     {
-      ModelPtr model = this->world->ModelByName(iter->second.Name());
+      ModelPtr model = this->world.ModelByName(iter->second.Name());
       if (model)
         result.insertions.push_back(model->UnscaledSDF()->ToString(""));
     }
@@ -433,9 +464,9 @@ WorldState WorldState::operator-(const WorldState &_state) const
   // Add in the new light states
   for (const auto &light : this->lightStates)
   {
-    if (!_state.HasLightState(light.second.Name()) && this->world)
+    if (!_state.HasLightState(light.second.Name()))
     {
-      LightPtr lightPtr = this->world->LightByName(light.second.Name());
+      LightPtr lightPtr = this->world.LightByName(light.second.Name());
       result.insertions.push_back(lightPtr->SDF()->ToString(""));
     }
   }
