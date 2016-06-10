@@ -2052,6 +2052,7 @@ void World::ProcessFactoryMsgs()
         }
         else if (isModel)
         {
+          // Make sure model name is unique
           auto entityName = elem->Get<std::string>("name");
           if (entityName.empty())
           {

@@ -126,6 +126,10 @@
     * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)
     * [Issue #1791](https://bitbucket.org/osrf/gazebo/issues/1791)
 
+1. Server generates unique model names in case of overlap
+    * [Pull request 2296](https://bitbucket.org/osrf/gazebo/pull-request/2296)
+    * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
+
 1. Model Editor: Select and align nested models
     * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)
 
