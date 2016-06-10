@@ -16,8 +16,7 @@
 */
 #include <ignition/math.hh>
 #include "gazebo/physics/physics.hh"
-#include "gazebo/physics/physics.hh"
-#include "test_config.h"
+#include "gazebo/transport/transport.hh"
 #include "plugins/ActorPlugin.hh"
 
 using namespace gazebo;
@@ -169,7 +168,7 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   this->HandleObstacles(pos);
 
   // Compute the yaw orientation
-  ignition::math::Angle yaw(atan2(pos.Y(), pos.X()) + 1.5707 - rpy.Z());
+  ignition::math::Angle yaw = atan2(pos.Y(), pos.X()) + 1.5707 - rpy.Z();
   yaw.Normalize();
 
   // Rotate in place, instead of jumping.

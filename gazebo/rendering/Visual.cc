@@ -328,7 +328,7 @@ void Visual::Load()
     this->dataPtr->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
+  pose = this->dataPtr->sdf->Get<math::Pose>("pose");
 
   std::string mesh = this->GetMeshName();
   std::string subMesh = this->GetSubMeshName();
@@ -395,9 +395,9 @@ void Visual::Load()
     }
     else if (geomElem->HasElement("plane"))
     {
-      ignition::math::Vector2d size =
-        geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
-      geometrySize.Set(size.X(), size.Y(), 1);
+      math::Vector2d size =
+        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
+      geometrySize.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
@@ -454,34 +454,14 @@ void Visual::Load()
         this->SetMaterial(matName);
     }
 
-
     if (matElemClone->HasElement("ambient"))
-    {
-      sdf::Color color = matElemClone->Get<sdf::Color>("ambient");
-      common::Color gzColor(color.r, color.g, color.b, color.a);
-      this->SetAmbient(gzColor);
-    }
-
+      this->SetAmbient(matElemClone->Get<common::Color>("ambient"));
     if (matElemClone->HasElement("diffuse"))
-    {
-      sdf::Color color = matElemClone->Get<sdf::Color>("diffuse");
-      common::Color gzColor(color.r, color.g, color.b, color.a);
-      this->SetDiffuse(gzColor);
-    }
-
+      this->SetDiffuse(matElemClone->Get<common::Color>("diffuse"));
     if (matElemClone->HasElement("specular"))
-    {
-      sdf::Color color = matElemClone->Get<sdf::Color>("specular");
-      common::Color gzColor(color.r, color.g, color.b, color.a);
-      this->SetSpecular(gzColor);
-    }
-
+      this->SetSpecular(matElemClone->Get<common::Color>("specular"));
     if (matElemClone->HasElement("emissive"))
-    {
-      sdf::Color color = matElemClone->Get<sdf::Color>("emissive");
-      common::Color gzColor(color.r, color.g, color.b, color.a);
-      this->SetEmissive(gzColor);
-    }
+      this->SetEmissive(matElemClone->Get<common::Color>("emissive"));
 
     if (matElem->HasElement("lighting"))
     {
@@ -603,7 +583,6 @@ void Visual::DetachVisual(const std::string &_name)
       this->dataPtr->children.erase(iter);
       if (this->dataPtr->sceneNode)
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
-      childVis->GetParent().reset();
       break;
     }
   }

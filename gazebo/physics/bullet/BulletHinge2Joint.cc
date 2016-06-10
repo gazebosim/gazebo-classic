@@ -64,18 +64,16 @@ void BulletHinge2Joint::Init()
     gzthrow("BulletHinge2Joint cannot be connected to the world (child)");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
-  ignition::math::Vector3d axis1 =
-    axis1Elem->Get<ignition::math::Vector3d>("xyz");
+  math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
 
   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
-  ignition::math::Vector3d axis2 =
-    axis2Elem->Get<ignition::math::Vector3d>("xyz");
+  math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
 
   // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
   btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
-  btVector3 baxis1(axis1.X(), axis1.Y(), axis1.Z());
-  btVector3 baxis2(axis2.X(), axis2.Y(), axis2.Z());
+  btVector3 baxis1(axis1.x, axis1.y, axis1.z);
+  btVector3 baxis2(axis2.x, axis2.y, axis2.z);
 
   this->bulletHinge2 = new btHinge2Constraint(
       *bulletParentLink->GetBulletLink(),

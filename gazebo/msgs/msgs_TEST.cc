@@ -2308,7 +2308,7 @@ TEST_F(MsgsTest, LinkToSDF)
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
   EXPECT_FALSE(linkSDF->Get<bool>("enable_wind"));
-  EXPECT_EQ(pose.Ign(), linkSDF->Get<ignition::math::Pose3d>("pose"));
+  EXPECT_EQ(pose, linkSDF->Get<math::Pose>("pose"));
 
   sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");
   EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("laser_retro"), laserRetro1);
@@ -2361,10 +2361,8 @@ TEST_F(MsgsTest, CollisionToSDF)
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("laser_retro"), 0.2);
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("max_contacts"), 5);
 
-  EXPECT_TRUE(collisionSDF->Get<ignition::math::Pose3d>("pose") ==
-      ignition::math::Pose3d(
-        ignition::math::Vector3d(1, 2, 3),
-        ignition::math::Quaterniond(0, 0, 1, 0)));
+  EXPECT_TRUE(collisionSDF->Get<math::Pose>("pose") ==
+      math::Pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0)));
 
   sdf::ElementPtr geomElem = collisionSDF->GetElement("geometry");
   sdf::ElementPtr cylinderElem = geomElem->GetElement("cylinder");
@@ -2410,7 +2408,7 @@ TEST_F(MsgsTest, VisualToSDF)
 
   EXPECT_DOUBLE_EQ(visualSDF->Get<double>("laser_retro"), laserRetro);
 
-  EXPECT_EQ(pose.Ign(), visualSDF->Get<ignition::math::Pose3d>("pose"));
+  EXPECT_EQ(pose, visualSDF->Get<math::Pose>("pose"));
 
   ASSERT_TRUE(visualSDF->HasElement("geometry"));
   sdf::ElementPtr geomElem = visualSDF->GetElement("geometry");
@@ -2457,8 +2455,8 @@ TEST_F(MsgsTest, GeometryToSDF)
 
   sdf::ElementPtr boxSDF = msgs::GeometryToSDF(boxMsg);
   sdf::ElementPtr boxElem = boxSDF->GetElement("box");
-  EXPECT_TRUE(boxElem->Get<ignition::math::Vector3d>("size") ==
-      ignition::math::Vector3d(0.5, 0.75, 1.0));
+  EXPECT_TRUE(boxElem->Get<math::Vector3>("size") ==
+      math::Vector3(0.5, 0.75, 1.0));
 
   // cylinder
   msgs::Geometry cylinderMsg;
@@ -2491,10 +2489,10 @@ TEST_F(MsgsTest, GeometryToSDF)
 
   sdf::ElementPtr planeSDF = msgs::GeometryToSDF(planeMsg);
   sdf::ElementPtr planeElem = planeSDF->GetElement("plane");
-  EXPECT_TRUE(planeElem->Get<ignition::math::Vector3d>("normal") ==
-      ignition::math::Vector3d(0, 0, 1.0));
-  EXPECT_TRUE(planeElem->Get<ignition::math::Vector2d>("size") ==
-      ignition::math::Vector2d(0.5, 0.8));
+  EXPECT_TRUE(planeElem->Get<math::Vector3>("normal") ==
+      math::Vector3(0, 0, 1.0));
+  EXPECT_TRUE(planeElem->Get<math::Vector2d>("size") ==
+      math::Vector2d(0.5, 0.8));
 
   // image
   msgs::Geometry imageMsg;
@@ -2543,10 +2541,10 @@ TEST_F(MsgsTest, GeometryToSDF)
   sdf::ElementPtr heightmapElem = heightmapSDF->GetElement("heightmap");
   EXPECT_STREQ(heightmapElem->Get<std::string>("uri").c_str(),
       "test_heightmap_filename");
-  EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("size") ==
-      ignition::math::Vector3d(100, 200, 30));
-  EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("pos") ==
-      ignition::math::Vector3d(50, 100, 15));
+  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("size") ==
+      math::Vector3(100, 200, 30));
+  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("pos") ==
+      math::Vector3(50, 100, 15));
   EXPECT_TRUE(heightmapElem->Get<bool>("use_terrain_paging"));
 
   sdf::ElementPtr textureElem1 = heightmapElem->GetElement("texture");
@@ -2579,8 +2577,8 @@ TEST_F(MsgsTest, GeometryToSDF)
   sdf::ElementPtr meshElem = meshSDF->GetElement("mesh");
   EXPECT_STREQ(meshElem->Get<std::string>("uri").c_str(),
       "test_mesh_filename");
-  EXPECT_TRUE(meshElem->Get<ignition::math::Vector3d>("scale") ==
-      ignition::math::Vector3d(2.3, 1.2, 2.9));
+  EXPECT_TRUE(meshElem->Get<math::Vector3>("scale") ==
+      math::Vector3(2.3, 1.2, 2.9));
   sdf::ElementPtr submeshElem = meshElem->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(),
       "test_mesh_submesh");
@@ -2600,14 +2598,11 @@ TEST_F(MsgsTest, GeometryToSDF)
   EXPECT_DOUBLE_EQ(polylineElem->Get<double>("height"), 2.33);
 
   sdf::ElementPtr pointElem1 = polylineElem->GetElement("point");
-  EXPECT_TRUE(pointElem1->Get<ignition::math::Vector2d>() ==
-      ignition::math::Vector2d(0.5, 0.7));
+  EXPECT_TRUE(pointElem1->Get<math::Vector2d>() == math::Vector2d(0.5, 0.7));
   sdf::ElementPtr pointElem2 = pointElem1->GetNextElement("point");
-  EXPECT_TRUE(pointElem2->Get<ignition::math::Vector2d>() ==
-      ignition::math::Vector2d(3.5, 4.7));
+  EXPECT_TRUE(pointElem2->Get<math::Vector2d>() == math::Vector2d(3.5, 4.7));
   sdf::ElementPtr pointElem3 = pointElem2->GetNextElement("point");
-  EXPECT_TRUE(pointElem3->Get<ignition::math::Vector2d>() ==
-      ignition::math::Vector2d(1000, 2000));
+  EXPECT_TRUE(pointElem3->Get<math::Vector2d>() == math::Vector2d(1000, 2000));
 }
 
 /////////////////////////////////////////////////
@@ -2622,15 +2617,31 @@ TEST_F(MsgsTest, MeshToSDF)
   sdf::ElementPtr meshSDF = msgs::MeshToSDF(msg);
 
   EXPECT_STREQ(meshSDF->Get<std::string>("uri").c_str(), "test_filename");
-  ignition::math::Vector3d scale =
-    meshSDF->Get<ignition::math::Vector3d>("scale");
-  EXPECT_DOUBLE_EQ(scale.X(), 0.1);
-  EXPECT_DOUBLE_EQ(scale.Y(), 0.2);
-  EXPECT_DOUBLE_EQ(scale.Z(), 0.3);
+  EXPECT_TRUE(meshSDF->HasElement("scale"));
+  math::Vector3 scale = meshSDF->Get<math::Vector3>("scale");
+  EXPECT_DOUBLE_EQ(scale.x, 0.1);
+  EXPECT_DOUBLE_EQ(scale.y, 0.2);
+  EXPECT_DOUBLE_EQ(scale.z, 0.3);
 
   sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(), "test_submesh");
   EXPECT_TRUE(submeshElem->Get<bool>("center"));
+
+  // no submesh
+  msgs::MeshGeom msg2;
+  msg2.set_filename("test_filename2");
+  msgs::Set(msg2.mutable_scale(), ignition::math::Vector3d(1, 2, 3));
+
+  sdf::ElementPtr meshSDF2 = msgs::MeshToSDF(msg2);
+
+  EXPECT_STREQ(meshSDF2->Get<std::string>("uri").c_str(), "test_filename2");
+  EXPECT_TRUE(meshSDF2->HasElement("scale"));
+  math::Vector3 scale2 = meshSDF2->Get<math::Vector3>("scale");
+  EXPECT_DOUBLE_EQ(scale2.x, 1);
+  EXPECT_DOUBLE_EQ(scale2.y, 2);
+  EXPECT_DOUBLE_EQ(scale2.z, 3);
+
+  EXPECT_FALSE(meshSDF2->HasElement("submesh"));
 }
 
 /////////////////////////////////////////////////
@@ -2662,7 +2673,7 @@ TEST_F(MsgsTest, InertialToSDF)
   EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), mass);
 
   EXPECT_TRUE(inertialSDF->HasElement("pose"));
-  EXPECT_EQ(inertialSDF->Get<ignition::math::Pose3d>("pose"), pose.Ign());
+  EXPECT_EQ(inertialSDF->Get<math::Pose>("pose"), pose);
 
   {
     ASSERT_TRUE(inertialSDF->HasElement("inertia"));
@@ -2736,24 +2747,13 @@ TEST_F(MsgsTest, MaterialToSDF)
   }
 
   EXPECT_TRUE(materialSDF->HasElement("ambient"));
-  sdf::Color color = materialSDF->Get<sdf::Color>("ambient");
-  common::Color gzColor(color.r, color.g, color.b, color.a);
-  EXPECT_EQ(ambient, gzColor);
-
+  EXPECT_EQ(ambient, materialSDF->Get<common::Color>("ambient"));
   EXPECT_TRUE(materialSDF->HasElement("diffuse"));
-  color = materialSDF->Get<sdf::Color>("diffuse");
-  gzColor.Set(color.r, color.g, color.b, color.a);
-  EXPECT_EQ(diffuse, gzColor);
-
+  EXPECT_EQ(diffuse, materialSDF->Get<common::Color>("diffuse"));
   EXPECT_TRUE(materialSDF->HasElement("emissive"));
-  color = materialSDF->Get<sdf::Color>("emissive");
-  gzColor.Set(color.r, color.g, color.b, color.a);
-  EXPECT_EQ(emissive, gzColor);
-
+  EXPECT_EQ(emissive, materialSDF->Get<common::Color>("emissive"));
   EXPECT_TRUE(materialSDF->HasElement("specular"));
-  color = materialSDF->Get<sdf::Color>("specular");
-  gzColor.Set(color.r, color.g, color.b, color.a);
-  EXPECT_EQ(specular, gzColor);
+  EXPECT_EQ(specular, materialSDF->Get<common::Color>("specular"));
 }
 
 /////////////////////////////////////////////////
@@ -2795,8 +2795,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   sdf::ElementPtr frictionPhysicsElem = frictionElem->GetElement("ode");
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu"), mu);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu2"), mu2);
-  EXPECT_TRUE(frictionPhysicsElem->Get<ignition::math::Vector3d>("fdir1") ==
-      fdir1.Ign());
+  EXPECT_TRUE(frictionPhysicsElem->Get<math::Vector3>("fdir1") == fdir1);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip1"), slip1);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip2"), slip2);
 

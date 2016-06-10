@@ -358,10 +358,8 @@ void Scene::Init()
   if (this->dataPtr->sdf->HasElement("fog"))
   {
     sdf::ElementPtr fogElem = this->dataPtr->sdf->GetElement("fog");
-    sdf::Color color = fogElem->Get<sdf::Color>("color");
-    common::Color gzColor(color.r, color.g, color.b, color.a);
     this->SetFog(fogElem->Get<std::string>("type"),
-                 gzColor,
+                 fogElem->Get<common::Color>("color"),
                  fogElem->Get<double>("density"),
                  fogElem->Get<double>("start"),
                  fogElem->Get<double>("end"));
@@ -509,8 +507,7 @@ common::Color Scene::GetAmbientColor() const
 //////////////////////////////////////////////////
 common::Color Scene::AmbientColor() const
 {
-  sdf::Color color = this->dataPtr->sdf->Get<sdf::Color>("ambient");
-  return common::Color(color.r, color.g, color.b, color.a);
+  return this->dataPtr->sdf->Get<common::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
@@ -549,8 +546,7 @@ common::Color Scene::GetBackgroundColor() const
 //////////////////////////////////////////////////
 common::Color Scene::BackgroundColor() const
 {
-  sdf::Color color = this->dataPtr->sdf->Get<sdf::Color>("background");
-  return common::Color(color.r, color.g, color.b, color.a);
+  return this->dataPtr->sdf->Get<common::Color>("background");
 }
 
 //////////////////////////////////////////////////
@@ -1262,9 +1258,10 @@ bool Scene::FirstContact(CameraPtr _camera,
     unsigned int flags = iter->movable->getVisibilityFlags();
 
     // Only accept a hit if there is an entity and not a gui visual
-    if (iter->movable &&
+    if (iter->movable && iter->movable->getVisible() &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI))
+        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
+        && !(flags & GZ_VISIBILITY_SELECTABLE)))
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
@@ -1702,10 +1699,8 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       elem->GetElement("type")->Set(type);
     }
 
-    sdf::Color color = elem->Get<sdf::Color>("color");
-    common::Color gzColor(color.r, color.g, color.b, color.a);
     this->SetFog(elem->Get<std::string>("type"),
-                 gzColor,
+                 elem->Get<common::Color>("color"),
                  elem->Get<double>("density"),
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));

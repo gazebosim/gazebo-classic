@@ -164,7 +164,7 @@ void Camera::Load()
   if (this->sdf->HasElement("horizontal_fov"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
-    ignition::math::Angle angle(elem->Get<double>());
+    ignition::math::Angle angle = elem->Get<double>();
     if (angle < 0.01 || angle > M_PI*2)
     {
       gzthrow("Camera horizontal field of view invalid.");

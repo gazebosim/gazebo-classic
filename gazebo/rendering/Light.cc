@@ -111,15 +111,10 @@ void Light::Update()
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
 
   this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
-  sdf::Color color =
-    this->dataPtr->sdf->GetElement("diffuse")->Get<sdf::Color>();
-  common::Color gzColor(color.r, color.g, color.b, color.a);
-  this->SetDiffuseColor(gzColor);
-
-  color = this->dataPtr->sdf->GetElement("specular")->Get<sdf::Color>();
-  gzColor.Set(color.r, color.g, color.b, color.a);
-
-  this->SetSpecularColor(gzColor);
+  this->SetDiffuseColor(
+      this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>());
+  this->SetSpecularColor(
+      this->dataPtr->sdf->GetElement("specular")->Get<common::Color>());
   this->SetDirection(
       this->dataPtr->sdf->Get<ignition::math::Vector3d>("direction"));
 
@@ -494,9 +489,7 @@ void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
 
-  sdf::Color color = elem->Get<sdf::Color>();
-  common::Color gzColor(color.r, color.g, color.b, color.a);
-  if (_color != gzColor)
+  if (_color != elem->Get<common::Color>())
     elem->Set(_color);
 
   this->dataPtr->light->setDiffuseColour(_color.r, _color.g, _color.b);
@@ -511,9 +504,7 @@ common::Color Light::GetDiffuseColor() const
 //////////////////////////////////////////////////
 common::Color Light::DiffuseColor() const
 {
-  sdf::Color color =
-    this->dataPtr->sdf->GetElement("diffuse")->Get<sdf::Color>();
-  return common::Color(color.r, color.g, color.b, color.a);
+  return this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>();
 }
 
 //////////////////////////////////////////////////
@@ -525,9 +516,7 @@ common::Color Light::GetSpecularColor() const
 //////////////////////////////////////////////////
 common::Color Light::SpecularColor() const
 {
-  sdf::Color color =
-    this->dataPtr->sdf->GetElement("specular")->Get<sdf::Color>();
-  return common::Color(color.r, color.g, color.b, color.a);
+  return this->dataPtr->sdf->GetElement("specular")->Get<common::Color>();
 }
 
 //////////////////////////////////////////////////
@@ -535,10 +524,7 @@ void Light::SetSpecularColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("specular");
 
-  sdf::Color color = elem->Get<sdf::Color>();
-  common::Color gzColor(color.r, color.g, color.b, color.a);
-
-  if (gzColor != _color)
+  if (elem->Get<common::Color>() != _color)
     elem->Set(_color);
 
   this->dataPtr->light->setSpecularColour(_color.r, _color.g, _color.b);
@@ -557,11 +543,8 @@ void Light::SetDirection(const ignition::math::Vector3d &_dir)
   math::Vector3 vec = _dir;
   vec.Normalize();
 
-  if (vec.Ign() !=
-      this->dataPtr->sdf->Get<ignition::math::Vector3d>("direction"))
-  {
+  if (vec != this->dataPtr->sdf->Get<math::Vector3>("direction"))
     this->dataPtr->sdf->GetElement("direction")->Set(vec);
-  }
 
   this->dataPtr->light->setDirection(vec.x, vec.y, vec.z);
 }

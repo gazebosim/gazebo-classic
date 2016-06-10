@@ -242,7 +242,7 @@ void Model::LoadJoints()
 void Model::Init()
 {
   // Record the model's initial pose (for reseting)
-  math::Pose initPose = this->sdf->Get<ignition::math::Pose3d>("pose");
+  math::Pose initPose = this->sdf->Get<math::Pose>("pose");
   this->SetInitialRelativePose(initPose);
   this->SetRelativePose(initPose);
 
