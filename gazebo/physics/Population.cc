@@ -75,7 +75,7 @@ bool Population::PopulateAll()
 //////////////////////////////////////////////////
 bool Population::PopulateOne(const sdf::ElementPtr _population)
 {
-  std::vector<ignition::math::Vector3> objects;
+  std::vector<ignition::math::Vector3d> objects;
   PopulationParams params;
 
   GZ_ASSERT(_population, "'_population' parameter is NULL");
@@ -224,7 +224,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
 
     // Read the <step> value used to separate each model in the grid.
     if (!this->ValueFromSdf<ignition::math::Vector3d>(
-          distribution, "step", _params.step))
+          distribution, "step", _params.step.Ign()))
     {
       return false;
     }
@@ -233,23 +233,23 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
     if (_params.cols % 2 == 0)
     {
       _params.pose.Pos().X() -=
-        (_params.step.X() * (_params.cols - 2) / 2.0) +
-        (_params.step.X() / 2.0);
+        (_params.step.x * (_params.cols - 2) / 2.0) +
+        (_params.step.x / 2.0);
     }
     else
     {
-      _params.pose.Pos().X() -= _params.step.X() * (_params.cols - 1) / 2.0;
+      _params.pose.Pos().X() -= _params.step.x * (_params.cols - 1) / 2.0;
     }
 
     if (_params.rows % 2 == 0)
     {
       _params.pose.Pos().Y() -=
-        (_params.step.Y() * (_params.rows - 2) / 2.0) +
-        (_params.step.Y() / 2.0);
+        (_params.step.y * (_params.rows - 2) / 2.0) +
+        (_params.step.y / 2.0);
     }
     else
     {
-      _params.pose.Pos().Y() -= _params.step.Y() * (_params.rows - 1) / 2.0;
+      _params.pose.Pos().Y() -= _params.step.y * (_params.rows - 1) / 2.0;
     }
   }
   else
@@ -277,14 +277,13 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
 
       // Read the size of the bounding box.
       if (!this->ValueFromSdf<ignition::math::Vector3d>(
-            box, "size", _params.size))
+            box, "size", _params.size.Ign()))
       {
         return false;
       }
 
       // Sanity check.
-      if (_params.size.X() <= 0 || _params.size.Y() <= 0 ||
-          _params.size.Z() <= 0)
+      if (_params.size.x <= 0 || _params.size.y <= 0 || _params.size.z <= 0)
       {
         gzwarn << "Incorrect box size while populating objects ["
                << _params.size << "]. Population ignored." << std::endl;
@@ -292,7 +291,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
       }
 
       // Align the origin of the box with 'pose'.
-      _params.pose.Pos() -= _params.size / 2.0;
+      _params.pose.Pos() -= _params.size.Ign() / 2.0;
     }
     else if (_population->HasElement("cylinder"))
     {
@@ -345,9 +344,9 @@ void Population::CreatePosesBoxRandom(const PopulationParams &_populParams,
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
     ignition::math::Pose3d offset(
-        ignition::math::Rand::DblUniform(0, _populParams.size.X()),
-        ignition::math::Rand::DblUniform(0, _populParams.size.Y()),
-        ignition::math::Rand::DblUniform(0, _populParams.size.Z()),
+        ignition::math::Rand::DblUniform(0, _populParams.size.x),
+        ignition::math::Rand::DblUniform(0, _populParams.size.y),
+        ignition::math::Rand::DblUniform(0, _populParams.size.z),
         0, 0, 0);
 
     _poses.push_back((offset + _populParams.pose).Pos());
@@ -377,7 +376,7 @@ void Population::CreatePosesBoxUniform(const PopulationParams &_populParams,
       ignition::math::Vector3d p;
       p.X() = x;
       p.Y() = y;
-      p.Z() = ignition::math::Rand::DblUniform(0, _populParams.size.Z());
+      p.Z() = ignition::math::Rand::DblUniform(0, _populParams.size.z);
       obs.push_back(p);
       x += .1;
     }
@@ -419,10 +418,10 @@ void Population::CreatePosesBoxGrid(const PopulationParams &_populParams,
     for (int j = 0; j < _populParams.cols; ++j)
     {
       _poses.push_back((offset + _populParams.pose).Pos());
-      offset.pos.X() += _populParams.step.X();
+      offset.pos.X() += _populParams.step.x;
     }
     offset.Pos.X() = 0;
-    offset.Pos.Y() += _populParams.step.Y();
+    offset.Pos.Y() += _populParams.step.y;
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -441,12 +440,12 @@ void Population::CreatePosesBoxLinearX(const PopulationParams &_populParams,
   // Evenly placed in a row along the global x-axis.
   _poses.clear();
   ignition::math::Pose3d offset = ignition::math::Pose3d::Zero;
-  offset.pos.Y() = _populParams.size.Y() / 2.0;
-  offset.pos.Z() = _populParams.size.Z() / 2.0;
+  offset.pos.Y() = _populParams.size.y / 2.0;
+  offset.pos.Z() = _populParams.size.z / 2.0;
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
     offset.pos.X() =
-      _populParams.size.X() * i / static_cast<double>(_populParams.modelCount);
+      _populParams.size.x * i / static_cast<double>(_populParams.modelCount);
     _poses.push_back((offset + _populParams.pose).Pos());
   }
 
@@ -465,12 +464,12 @@ void Population::CreatePosesBoxLinearY(const PopulationParams &_populParams,
   // Evenly placed in a row along the global y-axis.
   _poses.clear();
   ignition::math::Pose3d offset = ignition::math::Pose3d::Zero;
-  offset.Pos().X() = _populParams.size.X() / 2.0;
-  offset.Pos().Z() = _populParams.size.Z() / 2.0;
+  offset.Pos().X() = _populParams.size.x / 2.0;
+  offset.Pos().Z() = _populParams.size.z / 2.0;
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
     offset.Pos().Y() =
-      _populParams.size.Y() * i / static_cast<double>(_populParams.modelCount);
+      _populParams.size.y * i / static_cast<double>(_populParams.modelCount);
     _poses.push_back((offset + _populParams.pose).Pos());
   }
 
@@ -489,12 +488,12 @@ void Population::CreatePosesBoxLinearZ(const PopulationParams &_populParams,
   // Evenly placed in a row along the global z-axis.
   _poses.clear();
   ignition::math::Pose3d offset = ignition::math::Pose3d::Zero;
-  offset.pos.X() = _populParams.size.X() / 2.0;
-  offset.pos.Y() = _populParams.size.Y() / 2.0;
+  offset.pos.X() = _populParams.size.x / 2.0;
+  offset.pos.Y() = _populParams.size.y / 2.0;
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
     offset.Pos.Z() =
-      _populParams.size.Z() * i / static_cast<double>(_populParams.modelCount);
+      _populParams.size.z * i / static_cast<double>(_populParams.modelCount);
     _poses.push_back((offset + _populParams.pose).Pos());
   }
 
