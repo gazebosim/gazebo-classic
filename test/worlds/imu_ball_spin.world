@@ -1,0 +1,914 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>7.5 -3 1.5 0 0.27 2.35</pose>
+      </camera>
+    </gui>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name='sphere_1'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.4 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_1_imu' type='imu'>
+          <pose>0 0 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_1' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_2'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.8 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>-0.1 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0.1 0 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_2_imu' type='imu'>
+          <pose>0.1 0 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_2' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_3'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.2000000000000002 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 -0.1 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0.1 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_3_imu' type='imu'>
+          <pose>0 0.1 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_3' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_4'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.6 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 -0.1 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0.1 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_4_imu' type='imu'>
+          <pose>0 0 0.1 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0 0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_4' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_5'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>2.0 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0.1 0 0 0 0 0</pose>
+        <inertial>
+          <pose>-0.1 0 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_5_imu' type='imu'>
+          <pose>-0.1 0 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>-0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>-0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_5' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_6'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>2.4000000000000004 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0.1 0 0 0 0</pose>
+        <inertial>
+          <pose>0 -0.1 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_6_imu' type='imu'>
+          <pose>0 -0.1 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 -0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 -0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_6' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_7'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>2.8000000000000003 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.1 0 0 0</pose>
+        <inertial>
+          <pose>0 0 -0.1 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_7_imu' type='imu'>
+          <pose>0 0 -0.1 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_7' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_8'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>3.2 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0.1 0 0 1.5707963267948966 0 0</pose>
+        <inertial>
+          <pose>-0.1 0 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_8_imu' type='imu'>
+          <pose>-0.1 0 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>-0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>-0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_8' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_9'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>3.6 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0.1 0 0 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0 0 -0.1 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_9_imu' type='imu'>
+          <pose>0 0 -0.1 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_9' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_10'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>4.0 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0.1 0 0 0 0 1.5707963267948966</pose>
+        <inertial>
+          <pose>0 0.1 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_10_imu' type='imu'>
+          <pose>0 0.1 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_10' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_11'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>4.4 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0.1 0 1.5707963267948966 0 0</pose>
+        <inertial>
+          <pose>0 0 0.1 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_11_imu' type='imu'>
+          <pose>0 0 0.1 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0 0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_11' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_12'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>4.800000000000001 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0.1 0 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0 -0.1 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_12_imu' type='imu'>
+          <pose>0 -0.1 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 -0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 -0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_12' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_13'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>5.2 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0.1 0 0 0 1.5707963267948966</pose>
+        <inertial>
+          <pose>-0.1 0 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_13_imu' type='imu'>
+          <pose>-0.1 0 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>-0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>-0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_13' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_14'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>5.6000000000000005 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.1 1.5707963267948966 0 0</pose>
+        <inertial>
+          <pose>0 -0.1 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_14_imu' type='imu'>
+          <pose>0 -0.1 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 -0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 -0.1 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_14' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_15'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>6.0 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.1 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0.1 0 0 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_15_imu' type='imu'>
+          <pose>0.1 0 0 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0.1 0 0 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_15' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_16'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>6.4 0 0.1  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.1 0 0 1.5707963267948966</pose>
+        <inertial>
+          <pose>0 0 -0.1 0 0 0</pose>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='sphere_16_imu' type='imu'>
+          <pose>0 0 -0.1 0 0 0</pose>
+        </sensor>
+        <collision name="collision">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_16' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+  </world>
+</sdf>
