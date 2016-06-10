@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+set (CMAKE_AUTOMOC ON)
 
 find_package (Qt5)
 find_package(Protobuf REQUIRED)
@@ -11,8 +12,6 @@ include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
-
-QT5_WRAP_CPP(headers_MOC GUIExampleSpawnWidget.hh)
 
 add_library(gui_example_spawn_widget SHARED ${headers_MOC}
   GUIExampleSpawnWidget.cc)

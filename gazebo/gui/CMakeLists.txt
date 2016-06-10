@@ -197,17 +197,15 @@ gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
-QT5_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT5_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${resources_RCC})
+gz_add_library(gazebo_gui ${sources} ${resources_RCC})
 gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
-set (CMAKE_AUTOMOC ON)
 
 target_link_libraries(gazebo_gui
   libgazebo_client

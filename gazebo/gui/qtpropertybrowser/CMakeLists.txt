@@ -23,10 +23,9 @@ set (qt_headers qtpropertybrowser.h
   )
 
 set (resources qtpropertybrowser.qrc)
-QT5_WRAP_CPP(headers_MOC ${qt_headers})
 QT5_ADD_RESOURCES(resources_RCC ${resources})
 
-add_library(gzqtpropertybrowser STATIC ${sources} ${headers_MOC} ${resources_RCC})
+add_library(gzqtpropertybrowser STATIC ${sources} ${resources_RCC})
 set_target_properties(gzqtpropertybrowser PROPERTIES POSITION_INDEPENDENT_CODE ON)
 #set(CMAKE_PACKAGE_QTGUI TRUE)
 #

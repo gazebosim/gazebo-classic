@@ -88,7 +88,6 @@ if (VALID_DISPLAY)
      string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
      string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
      set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
-     QT5_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
 
      add_executable(${BINARY_NAME}
       ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)

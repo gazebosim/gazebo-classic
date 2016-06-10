@@ -35,8 +35,6 @@ set (qt_headers
 
 add_definitions(${Qt5Core_DEFINITIONS})
 
-QT5_WRAP_CPP(headers_MOC ${qt_headers})
-
 include_directories(
   ${GAZEBO_INCLUDE_DIRS}
   ${Qt5Core_INCLUDE_DIRS}

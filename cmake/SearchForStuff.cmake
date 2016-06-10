@@ -573,6 +573,7 @@ find_package (Qt5Test)
 if (NOT Qt5Test_FOUND)
   BUILD_ERROR("Missing: Qt5Test")
 endif()
+set (CMAKE_AUTOMOC ON)
 
 ########################################
 # Find Boost, if not specified manually
