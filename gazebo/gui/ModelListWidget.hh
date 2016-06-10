@@ -167,6 +167,13 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
                                      QtProperty *_parent);
 
+      /// \brief Fill the property tree with user camera info taken from
+      /// rendering.
+      private: void FillUserCamera();
+
+      /// \brief Fill the property tree with grid info taken from rendering.
+      private: void FillGrid();
+
       /// \brief Add a property to a parent property or to the property tree.
       /// \param[in] _item Pointer to the property to be added.
       /// \param[in] _parent Pointer to the parent property, if applicable.
@@ -206,15 +213,13 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void GUIPropertyChanged(QtProperty *_item);
 
-      private: void GUICameraPropertyChanged(QtProperty *_cameraItem,
-          QtProperty *_changedItem);
-
-      private: void GUIGridPropertyChanged(QtProperty *_changedItem);
-
-      /// \brief Called when a GUI property is changed by the user.
+      /// \brief Called when a GUI camera property is changed by the user.
       /// \param[in] _item The item that was changed.
-      private: void FillUserCamera();
-      private: void FillGrid();
+      private: void GUICameraPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a GUI grid property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUIGridPropertyChanged(QtProperty *_item);
 
       /// \internal
       /// \brief Pointer to private data.

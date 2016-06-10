@@ -711,7 +711,7 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
   QtProperty *cameraProperty = this->ChildItem("camera");
   if (cameraProperty && this->HasChildItem(cameraProperty, _item))
   {
-    this->GUICameraPropertyChanged(cameraProperty, _item);
+    this->GUICameraPropertyChanged(_item);
     return;
   }
 
@@ -724,13 +724,13 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::GUICameraPropertyChanged(QtProperty *_cameraProperty,
-    QtProperty *_changedItem)
+void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
 {
-  QtProperty *cameraPoseProperty = this->ChildItem(_cameraProperty, "pose");
+  QtProperty *cameraProperty = this->ChildItem("camera");
+  QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
   if (cameraPoseProperty)
   {
-    std::string changedProperty = _changedItem->propertyName().toStdString();
+    std::string changedProperty = _item->propertyName().toStdString();
     if (changedProperty == "x"
       || changedProperty == "y"
       || changedProperty == "z"
@@ -746,14 +746,14 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_cameraProperty,
     }
   }
 
-  QtProperty *cameraFollowProperty = this->ChildItem(_cameraProperty,
+  QtProperty *cameraFollowProperty = this->ChildItem(cameraProperty,
                                                         "track_visual");
   if (cameraFollowProperty)
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
     if (!cam)
       return;
-    std::string changedProperty = _changedItem->propertyName().toStdString();
+    std::string changedProperty = _item->propertyName().toStdString();
     if (changedProperty == "static")
     {
       cam->SetTrackIsStatic(this->dataPtr->variantManager->value(
@@ -794,9 +794,9 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_cameraProperty,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::GUIGridPropertyChanged(QtProperty *_changedItem)
+void ModelListWidget::GUIGridPropertyChanged(QtProperty *_item)
 {
-  if (!_changedItem)
+  if (!_item)
     return;
 
   auto scene = rendering::get_scene();
@@ -808,31 +808,31 @@ void ModelListWidget::GUIGridPropertyChanged(QtProperty *_changedItem)
   if (!grid)
     return;
 
-  auto changedProperty = _changedItem->propertyName().toStdString();
+  auto changedProperty = _item->propertyName().toStdString();
   if (changedProperty == "cell count")
   {
     grid->SetCellCount(this->dataPtr->variantManager->value(
-        _changedItem).toUInt());
+        _item).toUInt());
   }
   else if (changedProperty == "cell length")
   {
     grid->SetCellLength(this->dataPtr->variantManager->value(
-        _changedItem).toDouble());
+        _item).toDouble());
   }
   else if (changedProperty == "normal cell count")
   {
     grid->SetHeight(this->dataPtr->variantManager->value(
-        _changedItem).toUInt());
+        _item).toUInt());
   }
   else if (changedProperty == "line color")
   {
     grid->SetColor(gui::Conversions::Convert(
-        this->dataPtr->variantManager->value(_changedItem).value<QColor>()));
+        this->dataPtr->variantManager->value(_item).value<QColor>()));
   }
   else if (changedProperty == "height offset")
   {
     grid->SetHeightOffset(
-        this->dataPtr->variantManager->value(_changedItem).toDouble());
+        this->dataPtr->variantManager->value(_item).toDouble());
   }
 }
 
