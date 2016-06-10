@@ -279,7 +279,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       gzthrow("Couldn't Find Child Link[" + childName  + "]");
   }
 
-  this->LoadImpl(_sdf->Get<math::Pose>("pose"));
+  this->LoadImpl(_sdf->Get<ignition::math::Pose3d>("pose"));
 }
 
 /////////////////////////////////////////////////
@@ -354,7 +354,7 @@ void Joint::Init()
   if (this->GetAngleCount() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
+    this->SetAxis(0, axisElem->Get<ignition::math::Vector3d>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -371,7 +371,7 @@ void Joint::Init()
   if (this->GetAngleCount() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
+    this->SetAxis(1, axisElem->Get<ignition::math::Vector3d>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -416,9 +416,9 @@ math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
   math::Vector3 vec;
 
   if (_index == 0 && this->sdf->HasElement("axis"))
-    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
+    vec = this->sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz");
   else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
+    vec = this->sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz");
   // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
   // vec.Round();
   return vec;

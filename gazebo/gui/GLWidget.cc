@@ -1331,7 +1331,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

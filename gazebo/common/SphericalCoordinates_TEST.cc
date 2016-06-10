@@ -217,7 +217,8 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 
       // Set the ORIGIN to be the Open Source Robotics Foundation
       common::SphericalCoordinates sc2(st, ignition::math::Angle(osrf_s.X()),
-          ignition::math::Angle(osrf_s.Y()), osrf_s.Z(), 0.0);
+          ignition::math::Angle(osrf_s.Y()), osrf_s.Z(),
+          ignition::math::Angle::Zero);
 
       // Check that SPHERICAL -> ECEF works
       tmp = sc2.PositionTransform(osrf_s,

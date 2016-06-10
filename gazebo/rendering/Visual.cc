@@ -333,7 +333,7 @@ void Visual::Load()
     this->dataPtr->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->dataPtr->sdf->Get<math::Pose>("pose");
+  pose = this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
 
   std::string mesh = this->GetMeshName();
   std::string subMesh = this->GetSubMeshName();
@@ -400,9 +400,9 @@ void Visual::Load()
     }
     else if (geomElem->HasElement("plane"))
     {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      geometrySize.Set(size.x, size.y, 1);
+      ignition::math::Vector2d size =
+        geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
+      geometrySize.Set(size.X(), size.Y(), 1);
     }
     else if (geomElem->HasElement("mesh"))
     {

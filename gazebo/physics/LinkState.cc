@@ -105,25 +105,25 @@ void LinkState::Load(const sdf::ElementPtr _elem)
 
   // Set the link name
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link velocity
   if (_elem->HasElement("velocity"))
-    this->velocity = _elem->Get<math::Pose>("velocity");
+    this->velocity = _elem->Get<ignition::math::Pose3d>("velocity");
   else
     this->velocity.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link acceleration
   if (_elem->HasElement("acceleration"))
-    this->acceleration = _elem->Get<math::Pose>("acceleration");
+    this->acceleration = _elem->Get<ignition::math::Pose3d>("acceleration");
   else
     this->acceleration.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link wrench
   if (_elem->HasElement("wrench"))
-    this->wrench = _elem->Get<math::Pose>("wrench");
+    this->wrench = _elem->Get<ignition::math::Pose3d>("wrench");
   else
     this->wrench.Set(0, 0, 0, 0, 0, 0);
 }
