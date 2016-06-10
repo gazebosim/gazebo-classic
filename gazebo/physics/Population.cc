@@ -291,7 +291,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
       }
 
       // Align the origin of the box with 'pose'.
-      _params.pose.Pos() -= _params.size.Ign() / 2.0;
+      _params.pose.pos -= _params.size / 2.0;
     }
     else if (_population->HasElement("cylinder"))
     {
@@ -335,7 +335,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
 
 /////////////////////////////////////////////////
 void Population::CreatePosesBoxRandom(const PopulationParams &_populParams,
-  std::vector<igntion::math::Vector3d> &_poses)
+  std::vector<ignition::math::Vector3d> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
@@ -394,7 +394,7 @@ void Population::CreatePosesBoxUniform(const PopulationParams &_populParams,
   _poses.clear();
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    igniiton::math::Pose3d p(centroids[i],
+    ignition::math::Pose3d p(centroids[i],
         ignition::math::Quaterniond::Identity);
     _poses.push_back((p + _populParams.pose.Ign()).Pos());
   }
@@ -418,10 +418,10 @@ void Population::CreatePosesBoxGrid(const PopulationParams &_populParams,
     for (int j = 0; j < _populParams.cols; ++j)
     {
       _poses.push_back((offset + _populParams.pose.Ign()).Pos());
-      offset.pos.X() += _populParams.step.x;
+      offset.Pos().X() += _populParams.step.x;
     }
-    offset.Pos.X() = 0;
-    offset.Pos.Y() += _populParams.step.y;
+    offset.Pos().X() = 0;
+    offset.Pos().Y() += _populParams.step.y;
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -440,11 +440,11 @@ void Population::CreatePosesBoxLinearX(const PopulationParams &_populParams,
   // Evenly placed in a row along the global x-axis.
   _poses.clear();
   ignition::math::Pose3d offset = ignition::math::Pose3d::Zero;
-  offset.pos.Y() = _populParams.size.y / 2.0;
-  offset.pos.Z() = _populParams.size.z / 2.0;
+  offset.Pos().Y() = _populParams.size.y / 2.0;
+  offset.Pos().Z() = _populParams.size.z / 2.0;
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    offset.pos.X() =
+    offset.Pos().X() =
       _populParams.size.x * i / static_cast<double>(_populParams.modelCount);
     _poses.push_back((offset + _populParams.pose.Ign()).Pos());
   }
@@ -480,7 +480,7 @@ void Population::CreatePosesBoxLinearY(const PopulationParams &_populParams,
 
 /////////////////////////////////////////////////
 void Population::CreatePosesBoxLinearZ(const PopulationParams &_populParams,
-  std::vector<ignition::math::Vector3dj> &_poses)
+  std::vector<ignition::math::Vector3d> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
