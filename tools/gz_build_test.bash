@@ -99,6 +99,11 @@ do
       `grep '^ *[0-9]*/[0-9]* .*\*\*\*' $logfileRaw | wc -l` \
       tests failed
 
+    # update summary file
+    grep 'Test *#' $logfile  | \
+      sed -e 's@ *[0-9]*\.[0-9]* *sec$@@' -e 's@.*Test@failures:@' | \
+      sort | uniq -c | sort -rg > $logfileSummary
+
     junit_prefix_try="${junit_prefix}-try-$i"
     tar cfz ${junit_prefix_try}-test_results.tar.gz test_results
 
@@ -122,10 +127,17 @@ do
       cp ${JUNIT} ${junit_prefix_test_try}-$(basename ${JUNIT})
     done
 
-    # update summary file
-    grep 'Test *#' $logfile  | \
-      sed -e 's@ *[0-9]*\.[0-9]* *sec$@@' -e 's@.*Test@failures:@' | \
-      sort | uniq -c | sort -rg > $logfileSummary
+    # for each coredump
+    for c in $(find . | grep '/core$')
+    do
+      CORE_XML=$(strings $c | grep "$BUILD_ROOT/build/gazebo/.*xml$" | head -1)
+      CORE_TEST_NUMBER=$(grep $CORE_XML $logfileRaw | head -1 | sed -e 's@:.*@@')
+      CORE_TEST_NAME=$(basename $CORE_XML .xml)
+      CORE_TEST_PATH=$(find . | grep $CORE_TEST_NAME$)
+      CORE_BT_LOG="${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-backtrace.txt"
+      gdb $CORE_TEST_PATH $c -ex bt -ex 'thread apply all bt' -ex q > $CORE_BT_LOG
+      rm $c
+    done
   done
 done
 
