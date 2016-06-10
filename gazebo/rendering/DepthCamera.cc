@@ -417,7 +417,7 @@ event::ConnectionPtr DepthCamera::ConnectNewDepthFrame(
 //////////////////////////////////////////////////
 void DepthCamera::DisconnectNewDepthFrame(event::ConnectionPtr &_c)
 {
-  this->dataPtr->newDepthFrame.Disconnect(_c);
+  this->dataPtr->newDepthFrame.Disconnect(_c->Id());
 }
 
 //////////////////////////////////////////////////
@@ -431,5 +431,5 @@ event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
 //////////////////////////////////////////////////
 void DepthCamera::DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
 {
-  this->dataPtr->newRGBPointCloud.Disconnect(_c);
+  this->dataPtr->newRGBPointCloud.Disconnect(_c->Id());
 }

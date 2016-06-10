@@ -302,13 +302,13 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
     camSensorRotated2->SetActive(false);
 
     // disconnect callbacks
-    camSensorUnrotated->Camera(0)->DisconnectNewImageFrame(c0Left);
-    camSensorTranslated->Camera()->DisconnectNewImageFrame(ct);
-    camSensorRotated1->Camera(0)->DisconnectNewImageFrame(c1Left);
-    camSensorRotated2->Camera(0)->DisconnectNewImageFrame(c2Left);
-    camSensorUnrotated->Camera(1)->DisconnectNewImageFrame(c0Right);
-    camSensorRotated1->Camera(1)->DisconnectNewImageFrame(c1Right);
-    camSensorRotated2->Camera(1)->DisconnectNewImageFrame(c2Right);
+    c0Left.reset();
+    ct.reset();
+    c1Left.reset();
+    c2Left.reset();
+    c0Right.reset();
+    c1Right.reset();
+    c2Right.reset();
   }
 
   // cleanup

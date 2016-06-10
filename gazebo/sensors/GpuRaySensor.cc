@@ -334,7 +334,14 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 //////////////////////////////////////////////////
 void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
 {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->dataPtr->laserCam->DisconnectNewLaserFrame(_conn);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
