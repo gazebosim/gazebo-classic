@@ -163,8 +163,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelListWidget::~ModelListWidget()
 {
-  if (this->dataPtr->node)
-    this->dataPtr->node->Fini();
+  this->dataPtr->responseSub.reset();
+  this->dataPtr->requestSub.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->modelPub.reset();
   this->dataPtr->scenePub.reset();
@@ -172,8 +172,8 @@ ModelListWidget::~ModelListWidget()
   this->dataPtr->atmospherePub.reset();
   this->dataPtr->windPub.reset();
   this->dataPtr->lightPub.reset();
-  this->dataPtr->responseSub.reset();
-  this->dataPtr->requestSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
   delete this->dataPtr->propMutex;
   delete this->dataPtr->receiveMutex;

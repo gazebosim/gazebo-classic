@@ -195,9 +195,9 @@ GLWidget::~GLWidget()
   MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
 
-  this->dataPtr->node->Fini();
-  this->dataPtr->selectionPub.reset();
   this->dataPtr->requestSub.reset();
+  this->dataPtr->selectionPub.reset();
+  this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
 
   this->dataPtr->connections.clear();
