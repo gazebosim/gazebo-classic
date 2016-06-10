@@ -428,6 +428,9 @@ void RenderEngine::LoadPlugins()
 #ifdef __APPLE__
     std::string prefix = "lib";
     std::string extension = ".dylib";
+#elif defined(_WIN32)
+	std::string prefix = "";
+	std::string extension = ".dll";
 #else
     std::string prefix = "";
     std::string extension = ".so";
