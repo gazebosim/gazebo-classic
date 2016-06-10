@@ -37,6 +37,18 @@ class InertiaMsgsTest : public ServerFixture,
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SetCoG(const std::string &_physicsEngine);
 
+  /// \brief Set center of mass of link over ~/model/modify
+  /// and verify that it causes an unbalanced seesaw to balance.
+  /// In this case, the seesaw is connected with the boxes via joints.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  /// \param[in] _loadStableWorld Whether to load the stable world, or
+  ///       stabilize the link via publishing a message.
+  /// \param[in] _loadWorldWithJoints Whether to load a world where the
+  ///       seesaw is connected with the boxes via joints,
+  ///                   or if the boxes just lie on it.
+  public: void SetCoGComplex(const std::string &_physicsEngine,
+      bool _loadStableWorld, bool _loadWorldWithJoints);
+
   /// \brief Set mass of link over ~/model/modify
   /// and verify that it causes a seesaw to unbalance.
   /// \param[in] _physicsEngine Type of physics engine to use.
@@ -194,6 +206,177 @@ TEST_P(InertiaMsgsTest, SetCoG)
     return;
   }
   SetCoG(GetParam());
+}
+
+/////////////////////////////////////////////////
+void InertiaMsgsTest::SetCoGComplex(const std::string &_physicsEngine,
+    bool _loadStableWorld, bool _loadWorldWithJoints)
+{
+  if (_loadStableWorld)
+  {
+    if (_loadWorldWithJoints)
+    {
+      this->Load("worlds/seesaw_with_joints_stable.world", true,
+          _physicsEngine);
+    }
+    else
+    {
+      this->Load("worlds/seesaw_no_joints_stable.world", true,
+          _physicsEngine);
+    }
+  }
+  else
+  {
+    if (_loadWorldWithJoints)
+    {
+      this->Load("worlds/seesaw_with_joints.world", true, _physicsEngine);
+    }
+    else
+    {
+      this->Load("worlds/seesaw_no_joints.world", true, _physicsEngine);
+    }
+  }
+
+  // The seesaw_with_joints world contains a seesaw looking like this:
+  //
+  //  #             +              #
+  //  ==============================
+  //                       ||
+  //
+  // The seesaw_with_joints_stable world contains a seesaw looking like this:
+  //
+  //  #                    +       #
+  //  ==============================
+  //                       ||
+  //
+  // In both worlds, the masses of the boxes (#) are set so that if the
+  // center of gravity (+) of the plank is right above the fulcrum (||),
+  // the system is balanced.
+  //
+  // The stable world is here just to validate the above assumption.
+  // In the unstable world, we try to move the CoG programatically and
+  // achieve the same stable state as if we directly loaded the stable world.
+  //
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
+
+  const std::string modelName("plank");
+  auto model = world->GetModel(modelName);
+  ASSERT_TRUE(model != NULL);
+
+  // only alter the CoG in the unstable world
+  if (!_loadStableWorld)
+  {
+    auto link = model->GetLink();
+    ASSERT_TRUE(link != NULL);
+    auto inertial = link->GetInertial();
+    ASSERT_TRUE(inertial != NULL);
+    const double mass = inertial->GetMass();
+    const math::Vector3 cog = inertial->GetCoG();
+    const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
+    const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+    EXPECT_DOUBLE_EQ(mass, 120);
+    EXPECT_EQ(cog, math::Vector3::Zero);
+    EXPECT_EQ(Ixxyyzz, math::Vector3(2.564, 360.064, 362.5));
+    EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+
+    // new center of mass
+    msgs::Model msg;
+    msg.set_name(modelName);
+    msg.add_link();
+    auto msgLink = msg.mutable_link(0);
+    msgLink->set_name("link");
+    msgLink->set_id(link->GetId());
+    auto msgInertial = msgLink->mutable_inertial();
+    // offset x=1 should stabilize the system
+    const ignition::math::Vector3d newCoG(1.0, 0, 0);
+    msgs::Set(msgInertial->mutable_pose(), ignition::math::Pose3d(
+        newCoG, ignition::math::Quaterniond()));
+
+    // Set inertial properties by publishing to "~/model/modify"
+    transport::PublisherPtr modelPub =
+        this->node->Advertise<msgs::Model>("~/model/modify");
+    modelPub->WaitForConnection();
+    modelPub->Publish(msg, true);
+
+    while (newCoG != inertial->GetCoG().Ign())
+    {
+      world->Step(1);
+      common::Time::MSleep(1);
+      modelPub->Publish(msg, true);
+    }
+    EXPECT_EQ(inertial->GetCoG().Ign(), newCoG);
+  }
+
+  world->Step(1000);
+
+  // If the system was balanced, it did not move or rotate.
+  EXPECT_NEAR(0.0, model->GetWorldPose().pos.x, 1e-3);
+  EXPECT_NEAR(0.0, model->GetWorldPose().rot.GetAsEuler().y, 1e-3);
+}
+
+/////////////////////////////////////////////////
+TEST_P(InertiaMsgsTest, SetCoGWithJointsStable)
+{
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "bullet" || physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing a link's center of mass"
+          << std::endl;
+    return;
+  }
+  SetCoGComplex(GetParam(), true, true);
+}
+
+/////////////////////////////////////////////////
+TEST_P(InertiaMsgsTest, SetCoGWithJoints)
+{
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "bullet" || physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing a link's center of mass"
+          << std::endl;
+    return;
+  }
+  SetCoGComplex(GetParam(), false, true);
+}
+
+/////////////////////////////////////////////////
+TEST_P(InertiaMsgsTest, SetCoGWithoutJointsStable)
+{
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "bullet" || physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing a link's center of mass"
+          << std::endl;
+    return;
+  }
+  SetCoGComplex(GetParam(), true, false);
+}
+
+/////////////////////////////////////////////////
+TEST_P(InertiaMsgsTest, SetCoGWithoutJoints)
+{
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "bullet" || physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing a link's center of mass"
+          << std::endl;
+    return;
+  }
+  SetCoGComplex(GetParam(), false, false);
 }
 
 /////////////////////////////////////////////////
