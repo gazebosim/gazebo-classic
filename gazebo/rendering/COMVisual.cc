@@ -80,7 +80,7 @@ void COMVisual::Load(sdf::ElementPtr _elem)
     if (_elem->GetElement("inertial")->HasElement("pose"))
     {
       dPtr->inertiaPose =
-          _elem->GetElement("inertial")->Get<math::Pose3d>("pose");
+          _elem->GetElement("inertial")->Get<math::Pose>("pose");
     }
     else if (_elem->GetElement("inertial")->HasElement("mass"))
     {
