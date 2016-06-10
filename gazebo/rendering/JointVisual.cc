@@ -68,6 +68,10 @@ void JointVisual::Load(ConstJointPtr &_msg)
   this->SetRotation(this->GetRotation() *
       msgs::Convert(_msg->pose().orientation()));
 
+  dPtr->axisVisual->ScaleXAxis(math::Vector3(0.1, 0.1, 0.1));
+  dPtr->axisVisual->ScaleYAxis(math::Vector3(0.1, 0.1, 0.1));
+  dPtr->axisVisual->ScaleZAxis(math::Vector3(0.1, 0.1, 0.1));
+
   if (math::equal(_msg->axis1().xyz().x(), 1.0))
     dPtr->axisVisual->ShowRotation(0);
 

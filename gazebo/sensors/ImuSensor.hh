@@ -77,6 +77,15 @@ namespace gazebo
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();
 
+      /// \brief get orientation of the IMU relative to a reference pose
+      /// Initially, the reference pose is the boot up pose of the IMU,
+      /// but user can call either SetReferencePose to define current
+      /// pose as teh reference frame, or call SetWorldToReferencePose
+      /// to define transform from world frame to reference frame.
+      /// \return returns the orientation quaternion of the IMU relative to
+      /// the imu reference pose.
+      public: void SetWorldToReferencePose(const math::Pose &_pose);
+
       // Documentation inherited.
       public: virtual bool IsActive();
 

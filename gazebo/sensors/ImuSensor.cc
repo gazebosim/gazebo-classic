@@ -157,8 +157,23 @@ void ImuSensor::Load(const std::string &_worldName)
             "]. Must be a link\n");
   }
   this->referencePose = this->pose + this->parentEntity->GetWorldPose();
-  this->lastLinearVel = this->referencePose.rot.RotateVector(
-    this->parentEntity->GetWorldLinearVel());
+
+  /////////////////////////////////////////////////////////////////
+  // compute the last linear veloicty of the imu in the world frame
+  // for computing acceleartion based on finite differencing
+  /////////////////////////////////////////////////////////////////
+  // first get parent link linear vel in world frame
+  math::Vector3 linkWorldLinearVel
+      = this->parentEntity->GetWorldLinearVel();
+  math::Vector3 linkWorldAngularVel
+      = this->parentEntity->GetWorldAngularVel();
+  // next, account for vel in world frame of the imu
+  // given the imu frame is offset from link frame, and link is rotating
+  math::Pose parentEntityPose =
+    this->parentEntity->GetWorldPose();
+  math::Pose imuWorldPose = this->pose + parentEntityPose;
+  this->lastLinearVel = linkWorldLinearVel +
+      linkWorldAngularVel.Cross(parentEntityPose.pos - imuWorldPose.pos);
 }
 
 //////////////////////////////////////////////////
@@ -219,6 +234,14 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
+void ImuSensor::SetWorldToReferencePose(
+  const math::Pose &_pose)
+{
+  // worldToReference: from world frame to NED frame.
+  this->referencePose = _pose;
+}
+
+//////////////////////////////////////////////////
 bool ImuSensor::UpdateImpl(bool /*_force*/)
 {
   msgs::LinkData msg;
@@ -256,32 +279,38 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
 
     math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
-    math::Pose imuPose = this->pose + parentEntityPose;
+    math::Pose imuWorldPose = this->pose + parentEntityPose;
 
     // Set the IMU angular velocity
-    math::Vector3 imuWorldAngularVel
+    math::Vector3 linkWorldAngularVel
         = msgs::Convert(msg.angular_velocity());
 
     msgs::Set(this->imuMsg.mutable_angular_velocity(),
-              imuPose.rot.GetInverse().RotateVector(
-              imuWorldAngularVel));
+              imuWorldPose.rot.GetInverse().RotateVector(
+              linkWorldAngularVel));
 
-    // Compute and set the IMU linear acceleration
-    math::Vector3 imuWorldLinearVel
+    // first get imu link's linear velocity in world frame
+    math::Vector3 linkWorldLinearVel
         = msgs::Convert(msg.linear_velocity());
-    // Get the correct vel for imu's that are at an offset from parent link
-    imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
-    this->linearAcc = imuPose.rot.GetInverse().RotateVector(
+    // next, account for vel in world frame of the imu
+    // given the imu frame is offset from link frame, and link is rotating
+    // compute the velocity of the imu axis origin in world frame
+    math::Vector3 imuWorldLinearVel = linkWorldLinearVel +
+        linkWorldAngularVel.Cross(parentEntityPose.pos - imuWorldPose.pos);
+    // compute acceleration by differentiating velocity in world frame,
+    // and rotate into imu local frame
+    this->linearAcc = imuWorldPose.rot.GetInverse().RotateVector(
       (imuWorldLinearVel - this->lastLinearVel) / dt);
 
     // Add contribution from gravity
-    this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
+    this->linearAcc -= imuWorldPose.rot.GetInverse().RotateVector(this->gravity);
     msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
 
     // Set the IMU orientation
-    msgs::Set(this->imuMsg.mutable_orientation(),
-              (imuPose - this->referencePose).rot);
+    // imu orientation with respect to reference frame
+    math::Quaternion imuReferenceOrientation =
+      (imuWorldPose - this->referencePose).rot;
+    msgs::Set(this->imuMsg.mutable_orientation(), imuReferenceOrientation);
 
     this->lastLinearVel = imuWorldLinearVel;
 
