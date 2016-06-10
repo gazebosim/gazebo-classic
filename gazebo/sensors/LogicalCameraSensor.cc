@@ -64,6 +64,12 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
 }
 
 //////////////////////////////////////////////////
+std::string LogicalCameraSensor::GetTopic() const
+{
+  return this->Topic();
+}
+
+//////////////////////////////////////////////////
 std::string LogicalCameraSensor::Topic() const
 {
   std::string topicName = "~/" + this->ParentName() + "/" + this->Name() +

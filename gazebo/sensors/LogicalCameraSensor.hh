@@ -58,7 +58,8 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual std::string Topic() const;
+      // Remove this in gazebo8.
+      public: virtual std::string GetTopic() const;
 
       /// \brief Get the near distance. This is the distance from the
       /// frustum's vertex to the closest plane.
@@ -94,6 +95,10 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual bool IsActive() const;
+
+      // Documentation inherited.
+      // Move this to the public section in gazebo8.
+      public: virtual std::string Topic() const;
 
       // \internal
       // \brief Private data pointer
