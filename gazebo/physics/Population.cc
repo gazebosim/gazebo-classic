@@ -224,7 +224,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
 
     // Read the <step> value used to separate each model in the grid.
     if (!this->ValueFromSdf<ignition::math::Vector3d>(
-          distribution, "step", _params.step.Ign()))
+          distribution, "step", _params.step))
     {
       return false;
     }
@@ -232,18 +232,18 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
     // Align the origin of the grid with 'pose'.
     if (_params.cols % 2 == 0)
     {
-      _params.pose.Pos().X() -=
+      _params.pose.pos.x -=
         (_params.step.x * (_params.cols - 2) / 2.0) +
         (_params.step.x / 2.0);
     }
     else
     {
-      _params.pose.Pos().X() -= _params.step.x * (_params.cols - 1) / 2.0;
+      _params.pose.pos.x -= _params.step.x * (_params.cols - 1) / 2.0;
     }
 
     if (_params.rows % 2 == 0)
     {
-      _params.pose.Pos().Y() -=
+      _params.pose.pos.y -=
         (_params.step.y * (_params.rows - 2) / 2.0) +
         (_params.step.y / 2.0);
     }
@@ -349,7 +349,7 @@ void Population::CreatePosesBoxRandom(const PopulationParams &_populParams,
         ignition::math::Rand::DblUniform(0, _populParams.size.z),
         0, 0, 0);
 
-    _poses.push_back((offset + _populParams.pose).Pos());
+    _poses.push_back((offset + _populParams.pose).pos);
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -396,7 +396,7 @@ void Population::CreatePosesBoxUniform(const PopulationParams &_populParams,
   {
     igniiton::math::Pose3d p(centroids[i],
         ignition::math::Quaterniond::Identity);
-    _poses.push_back((p + _populParams.pose).Pos());
+    _poses.push_back((p + _populParams.pose).pos);
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -417,7 +417,7 @@ void Population::CreatePosesBoxGrid(const PopulationParams &_populParams,
   {
     for (int j = 0; j < _populParams.cols; ++j)
     {
-      _poses.push_back((offset + _populParams.pose).Pos());
+      _poses.push_back((offset + _populParams.pose).pos);
       offset.pos.X() += _populParams.step.x;
     }
     offset.Pos.X() = 0;
@@ -446,7 +446,7 @@ void Population::CreatePosesBoxLinearX(const PopulationParams &_populParams,
   {
     offset.pos.X() =
       _populParams.size.x * i / static_cast<double>(_populParams.modelCount);
-    _poses.push_back((offset + _populParams.pose).Pos());
+    _poses.push_back((offset + _populParams.pose).pos);
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -470,7 +470,7 @@ void Population::CreatePosesBoxLinearY(const PopulationParams &_populParams,
   {
     offset.Pos().Y() =
       _populParams.size.y * i / static_cast<double>(_populParams.modelCount);
-    _poses.push_back((offset + _populParams.pose).Pos());
+    _poses.push_back((offset + _populParams.pose).pos);
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -494,7 +494,7 @@ void Population::CreatePosesBoxLinearZ(const PopulationParams &_populParams,
   {
     offset.Pos.Z() =
       _populParams.size.z * i / static_cast<double>(_populParams.modelCount);
-    _poses.push_back((offset + _populParams.pose).Pos());
+    _poses.push_back((offset + _populParams.pose).pos);
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -518,7 +518,7 @@ void Population::CreatePosesCylinderRandom(const PopulationParams &_populParams,
     offset.Pos().X() = r * cos(ang);
     offset.Pos().Y() = r * sin(ang);
     offset.Pos().Z() = ignition::math::Rand::DblUniform(0, _populParams.length);
-    _poses.push_back((offset + _populParams.pose).Pos());
+    _poses.push_back((offset + _populParams.pose).pos);
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -561,7 +561,7 @@ void Population::CreatePosesCylinderUniform(
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
     offset.Pos() = centroids[i];
-    _poses.push_back((offset + _populParams.pose).Pos());
+    _poses.push_back((offset + _populParams.pose).pos);
   }
 
   // Check that we have generated the appropriate number of poses.
