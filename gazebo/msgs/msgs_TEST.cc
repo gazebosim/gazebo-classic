@@ -1979,7 +1979,7 @@ TEST_F(MsgsTest, VisualToSDF)
   msgs::Visual visualMsg;
   visualMsg.set_name(name);
   visualMsg.set_laser_retro(laserRetro);
-  msgs::Set(visualMsg.mutable_pose(), pose.Ign());
+  msgs::Set(visualMsg.mutable_pose(), pose);
 
   // geometry - see GeometryToSDF for a more detailed test
   auto geomMsg = visualMsg.mutable_geometry();
@@ -2368,7 +2368,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msgs::Friction *friction = msg.mutable_friction();
   friction->set_mu(mu);
   friction->set_mu2(mu2);
-  msgs::Set(friction->mutable_fdir1(), fdir1.Ign());
+  msgs::Set(friction->mutable_fdir1(), fdir1);
   friction->set_slip1(slip1);
   friction->set_slip2(slip2);
 
@@ -2908,7 +2908,7 @@ TEST_F(MsgsTest, AddBoxLink)
 
   const double mass = 1.0;
   const ignition::math::Vector3d size(1, 1, 1);
-  msgs::AddBoxLink(model, mass, size.Ign());
+  msgs::AddBoxLink(model, mass, size);
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -2938,7 +2938,7 @@ TEST_F(MsgsTest, AddBoxLink)
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
     }
 
     EXPECT_EQ(link.visual_size(), 1);
@@ -2946,12 +2946,12 @@ TEST_F(MsgsTest, AddBoxLink)
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddBoxLink(model, mass*massRatio, size.Ign());
+  msgs::AddBoxLink(model, mass*massRatio, size);
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -3117,7 +3117,7 @@ TEST_F(MsgsTest, ModelToSDF)
   msgs::Model model;
   model.set_name(name);
   model.set_is_static(false);
-  msgs::Set(model.mutable_pose(), pose.Ign());
+  msgs::Set(model.mutable_pose(), pose);
   EXPECT_EQ(model.link_size(), 0);
   EXPECT_EQ(model.joint_size(), 0);
 
