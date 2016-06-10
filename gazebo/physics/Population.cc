@@ -223,7 +223,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
     }
 
     // Read the <step> value used to separate each model in the grid.
-    if (!this->ValueFromSdf<ignition::math::Vector3d>(
+    if (!this->ValueFromSdf<math::Vector3>(
           distribution, "step", _params.step))
     {
       return false;
@@ -249,7 +249,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
     }
     else
     {
-      _params.pose.Pos().Y() -= _params.step.y * (_params.rows - 1) / 2.0;
+      _params.pose.pos.y -= _params.step.y * (_params.rows - 1) / 2.0;
     }
   }
   else
@@ -276,8 +276,8 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
       _params.region = "box";
 
       // Read the size of the bounding box.
-      if (!this->ValueFromSdf<ignition::math::Vector3d>(
-            box, "size", _params.size.Ign()))
+      if (!this->ValueFromSdf<math::Vector3>(
+            box, "size", _params.size))
       {
         return false;
       }
@@ -488,11 +488,11 @@ void Population::CreatePosesBoxLinearZ(const PopulationParams &_populParams,
   // Evenly placed in a row along the global z-axis.
   _poses.clear();
   ignition::math::Pose3d offset = ignition::math::Pose3d::Zero;
-  offset.pos.X() = _populParams.size.x / 2.0;
-  offset.pos.Y() = _populParams.size.y / 2.0;
+  offset.Pos().X() = _populParams.size.x / 2.0;
+  offset.Pos().Y() = _populParams.size.y / 2.0;
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    offset.Pos.Z() =
+    offset.Pos().Z() =
       _populParams.size.z * i / static_cast<double>(_populParams.modelCount);
     _poses.push_back((offset + _populParams.pose.Ign()).Pos());
   }
