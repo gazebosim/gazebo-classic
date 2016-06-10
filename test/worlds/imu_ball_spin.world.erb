@@ -1,0 +1,121 @@
+<?xml version="1.0" ?>
+<%
+  # Spinning IMUs with link pose offsets
+  # all should have zero measured acceleration
+  require 'matrix'
+  def a_to_s(v)
+    Array(v).join(" ")
+  end
+
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+
+  # Geometry and inertial parameters: sphere
+  radius = 0.1
+  mass = density * 4.0 * Math::PI / 3.0 * radius **3
+  ixx = mass * 0.4 * radius**2
+  iyy = ixx
+  izz = ixx
+
+  # initial velocity
+  spin0 = 2*Math::PI
+
+  # link pose
+  link_poses = [
+    [Vector[0, 0, 0, 0, 0, 0], Vector[0, 0, 0, 0, 0, 0]],
+    [Vector[-radius, 0, 0, 0, 0, 0], Vector[radius, 0, 0, 0, 0, 0]],
+    [Vector[0, -radius, 0, 0, 0, 0], Vector[0, radius, 0, 0, 0, 0]],
+    [Vector[0, 0, -radius, 0, 0, 0], Vector[0, 0, radius, 0, 0, 0]],
+    [Vector[radius, 0, 0, 0, 0, 0], Vector[-radius, 0, 0, 0, 0, 0]],
+    [Vector[0, radius, 0, 0, 0, 0], Vector[0, -radius, 0, 0, 0, 0]],
+    [Vector[0, 0, radius, 0, 0, 0], Vector[0, 0, -radius, 0, 0, 0]],
+    [Vector[radius, 0, 0, 0.5*Math::PI, 0, 0], Vector[-radius, 0, 0, 0, 0, 0]],
+    [Vector[radius, 0, 0, 0, 0.5*Math::PI, 0], Vector[0, 0, -radius, 0, 0, 0]],
+    [Vector[radius, 0, 0, 0, 0, 0.5*Math::PI], Vector[0, radius, 0, 0, 0, 0]],
+    [Vector[0, radius, 0, 0.5*Math::PI, 0, 0], Vector[0, 0, radius, 0, 0, 0]],
+    [Vector[0, radius, 0, 0, 0.5*Math::PI, 0], Vector[0, -radius, 0, 0, 0, 0]],
+    [Vector[0, radius, 0, 0, 0, 0.5*Math::PI], Vector[-radius, 0, 0, 0, 0, 0]],
+    [Vector[0, 0, radius, 0.5*Math::PI, 0, 0], Vector[0, -radius, 0, 0, 0, 0]],
+    [Vector[0, 0, radius, 0, 0.5*Math::PI, 0], Vector[radius, 0, 0, 0, 0, 0]],
+    [Vector[0, 0, radius, 0, 0, 0.5*Math::PI], Vector[0, 0, -radius, 0, 0, 0]],
+  ]
+%>
+<sdf version="1.5">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>7.5 -3 1.5 0 0.27 2.35</pose>
+      </camera>
+    </gui>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%  # Spheres
+    i = 0
+    link_poses.each do |poses|
+      i = i + 1
+      name = 'sphere_' + i.to_s
+      p0 = poses[0]
+      p1 = poses[1]
+%>
+    <model name='<%= name %>'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose><%= radius*4*i %> 0 <%= radius %>  0 0 0</pose>
+      <link name="link">
+        <pose><%= a_to_s(p0) %></pose>
+        <inertial>
+          <pose><%= a_to_s(p1) %></pose>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name='<%= name %>_imu' type='imu'>
+          <pose><%= a_to_s(p1) %></pose>
+        </sensor>
+        <collision name="collision">
+          <pose><%= a_to_s(p1) %></pose>
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose><%= a_to_s(p1) %></pose>
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='<%= name %>' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 <%= spin0 %></angular>
+      </plugin>
+    </model>
+<%  end %>
+  </world>
+</sdf>
