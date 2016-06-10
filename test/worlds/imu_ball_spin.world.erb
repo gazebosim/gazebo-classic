@@ -20,7 +20,10 @@
   # initial velocity
   spin0 = 2*Math::PI
 
-  # link pose
+  # pairs of link poses that invert when added together
+  # first the identity pose
+  # then 6 poses with pure translation
+  # then 9 poses with translation and 90 degree rotations
   link_poses = [
     [Vector[0, 0, 0, 0, 0, 0], Vector[0, 0, 0, 0, 0, 0]],
     [Vector[-radius, 0, 0, 0, 0, 0], Vector[radius, 0, 0, 0, 0, 0]],
@@ -29,15 +32,15 @@
     [Vector[radius, 0, 0, 0, 0, 0], Vector[-radius, 0, 0, 0, 0, 0]],
     [Vector[0, radius, 0, 0, 0, 0], Vector[0, -radius, 0, 0, 0, 0]],
     [Vector[0, 0, radius, 0, 0, 0], Vector[0, 0, -radius, 0, 0, 0]],
-    [Vector[radius, 0, 0, 0.5*Math::PI, 0, 0], Vector[-radius, 0, 0, 0, 0, 0]],
-    [Vector[radius, 0, 0, 0, 0.5*Math::PI, 0], Vector[0, 0, -radius, 0, 0, 0]],
-    [Vector[radius, 0, 0, 0, 0, 0.5*Math::PI], Vector[0, radius, 0, 0, 0, 0]],
-    [Vector[0, radius, 0, 0.5*Math::PI, 0, 0], Vector[0, 0, radius, 0, 0, 0]],
-    [Vector[0, radius, 0, 0, 0.5*Math::PI, 0], Vector[0, -radius, 0, 0, 0, 0]],
-    [Vector[0, radius, 0, 0, 0, 0.5*Math::PI], Vector[-radius, 0, 0, 0, 0, 0]],
-    [Vector[0, 0, radius, 0.5*Math::PI, 0, 0], Vector[0, -radius, 0, 0, 0, 0]],
-    [Vector[0, 0, radius, 0, 0.5*Math::PI, 0], Vector[radius, 0, 0, 0, 0, 0]],
-    [Vector[0, 0, radius, 0, 0, 0.5*Math::PI], Vector[0, 0, -radius, 0, 0, 0]],
+    [Vector[radius, 0, 0, 0.5*Math::PI, 0, 0], Vector[-radius, 0, 0, -0.5*Math::PI, 0, 0]],
+    [Vector[radius, 0, 0, 0, 0.5*Math::PI, 0], Vector[0, 0, -radius, 0, -0.5*Math::PI, 0]],
+    [Vector[radius, 0, 0, 0, 0, 0.5*Math::PI], Vector[0,  radius, 0, 0, 0, -0.5*Math::PI]],
+    [Vector[0, radius, 0, 0.5*Math::PI, 0, 0], Vector[0, 0,  radius, -0.5*Math::PI, 0, 0]],
+    [Vector[0, radius, 0, 0, 0.5*Math::PI, 0], Vector[0, -radius, 0, 0, -0.5*Math::PI, 0]],
+    [Vector[0, radius, 0, 0, 0, 0.5*Math::PI], Vector[-radius, 0, 0, 0, 0, -0.5*Math::PI]],
+    [Vector[0, 0, radius, 0.5*Math::PI, 0, 0], Vector[0, -radius, 0, -0.5*Math::PI, 0, 0]],
+    [Vector[0, 0, radius, 0, 0.5*Math::PI, 0], Vector[ radius, 0, 0, 0, -0.5*Math::PI, 0]],
+    [Vector[0, 0, radius, 0, 0, 0.5*Math::PI], Vector[0, 0, -radius, 0, 0, -0.5*Math::PI]],
   ]
 %>
 <sdf version="1.5">

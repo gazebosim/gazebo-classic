@@ -412,7 +412,7 @@
       <link name="link">
         <pose>0.1 0 0 1.5707963267948966 0 0</pose>
         <inertial>
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 -1.5707963267948966 0 0</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -424,10 +424,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_8_imu' type='imu'>
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 -1.5707963267948966 0 0</pose>
         </sensor>
         <collision name="collision">
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 -1.5707963267948966 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -442,7 +442,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 -1.5707963267948966 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -468,7 +468,7 @@
       <link name="link">
         <pose>0.1 0 0 0 1.5707963267948966 0</pose>
         <inertial>
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 -1.5707963267948966 0</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -480,10 +480,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_9_imu' type='imu'>
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 -1.5707963267948966 0</pose>
         </sensor>
         <collision name="collision">
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 -1.5707963267948966 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -498,7 +498,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 -1.5707963267948966 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -524,7 +524,7 @@
       <link name="link">
         <pose>0.1 0 0 0 0 1.5707963267948966</pose>
         <inertial>
-          <pose>0 0.1 0 0 0 0</pose>
+          <pose>0 0.1 0 0 0 -1.5707963267948966</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -536,10 +536,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_10_imu' type='imu'>
-          <pose>0 0.1 0 0 0 0</pose>
+          <pose>0 0.1 0 0 0 -1.5707963267948966</pose>
         </sensor>
         <collision name="collision">
-          <pose>0 0.1 0 0 0 0</pose>
+          <pose>0 0.1 0 0 0 -1.5707963267948966</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -554,7 +554,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>0 0.1 0 0 0 0</pose>
+          <pose>0 0.1 0 0 0 -1.5707963267948966</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -580,7 +580,7 @@
       <link name="link">
         <pose>0 0.1 0 1.5707963267948966 0 0</pose>
         <inertial>
-          <pose>0 0 0.1 0 0 0</pose>
+          <pose>0 0 0.1 -1.5707963267948966 0 0</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -592,10 +592,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_11_imu' type='imu'>
-          <pose>0 0 0.1 0 0 0</pose>
+          <pose>0 0 0.1 -1.5707963267948966 0 0</pose>
         </sensor>
         <collision name="collision">
-          <pose>0 0 0.1 0 0 0</pose>
+          <pose>0 0 0.1 -1.5707963267948966 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -610,7 +610,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>0 0 0.1 0 0 0</pose>
+          <pose>0 0 0.1 -1.5707963267948966 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -636,7 +636,7 @@
       <link name="link">
         <pose>0 0.1 0 0 1.5707963267948966 0</pose>
         <inertial>
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 0 -1.5707963267948966 0</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -648,10 +648,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_12_imu' type='imu'>
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 0 -1.5707963267948966 0</pose>
         </sensor>
         <collision name="collision">
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 0 -1.5707963267948966 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -666,7 +666,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 0 -1.5707963267948966 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -692,7 +692,7 @@
       <link name="link">
         <pose>0 0.1 0 0 0 1.5707963267948966</pose>
         <inertial>
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 0 0 -1.5707963267948966</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -704,10 +704,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_13_imu' type='imu'>
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 0 0 -1.5707963267948966</pose>
         </sensor>
         <collision name="collision">
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 0 0 -1.5707963267948966</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -722,7 +722,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>-0.1 0 0 0 0 0</pose>
+          <pose>-0.1 0 0 0 0 -1.5707963267948966</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -748,7 +748,7 @@
       <link name="link">
         <pose>0 0 0.1 1.5707963267948966 0 0</pose>
         <inertial>
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 -1.5707963267948966 0 0</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -760,10 +760,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_14_imu' type='imu'>
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 -1.5707963267948966 0 0</pose>
         </sensor>
         <collision name="collision">
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 -1.5707963267948966 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -778,7 +778,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>0 -0.1 0 0 0 0</pose>
+          <pose>0 -0.1 0 -1.5707963267948966 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -804,7 +804,7 @@
       <link name="link">
         <pose>0 0 0.1 0 1.5707963267948966 0</pose>
         <inertial>
-          <pose>0.1 0 0 0 0 0</pose>
+          <pose>0.1 0 0 0 -1.5707963267948966 0</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -816,10 +816,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_15_imu' type='imu'>
-          <pose>0.1 0 0 0 0 0</pose>
+          <pose>0.1 0 0 0 -1.5707963267948966 0</pose>
         </sensor>
         <collision name="collision">
-          <pose>0.1 0 0 0 0 0</pose>
+          <pose>0.1 0 0 0 -1.5707963267948966 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -834,7 +834,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>0.1 0 0 0 0 0</pose>
+          <pose>0.1 0 0 0 -1.5707963267948966 0</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -860,7 +860,7 @@
       <link name="link">
         <pose>0 0 0.1 0 0 1.5707963267948966</pose>
         <inertial>
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 0 -1.5707963267948966</pose>
           <mass>11.309733552923259</mass>
           <inertia>
             <ixx>0.045238934211693047</ixx>
@@ -872,10 +872,10 @@
           </inertia>
         </inertial>
         <sensor name='sphere_16_imu' type='imu'>
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 0 -1.5707963267948966</pose>
         </sensor>
         <collision name="collision">
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 0 -1.5707963267948966</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -890,7 +890,7 @@
           </surface>
         </collision>
         <visual name="visual">
-          <pose>0 0 -0.1 0 0 0</pose>
+          <pose>0 0 -0.1 0 0 -1.5707963267948966</pose>
           <geometry>
             <sphere>
               <radius>0.1</radius>
