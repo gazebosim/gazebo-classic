@@ -23,6 +23,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/ModelListWidget_TEST.hh"
 
@@ -43,7 +44,7 @@ void ModelListWidget_TEST::TreeWidget()
     QTreeWidget *modelTreeWidget = modelListWidget->findChild<QTreeWidget*>(
         "modelTreeWidget");
 
-    QVERIFY(modelTreeWidget != NULL);
+    QVERIFY(modelTreeWidget != nullptr);
 
     QList<QTreeWidgetItem *> treeSceneItems =
         modelTreeWidget->findItems(tr("Scene"), Qt::MatchExactly);
@@ -62,7 +63,7 @@ void ModelListWidget_TEST::TreeWidget()
     QCOMPARE(treeModelItems.size(), 1);
 
     QTreeWidgetItem *modelsItem = treeModelItems.front();
-    QVERIFY(modelsItem != NULL);
+    QVERIFY(modelsItem != nullptr);
 
     delete modelListWidget;
   }
@@ -299,7 +300,7 @@ void ModelListWidget_TEST::ModelsTree()
   QCOMPARE(treeModelItems.size(), 1);
 
   QTreeWidgetItem *modelsItem = treeModelItems.front();
-  QVERIFY(modelsItem != NULL);
+  QVERIFY(modelsItem != nullptr);
 
   // verify that there are 4 models, ground plane, sphere, box, and cylinder
   int modelCount = 4;
@@ -325,10 +326,10 @@ void ModelListWidget_TEST::ModelsTree()
   }
 
   // find all models in the tree
-  QTreeWidgetItem *groundPlaneItem = NULL;
-  QTreeWidgetItem *boxItem = NULL;
-  QTreeWidgetItem *sphereItem = NULL;
-  QTreeWidgetItem *cylinderItem = NULL;
+  QTreeWidgetItem *groundPlaneItem = nullptr;
+  QTreeWidgetItem *boxItem = nullptr;
+  QTreeWidgetItem *sphereItem = nullptr;
+  QTreeWidgetItem *cylinderItem = nullptr;
   for (int i = 0; i < modelsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = modelsItem->child(i);
@@ -343,15 +344,15 @@ void ModelListWidget_TEST::ModelsTree()
   }
 
   // verify all models are present
-  QVERIFY(groundPlaneItem != NULL);
-  QVERIFY(boxItem != NULL);
-  QVERIFY(sphereItem != NULL);
-  QVERIFY(cylinderItem != NULL);
+  QVERIFY(groundPlaneItem != nullptr);
+  QVERIFY(boxItem != nullptr);
+  QVERIFY(sphereItem != nullptr);
+  QVERIFY(cylinderItem != nullptr);
 
   node.reset();
   delete requestMsg;
   delete modelListWidget;
-  modelListWidget = NULL;
+  modelListWidget = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -385,7 +386,7 @@ void ModelListWidget_TEST::ModelProperties()
   QCOMPARE(treeModelItems.size(), 1);
 
   QTreeWidgetItem *modelsItem = treeModelItems.front();
-  QVERIFY(modelsItem != NULL);
+  QVERIFY(modelsItem != nullptr);
 
   // verify that there is only 1 model
   int modelCount = 1;
@@ -401,7 +402,7 @@ void ModelListWidget_TEST::ModelProperties()
 
   // Get the model item
   QTreeWidgetItem *modelItem = modelsItem->child(0);
-  QVERIFY(modelItem != NULL);
+  QVERIFY(modelItem != nullptr);
   std::string modelName = "multilink";
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
@@ -411,7 +412,7 @@ void ModelListWidget_TEST::ModelProperties()
   QtTreePropertyBrowser *propTreeBrowser =
     dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
-  QVERIFY(propTreeBrowser != NULL);
+  QVERIFY(propTreeBrowser != nullptr);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
 
   // select the models item
@@ -657,7 +658,7 @@ void ModelListWidget_TEST::LinkProperties()
   QCOMPARE(treeModelItems.size(), 1);
 
   QTreeWidgetItem *modelsItem = treeModelItems.front();
-  QVERIFY(modelsItem != NULL);
+  QVERIFY(modelsItem != nullptr);
 
   // verify that there is only 1 model
   int modelCount = 1;
@@ -673,7 +674,7 @@ void ModelListWidget_TEST::LinkProperties()
 
   // Get the model item
   QTreeWidgetItem *modelItem = modelsItem->child(0);
-  QVERIFY(modelItem != NULL);
+  QVERIFY(modelItem != nullptr);
   std::string modelName = "multilink";
   QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
@@ -683,7 +684,7 @@ void ModelListWidget_TEST::LinkProperties()
   QtTreePropertyBrowser *propTreeBrowser =
     dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
 
-  QVERIFY(propTreeBrowser != NULL);
+  QVERIFY(propTreeBrowser != nullptr);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
 
   // select the models item
@@ -728,7 +729,7 @@ void ModelListWidget_TEST::LinkProperties()
 
   // select the box link
   QTreeWidgetItem *boxLinkItem = modelItem->child(0);
-  QVERIFY(boxLinkItem != NULL);
+  QVERIFY(boxLinkItem != nullptr);
   std::string boxLinkName = "box_link";
   QCOMPARE(boxLinkItem->text(0), tr(boxLinkName.c_str()));
 
@@ -802,7 +803,7 @@ void ModelListWidget_TEST::LinkProperties()
 
   // select the sphere link
   QTreeWidgetItem *sphereLinkItem = modelItem->child(1);
-  QVERIFY(sphereLinkItem != NULL);
+  QVERIFY(sphereLinkItem != nullptr);
   std::string sphereLinkName = "sphere_link";
   QCOMPARE(sphereLinkItem->text(0), tr(sphereLinkName.c_str()));
 
@@ -894,7 +895,7 @@ void ModelListWidget_TEST::PhysicsProperties()
     modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
     dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
-  QVERIFY(propTreeBrowser != NULL);
+  QVERIFY(propTreeBrowser != nullptr);
   QCOMPARE(propTreeBrowser->properties().size(), 0);
 
   // Get the physics item from the model tree
@@ -904,7 +905,7 @@ void ModelListWidget_TEST::PhysicsProperties()
     modelTreeWidget->findItems(tr("Physics"), Qt::MatchExactly);
   QCOMPARE(treePhysicsItems.size(), 1);
   QTreeWidgetItem *physicsItem = treePhysicsItems.front();
-  QVERIFY(physicsItem != NULL);
+  QVERIFY(physicsItem != nullptr);
 
   // select the physics item after giving it time to be rendered
   QTest::qWait(10);
@@ -1050,6 +1051,137 @@ void ModelListWidget_TEST::PhysicsProperties()
   }
 
   modelListWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget_TEST::GUIProperties()
+{
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the model list widget
+  auto modelListWidget =
+      mainWindow->findChild<gazebo::gui::ModelListWidget *>();
+  modelListWidget->show();
+  QCoreApplication::processEvents();
+
+  // Verify that property browser widget is initially empty
+  auto propTreeObj = modelListWidget->findChild<QObject *>("propTreeBrowser");
+  auto propTreeBrowser = dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
+  QVERIFY(propTreeBrowser != nullptr);
+  QCOMPARE(propTreeBrowser->properties().size(), 0);
+
+  // Get the gui item from the model tree
+  auto modelTreeWidget = modelListWidget->findChild<QTreeWidget *>(
+      "modelTreeWidget");
+  auto treeGUIItems = modelTreeWidget->findItems(tr("GUI"), Qt::MatchExactly);
+  QCOMPARE(treeGUIItems.size(), 1);
+  QTreeWidgetItem *guiItem = treeGUIItems.front();
+  QVERIFY(guiItem != nullptr);
+
+  // select the gui item after giving it time to be rendered
+  QTest::qWait(10);
+  QRect guiRect;
+  {
+    guiRect = modelTreeWidget->visualItemRect(guiItem);
+    QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+        guiRect.center() );
+    QCoreApplication::processEvents();
+
+    // wait for the gui item to be selected
+    int sleep = 0;
+    int maxSleep = 5;
+    while (!guiItem->isSelected() && sleep < maxSleep)
+    {
+      QTest::qWait(10);
+      sleep++;
+    }
+    QVERIFY(guiItem->isSelected());
+  }
+
+  // Wait for the gui properties to appear
+  {
+    int sleep = 0;
+    int maxSleep = 10;
+    while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+    {
+      QCoreApplication::processEvents();
+      QTest::qWait(500);
+      sleep++;
+    }
+    QVERIFY(propTreeBrowser->properties().size() > 0);
+  }
+
+  // Verify that there are 2 gui properties
+  auto properties = propTreeBrowser->properties();
+  QCOMPARE(properties.size(), 2);
+
+  // Check default values of each parameter
+  // Camera
+  {
+    auto property = static_cast<QtVariantProperty *>(properties[0]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("camera"));
+
+    {
+      auto prop =
+          static_cast<QtVariantProperty *>(property->subProperties()[0]);
+      Q_ASSERT(prop);
+      QCOMPARE(prop->propertyName(), tr("name"));
+      QCOMPARE(prop->valueText(), QString("gzclient_camera"));
+    }
+    {
+      auto prop =
+          static_cast<QtVariantProperty *>(property->subProperties()[2]);
+      Q_ASSERT(prop);
+      QCOMPARE(prop->propertyName(), tr("track_visual"));
+    }
+  }
+
+  // Grid
+  {
+    auto property = static_cast<QtVariantProperty *>(properties[1]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("grid"));
+    {
+      auto prop =
+          static_cast<QtVariantProperty *>(property->subProperties()[0]);
+      Q_ASSERT(prop);
+      QCOMPARE(prop->propertyName(), tr("cell count"));
+      QCOMPARE(prop->value().toInt(), 20);
+    }
+    {
+      auto prop =
+          static_cast<QtVariantProperty *>(property->subProperties()[1]);
+      Q_ASSERT(prop);
+      QCOMPARE(prop->propertyName(), tr("cell length"));
+      QCOMPARE(prop->value().toDouble(), 1.0);
+    }
+    {
+      auto prop =
+          static_cast<QtVariantProperty *>(property->subProperties()[2]);
+      Q_ASSERT(prop);
+      QCOMPARE(prop->propertyName(), tr("normal cell count"));
+      QCOMPARE(prop->value().toInt(), 0);
+    }
+    {
+      auto prop =
+          static_cast<QtVariantProperty *>(property->subProperties()[3]);
+      Q_ASSERT(prop);
+      QCOMPARE(prop->propertyName(), tr("height offset"));
+      QVERIFY(fabs(prop->value().toDouble() - 0.015) < 1e-6);
+    }
+  }
+
+  delete mainWindow;
 }
 
 // Generate a main function for the test

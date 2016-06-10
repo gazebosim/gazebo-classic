@@ -719,7 +719,7 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
   QtProperty *gridProperty = this->ChildItem("grid");
   if (gridProperty && this->HasChildItem(gridProperty, _item))
   {
-    this->GUIGridPropertyChanged(gridProperty, _item);
+    this->GUIGridPropertyChanged(_item);
   }
 }
 
@@ -794,8 +794,7 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_cameraProperty,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::GUIGridPropertyChanged(QtProperty *_gridProperty,
-    QtProperty *_changedItem)
+void ModelListWidget::GUIGridPropertyChanged(QtProperty *_changedItem)
 {
   if (!_changedItem)
     return;
@@ -825,15 +824,15 @@ void ModelListWidget::GUIGridPropertyChanged(QtProperty *_gridProperty,
     grid->SetHeight(this->dataPtr->variantManager->value(
         _changedItem).toUInt());
   }
-  else if (changedProperty == "line width")
-  {
-    grid->SetLineWidth(this->dataPtr->variantManager->value(
-        _changedItem).toUInt());
-  }
   else if (changedProperty == "line color")
   {
     grid->SetColor(gui::Conversions::Convert(
         this->dataPtr->variantManager->value(_changedItem).value<QColor>()));
+  }
+  else if (changedProperty == "height offset")
+  {
+    grid->SetHeightOffset(
+        this->dataPtr->variantManager->value(_changedItem).toDouble());
   }
 }
 
@@ -3357,10 +3356,12 @@ void ModelListWidget::FillGrid()
   this->dataPtr->propTreeBrowser->addProperty(topItem);
 
   // Cell count
-  // TODO: set range
   auto cellCount = grid->CellCount();
   item = this->dataPtr->variantManager->addProperty(QVariant::Int,
       tr("cell count"));
+  static_cast<QtVariantPropertyManager *>(
+      this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+      item, "minimum", 0);
   item->setValue(cellCount);
   topItem->addSubProperty(item);
 
@@ -3368,6 +3369,12 @@ void ModelListWidget::FillGrid()
   auto cellLength = grid->CellLength();
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("cell length"));
+  static_cast<QtVariantPropertyManager *>(
+      this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+      item, "minimum", 0);
+  static_cast<QtVariantPropertyManager *>(
+      this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+      item, "decimals", 4);
   item->setValue(cellLength);
   topItem->addSubProperty(item);
 
@@ -3375,14 +3382,20 @@ void ModelListWidget::FillGrid()
   auto height = grid->Height();
   item = this->dataPtr->variantManager->addProperty(QVariant::Int,
       tr("normal cell count"));
+  static_cast<QtVariantPropertyManager *>(
+      this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+      item, "minimum", 0);
   item->setValue(height);
   topItem->addSubProperty(item);
 
-  // Line width
-  auto lineWidth = grid->LineWidth();
+  // Height offset
+  auto heightOffset = grid->HeightOffset();
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
-      tr("line width"));
-  item->setValue(lineWidth);
+      tr("height offset"));
+  static_cast<QtVariantPropertyManager *>(
+      this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+      item, "decimals", 4);
+  item->setValue(heightOffset);
   topItem->addSubProperty(item);
 
   // Line color

@@ -126,9 +126,10 @@ void Grid::SetCellLength(const float _len)
 //////////////////////////////////////////////////
 void Grid::SetLineWidth(const float _width)
 {
+  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
   this->dataPtr->lineWidth = _width;
 
-  this->Create();
+  // this->Create();
 }
 
 //////////////////////////////////////////////////
@@ -154,6 +155,14 @@ void Grid::SetColor(const common::Color &_color)
 void Grid::SetHeight(const uint32_t _height)
 {
   this->dataPtr->height = _height;
+
+  this->Create();
+}
+
+//////////////////////////////////////////////////
+void Grid::SetHeightOffset(const double _offset)
+{
+  this->dataPtr->heightOffset = _offset;
 
   this->Create();
 }
@@ -333,6 +342,7 @@ float Grid::GetLineWidth() const
 //////////////////////////////////////////////////
 float Grid::LineWidth() const
 {
+  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
   return this->dataPtr->lineWidth;
 }
 
@@ -346,4 +356,10 @@ uint32_t Grid::GetHeight() const
 uint32_t Grid::Height() const
 {
   return this->dataPtr->height;
+}
+
+//////////////////////////////////////////////////
+double Grid::HeightOffset() const
+{
+  return this->dataPtr->heightOffset;
 }
