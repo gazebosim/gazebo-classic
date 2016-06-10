@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Backport single pixel selection buffer for mouse picking
+    * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
+
 1. Prevent mouse pan and orbit from deselecting entities in model editor
     * [Pull request 2333](https://bitbucket.org/osrf/gazebo/pull-request/2333)
 
