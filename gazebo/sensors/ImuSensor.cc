@@ -207,8 +207,8 @@ void ImuSensor::Load(const std::string &_worldName)
   }
 
   /////////////////////////////////////////////////////////////////
-  // compute the last linear veloicty of the imu in the world frame
-  // for computing acceleartion based on finite differencing
+  // compute the last linear velocity of the imu in the world frame
+  // for computing acceleration based on finite differencing
   /////////////////////////////////////////////////////////////////
   // first get parent link linear vel in world frame
   ignition::math::Vector3d linkWorldLinearVel
