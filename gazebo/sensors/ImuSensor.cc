@@ -61,6 +61,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
+  // initialize worldToReference transform as local frame
+  this->dataPtr->worldToReference = this->pose +
+    this->dataPtr->parentEntity->GetWorldPose().Ign();
+
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
