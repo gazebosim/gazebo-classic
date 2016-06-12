@@ -111,6 +111,7 @@ cmake -Wno-dev -G "%generation_type%"^
     -DIGNITION-TRANSPORT_LIBRARY_DIRS:STRING="%IGN-TRANSPORT_PATH%\lib"^
     -DIGNITION-TRANSPORT_LIBRARIES="ignition-transport1.lib"^
     -DZERO_MQ_INCLUDE_DIRS="%ZEROMQ_PATH%\include"^
+	-DZERO_MQ_LIB_DIRS="%ZEROMQ_PATH%\lib"^
     -DZERO_MQ_LIB="%ZERO_MQ_LIB%"^
     -DCPPZMQ_INCLUDE_DIRS="%CPPZMQ_PATH%"^
     -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
