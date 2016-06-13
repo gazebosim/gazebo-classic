@@ -388,7 +388,13 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   // let messages propagate asynchronously
   world->Step(1000);
 
-  // orientation of the imu in NED frame
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Static Pose Initialization Tests                     */
+  /*                                                                          */
+  /****************************************************************************/
+  /* orientation of the imu in NED frame                                      */
+  /****************************************************************************/
   imuOrientation = ballFloatingImu->GetOrientation();
 
   EXPECT_NEAR(imuOrientation.w, 0, IMU_TOL);
@@ -405,9 +411,11 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(imuWorldOrientation.y, 0, IMU_TOL);
   EXPECT_NEAR(imuWorldOrientation.z, 0, IMU_TOL);
 
-  // floating ball 2
-  // This "robot" starts with a yaw of 1.8 rad from world frame.
-  // test that SetReferencePose resets orientation to identity
+  /****************************************************************************/
+  /* floating ball 2                                                          */
+  /* This "robot" starts with a yaw of 1.8 rad from world frame.              */
+  /* test that SetReferencePose resets orientation to identity                */
+  /****************************************************************************/
   ballFloatingImu2->SetReferencePose();
   math::Quaternion imuOrientation2 = ballFloatingImu2->GetOrientation();
   // note this test fails without normailzation because
@@ -419,14 +427,17 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(0, imuOrientation2.y, IMU_TOL);
   EXPECT_NEAR(0, imuOrientation2.z, IMU_TOL);
 
-  // test that SetReferenceOrientation sets orientation to argument
-  // in this test case, assume world is NWU (X-North, Y-West, Z-Up),
-  // then transform from NWU to NED is below:
-  math::Pose nwuToNEDReference2 =
-    math::Pose(math::Vector3(0, 0, 0),
-    math::Quaternion(M_PI, 0, 0));
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Static Pose Manipulation Tests                       */
+  /*                                                                          */
+  /****************************************************************************/
+  /* test that SetReferenceOrientation sets orientation to argument           */
+  /* in this test case, assume world is NWU (X-North, Y-West, Z-Up),          */
+  /* then transform from NWU to NED is below:                                 */
+  /****************************************************************************/
   // declare NED frame the reference frame for this IMU
-  ballFloatingImu2->SetWorldToReferencePose(nwuToNEDReference2);
+  ballFloatingImu2->SetWorldToReferencePose(nwuToNEDReference);
 
   // let messages propagate asynchronously
   world->Step(1000);
@@ -441,14 +452,20 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // imu orientation in world frame
   math::Quaternion imuWorldOrientation2 =
-    imuOrientation2 * nwuToNEDReference2.rot;
+    imuOrientation2 * nwuToNEDReference.rot;
   math::Vector3 rpyWorld2 = imuWorldOrientation2.GetAsEuler();
   EXPECT_NEAR(rpyWorld2.x, 0, IMU_TOL);
   EXPECT_NEAR(rpyWorld2.y, 0, IMU_TOL);
   EXPECT_NEAR(rpyWorld2.z, -imu2Angle, IMU_TOL);
 
-  // turn floating ball 2 by -1.8 rad yaw, and see if two floating
-  // balls orientation match
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Kinematic Pose Manipulation Test                     */
+  /*                                                                          */
+  /****************************************************************************/
+  /* turn floating ball 2 by -1.8 rad yaw, and see if two floating            */
+  /* balls orientation match                                                  */
+  /****************************************************************************/
   ballFloatingLink2->SetWorldPose(math::Pose(3.0, -3.40, 0.95, 0.0, 0.0, 0.0));
 
   // let messages propagate asynchronously
@@ -465,19 +482,38 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(rpy.y, rpy2.y, IMU_TOL);
   EXPECT_NEAR(rpy.z, rpy2.z, IMU_TOL);
 
-  // turn floating ball 2 by 0.6 rad yaw, apply torque about imu local Y-axis
-  // and test AngularVelocity is expressed in local frame.
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Dynamic Torque Test                                  */
+  /*                                                                          */
+  /****************************************************************************/
+  /* turn floating ball 2 by 0.6 rad yaw, apply torque about imu local Y-axis */
+  /* and test AngularVelocity is expressed in local frame.                    */
+  /****************************************************************************/
   const double yaw = 0.6;
   ballFloatingLink2->SetWorldPose(math::Pose(3.0, -3.40, 0.95, 0.0, 0.0, yaw));
+
+  // HACK: take 100 steps, due to message passing synchronization delays,
+  // we should fix this by haing an equivalent blocking "service call" to
+  // SetWorldPose.
   world->Step(100);
 
-  ballFloatingLink2->AddRelativeTorque(math::Vector3(0, 150.0, 0));
+  // Nm
+  const double tau = 150.0;
+
+  ballFloatingLink2->AddRelativeTorque(math::Vector3(0, tau, 0));
 
   // expected velocity calculation
-  const double iyy = 0.1;  // kg*m^2
-  const double tau = 150.0;  // Nm
-  const double dt = 0.001;  // sec
-  const double pDot = tau / iyy * dt;  // 1.5 m/s  // pitch rate
+  // kg*m^2
+  const double iyy = ballFloatingLink2->GetInertial()->GetPrincipalMoments().y;
+  EXPECT_NEAR(iyy, 0.1, 1e-6);
+
+  // sec
+  const double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  EXPECT_NEAR(dt, 0.001, 1e-6);
+
+  // 1.5 m/s , pitch rate
+  const double pDot = tau / iyy * dt;
   const int nsteps = 1000;
   const double p = pDot * (nsteps-1) * dt;
 
@@ -488,9 +524,11 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   imuOrientation2 = ballFloatingImu2->GetOrientation();
   rpy2 = imuOrientation2.GetAsEuler();
   math::Vector3 rpyDot2 = ballFloatingImu2->GetAngularVelocity();
+  math::Vector3 linAcc2 = ballFloatingImu2->GetLinearAcceleration();
 
-  // grab from running test, but we should be able to compute this too
-  EXPECT_NEAR(fabs(rpy2.x), M_PI, IMU_TOL);  // because NED
+  // compare against analytical results
+  // because NED
+  EXPECT_NEAR(fabs(rpy2.x), M_PI, IMU_TOL);
   EXPECT_NEAR(rpy2.y, -p, IMU_TOL);
   EXPECT_NEAR(rpy2.z, -yaw, IMU_TOL);
 
@@ -498,23 +536,54 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(rpyDot2.y, pDot, IMU_TOL);
   EXPECT_NEAR(rpyDot2.z, 0, IMU_TOL);
 
-  // turn floating ball 2 by 0.5 rad pitch, apply force about
-  // positive world z-axis
-  // and test if LinearAcceleration is expressed in local frame.
+  // centripetal acceleration along radial (x-axis) direction.
+  // then add gravity acceleration to x and z based on orientation of imu.
+  this->GetGravity(ballFloatingImu2->GetOrientation(), g);
+
+  const double radius = boost::static_pointer_cast<physics::SphereShape>(
+      ballFloatingLink2 ->GetCollision(
+        "collision_sphere")->GetShape())->GetRadius();
+
+  // const double acc = -pDot*pDot*r;
+  const double acc = -rpyDot2.y*rpyDot2.y*radius;
+  const double accX = acc + g.x;
+  const double accZ = g.z;
+  EXPECT_NEAR(linAcc2.x, accX, IMU_TOL);
+  EXPECT_NEAR(linAcc2.y, 0, IMU_TOL);
+
+  // FIXME: why is this error larger than default tol 1e-5?
+  // See ign-math issue #47.
+  // https://bitbucket.org/ignitionrobotics/ign-math/issues/47
+  const double special_IMU_TOL = 0.00016874990503534804;
+  EXPECT_NEAR(linAcc2.z, accZ, special_IMU_TOL);
+
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Dynamic Linear Force Test                            */
+  /*                                                                          */
+  /****************************************************************************/
+  /* turn floating ball 2 by 0.5 rad pitch, apply force about                 */
+  /* positive world z-axis                                                    */
+  /* and test if LinearAcceleration is expressed in local frame.              */
+  /****************************************************************************/
   const double pit = 0.5;
   ballFloatingImu2->SetWorldToReferencePose(math::Pose());
   ballFloatingLink2->Reset();
   ballFloatingLink2->SetWorldPose(math::Pose(3.0, -3.40, 0.95, 0.0, pit, 0.0));
+
   world->Step(100);
   for (int i = 0; i < 1000; ++i)
   {
     const double f = 13.8;
     ballFloatingLink2->AddForce(math::Vector3(0, 0, f));
     world->Step(1);
+
     const double m = 5.0;
     const double a = f / m;
+
     math::Vector3 linAcc2 = ballFloatingImu2->GetLinearAcceleration();
     this->GetGravity(ballFloatingImu2->GetOrientation(), g);
+
     if (i > 100)
     {
       // THERE MUST BE A BETTER WAY TO DO THIS...
