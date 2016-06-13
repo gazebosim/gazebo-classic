@@ -2,6 +2,8 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+## Gazebo 7.2.0 (2016-06-13)
+
 1. Backport single pixel selection buffer for mouse picking
     * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
 
