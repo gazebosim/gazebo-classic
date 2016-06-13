@@ -554,7 +554,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   // FIXME: why is this error larger than default tol 1e-5?
   // See ign-math issue #47.
   // https://bitbucket.org/ignitionrobotics/ign-math/issues/47
-  const double special_IMU_TOL = 0.00016874990503534804;
+  const double special_IMU_TOL = 0.00016874990504;
   EXPECT_NEAR(linAcc2.z, accZ, special_IMU_TOL);
 
   /****************************************************************************/
