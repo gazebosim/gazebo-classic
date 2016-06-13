@@ -5,12 +5,9 @@ include_directories(SYSTEM
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${IGNITION-MATH_INCLUDE_DIRS}
-  ${IGNITION-TRANSPORT_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
   ${tinyxml2_INCLUDE_DIRS}
-  ${ZERO_MQ_INCLUDE_DIRS}
-  ${CPPZMQ_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -21,8 +18,6 @@ link_directories(
   ${TBB_LIBRARY_DIR}
   ${CURL_LIBDIR}
   ${IGNITION-MATH_LIBRARY_DIRS}
-  ${IGNITION-TRANSPORT_LIBRARY_DIRS}
-  ${ZERO_MQ_LIB_DIRS}
 )
 
 if (WIN32)
@@ -67,8 +62,6 @@ target_link_libraries(gzserver
   # Extra libs needed when linking statically (e.g., on WIN32)
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
-  ${ZERO_MQ_LIB}
 )
 
 if (UNIX)
