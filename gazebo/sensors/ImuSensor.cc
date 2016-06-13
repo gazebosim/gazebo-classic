@@ -282,8 +282,8 @@ ignition::math::Quaterniond ImuSensor::Orientation() const
 void ImuSensor::SetReferencePose()
 {
   // this call sets the current imu pose as the imu's reference pose
-  this->dataPtr->worldToReference =
-    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+  this->SetWorldToReferencePose(
+      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
 }
 
 //////////////////////////////////////////////////
