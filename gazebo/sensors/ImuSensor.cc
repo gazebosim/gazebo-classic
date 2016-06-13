@@ -288,7 +288,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     // given the imu frame is offset from link frame, and link is rotating
     // compute the velocity of the imu axis origin in world frame
     math::Vector3 imuWorldLinearVel = linkWorldLinearVel +
-        linkWorldAngularVel.Cross(parentEntityPose.pos - imuWorldPose.pos);
+        linkWorldAngularVel.Cross(imuWorldPose.pos - parentEntityPose.pos);
     // compute acceleration by differentiating velocity in world frame,
     // and rotate into imu local frame
     this->linearAcc = imuWorldPose.rot.GetInverse().RotateVector(
