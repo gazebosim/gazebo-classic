@@ -78,7 +78,7 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 
 
-add_library(gazebo_sensors SHARED ${sources})
+add_library(gazebo_sensors STATIC ${sources})
 
 target_link_libraries(gazebo_sensors
   gazebo_common

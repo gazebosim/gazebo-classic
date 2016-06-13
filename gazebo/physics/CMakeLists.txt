@@ -108,12 +108,13 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
-gz_add_library(gazebo_physics ${sources})
+gz_add_library(gazebo_physics STATIC ${sources})
 
 target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
   gazebo_physics_ode
+  gazebo_sensors
 )
 
 if (HAVE_BULLET)
