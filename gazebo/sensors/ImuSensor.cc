@@ -61,6 +61,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
+  // Initialize orientation to identity.
+  msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
+      ignition::math::Quaterniond::Identity);
+
   // initialize worldToReference transform as local frame
   this->dataPtr->worldToReference = this->pose +
     this->dataPtr->parentEntity->GetWorldPose().Ign();
