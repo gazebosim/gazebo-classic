@@ -370,10 +370,6 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   // test that SetReferencePose resets orientation to identity
   ballFloatingImu->SetReferencePose();
   ignition::math::Quaterniond imuOrientation = ballFloatingImu->Orientation();
-  // note this test fails without normailzation because
-  // quaternion returned is unnormalized(0, 0, 0, 0),
-  // not default value of (1, 0, 0, 0)
-  imuOrientation.Normalize();
   EXPECT_NEAR(ignition::math::Quaterniond().W(), imuOrientation.W(), IMU_TOL);
   EXPECT_NEAR(ignition::math::Quaterniond().X(), imuOrientation.X(), IMU_TOL);
   EXPECT_NEAR(ignition::math::Quaterniond().Y(), imuOrientation.Y(), IMU_TOL);
@@ -421,10 +417,6 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   /****************************************************************************/
   ballFloatingImu2->SetReferencePose();
   ignition::math::Quaterniond imuOrientation2 = ballFloatingImu2->Orientation();
-  // note this test fails without normailzation because
-  // quaternion returned is unnormalized(0, 0, 0, 0),
-  // not default value of (1, 0, 0, 0)
-  imuOrientation2.Normalize();
   EXPECT_NEAR(ignition::math::Quaterniond().W(), imuOrientation2.W(), IMU_TOL);
   EXPECT_NEAR(ignition::math::Quaterniond().X(), imuOrientation2.X(), IMU_TOL);
   EXPECT_NEAR(ignition::math::Quaterniond().Y(), imuOrientation2.Y(), IMU_TOL);
