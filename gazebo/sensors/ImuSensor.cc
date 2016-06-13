@@ -162,18 +162,10 @@ void ImuSensor::Load(const std::string &_worldName)
   // compute the last linear veloicty of the imu in the world frame
   // for computing acceleartion based on finite differencing
   /////////////////////////////////////////////////////////////////
-  // first get parent link linear vel in world frame
-  math::Vector3 linkWorldLinearVel
-      = this->parentEntity->GetWorldLinearVel();
-  math::Vector3 linkWorldAngularVel
-      = this->parentEntity->GetWorldAngularVel();
-  // next, account for vel in world frame of the imu
+  // account for vel in world frame of the imu
   // given the imu frame is offset from link frame, and link is rotating
-  math::Pose parentEntityPose =
-    this->parentEntity->GetWorldPose();
-  math::Pose imuWorldPose = this->pose + parentEntityPose;
-  this->lastLinearVel = linkWorldLinearVel +
-      linkWorldAngularVel.Cross(parentEntityPose.pos - imuWorldPose.pos);
+  this->lastLinearVel =
+      this->parentEntity->GetWorldLinearVel(this->pose.pos);
 }
 
 //////////////////////////////////////////////////
