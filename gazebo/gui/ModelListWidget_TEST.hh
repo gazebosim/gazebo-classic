@@ -89,6 +89,32 @@ class ModelListWidget_TEST : public QTestFixture
     bool _selfCollide, bool _gravity, bool _kinematic, bool _canonical,
     bool _enableWind, const gazebo::math::Pose &_pose);
 
+  /// \brief Test link property attributes and values.
+  /// \param[in] _name Name of link.
+  /// \param[in] _selfCollide True if links in model self collide.
+  /// \param[in] _gravity True if gravity is enabled for this link.
+  /// \param[in] _kinematic True if the link is in kinematic mode.
+  /// \param[in] _canonical True if this is a canonical link.
+  /// \param[in] _enableWind True if wind is enabled for this link.
+  /// \param[in] _pose Expected pose values.
+  private: void CheckPluginProperty(QList<QtProperty *> _properties,
+    const std::string &_name, std::string _filename, std::string _innerxml);
+
+  /// \brief Set link property values.
+  /// \param[in] _propTreeBrowser Property browser.
+  /// \param[in] _properties Link properties.
+  /// \param[in] _name Name of link.
+  /// \param[in] _selfCollide New self collide value.
+  /// \param[in] _gravity New gravity value.
+  /// \param[in] _kinematic New kinematic value.
+  /// \param[in] _canonical True if this is a canonical link and the pose
+  /// should not be set.
+  /// \param[in] _enableWind New enable_wind value.
+  /// \param[in] _pose New pose values.
+  private: void SetPluginProperty(QtTreePropertyBrowser *propTreeBrowser,
+    QList<QtProperty *> _properties, const std::string &_name,
+    std::string _filename, std::string _innerxml);
+
   /// \brief Test to see the tree widget has correct items.
   private slots: void TreeWidget();
 
@@ -100,11 +126,15 @@ class ModelListWidget_TEST : public QTestFixture
   /// verify the changes are set.
   private slots: void ModelProperties();
 
-  /// \brief Test that the property browser displays correct link properties.
+  /// \brief Test that the property browser displays correct plugin properties.
   /// This is similar to the ModelProperties test except the property browser
   /// now only displays link properties as the result of directly clicking on
   /// the link item in the models tree widget.
   private slots: void LinkProperties();
+
+  /// \brief Test that the property browser displays correct plugin properties.
+  /// This is similar to the LinkProperties test.
+  private slots: void PluginProperties();
 
   /// \brief Test that the property browser displays correct physics properties
   /// and allows modification of physics properties.
