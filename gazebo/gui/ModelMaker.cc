@@ -143,21 +143,15 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
     dPtr->modelVisual.reset();
   }
 
-  // Unique name
-  std::string prefix;
-  if (_shape == BOX)
-    prefix = "unit_box_";
-  else if (_shape == SPHERE)
-    prefix = "unit_sphere_";
-  else if (_shape == CYLINDER)
-    prefix = "unit_cylinder_";
-
-  int counter = 0;
+  // Desired name (the server will append a number to generate a unique name
+  // in case of overlap.
   std::string modelName;
-  do
-  {
-    modelName = prefix + std::to_string(counter++);
-  } while (scene->GetVisual(modelName));
+  if (_shape == BOX)
+    modelName = "unit_box";
+  else if (_shape == SPHERE)
+    modelName = "unit_sphere";
+  else if (_shape == CYLINDER)
+    modelName = "unit_cylinder";
 
   // Model message
   msgs::Model model;
@@ -380,34 +374,19 @@ void ModelMaker::CreateTheEntity()
   if (!dPtr->clone)
   {
     sdf::ElementPtr modelElem;
-    bool isModel = false;
-    bool isLight = false;
     if (dPtr->modelSDF->Root()->HasElement("model"))
     {
       modelElem = dPtr->modelSDF->Root()->GetElement("model");
-      isModel = true;
     }
-    else if (dPtr->modelSDF->Root()->HasElement("light"))
+    else
     {
-      modelElem = dPtr->modelSDF->Root()->GetElement("light");
-      isLight = true;
+      gzerr << "Couldn't find model element in sdf, won't create entity."
+            << std::endl;
+      return;
     }
 
+    // The server will generate a unique name in case of name collision
     std::string modelName = modelElem->Get<std::string>("name");
-
-    // Automatically create a new name if the model exists
-    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-    gui::MainWindow *mainWindow = gui::get_main_window();
-    if (scene && mainWindow)
-    {
-      int i = 0;
-      while ((isModel && mainWindow->HasEntityName(modelName)) ||
-          (isLight && scene->GetLight(modelName)))
-      {
-        modelName = modelElem->Get<std::string>("name") + "_" +
-            std::to_string(i++);
-      }
-    }
 
     // Remove the topic namespace from the model name. This will get re-inserted
     // by the World automatically
