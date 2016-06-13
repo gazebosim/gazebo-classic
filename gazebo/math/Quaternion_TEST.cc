@@ -286,7 +286,7 @@ TEST_F(QuaternionTest, Quaternion)
   // if qa rotates frame o to p
   //    qb rotates frame p to q
   //    qc rotates frame q to r
-  //    qc rotates frame r to s
+  //    qd rotates frame r to s
   // then qd * qc * qb * qa rotates frame o to s
   EXPECT_EQ(math::Quaternion(0, 0, 0),
             math::Quaternion(0, -0.5*M_PI, 0)*
