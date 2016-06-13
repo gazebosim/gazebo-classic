@@ -13,6 +13,8 @@ link_directories(
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
   ${IGNITION-MATH_LIBRARY_DIRS}
+  ${IGNITION-TRANSPORT_LIBRARY_DIRS}
+  ${ZERO_MQ_LIB_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -50,6 +52,8 @@ target_link_libraries(gz
  gazebo_sensors
  ${QT_LIBRARIES}
  ${Boost_LIBRARIES}
+ ${IGNITION-TRANSPORT_LIBRARIES} 
+ ${ZERO_MQ_LIB}
 )
 
 if (UNIX)

@@ -13,6 +13,8 @@ link_directories(
   ${SDFormat_LIBRARY_DIRS}
   ${CURL_LIBDIR}
   ${IGNITION-MATH_LIBRARY_DIRS}
+  ${IGNITION-TRANSPORT_LIBRARY_DIRS}
+  ${ZERO_MQ_LIB_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -31,5 +33,5 @@ set (plugins
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries} ${IGNITION-TRANSPORT_LIBRARIES} ${ZERO_MQ_LIB})
 endforeach (src ${plugins})
