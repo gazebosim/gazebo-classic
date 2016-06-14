@@ -23,7 +23,6 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
-#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/ModelListWidget_TEST.hh"
 
@@ -1057,21 +1056,18 @@ void ModelListWidget_TEST::PhysicsProperties()
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::GUIProperties()
 {
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, true);
 
-  // Create the main window.
-  auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != nullptr);
-  mainWindow->Load();
-  mainWindow->Init();
-  mainWindow->show();
-
-  this->ProcessEventsAndDraw(mainWindow);
+  auto scene = gazebo::rendering::get_scene();
+  scene->SetGrid(true);
+  auto camera = scene->CreateUserCamera("gzclient_camera");
+  gazebo::gui::set_active_camera(camera);
 
   // Get the model list widget
-  auto modelListWidget =
-      mainWindow->findChild<gazebo::gui::ModelListWidget *>();
+  std::unique_ptr<gazebo::gui::ModelListWidget> modelListWidget(
+      new gazebo::gui::ModelListWidget);
   modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 800);
   QCoreApplication::processEvents();
 
   // Verify that property browser widget is initially empty
@@ -1182,7 +1178,7 @@ void ModelListWidget_TEST::GUIProperties()
     }
   }
 
-  delete mainWindow;
+  modelListWidget->hide();
 }
 
 // Generate a main function for the test
