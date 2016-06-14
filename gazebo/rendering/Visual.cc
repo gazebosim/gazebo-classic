@@ -173,8 +173,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  if (this->dataPtr->preRenderConnection)
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+  this->dataPtr->preRenderConnection.reset();
 
   delete this->dataPtr->boundingBox;
 
@@ -222,11 +221,7 @@ void Visual::Fini()
     this->dataPtr->sceneNode = NULL;
   }
 
-  if (this->dataPtr->preRenderConnection)
-  {
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
-    this->dataPtr->preRenderConnection.reset();
-  }
+  this->dataPtr->preRenderConnection.reset();
 
   this->dataPtr->scene.reset();
 }
@@ -588,7 +583,6 @@ void Visual::DetachVisual(const std::string &_name)
       this->dataPtr->children.erase(iter);
       if (this->dataPtr->sceneNode)
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
-      childVis->GetParent().reset();
       break;
     }
   }

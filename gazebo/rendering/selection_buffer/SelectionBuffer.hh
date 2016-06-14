@@ -69,9 +69,6 @@ namespace gazebo
       /// \brief Create the selection buffer offscreen render texture.
       private: void CreateRTTOverlays();
 
-      /// \brief Update the size of the offscreen render texture.
-      private: void UpdateBufferSize();
-
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<SelectionBufferPrivate> dataPtr;
