@@ -126,9 +126,10 @@ void Grid::SetCellLength(const float _len)
 //////////////////////////////////////////////////
 void Grid::SetLineWidth(const float _width)
 {
-  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
   this->dataPtr->lineWidth = _width;
 
+  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
+  // Uncomment once line width is implemented
   // this->Create();
 }
 

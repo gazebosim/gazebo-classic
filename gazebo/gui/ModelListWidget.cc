@@ -814,7 +814,7 @@ void ModelListWidget::GUIGridPropertyChanged(QtProperty *_item)
     grid->SetCellCount(this->dataPtr->variantManager->value(
         _item).toUInt());
   }
-  else if (changedProperty == "cell length")
+  else if (changedProperty == "cell size")
   {
     grid->SetCellLength(this->dataPtr->variantManager->value(
         _item).toDouble());
@@ -3365,10 +3365,10 @@ void ModelListWidget::FillGrid()
   item->setValue(cellCount);
   topItem->addSubProperty(item);
 
-  // Cell length
+  // Cell size
   auto cellLength = grid->CellLength();
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
-      tr("cell length"));
+      tr("cell size"));
   static_cast<QtVariantPropertyManager *>(
       this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
       item, "minimum", 0);

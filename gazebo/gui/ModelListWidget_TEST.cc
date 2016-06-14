@@ -361,6 +361,7 @@ void ModelListWidget_TEST::ModelProperties()
   gazebo::gui::ModelListWidget *modelListWidget
       = new gazebo::gui::ModelListWidget;
   modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 800);
   QCoreApplication::processEvents();
 
   this->Load("worlds/multilink_shape.world");
@@ -1162,7 +1163,7 @@ void ModelListWidget_TEST::GUIProperties()
       auto prop =
           static_cast<QtVariantProperty *>(property->subProperties()[1]);
       Q_ASSERT(prop);
-      QCOMPARE(prop->propertyName(), tr("cell length"));
+      QCOMPARE(prop->propertyName(), tr("cell size"));
       QCOMPARE(prop->value().toDouble(), 1.0);
     }
     {
