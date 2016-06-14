@@ -22,7 +22,6 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -107,7 +106,9 @@ namespace gazebo
 
       /// \brief Disconnect from a laser frame signal
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_c);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the number of laser samples in the width and height
       /// \param[in] _w Number of samples in the horizontal sweep

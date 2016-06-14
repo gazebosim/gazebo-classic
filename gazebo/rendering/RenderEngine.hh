@@ -21,7 +21,6 @@
 #include <string>
 
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"

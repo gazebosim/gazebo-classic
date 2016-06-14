@@ -91,7 +91,9 @@ namespace gazebo
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
+              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited.
       protected: virtual bool UpdateImpl(const bool _force);

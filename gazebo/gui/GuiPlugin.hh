@@ -44,8 +44,7 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_GUI_PLUGIN(classname) \
-  extern "C" GZ_GUI_VISIBLE gazebo::GUIPlugin *RegisterPlugin(); \
-  GZ_GUI_VISIBLE \
+  extern "C" GZ_PLUGIN_VISIBLE gazebo::GUIPlugin *RegisterPlugin(); \
   gazebo::GUIPlugin *RegisterPlugin() \
   {\
     return new classname();\

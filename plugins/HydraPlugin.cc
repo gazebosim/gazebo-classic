@@ -94,7 +94,7 @@ RazerHydra::RazerHydra()
 /////////////////////////////////////////////////
 RazerHydra::~RazerHydra()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  this->updateConnection.reset();
 
   this->stop = true;
   if (this->pollThread)

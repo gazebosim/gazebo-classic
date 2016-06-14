@@ -21,6 +21,10 @@
 #include "gazebo/math/Vector4.hh"
 #include "gazebo/math/Spline.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 

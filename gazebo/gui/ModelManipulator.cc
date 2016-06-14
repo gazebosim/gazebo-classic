@@ -169,6 +169,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     rot = rot * this->dataPtr->mouseMoveVisStartPose.rot;
 
   _vis->SetWorldRotation(rot);
+  Events::moveEntity(_vis->GetName(), _vis->GetWorldPose().Ign(), false);
 }
 
 /////////////////////////////////////////////////
@@ -522,6 +523,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     pose.pos.z = _vis->GetWorldPose().pos.z;
 
   _vis->SetWorldPose(pose);
+  Events::moveEntity(_vis->GetName(), pose.Ign(), false);
 }
 
 /////////////////////////////////////////////////
@@ -648,6 +650,8 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
     // If the root visual's ID can be found, it is a model in the main window
+    // TODO gui::get_entity_id always return 0 in QTestFixture due to NULL
+    // g_main_win
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
