@@ -482,6 +482,7 @@ void Joint::Update()
 void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
+  /// \todo Update joint specific parameters. Issue #1954
 }
 
 //////////////////////////////////////////////////
