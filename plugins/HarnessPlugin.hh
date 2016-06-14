@@ -17,6 +17,9 @@
 #ifndef GAZEBO_PLUGINS_HARNESSPLUGIN_HH_
 #define GAZEBO_PLUGINS_HARNESSPLUGIN_HH_
 
+#include <string>
+#include <vector>
+
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"

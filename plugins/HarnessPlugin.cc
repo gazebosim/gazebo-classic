@@ -77,7 +77,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
         joint->Load(jointElem);
         this->joints.push_back(joint);
       }
-      catch (gazebo::common::Exception &_e)
+      catch(gazebo::common::Exception &_e)
       {
         gzerr << "Unable to load joint[" << jointName << "]. "
           << _e.GetErrorStr() << "]\n";
@@ -232,7 +232,7 @@ double HarnessPlugin::WinchVelocity() const
 /////////////////////////////////////////////////
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
-  this->winchTargetVel = _value;;
+  this->winchTargetVel = _value;
 }
 
 /////////////////////////////////////////////////
@@ -255,7 +255,7 @@ void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
   {
     this->SetWinchVelocity(std::stof(_msg->data()));
   }
-  catch (...)
+  catch(...)
   {
     gzerr << "Inavlid velocity data[" << _msg->data() << "]\n";
   }
