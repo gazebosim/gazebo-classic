@@ -22,6 +22,10 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/RotationSpline.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class RotationSplineTest : public ::testing::Test { };
