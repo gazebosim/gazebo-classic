@@ -15,24 +15,21 @@
  *
 */
 
-#ifndef GAZEBO_TEST_MOUSEPICKINGTEST_HH_
-#define GAZEBO_TEST_MOUSEPICKINGTEST_HH_
+#ifndef GAZEBO_TEST_INTEGRATION_VIEWCONTROLTEST_HH
+#define GAZEBO_TEST_INTEGRATION_VIEWCONTROLTEST_HH
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for GUI mouse picking.
-class MousePickingTest : public QTestFixture
+/// \brief A test class for the view controller
+class ViewControlTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Verify camera movement does not affect entity selection
-  private slots: void ModelEditorSelection();
+  /// \brief Test zooming in on a model in simulation
+  private slots: void MouseZoomSimulation();
 
-  /// \brief Verify simple shapes can be picked.
-  private slots: void Shapes();
-
-  /// \brief Verify models can be picked.
-  private slots: void Transparency();
+  /// \brief Test zooming in on a model in model editor
+  private slots: void MouseZoomModelEditor();
 };
 
 #endif

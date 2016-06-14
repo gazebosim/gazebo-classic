@@ -15,24 +15,18 @@
  *
 */
 
-#ifndef GAZEBO_TEST_MOUSEPICKINGTEST_HH_
-#define GAZEBO_TEST_MOUSEPICKINGTEST_HH_
+#ifndef GAZEBO_TEST_INTEGRATION_VIEW_ANGLE_HH
+#define GAZEBO_TEST_INTEGRATION_VIEW_ANGLE_HH
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for GUI mouse picking.
-class MousePickingTest : public QTestFixture
+/// \brief A test class for the view angle widget
+class ViewAngleTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Verify camera movement does not affect entity selection
-  private slots: void ModelEditorSelection();
-
-  /// \brief Verify simple shapes can be picked.
-  private slots: void Shapes();
-
-  /// \brief Verify models can be picked.
-  private slots: void Transparency();
+  /// \brief Test setting view angle in orthographic view
+  private slots: void OrthoProjection();
 };
 
 #endif

@@ -49,6 +49,109 @@ class WorldResetTest : public ServerFixture,
                          const std::string &_world, const int _resets);
 };
 
+class WorldControlResetTest : public ServerFixture,
+                       public ::testing::WithParamInterface<const char *>
+{
+  /// \brief Test to see if model pose is reset when the world is reset through
+  /// world_control topic
+  /// \param[in] _physicsEngine Physics engine type.
+  public: void ModelOverlapReset(const std::string &_physicsEngine);
+};
+
+/////////////////////////////////////////////////
+void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Simbody fails this test due to issue #1957" << std::endl;
+    return;
+  }
+
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  double dt = physics->GetMaxStepSize();
+  unsigned int steps = 250;
+
+  // Step forward, verify time increasing
+  world->Step(steps);
+  double simTime = world->GetSimTime().Double();
+  EXPECT_NEAR(simTime, dt*steps, dt);
+
+  // spawn a box with known initial pose
+  ignition::math::Pose3d initialPose(1, 2, 0.0, 0, 0, 1.57);
+  math::Vector3 size(1, 1, 1);
+  SpawnBox("box", size, initialPose.Pos(), initialPose.Rot().Euler(), false);
+  physics::ModelPtr model = world->GetModel("box");
+  ASSERT_TRUE(model != NULL);
+
+  // spawn another box that overlaps with the previous box
+  ignition::math::Pose3d initialPose2(1.2, 2, 0.5, 0, 0, 0);
+  SpawnBox("box2", size, initialPose2.Pos(), initialPose2.Rot().Euler(), false);
+  physics::ModelPtr model2 = world->GetModel("box2");
+  ASSERT_TRUE(model2 != NULL);
+
+  // physics engine has not stepped yet since the boxes were spawned so they
+  // should stay overlapped. Verify pose
+  EXPECT_EQ(model->GetWorldPose(), initialPose);
+  EXPECT_EQ(model2->GetWorldPose(), initialPose2);
+
+  // Step forward, verify time increasing
+  world->Step(steps);
+  double simTime2 = world->GetSimTime().Double();
+  EXPECT_NEAR(simTime2, simTime + dt*steps, dt);
+
+  // physics engine has stepped, verify the models are pushed apart
+  // Note: DART doesn't really mind overlapping models
+  if (_physicsEngine != "dart")
+  {
+    EXPECT_NE(model->GetWorldPose(), initialPose);
+    EXPECT_NE(model2->GetWorldPose(), initialPose2);
+  }
+
+  // Create a publisher to reset gzserver
+  gazebo::transport::PublisherPtr pub =
+    node->Advertise<gazebo::msgs::WorldControl>(
+        "/gazebo/default/world_control");
+  pub->WaitForConnection();
+
+  // Reset world, verify time == 0
+  gazebo::msgs::WorldControl msg;
+  msg.mutable_reset()->set_all(true);
+  pub->Publish(msg);
+
+  int sleep = 0;
+  int maxSleep = 20;
+  // Wait for sim time to be reset
+  while (sleep < maxSleep)
+  {
+    simTime = world->GetSimTime().Double();
+    if (ignition::math::equal(simTime, 0.0, dt))
+      break;
+    sleep++;
+    gazebo::common::Time::MSleep(100);
+  }
+
+  simTime = world->GetSimTime().Double();
+  EXPECT_NEAR(simTime, 0.0, dt);
+
+  // verify boxes have moved back to initial pose and they are not pushed
+  // apart
+  EXPECT_EQ(model->GetWorldPose(), initialPose);
+  EXPECT_EQ(model2->GetWorldPose(), initialPose2);
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldControlResetTest, ModelOverlapReset)
+{
+  ModelOverlapReset(GetParam());
+}
+
 /////////////////////////////////////////////////
 void WorldResetTest::ModelPose(const std::string &_physicsEngine,
                                const std::string &_world, const int _resets)
@@ -310,6 +413,9 @@ TEST_P(WorldResetTest, WorldName)
         << std::endl;
   WorldName(physics, worldName, resets);
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldControlResetTest,
+    PHYSICS_ENGINE_VALUES);
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldResetTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,

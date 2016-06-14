@@ -360,6 +360,22 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
+  /// Switch between RTS modes
+  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
+      this->dataPtr->state != "make_entity")
+  {
+    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
+      g_rotateAct->trigger();
+    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
+      g_translateAct->trigger();
+    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
+      g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
+      g_snapAct->trigger();
+    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
+      g_arrowAct->trigger();
+  }
+
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
   this->dataPtr->keyEvent.shift =
@@ -414,22 +430,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     return;
 
   this->dataPtr->keyModifiers = _event->modifiers();
-
-  /// Switch between RTS modes
-  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
-      this->dataPtr->state != "make_entity")
-  {
-    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
-      g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
-      g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
-      g_scaleAct->trigger();
-    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
-      g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
-      g_arrowAct->trigger();
-  }
 
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
