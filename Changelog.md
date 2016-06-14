@@ -100,6 +100,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Backport single pixel selection buffer for mouse picking
+    * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
+
 1. Prevent mouse pan and orbit from deselecting entities in model editor
     * [Pull request 2333](https://bitbucket.org/osrf/gazebo/pull-request/2333)
 
@@ -125,6 +128,10 @@
 1. Fix view control mouse focus in model editor
     * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)
     * [Issue #1791](https://bitbucket.org/osrf/gazebo/issues/1791)
+
+1. Server generates unique model names in case of overlap
+    * [Pull request 2296](https://bitbucket.org/osrf/gazebo/pull-request/2296)
+    * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
 
 1. Model Editor: Select and align nested models
     * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)

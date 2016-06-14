@@ -47,6 +47,48 @@ ignition::math::Vector2i GetScreenSpaceCoords(ignition::math::Vector3d _pt,
 }
 
 /////////////////////////////////////////////////
+void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
+    const ignition::math::Vector2d &_start,
+    const ignition::math::Vector2d &_end)
+{
+  // move the mouse cursor to the _start pos
+  QTest::mouseMove(_widget,
+      QPoint(_widget->width()*_start.X(), _widget->height()*_start.Y()));
+
+  // There seem to be a problem simulating mouse drag using QTest
+  // so use raw QMouseEvent.
+  QPoint startPt(_widget->width()*_start.X(), _widget->height()*_start.Y());
+  QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, startPt,
+      _widget->mapToGlobal(startPt), _button, _button, Qt::NoModifier);
+  QApplication::postEvent(_widget, pressEvent);
+
+  ignition::math::Vector2d dist = _end - _start;
+
+  // move the cursor to _end pos over 10 steps
+  unsigned int steps = 10;
+  for (unsigned int i = 0; i < steps; ++i)
+  {
+    // compute next pos to move the cursor to
+    ignition::math::Vector2d nextPos = _start + dist * (1.0 / steps) * (i+1);
+
+    QPoint movePt(_widget->width()*nextPos.X(), _widget->height()*nextPos.Y());
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, movePt,
+        _widget->mapToGlobal(movePt), _button, _button, Qt::NoModifier);
+    QApplication::postEvent(_widget, moveEvent);
+
+    gazebo::common::Time::MSleep(10);
+    QCoreApplication::processEvents();
+  }
+
+  QPoint releasePt(_widget->width()*_end.X(), _widget->height()*_end.Y());
+  QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
+      releasePt, _widget->mapToGlobal(releasePt), _button, _button,
+      Qt::NoModifier);
+  QApplication::postEvent(_widget, releaseEvent);
+}
+
+/////////////////////////////////////////////////
 void MousePickingTest::Shapes()
 {
   this->resMaxPercentChange = 5.0;
@@ -158,48 +200,6 @@ void MousePickingTest::Shapes()
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
-}
-
-/////////////////////////////////////////////////
-void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
-    const ignition::math::Vector2d &_start,
-    const ignition::math::Vector2d &_end)
-{
-  // move the mouse cursor to the _start pos
-  QTest::mouseMove(_widget,
-      QPoint(_widget->width()*_start.X(), _widget->height()*_start.Y()));
-
-  // There seem to be a problem simulating mouse drag using QTest
-  // so use raw QMouseEvent.
-  QPoint startPt(_widget->width()*_start.X(), _widget->height()*_start.Y());
-  QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, startPt,
-      _widget->mapToGlobal(startPt), _button, _button, Qt::NoModifier);
-  QApplication::postEvent(_widget, pressEvent);
-
-  ignition::math::Vector2d dist = _end - _start;
-
-  // move the cursor to _end pos over 10 steps
-  unsigned int steps = 10;
-  for (unsigned int i = 0; i < steps; ++i)
-  {
-    // compute next pos to move the cursor to
-    ignition::math::Vector2d nextPos = _start + dist * (1.0 / steps) * (i+1);
-
-    QPoint movePt(_widget->width()*nextPos.X(), _widget->height()*nextPos.Y());
-
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, movePt,
-        _widget->mapToGlobal(movePt), _button, _button, Qt::NoModifier);
-    QApplication::postEvent(_widget, moveEvent);
-
-    gazebo::common::Time::MSleep(10);
-    QCoreApplication::processEvents();
-  }
-
-  QPoint releasePt(_widget->width()*_end.X(), _widget->height()*_end.Y());
-  QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
-      releasePt, _widget->mapToGlobal(releasePt), _button, _button,
-      Qt::NoModifier);
-  QApplication::postEvent(_widget, releaseEvent);
 }
 
 /////////////////////////////////////////////////
