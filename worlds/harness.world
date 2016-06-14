@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="harness">
+      <pose>0 0 2.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>.5 .25 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>.5 .25 0.05</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="fixed_joint" type="fixed">
+        <parent>world</parent>
+        <child>link</child>
+      </joint>
+
+      <plugin filename="libHarnessPlugin.so" name="harness">
+
+        <joint name="joint1" type="prismatic">
+          <pose>0 0 0 0 0 0</pose>
+          <parent>harness::link</parent>
+          <child>box::link</child>
+          <axis>
+            <xyz>0 0 1</xyz>
+            <dynamics>
+              <damping>0</damping>
+            </dynamics>
+            <limit>
+              <lower>-.5</lower>
+              <upper>0</upper>
+              <effort>100</effort>
+              <velocity>0</velocity>
+              <stiffness>0</stiffness>
+              <dissipation>0</dissipation>
+            </limit>
+          </axis>
+        </joint>
+
+        <!-- The joint that raises or lowers the harness -->
+        <winch>
+          <joint>joint1</joint>
+
+          <!-- PID value for velocity control of the winch -->
+          <pid>
+            <p>100000</p>
+            <i>0</i>
+            <d>10</d>
+          </pid>
+        </winch>
+
+        <!-- Joint to detach. Once the joint is detached, it cannot be
+             reattached. -->
+        <detach>joint1</detach>
+
+        <!-- True will turn on debug output -->
+        <debug>false</debug>
+      </plugin>
+    </model>
+
+    <model name="box">
+      <pose>0 0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
