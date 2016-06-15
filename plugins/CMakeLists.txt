@@ -43,6 +43,7 @@ set (plugins
   ActorPlugin
   ActuatorPlugin
   ArduCopterPlugin
+  ArduCopterIRLockPlugin
   ArrangePlugin
   BreakableJointPlugin
   BuoyancyPlugin
