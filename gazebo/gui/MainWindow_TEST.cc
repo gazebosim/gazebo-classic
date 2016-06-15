@@ -750,6 +750,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_redoAct);
 
+  QVERIFY(gazebo::gui::g_plotAct);
+
   QVERIFY(gazebo::gui::g_redoHistoryAct);
 
   mainWindow->close();
@@ -870,6 +872,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_redoAct);
 
   QVERIFY(!gazebo::gui::g_redoHistoryAct);
+
+  QVERIFY(!gazebo::gui::g_plotAct);
 }
 
 /////////////////////////////////////////////////

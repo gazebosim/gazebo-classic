@@ -9,6 +9,7 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
+  ${QWT_INCLUDE_DIR}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -205,6 +206,7 @@ target_link_libraries(gazebo_gui
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${QWT_LIBRARY}
 )
 
 if (UNIX)

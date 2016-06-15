@@ -158,6 +158,8 @@ TopToolbar::TopToolbar(QWidget *_parent)
     this->dataPtr->toolbar->addAction(g_screenshotAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
+  if (g_plotAct)
+    this->dataPtr->toolbar->addAction(g_plotAct);
 
   // Layout
   QHBoxLayout *toolLayout = new QHBoxLayout;

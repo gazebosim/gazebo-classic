@@ -209,6 +209,16 @@ QPushButton#plotAddCanvas
   height: 20px;
 }
 
+QPushButton#plotExport
+{
+  padding: 8px;
+  background-color: #616161;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 2px;
+  border: 0px;
+}
+
 QPushButton#expandButton
 {
   margin: 0px;
@@ -383,17 +393,13 @@ QLineEdit:disabled
 
 QPushButton
 {
-  /*
-  border: 2px outset #727272;
-  border-radius: 4px;
-  background: #737373;
-  */
-
-  color: #d0d0d0;
-  border: 2px solid #737373;
-  border-radius: 0px;
+  padding: 8px;
+  font-weight: 200;
+  color: #fefefe;
+  text-align: center;
+  border-radius: 2px;
+  border: 0px;
   selection-color: transparent;
-  padding: 2px;
   margin: 2px;
   background: #505050;
 }

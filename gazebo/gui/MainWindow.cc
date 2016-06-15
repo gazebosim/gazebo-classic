@@ -61,6 +61,7 @@
 #include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/UserCmdHistory.hh"
 #include "gazebo/gui/ViewAngleWidget.hh"
+#include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
@@ -69,10 +70,6 @@
 #include "gazebo/gui/viewers/ImageView.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/MainWindowPrivate.hh"
-
-#ifdef HAVE_QWT
-#include "gazebo/gui/Diagnostics.hh"
-#endif
 
 #ifdef HAVE_OCULUS
 #include "gazebo/gui/OculusWindow.hh"
@@ -401,12 +398,10 @@ void MainWindow::New()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Diagnostics()
+void MainWindow::Plot()
 {
-#ifdef HAVE_QWT
-  gui::Diagnostics *diag = new gui::Diagnostics(this);
-  diag->show();
-#endif
+  gui::PlotWindow *plot = new gui::PlotWindow(this);
+  plot->show();
 }
 
 /////////////////////////////////////////////////
@@ -1084,13 +1079,11 @@ void MainWindow::CreateActions()
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
-#ifdef HAVE_QWT
-  /*g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
-  g_diagnosticsAct->setShortcut(tr("Ctrl+U"));
-  g_diagnosticsAct->setStatusTip(tr("Plot diagnostic information"));
-  connect(g_diagnosticsAct, SIGNAL(triggered()), this, SLOT(Diagnostics()));
-  */
-#endif
+  g_plotAct = new QAction(QIcon(":images/graph_line_toolbar.svg"),
+      tr("Plot"), this);
+  g_plotAct->setShortcut(tr("Ctrl+P"));
+  g_plotAct->setToolTip(tr("Create plot (Ctrl+P)"));
+  connect(g_plotAct, SIGNAL(triggered()), this, SLOT(Plot()));
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
@@ -1414,7 +1407,7 @@ void MainWindow::CreateActions()
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
       tr("Screenshot"), this);
-  g_screenshotAct->setStatusTip(tr("Take a screenshot"));
+  g_screenshotAct->setToolTip(tr("Take a screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
@@ -1814,6 +1807,9 @@ void MainWindow::DeleteActions()
 
   delete g_redoHistoryAct;
   g_redoHistoryAct = 0;
+
+  delete g_plotAct;
+  g_plotAct = 0;
 }
 
 
@@ -1885,9 +1881,7 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
 
-#ifdef HAVE_QWT
-  // windowMenu->addAction(g_diagnosticsAct);
-#endif
+  windowMenu->addAction(g_plotAct);
 
   bar->addSeparator();
 
@@ -2427,6 +2421,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_overlayAct->setVisible(simOrLog);
   g_showToolbarsAct->setVisible(simOrLog);
   g_fullScreenAct->setVisible(simOrLog);
+  g_plotAct->setVisible(simulation);
 
   // About
   g_hotkeyChartAct->setVisible(simOrLog);
