@@ -2467,14 +2467,7 @@ namespace gazebo
       }
       else
       {
-        auto inertial = link->mutable_inertial();
-        inertial->set_mass(_mass);
-        inertial->set_ixx(m.IXX());
-        inertial->set_iyy(m.IYY());
-        inertial->set_izz(m.IZZ());
-        inertial->set_ixy(m.IXY());
-        inertial->set_ixz(m.IXZ());
-        inertial->set_iyz(m.IYZ());
+        msgs::Set(link->mutable_inertial(), m);
       }
     }
 
@@ -2501,14 +2494,7 @@ namespace gazebo
       }
       else
       {
-        auto inertial = link->mutable_inertial();
-        inertial->set_mass(_mass);
-        inertial->set_ixx(m.IXX());
-        inertial->set_iyy(m.IYY());
-        inertial->set_izz(m.IZZ());
-        inertial->set_ixy(m.IXY());
-        inertial->set_ixz(m.IXZ());
-        inertial->set_iyz(m.IYZ());
+        msgs::Set(link->mutable_inertial(), m);
       }
     }
 
@@ -2531,14 +2517,7 @@ namespace gazebo
       }
       else
       {
-        auto inertial = link->mutable_inertial();
-        inertial->set_mass(_mass);
-        inertial->set_ixx(m.IXX());
-        inertial->set_iyy(m.IYY());
-        inertial->set_izz(m.IZZ());
-        inertial->set_ixy(m.IXY());
-        inertial->set_ixz(m.IXZ());
-        inertial->set_iyz(m.IYZ());
+        msgs::Set(link->mutable_inertial(), m);
       }
     }
 
