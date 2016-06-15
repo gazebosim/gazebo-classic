@@ -83,6 +83,7 @@
         </inertial>
         <sensor name='<%= name %>_imu' type='imu'>
           <pose><%= a_to_s(p1) %></pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose><%= a_to_s(p1) %></pose>

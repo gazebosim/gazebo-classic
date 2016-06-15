@@ -33,6 +33,7 @@
         </inertial>
         <sensor name='sphere_1_imu' type='imu'>
           <pose>0 0 0 0 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0 0 0 0 0</pose>
@@ -89,6 +90,7 @@
         </inertial>
         <sensor name='sphere_2_imu' type='imu'>
           <pose>0.1 0 0 0 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0.1 0 0 0 0 0</pose>
@@ -145,6 +147,7 @@
         </inertial>
         <sensor name='sphere_3_imu' type='imu'>
           <pose>0 0.1 0 0 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0.1 0 0 0 0</pose>
@@ -201,6 +204,7 @@
         </inertial>
         <sensor name='sphere_4_imu' type='imu'>
           <pose>0 0 0.1 0 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0 0.1 0 0 0</pose>
@@ -257,6 +261,7 @@
         </inertial>
         <sensor name='sphere_5_imu' type='imu'>
           <pose>-0.1 0 0 0 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>-0.1 0 0 0 0 0</pose>
@@ -313,6 +318,7 @@
         </inertial>
         <sensor name='sphere_6_imu' type='imu'>
           <pose>0 -0.1 0 0 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 -0.1 0 0 0 0</pose>
@@ -369,6 +375,7 @@
         </inertial>
         <sensor name='sphere_7_imu' type='imu'>
           <pose>0 0 -0.1 0 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0 -0.1 0 0 0</pose>
@@ -425,6 +432,7 @@
         </inertial>
         <sensor name='sphere_8_imu' type='imu'>
           <pose>-0.1 0 0 -1.5707963267948966 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>-0.1 0 0 -1.5707963267948966 0 0</pose>
@@ -481,6 +489,7 @@
         </inertial>
         <sensor name='sphere_9_imu' type='imu'>
           <pose>0 0 -0.1 0 -1.5707963267948966 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0 -0.1 0 -1.5707963267948966 0</pose>
@@ -537,6 +546,7 @@
         </inertial>
         <sensor name='sphere_10_imu' type='imu'>
           <pose>0 0.1 0 0 0 -1.5707963267948966</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0.1 0 0 0 -1.5707963267948966</pose>
@@ -593,6 +603,7 @@
         </inertial>
         <sensor name='sphere_11_imu' type='imu'>
           <pose>0 0 0.1 -1.5707963267948966 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0 0.1 -1.5707963267948966 0 0</pose>
@@ -649,6 +660,7 @@
         </inertial>
         <sensor name='sphere_12_imu' type='imu'>
           <pose>0 -0.1 0 0 -1.5707963267948966 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 -0.1 0 0 -1.5707963267948966 0</pose>
@@ -705,6 +717,7 @@
         </inertial>
         <sensor name='sphere_13_imu' type='imu'>
           <pose>-0.1 0 0 0 0 -1.5707963267948966</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>-0.1 0 0 0 0 -1.5707963267948966</pose>
@@ -761,6 +774,7 @@
         </inertial>
         <sensor name='sphere_14_imu' type='imu'>
           <pose>0 -0.1 0 -1.5707963267948966 0 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 -0.1 0 -1.5707963267948966 0 0</pose>
@@ -817,6 +831,7 @@
         </inertial>
         <sensor name='sphere_15_imu' type='imu'>
           <pose>0.1 0 0 0 -1.5707963267948966 0</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0.1 0 0 0 -1.5707963267948966 0</pose>
@@ -873,6 +888,7 @@
         </inertial>
         <sensor name='sphere_16_imu' type='imu'>
           <pose>0 0 -0.1 0 0 -1.5707963267948966</pose>
+          <always_on>1</always_on>
         </sensor>
         <collision name="collision">
           <pose>0 0 -0.1 0 0 -1.5707963267948966</pose>
