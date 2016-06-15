@@ -207,6 +207,22 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
   EXPECT_EQ(123, v.nsec);
 }
 
+TEST_F(MsgsTest, ConvertMathMassMatrix3ToMsgs)
+{
+  msgs::Inertial msg = msgs::Convert(
+      ignition::math::MassMatrix3d(12.0,
+        ignition::math::Vector3d(2, 3, 4),
+        ignition::math::Vector3d(0.1, 0.2, 0.3)));
+
+  EXPECT_DOUBLE_EQ(12.0, msg.mass());
+  EXPECT_DOUBLE_EQ(2.0, msg.ixx());
+  EXPECT_DOUBLE_EQ(3.0, msg.iyy());
+  EXPECT_DOUBLE_EQ(4.0, msg.izz());
+  EXPECT_DOUBLE_EQ(0.1, msg.ixy());
+  EXPECT_DOUBLE_EQ(0.2, msg.ixz());
+  EXPECT_DOUBLE_EQ(0.3, msg.iyz());
+}
+
 TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 {
   msgs::PlaneGeom msg = msgs::Convert(
@@ -368,6 +384,23 @@ TEST_F(MsgsTest, SetTime)
   msgs::Set(&msg, common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());
+}
+
+TEST_F(MsgsTest, SetMassMatrix3)
+{
+  msgs::Inertial msg;
+  msgs::Set(&msg, ignition::math::MassMatrix3d(
+        12.0,
+        ignition::math::Vector3d(2, 3, 4),
+        ignition::math::Vector3d(0.1, 0.2, 0.3)));
+
+  EXPECT_DOUBLE_EQ(12.0, msg.mass());
+  EXPECT_DOUBLE_EQ(2.0, msg.ixx());
+  EXPECT_DOUBLE_EQ(3.0, msg.iyy());
+  EXPECT_DOUBLE_EQ(4.0, msg.izz());
+  EXPECT_DOUBLE_EQ(0.1, msg.ixy());
+  EXPECT_DOUBLE_EQ(0.2, msg.ixz());
+  EXPECT_DOUBLE_EQ(0.3, msg.iyz());
 }
 
 TEST_F(MsgsTest, SetPlane)
