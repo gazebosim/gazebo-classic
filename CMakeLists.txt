@@ -220,12 +220,11 @@ if(USE_UPSTREAM_CFLAGS)
 endif()
 
 if (NOT MSVC)
-# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-# Skip this check for MSVC so that the warning level can be set from a config file via MSVC_CXX_WARNING_FLAGS.
-filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+  # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
+  filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
                                -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-endif()
+endif()				   
 				   
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
@@ -236,7 +235,7 @@ endif()
 if (MSVC)
   # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
   # Handling exceptions rightly
-  set(UNFILTERED_FLAGS "/EHsc")
+  set(UNFILTERED_FLAGS "/EHsc /wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
 endif()
 
 # Visual Studio enables c++11 support by default
@@ -244,7 +243,7 @@ if (NOT MSVC)
   set(UNFILTERED_FLAGS "-std=c++11")
 endif()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS} ${MSVC_CXX_WARNING_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
 #################################################
 # OS Specific initialization
