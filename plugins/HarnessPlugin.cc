@@ -71,12 +71,14 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   // which a model can be lowered
   this->harnessLink = _model->CreateLink(harnessLinkName);
   this->harnessLink->SetWorldPose(math::Pose(0, 0, 3, 0, 0, 0));
+  this->harnessLink->Init();
 
   this->harnessJoint = world->GetPhysicsEngine()->CreateJoint("fixed");
   this->harnessJoint->SetName(harnessLinkName + "__fixed_joint__");
   this->harnessJoint->Attach(physics::LinkPtr(), this->harnessLink);
   this->harnessJoint->Load(physics::LinkPtr(), this->harnessLink,
       ignition::math::Pose3d::Zero);
+  this->harnessJoint->Init();
 
   // Load all the harness joints
   sdf::ElementPtr jointElem = _sdf->GetElement("joint");

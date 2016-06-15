@@ -42,6 +42,11 @@ BulletLink::BulletLink(EntityPtr _parent)
 {
   this->rigidLink = NULL;
   this->compoundShape = NULL;
+
+  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
+      this->GetWorld()->GetPhysicsEngine());
+  if (this->bulletPhysics == NULL)
+    gzthrow("Not using the bullet physics engine");
 }
 
 //////////////////////////////////////////////////
@@ -53,12 +58,6 @@ BulletLink::~BulletLink()
 //////////////////////////////////////////////////
 void BulletLink::Load(sdf::ElementPtr _sdf)
 {
-  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
-
-  if (this->bulletPhysics == NULL)
-    gzthrow("Not using the bullet physics engine");
-
   Link::Load(_sdf);
 }
 
