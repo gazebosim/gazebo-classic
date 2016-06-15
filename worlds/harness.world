@@ -9,8 +9,20 @@
     </include>
 
     <model name="box">
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0 0 1.5 0 0 0</pose>
       <link name="link">
+        <inertial>
+          <mass>0.2</mass>
+          <inertia>
+            <ixx>0.0333333</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0333333</iyy>
+            <iyz>0</iyz>
+            <izz>0.0333333</izz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
@@ -42,17 +54,26 @@
           <axis>
             <xyz>0 0 1</xyz>
             <dynamics>
-              <damping>0</damping>
+              <damping>10</damping>
             </dynamics>
             <limit>
               <lower>-0.5</lower>
               <upper>0</upper>
-              <effort>0</effort>
-              <velocity>0</velocity>
+              <effort>10000</effort>
+              <velocity>-1</velocity>
               <stiffness>0</stiffness>
               <dissipation>0</dissipation>
             </limit>
           </axis>
+          <physics>
+            <ode>
+              <implicit_spring_damper>1</implicit_spring_damper>
+              <limit>
+                <cfm>0.0</cfm>
+                <erp>0.0</erp>
+              </limit>
+            </ode>
+          </physics>
         </joint>
 
         <!-- The joint that raises or lowers the harness -->
@@ -61,11 +82,12 @@
                the body of this plugin. -->
           <joint>joint1</joint>
 
-          <!-- PID value for velocity control of the winch -->
+          <!-- PID value for velocity control of the winch. These values
+               are tuned to work with this box model. -->
           <pid>
-            <p>10000</p>
+            <p>400</p>
             <i>0</i>
-            <d>10</d>
+            <d>0</d>
           </pid>
         </winch>
 

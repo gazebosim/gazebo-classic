@@ -229,15 +229,6 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   double winchForce = this->winchPID.Update(error,
       _info.simTime - this->prevSimTime);
 
-  std::cout << "-------------------------------------\n";
-  std::cout << "  Joint Vel["
-    << this->joints[this->winchIndex]->GetVelocity(0)  << "]\n";
-  std::cout << "  Joint Pos["
-    << this->joints[this->winchIndex]->GetAngle(0).Radian()  << "]\n";
-  std::cout << "  Target Vel[" << this->winchTargetVel << "]\n";
-  std::cout << "  Error[" << error << "]\n";
-  std::cout << "  Force[" << winchForce << "]\n";
-
   // Apply the joint force
   this->joints[this->winchIndex]->SetForce(0, winchForce);
 
