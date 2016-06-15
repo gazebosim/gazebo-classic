@@ -272,7 +272,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
         = msgs::Convert(msg.linear_velocity());
     // Get the correct vel for imu's that are at an offset from parent link
     imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
+        imuWorldAngularVel.Cross(imuPose.pos - parentEntityPose.pos);
     this->linearAcc = imuPose.rot.GetInverse().RotateVector(
       (imuWorldLinearVel - this->lastLinearVel) / dt);
 
