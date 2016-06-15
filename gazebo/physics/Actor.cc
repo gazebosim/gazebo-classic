@@ -26,7 +26,6 @@
 
 #include "gazebo/common/BVHLoader.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Events.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Mesh.hh"
@@ -38,7 +37,6 @@
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"
-#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -60,8 +58,18 @@ Actor::Actor(BasePtr _parent)
 //////////////////////////////////////////////////
 Actor::~Actor()
 {
-  this->skelAnimation.clear();
   this->bonePosePub.reset();
+  this->customTrajectoryInfo.reset();
+
+  this->skelAnimation.clear();
+  this->skelNodesMap.clear();
+  this->interpolateX.clear();
+  this->trajInfo.clear();
+  this->trajectories.clear();
+
+  this->mainLink.reset();
+
+  // mesh and skeleton should be deleted by the MeshManager
 }
 
 //////////////////////////////////////////////////
@@ -218,7 +226,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
   {
     TrajectoryInfo tinfo;
     tinfo.id = 0;
-    tinfo.type = this->skinFile;
+    tinfo.type = this->skelAnimation.begin()->first;
     tinfo.startTime = 0.0;
     tinfo.duration = this->skelAnimation.begin()->second->GetLength();
     tinfo.endTime = tinfo.duration;
