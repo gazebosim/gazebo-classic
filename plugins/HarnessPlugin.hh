@@ -113,8 +113,7 @@ namespace gazebo
     /// joints can be attached.
     private: physics::LinkPtr harnessLink;
 
-    /// \brief A dynamically created joint between the world and
-    //harnessLink.
+    /// \brief A dynamically created joint between the world and harnessLink.
     private: physics::JointPtr harnessJoint;
 
     /// \brief Communication node
