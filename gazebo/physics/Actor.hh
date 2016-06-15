@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ACTOR_HH_
-#define _ACTOR_HH_
+#ifndef GAZEBO_PHYSICS_ACTOR_HH_
+#define GAZEBO_PHYSICS_ACTOR_HH_
 
 #include <string>
 #include <map>
@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief ID of the trajectory.
       public: unsigned int id;
 
-      /// \brief Type of trajectory.
+      /// \brief Type of trajectory, such as...
       public: std::string type;
 
       /// \brief Duration of the trajectory.
@@ -58,7 +58,7 @@ namespace gazebo
       /// \brief End time of the trajectory.
       public: double endTime;
 
-      /// \brief True if the trajectory is tranlated.
+      /// \brief True if the trajectory is translated.
       public: bool translated;
     };
 
@@ -71,7 +71,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE Actor : public Model
     {
       /// \brief Typedef the skeleton animation map.
-      public: typedef std::map<std::string, common::SkeletonAnimation*>
+      public: typedef std::map<std::string, common::SkeletonAnimation *>
               SkeletonAnimation_M;
 
       /// \brief Constructor
@@ -103,7 +103,7 @@ namespace gazebo
       /// \brief Finalize the actor
       public: virtual void Fini();
 
-      /// \brief update the parameters using new sdf values.
+      /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
@@ -121,7 +121,7 @@ namespace gazebo
 
       /// \brief Returns a dictionary of all the skeleton animations associated
       /// with the actor.
-      /// \return a map of SkeletonAnimation, indexed by their name.
+      /// \return A map of SkeletonAnimation, indexed by their name.
       public: const SkeletonAnimation_M &SkeletonAnimations() const;
 
       /// \brief Set a custom trajectory for the actor.
@@ -131,11 +131,18 @@ namespace gazebo
       /// \brief Reset custom trajectory of the actor.
       public: void ResetCustomTrajectory();
 
-      // Documentation inherited
+      /// \brief Get whether the links in the actor can collide with each other.
+      /// This is always false for actors.
+      /// \return False, because actors can't self-collide.
+      /// \sa SetSelfCollide()
       public: virtual bool GetSelfCollide() const;
 
-      // Documentation inherited
-      public: virtual void SetSelfCollide(bool _self_collide);
+      /// \brief Override set self collide method to make it impossible to set
+      /// it to true for actors.
+      /// \param [in] _selfCollide Whether this can collide with itself, will be
+      /// false for actors regardless of the input.
+      /// \sa GetSelfCollide()
+      public: virtual void SetSelfCollide(bool _selfCollide);
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
@@ -182,7 +189,7 @@ namespace gazebo
                    const std::string &_material,
                    const common::Color &_ambient);
 
-      /// \brief Add an actor visual to a link.
+      /// \brief Add a visual to the given link which holds the actor's skin.
       /// \param[in] _linkSdf Link to add the visual to.
       /// \param[in] _name Name of the visual.
       /// \param[in] _pose Pose of the visual.
@@ -190,9 +197,13 @@ namespace gazebo
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose);
 
-      /// \brief Load an animation from SDF.
+      /// \brief Load an animation from SDF. These are the animations which
+      /// will be applied to the skeletons defined in the skin.
       /// \param[in] _sdf SDF element containing the animation.
       private: void LoadAnimation(sdf::ElementPtr _sdf);
+
+
+      private: void LoadSkin(sdf::ElementPtr _sdf);
 
       /// \brief Load an animation script from SDF.
       /// \param[in] _sdf SDF element containing the animation script.
@@ -203,14 +214,14 @@ namespace gazebo
       /// \param[in] _skelMap Map of bone relationships.
       /// \param[in] _time Time over which to animate the set pose.
       private: void SetPose(
-                   std::map<std::string, ignition::math::Matrix4d> _frame,
-                   std::map<std::string, std::string> _skelMap, double _time);
+          std::map<std::string, ignition::math::Matrix4d> _frame,
+          std::map<std::string, std::string> _skelMap, const double _time);
 
       /// \brief Pointer to the actor's mesh.
-      protected: const common::Mesh *mesh;
+      protected: const common::Mesh *mesh = nullptr;
 
       /// \brief The actor's skeleton.
-      protected: common::Skeleton *skeleton;
+      protected: common::Skeleton *skeleton = nullptr;
 
       /// \brief Filename for the skin.
       protected: std::string skinFile;
@@ -243,7 +254,7 @@ namespace gazebo
       protected: common::Time playStartTime;
 
       /// \brief All the trajectories.
-      protected: std::map<unsigned int, common::PoseAnimation*> trajectories;
+      protected: std::map<unsigned int, common::PoseAnimation *> trajectories;
 
       /// \brief Trajectory information
       protected: std::vector<TrajectoryInfo> trajInfo;
@@ -264,7 +275,7 @@ namespace gazebo
       /// \brief Length of the actor's path.
       protected: double pathLength;
 
-      /// \brief THe last trajectory
+      /// \brief The last trajectory
       protected: unsigned int lastTraj;
 
       /// \brief Name of the visual

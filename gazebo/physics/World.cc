@@ -1191,6 +1191,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 
     while (childElem)
     {
+      // No Init?
       this->LoadActor(childElem, _parent);
 
       childElem = childElem->GetNextElement("actor");
