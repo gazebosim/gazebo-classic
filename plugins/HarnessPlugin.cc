@@ -243,7 +243,7 @@ void HarnessPlugin::Detach()
   this->prevSimTime == common::Time::Zero;
 
   // We no longer need to update
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////

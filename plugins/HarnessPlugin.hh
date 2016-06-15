@@ -91,9 +91,6 @@ namespace gazebo
     /// \return Index into this->jointsto
     private: int JointIndex(const std::string &_name) const;
 
-    /// \brief Connection to World Update events.
-    private: event::ConnectionPtr updateConnection;
-
     /// \brief Vector of joints
     private: std::vector<physics::JointPtr> joints;
 
@@ -112,6 +109,14 @@ namespace gazebo
     /// \brief Previous simulation time
     private: common::Time prevSimTime = common::Time::Zero;
 
+    /// \brief A dynamically created link that acts as a fixed point to which
+    /// joints can be attached.
+    private: physics::LinkPtr harnessLink;
+
+    /// \brief A dynamically created joint between the world and
+    //harnessLink.
+    private: physics::JointPtr harnessJoint;
+
     /// \brief Communication node
     /// \todo: Transition to ignition-transport in gazebo8
     private: transport::NodePtr node;
@@ -124,13 +129,8 @@ namespace gazebo
     /// \todo: Transition to ignition-transport in gazebo8
     private: transport::SubscriberPtr detachSub;
 
-    /// \brief A dynamically created link that acts as a fixed point to which
-    /// joints can be attached.
-    private: physics::LinkPtr harnessLink;
-
-    /// \brief A dynamically created joint between the world and
-    //harnessLink.
-    private: physics::JointPtr harnessJoint;
+    /// \brief Connection to World Update events.
+    private: event::ConnectionPtr updateConnection;
   };
 }
 #endif
