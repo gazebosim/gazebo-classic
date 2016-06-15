@@ -427,15 +427,9 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
     else if (i == 3)
     {
       ignition::math::MassMatrix3d m;
-      m.SetFromBox(mass, ignition::math::Vector3d(dx, dy, dz),
-          ignition::math::Quaterniond(0, 0, angle));
-      auto msgInertial = msgModel.mutable_link(0)->mutable_inertial();
-      msgInertial->set_ixx(m.IXX());
-      msgInertial->set_iyy(m.IYY());
-      msgInertial->set_izz(m.IZZ());
-      msgInertial->set_ixy(m.IXY());
-      msgInertial->set_ixz(m.IXZ());
-      msgInertial->set_iyz(m.IYZ());
+      EXPECT_TRUE(m.SetFromBox(mass, ignition::math::Vector3d(dx, dy, dz),
+          ignition::math::Quaterniond(0, 0, angle)));
+      msgs::Set(msgModel.mutable_link(0)->mutable_inertial(), m);
     }
     // i=4: offset inertial pose
     //  expect inertial pose to differ from link pose
