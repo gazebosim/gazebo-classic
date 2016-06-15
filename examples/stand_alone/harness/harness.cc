@@ -41,7 +41,7 @@ int main(int _argc, char **_argv)
 
   // Publish to a Gazebo topic
   gazebo::transport::PublisherPtr pub =
-    node->Advertise<gazebo::msgs::GzString>("~/harness/harness/velocity");
+    node->Advertise<gazebo::msgs::GzString>("~/box/harness/velocity");
 
   // Wait for a subscriber to connect
   pub->WaitForConnection();

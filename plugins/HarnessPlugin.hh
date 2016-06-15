@@ -123,6 +123,14 @@ namespace gazebo
     /// \brief Detach control subscriber
     /// \todo: Transition to ignition-transport in gazebo8
     private: transport::SubscriberPtr detachSub;
+
+    /// \brief A dynamically created link that acts as a fixed point to which
+    /// joints can be attached.
+    private: physics::LinkPtr harnessLink;
+
+    /// \brief A dynamically created joint between the world and
+    //harnessLink.
+    private: physics::JointPtr harnessJoint;
   };
 }
 #endif

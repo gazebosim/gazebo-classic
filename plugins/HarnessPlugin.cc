@@ -45,8 +45,16 @@ HarnessPlugin::~HarnessPlugin()
 void HarnessPlugin::Load(physics::ModelPtr _model,
                          sdf::ElementPtr _sdf)
 {
+  if (!_sdf->HasElement("harness_link_name"))
+  {
+    gzerr << "No <harness_link_name> present. Harness plugin will not run.\n";
+    return;
+  }
+  std::string harnessLinkName = _sdf->Get<std::string>("harness_link_name");
+
   // Get a pointer to the world
   physics::WorldPtr world = _model->GetWorld();
+
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(world->GetName());
@@ -59,6 +67,17 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
       "~/" + _model->GetName() + "/harness/detach",
       &HarnessPlugin::OnDetach, this);
 
+  // Create a link that is fixed the world. This will act as the base from
+  // which a model can be lowered
+  this->harnessLink = _model->CreateLink(harnessLinkName);
+  this->harnessLink->SetWorldPose(math::Pose(0, 0, 3, 0, 0, 0));
+
+  this->harnessJoint = world->GetPhysicsEngine()->CreateJoint("fixed");
+  this->harnessJoint->SetName(harnessLinkName + "__fixed_joint__");
+  this->harnessJoint->Attach(physics::LinkPtr(), this->harnessLink);
+  this->harnessJoint->Load(physics::LinkPtr(), this->harnessLink,
+      ignition::math::Pose3d::Zero);
+
   // Load all the harness joints
   sdf::ElementPtr jointElem = _sdf->GetElement("joint");
   while (jointElem)
@@ -68,12 +87,14 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
 
     // Create the joint
     physics::JointPtr joint = world->GetPhysicsEngine()->CreateJoint(jointType);
+    joint->SetModel(_model);
     if (joint)
     {
       // Load the joint
       try
       {
         joint->SetWorld(world);
+
         joint->Load(jointElem);
         this->joints.push_back(joint);
       }
@@ -90,6 +111,8 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
 
     jointElem = jointElem->GetNextElement("joint");
   }
+
+
 
   // Make sure at least one joint was created.
   if (this->joints.empty())
@@ -206,6 +229,15 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   double winchForce = this->winchPID.Update(error,
       _info.simTime - this->prevSimTime);
 
+  std::cout << "-------------------------------------\n";
+  std::cout << "  Joint Vel["
+    << this->joints[this->winchIndex]->GetVelocity(0)  << "]\n";
+  std::cout << "  Joint Pos["
+    << this->joints[this->winchIndex]->GetAngle(0).Radian()  << "]\n";
+  std::cout << "  Target Vel[" << this->winchTargetVel << "]\n";
+  std::cout << "  Error[" << error << "]\n";
+  std::cout << "  Force[" << winchForce << "]\n";
+
   // Apply the joint force
   this->joints[this->winchIndex]->SetForce(0, winchForce);
 
@@ -251,6 +283,7 @@ int HarnessPlugin::JointIndex(const std::string &_name) const
 /////////////////////////////////////////////////
 void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
 {
+  std::cout << "SetVelocity[" << _msg->data() << "]\n";
   try
   {
     this->SetWinchVelocity(std::stof(_msg->data()));
