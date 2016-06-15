@@ -19,7 +19,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
-#include "gazebo/gui/plot/ExportDialog.hh"
+// #include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/Palette.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
@@ -346,9 +346,9 @@ void PlotWindow::OnExport()
   }
   else
   {
-    ExportDialog *dialog = new ExportDialog(this, plots);
-    dialog->setModal(true);
-    dialog->show();
+    // ExportDialog *dialog = new ExportDialog(this, plots);
+    // dialog->setModal(true);
+    // dialog->show();
   }
 }
 

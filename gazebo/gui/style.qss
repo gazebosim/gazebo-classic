@@ -209,16 +209,6 @@ QPushButton#plotAddCanvas
   height: 20px;
 }
 
-QPushButton#plotExport
-{
-  padding: 8px;
-  background-color: #616161;
-  color: #ffffff;
-  text-align: center;
-  border-radius: 2px;
-  border: 0px;
-}
-
 QPushButton#expandButton
 {
   margin: 0px;
