@@ -72,14 +72,14 @@ void ImuSpinTest::SpinTestWorld(const std::string &_physicsEngine)
     {
       auto imu = boost::static_pointer_cast<sensors::ImuSensor>(sensor);
       ASSERT_NE(imu, nullptr);
-      EXPECT_EQ(sensor->GetLinearAcceleration(), -gravity);
+      EXPECT_EQ(imu->GetLinearAcceleration(), -gravity);
     }
   }
 }
 
 TEST_P(ImuSpinTest, ImuSensorTestWorld)
 {
-  ImuSensorTestWorld(GetParam());
+  SpinTestWorld(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, ImuSpinTest, PHYSICS_ENGINE_VALUES);
