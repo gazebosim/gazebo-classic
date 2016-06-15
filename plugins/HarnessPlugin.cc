@@ -70,7 +70,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   // Create a link that is fixed the world. This will act as the base from
   // which a model can be lowered
   this->harnessLink = _model->CreateLink(harnessLinkName);
-  this->harnessLink->SetWorldPose(math::Pose(0, 0, 3, 0, 0, 0));
+  this->harnessLink->SetWorldPose(math::Pose(0, 0, 1, 0, 0, 0));
 
   this->harnessJoint = world->GetPhysicsEngine()->CreateJoint("fixed");
   this->harnessJoint->SetName(harnessLinkName + "__fixed_joint__");
@@ -274,7 +274,6 @@ int HarnessPlugin::JointIndex(const std::string &_name) const
 /////////////////////////////////////////////////
 void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
 {
-  std::cout << "SetVelocity[" << _msg->data() << "]\n";
   try
   {
     this->SetWinchVelocity(std::stof(_msg->data()));
