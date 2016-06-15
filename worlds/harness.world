@@ -46,6 +46,9 @@
         -->
         <harness_link_name>harness_link</harness_link_name>
 
+        <!-- Pose of the harness link, in this model's frame -->
+        <harness_link_pose>0 0 2 0 0 0</harness_link_pose>
+
         <joint name="joint1" type="prismatic">
           <pose>0 0 0 0 0 0</pose>
           <!-- This name matches <harness_link_name> above. -->
