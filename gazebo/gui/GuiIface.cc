@@ -255,9 +255,9 @@ bool gui::load()
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
-  // Register common::Time as a type that can be used in signals and slots.
-  // Q_DECLARE_METATYPE is also required, see above.
-  qRegisterMetaType<common::Time>();
+  if (!gui::register_metatypes())
+    std::cerr << "Unable to register Qt metatypes" << std::endl;
+
 
   g_splashScreen = new gui::SplashScreen();
 
@@ -364,6 +364,16 @@ rendering::UserCameraPtr gui::get_active_camera()
 bool gui::has_entity_name(const std::string &_name)
 {
   return g_main_win->HasEntityName(_name);
+}
+
+/////////////////////////////////////////////////
+bool gui::register_metatypes()
+{
+  // Register common::Time as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<common::Time>();
+
+  return true;
 }
 
 /////////////////////////////////////////////////
