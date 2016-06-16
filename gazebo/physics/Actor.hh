@@ -154,6 +154,19 @@ namespace gazebo
       /// \sa GetSelfCollide()
       public: virtual void SetSelfCollide(bool _selfCollide);
 
+      /// \brief Get whether the links in the actor are affected by wind.
+      /// This is always false for actors.
+      /// \return False, because forces can't be applied to actors.
+      /// \sa SetWindMode()
+      public: virtual bool WindMode() const;
+
+      /// \brief Override set wind mode method to make it impossible to set
+      /// it to true for actors.
+      /// \param [in] _enabled Whether this is affected by wind, will be
+      /// false for actors regardless of the input.
+      /// \sa GetWindMode()
+      public: virtual void SetWindMode(bool _enabled);
+
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.

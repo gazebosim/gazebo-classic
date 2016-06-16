@@ -925,11 +925,23 @@ void Actor::AddActorVisual(const sdf::ElementPtr &_linkSdf,
 /////////////////////////////////////////////////
 void Actor::SetSelfCollide(bool /*_self_collide*/)
 {
-  gzwarn << "Actor::SetSelfCollide not implemented." << std::endl;
+  // Actors don't support self collide
 }
 
 /////////////////////////////////////////////////
 bool Actor::GetSelfCollide() const
+{
+  return false;
+}
+
+/////////////////////////////////////////////////
+void Actor::SetWindMode(bool /*_enable*/)
+{
+  // Actors don't support wind mode
+}
+
+/////////////////////////////////////////////////
+bool Actor::WindMode() const
 {
   return false;
 }
