@@ -17,6 +17,8 @@
 
 #include <functional>
 
+#include <boost/algorithm/string/replace.hpp>
+
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
