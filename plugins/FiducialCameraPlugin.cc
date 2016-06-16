@@ -212,7 +212,7 @@ void FiducialCameraPlugin::Publish(const std::vector<FiducialData> &_results)
   msgs::PosesStamped msg;
   msgs::Set(msg.mutable_time(), timestamp);
 
-  for (const auto fd : _results)
+  for (const auto &fd : _results)
   {
     msgs::Pose *poseMsg = msg.add_pose();
     poseMsg->set_name(fd.id);
