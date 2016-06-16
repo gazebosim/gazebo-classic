@@ -52,7 +52,7 @@ set OGRE_LIB_SUFFIX=.lib
 @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
 @set DLFCN_WIN32_INCLUDE_DIR=%DLFCN_WIN32_PATH%\include
 
-@set QT4_PATH=%cd%\..\..\Qt\4.8.6\x64\msvc2013
+@set QT4_PATH=C:\Qt\4.8.6\x64\msvc2013
 @set QT4_BIN_DIR=%QT4_PATH%\bin
 
 @set ZeroMQ_ROOT_DIR=%cd%\..\..\ZeroMQ4.0.4
