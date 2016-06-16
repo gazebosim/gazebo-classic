@@ -28,8 +28,8 @@ void VariablePill_TEST::Variable()
   this->Load("worlds/empty.world");
 
   // test various variable pill set/get functions
-  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var01 != NULL);
+  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var01 != nullptr);
 
   // name
   std::string varName = "var01name";
@@ -51,10 +51,10 @@ void VariablePill_TEST::Variable()
   QCOMPARE(var01->IsSelected(), false);
 
   // parent
-  QVERIFY(var01->Parent() == NULL);
+  QVERIFY(var01->Parent() == nullptr);
 
-  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var02 != NULL);
+  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var02 != nullptr);
 
   var01->SetParent(var02);
   QCOMPARE(var01->Parent(), var02);
@@ -75,22 +75,22 @@ void VariablePill_TEST::VariableId()
   std::set<unsigned int> ids;
 
   // Create new variable pills and verify they all have unique ids
-  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var01 != NULL);
+  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var01 != nullptr);
   unsigned int id = var01->Id();
   QVERIFY(id != gazebo::gui::VariablePill::EmptyVariable);
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
 
-  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var02 != NULL);
+  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var02 != nullptr);
   id = var02->Id();
   QVERIFY(id != gazebo::gui::VariablePill::EmptyVariable);
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
 
-  gazebo::gui::VariablePill *var03 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var03 != NULL);
+  gazebo::gui::VariablePill *var03 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var03 != nullptr);
   id = var03->Id();
   QVERIFY(id != gazebo::gui::VariablePill::EmptyVariable);
   QVERIFY(ids.count(id) == 0u);
@@ -105,20 +105,20 @@ void VariablePill_TEST::VariableId()
 void VariablePill_TEST::MultiVariable()
 {
   // create 4 variable pills
-  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var01 != NULL);
+  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var01 != nullptr);
   QCOMPARE(var01->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var02 != NULL);
+  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var02 != nullptr);
   QCOMPARE(var02->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var03 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var03 != NULL);
+  gazebo::gui::VariablePill *var03 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var03 != nullptr);
   QCOMPARE(var03->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var04 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var04 != NULL);
+  gazebo::gui::VariablePill *var04 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var04 != nullptr);
   QCOMPARE(var04->VariablePillCount(), 0u);
 
   // add var02 to var01 - var01 becomes a multi-variable pill
@@ -149,17 +149,17 @@ void VariablePill_TEST::MultiVariable()
   // remove var02 from var01
   var01->RemoveVariablePill(var02);
   QCOMPARE(var01->VariablePillCount(), 0u);
-  QVERIFY(var02->Parent() == NULL);
+  QVERIFY(var02->Parent() == nullptr);
 
   // try remove var02 again - it should not do anything
   var01->RemoveVariablePill(var02);
   QCOMPARE(var01->VariablePillCount(), 0u);
-  QVERIFY(var02->Parent() == NULL);
+  QVERIFY(var02->Parent() == nullptr);
 
   // remove var03 from var04
   var04->RemoveVariablePill(var03);
   QCOMPARE(var04->VariablePillCount(), 0u);
-  QVERIFY(var03->Parent() == NULL);
+  QVERIFY(var03->Parent() == nullptr);
 
   delete var01;
   delete var02;

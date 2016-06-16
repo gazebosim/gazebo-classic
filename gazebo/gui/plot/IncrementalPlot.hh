@@ -65,7 +65,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
-      public: IncrementalPlot(QWidget *_parent = NULL);
+      public: IncrementalPlot(QWidget *_parent = nullptr);
 
       /// \brief Destructor
       public: virtual ~IncrementalPlot();
@@ -92,12 +92,12 @@ namespace gazebo
 
       /// \brief Find a plot curve by name
       /// \param[in] _label Name of the curve to look for.
-      /// \return Plot curve if found, NULL otherwise.
+      /// \return Plot curve if found, nullptr otherwise.
       public: PlotCurveWeakPtr Curve(const std::string &_label) const;
 
       /// \brief Find a plot curve by id
       /// \param[in] _id Unique id of the plot curve.
-      /// \return Plot curve if found, NULL otherwise.
+      /// \return Plot curve if found, nullptr otherwise.
       public: PlotCurveWeakPtr Curve(const unsigned int _id) const;
 
       /// \brief Update all the curves in the plot

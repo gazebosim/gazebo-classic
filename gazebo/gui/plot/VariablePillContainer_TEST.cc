@@ -24,29 +24,29 @@ void VariablePillContainer_TEST::AddRemoveVariable()
 {
   // create container
   gazebo::gui::VariablePillContainer *container01 =
-      new gazebo::gui::VariablePillContainer(NULL);
-  QVERIFY(container01 != NULL);
+      new gazebo::gui::VariablePillContainer(nullptr);
+  QVERIFY(container01 != nullptr);
   QCOMPARE(container01->VariablePillCount(), 0u);
 
   // create variable pills
-  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var01 != NULL);
+  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var01 != nullptr);
   QCOMPARE(var01->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var02 != NULL);
+  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var02 != nullptr);
   QCOMPARE(var02->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var03 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var03 != NULL);
+  gazebo::gui::VariablePill *var03 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var03 != nullptr);
   QCOMPARE(var03->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var04 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var04 != NULL);
+  gazebo::gui::VariablePill *var04 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var04 != nullptr);
   QCOMPARE(var04->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var05 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var05 != NULL);
+  gazebo::gui::VariablePill *var05 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var05 != nullptr);
   QCOMPARE(var05->VariablePillCount(), 0u);
 
   // add variable to container
@@ -91,7 +91,7 @@ void VariablePillContainer_TEST::AddRemoveVariable()
   // remove multi-variable - check that it doesn't remove the child variable
   container01->RemoveVariablePill(var04);
   QCOMPARE(container01->VariablePillCount(), 2u);
-  QVERIFY(var05->Parent() == NULL);
+  QVERIFY(var05->Parent() == nullptr);
   QCOMPARE(var05->Container(), container01);
 
   // remove remaining variables
@@ -119,8 +119,8 @@ void VariablePillContainer_TEST::MaxSize()
 
   // create new container
   gazebo::gui::VariablePillContainer *container =
-      new gazebo::gui::VariablePillContainer(NULL);
-  QVERIFY(container != NULL);
+      new gazebo::gui::VariablePillContainer(nullptr);
+  QVERIFY(container != nullptr);
 
   // set text
   std::string containerName = "container_test";
@@ -134,12 +134,12 @@ void VariablePillContainer_TEST::MaxSize()
   QCOMPARE(container->MaxSize(), maxSize);
 
   // create variable pills
-  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var01 != NULL);
+  gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var01 != nullptr);
   QCOMPARE(var01->VariablePillCount(), 0u);
 
-  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(NULL);
-  QVERIFY(var02 != NULL);
+  gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(nullptr);
+  QVERIFY(var02 != nullptr);
   QCOMPARE(var02->VariablePillCount(), 0u);
 
   // add variable to container - max size reached
@@ -150,12 +150,12 @@ void VariablePillContainer_TEST::MaxSize()
   // verify no more variables can be added
   container->AddVariablePill(var02);
   QCOMPARE(container->VariablePillCount(), 1u);
-  QVERIFY(var02->Container() == NULL);
+  QVERIFY(var02->Container() == nullptr);
 
   var01->AddVariablePill(var02);
   QCOMPARE(container->VariablePillCount(), 1u);
-  QVERIFY(var02->Container() == NULL);
-  QVERIFY(var02->Parent() == NULL);
+  QVERIFY(var02->Container() == nullptr);
+  QVERIFY(var02->Parent() == nullptr);
 
   // remove variable and verify we can add a different variable now
   container->RemoveVariablePill(var01);

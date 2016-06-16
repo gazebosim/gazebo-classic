@@ -35,10 +35,10 @@ namespace gazebo
       public: QFrame *mainFrame;
 
       /// \brief Pointer to the container this variable pill is in
-      public: VariablePillContainer *container = NULL;
+      public: VariablePillContainer *container = nullptr;
 
       /// \brief Parent variable pill if this is inside a multi-variable pill.
-      public: VariablePill *parent = NULL;
+      public: VariablePill *parent = nullptr;
 
       /// \brief Child variables pills if this is a multi-variable pill.
       public: std::map<unsigned int, VariablePill *> variables;
@@ -238,7 +238,7 @@ void VariablePill::AddVariablePill(VariablePill *_variable)
   }
 
   // remove variable from parent if it already has one
-  if (_variable->Parent() != NULL && _variable->Parent() != _variable)
+  if (_variable->Parent() != nullptr && _variable->Parent() != _variable)
     _variable->Parent()->RemoveVariablePill(_variable);
 
   if (this->dataPtr->variables.empty())
@@ -271,7 +271,7 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
       QLayoutItem *item = this->dataPtr->variableLayout->takeAt(0);
       VariablePill *newMultiVariable =
           qobject_cast<VariablePill *>(item->widget());
-      newMultiVariable->SetParent(NULL);
+      newMultiVariable->SetParent(nullptr);
       newMultiVariable->blockSignals(true);
       newMultiVariable->UpdateStyleSheet();
       while (this->dataPtr->variableLayout->count() > 0)
@@ -286,11 +286,11 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
       this->dataPtr->container->AddVariablePill(newMultiVariable);
       this->dataPtr->container->blockSignals(false);
     }
-    // set parent and container to NULL before calling
+    // set parent and container to nullptr before calling
     // VariablePillContainer::RemoveVariablePill to prevent double removal
     VariablePillContainer *tmpContainer =  this->dataPtr->container;
-    this->dataPtr->parent = NULL;
-    this->dataPtr->container = NULL;
+    this->dataPtr->parent = nullptr;
+    this->dataPtr->container = nullptr;
     this->dataPtr->variables.clear();
     tmpContainer->blockSignals(true);
     tmpContainer->RemoveVariablePill(this);
@@ -310,15 +310,15 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
   this->dataPtr->variableLayout->takeAt(idx);
   this->dataPtr->variables.erase(_variable->Id());
   _variable->setVisible(false);
-  _variable->setParent(NULL);
-  _variable->SetParent(NULL);
-  _variable->SetContainer(NULL);
+  _variable->setParent(nullptr);
+  _variable->SetParent(nullptr);
+  _variable->SetContainer(nullptr);
   _variable->UpdateStyleSheet();
 
   // becomes single variable pill
   if (this->dataPtr->variables.empty())
   {
-    this->SetParent(NULL);
+    this->SetParent(nullptr);
     this->SetMultiVariableMode(false);
   }
 
@@ -337,7 +337,7 @@ VariablePill *VariablePill::VariablePillByName(const std::string &_name)
       return v.second;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -401,7 +401,7 @@ void VariablePill::dropEvent(QDropEvent *_evt)
     VariablePill *variable = qobject_cast<VariablePill *>(_evt->source());
     if (!variable)
     {
-      gzerr << "Variable is NULL" << std::endl;
+      gzerr << "Variable is nullptr" << std::endl;
       return;
     }
 

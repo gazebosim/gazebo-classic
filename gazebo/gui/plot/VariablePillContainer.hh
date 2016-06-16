@@ -40,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
-      public: VariablePillContainer(QWidget *_parent = NULL);
+      public: VariablePillContainer(QWidget *_parent = nullptr);
 
       /// \brief Destructor
       public: virtual ~VariablePillContainer();

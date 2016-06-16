@@ -47,7 +47,7 @@ namespace gazebo
       public: int maxSize = -1;
 
       /// \brief Pointer to variable pill that is currently selected.
-      public: VariablePill *selectedVariable = NULL;
+      public: VariablePill *selectedVariable = nullptr;
     };
   }
 }
@@ -116,7 +116,7 @@ std::string VariablePillContainer::Text() const
 void VariablePillContainer::SetVariablePillLabel(const unsigned int _id,
     const std::string &_label)
 {
-  VariablePill *variable = NULL;
+  VariablePill *variable = nullptr;
   auto it = this->dataPtr->variables.find(_id);
   if (it == this->dataPtr->variables.end())
   {
@@ -231,7 +231,7 @@ int VariablePillContainer::MaxSize() const
 /////////////////////////////////////////////////
 void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
 {
-  VariablePill *variable = NULL;
+  VariablePill *variable = nullptr;
   auto it = this->dataPtr->variables.find(_id);
   if (it == this->dataPtr->variables.end())
   {
@@ -272,7 +272,7 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
   }
 
   // otherwise remove from container
-  variable->SetContainer(NULL);
+  variable->SetContainer(nullptr);
   variable->setVisible(false);
 }
 
@@ -312,7 +312,7 @@ VariablePill *VariablePillContainer::GetVariablePill(
         return child.second;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -373,7 +373,7 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     VariablePill *variable = qobject_cast<VariablePill *>(_evt->source());
     if (!variable)
     {
-      gzerr << "Variable is NULL" << std::endl;
+      gzerr << "Variable is nullptr" << std::endl;
       return;
     }
 
@@ -456,7 +456,7 @@ void VariablePillContainer::keyPressEvent(QKeyEvent *_event)
     if (this->dataPtr->selectedVariable)
     {
       this->RemoveVariablePill(this->dataPtr->selectedVariable);
-      this->dataPtr->selectedVariable = NULL;
+      this->dataPtr->selectedVariable = nullptr;
     }
   }
 }
@@ -464,7 +464,7 @@ void VariablePillContainer::keyPressEvent(QKeyEvent *_event)
 /////////////////////////////////////////////////
 void VariablePillContainer::mouseReleaseEvent(QMouseEvent *_event)
 {
-  this->SetSelected(NULL);
+  this->SetSelected(nullptr);
 
   bool selected = false;
   for (const auto v : this->dataPtr->variables)

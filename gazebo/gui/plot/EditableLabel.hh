@@ -39,7 +39,8 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _label Label text.
       /// \param[in] _parent Parent widget.
-      public: EditableLabel(const std::string &_label, QWidget *_parent = NULL);
+      public: EditableLabel(const std::string &_label,
+          QWidget *_parent = nullptr);
 
       /// \brief Destructor.
       public: ~EditableLabel();

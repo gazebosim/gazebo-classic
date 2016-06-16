@@ -46,7 +46,7 @@ namespace gazebo
       public: unsigned int id;
 
       /// brief Pointer to the plot
-      public: IncrementalPlot *plot = NULL;
+      public: IncrementalPlot *plot = nullptr;
 
       /// \brief A map of container variable ids to their plot curve ids.
       public: std::map<unsigned int, unsigned int> variableCurves;
@@ -66,13 +66,13 @@ namespace gazebo
       public: std::map<unsigned int, PlotData *> plotData;
 
       /// \brief Pointer to an empty plot.
-      public: IncrementalPlot *emptyPlot = NULL;
+      public: IncrementalPlot *emptyPlot = nullptr;
 
       /// \brief Container for all the variableCurves on the Y axis.
-      public: VariablePillContainer *yVariableContainer = NULL;
+      public: VariablePillContainer *yVariableContainer = nullptr;
 
       /// \brief Delete canvas Qt action
-      public: QAction *deleteCanvasAct = NULL;
+      public: QAction *deleteCanvasAct = nullptr;
 
       /// \brief Global plot counter.
       public: static unsigned int globalPlotId;
