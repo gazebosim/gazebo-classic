@@ -1913,7 +1913,8 @@ void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveModelPlugin(const std::string &_name, const bool _newCmd)
+void ModelCreator::RemoveModelPlugin(const std::string &_name,
+    const bool _newCmd)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
