@@ -74,9 +74,6 @@ namespace gazebo
       /// \brief Update all canvases
       private slots: void Update();
 
-      /// \brief QT callback for when a plot is to be exported.
-      private slots: void OnExport();
-
       /// \brief Qt Callback when a new plot canvas should be added.
       private slots: void OnAddCanvas();
 

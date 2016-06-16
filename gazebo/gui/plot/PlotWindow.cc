@@ -103,22 +103,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addCanvasButton->setGraphicsEffect(addCanvasShadow);
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
 
-  // export button
-  QPushButton *exportPlotButton = new QPushButton("Export");
-  exportPlotButton->setIcon(QIcon(":/images/file_upload.svg"));
-  exportPlotButton->setObjectName("plotExport");
-  exportPlotButton->setDefault(false);
-  exportPlotButton->setAutoDefault(false);
-  exportPlotButton->setToolTip("Export plot data");
-  QGraphicsDropShadowEffect *exportPlotShadow = new QGraphicsDropShadowEffect();
-  exportPlotShadow->setBlurRadius(8);
-  exportPlotShadow->setOffset(0, 0);
-  exportPlotButton->setGraphicsEffect(exportPlotShadow);
-  connect(exportPlotButton, SIGNAL(clicked()), this, SLOT(OnExport()));
-
-
   QHBoxLayout *addButtonLayout = new QHBoxLayout;
-  addButtonLayout->addWidget(exportPlotButton);
   addButtonLayout->addStretch();
   addButtonLayout->addWidget(addCanvasButton);
   addButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
@@ -298,58 +283,6 @@ void PlotWindow::TogglePause()
     mainWindow->Play();
   else
     mainWindow->Pause();
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::OnExport()
-{
-  // Get the plots that have data.
-  std::list<PlotCanvas*> plots;
-  for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
-  {
-    bool hasData = false;
-    PlotCanvas *canvas =
-        qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
-
-    if (!canvas)
-      continue;
-
-    for (const auto &plot : canvas->Plots())
-    {
-      for (const auto &curve : plot->Curves())
-      {
-        auto c = curve.lock();
-        if (!c)
-          continue;
-
-        hasData = hasData || c->Size() > 0;
-      }
-    }
-
-    if (hasData)
-      plots.push_back(canvas);
-  }
-
-  // Display an error message if no plots have data.
-  if (plots.empty())
-  {
-    QMessageBox msgBox(
-        QMessageBox::Information,
-        QString("Unable to export"),
-        QString(
-          "No data to export.\nAdd variables with data to a graph first."),
-        QMessageBox::Close,
-        this,
-        Qt::Window | Qt::WindowTitleHint |
-        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
-    msgBox.exec();
-  }
-  else
-  {
-    // ExportDialog *dialog = new ExportDialog(this, plots);
-    // dialog->setModal(true);
-    // dialog->show();
-  }
 }
 
 /////////////////////////////////////////////////
