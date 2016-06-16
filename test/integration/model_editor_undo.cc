@@ -28,10 +28,10 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
+#include "gazebo/gui/model/ModelPluginInspector.hh"
 
 #include "model_editor_undo.hh"
 
@@ -610,38 +610,42 @@ void ModelEditorUndoTest::ModelPluginInsertion()
   QVERIFY(pluginsItem != nullptr);
   QCOMPARE(pluginsItem->childCount(), 1);
 
-  // Plugin info
+  // Open the dialog to insert plugin
+  auto addButton = modelTree->findChild<QPushButton *>();
+  QVERIFY(addButton != nullptr);
+  QCOMPARE(addButton->text(), QString("Add"));
+
+  addButton->click();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get widgets in the dialog
+  auto inspector =
+      mainWindow->findChild<gazebo::gui::ModelPluginInspector *>();
+  QVERIFY(inspector != nullptr);
+
+  auto lineEdits = inspector->findChildren<QLineEdit *>();
+  QVERIFY(lineEdits.size() == 2);
+
+  auto plainText = inspector->findChild<QPlainTextEdit *>();
+  QVERIFY(plainText != nullptr);
+
+  auto buttons = inspector->findChildren<QPushButton *>();
+  QVERIFY(buttons.size() == 2);
+
+  // Fill the dialog
   std::string pluginName = "plugin-name";
   std::string pluginFileName = "plugin-filename.so";
   std::string pluginInnerXml = "<inner>xml</inner>";
 
-  /// \todo Generating user command directly here instead of triggering the
-  /// model plugin inspector because gui::get_main_window returns nullptr
-  /// during tests. See ModelTreeWidget::OnModelPluginApply.
-  {
-    sdf::ElementPtr sdf(new sdf::Element());
-    sdf::initFile("plugin.sdf", sdf);
-    QVERIFY(sdf::readString(
-        "<sdf version='" SDF_VERSION "'>\
-           <plugin name='"  + pluginName + "' filename='" + pluginFileName +
-           "'>" + pluginInnerXml +
-           "</plugin>\
-         </sdf>", sdf));
-
-    auto modelCreator = mainWindow->findChild<gazebo::gui::ModelCreator *>();
-    QVERIFY(modelCreator != nullptr);
-
-    auto cmd = modelCreator->UserCmdManager()->NewCmd(
-        "Inserted plugin [" + pluginName + "]",
-        gazebo::gui::MEUserCmd::INSERTING_MODEL_PLUGIN);
-    cmd->SetSDF(sdf);
-    cmd->SetScopedName(pluginName);
-
-    gazebo::gui::model::Events::requestModelPluginInsertion(pluginName,
-        pluginFileName, pluginInnerXml);
-  }
+  lineEdits[0]->setText(QString::fromStdString(pluginName));
+  lineEdits[1]->setText(QString::fromStdString(pluginFileName));
+  plainText->setPlainText(QString::fromStdString(pluginInnerXml));
 
   this->ProcessEventsAndDraw(mainWindow);
+
+  // Accept
+  buttons[1]->click();
 
   // Undo -> Redo a few times
   for (unsigned int j = 0; j < 3; ++j)

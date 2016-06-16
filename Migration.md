@@ -33,6 +33,10 @@ release will remove the deprecated code.
     + ***Replacement:*** DisconnectSetSelectedEntity
     + ***Removed:*** setSelectedLink
     + ***Replacement:*** setSelectedEntity
+    + ***Removed:*** event::EventT<void (std::string)> requestModelPluginRemoval;
+    + ***Replacement:*** event::EventT<void (std::string, bool)> requestModelPluginRemoval;
+    + ***Removed:*** event::EventT<void (std::string, std::string, std::string)> requestModelPluginInsertion;
+    + ***Replacement:*** event::EventT<void (std::string, std::string, std::string, bool)> requestModelPluginInsertion;
 
 1. **gazebo/common/CommonTypes.hh**
     + ***Removed:*** GAZEBO_DEPRECATED

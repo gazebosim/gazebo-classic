@@ -17,10 +17,6 @@
 
 #include "gazebo/common/Console.hh"
 
-#include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/model/MEUserCmdManager.hh"
-#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
@@ -120,26 +116,11 @@ void ModelPluginInspector::OnRemove()
 {
   std::string pluginName =
       this->dataPtr->configWidget->StringWidgetValue("name");
-  auto pluginMsg =
-      dynamic_cast<msgs::Plugin *>(this->dataPtr->configWidget->Msg());
-
-  // User request from inspector
-  auto mainWindow = gui::get_main_window();
-  if (mainWindow)
-  {
-    auto modelCreator = mainWindow->findChild<ModelCreator *>();
-    if (modelCreator)
-    {
-      auto cmd = modelCreator->UserCmdManager()->NewCmd(
-          "Deleted plugin [" + pluginName + "]",
-          MEUserCmd::DELETING_MODEL_PLUGIN);
-      cmd->SetSDF(msgs::PluginToSDF(*pluginMsg));
-      cmd->SetScopedName(pluginName);
-    }
-  }
 
   this->OnCancel();
-  model::Events::requestModelPluginRemoval(pluginName);
+
+  // User request from inspector
+  model::Events::requestModelPluginRemoval(pluginName, true);
 }
 
 /////////////////////////////////////////////////

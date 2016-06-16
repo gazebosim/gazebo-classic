@@ -154,7 +154,7 @@ void MEUserCmd::Undo()
   else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
      !this->dataPtr->scopedName.empty())
   {
-    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName);
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName, false);
   }
   // Deleting model plugin
   else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
@@ -163,7 +163,7 @@ void MEUserCmd::Undo()
     auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
 
     model::Events::requestModelPluginInsertion(pluginMsg.name(),
-        pluginMsg.filename(), pluginMsg.innerxml());
+        pluginMsg.filename(), pluginMsg.innerxml(), false);
   }
 }
 
@@ -232,13 +232,13 @@ void MEUserCmd::Redo()
     auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
 
     model::Events::requestModelPluginInsertion(pluginMsg.name(),
-        pluginMsg.filename(), pluginMsg.innerxml());
+        pluginMsg.filename(), pluginMsg.innerxml(), false);
   }
   // Deleting model plugin
   else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
       this->dataPtr->sdf)
   {
-    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName);
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName, false);
   }
 }
 
