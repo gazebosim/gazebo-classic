@@ -37,6 +37,7 @@ set(tests
   contact_sensor.cc
   dem.cc
   elastic_modulus.cc
+  fiducial.cc
   file_handling.cc
   gripper.cc
   gz_joint.cc
