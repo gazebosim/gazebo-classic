@@ -184,9 +184,9 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char * /*_image*/,
             Ogre::any_cast<std::string>(
             entity->getUserObjectBindings().getUserAny()));
       }
-      catch(Ogre::Exception &e)
+      catch(Ogre::Exception &_e)
       {
-        gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+        gzerr << "Ogre Error:" << _e.getFullDescription() << "\n";
         continue;
       }
     }
