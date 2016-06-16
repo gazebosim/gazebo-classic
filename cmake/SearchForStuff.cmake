@@ -657,31 +657,25 @@ else ()
 endif ()
 
 ########################################
-# Find ignition math in unix platforms
-# In Windows we expect a call from configure.bat script with the paths
-#if (NOT WIN32)
-  find_package(ignition-math2 2.3 QUIET)
-  if (NOT ignition-math2_FOUND)
-    message(STATUS "Looking for ignition-math2-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math2 library.")
-  else()
-    message(STATUS "Looking for ignition-math2-config.cmake - found")
-  endif()
-#endif()
+# Find ignition math
+find_package(ignition-math2 2.3 QUIET)
+if (NOT ignition-math2_FOUND)
+  message(STATUS "Looking for ignition-math2-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math2 library.")
+else()
+  message(STATUS "Looking for ignition-math2-config.cmake - found")
+endif()
 
 ########################################
-# Find the Ignition_Transport library
-# In Windows we expect a call from configure.bat script with the paths
-#if (NOT WIN32)
-  find_package(ignition-transport1 QUIET)
-  if (NOT ignition-transport1_FOUND)
-    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
-  else()
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
-    include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
-    link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
-  endif()
-#endif()
+# Find the Ignition_Transport
+find_package(ignition-transport1 QUIET)
+if (NOT ignition-transport1_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
+else()
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+  include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
+  link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
+endif()
 
 ################################################
 # Find Valgrind for checking memory leaks in the
