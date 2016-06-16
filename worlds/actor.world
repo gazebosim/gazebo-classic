@@ -10,12 +10,12 @@
       </include>
       <actor name="actor">
          <skin>
-            <filename>moonwalk.dae</filename>
+            <filename>talk_b.dae</filename>
             <scale>1.0</scale>
          </skin>
          <pose>0 0 0 0 0 0</pose>
          <animation name="walking">
-            <filename>walk.dae</filename>
+            <filename>talk_b.dae</filename>
             <scale>1.000000</scale>
             <interpolate_x>true</interpolate_x>
          </animation>

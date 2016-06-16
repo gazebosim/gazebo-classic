@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ACTOR_HH_
-#define _ACTOR_HH_
+#ifndef GAZEBO_PHYSICS_ACTOR_HH_
+#define GAZEBO_PHYSICS_ACTOR_HH_
 
 #include <string>
 #include <map>
@@ -23,7 +23,6 @@
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/util/system.hh"
 
@@ -33,6 +32,7 @@ namespace gazebo
   {
     class Mesh;
     class Color;
+    class Skeleton;
   }
 
   namespace physics
@@ -49,16 +49,16 @@ namespace gazebo
       /// \brief Type of trajectory.
       public: std::string type;
 
-      /// \brief Duration of the trajectory.
+      /// \brief Duration of this keyframe in seconds.
       public: double duration;
 
-      /// \brief Start time of the trajectory.
+      /// \brief Start time of this keyframe within the trajectory, in seconds.
       public: double startTime;
 
-      /// \brief End time of the trajectory.
+      /// \brief End time of this keyframe within the trajectory, in seconds.
       public: double endTime;
 
-      /// \brief True if the trajectory is tranlated.
+      /// \brief True if the trajectory is translated.
       public: bool translated;
     };
 
@@ -70,7 +70,7 @@ namespace gazebo
     /// scriptable animation.
     class GZ_PHYSICS_VISIBLE Actor : public Model
     {
-      /// \brief Typedef the skeleton animation map.
+      /// \brief Typedef the skeleton animation map, indexed by their names.
       public: typedef std::map<std::string, common::SkeletonAnimation*>
               SkeletonAnimation_M;
 
@@ -95,7 +95,8 @@ namespace gazebo
       public: virtual void Stop();
 
       /// \brief Returns true when actor is playing animation
-      public: virtual bool IsActive();
+      /// \return True if animation is being played.
+      public: virtual bool IsActive() const;
 
       /// \brief Update the actor
       public: void Update();
@@ -103,7 +104,7 @@ namespace gazebo
       /// \brief Finalize the actor
       public: virtual void Fini();
 
-      /// \brief update the parameters using new sdf values.
+      /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
@@ -112,30 +113,55 @@ namespace gazebo
       public: virtual const sdf::ElementPtr GetSDF();
 
       /// \brief Set the current script time.
-      /// \param[in] _time Current script time.
+      /// \param[in] _time Time in seconds from the beginning of the current
+      /// script loop.
+      /// \sa ScriptTime
       public: void SetScriptTime(const double _time);
 
       /// \brief Get the current script time.
-      /// \return Script time.
+      /// \return _time Time in seconds from the beginning of the current
+      /// script loop.
+      /// \sa SetScriptTime
       public: double ScriptTime() const;
 
       /// \brief Returns a dictionary of all the skeleton animations associated
       /// with the actor.
-      /// \return a map of SkeletonAnimation, indexed by their name.
+      /// \return A map of SkeletonAnimation, indexed by their name.
       public: const SkeletonAnimation_M &SkeletonAnimations() const;
 
-      /// \brief Set a custom trajectory for the actor.
+      /// \brief Set a custom trajectory for the actor. This will override any
+      /// trajectories previously defined.
       /// \param[in] _trajInfo Information about custom trajectory.
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
 
       /// \brief Reset custom trajectory of the actor.
       public: void ResetCustomTrajectory();
 
-      // Documentation inherited
+      /// \brief Get whether the links in the actor can collide with each other.
+      /// This is always false for actors.
+      /// \return False, because actors can't self-collide.
+      /// \sa SetSelfCollide()
       public: virtual bool GetSelfCollide() const;
 
-      // Documentation inherited
+      /// \brief Override set self collide method to make it impossible to set
+      /// it to true for actors.
+      /// \param [in] _selfCollide Whether this can collide with itself, will be
+      /// false for actors regardless of the input.
+      /// \sa GetSelfCollide()
       public: virtual void SetSelfCollide(bool _self_collide);
+
+      /// \brief Get whether the links in the actor are affected by wind.
+      /// This is always false for actors.
+      /// \return False, because forces can't be applied to actors.
+      /// \sa SetWindMode()
+      public: virtual bool WindMode() const;
+
+      /// \brief Override set wind mode method to make it impossible to set
+      /// it to true for actors.
+      /// \param [in] _enabled Whether this is affected by wind, will be
+      /// false for actors regardless of the input.
+      /// \sa GetWindMode()
+      public: virtual void SetWindMode(bool _enabled);
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
@@ -182,7 +208,7 @@ namespace gazebo
                    const std::string &_material,
                    const common::Color &_ambient);
 
-      /// \brief Add an actor visual to a link.
+      /// \brief Add a visual to the given link which holds the actor's skin.
       /// \param[in] _linkSdf Link to add the visual to.
       /// \param[in] _name Name of the visual.
       /// \param[in] _pose Pose of the visual.
@@ -198,7 +224,8 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the animation script.
       private: void LoadScript(sdf::ElementPtr _sdf);
 
-      /// \brief Set the actor's pose.
+      /// \brief Set the actor's pose. This sets the pose for each bone in the
+      /// skeleton and also the actor's pose in the world.
       /// \param[in] _frame Each frame name and transform.
       /// \param[in] _skelMap Map of bone relationships.
       /// \param[in] _time Time over which to animate the set pose.
@@ -207,10 +234,10 @@ namespace gazebo
                    std::map<std::string, std::string> _skelMap, double _time);
 
       /// \brief Pointer to the actor's mesh.
-      protected: const common::Mesh *mesh;
+      protected: const common::Mesh *mesh = nullptr;
 
       /// \brief The actor's skeleton.
-      protected: common::Skeleton *skeleton;
+      protected: common::Skeleton *skeleton = nullptr;
 
       /// \brief Filename for the skin.
       protected: std::string skinFile;
@@ -218,10 +245,11 @@ namespace gazebo
       /// \brief Scaling factor to apply to the skin.
       protected: double skinScale;
 
-      /// \brief Amount of time to delay start by.
+      /// \brief Time to wait before starting the script. If running in a loop,
+      /// this time will be waited before starting each cycle.
       protected: double startDelay;
 
-      /// \brief Time length of a scipt.
+      /// \brief Total time length of the script, in seconds.
       protected: double scriptLength;
 
       /// \brief True if the animation should loop.
@@ -230,10 +258,11 @@ namespace gazebo
       /// \brief True if the actor is being updated.
       protected: bool active;
 
-      /// \brief True if the actor should start running automatically.
+      /// \brief True if the actor should start running automatically,
+      /// otherwise it will only start once Play is called.
       protected: bool autoStart;
 
-      /// \brief Base link.
+      /// \brief Pointer to the actor's canonical link.
       protected: LinkPtr mainLink;
 
       /// \brief Time of the previous frame.
@@ -242,41 +271,61 @@ namespace gazebo
       /// \brief Time when the animation was started.
       protected: common::Time playStartTime;
 
-      /// \brief All the trajectories.
-      protected: std::map<unsigned int, common::PoseAnimation*> trajectories;
+      /// \brief Map of all the trajectories (pose animations) and their
+      /// indices. The indices here match the order in `trajInfo`.
+      /// \sa trajInfo
+      protected: std::map<unsigned int, common::PoseAnimation *> trajectories;
 
-      /// \brief Trajectory information
+      /// \brief A vector of trajectory information, which contains information
+      /// such as their durations, uniquely identifiable by their IDs. The IDs
+      /// here match those on the `trajectories` vector.
+      /// \sa trajectories
       protected: std::vector<TrajectoryInfo> trajInfo;
 
-      /// \brief Skeleton animations
+      /// \brief Map of skeleton animations, indexed by their names. The names
+      /// match those in `interpolateX` and `skelNodesMap`.
+      /// \sa interpolateX
+      /// \sa skelNodesMap
       protected: SkeletonAnimation_M skelAnimation;
 
-      /// \brief Skeleton to node map
+      /// \brief Skeleton to node map:
+      /// * Skeleton animation name (should match those in `skelAnimation` and
+      /// `interpolateX`)
+      /// * Map holding:
+      ///     * Skeleton node names
+      ///     * Skeleton animation node names
+      /// \sa interpolateX
+      /// \sa skelAnimation
       protected: std::map<std::string, std::map<std::string, std::string> >
                                                             skelNodesMap;
 
-      /// \brief True to interpolate along x direction.
+      /// \brief Map of animation types (the same name as in `skelAnimation` and
+      /// `skelNodesMap`) and whether they should be interpolated along X
+      // direction.
+      /// \sa skelAnimation
+      /// \sa skelNodesMap
       protected: std::map<std::string, bool> interpolateX;
 
-      /// \brief Last position of the actor
+      /// \brief Last position of the actor.
       protected: ignition::math::Vector3d lastPos;
 
       /// \brief Length of the actor's path.
       protected: double pathLength;
 
-      /// \brief THe last trajectory
+      /// \brief Id of the last trajectory
       protected: unsigned int lastTraj;
 
-      /// \brief Name of the visual
+      /// \brief Name of the visual representing the skin.
       protected: std::string visualName;
 
-      /// \brief ID for this visual
+      /// \brief ID for the visual representing the skin.
       protected: uint32_t visualId;
 
-      /// \brief Where to send bone info.
+      /// \brief Publisher to send bone info.
       protected: transport::PublisherPtr bonePosePub;
 
-      /// \brief Current script time
+      /// \brief Current time within the script, which is the current time minus
+      /// the time when the script started.
       private: double scriptTime;
 
       /// \brief Custom trajectory.
