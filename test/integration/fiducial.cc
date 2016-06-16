@@ -81,7 +81,7 @@ TEST_F(FiducialCameraTest, Fiducial)
   bool received = false;
   while (!received && sleep < maxSleep)
   {
-    gazebo::common::Time::MSleep(10);
+    gazebo::common::Time::MSleep(30);
     sleep++;
 
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -116,7 +116,7 @@ TEST_F(FiducialCameraTest, Fiducial)
   received = false;
   while (!received && sleep < maxSleep)
   {
-    gazebo::common::Time::MSleep(10);
+    gazebo::common::Time::MSleep(30);
     sleep++;
 
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -147,7 +147,7 @@ TEST_F(FiducialCameraTest, Fiducial)
   received = false;
   while (!received && sleep < maxSleep)
   {
-    gazebo::common::Time::MSleep(10);
+    gazebo::common::Time::MSleep(30);
     sleep++;
 
     std::lock_guard<std::mutex> lock(g_mutex);
