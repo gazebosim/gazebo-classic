@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <boost/algorithm/string/replace.hpp>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 
