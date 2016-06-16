@@ -4,6 +4,9 @@
 
 ## Gazebo 7.2.0 (2016-06-13)
 
+1. Fix right click view options after deleting and respawning a model.
+    * [Pull request 1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
+
 1. Backport single pixel selection buffer for mouse picking
     * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
 
