@@ -39,7 +39,7 @@ namespace gazebo
     public: sensors::CameraSensorPtr parentSensor;
 
     /// \brief Selection buffer used for occlusion detection
-    public: rendering::SelectionBuffer *selectionBuffer = NULL;
+    public: rendering::SelectionBuffer *selectionBuffer = nullptr;
 
     /// \brief All event connections.
     public: std::vector<event::ConnectionPtr> connections;
@@ -52,7 +52,6 @@ namespace gazebo
 
     /// \brief Publisher of fiducial messages.
     public: transport::PublisherPtr fiducialPub;
-
   };
 }
 

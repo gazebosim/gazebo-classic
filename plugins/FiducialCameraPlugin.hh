@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_FIDUCIAL_CAMERA_PLUGIN_HH_
-#define _GAZEBO_FIDUCIAL_CAMERA_PLUGIN_HH_
+#ifndef GAZEBO_FIDUCIAL_CAMERA_PLUGIN_HH_
+#define GAZEBO_FIDUCIAL_CAMERA_PLUGIN_HH_
 
+#include <vector>
 #include <string>
 #include <memory>
 
