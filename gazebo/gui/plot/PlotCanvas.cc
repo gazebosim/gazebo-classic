@@ -231,11 +231,6 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   mainLayout->addWidget(mainFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
-
-  QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
-  shadow->setBlurRadius(8);
-  shadow->setOffset(0, 0);
-  this->setGraphicsEffect(shadow);
 }
 
 /////////////////////////////////////////////////
