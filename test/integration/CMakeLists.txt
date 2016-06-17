@@ -37,7 +37,6 @@ set(tests
   contact_sensor.cc
   dem.cc
   elastic_modulus.cc
-  fiducial.cc
   file_handling.cc
   gripper.cc
   gz_joint.cc
@@ -156,6 +155,7 @@ set(dri_tests
   camera_sensor.cc
   depth_camera.cc
   factory.cc
+  fiducial.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
