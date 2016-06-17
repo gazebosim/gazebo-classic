@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Add FiducialCameraPlugin for Camera Sensors
+    * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
+
 1. Use single pixel selection buffer for mouse picking
     * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
 
