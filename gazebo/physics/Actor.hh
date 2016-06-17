@@ -74,7 +74,7 @@ namespace gazebo
     /// scriptable animation.
     class GZ_PHYSICS_VISIBLE Actor : public Model
     {
-      /// \brief Typedef the skeleton animation map indexed by their names.
+      /// \brief Typedef the skeleton animation map, indexed by their names.
       public: typedef std::map<std::string, common::SkeletonAnimation *>
               SkeletonAnimation_M;
 
@@ -237,8 +237,8 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the trajectory script.
       private: void LoadScript(sdf::ElementPtr _sdf);
 
-      /// \brief Set the actor's pose, this sets the pose for each bone in the
-      /// skeleton and also the actor's pose based on the trajectory.
+      /// \brief Set the actor's pose. This sets the pose for each bone in the
+      /// skeleton and also the actor's pose in the world.
       /// \param[in] _frame Each frame name and transform.
       /// \param[in] _skelMap Map of bone relationships.
       /// \param[in] _time Time over which to animate the set pose.
@@ -258,7 +258,8 @@ namespace gazebo
       /// \brief Scaling factor to apply to the skin.
       protected: double skinScale;
 
-      /// \brief Amount of time to delay start by.
+      /// \brief Time to wait before starting the script. If running in a loop,
+      /// this time will be waited before starting each cycle.
       protected: double startDelay;
 
       /// \brief Total time length of the script, in seconds.
@@ -270,8 +271,8 @@ namespace gazebo
       /// \brief True if the actor is being updated.
       protected: bool active;
 
-      /// \brief True if the actor should start running automatically.
-      /// How does this play with startDelay?
+      /// \brief True if the actor should start running automatically,
+      /// otherwise it will only start once Play is called.
       protected: bool autoStart;
 
       /// \brief Pointer to the actor's canonical link.
@@ -284,7 +285,7 @@ namespace gazebo
       protected: common::Time playStartTime;
 
       /// \brief Map of all the trajectories (pose animations) and their
-      /// indices. The indices here match those within trajInfo.
+      /// indices. The indices here match the order in `trajInfo`.
       /// \sa trajInfo
       protected: std::map<unsigned int, common::PoseAnimation *> trajectories;
 
@@ -295,13 +296,15 @@ namespace gazebo
       protected: std::vector<TrajectoryInfo> trajInfo;
 
       /// \brief Map of skeleton animations, indexed by their names. The names
-      /// match those in interpolateX and skelNodesMap (?).
+      /// match those in `interpolateX` and `skelNodesMap`.
       /// \sa interpolateX
       /// \sa skelNodesMap
       protected: SkeletonAnimation_M skelAnimation;
 
       /// \brief Skeleton to node map:
-      /// * Skin filename -- or animName?!
+      /// * Skeleton animation name (should match those in `skelAnimation` and
+      /// `interpolateX`)
+      /// * Map holding:
       ///     * Skeleton node names
       ///     * Skeleton animation node names
       /// \sa interpolateX
@@ -309,9 +312,9 @@ namespace gazebo
       protected: std::map<std::string, std::map<std::string, std::string> >
                                                             skelNodesMap;
 
-      /// \brief Map of animation types (the same name as in skelAnimation and
-      /// skelNodesMap) and whether they should be interpolated along x
-      // direction. Does false mean to interpolate on Y?
+      /// \brief Map of animation types (the same name as in `skelAnimation` and
+      /// `skelNodesMap`) and whether they should be interpolated along X
+      // direction.
       /// \sa skelAnimation
       /// \sa skelNodesMap
       protected: std::map<std::string, bool> interpolateX;

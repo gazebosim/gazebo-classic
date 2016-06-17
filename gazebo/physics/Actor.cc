@@ -222,7 +222,8 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
   }
 
   // If there are no trajectories, but there are animations, add a trajectory
-  if (!this->skelAnimation.empty() && this->trajInfo.empty())
+  if (!this->skelAnimation.empty() && this->skelAnimation.begin()->second &&
+      this->trajInfo.empty())
   {
     TrajectoryInfo tinfo;
     tinfo.id = 0;

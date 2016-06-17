@@ -684,7 +684,9 @@ SkeletonNode* ColladaLoader::LoadSkeletonNodes(TiXmlElement *_xml,
 
   if (_xml->Attribute("type") &&
       std::string(_xml->Attribute("type")) == std::string("NODE"))
+  {
     node->SetType(SkeletonNode::NODE);
+  }
 
   this->SetSkeletonNodeTransform(_xml, node);
 
