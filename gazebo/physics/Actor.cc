@@ -306,7 +306,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     }
   }
   double time = 0.0;
-  if (!this->skelAnimation.empty())
+  if (!this->skelAnimation.empty() && this->skelAnimation.begin()->second)
   {
     if (this->trajInfo.empty())
     {
