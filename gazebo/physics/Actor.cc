@@ -581,7 +581,7 @@ void Actor::Update()
 
 //////////////////////////////////////////////////
 void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
-      std::map<std::string, std::string> _skelMap, double _time)
+      std::map<std::string, std::string> _skelMap, const double _time)
 {
   msgs::PoseAnimation msg;
   msg.set_model_name(this->visualName);
