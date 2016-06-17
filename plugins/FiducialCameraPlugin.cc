@@ -114,7 +114,7 @@ void FiducialCameraPlugin::Load(sensors::SensorPtr _sensor,
   }
   else
   {
-    gzerr << "No fidicuals specified. FiducialCameraPlugin will not be run."
+    gzerr << "No fiducials specified. FiducialCameraPlugin will not be run."
         << std::endl;
     return;
   }
@@ -134,7 +134,7 @@ void FiducialCameraPlugin::Init()
   this->dataPtr->node.reset(new transport::Node());
   this->dataPtr->node->Init();
 
-  // Create publisher for tactile messages
+  // Create publisher for fiducial messages
   std::string topicName = "~/" + this->dataPtr->parentSensor->ParentName()
       + "/" + this->dataPtr->parentSensor->Name() + "/fiducial";
   boost::replace_all(topicName, "::", "/");
@@ -143,7 +143,7 @@ void FiducialCameraPlugin::Init()
 }
 
 /////////////////////////////////////////////////
-void FiducialCameraPlugin::OnNewFrame(const unsigned char * /*_image*/,
+void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     unsigned int /*_width*/, unsigned int /*_height*/, unsigned int /*_depth*/,
     const std::string &/*_format*/)
 {
