@@ -17,8 +17,6 @@
 
 #include <functional>
 
-#include <boost/algorithm/string/replace.hpp>
-
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
@@ -41,36 +39,23 @@ namespace gazebo
     public: sensors::CameraSensorPtr parentSensor;
 
     /// \brief Selection buffer used for occlusion detection
-    public: rendering::SelectionBuffer *selectionBuffer = nullptr;
+    public: std::unique_ptr<rendering::SelectionBuffer> selectionBuffer;
 
     /// \brief All event connections.
     public: std::vector<event::ConnectionPtr> connections;
 
     /// \brief A list of fiducials tracked by this camera.
-    public: std::vector<std::string> fiducials;
+    public: std::set<std::string> fiducials;
 
     /// \brief Transport node used for publishing fiducial messages.
     public: transport::NodePtr node;
 
     /// \brief Publisher of fiducial messages.
     public: transport::PublisherPtr fiducialPub;
+
+    /// \brief True to detect all objects in the world.
+    public: bool detectAll = false;
   };
-}
-
-/////////////////////////////////////////////////
-ignition::math::Vector2i GetScreenSpaceCoords(ignition::math::Vector3d _pt,
-    gazebo::rendering::CameraPtr _cam)
-{
-  // Convert from 3D world pos to 2D screen pos
-  Ogre::Vector3 pos = _cam->OgreCamera()->getProjectionMatrix() *
-      _cam->OgreCamera()->getViewMatrix() *
-      gazebo::rendering::Conversions::Convert(_pt);
-
-  ignition::math::Vector2i screenPos;
-  screenPos.X() = ((pos.x / 2.0) + 0.5) * _cam->ViewportWidth();
-  screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * _cam->ViewportHeight();
-
-  return screenPos;
 }
 
 /////////////////////////////////////////////////
@@ -83,8 +68,6 @@ FiducialCameraPlugin::FiducialCameraPlugin()
 /////////////////////////////////////////////////
 FiducialCameraPlugin::~FiducialCameraPlugin()
 {
-  delete this->dataPtr->selectionBuffer;
-
   this->dataPtr->connections.clear();
   this->dataPtr->parentSensor.reset();
 }
@@ -108,15 +91,15 @@ void FiducialCameraPlugin::Load(sensors::SensorPtr _sensor,
     sdf::ElementPtr elem = _sdf->GetElement("fiducial");
     while (elem)
     {
-      this->dataPtr->fiducials.push_back(elem->Get<std::string>());
+      this->dataPtr->fiducials.insert(elem->Get<std::string>());
       elem = elem->GetNextElement("fiducial");
     }
   }
   else
   {
-    gzerr << "No fiducials specified. FiducialCameraPlugin will not be run."
+    gzmsg << "No fiducials specified. All models will be tracked."
         << std::endl;
-    return;
+    this->dataPtr->detectAll = true;
   }
 
   this->dataPtr->parentSensor->SetActive(true);
@@ -137,15 +120,37 @@ void FiducialCameraPlugin::Init()
   // Create publisher for fiducial messages
   std::string topicName = "~/" + this->dataPtr->parentSensor->ParentName()
       + "/" + this->dataPtr->parentSensor->Name() + "/fiducial";
-  boost::replace_all(topicName, "::", "/");
+
+  size_t pos;
+  while ((pos = topicName.find("::")) != std::string::npos)
+    topicName = topicName.substr(0, pos) + "/" + topicName.substr(pos+2);
+
   this->dataPtr->fiducialPub =
       this->dataPtr->node->Advertise<msgs::PosesStamped>(topicName);
 }
 
 /////////////////////////////////////////////////
+void FiducialCameraPlugin::PopulateFiducials()
+{
+  rendering::CameraPtr camera = this->dataPtr->parentSensor->Camera();
+  rendering::ScenePtr scene = camera->GetScene();
+
+  this->dataPtr->fiducials.clear();
+
+  // Check all models for inclusion in the frustum.
+  rendering::VisualPtr worldVis = scene->WorldVisual();
+  for (unsigned int i = 0; i < worldVis->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr childVis = worldVis->GetChild(i);
+    if (childVis->GetType() == rendering::Visual::VT_MODEL)
+      this->dataPtr->fiducials.insert(childVis->GetName());
+  }
+}
+
+/////////////////////////////////////////////////
 void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
-    unsigned int /*_width*/, unsigned int /*_height*/, unsigned int /*_depth*/,
-    const std::string &/*_format*/)
+    const unsigned int /*_width*/, const unsigned int /*_height*/,
+    const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
   rendering::CameraPtr camera = this->dataPtr->parentSensor->Camera();
   rendering::ScenePtr scene = camera->GetScene();
@@ -153,10 +158,13 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
   if (!this->dataPtr->selectionBuffer)
   {
     std::string cameraName = camera->OgreCamera()->getName();
-    this->dataPtr->selectionBuffer = new rendering::SelectionBuffer(cameraName,
-        scene->OgreSceneManager(),
-        camera->RenderTexture()->getBuffer()->getRenderTarget());
+    this->dataPtr->selectionBuffer.reset(
+        new rendering::SelectionBuffer(cameraName, scene->OgreSceneManager(),
+        camera->RenderTexture()->getBuffer()->getRenderTarget()));
   }
+
+  if (this->dataPtr->detectAll)
+    this->PopulateFiducials();
 
   std::vector<FiducialData> results;
   for (const auto &f : this->dataPtr->fiducials)
@@ -169,8 +177,8 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     if (!camera->IsVisible(vis))
       continue;
 
-    ignition::math::Vector2i pt = GetScreenSpaceCoords(
-        vis->GetWorldPose().pos.Ign(), camera);
+    ignition::math::Vector2i pt =
+        camera->Project(vis->GetWorldPose().pos.Ign());
 
     // use selection buffer to check if visual is occluded by other entities
     // in the camera view
@@ -207,6 +215,7 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
 
 /////////////////////////////////////////////////
 void FiducialCameraPlugin::Publish(const std::vector<FiducialData> &_results)
+    const
 {
   // publish the results
   common::Time timestamp = this->dataPtr->parentSensor->LastMeasurementTime();
@@ -216,6 +225,9 @@ void FiducialCameraPlugin::Publish(const std::vector<FiducialData> &_results)
 
   for (const auto &fd : _results)
   {
+    // use pose msg to store the result
+    // position x and y are image coordinates and z always 0
+    // orientation is always an identity quaternion for now
     msgs::Pose *poseMsg = msg.add_pose();
     poseMsg->set_name(fd.id);
     ignition::math::Vector3d pos(fd.pt.X(), fd.pt.Y(), 0);

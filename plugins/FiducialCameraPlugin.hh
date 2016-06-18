@@ -22,6 +22,8 @@
 #include <string>
 #include <memory>
 
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/util/system.hh"
 
@@ -41,6 +43,12 @@ namespace gazebo
   };
 
   /// \brief A camera sensor plugin for fiducial detection
+  /// A fiducial is detected if its center is within the camera frustum and
+  /// not occluded by other models in the view. The results are published to
+  /// a topic, e.g. ~/camera_model_name/link_name/sensor_name/fiducial
+  /// The message format is PosesStamped. The pose's x and y position fields are
+  /// the image coordinates of the center of the detected fiducial, and the
+  /// orientation is currently always an identity quaternion.
   class GAZEBO_VISIBLE FiducialCameraPlugin : public SensorPlugin
   {
     /// \brief Constructor
@@ -62,12 +70,17 @@ namespace gazebo
     /// \param[in] _depth image depth
     /// \param[in] _format image format
     public: virtual void OnNewFrame(const unsigned char *_image,
-        unsigned int _width, unsigned int _height, unsigned int _depth,
-        const std::string &_format);
+        const unsigned int _width, const unsigned int _height,
+        const unsigned int _depth, const std::string &_format);
 
     /// \brief Publish the results
     /// \param[in] _results Fiducial data containing id and location in image.
-    public: virtual void Publish(const std::vector<FiducialData> &_results);
+    public: virtual void Publish(const std::vector<FiducialData> &_results)
+        const;
+
+    /// \brief Helper function to fill the list of fiducials with all models
+    /// in the world if none are specified
+    private: void PopulateFiducials();
 
     /// \internal
     /// \brief Pointer to private data.

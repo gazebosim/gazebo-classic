@@ -15,8 +15,6 @@
  *
 */
 
-#include <boost/algorithm/string/replace.hpp>
-
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 
@@ -71,7 +69,11 @@ TEST_F(FiducialCameraTest, Fiducial)
   // subscribe to fiducial camera topic
   std::string topicName = "~/";
   topicName += camSensor->ParentName() + "/" + camSensor->Name() + "/fiducial";
-  boost::replace_all(topicName, "::", "/");
+
+  size_t pos;
+  while ((pos = topicName.find("::")) != std::string::npos)
+    topicName = topicName.substr(0, pos) + "/" + topicName.substr(pos+2);
+
   auto fiducialSub = node->Subscribe(topicName, &OnFiducial);
   ASSERT_TRUE(fiducialSub != nullptr);
 
