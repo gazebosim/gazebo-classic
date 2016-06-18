@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SKELETON_HH_
-#define _GAZEBO_SKELETON_HH_
+#ifndef GAZEBO_COMMON_SKELETON_HH_
+#define GAZEBO_COMMON_SKELETON_HH_
 
 #include <vector>
 #include <string>
@@ -24,7 +24,6 @@
 
 #include <ignition/math/Matrix4.hh>
 
-#include "gazebo/math/Matrix4.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
