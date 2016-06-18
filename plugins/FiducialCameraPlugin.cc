@@ -68,6 +68,9 @@ FiducialCameraPlugin::FiducialCameraPlugin()
 /////////////////////////////////////////////////
 FiducialCameraPlugin::~FiducialCameraPlugin()
 {
+  this->dataPtr->fiducialPub.reset();
+  this->dataPtr->node->Fini();
+
   this->dataPtr->connections.clear();
   this->dataPtr->parentSensor.reset();
 }
