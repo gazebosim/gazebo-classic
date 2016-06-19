@@ -37,6 +37,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
@@ -116,6 +117,23 @@ void Model::OnRequest(ConstRequestPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->receiveMutex);
 
+  printf("%s\n", "world req");
+  printf("%s\n", _msg->data().c_str());
+
+  common::URI pluginUri;
+
+  pluginUri.SetScheme("data");
+
+  pluginUri.Path().PushBack("world");
+  pluginUri.Path().PushBack(this->GetWorld()->GetName());
+  pluginUri.Path().PushBack("model");
+  pluginUri.Path().PushBack(this->GetName());
+  pluginUri.Path().PushBack("plugin");
+
+    printf("%s\n", "roro");
+
+    printf("%s\n", pluginUri.Str().c_str());
+
   // Only handle requests for model plugin info
   if (_msg->request() == "model_plugin_info" && this->sdf->HasElement("plugin"))
   {
@@ -125,15 +143,18 @@ void Model::OnRequest(ConstRequestPtr &_msg)
     {
       std::string pluginName = pluginElem->Get<std::string>("name");
 
-      if (pluginName == _msg->data().c_str())
+      pluginUri.Path().PushBack(pluginName);
+
+      if (pluginUri == _msg->data())
       {
         // Get plugin info from SDF
         msgs::Plugin pluginMsg;
         pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
-
+        
         // Publish response with plugin info
         msgs::Response response;
         response.set_id(_msg->id());
+        //response.set_name(this->URI.Str().c_str() + "/plugin/buoyancy");
         response.set_request(_msg->request());
         response.set_response("success");
         response.set_type(pluginMsg.GetTypeName());

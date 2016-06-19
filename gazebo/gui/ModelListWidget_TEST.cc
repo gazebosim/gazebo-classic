@@ -1040,14 +1040,20 @@ void ModelListWidget_TEST::PluginProperties()
   // wait for the models plugin to be selected
   sleep = 0;
   maxSleep = 5;
-  while (!modelsItem->isSelected() && sleep < maxSleep)
+  while (!pluginItem->isSelected() && sleep < maxSleep)
   {
     QTest::qWait(10);
     sleep++;
   }
+
   QVERIFY(pluginItem->isSelected());
 
-  QTest::qWait(10000);
+  //QTest::qWait(10000);
+
+QTest::qWait(10000);
+QTest::qWait(10000);
+QTest::qWait(10000);
+QTest::qWait(10000);
 
   // wait for the plugin properties to appear
   sleep = 0;
