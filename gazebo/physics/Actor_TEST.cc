@@ -25,15 +25,77 @@ using namespace gazebo;
 class ActorTest : public ServerFixture { };
 
 //////////////////////////////////////////////////
-TEST_F(ActorTest, Scale)
+TEST_F(ActorTest, Load)
 {
   // Load a world with an actor
-  this->Load("worlds/empty.world", true);
+  this->Load("worlds/actor.world", true);
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  // Cleanup world and check there are no segfaults
-  world.reset();
+  // Get model
+  auto model = world->GetModel("actor");
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check it is active
+  EXPECT_TRUE(actor->IsActive());
+
+  // Check the SDF
+  auto sdf = actor->GetSDF();
+  ASSERT_TRUE(sdf != nullptr);
+
+  EXPECT_TRUE(sdf->HasElement("skin"));
+  EXPECT_TRUE(sdf->HasElement("animation"));
+  EXPECT_TRUE(sdf->HasElement("script"));
+
+  // Check the skeleton animation was loaded
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_FALSE(skelAnims.empty());
+  EXPECT_EQ(skelAnims.size(), 1u);
+  EXPECT_TRUE(skelAnims["walking"] != nullptr);
+
+  // Check some params are false for actors
+  EXPECT_FALSE(actor->WindMode());
+  EXPECT_FALSE(actor->GetSelfCollide());
+}
+
+//////////////////////////////////////////////////
+TEST_F(ActorTest, TrajectoryFromSDF)
+{
+  // Load a world with an actor
+  this->Load("worlds/actor.world", true);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Get model
+  auto model = world->GetModel("actor");
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check initial pose
+  auto startPose = actor->GetWorldPose().Ign();
+  EXPECT_EQ(startPose, ignition::math::Pose3d::Zero);
+  EXPECT_EQ(actor->ScriptTime(), 0.0);
+
+  // Pass some time and check actor is near the target pose
+  world->Step(4000);
+
+  ignition::math::Vector3d target(1.0, 0.0, 1.0);
+  EXPECT_LT((target - actor->GetWorldPose().Ign().Pos()).Length(), 0.1);
+  EXPECT_EQ(actor->ScriptTime(), 4.0);
+
+  // Pass some time and check actor is near the target pose
+  world->Step(4000);
+
+  target.Set(0.3, -1.0, 1.0);
+  EXPECT_LT((target - actor->GetWorldPose().Ign().Pos()).Length(), 0.1);
+  EXPECT_EQ(actor->ScriptTime(), 8.0);
 }
 
 //////////////////////////////////////////////////
