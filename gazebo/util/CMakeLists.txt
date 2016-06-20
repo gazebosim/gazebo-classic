@@ -8,7 +8,8 @@ endif()
 
 include_directories(${TBB_INCLUDEDIR}
                     ${tinyxml_INCLUDE_DIRS}
-                    ${tinyxml2_INCLUDE_DIRS})
+                    ${tinyxml2_INCLUDE_DIRS}
+                    ${IGNITION-TRANSPORT_INCLUDE_DIRS})
 
 link_directories(${tinyxml2_LIBRARY_DIRS})
 
