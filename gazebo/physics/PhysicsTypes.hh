@@ -14,13 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _PHYSICSTYPES_HH_
-#define _PHYSICSTYPES_HH_
+#ifndef GAZEBO_PHYSICS_PHYSICSTYPES_HH_
+#define GAZEBO_PHYSICS_PHYSICSTYPES_HH_
 
-#include <vector>
 #include <map>
+#include <memory>
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
+
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -48,6 +50,8 @@ namespace gazebo
     class UserCmd;
     class UserCmdManager;
     class PhysicsEngine;
+    class Wind;
+    class Atmosphere;
     class Mass;
     class Road;
     class Shape;
@@ -66,6 +70,7 @@ namespace gazebo
     class LightState;
     class LinkState;
     class JointState;
+    class TrajectoryInfo;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
@@ -90,6 +95,10 @@ namespace gazebo
     /// \def Actor
     /// \brief Boost shared pointer to an Actor object
     typedef boost::shared_ptr<Actor> ActorPtr;
+
+    /// \def TrajectoryInfoPtr
+    /// \brief Shared pointer to a TrajectoryInfo object
+    typedef std::shared_ptr<TrajectoryInfo> TrajectoryInfoPtr;
 
     /// \def LightPtr
     /// \brief Boost shared pointer to a Light object

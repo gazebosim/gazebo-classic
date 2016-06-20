@@ -5,6 +5,193 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.X to 8.X
+
+### Additions
+
+1. **gazebo/common/Event.hh**
+    + public: bool Connection::Id() const;
+    + public: bool Event::Signaled() const;
+    + public: void Event::SetSignaled(const bool);
+
+### Modifications
+
+1. **gazebo/common/Event.hh**
+    + Connection(Event*, int) constructor changed to
+      Connection(Event*, const int)
+    + EventTPrivate no longer inherits from EventPrivate
+    + EventT::Connect(const boost::function<T> &) changed to
+      EventT::Connect(const std::function<T> &)
+
+1. **gazebo/sensors/DepthCameraSensor.hh**
+    + Modified to inherit from CameraSensor class.
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** ConnectSetSelectedLink
+    + ***Replacement:*** ConnectSetSelectedEntity
+    + ***Removed:*** DisconnectSetSelectedLink
+    + ***Replacement:*** DisconnectSetSelectedEntity
+    + ***Removed:*** setSelectedLink
+    + ***Replacement:*** setSelectedEntity
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_DEPRECATED
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_DEPRECATED
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_FORCEINLINE
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_FORCEINLINE
+
+### Deprecations
+
+1. **gazebo/common/Event.hh**
+    + ***Deprecation:*** public: void Event::Disconnect(ConnectionPtr);
+    + ***Deprecation:*** public: void EventT::Disconnect(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+    + ***Deprecation:*** public: bool Event::GetSignaled() const;
+    + ***Replacement:*** public: bool Event::Signaled() const;
+    + ***Deprecation:*** public: bool Connection::GetId() const;
+    + ***Replacement:*** public: bool Connection::Id() const;
+
+1. **gazebo/common/Events.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/building/BuildingEditorEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation:*** public: void Joint::DisconnectJointUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/Link.hh**
+    + ***Deprecation:*** public: void Link::DisconnectEnabled(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/MultiRayShape.hh**
+    + ***Deprecation:*** public: void MultiRayShape::DisconnectNewLaserScans(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: math::Vector3 GetGravity const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
+1. **gazebo/rendering/Grid.hh**
+    + ***Deprecation:*** public: public: Ogre::SceneNode *GetSceneNode()
+    + ***Replacement:*** public: public: Ogre::SceneNode *SceneNode() const
+    + ***Deprecation:*** public: common::Color GetColor() const
+    + ***Replacement:*** public: common::Color Color() const
+    + ***Deprecation:*** public: uint32_t GetCellCount() const
+    + ***Replacement:*** public: uint32_t CellCount() const
+    + ***Deprecation:*** public: float GetCellLength() const
+    + ***Replacement:*** public: float CellLength() const
+    + ***Deprecation:*** public: float GetLineWidth() const
+    + ***Replacement:*** public: float LineWidth() const
+    + ***Deprecation:*** public: uint32_t GetHeight() const
+    + ***Replacement:*** public: uint32_t Height() const
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: void Camera::DisconnectNewImageFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Deprecation:*** public: void DepthCamera::DisconnectNewDepthFrame(ConnectionPtr);
+    + ***Deprecation:*** public: void DepthCamera::DisconnectNewRGBPointCloud(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Deprecation:*** public: void GpuLaser::DisconnectNewLaserFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + ***Deprecation:*** public: void ForceTorqueSensor::DisconnectUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + ***Deprecation:*** public: void GpuRaySensor::DisconnectNewLaserFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/Sensor.hh**
+    + ***Deprecation:*** public: void Sensor::DisconnectUpdated(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/SonarSensor.hh**
+    + ***Deprecation:*** public: void SonarSensor::DisconnectUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/transport/Connection.hh**
+    + ***Deprecation:*** public: void Connection::DisconnectShutdown(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **plugins/events/EventSource.hh**
+    + ***Deprecation:*** public: void SimEventConnector::DisconnectSpawnModel(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/math/Spline.hh**
+    + ***Deprecation:*** public: gazebo::math::Spline
+    + ***Replacement:*** public: ignition::math::Spline
+
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
+
+### Deletions
+
+1. **gazebo/common/Event.hh**
+    + ConnectionPrivate class
+    + Connection() constructor
+    + EventPrivate class
+    + Event(EventPrivate&) constructor
+
+1. **gazebo/gui/EntityMaker.hh**
+    + EntityMakerPrivate class
+    + Entity(EntityMakerPrivate&) constructor
+    + EntityMakerPrivate *dataPtr
+
+## Gazebo 7.1.0 to 7.X
+
+### Additions
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + public: virtual void Fini();
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + public: virtual void Fini();
+
 ## Gazebo 6.X to 7.X
 
 ### Additions
@@ -65,7 +252,6 @@ release will remove the deprecated code.
     + ***Replacement:*** public: virtual void SetClipDist();
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewImageFrame(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewImageFrame(std::function<void (const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> _subscriber);
-
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
@@ -368,9 +554,9 @@ release will remove the deprecated code.
     + ***Replacement:** public: virtual std::string Topic() const;
     + ***Deprecation:** public: rendering::GpuLaserPtr GetLaserCamera() const
     + ***Replacement:** public: rendering::GpuLaserPtr LaserCamera() const;
-    + ***Deprecation:** public: double GetAngleResolution() const 
+    + ***Deprecation:** public: double GetAngleResolution() const
     + ***Replacement:** public: double AngleResolution() const;
-    + ***Deprecation:** public: double GetRangeMin() const 
+    + ***Deprecation:** public: double GetRangeMin() const
     + ***Replacement:** public: double RangeMin() const;
     + ***Deprecation:** public: double GetRangeMax() const
     + ***Replacement:** public: double RangeMax() const;
@@ -524,7 +710,7 @@ release will remove the deprecated code.
 1. **gazebo/sensors/WirelessTransmitter.hh**
     + ***Deprecation:** public: std::string GetESSID() const
     + ***Replacement:** public: std::string ESSID() const;
-    + ***Deprecation:** public: double GetFreq() const 
+    + ***Deprecation:** public: double GetFreq() const
     + ***Replacement:** public: double Freq() const;
 
 1. **gazebo/rendering/ApplyWrenchVisual.hh**

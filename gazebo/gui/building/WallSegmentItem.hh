@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_BUILDING_WALLSEGMENTITEM_HH_
 
 #include <memory>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/SegmentItem.hh"
@@ -45,19 +46,19 @@ namespace gazebo
       /// param[in] _start Start position of the item in pixel coordinates.
       /// param[in] _end End position of the item in pixel coordinates.
       /// param[in] _height Height of the wall segment in meters.
-      public: WallSegmentItem(const QPointF &_start, const QPointF &_end,
-          const double _height);
+      public: WallSegmentItem(const ignition::math::Vector2d &_start,
+          const ignition::math::Vector2d &_end, const double _height);
 
       /// \brief Destructor
       public: ~WallSegmentItem();
 
       /// \brief Get the height of the wall segment item.
       /// \return Height of the wall segment item in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Set the height of the wall segment item.
       /// param[in] _height Height of the wall segment item in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Clone the wall segment item.
       /// \return A pointer to a copy of the wall segment item.
@@ -73,7 +74,7 @@ namespace gazebo
       public: void UpdateInspector();
 
       // Documentation inherited
-      public: void SetHighlighted(bool _highlighted);
+      public: void SetHighlighted(const bool _highlighted);
 
       /// \brief Update wall segment when segment updated.
       protected: void SegmentUpdated();

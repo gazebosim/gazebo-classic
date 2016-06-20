@@ -54,7 +54,9 @@ void ReceiveSimEvent(ConstSimEventPtr &_msg)
   g_event_type = _msg->type();
   g_event_name = _msg->name();
   g_event_data = _msg->data();
-  gzdbg << "ReceiveSimEvent " << g_event_type << std::endl;
+  gzdbg << "ReceiveSimEvent " << g_event_type
+        << " " << g_event_name
+        << std::endl;
 }
 
 // get the count in a thread safe way

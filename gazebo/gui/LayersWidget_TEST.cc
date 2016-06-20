@@ -43,13 +43,7 @@ void LayersWidget_TEST::ToggleLayers()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   const unsigned char *data = cam->ImageData();
   unsigned int width = cam->ImageWidth();
@@ -84,13 +78,7 @@ void LayersWidget_TEST::ToggleLayers()
     // Disable the visual. This should hide the visual.
     gazebo::rendering::Events::toggleLayer(0);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Get the new image data
     data = cam->ImageData();
@@ -126,13 +114,7 @@ void LayersWidget_TEST::ToggleLayers()
     // Re-enable the visual. This should make the visual visible again.
     gazebo::rendering::Events::toggleLayer(0);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Get the new image data
     data = cam->ImageData();

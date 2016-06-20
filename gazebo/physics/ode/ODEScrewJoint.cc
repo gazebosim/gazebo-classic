@@ -37,14 +37,13 @@ using namespace physics;
 ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
     : ScrewJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateScrew(_worldId, NULL);
+  this->jointId = dJointCreateScrew(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODEScrewJoint::~ODEScrewJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////
@@ -64,7 +63,10 @@ math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
   if (this->jointId)
     dJointGetScrewAnchor(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid, returning 0 vector.\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -96,7 +98,10 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
   if (this->jointId)
     dJointGetScrewAxis(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }

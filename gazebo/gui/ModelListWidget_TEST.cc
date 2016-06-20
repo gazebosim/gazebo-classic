@@ -15,6 +15,7 @@
  *
 */
 #include <boost/filesystem.hpp>
+#include <memory>
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -82,23 +83,28 @@ void ModelListWidget_TEST::OnResponse(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void ModelListWidget_TEST::CheckVector3Property(QList<QtProperty *> _properties,
+    const ignition::math::Vector3d &_xyz)
+{
+  QVERIFY(_properties.size() >= 3);
+  for (unsigned char c = 0; c < 3; ++c)
+  {
+    QtVariantProperty *property =
+      static_cast<QtVariantProperty *>(_properties[c]);
+    Q_ASSERT(property);
+    std::string name(1, 'x' + c);
+    QCOMPARE(property->propertyName(), tr(name.c_str()));
+    QCOMPARE(property->value().toDouble(), _xyz[c]);
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget_TEST::CheckPoseProperty(QList<QtProperty *> _properties,
     const gazebo::math::Pose &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[0]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("x"));
-  QCOMPARE(property->value().toDouble(), _pose.pos.x);
-  property = static_cast<QtVariantProperty *>(_properties[1]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("y"));
-  QCOMPARE(property->value().toDouble(), _pose.pos.y);
-  property = static_cast<QtVariantProperty *>(_properties[2]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("z"));
-  QCOMPARE(property->value().toDouble(), _pose.pos.z);
+  this->CheckVector3Property(_properties, _pose.pos.Ign());
+  QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
@@ -114,56 +120,60 @@ void ModelListWidget_TEST::CheckPoseProperty(QList<QtProperty *> _properties,
 }
 
 /////////////////////////////////////////////////
+void ModelListWidget_TEST::SetVector3Property(
+    QtTreePropertyBrowser *_propTreeBrowser,
+    QList<QtProperty *> _properties,
+    const ignition::math::Vector3d &_xyz)
+{
+  QVERIFY(_properties.size() >= 3);
+  for (unsigned char c = 0; c < 3; ++c)
+  {
+    QtVariantProperty *property =
+      static_cast<QtVariantProperty *>(_properties[c]);
+    Q_ASSERT(property);
+    std::string name(1, 'x' + c);
+    QCOMPARE(property->propertyName(), tr(name.c_str()));
+    QVERIFY(_propTreeBrowser->items(property).size() == 1);
+    _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
+    property->setValue(_xyz[c]);
+  }
+  QTest::qWait(500);
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget_TEST::SetPoseProperty(
-    QtTreePropertyBrowser *propTreeBrowser,
+    QtTreePropertyBrowser *_propTreeBrowser,
     QList<QtProperty *> _properties,
     const gazebo::math::Pose &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[0]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("x"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.pos.x);
-  property = static_cast<QtVariantProperty *>(_properties[1]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("y"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.pos.y);
-  property = static_cast<QtVariantProperty *>(_properties[2]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("z"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.pos.z);
+  this->SetVector3Property(_propTreeBrowser, _properties, _pose.pos.Ign());
+  QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  QVERIFY(_propTreeBrowser->items(property).size() == 1);
+  _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
   property->setValue(_pose.rot.GetAsEuler().x);
   property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pitch"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  QVERIFY(_propTreeBrowser->items(property).size() == 1);
+  _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
   property->setValue(_pose.rot.GetAsEuler().y);
   property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("yaw"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  QVERIFY(_propTreeBrowser->items(property).size() == 1);
+  _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
   property->setValue(_pose.rot.GetAsEuler().z);
-  QTest::qWait(1000);
+  QTest::qWait(500);
 }
 
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
-    bool _canonical, const gazebo::math::Pose &_pose)
+    bool _canonical, bool _enableWind, const gazebo::math::Pose &_pose)
 {
   // ignore checking link id in _properties[0]
   QtVariantProperty *property =
@@ -189,6 +199,10 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
   QCOMPARE(property->value().toBool(), _canonical);
   property = static_cast<QtVariantProperty *>(_properties[6]);
   Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("enable_wind"));
+  QCOMPARE(property->value().toBool(), _enableWind);
+  property = static_cast<QtVariantProperty *>(_properties[7]);
+  Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pose"));
   CheckPoseProperty(property->subProperties(), _pose);
   // pose settings for canonical links should be disabled
@@ -201,7 +215,7 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
 void ModelListWidget_TEST::SetLinkProperty(
     QtTreePropertyBrowser *propTreeBrowser, QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
-    bool _canonical, const gazebo::math::Pose &_pose)
+    bool _canonical, bool _enableWind, const gazebo::math::Pose &_pose)
 {
   QtVariantProperty *property =
       static_cast<QtVariantProperty *>(_properties[1]);
@@ -235,7 +249,7 @@ void ModelListWidget_TEST::SetLinkProperty(
   QCOMPARE(property->value().toBool(), _canonical);
   if (!property->value().toBool())
   {
-    property = static_cast<QtVariantProperty *>(_properties[6]);
+    property = static_cast<QtVariantProperty *>(_properties[7]);
     Q_ASSERT(property);
     QCOMPARE(property->propertyName(), tr("pose"));
     QVERIFY(propTreeBrowser->items(property).size() == 1);
@@ -243,6 +257,13 @@ void ModelListWidget_TEST::SetLinkProperty(
     propTreeBrowser->setExpanded(propTreeBrowser->topLevelItem(property), true);
     this->SetPoseProperty(propTreeBrowser, property->subProperties(), _pose);
   }
+  property = static_cast<QtVariantProperty *>(_properties[6]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("enable_wind"));
+  QVERIFY(propTreeBrowser->items(property).size() == 1);
+  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  property->setValue(_enableWind);
+
   QTest::qWait(1000);
   /// TODO set inertial, collision, visual properties
 }
@@ -467,7 +488,7 @@ void ModelListWidget_TEST::ModelProperties()
           find("box_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
-          modelName + "::box_link", false, true, false, true,
+          modelName + "::box_link", false, true, false, true, false,
           gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
@@ -475,7 +496,7 @@ void ModelListWidget_TEST::ModelProperties()
         find("sphere_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
-            modelName + "::sphere_link", false, true, false, false,
+            modelName + "::sphere_link", false, true, false, false, false,
             gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
         numLinks++;
       }
@@ -517,7 +538,7 @@ void ModelListWidget_TEST::ModelProperties()
           find("box_link") != std::string::npos)
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
-            modelName + "::box_link", true, false, true, true,
+            modelName + "::box_link", true, false, true, true, false,
             gazebo::math::Pose(1.5, 2.0, 3.2, 0.6, 0.7, 0.8));
         numLinks++;
       }
@@ -525,7 +546,7 @@ void ModelListWidget_TEST::ModelProperties()
         find("sphere_link") != std::string::npos)
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
-            modelName + "::sphere_link", true, false, true, false,
+            modelName + "::sphere_link", true, false, true, false, false,
             gazebo::math::Pose(-2.0, 0.5, 1.0, 3.14, 0, 0));
         numLinks++;
       }
@@ -582,7 +603,7 @@ void ModelListWidget_TEST::ModelProperties()
         // as this is the canonical link, the pose properties should remain
         // unchanged
         this->CheckLinkProperty(property->subProperties(),
-            modelName + "::box_link", true, false, true, true,
+            modelName + "::box_link", true, false, true, true, false,
             gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
@@ -590,7 +611,7 @@ void ModelListWidget_TEST::ModelProperties()
         find("sphere_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
-            modelName + "::sphere_link", true, false, true, false,
+            modelName + "::sphere_link", true, false, true, false, false,
             gazebo::math::Pose(-2.0, 0.5, 1.0, 3.14, 0, 0));
         numLinks++;
       }
@@ -738,13 +759,13 @@ void ModelListWidget_TEST::LinkProperties()
 
   // check the box link properties
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + boxLinkName, false, true, false, true,
+      modelName + "::" + boxLinkName, false, true, false, true, false,
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
   // change box link properties
   // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
-      modelName + "::" + boxLinkName, true, false, true, true,
+      modelName + "::" + boxLinkName, true, false, true, true, false,
       gazebo::math::Pose(2.5, 1.0, 4.2, 0.8, 0.5, 0.1));
 
   // select the box link again to refresh the property browser
@@ -776,7 +797,7 @@ void ModelListWidget_TEST::LinkProperties()
   // verify the link properties are sucessfully set
   // the link is canonical so the pose should remain the same
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + boxLinkName, true, false, true, true,
+      modelName + "::" + boxLinkName, true, false, true, true, false,
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
   // select the sphere link
@@ -813,13 +834,13 @@ void ModelListWidget_TEST::LinkProperties()
 
   // check the sphere link properties
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + sphereLinkName, false, true, false, false,
+      modelName + "::" + sphereLinkName, false, true, false, false, false,
       gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
 
   // change sphere link properties
   // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
-      modelName + "::" + sphereLinkName, true, false, true, false,
+      modelName + "::" + sphereLinkName, true, false, true, false, false,
       gazebo::math::Pose(-2.0, 0.1, -1.2, 0, 1.57, 0));
 
   // select the sphere link again to refresh the property browser
@@ -848,13 +869,187 @@ void ModelListWidget_TEST::LinkProperties()
 
   // verify the link properties are sucessfully set
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + sphereLinkName, true, false, true, false,
+      modelName + "::" + sphereLinkName, true, false, true, false, false,
       gazebo::math::Pose(-2.0, 0.1, -1.2, 0, 1.57, 0));
 
   modelListWidget->hide();
   node.reset();
   delete requestMsg;
   delete modelListWidget;
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget_TEST::PhysicsProperties()
+{
+  std::unique_ptr<gazebo::gui::ModelListWidget> modelListWidget(
+      new gazebo::gui::ModelListWidget);
+  modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 800);
+  QCoreApplication::processEvents();
+
+  this->Load("worlds/empty.world");
+
+  // Verify that property browser widget is initially empty
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
+  QtTreePropertyBrowser *propTreeBrowser =
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
+  QVERIFY(propTreeBrowser != NULL);
+  QCOMPARE(propTreeBrowser->properties().size(), 0);
+
+  // Get the physics item from the model tree
+  QTreeWidget *modelTreeWidget = modelListWidget->findChild<QTreeWidget *>(
+      "modelTreeWidget");
+  QList<QTreeWidgetItem *> treePhysicsItems =
+    modelTreeWidget->findItems(tr("Physics"), Qt::MatchExactly);
+  QCOMPARE(treePhysicsItems.size(), 1);
+  QTreeWidgetItem *physicsItem = treePhysicsItems.front();
+  QVERIFY(physicsItem != NULL);
+
+  // select the physics item after giving it time to be rendered
+  QTest::qWait(10);
+  QRect physicsRect;
+  {
+    physicsRect = modelTreeWidget->visualItemRect(physicsItem);
+    QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+        physicsRect.center() );
+    QCoreApplication::processEvents();
+    // wait for the physics item to be selected
+    int sleep = 0;
+    int maxSleep = 5;
+    while (!physicsItem->isSelected() && sleep < maxSleep)
+    {
+      QTest::qWait(10);
+      sleep++;
+    }
+    QVERIFY(physicsItem->isSelected());
+  }
+
+  // wait for the physics properties to appear
+  {
+    int sleep = 0;
+    int maxSleep = 10;
+    while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+    {
+      QCoreApplication::processEvents();
+      QTest::qWait(500);
+      sleep++;
+    }
+    QVERIFY(propTreeBrowser->properties().size() > 0);
+  }
+
+  // verify that there are 8 physics properties
+  QCOMPARE(propTreeBrowser->properties().size(), 8);
+
+  // check default values of each parameter
+  // physics engine type: ODE
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[0]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("physics engine"));
+    QCOMPARE(property->valueText(), tr("ODE"));
+  }
+
+  // physics enabled: true
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[1]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("enable physics"));
+    QCOMPARE(property->value().toBool(), true);
+  }
+
+  // real time update rate: 1000
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[2]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("real time update rate"));
+    QCOMPARE(property->value().toDouble(), 1e3);
+  }
+
+  // max step size:  0.001
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[3]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("max step size"));
+    QCOMPARE(property->value().toDouble(), 1e-3);
+  }
+
+  // gravity: 0 0 -9.8
+  {
+    const ignition::math::Vector3d gravity(0, 0, -9.8);
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[4]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("gravity"));
+    this->CheckVector3Property(property->subProperties(), gravity);
+    // set gravity to 0 0 0
+    this->SetVector3Property(propTreeBrowser, property->subProperties(),
+        ignition::math::Vector3d::Zero);
+  }
+
+  // magnetic field: 6e-6 2.3e-5 -4.2e-5
+  {
+    const ignition::math::Vector3d xyz(6e-6, 2.3e-5, -4.2e-5);
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[5]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("magnetic field"));
+    CheckVector3Property(property->subProperties(), xyz);
+  }
+
+  // select the box link again to refresh the property browser
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      physicsRect.center() );
+
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(100);
+    int sleep = 0;
+    int maxSleep = 5;
+    while (!physicsItem->isSelected() && sleep < maxSleep)
+    {
+      QCoreApplication::processEvents();
+      QTest::qWait(10);
+      sleep++;
+    }
+    QVERIFY(physicsItem->isSelected());
+  }
+
+  // wait for the box link properties to appear
+  {
+    int sleep = 0;
+    int maxSleep = 10;
+    while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+    {
+      QCoreApplication::processEvents();
+      QTest::qWait(500);
+      sleep++;
+    }
+    QVERIFY(propTreeBrowser->properties().size() > 0);
+  }
+
+  // check gravity: 0 0 0
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[4]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("gravity"));
+    this->CheckVector3Property(property->subProperties(),
+        ignition::math::Vector3d::Zero);
+  }
+
+  modelListWidget->hide();
 }
 
 // Generate a main function for the test

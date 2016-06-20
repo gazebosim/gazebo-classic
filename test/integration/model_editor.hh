@@ -25,6 +25,9 @@ class ModelEditorTest : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test editing and saving existing model
+  private slots: void EditModel();
+
   /// \brief Test pose of model links and joints before and after saving
   private slots: void SaveModelPose();
 

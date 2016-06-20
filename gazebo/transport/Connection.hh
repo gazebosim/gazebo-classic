@@ -204,6 +204,7 @@ namespace gazebo
       public: template<typename Handler>
               void AsyncRead(Handler _handler)
               {
+                boost::mutex::scoped_lock lock(this->socketMutex);
                 if (!this->IsOpen())
                 {
                   gzerr << "AsyncRead on a closed socket\n";
@@ -325,10 +326,13 @@ namespace gazebo
               { return this->shutdown.Connect(_subscriber); }
 
       /// \brief Unregister a function to be called when the connection is
-      /// shut down \param[in] _subscriber Handle previously returned by
+      /// shut down
+      /// \param[in] _subscriber Handle previously returned by
       /// ConnectToShutdown()
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
-              {this->shutdown.Disconnect(_subscriber);}
+              GAZEBO_DEPRECATED(8.0)
+              {this->shutdown.Disconnect(_subscriber->Id());}
 
       /// \brief Handle on-write callbacks
       public: void ProcessWriteQueue(bool _blocking = false);

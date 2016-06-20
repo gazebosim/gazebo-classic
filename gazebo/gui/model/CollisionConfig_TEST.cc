@@ -165,5 +165,54 @@ void CollisionConfig_TEST::OnApply()
   g_appliedSignalCount++;
 }
 
+/////////////////////////////////////////////////
+void CollisionConfig_TEST::Restore()
+{
+  CollisionConfig cc;
+  msgs::Collision c1, c2, c3;
+
+  cc.AddCollision("c1", &c1);
+  cc.AddCollision("c2", &c2);
+
+  QCOMPARE(cc.GetCollisionCount(), 2u);
+  QVERIFY(cc.GetData("c1") != NULL);
+  QVERIFY(cc.GetData("c2") != NULL);
+  QVERIFY(cc.GetData("c3") == NULL);
+
+  // Set this as the original data
+  cc.Init();
+
+  // Add a collision and restore
+  cc.AddCollision("c3", &c3);
+  QCOMPARE(cc.GetCollisionCount(), 3u);
+  QVERIFY(cc.GetData("c1") != NULL);
+  QVERIFY(cc.GetData("c2") != NULL);
+  QVERIFY(cc.GetData("c3") != NULL);
+
+  cc.RestoreOriginalData();
+  QCOMPARE(cc.GetCollisionCount(), 2u);
+  QVERIFY(cc.GetData("c1") != NULL);
+  QVERIFY(cc.GetData("c2") != NULL);
+  QVERIFY(cc.GetData("c3") == NULL);
+
+  // Remove a collision and restore
+  auto button = cc.findChild<QToolButton *>("removeCollisionButton_0");
+  QVERIFY(button);
+
+  // Note that the confirmation dialog has been disabled for tests (issue #1963)
+  button->click();
+
+  QCOMPARE(cc.GetCollisionCount(), 1u);
+  QVERIFY(cc.GetData("c1") == NULL);
+  QVERIFY(cc.GetData("c2") != NULL);
+  QVERIFY(cc.GetData("c3") == NULL);
+
+  cc.RestoreOriginalData();
+  QCOMPARE(cc.GetCollisionCount(), 2u);
+  QVERIFY(cc.GetData("c1") != NULL);
+  QVERIFY(cc.GetData("c2") != NULL);
+  QVERIFY(cc.GetData("c3") == NULL);
+}
+
 // Generate a main function for the test
 QTEST_MAIN(CollisionConfig_TEST)

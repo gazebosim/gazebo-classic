@@ -19,6 +19,12 @@
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 
+/// \addtogroup gazebo_physics_bullet
+/// \{
+
+/// \class gzBtUniversalConstraint
+/// \brief Functions that implement a universal joint/constraint using
+/// bullet.
 ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint
 : public btGeneric6DofConstraint
 {
@@ -131,5 +137,5 @@ ATTRIBUTE_ALIGNED16(class) gzBtUniversalConstraint
   /// \brief Maximum motor impulses.
   private: btScalar maxMotorImpulse[2];
 };
-
+/// \}
 #endif

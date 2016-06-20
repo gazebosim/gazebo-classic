@@ -29,11 +29,10 @@ set (sources
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
-  HotkeyDialog.cc
-  RenderWidget.cc
   GLWidget.cc
-  GuiIface.cc
   GuiEvents.cc
+  GuiIface.cc
+  HotkeyDialog.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -42,12 +41,13 @@ set (sources
   LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
-  ModelManipulator.cc
-  ModelSnap.cc
   ModelListWidget.cc
   ModelMaker.cc
+  ModelManipulator.cc
   ModelRightMenu.cc
+  ModelSnap.cc
   MouseEventHandler.cc
+  RenderWidget.cc
   SaveDialog.cc
   SpaceNav.cc
   SplashScreen.cc
@@ -126,23 +126,17 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-#if (HAVE_QWT)
-#  set (sources ${sources}
-#    Diagnostics.cc
-#    IncrementalPlot.cc
-#  )
-#  set (qt_headers ${qt_headers}
-#    Diagnostics.hh
-#    IncrementalPlot.hh
-#  )
-#endif()
-
 set (qt_tests
+  BuildingEditor_TEST.cc
+  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
+  GLWidget_TEST.cc
+  GLWidget_TEST2.cc
   GuiIface_TEST.cc
   HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
+  ModelListWidget_TEST.cc
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
@@ -158,6 +152,7 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
+add_subdirectory(plot)
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
@@ -176,14 +171,9 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       ApplyWrenchDialog_TEST.cc
-      BuildingEditor_TEST.cc
-      ConfigWidget_TEST.cc
-      GLWidget_TEST.cc
-      GLWidget_TEST2.cc
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
-      ModelListWidget_TEST.cc
       ModelSnap_TEST.cc
       Projection_TEST.cc)
 endif()
@@ -196,7 +186,7 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC})
+gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${resources_RCC})
 gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)
@@ -240,8 +230,7 @@ set (gtest_sources
   Conversions_TEST.cc
 )
 
-set (GZ_BUILD_TESTS_EXTRA_LIBS gazebo_gui)
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_gui)
 
 add_definitions(${QT_DEFINITIONS})
 

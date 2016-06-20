@@ -62,6 +62,37 @@ TEST_F(OpenAL, DefaultDevice)
 }
 
 /////////////////////////////////////////////////
+TEST_F(OpenAL, DeviceList)
+{
+  common::load();
+
+  // retrieve audio devices and try opening them.
+  std::set<std::string> devices = util::OpenAL::Instance()->DeviceList();
+  EXPECT_FALSE(devices.empty());
+
+  for (const auto &d : devices)
+  {
+    sdf::SDFPtr sdf(new sdf::SDF);
+    sdf::initFile("world.sdf", sdf->Root());
+
+    std::string sdfString = "<sdf version='1.4'>"
+      "<world name='default'>"
+      "<audio>"
+      "<device>" + d + "</device>"
+      "</audio>"
+      "</world>"
+      "</sdf>";
+
+    EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
+
+    EXPECT_TRUE(util::OpenAL::Instance()->Load(
+        sdf->Root()->GetElement("audio")));
+  }
+
+  ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
+}
+
+/////////////////////////////////////////////////
 TEST_F(OpenAL, NonDefaultDevice)
 {
   common::load();

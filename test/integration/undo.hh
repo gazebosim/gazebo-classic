@@ -42,6 +42,9 @@ class UndoTest : public QTestFixture
   /// \brief Test undoing rotate light command.
   private slots: void UndoRotateLight();
 
+  /// \brief Test undoing scale model command.
+  private slots: void UndoScaleModel();
+
   /// \brief Test undoing snap commands.
   private slots: void UndoSnap();
 

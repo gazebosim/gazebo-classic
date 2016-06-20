@@ -27,7 +27,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Event.hh"
 #include "gazebo/math/Box.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Quaternion.hh"

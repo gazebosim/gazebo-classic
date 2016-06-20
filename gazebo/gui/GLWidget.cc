@@ -359,6 +359,22 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
+  /// Switch between RTS modes
+  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
+      this->dataPtr->state != "make_entity")
+  {
+    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
+      g_rotateAct->trigger();
+    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
+      g_translateAct->trigger();
+    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
+      g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
+      g_snapAct->trigger();
+    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
+      g_arrowAct->trigger();
+  }
+
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
   this->dataPtr->keyEvent.shift =
@@ -413,22 +429,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     return;
 
   this->dataPtr->keyModifiers = _event->modifiers();
-
-  /// Switch between RTS modes
-  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
-      this->dataPtr->state != "make_entity")
-  {
-    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
-      g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
-      g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
-      g_scaleAct->trigger();
-    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
-      g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
-      g_arrowAct->trigger();
-  }
 
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
@@ -917,7 +917,7 @@ std::string GLWidget::OgreHandle() const
   ogreHandle = std::to_string(this->winId());
 #elif defined(WIN32)
   ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
+      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);

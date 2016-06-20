@@ -37,6 +37,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
@@ -172,8 +173,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  if (this->dataPtr->preRenderConnection)
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+  this->dataPtr->preRenderConnection.reset();
 
   delete this->dataPtr->boundingBox;
 
@@ -221,11 +221,7 @@ void Visual::Fini()
     this->dataPtr->sceneNode = NULL;
   }
 
-  if (this->dataPtr->preRenderConnection)
-  {
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
-    this->dataPtr->preRenderConnection.reset();
-  }
+  this->dataPtr->preRenderConnection.reset();
 
   this->dataPtr->scene.reset();
 }
@@ -587,7 +583,6 @@ void Visual::DetachVisual(const std::string &_name)
       this->dataPtr->children.erase(iter);
       if (this->dataPtr->sceneNode)
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
-      childVis->GetParent().reset();
       break;
     }
   }
@@ -666,6 +661,7 @@ void Visual::DetachObjects()
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
   this->dataPtr->myMaterialName = "";
+  this->dataPtr->skeleton = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -754,6 +750,19 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(math::Vector3(this->dataPtr->scale)));
+
+  // Scale selection object in case we have one attached. Other children were
+  // scaled from UpdateGeomSize
+  for (auto child : this->dataPtr->children)
+  {
+    auto selectionObj = std::dynamic_pointer_cast<SelectionObj>(child);
+
+    if (selectionObj)
+    {
+      selectionObj->UpdateSize();
+      break;
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1722,12 +1731,16 @@ void Visual::SetPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetPosition() const
 {
+  if (!this->dataPtr->sceneNode)
+    return math::Vector3::Zero;
   return Conversions::Convert(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+  if (!this->dataPtr->sceneNode)
+    return math::Vector3::Zero;
   return Conversions::Convert(this->dataPtr->sceneNode->getOrientation());
 }
 
@@ -1750,12 +1763,16 @@ void Visual::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+  if (!this->dataPtr->sceneNode)
+    return;
   this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
+  if (!this->dataPtr->sceneNode)
+    return;
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
@@ -2345,10 +2362,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
       this->DetachObjects();
 
+      Ogre::MovableObject *obj = NULL;
       if (newGeometryType == "box" || newGeometryType == "cylinder" ||
           newGeometryType == "sphere" || newGeometryType == "plane")
       {
-        this->AttachMesh("unit_" + newGeometryType);
+        obj = this->AttachMesh("unit_" + newGeometryType);
         sdf::ElementPtr shapeElem = geomElem->AddElement(newGeometryType);
         if (newGeometryType == "sphere" || newGeometryType == "cylinder")
           shapeElem->GetElement("radius")->Set(0.5);
@@ -2373,7 +2391,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
             centerSubmesh= _msg->geometry().mesh().center_submesh();
         }
 
-        this->AttachMesh(meshName, submeshName, centerSubmesh);
+        obj = this->AttachMesh(meshName, submeshName, centerSubmesh);
 
         sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
         if (!filename.empty())
@@ -2385,6 +2403,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           submeshElem->GetElement("center")->Set(centerSubmesh);
         }
       }
+      Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
+      if (ent && ent->hasSkeleton())
+        this->dataPtr->skeleton = ent->getSkeleton();
       this->SetTransparency(origTransparency);
       this->SetMaterial(origMaterial);
     }

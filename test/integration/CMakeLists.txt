@@ -45,6 +45,7 @@ set(tests
   gz_physics.cc
   gz_world.cc
   imu.cc
+  introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
@@ -59,10 +60,12 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_base.cc
   physics_basic_controller_response.cc
   physics_collision.cc
   physics_friction.cc
@@ -76,6 +79,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   region_events.cc
   rest_web.cc
   road.cc
@@ -97,6 +101,7 @@ set(tests
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
+  world_remove.cc
   worlds_installed.cc
   )
 
@@ -112,13 +117,19 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+
+  set_property(
+    SOURCE world_clone.cc
+    PROPERTY COMPILE_DEFINITIONS
+    GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+  )
 
   # Increase timeout for debug-mode
   if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
@@ -128,6 +139,9 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+
+  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
+    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests
@@ -139,6 +153,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  depth_camera.cc
   factory.cc
   gpu_laser.cc
   gz_camera.cc
@@ -151,14 +166,18 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-
-gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_editor_undo.cc
   model_manipulation.cc
+  mouse_pick.cc
+  track_visual.cc
   undo.cc
+  view_angle.cc
+  view_control.cc
   visual_pose.cc
 )
 
@@ -169,4 +188,7 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
+
+  set_target_properties(${TEST_TYPE}_model_editor_undo PROPERTIES
+    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
