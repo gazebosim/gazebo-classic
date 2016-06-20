@@ -34,7 +34,7 @@ using namespace gui;
 TopToolbar::TopToolbar(QWidget *_parent)
   : QFrame(_parent), dataPtr(new TopToolbarPrivate)
 {
-  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->setObjectName("topToolbar");
 
   this->dataPtr->toolbar = new QToolBar;

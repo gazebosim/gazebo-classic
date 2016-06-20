@@ -91,6 +91,8 @@ MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
   this->dataPtr->renderWidget = NULL;
+  this->dataPtr->menuLayout = NULL;
+  this->dataPtr->menuBar = NULL;
   this->setObjectName("mainWindow");
 
   // Do these things first.
@@ -296,34 +298,51 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
-  // Default window size is entire desktop.
-  QSize winSize = QApplication::desktop()->screenGeometry().size();
-
   // Get the size properties from the INI file.
-  int winWidth = getINIProperty<int>("geometry.width", winSize.width());
-  int winHeight = getINIProperty<int>("geometry.height", winSize.height());
+  int winWidth = getINIProperty<int>("geometry.width", -1);
+  int winHeight = getINIProperty<int>("geometry.height", -1);
 
-  winWidth = winWidth < 0 ? winSize.width() : winWidth;
-  winHeight = winHeight < 0 ? winSize.height() : winHeight;
-
-  // Get the position properties from the INI file.
-  int winXPos = getINIProperty<int>("geometry.x", 0);
-  int winYPos = getINIProperty<int>("geometry.y", 0);
-
-  this->setGeometry(winXPos, winYPos, winWidth, winHeight);
-
-  if (this->width() > winWidth)
+  // Width or height were not specified. Therefore make the window
+  // maximized.
+  if (winWidth <= 0 || winHeight <= 0)
   {
-    gzwarn << "Requested geometry.width of " << winWidth
-           << " but the minimum width of the window is "
-           << this->width() << "." << std::endl;
+    // Output error if the gui.ini file has missing value.
+    if (winWidth > 0)
+    {
+      gzerr << "gui.ini file has width but not height specified. "
+       << "The main window will appear maximized.\n";
+    }
+
+    // Output error if the gui.ini file has missing value.
+    if (winHeight > 0)
+    {
+      gzerr << "gui.ini file has height but not width specified. "
+       << "The main window will appear maximized.\n";
+    }
+
+    this->showMaximized();
   }
-
-  if (this->height() > winHeight)
+  else
   {
-    gzwarn << "Requested geometry.height of " << winHeight
-           << " but the minimum height of the window is "
-           << this->height() << "." << std::endl;
+    // Get the position properties from the INI file.
+    int winXPos = getINIProperty<int>("geometry.x", 0);
+    int winYPos = getINIProperty<int>("geometry.y", 0);
+
+    this->setGeometry(winXPos, winYPos, winWidth, winHeight);
+
+    if (this->width() > winWidth)
+    {
+      gzwarn << "Requested geometry.width of " << winWidth
+        << " but the minimum width of the window is "
+        << this->width() << "." << std::endl;
+    }
+
+    if (this->height() > winHeight)
+    {
+      gzwarn << "Requested geometry.height of " << winHeight
+        << " but the minimum height of the window is "
+        << this->height() << "." << std::endl;
+    }
   }
 
   this->dataPtr->worldControlPub =
@@ -830,6 +849,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showFullScreen();
     this->dataPtr->leftColumn->hide();
     this->dataPtr->toolsWidget->hide();
+    this->dataPtr->menuBar->hide();
     this->setContentsMargins(0, 0, 0, 0);
     this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
   }
@@ -838,6 +858,7 @@ void MainWindow::OnFullScreen(bool _value)
     this->showNormal();
     this->dataPtr->leftColumn->show();
     this->dataPtr->toolsWidget->show();
+    this->dataPtr->menuBar->show();
   }
   g_fullScreenAct->setChecked(_value);
   g_fullscreen = _value;
@@ -1577,10 +1598,61 @@ void MainWindow::CreateActions()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ShowMenuBar(QMenuBar * /*_bar*/)
+void MainWindow::ShowMenuBar(QMenuBar *_bar)
 {
-  // populate main window's menu bar with menus from normal simulation mode
-  this->CreateMenuBar();
+  if (!this->dataPtr->menuLayout)
+    this->dataPtr->menuLayout = new QHBoxLayout;
+
+  // Remove all widgets from the menuLayout
+  while (this->dataPtr->menuLayout->takeAt(0) != 0)
+  {
+  }
+
+  if (!this->dataPtr->menuBar)
+  {
+    // create the native menu bar
+    this->dataPtr->menuBar = new QMenuBar;
+    this->dataPtr->menuBar->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+    this->setMenuBar(this->dataPtr->menuBar);
+
+    // populate main window's menu bar with menus from normal simulation mode
+    this->CreateMenuBar();
+  }
+
+  this->dataPtr->menuBar->clear();
+
+  QMenuBar *newMenuBar = NULL;
+  if (!_bar)
+  {
+    // Get the main window's menubar
+    // Note: for some reason we can not call menuBar() again,
+    // so manually retrieving the menubar from the mainwindow.
+    QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+    if (!menuBars.empty())
+      newMenuBar = menuBars[0];
+  }
+  else
+  {
+    newMenuBar = _bar;
+  }
+
+  if (!newMenuBar)
+  {
+    gzerr << "Unable to set NULL menu bar" << std::endl;
+    return;
+  }
+
+  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
+  for (int i = 0; i < menus.size(); ++i)
+  {
+    this->dataPtr->menuBar->addMenu(menus[i]);
+  }
+
+  this->dataPtr->menuLayout->addWidget(this->dataPtr->menuBar);
+
+  this->dataPtr->menuLayout->addStretch(5);
+  this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -1869,6 +1941,12 @@ void MainWindow::AddMenu(QMenu *_menu)
 void MainWindow::CreateMenus()
 {
   this->ShowMenuBar();
+
+  QFrame *frame = new QFrame;
+  frame->setLayout(this->dataPtr->menuLayout);
+  frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+  this->setMenuWidget(frame);
 }
 
 /////////////////////////////////////////////////

@@ -76,6 +76,34 @@ Q_DECLARE_METATYPE(common::Time)
 Q_DECLARE_METATYPE(std::string)
 
 //////////////////////////////////////////////////
+// QT message handler that pipes qt messages into gazebo's console system.
+void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
+    const QString &_msg)
+{
+  QByteArray localMsg = _msg.toLocal8Bit();
+  switch (_type) {
+    case QtDebugMsg:
+      gzdbg << localMsg.constData() << "(" << _context.file
+       << ":" <<  _context.line << " " << _context.function << std::endl;
+      break;
+    case QtInfoMsg:
+      gzmsg << localMsg.constData() << "(" << _context.file
+       << ":" <<  _context.line << " " << _context.function << std::endl;
+      break;
+    case QtWarningMsg:
+      gzwarn << localMsg.constData() << "(" << _context.file
+       << ":" <<  _context.line << " " << _context.function << std::endl;
+      break;
+    case QtFatalMsg:
+    case QtCriticalMsg:
+      gzerr << localMsg.constData() << "(" << _context.file
+       << ":" <<  _context.line << " " << _context.function << std::endl;
+    default:
+      break;
+  }
+}
+
+//////////////////////////////////////////////////
 void print_usage()
 {
   std::cerr << "gzclient -- Gazebo GUI Client\n\n";
@@ -255,6 +283,9 @@ bool gui::load()
     g_argv[i] = new char[strlen("gazebo")];
     snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
+
+  // Register custom message handler
+  qInstallMessageHandler(messageHandler);
 
   g_app = new QApplication(g_argc, g_argv);
   set_style();
