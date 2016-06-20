@@ -89,6 +89,14 @@ class ModelListWidget_TEST : public QTestFixture
     bool _selfCollide, bool _gravity, bool _kinematic, bool _canonical,
     bool _enableWind, const gazebo::math::Pose &_pose);
 
+  /// \brief Test plugin property attributes and values.
+  /// \param[in] _name Name of plugin.
+  /// \param[in] _fileName Filename of plugin.
+  /// \param[in] _innerxml Inner XML of plugin.
+  private: void CheckPluginProperty(QList<QtProperty *> _properties,
+      const std::string &_name, const std::string &_filename,
+      const std::string &_innerxml);
+
   /// \brief Test to see the tree widget has correct items.
   private slots: void TreeWidget();
 
@@ -105,6 +113,10 @@ class ModelListWidget_TEST : public QTestFixture
   /// now only displays link properties as the result of directly clicking on
   /// the link item in the models tree widget.
   private slots: void LinkProperties();
+
+  /// \brief Test that the property browser displays correct plugin properties.
+  /// This is similar to the LinkProperties test.
+  private slots: void PluginProperties();
 
   /// \brief Test that the property browser displays correct physics properties
   /// and allows modification of physics properties.

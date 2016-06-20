@@ -37,6 +37,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
@@ -116,17 +117,23 @@ void Model::OnRequest(ConstRequestPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->receiveMutex);
 
-  // Only handle requests for model plugin info
-  if (_msg->request() == "model_plugin_info" && this->sdf->HasElement("plugin"))
+  // Only handle requests for model plugins in this model
+  if (_msg->request() == "model_plugin_info" && this->sdf->HasElement("plugin")
+      && _msg->data().find(this->URI().Str()) != std::string::npos)
   {
-    // Check if requested plugin is within this model
+    // Find correct plugin
     sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
     while (pluginElem)
     {
       std::string pluginName = pluginElem->Get<std::string>("name");
 
-      if (pluginName == _msg->data().c_str())
+      if (_msg->data().find(pluginName) != std::string::npos)
       {
+        // Build plugin URI
+        common::URI pluginUri(this->URI());
+        pluginUri.Path().PushBack("plugin");
+        pluginUri.Path().PushBack(pluginName);
+
         // Get plugin info from SDF
         msgs::Plugin pluginMsg;
         pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
@@ -147,6 +154,9 @@ void Model::OnRequest(ConstRequestPtr &_msg)
       }
       pluginElem = pluginElem->GetNextElement("plugin");
     }
+
+    gzwarn << "Plugin [" << _msg->data() << "] not found in model [" <<
+        this->URI().Str() << "]" << std::endl;
   }
 }
 

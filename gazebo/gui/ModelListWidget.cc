@@ -34,6 +34,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -342,7 +343,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
         if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
         {
           this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
-            this->dataPtr->selectedEntityName);
+              this->dataPtr->selectedEntityName);
         }
         else
         {
@@ -522,7 +523,7 @@ void ModelListWidget::ProcessModelMsgs()
         {
           // Create subheader for plugins
           QTreeWidgetItem *pluginHeaderItem = new QTreeWidgetItem(topItem,
-          QStringList(QString("%1").arg(QString::fromStdString("PLUGINS"))));
+          QStringList(QString("%1").arg("PLUGINS")));
           pluginHeaderItem->setFont(0, subheaderFont);
           pluginHeaderItem->setFlags(Qt::ItemIsEnabled);
           this->dataPtr->modelTreeWidget->addTopLevelItem(pluginHeaderItem);
@@ -536,8 +537,20 @@ void ModelListWidget::ProcessModelMsgs()
               QStringList(QString("%1").arg(
                   QString::fromStdString(pluginName))));
 
-          pluginItem->setData(0, Qt::UserRole, QVariant(pluginName.c_str()));
+          common::URI pluginUri;
+          pluginUri.SetScheme("data");
+
+          pluginUri.Path().PushBack("world");
+          pluginUri.Path().PushBack(gui::get_world());
+          pluginUri.Path().PushBack("model");
+          pluginUri.Path().PushBack((*iter).name());
+          pluginUri.Path().PushBack("plugin");
+          pluginUri.Path().PushBack(pluginName);
+
+          pluginItem->setData(0, Qt::UserRole,
+              QVariant(pluginUri.Str().c_str()));
           pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
+
           this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
         }
       }
