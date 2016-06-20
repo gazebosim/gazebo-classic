@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Open a new world without restarting the server
+    * [Pull request 2319](https://bitbucket.org/osrf/gazebo/pull-request/2319)
+
 ## Gazebo 7.2.0 (2016-06-13)
 
 1. Fix right click view options after deleting and respawning a model.
