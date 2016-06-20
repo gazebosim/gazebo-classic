@@ -14,11 +14,7 @@
  * limitations under the License.
  *
  */
-#ifdef __linux__
-#include <QtX11Extras/QX11Info>
-#endif
-
-#include <boost/bind.hpp>
+#include <thread>
 
 #include "gazebo/gui/OculusWindow.hh"
 #include "gazebo/rendering/OculusCamera.hh"
@@ -46,19 +42,11 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Oculus"));
 
-  this->renderFrame = new QFrame;
-  this->renderFrame->setFrameShape(QFrame::NoFrame);
-  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
-  this->renderFrame->setContentsMargins(0, 0, 0, 0);
-  this->renderFrame->show();
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-  QVBoxLayout *renderLayout = new QVBoxLayout;
-  renderLayout->addWidget(this->renderFrame);
-  renderLayout->setContentsMargins(0, 0, 0, 0);
-
-  this->setLayout(renderLayout);
-  this->attachCameraThread = NULL;
+  this->attachCameraThread = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -105,7 +93,7 @@ void OculusWindow::AttachCameraToVisual()
 {
   if (!this->scene)
   {
-    gzerr << "OculusWindow::AttachCameraToVisual(): Scene is NULL" << std::endl;
+    gzerr << "OculusWindow::AttachCameraToVisual(): Scene is null" << std::endl;
     return;
   }
   int tries = 0;
@@ -142,7 +130,7 @@ bool OculusWindow::CreateCamera()
   this->scene = rendering::get_scene();
 
   if (!this->scene)
-    gzerr << "Unable to create an oculus camera, scene is NULL" << std::endl;
+    gzerr << "Unable to create an oculus camera, scene is null" << std::endl;
 
   this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
   return this->oculusCamera->Ready();
@@ -152,8 +140,8 @@ bool OculusWindow::CreateCamera()
 void OculusWindow::showEvent(QShowEvent *_event)
 {
   if (this->oculusCamera)
-    this->attachCameraThread = new boost::thread(
-        boost::bind(&OculusWindow::AttachCameraToVisual, this));
+    this->attachCameraThread = new std::thread(
+        std::bind(&OculusWindow::AttachCameraToVisual, this));
 
   if (this->windowId == -1)
   {
@@ -188,16 +176,10 @@ std::string OculusWindow::GetOgreHandle() const
 {
   std::string ogreHandle;
 
-#if defined(WIN32) || defined(__APPLE__)
-  ogreHandle = boost::lexical_cast<std::string>(this->winId());
+#if defined(__APPLE__)
+  ogreHandle = std::to_string(reinterpret_cast<uint32_t>(this->winId()));
 #else
-  QWidget *qParent = dynamic_cast<QWidget*>(this->renderFrame);
-  GZ_ASSERT(qParent, "qParent is null");
-
-  ogreHandle =
-    std::to_string(reinterpret_cast<uint64_t>(QX11Info::display())) + ":" +
-    std::to_string(static_cast<uint32_t>(QX11Info::appScreen())) + ":" +
-    std::to_string(static_cast<uint64_t>(qParent->winId()));
+  ogreHandle = std::to_string(static_cast<uint64_t>(this->winId()));
 #endif
 
   return ogreHandle;

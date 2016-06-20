@@ -20,10 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#ifdef __linux__
-#include <QtX11Extras/QX11Info>
-#endif
-
 #include <functional>
 #include <boost/algorithm/string.hpp>
 #include <math.h>
