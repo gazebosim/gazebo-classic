@@ -210,6 +210,13 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    void Set(msgs::Inertial *_i, const ignition::math::Inertiald &_m)
+    {
+      msgs::Set(_i, _m.MassMatrix());
+      msgs::Set(_i->mutable_pose(), _m.Pose());
+    }
+
+    /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
     {
       Set(_p->mutable_normal(), _v.Normal());
@@ -302,6 +309,14 @@ namespace gazebo
       msgs::Time result;
       result.set_sec(_t.sec);
       result.set_nsec(_t.nsec);
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    msgs::Inertial Convert(const ignition::math::Inertiald &_i)
+    {
+      msgs::Inertial result;
+      msgs::Set(&result, _i);
       return result;
     }
 
