@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<%
+  # Collide spheres: testing the collision detection algorithm
+  # SI units (length in meters)
+  require "matrix"
+  def a_to_s(v)
+    Array(v).join(" ")
+  end
+
+  mm = 1e-3
+  dm = 1e-1
+  density = 600
+  spheres = {
+    "mm30" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 3.0},
+    "mm25" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 2.5},
+    "mm22" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 2.2},
+    "mm21" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 2.1},
+    "mm20" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 2.0},
+    "mm19" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 1.9},
+    "mm18" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 1.8},
+    "mm15" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 1.5},
+    "mm10" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 1.0},
+    "mm05" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 0.5},
+    "mm01" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 0.1},
+    "mm00" => {:radius => mm, :radiusRatio => 1.0, :separationRatio => 0.0},
+    "dm30" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 3.0},
+    "dm25" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 2.5},
+    "dm22" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 2.2},
+    "dm21" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 2.1},
+    "dm20" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 2.0},
+    "dm19" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 1.9},
+    "dm18" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 1.8},
+    "dm15" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 1.5},
+    "dm10" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 1.0},
+    "dm05" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 0.5},
+    "dm01" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 0.1},
+    "dm00" => {:radius => dm, :radiusRatio => 1.0, :separationRatio => 0.0},
+  }
+%>
+<sdf version="1.5">
+  <world name="collide_spheres">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%
+  spheres.keys.each_with_index do |k, i|
+    modelName = k
+    radiusA = spheres[k][:radius]
+    radiusB = radiusA * spheres[k][:radiusRatio]
+    separationRatio = spheres[k][:separationRatio]
+    posA = Vector[0.0, i*0.3, 0.5]
+    posB = Vector[separationRatio * radiusA, i*0.3, 0.5]
+    pair = {
+      "A" => {:pos => posA, :radius => radiusA},
+      "B" => {:pos => posB, :radius => radiusB},
+    }
+    pair.keys.each do |suffix|
+      pos = pair[suffix][:pos]
+      radius = pair[suffix][:radius]
+      volume = 4.0 / 3.0 * Math::PI * radius**3
+      mass = density * volume
+      ixx  = 2.0/5.0 * mass * radius**2
+      iyy  = 2.0/5.0 * mass * radius**2
+      izz  = 2.0/5.0 * mass * radius**2
+%>
+    <model name="<%= modelName + suffix %>">
+      <pose><%= a_to_s(pos) %>  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+    end
+  end
+%>
+  </world>
+</sdf>

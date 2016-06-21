@@ -33,6 +33,7 @@ add_definitions(${QT_DEFINITIONS})
 set(tests
   aero_plugin.cc
   bandwidth.cc
+  collide_spheres.cc
   concave_mesh.cc
   contact_sensor.cc
   dem.cc
