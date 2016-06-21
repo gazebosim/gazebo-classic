@@ -15,7 +15,7 @@
  *
 */
 
-#include <ignition/math/MassMatrix3.hh>
+#include <ignition/math/Inertial.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
