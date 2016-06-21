@@ -538,7 +538,7 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "make_entity")
   {
-   this->OnMouseMoveMakeEntity();
+    this->OnMouseMoveMakeEntity();
   }
   else if (this->dataPtr->state == "snap")
   {
