@@ -76,9 +76,9 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
 {
   Visual::Load();
 
-  auto inertial = msgs::Convert(_msg);
-  auto xyz = msgs::ConvertIgn(inertial.pose().position());
-  auto q = msgs::ConvertIgn(inertial.pose().orientation());
+  auto inertial = msgs::Convert(_msg->inertial());
+  auto xyz = inertial.Pose().Pos();
+  auto q = inertial.Pose().Rot();
 
   // Use ignition::math::MassMatrix3 to compute
   // equivalent box size and rotation
