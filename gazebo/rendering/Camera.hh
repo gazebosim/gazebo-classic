@@ -748,7 +748,9 @@ namespace gazebo
 
       /// \brief Disconnect from an image frame
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer
@@ -862,6 +864,10 @@ namespace gazebo
       /// \return "perspective" or "orthographic"
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
+
+      /// \brief Return the projection matrix of this camera.
+      /// \return the projection matrix
+      public: ignition::math::Matrix4d ProjectionMatrix() const;
 
       /// \brief Get the visual tracked by this camera.
       /// \return Tracked visual.

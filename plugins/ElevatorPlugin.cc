@@ -42,7 +42,7 @@ ElevatorPlugin::ElevatorPlugin()
 /////////////////////////////////////////////////
 ElevatorPlugin::~ElevatorPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
+  this->dataPtr->updateConnection.reset();
 
   delete this->dataPtr->doorController;
   this->dataPtr->doorController = NULL;

@@ -52,5 +52,5 @@ EventT<void (sdf::ElementPtr, const std::string &,
 /////////////////////////////////////////////////
 void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)
 {
-  worldUpdateBegin.Disconnect(_subscriber);
+  worldUpdateBegin.Disconnect(_subscriber->Id());
 }

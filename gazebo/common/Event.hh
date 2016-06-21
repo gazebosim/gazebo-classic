@@ -50,7 +50,9 @@ namespace gazebo
 
       /// \brief Disconnect
       /// \param[in] _c A pointer to a connection
-      public: virtual void Disconnect(ConnectionPtr _c) = 0;
+      /// \deprecated Use event::~Connection to disconnect
+      public: virtual void Disconnect(ConnectionPtr _c)
+              GAZEBO_DEPRECATED(8.0) = 0;
 
       /// \brief Disconnect
       /// \param[in] _id Integer ID of a connection
@@ -124,7 +126,9 @@ namespace gazebo
 
       /// \brief Disconnect a callback to this event.
       /// \param[in] _c The connection to disconnect.
-      public: virtual void Disconnect(ConnectionPtr _c);
+      /// \deprecated Use event::~Connection to disconnect
+      public: virtual void Disconnect(ConnectionPtr _c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Disconnect a callback to this event.
       /// \param[in] _id The id of the connection to disconnect.

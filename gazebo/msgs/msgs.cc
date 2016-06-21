@@ -2824,10 +2824,10 @@ namespace gazebo
         submeshElem->GetElement("name")->Set(_msg.submesh());
         if (_msg.has_center_submesh())
           submeshElem->GetElement("center")->Set(_msg.center_submesh());
-        if (_msg.has_scale())
-        {
-          meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
-        }
+      }
+      if (_msg.has_scale())
+      {
+        meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
       }
       return meshSDF;
     }

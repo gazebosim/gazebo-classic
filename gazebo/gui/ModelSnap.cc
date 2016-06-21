@@ -52,8 +52,8 @@ ModelSnap::ModelSnap()
   this->dataPtr->initialized = false;
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
-  this->dataPtr->snapLines = NULL;
-  this->dataPtr->updateMutex = NULL;
+  this->dataPtr->snapLines = nullptr;
+  this->dataPtr->snapHighlight = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -62,6 +62,12 @@ ModelSnap::~ModelSnap()
   this->Clear();
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelSnap::Fini()
+{
+  this->Clear();
 }
 
 /////////////////////////////////////////////////
@@ -77,25 +83,23 @@ void ModelSnap::Clear()
   this->dataPtr->node.reset();
   this->dataPtr->userCmdPub.reset();
 
-  if (this->dataPtr->updateMutex)
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    delete this->dataPtr->snapLines;
-    this->dataPtr->snapLines = NULL;
-    this->dataPtr->snapVisual.reset();
+  this->dataPtr->renderConnection.reset();
 
-    if (this->dataPtr->snapHighlight != NULL &&
-        this->dataPtr->highlightVisual != NULL)
-    {
-      this->dataPtr->highlightVisual->
-          DeleteDynamicLine(this->dataPtr->snapHighlight);
-    }
+  if (this->dataPtr->snapVisual)
+  {
+    this->dataPtr->snapVisual->DeleteDynamicLine(this->dataPtr->snapLines);
+    this->dataPtr->snapLines = nullptr;
+    this->dataPtr->snapVisual->Fini();
+    this->dataPtr->snapVisual.reset();
+  }
+  if (this->dataPtr->highlightVisual)
+  {
+    this->dataPtr->highlightVisual->DeleteDynamicLine(
+        this->dataPtr->snapHighlight);
+    this->dataPtr->snapHighlight = nullptr;
+    this->dataPtr->highlightVisual->Fini();
     this->dataPtr->highlightVisual.reset();
   }
-
-  if (this->dataPtr->renderConnection)
-    event::Events::DisconnectRender(this->dataPtr->renderConnection);
-  this->dataPtr->renderConnection.reset();
 
   delete this->dataPtr->updateMutex;
   this->dataPtr->updateMutex = NULL;
@@ -153,24 +157,14 @@ void ModelSnap::Reset()
   {
     if (this->dataPtr->snapVisual->GetVisible())
       this->dataPtr->snapVisual->SetVisible(false);
-    if (this->dataPtr->snapVisual->GetParent())
-    {
-      this->dataPtr->snapVisual->GetParent()->DetachVisual(
-          this->dataPtr->snapVisual);
-    }
   }
 
   if (this->dataPtr->highlightVisual)
   {
-    this->dataPtr->highlightVisual->SetVisible(false);
-    if (this->dataPtr->highlightVisual->GetParent())
-    {
-      this->dataPtr->highlightVisual->GetParent()->DetachVisual(
-          this->dataPtr->highlightVisual);
-    }
+    if (this->dataPtr->highlightVisual->GetVisible())
+      this->dataPtr->highlightVisual->SetVisible(false);
   }
 
-  event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
 }
 
@@ -402,6 +396,7 @@ void ModelSnap::Update()
         std::string highlightVisName = "_SNAP_HIGHLIGHT_";
         this->dataPtr->highlightVisual.reset(new rendering::Visual(
             highlightVisName, this->dataPtr->hoverVis, false));
+        this->dataPtr->highlightVisual->Load();
         this->dataPtr->snapHighlight =
             this->dataPtr->highlightVisual->CreateDynamicLine(
             rendering::RENDERING_TRIANGLE_FAN);
@@ -465,7 +460,7 @@ void ModelSnap::Update()
       std::string snapVisName = "_SNAP_";
       this->dataPtr->snapVisual.reset(new rendering::Visual(
           snapVisName, this->dataPtr->selectedVis, false));
-
+      this->dataPtr->snapVisual->Load();
       this->dataPtr->snapLines =
           this->dataPtr->snapVisual->CreateDynamicLine(
           rendering::RENDERING_LINE_STRIP);

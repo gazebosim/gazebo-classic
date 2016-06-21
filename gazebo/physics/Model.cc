@@ -490,25 +490,58 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
+      auto linkName = linkElem->Get<std::string>("name");
       LinkPtr link = boost::dynamic_pointer_cast<Link>(
-          this->GetChild(linkElem->Get<std::string>("name")));
-      link->UpdateParameters(linkElem);
+          this->GetChild(linkName));
+      if (link)
+        link->UpdateParameters(linkElem);
+      else
+      {
+        gzwarn << "Model [" << this->GetName() <<
+            "] doesn't have a link called [" << linkName << "]" << std::endl;
+      }
       linkElem = linkElem->GetNextElement("link");
     }
   }
-  /*
 
   if (_sdf->HasElement("joint"))
   {
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
-      joint->UpdateParameters(jointElem);
+      auto jointName = jointElem->Get<std::string>("name");
+      JointPtr joint = boost::dynamic_pointer_cast<Joint>(
+          this->GetChild(jointName));
+      if (joint)
+        joint->UpdateParameters(jointElem);
+      else
+      {
+        gzwarn << "Model [" << this->GetName() <<
+            "] doesn't have a joint called [" << jointName << "]" << std::endl;
+      }
       jointElem = jointElem->GetNextElement("joint");
     }
   }
-  */
+
+  if (_sdf->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = _sdf->GetElement("model");
+    while (modelElem)
+    {
+      auto modelName = modelElem->Get<std::string>("name");
+      ModelPtr model = boost::dynamic_pointer_cast<Model>(
+          this->GetChild(modelName));
+      if (model)
+        model->UpdateParameters(modelElem);
+      else
+      {
+        gzwarn << "Model [" << this->GetName() <<
+            "] doesn't have a nested model called [" << modelName << "]"
+            << std::endl;
+      }
+      modelElem = modelElem->GetNextElement("model");
+    }
+  }
 }
 
 //////////////////////////////////////////////////
