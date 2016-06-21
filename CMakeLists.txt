@@ -138,11 +138,13 @@ set(GAZEBO_DEFAULT_MASTER_PORT 11345)
 set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
 set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
 if(WIN32)
-  # Can't find a way to use a semi-colon as a path separator and not have it end up truncated in the build file and blow up the compiler.
+  # ToDo: Can't find a way to use a semi-colon as a path separator have it correctly pass through the cmake build file generation process.
   set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
 else()
   set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo_models)
 endif()
+
+set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo_models)
 set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
@@ -219,13 +221,17 @@ if(USE_UPSTREAM_CFLAGS)
   include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
 endif()
 
-if (NOT MSVC)
-  # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-  filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
+# For MSVC it is recommended to use /W4 instead of /Wall
+if (MSVC)
+  set(WARN_LEVEL "/W4")
+else()
+  set(WARN_LEVEL "-Wall")
+endif()
+filter_valid_compiler_flags(${WARN_LEVEL} -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
                                -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-endif()				   
-				   
+
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
 if (UNIX AND NOT APPLE)
@@ -235,7 +241,7 @@ endif()
 if (MSVC)
   # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
   # Handling exceptions rightly
-  set(UNFILTERED_FLAGS "/EHsc /wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
+  set(UNFILTERED_FLAGS "/EHsc")
 endif()
 
 # Visual Studio enables c++11 support by default
