@@ -21,10 +21,15 @@
   #include <Winsock2.h>
 #endif
 
+#ifndef _MSC_VER
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
 #include <QWebView>
+#ifndef _MSC_VER
 #pragma GCC diagnostic pop
+#endif
+
 #include <QtGui/qdesktopservices.h>
 
 #include "gazebo/gui/MainWindow.hh"

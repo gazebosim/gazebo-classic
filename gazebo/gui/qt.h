@@ -18,7 +18,9 @@
 #ifndef GAZEBO_QT_HEADERS_H_
 #define GAZEBO_QT_HEADERS_H_
 
+#ifndef _MSC_VER
 #pragma GCC system_header
+#endif
 
 #include <QtGui/QWindow>
 #include <QtWidgets/QWidget>
