@@ -21,8 +21,6 @@
   #define snprintf _snprintf
 #endif
 
-#include <QtCore/qlogging.h>
-
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -88,10 +86,12 @@ void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
       gzdbg << localMsg.constData() << "(" << _context.file
        << ":" <<  _context.line << " " << _context.function << std::endl;
       break;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
     case QtInfoMsg:
       gzmsg << localMsg.constData() << "(" << _context.file
        << ":" <<  _context.line << " " << _context.function << std::endl;
       break;
+#endif
     case QtWarningMsg:
       gzwarn << localMsg.constData() << "(" << _context.file
        << ":" <<  _context.line << " " << _context.function << std::endl;
