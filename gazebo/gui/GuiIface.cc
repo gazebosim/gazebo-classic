@@ -21,6 +21,8 @@
   #define snprintf _snprintf
 #endif
 
+#include <QtCore/qlogging.h>
+
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
