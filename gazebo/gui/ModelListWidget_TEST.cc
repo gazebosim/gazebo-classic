@@ -271,56 +271,26 @@ void ModelListWidget_TEST::SetLinkProperty(
 
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::CheckPluginProperty(QList<QtProperty *> _properties,
-    const std::string &_name, std::string _filename, std::string _innerxml)
+    const std::string &_name, const std::string &_filename,
+    const std::string &_innerxml)
 {
-  // ignore checking plugin id in _properties[0]
-  QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[1]);
+  // Name
+  auto property = static_cast<QtVariantProperty *>(_properties[0]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("name"));
   QCOMPARE(property->valueText(), tr(_name.c_str()));
 
-  property = static_cast<QtVariantProperty *>(_properties[2]);
+  // Filename
+  property = static_cast<QtVariantProperty *>(_properties[1]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("filename"));
   QCOMPARE(property->valueText(), tr(_filename.c_str()));
 
-  property = static_cast<QtVariantProperty *>(_properties[3]);
+  // Inner XML
+  property = static_cast<QtVariantProperty *>(_properties[2]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("innerxml"));
   QCOMPARE(property->valueText(), tr(_innerxml.c_str()));
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget_TEST::SetPluginProperty(
-    QtTreePropertyBrowser *propTreeBrowser, QList<QtProperty *> _properties,
-    const std::string &_name, std::string _filename, std::string _innerxml)
-{
-  QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[1]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("name"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(tr(_name.c_str()));
-
-  property =
-      static_cast<QtVariantProperty *>(_properties[2]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("name"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(tr(_filename.c_str()));
-
-  property =
-      static_cast<QtVariantProperty *>(_properties[3]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("name"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(tr(_innerxml.c_str()));
-
-  QTest::qWait(1000);
 }
 
 /////////////////////////////////////////////////
@@ -414,7 +384,7 @@ void ModelListWidget_TEST::ModelProperties()
   gazebo::gui::ModelListWidget *modelListWidget
       = new gazebo::gui::ModelListWidget;
   modelListWidget->show();
-  modelListWidget->setMinimumHeight(2000);
+  modelListWidget->setGeometry(0, 0, 400, 800);
   QCoreApplication::processEvents();
 
   this->Load("worlds/multilink_shape.world");
@@ -940,11 +910,12 @@ void ModelListWidget_TEST::PluginProperties()
   gazebo::gui::ModelListWidget *modelListWidget
       = new gazebo::gui::ModelListWidget;
   modelListWidget->show();
-  modelListWidget->setGeometry(0, 0, 400, 800);
+  modelListWidget->setGeometry(0, 0, 400, 2000);
   QCoreApplication::processEvents();
 
   this->Load("worlds/underwater.world");
 
+  // Initialize transport
   gazebo::transport::NodePtr node;
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
@@ -953,6 +924,7 @@ void ModelListWidget_TEST::PluginProperties()
   gazebo::transport::SubscriberPtr responseSub = node->Subscribe("~/response",
       &ModelListWidget_TEST::OnResponse, this);
 
+  // Request list of entities
   gazebo::msgs::Request *requestMsg =
       gazebo::msgs::CreateRequest("entity_list");
   requestPub->Publish(*requestMsg);
@@ -966,10 +938,10 @@ void ModelListWidget_TEST::PluginProperties()
   QCOMPARE(treeModelItems.size(), 1);
 
   QTreeWidgetItem *modelsItem = treeModelItems.front();
-  QVERIFY(modelsItem != NULL);
+  QVERIFY(modelsItem != nullptr);
 
-  // verify that there is only 1 model
-  int modelCount = 1;
+  // Verify that there are 5 models
+  int modelCount = 5;
   int maxSleep = 10;
   int sleep = 0;
   while (modelsItem->childCount() < modelCount && sleep < maxSleep)
@@ -978,37 +950,26 @@ void ModelListWidget_TEST::PluginProperties()
     QTest::qWait(500);
     sleep++;
   }
-  QVERIFY(sleep < maxSleep);
-
-  // Get the model item
-  QTreeWidgetItem *modelItem = modelsItem->child(3);
-  QVERIFY(modelItem != NULL);
-  std::string modelName = "submarine_buoyant";
-  QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
-
-  // select the buoyancy plugin
-  QTreeWidgetItem *pluginItem = modelItem->child(6);
-  QVERIFY(pluginItem != NULL);
-  std::string pluginName = "buoyancy";
-  QCOMPARE(pluginItem->text(0), tr(pluginName.c_str()));
+  QCOMPARE(modelsItem->childCount(), modelCount);
 
   // Get propery browser widget
   QObject *propTreeObj =
     modelListWidget->findChild<QObject *>("propTreeBrowser");
   QtTreePropertyBrowser *propTreeBrowser =
     dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
+  QVERIFY(propTreeBrowser != nullptr);
 
-  QVERIFY(propTreeBrowser != NULL);
+  // Check there are no properties yet
   QCOMPARE(propTreeBrowser->properties().size(), 0);
 
-  // select the models item
+  // Select the models item
   QRect modelsRect = modelTreeWidget->visualItemRect(modelsItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
       modelsRect.center() );
   QCoreApplication::processEvents();
-  // wait for the models item to be selected
+
+  // Wait for the models item to be selected
   sleep = 0;
-  maxSleep = 5;
   while (!modelsItem->isSelected() && sleep < maxSleep)
   {
     QTest::qWait(10);
@@ -1016,9 +977,13 @@ void ModelListWidget_TEST::PluginProperties()
   }
   QVERIFY(modelsItem->isSelected());
 
-    QTest::qWait(10000);
+  // Get the submarine model item
+  QTreeWidgetItem *modelItem = modelsItem->child(3);
+  QVERIFY(modelItem != nullptr);
+  std::string modelName = "submarine_buoyant";
+  QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
 
-  // select the submarine model
+  // Select the submarine model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
       modelRect.center());
@@ -1032,12 +997,19 @@ void ModelListWidget_TEST::PluginProperties()
   }
   QVERIFY(modelItem->isSelected());
 
-  // select the buoyancy plugin
+  // Get the buoyancy plugin
+  QTreeWidgetItem *pluginItem = modelItem->child(6);
+  QVERIFY(pluginItem != nullptr);
+  std::string pluginName = "buoyancy";
+  QCOMPARE(pluginItem->text(0), tr(pluginName.c_str()));
+
+  // Select the buoyancy plugin
   QRect pluginRect = modelTreeWidget->visualItemRect(pluginItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
       pluginRect.center() );
   QCoreApplication::processEvents();
-  // wait for the models plugin to be selected
+
+  // Wait for the models plugin to be selected
   sleep = 0;
   maxSleep = 5;
   while (!pluginItem->isSelected() && sleep < maxSleep)
@@ -1045,17 +1017,9 @@ void ModelListWidget_TEST::PluginProperties()
     QTest::qWait(10);
     sleep++;
   }
-
   QVERIFY(pluginItem->isSelected());
 
-  //QTest::qWait(10000);
-
-QTest::qWait(10000);
-QTest::qWait(10000);
-QTest::qWait(10000);
-QTest::qWait(10000);
-
-  // wait for the plugin properties to appear
+  // Wait for the plugin properties to appear
   sleep = 0;
   maxSleep = 10;
   while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
@@ -1067,53 +1031,14 @@ QTest::qWait(10000);
   QVERIFY(propTreeBrowser->properties().size() > 0);
 
   std::string pluginFilename = "libBuoyancyPlugin.so";
-  std::string plugininnerxml = "<fluid_density>"
-      "999.1026</fluid_density>";
+  std::string plugininnerxml = "<fluid_density>999.1026</fluid_density> ";
 
   // check the buoyancy properties
-  this->CheckPluginProperty(propTreeBrowser->properties(),
-      modelName + "::" + pluginName, pluginFilename, plugininnerxml);
-
-  // change plugin properties
-  // TODO changing plugin name currently fails.
-  pluginFilename = "Buoy.so";
-  plugininnerxml = "<fluid_density>111.666</fluid_density>";
-
-  this->SetPluginProperty(propTreeBrowser, propTreeBrowser->properties(),
-      modelName + "::" + pluginName, pluginFilename, plugininnerxml);
-
-  // select the plugin again to refresh the property browser
-  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      pluginRect.center() );
-
-  QCoreApplication::processEvents();
-  QTest::qWait(100);
-  sleep = 0;
-  maxSleep = 5;
-  while (!pluginItem->isSelected() && sleep < maxSleep)
-  {
-    QCoreApplication::processEvents();
-    QTest::qWait(10);
-    sleep++;
-  }
-  QVERIFY(pluginItem->isSelected());
-  // wait for the plugin properties to appear
-  sleep = 0;
-  maxSleep = 10;
-  while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
-  {
-    QCoreApplication::processEvents();
-    QTest::qWait(500);
-    sleep++;
-  }
-  QVERIFY(propTreeBrowser->properties().size() > 0);
-
-  // verify the plugin properties are sucessfully set
-  this->CheckPluginProperty(propTreeBrowser->properties(),
-      modelName + "::" + pluginName, pluginFilename, plugininnerxml);
+  this->CheckPluginProperty(propTreeBrowser->properties(), pluginName,
+      pluginFilename, plugininnerxml);
 
   modelListWidget->hide();
-  node.reset();
+  node->Fini();
   delete requestMsg;
   delete modelListWidget;
 }

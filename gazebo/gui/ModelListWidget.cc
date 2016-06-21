@@ -327,10 +327,6 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 {
   this->dataPtr->selectedEntityName = _name;
 
-  qDebug() << _name.c_str() << "onselect";
-
-
-
   this->dataPtr->propTreeBrowser->clear();
   if (!this->dataPtr->selectedEntityName.empty())
   {
@@ -347,7 +343,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
         if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
         {
           this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
-           this->dataPtr->selectedEntityName);
+              this->dataPtr->selectedEntityName);
         }
         else
         {
@@ -551,9 +547,8 @@ void ModelListWidget::ProcessModelMsgs()
           pluginUri.Path().PushBack("plugin");
           pluginUri.Path().PushBack(pluginName);
 
-          qDebug() << pluginUri.Str().c_str();
-
-          pluginItem->setData(0, Qt::UserRole, QVariant(pluginUri.Str().c_str()));
+          pluginItem->setData(0, Qt::UserRole,
+              QVariant(pluginUri.Str().c_str()));
           pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
 
           this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
