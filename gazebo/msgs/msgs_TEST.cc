@@ -210,8 +210,8 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 TEST_F(MsgsTest, ConvertMathInertialToMsgs)
 {
   const auto pose = ignition::math::Pose3d(
-    ignition::math::Vector3d(2, 3, 4),
-    ignition::math::Vector3d(0.1, 0.2, 0.3));
+    ignition::math::Vector3d(5, 6, 7),
+    ignition::math::Vector3d(0.4, 0.5, 0.6));
   msgs::Inertial msg = msgs::Convert(
       ignition::math::Inertiald(
         ignition::math::MassMatrix3d(12.0,
@@ -227,6 +227,29 @@ TEST_F(MsgsTest, ConvertMathInertialToMsgs)
   EXPECT_DOUBLE_EQ(0.2, msg.ixz());
   EXPECT_DOUBLE_EQ(0.3, msg.iyz());
   EXPECT_EQ(pose, msgs::ConvertIgn(msg.pose()));
+}
+
+TEST_F(MsgsTest, ConvertMsgsInertialToMath)
+{
+  const auto pose = ignition::math::Pose3d(
+    ignition::math::Vector3d(5, 6, 7),
+    ignition::math::Vector3d(0.4, 0.5, 0.6));
+  msgs::Inertial msg = msgs::Convert(
+      ignition::math::Inertiald(
+        ignition::math::MassMatrix3d(12.0,
+          ignition::math::Vector3d(2, 3, 4),
+          ignition::math::Vector3d(0.1, 0.2, 0.3)),
+        pose));
+  auto inertial = msgs::Convert(msg);
+
+  EXPECT_DOUBLE_EQ(12.0, inertial.MassMatrix().Mass());
+  EXPECT_DOUBLE_EQ(2.0, inertial.MassMatrix().IXX());
+  EXPECT_DOUBLE_EQ(3.0, inertial.MassMatrix().IYY());
+  EXPECT_DOUBLE_EQ(4.0, inertial.MassMatrix().IZZ());
+  EXPECT_DOUBLE_EQ(0.1, inertial.MassMatrix().IXY());
+  EXPECT_DOUBLE_EQ(0.2, inertial.MassMatrix().IXZ());
+  EXPECT_DOUBLE_EQ(0.3, inertial.MassMatrix().IYZ());
+  EXPECT_EQ(pose, inertial.Pose());
 }
 
 TEST_F(MsgsTest, ConvertMathMassMatrix3ToMsgs)
@@ -411,8 +434,8 @@ TEST_F(MsgsTest, SetTime)
 TEST_F(MsgsTest, SetInertial)
 {
   const auto pose = ignition::math::Pose3d(
-    ignition::math::Vector3d(2, 3, 4),
-    ignition::math::Vector3d(0.1, 0.2, 0.3));
+    ignition::math::Vector3d(5, 6, 7),
+    ignition::math::Vector3d(0.4, 0.5, 0.6));
   msgs::Inertial msg;
   msgs::Set(&msg, ignition::math::Inertiald(
       ignition::math::MassMatrix3d(

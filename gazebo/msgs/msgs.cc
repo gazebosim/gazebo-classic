@@ -568,6 +568,18 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
+    ignition::math::Inertiald Convert(const msgs::Inertial &_i)
+    {
+      auto pose = msgs::ConvertIgn(_i.pose());
+      return ignition::math::Inertiald(
+        ignition::math::MassMatrix3d(
+          _i.mass(),
+          ignition::math::Vector3d(_i.ixx(), _i.iyy(), _i.izz()),
+          ignition::math::Vector3d(_i.ixy(), _i.ixz(), _i.iyz())),
+        pose);
+    }
+
+    /////////////////////////////////////////////
     common::Color Convert(const msgs::Color &_c)
     {
       return common::Color(_c.r(), _c.g(), _c.b(), _c.a());

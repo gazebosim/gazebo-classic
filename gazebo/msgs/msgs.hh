@@ -180,10 +180,16 @@ namespace gazebo
     ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q);
 
     /// \brief Convert a msgs::Pose to an ignition::math::Pose
-    /// \param[in] _q The pose to convert
+    /// \param[in] _p The pose to convert
     /// \return An ignition::math::Pose object
     GAZEBO_VISIBLE
     ignition::math::Pose3d ConvertIgn(const msgs::Pose &_p);
+
+    /// \brief Convert a msgs::Inertial to an ignition::math::Inertiald
+    /// \param[in] _i The inertial to convert
+    /// \return An ignition::math::Inertiald object
+    GAZEBO_VISIBLE
+    ignition::math::Inertiald Convert(const msgs::Inertial &_i);
 
     /// \brief Convert a msgs::Image to a common::Image
     /// \param[out] _img The common::Image container
