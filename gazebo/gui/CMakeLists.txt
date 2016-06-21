@@ -11,10 +11,6 @@ include_directories(
   ${Qt5WebKitWidgets_INCLUDE_DIRS}
 )
 
-if (UNIX AND NOT APPLE)
-  include_directories(${Qt5X11Extras_INCLUDE_DIRS})
-endif()
-
 include_directories(${tinyxml_INCLUDE_DIRS})
 
 add_definitions(${Qt5Core_DEFINITIONS})
@@ -224,9 +220,6 @@ target_link_libraries(gazebo_gui
 
 if (UNIX)
   target_link_libraries(gazebo_gui pthread)
-  if (NOT APPLE)
-    target_link_libraries(gazebo_gui ${Qt5X11Extras_LIBRARIES} )
-  endif()
 endif()
 
 if (HAVE_GRAPHVIZ)
