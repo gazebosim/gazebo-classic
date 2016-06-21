@@ -27,9 +27,8 @@
         </link>
         <script>
           <loop>true</loop>
-          <delay_start>0.000000</delay_start>
           <auto_start>true</auto_start>
-          <trajectory id="0" type="walking">
+          <trajectory id="0" type="square">
              <waypoint>
                 <time>0.0</time>
                 <pose>-1 -1 1 0 0 0</pose>

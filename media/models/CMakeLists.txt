@@ -1,5 +1,6 @@
 set (files
 	moonwalk.dae
+	person_skin.dae
 	run.dae
 	sit_down.dae
 	sitting.dae
@@ -9,6 +10,7 @@ set (files
 	talk_a.dae
 	talk_b.dae
 	walk.dae
+	walking_animation.dae
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/models/)

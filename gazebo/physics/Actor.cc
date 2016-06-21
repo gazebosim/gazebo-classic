@@ -528,7 +528,7 @@ void Actor::Update()
 
   common::Time currentTime = this->world->GetSimTime();
 
-  // do not refresh animation faster the 30 Hz sim time
+  // do not refresh animation faster than 30 Hz sim time
   // TODO: Reducing to 20 Hz. Because there were memory corruption
   // and segmentation faults. Possibly due to some dangling pointers
   // in pose message processing. This will need a proper fix. Just a
@@ -821,25 +821,19 @@ void Actor::AddSphereInertia(const sdf::ElementPtr &_linkSdf,
                              const ignition::math::Pose3d &_pose,
                              const double _mass, const double _radius)
 {
-  // Create mass matrix as if pose was zero
-  ignition::math::MassMatrix3d massMatrix;
-  massMatrix.SetFromSphere(_mass, _radius);
-
-  // Set properties to link SDF
+  double ixx = 2.0 * _mass * _radius * _radius / 5.0;
   sdf::ElementPtr inertialSdf = _linkSdf->GetElement("inertial");
   sdf::ElementPtr inertialPoseSdf = inertialSdf->GetElement("pose");
-
-  // Note that the matrix is wrong for any CoM different from zero
   inertialPoseSdf->Set(_pose);
 
   inertialSdf->GetElement("mass")->Set(_mass);
   sdf::ElementPtr tensorSdf = inertialSdf->GetElement("inertia");
-  tensorSdf->GetElement("ixx")->Set(massMatrix.IXX());
+  tensorSdf->GetElement("ixx")->Set(ixx);
   tensorSdf->GetElement("ixy")->Set(0.00);
   tensorSdf->GetElement("ixz")->Set(0.00);
-  tensorSdf->GetElement("iyy")->Set(massMatrix.IYY());
+  tensorSdf->GetElement("iyy")->Set(ixx);
   tensorSdf->GetElement("iyz")->Set(0.00);
-  tensorSdf->GetElement("izz")->Set(massMatrix.IZZ());
+  tensorSdf->GetElement("izz")->Set(ixx);
 }
 
 //////////////////////////////////////////////////
@@ -915,7 +909,7 @@ void Actor::AddActorVisual(const sdf::ElementPtr &_linkSdf,
   sdf::ElementPtr visualPoseSdf = visualSdf->GetElement("pose");
   visualPoseSdf->Set(_pose);
 
-  // Set mesh geometry
+  // Set mesh geometry (skin file)
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetElement("mesh");
   meshSdf->GetElement("uri")->Set(this->skinFile);

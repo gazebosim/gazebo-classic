@@ -38,7 +38,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Information about a trajectory for an Actor.
-    /// This doesn't contain the keyframes information itself.
+    /// This doesn't contain the keyframes information, just duration.
     class GZ_PHYSICS_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor.
@@ -233,7 +233,7 @@ namespace gazebo
       /// \sa LoadSkin
       private: void LoadAnimation(sdf::ElementPtr _sdf);
 
-      /// \brief Load a trajectory script from SDF.
+      /// \brief Load scripted trajectories from SDF.
       /// \param[in] _sdf SDF element containing the trajectory script.
       private: void LoadScript(sdf::ElementPtr _sdf);
 
