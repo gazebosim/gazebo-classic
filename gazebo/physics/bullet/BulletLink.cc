@@ -85,8 +85,23 @@ void BulletLink::Init()
     mass = 0;
     this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
   }
-  btVector3 fallInertia(0, 0, 0);
-  math::Vector3 cogVec = this->inertial->GetCoG();
+
+  // diagonalize inertia matrix and add inertial pose rotation
+  {
+    ignition::math::MassMatrix3d m(this->inertial->GetMass(),
+      this->inertial->GetPrincipalMoments().Ign(),
+      this->inertial->GetProductsofInertia().Ign());
+    auto Idiag = m.PrincipalMoments();
+    this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
+
+    auto inertialPose = this->inertial->GetPose().Ign();
+    inertialPose.Rot() = inertialPose.Rot() * m.PrincipalAxesOffset();
+    this->inertial->SetCoG(inertialPose);
+  }
+  auto fallInertia = BulletTypes::ConvertVector3(
+    this->inertial->GetPrincipalMoments());
+  this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
+                                   fallInertia.z(), 0, 0, 0);
 
   /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
@@ -117,12 +132,10 @@ void BulletLink::Init()
 
       hackMu1 = friction->MuPrimary();
       hackMu2 = friction->MuSecondary();
-      // gzerr << "link[" << this->GetName()
-      //       << "] mu[" << hackMu1
-      //       << "] mu2[" << hackMu2 << "]\n";
 
-      math::Pose relativePose = collision->GetRelativePose();
-      relativePose.pos -= cogVec;
+      math::Pose relativePose =
+        - this->inertial->GetPose()
+        + collision->GetRelativePose().Ign();
       if (!this->compoundShape)
         this->compoundShape = new btCompoundShape();
       dynamic_cast<btCompoundShape *>(this->compoundShape)->addChildShape(
@@ -133,24 +146,6 @@ void BulletLink::Init()
   // if there are no collisions in the link then use an empty shape
   if (!this->compoundShape)
     this->compoundShape = new btEmptyShape();
-
-  // diagonalize inertia matrix and add inertial pose rotation
-  {
-    ignition::math::MassMatrix3d m(this->inertial->GetMass(),
-      this->inertial->GetPrincipalMoments().Ign(),
-      this->inertial->GetProductsofInertia().Ign());
-    auto inertialPose = this->inertial->GetPose().Ign();
-    auto Idiag = m.PrincipalMoments();
-    this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
-    inertialPose.Rot() = inertialPose.Rot() * m.PrincipalAxesOffset();
-    this->inertial->SetCoG(inertialPose);
-  }
-  // this->compoundShape->calculateLocalInertia(mass, fallInertia);
-  fallInertia = BulletTypes::ConvertVector3(
-    this->inertial->GetPrincipalMoments());
-  // TODO: inertia products not currently used
-  this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
-                                   fallInertia.z(), 0, 0, 0);
 
   // Create a construction info object
   btRigidBody::btRigidBodyConstructionInfo
@@ -245,8 +240,26 @@ void BulletLink::UpdateMass()
 {
   if (this->rigidLink && this->inertial)
   {
-    this->rigidLink->setMassProps(this->inertial->GetMass(),
-        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+    gzerr << "pose0 " << this->GetWorldInertialPose() << std::endl;
+    gzerr << "inertia0 " << this->GetWorldInertiaMatrix() << std::endl;
+    // diagonalize inertia matrix and add inertial pose rotation
+    auto inertialPose = this->inertial->GetPose().Ign();
+    ignition::math::Vector3d Idiag;
+    {
+      ignition::math::MassMatrix3d m(this->inertial->GetMass(),
+        this->inertial->GetPrincipalMoments().Ign(),
+        this->inertial->GetProductsofInertia().Ign());
+      Idiag = m.PrincipalMoments();
+      this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
+      inertialPose.Rot() = inertialPose.Rot() * m.PrincipalAxesOffset();
+      this->inertial->SetCoG(inertialPose);
+    }
+    auto bulletInertia = BulletTypes::ConvertVector3(Idiag);
+
+    this->OnPoseChange();
+    this->rigidLink->setMassProps(this->inertial->GetMass(), bulletInertia);
+    gzerr << "pose1 " << this->GetWorldInertialPose() << std::endl;
+    gzerr << "inertia1 " << this->GetWorldInertiaMatrix() << std::endl;
   }
 }
 
@@ -334,7 +347,7 @@ void BulletLink::OnPoseChange()
 
   // this->SetEnabled(true);
 
-  const math::Pose myPose = this->GetWorldCoGPose();
+  const math::Pose myPose = this->GetWorldInertialPose();
 
   this->rigidLink->setCenterOfMassTransform(
     BulletTypes::ConvertPose(myPose));

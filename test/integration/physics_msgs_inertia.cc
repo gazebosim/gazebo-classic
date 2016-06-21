@@ -179,10 +179,10 @@ void InertiaMsgsTest::ResizeBoxes(const std::string &_physicsEngine)
   {
     // Check pitch angle and rate
     EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().X(), 0.0, 1e-4);
-    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().Y(), 1.5303, 1e-4);
+    EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().Y(), 1.5303, 3e-2);
     EXPECT_NEAR(model->GetWorldPose().Ign().Rot().Euler().Z(), 0.0, 1e-4);
     EXPECT_NEAR(model->GetWorldAngularVel().Ign().X(), 0.0, 1e-4);
-    EXPECT_NEAR(model->GetWorldAngularVel().Ign().Y(), 5.3640, 1e-4);
+    EXPECT_NEAR(model->GetWorldAngularVel().Ign().Y(), 5.3640, 6e-2);
     EXPECT_NEAR(model->GetWorldAngularVel().Ign().Z(), 0.0, 1e-4);
   }
 
@@ -224,14 +224,7 @@ void InertiaMsgsTest::ResizeBoxes(const std::string &_physicsEngine)
 TEST_P(InertiaMsgsTest, ResizeBoxes)
 {
   std::string physicsEngine = GetParam();
-  if (physicsEngine == "bullet")
-  {
-    gzerr << physicsEngine
-          << " doesn't yet support off-axis inertia terms"
-          << std::endl;
-    return;
-  }
-  else if (physicsEngine == "simbody")
+  if (physicsEngine == "simbody")
   {
     gzerr << physicsEngine
           << " doesn't yet support dynamically changing moment of inertia"
