@@ -538,7 +538,7 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "make_entity")
   {
-   this->OnMouseMoveMakeEntity();
+    this->OnMouseMoveMakeEntity();
   }
   else if (this->dataPtr->state == "snap")
   {
@@ -903,15 +903,7 @@ rendering::UserCameraPtr GLWidget::Camera() const
 //////////////////////////////////////////////////
 std::string GLWidget::OgreHandle() const
 {
-  std::string ogreHandle;
-
-#if defined(__APPLE__)
-  ogreHandle = std::to_string(reinterpret_cast<uint32_t>(this->winId()));
-#else
-  ogreHandle = std::to_string(static_cast<uint64_t>(this->winId()));
-#endif
-
-  return ogreHandle;
+  return std::to_string(static_cast<uint64_t>(this->winId()));
 }
 
 /////////////////////////////////////////////////
