@@ -228,11 +228,6 @@ void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 void ImageGaussianNoiseModel::Fini()
 {
   GaussianNoiseModel::Fini();
-  if (this->gaussianNoiseCompositorListener)
-  {
-    this->gaussianNoiseInstance->removeListener(
-      this->gaussianNoiseCompositorListener.get());
-  }
 }
 
 //////////////////////////////////////////////////
