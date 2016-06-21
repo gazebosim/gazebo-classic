@@ -294,9 +294,9 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   ASSERT_EQ(I0, link->GetWorldInertiaMatrix());
 
   // Compute initial angular momentum
-  const math::Vector3 H0(I0 * w0);
-  ASSERT_EQ(H0, link->GetWorldAngularMomentum());
-  const double H0mag = H0.GetLength();
+  const auto H0((I0 * w0).Ign());
+  ASSERT_EQ(H0, link->GetWorldAngularMomentum().Ign());
+  const double H0mag = H0.Length();
 
   ignition::math::Vector3Stats angularMomentumError;
   const std::string stat("maxAbs");
@@ -305,7 +305,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   for (int i = 0; i < steps; ++i)
   {
     world->Step(1);
-    math::Vector3 H = link->GetWorldAngularMomentum();
+    auto H = link->GetWorldAngularMomentum().Ign();
     angularMomentumError.InsertData((H - H0) / H0mag);
   }
   if (_physicsEngine == "dart")
