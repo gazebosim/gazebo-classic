@@ -201,8 +201,16 @@ TEST_F(WorldClone, Clone)
   // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
   setenv("GAZEBO_MASTER_URI", "http://localhost:11347", 1);
 
-  // Check that the cloned world contains the camera topics.
+  // Give cloned world enough time to initialize transport and then
+  // check that it contains the camera topics.
+  retries = 0;
   output = custom_exec_str("gz topic -l");
+  while (output.find("/gazebo/default/camera/") == std::string::npos
+      && retries++ < 100)
+  {
+    common::Time::MSleep(20);
+    output = custom_exec_str("gz topic -l");
+  }
   EXPECT_NE(output.find("/gazebo/default/camera/"), std::string::npos);
 
   // Kill the cloned server. In the case of no presence of gzserver ps will

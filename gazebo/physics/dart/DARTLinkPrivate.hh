@@ -45,8 +45,8 @@ namespace gazebo
       /// \brief Default destructor
       public: ~DARTLinkPrivate()
       {
-        // We don't need to delete dtBodyNode because skeletone will delete
-        // dtBodyNode if it is registered to the skeletone.
+        // We don't need to delete dtBodyNode because skeleton will delete
+        // dtBodyNode if it is registered to the skeleton.
 
         delete dtWeldJointConst;
       }
