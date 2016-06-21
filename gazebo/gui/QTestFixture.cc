@@ -82,6 +82,9 @@ void QTestFixture::init()
   this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
   gazebo::rendering::load();
+
+  if (!gazebo::gui::register_metatypes())
+    gzerr << "Unable to register Qt metatypes" << std::endl;
 }
 
 /////////////////////////////////////////////////

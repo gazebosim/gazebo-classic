@@ -525,7 +525,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   while (this->gotImage < 20)
     common::Time::MSleep(100);
 
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  // c will disconnect automatically when it goes out of scope
 }
 
 /////////////////////////////////////////////////
