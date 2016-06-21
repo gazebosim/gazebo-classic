@@ -15,7 +15,7 @@
  *
 */
 
-#include <ignition/math/MassMatrix3.hh>
+#include <ignition/math/Inertial.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -76,18 +76,13 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
 {
   Visual::Load();
 
-  auto xyz = msgs::ConvertIgn(_msg->inertial().pose().position());
-  auto q = msgs::ConvertIgn(_msg->inertial().pose().orientation());
+  auto inertial = msgs::Convert(_msg->inertial());
+  auto xyz = inertial.Pose().Pos();
+  auto q = inertial.Pose().Rot();
 
   // Use ignition::math::MassMatrix3 to compute
   // equivalent box size and rotation
-  ignition::math::MassMatrix3d m(_msg->inertial().mass(),
-      ignition::math::Vector3d(_msg->inertial().ixx(),
-                               _msg->inertial().iyy(),
-                               _msg->inertial().izz()),
-      ignition::math::Vector3d(_msg->inertial().ixy(),
-                               _msg->inertial().ixz(),
-                               _msg->inertial().iyz()));
+  auto m = inertial.MassMatrix();
   ignition::math::Vector3d boxScale;
   ignition::math::Quaterniond boxRot;
   if (!m.EquivalentBox(boxScale, boxRot))
