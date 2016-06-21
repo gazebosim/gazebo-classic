@@ -824,10 +824,13 @@ void ModelListWidget::GUIGridPropertyChanged(QtProperty *_item)
     grid->SetHeight(this->dataPtr->variantManager->value(
         _item).toUInt());
   }
-  else if (changedProperty == "line color")
+  else if (changedProperty == "line color" || changedProperty == "Red" ||
+           changedProperty == "Green" || changedProperty == "Blue" ||
+           changedProperty == "Alpha")
   {
+    auto lineColorItem = this->ChildItem("line color");
     grid->SetColor(gui::Conversions::Convert(
-        this->dataPtr->variantManager->value(_item).value<QColor>()));
+        this->dataPtr->variantManager->value(lineColorItem).value<QColor>()));
   }
   else if (changedProperty == "height offset")
   {

@@ -141,10 +141,7 @@ void Grid::SetColor(const common::Color &_color)
   this->dataPtr->material->setDiffuse(_color.r, _color.g, _color.b, _color.a);
   this->dataPtr->material->setAmbient(_color.r, _color.g, _color.b);
 
-  if ((this->dataPtr->color).a < 0.9998)
-    this->dataPtr->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  else
-    this->dataPtr->material->setSceneBlending(Ogre::SBT_REPLACE);
+  this->dataPtr->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
 
   this->dataPtr->material->setDepthWriteEnabled(false);
   this->dataPtr->material->setDepthCheckEnabled(true);
@@ -197,8 +194,6 @@ void Grid::Init()
   this->dataPtr->material->getTechnique(0)->setLightingEnabled(false);
 
   this->SetColor(this->dataPtr->color);
-
-  this->Create();
 }
 
 //////////////////////////////////////////////////
