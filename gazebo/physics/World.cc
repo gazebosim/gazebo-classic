@@ -837,6 +837,8 @@ void World::Fini()
     this->dataPtr->lightModifySub.reset();
     this->dataPtr->modelSub.reset();
 
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
 
@@ -876,7 +878,11 @@ void World::Fini()
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
+  if (this->dataPtr->physicsEngine)
+    this->dataPtr->physicsEngine->Fini();
   this->dataPtr->physicsEngine.reset();
+  util::DiagnosticManager::Instance()->Fini();
+  util::LogRecord::Instance()->Fini();
 
   // Clean mutexes
   if (this->dataPtr->receiveMutex)

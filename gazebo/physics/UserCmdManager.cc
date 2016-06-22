@@ -146,6 +146,8 @@ UserCmdManager::~UserCmdManager()
     this->dataPtr->userCmdSub.reset();
     this->dataPtr->undoRedoSub.reset();
 
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
 

@@ -194,7 +194,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->dataPtr->node->Fini();
   this->dataPtr->modelMsgs.clear();
   this->dataPtr->visualMsgs.clear();
   this->dataPtr->lightFactoryMsgs.clear();
@@ -220,14 +219,18 @@ void Scene::Clear()
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
 
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
   this->dataPtr->joints.clear();
 
-  delete this->dataPtr->terrain;
-  this->dataPtr->terrain = NULL;
+  if (this->dataPtr->terrain)
+    delete this->dataPtr->terrain;
+  this->dataPtr->terrain = nullptr;
 
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
-
   this->dataPtr->visuals.clear();
 
   if (this->dataPtr->originVisual)
@@ -259,8 +262,9 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
+  if (this->dataPtr->skyx)
+    delete this->dataPtr->skyx;
+  this->dataPtr->skyx = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
 

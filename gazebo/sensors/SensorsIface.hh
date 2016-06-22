@@ -93,6 +93,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     SensorPtr get_sensor(const std::string &_name);
 
+    /// \brief Get a vector of all the sensors.
+    /// \return Vector containing all sensors.
+    GAZEBO_VISIBLE
+    Sensor_V get_sensors();
+
     /// \brief Disable sensors.
     GAZEBO_VISIBLE
     void disable();

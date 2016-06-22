@@ -268,6 +268,8 @@ void Sensor::Fini()
     this->sdf->Reset();
   this->sdf.reset();
 
+  if (this->scene && this->world)
+    rendering::remove_scene(this->world->GetName());
   this->scene.reset();
   this->world.reset();
 }

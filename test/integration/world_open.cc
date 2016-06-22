@@ -18,10 +18,14 @@
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/transport/transport.hh"
+
+#include "gazebo/physics/PhysicsIface.hh"
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 using namespace gazebo;
 
@@ -50,16 +54,24 @@ void WorldOpenTest::NewWorldMsg(const std::string &_physicsEngine)
   this->Load("worlds/shapes.world", false, _physicsEngine);
 
   auto world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Check all the entities that are present
-  EXPECT_TRUE(world->GetModel("ground_plane") != NULL);
-  EXPECT_TRUE(world->Light("sun") != NULL);
-  EXPECT_TRUE(world->GetModel("box") != NULL);
-  EXPECT_TRUE(world->GetModel("sphere") != NULL);
-  EXPECT_TRUE(world->GetModel("cylinder") != NULL);
+  EXPECT_TRUE(world->GetModel("ground_plane") != nullptr);
+  EXPECT_TRUE(world->Light("sun") != nullptr);
+  EXPECT_TRUE(world->GetModel("box") != nullptr);
+  EXPECT_TRUE(world->GetModel("sphere") != nullptr);
+  EXPECT_TRUE(world->GetModel("cylinder") != nullptr);
 
-  // Create transport
+  // Terminate ServerFixture's default transport
+  {
+    this->factoryPub.reset();
+    this->requestPub.reset();
+    this->node->Fini();
+    this->node.reset();
+  }
+
+  // Create new transport
   auto node = transport::NodePtr(new transport::Node());
   node->Init();
   auto pub = node->Advertise<gazebo::msgs::ServerControl>(
@@ -79,7 +91,7 @@ void WorldOpenTest::NewWorldMsg(const std::string &_physicsEngine)
 
   // Wait for message to be received
   int sleep = 0;
-  int maxSleep = 10;
+  int maxSleep = 100;
   bool worldHasBeenDeleted = false;
   bool newWorldHasBeenCreated = false;
   while (sleep < maxSleep && !newWorldHasBeenCreated)
@@ -99,14 +111,14 @@ void WorldOpenTest::NewWorldMsg(const std::string &_physicsEngine)
   }
   EXPECT_TRUE(worldHasBeenDeleted);
   EXPECT_TRUE(newWorldHasBeenCreated);
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   EXPECT_TRUE(world->GetSimTime() < time);
 
-  EXPECT_TRUE(world->GetModel("ground_plane") != NULL);
-  EXPECT_TRUE(world->Light("sun") != NULL);
-  EXPECT_TRUE(world->GetModel("box") == NULL);
-  EXPECT_TRUE(world->GetModel("sphere") == NULL);
-  EXPECT_TRUE(world->GetModel("cylinder") == NULL);
+  EXPECT_TRUE(world->GetModel("ground_plane") != nullptr);
+  EXPECT_TRUE(world->Light("sun") != nullptr);
+  EXPECT_TRUE(world->GetModel("box") == nullptr);
+  EXPECT_TRUE(world->GetModel("sphere") == nullptr);
+  EXPECT_TRUE(world->GetModel("cylinder") == nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -115,9 +127,17 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
   // load a world with simple shapes
   this->Load("worlds/empty.world", true, _physicsEngine);
   auto world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
-  // Create transport
+  // Terminate ServerFixture's default transport
+  {
+    this->factoryPub.reset();
+    this->requestPub.reset();
+    this->node->Fini();
+    this->node.reset();
+  }
+
+  // Create new transport
   auto node = transport::NodePtr(new transport::Node());
   node->Init();
   auto pub = node->Advertise<gazebo::msgs::ServerControl>(
@@ -201,7 +221,7 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
     // world is invalid
     EXPECT_EQ(worldHasBeenDeleted, worlds[i][0][0][0] != "invalid_world");
     EXPECT_EQ(newWorldHasBeenCreated, worlds[i][0][0][0] != "invalid_world");
-    ASSERT_TRUE(world != NULL);
+    ASSERT_TRUE(world != nullptr);
 
     EXPECT_TRUE(world->SensorsInitialized());
     EXPECT_TRUE(world->PluginsLoaded());
@@ -215,7 +235,7 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
 
       gzmsg << "Checking world [" << worlds[i][0][0][0] << "] model [" <<
           worlds[i][j][0][0] << "]" << std::endl;
-      EXPECT_TRUE(world->GetModel(worlds[i][j][0][0]) != NULL);
+      EXPECT_TRUE(world->GetModel(worlds[i][j][0][0]) != nullptr);
       count++;
     }
     EXPECT_EQ(count, world->GetModelCount());
@@ -229,7 +249,7 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
 
       gzmsg << "Checking world [" << worlds[i][0][0][0] << "] light [" <<
           worlds[i][0][j][0] << "]" << std::endl;
-      EXPECT_TRUE(world->Light(worlds[i][0][j][0]) != NULL);
+      EXPECT_TRUE(world->Light(worlds[i][0][j][0]) != nullptr);
       count++;
     }
     EXPECT_EQ(count, world->Lights().size());
@@ -252,7 +272,7 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
   // Load a world with cameras
   this->Load("worlds/camera.world", true, _physicsEngine);
   auto world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Sleep to ensure transport topics are all advertised
   world->Step(100);
@@ -265,14 +285,14 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
     EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 2u);
 
     auto camera = world->GetModel("camera");
-    EXPECT_TRUE(camera != NULL);
+    EXPECT_TRUE(camera != nullptr);
     auto camera2 = world->GetModel("camera 2");
-    EXPECT_TRUE(camera2 != NULL);
+    EXPECT_TRUE(camera2 != nullptr);
 
     auto cameraLink = camera->GetLink("link");
-    EXPECT_TRUE(cameraLink != NULL);
+    EXPECT_TRUE(cameraLink != nullptr);
     auto camera2Link = camera2->GetLink("link");
-    EXPECT_TRUE(camera2Link != NULL);
+    EXPECT_TRUE(camera2Link != nullptr);
 
     // Check they have sensors
     EXPECT_EQ(cameraLink->GetSensorCount(), 1u);
@@ -298,7 +318,15 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
   }
   EXPECT_GT(count1, 0);
 
-  // Create transport
+  // Terminate ServerFixture's default transport
+  {
+    this->factoryPub.reset();
+    this->requestPub.reset();
+    this->node->Fini();
+    this->node.reset();
+  }
+
+  // Create new transport
   auto node = transport::NodePtr(new transport::Node());
   node->Init();
   auto pub = node->Advertise<gazebo::msgs::ServerControl>(
@@ -322,7 +350,7 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
 
   // Get the new world
   world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   world->SetPaused(true);
   world->Step(100);
   common::Time::MSleep(100);
@@ -334,9 +362,9 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
     EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 0u);
 
     auto camera = world->GetModel("camera");
-    EXPECT_TRUE(camera == NULL);
+    EXPECT_TRUE(camera == nullptr);
     auto camera2 = world->GetModel("camera 2");
-    EXPECT_TRUE(camera2 == NULL);
+    EXPECT_TRUE(camera2 == nullptr);
   }
 
   // Check advertised topics
@@ -375,7 +403,7 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
 
   // Get the new world
   world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   world->SetPaused(true);
   world->Step(100);
   common::Time::MSleep(100);
@@ -387,10 +415,10 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
     EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 1u);
 
     auto model = world->GetModel("magnetometerModel");
-    EXPECT_TRUE(model != NULL);
+    EXPECT_TRUE(model != nullptr);
 
     auto link = model->GetLink("link");
-    EXPECT_TRUE(link != NULL);
+    EXPECT_TRUE(link != nullptr);
 
     EXPECT_EQ(link->GetSensorCount(), 1u);
   }
@@ -431,7 +459,7 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
 
   // Get the new world
   world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   world->SetPaused(true);
   world->Step(100);
   common::Time::MSleep(100);
@@ -443,14 +471,14 @@ void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
     EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 2u);
 
     auto camera = world->GetModel("camera");
-    EXPECT_TRUE(camera != NULL);
+    EXPECT_TRUE(camera != nullptr);
     auto camera2 = world->GetModel("camera 2");
-    EXPECT_TRUE(camera2 != NULL);
+    EXPECT_TRUE(camera2 != nullptr);
 
     auto cameraLink = camera->GetLink("link");
-    EXPECT_TRUE(cameraLink != NULL);
+    EXPECT_TRUE(cameraLink != nullptr);
     auto camera2Link = camera2->GetLink("link");
-    EXPECT_TRUE(camera2Link != NULL);
+    EXPECT_TRUE(camera2Link != nullptr);
 
     // Check they have sensors
     EXPECT_EQ(cameraLink->GetSensorCount(), 1u);

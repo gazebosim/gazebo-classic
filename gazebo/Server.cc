@@ -739,7 +739,7 @@ bool Server::OpenWorld(const std::string &_filename)
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
   {
-    gzerr << "Could not open file [" << _filename << "]\n";
+    gzerr << "Could not open file [" << _filename << "]" << std::endl;
     return false;
   }
   fclose(test);
@@ -747,13 +747,13 @@ bool Server::OpenWorld(const std::string &_filename)
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize sdf\n";
+    gzerr << "Unable to initialize sdf [" << _filename << "]" << std::endl;
     return false;
   }
 
   if (!sdf::readFile(common::find_file(_filename), sdf))
   {
-    gzerr << "Unable to read sdf file[" << _filename << "]\n";
+    gzerr << "Unable to read sdf file[" << _filename << "]" << std::endl;
     return false;
   }
 
@@ -768,8 +768,21 @@ bool Server::OpenWorld(const std::string &_filename)
   // Stop and remove current worlds
   physics::remove_worlds();
 
-  // TODO: Find a way to check if the worlds have been completely destroyed
-  common::Time::MSleep(1000);
+  int time = 0;
+  int timeout = 100;
+  while (time < timeout && physics::worlds_running())
+  {
+    common::Time::MSleep(10);
+    ++time;
+  }
+  if (physics::worlds_running())
+  {
+    gzerr << "It wasn't possible to remove worlds, timed out." << std::endl;
+    return false;
+  }
+
+  // Keep transport system but clear all previous messages
+  gazebo::transport::clear_buffers();
 
   // Keep sensor manager but make sure it is clear.
   // (All sensors should be removed when the links containing them are removed,
@@ -777,36 +790,83 @@ bool Server::OpenWorld(const std::string &_filename)
   sensors::remove_sensors();
   sensors::run_once(true);
 
-  // Keep transport system but clear all previous messages
-  gazebo::transport::clear_buffers();
-
-  // Sleep for a long time to make sure sensors and transport are clear.
-  common::Time::MSleep(1000);
+  // Wait until sensors are clear
+  time = 0;
+  while (time < timeout && !sensors::get_sensors().empty())
+  {
+    common::Time::MSleep(10);
+    ++time;
+  }
+  if (!sensors::get_sensors().empty())
+  {
+    gzerr << "It wasn't possible to remove sensors, timed out." << std::endl;
+    return false;
+  }
 
   // Notify clients that world has been removed
+  // FIXME: hardcoded world name "default"
+  std::string worldName = "default";
   {
     msgs::WorldModify worldMsg;
-    worldMsg.set_world_name("default");
+    worldMsg.set_world_name(worldName);
     worldMsg.set_remove(true);
     this->dataPtr->worldModPub->Publish(worldMsg);
   }
 
-  auto world = physics::create_world("default");
+  // Wait for all transport related to the world to be cleaned up
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+  time = 0;
+  std::vector<std::string> leftOvers;
+  leftOvers.push_back("garbage");
+  while (time < timeout && !leftOvers.empty())
+  {
+    leftOvers.clear();
+    common::Time::MSleep(30);
+
+    for (auto msgType : msgTypes)
+    {
+      for (auto topic : msgType.second)
+      {
+        if (topic.find(worldName) != std::string::npos)
+        {
+          leftOvers.push_back(topic);
+        }
+      }
+    }
+    msgTypes = gazebo::transport::getAdvertisedTopics();
+    ++time;
+  }
+  if (!leftOvers.empty())
+  {
+    // If there are standalone programs using these topics, we can't guarantee
+    // their publishers and subscribers are cleaned.
+    std::ostringstream errorMsg;
+    errorMsg << "The following topics are still advertised for the old world ["
+        << worldName << "], if they're not from external programs, there's a "
+        << "problem in Gazebo." << std::endl;
+
+    for (auto topic : leftOvers)
+      errorMsg << "    " << topic << std::endl;
+
+    gzerr << errorMsg.str();
+  }
+
+  auto world = physics::create_world(worldName);
   if (!world)
+  {
+    gzerr << "Failed to create world [" << worldName << "]" << std::endl;
     return false;
+  }
 
   physics::load_world(world, worldElem);
   physics::init_world(world);
   physics::run_world(world);
   sensors::run_once(true);
 
-  // Sleep for a while to make sure sensors and plugins are loaded
-  common::Time::MSleep(1000);
-
-  // TODO: Notify clients that a new world is available
+  // Notify clients that a new world is available
   {
     msgs::WorldModify worldMsg;
-    worldMsg.set_world_name("default");
+    worldMsg.set_world_name(worldName);
     worldMsg.set_create(true);
     this->dataPtr->worldModPub->Publish(worldMsg);
   }

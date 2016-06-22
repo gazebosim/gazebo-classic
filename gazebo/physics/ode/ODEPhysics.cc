@@ -450,7 +450,9 @@ void ODEPhysics::Fini()
 {
   dCloseODE();
 
-  dJointGroupDestroy(this->dataPtr->contactGroup);
+  if (this->dataPtr->contactGroup)
+    dJointGroupDestroy(this->dataPtr->contactGroup);
+  this->dataPtr->contactGroup = nullptr;
 
   // Delete all the joint feedbacks.
   for (auto iter = this->dataPtr->jointFeedbacks.begin();
@@ -465,12 +467,11 @@ void ODEPhysics::Fini()
     dSpaceSetCleanup(this->dataPtr->spaceId, 0);
     dSpaceDestroy(this->dataPtr->spaceId);
   }
+  this->dataPtr->spaceId = nullptr;
 
   if (this->dataPtr->worldId)
     dWorldDestroy(this->dataPtr->worldId);
-  this->dataPtr->worldId = NULL;
-
-  this->dataPtr->spaceId = NULL;
+  this->dataPtr->worldId = nullptr;
 
   PhysicsEngine::Fini();
 }

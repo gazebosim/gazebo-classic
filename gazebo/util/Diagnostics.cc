@@ -73,7 +73,19 @@ DiagnosticManager::DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Fini()
+{
   event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
+  this->dataPtr->updateConnection.reset();
+
+  this->dataPtr->pub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////

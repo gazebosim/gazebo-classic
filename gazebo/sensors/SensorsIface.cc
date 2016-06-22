@@ -147,6 +147,15 @@ sensors::SensorPtr sensors::get_sensor(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+sensors::Sensor_V sensors::get_sensors()
+{
+  if (g_disable)
+    return sensors::Sensor_V();
+
+  return sensors::SensorManager::Instance()->GetSensors();
+}
+
+/////////////////////////////////////////////////
 void sensors::disable()
 {
   g_disable = true;
