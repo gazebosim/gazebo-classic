@@ -300,11 +300,11 @@ void Road2d::Segment::Load(msgs::Road _msg)
       math::Vector3 v1 = (this->points[i+1] - this->points[i]).Normalize();
       math::Vector3 v0 = (this->points[i] - this->points[i-1]).Normalize();
       double dot = v0.Dot(v1 * -1);
-      tangent = (this->points[i+1] - this->points[i-1]).Normalize();
+      tangent = (v1+v0).Normalize().Ign();
 
       // Check to see if the points are not colinear
       // If not colinear, then the road needs to be widended for the turns
-      if (dot > -.97 && dot < 0.97)
+      if (!ignition::math::equal(fabs(dot), 1.0))
       {
         factor = 1.0 / sin(acos(dot) * 0.5);
       }
