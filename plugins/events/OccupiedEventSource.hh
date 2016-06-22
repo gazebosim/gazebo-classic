@@ -63,7 +63,7 @@ namespace gazebo
                 const std::map<std::string, RegionPtr> &_regions);
 
     /// \brief Destructor.
-    public: ~OccupiedEventSource() = default;
+    public: ~OccupiedEventSource();
 
     // Documentation inherited
     public: virtual void Load(const sdf::ElementPtr _sdf);

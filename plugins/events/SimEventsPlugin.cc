@@ -41,7 +41,17 @@ void SimEventsPlugin::OnModelInfo(ConstModelPtr &_msg)
 ////////////////////////////////////////////////////////////////////////////////
 SimEventsPlugin::~SimEventsPlugin()
 {
+  this->spawnSub.reset();
+  this->requestSub.reset();
+  this->pub.reset();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
   this->events.clear();
+  this->regions.clear();
+  this->sdf.reset();
+  this->world.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -43,6 +43,18 @@ OccupiedEventSource::OccupiedEventSource(transport::PublisherPtr _pub,
 {
 }
 
+//////////////////////////////////////////////////
+OccupiedEventSource::~OccupiedEventSource()
+{
+  this->msgPub.reset();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
+  this->sdf.reset();
+  this->regions.clear();
+}
+
 /////////////////////////////////////////////////
 void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
 {

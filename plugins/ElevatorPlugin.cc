@@ -44,6 +44,11 @@ ElevatorPlugin::~ElevatorPlugin()
 {
   event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
 
+  this->dataPtr->elevatorSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
   delete this->dataPtr->doorController;
   this->dataPtr->doorController = NULL;
 
