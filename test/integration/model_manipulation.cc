@@ -305,11 +305,11 @@ void ModelManipulationTest::GlobalLocalFrames()
   // move the box in +z in local frame
   auto startPos = modelVis->GetWorldPose().pos.Ign() +
       modelVis->GetWorldPose().rot.Ign() *
-      ignition::math::Vector3d(0.5, 0, 0.8);
+      ignition::math::Vector3d(0.0, 0, 0.6);
   auto startPt = cam->Project(startPos);
   auto endPos = modelVis->GetWorldPose().pos.Ign() +
       modelVis->GetWorldPose().rot.Ign() *
-      ignition::math::Vector3d(0.5, 0, 1.0);
+      ignition::math::Vector3d(0.0, 0, 0.8);
   auto endPt = cam->Project(endPos);
   MouseDrag(glWidget, Qt::LeftButton, Qt::NoModifier, startPt, endPt);
 
@@ -317,6 +317,8 @@ void ModelManipulationTest::GlobalLocalFrames()
 
   // verify the box has moved
   auto boxNewPos = modelVis->GetWorldPose().pos.Ign();
+
+  gzdbg << boxNewPos << " vs " << initialPos << std::endl;
 
   QVERIFY(ignition::math::equal(boxNewPos.X(), initialPos.X()));
   QVERIFY(boxNewPos.Y() > initialPos.Y());
