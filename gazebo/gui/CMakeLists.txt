@@ -8,7 +8,6 @@ link_directories(
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
   ${Qt5Core_INCLUDE_DIRS}
-  ${Qt5WebKitWidgets_INCLUDE_DIRS}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -212,7 +211,6 @@ target_link_libraries(gazebo_gui
   gzqtpropertybrowser
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  ${Qt5WebKitWidgets_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}

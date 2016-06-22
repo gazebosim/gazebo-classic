@@ -17,7 +17,6 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
   ${TBB_LIBRARY_DIR}
   ${CURL_LIBDIR}
-  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 if (WIN32)
