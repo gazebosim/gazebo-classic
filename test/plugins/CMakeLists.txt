@@ -30,7 +30,6 @@ set (plugins
 )
 
 foreach (src ${plugins})
-  # Change SHARED to MODULE when support for dylib plugins is removed
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} libgazebo ${ogre_libraries})
 endforeach (src ${plugins})

@@ -1,3 +1,4 @@
+include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
 include_directories(
@@ -5,7 +6,6 @@ include_directories(
   ${tinyxml2_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
-  ${Qt5Core_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -48,8 +48,7 @@ target_link_libraries(gz
  gazebo_gui
  gazebo_physics
  gazebo_sensors
- ${Qt5Core_LIBRARIES}
- ${Qt5Widgets_LIBRARIES}
+ ${QT_LIBRARIES}
  ${Boost_LIBRARIES}
 )
 

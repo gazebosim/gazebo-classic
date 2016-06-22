@@ -219,15 +219,14 @@ if(USE_UPSTREAM_CFLAGS)
   include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
 endif()
 
- if (MSVC)
+# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
+if (MSVC)
   # Default Windows-MSVC.cmake sets MSVC warning flag to /W3. Add some extra warning excludes.
   set(WARN_LEVEL "/wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
- else()
+else()
   set(WARN_LEVEL "-Wall")
- endif()
-
-# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+endif()
+filter_valid_compiler_flags(${WARN_LEVEL} -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
                             -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
 			                -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
 				   

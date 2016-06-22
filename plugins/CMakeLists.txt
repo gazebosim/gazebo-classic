@@ -8,7 +8,6 @@ include_directories(
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
   ${IGNITION-MATH_INCLUDE_DIRS}
-  ${Qt5Core_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -23,7 +22,8 @@ link_directories(
   ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
-add_definitions(${Qt5Core_DEFINITIONS})
+include (${QT_USE_FILE})
+add_definitions(${QT_DEFINITIONS})
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
@@ -111,6 +111,7 @@ foreach (src ${plugins_private_header})
 endforeach ()
 
 foreach (src ${GUIplugins})
+  QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
   target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
