@@ -219,12 +219,17 @@ if(USE_UPSTREAM_CFLAGS)
   include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
 endif()
 
-if (NOT MSVC)
-  # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-  filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
-                               -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
-			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-endif()				   
+ if (MSVC)
+  # Default Windows-MSVC.cmake sets MSVC warning flag to /W3. Add some extra warning excludes.
+  set(WARN_LEVEL "/wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
+ else()
+  set(WARN_LEVEL "-Wall")
+ endif()
+
+# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
+filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+                            -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
+			                -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
 				   
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
@@ -235,7 +240,7 @@ endif()
 if (MSVC)
   # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
   # Handling exceptions rightly
-  set(UNFILTERED_FLAGS "/EHsc /wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
+  set(UNFILTERED_FLAGS "/EHsc")
 endif()
 
 # Visual Studio enables c++11 support by default
@@ -243,7 +248,7 @@ if (NOT MSVC)
   set(UNFILTERED_FLAGS "-std=c++11")
 endif()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
+set (CMAKE_CXX_FLAGS "${WARN_LEVEL} ${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
 #################################################
 # OS Specific initialization
