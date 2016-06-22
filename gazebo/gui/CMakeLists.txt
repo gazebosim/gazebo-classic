@@ -31,7 +31,6 @@ set (sources
   GLWidget.cc
   GuiEvents.cc
   GuiIface.cc
-  HotkeyDialog.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -77,7 +76,6 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
-  HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
@@ -143,7 +141,6 @@ set (qt_tests
   GLWidget_TEST.cc
   GLWidget_TEST2.cc
   GuiIface_TEST.cc
-  HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelListWidget_TEST.cc

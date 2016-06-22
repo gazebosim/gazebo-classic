@@ -19,7 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
+#include <QDesktopServices>
 #include <functional>
 
 #include <sdf/sdf.hh>
@@ -49,7 +49,6 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiPlugin.hh"
-#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
@@ -246,9 +245,6 @@ MainWindow::MainWindow()
   this->dataPtr->dataLogger = new gui::DataLogger(this);
   connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
     OnDataLoggerClosed()));
-
-  // Hotkey dialog
-  this->dataPtr->hotkeyDialog = NULL;
 
   this->show();
 }
@@ -648,13 +644,7 @@ void MainWindow::About()
 /////////////////////////////////////////////////
 void MainWindow::HotkeyChart()
 {
-  // Opening for the first time
-  if (!this->dataPtr->hotkeyDialog)
-  {
-    this->dataPtr->hotkeyDialog = new HotkeyDialog(this);
-  }
-
-  this->dataPtr->hotkeyDialog->show();
+  QDesktopServices::openUrl(QUrl("http://gazebosim.org/hotkeys.html"));
 }
 
 /////////////////////////////////////////////////

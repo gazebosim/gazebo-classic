@@ -174,13 +174,5 @@ void OculusWindow::showEvent(QShowEvent *_event)
 //////////////////////////////////////////////////
 std::string OculusWindow::GetOgreHandle() const
 {
-  std::string ogreHandle;
-
-#if defined(__APPLE__)
-  ogreHandle = std::to_string(reinterpret_cast<uint32_t>(this->winId()));
-#else
-  ogreHandle = std::to_string(static_cast<uint64_t>(this->winId()));
-#endif
-
-  return ogreHandle;
+  return std::to_string(reinterpret_cast<uint32_t>(this->winId()));
 }

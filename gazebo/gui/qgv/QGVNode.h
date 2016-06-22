@@ -18,11 +18,15 @@ License along with this library.
 #ifndef QGVNODE_H
 #define QGVNODE_H
 
+#ifndef _MSC_VER
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
 #include <QGraphicsItem>
 #include <QPen>
+#ifndef _MSC_VER
 #pragma GCC diagnostic pop
+#endif
 
 #include "qgv.h"
 

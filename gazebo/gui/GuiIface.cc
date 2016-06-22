@@ -81,7 +81,8 @@ void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
     const QString &_msg)
 {
   QByteArray localMsg = _msg.toLocal8Bit();
-  switch (_type) {
+  switch (_type)
+  {
     case QtDebugMsg:
       gzdbg << localMsg.constData() << "(" << _context.file
        << ":" <<  _context.line << " " << _context.function << std::endl;
