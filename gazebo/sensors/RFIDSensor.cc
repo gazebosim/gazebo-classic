@@ -109,6 +109,9 @@ void RFIDSensor::Load(const std::string &_worldName)
 /////////////////////////////////////////////////
 void RFIDSensor::Fini()
 {
+  this->dataPtr->entity.reset();
+  this->dataPtr->scanPub.reset();
+
   Sensor::Fini();
 }
 

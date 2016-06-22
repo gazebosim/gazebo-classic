@@ -37,7 +37,7 @@ namespace gazebo
       public: transport::PublisherPtr scanPub;
 
       /// \brief All the RFID tags.
-      public: std::vector<RFIDTag*> tags;
+      public: std::vector<RFIDTag *> tags;
     };
   }
 }

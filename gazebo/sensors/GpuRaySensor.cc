@@ -320,7 +320,6 @@ void GpuRaySensor::Fini()
 {
   if (this->scene)
     this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
-  this->scene.reset();
 
   this->dataPtr->laserCam.reset();
 

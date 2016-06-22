@@ -47,6 +47,12 @@ CessnaPlugin::CessnaPlugin() : cmds {{0, 0, 0, 0, 0, 0, 0}}
 CessnaPlugin::~CessnaPlugin()
 {
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
+  this->statePub.reset();
+  this->controlSub.reset();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
 }
 
 /////////////////////////////////////////////////

@@ -106,6 +106,11 @@ CessnaGUIPlugin::CessnaGUIPlugin()
 /////////////////////////////////////////////////
 CessnaGUIPlugin::~CessnaGUIPlugin()
 {
+  this->stateSub.reset();
+  this->controlPub.reset();
+  if (this->gzNode)
+    this->gzNode->Fini();
+  this->gzNode.reset();
 }
 
 /////////////////////////////////////////////////

@@ -136,7 +136,6 @@ void DepthCameraSensor::Fini()
 {
   if (this->scene && this->dataPtr->camera)
     this->scene->RemoveCamera(this->dataPtr->camera->Name());
-  this->scene.reset();
   this->dataPtr->camera.reset();
 
   Sensor::Fini();

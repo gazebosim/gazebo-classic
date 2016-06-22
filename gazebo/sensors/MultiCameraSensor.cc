@@ -200,7 +200,6 @@ void MultiCameraSensor::Init()
 void MultiCameraSensor::Fini()
 {
   this->dataPtr->imagePub.reset();
-  Sensor::Fini();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
 
@@ -211,7 +210,8 @@ void MultiCameraSensor::Fini()
     (*iter)->GetScene()->RemoveCamera((*iter)->Name());
   }
   this->dataPtr->cameras.clear();
-  this->scene.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
