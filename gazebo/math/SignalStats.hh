@@ -50,7 +50,9 @@ namespace gazebo
 
       /// \brief Copy constructor
       /// \param[in] _ss SignalStatistic to copy
-      public: SignalStatistic(const SignalStatistic &_ss);
+      /// \deprecated See ignition::math::SignalStatistic
+      public: SignalStatistic(const SignalStatistic &_ss)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the current value of the statistical measure.
       /// \return Current value of the statistical measure.
@@ -143,7 +145,9 @@ namespace gazebo
 
       /// \brief Copy constructor
       /// \param[in] _ss SignalStats to copy
-      public: SignalStats(const SignalStats &_ss);
+      /// \deprecated See ignition::math::SignalStatistic
+      public: SignalStats(const SignalStats &_ss)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get number of data points in first statistic.
       /// Technically you can have different numbers of data points
