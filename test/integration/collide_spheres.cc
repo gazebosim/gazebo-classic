@@ -64,7 +64,7 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
   for (const auto model : models)
   {
     const auto name = model->GetName();
-    if (name.find("mm") == 0)
+    if (name.compare(0, 2, "mm") == 0)
     {
       double separation = std::stod(name.substr(2, 2)) / 10;
       if (name.at(4) == 'A')
@@ -80,7 +80,7 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
         gzerr << "Unrecognized model name: " << name << std::endl;
       }
     }
-    else if (name.find("dm") == 0)
+    else if (name.compare(0, 2, "dm") == 0)
     {
       double separation = std::stod(name.substr(2, 2)) / 10;
       if (name.at(4) == 'A')
@@ -97,6 +97,9 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
       }
     }
   }
+
+  EXPECT_EQ(mmRadius.size(), 12u);
+  EXPECT_EQ(dmRadius.size(), 12u);
 
   // Confirm no models are missing a partner
   for (const auto mmPair : mmRadius)
