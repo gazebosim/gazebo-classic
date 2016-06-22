@@ -27,7 +27,7 @@ class EditableLabel_TEST : public QTestFixture
   /// \brief Test retrieving label text.
   private slots: void Text();
 
-  /// \brief Test editing lable.
+  /// \brief Test editing label.
   private slots: void Edit();
 };
 #endif
