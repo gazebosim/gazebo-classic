@@ -8,7 +8,6 @@ link_directories(
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
   ${Qt5Core_INCLUDE_DIRS}
-  ${Qt5WebKitWidgets_INCLUDE_DIRS}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -32,7 +31,6 @@ set (sources
   GLWidget.cc
   GuiEvents.cc
   GuiIface.cc
-  HotkeyDialog.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -78,7 +76,6 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
-  HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
@@ -144,7 +141,6 @@ set (qt_tests
   GLWidget_TEST.cc
   GLWidget_TEST2.cc
   GuiIface_TEST.cc
-  HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelListWidget_TEST.cc
@@ -212,7 +208,6 @@ target_link_libraries(gazebo_gui
   gzqtpropertybrowser
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  ${Qt5WebKitWidgets_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
