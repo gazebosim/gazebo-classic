@@ -962,7 +962,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
