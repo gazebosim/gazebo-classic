@@ -29,6 +29,9 @@ PressurePlugin::PressurePlugin() : SensorPlugin()
 /////////////////////////////////////////////////
 PressurePlugin::~PressurePlugin()
 {
+  this->tactilePub.reset();
+  if (this->node)
+    this->node->Fini();
 }
 
 /////////////////////////////////////////////////

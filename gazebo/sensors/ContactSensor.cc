@@ -53,7 +53,7 @@ ContactSensor::ContactSensor()
 //////////////////////////////////////////////////
 ContactSensor::~ContactSensor()
 {
-  this->dataPtr->collisions.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -226,6 +226,9 @@ void ContactSensor::Fini()
 
   this->dataPtr->contactSub.reset();
   this->dataPtr->contactsPub.reset();
+
+  this->dataPtr->collisions.clear();
+
   Sensor::Fini();
 }
 
