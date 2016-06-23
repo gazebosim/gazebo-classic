@@ -66,14 +66,14 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
     const auto name = model->GetName();
     if (name.compare(0, 2, "mm") == 0)
     {
-      double separation = std::stod(name.substr(2, 2)) / 10;
+      double separationRatio = std::stod(name.substr(2, 2)) / 10;
       if (name.at(4) == 'A')
       {
-        mmRadius[separation].first = model;
+        mmRadius[separationRatio].first = model;
       }
       else if (name.at(4) == 'B')
       {
-        mmRadius[separation].second = model;
+        mmRadius[separationRatio].second = model;
       }
       else
       {
@@ -82,14 +82,14 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
     }
     else if (name.compare(0, 2, "dm") == 0)
     {
-      double separation = std::stod(name.substr(2, 2)) / 10;
+      double separationRatio = std::stod(name.substr(2, 2)) / 10;
       if (name.at(4) == 'A')
       {
-        dmRadius[separation].first = model;
+        dmRadius[separationRatio].first = model;
       }
       else if (name.at(4) == 'B')
       {
-        dmRadius[separation].second = model;
+        dmRadius[separationRatio].second = model;
       }
       else
       {
@@ -104,7 +104,7 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
   // Confirm no models are missing a partner
   for (const auto mmPair : mmRadius)
   {
-    gzdbg << "Checking mm radius pair with separation "
+    gzdbg << "Checking mm radius pair with separation ratio "
           << mmPair.first
           << std::endl;
     ASSERT_NE(mmPair.second.first, nullptr);
