@@ -520,6 +520,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     pose.pos.z = _vis->GetWorldPose().pos.z;
 
   _vis->SetWorldPose(pose);
+  gzdbg << "MM translate to " << pose << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -616,6 +617,7 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 {
+  gzdbg << "MM Press event " << std::endl;
   this->dataPtr->mouseEvent = _event;
   this->dataPtr->mouseStart = _event.PressPos();
   this->SetMouseMoveVisual(rendering::VisualPtr());
@@ -635,6 +637,17 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   {
     vis = this->dataPtr->selectionObj->GetParent();
   }
+  gzdbg << "MM Mode " << this->dataPtr->selectionObj->GetMode() << " vs " <<
+            rendering::SelectionObj::TRANS << std::endl;
+
+  if (mouseVis)
+    gzdbg << "MM mousevis " << mouseVis->GetName() << std::endl;
+
+  if (vis)
+    gzdbg << "MM vis " << vis->GetName() << std::endl;
+  else
+    gzdbg << "MM vis is null!!!!!! " << std::endl;
+
 
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
@@ -708,6 +721,8 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
         axis.y = 1;
       else if (this->dataPtr->keyEvent.key == Qt::Key_Z)
         axis.z = 1;
+
+      gzdbg << "MM Move Drag " << this->dataPtr->selectionObj->GetMode() << std::endl;
 
       if (this->dataPtr->selectionObj->GetMode() ==
           rendering::SelectionObj::TRANS)
