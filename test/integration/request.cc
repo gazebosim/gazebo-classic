@@ -36,14 +36,16 @@ size_t g_requestId = 0;
 void OnNotification(const ignition::msgs::Operation &_msg)
 {
   EXPECT_TRUE(_msg.has_type());
-  EXPECT_EQ(_msg.type(), ignition::msgs::Operation::DELETE_ENTITY);
+  EXPECT_EQ(_msg.type(), ignition::msgs::Operation::DELETE);
 
-  EXPECT_TRUE(_msg.has_uri());
+  EXPECT_TRUE(_msg.has_op_delete());
 
-  auto uri = _msg.uri();
+  auto uri = _msg.op_delete().uri();
 
-  if (uri == "box")
+  if (uri.find("box") != std::string::npos)
   {
+    //EXPECT_NEQ(uri.find("model"), std::string::npos);
+
     if (_msg.has_id() && _msg.id() == g_requestId)
     {
       g_directResponse = true;
@@ -54,16 +56,19 @@ void OnNotification(const ignition::msgs::Operation &_msg)
     else
       g_modelDeleted = true;
   }
-  else if (uri == "box::link")
+  else if (uri.find("link") != std::string::npos)
   {
+//    EXPECT_EQ(type, ignition::msgs::Types::LINK);
     g_linkDeleted = true;
   }
-  else if (uri == "box::link::collision")
+  else if (uri.find("collision") != std::string::npos)
   {
+  //  EXPECT_EQ(type, ignition::msgs::Types::COLLISION);
     g_collisionDeleted = true;
   }
-  else if (uri == "non_existing")
+  else if (uri.find("non_existing") != std::string::npos)
   {
+    //EXPECT_EQ(type, ignition::msgs::Types::NONE);
     if (_msg.has_id() && _msg.id() == g_requestId)
     {
       g_directResponse = true;
@@ -95,7 +100,7 @@ TEST_F(RequestTest, RequestDelete)
   ignNode.Subscribe("/notification", &OnNotification);
 
   // Request deletion of existing model
-  g_requestId = transport::RequestDelete("box");
+  g_requestId = transport::RequestDelete(common::URI("box"));
   EXPECT_NE(g_requestId, 0u);
 
   // Wait for the request to be completed
@@ -126,7 +131,7 @@ TEST_F(RequestTest, RequestDelete)
   g_requestId = 0;
 
   // Request deletion of non existing model
-  g_requestId = transport::RequestDelete("non_existing");
+  g_requestId = transport::RequestDelete(common::URI("non_existing"));
   EXPECT_NE(g_requestId, 0u);
 
   // Wait for the request to be completed

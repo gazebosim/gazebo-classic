@@ -30,16 +30,19 @@ std::function<void(const ignition::msgs::Empty &, const bool)> unused =
 };
 
 /////////////////////////////////////////////////
-size_t transport::RequestDelete(const std::string &_name)
+size_t transport::RequestDelete(const common::URI &_uri)
 {
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
   // Operation msg
+  ignition::msgs::OpDelete del;
+  del.set_uri(_uri.Str());
+
   ignition::msgs::Operation req;
-  req.set_type(ignition::msgs::Operation::DELETE_ENTITY);
+  req.set_type(ignition::msgs::Operation::DELETE);
   req.set_id(id);
-  req.set_uri(_name);
+  req.mutable_op_delete()->CopyFrom(del);
 
   // Request
   ignition::transport::Node ignNode;
@@ -66,9 +69,9 @@ size_t transport::RequestInsertSDF(const std::string &_sdf,
 
   // Operation msg
   ignition::msgs::Operation req;
-  req.set_type(ignition::msgs::Operation::INSERT_ENTITY);
+  req.set_type(ignition::msgs::Operation::INSERT);
   req.set_id(id);
-  req.mutable_factory()->CopyFrom(msg);
+  req.mutable_op_insert()->CopyFrom(msg);
 
   // Request
   ignition::transport::Node ignNode;
@@ -95,9 +98,9 @@ size_t transport::RequestInsertFile(const std::string &_filename,
 
   // Operation msg
   ignition::msgs::Operation req;
-  req.set_type(ignition::msgs::Operation::INSERT_ENTITY);
+  req.set_type(ignition::msgs::Operation::INSERT);
   req.set_id(id);
-  req.mutable_factory()->CopyFrom(msg);
+  req.mutable_op_insert()->CopyFrom(msg);
 
   // Request
   ignition::transport::Node ignNode;
@@ -124,9 +127,9 @@ size_t transport::RequestClone(const std::string &_name,
 
   // Operation msg
   ignition::msgs::Operation req;
-  req.set_type(ignition::msgs::Operation::INSERT_ENTITY);
+  req.set_type(ignition::msgs::Operation::INSERT);
   req.set_id(id);
-  req.mutable_factory()->CopyFrom(msg);
+  req.mutable_op_insert()->CopyFrom(msg);
 
   // Request
   ignition::transport::Node ignNode;
@@ -146,9 +149,9 @@ size_t transport::RequestInsert(const ignition::msgs::Light &_msg)
   fac.mutable_light()->CopyFrom(_msg);
 
   ignition::msgs::Operation req;
-  req.set_type(ignition::msgs::Operation::INSERT_LIGHT);
+  req.set_type(ignition::msgs::Operation::INSERT);
   req.set_id(id);
-  req.mutable_factory()->CopyFrom(fac);
+  req.mutable_op_insert()->CopyFrom(fac);
 
   // Request
   ignition::transport::Node ignNode;
@@ -165,9 +168,9 @@ size_t transport::RequestInsert(const ignition::msgs::EntityFactory &_msg)
 
   // Operation msg
   ignition::msgs::Operation req;
-  req.set_type(ignition::msgs::Operation::INSERT_LIGHT);
+  req.set_type(ignition::msgs::Operation::INSERT);
   req.set_id(id);
-  req.mutable_factory()->CopyFrom(_msg);
+  req.mutable_op_insert()->CopyFrom(_msg);
 
   // Request
   ignition::transport::Node ignNode;

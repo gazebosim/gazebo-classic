@@ -1603,7 +1603,7 @@ physics::ModelPtr ServerFixture::GetModel(const std::string &_name)
 /////////////////////////////////////////////////
 void ServerFixture::RemoveModel(const std::string &_name)
 {
-  transport::RequestDelete(_name);
+  transport::RequestDelete(common::URI(_name));
 }
 
 /////////////////////////////////////////////////

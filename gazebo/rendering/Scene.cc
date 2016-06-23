@@ -28,6 +28,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -3570,30 +3571,34 @@ void Scene::ToggleLayer(const int32_t _layer)
 void Scene::OnNotification(const ignition::msgs::Operation &_msg)
 {
   // Deletion
-  if (_msg.type() == ignition::msgs::Operation::DELETE_ENTITY &&
-      _msg.has_uri())
+  if (_msg.type() == ignition::msgs::Operation::DELETE &&
+      _msg.has_op_delete())
   {
-    std::string name = _msg.uri();
+    auto uri = _msg.op_delete().uri();
+    auto uriParts = common::split(uri, "/");
 
-    Light_M::iterator lightIter = this->dataPtr->lights.find(name);
-
-    // Check to see if the deleted entity is a light.
-    if (lightIter != this->dataPtr->lights.end())
+    // Light
+    if (std::find(uriParts.begin(), uriParts.end(), "light") != uriParts.end())
     {
-      this->dataPtr->lights.erase(lightIter);
+      auto lightIter = this->dataPtr->lights.find(uriParts.back());
+
+      if (lightIter != this->dataPtr->lights.end())
+      {
+        this->dataPtr->lights.erase(lightIter);
+      }
     }
-    // Otherwise delete a visual
-    else
+    // Visual
+    if (std::find(uriParts.begin(), uriParts.end(), "visual") != uriParts.end())
     {
       VisualPtr visPtr;
       try
       {
-        auto iter = this->dataPtr->visuals.find(std::stoul(name));
+        auto iter = this->dataPtr->visuals.find(std::stoul(uriParts.back()));
         if (iter != this->dataPtr->visuals.end())
           visPtr = iter->second;
       } catch(...)
       {
-        visPtr = this->GetVisual(name);
+        visPtr = this->GetVisual(uriParts.back());
       }
 
       if (visPtr)
@@ -3602,10 +3607,10 @@ void Scene::OnNotification(const ignition::msgs::Operation &_msg)
   }
 
   // Light insertion
-  if (_msg.type() == ignition::msgs::Operation::INSERT_LIGHT &&
-      _msg.has_factory() && _msg.factory().has_light())
+  if (_msg.type() == ignition::msgs::Operation::INSERT &&
+      _msg.has_op_insert() && _msg.op_insert().has_light())
   {
-    auto gzMsg = msgs::Convert(_msg.factory().light());
+    auto gzMsg = msgs::Convert(_msg.op_insert().light());
     boost::shared_ptr<msgs::Light> fac(new msgs::Light(gzMsg));
 
     std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);

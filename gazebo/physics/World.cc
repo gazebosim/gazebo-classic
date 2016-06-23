@@ -603,7 +603,13 @@ void World::LogStep()
 
           while (nameElem)
           {
-            transport::RequestDelete(nameElem->Get<std::string>());
+            // TODO: check if it's light or model
+            common::URI uri;
+            uri.SetScheme("data");
+            uri.Path().PushFront(nameElem->Get<std::string>());
+            uri.Path().PushFront("model");
+
+            transport::RequestDelete(uri);
             nameElem = nameElem->GetNextElement("name");
           }
         }
@@ -1389,8 +1395,8 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 
   // TODO: Converting to operation on Gazebo8, remove on Gazebo9
   ignition::msgs::Operation msg;
-  msg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
-  msg.mutable_factory()->CopyFrom(*_msg);
+  msg.set_type(ignition::msgs::Operation::INSERT);
+  msg.mutable_op_insert()->CopyFrom(*_msg);
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
@@ -1666,12 +1672,13 @@ void World::ProcessRequestMsgs()
     {
       gzwarn << "Request for `entity_delete` [" << requestMsg.data()
           << "] is deprecated. Use "
-          << "transport::RequestDelete(<entity uri>)"
+          << "transport::RequestDelete(<entity name>, <entity type>)"
           << " instead." << std::endl;
 
+      // TODO: check if it's model or light
       ignition::msgs::Operation msg;
-      msg.set_type(ignition::msgs::Operation::DELETE_ENTITY);
-      msg.set_uri(requestMsg.data());
+      msg.set_type(ignition::msgs::Operation::DELETE);
+      msg.mutable_op_delete()->set_uri(requestMsg.data());
 
       {
         std::lock_guard<std::mutex> lockReq(this->dataPtr->requestsMutex);
@@ -2294,12 +2301,9 @@ void World::SetState(const WorldState &_state)
 //////////////////////////////////////////////////
 void World::InsertModelFile(const std::string &_sdfFilename)
 {
-  msgs::Factory msg;
-  msg.set_sdf_filename(_sdfFilename);
-
   ignition::msgs::Operation opMsg;
-  opMsg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
-  opMsg.mutable_factory()->CopyFrom(msg);
+  opMsg.set_type(ignition::msgs::Operation::INSERT);
+  opMsg.mutable_op_insert()->set_sdf_filename(_sdfFilename);
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
@@ -2310,12 +2314,9 @@ void World::InsertModelFile(const std::string &_sdfFilename)
 //////////////////////////////////////////////////
 void World::InsertModelSDF(const sdf::SDF &_sdf)
 {
-  msgs::Factory msg;
-  msg.set_sdf(_sdf.ToString());
-
   ignition::msgs::Operation opMsg;
-  opMsg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
-  opMsg.mutable_factory()->CopyFrom(msg);
+  opMsg.set_type(ignition::msgs::Operation::INSERT);
+  opMsg.mutable_op_insert()->set_sdf(_sdf.ToString());
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
@@ -2326,12 +2327,9 @@ void World::InsertModelSDF(const sdf::SDF &_sdf)
 //////////////////////////////////////////////////
 void World::InsertModelString(const std::string &_sdfString)
 {
-  msgs::Factory msg;
-  msg.set_sdf(_sdfString);
-
   ignition::msgs::Operation opMsg;
-  opMsg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
-  opMsg.mutable_factory()->CopyFrom(msg);
+  opMsg.set_type(ignition::msgs::Operation::INSERT);
+  opMsg.mutable_op_insert()->set_sdf(_sdfString);
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
@@ -2706,7 +2704,7 @@ bool World::RemoveModel(const std::string &_name)
 {
   if (_name.empty())
   {
-    gzerr << "Can't remove a model with an empty name." << std::endl;
+    gzerr << "Can't remove a model with an empty URI." << std::endl;
     return false;
   }
 
@@ -2715,42 +2713,75 @@ bool World::RemoveModel(const std::string &_name)
 
   boost::mutex::scoped_lock flock(this->dataPtr->factoryDeleteMutex);
 
-  // Destroy physics entities
+  // Rebuild URI
+  common::URI uri(_name);
+  if (!uri.Valid())
+  {
+    gzerr << "[" << _name << "] is not a valid URI, not deleting." << std::endl;
+    return false;
+  }
+
   bool isModel = false;
   bool isLight = false;
+
+  // Get type
+  auto uriParts = common::split(uri.Path().Str(), "/");
+
+  if (uriParts.end()[-2] == "model")
+    isModel = true;
+  else if (uriParts.end()[-2] == "light")
+    isLight = true;
+
+  if (!isModel && !isLight)
+  {
+    gzerr << "[" << _name << "] doesn't contain a model or a light, "
+        << "not deleting." << std::endl;
+    return false;
+  }
+
+  // Get name
+  auto name = uriParts.end()[-1];
+
+  // Destroy physics entities
+  bool found = false;
   {
     boost::recursive_mutex::scoped_lock lock(
         *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
-    this->dataPtr->rootElement->RemoveChild(_name);
+    this->dataPtr->rootElement->RemoveChild(name);
 
-    for (auto model = this->dataPtr->models.begin();
-              model != this->dataPtr->models.end(); ++model)
+    if (isModel)
     {
-      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
+      for (auto model = this->dataPtr->models.begin();
+                model != this->dataPtr->models.end(); ++model)
       {
-        this->dataPtr->models.erase(model);
-        isModel = true;
-        break;
+        if ((*model)->GetName() == name || (*model)->GetScopedName() == name)
+        {
+          this->dataPtr->models.erase(model);
+          found = true;
+          break;
+        }
       }
     }
-
-    for (auto light = this->dataPtr->lights.begin();
-              light != this->dataPtr->lights.end(); ++light)
+    else if (isLight)
     {
-      if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
+      for (auto light = this->dataPtr->lights.begin();
+                light != this->dataPtr->lights.end(); ++light)
       {
-        isLight = true;
-        this->dataPtr->lights.erase(light);
-        break;
+        if ((*light)->GetName() == name || (*light)->GetScopedName() == name)
+        {
+          found = true;
+          this->dataPtr->lights.erase(light);
+          break;
+        }
       }
     }
   }
 
-  if (!isModel && !isLight)
+  if (!found)
   {
-    gzerr << "Can't find a model or light named [" << _name
-          << "], not removing." << std::endl;
+    gzerr << "Can't find entity named [" << name << "], not removing."
+        << std::endl;
     return false;
   }
 
@@ -2759,8 +2790,8 @@ bool World::RemoveModel(const std::string &_name)
     for (auto entity = this->dataPtr->dirtyPoses.begin();
               entity != this->dataPtr->dirtyPoses.end();)
     {
-      if ((*entity)->GetName() == _name ||
-         ((*entity)->GetParent() && (*entity)->GetParent()->GetName() == _name))
+      if ((*entity)->GetName() == name ||
+         ((*entity)->GetParent() && (*entity)->GetParent()->GetName() == name))
       {
         this->dataPtr->dirtyPoses.erase(entity++);
       }
@@ -2775,7 +2806,7 @@ bool World::RemoveModel(const std::string &_name)
     for (auto model = this->dataPtr->publishModelPoses.begin();
               model != this->dataPtr->publishModelPoses.end(); ++model)
     {
-      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
+      if ((*model)->GetName() == name || (*model)->GetScopedName() == name)
       {
         this->dataPtr->publishModelPoses.erase(model);
         break;
@@ -2787,7 +2818,7 @@ bool World::RemoveModel(const std::string &_name)
     boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
     for (auto light : this->dataPtr->publishLightPoses)
     {
-      if (light->GetName() == _name || light->GetScopedName() == _name)
+      if (light->GetName() == name || light->GetScopedName() == name)
       {
         this->dataPtr->publishLightPoses.erase(light);
         break;
@@ -2798,7 +2829,7 @@ bool World::RemoveModel(const std::string &_name)
   // Remove from scene message (only light? what happens to models?)
   for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
   {
-    if (this->dataPtr->sceneMsg.light(i).name() == _name)
+    if (this->dataPtr->sceneMsg.light(i).name() == name)
     {
       this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
           this->dataPtr->sceneMsg.light_size()-1);
@@ -2811,7 +2842,7 @@ bool World::RemoveModel(const std::string &_name)
   if (this->dataPtr->sdf->HasElement("model"))
   {
     sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("model");
-    while (childElem && childElem->Get<std::string>("name") != _name)
+    while (childElem && childElem->Get<std::string>("name") != name)
       childElem = childElem->GetNextElement("model");
     if (childElem)
       this->dataPtr->sdf->RemoveChild(childElem);
@@ -2820,7 +2851,7 @@ bool World::RemoveModel(const std::string &_name)
   if (this->dataPtr->sdf->HasElement("light"))
   {
     sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("light");
-    while (childElem && childElem->Get<std::string>("name") != _name)
+    while (childElem && childElem->Get<std::string>("name") != name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
@@ -2845,12 +2876,9 @@ void World::OnLightFactoryMsg(ConstLightPtr &_msg)
       << "transport::RequestInsertSDF() instead." << std::endl;
 
   // TODO: Converting to operation on Gazebo8, remove on Gazebo9
-  msgs::Factory fac;
-  fac.mutable_light()->CopyFrom(*_msg);
-
   ignition::msgs::Operation msg;
-  msg.set_type(ignition::msgs::Operation::INSERT_LIGHT);
-  msg.mutable_factory()->CopyFrom(fac);
+  msg.set_type(ignition::msgs::Operation::INSERT);
+  msg.mutable_op_insert()->mutable_light()->CopyFrom(*_msg);
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
@@ -2941,46 +2969,46 @@ void World::ProcessRequests()
   for (const auto &request : this->dataPtr->requests)
   {
     // Entity delete
-    if (request.type() == ignition::msgs::Operation::DELETE_ENTITY &&
-        request.has_uri())
+    if (request.type() == ignition::msgs::Operation::DELETE &&
+        request.has_op_delete())
     {
       // Notify whether deletion succeeded or failed
       ignition::msgs::Operation msg;
-      msg.set_type(ignition::msgs::Operation::DELETE_ENTITY);
-      msg.set_uri(request.uri());
+      msg.set_type(request.type());
       msg.set_id(request.id());
+      msg.mutable_op_delete()->set_uri(request.op_delete().uri());
 
-      if (this->RemoveModel(request.uri()))
+      if (this->RemoveModel(request.op_delete().uri()))
       {
-        msg.set_msg("[" + request.uri() + "] removed successfully.");
+        msg.set_msg("[" + request.op_delete().uri() + "] removed successfully.");
         msg.set_success(true);
       }
       else
       {
-        msg.set_msg("Failed to remove [" + request.uri() +
+        msg.set_msg("Failed to remove [" + request.op_delete().uri() +
             "]. See log for details.");
         msg.set_success(false);
       }
       this->dataPtr->ignNode.Publish("/notification", msg);
     }
     // Entity insert
-    else if (request.type() == ignition::msgs::Operation::INSERT_ENTITY &&
-        request.has_factory())
+    else if (request.type() == ignition::msgs::Operation::INSERT &&
+        request.has_op_insert())
     {
       // Notify whether insertion succeeded or failed
       ignition::msgs::Operation msg;
-      msg.set_type(ignition::msgs::Operation::INSERT_ENTITY);
-      msg.mutable_factory()->CopyFrom(request.factory());
+      msg.set_type(request.type());
       msg.set_id(request.id());
+      msg.mutable_op_insert()->CopyFrom(request.op_insert());
 
-      auto entityName = this->ProcessInsertEntityRequest(request.factory());
+      auto entityName = this->ProcessInsertEntityRequest(request.op_insert());
       if (!entityName.empty())
       {
         msg.set_msg("Entity [" + entityName + "] inserted successfully.");
         msg.set_success(true);
 
         // Update name in factory msg
-        msg.mutable_factory()->set_edit_name(entityName);
+        msg.mutable_op_insert()->set_edit_name(entityName);
       }
       else
       {
@@ -2990,23 +3018,23 @@ void World::ProcessRequests()
       this->dataPtr->ignNode.Publish("/notification", msg);
     }
     // Light insert
-    else if (request.type() == ignition::msgs::Operation::INSERT_LIGHT &&
-        request.has_factory() && request.factory().has_light())
+    else if (request.type() == ignition::msgs::Operation::INSERT &&
+        request.has_op_insert() && request.op_insert().has_light())
     {
       // Notify whether insertion succeeded or failed
       ignition::msgs::Operation msg;
-      msg.set_type(ignition::msgs::Operation::INSERT_LIGHT);
+      msg.set_type(ignition::msgs::Operation::INSERT);
       msg.set_id(request.id());
-      msg.mutable_factory()->CopyFrom(request.factory());
+      msg.mutable_op_insert()->CopyFrom(request.op_insert());
 
-      auto lightName = this->ProcessInsertLightRequest(request.factory());
+      auto lightName = this->ProcessInsertLightRequest(request.op_insert());
       if (!lightName.empty())
       {
         msg.set_msg("Light [" + lightName + "] inserted successfully.");
         msg.set_success(true);
 
-        // Update light name in factory msg
-        msg.mutable_factory()->mutable_light()->set_name(lightName);
+        // Update light name in op_insert msg
+        msg.mutable_op_insert()->mutable_light()->set_name(lightName);
       }
       else
       {

@@ -584,9 +584,11 @@ void Entity::Fini()
 
   // Notify that deletion was completed
   {
+    ignition::msgs::OpDelete del;
+    del.set_uri(this->URI().Str());
+
     ignition::msgs::Operation msg;
-    msg.set_type(ignition::msgs::Operation::DELETE_ENTITY);
-    msg.set_uri(this->GetScopedName());
+    msg.set_type(ignition::msgs::Operation::DELETE);
     msg.set_success(true);
 
     this->ignNode.Publish("/notification", msg);

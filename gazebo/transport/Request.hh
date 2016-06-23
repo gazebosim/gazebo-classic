@@ -23,6 +23,7 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/msgs.hh>
 
+#include "gazebo/common/URI.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -34,7 +35,7 @@ namespace gazebo
     /// \param[in] _uri URI of entity to be deleted.
     /// \return Unique id for the request.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestDelete(const std::string &_uri);
+    size_t RequestDelete(const common::URI &_uri);
 
     /// \brief Helper class to send an entity insert request using ignition
     /// transport.
@@ -60,7 +61,7 @@ namespace gazebo
 
     /// \brief Helper class to send a clone entity request using ignition
     /// transport.
-    /// \param[in] _uri URI of entity to be cloned.
+    /// \param[in] _uri URI of entity to be cloned. TODO
     GZ_TRANSPORT_VISIBLE
     size_t RequestClone(const std::string &_uri,
         const ignition::math::Pose3d &_pose =

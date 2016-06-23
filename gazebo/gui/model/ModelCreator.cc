@@ -1643,7 +1643,7 @@ void ModelCreator::FinishModel()
     this->SetModelVisible(this->dataPtr->serverModelName, true);
 
     // delete model on server first before spawning the updated one.
-    transport::RequestDelete(this->dataPtr->serverModelName);
+    transport::RequestDelete(common::URI(this->dataPtr->serverModelName));
 
     int timeoutCounter = 0;
     int timeout = 100;

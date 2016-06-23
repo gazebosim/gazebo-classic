@@ -68,13 +68,13 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   std::function<void(const ignition::msgs::Operation &)> onNotification =
               [this](const ignition::msgs::Operation &_msg)
   {
-    if (!(_msg.type() == ignition::msgs::Operation::DELETE_ENTITY &&
-        _msg.has_uri()))
+    if (!(_msg.type() == ignition::msgs::Operation::DELETE &&
+        _msg.has_op_delete()))
     {
       return;
     }
 
-    std::string modelName = _msg.uri();
+    auto modelName = common::split(_msg.op_delete().uri(), "/").back();
     if (models.erase(modelName) == 1)
     {
       // notify everyone!

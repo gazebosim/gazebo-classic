@@ -323,7 +323,16 @@ void ModelRightMenu::OnDelete(const std::string &_name)
   if (name.empty())
     name = this->entityName;
 
-  transport::RequestDelete(name);
+  // Build entity URI
+  // FIXME: Assuming it's model
+  common::URI uri;
+  uri.SetScheme("data");
+  uri.Path().PushBack("world");
+  uri.Path().PushBack(gui::get_world());
+  uri.Path().PushBack("model");
+  uri.Path().PushBack(name);
+
+  transport::RequestDelete(uri);
 }
 
 /////////////////////////////////////////////////

@@ -25,6 +25,7 @@
 #include <math.h>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -1268,13 +1269,13 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void GLWidget::OnNotification(const ignition::msgs::Operation &_msg)
 {
-  if (!(_msg.type() == ignition::msgs::Operation::DELETE_ENTITY &&
-      _msg.has_uri()))
+  if (!(_msg.type() == ignition::msgs::Operation::DELETE &&
+      _msg.has_op_delete()))
   {
     return;
   }
 
-  std::string name = _msg.uri();
+  std::string name = common::split(_msg.op_delete().uri(), "/").back();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
   if (!this->dataPtr->selectedVisuals.empty())

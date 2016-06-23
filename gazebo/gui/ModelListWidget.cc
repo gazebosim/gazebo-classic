@@ -2666,13 +2666,14 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 /////////////////////////////////////////////////
 void ModelListWidget::OnNotification(const ignition::msgs::Operation &_msg)
 {
-  if (!(_msg.type() == ignition::msgs::Operation::DELETE_ENTITY &&
-      _msg.has_uri()))
+  if (!(_msg.type() == ignition::msgs::Operation::DELETE &&
+      _msg.has_op_delete()))
   {
     return;
   }
 
-  this->dataPtr->removeEntityList.push_back(_msg.uri());
+  // TODO: Differentiate by type
+  this->dataPtr->removeEntityList.push_back(_msg.op_delete().uri());
 }
 
 /////////////////////////////////////////////////

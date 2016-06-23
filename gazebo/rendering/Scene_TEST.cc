@@ -170,7 +170,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   }
 
   // Send request to delete the box model
-  transport::RequestDelete("box");
+  transport::RequestDelete(common::URI("box"));
 
   sleep = 0;
   while (box && sleep < maxSleep)

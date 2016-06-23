@@ -85,7 +85,7 @@ void GLWidget_TEST::SelectObject()
   // segfault if an object is deleted.
   {
     std::string name = selectedVisuals.back()->GetName();
-    gazebo::transport::RequestDelete(name);
+    gazebo::transport::RequestDelete(gazebo::common::URI(name));
 
     this->ProcessEventsAndDraw(mainWindow);
   }

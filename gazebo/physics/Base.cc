@@ -329,6 +329,12 @@ std::string Base::GetScopedName(bool _prependWorldName) const
 //////////////////////////////////////////////////
 common::URI Base::URI() const
 {
+  if (!this->world)
+  {
+    gzerr << "No world" << std::endl;
+    return common::URI();
+  }
+
   common::URI uri;
 
   uri.SetScheme("data");
