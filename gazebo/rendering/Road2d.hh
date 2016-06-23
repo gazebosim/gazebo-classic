@@ -58,21 +58,11 @@ namespace gazebo
       private: void OnRoadMsg(ConstRoadPtr &_msg);
 
       /// \brief A road segment
-      private: class Segment : public Ogre::SimpleRenderable
+      private: class Segment
                {
                  /// \brief Load the road segment from message data.
                  /// \param[in] _msg The robot data.
                  public: void Load(msgs::Road _msg);
-
-
-                 /// \internal
-                 /// \brief Implementation of Ogre::SimpleRenderable
-                 public: virtual Ogre::Real getBoundingRadius() const;
-
-                 /// \internal
-                 /// \brief Implementation of Ogre::SimpleRenderable
-                 public: virtual Ogre::Real getSquaredViewDepth(
-                             const Ogre::Camera* cam) const;
 
                  /// \brief Name of the road.
                  public: std::string name;
