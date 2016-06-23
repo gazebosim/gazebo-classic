@@ -654,6 +654,8 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   _mod = "";
   if (entity)
   {
+    gzdbg << "UserCamera GetVisual " << entity->getName() << " "
+      << entity->getUserObjectBindings().getUserAny().isEmpty() << std::endl;
     // Make sure we set the _mod only if we have found a selection object
     if (entity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
         !entity->getUserObjectBindings().getUserAny().isEmpty() &&

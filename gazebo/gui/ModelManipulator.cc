@@ -321,6 +321,10 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
 math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
     const math::Vector3 &_axis, bool _local) const
 {
+  gzdbg << "MM GetMouseMoveDistance " << this->dataPtr->mouseStart << " vs "
+            << math::Vector2i(this->dataPtr->mouseEvent.Pos().X(), this->dataPtr->mouseEvent.Pos().Y())
+            << " " << _pose << " " <<  _axis << " " << _local << std::endl;
+
   return GetMouseMoveDistance(this->dataPtr->userCamera,
       this->dataPtr->mouseStart,
       math::Vector2i(this->dataPtr->mouseEvent.Pos().X(),
@@ -520,7 +524,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     pose.pos.z = _vis->GetWorldPose().pos.z;
 
   _vis->SetWorldPose(pose);
-  gzdbg << "MM translate to " << pose << std::endl;
+  gzdbg << "MM translate to " << pose << " dist " << distance << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -617,10 +621,11 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 {
-  gzdbg << "MM Press event " << std::endl;
   this->dataPtr->mouseEvent = _event;
   this->dataPtr->mouseStart = _event.PressPos();
   this->SetMouseMoveVisual(rendering::VisualPtr());
+
+  gzdbg << "MM Press mouse start " << this->dataPtr->mouseStart << std::endl;
 
   rendering::VisualPtr vis;
   rendering::VisualPtr mouseVis
@@ -722,7 +727,9 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
       else if (this->dataPtr->keyEvent.key == Qt::Key_Z)
         axis.z = 1;
 
-      gzdbg << "MM Move Drag " << this->dataPtr->selectionObj->GetMode() << std::endl;
+      gzdbg << "MM Move Drag " << this->dataPtr->selectionObj->GetMode()
+            << " state " << this->dataPtr->selectionObj->GetState()
+            << " ev " << this->dataPtr->mouseEvent.Pos() << std::endl;
 
       if (this->dataPtr->selectionObj->GetMode() ==
           rendering::SelectionObj::TRANS)
@@ -822,6 +829,8 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     std::string manipState;
     this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos(),
         manipState);
+    gzdbg << "MM setting state " << this->dataPtr->mouseEvent.Pos()
+          << " " <<  manipState << std::endl;
     this->dataPtr->selectionObj->SetState(manipState);
 
     if (!manipState.empty())
@@ -844,6 +853,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
 void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
+  gzdbg << " MM release " << this->dataPtr->mouseEvent.Pos() << std::endl;
   if (this->dataPtr->mouseEvent.Dragging())
   {
     // If we were dragging a visual around, then publish its new pose to the

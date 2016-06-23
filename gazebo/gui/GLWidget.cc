@@ -193,6 +193,7 @@ GLWidget::~GLWidget()
   MouseEventHandler::Instance()->RemovePressFilter("glwidget");
   MouseEventHandler::Instance()->RemoveReleaseFilter("glwidget");
   MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
+  gzdbg << "GLWidget remove move filter " << std::endl;
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
 
   this->dataPtr->connections.clear();
