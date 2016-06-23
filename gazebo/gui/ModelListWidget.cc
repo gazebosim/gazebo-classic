@@ -411,7 +411,7 @@ void ModelListWidget::ProcessModelMsgs()
           QTreeWidgetItem *jointHeaderItem = new QTreeWidgetItem(topItem,
           QStringList(QString("%1").arg(QString::fromStdString("JOINTS"))));
           jointHeaderItem->setFont(0, subheaderFont);
-          jointHeaderItem->setFlags(Qt::ItemIsEnabled);
+          jointHeaderItem->setFlags(Qt::NoItemFlags);
           this->dataPtr->modelTreeWidget->addTopLevelItem(jointHeaderItem);
         }
 
@@ -438,7 +438,7 @@ void ModelListWidget::ProcessModelMsgs()
           QTreeWidgetItem *pluginHeaderItem = new QTreeWidgetItem(topItem,
           QStringList(QString("%1").arg("PLUGINS")));
           pluginHeaderItem->setFont(0, subheaderFont);
-          pluginHeaderItem->setFlags(Qt::ItemIsEnabled);
+          pluginHeaderItem->setFlags(Qt::NoItemFlags);
           this->dataPtr->modelTreeWidget->addTopLevelItem(pluginHeaderItem);
         }
 
