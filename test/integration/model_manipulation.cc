@@ -58,6 +58,8 @@ void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
         _widget->mapToGlobal(movePt), _button, _button, _modifiers);
     QApplication::postEvent(_widget, moveEvent);
 
+    QTest::mouseMove(_widget, movePt);
+
     gazebo::common::Time::MSleep(10);
     QCoreApplication::processEvents();
   }
@@ -305,11 +307,11 @@ void ModelManipulationTest::GlobalLocalFrames()
   // move the box in +z in local frame
   auto startPos = modelVis->GetWorldPose().pos.Ign() +
       modelVis->GetWorldPose().rot.Ign() *
-      ignition::math::Vector3d(0.0, 0, 0.6);
+      ignition::math::Vector3d(0.0, 0, 0.8);
   auto startPt = cam->Project(startPos);
   auto endPos = modelVis->GetWorldPose().pos.Ign() +
       modelVis->GetWorldPose().rot.Ign() *
-      ignition::math::Vector3d(0.0, 0, 0.8);
+      ignition::math::Vector3d(0.0, 0, 1.0);
   auto endPt = cam->Project(endPos);
   MouseDrag(glWidget, Qt::LeftButton, Qt::NoModifier, startPt, endPt);
 
