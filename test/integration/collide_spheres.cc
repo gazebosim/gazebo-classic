@@ -109,19 +109,8 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
           << std::endl;
     ASSERT_NE(mmPair.second.first, nullptr);
     ASSERT_NE(mmPair.second.second, nullptr);
-  }
-  for (const auto dmPair : dmRadius)
-  {
-    gzdbg << "Checking dm radius pair with separation "
-          << dmPair.first
-          << std::endl;
-    ASSERT_NE(dmPair.second.first, nullptr);
-    ASSERT_NE(dmPair.second.second, nullptr);
-  }
 
-  // compute distance between object centers
-  for (const auto mmPair : mmRadius)
-  {
+    // compute distance between object centers
     auto modelA = mmPair.second.first;
     auto modelB = mmPair.second.second;
     auto positionDiff = modelA->GetWorldPose().Ign().Pos()
@@ -130,6 +119,13 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
   }
   for (const auto dmPair : dmRadius)
   {
+    gzdbg << "Checking dm radius pair with separation ratio "
+          << dmPair.first
+          << std::endl;
+    ASSERT_NE(dmPair.second.first, nullptr);
+    ASSERT_NE(dmPair.second.second, nullptr);
+
+    // compute distance between object centers
     auto modelA = dmPair.second.first;
     auto modelB = dmPair.second.second;
     auto positionDiff = modelA->GetWorldPose().Ign().Pos()
