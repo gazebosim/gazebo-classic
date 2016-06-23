@@ -1075,22 +1075,6 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     linkMsg->set_name(linkName);
     fillMsg = linkMsg;
   }
-  // check if it's a plugin
-  else if (currentItem->data(3, Qt::UserRole).toString().toStdString() ==
-      "Plugin")
-  {
-    msg.set_name(currentItem->data(1, Qt::UserRole).toString().toStdString());
-    msg.set_id(currentItem->data(2, Qt::UserRole).toInt());
-
-    // strip plugin name.
-    msgs::Plugin *pluginMsg = msg.add_plugin();
-    std::string pluginName = this->dataPtr->pluginMsg.name();
-    size_t index = pluginName.find_last_of("::");
-    if (index != std::string::npos)
-      pluginName = pluginName.substr(index+1);
-    pluginMsg->set_name(pluginName);
-    fillMsg = pluginMsg;
-  }
   else
   {
     msg.set_id(this->dataPtr->modelMsg.id());
