@@ -112,7 +112,7 @@ endforeach ()
 
 foreach (src ${GUIplugins})
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
+  target_link_libraries(${src} libgazebo ${ogre_libraries} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
