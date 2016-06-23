@@ -25,6 +25,8 @@
 
 using namespace gazebo;
 
+const double g_tolerance = 1e-6;
+
 class CollideTest : public ServerFixture,
                     public testing::WithParamInterface<const char *>
 {
@@ -152,13 +154,48 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
     EXPECT_EQ(contact->count, 1);
     if (contact->count != 1)
       continue;
-    gzdbg << contact->collision1->GetScopedName()
+
+    gzdbg << contact->collision1->GetModel()->GetScopedName()
           << " "
-          << contact->collision2->GetScopedName()
+          << contact->collision2->GetModel()->GetScopedName()
           << " "
           << contact->normals[0] << " normal, "
           << contact->depths[0] << " depth"
           << std::endl;
+
+    std::string name1(contact->collision1->GetModel()->GetScopedName());
+    std::string name2(contact->collision2->GetModel()->GetScopedName());
+    EXPECT_EQ(0, name1.compare(0, 4, name2.substr(0, 4)));
+    double radius;
+    if (name1.compare(0, 2, "mm") == 0)
+    {
+      radius = 1e-3;
+    }
+    else if (name1.compare(0, 2, "dm") == 0)
+    {
+      radius = 1e-1;
+    }
+    else
+    {
+      ADD_FAILURE() << " unrecognized model name prefix: "
+                    << name1.substr(0, 2);
+      continue;
+    }
+    double separation = radius * std::stod(name1.substr(2, 2)) / 10;
+    double depth = 2*radius - separation;
+    EXPECT_NEAR(depth, contact->depths[0], g_tolerance);
+
+    // normal is undefined when sphere centers coincide
+    if (separation != 0.0)
+    {
+      // otherwise expect unit vectors parallel to UnitX
+      // {1, 0, 0} or {-1, 0, 0}
+      auto normal = contact->normals[0].Ign();
+      EXPECT_NEAR(normal.Length(), 1.0, g_tolerance);
+      EXPECT_NEAR(0.0,
+        ignition::math::Vector3d::UnitX.Cross(normal).Length(),
+        g_tolerance);
+    }
   }
 }
 
