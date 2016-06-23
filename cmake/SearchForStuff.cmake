@@ -29,37 +29,6 @@ if (PROTOBUF_VERSION LESS 2.3.0)
   BUILD_ERROR("Incorrect version: Gazebo requires protobuf version 2.3.0 or greater")
 endif()
 
-#################################################
-# Find ZeroMQ.
-include (${gazebo_cmake_dir}/FindZeroMQ.cmake)
-
-if (NOT ZeroMQ_FOUND)
-  BUILD_ERROR ("zmq not found, Please install zmq")
-else ()
-  include_directories(${ZeroMQ_INCLUDE_DIRS})
-  link_directories(${ZeroMQ_LIBRARY_DIRS})
-endif ()
-
-#################################################
-# Find cppzeromq header (shipped together with zeromq in debian/ubuntu but
-# different upstream projects and tarballs)
-#
-# Provide the PATH using CPPZMQ_ROOT_DIR
-#
-find_path(cppzmq_INCLUDE_DIRS
-          zmq.hpp
-          PATHS
-          ${ZeroMQ_INCLUDE_DIRS}
-          ${CPPZMQ_ROOT_DIR})
-
-if (NOT cppzmq_INCLUDE_DIRS)
-  message(STATUS "cppzmq header file was not found")
-  BUILD_ERROR("cppzmq header file was not found")
-else()
-  message(STATUS "cppzmq file - found")
-  include_directories(${cppzmq_INCLUDE_DIRS})
-endif()
-
 ########################################
 # The Google Protobuf library for message generation + serialization
 find_package(Protobuf REQUIRED)

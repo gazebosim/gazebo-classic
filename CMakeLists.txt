@@ -247,7 +247,7 @@ if (NOT MSVC)
   set(UNFILTERED_FLAGS "-std=c++11")
 endif()
 
-set (CMAKE_CXX_FLAGS "${WARN_LEVEL} ${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
 #################################################
 # OS Specific initialization
