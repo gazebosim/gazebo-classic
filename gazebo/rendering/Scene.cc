@@ -3293,10 +3293,6 @@ void Scene::SetGrid(const bool _enabled)
     Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
     grid->Init();
     this->dataPtr->grids.push_back(grid);
-
-    grid = new Grid(this, 4, 5, 20, common::Color(0.8, 0.8, 0.8, 0.5));
-    grid->Init();
-    this->dataPtr->grids.push_back(grid);
   }
   else
   {

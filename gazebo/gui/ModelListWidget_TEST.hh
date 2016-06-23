@@ -121,6 +121,9 @@ class ModelListWidget_TEST : public QTestFixture
   /// \brief Test that the property browser displays correct physics properties
   /// and allows modification of physics properties.
   private slots: void PhysicsProperties();
+
+  /// \brief Test that the property browser displays correct GUI properties.
+  private slots: void GUIProperties();
 };
 
 #endif
