@@ -270,6 +270,30 @@ void ModelListWidget_TEST::SetLinkProperty(
 
 
 /////////////////////////////////////////////////
+void ModelListWidget_TEST::CheckPluginProperty(QList<QtProperty *> _properties,
+    const std::string &_name, const std::string &_filename,
+    const std::string &_innerxml)
+{
+  // Name
+  auto property = static_cast<QtVariantProperty *>(_properties[0]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("name"));
+  QCOMPARE(property->valueText(), tr(_name.c_str()));
+
+  // Filename
+  property = static_cast<QtVariantProperty *>(_properties[1]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("filename"));
+  QCOMPARE(property->valueText(), tr(_filename.c_str()));
+
+  // Inner XML
+  property = static_cast<QtVariantProperty *>(_properties[2]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("innerxml"));
+  QCOMPARE(property->valueText(), tr(_innerxml.c_str()));
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget_TEST::ModelsTree()
 {
   gazebo::gui::ModelListWidget *modelListWidget
@@ -433,7 +457,7 @@ void ModelListWidget_TEST::ModelProperties()
   // select the multi-link model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center() );
+      modelRect.center());
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -728,8 +752,13 @@ void ModelListWidget_TEST::LinkProperties()
   QVERIFY(propTreeBrowser->properties().size() > 0);
 
   // select the box link
+<<<<<<< local
   QTreeWidgetItem *boxLinkItem = modelItem->child(0);
   QVERIFY(boxLinkItem != nullptr);
+=======
+  QTreeWidgetItem *boxLinkItem = modelItem->child(1);
+  QVERIFY(boxLinkItem != NULL);
+>>>>>>> other
   std::string boxLinkName = "box_link";
   QCOMPARE(boxLinkItem->text(0), tr(boxLinkName.c_str()));
 
@@ -802,6 +831,7 @@ void ModelListWidget_TEST::LinkProperties()
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
   // select the sphere link
+<<<<<<< local
   QTreeWidgetItem *sphereLinkItem = modelItem->child(1);
   QVERIFY(sphereLinkItem != nullptr);
   std::string sphereLinkName = "sphere_link";
@@ -875,6 +905,146 @@ void ModelListWidget_TEST::LinkProperties()
 
   modelListWidget->hide();
   node.reset();
+  delete requestMsg;
+  delete modelListWidget;
+}
+
+
+/////////////////////////////////////////////////
+void ModelListWidget_TEST::PluginProperties()
+{
+  gazebo::gui::ModelListWidget *modelListWidget
+      = new gazebo::gui::ModelListWidget;
+  modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 2000);
+  QCoreApplication::processEvents();
+
+  this->Load("worlds/underwater.world");
+
+  // Initialize transport
+  gazebo::transport::NodePtr node;
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+  gazebo::transport::PublisherPtr requestPub =
+      node->Advertise<gazebo::msgs::Request>("~/request");
+  gazebo::transport::SubscriberPtr responseSub = node->Subscribe("~/response",
+      &ModelListWidget_TEST::OnResponse, this);
+
+  // Request list of entities
+  gazebo::msgs::Request *requestMsg =
+      gazebo::msgs::CreateRequest("entity_list");
+  requestPub->Publish(*requestMsg);
+
+  // Get tree widget
+  QTreeWidget *modelTreeWidget = modelListWidget->findChild<QTreeWidget *>(
+      "modelTreeWidget");
+
+  QList<QTreeWidgetItem *> treeModelItems =
+      modelTreeWidget->findItems(tr("Models"), Qt::MatchExactly);
+  QCOMPARE(treeModelItems.size(), 1);
+
+  QTreeWidgetItem *modelsItem = treeModelItems.front();
+  QVERIFY(modelsItem != nullptr);
+
+  // Verify that there are 5 models
+  int modelCount = 5;
+  int maxSleep = 10;
+  int sleep = 0;
+  while (modelsItem->childCount() < modelCount && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(500);
+    sleep++;
+  }
+  QCOMPARE(modelsItem->childCount(), modelCount);
+
+  // Get propery browser widget
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
+  QtTreePropertyBrowser *propTreeBrowser =
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
+  QVERIFY(propTreeBrowser != nullptr);
+
+  // Check there are no properties yet
+  QCOMPARE(propTreeBrowser->properties().size(), 0);
+
+  // Select the models item
+  QRect modelsRect = modelTreeWidget->visualItemRect(modelsItem);
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      modelsRect.center() );
+  QCoreApplication::processEvents();
+
+  // Wait for the models item to be selected
+  sleep = 0;
+  while (!modelsItem->isSelected() && sleep < maxSleep)
+  {
+    QTest::qWait(10);
+    sleep++;
+  }
+  QVERIFY(modelsItem->isSelected());
+
+  // Get the submarine model item
+  QTreeWidgetItem *modelItem = modelsItem->child(3);
+  QVERIFY(modelItem != nullptr);
+  std::string modelName = "submarine_buoyant";
+  QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
+
+  // Select the submarine model
+  QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      modelRect.center());
+  QCoreApplication::processEvents();
+  sleep = 0;
+  maxSleep = 5;
+  while (!modelItem->isSelected() && sleep < maxSleep)
+  {
+    QTest::qWait(10);
+    sleep++;
+  }
+  QVERIFY(modelItem->isSelected());
+
+  // Get the buoyancy plugin
+  QTreeWidgetItem *pluginItem = modelItem->child(6);
+  QVERIFY(pluginItem != nullptr);
+  std::string pluginName = "buoyancy";
+  QCOMPARE(pluginItem->text(0), tr(pluginName.c_str()));
+
+  // Select the buoyancy plugin
+  QRect pluginRect = modelTreeWidget->visualItemRect(pluginItem);
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      pluginRect.center() );
+  QCoreApplication::processEvents();
+
+  // Wait for the models plugin to be selected
+  sleep = 0;
+  maxSleep = 5;
+  while (!pluginItem->isSelected() && sleep < maxSleep)
+  {
+    QTest::qWait(10);
+    sleep++;
+  }
+  QVERIFY(pluginItem->isSelected());
+
+  // Wait for the plugin properties to appear
+  sleep = 0;
+  maxSleep = 10;
+  while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(500);
+    sleep++;
+  }
+  QVERIFY(propTreeBrowser->properties().size() > 0);
+
+  std::string pluginFilename = "libBuoyancyPlugin.so";
+  std::string plugininnerxml = "<fluid_density>999.1026</fluid_density> ";
+
+  // check the buoyancy properties
+  this->CheckPluginProperty(propTreeBrowser->properties(), pluginName,
+      pluginFilename, plugininnerxml);
+
+  modelListWidget->hide();
+  node->Fini();
   delete requestMsg;
   delete modelListWidget;
 }
