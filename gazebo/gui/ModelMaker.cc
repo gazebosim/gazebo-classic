@@ -188,9 +188,11 @@ bool ModelMaker::Init()
     modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
   else if (this->dataPtr->modelSDF->Root()->HasElement("light"))
     modelElem = this->dataPtr->modelSDF->Root()->GetElement("light");
+  else if (this->dataPtr->modelSDF->Root()->HasElement("actor"))
+    modelElem = this->dataPtr->modelSDF->Root()->GetElement("actor");
   else
   {
-    gzerr << "No model or light in SDF\n";
+    gzerr << "No model, actor or light in SDF\n";
     return false;
   }
 
@@ -213,6 +215,10 @@ bool ModelMaker::Init()
     this->CreateModelFromSDF(modelElem);
   }
   else if (modelElem->GetName() == "light")
+  {
+    this->dataPtr->modelVisual->AttachMesh("unit_sphere");
+  }
+  else if (modelElem->GetName() == "actor")
   {
     this->dataPtr->modelVisual->AttachMesh("unit_sphere");
   }
@@ -356,6 +362,10 @@ void ModelMaker::CreateTheEntity()
     if (this->dataPtr->modelSDF->Root()->HasElement("model"))
     {
       modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
+    }
+    else if (this->dataPtr->modelSDF->Root()->HasElement("actor"))
+    {
+      modelElem = this->dataPtr->modelSDF->Root()->GetElement("actor");
     }
     else
     {

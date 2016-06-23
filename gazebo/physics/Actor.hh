@@ -133,12 +133,16 @@ namespace gazebo
       /// \return A map of SkeletonAnimation, indexed by their name.
       public: const SkeletonAnimation_M &SkeletonAnimations() const;
 
-      /// \brief Set a custom trajectory for the actor. This will override any
-      /// trajectories previously defined.
+      /// \brief Set a custom trajectory for the actor, using one of the
+      /// existing animations. This will override any trajectories previously
+      /// defined. When a custom trajectory is defined, the script time must
+      /// be set with `SetScriptTime` order to play the animation.
       /// \param[in] _trajInfo Information about custom trajectory.
+      /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
 
       /// \brief Reset custom trajectory of the actor.
+      /// \sa SetCustomTrajectory
       public: void ResetCustomTrajectory();
 
       /// \brief Get whether the links in the actor can collide with each other.

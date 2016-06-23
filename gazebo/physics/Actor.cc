@@ -529,11 +529,7 @@ void Actor::Update()
   common::Time currentTime = this->world->GetSimTime();
 
   // do not refresh animation faster than 30 Hz sim time
-  // TODO: Reducing to 20 Hz. Because there were memory corruption
-  // and segmentation faults. Possibly due to some dangling pointers
-  // in pose message processing. This will need a proper fix. Just a
-  // workaround for now.
-  if ((currentTime - this->prevFrameTime).Double() < (1.0 / 20.0))
+  if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
     return;
 
   // Get trajectory
