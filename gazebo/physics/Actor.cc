@@ -77,12 +77,6 @@ void Actor::Load(sdf::ElementPtr _sdf)
 {
   // Name
   auto actorName = _sdf->Get<std::string>("name");
-  if (actorName.empty())
-  {
-    actorName = "actor";
-    gzwarn << "Empty actor name provided, using [" << actorName << "]"
-        << std::endl;
-  }
   this->SetName(actorName);
 
   // Parse skin
@@ -91,7 +85,25 @@ void Actor::Load(sdf::ElementPtr _sdf)
     // Only load skeleton animations if we get a skeleton from the skin
     if (this->LoadSkin(_sdf->GetElement("skin")) && this->skeleton)
     {
-      // If there are user-defined animations
+      // If there are no user-defined animations, but skin has animation
+      if (!_sdf->HasElement("animation") && !this->skinFile.empty() &&
+          this->skeleton->GetAnimation(0))
+      {
+        auto animElem = _sdf->AddElement("animation");
+
+        // Get name from trajectory
+        if (_sdf->HasElement("script") &&
+            _sdf->GetElement("script")->HasElement("trajectory"))
+        {
+          auto name = _sdf->GetElement("script")->GetElement("trajectory")->
+              Get<std::string>("type");
+          animElem->GetAttribute("name")->Set(name);
+        }
+
+        // Get file from skin
+        animElem->GetElement("filename")->Set(this->skinFile);
+      }
+
       if (_sdf->HasElement("animation"))
       {
         sdf::ElementPtr animSdf = _sdf->GetElement("animation");
@@ -100,21 +112,6 @@ void Actor::Load(sdf::ElementPtr _sdf)
           this->LoadAnimation(animSdf);
           animSdf = animSdf->GetNextElement("animation");
         }
-      }
-      // Otherwise, take animation from skin
-      else if (!this->skinFile.empty() && this->skeleton->GetAnimation(0))
-      {
-        this->skelAnimation[this->skinFile] = this->skeleton->GetAnimation(0);
-
-        // Map of names point to themselves
-        std::map<std::string, std::string> skelMap;
-        for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
-        {
-          skelMap[this->skeleton->GetNodeByHandle(i)->GetName()] =
-            this->skeleton->GetNodeByHandle(i)->GetName();
-        }
-        this->skelNodesMap[this->skinFile] = skelMap;
-        this->interpolateX[this->skinFile] = false;
       }
       else
       {
