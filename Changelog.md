@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix Model Manipulator switching between local and global frames
+    * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
+
 ## Gazebo 7.2.0 (2016-06-13)
 
 1. Fix right click view options after deleting and respawning a model.
