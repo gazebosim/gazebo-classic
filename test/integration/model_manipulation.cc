@@ -34,11 +34,15 @@ void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
   ignition::math::Vector2d end(_end.X(), _end.Y());
 
   // move the mouse cursor to the _start pos
-  QTest::mouseMove(_widget, QPoint(start.X(), start.Y()));
+  QPoint startPt(start.X(), start.Y());
+  QTest::mouseMove(_widget, startPt);
+  /*QMouseEvent *moveStartEvent = new QMouseEvent(QEvent::MouseMove, startPt,
+      _widget->mapToGlobal(startPt), _button, _button, _modifiers);
+  QApplication::postEvent(_widget, moveStartEvent);
+*/
 
   // There seem to be a problem simulating mouse drag using QTest
   // so use raw QMouseEvent.
-  QPoint startPt(start.X(), start.Y());
   QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, startPt,
       _widget->mapToGlobal(startPt), _button, _button, _modifiers);
   QApplication::postEvent(_widget, pressEvent);
@@ -53,12 +57,10 @@ void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
     ignition::math::Vector2d nextPos = start + dist * (1.0 / steps) * (i+1);
 
     QPoint movePt(nextPos.X(), nextPos.Y());
-
+    //QTest::mouseMove(_widget, movePt);
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, movePt,
         _widget->mapToGlobal(movePt), _button, _button, _modifiers);
     QApplication::postEvent(_widget, moveEvent);
-
-    QTest::mouseMove(_widget, movePt);
 
     gazebo::common::Time::MSleep(10);
     QCoreApplication::processEvents();
@@ -327,8 +329,6 @@ void ModelManipulationTest::GlobalLocalFrames()
   QVERIFY(boxNewPos.Y() > initialPos.Y());
   QVERIFY(boxNewPos.Z() > initialPos.Z());
 
-  this->ProcessEventsAndDraw(mainWindow, 10, 30);
-
   initialPos = boxNewPos;
 
   // now move the box in -z in global frame
@@ -341,7 +341,9 @@ void ModelManipulationTest::GlobalLocalFrames()
   endPt = cam->Project(endPos);
 
   QTest::keyPress(glWidget, Qt::Key_Shift, Qt::NoModifier, 100);
+  this->ProcessEventsAndDraw(mainWindow, 10, 30);
   MouseDrag(glWidget, Qt::LeftButton, Qt::ShiftModifier, startPt, endPt);
+  this->ProcessEventsAndDraw(mainWindow, 10, 30);
   QTest::keyRelease(glWidget, Qt::Key_Shift, Qt::NoModifier, 100);
 
   this->ProcessEventsAndDraw(mainWindow, 10, 30);
@@ -351,8 +353,6 @@ void ModelManipulationTest::GlobalLocalFrames()
   QVERIFY(ignition::math::equal(boxNewPos.X(), initialPos.X()));
   QVERIFY(ignition::math::equal(boxNewPos.Y(), initialPos.Y()));
   QVERIFY(boxNewPos.Z() < initialPos.Z());
-
-  this->ProcessEventsAndDraw(mainWindow, 10, 30);
 
   initialPos = boxNewPos;
 

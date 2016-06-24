@@ -630,6 +630,15 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   rendering::VisualPtr vis;
   rendering::VisualPtr mouseVis
       = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+
+  std::string manipState;
+  this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos(),
+      manipState);
+  gzdbg << "MM setting state " << this->dataPtr->mouseEvent.Pos()
+        << " " <<  manipState << std::endl;
+  this->dataPtr->selectionObj->SetState(manipState);
+
+
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
   if (!this->dataPtr->keyEvent.key && (this->dataPtr->selectionObj->GetMode() ==
