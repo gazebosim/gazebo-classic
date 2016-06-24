@@ -17,6 +17,7 @@ set (sources_local
   model/ModelEditorPalette.cc
   model/ModelPluginInspector.cc
   model/ModelTreeWidget.cc
+  model/SDFInitializer.cc
   model/VisualConfig.cc
 )
 
@@ -58,6 +59,7 @@ set (qt_tests_local
   ModelEditorPalette_TEST.cc
   ModelPluginInspector_TEST.cc
   ModelTreeWidget_TEST.cc
+  SDFInitializer_TEST.cc
   VisualConfig_TEST.cc
 )
 

@@ -35,6 +35,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelAlign.hh"
 
+#include "gazebo/gui/model/SDFInitializer.hh"
 #include "gazebo/gui/model/JointCreationDialog.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -903,8 +904,10 @@ std::string JointMaker::ScopedLinkName(const std::string &_name)
 /////////////////////////////////////////////////
 void JointMaker::GenerateSDF()
 {
-  this->dataPtr->modelSDF.reset(new sdf::Element);
-  sdf::initFile("model.sdf", this->dataPtr->modelSDF);
+//  this->dataPtr->modelSDF.reset(new sdf::Element);
+//  sdf::initFile("model.sdf", this->dataPtr->modelSDF);
+//  this->dataPtr->modelSDF->Copy(SDFInitializer::ModelSDF());
+  this->dataPtr->modelSDF = SDFInitializer::ModelSDF();
   this->dataPtr->modelSDF->ClearElements();
 
   // update joint visuals as the model pose may have changed when

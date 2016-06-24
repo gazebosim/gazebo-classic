@@ -32,6 +32,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/model/SDFInitializer.hh"
 #include "gazebo/gui/model/EditorMaterialSwitcher.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -515,7 +516,8 @@ void ModelEditor::OnCreateEntity(const std::string &_type,
   if (_type == "model" && !_data.empty())
   {
     sdf::SDFPtr modelSDF(new sdf::SDF);
-    sdf::initFile("root.sdf", modelSDF);
+//    sdf::initFile("root.sdf", modelSDF);
+    modelSDF->Root(SDFInitializer::RootSDF());
 
     if (!sdf::readFile(_data, modelSDF))
     {

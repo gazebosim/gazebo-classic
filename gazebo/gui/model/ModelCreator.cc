@@ -52,6 +52,7 @@
 #include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/MainWindow.hh"
 
+#include "gazebo/gui/model/SDFInitializer.hh"
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
@@ -437,6 +438,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   // Get SDF model element from model name
   // TODO replace with entity_info and parse gazebo.msgs.Model msgs
   // or handle model_sdf requests in world.
+
   auto response = transport::request(gui::get_world(), "world_sdf");
 
   msgs::GzString msg;
@@ -2851,8 +2853,11 @@ void ModelCreator::OnAddModelPlugin(const std::string &_name,
   }
 
   // Use the SDF parser to read all the inner xml.
-  sdf::ElementPtr modelPluginSDF(new sdf::Element);
-  sdf::initFile("plugin.sdf", modelPluginSDF);
+//  sdf::ElementPtr modelPluginSDF(new sdf::Element);
+//  sdf::initFile("plugin.sdf", modelPluginSDF);
+//  modelPluginSDF->Copy(SDFInitializer::PluginSDF());
+  sdf::ElementPtr modelPluginSDF = SDFInitializer::PluginSDF();
+
   std::stringstream tmp;
   tmp << "<sdf version='" << SDF_VERSION << "'>";
   tmp << "<plugin name='" << _name << "' filename='" << _filename << "'>";

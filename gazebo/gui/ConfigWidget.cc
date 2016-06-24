@@ -18,6 +18,7 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidgetPrivate.hh"
@@ -83,6 +84,9 @@ void ConfigWidget::Load(const google::protobuf::Message *_msg)
 /////////////////////////////////////////////////
 void ConfigWidget::UpdateFromMsg(const google::protobuf::Message *_msg)
 {
+  if (!this->dataPtr->configMsg)
+    return;
+
   this->dataPtr->configMsg->CopyFrom(*_msg);
   this->Parse(this->dataPtr->configMsg, true);
 }
@@ -671,12 +675,14 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
 
   for (unsigned int i = 0; i < count ; ++i)
   {
+    common::Time t = common::Time::GetWallTime();
     const google::protobuf::FieldDescriptor *field = d->field(i);
 
     if (!field)
       return NULL;
 
     const google::protobuf::Reflection *ref = _msg->GetReflection();
+
 
     if (!ref)
       return NULL;
@@ -707,6 +713,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
         case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           double value = ref->GetDouble(*_msg, field);
+
           if (!math::equal(value, value))
             value = 0;
           if (newWidget)
@@ -1108,6 +1115,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
         }
       }
     }
+    common::Time t2 = common::Time::GetWallTime();
+    //std::cerr << "     name " << name << (t2-t).Double() << std::endl;
   }
 
   if (!newWidgets.empty())
@@ -1336,6 +1345,8 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
     const int _level)
 {
+  common::Time t1 = common::Time::GetWallTime();
+
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
 
@@ -1343,10 +1354,16 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   QLabel *keyLabel = new QLabel(tr(this->HumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
+  common::Time t11 = common::Time::GetWallTime();
+  std::cerr << " - 0 " << (t11-t1).Double() << std::endl;
+
   // SpinBox
   double min = 0;
   double max = 0;
   this->RangeFromKey(_key, min, max);
+
+  common::Time t4 = common::Time::GetWallTime();
+//  std::cerr << " - 4 " << (t4-t11).Double() << std::endl;
 
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox(widget);
   valueSpinBox->setRange(min, max);
@@ -1356,9 +1373,19 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   connect(valueSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnDoubleValueChanged()));
 
+  common::Time t15 = common::Time::GetWallTime();
+  std::cerr << " - 5 " << (t15-t4).Double() << std::endl;
+
   // Unit
   std::string jointType = this->EnumWidgetValue("type");
+
+  common::Time t16 = common::Time::GetWallTime();
+  std::cerr << " - 6 " << (t16-t15).Double() << std::endl;
+
   std::string unit = this->UnitFromKey(_key, jointType);
+
+  common::Time t12 = common::Time::GetWallTime();
+  std::cerr << " - 1 " << (t12-t16).Double() << std::endl;
 
   QLabel *unitLabel = new QLabel();
   unitLabel->setMaximumWidth(40);
@@ -1376,6 +1403,9 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   if (unitLabel->text() != "")
     widgetLayout->addWidget(unitLabel);
 
+  common::Time t13 = common::Time::GetWallTime();
+//  std::cerr << " - 2 " << (t13-t12).Double() << std::endl;
+
   // ChildWidget
   widget->key = _key;
   widget->setLayout(widgetLayout);
@@ -1383,6 +1413,9 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
 
   widget->widgets.push_back(valueSpinBox);
   widget->mapWidgetToUnit[valueSpinBox] = unitLabel;
+
+  common::Time t2 = common::Time::GetWallTime();
+//  std::cerr << "CreateDoubleWidget " << (t2-t1).Double() << std::endl;
 
   return widget;
 }

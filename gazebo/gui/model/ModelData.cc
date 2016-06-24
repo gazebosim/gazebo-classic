@@ -27,6 +27,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/gui/model/SDFInitializer.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/VisualConfig.hh"
@@ -118,8 +119,10 @@ int NestedModelData::Depth() const
 /////////////////////////////////////////////////
 LinkData::LinkData()
 {
-  this->linkSDF.reset(new sdf::Element);
-  sdf::initFile("link.sdf", this->linkSDF);
+//  this->linkSDF.reset(new sdf::Element);
+//  sdf::initFile("link.sdf", this->linkSDF);
+//  this->linkSDF->Copy(SDFInitializer::LinkSDF());
+  this->linkSDF = SDFInitializer::LinkSDF();
 
   this->scale = ignition::math::Vector3d::One;
   this->inertiaIxx = 0;
@@ -551,6 +554,7 @@ void LinkData::UpdateConfig()
 void LinkData::AddVisual(rendering::VisualPtr _visual)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
+
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
   this->visuals[_visual] = visualMsg;
@@ -570,8 +574,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
 {
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
 
-  sdf::ElementPtr collisionSDF(new sdf::Element);
-  sdf::initFile("collision.sdf", collisionSDF);
+  sdf::ElementPtr collisionSDF = SDFInitializer::CollisionSDF();
 
   std::string visName = _collisionVis->GetName();
   std::string leafName = visName;
@@ -1192,8 +1195,10 @@ void LinkData::Update()
 ModelPluginData::ModelPluginData()
 {
   // Initialize SDF
-  this->modelPluginSDF.reset(new sdf::Element);
-  sdf::initFile("plugin.sdf", this->modelPluginSDF);
+//  this->modelPluginSDF.reset(new sdf::Element);
+  //sdf::initFile("plugin.sdf", this->modelPluginSDF);
+//  this->modelPluginSDF->Copy(SDFInitializer::PluginSDF());
+  this->modelPluginSDF = SDFInitializer::PluginSDF();
 
   // Inspector
   this->inspector = new ModelPluginInspector();
