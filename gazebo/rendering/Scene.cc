@@ -171,6 +171,9 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->modelInfoSub = this->dataPtr->node->Subscribe("~/model/info",
                                              &Scene::OnModelMsg, this);
 
+  this->dataPtr->roadSub =
+      this->dataPtr->node->Subscribe("~/roads", &Scene::OnRoadMsg, this, true);
+
   this->dataPtr->requestPub =
       this->dataPtr->node->Advertise<msgs::Request>("~/request");
 
@@ -205,6 +208,7 @@ void Scene::Clear()
   this->dataPtr->jointMsgs.clear();
   this->dataPtr->linkMsgs.clear();
   this->dataPtr->sensorMsgs.clear();
+  this->dataPtr->roadMsgs.clear();
 
   this->dataPtr->poseSub.reset();
   this->dataPtr->jointSub.reset();
@@ -220,6 +224,7 @@ void Scene::Clear()
   this->dataPtr->modelInfoSub.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
+  this->dataPtr->roadSub.reset();
 
   this->dataPtr->joints.clear();
 
@@ -383,11 +388,6 @@ void Scene::Init()
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
-
-  this->dataPtr->road.reset(
-      new Road2d(this->dataPtr->worldVisual->GetName() + "_roads",
-      this->dataPtr->worldVisual));
-  this->dataPtr->road->Load();
 }
 
 //////////////////////////////////////////////////
@@ -1906,6 +1906,7 @@ void Scene::PreRender()
   VisualMsgs_L collisionVisualMsgsCopy;
   JointMsgs_L jointMsgsCopy;
   LinkMsgs_L linkMsgsCopy;
+  RoadMsgs_L roadMsgsCopy;
 
   {
     std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
@@ -1961,6 +1962,10 @@ void Scene::PreRender()
     std::copy(this->dataPtr->linkMsgs.begin(), this->dataPtr->linkMsgs.end(),
               std::back_inserter(linkMsgsCopy));
     this->dataPtr->linkMsgs.clear();
+
+    std::copy(this->dataPtr->roadMsgs.begin(), this->dataPtr->roadMsgs.end(),
+              std::back_inserter(roadMsgsCopy));
+    this->dataPtr->roadMsgs.clear();
   }
 
   // Process the scene messages. DO THIS FIRST
@@ -2190,6 +2195,14 @@ void Scene::PreRender()
       }
       else
         ++spIter;
+    }
+
+    // Process the road messages.
+    for (const auto &msg : roadMsgsCopy)
+    {
+      Road2dPtr road(new Road2d(msg->name(), this->dataPtr->worldVisual));
+      road->Load(*msg);
+      this->dataPtr->visuals[road->GetId()] = road;
     }
 
     // official time stamp of approval
@@ -2913,6 +2926,13 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
   }
 
   this->dataPtr->skeletonPoseMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+void Scene::OnRoadMsg(ConstRoadPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->roadMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////

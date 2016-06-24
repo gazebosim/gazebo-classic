@@ -21,12 +21,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <mutex>
 #include <vector>
-#include <list>
-
-#include "gazebo/common/Events.hh"
-#include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Conversions.hh"
@@ -62,27 +57,8 @@ namespace gazebo
     /// \brief Private data for the Road2d class.
     class Road2dPrivate : public VisualPrivate
     {
-      /// \def RoadMsgs_L
-      /// \brief List of road messages
-      typedef std::list<boost::shared_ptr<msgs::Road const> > RoadMsgs_L;
-
-      /// \brief List of messages to process.
-      public: RoadMsgs_L msgs;
-
       /// \brief All the road segments.
       public: std::vector<RoadSegment> segments;
-
-      /// \brief Handles communication.
-      public: transport::NodePtr node;
-
-      /// \brief Subscribes to the road message topic.
-      public: transport::SubscriberPtr sub;
-
-      /// \brief All the event connections.
-      public: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief mutex to protect the road msg list.
-      public: std::mutex mutex;
     };
   }
 }
@@ -103,12 +79,6 @@ Road2d::Road2d(const std::string &_name, VisualPtr _parent)
   Road2dPrivate *dPtr =
       reinterpret_cast<Road2dPrivate *>(this->dataPtr);
 
-  dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init();
-  dPtr->sub = dPtr->node->Subscribe("~/roads", &Road2d::OnRoadMsg, this, true);
-
-  dPtr->connections.push_back(
-      event::Events::ConnectPreRender(std::bind(&Road2d::PreRender, this)));
   dPtr->type = VT_VISUAL;
 }
 
@@ -118,8 +88,6 @@ Road2d::~Road2d()
   Road2dPrivate *dPtr =
       reinterpret_cast<Road2dPrivate *>(this->dataPtr);
 
-  dPtr->sub.reset();
-  dPtr->node.reset();
   dPtr->segments.clear();
 }
 
@@ -130,41 +98,25 @@ void Road2d::Load(VisualPtr /*_parent*/)
 }
 
 //////////////////////////////////////////////////
-void Road2d::PreRender()
+void Road2d::Load(msgs::Road _msg)
 {
+  this->Load();
+
   Road2dPrivate *dPtr =
       reinterpret_cast<Road2dPrivate *>(this->dataPtr);
 
-  std::lock_guard<std::mutex> lock(dPtr->mutex);
-  if (dPtr->msgs.empty())
-    return;
+  RoadSegment segment;
+  segment.Load(_msg);
 
-  for (auto &iter : dPtr->msgs)
-  {
-    RoadSegment segment;
-    segment.Load(*iter);
-
-    Ogre::MovableObject *obj = dynamic_cast<Ogre::MovableObject *>
-        (this->GetSceneNode()->getCreator()->createEntity(
-        segment.name, segment.name));
-    obj->setRenderQueueGroup(obj->getRenderQueueGroup()+1);
-    this->AttachObject(obj);
-    dPtr->segments.push_back(segment);
-  }
-  dPtr->msgs.clear();
+  Ogre::MovableObject *obj = dynamic_cast<Ogre::MovableObject *>
+      (this->GetSceneNode()->getCreator()->createEntity(
+      segment.name, segment.name));
+  obj->setRenderQueueGroup(obj->getRenderQueueGroup()+1);
+  this->AttachObject(obj);
+  dPtr->segments.push_back(segment);
 
   // make the road visual not selectable
   this->SetVisibilityFlags(GZ_VISIBILITY_ALL & (~GZ_VISIBILITY_SELECTABLE));
-}
-
-/////////////////////////////////////////////////
-void Road2d::OnRoadMsg(ConstRoadPtr &_msg)
-{
-  Road2dPrivate *dPtr =
-      reinterpret_cast<Road2dPrivate *>(this->dataPtr);
-
-  std::lock_guard<std::mutex> lock(dPtr->mutex);
-  dPtr->msgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////

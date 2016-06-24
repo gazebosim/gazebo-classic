@@ -74,34 +74,18 @@ void RoadTest::RoadVisual()
   rendering::VisualPtr worldVis = scene->WorldVisual();
   ASSERT_TRUE(worldVis != nullptr);
 
-  // get the road visual
-  unsigned int worldVisCount = worldVis->GetChildCount();
-  EXPECT_GT(worldVisCount, 0);
-
-  rendering::Road2dPtr roadVis;
-  for (unsigned int i = 0; i < worldVisCount; ++i)
-  {
-    rendering::VisualPtr childVis = worldVis->GetChild(i);
-    roadVis = std::dynamic_pointer_cast<rendering::Road2d>(childVis);
-    if (roadVis)
-      break;
-  }
-  ASSERT_TRUE(roadVis != nullptr);
-
-  EXPECT_EQ(roadVis->GetChildCount(), 0u);
-  EXPECT_EQ(roadVis->GetAttachedObjectCount(), 0u);
-
-  // spawn a camera sensor to tigger render events needed
-  // to process road msgs
+  // spawn a camera sensor to trigger render events needed to process road msgs
   ignition::math::Pose3d testPose(
     ignition::math::Vector3d(-5, 0, 5),
     ignition::math::Quaterniond::Identity);
-  SpawnCamera("cam_model", "cam_sensor", testPose.Pos(), testPose.Rot().Euler());
+  SpawnCamera("cam_model", "cam_sensor", testPose.Pos(),
+      testPose.Rot().Euler());
 
   // publish road msg to create the road
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
   transport::PublisherPtr roadPub = node->Advertise<msgs::Road>("~/roads");
+  roadPub->WaitForConnection();
 
   std::string roadName = "road_test";
   msgs::Road msg;
@@ -116,17 +100,24 @@ void RoadTest::RoadVisual()
 
   roadPub->Publish(msg);
 
-  // wait for the road object to be created
+  // verify that the road visual is created
+  rendering::Road2dPtr roadVis;
   int sleep = 0;
   int maxSleep = 20;
-  while (!roadVis->HasAttachedObject(roadName) && sleep < maxSleep)
+  while (!roadVis && sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(30);
+    for (unsigned int i = 0; i < worldVis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = worldVis->GetChild(i);
+      roadVis = std::dynamic_pointer_cast<rendering::Road2d>(childVis);
+      if (roadVis)
+        break;
+    }
     sleep++;
   }
-
-  // verify the visual has the road
-  EXPECT_TRUE(roadVis->HasAttachedObject(roadName));
+  ASSERT_TRUE(roadVis != nullptr);
+  EXPECT_EQ(roadVis->GetName(), roadName);
 }
 
 /////////////////////////////////////////////////

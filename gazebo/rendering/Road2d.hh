@@ -45,16 +45,15 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Road2d();
 
-      /// \brief Load the visual using a parent visual.
-      /// \param[in] _parent Pointer to the parent visual.
-      public: void Load(VisualPtr _parent) GAZEBO_DEPRECATED(8.0);
+      /// \brief Load the visual using a road msg.
+      /// \param[in] _msg Message containing road data.
+      public: void Load(msgs::Road _msg);
       using Visual::Load;
 
-      /// \brief Process all received messages
-      private: void PreRender();
-
-      /// \brief Recieve a road msg
-      private: void OnRoadMsg(ConstRoadPtr &_msg);
+      /// \brief Load the visual using a parent visual.
+      /// \param[in] _parent Pointer to the parent visual.
+      /// \sa Load function that takes in msgs::Road
+      public: void Load(VisualPtr _parent) GAZEBO_DEPRECATED(8.0);
     };
     /// \}
   }
