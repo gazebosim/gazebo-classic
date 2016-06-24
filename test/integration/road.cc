@@ -15,25 +15,27 @@
  *
 */
 
-#include <map>
-#include <string>
-#include <vector>
-
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/test/helper_physics_generator.hh"
 
-#define PHYSICS_TOL 1e-2
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Road2d.hh"
+
 using namespace gazebo;
 
-class RoadTextureTest : public ServerFixture
+class RoadTest : public ServerFixture
 {
+  /// \brief Test loading a world with textured roads
   public: void TexturedWorld();
+
+  /// \brief Test creating a road visual
+  public: void RoadVisual();
 };
 
-void RoadTextureTest::TexturedWorld()
+/////////////////////////////////////////////////
+void RoadTest::TexturedWorld()
 {
   // Load the sample world
   Load("worlds/road_textures.world");
@@ -55,9 +57,82 @@ void RoadTextureTest::TexturedWorld()
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
-TEST_F(RoadTextureTest, TexturedWorld)
+/////////////////////////////////////////////////
+TEST_F(RoadTest, TexturedWorld)
 {
   TexturedWorld();
+}
+
+/////////////////////////////////////////////////
+void RoadTest::RoadVisual()
+{
+  Load("worlds/empty.world");
+
+  rendering::ScenePtr scene = rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  rendering::VisualPtr worldVis = scene->WorldVisual();
+  ASSERT_TRUE(worldVis != nullptr);
+
+  // get the road visual
+  unsigned int worldVisCount = worldVis->GetChildCount();
+  EXPECT_GT(worldVisCount, 0);
+
+  rendering::Road2dPtr roadVis;
+  for (unsigned int i = 0; i < worldVisCount; ++i)
+  {
+    rendering::VisualPtr childVis = worldVis->GetChild(i);
+    roadVis = std::dynamic_pointer_cast<rendering::Road2d>(childVis);
+    if (roadVis)
+      break;
+  }
+  ASSERT_TRUE(roadVis != nullptr);
+
+  EXPECT_EQ(roadVis->GetChildCount(), 0u);
+  EXPECT_EQ(roadVis->GetAttachedObjectCount(), 0u);
+
+  // spawn a camera sensor to tigger render events needed
+  // to process road msgs
+  ignition::math::Pose3d testPose(
+    ignition::math::Vector3d(-5, 0, 5),
+    ignition::math::Quaterniond::Identity);
+  SpawnCamera("cam_model", "cam_sensor", testPose.Pos(), testPose.Rot().Euler());
+
+  // publish road msg to create the road
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+  transport::PublisherPtr roadPub = node->Advertise<msgs::Road>("~/roads");
+
+  std::string roadName = "road_test";
+  msgs::Road msg;
+  msg.set_name(roadName);
+  msg.set_width(8);
+  msgs::Vector3d *pt01Msg = msg.add_point();
+  msgs::Set(pt01Msg, ignition::math::Vector3d(0, 0, 0));
+  msgs::Vector3d *pt02Msg = msg.add_point();
+  msgs::Set(pt02Msg, ignition::math::Vector3d(0, 5, 0));
+  msgs::Vector3d *pt03Msg = msg.add_point();
+  msgs::Set(pt03Msg, ignition::math::Vector3d(2, 5, 0));
+
+  roadPub->Publish(msg);
+
+  // wait for the road object to be created
+  int sleep = 0;
+  int maxSleep = 20;
+  while (!roadVis->HasAttachedObject(roadName) && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(30);
+    sleep++;
+  }
+
+  // verify the visual has the road
+  EXPECT_TRUE(roadVis->HasAttachedObject(roadName));
+}
+
+/////////////////////////////////////////////////
+TEST_F(RoadTest, RoadVisual)
+{
+  RoadVisual();
 }
 
 int main(int argc, char **argv)

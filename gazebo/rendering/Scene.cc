@@ -384,8 +384,10 @@ void Scene::Init()
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
-  Road2d *road = new Road2d();
-  road->Load(this->dataPtr->worldVisual);
+  this->dataPtr->road.reset(
+      new Road2d(this->dataPtr->worldVisual->GetName() + "_roads",
+      this->dataPtr->worldVisual));
+  this->dataPtr->road->Load();
 }
 
 //////////////////////////////////////////////////

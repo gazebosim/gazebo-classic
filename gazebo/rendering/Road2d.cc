@@ -21,69 +21,154 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
-#include <algorithm>
+#include <mutex>
+#include <vector>
+#include <list>
 
+#include "gazebo/common/Events.hh"
 #include "gazebo/transport/transport.hh"
+
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/VisualPrivate.hh"
+
+namespace gazebo
+{
+  namespace rendering
+  {
+    /// \brief A road segment
+    class RoadSegment
+    {
+      /// \brief Load the road segment from message data.
+      /// \param[in] _msg The robot data.
+      public: void Load(msgs::Road _msg);
+
+      /// \brief Name of the road.
+      public: std::string name;
+
+      /// \brief Point that make up the middle of the road.
+      public: std::vector<ignition::math::Vector3d> points;
+
+      /// \brief Width of the road.
+      public: double width;
+
+      /// \brief Texture of the road
+      public: std::string texture;
+    };
+
+    /// \brief Private data for the Road2d class.
+    class Road2dPrivate : public VisualPrivate
+    {
+      /// \def RoadMsgs_L
+      /// \brief List of road messages
+      typedef std::list<boost::shared_ptr<msgs::Road const> > RoadMsgs_L;
+
+      /// \brief List of messages to process.
+      public: RoadMsgs_L msgs;
+
+      /// \brief All the road segments.
+      public: std::vector<RoadSegment> segments;
+
+      /// \brief Handles communication.
+      public: transport::NodePtr node;
+
+      /// \brief Subscribes to the road message topic.
+      public: transport::SubscriberPtr sub;
+
+      /// \brief All the event connections.
+      public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief mutex to protect the road msg list.
+      public: std::mutex mutex;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
 Road2d::Road2d()
+  : Visual(*new Road2dPrivate, "roads", rendering::get_scene())
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->sub = this->node->Subscribe("~/roads", &Road2d::OnRoadMsg, this, true);
+}
 
-  this->connections.push_back(
-      event::Events::ConnectPreRender(boost::bind(&Road2d::PreRender, this)));
+/////////////////////////////////////////////////
+Road2d::Road2d(const std::string &_name, VisualPtr _parent)
+  : Visual(*new Road2dPrivate, _name, _parent)
+{
+  Road2dPrivate *dPtr =
+      reinterpret_cast<Road2dPrivate *>(this->dataPtr);
+
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init();
+  dPtr->sub = dPtr->node->Subscribe("~/roads", &Road2d::OnRoadMsg, this, true);
+
+  dPtr->connections.push_back(
+      event::Events::ConnectPreRender(std::bind(&Road2d::PreRender, this)));
+  dPtr->type = VT_VISUAL;
 }
 
 /////////////////////////////////////////////////
 Road2d::~Road2d()
 {
-  this->sub.reset();
-  this->node.reset();
-  this->parent.reset();
+  Road2dPrivate *dPtr =
+      reinterpret_cast<Road2dPrivate *>(this->dataPtr);
+
+  dPtr->sub.reset();
+  dPtr->node.reset();
+  dPtr->segments.clear();
 }
 
 /////////////////////////////////////////////////
-void Road2d::Load(VisualPtr _parent)
+void Road2d::Load(VisualPtr /*_parent*/)
 {
-  this->parent = _parent;
+  // This function is deprecated. Remove in gazebo9
 }
 
 //////////////////////////////////////////////////
 void Road2d::PreRender()
 {
-  for (RoadMsgs_L::iterator iter = this->msgs.begin();
-      iter != this->msgs.end(); ++iter)
+  Road2dPrivate *dPtr =
+      reinterpret_cast<Road2dPrivate *>(this->dataPtr);
+
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
+  if (dPtr->msgs.empty())
+    return;
+
+  for (auto &iter : dPtr->msgs)
   {
-    Road2d::Segment *segment = new Road2d::Segment;
-    segment->Load(**iter);
+    RoadSegment segment;
+    segment.Load(*iter);
 
     Ogre::MovableObject *obj = dynamic_cast<Ogre::MovableObject *>
-        (this->parent->GetSceneNode()->getCreator()->createEntity(
-        segment->name + "_entity", segment->name));
-
-    this->parent->AttachObject(obj);
-    this->segments.push_back(segment);
+        (this->GetSceneNode()->getCreator()->createEntity(
+        segment.name, segment.name));
+    obj->setRenderQueueGroup(obj->getRenderQueueGroup()+1);
+    this->AttachObject(obj);
+    dPtr->segments.push_back(segment);
   }
-  this->msgs.clear();
+  dPtr->msgs.clear();
+
+  // make the road visual not selectable
+  this->SetVisibilityFlags(GZ_VISIBILITY_ALL & (~GZ_VISIBILITY_SELECTABLE));
 }
 
 /////////////////////////////////////////////////
 void Road2d::OnRoadMsg(ConstRoadPtr &_msg)
 {
-  this->msgs.push_back(_msg);
+  Road2dPrivate *dPtr =
+      reinterpret_cast<Road2dPrivate *>(this->dataPtr);
+
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
+  dPtr->msgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
-void Road2d::Segment::Load(msgs::Road _msg)
+void RoadSegment::Load(msgs::Road _msg)
 {
   this->width = _msg.width();
 
@@ -92,7 +177,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
     this->points.push_back(msgs::ConvertIgn(_msg.point(i)));
   }
 
-  this->name = _msg.name() + "_segment";
+  this->name = _msg.name();
 
   /// Create the mesh
   Ogre::MeshPtr mesh =

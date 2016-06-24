@@ -280,6 +280,9 @@ namespace gazebo
       /// \brief The heightmap, if any.
       public: Heightmap *terrain;
 
+      /// \brief Pointer to Road2d that holds all the road visuals
+      public: Road2dPtr road;
+
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;
 
