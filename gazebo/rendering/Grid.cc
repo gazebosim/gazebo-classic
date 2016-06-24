@@ -119,7 +119,9 @@ void Grid::SetLineWidth(const float _width)
 {
   this->dataPtr->lineWidth = _width;
 
-  this->Create();
+  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
+  // Uncomment once line width is implemented
+  // this->Create();
 }
 
 //////////////////////////////////////////////////
@@ -130,10 +132,7 @@ void Grid::SetColor(const common::Color &_color)
   this->dataPtr->material->setDiffuse(_color.r, _color.g, _color.b, _color.a);
   this->dataPtr->material->setAmbient(_color.r, _color.g, _color.b);
 
-  if ((this->dataPtr->color).a < 0.9998)
-    this->dataPtr->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-  else
-    this->dataPtr->material->setSceneBlending(Ogre::SBT_REPLACE);
+  this->dataPtr->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
 
   this->dataPtr->material->setDepthWriteEnabled(false);
   this->dataPtr->material->setDepthCheckEnabled(true);
@@ -145,6 +144,14 @@ void Grid::SetColor(const common::Color &_color)
 void Grid::SetHeight(const uint32_t _height)
 {
   this->dataPtr->height = _height;
+
+  this->Create();
+}
+
+//////////////////////////////////////////////////
+void Grid::SetHeightOffset(const double _offset)
+{
+  this->dataPtr->heightOffset = _offset;
 
   this->Create();
 }
@@ -178,8 +185,6 @@ void Grid::Init()
   this->dataPtr->material->getTechnique(0)->setLightingEnabled(false);
 
   this->SetColor(this->dataPtr->color);
-
-  this->Create();
 }
 
 //////////////////////////////////////////////////
@@ -324,6 +329,7 @@ float Grid::GetLineWidth() const
 //////////////////////////////////////////////////
 float Grid::LineWidth() const
 {
+  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
   return this->dataPtr->lineWidth;
 }
 
@@ -337,4 +343,10 @@ uint32_t Grid::GetHeight() const
 uint32_t Grid::Height() const
 {
   return this->dataPtr->height;
+}
+
+//////////////////////////////////////////////////
+double Grid::HeightOffset() const
+{
+  return this->dataPtr->heightOffset;
 }

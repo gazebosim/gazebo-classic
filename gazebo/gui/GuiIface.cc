@@ -266,11 +266,6 @@ bool gui::load()
   if (!gui::register_metatypes())
     std::cerr << "Unable to register Qt metatypes" << std::endl;
 
-
-  // Register std::string as a type that can be used in signals and slots.
-  // Q_DECLARE_METATYPE is also required, see above.
-  qRegisterMetaType<std::string>();
-
   g_splashScreen = new gui::SplashScreen();
 
   g_main_win = new gui::MainWindow();

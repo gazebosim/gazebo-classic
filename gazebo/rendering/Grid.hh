@@ -156,6 +156,14 @@ namespace gazebo
       /// \return The height
       public: uint32_t Height() const;
 
+      /// \brief Set the height offset of the grid.
+      /// \param[in] _count Grid height offset.
+      public: void SetHeightOffset(const double _offset);
+
+      /// \brief Get the height offset.
+      /// \return The height offset.
+      public: double HeightOffset() const;
+
       /// \brief Create the grid.
       private: void Create();
 
