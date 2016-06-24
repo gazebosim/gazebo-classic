@@ -71,7 +71,7 @@
 #include "gazebo/gui/MainWindowPrivate.hh"
 
 #ifdef HAVE_QWT
-#include "gazebo/gui/Diagnostics.hh"
+// #include "gazebo/gui/Diagnostics.hh"
 #endif
 
 #ifdef HAVE_OCULUS
@@ -404,8 +404,8 @@ void MainWindow::New()
 void MainWindow::Diagnostics()
 {
 #ifdef HAVE_QWT
-  gui::Diagnostics *diag = new gui::Diagnostics(this);
-  diag->show();
+//   gui::Diagnostics *diag = new gui::Diagnostics(this);
+//   diag->show();
 #endif
 }
 
