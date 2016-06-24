@@ -35,6 +35,27 @@ class FactoryTest : public ServerFixture,
   public: void Box(const std::string &_physicsEngine);
   public: void Sphere(const std::string &_physicsEngine);
   public: void Cylinder(const std::string &_physicsEngine);
+
+  /// \brief Test spawning an actor with skin only.
+  /// \param[in] _physicsEngine Physics engine name
+  public: void ActorSkinOnly(const std::string &_physicsEngine);
+
+  /// \brief Test spawning an actor with skin and animation.
+  /// \param[in] _physicsEngine Physics engine name
+  public: void ActorSkinAnim(const std::string &_physicsEngine);
+
+  /// \brief Test spawning an actor with skin and trajectory.
+  /// \param[in] _physicsEngine Physics engine name
+  public: void ActorSkinTrajectory(const std::string &_physicsEngine);
+
+  /// \brief Test spawning an actor with link and trajectory.
+  /// \param[in] _physicsEngine Physics engine name
+  public: void ActorLinkTrajectory(const std::string &_physicsEngine);
+
+  /// \brief Test spawning an actor with skin, animation and trajectory.
+  /// \param[in] _physicsEngine Physics engine name
+  public: void ActorAll(const std::string &_physicsEngine);
+
   public: void Clone(const std::string &_physicsEngine);
 };
 
@@ -162,6 +183,509 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
 TEST_P(FactoryTest, Cylinder)
 {
   Cylinder(GetParam());
+}
+
+/////////////////////////////////////////////////
+void FactoryTest::ActorSkinOnly(const std::string &_physicsEngine)
+{
+  this->Load("worlds/empty.world", true, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // Check there is no actor yet
+  std::string actorName("test_actor");
+  EXPECT_FALSE(world->GetModel(actorName));
+
+  // Spawn from actor SDF string
+  std::string skinFile("walk.dae");
+  std::ostringstream actorStr;
+  actorStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name ='" << actorName << "'>"
+    << "  <skin>"
+    << "    <filename>" << skinFile << "</filename>"
+    << "  </skin>"
+    << "</actor>"
+    << "</sdf>";
+
+  msgs::Factory msg;
+  msg.set_sdf(actorStr.str());
+  this->factoryPub->Publish(msg);
+
+  // Wait until actor was spawned
+  int sleep = 0;
+  int maxSleep = 10;
+  auto model = world->GetModel(actorName);
+  while (!model && sleep < maxSleep)
+  {
+    common::Time::MSleep(300);
+    model = world->GetModel(actorName);
+    ++sleep;
+  }
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check it is active
+  EXPECT_TRUE(actor->IsActive());
+
+  // Check the SDF
+  auto sdf = actor->GetSDF();
+  ASSERT_TRUE(sdf != nullptr);
+
+  // Check skin is still there
+  EXPECT_TRUE(sdf->HasElement("skin"));
+  auto skinElem = sdf->GetElement("skin");
+  ASSERT_TRUE(skinElem != nullptr);
+  EXPECT_EQ(skinElem->GetElement("filename")->Get<std::string>(),
+      skinFile);
+
+  // Check the skin file was copied into the animation
+  EXPECT_TRUE(sdf->HasElement("animation"));
+  auto animationElem = sdf->GetElement("animation");
+  ASSERT_TRUE(animationElem != nullptr);
+  EXPECT_EQ(animationElem->GetElement("filename")->Get<std::string>(),
+      skinFile);
+
+  // Check a default script was added
+  EXPECT_TRUE(sdf->HasElement("script"));
+
+  // Check links were added
+  EXPECT_TRUE(sdf->HasElement("link"));
+
+  auto linkElem = sdf->GetElement("link");
+  EXPECT_TRUE(linkElem != nullptr);
+
+  int linkCount = 0;
+  while (linkElem)
+  {
+    linkCount++;
+    linkElem = linkElem->GetNextElement("link");
+  }
+  EXPECT_EQ(linkCount, 32);
+
+  // Check the skin animation was loaded as default
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_FALSE(skelAnims.empty());
+  EXPECT_EQ(skelAnims.size(), 1u);
+  EXPECT_TRUE(skelAnims["__default__"] != nullptr);
+}
+
+/////////////////////////////////////////////////
+TEST_P(FactoryTest, ActorSkinOnly)
+{
+  ActorSkinOnly(GetParam());
+}
+
+/////////////////////////////////////////////////
+void FactoryTest::ActorSkinAnim(const std::string &_physicsEngine)
+{
+  this->Load("worlds/empty.world", true, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // Check there is no actor yet
+  std::string actorName("test_actor");
+  EXPECT_FALSE(world->GetModel(actorName));
+
+  // Spawn from actor SDF string
+  std::string skinFile("walk.dae");
+  std::string animFile("moonwalk.dae");
+  std::string animName("moonwalk_animation");
+  std::ostringstream actorStr;
+  actorStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name ='" << actorName << "'>"
+    << "  <skin>"
+    << "    <filename>" << skinFile << "</filename>"
+    << "  </skin>"
+    << "  <animation name='" << animName << "'>"
+    << "    <filename>" << animFile << "</filename>"
+    << "  </animation>"
+    << "</actor>"
+    << "</sdf>";
+
+  msgs::Factory msg;
+  msg.set_sdf(actorStr.str());
+  this->factoryPub->Publish(msg);
+
+  // Wait until actor was spawned
+  int sleep = 0;
+  int maxSleep = 10;
+  auto model = world->GetModel(actorName);
+  while (!model && sleep < maxSleep)
+  {
+    common::Time::MSleep(300);
+    model = world->GetModel(actorName);
+    ++sleep;
+  }
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check it is active
+  EXPECT_TRUE(actor->IsActive());
+
+  // Check the SDF
+  auto sdf = actor->GetSDF();
+  ASSERT_TRUE(sdf != nullptr);
+
+  // Check skin is still there
+  EXPECT_TRUE(sdf->HasElement("skin"));
+  auto skinElem = sdf->GetElement("skin");
+  ASSERT_TRUE(skinElem != nullptr);
+  EXPECT_EQ(skinElem->GetElement("filename")->Get<std::string>(),
+      skinFile);
+
+  // Check the animation is still there
+  EXPECT_TRUE(sdf->HasElement("animation"));
+  auto animationElem = sdf->GetElement("animation");
+  ASSERT_TRUE(animationElem != nullptr);
+  EXPECT_EQ(animationElem->GetElement("filename")->Get<std::string>(),
+      animFile);
+
+  // Check a default script was added
+  EXPECT_TRUE(sdf->HasElement("script"));
+
+  // Check links were added
+  EXPECT_TRUE(sdf->HasElement("link"));
+
+  auto linkElem = sdf->GetElement("link");
+  EXPECT_TRUE(linkElem != nullptr);
+
+  int linkCount = 0;
+  while (linkElem)
+  {
+    linkCount++;
+    linkElem = linkElem->GetNextElement("link");
+  }
+  EXPECT_EQ(linkCount, 32);
+
+  // Check the anim animation was loaded
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_FALSE(skelAnims.empty());
+  EXPECT_EQ(skelAnims.size(), 1u);
+  EXPECT_TRUE(skelAnims[animName] != nullptr);
+}
+
+/////////////////////////////////////////////////
+void FactoryTest::ActorSkinTrajectory(const std::string &_physicsEngine)
+{
+  this->Load("worlds/empty.world", true, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // Check there is no actor yet
+  std::string actorName("test_actor");
+  EXPECT_FALSE(world->GetModel(actorName));
+
+  // Spawn from actor SDF string
+  std::string skinFile("run.dae");
+  std::string animName("run_animation");
+  std::ostringstream actorStr;
+  actorStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name ='" << actorName << "'>"
+    << "  <skin>"
+    << "    <filename>" << skinFile << "</filename>"
+    << "  </skin>"
+    << "  <script>"
+    << "    <trajectory id='0' type='" << animName << "'>"
+    << "      <waypoint>"
+    << "        <time>0.0</time>"
+    << "        <pose>1 1 0 0 0 0</pose>"
+    << "      </waypoint>"
+    << "      <waypoint>"
+    << "        <time>1.0</time>"
+    << "        <pose>2 2 0 0 0 0</pose>"
+    << "      </waypoint>"
+    << "    </trajectory>"
+    << "  </script>"
+    << "</actor>"
+    << "</sdf>";
+
+  msgs::Factory msg;
+  msg.set_sdf(actorStr.str());
+  this->factoryPub->Publish(msg);
+
+  // Wait until actor was spawned
+  int sleep = 0;
+  int maxSleep = 10;
+  auto model = world->GetModel(actorName);
+  while (!model && sleep < maxSleep)
+  {
+    common::Time::MSleep(300);
+    model = world->GetModel(actorName);
+    ++sleep;
+  }
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check it is active
+  EXPECT_TRUE(actor->IsActive());
+
+  // Check the SDF
+  auto sdf = actor->GetSDF();
+  ASSERT_TRUE(sdf != nullptr);
+
+  // Check skin is still there
+  EXPECT_TRUE(sdf->HasElement("skin"));
+  auto skinElem = sdf->GetElement("skin");
+  ASSERT_TRUE(skinElem != nullptr);
+  EXPECT_EQ(skinElem->GetElement("filename")->Get<std::string>(),
+      skinFile);
+
+  // Check the skin file and the trajectory type were copied into the animation
+  EXPECT_TRUE(sdf->HasElement("animation"));
+  auto animationElem = sdf->GetElement("animation");
+  ASSERT_TRUE(animationElem != nullptr);
+  EXPECT_EQ(animationElem->GetElement("filename")->Get<std::string>(),
+      skinFile);
+  EXPECT_EQ(animationElem->Get<std::string>("name"), animName);
+
+  // Check the script is still there
+  EXPECT_TRUE(sdf->HasElement("script"));
+
+  // Check links were added
+  EXPECT_TRUE(sdf->HasElement("link"));
+
+  auto linkElem = sdf->GetElement("link");
+  EXPECT_TRUE(linkElem != nullptr);
+
+  int linkCount = 0;
+  while (linkElem)
+  {
+    linkCount++;
+    linkElem = linkElem->GetNextElement("link");
+  }
+  EXPECT_EQ(linkCount, 32);
+
+  // Check the anim animation was loaded
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_FALSE(skelAnims.empty());
+  EXPECT_EQ(skelAnims.size(), 1u);
+  EXPECT_TRUE(skelAnims[animName] != nullptr);
+}
+
+/////////////////////////////////////////////////
+TEST_P(FactoryTest, ActorSkinTrajectory)
+{
+  ActorSkinTrajectory(GetParam());
+}
+
+/////////////////////////////////////////////////
+void FactoryTest::ActorLinkTrajectory(const std::string &_physicsEngine)
+{
+  this->Load("worlds/empty.world", true, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // Check there is no actor yet
+  std::string actorName("test_actor");
+  EXPECT_FALSE(world->GetModel(actorName));
+
+  // Spawn from actor SDF string
+  std::ostringstream actorStr;
+  std::string animName("link_animation");
+  actorStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name ='" << actorName << "'>"
+    << "  <link name='link'>"
+    << "    <visual name='visual'>"
+    << "      <geometry>"
+    << "        <box>"
+    << "          <size>.2 .2 .2</size>"
+    << "        </box>"
+    << "      </geometry>"
+    << "    </visual>"
+    << "  </link>"
+    << "  <script>"
+    << "    <trajectory id='0' type='" << animName << "'>"
+    << "      <waypoint>"
+    << "        <time>0.0</time>"
+    << "        <pose>1 1 0 0 0 0</pose>"
+    << "      </waypoint>"
+    << "      <waypoint>"
+    << "        <time>1.0</time>"
+    << "        <pose>2 2 0 0 0 0</pose>"
+    << "      </waypoint>"
+    << "    </trajectory>"
+    << "  </script>"
+    << "</actor>"
+    << "</sdf>";
+
+  msgs::Factory msg;
+  msg.set_sdf(actorStr.str());
+  this->factoryPub->Publish(msg);
+
+  // Wait until actor was spawned
+  int sleep = 0;
+  int maxSleep = 10;
+  auto model = world->GetModel(actorName);
+  while (!model && sleep < maxSleep)
+  {
+    common::Time::MSleep(300);
+    model = world->GetModel(actorName);
+    ++sleep;
+  }
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check it is active
+  EXPECT_TRUE(actor->IsActive());
+
+  // Check the SDF
+  auto sdf = actor->GetSDF();
+  ASSERT_TRUE(sdf != nullptr);
+
+  // Check skin is still there
+  EXPECT_FALSE(sdf->HasElement("skin"));
+
+  // Check the skin file and the trajectory type were copied into the animation
+  EXPECT_FALSE(sdf->HasElement("animation"));
+
+  // Check the script is still there
+  EXPECT_TRUE(sdf->HasElement("script"));
+
+  // Check there's only one link
+  EXPECT_TRUE(sdf->HasElement("link"));
+
+  auto linkElem = sdf->GetElement("link");
+  EXPECT_TRUE(linkElem != nullptr);
+
+  int linkCount = 0;
+  while (linkElem)
+  {
+    linkCount++;
+    linkElem = linkElem->GetNextElement("link");
+  }
+  EXPECT_EQ(linkCount, 1);
+
+  // Check there's no animation
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_TRUE(skelAnims.empty());
+}
+
+/////////////////////////////////////////////////
+TEST_P(FactoryTest, ActorLinkTrajectory)
+{
+  ActorLinkTrajectory(GetParam());
+}
+
+/////////////////////////////////////////////////
+void FactoryTest::ActorAll(const std::string &_physicsEngine)
+{
+  this->Load("worlds/empty.world", true, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // Check there is no actor yet
+  std::string actorName("test_actor");
+  EXPECT_FALSE(world->GetModel(actorName));
+
+  // Spawn from actor SDF string
+  std::string skinFile("moonwalk.dae");
+  std::string animFile("walk.dae");
+  std::string animName("walk_animation");
+  std::ostringstream actorStr;
+  actorStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name ='" << actorName << "'>"
+    << "  <skin>"
+    << "    <filename>" << skinFile << "</filename>"
+    << "  </skin>"
+    << "  <animation name='" << animName << "'>"
+    << "    <filename>" << animFile << "</filename>"
+    << "  </animation>"
+    << "  <script>"
+    << "    <trajectory id='0' type='" << animName << "'>"
+    << "      <waypoint>"
+    << "        <time>0.0</time>"
+    << "        <pose>1 1 0 0 0 0</pose>"
+    << "      </waypoint>"
+    << "      <waypoint>"
+    << "        <time>1.0</time>"
+    << "        <pose>2 2 0 0 0 0</pose>"
+    << "      </waypoint>"
+    << "    </trajectory>"
+    << "  </script>"
+    << "</actor>"
+    << "</sdf>";
+
+  msgs::Factory msg;
+  msg.set_sdf(actorStr.str());
+  this->factoryPub->Publish(msg);
+
+  // Wait until actor was spawned
+  int sleep = 0;
+  int maxSleep = 10;
+  auto model = world->GetModel(actorName);
+  while (!model && sleep < maxSleep)
+  {
+    common::Time::MSleep(300);
+    model = world->GetModel(actorName);
+    ++sleep;
+  }
+  ASSERT_TRUE(model != nullptr);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_TRUE(actor != nullptr);
+
+  // Check it is active
+  EXPECT_TRUE(actor->IsActive());
+
+  // Check the SDF
+  auto sdf = actor->GetSDF();
+  ASSERT_TRUE(sdf != nullptr);
+
+  // Check skin is still there
+  EXPECT_TRUE(sdf->HasElement("skin"));
+  auto skinElem = sdf->GetElement("skin");
+  ASSERT_TRUE(skinElem != nullptr);
+  EXPECT_EQ(skinElem->GetElement("filename")->Get<std::string>(),
+      skinFile);
+
+  // Check the animation is still there
+  EXPECT_TRUE(sdf->HasElement("animation"));
+  auto animationElem = sdf->GetElement("animation");
+  ASSERT_TRUE(animationElem != nullptr);
+  EXPECT_EQ(animationElem->GetElement("filename")->Get<std::string>(),
+      animFile);
+
+  // Check the script is still there
+  EXPECT_TRUE(sdf->HasElement("script"));
+
+  // Check links were added
+  EXPECT_TRUE(sdf->HasElement("link"));
+
+  auto linkElem = sdf->GetElement("link");
+  EXPECT_TRUE(linkElem != nullptr);
+
+  int linkCount = 0;
+  while (linkElem)
+  {
+    linkCount++;
+    linkElem = linkElem->GetNextElement("link");
+  }
+  EXPECT_EQ(linkCount, 32);
+
+  // Check the anim animation was loaded
+  auto skelAnims = actor->SkeletonAnimations();
+  EXPECT_FALSE(skelAnims.empty());
+  EXPECT_EQ(skelAnims.size(), 1u);
+  EXPECT_TRUE(skelAnims[animName] != nullptr);
+}
+
+/////////////////////////////////////////////////
+TEST_P(FactoryTest, ActorAll)
+{
+  ActorAll(GetParam());
 }
 
 /////////////////////////////////////////////////
