@@ -60,6 +60,9 @@
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
 
+1. Generalize actors to work even if not all elements are specified
+    * [Pull request #2360](https://bitbucket.org/osrf/gazebo/pull-request/2360)
+
 1. PIMPLize rendering/Grid
     * [Pull request 2330](https://bitbucket.org/osrf/gazebo/pull-request/2330)
 
