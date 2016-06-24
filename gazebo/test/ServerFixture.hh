@@ -37,6 +37,8 @@
 #include <vector>
 
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/SignalStats.hh>
+#include <ignition/math/Vector3Stats.hh>
 
 #include "gazebo/transport/transport.hh"
 
@@ -50,8 +52,8 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "ignition/math/SignalStats.hh"
-#include "ignition/math/Vector3Stats.hh"
+#include "gazebo/math/SignalStats.hh"
+#include "gazebo/math/Vector3Stats.hh"
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
