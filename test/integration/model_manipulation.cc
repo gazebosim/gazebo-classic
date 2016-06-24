@@ -53,7 +53,6 @@ void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
     ignition::math::Vector2d nextPos = start + dist * (1.0 / steps) * (i+1);
 
     QPoint movePt(nextPos.X(), nextPos.Y());
-    //QTest::mouseMove(_widget, movePt);
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, movePt,
         _widget->mapToGlobal(movePt), _button, _button, _modifiers);
     QApplication::postEvent(_widget, moveEvent);
