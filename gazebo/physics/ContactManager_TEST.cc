@@ -132,7 +132,7 @@ TEST_F(ContactManagerTest, RemoveFilter)
   EXPECT_EQ(manager->GetFilterCount(), 1u);
   // Verify that the filter is removed
   manager->RemoveFilter(collisionMapName);
-  EXPECT_TRUE(!manager->HasFilter(collisionMapName));
+  EXPECT_FALSE(manager->HasFilter(collisionMapName));
   EXPECT_EQ(manager->GetFilterCount(), 0u);
 }
 
