@@ -36,10 +36,6 @@ void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
   // move the mouse cursor to the _start pos
   QPoint startPt(start.X(), start.Y());
   QTest::mouseMove(_widget, startPt);
-  /*QMouseEvent *moveStartEvent = new QMouseEvent(QEvent::MouseMove, startPt,
-      _widget->mapToGlobal(startPt), _button, _button, _modifiers);
-  QApplication::postEvent(_widget, moveStartEvent);
-*/
 
   // There seem to be a problem simulating mouse drag using QTest
   // so use raw QMouseEvent.
