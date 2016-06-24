@@ -752,13 +752,9 @@ void ModelListWidget_TEST::LinkProperties()
   QVERIFY(propTreeBrowser->properties().size() > 0);
 
   // select the box link
-<<<<<<< local
-  QTreeWidgetItem *boxLinkItem = modelItem->child(0);
-  QVERIFY(boxLinkItem != nullptr);
-=======
   QTreeWidgetItem *boxLinkItem = modelItem->child(1);
-  QVERIFY(boxLinkItem != NULL);
->>>>>>> other
+  QVERIFY(boxLinkItem != nullptr);
+
   std::string boxLinkName = "box_link";
   QCOMPARE(boxLinkItem->text(0), tr(boxLinkName.c_str()));
 
@@ -831,7 +827,6 @@ void ModelListWidget_TEST::LinkProperties()
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
   // select the sphere link
-<<<<<<< local
   QTreeWidgetItem *sphereLinkItem = modelItem->child(1);
   QVERIFY(sphereLinkItem != nullptr);
   std::string sphereLinkName = "sphere_link";
