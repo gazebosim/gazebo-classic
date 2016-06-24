@@ -321,10 +321,6 @@ void ModelManipulationTest::GlobalLocalFrames()
 
   // verify the box has moved
   auto boxNewPos = modelVis->GetWorldPose().pos.Ign();
-
-  gzdbg << "start end " <<  startPt << " vs " << endPt << std::endl;
-  gzdbg << "new / old pos " <<  boxNewPos << " vs " << initialPos << std::endl;
-
   QVERIFY(ignition::math::equal(boxNewPos.X(), initialPos.X()));
   QVERIFY(boxNewPos.Y() > initialPos.Y());
   QVERIFY(boxNewPos.Z() > initialPos.Z());
