@@ -126,17 +126,6 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-#if (HAVE_QWT)
-#  set (sources ${sources}
-#    Diagnostics.cc
-#    IncrementalPlot.cc
-#  )
-#  set (qt_headers ${qt_headers}
-#    Diagnostics.hh
-#    IncrementalPlot.hh
-#  )
-#endif()
-
 set (qt_tests
   BuildingEditor_TEST.cc
   ConfigWidget_TEST.cc
@@ -163,6 +152,7 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
+add_subdirectory(plot)
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
