@@ -112,8 +112,8 @@ void SimbodyLink::Init()
 //////////////////////////////////////////////////
 void SimbodyLink::Fini()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->gravityModeConnection);
-  event::Events::DisconnectWorldUpdateEnd(this->staticLinkConnection);
+  this->gravityModeConnection.reset();
+  this->staticLinkConnection.reset();
   Link::Fini();
 }
 

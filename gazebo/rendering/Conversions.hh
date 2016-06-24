@@ -54,21 +54,21 @@ namespace gazebo
       /// \return Ogre vector
       public: static Ogre::Vector3 Convert(const math::Vector3 &_v);
 
-      /// \brief return Ogre Vector from ignition::math::Vector3d
-      /// \param[in] _v ignition::math::Vector3d
-      /// \return Ogre vector
-      public: static Ogre::Vector3 Convert(const ignition::math::Vector3d &_v);
-
       /// \brief return gazebo Vector from ogre Vector3
       /// \param[in] _v Ogre vector
       /// \return Gazebo vector
       public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
 
-      /// \brief return ignition::math::Vector3d from ogre Vector3
-      /// \param[in] _v Ogre vector
-      /// \return ignition::math::Vector3d
+      /// \brief Return ignition::math::Vector3d from Ogre Vector3.
+      /// \param[in] _v Ogre Vector3
+      /// \return Ignition math Vector3d
       public: static ignition::math::Vector3d ConvertIgn(
-                  const Ogre::Vector3 &_v);
+          const Ogre::Vector3 &_v);
+
+      /// \brief Return Ogre Vector3 from ignition::math::Vector3d
+      /// \param[in] _v Ignition math Vector3d
+      /// \return Ogre Vector3
+      public: static Ogre::Vector3 Convert(const ignition::math::Vector3d &_v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
       /// \param[in] _v Gazebo quaternion
@@ -77,14 +77,31 @@ namespace gazebo
 
       /// \brief Ogre quaternion to Gazebo quaternion
       /// \param[in] _v Ogre quaternion
-      /// return Gazebo quaternion
+      /// \return Gazebo quaternion
       public: static math::Quaternion Convert(const Ogre::Quaternion &_v);
 
       /// \brief Ogre quaternion to ignition::math::Quaterniond
-      /// \param[in] _v Ogre quaternion
+      /// \param[in] _q Ogre quaternion
       /// return Ignition math quaternion
       public: static ignition::math::Quaterniond ConvertIgn(
-                  const Ogre::Quaternion &_v);
+                  const Ogre::Quaternion &_q);
+
+      /// \brief ignition::math::Quaterniond to Ogre quaternion
+      /// \param[in] _q Ignition math quaternion
+      /// \return Ogre quaternion
+      public: static Ogre::Quaternion Convert(
+                  const ignition::math::Quaterniond &_q);
+
+      /// \brief Ogre Matrix4 to ignition math Matrix4d
+      /// \param[in] _m Ogre Matrix4
+      /// \return ignition math Matrix4d
+      public: static ignition::math::Matrix4d ConvertIgn(
+          const Ogre::Matrix4 &_m);
+
+      /// \brief Ignition math Matrix4d to Ogre Matrix4
+      /// \param[in] _m ignition math Matrix4d
+      /// \return Ogre Matrix4
+      public: static Ogre::Matrix4 Convert(const ignition::math::Matrix4d &_m);
 
       /// \brief Return the equivalent ogre transform space
       /// \param[in] _rf gazebo reference frame to convert

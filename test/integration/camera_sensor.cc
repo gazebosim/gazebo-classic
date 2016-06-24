@@ -69,7 +69,7 @@ TEST_F(CameraSensor, WorldReset)
     return;
   }
 
-  // spawn camera sensor
+  // spawn sensors of various sizes to test speed
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
@@ -121,7 +121,7 @@ TEST_F(CameraSensor, WorldReset)
   EXPECT_GT(dt.Double(), 1.0);
   EXPECT_LT(dt.Double(), 3.0);
 
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  c.reset();
   delete [] img;
 }
 
@@ -264,7 +264,7 @@ TEST_F(CameraSensor, CheckThrottle)
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   EXPECT_GT(rate, 7.0);
   EXPECT_LT(rate, 11.0);
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  c.reset();
   delete [] img;
 }
 
@@ -378,7 +378,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  c.reset();
   EXPECT_GT(rate, 30.0);
 
   delete [] img;
@@ -431,7 +431,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  c.reset();
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
 
@@ -486,7 +486,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  c.reset();
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
 
