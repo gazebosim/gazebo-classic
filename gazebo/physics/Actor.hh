@@ -38,6 +38,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Information about a trajectory for an Actor.
+    /// This doesn't contain the keyframes information, just duration.
     class GZ_PHYSICS_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor.
@@ -46,7 +47,8 @@ namespace gazebo
       /// \brief ID of the trajectory.
       public: unsigned int id;
 
-      /// \brief Type of trajectory.
+      /// \brief Type of trajectory. If it matches the name of a skeleton
+      /// animation, they will be played together.
       public: std::string type;
 
       /// \brief Duration of this keyframe in seconds.
@@ -71,7 +73,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE Actor : public Model
     {
       /// \brief Typedef the skeleton animation map, indexed by their names.
-      public: typedef std::map<std::string, common::SkeletonAnimation*>
+      public: typedef std::map<std::string, common::SkeletonAnimation *>
               SkeletonAnimation_M;
 
       /// \brief Constructor
@@ -129,12 +131,16 @@ namespace gazebo
       /// \return A map of SkeletonAnimation, indexed by their name.
       public: const SkeletonAnimation_M &SkeletonAnimations() const;
 
-      /// \brief Set a custom trajectory for the actor. This will override any
-      /// trajectories previously defined.
+      /// \brief Set a custom trajectory for the actor, using one of the
+      /// existing animations. This will override any trajectories previously
+      /// defined. When a custom trajectory is defined, the script time must
+      /// be set with `SetScriptTime` order to play the animation.
       /// \param[in] _trajInfo Information about custom trajectory.
+      /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
 
       /// \brief Reset custom trajectory of the actor.
+      /// \sa SetCustomTrajectory
       public: void ResetCustomTrajectory();
 
       /// \brief Get whether the links in the actor can collide with each other.
@@ -148,7 +154,7 @@ namespace gazebo
       /// \param [in] _selfCollide Whether this can collide with itself, will be
       /// false for actors regardless of the input.
       /// \sa GetSelfCollide()
-      public: virtual void SetSelfCollide(bool _self_collide);
+      public: virtual void SetSelfCollide(bool _selfCollide);
 
       /// \brief Get whether the links in the actor are affected by wind.
       /// This is always false for actors.
@@ -216,12 +222,21 @@ namespace gazebo
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose);
 
-      /// \brief Load an animation from SDF.
+      /// \brief Load a skin from SDF. From the skin, skeletons which can
+      /// be animated are generated.
+      /// \param[in] _sdf SDF element containing the skin.
+      /// \sa LoadAnimation
+      private: bool LoadSkin(sdf::ElementPtr _sdf);
+
+      /// \brief Load an animation from SDF. These are the animations which
+      /// will be applied to the skeletons defined in the skin.
+      /// The animation may be described in COLLADA or BVH formats.
       /// \param[in] _sdf SDF element containing the animation.
+      /// \sa LoadSkin
       private: void LoadAnimation(sdf::ElementPtr _sdf);
 
-      /// \brief Load an animation script from SDF.
-      /// \param[in] _sdf SDF element containing the animation script.
+      /// \brief Load scripted trajectories from SDF.
+      /// \param[in] _sdf SDF element containing the trajectory script.
       private: void LoadScript(sdf::ElementPtr _sdf);
 
       /// \brief Set the actor's pose. This sets the pose for each bone in the
@@ -293,8 +308,8 @@ namespace gazebo
       /// * Skeleton animation name (should match those in `skelAnimation` and
       /// `interpolateX`)
       /// * Map holding:
-      ///     * Skeleton node names
-      ///     * Skeleton animation node names
+      ///     * Skeleton node names from skin
+      ///     * Skeleton node names from animation
       /// \sa interpolateX
       /// \sa skelAnimation
       protected: std::map<std::string, std::map<std::string, std::string> >
@@ -337,3 +352,4 @@ namespace gazebo
   }
 }
 #endif
+
