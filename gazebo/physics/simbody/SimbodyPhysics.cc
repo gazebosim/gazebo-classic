@@ -490,6 +490,7 @@ void SimbodyPhysics::UpdateCollision()
 
       if (contactFeedback)
       {
+        count = 0;
         const bool useContactPatch = true;
         if (useContactPatch)
         {

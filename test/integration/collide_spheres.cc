@@ -151,17 +151,18 @@ void CollideTest::Spheres(const std::string &_physicsEngine)
   for (unsigned int i = 0; i < contactCount; ++i)
   {
     const auto contact = contacts[i];
+    gzdbg << contact->collision1->GetModel()->GetScopedName()
+          << " "
+          << contact->collision2->GetModel()->GetScopedName()
+          << " ";
+
     EXPECT_EQ(contact->count, 1);
     if (contact->count != 1)
       continue;
 
-    gzdbg << contact->collision1->GetModel()->GetScopedName()
-          << " "
-          << contact->collision2->GetModel()->GetScopedName()
-          << " "
-          << contact->normals[0] << " normal, "
-          << contact->depths[0] << " depth"
-          << std::endl;
+    std::cerr << contact->normals[0] << " normal, "
+              << contact->depths[0] << " depth"
+              << std::endl;
 
     std::string name1(contact->collision1->GetModel()->GetScopedName());
     std::string name2(contact->collision2->GetModel()->GetScopedName());
