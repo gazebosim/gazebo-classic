@@ -22,6 +22,11 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace gazebo
 {
   namespace math
@@ -37,7 +42,8 @@ namespace gazebo
     class GZ_MATH_VISIBLE Vector3Stats
     {
       /// \brief Constructor
-      public: Vector3Stats();
+      /// \deprecated See ignition::math::Vector3Stats
+      public: Vector3Stats() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: ~Vector3Stats();
@@ -107,5 +113,8 @@ namespace gazebo
     /// \}
   }
 }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 #endif
 
