@@ -52,7 +52,7 @@
               <damping>10</damping>
             </dynamics>
             <limit>
-              <lower>-0.5</lower>
+              <lower>-1.5</lower>
               <upper>0</upper>
               <effort>10000</effort>
               <velocity>-1</velocity>

@@ -210,6 +210,9 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   double winchForce = this->winchPID.Update(error,
       _info.simTime - this->prevSimTime);
 
+  // Truncate winchForce so it doesn't push the robot downwards
+  winchForce = winchForce > 0? winchForce : 0.0;
+
   // Apply the joint force
   this->joints[this->winchIndex]->SetForce(0, winchForce);
 
