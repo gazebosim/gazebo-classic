@@ -415,12 +415,40 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
+  // Destroy all attached models
+  for (auto &model : this->attachedModels)
+  {
+    if (model)
+      model->Fini();
+  }
   this->attachedModels.clear();
-  this->canonicalLink.reset();
-  this->jointController.reset();
-  this->joints.clear();
-  this->links.clear();
+
+  // Destroy all models
+  for (auto &model : this->models)
+  {
+    if (model)
+      model->Fini();
+  }
   this->models.clear();
+
+  // Destroy all joints
+  for (auto &joint : this->joints)
+  {
+    if (joint)
+      joint->Fini();
+  }
+  this->joints.clear();
+  this->jointController.reset();
+
+  // Destroy all links
+  for (auto &link : this->links)
+  {
+    if (link)
+      link->Fini();
+  }
+  this->canonicalLink.reset();
+  this->links.clear();
+
   this->plugins.clear();
 
   Entity::Fini();

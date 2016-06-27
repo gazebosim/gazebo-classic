@@ -251,6 +251,10 @@ namespace gazebo
       /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
 
+      /// \brief Remove a child by pointer.
+      /// \param[in] _child Pointer to the child.
+      public: void RemoveChild(physics::BasePtr _child);
+
       /// \brief Add a type specifier.
       /// \param[in] _type New type to append to this objects type
       /// definition.

@@ -157,6 +157,31 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(ballNoFrictionImu != NULL);
   ballNoFrictionImu->Init();
 
+  // get floating ball
+  std::string ballFloatingName = "model_floating_imu";
+  physics::ModelPtr ballFloatingModel = world->GetModel(ballFloatingName);
+  ASSERT_TRUE(ballFloatingModel != NULL);
+
+  std::string ballFloatingSensorName = "ball_floating_imu_sensor";
+  sensors::ImuSensorPtr ballFloatingImu =
+    std::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(ballFloatingSensorName));
+  ASSERT_TRUE(ballFloatingImu != NULL);
+  ballFloatingImu->Init();
+
+  // get floating ball 2
+  std::string ballFloatingName2 = "link_floating_imu_2";
+  physics::LinkPtr ballFloatingLink2 =
+    ballFloatingModel->GetLink(ballFloatingName2);
+  ASSERT_TRUE(ballFloatingLink2 != NULL);
+
+  std::string ballFloatingSensorName2 = "ball_floating_imu_sensor_2";
+  sensors::ImuSensorPtr ballFloatingImu2 =
+    std::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(ballFloatingSensorName2));
+  ASSERT_TRUE(ballFloatingImu2 != NULL);
+  ballFloatingImu2->Init();
+
   // get gravity
   auto g = world->Gravity();
 
@@ -331,6 +356,243 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         EXPECT_NEAR(worldLinearAccel.y, 0, IMU_TOL);
         EXPECT_NEAR(worldLinearAccel.z, 0, IMU_TOL);
       }
+    }
+  }
+
+  // floating ball
+  // This "robot" starts up aligned with world axis.
+  // test that SetReferencePose resets orientation to identity
+  ballFloatingImu->SetReferencePose();
+  ignition::math::Quaterniond imuOrientation = ballFloatingImu->Orientation();
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.W(),
+      imuOrientation.W(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.X(),
+      imuOrientation.X(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.Y(),
+      imuOrientation.Y(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.Z(),
+      imuOrientation.Z(), IMU_TOL);
+
+  // test that SetReferenceOrientation sets orientation to argument
+  // in this test case, assume world is NWU (X-North, Y-West, Z-Up),
+  // then transform from NWU to NED is below:
+  ignition::math::Pose3d nwuToNEDReference =
+    ignition::math::Pose3d(ignition::math::Vector3d::Zero,
+                           ignition::math::Quaterniond(M_PI, 0, 0));
+  // declare NED frame the reference frame for this IMU
+  ballFloatingImu->SetWorldToReferencePose(nwuToNEDReference);
+
+  // let messages propagate asynchronously
+  world->Step(1000);
+
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Static Pose Initialization Tests                     */
+  /*                                                                          */
+  /****************************************************************************/
+  /* orientation of the imu in NED frame                                      */
+  /****************************************************************************/
+  imuOrientation = ballFloatingImu->Orientation();
+
+  EXPECT_NEAR(imuOrientation.W(), 0, IMU_TOL);
+  EXPECT_NEAR(imuOrientation.X(), -1, IMU_TOL);
+  EXPECT_NEAR(imuOrientation.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(imuOrientation.Z(), 0, IMU_TOL);
+
+  // imu orientation in world frame
+  ignition::math::Quaterniond imuWorldOrientation =
+    imuOrientation * nwuToNEDReference.Rot();
+
+  EXPECT_NEAR(imuWorldOrientation.W(), 1, IMU_TOL);
+  EXPECT_NEAR(imuWorldOrientation.X(), 0, IMU_TOL);
+  EXPECT_NEAR(imuWorldOrientation.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(imuWorldOrientation.Z(), 0, IMU_TOL);
+
+  /****************************************************************************/
+  /* floating ball 2                                                          */
+  /* This "robot" starts with a yaw of 1.8 rad from world frame.              */
+  /* test that SetReferencePose resets orientation to identity                */
+  /****************************************************************************/
+  ballFloatingImu2->SetReferencePose();
+  ignition::math::Quaterniond imuOrientation2 = ballFloatingImu2->Orientation();
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.W(),
+      imuOrientation2.W(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.X(),
+      imuOrientation2.X(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.Y(),
+      imuOrientation2.Y(), IMU_TOL);
+  EXPECT_NEAR(ignition::math::Quaterniond::Identity.Z(),
+      imuOrientation2.Z(), IMU_TOL);
+
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Static Pose Manipulation Tests                       */
+  /*                                                                          */
+  /****************************************************************************/
+  /* test that SetReferenceOrientation sets orientation to argument           */
+  /* in this test case, assume world is NWU (X-North, Y-West, Z-Up),          */
+  /* then transform from NWU to NED is below:                                 */
+  /****************************************************************************/
+  // declare NED frame the reference frame for this IMU
+  ballFloatingImu2->SetWorldToReferencePose(nwuToNEDReference);
+
+  // let messages propagate asynchronously
+  world->Step(1000);
+
+  // orientation of the imu in NED frame
+  const double imu2Angle = 1.8;
+  imuOrientation2 = ballFloatingImu2->Orientation();
+  ignition::math::Vector3d rpy2 = imuOrientation2.Euler();
+  EXPECT_NEAR(fabs(rpy2.X()), M_PI, IMU_TOL);
+  EXPECT_NEAR(rpy2.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(rpy2.Z(), -imu2Angle, IMU_TOL);
+
+  // imu orientation in world frame
+  ignition::math::Quaterniond imuWorldOrientation2 =
+    imuOrientation2 * nwuToNEDReference.Rot();
+  ignition::math::Vector3d rpyWorld2 = imuWorldOrientation2.Euler();
+  EXPECT_NEAR(rpyWorld2.X(), 0, IMU_TOL);
+  EXPECT_NEAR(rpyWorld2.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(rpyWorld2.Z(), -imu2Angle, IMU_TOL);
+
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Kinematic Pose Manipulation Test                     */
+  /*                                                                          */
+  /****************************************************************************/
+  /* turn floating ball 2 by -1.8 rad yaw, and see if two floating            */
+  /* balls orientation match                                                  */
+  /****************************************************************************/
+  ballFloatingLink2->SetWorldPose(
+      ignition::math::Pose3d(3.0, -3.40, 0.95, 0.0, 0.0, 0.0));
+
+  // let messages propagate asynchronously
+  world->Step(1000);
+
+  // get orientation of two floating balls and compare them
+  imuOrientation = ballFloatingImu->Orientation();
+  ignition::math::Vector3d rpy = imuOrientation.Euler();
+
+  imuOrientation2 = ballFloatingImu2->Orientation();
+  rpy2 = imuOrientation2.Euler();
+
+  EXPECT_NEAR(fabs(rpy.X()), fabs(rpy2.X()), IMU_TOL);
+  EXPECT_NEAR(rpy.Y(), rpy2.Y(), IMU_TOL);
+  EXPECT_NEAR(rpy.Z(), rpy2.Z(), IMU_TOL);
+
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Dynamic Torque Test                                  */
+  /*                                                                          */
+  /****************************************************************************/
+  /* turn floating ball 2 by 0.6 rad yaw, apply torque about imu local Y-axis */
+  /* and test AngularVelocity is expressed in local frame.                    */
+  /****************************************************************************/
+  const double yaw = 0.6;
+  ballFloatingLink2->SetWorldPose(
+      ignition::math::Pose3d(3.0, -3.40, 0.95, 0.0, 0.0, yaw));
+
+  // HACK: take 100 steps, due to message passing synchronization delays,
+  // we should fix this by haing an equivalent blocking "service call" to
+  // SetWorldPose.
+  world->Step(100);
+
+  // Nm
+  const double tau = 150.0;
+
+  ballFloatingLink2->AddRelativeTorque(
+      ignition::math::Vector3d(0, tau, 0));
+
+  // expected velocity calculation
+  // kg*m^2
+  const double iyy = ballFloatingLink2->GetInertial()->GetPrincipalMoments().y;
+  EXPECT_NEAR(iyy, 0.1, 1e-6);
+
+  // sec
+  const double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  EXPECT_NEAR(dt, 0.001, 1e-6);
+
+  // 1.5 m/s , pitch rate
+  const double pDot = tau / iyy * dt;
+  const int nsteps = 1000;
+  const double p = pDot * (nsteps-1) * dt;
+
+  // let messages propagate asynchronously
+  world->Step(nsteps);
+
+  // get orientation of two floating balls and compare them
+  imuOrientation2 = ballFloatingImu2->Orientation();
+  rpy2 = imuOrientation2.Euler();
+  ignition::math::Vector3d rpyDot2 = ballFloatingImu2->AngularVelocity();
+  ignition::math::Vector3d linAcc2 = ballFloatingImu2->LinearAcceleration();
+
+  // compare against analytical results
+  // because NED
+  EXPECT_NEAR(fabs(rpy2.X()), M_PI, IMU_TOL);
+  EXPECT_NEAR(rpy2.Y(), -p, IMU_TOL);
+  EXPECT_NEAR(rpy2.Z(), -yaw, IMU_TOL);
+
+  EXPECT_NEAR(rpyDot2.X(), 0, IMU_TOL);
+  EXPECT_NEAR(rpyDot2.Y(), pDot, IMU_TOL);
+  EXPECT_NEAR(rpyDot2.Z(), 0, IMU_TOL);
+
+  // centripetal acceleration along radial (x-axis) direction.
+  // then add gravity acceleration to x and z based on orientation of imu.
+  this->GetGravity(ballFloatingImu2->Orientation(), g);
+
+  const double radius = boost::static_pointer_cast<physics::SphereShape>(
+      ballFloatingLink2 ->GetCollision(
+        "collision_sphere")->GetShape())->GetRadius();
+
+  // const double acc = -pDot*pDot*r;
+  const double acc = -rpyDot2.Y()*rpyDot2.Y()*radius;
+  const double accX = acc + g.x;
+  const double accZ = g.z;
+  EXPECT_NEAR(linAcc2.X(), accX, IMU_TOL);
+  EXPECT_NEAR(linAcc2.Y(), 0, IMU_TOL);
+
+  // FIXME: why is this error larger than default tol 1e-5?
+  // See ign-math issue #47.
+  // https://bitbucket.org/ignitionrobotics/ign-math/issues/47
+  const double special_IMU_TOL = 0.00016874990503534804;
+  EXPECT_NEAR(linAcc2.Z(), accZ, special_IMU_TOL);
+
+  /****************************************************************************/
+  /*                                                                          */
+  /*                     Dynamic Linear Force Test                            */
+  /*                                                                          */
+  /****************************************************************************/
+  /* turn floating ball 2 by 0.5 rad pitch, apply force about                 */
+  /* positive world z-axis                                                    */
+  /* and test if LinearAcceleration is expressed in local frame.              */
+  /****************************************************************************/
+  const double pitch = 0.5;
+  ballFloatingImu2->SetWorldToReferencePose(ignition::math::Pose3d());
+  ballFloatingLink2->Reset();
+  ballFloatingLink2->SetWorldPose(
+      ignition::math::Pose3d(3.0, -3.40, 0.95, 0.0, pitch, 0.0));
+
+  world->Step(100);
+  for (int i = 0; i < 1000; ++i)
+  {
+    const double f = 13.8;
+    ballFloatingLink2->AddForce(ignition::math::Vector3d(0, 0, f));
+    world->Step(1);
+
+    const double m = 5.0;
+    const double a = f / m;
+
+    ignition::math::Vector3d linAcc2 = ballFloatingImu2->LinearAcceleration();
+    this->GetGravity(ballFloatingImu2->Orientation(), g);
+
+    if (i > 100)
+    {
+      // THERE MUST BE A BETTER WAY TO DO THIS...
+      // need to take 100 stesps to ensure that
+      // imu readings are passed through from asynchronous transport
+      EXPECT_NEAR(linAcc2.X(), -a*sin(pitch) - g.x, IMU_TOL);
+      EXPECT_NEAR(linAcc2.Y(), 0 - g.y, IMU_TOL);
+      EXPECT_NEAR(linAcc2.Z(), a*cos(pitch) - g.z, IMU_TOL);
     }
   }
 }

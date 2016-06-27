@@ -669,6 +669,8 @@ namespace gazebo
       protected: InertialPtr inertial;
 
       /// \brief Center of gravity visual elements.
+      /// TODO: Not used, kept for ABI compatibility.
+      /// Deprecate when merging forward.
       protected: std::vector<std::string> cgVisuals;
 
       /// \def Visuals_M
