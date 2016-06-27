@@ -75,5 +75,6 @@
 #include <QtGui/QVector3D>
 #include <QtCore/QPointF>
 #include <QtGui/QStandardItem>
+#include <QtWidgets/QStyledItemDelegate>
 
 #endif
