@@ -32,8 +32,8 @@
 
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture,
-                    public testing::WithParamInterface<const char*>
+class ElasticModulus : public ServerFixture,
+                       public testing::WithParamInterface<const char*>
 {
   /// \brief test elastic modulus
   public: void ElasticModulusContact(const std::string &_physicsEngine);
@@ -50,14 +50,14 @@ class PhysicsTest : public ServerFixture,
 };
 
 /////////////////////////////////////////////////
-void PhysicsTest::ContactCallback(const ConstContactsPtr &_msg)
+void ElasticModulus::ContactCallback(const ConstContactsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
   this->contactsMsg = *_msg;
 }
 
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
+void ElasticModulus::ElasticModulusContact(const std::string &_physicsEngine)
 {
   if (_physicsEngine != "ode")
   {
@@ -99,7 +99,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 
   gzdbg << "Listening to " << topic << std::endl;
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
-      &PhysicsTest::ContactCallback, this);
+      &ElasticModulus::ContactCallback, this);
 
   // step to let contact happen and settle
   world->Step(3000);
@@ -225,13 +225,13 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_P(PhysicsTest, ElasticModulusContact)
+TEST_P(ElasticModulus, ElasticModulusContact)
 {
   ElasticModulusContact(GetParam());
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ElasticModulus, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

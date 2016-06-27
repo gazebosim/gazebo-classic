@@ -22,8 +22,8 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture,
-                  public testing::WithParamInterface<const char*>
+class WorldEntityBelowPoint : public ServerFixture,
+                              public testing::WithParamInterface<const char*>
 {
   /// \brief Test World::GetEntityBelowPoint
   /// \param[in] _physicsEngine Type of physics engine to test.
@@ -31,7 +31,8 @@ class WorldTest : public ServerFixture,
 };
 
 /////////////////////////////////////////////////
-void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
+void WorldEntityBelowPoint::GetEntityBelowPoint(
+            const std::string &_physicsEngine)
 {
   // Load in a world with lasers
   Load("worlds/shapes.world", false, _physicsEngine);
@@ -108,7 +109,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_P(WorldTest, GetEntityBelowPoint)
+TEST_P(WorldEntityBelowPoint, GetEntityBelowPoint)
 {
   if (std::string(GetParam()) != "ode" &&
       std::string(GetParam()) != "bullet")
@@ -121,7 +122,8 @@ TEST_P(WorldTest, GetEntityBelowPoint)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldEntityBelowPoint,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

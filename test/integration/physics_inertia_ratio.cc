@@ -31,14 +31,14 @@ using namespace gazebo;
 const double g_angle_y_tol = 0.21;
 const double g_angle_z_tol = 0.23;
 
-class PhysicsTest : public ServerFixture,
-                    public testing::WithParamInterface<const char*>
+class InertiaRatio : public ServerFixture,
+                     public testing::WithParamInterface<const char*>
 {
   public: void InertiaRatioPendulum(const std::string &_physicsEngine);
 };
 
 // Double pendulum with large inertia ratio and lateral gravity component
-void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
+void InertiaRatio::InertiaRatioPendulum(const std::string &_physicsEngine)
 {
   Load("worlds/inertia_ratio_pendulum.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -87,12 +87,12 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   this->Record("upperAngles", upperAngles);
 }
 
-TEST_P(PhysicsTest, InertiaRatioPendulum)
+TEST_P(InertiaRatio, InertiaRatioPendulum)
 {
   InertiaRatioPendulum(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, InertiaRatio, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
