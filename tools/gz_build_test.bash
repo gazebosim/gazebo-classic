@@ -133,10 +133,19 @@ do
       CORE_XML=$(strings $c | grep "$BUILD_ROOT/build/gazebo/.*xml$" | head -1)
       CORE_TEST_NUMBER=$(grep $CORE_XML $logfileRaw | head -1 | sed -e 's@:.*@@')
       CORE_TEST_NAME=$(basename $CORE_XML .xml)
+      if [[ "${CORE_TEST_NAME}" == "UNIT_Exception_TEST" || \
+            "${CORE_TEST_NAME}" == "UNIT_ModelSnap_TEST" ]]; then
+        continue
+      fi
       CORE_TEST_PATH=$(find . | grep $CORE_TEST_NAME$)
       CORE_BT_LOG="${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-backtrace.txt"
       gdb $CORE_TEST_PATH $c -ex bt -ex 'thread apply all bt' -ex q > $CORE_BT_LOG
       rm $c
+      if grep OnReadHeader $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-OnReadHeader-backtrace.txt"
+      elif grep DispatchDiscoveryMsg $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-DispatchDiscoveryMsg-backtrace.txt"
+      fi
     done
   done
 done
