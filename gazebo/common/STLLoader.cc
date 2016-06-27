@@ -56,7 +56,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
   if (!this->ReadAscii(file, mesh))
   {
     fclose(file);
-    file = fopen(_filename.c_str(), "r");
+    file = fopen(_filename.c_str(), "rb");
     if (!this->ReadBinary(file, mesh))
       gzerr << "Unable to read STL[" << _filename << "]\n";
   }
@@ -85,7 +85,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   while (fgets (input, LINE_MAX_LEN, _filein) != nullptr)
   {
     // Advance to the first nonspace character in INPUT.
-    for (next = input; *next != '\0' && isspace(*next); next++);
+    for (next = input; *next != '\0' && iswspace(*next); next++);
 
     // Skip blank lines and comments.
     if (*next == '\0' || *next == '#' || *next == '!' || *next == '$')

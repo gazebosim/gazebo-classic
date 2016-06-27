@@ -2109,6 +2109,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     this->ModelChanged();
   this->dataPtr->nestedModelPoseUpdate.clear();
 
+  // camera movement mouse release
+  if (_event.Dragging())
+    return false;
+
   // mouse selection and context menu events
   rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)

@@ -2209,6 +2209,12 @@ std::string Camera::ProjectionType() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
+}
+
+//////////////////////////////////////////////////
 event::ConnectionPtr Camera::ConnectNewImageFrame(
     std::function<void (const unsigned char *, unsigned int, unsigned int,
     unsigned int, const std::string &)> _subscriber)
@@ -2219,7 +2225,7 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 //////////////////////////////////////////////////
 void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 {
-  this->newImageFrame.Disconnect(_c);
+  this->newImageFrame.Disconnect(_c->Id());
 }
 
 /////////////////////////////////////////////////

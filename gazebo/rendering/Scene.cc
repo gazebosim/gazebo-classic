@@ -1258,9 +1258,10 @@ bool Scene::FirstContact(CameraPtr _camera,
     unsigned int flags = iter->movable->getVisibilityFlags();
 
     // Only accept a hit if there is an entity and not a gui visual
-    if (iter->movable &&
+    if (iter->movable && iter->movable->getVisible() &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI))
+        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
+        && !(flags & GZ_VISIBILITY_SELECTABLE)))
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
@@ -3290,10 +3291,6 @@ void Scene::SetGrid(const bool _enabled)
   if (_enabled && this->dataPtr->grids.empty())
   {
     Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
-    grid->Init();
-    this->dataPtr->grids.push_back(grid);
-
-    grid = new Grid(this, 4, 5, 20, common::Color(0.8, 0.8, 0.8, 0.5));
     grid->Init();
     this->dataPtr->grids.push_back(grid);
   }

@@ -183,7 +183,6 @@ LinkData::LinkData()
 /////////////////////////////////////////////////
 LinkData::~LinkData()
 {
-  event::Events::DisconnectPreRender(this->connections[0]);
   this->connections.clear();
   delete this->inspector;
   delete this->updateMutex;
