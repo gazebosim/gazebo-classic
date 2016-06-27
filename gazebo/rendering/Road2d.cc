@@ -41,7 +41,7 @@ namespace gazebo
       /// \param[in] _msg The robot data.
       public: void Load(msgs::Road _msg);
 
-      /// \brief Name of the road.
+      /// \brief Name of the road segment.
       public: std::string name;
 
       /// \brief Point that make up the middle of the road.
