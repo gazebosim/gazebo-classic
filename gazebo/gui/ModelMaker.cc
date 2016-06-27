@@ -357,9 +357,11 @@ void ModelMaker::CreateTheEntity()
     {
       modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
     }
-    else if (this->dataPtr->modelSDF->Root()->HasElement("light"))
+    else
     {
-      modelElem = this->dataPtr->modelSDF->Root()->GetElement("light");
+      gzerr << "Couldn't find model element in sdf, won't create entity."
+            << std::endl;
+      return;
     }
 
     // The server will generate a unique name in case of name collision

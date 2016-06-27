@@ -865,6 +865,10 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
 
+      /// \brief Return the projection matrix of this camera.
+      /// \return the projection matrix
+      public: ignition::math::Matrix4d ProjectionMatrix() const;
+
       /// \brief Get the visual tracked by this camera.
       /// \return Tracked visual.
       public: VisualPtr TrackedVisual() const;

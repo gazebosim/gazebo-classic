@@ -161,13 +161,23 @@ release will remove the deprecated code.
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
+
+1. **gazebo/math/SignalStats.hh**
+    + ***Deprecation:*** public: gazebo::math::SignalStatistic
+    + ***Replacement:*** public: ignition::math::SignalStatistic
+    + ***Deprecation:*** public: gazebo::math::SignalStats
+    + ***Replacement:*** public: ignition::math::SignalStats
+
 1. **gazebo/math/Spline.hh**
     + ***Deprecation:*** public: gazebo::math::Spline
     + ***Replacement:*** public: ignition::math::Spline
 
-1. **gazebo/math/RotationSpline.hh**
-    + ***Deprecation:*** public: gazebo::math::RotationSpline
-    + ***Replacement:*** public: ignition::math::RotationSpline
+1. **gazebo/math/Vector3Stats.hh**
+    + ***Deprecation:*** public: gazebo::math::Vector3Stats
+    + ***Replacement:*** public: ignition::math::Vector3Stats
 
 ### Deletions
 

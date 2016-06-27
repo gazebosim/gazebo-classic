@@ -22,6 +22,11 @@
 #include <string>
 #include "gazebo/util/system.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace gazebo
 {
   namespace math
@@ -37,14 +42,17 @@ namespace gazebo
     class GZ_MATH_VISIBLE SignalStatistic
     {
       /// \brief Constructor
-      public: SignalStatistic();
+      /// \deprecated See ignition::math::SignalStatistic
+      public: SignalStatistic() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~SignalStatistic();
 
       /// \brief Copy constructor
       /// \param[in] _ss SignalStatistic to copy
-      public: SignalStatistic(const SignalStatistic &_ss);
+      /// \deprecated See ignition::math::SignalStatistic
+      public: SignalStatistic(const SignalStatistic &_ss)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the current value of the statistical measure.
       /// \return Current value of the statistical measure.
@@ -129,14 +137,17 @@ namespace gazebo
     class GZ_MATH_VISIBLE SignalStats
     {
       /// \brief Constructor
-      public: SignalStats();
+      /// \deprecated See ignition::math::SignalStats
+      public: SignalStats() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: ~SignalStats();
 
       /// \brief Copy constructor
       /// \param[in] _ss SignalStats to copy
-      public: SignalStats(const SignalStats &_ss);
+      /// \deprecated See ignition::math::SignalStats
+      public: SignalStats(const SignalStats &_ss)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get number of data points in first statistic.
       /// Technically you can have different numbers of data points
@@ -184,5 +195,8 @@ namespace gazebo
     /// \}
   }
 }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 #endif
 

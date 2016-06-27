@@ -238,6 +238,14 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     TiXmlElement *contrXml = this->GetElementId("controller", contrURL);
 
     TiXmlElement *instSkelXml = instContrXml->FirstChildElement("skeleton");
+    if (!instSkelXml)
+    {
+      gzwarn << "<instance_controller> without a <skeleton> cannot be parsed"
+          << std::endl;
+      instContrXml = instContrXml->NextSiblingElement("instance_controller");
+      continue;
+    }
+
     std::string rootURL = instSkelXml->GetText();
     TiXmlElement *rootNodeXml = this->GetElementId("node", rootURL);
 
@@ -674,8 +682,11 @@ SkeletonNode* ColladaLoader::LoadSkeletonNodes(TiXmlElement *_xml,
 
   SkeletonNode* node = new SkeletonNode(_parent, name, _xml->Attribute("id"));
 
-  if (std::string(_xml->Attribute("type")) == std::string("NODE"))
+  if (_xml->Attribute("type") &&
+      std::string(_xml->Attribute("type")) == std::string("NODE"))
+  {
     node->SetType(SkeletonNode::NODE);
+  }
 
   this->SetSkeletonNodeTransform(_xml, node);
 
