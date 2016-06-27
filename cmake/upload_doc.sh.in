@@ -34,7 +34,7 @@ if [ ! -f "@CMAKE_BINARY_DIR@/doxygen/html/index.html" ]; then
 fi
 
 # The code API
-s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api//$target --dry-run -v
+s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api/$target/ --dry-run -v
 
 echo "\nUpload target: $target"
 echo -n "Upload code API(Y/n)? "
