@@ -74,5 +74,6 @@
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <QtGui/QVector3D>
 #include <QtCore/QPointF>
+#include <QtGui/QStandardItem>
 
 #endif
