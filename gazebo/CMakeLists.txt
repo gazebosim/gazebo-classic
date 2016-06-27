@@ -9,8 +9,6 @@ include_directories(SYSTEM
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
   ${tinyxml2_INCLUDE_DIRS}
-  ${ZERO_MQ_INCLUDE_DIRS}
-  ${CPPZMQ_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -22,7 +20,6 @@ link_directories(
   ${CURL_LIBDIR}
   ${IGNITION-MATH_LIBRARY_DIRS}
   ${IGNITION-TRANSPORT_LIBRARY_DIRS}
-  ${ZERO_MQ_LIB_DIRS}
 )
 
 if (WIN32)
@@ -68,7 +65,6 @@ target_link_libraries(gzserver
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
-  ${ZERO_MQ_LIB}
 )
 
 if (UNIX)
