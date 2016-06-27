@@ -45,16 +45,8 @@ HarnessPlugin::~HarnessPlugin()
 void HarnessPlugin::Load(physics::ModelPtr _model,
                          sdf::ElementPtr _sdf)
 {
-  if (!_sdf->HasElement("harness_link_name"))
-  {
-    gzerr << "No <harness_link_name> present. Harness plugin will not run.\n";
-    return;
-  }
-  std::string harnessLinkName = _sdf->Get<std::string>("harness_link_name");
-
   // Get a pointer to the world
   physics::WorldPtr world = _model->GetWorld();
-
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(world->GetName());
@@ -66,24 +58,6 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   this->detachSub = this->node->Subscribe(
       "~/" + _model->GetName() + "/harness/detach",
       &HarnessPlugin::OnDetach, this);
-
-  // Create a link that is fixed the world. This will act as the base from
-  // which a model can be lowered
-  this->harnessLink = _model->CreateLink(harnessLinkName);
-
-  ignition::math::Pose3d harnessPose = _sdf->HasElement("harness_link_pose") ?
-    _sdf->Get<ignition::math::Pose3d>("harness_link_pose") :
-    ignition::math::Pose3d::Zero;
-
-  this->harnessLink->SetWorldPose(harnessPose);
-  this->harnessLink->Init();
-
-  this->harnessJoint = world->GetPhysicsEngine()->CreateJoint("fixed");
-  this->harnessJoint->SetName(harnessLinkName + "__fixed_joint__");
-  this->harnessJoint->Attach(physics::LinkPtr(), this->harnessLink);
-  this->harnessJoint->Load(physics::LinkPtr(), this->harnessLink,
-      ignition::math::Pose3d::Zero);
-  this->harnessJoint->Init();
 
   // Load all the harness joints
   sdf::ElementPtr jointElem = _sdf->GetElement("joint");

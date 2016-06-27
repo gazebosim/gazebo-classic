@@ -109,13 +109,6 @@ namespace gazebo
     /// \brief Previous simulation time
     private: common::Time prevSimTime = common::Time::Zero;
 
-    /// \brief A dynamically created link that acts as a fixed point to which
-    /// joints can be attached.
-    private: physics::LinkPtr harnessLink;
-
-    /// \brief A dynamically created joint between the world and harnessLink.
-    private: physics::JointPtr harnessJoint;
-
     /// \brief Communication node
     /// \todo: Transition to ignition-transport in gazebo8
     private: transport::NodePtr node;
