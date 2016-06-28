@@ -90,8 +90,6 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
-std::cerr << "MainWindow::MainWindow()" << std::endl;
-
   this->dataPtr->renderWidget = NULL;
   this->dataPtr->menuLayout = NULL;
   this->dataPtr->menuBar = NULL;
@@ -268,7 +266,6 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-std::cerr << "MainWindow::Load " << std::endl;
   this->dataPtr->guiSub = this->dataPtr->node->Subscribe("~/gui",
     &MainWindow::OnGUI, this, true);
 #ifdef HAVE_OCULUS
@@ -366,8 +363,6 @@ void MainWindow::Init()
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
   gui::Events::mainWindowReady();
-
-  std::cerr << "MainWindow::Init() l370 " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -2044,9 +2039,6 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       this->dataPtr->pluginMsgs.push_back(pm);
     }
   }
-
-std::cerr << "MainWindow::OnGUI " << std::endl;
-
   // Call the signal to trigger plugin loading in the main thread.
   this->AddPlugins();
 }
