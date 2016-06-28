@@ -19,6 +19,10 @@
 
 #include "gazebo/math/Vector3Stats.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class Vector3StatsTest : public ::testing::Test

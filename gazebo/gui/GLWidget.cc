@@ -24,9 +24,10 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -864,21 +865,16 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->dataPtr->userCamera);
   this->dataPtr->scene = _scene;
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(5, -5, 2);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  auto delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y, delta.x);
+  double yaw = atan2(delta.Y(), delta.X());
 
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
-}
-
-/////////////////////////////////////////////////
-rendering::ScenePtr GLWidget::GetScene() const
-{
-  return this->Scene();
+  double pitch = atan2(-delta.Z(),
+      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
+  this->dataPtr->userCamera->SetDefaultPose(ignition::math::Pose3d(camPos,
+        ignition::math::Quaterniond(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
@@ -895,12 +891,6 @@ void GLWidget::Clear()
   this->dataPtr->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
   this->dataPtr->keyModifiers = 0;
-}
-
-//////////////////////////////////////////////////
-rendering::UserCameraPtr GLWidget::GetCamera() const
-{
-  return this->Camera();
 }
 
 //////////////////////////////////////////////////

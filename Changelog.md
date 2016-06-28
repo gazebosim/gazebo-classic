@@ -45,6 +45,7 @@
 
 1. Deprecate gazebo::math
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
@@ -106,6 +107,12 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+## Gazebo 7.2.0 (2016-06-13)
+
+1. Fix right click view options after deleting and respawning a model.
+    * [Pull request 2349](https://bitbucket.org/osrf/gazebo/pull-request/2349)
+    * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1985)
+
 1. Backport single pixel selection buffer for mouse picking
     * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
 
@@ -130,6 +137,9 @@
 
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
+
+1. Properly cleanup pointers when destroying a world with joints.
+    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
 
 1. Fix view control mouse focus in model editor
     * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)

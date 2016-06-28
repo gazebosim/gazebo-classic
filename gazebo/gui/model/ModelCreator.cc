@@ -2925,7 +2925,7 @@ void ModelCreator::ModelChanged()
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
-  const gazebo::math::Vector3 &_scale)
+  const ignition::math::Vector3d &_scale)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   for (auto linksIt : this->dataPtr->allLinks)
@@ -2937,7 +2937,7 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
     if (_name == linksIt.first || linkName == linksIt.first)
     {
       // Update data
-      linksIt.second->SetScale(_scale.Ign());
+      linksIt.second->SetScale(_scale);
       break;
     }
   }
