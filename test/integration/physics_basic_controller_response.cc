@@ -30,8 +30,8 @@
 #define TOL 5e-5
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture,
-                    public testing::WithParamInterface<const char*>
+class BasicController : public ServerFixture,
+                        public testing::WithParamInterface<const char*>
 {
   // the trikey model has three wheels oriented in different directions.
   // it caught a corner case in ODE where the inertia was being
@@ -42,8 +42,8 @@ class PhysicsTest : public ServerFixture,
                                    const std::string &_worldFileName);
 };
 
-void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
-                                      const std::string &_worldFileName)
+void BasicController::TrikeyWheelResponse(const std::string &_physicsEngine,
+                                          const std::string &_worldFileName)
 {
   if (_physicsEngine == "bullet")
   {
@@ -136,12 +136,12 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   }
 }
 
-TEST_F(PhysicsTest, TrikeyWheelResponse)
+TEST_F(BasicController, TrikeyWheelResponse)
 {
   TrikeyWheelResponse("ode", "worlds/inertia_ratio_reduction_test.world");
 }
 
-TEST_F(PhysicsTest, TrikeyWheelResponse2)
+TEST_F(BasicController, TrikeyWheelResponse2)
 {
   TrikeyWheelResponse("ode", "worlds/inertia_ratio_reduction_test2.world");
 }

@@ -28,7 +28,7 @@
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture,
+class PhysicsSolver : public ServerFixture,
   public testing::WithParamInterface<const char*>
 {
   public: void DropTest(const std::string &_physicsEngine,
@@ -37,7 +37,7 @@ class PhysicsTest : public ServerFixture,
 };
 
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::DropTest(const std::string &_physicsEngine,
+void PhysicsSolver::DropTest(const std::string &_physicsEngine,
     const std::string &_solverType,
     const std::string &_worldSolverType)
 {
@@ -112,13 +112,13 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   }
 }
 
-TEST_P(PhysicsTest, DropTest)
+TEST_P(PhysicsSolver, DropTest)
 {
   gzdbg << "DropTest(ode, world, " << GetParam() << ')' << std::endl;
   DropTest("ode", "world", GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(WorldStepSolvers, PhysicsTest,
+INSTANTIATE_TEST_CASE_P(WorldStepSolvers, PhysicsSolver,
                         WORLD_STEP_SOLVERS);
 
 int main(int argc, char **argv)

@@ -22,12 +22,12 @@
 
 using namespace gazebo;
 
-class PresetManagerTest : public ServerFixture
+class PresetManager_TEST : public ServerFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, GetSetPresetParam)
+TEST_F(PresetManager_TEST, GetSetPresetParam)
 {
   physics::Preset preset("preset1");
   EXPECT_EQ(preset.Name(), "preset1");
@@ -55,7 +55,7 @@ TEST_F(PresetManagerTest, GetSetPresetParam)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, GetSetProfileParam)
+TEST_F(PresetManager_TEST, GetSetProfileParam)
 {
   EXPECT_NO_THROW(physics::PresetManager(NULL, NULL));
 
@@ -116,7 +116,7 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, CreateRemoveProfile)
+TEST_F(PresetManager_TEST, CreateRemoveProfile)
 {
   // Load preset test world
   Load("test/worlds/presets.world", true);
@@ -163,7 +163,7 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, SDF)
+TEST_F(PresetManager_TEST, SDF)
 {
   // Load preset test world
   Load("test/worlds/presets.world", true);

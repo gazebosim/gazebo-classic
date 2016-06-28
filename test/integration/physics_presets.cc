@@ -23,13 +23,13 @@
 
 using namespace gazebo;
 
-class PresetManagerTest : public ServerFixture,
+class PhysicsPresetsTest : public ServerFixture,
     public testing::WithParamInterface<const char*>
 {
 };
 
 /////////////////////////////////////////////////
-TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
+TEST_P(PhysicsPresetsTest, InitializeAllPhysicsEngines)
 {
   const std::string physicsEngineName = GetParam();
   Load("test/worlds/presets.world", false, physicsEngineName);
@@ -87,7 +87,7 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, MultipleDefaults)
+TEST_F(PhysicsPresetsTest, MultipleDefaults)
 {
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
@@ -103,7 +103,7 @@ TEST_F(PresetManagerTest, MultipleDefaults)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, NoDefault)
+TEST_F(PhysicsPresetsTest, NoDefault)
 {
   Load("test/worlds/presets_nodefault.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
@@ -119,7 +119,7 @@ TEST_F(PresetManagerTest, NoDefault)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, SetProfileParam)
+TEST_F(PhysicsPresetsTest, SetProfileParam)
 {
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
@@ -152,7 +152,7 @@ TEST_F(PresetManagerTest, SetProfileParam)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, SetCurrentProfile)
+TEST_F(PhysicsPresetsTest, SetCurrentProfile)
 {
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
@@ -192,7 +192,7 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
 }
 
 /////////////////////////////////////////////////
-TEST_F(PresetManagerTest, CreateProfileFromSDF)
+TEST_F(PhysicsPresetsTest, CreateProfileFromSDF)
 {
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
@@ -247,7 +247,7 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
   }
 }
 
-TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
+TEST_F(PhysicsPresetsTest, BackwardsCompatibilityTest)
 {
   Load("worlds/empty.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
@@ -285,7 +285,7 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
   }
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PresetManagerTest,
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsPresetsTest,
                         PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////

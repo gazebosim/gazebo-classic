@@ -28,17 +28,15 @@ using namespace gazebo;
 
 class ImageHeightmapTest : public gazebo::testing::AutoLogFixture { };
 
-class DemTest : public gazebo::testing::AutoLogFixture { };
-
 /////////////////////////////////////////////////
-TEST_F(DemTest, MisingFile)
+TEST_F(ImageHeightmapTest, MisingFile)
 {
   common::ImageHeightmap img;
   EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
 }
 
 /////////////////////////////////////////////////
-TEST_F(DemTest, NotImage)
+TEST_F(ImageHeightmapTest, NotImage)
 {
   common::ImageHeightmap img;
   boost::filesystem::path path = TEST_PATH;

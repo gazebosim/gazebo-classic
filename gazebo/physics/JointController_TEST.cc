@@ -27,7 +27,7 @@
 
 using namespace gazebo;
 
-class JointControllerTest : public gazebo::testing::AutoLogFixture { };
+class JointController_TEST : public gazebo::testing::AutoLogFixture { };
 
 class FakeJoint : public physics::Joint
 {
@@ -110,7 +110,7 @@ class FakeJoint : public physics::Joint
 };
 
 /////////////////////////////////////////////////
-TEST_F(JointControllerTest, Construction)
+TEST_F(JointController_TEST, Construction)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
@@ -134,7 +134,7 @@ TEST_F(JointControllerTest, Construction)
 }
 
 /////////////////////////////////////////////////
-TEST_F(JointControllerTest, AddJoint)
+TEST_F(JointController_TEST, AddJoint)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
@@ -233,7 +233,7 @@ TEST_F(JointControllerTest, AddJoint)
 }
 
 /////////////////////////////////////////////////
-TEST_F(JointControllerTest, SetJointPositions)
+TEST_F(JointController_TEST, SetJointPositions)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));

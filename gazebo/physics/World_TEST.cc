@@ -22,11 +22,11 @@
 
 using namespace gazebo;
 
-class WorldTest : public ServerFixture {};
+class World_TEST : public ServerFixture {};
 
 //////////////////////////////////////////////////
 /// \brief Test generating unique model name for models on insertion.
-TEST_F(WorldTest, UniqueModelName)
+TEST_F(World_TEST, UniqueModelName)
 {
   // Load a blank world
   this->Load("worlds/blank.world", true);
@@ -84,7 +84,7 @@ TEST_F(WorldTest, UniqueModelName)
 
 //////////////////////////////////////////////////
 /// \brief Test publishing a factory message to edit a model.
-TEST_F(WorldTest, EditName)
+TEST_F(World_TEST, EditName)
 {
   // Load a world with simple shapes
   this->Load("worlds/blank.world", true);

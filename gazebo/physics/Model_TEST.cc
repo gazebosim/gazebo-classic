@@ -22,10 +22,10 @@
 
 using namespace gazebo;
 
-class ModelTest : public ServerFixture { };
+class Model_TEST : public ServerFixture { };
 
 //////////////////////////////////////////////////
-TEST_F(ModelTest, Scale)
+TEST_F(Model_TEST, Scale)
 {
   // Load a world
   this->Load("worlds/empty.world", true);

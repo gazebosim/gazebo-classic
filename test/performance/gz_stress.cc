@@ -32,7 +32,7 @@
 #include "test/util.hh"
 #include "test_config.h"
 
-class gzTest : public gazebo::testing::AutoLogFixture { };
+class gzStressTest : public gazebo::testing::AutoLogFixture { };
 
 std::string g_msgDebugOut;
 boost::mutex g_mutex;
@@ -137,7 +137,7 @@ void fini()
 }
 
 /////////////////////////////////////////////////
-TEST_F(gzTest, Stress)
+TEST_F(gzStressTest, Stress)
 {
   init();
 
