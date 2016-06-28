@@ -42,6 +42,7 @@
 
 1. Deprecate gazebo::math
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
