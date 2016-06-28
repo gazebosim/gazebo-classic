@@ -14,10 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GUI_EVENTS_HH_
-#define _GUI_EVENTS_HH_
+#ifndef GAZEBO_GUI_GUIEVENTS_HH_
+#define GAZEBO_GUI_GUIEVENTS_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
@@ -327,7 +330,7 @@ namespace gazebo
 
       /// \brief Scale entity event.
       public: static event::EventT<void (const std::string &,
-          const math::Vector3 &)> scaleEntity;
+          const ignition::math::Vector3d &)> scaleEntity;
 
       /// \brief Move entity event. Parameters: Entity name, new pose, flag
       /// indicating whether the pose is final.
