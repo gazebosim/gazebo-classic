@@ -20,6 +20,8 @@
 #include <memory>
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -43,6 +45,10 @@ namespace gazebo
     class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
+
+      public: void AddGuiPlugin(const std::string &_filename,
+                              const std::string &_name,
+                              const sdf::ElementPtr &_sdf);
 
       /// \brief Constructor
       public: MainWindow();

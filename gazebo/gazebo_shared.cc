@@ -42,11 +42,14 @@ void gazebo_shared::addPlugin(const std::string &_filename,
   if (_filename.empty())
     return;
 
+std::cerr << "gazebo_shared::addPlugin l45 todo remove" << std::endl;
+
   gazebo::SystemPluginPtr plugin =
     gazebo::SystemPlugin::Create(_filename, _filename);
 
   if (plugin)
   {
+std::cerr << "gazebo_shared::addPlugin l52 todo remove" << std::endl;
     if (plugin->GetType() != gazebo::SYSTEM_PLUGIN)
     {
       gzerr << "System is attempting to load "
@@ -75,6 +78,7 @@ bool gazebo_shared::setup(const std::string &_prefix, int _argc, char **_argv,
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
        _plugins.begin(); iter != _plugins.end(); ++iter)
   {
+std::cerr << "gazebo_shared::setup l81 todo remove" << std::endl;
     (*iter)->Load(_argc, _argv);
   }
 

@@ -90,6 +90,8 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
+std::cerr << "MainWindow::MainWindow()" << std::endl;
+
   this->dataPtr->renderWidget = NULL;
   this->dataPtr->menuLayout = NULL;
   this->dataPtr->menuBar = NULL;
@@ -266,6 +268,7 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
+std::cerr << "MainWindow::Load " << std::endl;
   this->dataPtr->guiSub = this->dataPtr->node->Subscribe("~/gui",
     &MainWindow::OnGUI, this, true);
 #ifdef HAVE_OCULUS
@@ -363,6 +366,8 @@ void MainWindow::Init()
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
   gui::Events::mainWindowReady();
+
+  std::cerr << "MainWindow::Init() l370 " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -2040,8 +2045,32 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     }
   }
 
+std::cerr << "MainWindow::OnGUI " << std::endl;
+
   // Call the signal to trigger plugin loading in the main thread.
   this->AddPlugins();
+}
+
+void MainWindow::AddGuiPlugin(const std::string &_filename,
+                              const std::string &_name,
+                              const sdf::ElementPtr &_sdf)
+{
+  // Try to create the plugin
+  gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
+      _filename, _name);
+
+  if (!plugin)
+  {
+    gzerr << "Unable to create gui overlay plugin with filename["
+      << _filename << "]\n";
+  }
+  else
+  {
+    gzlog << "Loaded GUI plugin[" << _filename << "]\n";
+    // Attach the plugin to the render widget.
+std::cerr << "MainWindow::AddGuiPlugin  todo remove" << std::endl;
+    this->dataPtr->renderWidget->AddPlugin(plugin, _sdf);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2049,10 +2078,15 @@ void MainWindow::OnAddPlugins()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->pluginLoadMutex);
 
+std::cerr << "MainWindow::OnAddPlugins() # todo remove! 2052" << std::endl;
+
   // Load all plugins.
   for (auto iter = this->dataPtr->pluginMsgs.begin();
       iter != this->dataPtr->pluginMsgs.end(); ++iter)
   {
+    this->AddGuiPlugin( (*iter)->filename(), (*iter)->name(),
+                      msgs::PluginToSDF(**iter));
+/*
     // Make sure the filename string is not empty
     if (!(*iter)->filename().empty())
     {
@@ -2074,6 +2108,7 @@ void MainWindow::OnAddPlugins()
           msgs::PluginToSDF(**iter));
       }
     }
+*/
   }
   this->dataPtr->pluginMsgs.clear();
 
