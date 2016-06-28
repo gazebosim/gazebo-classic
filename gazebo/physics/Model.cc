@@ -129,11 +129,6 @@ void Model::OnRequest(ConstRequestPtr &_msg)
 
       if (_msg->data().find(pluginName) != std::string::npos)
       {
-        // Build plugin URI
-        common::URI pluginUri(this->URI());
-        pluginUri.Path().PushBack("plugin");
-        pluginUri.Path().PushBack(pluginName);
-
         // Get plugin info from SDF
         msgs::Plugin pluginMsg;
         pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
