@@ -133,20 +133,6 @@ bool parse_args(int _argc, char **_argv)
     gazebo::client::printVersion();
     gazebo::common::Console::SetQuiet(false);
   }
-/*
-  /// Load all the plugins specified on the command line
-  if (vm.count("gui-plugin"))
-  {
-    std::vector<std::string> pp =
-      vm["gui-plugin"].as<std::vector<std::string> >();
-
-    for (std::vector<std::string>::iterator iter = pp.begin();
-         iter != pp.end(); ++iter)
-    {
-      gazebo::client::addPlugin(*iter);
-    }
-  }
-*/
   return true;
 }
 
@@ -268,16 +254,12 @@ bool gui::load()
   qRegisterMetaType<std::string>();
 
   g_splashScreen = new gui::SplashScreen();
-
   g_main_win = new gui::MainWindow();
-
   g_main_win->Load();
 
-/// **** ****
-
-  sdf::ElementPtr emptyElem = std::make_shared<sdf::Element>();
-
   /// Load all the plugins specified on the command line
+  // They don't have a name or any sdf.
+  sdf::ElementPtr emptyElem = std::make_shared<sdf::Element>();
   if (vm.count("gui-plugin"))
   {
     std::vector<std::string> pp =
@@ -287,12 +269,9 @@ bool gui::load()
          iter != pp.end(); ++iter)
     {
       // gazebo::client::addPlugin(*iter);
-
       g_main_win->AddGuiPlugin(*iter, *iter, emptyElem);
     }
   }
-
-  emptyElem.reset();
   return true;
 }
 

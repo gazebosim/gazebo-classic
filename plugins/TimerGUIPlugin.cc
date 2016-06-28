@@ -24,8 +24,6 @@
 #include <gazebo/msgs/msgs.hh>
 #include "TimerGUIPlugin.hh"
 
-// #include <csignal> // # todo remove
-
 using namespace gazebo;
 
 // Register this plugin with the simulator
@@ -35,14 +33,6 @@ GZ_REGISTER_GUI_PLUGIN(TimerGUIPlugin)
 TimerGUIPlugin::TimerGUIPlugin()
   : GUIPlugin()
 {
-//double z = 0;
-std::cerr << "TimerGUIPlugin::TimerGUIPlugin()" << std::endl;
-// std::raise(SIGABRT); // # todo remove
-//double x = 2 * z;
-//getchar();
-//std::cerr << "AFTER div 0  RAISE" << std::endl;
-
-  // Set the frame background and foreground colors
   this->setStyleSheet(
       "QFrame {"
         "background-color : rgba(255, 255, 255, 255);"

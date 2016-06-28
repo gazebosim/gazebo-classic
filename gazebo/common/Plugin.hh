@@ -122,7 +122,6 @@ namespace gazebo
     public: static TPtr Create(const std::string &_filename,
                 const std::string &_name)
             {
-std::cerr << "PluginT<T>::Create l125 todo remove  " << &_filename << ", " << _name  << std::endl;
               TPtr result;
               // PluginPtr result;
               struct stat st;
@@ -192,15 +191,13 @@ std::cerr << "PluginT<T>::Create l125 todo remove  " << &_filename << ", " << _n
                 return result;
               }
 
-std::cerr << " todo remove l194 registered" << std::endl;
-
               // Register the new controller.
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
 
               result->handleName = _name;
               result->filename = filename;
-std::cerr << " todo remove l203 Plugin<T>Created!" << std::endl;
+
               return result;
             }
 
