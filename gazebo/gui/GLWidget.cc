@@ -875,12 +875,6 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 }
 
 /////////////////////////////////////////////////
-rendering::ScenePtr GLWidget::GetScene() const
-{
-  return this->Scene();
-}
-
-/////////////////////////////////////////////////
 rendering::ScenePtr GLWidget::Scene() const
 {
   return this->dataPtr->scene;
@@ -894,12 +888,6 @@ void GLWidget::Clear()
   this->dataPtr->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
   this->dataPtr->keyModifiers = 0;
-}
-
-//////////////////////////////////////////////////
-rendering::UserCameraPtr GLWidget::GetCamera() const
-{
-  return this->Camera();
 }
 
 //////////////////////////////////////////////////

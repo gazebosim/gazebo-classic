@@ -90,12 +90,6 @@ void ConfigWidget::UpdateFromMsg(const google::protobuf::Message *_msg)
 }
 
 /////////////////////////////////////////////////
-google::protobuf::Message *ConfigWidget::GetMsg()
-{
-  return this->Msg();
-}
-
-/////////////////////////////////////////////////
 google::protobuf::Message *ConfigWidget::Msg()
 {
   this->UpdateMsg(this->dataPtr->configMsg);
@@ -109,13 +103,6 @@ std::string ConfigWidget::HumanReadableKey(const std::string &_key)
   humanKey[0] = std::toupper(humanKey[0]);
   std::replace(humanKey.begin(), humanKey.end(), '_', ' ');
   return humanKey;
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
-    const std::string &_jointType)
-{
-  return this->UnitFromKey(_key, _jointType);
 }
 
 /////////////////////////////////////////////////
@@ -194,13 +181,6 @@ std::string ConfigWidget::UnitFromKey(const std::string &_key,
 }
 
 /////////////////////////////////////////////////
-void ConfigWidget::GetRangeFromKey(const std::string &_key, double &_min,
-    double &_max)
-{
-  this->RangeFromKey(_key, _min, _max);
-}
-
-/////////////////////////////////////////////////
 void ConfigWidget::RangeFromKey(const std::string &_key, double &_min,
     double &_max) const
 {
@@ -227,12 +207,6 @@ void ConfigWidget::RangeFromKey(const std::string &_key, double &_min,
     _min = -1;
     _max = +1;
   }
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
-{
-  return this->WidgetVisible(_name);
 }
 
 /////////////////////////////////////////////////
@@ -273,12 +247,6 @@ void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
     }
     iter->second->setVisible(_visible);
   }
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
-{
-  return this->WidgetReadOnly(_name);
 }
 
 /////////////////////////////////////////////////
@@ -484,12 +452,6 @@ bool ConfigWidget::SetEnumWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-int ConfigWidget::GetIntWidgetValue(const std::string &_name) const
-{
-  return this->IntWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 int ConfigWidget::IntWidgetValue(const std::string &_name) const
 {
   int value = 0;
@@ -499,12 +461,6 @@ int ConfigWidget::IntWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->IntWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-unsigned int ConfigWidget::GetUIntWidgetValue(const std::string &_name) const
-{
-  return this->UIntWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -520,12 +476,6 @@ unsigned int ConfigWidget::UIntWidgetValue(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-double ConfigWidget::GetDoubleWidgetValue(const std::string &_name) const
-{
-  return this->DoubleWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 double ConfigWidget::DoubleWidgetValue(const std::string &_name) const
 {
   double value = 0.0;
@@ -535,12 +485,6 @@ double ConfigWidget::DoubleWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->DoubleWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::GetBoolWidgetValue(const std::string &_name) const
-{
-  return this->BoolWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -556,12 +500,6 @@ bool ConfigWidget::BoolWidgetValue(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-std::string ConfigWidget::GetStringWidgetValue(const std::string &_name) const
-{
-  return this->StringWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 std::string ConfigWidget::StringWidgetValue(const std::string &_name) const
 {
   std::string value;
@@ -571,13 +509,6 @@ std::string ConfigWidget::StringWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->StringWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 ConfigWidget::GetVector3WidgetValue(const std::string &_name)
-    const
-{
-  return this->Vector3dWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -594,12 +525,6 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
 }
 
 /////////////////////////////////////////////////
-common::Color ConfigWidget::GetColorWidgetValue(const std::string &_name) const
-{
-  return this->ColorWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 common::Color ConfigWidget::ColorWidgetValue(const std::string &_name) const
 {
   common::Color value;
@@ -609,12 +534,6 @@ common::Color ConfigWidget::ColorWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->ColorWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-math::Pose ConfigWidget::GetPoseWidgetValue(const std::string &_name) const
-{
-  return this->PoseWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -628,17 +547,6 @@ ignition::math::Pose3d ConfigWidget::PoseWidgetValue(const std::string &_name)
   if (iter != this->dataPtr->configWidgets.end())
     value = this->PoseWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
-    math::Vector3 &_dimensions, std::string &_uri) const
-{
-  ignition::math::Vector3d dimensions;
-  std::string type = this->GeometryWidgetValue(_name, dimensions, _uri);
-  _dimensions = dimensions;
-
-  return type;
 }
 
 /////////////////////////////////////////////////
@@ -669,12 +577,6 @@ std::string ConfigWidget::GeometryWidgetValue(const std::string &_name,
   if (iter != this->dataPtr->configWidgets.end())
     type = this->GeometryWidgetValue(iter->second, _dimensions, _uri);
   return type;
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
-{
-  return this->EnumWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
