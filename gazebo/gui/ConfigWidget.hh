@@ -27,7 +27,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/gui/qt.h"
 
 namespace google

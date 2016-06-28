@@ -357,13 +357,6 @@ bool ConfigWidget::SetStringWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
-    const math::Vector3 &_value)
-{
-  return this->SetVector3dWidgetValue(_name, _value.Ign());
-}
-
-/////////////////////////////////////////////////
 bool ConfigWidget::SetVector3dWidgetValue(const std::string &_name,
     const ignition::math::Vector3d &_value)
 {
@@ -389,13 +382,6 @@ bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
-    const math::Pose &_value)
-{
-  return this->SetPoseWidgetValue(_name, _value.Ign());
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
     const ignition::math::Pose3d &_value)
 {
   auto iter = this->dataPtr->configWidgets.find(_name);
@@ -404,14 +390,6 @@ bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
     return this->UpdatePoseWidget(iter->second, _value);
 
   return false;
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
-    const std::string &_value, const math::Vector3 &_dimensions,
-    const std::string &_uri)
-{
-  return this->SetGeometryWidgetValue(_name, _value, _dimensions.Ign(), _uri);
 }
 
 /////////////////////////////////////////////////
@@ -639,7 +617,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
         case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           double value = ref->GetDouble(*_msg, field);
-          if (!math::equal(value, value))
+          if (!ignition::math::equal(value, value))
             value = 0;
           if (newWidget)
           {
@@ -662,7 +640,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
         case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           float value = ref->GetFloat(*_msg, field);
-          if (!math::equal(value, value))
+          if (!ignition::math::equal(value, value))
             value = 0;
           if (newWidget)
           {
@@ -2314,13 +2292,14 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                       qobject_cast<QDoubleSpinBox *>(childWidget->widgets[k]);
                   rotValues.push_back(valueSpinBox->value());
                 }
-                math::Quaternion quat(rotValues[0], rotValues[1], rotValues[2]);
+                ignition::math::Quaterniond quat(rotValues[0], rotValues[1],
+                    rotValues[2]);
 
                 std::vector<double> quatValues;
-                quatValues.push_back(quat.x);
-                quatValues.push_back(quat.y);
-                quatValues.push_back(quat.z);
-                quatValues.push_back(quat.w);
+                quatValues.push_back(quat.X());
+                quatValues.push_back(quat.Y());
+                quatValues.push_back(quat.Z());
+                quatValues.push_back(quat.W());
                 const google::protobuf::Descriptor *quatValueDescriptor =
                     quatValueMsg->GetDescriptor();
                 for (unsigned int k = 0; k < quatValues.size(); ++k)
