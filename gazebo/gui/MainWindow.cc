@@ -2055,7 +2055,8 @@ void MainWindow::AddGuiPlugin(const std::string &_filename,
                               const std::string &_name,
                               const sdf::ElementPtr &_sdf)
 {
-  // Try to create the plugin
+  // This method loads plugins that are specified in a world file
+  // or the cmd line.
   gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
       _filename, _name);
 
@@ -2067,8 +2068,8 @@ void MainWindow::AddGuiPlugin(const std::string &_filename,
   else
   {
     gzlog << "Loaded GUI plugin[" << _filename << "]\n";
-    // Attach the plugin to the render widget.
-std::cerr << "MainWindow::AddGuiPlugin  todo remove" << std::endl;
+    // Attach the plugin to the render widget. This is specific
+    // to gui plugins
     this->dataPtr->renderWidget->AddPlugin(plugin, _sdf);
   }
 }
@@ -2086,29 +2087,6 @@ std::cerr << "MainWindow::OnAddPlugins() # todo remove! 2052" << std::endl;
   {
     this->AddGuiPlugin( (*iter)->filename(), (*iter)->name(),
                       msgs::PluginToSDF(**iter));
-/*
-    // Make sure the filename string is not empty
-    if (!(*iter)->filename().empty())
-    {
-      // Try to create the plugin
-      gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
-          (*iter)->filename(), (*iter)->name());
-
-      if (!plugin)
-      {
-        gzerr << "Unable to create gui overlay plugin with filename["
-          << (*iter)->filename() << "]\n";
-      }
-      else
-      {
-        gzlog << "Loaded GUI plugin[" << (*iter)->filename() << "]\n";
-
-        // Attach the plugin to the render widget.
-        this->dataPtr->renderWidget->AddPlugin(plugin,
-          msgs::PluginToSDF(**iter));
-      }
-    }
-*/
   }
   this->dataPtr->pluginMsgs.clear();
 

@@ -46,10 +46,6 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: void AddGuiPlugin(const std::string &_filename,
-                              const std::string &_name,
-                              const sdf::ElementPtr &_sdf);
-
       /// \brief Constructor
       public: MainWindow();
 
@@ -139,6 +135,14 @@ namespace gazebo
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
       public: gui::Editor *Editor(const std::string &_name) const;
+
+      /// \brief Loads a gui plugin and attaches it to the render widget
+      /// \param[in] _filename Name of the shared library (not full path)
+      /// \param[in] _name Name of the plugin
+      /// \param[in] _sdf SDF data of the plugin
+      public: void AddGuiPlugin(const std::string &_filename,
+                              const std::string &_name,
+                              const sdf::ElementPtr &_sdf);
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
