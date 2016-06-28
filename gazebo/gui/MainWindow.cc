@@ -2043,6 +2043,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
   this->AddPlugins();
 }
 
+/////////////////////////////////////////////////
 void MainWindow::AddGuiPlugin(const std::string &_filename,
                               const std::string &_name,
                               const sdf::ElementPtr &_sdf)

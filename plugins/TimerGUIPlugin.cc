@@ -33,6 +33,7 @@ GZ_REGISTER_GUI_PLUGIN(TimerGUIPlugin)
 TimerGUIPlugin::TimerGUIPlugin()
   : GUIPlugin()
 {
+  // Set the frame background and foreground colors
   this->setStyleSheet(
       "QFrame {"
         "background-color : rgba(255, 255, 255, 255);"
