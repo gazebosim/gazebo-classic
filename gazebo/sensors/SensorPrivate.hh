@@ -22,7 +22,7 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"

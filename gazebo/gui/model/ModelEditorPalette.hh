@@ -22,7 +22,7 @@
 #include <string>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"

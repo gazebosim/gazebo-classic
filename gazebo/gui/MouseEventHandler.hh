@@ -22,7 +22,7 @@
 #include <list>
 
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/MouseEvent-fwd.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

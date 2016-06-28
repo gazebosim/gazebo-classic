@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BATTERYFWD_HH_
-#define _GAZEBO_BATTERYFWD_HH_
+/* Desc: A timer class
+ * Author: Nate Koenig
+ * Date: 22 Nov 2009
+ */
 
-#include <map>
-#include <string>
-#include <functional>
-#include <memory>
-
-#include "sdf/sdf.hh"
-#include "gazebo/common/CommonTypes-fwd.hh"
-#include "gazebo/util/system.hh"
+#ifndef _TIMERFWD_HH_
+#define _TIMERFWD_HH_
 
 namespace gazebo
 {
   namespace common
   {
-    class Battery;
+    /// \class Timer Timer.hh common/common.hh
+    class Timer;
   }
 }
 #endif
+
+

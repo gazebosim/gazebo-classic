@@ -14,24 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BVHLOADERFWD_HH_
-#define _GAZEBO_BVHLOADERFWD_HH_
 
-#define X_POSITION 0
-#define Y_POSITION 1
-#define Z_POSITION 2
-#define X_ROTATION 3
-#define Y_ROTATION 4
-#define Z_ROTATION 5
+#ifndef _GAZEBO_EVENTFWD_HH_
+#define _GAZEBO_EVENTFWD_HH_
 
 namespace gazebo
 {
-  namespace common
+  /// \ingroup gazebo_event
+  namespace event
   {
-    class Skeleton;
-
-    class BVHLoader;
+    /// \class Event Event.hh common/common.hh
+    class Event;
+      
+    /// \brief Friend class.
+    template<typename T> class EventT;
   }
 }
-
 #endif

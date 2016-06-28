@@ -24,7 +24,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/util/UtilTypes.hh"
 
 namespace gazebo

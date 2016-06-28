@@ -24,8 +24,8 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/KeyEvent-fwd.hh"
+#include "gazebo/common/MouseEvent-fwd.hh"
 
 #include "gazebo/gui/qt.h"
 

@@ -22,7 +22,7 @@
 #include <utility>
 
 #include <boost/function.hpp>
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"

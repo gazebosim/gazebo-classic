@@ -28,7 +28,7 @@
 #include <gazebo/transport/Subscriber.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/common/PID.hh>
-#include <gazebo/common/Timer.hh>
+#include <gazebo/common/Timer-fwd.hh>
 
 namespace gazebo
 {

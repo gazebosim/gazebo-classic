@@ -18,7 +18,7 @@
 #define _RENDER_EVENTS_HH_
 
 #include <string>
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 

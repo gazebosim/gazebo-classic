@@ -23,7 +23,7 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 
 namespace Ogre
 {

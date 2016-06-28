@@ -33,7 +33,7 @@
 #include <string>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
 

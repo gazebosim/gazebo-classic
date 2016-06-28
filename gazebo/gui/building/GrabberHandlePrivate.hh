@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "gazebo/common/Color.hh"
+#include "gazebo/common/Color-fwd.hh"
 
 namespace gazebo
 {

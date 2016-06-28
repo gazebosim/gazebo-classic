@@ -24,7 +24,7 @@
 
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/Timer.hh"
+#include "gazebo/common/Timer-fwd.hh"
 
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/util/system.hh"

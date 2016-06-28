@@ -33,7 +33,7 @@
 #include <deque>
 #include <utility>
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/system.hh"

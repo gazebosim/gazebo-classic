@@ -19,7 +19,7 @@
 #define _GAZEBO_BUOYANCY_PLUGIN_HH_
 
 #include <map>
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"

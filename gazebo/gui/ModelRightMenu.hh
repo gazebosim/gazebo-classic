@@ -21,7 +21,7 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/KeyEvent-fwd.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/msgs/msgs.hh"

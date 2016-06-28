@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "gazebo/common/Color.hh"
+#include "gazebo/common/Color-fwd.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"

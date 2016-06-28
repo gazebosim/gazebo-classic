@@ -21,7 +21,7 @@
 #include <map>
 #include <string>
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/common/Color.hh"
+#include "gazebo/common/Color-fwd.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

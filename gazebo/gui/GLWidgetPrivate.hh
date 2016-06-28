@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/KeyEvent-fwd.hh"
+#include "gazebo/common/MouseEvent-fwd.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/LightMaker.hh"

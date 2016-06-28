@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/MouseEvent-fwd.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"

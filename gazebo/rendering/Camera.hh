@@ -38,7 +38,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 

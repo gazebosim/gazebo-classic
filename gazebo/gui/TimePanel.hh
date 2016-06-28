@@ -26,7 +26,7 @@
 #include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/system.hh"
 

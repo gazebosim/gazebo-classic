@@ -26,7 +26,7 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/Color.hh"
+#include "gazebo/common/Color-fwd.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Time.hh"
 

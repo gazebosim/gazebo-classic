@@ -35,7 +35,7 @@
 #include "gazebo/math/Plane.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/common/Color.hh"
+#include "gazebo/common/Color-fwd.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Image.hh"
 

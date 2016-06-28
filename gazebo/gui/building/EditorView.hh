@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

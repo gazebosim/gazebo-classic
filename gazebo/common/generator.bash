@@ -1,7 +1,7 @@
 GAZEBO_ROOT=/home/jrivero/code/gazebo
 # TODO: set iofwd for iostreams. Its own PRs?
 
-for f in $(ls *.hh | grep -v Private); do
+for f in Color.hh Timer.hh Event.hh; do
     # exclusions
     case ${f} in
 	Plugin.hh)

@@ -19,7 +19,7 @@
 
 #include <string>
 #include "gazebo/math/Pose.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

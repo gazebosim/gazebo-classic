@@ -22,8 +22,8 @@
 #include <string>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Event-fwd.hh"
+#include "gazebo/common/MouseEvent-fwd.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 

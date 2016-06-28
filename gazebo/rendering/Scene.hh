@@ -31,7 +31,7 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Color.hh"
+#include "gazebo/common/Color-fwd.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/msgs/msgs.hh"

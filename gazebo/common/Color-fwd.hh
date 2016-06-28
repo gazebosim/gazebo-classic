@@ -14,35 +14,15 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COMMONIFACEFWD_HH_
-#define _COMMONIFACEFWD_HH_
-
-#include <vector>
-#include <boost/uuid/sha1.hpp>
-#include <iosfwd>
+#ifndef _GAZEBO_COLORFWD_HH_
+#define _GAZEBO_COLORFWD_HH_
 
 namespace gazebo
 {
   namespace common
   {
-    void load();
-
-    void add_search_path_suffix(const std::string &_suffix);
-
-    std::string find_file(const std::string &_file);
-
-    std::string find_file(const std::string &_file,
-                          bool _searchLocalPath);
-
-    std::string find_file_path(const std::string &_file);
-
-    /// function are std::string and any STL container.
-    template<typename T>
-    std::string get_sha1(const T &_buffer);
-
-    const char *getEnv(const char *_name);
-    /// \}
+    /// \class Color Color.hh common/common.hh
+    class Color
   }
 }
 #endif

@@ -26,7 +26,7 @@
 #include <sdf/sdf.hh>
 #include <string>
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/msgs/msgs.hh"

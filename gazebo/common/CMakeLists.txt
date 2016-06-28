@@ -90,10 +90,12 @@ set (headers
   CommonIface.hh
   CommonTypes.hh
   Color.hh
+Color-fwd.hh
   Console.hh
   Dem.hh
   EnumIface.hh
   Event.hh
+Event-fwd.hh
   Events.hh
   Exception.hh
   MovingWindowFilter.hh
@@ -101,6 +103,7 @@ set (headers
   Image.hh
   ImageHeightmap.hh
   KeyEvent.hh
+Event-fwd.hh
   KeyFrame.hh
   Material.hh
   MaterialDensity.hh
@@ -109,6 +112,7 @@ set (headers
   MeshManager.hh
   ModelDatabase.hh
   MouseEvent.hh
+Event-fwd.hh
   PID.hh
   Plugin.hh
   SkeletonAnimation.hh
@@ -120,6 +124,7 @@ set (headers
   SVGLoader.hh
   Time.hh
   Timer.hh
+Timer-fwd.hh
   UpdateInfo.hh
   Video.hh
   ffmpeg_inc.h

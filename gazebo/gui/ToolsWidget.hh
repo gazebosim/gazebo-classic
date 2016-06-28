@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Event-fwd.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 

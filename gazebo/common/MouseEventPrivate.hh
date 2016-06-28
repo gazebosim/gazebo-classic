@@ -18,7 +18,7 @@
 #define _GAZEBO_MOUSEEVENT_PRIVATE_HH_
 
 #include <ignition/math/Vector2.hh>
-#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/MouseEvent-fwd.hh"
 
 namespace gazebo
 {

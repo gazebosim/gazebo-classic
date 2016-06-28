@@ -21,8 +21,8 @@
 #include <vector>
 #include <map>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent-fwd.hh"
+#include "gazebo/common/KeyEvent-fwd.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 
