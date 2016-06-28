@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_IMUSENSOR_HH_
-#define _GAZEBO_SENSORS_IMUSENSOR_HH_
+#ifndef GAZEBO_SENSORS_IMUSENSOR_HH_
+#define GAZEBO_SENSORS_IMUSENSOR_HH_
 
 #include <memory>
 #include <string>
@@ -87,7 +87,7 @@ namespace gazebo
       /// \brief get orientation of the IMU relative to a reference pose
       /// Initially, the reference pose is the boot up pose of the IMU,
       /// but user can call either SetReferencePose to define current
-      /// pose as teh reference frame, or call SetWorldToReferencePose
+      /// pose as the reference frame, or call SetWorldToReferencePose
       /// to define transform from world frame to reference frame.
       /// \return returns the orientation quaternion of the IMU relative to
       /// the imu reference pose.
