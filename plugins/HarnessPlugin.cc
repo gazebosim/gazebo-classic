@@ -223,6 +223,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 void HarnessPlugin::Detach()
 {
   this->joints[this->detachIndex]->Detach();
+  (this->joints[this->detachIndex]).reset();
 
   this->prevSimTime == common::Time::Zero;
 
