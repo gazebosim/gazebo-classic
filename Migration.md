@@ -195,6 +195,9 @@ release will remove the deprecated code.
     + EntityMakerPrivate class
     + Entity(EntityMakerPrivate&) constructor
     + EntityMakerPrivate *dataPtr
+    
+1. **gazebo/physics/Link.hh**
+    + std::vector<std::string> cgVisuals
 
 ## Gazebo 7.1.0 to 7.X
 
