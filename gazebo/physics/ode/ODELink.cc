@@ -43,9 +43,7 @@ ODELink::ODELink(EntityPtr _parent)
 //////////////////////////////////////////////////
 ODELink::~ODELink()
 {
-  if (this->linkId)
-    dBodyDestroy(this->linkId);
-  this->linkId = nullptr;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -179,12 +177,13 @@ void ODELink::MoveCallback(dBodyID _id)
 //////////////////////////////////////////////////
 void ODELink::Fini()
 {
-  Link::Fini();
   if (this->linkId)
     dBodyDestroy(this->linkId);
   this->linkId = nullptr;
 
   this->odePhysics.reset();
+
+  Link::Fini();
 }
 
 //////////////////////////////////////////////////
