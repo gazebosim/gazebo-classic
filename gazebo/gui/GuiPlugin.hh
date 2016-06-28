@@ -22,19 +22,11 @@
 
 namespace gazebo
 {
-  class p
-  {
-    public: p() {
-std::cerr << "pppppp!ppppp!ppppp!" << std::endl;
-    }
-  };
-
   /// \brief A plugin loaded within the gzclient on startup.
-  class GZ_GUI_VISIBLE GUIPlugin : public p, public QWidget, public PluginT<GUIPlugin>
+  class GZ_GUI_VISIBLE GUIPlugin : public QWidget, public PluginT<GUIPlugin>
   {
     public: GUIPlugin() : p(), QWidget(NULL)
     {
-std::cerr << "GUIPlugin()" << std::endl;
       this->type = GUI_PLUGIN;
     }
 

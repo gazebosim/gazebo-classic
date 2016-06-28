@@ -2079,14 +2079,13 @@ void MainWindow::OnAddPlugins()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->pluginLoadMutex);
 
-std::cerr << "MainWindow::OnAddPlugins() # todo remove! 2052" << std::endl;
-
   // Load all plugins.
   for (auto iter = this->dataPtr->pluginMsgs.begin();
       iter != this->dataPtr->pluginMsgs.end(); ++iter)
   {
-    this->AddGuiPlugin( (*iter)->filename(), (*iter)->name(),
-                      msgs::PluginToSDF(**iter));
+    this->AddGuiPlugin((*iter)->filename(),
+                       (*iter)->name(),
+                       msgs::PluginToSDF(**iter));
   }
   this->dataPtr->pluginMsgs.clear();
 
