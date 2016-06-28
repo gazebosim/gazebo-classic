@@ -47,12 +47,12 @@
           <parent>world</parent>
           <child>link</child>
           <axis>
-            <xyz>0 0 1</xyz>
+            <xyz>1 1 1</xyz>
             <dynamics>
               <damping>10</damping>
             </dynamics>
             <limit>
-              <lower>-1.5</lower>
+              <lower>-2.5</lower>
               <upper>0</upper>
               <effort>10000</effort>
               <velocity>-1</velocity>
