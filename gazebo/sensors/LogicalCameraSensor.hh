@@ -58,10 +58,6 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      // Move this to the public section in gazebo8. Basically move this
-      // function up in this file to be grouped with other public functions
-      // per the Gazebo style guide. This should replace the GetTopic
-      // function.
       public: virtual std::string Topic() const;
 
       /// \brief Get the near distance. This is the distance from the
