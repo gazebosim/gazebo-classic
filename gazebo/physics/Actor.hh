@@ -134,7 +134,7 @@ namespace gazebo
       /// \brief Set a custom trajectory for the actor, using one of the
       /// existing animations. This will override any trajectories previously
       /// defined. When a custom trajectory is defined, the script time must
-      /// be set with `SetScriptTime` order to play the animation.
+      /// be set with `SetScriptTime` in order to play the animation.
       /// \param[in] _trajInfo Information about custom trajectory.
       /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
