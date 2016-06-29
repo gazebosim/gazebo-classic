@@ -100,8 +100,14 @@ namespace gazebo
     /// \brief Index into the joints vector that specifies the joint to detach.
     private: int detachIndex = 0;
 
-    /// \brief PID controller for the winch
-    private: common::PID winchPID;
+    /// \brief Position PID controller for the winch
+    private: common::PID winchPosPID;
+
+    /// \brief Velocity PID controller for the winch
+    private: common::PID winchVelPID;
+
+    /// \brief Target winch position
+    private: float winchTargetPos = 0.0;
 
     /// \brief Target winch velocity
     private: float winchTargetVel = 0.0;
