@@ -127,8 +127,8 @@ World::World(const std::string &_name)
   this->dataPtr->loaded = false;
   this->dataPtr->stepInc = 0;
   this->dataPtr->pause = false;
-  this->dataPtr->thread = NULL;
-  this->dataPtr->logThread = NULL;
+  this->dataPtr->thread = nullptr;
+  this->dataPtr->logThread = nullptr;
   this->dataPtr->stop = false;
 
   this->dataPtr->currentStateBuffer = 0;
@@ -164,7 +164,7 @@ World::~World()
   this->Fini();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -252,7 +252,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
-  if (this->dataPtr->physicsEngine == NULL)
+  if (this->dataPtr->physicsEngine == nullptr)
     gzthrow("Unable to create physics engine\n");
 
   this->dataPtr->physicsEngine->Load(physicsElem);
@@ -274,7 +274,7 @@ void World::Load(sdf::ElementPtr _sdf)
       surfaceType, latitude, longitude, elevation, heading));
   }
 
-  if (this->dataPtr->sphericalCoordinates == NULL)
+  if (this->dataPtr->sphericalCoordinates == nullptr)
     gzthrow("Unable to create spherical coordinates data structure\n");
 
   this->dataPtr->rootElement.reset(new Base(BasePtr()));
@@ -431,7 +431,7 @@ void World::Stop()
   {
     this->dataPtr->thread->join();
     delete this->dataPtr->thread;
-    this->dataPtr->thread = NULL;
+    this->dataPtr->thread = nullptr;
   }
 }
 
@@ -487,7 +487,7 @@ void World::RunLoop()
     }
     this->dataPtr->logThread->join();
     delete this->dataPtr->logThread;
-    this->dataPtr->logThread = NULL;
+    this->dataPtr->logThread = nullptr;
   }
 }
 
@@ -803,7 +803,7 @@ void World::Update()
 //////////////////////////////////////////////////
 void World::Fini()
 {
-  this->Stop();
+  this->dataPtr->stop = true;
 
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
@@ -881,25 +881,33 @@ void World::Fini()
   if (this->dataPtr->receiveMutex)
   {
     delete this->dataPtr->receiveMutex;
-    this->dataPtr->receiveMutex = NULL;
+    this->dataPtr->receiveMutex = nullptr;
   }
 
   if (this->dataPtr->loadModelMutex)
   {
     delete this->dataPtr->loadModelMutex;
-    this->dataPtr->loadModelMutex = NULL;
+    this->dataPtr->loadModelMutex = nullptr;
   }
 
   if (this->dataPtr->setWorldPoseMutex)
   {
     delete this->dataPtr->setWorldPoseMutex;
-    this->dataPtr->setWorldPoseMutex = NULL;
+    this->dataPtr->setWorldPoseMutex = nullptr;
   }
 
   if (this->dataPtr->worldUpdateMutex)
   {
     delete this->dataPtr->worldUpdateMutex;
-    this->dataPtr->worldUpdateMutex = NULL;
+    this->dataPtr->worldUpdateMutex = nullptr;
+  }
+
+  // End world run thread
+  if (this->dataPtr->thread)
+  {
+    this->dataPtr->thread->join();
+    delete this->dataPtr->thread;
+    this->dataPtr->thread = nullptr;
   }
 }
 
@@ -907,6 +915,7 @@ void World::Fini()
 void World::Clear()
 {
   g_clearModels = true;
+  /// \todo Clear lights too?
 }
 
 //////////////////////////////////////////////////
@@ -916,13 +925,9 @@ void World::ClearModels()
   bool pauseState = this->IsPaused();
   this->SetPaused(true);
 
-  this->dataPtr->publishModelPoses.clear();
-  this->dataPtr->publishModelScales.clear();
-
-  // Remove all models
-  for (auto &model : this->dataPtr->models)
+  while (!this->dataPtr->models.empty())
   {
-    this->dataPtr->rootElement->RemoveChild(model->GetId());
+    this->RemoveModel(this->dataPtr->models[0]);
   }
   this->dataPtr->models.clear();
 
@@ -1059,7 +1064,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   if (_sdf->GetName() != "light")
   {
     gzerr << "SDF is missing the <light> tag" << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   // Add to scene message
@@ -2747,7 +2752,7 @@ void World::EnablePhysicsEngine(bool _enable)
 /////////////////////////////////////////////////
 void World::_AddDirty(Entity *_entity)
 {
-  GZ_ASSERT(_entity != NULL, "_entity is NULL");
+  GZ_ASSERT(_entity != nullptr, "_entity is nullptr");
   this->dataPtr->dirtyPoses.push_back(_entity);
 }
 
