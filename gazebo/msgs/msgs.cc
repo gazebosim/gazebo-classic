@@ -3006,6 +3006,18 @@ namespace gazebo
         jointElem = JointToSDF(_msg.joint(i), jointElem);
       }
 
+      if (_msg.plugin_size() > 0)
+      {
+        while (modelSDF->HasElement("plugin"))
+          modelSDF->GetElement("plugin")->RemoveFromParent();
+      }
+
+      for (int i = 0; i < _msg.plugin_size(); ++i)
+      {
+        sdf::ElementPtr pluginElem = modelSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
+      }
+
       if (_msg.link_size())
         while (modelSDF->HasElement("link"))
           modelSDF->GetElement("link")->RemoveFromParent();

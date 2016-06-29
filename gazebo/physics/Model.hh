@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -32,6 +33,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -441,6 +443,10 @@ namespace gazebo
       /// \brief Publish the scale.
       private: virtual void PublishScale();
 
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
 
@@ -478,11 +484,20 @@ namespace gazebo
       /// \brief Callback used when a joint animation completes.
       private: boost::function<void()> onJointAnimationComplete;
 
+      /// \brief Controller for the joints.
+      private: JointControllerPtr jointController;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;
 
-      /// \brief Controller for the joints.
-      private: JointControllerPtr jointController;
+      /// \brief Mutex to protect incoming message buffers.
+      private: std::mutex receiveMutex;
     };
     /// \}
   }
