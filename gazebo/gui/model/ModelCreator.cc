@@ -179,8 +179,11 @@ namespace gazebo
       /// \brief Mutex to protect updates
       public: std::recursive_mutex updateMutex;
 
-      /// \brief A list of link names whose scale has changed externally.
-      public: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
+      /// \brief A list of link names whose scale has changed externally,
+      /// and for each link, the list of scales for each of its visuals and
+      /// collisions.
+      public: std::map<LinkData *,
+          std::map<std::string, ignition::math::Vector3d>> linkScaleUpdate;
 
       /// \brief A list of link data whose pose has changed externally.
       /// This is the link's local pose.
@@ -2943,7 +2946,7 @@ void ModelCreator::ModelChanged()
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
-  const ignition::math::Vector3d &_scale)
+  const ignition::math::Vector3d &/*_scale*/)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   for (auto linksIt : this->dataPtr->allLinks)
@@ -2954,11 +2957,19 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
-      // Update inspector only
-      linksIt.second->SetInspectorScale(_scale);
+      // Update inspector according to visual size
+      linksIt.second->UpdateInspectorScale();
 
-      // Queue to register command once it is finalized
-      this->dataPtr->linkScaleUpdate[linksIt.second] = _scale;
+      // Queue to only register command once it is finalized
+      auto linkVis = linksIt.second->linkVisual;
+      std::map<std::string, ignition::math::Vector3d> scales;
+      for (unsigned int i = 0; i < linkVis->GetChildCount(); ++i)
+      {
+        // Add to map of scales to update
+        auto child = linkVis->GetChild(i);
+        scales[child->GetName()] = linkVis->GetChild(i)->GetGeometrySize();
+      }
+      this->dataPtr->linkScaleUpdate[linksIt.second] = scales;
 
       break;
     }
@@ -3177,7 +3188,7 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
 
 /////////////////////////////////////////////////
 void ModelCreator::OnRequestLinkScale(const std::string &_name,
-    const ignition::math::Vector3d &_scale)
+    std::map<std::string, ignition::math::Vector3d> _scales)
 {
   auto link = this->dataPtr->allLinks.find(_name);
   if (link == this->dataPtr->allLinks.end())
@@ -3186,19 +3197,25 @@ void ModelCreator::OnRequestLinkScale(const std::string &_name,
     return;
   }
 
-  auto vis = link->second->linkVisual;
-  for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
+  auto linkVis = link->second->linkVisual;
+
+  // Go through all child visuals (visuals and collisions)
+  for (unsigned int i = 0; i < linkVis->GetChildCount(); ++i)
   {
-    auto childVis = vis->GetChild(i);
-    auto geomType = childVis->GetGeometryType();
-    if (geomType != "" && geomType != "mesh")
+    auto childVis = linkVis->GetChild(i);
+
+    // Check if there is a new scale for this child
+    if (_scales.find(childVis->GetName()) == _scales.end())
     {
-      /// \todo Different geoms might be scaled differently
-      childVis->SetScale(_scale);
+      continue;
     }
+
+   auto scale = _scales[childVis->GetName()];
+   childVis->SetScale(scale);
   }
 
-  link->second->SetScale(_scale);
+ // Update link data and inspector
+ link->second->SetScale(_scales);
 }
 
 /////////////////////////////////////////////////

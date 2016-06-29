@@ -435,9 +435,9 @@ namespace gazebo
 
       /// \brief Callback when receiving a request to scale a link.
       /// \param[in] _name Link name.
-      /// \param[in] _scale New link scale.
+      /// \param[in] _scales New scale for each child of the link.
       private: void OnRequestLinkScale(const std::string &_name,
-          const ignition::math::Vector3d &_scale);
+          std::map<std::string, ignition::math::Vector3d> _scales);
 
       /// \brief Callback when receiving a request to move a link.
       /// \param[in] _name Link name.

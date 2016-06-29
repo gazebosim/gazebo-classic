@@ -54,11 +54,13 @@ namespace gazebo
       /// \brief Pose after the command (to be used by redo).
       public: ignition::math::Pose3d poseAfter;
 
-      /// \brief Scale before the command (to be used by undo).
-      public: ignition::math::Vector3d scaleBefore;
+      /// \brief Map of scale for each visual and collision before the command
+      /// (to be used by undo), indexed by the visual name.
+      public: std::map<std::string, ignition::math::Vector3d> scalesBefore;
 
-      /// \brief Scale after the command (to be used by redo).
-      public: ignition::math::Vector3d scaleAfter;
+      /// \brief Map of scale for each visual and collision after the command
+      /// (to be used by redo), indexed by the visual name.
+      public: std::map<std::string, ignition::math::Vector3d> scalesAfter;
     };
 
     /// \internal
@@ -161,7 +163,7 @@ void MEUserCmd::Undo()
       !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkScale(this->dataPtr->scopedName,
-        this->dataPtr->scaleBefore);
+        this->dataPtr->scalesBefore);
   }
 }
 
@@ -228,7 +230,7 @@ void MEUserCmd::Redo()
       !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkScale(this->dataPtr->scopedName,
-        this->dataPtr->scaleAfter);
+        this->dataPtr->scalesAfter);
   }
 }
 
@@ -271,11 +273,18 @@ void MEUserCmd::SetPoseChange(const ignition::math::Pose3d &_before,
 }
 
 /////////////////////////////////////////////////
-void MEUserCmd::SetScaleChange(const ignition::math::Vector3d &_before,
-    const ignition::math::Vector3d &_after)
+void MEUserCmd::SetScaleChange(
+    const std::map<std::string, ignition::math::Vector3d> &_before,
+    const std::map<std::string, ignition::math::Vector3d> &_after)
 {
-  this->dataPtr->scaleBefore = _before;
-  this->dataPtr->scaleAfter = _after;
+  if (_before.size() != _after.size())
+  {
+    gzwarn << "Number of scales before and after command are different, " <<
+        "some visual or collision might be scaled wrong." << std::endl;
+  }
+
+  this->dataPtr->scalesBefore = _before;
+  this->dataPtr->scalesAfter = _after;
 }
 
 /////////////////////////////////////////////////

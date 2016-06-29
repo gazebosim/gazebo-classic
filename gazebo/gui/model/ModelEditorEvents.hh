@@ -17,6 +17,7 @@
 #ifndef GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 #define GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 
+#include <map>
 #include <string>
 #include <sdf/sdf.hh>
 
@@ -228,12 +229,6 @@ namespace gazebo
             static event::ConnectionPtr ConnectRequestLinkScale(
             T _subscriber)
           { return requestLinkScale.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the request link scale signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectRequestLinkScale(
-            event::ConnectionPtr _subscriber)
-          { requestLinkScale.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the request link move signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -811,7 +806,7 @@ namespace gazebo
 
         /// \brief Request to scale a link.
         public: static event::EventT<void (std::string,
-            ignition::math::Vector3d)> requestLinkScale;
+            std::map<std::string, ignition::math::Vector3d>)> requestLinkScale;
 
         /// \brief Request to move a link.
         public: static event::EventT<void (std::string, ignition::math::Pose3d)>

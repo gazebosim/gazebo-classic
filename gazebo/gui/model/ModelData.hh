@@ -121,22 +121,23 @@ namespace gazebo
       /// \param[in] _sdf Link SDF element.
       public: void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Get the scale of the link.
-      /// \return Scale of link.
-      public: ignition::math::Vector3d Scale() const;
+      /// \brief Get the scale of all of the link's children.
+      /// \return Scales of visuals and collisions.
+      public: std::map<std::string, ignition::math::Vector3d> Scale() const;
 
-      /// \brief Set the scale of all the inspectors, making the necessary
+      /// \brief Update the scale of all the inspectors, making the necessary
       /// conversions to update inertial information.
+      /// The scale us updated based on the currenty geometry of 3D visuals.
       /// This does not alter the internal scale value returned by Scale().
       /// \sa SetScale
-      /// \param[in] _scale Scale of link.
-      public: void SetInspectorScale(const ignition::math::Vector3d &_scale);
+      public: void UpdateInspectorScale();
 
-      /// \brief Set the scale of the link. This function calls
-      /// SetInspectorScale.
-      /// \sa SetInspectorScale
-      /// \param[in] _scale Scale of link.
-      public: void SetScale(const ignition::math::Vector3d &_scale);
+      /// \brief Set the scales of the link. This function calls
+      /// UpdateInspectorScale.
+      /// \sa UpdateInspectorScale
+      /// \param[in] _scale Scales of all of the link's children.
+      public: void SetScale(
+          const std::map<std::string, ignition::math::Vector3d> &_scales);
 
       /// \brief Add a visual to the link.
       /// \param[in] _visual Visual to be added.
@@ -235,8 +236,8 @@ namespace gazebo
       /// \brief Inertia izz.
       private: double inertiaIzz;
 
-      /// \brief Scale of link.
-      public: ignition::math::Vector3d scale;
+      /// \brief Scale of all collision and visuals in the link.
+      public: std::map<std::string, ignition::math::Vector3d> scale;
 
       /// \brief Visual representing this link.
       public: rendering::VisualPtr linkVisual;

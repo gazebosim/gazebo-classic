@@ -120,11 +120,12 @@ namespace gazebo
       public: void SetPoseChange(const ignition::math::Pose3d &_before,
           const ignition::math::Pose3d &_after);
 
-      /// \brief Set the scale before and after the command.
-      /// \param[in] _before Scale before the command, to be used by undo.
-      /// \param[in] _after Scale after the command, to be used by redo.
-      public: void SetScaleChange(const ignition::math::Vector3d &_before,
-          const ignition::math::Vector3d &_after);
+      /// \brief Set the scales before and after the command.
+      /// \param[in] _before Scales before the command, to be used by undo.
+      /// \param[in] _after Scales after the command, to be used by redo.
+      public: void SetScaleChange(
+          const std::map<std::string, ignition::math::Vector3d> &_before,
+          const std::map<std::string, ignition::math::Vector3d> &_after);
 
       /// \internal
       /// \brief Pointer to private data.
