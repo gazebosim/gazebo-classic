@@ -2,6 +2,10 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Remove contact filters with names that contain `::`
+    * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
+    * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1805)
+
 ## Gazebo 7.2.0 (2016-06-13)
 
 1. Fix right click view options after deleting and respawning a model.
