@@ -79,11 +79,24 @@
 
           <!-- PID value for velocity control of the winch. These values
                are tuned to work with this box model. -->
-          <pid>
+          <pos_pid>
             <p>400</p>
             <i>0</i>
             <d>0</d>
-          </pid>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
+            <cmd_max>10000</cmd_max>
+            <cmd_min>-10000</cmd_min>
+          </pos_pid>
+          <vel_pid>
+            <p>400</p>
+            <i>0</i>
+            <d>0</d>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
+            <cmd_max>10000</cmd_max>
+            <cmd_min>0</cmd_min>
+          </vel_pid>
         </winch>
 
         <!-- Joint to detach. Once the joint is detached, it cannot be

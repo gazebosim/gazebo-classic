@@ -153,15 +153,43 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
         << "as the winch.\n";
     }
 
-    // Load the PID controller
-    if (winchElem->HasElement("pid"))
+    // Load the Position PID controller
+    if (winchElem->HasElement("pos_pid"))
     {
-      sdf::ElementPtr pidElem = winchElem->GetElement("pid");
+      sdf::ElementPtr pidElem = winchElem->GetElement("pos_pid");
       double pValue = pidElem->HasElement("p") ? pidElem->Get<double>("p") : 0;
       double iValue = pidElem->HasElement("i") ? pidElem->Get<double>("i") : 0;
       double dValue = pidElem->HasElement("d") ? pidElem->Get<double>("d") : 0;
+      double iMax =
+        pidElem->HasElement("i_max") ? pidElem->Get<double>("i_max") : 0;
+      double iMin =
+        pidElem->HasElement("i_min") ? pidElem->Get<double>("i_min") : 0;
+      double cmdMax =
+        pidElem->HasElement("cmd_max") ? pidElem->Get<double>("cmd_max") : 0;
+      double cmdMin =
+        pidElem->HasElement("cmd_min") ? pidElem->Get<double>("cmd_min") : 0;
 
-      this->winchPID.Init(pValue, iValue, dValue);
+      this->winchPosPID.Init(pValue, iValue, dValue,
+        iMax, iMin, cmdMax, cmdMin);
+    }
+    // Load the Velocity PID controller
+    if (winchElem->HasElement("vel_pid"))
+    {
+      sdf::ElementPtr pidElem = winchElem->GetElement("vel_pid");
+      double pValue = pidElem->HasElement("p") ? pidElem->Get<double>("p") : 0;
+      double iValue = pidElem->HasElement("i") ? pidElem->Get<double>("i") : 0;
+      double dValue = pidElem->HasElement("d") ? pidElem->Get<double>("d") : 0;
+      double iMax =
+        pidElem->HasElement("i_max") ? pidElem->Get<double>("i_max") : 0;
+      double iMin =
+        pidElem->HasElement("i_min") ? pidElem->Get<double>("i_min") : 0;
+      double cmdMax =
+        pidElem->HasElement("cmd_max") ? pidElem->Get<double>("cmd_max") : 0;
+      double cmdMin =
+        pidElem->HasElement("cmd_min") ? pidElem->Get<double>("cmd_min") : 0;
+
+      this->winchVelPID.Init(pValue, iValue, dValue,
+        iMax, iMin, cmdMax, cmdMin);
     }
   }
   else
@@ -201,20 +229,31 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
     this->prevSimTime = _info.simTime;
     return;
   }
+  common::Time dt = _info.simTime - this->prevSimTime;
+
+  double pError = 0;
+  if (ignition::math::equal(this->winchTargetVel, 0.0f))
+  {
+    // Calculate the position error if vel target is 0
+    pError = this->joints[this->winchIndex]->GetAngle(0).Radian() -
+      this->winchTargetPos;
+  }
 
   // Calculate the velocity error
-  double error = this->joints[this->winchIndex]->GetVelocity(0) -
+  double vError = this->joints[this->winchIndex]->GetVelocity(0) -
     this->winchTargetVel;
 
+
   // Use the PID controller to compute the joint force
-  double winchForce = this->winchPID.Update(error,
-      _info.simTime - this->prevSimTime);
+  double winchPosForce = this->winchPosPID.Update(pError, dt);
+  double winchVelForce = this->winchVelPID.Update(vError, dt);
 
   // Truncate winchForce so it doesn't push the robot downwards
-  winchForce = winchForce > 0? winchForce : 0.0;
+  // although this can also be accomplished by cmd_min and cmd_max.
+  winchVelForce = winchVelForce > 0? winchVelForce : 0.0;
 
   // Apply the joint force
-  this->joints[this->winchIndex]->SetForce(0, winchForce);
+  this->joints[this->winchIndex]->SetForce(0, winchVelForce + winchPosForce);
 
   this->prevSimTime = _info.simTime;
 }
@@ -241,6 +280,12 @@ double HarnessPlugin::WinchVelocity() const
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
   this->winchTargetVel = _value;
+  if (ignition::math::equal(_value, 0.0f))
+  {
+    // if zero velocity is commanded, hold position
+    this->winchTargetPos = this->joints[this->winchIndex]->GetAngle(0).Radian();
+    this->winchPosPID.Reset();
+  }
 }
 
 /////////////////////////////////////////////////
