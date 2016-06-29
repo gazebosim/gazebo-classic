@@ -34,6 +34,10 @@ release will remove the deprecated code.
     + ***Removed:*** setSelectedLink
     + ***Replacement:*** setSelectedEntity
 
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Removed:*** event::EventT<void (const std::string &, const gazebo::math::Vector3 &)> Events::scaleEntity
+    + ***Replacement:*** event::EventT<void (const std::string &, const ignition::math::Vector3d &)> Events::scaleEntity
+
 1. **gazebo/common/CommonTypes.hh**
     + ***Removed:*** GAZEBO_DEPRECATED
 1. **gazebo/util/system.hh**
@@ -161,13 +165,23 @@ release will remove the deprecated code.
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
+
+1. **gazebo/math/SignalStats.hh**
+    + ***Deprecation:*** public: gazebo::math::SignalStatistic
+    + ***Replacement:*** public: ignition::math::SignalStatistic
+    + ***Deprecation:*** public: gazebo::math::SignalStats
+    + ***Replacement:*** public: ignition::math::SignalStats
+
 1. **gazebo/math/Spline.hh**
     + ***Deprecation:*** public: gazebo::math::Spline
     + ***Replacement:*** public: ignition::math::Spline
 
-1. **gazebo/math/RotationSpline.hh**
-    + ***Deprecation:*** public: gazebo::math::RotationSpline
-    + ***Replacement:*** public: ignition::math::RotationSpline
+1. **gazebo/math/Vector3Stats.hh**
+    + ***Deprecation:*** public: gazebo::math::Vector3Stats
+    + ***Replacement:*** public: ignition::math::Vector3Stats
 
 ### Deletions
 
@@ -181,6 +195,9 @@ release will remove the deprecated code.
     + EntityMakerPrivate class
     + Entity(EntityMakerPrivate&) constructor
     + EntityMakerPrivate *dataPtr
+    
+1. **gazebo/physics/Link.hh**
+    + std::vector<std::string> cgVisuals
 
 ## Gazebo 7.1.0 to 7.X
 
