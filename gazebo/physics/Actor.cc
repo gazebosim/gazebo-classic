@@ -384,7 +384,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
   // Finally, (re)fill the times for all trajectories so that they are in a
   // sequence
   double time = 0.0;
-  for (unsigned int i = 0; i < this->trajInfo.size(); i++)
+  for (unsigned int i = 0; i < this->trajInfo.size(); ++i)
   {
     this->trajInfo[i].startTime = time;
     time += this->trajInfo[i].duration;
