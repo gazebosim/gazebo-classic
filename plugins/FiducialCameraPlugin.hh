@@ -18,11 +18,8 @@
 #ifndef GAZEBO_FIDUCIAL_CAMERA_PLUGIN_HH_
 #define GAZEBO_FIDUCIAL_CAMERA_PLUGIN_HH_
 
-#include <vector>
 #include <string>
 #include <memory>
-
-#include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/util/system.hh"
@@ -31,16 +28,6 @@ namespace gazebo
 {
   // Forward declare private class.
   class FiducialCameraPluginPrivate;
-
-  /// \brief A class to store fiducial data
-  class FiducialData
-  {
-    /// \brief Fiducial ID
-    public: std::string id;
-
-    /// \brief Center point of the fiducial in the image
-    public: ignition::math::Vector2i pt;
-  };
 
   /// \brief A camera sensor plugin for fiducial detection
   /// A fiducial is detected if its center is within the camera frustum and
@@ -72,11 +59,6 @@ namespace gazebo
     public: virtual void OnNewFrame(const unsigned char *_image,
         const unsigned int _width, const unsigned int _height,
         const unsigned int _depth, const std::string &_format);
-
-    /// \brief Publish the results
-    /// \param[in] _results Fiducial data containing id and location in image.
-    public: virtual void Publish(const std::vector<FiducialData> &_results)
-        const;
 
     /// \brief Helper function to fill the list of fiducials with all models
     /// in the world if none are specified

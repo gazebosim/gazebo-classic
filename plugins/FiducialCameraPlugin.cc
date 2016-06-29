@@ -15,6 +15,7 @@
  *
 */
 
+#include <vector>
 #include <functional>
 
 #include <ignition/math/Vector3.hh>
@@ -33,6 +34,16 @@ GZ_REGISTER_SENSOR_PLUGIN(FiducialCameraPlugin)
 
 namespace gazebo
 {
+  /// \brief A class to store fiducial data
+  class FiducialData
+  {
+    /// \brief Fiducial ID
+    public: std::string id;
+
+    /// \brief Center point of the fiducial in the image
+    public: ignition::math::Vector2i pt;
+  };
+
   class FiducialCameraPluginPrivate
   {
     /// \brief Pointer to the parent camera sensor
@@ -55,6 +66,16 @@ namespace gazebo
 
     /// \brief True to detect all objects in the world.
     public: bool detectAll = false;
+
+    /// \brief Pointer to the camera.
+    public: rendering::CameraPtr camera;
+
+    /// \brief Pointer to the scene.
+    public: rendering::ScenePtr scene;
+
+    /// \brief Publish the results
+    /// \param[in] _results Fiducial data containing id and location in image.
+    public: void Publish(const std::vector<FiducialData> &_results) const;
   };
 }
 
@@ -107,11 +128,24 @@ void FiducialCameraPlugin::Load(sensors::SensorPtr _sensor,
 
   this->dataPtr->parentSensor->SetActive(true);
 
-  this->dataPtr->connections.push_back(
-      this->dataPtr->parentSensor->Camera()->ConnectNewImageFrame(
-      std::bind(&FiducialCameraPlugin::OnNewFrame, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-        std::placeholders::_4, std::placeholders::_5)));
+  this->dataPtr->camera = this->dataPtr->parentSensor->Camera();
+  if (this->dataPtr->camera)
+  {
+    this->dataPtr->scene = this->dataPtr->camera->GetScene();
+    if (this->dataPtr->scene)
+    {
+      this->dataPtr->connections.push_back(
+          this->dataPtr->parentSensor->Camera()->ConnectNewImageFrame(
+          std::bind(&FiducialCameraPlugin::OnNewFrame, this,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5)));
+    }
+  }
+  if (!this->dataPtr->camera || !this->dataPtr->scene)
+  {
+    gzerr << "FiducialCameraPlugin failed to load. "
+        << "Camera and/or Scene not found" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -135,13 +169,10 @@ void FiducialCameraPlugin::Init()
 /////////////////////////////////////////////////
 void FiducialCameraPlugin::PopulateFiducials()
 {
-  rendering::CameraPtr camera = this->dataPtr->parentSensor->Camera();
-  rendering::ScenePtr scene = camera->GetScene();
-
   this->dataPtr->fiducials.clear();
 
   // Check all models for inclusion in the frustum.
-  rendering::VisualPtr worldVis = scene->WorldVisual();
+  rendering::VisualPtr worldVis = this->dataPtr->scene->WorldVisual();
   for (unsigned int i = 0; i < worldVis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = worldVis->GetChild(i);
@@ -155,15 +186,14 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     const unsigned int /*_width*/, const unsigned int /*_height*/,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
-  rendering::CameraPtr camera = this->dataPtr->parentSensor->Camera();
-  rendering::ScenePtr scene = camera->GetScene();
-
   if (!this->dataPtr->selectionBuffer)
   {
-    std::string cameraName = camera->OgreCamera()->getName();
+    std::string cameraName = this->dataPtr->camera->OgreCamera()->getName();
     this->dataPtr->selectionBuffer.reset(
-        new rendering::SelectionBuffer(cameraName, scene->OgreSceneManager(),
-        camera->RenderTexture()->getBuffer()->getRenderTarget()));
+        new rendering::SelectionBuffer(cameraName,
+        this->dataPtr->scene->OgreSceneManager(),
+        this->dataPtr->camera->RenderTexture()->getBuffer()->
+        getRenderTarget()));
   }
 
   if (this->dataPtr->detectAll)
@@ -173,15 +203,15 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
   for (const auto &f : this->dataPtr->fiducials)
   {
     // check if fiducial is visible within the frustum
-    rendering::VisualPtr vis = scene->GetVisual(f);
+    rendering::VisualPtr vis = this->dataPtr->scene->GetVisual(f);
     if (!vis)
       continue;
 
-    if (!camera->IsVisible(vis))
+    if (!this->dataPtr->camera->IsVisible(vis))
       continue;
 
     ignition::math::Vector2i pt =
-        camera->Project(vis->GetWorldPose().pos.Ign());
+        this->dataPtr->camera->Project(vis->GetWorldPose().pos.Ign());
 
     // use selection buffer to check if visual is occluded by other entities
     // in the camera view
@@ -193,7 +223,7 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     {
       try
       {
-        result = scene->GetVisual(
+        result = this->dataPtr->scene->GetVisual(
             Ogre::any_cast<std::string>(
             entity->getUserObjectBindings().getUserAny()));
       }
@@ -213,15 +243,15 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     }
   }
 
-  this->Publish(results);
+  this->dataPtr->Publish(results);
 }
 
 /////////////////////////////////////////////////
-void FiducialCameraPlugin::Publish(const std::vector<FiducialData> &_results)
-    const
+void FiducialCameraPluginPrivate::Publish(
+    const std::vector<FiducialData> &_results) const
 {
   // publish the results
-  common::Time timestamp = this->dataPtr->parentSensor->LastMeasurementTime();
+  common::Time timestamp = this->parentSensor->LastMeasurementTime();
 
   msgs::PosesStamped msg;
   msgs::Set(msg.mutable_time(), timestamp);
@@ -238,5 +268,5 @@ void FiducialCameraPlugin::Publish(const std::vector<FiducialData> &_results)
         ignition::math::Quaterniond::Identity));
   }
 
-  this->dataPtr->fiducialPub->Publish(msg);
+  this->fiducialPub->Publish(msg);
 }
