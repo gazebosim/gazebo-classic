@@ -117,13 +117,13 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Time Convert(const common::Time &_t);
 
-    /// \brief Convert a ignition::math::Inertiald to a msgs::Inertial
+    /// \brief Convert an ignition::math::Inertiald to a msgs::Inertial
     /// \param[in] _m The Inertiald to convert
     /// \return A msgs::Inertial object
     GAZEBO_VISIBLE
     msgs::Inertial Convert(const ignition::math::Inertiald &_i);
 
-    /// \brief Convert a ignition::math::MassMatrix3d to a msgs::Inertial
+    /// \brief Convert an ignition::math::MassMatrix3d to a msgs::Inertial
     /// \param[in] _m The MassMatrix3d to convert
     /// \return A msgs::Inertial object
     GAZEBO_VISIBLE
