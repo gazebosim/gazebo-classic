@@ -44,7 +44,7 @@ namespace gazebo
       /// \brief Name of the road segment.
       public: std::string name;
 
-      /// \brief Point that make up the middle of the road.
+      /// \brief Points that make up the middle of the road.
       public: std::vector<ignition::math::Vector3d> points;
 
       /// \brief Width of the road.
