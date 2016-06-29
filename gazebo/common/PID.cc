@@ -151,10 +151,21 @@ double PID::Update(double _error, common::Time _dt)
   this->cmd = -pTerm - iTerm - dTerm;
 
   // Check the command limits
-  if (!ignition::math::equal(this->cmdMax, 0.0) && this->cmd > this->cmdMax)
-    this->cmd = this->cmdMax;
-  if (!ignition::math::equal(this->cmdMin, 0.0) && this->cmd < this->cmdMin)
-    this->cmd = this->cmdMin;
+  if (this->cmdMax < this->cmdMin)
+  {
+    // max command limit is less than min command limit, leave
+    //  command untruncated.
+  }
+  else if (ignition::math::equal(this->cmdMax, this->cmdMin))
+  {
+    // max and min command limit are equal, truncate command.
+    this->cmd = ignition::math::clamp(this->cmd, this->cmdMin, this->cmdMax);
+  }
+  else
+  {
+    // truncate command
+    this->cmd = ignition::math::clamp(this->cmd, this->cmdMin, this->cmdMax);
+  }
 
   return this->cmd;
 }
