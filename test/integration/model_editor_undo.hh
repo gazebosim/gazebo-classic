@@ -41,6 +41,13 @@ class ModelEditorUndoTest : public QTestFixture
   /// \brief Test undo/redo joint insertion via creation dialog.
   private slots: void JointInsertionByDialog();
 
+  /// \brief Test undo/redo model plugin insertion.
+  private slots: void ModelPluginInsertion();
+
+  /// \brief Test undo/redo model plugin deletion via the right-click context
+  /// menu.
+  private slots: void ModelPluginDeletionByContextMenu();
+
   /// \brief Test undo/redo link translation.
   private slots: void LinkTranslation();
 

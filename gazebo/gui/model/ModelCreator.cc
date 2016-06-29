@@ -364,7 +364,7 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginRemoval(
       std::bind(&ModelCreator::RemoveModelPlugin, this,
-      std::placeholders::_1)));
+      std::placeholders::_1, std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
@@ -374,7 +374,8 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginInsertion(
       std::bind(&ModelCreator::OnAddModelPlugin, this,
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestLinkScale(
@@ -1914,11 +1915,13 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
 /////////////////////////////////////////////////
 void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 {
+  // User request from right-click menu
   this->RemoveModelPlugin(_name.toStdString());
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveModelPlugin(const std::string &_name)
+void ModelCreator::RemoveModelPlugin(const std::string &_name,
+    const bool _newCmd)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
@@ -1926,6 +1929,15 @@ void ModelCreator::RemoveModelPlugin(const std::string &_name)
   if (it == this->dataPtr->allModelPlugins.end())
   {
     return;
+  }
+
+  if (_newCmd)
+  {
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Delete plugin [" + _name + "]",
+        MEUserCmd::DELETING_MODEL_PLUGIN);
+    cmd->SetSDF(it->second->modelPluginSDF);
+    cmd->SetScopedName(_name);
   }
 
   ModelPluginData *data = it->second;
@@ -2339,6 +2351,7 @@ void ModelCreator::ShowModelPluginContextMenu(const std::string &_name)
 
   // Menu
   QMenu menu;
+  menu.setObjectName("ModelEditorContextMenu");
   menu.addAction(inspectorAct);
   menu.addAction(deleteAct);
 
@@ -3103,7 +3116,8 @@ ModelCreator::SaveState ModelCreator::CurrentSaveState() const
 
 /////////////////////////////////////////////////
 void ModelCreator::OnAddModelPlugin(const std::string &_name,
-    const std::string &_filename, const std::string &_innerxml)
+    const std::string &_filename, const std::string &_innerxml,
+    const bool _newCmd)
 {
   if (_name.empty() || _filename.empty())
   {
@@ -3123,6 +3137,16 @@ void ModelCreator::OnAddModelPlugin(const std::string &_name,
   if (sdf::readString(tmp.str(), modelPluginSDF))
   {
     this->AddModelPlugin(modelPluginSDF);
+
+    if (_newCmd)
+    {
+      auto cmd = this->dataPtr->userCmdManager->NewCmd(
+          "Inserted plugin [" + _name + "]",
+          MEUserCmd::INSERTING_MODEL_PLUGIN);
+      cmd->SetSDF(modelPluginSDF);
+      cmd->SetScopedName(_name);
+    }
+
     this->ModelChanged();
   }
   else
@@ -3256,3 +3280,4 @@ ignition::math::Pose3d ModelCreator::WorldToLocal(
   // p_T_t = w_T_p^-1 * w_T_t
   return (parentModelWorld.Inverse() * targetWorld).Pose();
 }
+

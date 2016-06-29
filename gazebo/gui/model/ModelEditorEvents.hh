@@ -797,12 +797,16 @@ namespace gazebo
         public: static event::EventT<void (std::string)> modelPluginRemoved;
 
         /// \brief Request to remove a model plugin.
-        public: static event::EventT<void (std::string)>
+        /// The parameters are: name, flag to indicate whether a new user
+        /// command should be created.
+        public: static event::EventT<void (std::string, bool)>
             requestModelPluginRemoval;
 
         /// \brief Request to insert a model plugin.
+        /// The parameters are: name, filename, inner XML, flag to indicate
+        /// whether a new user command should be created.
         public: static event::EventT<void (std::string, std::string,
-            std::string)> requestModelPluginInsertion;
+            std::string, bool)> requestModelPluginInsertion;
 
         /// \brief Request to scale a link.
         public: static event::EventT<void (std::string,

@@ -82,9 +82,10 @@ event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;
 event::EventT<void (std::string)> model::Events::modelPluginRemoved;
 
-event::EventT<void (std::string, std::string, std::string)>
+event::EventT<void (std::string, std::string, std::string, bool)>
     model::Events::requestModelPluginInsertion;
-event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;
+event::EventT<void (std::string, bool)>
+    model::Events::requestModelPluginRemoval;
 
 event::EventT<void (std::string)> model::Events::openModelPluginInspector;
 event::EventT<void (std::string)> model::Events::showModelPluginContextMenu;

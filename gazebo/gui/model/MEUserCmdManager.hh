@@ -73,7 +73,13 @@ namespace gazebo
         MOVING_NESTED_MODEL = 7,
 
         /// \brief Scale a link.
-        SCALING_LINK = 8
+        SCALING_LINK = 8,
+
+        /// \brief Insert a model plugin.
+        INSERTING_MODEL_PLUGIN = 9,
+
+        /// \brief Delete a model plugin.
+        DELETING_MODEL_PLUGIN = 10
       };
 
       /// \brief Constructor

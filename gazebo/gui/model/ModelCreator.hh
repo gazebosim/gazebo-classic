@@ -162,7 +162,10 @@ namespace gazebo
 
       /// \brief Remove a model plugin from the model.
       /// \param[in] _pluginName Name of the model plugin to remove.
-      public: void RemoveModelPlugin(const std::string &_pluginName);
+      /// \param[in] _newCmd Flag indicating whether a new command should be
+      /// created.
+      public: void RemoveModelPlugin(const std::string &_pluginName,
+          const bool _newCmd = true);
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
@@ -209,8 +212,11 @@ namespace gazebo
       /// \param[in] _name Name of plugin
       /// \param[in] _filename Plugin filename
       /// \param[in] _innerxml Plugin SDF elements in string
+      /// \param[in] _newCmd Flag indicating whether a new command should be
+      /// created.
       public: void OnAddModelPlugin(const std::string &_name,
-          const std::string &_filename, const std::string &_innerxml);
+          const std::string &_filename, const std::string &_innerxml,
+          const bool _newCmd = true);
 
       /// \brief Add a model plugin to the model
       /// \param[in] _pluginElem Pointer to plugin SDF element
