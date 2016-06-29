@@ -61,6 +61,7 @@ GpuRaySensor::GpuRaySensor()
 //////////////////////////////////////////////////
 GpuRaySensor::~GpuRaySensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -317,10 +318,13 @@ void GpuRaySensor::Init()
 //////////////////////////////////////////////////
 void GpuRaySensor::Fini()
 {
-  Sensor::Fini();
-  this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
-  this->dataPtr->laserCam.reset();
+  if (this->scene)
+    this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
   this->scene.reset();
+
+  this->dataPtr->laserCam.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////

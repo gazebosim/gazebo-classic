@@ -70,7 +70,7 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
 
   // Model tree
   this->modelTreeWidget = new QTreeWidget();
-  this->modelTreeWidget->setObjectName("modelTreeWidget");
+  this->modelTreeWidget->setObjectName("modelEditorTreeWidget");
   this->modelTreeWidget->setColumnCount(1);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();
@@ -723,6 +723,8 @@ void ModelTreeWidget::OnAddModelPlugin()
 void ModelTreeWidget::OnModelPluginApply()
 {
   msgs::Plugin *msg = this->modelPluginInspector->Data();
+
+  // User command from tree
   model::Events::requestModelPluginInsertion(msg->name(), msg->filename(),
-      msg->innerxml());
+      msg->innerxml(), true);
 }
