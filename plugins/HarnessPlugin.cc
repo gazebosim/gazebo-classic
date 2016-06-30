@@ -93,8 +93,6 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
     jointElem = jointElem->GetNextElement("joint");
   }
 
-
-
   // Make sure at least one joint was created.
   if (this->joints.empty())
   {
