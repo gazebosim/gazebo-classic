@@ -33,6 +33,14 @@ release will remove the deprecated code.
     + ***Replacement:*** DisconnectSetSelectedEntity
     + ***Removed:*** setSelectedLink
     + ***Replacement:*** setSelectedEntity
+    + ***Removed:*** event::EventT<void (std::string)> requestModelPluginRemoval;
+    + ***Replacement:*** event::EventT<void (std::string, bool)> requestModelPluginRemoval;
+    + ***Removed:*** event::EventT<void (std::string, std::string, std::string)> requestModelPluginInsertion;
+    + ***Replacement:*** event::EventT<void (std::string, std::string, std::string, bool)> requestModelPluginInsertion;
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Removed:*** event::EventT<void (const std::string &, const gazebo::math::Vector3 &)> Events::scaleEntity
+    + ***Replacement:*** event::EventT<void (const std::string &, const ignition::math::Vector3d &)> Events::scaleEntity
 
 1. **gazebo/common/CommonTypes.hh**
     + ***Removed:*** GAZEBO_DEPRECATED
@@ -191,6 +199,9 @@ release will remove the deprecated code.
     + EntityMakerPrivate class
     + Entity(EntityMakerPrivate&) constructor
     + EntityMakerPrivate *dataPtr
+    
+1. **gazebo/physics/Link.hh**
+    + std::vector<std::string> cgVisuals
 
 ## Gazebo 7.1.0 to 7.X
 

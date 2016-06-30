@@ -49,11 +49,6 @@ namespace gazebo
 
       /// \brief Get the port for the new gzserver specified by the user.
       /// \return The port for the new gzserver.
-      /// \deprecated See Port() const
-      public: int GetPort() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the port for the new gzserver specified by the user.
-      /// \return The port for the new gzserver.
       public: int Port() const;
 
       /// \brief True if the stored port is a valid one. A valid port is an

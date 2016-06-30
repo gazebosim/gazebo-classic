@@ -16,7 +16,7 @@
 */
 #include <boost/bind.hpp>
 
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/Color.hh"
 
@@ -377,8 +377,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           {
             // Snap to angular increments
             QLineF newLine(p1, p2);
-            double angle = GZ_DTOR(QLineF(p1, p2).angle());
-            double range = GZ_DTOR(SegmentItem::SnapAngle);
+            double angle = IGN_DTOR(QLineF(p1, p2).angle());
+            double range = IGN_DTOR(SegmentItem::SnapAngle);
             int angleIncrement = angle / range;
 
             if ((angle - range*angleIncrement) > range*0.5)

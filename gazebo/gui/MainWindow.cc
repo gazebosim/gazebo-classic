@@ -22,6 +22,7 @@
 #include <QDesktopServices>
 #include <functional>
 
+#include <ignition/math/Pose3.hh>
 #include <sdf/sdf.hh>
 #include <boost/algorithm/string.hpp>
 
@@ -2267,12 +2268,6 @@ RenderWidget *MainWindow::RenderWidget() const
 }
 
 /////////////////////////////////////////////////
-RenderWidget *MainWindow::GetRenderWidget() const
-{
-  return this->RenderWidget();
-}
-
-/////////////////////////////////////////////////
 bool MainWindow::IsPaused() const
 {
   if (this->dataPtr->renderWidget)
@@ -2350,12 +2345,6 @@ Editor *MainWindow::Editor(const std::string &_name) const
     return iter->second.get();
 
   return NULL;
-}
-
-/////////////////////////////////////////////////
-Editor *MainWindow::GetEditor(const std::string &_name) const
-{
-  return this->Editor(_name);
 }
 
 /////////////////////////////////////////////////

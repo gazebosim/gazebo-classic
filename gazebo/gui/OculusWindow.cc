@@ -16,6 +16,8 @@
  */
 #include <thread>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/gui/OculusWindow.hh"
 #include "gazebo/rendering/OculusCamera.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -112,15 +114,16 @@ void OculusWindow::AttachCameraToVisual()
 
   this->oculusCamera->AttachToVisual(this->visualName, true, 0, 0);
 
-  math::Vector3 camPos(0.1, 0, 0);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(0.1, 0, 0);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  auto delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y, delta.x);
+  double yaw = atan2(delta.Y(), delta.X());
 
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  double pitch = atan2(-delta.Z(),
+      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
 
-  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(camPos.Ign(),
+  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(camPos,
       ignition::math::Quaterniond(0.0, pitch, yaw)));
 }
 
