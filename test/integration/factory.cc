@@ -67,9 +67,7 @@ class FactoryTest : public ServerFixture,
 void FactoryTest::BoxSdf(const std::string &_physicsEngine)
 {
   ignition::math::Pose3d setPose;
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  this->Load("worlds/empty.world", true, _physicsEngine);
 
   unsigned int entityCount = 6;
 
@@ -90,7 +88,7 @@ void FactoryTest::BoxSdf(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_box_" << i;
 
-    physics::ModelPtr model = world->GetModel(name.str());
+    physics::ModelPtr model = this->GetModel(name.str());
     ASSERT_TRUE(model != NULL);
     msgs::Model msg;
     model->FillMsg(msg);
@@ -109,7 +107,7 @@ TEST_P(FactoryTest, BoxSdf)
 void FactoryTest::Box(const std::string &_physicsEngine)
 {
   ignition::math::Pose3d setPose, testPose;
-  Load("worlds/empty.world", true, _physicsEngine);
+  this->Load("worlds/empty.world", true, _physicsEngine);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -136,7 +134,7 @@ TEST_P(FactoryTest, Box)
 void FactoryTest::Sphere(const std::string &_physicsEngine)
 {
   ignition::math::Pose3d setPose, testPose;
-  Load("worlds/empty.world", true, _physicsEngine);
+  this->Load("worlds/empty.world", true, _physicsEngine);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -162,7 +160,7 @@ TEST_P(FactoryTest, Sphere)
 void FactoryTest::Cylinder(const std::string &_physicsEngine)
 {
   ignition::math::Pose3d setPose, testPose;
-  Load("worlds/empty.world", true, _physicsEngine);
+  this->Load("worlds/empty.world", true, _physicsEngine);
 
   for (unsigned int i = 0; i < 100; i++)
   {
@@ -189,12 +187,10 @@ TEST_P(FactoryTest, Cylinder)
 void FactoryTest::ActorSkinOnly(const std::string &_physicsEngine)
 {
   this->Load("worlds/empty.world", true, _physicsEngine);
-  auto world = physics::get_world();
-  ASSERT_TRUE(world != nullptr);
 
   // Check there is no actor yet
   std::string actorName("test_actor");
-  EXPECT_FALSE(world->GetModel(actorName));
+  EXPECT_FALSE(this->GetModel(actorName));
 
   // Spawn from actor SDF string
   std::string skinFile("walk.dae");
@@ -212,15 +208,9 @@ void FactoryTest::ActorSkinOnly(const std::string &_physicsEngine)
   this->factoryPub->Publish(msg);
 
   // Wait until actor was spawned
-  int sleep = 0;
-  int maxSleep = 10;
-  auto model = world->GetModel(actorName);
-  while (!model && sleep < maxSleep)
-  {
-    common::Time::MSleep(300);
-    model = world->GetModel(actorName);
-    ++sleep;
-  }
+  this->WaitUntilEntitySpawn(actorName, 300, 10);
+
+  auto model = this->GetModel(actorName);
   ASSERT_TRUE(model != nullptr);
 
   // Convert to actor
@@ -282,12 +272,10 @@ TEST_P(FactoryTest, ActorSkinOnly)
 void FactoryTest::ActorSkinAnim(const std::string &_physicsEngine)
 {
   this->Load("worlds/empty.world", true, _physicsEngine);
-  auto world = physics::get_world();
-  ASSERT_TRUE(world != nullptr);
 
   // Check there is no actor yet
   std::string actorName("test_actor");
-  EXPECT_FALSE(world->GetModel(actorName));
+  EXPECT_FALSE(this->GetModel(actorName));
 
   // Spawn from actor SDF string
   std::string skinFile("walk.dae");
@@ -310,15 +298,9 @@ void FactoryTest::ActorSkinAnim(const std::string &_physicsEngine)
   this->factoryPub->Publish(msg);
 
   // Wait until actor was spawned
-  int sleep = 0;
-  int maxSleep = 10;
-  auto model = world->GetModel(actorName);
-  while (!model && sleep < maxSleep)
-  {
-    common::Time::MSleep(300);
-    model = world->GetModel(actorName);
-    ++sleep;
-  }
+  this->WaitUntilEntitySpawn(actorName, 300, 10);
+
+  auto model = this->GetModel(actorName);
   ASSERT_TRUE(model != nullptr);
 
   // Convert to actor
@@ -374,12 +356,10 @@ void FactoryTest::ActorSkinAnim(const std::string &_physicsEngine)
 void FactoryTest::ActorSkinTrajectory(const std::string &_physicsEngine)
 {
   this->Load("worlds/empty.world", true, _physicsEngine);
-  auto world = physics::get_world();
-  ASSERT_TRUE(world != nullptr);
 
   // Check there is no actor yet
   std::string actorName("test_actor");
-  EXPECT_FALSE(world->GetModel(actorName));
+  EXPECT_FALSE(this->GetModel(actorName));
 
   // Spawn from actor SDF string
   std::string skinFile("run.dae");
@@ -410,15 +390,9 @@ void FactoryTest::ActorSkinTrajectory(const std::string &_physicsEngine)
   this->factoryPub->Publish(msg);
 
   // Wait until actor was spawned
-  int sleep = 0;
-  int maxSleep = 10;
-  auto model = world->GetModel(actorName);
-  while (!model && sleep < maxSleep)
-  {
-    common::Time::MSleep(300);
-    model = world->GetModel(actorName);
-    ++sleep;
-  }
+  this->WaitUntilEntitySpawn(actorName, 300, 10);
+
+  auto model = this->GetModel(actorName);
   ASSERT_TRUE(model != nullptr);
 
   // Convert to actor
@@ -481,12 +455,10 @@ TEST_P(FactoryTest, ActorSkinTrajectory)
 void FactoryTest::ActorLinkTrajectory(const std::string &_physicsEngine)
 {
   this->Load("worlds/empty.world", true, _physicsEngine);
-  auto world = physics::get_world();
-  ASSERT_TRUE(world != nullptr);
 
   // Check there is no actor yet
   std::string actorName("test_actor");
-  EXPECT_FALSE(world->GetModel(actorName));
+  EXPECT_FALSE(this->GetModel(actorName));
 
   // Spawn from actor SDF string
   std::ostringstream actorStr;
@@ -524,11 +496,11 @@ void FactoryTest::ActorLinkTrajectory(const std::string &_physicsEngine)
   // Wait until actor was spawned
   int sleep = 0;
   int maxSleep = 10;
-  auto model = world->GetModel(actorName);
+  auto model = this->GetModel(actorName);
   while (!model && sleep < maxSleep)
   {
     common::Time::MSleep(300);
-    model = world->GetModel(actorName);
+    model = this->GetModel(actorName);
     ++sleep;
   }
   ASSERT_TRUE(model != nullptr);
@@ -582,12 +554,10 @@ TEST_P(FactoryTest, ActorLinkTrajectory)
 void FactoryTest::ActorAll(const std::string &_physicsEngine)
 {
   this->Load("worlds/empty.world", true, _physicsEngine);
-  auto world = physics::get_world();
-  ASSERT_TRUE(world != nullptr);
 
   // Check there is no actor yet
   std::string actorName("test_actor");
-  EXPECT_FALSE(world->GetModel(actorName));
+  EXPECT_FALSE(this->GetModel(actorName));
 
   // Spawn from actor SDF string
   std::string skinFile("moonwalk.dae");
@@ -622,15 +592,9 @@ void FactoryTest::ActorAll(const std::string &_physicsEngine)
   this->factoryPub->Publish(msg);
 
   // Wait until actor was spawned
-  int sleep = 0;
-  int maxSleep = 10;
-  auto model = world->GetModel(actorName);
-  while (!model && sleep < maxSleep)
-  {
-    common::Time::MSleep(300);
-    model = world->GetModel(actorName);
-    ++sleep;
-  }
+  this->WaitUntilEntitySpawn(actorName, 300, 10);
+
+  auto model = this->GetModel(actorName);
   ASSERT_TRUE(model != nullptr);
 
   // Convert to actor
@@ -692,7 +656,7 @@ TEST_P(FactoryTest, ActorAll)
 void FactoryTest::Clone(const std::string &_physicsEngine)
 {
   ignition::math::Pose3d testPose;
-  Load("worlds/pr2.world", true, _physicsEngine);
+  this->Load("worlds/pr2.world", true, _physicsEngine);
 
   // clone the pr2
   std::string name = "pr2";
@@ -715,13 +679,10 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   EXPECT_TRUE(math::equal(testPose.Pos().Z(), clonePose.Pos().Z(), 0.1));
 
   // Verify properties of the pr2 clone with the original model.
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
   // Check model
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = this->GetModel(name);
   ASSERT_TRUE(model != NULL);
-  physics::ModelPtr modelClone = world->GetModel(cloneName);
+  physics::ModelPtr modelClone = this->GetModel(cloneName);
   ASSERT_TRUE(modelClone != NULL);
   EXPECT_EQ(model->GetJointCount(), modelClone->GetJointCount());
   EXPECT_EQ(model->GetLinks().size(), modelClone->GetLinks().size());

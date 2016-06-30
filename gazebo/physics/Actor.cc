@@ -95,9 +95,9 @@ void Actor::Load(sdf::ElementPtr _sdf)
         if (_sdf->HasElement("script") &&
             _sdf->GetElement("script")->HasElement("trajectory"))
         {
-          auto name = _sdf->GetElement("script")->GetElement("trajectory")->
+          auto trajName = _sdf->GetElement("script")->GetElement("trajectory")->
               Get<std::string>("type");
-          animElem->GetAttribute("name")->Set(name);
+          animElem->GetAttribute("name")->Set(trajName);
         }
 
         // Get file from skin
@@ -609,7 +609,7 @@ void Actor::Update()
     // If we're still in the same trajectory, compare to last position
     if (this->lastTraj == tinfo->id)
     {
-      this->pathLength += fabs(this->lastPos.Distance(modelPose.Pos()));
+      this->pathLength += this->lastPos.Distance(modelPose.Pos());
     }
     // Otherwise, compare to first frame of this trajectory - ?
     else
@@ -617,7 +617,7 @@ void Actor::Update()
       auto frame0 = dynamic_cast<common::PoseKeyFrame *>
         (this->trajectories[tinfo->id]->GetKeyFrame(0));
       ignition::math::Vector3d vector3Ign = frame0->Translation();
-      this->pathLength = fabs(modelPose.Pos().Distance(vector3Ign));
+      this->pathLength = modelPose.Pos().Distance(vector3Ign);
     }
     this->lastPos = modelPose.Pos();
   }
