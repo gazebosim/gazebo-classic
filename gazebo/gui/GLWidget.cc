@@ -541,18 +541,24 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 {
   // Update the view depending on the current GUI state
-  if (this->dataPtr->state == "make_entity")
-    this->OnMouseMoveMakeEntity();
-  else if (this->dataPtr->state == "select")
+  if (this->dataPtr->state == "select")
+  {
     this->OnMouseMoveNormal();
+  }
   else if (this->dataPtr->state == "translate" ||
            this->dataPtr->state == "rotate"    ||
            this->dataPtr->state == "scale")
   {
     ModelManipulator::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
   }
+  else if (this->dataPtr->state == "make_entity")
+  {
+    this->OnMouseMoveMakeEntity();
+  }
   else if (this->dataPtr->state == "snap")
+  {
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
+  }
 
   return true;
 }
@@ -1321,7 +1327,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
