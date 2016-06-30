@@ -2,6 +2,12 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Rearrange GLWidget::OnMouseMove so that the more common use cases it
+   fewer if statements. Use std::thread in place of boost in OculusWindow.
+   Pragma statements to prevent warnings. Prevent variable hiding in
+   WallSegmentItem.
+    * [Pull request #2376](https://bitbucket.org/osrf/gazebo/pull-request/2376)
+
 1. Use single pixel selection buffer for mouse picking
     * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
 
