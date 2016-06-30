@@ -184,4 +184,7 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
+
+  set_target_properties(${TEST_TYPE}_model_editor_undo PROPERTIES
+    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
