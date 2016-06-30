@@ -250,7 +250,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
 
   // Add the test model database to the insert tab
   gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(
-      std::string(PROJECT_SOURCE_PATH) + "/test/models/testdb");
+      CMAKE_SOURCE_DIR "/test/models/testdb");
 
   // Get the insert model widget
   auto insertModelWidget = mainWindow->findChild<
@@ -462,7 +462,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
 
   // Add the test model database to the insert tab
   gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(
-      std::string(PROJECT_SOURCE_PATH) +"/test/models/testdb");
+      CMAKE_SOURCE_DIR "/test/models/testdb");
 
   // Get the insert model widget
   auto insertModelWidget = mainWindow->findChild<
