@@ -2,6 +2,13 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix Model Manipulator switching between local and global frames
+    * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
+
+1. Remove contact filters with names that contain `::`
+    * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
+    * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1805)
+
 1. Open a new world without restarting the server
     * [Pull request 2319](https://bitbucket.org/osrf/gazebo/pull-request/2319)
 
