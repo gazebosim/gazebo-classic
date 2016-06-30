@@ -152,17 +152,7 @@ double PID::Update(double _error, common::Time _dt)
 
   // Check the command limits
   // fixed for issue #1997
-  if (this->cmdMax < this->cmdMin)
-  {
-    // max command limit is less than min command limit, leave
-    //  command untruncated.
-  }
-  else if (ignition::math::equal(this->cmdMax, this->cmdMin))
-  {
-    // max and min command limit are equal, truncate command.
-    this->cmd = ignition::math::clamp(this->cmd, this->cmdMin, this->cmdMax);
-  }
-  else
+  if (!(this->cmdMax < this->cmdMin))
   {
     // truncate command
     this->cmd = ignition::math::clamp(this->cmd, this->cmdMin, this->cmdMax);
