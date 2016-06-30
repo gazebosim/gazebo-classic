@@ -18,6 +18,7 @@
 #ifndef GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 #define GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>

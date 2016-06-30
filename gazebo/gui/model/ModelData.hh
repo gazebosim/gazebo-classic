@@ -123,7 +123,7 @@ namespace gazebo
 
       /// \brief Get the scale of all of the link's children.
       /// \return Scales of visuals and collisions.
-      public: std::map<std::string, ignition::math::Vector3d> Scale() const;
+      public: std::map<std::string, ignition::math::Vector3d> Scales() const;
 
       /// \brief Update the scale of all the inspectors, making the necessary
       /// conversions to update inertial information.
@@ -136,7 +136,7 @@ namespace gazebo
       /// UpdateInspectorScale.
       /// \sa UpdateInspectorScale
       /// \param[in] _scale Scales of all of the link's children.
-      public: void SetScale(
+      public: void SetScales(
           const std::map<std::string, ignition::math::Vector3d> &_scales);
 
       /// \brief Add a visual to the link.
@@ -236,8 +236,9 @@ namespace gazebo
       /// \brief Inertia izz.
       private: double inertiaIzz;
 
-      /// \brief Scale of all collision and visuals in the link.
-      public: std::map<std::string, ignition::math::Vector3d> scale;
+      /// \brief Scale of all collision and visuals in the link, indexes by
+      /// their visual's names.
+      public: std::map<std::string, ignition::math::Vector3d> scales;
 
       /// \brief Visual representing this link.
       public: rendering::VisualPtr linkVisual;

@@ -2082,10 +2082,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Scale [" + link.first->Name() + "]", MEUserCmd::SCALING_LINK);
     cmd->SetScopedName(link.first->linkVisual->GetName());
-    cmd->SetScaleChange(link.first->Scale(), link.second);
+    cmd->SetScaleChange(link.first->Scales(), link.second);
 
     // Update data and inspector
-    link.first->SetScale(link.second);
+    link.first->SetScales(link.second);
   }
   if (!this->dataPtr->linkScaleUpdate.empty())
     this->ModelChanged();
@@ -2753,7 +2753,6 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
     msgs::Visual visualMsg = it.second;
     sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
 
-    // The rest of the visual msg is being ignored?
     visualElem->GetElement("transparency")->Set<double>(
         visualMsg.transparency());
     newLinkElem->InsertElement(visualElem);
@@ -3234,12 +3233,12 @@ void ModelCreator::OnRequestLinkScale(const std::string &_name,
       continue;
     }
 
-   auto scale = _scales[childVis->GetName()];
-   childVis->SetScale(scale);
+    auto scale = _scales[childVis->GetName()];
+    childVis->SetScale(scale);
   }
 
- // Update link data and inspector
- link->second->SetScale(_scales);
+  // Update link data and inspector
+  link->second->SetScales(_scales);
 }
 
 /////////////////////////////////////////////////

@@ -427,18 +427,18 @@ void LinkData::UpdateInspectorScale()
 }
 
 /////////////////////////////////////////////////
-void LinkData::SetScale(
+void LinkData::SetScales(
     const std::map<std::string, ignition::math::Vector3d> &_scales)
 {
   this->UpdateInspectorScale();
 
-  this->scale = _scales;
+  this->scales = _scales;
 }
 
 /////////////////////////////////////////////////
-std::map<std::string, ignition::math::Vector3d> LinkData::Scale() const
+std::map<std::string, ignition::math::Vector3d> LinkData::Scales() const
 {
-  return this->scale;
+  return this->scales;
 }
 
 /////////////////////////////////////////////////
@@ -602,7 +602,7 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
   this->visuals[_visual] = visualMsg;
-  this->scale[_visual->GetName()] = _visual->GetGeometrySize();
+  this->scales[_visual->GetName()] = _visual->GetGeometrySize();
 
   std::string visName = _visual->GetName();
   std::string leafName = visName;
@@ -646,7 +646,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
   }
 
   this->collisions[_collisionVis] = collisionMsg;
-  this->scale[_collisionVis->GetName()] = _collisionVis->GetGeometrySize();
+  this->scales[_collisionVis->GetName()] = _collisionVis->GetGeometrySize();
   collisionConfig->AddCollision(leafName, &collisionMsg);
 }
 
@@ -1265,7 +1265,7 @@ void LinkData::OnAddVisual(const std::string &_name)
   visualMsgPtr->CopyFrom(visualMsg);
   visualConfig->UpdateVisual(_name, visualMsgPtr);
   this->visuals[visVisual] = visualMsg;
-  this->scale[visVisual->GetName()] = visVisual->GetGeometrySize();
+  this->scales[visVisual->GetName()] = visVisual->GetGeometrySize();
   visVisual->SetTransparency(visualMsg.transparency() *
       (1-ModelData::GetEditTransparency()-0.1)
       + ModelData::GetEditTransparency());
@@ -1334,7 +1334,7 @@ void LinkData::OnAddCollision(const std::string &_name)
   collisionMsgPtr->CopyFrom(collisionMsg);
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
   this->collisions[collisionVis] = collisionMsg;
-  this->scale[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+  this->scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
 
   collisionVis->SetTransparency(
       ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
@@ -1359,7 +1359,7 @@ void LinkData::OnRemoveVisual(const std::string &_name)
       it->first->SetVisible(false);
 
       this->deletedVisuals[it->first] = it->second;
-      this->scale.erase(visualName);
+      this->scales.erase(visualName);
 
       this->visuals.erase(it);
       break;
@@ -1385,7 +1385,7 @@ void LinkData::OnRemoveCollision(const std::string &_name)
       it->first->SetVisible(false);
 
       this->deletedCollisions[it->first] = it->second;
-      this->scale.erase(collisionName);
+      this->scales.erase(collisionName);
 
       this->collisions.erase(it);
       break;
@@ -1413,7 +1413,7 @@ void LinkData::Update()
         // but generated sdf will use the correct transparency value
         it.first->UpdateFromMsg(updateMsgPtr);
 
-        this->scale[it.first->GetName()] = it.first->GetGeometrySize();
+        this->scales[it.first->GetName()] = it.first->GetGeometrySize();
 
         it.first->SetTransparency(updateMsgPtr->transparency() *
             (1-ModelData::GetEditTransparency()-0.1)
@@ -1443,7 +1443,7 @@ void LinkData::Update()
         std::string origGeomType = it.first->GetGeometryType();
         it.first->UpdateFromMsg(updateMsgPtr);
 
-        this->scale[it.first->GetName()] = it.first->GetGeometrySize();
+        this->scales[it.first->GetName()] = it.first->GetGeometrySize();
 
         // fix for transparency alpha compositing
         if (it.first->GetGeometryType() != origGeomType)
