@@ -74,7 +74,6 @@
   <file>images/eye_collision.svg</file>
   <file>images/eye_frame.svg</file>
   <file>images/eye_visual.svg</file>
-  <file>hotkeyTable.html</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
