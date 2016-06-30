@@ -98,7 +98,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   {
     physics->SetGravity(math::Vector3::Zero);
   }
-  math::Vector3 g = physics->GetGravity();
+  math::Vector3 g = world->Gravity();
 
   // Box size
   const double dx = 0.5;
@@ -249,11 +249,11 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   int steps = ceil(simDuration / _dt);
 
   // variables to compute statistics on
-  math::Vector3Stats linearPositionError;
-  math::Vector3Stats linearVelocityError;
-  math::Vector3Stats angularPositionError;
-  math::Vector3Stats angularMomentumError;
-  math::SignalStats energyError;
+  ignition::math::Vector3Stats linearPositionError;
+  ignition::math::Vector3Stats linearVelocityError;
+  ignition::math::Vector3Stats angularPositionError;
+  ignition::math::Vector3Stats angularMomentumError;
+  ignition::math::SignalStats energyError;
   {
     const std::string statNames = "MaxAbs";
     EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
@@ -301,25 +301,25 @@ void JointsTest::OneDof(const std::string &_physicsEngine
     if (math::equal(_freq, 0.0))
     {
       // constant velocity / angular momentum
-      linearVelocityError.InsertData(v - v0);
-      angularMomentumError.InsertData(H - H0);
+      linearVelocityError.InsertData((v - v0).Ign());
+      angularMomentumError.InsertData((H - H0).Ign());
 
       // linear position / angle
-      linearPositionError.InsertData(p - (p0 + v0 * t));
+      linearPositionError.InsertData((p - (p0 + v0 * t)).Ign());
       math::Quaternion angleTrue(w0 * t);
-      angularPositionError.InsertData(a - angleTrue.GetAsEuler());
+      angularPositionError.InsertData((a - angleTrue.GetAsEuler()).Ign());
     }
     else
     {
       // nonlinear trajectory
       double theta = radiansPerSec * t;
-      linearVelocityError.InsertData(v - v0 * cos(theta));
-      angularMomentumError.InsertData(H - H0 * cos(theta));
+      linearVelocityError.InsertData((v - v0 * cos(theta)).Ign());
+      angularMomentumError.InsertData((H - H0 * cos(theta)).Ign());
 
-      linearPositionError.InsertData(
-        p - (p0 + v0 / radiansPerSec * sin(theta)));
+      linearPositionError.InsertData((
+        p - (p0 + v0 / radiansPerSec * sin(theta))).Ign());
       math::Quaternion angleTrue(w0 / radiansPerSec * sin(theta));
-      angularPositionError.InsertData(a - angleTrue.GetAsEuler());
+      angularPositionError.InsertData((a - angleTrue.GetAsEuler()).Ign());
     }
 
     // energy error

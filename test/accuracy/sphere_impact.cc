@@ -97,7 +97,7 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
   // get gravity value
   physics->SetGravity(math::Vector3(0, 0, _gravity));
 
-  math::Vector3 g = physics->GetGravity();
+  math::Vector3 g = world->Gravity();
 
   // set simulation time step size
   //   change step size after setting initial conditions
@@ -263,11 +263,11 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
   double E0_2 = link_2->GetWorldEnergy();
 
   // variables to compute statistics on
-  math::Vector3Stats linearMomentumError;
-  math::Vector3Stats angularMomentumError;
-  math::SignalStats energyError;
-  math::SignalStats constraintErrorTotal;
-  math::SignalStats constraintResidualTotal;
+  ignition::math::Vector3Stats linearMomentumError;
+  ignition::math::Vector3Stats angularMomentumError;
+  ignition::math::SignalStats energyError;
+  ignition::math::SignalStats constraintErrorTotal;
+  ignition::math::SignalStats constraintResidualTotal;
   {
     const std::string statNames = "MaxAbs,Variance,Mean";
     EXPECT_TRUE(linearMomentumError.InsertStatistics(statNames));
@@ -298,16 +298,16 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     // linear momentum error
     math::Vector3 P_1 = link_1->GetInertial()->GetMass()*v_1;
     math::Vector3 P_2 = link_2->GetInertial()->GetMass()*v_2;
-    linearMomentumError.InsertData((P_1 + P_2 - P0_1 - P0_2)
-      / (P0mag_1 + P0mag_2));
+    linearMomentumError.InsertData(((P_1 + P_2 - P0_1 - P0_2)
+      / (P0mag_1 + P0mag_2)).Ign());
 
     // angular momentum error
     math::Vector3 H_1 =
       link_1->GetWorldInertiaMatrix()*link_1->GetWorldAngularVel();
     math::Vector3 H_2 =
       link_2->GetWorldInertiaMatrix()*link_2->GetWorldAngularVel();
-    angularMomentumError.InsertData((H_1 + H_2 - H0_1 - H0_2)
-      / (H0mag_1 + H0mag_2));
+    angularMomentumError.InsertData(((H_1 + H_2 - H0_1 - H0_2)
+      / (H0mag_1 + H0mag_2)).Ign());
 
     // energy error
     energyError.InsertData(

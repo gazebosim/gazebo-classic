@@ -110,7 +110,7 @@ void PhysicsTest::InertiaRatioSphereStack(const std::string &_physicsEngine)
 
   // verify lateral gravity
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  math::Vector3 g = physics->GetGravity();
+  math::Vector3 g = world->Gravity();
   EXPECT_EQ(g, math::Vector3(0.1, 0, -9.81));
 
   // get models
@@ -129,8 +129,8 @@ void PhysicsTest::InertiaRatioSphereStack(const std::string &_physicsEngine)
   physics::LinkPtr link_1 = sphere_1->GetLink("upper_link");
   ASSERT_TRUE(link_1 != NULL);
 
-  math::Vector3Stats upperAngles;
-  math::Vector3Stats lowerAngles;
+  ignition::math::Vector3Stats upperAngles;
+  ignition::math::Vector3Stats lowerAngles;
   {
     const std::string statNames = "MaxAbs,Rms";
     EXPECT_TRUE(upperAngles.InsertStatistics(statNames));
@@ -144,7 +144,7 @@ void PhysicsTest::InertiaRatioSphereStack(const std::string &_physicsEngine)
     world->Step(1);
 
     // Get statistics on link rotations
-    upperAngles.InsertData(link_1->GetWorldPose().rot.GetAsEuler());
+    upperAngles.InsertData(link_1->GetWorldPose().rot.GetAsEuler().Ign());
   }
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
   this->Record("elapsedWallTime", elapsedTime.Double());

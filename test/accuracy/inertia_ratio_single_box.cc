@@ -163,11 +163,11 @@ void RigidBodyTest::InertiaRatioBox(const std::string &_physicsEngine
   double E0 = link->GetWorldEnergy();
 
   // variables to compute statistics on
-  math::Vector3Stats linearPositionError;
-  math::Vector3Stats linearVelocityError;
-  math::SignalStats energyError;
-  math::SignalStats constraintErrorTotal;
-  math::SignalStats constraintResidualTotal;
+  ignition::math::Vector3Stats linearPositionError;
+  ignition::math::Vector3Stats linearVelocityError;
+  ignition::math::SignalStats energyError;
+  ignition::math::SignalStats constraintErrorTotal;
+  ignition::math::SignalStats constraintResidualTotal;
   {
     const std::string statNames = "MaxAbs,Variance,Mean";
     EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
@@ -210,11 +210,11 @@ void RigidBodyTest::InertiaRatioBox(const std::string &_physicsEngine
 
     // linear velocity error
     math::Vector3 v = link->GetWorldCoGLinearVel();
-    linearVelocityError.InsertData(v - v0);
+    linearVelocityError.InsertData((v - v0).Ign());
 
     // linear position error
     math::Vector3 p = link->GetWorldInertialPose().pos;
-    linearPositionError.InsertData(p - p0);
+    linearPositionError.InsertData((p - p0).Ign());
 
     // angular momentum error
     // math::Vector3 H =

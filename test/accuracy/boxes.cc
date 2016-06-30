@@ -72,7 +72,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   {
     physics->SetGravity(math::Vector3::Zero);
   }
-  math::Vector3 g = physics->GetGravity();
+  ignition::math::Vector3d g = world->Gravity();
 
   // Box size
   const double dx = 0.1;
@@ -98,7 +98,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   physics::LinkPtr link;
 
   // initial linear velocity in global frame
-  const math::Vector3 v0(0.1, 0.4, 0.9);
+  const ignition::math::Vector3d v0(0.1, 0.4, 0.9);
 
   // initial angular velocity in global frame
   math::Vector3 w0;
@@ -140,7 +140,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     link->SetLinearVel(v0);
     link->SetAngularVel(w0);
   }
-  ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
+  ASSERT_EQ(v0, link->GetWorldCoGLinearVel().Ign());
   ASSERT_EQ(w0, link->GetWorldAngularVel());
   ASSERT_EQ(I0, link->GetInertial()->GetMOI());
   ASSERT_NEAR(link->GetWorldEnergy(), E0, 1e-6);
@@ -149,10 +149,11 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   common::Time t0 = world->GetSimTime();
 
   // initial linear position in global frame
-  math::Vector3 p0 = link->GetWorldInertialPose().pos;
+  ignition::math::Vector3d p0 = link->GetWorldInertialPose().pos.Ign();
 
   // initial angular momentum in global frame
-  math::Vector3 H0 = link->GetWorldInertiaMatrix() * link->GetWorldAngularVel();
+  math::Vector3 H0 =
+    (link->GetWorldInertiaMatrix() * link->GetWorldAngularVel()).Ign();
   ASSERT_EQ(H0, math::Vector3(Ixx, Iyy, Izz) * w0);
   double H0mag = H0.GetLength();
 
@@ -163,11 +164,11 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   int steps = ceil(simDuration / _dt);
 
   // variables to compute statistics on
-  math::Vector3Stats linearPositionError;
-  math::Vector3Stats linearVelocityError;
-  math::Vector3Stats angularPositionError;
-  math::Vector3Stats angularMomentumError;
-  math::SignalStats energyError;
+  ignition::math::Vector3Stats linearPositionError;
+  ignition::math::Vector3Stats linearVelocityError;
+  ignition::math::Vector3Stats angularPositionError;
+  ignition::math::Vector3Stats angularMomentumError;
+  ignition::math::SignalStats energyError;
   {
     const std::string statNames = "MaxAbs";
     EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
@@ -188,23 +189,24 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     double t = (world->GetSimTime() - t0).Double();
 
     // linear velocity error
-    math::Vector3 v = link->GetWorldCoGLinearVel();
+    ignition::math::Vector3d v = link->GetWorldCoGLinearVel().Ign();
     linearVelocityError.InsertData(v - (v0 + g*t));
 
     // linear position error
-    math::Vector3 p = link->GetWorldInertialPose().pos;
+    ignition::math::Vector3d p = link->GetWorldInertialPose().pos.Ign();
     linearPositionError.InsertData(p - (p0 + v0 * t + 0.5*g*t*t));
 
     // angular momentum error
-    math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
-    angularMomentumError.InsertData((H - H0) / H0mag);
+    ignition::math::Vector3d H =
+      (link->GetWorldInertiaMatrix()*link->GetWorldAngularVel()).Ign();
+    angularMomentumError.InsertData((H - H0.Ign()) / H0mag);
 
     // angular position error
     if (!_nonlinear)
     {
       math::Vector3 a = link->GetWorldInertialPose().rot.GetAsEuler();
       math::Quaternion angleTrue(w0 * t);
-      angularPositionError.InsertData(a - angleTrue.GetAsEuler());
+      angularPositionError.InsertData((a - angleTrue.GetAsEuler()).Ign());
     }
 
     // energy error
