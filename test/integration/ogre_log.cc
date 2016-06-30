@@ -53,9 +53,8 @@ TEST_F(OgreLog, LogError)
   {
     std::string line;
     std::getline(ogreLog, line);
+
     EXPECT_EQ(line.find("Error"), std::string::npos);
-    if (line.find("error") != std::string::npos)
-      std::cout << line << std::endl;
     EXPECT_EQ(line.find("error"), std::string::npos);
     EXPECT_EQ(line.find("ERROR"), std::string::npos);
   }
