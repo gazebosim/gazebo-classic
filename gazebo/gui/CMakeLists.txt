@@ -10,6 +10,8 @@ include_directories(
   ${Qt5Core_INCLUDE_DIRS}
 )
 
+set (CMAKE_AUTOMOC ON)
+
 include_directories(${tinyxml_INCLUDE_DIRS})
 
 add_definitions(${Qt5Core_DEFINITIONS})

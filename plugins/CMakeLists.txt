@@ -24,6 +24,7 @@ link_directories(
 )
 
 add_definitions(${Qt5Core_DEFINITIONS})
+set (CMAKE_AUTOMOC ON)
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})

@@ -11,6 +11,7 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
 )
+set (CMAKE_AUTOMOC ON)
 
 # Disable the player test for now, until we figure out a better way to test them
 #if (INCLUDE_PLAYER)

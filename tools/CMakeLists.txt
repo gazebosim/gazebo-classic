@@ -14,6 +14,7 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
   ${IGNITION-MATH_LIBRARY_DIRS}
 )
+set (CMAKE_AUTOMOC ON)
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
