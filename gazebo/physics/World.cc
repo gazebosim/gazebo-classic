@@ -1878,6 +1878,7 @@ void World::ProcessModelMsgs()
 //////////////////////////////////////////////////
 void World::ProcessLightModifyMsgs()
 {
+  DIAG_TIMER_START("World::ProcessLightModifyMsgs");
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   for (auto const &lightModifyMsg : this->dataPtr->lightModifyMsgs)
   {
@@ -1915,6 +1916,7 @@ void World::ProcessLightModifyMsgs()
 //////////////////////////////////////////////////
 void World::ProcessLightFactoryMsgs()
 {
+  DIAG_TIMER_START("World::ProcessLightFactoryMsgs");
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   for (auto const &lightFactoryMsg : this->dataPtr->lightFactoryMsgs)
   {
