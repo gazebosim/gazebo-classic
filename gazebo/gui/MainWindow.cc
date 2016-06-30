@@ -19,6 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
 #include <QDesktopServices>
 #include <functional>
 
@@ -1125,7 +1126,7 @@ void MainWindow::CreateActions()
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
 
   g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
-  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  g_hotkeyChartAct->setStatusTip(tr("Open hotkey chart in a browser"));
   connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
