@@ -690,7 +690,7 @@ void ModelData_TEST::LinkScale()
     link->AddCollision(collisionVis);
 
     // verify scale
-    ignition::math::Vector3d scale = ignition::math::Vector3d::One * radius * 2.0;
+    ignition::math::Vector3d scale = ignition::math::Vector3d::One * radius * 2;
     QVERIFY(link->Scales()[collisionVis->GetName()] == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;

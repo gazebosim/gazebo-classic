@@ -104,7 +104,7 @@
         * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
 
     1. Undo scale links
-        * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+        * [Pull request #2368](https://bitbucket.org/osrf/gazebo/pull-request/2368)
 
 1. Google Summer of Code Graphical interface for inserting plugins during simulation.
 
