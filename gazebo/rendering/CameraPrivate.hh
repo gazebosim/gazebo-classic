@@ -116,6 +116,15 @@ namespace gazebo
 
       /// \brief Maximum distance between the camera and tracked model.
       public: double trackMaxDistance;
+
+      /// \brief Video encoder.
+      public: std::unique_ptr<common::VideoEncoder> videoEncoder;
+
+      /// \brief True to encode frames to video buffer.
+      public: bool encodeVideo = false;
+
+      /// \brief Video encoding format
+      public: std::string videoEncodeFormat = "";
     };
   }
 }

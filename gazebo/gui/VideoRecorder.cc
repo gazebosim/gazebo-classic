@@ -17,7 +17,7 @@
 
 #include "gazebo/rendering/UserCamera.hh"
 
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/RenderWidget.hh"
@@ -30,7 +30,7 @@ using namespace gui;
 VideoRecorder::VideoRecorder(QWidget *_parent)
   : QWidget(_parent)
 {
-  this->recordVideoTimer = NULL;
+  this->recordVideoTimer = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -50,7 +50,7 @@ void VideoRecorder::CreateActions()
   connect(g_recordVideoAct, SIGNAL(triggered()), this,
       SLOT(RecordVideo()));
 
-  g_recordVideoFormatAct = new QWidgetAction(NULL);
+  g_recordVideoFormatAct = new QWidgetAction(nullptr);
   g_recordVideoFormatAct->setStatusTip(tr("Select video format"));
   g_recordVideoFormatAct->setCheckable(false);
 
@@ -101,17 +101,17 @@ void VideoRecorder::RecordVideo()
     this->recordVideoTimer->stop();
     g_recordVideoAct->setIcon(QIcon(":/images/record.png"));
 
-    std::string friendlyName = cam->GetName();
+    std::string friendlyName = cam->Name();
     boost::replace_all(friendlyName, "::", "_");
     std::string timestamp = common::Time::GetWallTimeAsISOString();
     boost::replace_all(timestamp, ":", "_");
 
     SaveDialog saveDialog;
-    saveDialog.SetSaveName(friendlyName + "_" + timestamp);
+    saveDialog.SetModelName(friendlyName + "_" + timestamp);
     saveDialog.SetSaveLocation(QDir::homePath().toStdString());
     if (saveDialog.exec() == QDialog::Accepted)
     {
-      std::string name = saveDialog.GetSaveName();
+      std::string name = saveDialog.GetModelName();
       std::string location = saveDialog.GetSaveLocation();
       cam->SaveVideo(location + "/" + name);
       emit MessageChanged(name + " saved in: " + location, 2000);

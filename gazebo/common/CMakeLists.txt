@@ -129,7 +129,7 @@ set (headers
   Video.hh
   VideoEncoder.hh
   ffmpeg_inc.h
- )
+)
 
 set (gtest_sources
   Animation_TEST.cc

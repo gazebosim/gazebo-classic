@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SAVE_DIALOG_HH_
-#define _SAVE_DIALOG_HH_
+#ifndef GAZEBO_GUI_SAVEDIALOG_HH_
+#define GAZEBO_GUI_SAVEDIALOG_HH_
 
 #include <string>
 #include <sdf/sdf.hh>

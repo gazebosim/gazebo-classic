@@ -89,12 +89,9 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   this->renderTarget = NULL;
   this->renderTexture = NULL;
-  this->videoEncoder = NULL;
 
   this->captureData = false;
   this->captureDataOnce = false;
-  this->encodeVideo = false;
-  this->videoEncodeFormat = "";
 
   this->camera = NULL;
   this->viewport = NULL;
@@ -476,7 +473,8 @@ void Camera::RenderImpl()
 //////////////////////////////////////////////////
 void Camera::ReadPixelBuffer()
 {
-  if (this->newData && (this->captureData || this->captureDataOnce || this->encodeVideo))
+  if (this->newData && (this->captureData || this->captureDataOnce ||
+      this->dataPtr->encodeVideo))
   {
     size_t size;
     unsigned int width = this->ImageWidth();
@@ -564,16 +562,22 @@ void Camera::PostRender()
   if (this->newData)
     this->lastRenderWallTime = common::Time::GetWallTime();
 
-  if (this->newData && (this->captureData || this->captureDataOnce || this->encodeVideo))
+  if (this->newData && (this->captureData || this->captureDataOnce ||
+      this->dataPtr->encodeVideo))
   {
+    unsigned int width = this->ImageWidth();
+    unsigned int height = this->ImageHeight();
+    const unsigned char *buffer = this->saveFrameBuffer;
+
     if (this->captureDataOnce)
     {
       this->SaveFrame(this->FrameFilename());
       this->captureDataOnce = false;
     }
-    else if (this->encodeVideo)
+    else if (this->dataPtr->encodeVideo)
     {
-        this->videoEncoder->AddFrame(this->saveFrameBuffer, width, height);
+        this->dataPtr->videoEncoder->AddFrame(
+            this->saveFrameBuffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&
@@ -581,10 +585,6 @@ void Camera::PostRender()
     {
       this->SaveFrame(this->FrameFilename());
     }
-
-    unsigned int width = this->ImageWidth();
-    unsigned int height = this->ImageHeight();
-    const unsigned char *buffer = this->saveFrameBuffer;
 
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
     if ((this->ImageFormat() == "BAYER_RGGB8") ||
@@ -1266,14 +1266,15 @@ bool Camera::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 bool Camera::SaveVideo(const std::string &_filename)
 {
-  if (!this->videoEncoder || !this->videoEncoder->IsInitialized())
+  if (!this->dataPtr->videoEncoder ||
+      !this->dataPtr->videoEncoder->IsInitialized())
   {
     gzwarn << "Video encoder not initialized\n";
     return false;
   }
 
-  this->videoEncoder->SaveToFile(_filename);
-  this->videoEncoder->Reset();
+  this->dataPtr->videoEncoder->SaveToFile(_filename);
+  this->dataPtr->videoEncoder->Reset();
   return true;
 }
 
@@ -1559,27 +1560,27 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::SetEncodeVideo(bool _encode)
 {
-  if (this->encodeVideo == _encode)
+  if (this->dataPtr->encodeVideo == _encode)
     return;
 
-  this->encodeVideo = _encode;
+  this->dataPtr->encodeVideo = _encode;
 
-  if (this->encodeVideo)
+  if (this->dataPtr->encodeVideo)
   {
-    if (!this->videoEncoder)
+    if (!this->dataPtr->videoEncoder)
     {
-      this->videoEncoder = new common::VideoEncoder();
+      this->dataPtr->videoEncoder.reset(new common::VideoEncoder());
     }
-    if (!this->videoEncodeFormat.empty())
-      this->videoEncoder->SetFormat(this->videoEncodeFormat);
-    this->videoEncoder->Init();
+    if (!this->dataPtr->videoEncodeFormat.empty())
+      this->dataPtr->videoEncoder->SetFormat(this->dataPtr->videoEncodeFormat);
+    this->dataPtr->videoEncoder->Init();
   }
 }
 
 //////////////////////////////////////////////////
 void Camera::SetEncodeVideoFormat(const std::string &_format)
 {
-  this->videoEncodeFormat = _format;
+  this->dataPtr->videoEncodeFormat = _format;
 }
 
 //////////////////////////////////////////////////

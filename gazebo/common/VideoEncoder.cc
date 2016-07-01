@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,11 +100,6 @@ void VideoEncoder::Cleanup()
     sws_freeContext(this->swsCtx);
 #endif
 
-  if (this->outbuf)
-  {
-    delete[] this->outbuf;
-    this->outbuf = NULL;
-  }
   if (this->pictureBuf)
   {
     delete[] this->pictureBuf;
@@ -253,10 +248,6 @@ void VideoEncoder::Init()
   if (avformat_write_header(this->formatCtx, NULL) < 0)
     gzerr << " Error occured when opening output file" << std::endl;
 
-  // alloc image and output buffer
-  this->outBufferSize = this->codecCtx->width * this->codecCtx->height;
-  this->outbuf = new unsigned char[this->outBufferSize];
-
   this->initialized = true;
 }
 #else
@@ -347,31 +338,44 @@ void VideoEncoder::AddFrame(unsigned char *_frame, unsigned int _width,
       0, _height, this->avOutFrame->data, this->avOutFrame->linesize);
   this->codecCtx->coded_frame->pts = this->videoPts;
 
-  this->outSize = avcodec_encode_video(this->codecCtx, this->outbuf,
-      this->outBufferSize, this->avOutFrame);
+  int gotOutput = 0;
+  AVPacket avPacket;
+  av_init_packet(&avPacket);
+  avPacket.data = nullptr;
+  avPacket.size = 0;
 
-  this->codecCtx->coded_frame->pts = this->videoPts;
+  int ret = avcodec_encode_video2(this->codecCtx, &avPacket,
+      this->avOutFrame, &gotOutput);
 
-  // write the frame
-  if (outSize > 0)
+  if (ret > 0)
   {
-    AVPacket avPacket;
-    av_init_packet(&avPacket);
-    avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
-        this->codecCtx->time_base, this->videoStream->time_base);
+    this->codecCtx->coded_frame->pts = this->videoPts;
 
-    if (this->codecCtx->coded_frame->key_frame)
-       avPacket.flags |= AV_PKT_FLAG_KEY;
+    // write the frame
+    if (gotOutput)
+    {
+      /*avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
+          this->codecCtx->time_base, this->videoStream->time_base);
 
-    avPacket.stream_index= this->videoStream->index;
-    avPacket.data= this->outbuf;
-    avPacket.size= this->outSize;
-    int ret = av_interleaved_write_frame(this->formatCtx, &avPacket);
+      if (this->codecCtx->coded_frame->key_frame)
+        avPacket.flags |= AV_PKT_FLAG_KEY;
 
-    if (ret < 0)
-      gzerr << "Error writing frame" << std::endl;
-    av_free_packet(&avPacket);
+      avPacket.stream_index= this->videoStream->index;
+      avPacket.data= this->outbuf;
+      avPacket.size= this->outSize;
+      */
+      ret = av_interleaved_write_frame(this->formatCtx, &avPacket);
+
+      if (ret < 0)
+        gzerr << "Error writing frame" << std::endl;
+    }
   }
+  else
+  {
+    gzerr << "Error encoding frame\n";
+  }
+
+  av_free_packet(&avPacket);
 }
 #else
 void VideoEncoder::AddFrame(unsigned char */*_frame*/, unsigned int /*_w*/,
@@ -419,7 +423,6 @@ void VideoEncoder::Reset()
   this->sampleRate = this->fps * 2;
   this->totalTime = 0;
   this->videoPts = -1;
-  this->outbuf = NULL;
   this->pictureBuf = NULL;
   this->inFrameWidth = 0;
   this->inFrameHeight = 0;

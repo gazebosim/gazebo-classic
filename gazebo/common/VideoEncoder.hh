@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ENCODER_HH_
-#define _ENCODER_HH_
+#ifndef GAZEBO_COMMON_VIDEOENCODER_HH_
+#define GAZEBO_COMMON_VIDEOENCODER_HH_
 
 #include <gazebo/common/Time.hh>
 #include <string>
@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \class VideoEncoder VideoEncoder.hh common/common.hh
     /// \brief Handle video encoding using libavcodec
-    class VideoEncoder
+    class GZ_COMMON_VISIBLE VideoEncoder
     {
       /// \brief Constructor
       public: VideoEncoder();
@@ -123,9 +123,6 @@ namespace gazebo
       /// \brief Software scaling context
       private: SwsContext *swsCtx;
 
-      /// \brief Encoding buffer
-      private: unsigned char *outbuf;
-
       /// \brief Size of the picture buffer
       private: unsigned char *pictureBuf;
 
@@ -140,9 +137,6 @@ namespace gazebo
 
       /// \brief Output frame height
       private: unsigned int frameHeight;
-
-      /// \brief Size of the output buffer.
-      private: int outBufferSize;
 
       /// \brief Temporary filename to write the file to.
       private: std::string tmpFilename;
