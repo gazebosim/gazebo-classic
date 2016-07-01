@@ -510,13 +510,13 @@ void ModelMaker_TEST::FromNestedModel()
 
   // Check there's no clone in the scene -- the preview is gone
   vis = scene->GetVisual("model_00_clone_tmp");
-  QVERIFY(vis == NULL);
+  QVERIFY(vis == nullptr);
   vis = scene->GetVisual("model_00_clone_tmp::model_01");
-  QVERIFY(vis == NULL);
+  QVERIFY(vis == nullptr);
   vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02");
-  QVERIFY(vis == NULL);
+  QVERIFY(vis == nullptr);
   vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
-  QVERIFY(vis == NULL);
+  QVERIFY(vis == nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 

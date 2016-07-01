@@ -35,17 +35,17 @@ TEST_F(OriginVisual_TEST, Load)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // get scene visual child count before we create any visuals
-  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
   unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // Create and load visual
   rendering::OriginVisualPtr origin;
   origin.reset(new rendering::OriginVisual("origin", scene->WorldVisual()));
   origin->Load();
-  EXPECT_TRUE(origin != NULL);
+  EXPECT_TRUE(origin != nullptr);
 
   // Check that it was added to the scene (by Load)
   EXPECT_EQ(scene->GetVisual("origin"), origin);
@@ -54,11 +54,11 @@ TEST_F(OriginVisual_TEST, Load)
   scene->RemoveVisual(origin);
 
   // Check that it was removed
-  EXPECT_TRUE(scene->GetVisual("origin") == NULL);
+  EXPECT_TRUE(scene->GetVisual("origin") == nullptr);
 
   // Reset pointer
   origin.reset();
-  EXPECT_TRUE(origin == NULL);
+  EXPECT_TRUE(origin == nullptr);
 
   // verify scene's child count is the same as before the visual was created
   EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);

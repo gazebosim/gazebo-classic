@@ -37,10 +37,10 @@ TEST_F(TransmitterVisual_TEST, TransmitterVisualTest)
   if (!scene)
       scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // get scene visual child count before we create any visuals
-  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
   unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // test calling constructor and Load functions and make sure

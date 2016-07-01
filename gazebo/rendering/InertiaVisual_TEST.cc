@@ -37,9 +37,9 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
   if (!scene)
       scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
-  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
   unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // test calling constructor and Load functions and make sure
@@ -50,7 +50,7 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
 
   EXPECT_EQ(inertiaVis->GetName(), "inertia_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
-  EXPECT_TRUE(scene->GetVisual(inertiaVis->GetName()) != NULL);
+  EXPECT_TRUE(scene->GetVisual(inertiaVis->GetName()) != nullptr);
 
   // test destroying the visual
   inertiaVis->Fini();

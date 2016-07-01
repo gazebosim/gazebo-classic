@@ -36,10 +36,10 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // get scene visual child count before we create any visuals
-  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
   unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // create a default link message

@@ -37,7 +37,7 @@ TEST_F(Light_TEST, LightVisualTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
   // create a light
   gazebo::rendering::LightPtr light(new gazebo::rendering::Light(scene));
@@ -45,7 +45,7 @@ TEST_F(Light_TEST, LightVisualTest)
 
   std::string lightName = light->Name();
   gazebo::rendering::VisualPtr lightVisual = scene->GetVisual(lightName);
-  EXPECT_TRUE(lightVisual != NULL);
+  EXPECT_TRUE(lightVisual != nullptr);
 
   scene->RemoveLight(light);
 
@@ -53,7 +53,7 @@ TEST_F(Light_TEST, LightVisualTest)
   light.reset();
 
   lightVisual = scene->GetVisual(lightName);
-  EXPECT_TRUE(lightVisual == NULL);
+  EXPECT_TRUE(lightVisual == nullptr);
 }
 
 /////////////////////////////////////////////////

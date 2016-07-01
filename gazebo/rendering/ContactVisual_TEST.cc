@@ -37,9 +37,9 @@ TEST_F(ContactVisual_TEST, ContactVisualTest)
   if (!scene)
       scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
 
-  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
   unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // test calling constructor and Load functions and make sure
@@ -51,7 +51,7 @@ TEST_F(ContactVisual_TEST, ContactVisualTest)
 
   EXPECT_EQ(contactVis->GetName(), "contact_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
-  EXPECT_TRUE(scene->GetVisual(contactVis->GetName()) != NULL);
+  EXPECT_TRUE(scene->GetVisual(contactVis->GetName()) != nullptr);
 
   // test destroying the visual
   contactVis->Fini();
