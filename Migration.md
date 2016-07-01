@@ -16,6 +16,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/Road2d.hh**
+    + Modified to inherit from Visual class.
+
 1. **gazebo/common/Event.hh**
     + Connection(Event*, int) constructor changed to
       Connection(Event*, const int)
@@ -33,6 +36,10 @@ release will remove the deprecated code.
     + ***Replacement:*** DisconnectSetSelectedEntity
     + ***Removed:*** setSelectedLink
     + ***Replacement:*** setSelectedEntity
+    + ***Removed:*** event::EventT<void (std::string)> requestModelPluginRemoval;
+    + ***Replacement:*** event::EventT<void (std::string, bool)> requestModelPluginRemoval;
+    + ***Removed:*** event::EventT<void (std::string, std::string, std::string)> requestModelPluginInsertion;
+    + ***Replacement:*** event::EventT<void (std::string, std::string, std::string, bool)> requestModelPluginInsertion;
 
 1. **gazebo/gui/GuiEvents.hh**
     + ***Removed:*** event::EventT<void (const std::string &, const gazebo::math::Vector3 &)> Events::scaleEntity
@@ -49,6 +56,10 @@ release will remove the deprecated code.
     + ***Replacement:*** GAZEBO_FORCEINLINE
 
 ### Deprecations
+
+1. **gazebo/rendering/Road2d.hh**
+    + ***Deprecation:*** public: void Load(VisualPtr);
+    + ***Replacement:*** public: void Load(msgs::Road);
 
 1. **gazebo/common/Event.hh**
     + ***Deprecation:*** public: void Event::Disconnect(ConnectionPtr);
