@@ -101,8 +101,10 @@ void messageHandler(QtMsgType _type, const char *_msg)
     case QtFatalMsg:
     case QtCriticalMsg:
       gzerr << msg << std::endl;
+      break;
     default:
-      gzwarn << "Unknown QT Message type[" << msg << "]" << std::endl;
+      gzwarn << "Unknown QT Message type[" << _type << "]: "
+        << msg << std::endl;
       break;
   }
 }
