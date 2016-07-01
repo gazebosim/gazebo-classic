@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Add FiducialCameraPlugin for Camera Sensors
+    * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
+
 1. Fix Road2d vertices and shadows
     * [Pull request #2362](https://bitbucket.org/osrf/gazebo/pull-request/2362)
 
