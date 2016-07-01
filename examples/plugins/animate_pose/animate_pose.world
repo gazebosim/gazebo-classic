@@ -1,49 +1,43 @@
-<?xml version="1.0"?>
-<gazebo version="1.0">
+<?xml version="1.0" ?>
+<sdf version="1.4">
   <world name="default">
-    <scene>
-      <ambient rgba="0.0 0.0 0.0 1"/>
-      <background rgba="0 0 0 1"/>
-      <shadows enabled="false"/>
-    </scene>
-
-    <!-- Physics Engine Parameters -->
-    <physics type="ode">
-      <gravity xyz="0 0 -9.8"/>
-      <ode>
-        <solver type="quick" dt="0.001" iters="100" sor="1.3"/>
-        <constraints cfm="0.0" erp="0.2"
-          contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
-      </ode>
-    </physics>
-
-    <include filename="ground_plane.model"/>
-
-    <model name="box_model" static="true">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <model name="box_model">
       <link name="body">
-        <origin pose="0 0 0.5 0 0 0"/>
-
+        <pose>0 0 0.5 0 0 0</pose>
         <collision name="geom">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </collision>
         <visual name="visual1">
           <geometry>
-            <box size="1 1 1"/>
+            <box>
+              <size>1 1 1</size>
+            </box>
           </geometry>
         </visual>
       </link>
-      <plugin filename="libanimate_pose.so" name="pose_animation"/>
+      <plugin filename="libanimate_pose.so" name="pose_animation" />
+      <static>true</static>
     </model>
-
     <!-- Light Source -->
-    <light type="directional" name="sun" cast_shadows="true">
-      <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba="1.0 1.0 1.0 1"/>
-      <specular rgba="0 0 0 1"/>
-      <attenuation range="20" constant="0.8" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 0.2 -8.0"/>
+    <light type="directional" name="sun">
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <specular>0 0 0 1</specular>
+      <attenuation>
+        <range>20</range>
+        <linear>0.01</linear>
+        <constant>0.8</constant>
+        <quadratic>0.0</quadratic>
+      </attenuation>
+      <direction>0.0 0.2 -8.0</direction>
+      <cast_shadows>true</cast_shadows>
     </light>
   </world>
-</gazebo>
+</sdf>

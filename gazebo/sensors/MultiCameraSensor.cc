@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,18 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/algorithm/string.hpp>
+#include <functional>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/EnumIface.hh"
 #include "gazebo/common/Image.hh"
 
 #include "gazebo/physics/World.hh"
@@ -26,9 +36,12 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/MultiCameraSensorPrivate.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
 using namespace gazebo;
@@ -38,8 +51,13 @@ GZ_REGISTER_STATIC_SENSOR("multicamera", MultiCameraSensor)
 
 //////////////////////////////////////////////////
 MultiCameraSensor::MultiCameraSensor()
-    : Sensor(sensors::IMAGE)
+: Sensor(sensors::IMAGE),
+  dataPtr(new MultiCameraSensorPrivate)
 {
+  this->dataPtr->rendered = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        std::bind(&MultiCameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -48,15 +66,15 @@ MultiCameraSensor::~MultiCameraSensor()
 }
 
 //////////////////////////////////////////////////
-std::string MultiCameraSensor::GetTopic() const
+std::string MultiCameraSensor::Topic() const
 {
-  std::string topic = Sensor::GetTopic();
+  std::string topic = Sensor::Topic();
 
   // Create a topic name if one has not been specified.
   if (topic.empty())
   {
     topic = "~/";
-    topic += this->parentName + "/" + this->GetName() + "/images";
+    topic += this->ParentName() + "/" + this->Name() + "/images";
     boost::replace_all(topic, "::", "/");
   }
 
@@ -69,7 +87,8 @@ void MultiCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   // Create the publisher of image data.
-  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(this->GetTopic());
+  this->dataPtr->imagePub =
+    this->node->Advertise<msgs::ImagesStamped>(this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -90,31 +109,34 @@ void MultiCameraSensor::Init()
     return;
   }
 
-  rendering::ScenePtr scene = rendering::get_scene(worldName);
+  this->scene = rendering::get_scene(worldName);
 
-  if (!scene)
+  if (!this->scene)
   {
-    scene = rendering::create_scene(worldName, false);
+    this->scene = rendering::create_scene(worldName, false, true);
 
     // This usually means rendering is not available
-    if (!scene)
+    if (!this->scene)
     {
       gzerr << "Unable to create MultiCameraSensor.\n";
       return;
     }
   }
 
+  // Each camera has its own noise pointer
+  common::EnumIterator<SensorNoiseType> noiseIndex = SENSOR_NOISE_TYPE_BEGIN;
+
   // Create and initialize all the cameras
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
   {
-    rendering::CameraPtr camera = scene->CreateCamera(
-          cameraSdf->GetValueString("name"), false);
+    rendering::CameraPtr camera = this->scene->CreateCamera(
+          cameraSdf->Get<std::string>("name"), false);
 
     if (!camera)
     {
       gzthrow("Unable to create multicamera sensor[" +
-              cameraSdf->GetValueString("name"));
+              cameraSdf->Get<std::string>("name"));
       return;
     }
 
@@ -122,25 +144,54 @@ void MultiCameraSensor::Init()
     camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (camera->GetImageWidth() == 0 || camera->GetImageHeight() == 0)
+    if (camera->ImageWidth() == 0 || camera->ImageHeight() == 0)
       gzthrow("Image has zero size");
 
     camera->Init();
-    camera->CreateRenderTexture(camera->GetName() + "_RttTex");
+    camera->CreateRenderTexture(camera->Name() + "_RttTex");
 
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
-    camera->AttachToVisual(this->parentName, true);
+    camera->AttachToVisual(this->parentId, true, 0, 0);
+
+    if (cameraSdf->HasElement("noise"))
+    {
+      // Create a noise model and attach the camera
+      this->noises[*noiseIndex] = NoiseFactory::NewNoiseModel(
+        cameraSdf->GetElement("noise"), this->Type());
+      this->noises[*noiseIndex]->SetCamera(camera);
+    }
+    else
+    {
+      this->noises[*noiseIndex].reset(
+          new sensors::Noise(sensors::Noise::NONE));
+    }
+
+    // Increment the noise index -- one for each camera in the setup
+    ++noiseIndex;
 
     {
-      boost::mutex::scoped_lock lock(this->cameraMutex);
-      this->cameras.push_back(camera);
+      std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+      this->dataPtr->cameras.push_back(camera);
     }
+
+    msgs::Image *image = this->dataPtr->msg.add_image();
+    image->set_width(camera->ImageWidth());
+    image->set_height(camera->ImageHeight());
+    image->set_pixel_format(common::Image::ConvertPixelFormat(
+          camera->ImageFormat()));
+    image->set_step(camera->ImageWidth() * camera->ImageDepth());
 
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
+
+  // Disable clouds and moon on server side until fixed and also to improve
+  // performance
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+      ~rendering::Scene::GZ_SKYX_CLOUDS &
+      ~rendering::Scene::GZ_SKYX_MOON);
 
   Sensor::Init();
 }
@@ -148,92 +199,143 @@ void MultiCameraSensor::Init()
 //////////////////////////////////////////////////
 void MultiCameraSensor::Fini()
 {
+  this->dataPtr->imagePub.reset();
   Sensor::Fini();
 
-  boost::mutex::scoped_lock lock(this->cameraMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
 
   for (std::vector<rendering::CameraPtr>::iterator iter =
-      this->cameras.begin(); iter != this->cameras.end(); ++iter)
+      this->dataPtr->cameras.begin();
+      iter != this->dataPtr->cameras.end(); ++iter)
   {
-    (*iter)->Fini();
+    (*iter)->GetScene()->RemoveCamera((*iter)->Name());
   }
-  this->cameras.clear();
+  this->dataPtr->cameras.clear();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////
 rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
 {
-  boost::mutex::scoped_lock lock(this->cameraMutex);
-
-  if (_index < this->cameras.size())
-    return this->cameras[_index];
-  else
-    gzthrow("camera index out of range. Valid range[0.." +
-        boost::lexical_cast<std::string>(this->cameras.size()-1));
+  return this->Camera(_index);
 }
 
 //////////////////////////////////////////////////
-void MultiCameraSensor::UpdateImpl(bool /*_force*/)
+rendering::CameraPtr MultiCameraSensor::Camera(const unsigned int _index) const
 {
-  boost::mutex::scoped_lock lock(this->cameraMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
 
-  if (this->cameras.size() == 0)
+  if (_index < this->dataPtr->cameras.size())
+    return this->dataPtr->cameras[_index];
+  else
+  {
+    gzerr << "camera index out of range. Valid range[0.." <<
+        this->dataPtr->cameras.size()-1 << "]\n";
+  }
+  return rendering::CameraPtr();
+}
+
+//////////////////////////////////////////////////
+void MultiCameraSensor::Render()
+{
+  if (this->dataPtr->cameras.empty() || !this->IsActive() ||
+      !this->NeedsUpdate())
+  {
     return;
-
-  bool publish = this->imagePub->HasConnections();
-
-  this->lastMeasurementTime = this->world->GetSimTime();
-
-  msgs::ImagesStamped msg;
-  msgs::Set(msg.mutable_time(), this->lastMeasurementTime);
+  }
 
   // Update all the cameras
-  for (std::vector<rendering::CameraPtr>::iterator iter = this->cameras.begin();
-       iter != this->cameras.end(); ++iter)
+  for (auto iter = this->dataPtr->cameras.begin();
+      iter != this->dataPtr->cameras.end(); ++iter)
   {
     (*iter)->Render();
+  }
+
+  this->dataPtr->rendered = true;
+  this->lastMeasurementTime = this->scene->SimTime();
+}
+
+//////////////////////////////////////////////////
+bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+
+  if (!this->dataPtr->rendered)
+    return false;
+
+  bool publish = this->dataPtr->imagePub->HasConnections();
+
+  msgs::Set(this->dataPtr->msg.mutable_time(),
+            this->lastMeasurementTime);
+
+  int index = 0;
+  for (auto iter = this->dataPtr->cameras.begin();
+       iter != this->dataPtr->cameras.end(); ++iter, ++index)
+  {
     (*iter)->PostRender();
 
     if (publish)
     {
-      msgs::Image *image = msg.add_image();
-      image->set_width((*iter)->GetImageWidth());
-      image->set_height((*iter)->GetImageHeight());
-      image->set_pixel_format(common::Image::ConvertPixelFormat(
-            (*iter)->GetImageFormat()));
-      image->set_step((*iter)->GetImageWidth() * (*iter)->GetImageDepth());
-      image->set_data((*iter)->GetImageData(0),
-          image->width() * (*iter)->GetImageDepth() * image->height());
+      msgs::Image *image = this->dataPtr->msg.mutable_image(index);
+      image->set_data((*iter)->ImageData(0),
+          image->width() * (*iter)->ImageDepth() * image->height());
     }
   }
 
   if (publish)
-    this->imagePub->Publish(msg);
+    this->dataPtr->imagePub->Publish(this->dataPtr->msg);
+
+  this->dataPtr->rendered = false;
+  return true;
 }
 
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetCameraCount() const
 {
-  boost::mutex::scoped_lock lock(this->cameraMutex);
-  return this->cameras.size();
+  return this->CameraCount();
+}
+
+//////////////////////////////////////////////////
+unsigned int MultiCameraSensor::CameraCount() const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+  return this->dataPtr->cameras.size();
 }
 
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageWidth(unsigned int _index) const
 {
-  return this->GetCamera(_index)->GetImageWidth();
+  return this->ImageWidth(_index);
+}
+
+//////////////////////////////////////////////////
+unsigned int MultiCameraSensor::ImageWidth(const unsigned int _index) const
+{
+  return this->Camera(_index)->ImageWidth();
 }
 
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageHeight(unsigned int _index) const
 {
-  return this->GetCamera(_index)->GetImageHeight();
+  return this->ImageHeight(_index);
+}
+
+//////////////////////////////////////////////////
+unsigned int MultiCameraSensor::ImageHeight(const unsigned int _index) const
+{
+  return this->Camera(_index)->ImageHeight();
 }
 
 //////////////////////////////////////////////////
 const unsigned char *MultiCameraSensor::GetImageData(unsigned int _index)
 {
-  return this->GetCamera(_index)->GetImageData(0);
+  return this->ImageData(_index);
+}
+
+//////////////////////////////////////////////////
+const unsigned char *MultiCameraSensor::ImageData(const unsigned int _index)
+{
+  return this->Camera(_index)->ImageData(0);
 }
 
 //////////////////////////////////////////////////
@@ -241,17 +343,17 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 {
   this->SetActive(true);
 
-  boost::mutex::scoped_lock lock(this->cameraMutex);
-  if (_filenames.size() != this->cameras.size())
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+  if (_filenames.size() != this->dataPtr->cameras.size())
   {
     gzerr << "Filename count[" << _filenames.size() << "] does not match "
-          << "camera count[" << this->cameras.size() << "]\n";
+          << "camera count[" << this->dataPtr->cameras.size() << "]\n";
     return false;
   }
 
   bool result = true;
 
-  std::vector<rendering::CameraPtr>::iterator citer = this->cameras.begin();
+  auto citer = this->dataPtr->cameras.begin();
   for (std::vector<std::string>::const_iterator fiter = _filenames.begin();
        fiter != _filenames.end(); ++fiter, ++citer)
   {
@@ -262,7 +364,8 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::IsActive()
+bool MultiCameraSensor::IsActive() const
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->dataPtr->imagePub && this->dataPtr->imagePub->HasConnections());
 }

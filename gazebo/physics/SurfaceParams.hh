@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: common::Parameters for a surface
- * Author: Nate Koenig
- * Date: 30 July 2003
- */
 
-#ifndef _SURFACEPARAMS_HH_
-#define _SURFACEPARAMS_HH_
+#ifndef _GAZEBO_SURFACEPARAMS_HH_
+#define _GAZEBO_SURFACEPARAMS_HH_
+
+#include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,11 +31,150 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// \class FrictionPyramid SurfaceParams.hh physics/physics.hh
+    /// \brief Parameters used for friction pyramid model.
+    class GZ_PHYSICS_VISIBLE FrictionPyramid
+    {
+      /// \brief Constructor.
+      public: FrictionPyramid();
+
+      /// \brief Destructor.
+      public: virtual ~FrictionPyramid();
+
+      /// \brief Get the friction coefficient in the primary direction.
+      /// \return Friction coefficient in primary direction.
+      /// \deprecated See const function MuPrimary
+      public: double GetMuPrimary() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the friction coefficient in the secondary direction.
+      /// \return Friction coefficient in secondary direction.
+      /// \deprecated See const function MuSecondary
+      public: double GetMuSecondary() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the friction coefficient in the primary direction.
+      /// \return Friction coefficient in primary direction.
+      public: double MuPrimary() const;
+
+      /// \brief Get the friction coefficient in the secondary direction.
+      /// \return Friction coefficient in secondary direction.
+      public: double MuSecondary() const;
+
+      /// \brief Get the torsional friction coefficient.
+      /// \return Torsional friction coefficient.
+      public: double MuTorsion() const;
+
+      /// \brief Get the torsional patch radius.
+      /// \return Torsional patch radius.
+      public: double PatchRadius() const;
+
+      /// \brief Get the torsional surface radius.
+      /// \return Torsional surface radius.
+      public: double SurfaceRadius() const;
+
+      /// \brief Get the torsional "use patch radius" flag.
+      /// \return Torsional "use patch radius" flag.
+      public: bool UsePatchRadius() const;
+
+      /// \brief Set the friction coefficient in the primary direction.
+      /// \param[in] _mu Friction coefficient.
+      public: void SetMuPrimary(double _mu);
+
+      /// \brief Set the friction coefficient in the secondary direction.
+      /// \param[in] _mu Friction coefficient.
+      public: void SetMuSecondary(double _mu);
+
+      /// \brief Set the torsional friction coefficient.
+      /// \param[in] _mu Torsional friction coefficient.
+      public: void SetMuTorsion(const double _mu);
+
+      /// \brief Set the torsional patch radius.
+      /// \param[in] _radius Torsional patch radius.
+      public: void SetPatchRadius(const double _radius);
+
+      /// \brief Set the torsional surface radius.
+      /// \param[in] _radius Torsional surface radius.
+      public: void SetSurfaceRadius(const double _radius);
+
+      /// \brief Set whether to use the surface radius.
+      /// \param[in] _use True to use the surface radius.
+      public: void SetUsePatchRadius(const bool _use);
+
+      /// \brief Get the Poisson's ratio
+      /// \return Poisson's ratio
+      public: double PoissonsRatio() const;
+
+      /// \brief Set the Poisson's ratio
+      /// \param[in] _ratio Poisson's ratio
+      public: void SetPoissonsRatio(const double _ratio);
+
+      /// \brief Get the elastic modulus
+      /// \return elastic modulus
+      public: double ElasticModulus() const;
+
+      /// \brief Set the elastic modulus
+      /// \param[in] _modulus elastic modulus to set to
+      public: void SetElasticModulus(const double _modulus);
+
+      /// \brief Get the friction coefficient in a single direction.
+      /// \param[in] _index Index of friction direction, 0 for primary,
+      /// 1 for secondary direction.
+      /// \return Friction coefficient, or negative value if invalid
+      /// _index is supplied.
+      private: double Mu(const unsigned int _index) const;
+
+      /// \brief Set the friction coefficient in a single direction.
+      /// If a negative value is supplied, use an astronomically high
+      /// value instead.
+      /// \param[in] _index Index of friction direction, 0 for primary,
+      /// 1 for secondary direction.
+      /// \param[in] _mu Friction coefficient.
+      private: void SetMu(unsigned int _index, double _mu);
+
+      /// \brief Vector for specifying the primary friction direction,
+      /// relative to the parent collision frame. The component of this
+      /// vector that is orthogonal to the surface normal will be set
+      /// as the primary friction direction.
+      /// If undefined, a vector consstrained to be perpendicular
+      /// to the contact normal in the global y-z plane is used.
+      /// \sa http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
+      public: math::Vector3 direction1;
+
+      /// \brief Array of dry friction coefficients. mu[0] is in the
+      /// primary direction as defined by the friction pyramid.
+      /// mu[1] is in the second direction.
+      /// mu[2] is in the torsional direction.
+      private: double mu[3];
+
+      /// \brief Radius of the contact patch used to calculate torsional
+      /// friction. The same patch is used by all contact points in this
+      /// surface.
+      /// The patch is equal to the square root of the surface radius times the
+      /// contact depth: a = srqt(R * d).
+      private: double patchRadius;
+
+      /// \brief Radius of the surface to be used to calculate torsional
+      /// friction. The same radius is used for all contacts points in this
+      /// surface.
+      private: double surfaceRadius;
+
+      /// \brief Flag for choosing the method for computing the contact
+      /// patch radius in torsional friction.
+      /// True to use the constant patch radius parameter. False to use the
+      /// surface radius together with contact depth.
+      private: bool usePatchRadius;
+
+      /// \brief Poisson's Ratio
+      private: double poissonsRatio;
+
+      /// \brief Elastic modulus.
+      private: double elasticModulus;
+    };
+
     /// \class SurfaceParams SurfaceParams.hh physics/physics.hh
     /// \brief SurfaceParams defines various Surface contact parameters.
     /// These parameters defines the properties of a
     /// physics::Contact constraint.
-    class SurfaceParams
+    class GZ_PHYSICS_VISIBLE SurfaceParams
     {
       /// \brief Constructor.
       public: SurfaceParams();
@@ -50,91 +188,34 @@ namespace gazebo
 
       /// \brief Fill in a surface message.
       /// \param[in] _msg Message to fill with this object's values.
-      public: void FillMsg(msgs::Surface &_msg);
+      public: virtual void FillMsg(msgs::Surface &_msg);
 
+      /// \brief Process a surface message.
+      /// \param[in] _msg Message to read values from.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
-      /// \brief bounce restitution coefficient [0,1], with 0 being inelastic,
-      ///        and 1 being perfectly elastic.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double bounce;
+      /// \brief Get access to FrictionPyramid data, if available.
+      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// not use FrictionPyramid data.
+      /// \deprecated See function FrictionPyramid
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
 
-      /// \brief minimum contact velocity for bounce to take effect, otherwise
-      ///        the collision is treated as an inelastic collision.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double bounceThreshold;
-
-      /// \brief spring constant equivalents of a contact as a function of
-      ///        SurfaceParams::cfm and SurfaceParams::erp.
-      /// \sa    See for example
-      ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_2
-      ///        for more details.
-      public: double kp;
-
-      /// \brief spring damping constant equivalents of a contact as a
-      ///        function of SurfaceParams::cfm and SurfaceParams::erp.
-      /// \sa    See for example
-      ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_2
-      ///        for more details.
-      public: double kd;
-
-      /// \brief Constraint Force Mixing parameter.
-      ///        See for example
-      ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_0
-      ///        for more details.
-      public: double cfm;
-
-      /// \brief Error Reduction Parameter.
-      /// \sa    See for example
-      ///        http://www.ode.org/ode-latest-userguide.html#sec_3_8_0
-      ///        for more details.
-      public: double erp;
-
-      /// \brief Maximum interpenetration error correction velocity.  If
-      ///        set to 0, two objects interpenetrating each other
-      ///        will not be pushed apart.
-      /// \sa    See dWroldSetContactMaxCorrectingVel
-      ///        (http://www.ode.org/ode-latest-userguide.html#sec_5_2_0)
-      public: double maxVel;
-
-      /// \brief Minimum depth before ERP takes effect.
-      /// \sa    See dWorldSetContactSurfaceLayer
-      ///        (http://www.ode.org/ode-latest-userguide.html#sec_5_2_0)
-      public: double minDepth;
-
-      /// \brief Dry friction coefficient in the primary friction direction
-      ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector consstrained to be perpendicular to the
-      ///        contact normal in the global y-z plane is used.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double mu1;
-
-      /// \brief Dry friction coefficient in the second friction direction
-      ///        as defined by the friction pyramid.  This is fdir1 if defined,
-      ///        otherwise, a vector consstrained to be perpendicular to the
-      ///        contact normal in the global y-z plane is used.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double mu2;
-
-      /// \brief Artificial contact slip in the primary friction direction.
-      /// \sa    See dContactSlip1 in
-      ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double slip1;
-
-      /// \brief Artificial contact slip in the secondary friction dirction.
-      /// \sa    See dContactSlip2 in
-      ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: double slip2;
-
-      /// \brief Primary friction direction for dry friction coefficient
-      ///        (SurfaceParams::mu1) of the friction pyramid.
-      ///        If undefined, a vector consstrained to be perpendicular
-      ///        to the contact normal in the global y-z plane is used.
-      /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: math::Vector3 fdir1;
+      /// \brief Get access to FrictionPyramid data, if available.
+      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// not use FrictionPyramid data.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
 
       /// \brief Allow collision checking without generating a contact joint.
       public: bool collideWithoutContact;
+
+      /// \brief Custom collision filtering used when collideWithoutContact is
+      /// true.
+      public: unsigned int collideWithoutContactBitmask;
+
+      /// \brief Custom collision filtering. Will override
+      /// collideWithoutContact.
+      public: unsigned int collideBitmask;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@
 #define _TOPICMANAGER_HH_
 
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <map>
 #include <list>
 #include <string>
 #include <vector>
+#include <boost/unordered/unordered_set.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
@@ -36,6 +38,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Publication.hh"
 #include "gazebo/transport/Subscriber.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -46,7 +49,7 @@ namespace gazebo
 
     /// \class TopicManager TopicManager.hh transport/transport.hh
     /// \brief Manages topics and their subscriptions
-    class TopicManager : public SingletonT<TopicManager>
+    class GZ_TRANSPORT_VISIBLE TopicManager : public SingletonT<TopicManager>
     {
       private: TopicManager();
       private: virtual ~TopicManager();
@@ -74,11 +77,6 @@ namespace gazebo
       /// \param[in] _onlyOut True means only outbound messages on nodes will be
       /// sent. False means nodes process both outbound and inbound messages
       public: void ProcessNodes(bool _onlyOut = false);
-
-      /// \brief Has the topic been advertised?
-      /// \param[in] _topic The name of the topic to check
-      /// \return true if the topic has been advertised, false otherwise
-      public: bool IsAdvertised(const std::string &_topic);
 
       /// \brief Subscribe to a topic
       /// \param[in] _options The options to use for the subscription
@@ -157,13 +155,24 @@ namespace gazebo
       /// \param[in] _topic The topic to be unadvertised
       public: void Unadvertise(const std::string &_topic);
 
+      /// \brief Unadvertise a publisher.
+      /// \param[in] _pub Publisher to unadvertise.
+      public: void Unadvertise(PublisherPtr _pub);
+
+      /// \brief Unadvertise a publisher, based on a publisher id.
+      /// \param[in] _topic The publisher's topic. It will also be unadvertised
+      /// if there are no advertised publishers left.
+      /// \param[in] _id ID of the publisher to unadvertise.
+      public: void Unadvertise(const std::string &_topic, const uint32_t _id);
+
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.
-      /// \param _topic Name of the topic
-      /// \param _message The message to send.
-      /// \param _cb Callback, used when the publish is completed.
+      /// \param [in] _topic Name of the topic
+      /// \param [in] _message The message to send.
+      /// \param [in] _cb Callback, used when the publish is completed.
+      /// \param [in] _id ID associated with the message.
       public: void Publish(const std::string &_topic, MessagePtr _message,
-                  const boost::function<void()> &_cb = NULL);
+                  boost::function<void(uint32_t)> _cb, uint32_t _id);
 
       /// \brief Connection a local Publisher to a remote Subscriber
       /// \param[in] _topic The topic to use
@@ -211,19 +220,16 @@ namespace gazebo
       /// \param[out] _namespaces The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
-      /// \brief Get a list of all the topics.
-      /// \return A map where keys are message types, and values are a list
-      /// of topic names.
-      /// \sa transport::GetAdvertisedTopics
-      public: std::map<std::string, std::list<std::string> >
-              GetAdvertisedTopics() const GAZEBO_DEPRECATED(1.5);
-
       /// \brief Clear all buffers
       public: void ClearBuffers();
 
       /// \brief Pause or unpause processing of incoming messages
       /// \param[in] _pause If true pause processing; otherwse unpause
       public: void PauseIncoming(bool _pause);
+
+      /// \brief Add a node to the list of nodes that requires processing.
+      /// \param[in] _ptr Node to process.
+      public: void AddNodeToProcess(NodePtr _ptr);
 
       /// \brief A map of string->list of Node pointers
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
@@ -234,10 +240,16 @@ namespace gazebo
       private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
 
+      /// \brief Nodes that require processing.
+      private: boost::unordered_set<NodePtr> nodesToProcess;
+
       private: boost::recursive_mutex nodeMutex;
 
       /// \brief Used to protect subscription connection creation.
       private: boost::mutex subscriberMutex;
+
+      /// \brief Mutex to protect node processing
+      private: boost::mutex processNodesMutex;
 
       private: bool pauseIncoming;
 

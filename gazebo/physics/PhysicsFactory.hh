@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@
 #include <string>
 #include <map>
 
-#include "physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
 
     /// \class PhysicsFactory PhysicsFactory.hh physics/physics.hh
     /// \brief The physics factory instantiates different physics engines.
-    class PhysicsFactory
+    class GZ_PHYSICS_VISIBLE PhysicsFactory
     {
       /// \brief Register everything.
       public: static void RegisterAll();

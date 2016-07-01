@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,26 @@
  * limitations under the License.
  *
 */
-#include "gui/Gui.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 //////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
+  Q_INIT_RESOURCE(resources);
   int result = 0;
-  if (!gazebo::gui::run(_argc, _argv))
+  try
+  {
+    if (!gazebo::gui::run(_argc, _argv))
+      result = -1;
+  }
+  catch(Ogre::Exception &_e)
+  {
+    gzerr << "Ogre Error:" << _e.getFullDescription() << "\n";
     result = -1;
+  }
+
   return result;
 }

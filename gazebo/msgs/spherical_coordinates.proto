@@ -1,0 +1,19 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface SphericalCoordinates
+/// \brief Spherical coordinates information 
+
+message SphericalCoordinates
+{
+  enum SurfaceModel
+  {
+    EARTH_WGS84 = 1;
+  }
+
+  required SurfaceModel surface_model   = 1;
+  required double latitude_deg          = 2;
+  required double longitude_deg         = 3;
+  required double elevation             = 4;
+  required double heading_deg           = 5;
+}

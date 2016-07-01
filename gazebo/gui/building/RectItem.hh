@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,54 @@
  *
 */
 
-#ifndef _RECT_ITEM_HH_
-#define _RECT_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_RECTITEM_HH_
+#define _GAZEBO_GUI_BUILDING_RECTITEM_HH_
 
+#include <memory>
 #include <vector>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/Color.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
     class GrabberHandle;
+    class MeasureItem;
     class RotateHandle;
-    class EditorItem;
+
+    // Forward declare private data.
+    class RectItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class RectItem RectItem.hh
     /// \brief 2D rectangle.
-    class RectItem : public EditorItem, public QGraphicsRectItem
+    class GZ_GUI_VISIBLE RectItem :
+      public EditorItem, public QGraphicsRectItem
     {
       Q_OBJECT
 
       /// \brief Resize flags used to indicate which dimension can be resized.
-      public: enum ResizeFlags {NONE = 0x00,
-          ITEM_WIDTH = 0x01, ITEM_HEIGHT = 0x02};
+      public: enum ResizeFlags
+          {
+            /// \brief No dimensions.
+            NONE = 0x00,
+
+            /// \brief Width
+            ITEM_WIDTH = 0x01,
+
+            /// \brief Height
+            ITEM_HEIGHT = 0x02
+          };
 
       /// \brief Constructor
       public: RectItem();
@@ -51,27 +72,49 @@ namespace gazebo
 
       /// \brief Set the width of the rect item.
       /// \param[in] _width Width of the rect item in pixels.
-      public: void SetWidth(int _width);
+      public: void SetWidth(const int _width);
 
       /// \brief Set the height of the rect item.
       /// \param[in] _height Height of the rect item in pixels.
-      public: void SetHeight(int _height);
+      public: void SetHeight(const int _height);
 
       /// \brief Set the size of the rect item.
       /// \param[in] _size Size of the rect item in pixels.
-      public: void SetSize(QSize _size);
+      public: void SetSize(const ignition::math::Vector2i &_size);
 
       /// \brief Get the width of the rect item.
       /// \return Width of the rect item in pixels.
-      public: double GetWidth() const;
+      public: double Width() const;
 
       /// \brief Get the height of the rect item.
       /// \return Height of the rect item in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
+
+      /// \brief Set the position of this item inside its parent wall.
+      /// \param[in] _positionOnWall New normalized position on wall.
+      public: void SetPositionOnWall(const double _positionOnWall);
+
+      /// \brief Get the position of this item inside its parent wall.
+      /// \return Normalized position on parent wall.
+      public: double PositionOnWall() const;
+
+      /// \brief Set the angle of this item inside its parent wall.
+      /// \param[in] _angleOnWall New angle on wall, either 0 or 180 degrees.
+      public: void SetAngleOnWall(const double _angleOnWall);
+
+      /// \brief Get the angle of this item inside its parent wall.
+      /// \return Angle on parent wall in degrees.
+      public: double AngleOnWall() const;
 
       /// \brief Show the grabber and rotate handles of the rect item.
       /// \param[in] _show True to draw the handles, and false to hide them.
-      public: void ShowHandles(bool _show);
+      public: void ShowHandles(const bool _show);
+
+      // Documentation inherited
+      public: void SetHighlighted(const bool _highlighted);
+
+      /// \brief Detach the rect item from its parent.
+      public: void DetachFromParent();
 
       /// \brief Helper method for Updating the corner positions of the rect
       /// item.
@@ -83,38 +126,41 @@ namespace gazebo
 
       /// \brief Set the position of the rect item
       /// \param[in] _pos Position in pixel coordinates.
-      public: virtual void SetPosition(const QPointF &_pos);
+      public: virtual void SetPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the position of the rect item
       /// \param[in] _x X position in pixel coordinates.
       /// \param[in] _y Y position in pixel coordinates.
-      public: virtual void SetPosition(double _x, double _y);
+      public: virtual void SetPosition(const double _x, const double _y);
 
       /// \brief Set the rotation of the rect item.
       /// \param[in] _angle Rotation angle in degrees.
-      public: virtual void SetRotation(double _angle);
+      public: virtual void SetRotation(const double _angle);
 
       /// \brief Set the resize flag of the rect item.
       /// \param[in] _flag Resize flag which controls how the item can be
       /// resized.
-      public: virtual void SetResizeFlag(unsigned int _flag);
+      public: virtual void SetResizeFlag(const unsigned int _flag);
 
       /// \brief Get the rotation of the rect item
       /// \return Rotation in degrees.
-      public: virtual double GetRotation() const;
+      public: virtual double Rotation() const;
 
       // Documentation inherited
-      public: virtual QVector3D GetSize() const;
+      public: virtual ignition::math::Vector3d Size() const;
 
       // Documentation inherited
-      public: virtual QVector3D GetScenePosition() const;
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
       // Documentation inherited
-      public: virtual double GetSceneRotation() const;
+      public: virtual double SceneRotation() const;
 
       /// \brief Get the bounding box of the rect item.
       /// \return The bounding box of the rect item.
       protected: virtual QRectF boundingRect() const;
+
+      /// \brief Update this item's measures.
+      protected: void UpdateMeasures();
 
       /// \brief Filter Qt events and redirect them to the rotate handle.
       /// \param[in] _rotateHandle Rotate handle that will handle the event.
@@ -123,7 +169,7 @@ namespace gazebo
           QEvent *_event);
 
       /// \brief Filter Qt events and redirect them to the grabber handle.
-      /// \param[in] _rotateHandle Grabber handle that will handle the event.
+      /// \param[in] _grabber Grabber handle that will handle the event.
       /// \param[in] _event Qt event
       private: virtual bool GrabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);
@@ -199,7 +245,7 @@ namespace gazebo
       /// brief Helper function for resizing the rect item.
       /// \param[in] _x Change in x (width).
       /// \param[in] _y Change in y (height).
-      private: void AdjustSize(double _x, double _y);
+      private: void AdjustSize(const double _x, const double _y);
 
       /// \brief Qt callback for opening the item inspector
       private slots: virtual void OnOpenInspector();
@@ -226,13 +272,10 @@ namespace gazebo
       protected: double drawingOriginY;
 
       /// \brief Border color of the rect item.
-      protected: QColor borderColor;
+      protected: common::Color borderColor;
 
       /// \brief Rotation angle of the rect item in degrees.
       protected: double rotationAngle;
-
-      /// \brief Z ordering of the rect item when idle (unselected.)
-      protected: int zValueIdle;
 
       /// \brief Qt action for opening the inspector.
       protected: QAction *openInspectorAct;
@@ -240,28 +283,14 @@ namespace gazebo
       /// \brief Qt action for deleting the item.
       protected: QAction *deleteItemAct;
 
-      /// \brief Mouse press position in pixel coordinates.
-      private: QPointF mousePressPos;
+      /// \brief A vector containing this item's measure items.
+      /// Currently only used for windows and doors, containing one measure
+      /// towards each end of this item's parent wall.
+      protected: std::vector<MeasureItem *> measures;
 
-      /// \brief Mouse press position in pixel coordinates.
-      private: int gridSpace;
-
-      /// \brief A list of grabber handles for this item. Four for corners and
-      /// four for edges, going clockwise with 0 being top left
-      private: std::vector<GrabberHandle *> grabbers;
-
-      /// \brief Rotate handle for rotating the rect item.
-      private: RotateHandle *rotateHandle;
-
-      /// \brief A list of resize cursors used when the mouse hovers over the
-      /// grabber handles.
-      private: std::vector<Qt::CursorShape> cursors;
-
-      /// \brieft Z ordering of the rect item when selected.
-      private: int zValueSelected;
-
-      /// \brieft Resize flag that controls how the rect item can be resized.
-      private: unsigned int resizeFlag;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<RectItemPrivate> dataPtr;
     };
     /// \}
   }

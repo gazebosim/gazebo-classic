@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -52,6 +52,12 @@ Pose::Pose(const Pose &_pose)
 }
 
 //////////////////////////////////////////////////
+Pose::Pose(const ignition::math::Pose3d &_pose)
+  : pos(_pose.Pos()), rot(_pose.Rot())
+{
+}
+
+//////////////////////////////////////////////////
 Pose::~Pose()
 {
 }
@@ -61,6 +67,13 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 {
   this->pos = _pos;
   this->rot = _rot;
+}
+
+//////////////////////////////////////////////////
+void Pose::Set(const Vector3 &_pos, const Vector3 &_rpy)
+{
+  this->pos = _pos;
+  this->rot.SetFromEuler(_rpy);
 }
 
 //////////////////////////////////////////////////
@@ -129,6 +142,22 @@ bool Pose::operator!=(const Pose &_pose) const
 Pose Pose::operator*(const Pose &pose)
 {
   return Pose(this->CoordPositionAdd(pose),  pose.rot * this->rot);
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const Pose &_pose)
+{
+  this->pos = _pose.pos;
+  this->rot = _pose.rot;
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const ignition::math::Pose3d &_pose)
+{
+  this->pos = _pose.Pos();
+  this->rot = _pose.Rot();
+  return *this;
 }
 
 //////////////////////////////////////////////////
@@ -224,3 +253,8 @@ void Pose::Round(int _precision)
   this->pos.Round(_precision);
 }
 
+//////////////////////////////////////////////////
+ignition::math::Pose3d Pose::Ign() const
+{
+  return ignition::math::Pose3d(this->pos.Ign(), this->rot.Ign());
+}

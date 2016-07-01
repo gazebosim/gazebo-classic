@@ -31,6 +31,7 @@
 #include <ou/namespace.h>
 #include <ou/inttypes.h>
 #include <ou/platform.h>
+#include <ou/ou_dll.h>
 
 #include <stddef.h>
 
@@ -77,7 +78,7 @@ typedef void (_OU_CONVENTION_CALLBACK *CAssertionFailedProcedure)(EASSERTIONFAIL
 	const char *szAssertionExpression, const char *szAssertionFileName, unsigned int uiAssertionSourceLine);
 
 
-class CAssertionCheckCustomization
+class OU_VISIBLE CAssertionCheckCustomization
 {
 public:
 	static _OU_ALWAYSINLINE_PRE CAssertionFailedProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API
@@ -107,7 +108,7 @@ typedef void *(_OU_CONVENTION_CALLBACK *CMemoryReallocationProcedure)(void *pv_E
 typedef void (_OU_CONVENTION_CALLBACK *CMemoryDeallocationProcedure)(void *pv_ExistingBlock);
 
 
-class CMemoryManagerCustomization
+class OU_VISIBLE CMemoryManagerCustomization
 {
 public:
 	static _OU_ALWAYSINLINE_PRE CMemoryAllocationProcedure _OU_ALWAYSINLINE_IN _OU_CONVENTION_API

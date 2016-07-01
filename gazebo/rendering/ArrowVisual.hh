@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Arrow Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _ARROWVISUAL_HH_
 #define _ARROWVISUAL_HH_
 
 #include <string>
-#include "rendering/Visual.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +31,7 @@ namespace gazebo
 
     /// \class ArrowVisual ArrowVisual.hh rendering/rendering.hh
     /// \brief Basic arrow visualization
-    class ArrowVisual : public Visual
+    class GZ_RENDERING_VISIBLE ArrowVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the arrow visual
@@ -46,17 +39,25 @@ namespace gazebo
       public: ArrowVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: virtual ~ArrowVisual();
+      public: virtual ~ArrowVisual() = default;
 
       /// \brief Load the visual with default parameters
       public: virtual void Load();
 
-      /// \brief Show the rotation of the visual
-      public: void ShowRotation();
+      /// \brief Show the rotation of the arrow visual.
+      /// \param[in] _show True to show the arrow rotation.
+      public: void ShowRotation(bool _show);
 
-      private: Ogre::SceneNode *headNode;
-      private: Ogre::SceneNode *shaftNode;
-      private: Ogre::SceneNode *rotationNode;
+      /// \brief Show the shaft of the arrow visual.
+      /// \param[in] _show True to show the arrow shaft.
+      public: void ShowShaft(bool _show);
+
+      /// \brief Show the head of the arrow visual.
+      /// \param[in] _show True to show the arrow head.
+      public: void ShowHead(bool _show);
+
+      // Documentation inherited
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
     };
     /// \}
   }

@@ -14,5 +14,3 @@ message TopicInfo
   repeated Publish publisher    = 2;
   repeated Subscribe subscriber = 3;
 }
-
-

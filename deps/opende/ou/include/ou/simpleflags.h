@@ -32,6 +32,7 @@
 #include <ou/assert.h>
 #include <ou/inttypes.h>
 #include <ou/namespace.h>
+#include <ou/ou_dll.h>
 
 #include <stddef.h>
 
@@ -40,7 +41,7 @@ BEGIN_NAMESPACE_OU()
 
 
 template<typename ContainerType>
-class CSimpleFlagsTemplate
+class OU_VISIBLE CSimpleFlagsTemplate
 {
 public:
 	_OU_INLINE _OU_CONVENTION_METHOD CSimpleFlagsTemplate():

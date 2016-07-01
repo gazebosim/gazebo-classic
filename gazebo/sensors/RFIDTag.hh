@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,29 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
+#ifndef _GAZEBO_SENSORS_RFIDTAG_HH_
+#define _GAZEBO_SENSORS_RFIDTAG_HH_
 
-#ifndef _RFIDTAG_HH_
-#define _RFIDTAG_HH_
-
-#include <vector>
+#include <sdf/sdf.hh>
 #include <string>
+#include <ignition/math/Pose3.hh>
 
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/gzmath.hh"
-#include "gazebo/physics/physics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class.
+    class RFIDTagPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
     /// \class RFIDTag RFIDTag.hh sensors/sensors.hh
     /// \brief RFIDTag to interact with RFIDTagSensors
-    class RFIDTag: public Sensor
+    class GAZEBO_VISIBLE RFIDTag: public Sensor
     {
       /// \brief Constructor.
       public: RFIDTag();
@@ -49,7 +46,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName,
-                                sdf::ElementPtr &_sdf);
+                                sdf::ElementPtr _sdf);
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName);
@@ -58,21 +55,18 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
 
       /// \brief Returns pose of tag in world coordinate.
       /// \return Pose of object.
-      public: math::Pose GetTagPose() const
-              {return entity->GetWorldPose();}
+      public: ignition::math::Pose3d TagPose() const;
 
-      /// \brief Pointer the entity that has the RFID tag.
-      private: physics::EntityPtr entity;
-
-      /// \brief Publisher for tag pose messages.
-      private: transport::PublisherPtr scanPub;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<RFIDTagPrivate> dataPtr;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@
 #ifndef _TIMER_HH_
 #define _TIMER_HH_
 
-#include "common/Console.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,10 +35,16 @@ namespace gazebo
 
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class Timer
+    class GZ_COMMON_VISIBLE Timer
     {
-      /// \brief Constructor
+      /// \brief Default constructor
       public: Timer();
+
+      /// \brief Countdown constructor
+      /// \param[in] _maxTime The time to count down from.
+      /// \param[in] _countdown. Whether or not to count down. True by default
+      /// if this constructor is used.
+      public: Timer(const Time &_maxTime, const bool _countdown = true);
 
       /// \brief Destructor
       public: virtual ~Timer();
@@ -56,6 +63,9 @@ namespace gazebo
       /// \return The time
       public: Time GetElapsed() const;
 
+      /// \brief Reset the timer
+      public: void Reset();
+
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const gazebo::common::Timer &t)
@@ -64,14 +74,24 @@ namespace gazebo
                 return out;
               }
 
+      /// \brief True if a reset is needed.
+      private: bool reset;
+
+      /// \brief True if the timer is running.
+      private: bool running;
+
+      /// \brief True if the timer is counting down, false otherwise.
+      /// False by default.
+      private: bool countdown;
+
       /// \brief The time of the last call to Start
       private: Time start;
 
       /// \brief The time when Stop was called.
       private: Time stop;
 
-      /// \brief True if the timer is running.
-      private: bool running;
+      /// \brief Maximum time, only used in countdown.
+      private: Time maxTime;
     };
     /// \}
   }

@@ -1,0 +1,23 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Joystick 
+/// \brief Message for a joystick
+
+import "vector3d.proto";
+
+message Joystick
+{
+  // Translation measurements along the x,y,z
+  // axes. These values should be normalized to
+  // the range -1...1
+  optional Vector3d translation = 1;
+
+  // Rotation measurements about the x,y,z 
+  // axes. These values should be normalized to
+  // the range -1...1
+  optional Vector3d rotation    = 2;
+
+  // Button measurements
+  repeated int32 buttons        = 3;
+}

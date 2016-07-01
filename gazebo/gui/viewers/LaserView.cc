@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,15 @@
  *
  */
 
-#include "gazebo/transport/Transport.hh"
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
-
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/LaserView.hh"
@@ -60,6 +64,10 @@ LaserView::LaserView(QWidget *_parent)
   QPushButton *fitButton = new QPushButton("Fit in View");
   connect(fitButton, SIGNAL(clicked()), this, SLOT(OnFitInView()));
 
+  this->vertScanSpin = new QSpinBox(this);
+  this->vertScanSpin->setRange(0, 0);
+  this->vertScanSpin->setToolTip("Select vertical scan");
+
   QRadioButton *degreeToggle = new QRadioButton();
   degreeToggle->setText("Degrees");
   connect(degreeToggle, SIGNAL(toggled(bool)), this, SLOT(OnDegree(bool)));
@@ -74,6 +82,8 @@ LaserView::LaserView(QWidget *_parent)
 
   controlLayout->addWidget(degreeToggle);
   controlLayout->addWidget(fitButton);
+  controlLayout->addWidget(new QLabel("Vertical:"));
+  controlLayout->addWidget(this->vertScanSpin);
   controlLayout->addStretch(1);
   controlLayout->addWidget(new QLabel("Range"));
   controlLayout->addWidget(this->rangeEdit);
@@ -140,11 +150,36 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
 
   this->laserItem->Clear();
 
-  double r;
-  for (unsigned int i = 0;
-       i < static_cast<unsigned int>(_msg->scan().ranges_size()); i++)
+  // Rayoffset is the start index in _msg->scan()->ranges(). This value is
+  // computed below by multiplying the number of ranges in a scan by the
+  // selected vertical scan.
+  int rayOffset = this->vertScanSpin->value();
+
+  // Make sure the spin box has a valid value.
+  if (_msg->scan().has_vertical_count() && _msg->scan().vertical_count() !=
+      static_cast<uint32_t>(this->vertScanSpin->maximum()+1))
   {
-    r = _msg->scan().ranges(i);
+    int max = std::max(0u, _msg->scan().vertical_count()-1);
+    rayOffset = std::min(rayOffset, max);
+
+    if (this->vertScanSpin->value() > max)
+      this->vertScanSpin->setValue(max);
+    this->vertScanSpin->setMaximum(max);
+  }
+  else if (!_msg->scan().has_vertical_count())
+  {
+    rayOffset = 0;
+    this->vertScanSpin->setValue(0);
+    this->vertScanSpin->setMaximum(0);
+  }
+
+  // Compute the final ray index
+  rayOffset *= _msg->scan().count();
+
+  for (unsigned int i = 0;
+       i < static_cast<unsigned int>(_msg->scan().count()); i++)
+  {
+    double r = _msg->scan().ranges(i+rayOffset);
 
     if (i+1 >= this->laserItem->GetRangeCount())
       this->laserItem->AddRange(r);
@@ -201,8 +236,15 @@ void LaserView::LaserItem::paint(QPainter *_painter,
   boost::mutex::scoped_lock lock(this->mutex);
 
   QColor orange(245, 129, 19, 255);
+  QColor noHitDarkGrey(200, 200, 200, 255);
+  QColor noHitLightGrey(200, 200, 200, 50);
   QColor darkGrey(100, 100, 100, 255);
   QColor lightGrey(100, 100, 100, 50);
+  _painter->setPen(QPen(noHitDarkGrey));
+  _painter->setBrush(noHitLightGrey);
+
+  // Draw the filled polygon that fill the gaps for the laser rays
+  _painter->drawPolygon(&this->noHitPoints[0], this->noHitPoints.size());
 
   _painter->setPen(QPen(darkGrey));
   _painter->setBrush(lightGrey);
@@ -229,7 +271,9 @@ void LaserView::LaserItem::paint(QPainter *_painter,
   {
     double x1, y1;
 
-    double rangeScaled = this->ranges[index] * this->scale;
+    double r = this->ranges[index];
+    double hitRange = std::isinf(r) ? 0 : r;
+    double rangeScaled = hitRange * this->scale;
     double rangeMaxScaled = this->rangeMax * this->scale;
 
     this->indexAngle = this->angleMin + index * this->angleStep;
@@ -334,7 +378,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
 /////////////////////////////////////////////////
 QRectF LaserView::LaserItem::GetBoundingRect() const
 {
-  if (this->ranges.size() == 0)
+  if (this->ranges.empty())
     return QRectF(0, 0, 0, 0);
 
   // Compute the maximum size of bound box by scaling up the maximum
@@ -380,6 +424,7 @@ void LaserView::LaserItem::Clear()
   boost::mutex::scoped_lock lock(this->mutex);
   this->ranges.clear();
   this->points.clear();
+  this->noHitPoints.clear();
 }
 
 /////////////////////////////////////////////////
@@ -416,13 +461,15 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     // A min range > 0 means we have to draw an inner circle, so we twice as
     // many points
     this->points.resize(this->ranges.size() * 2);
+    this->noHitPoints.resize(this->ranges.size() * 2);
   }
-  else if (math::equal(this->rangeMin, 0.0) &&
+  else if (ignition::math::equal(this->rangeMin, 0.0) &&
       this->ranges.size() + 1 != this->points.size())
   {
     // A min range == 0 mean we just need a closing point at the (0, 0)
     // location
     this->points.resize(this->ranges.size() + 1);
+    this->noHitPoints.resize(this->ranges.size() + 1);
   }
 
   double angle = this->angleMin;
@@ -430,9 +477,16 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
   // Add a point for each laser reading
   for (unsigned int i = 0; i < this->ranges.size(); ++i)
   {
-    QPointF pt(this->ranges[i] * this->scale * cos(angle),
-        -this->ranges[i] * this->scale * sin(angle));
+    double r = this->ranges[i];
+    double hitRange = std::isinf(r) ? 0 : r;
+    QPointF pt(hitRange * this->scale * cos(angle),
+        -hitRange * this->scale * sin(angle));
     this->points[i] = pt;
+    double noHitRange = std::isinf(r) ? this->rangeMax : hitRange;
+    QPointF noHitPt(noHitRange * this->scale * cos(angle),
+        -noHitRange * this->scale * sin(angle));
+    this->noHitPoints[i] = noHitPt;
+
     angle += this->angleStep;
   }
 
@@ -445,6 +499,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
       QPointF pt(this->rangeMin * this->scale * cos(angle),
           -this->rangeMin * this->scale * sin(angle));
       this->points[i + this->ranges.size()] = pt;
+      this->noHitPoints[i + this->ranges.size()] = pt;
       angle -= this->angleStep;
     }
   }
@@ -452,6 +507,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
   {
     // Connect the last point to the (0,0)
     this->points[this->ranges.size()] = QPointF(0, 0);
+    this->noHitPoints[this->ranges.size()] = QPointF(0, 0);
   }
 
   // Tell QT we have changed.
@@ -484,7 +540,7 @@ void LaserView::LaserItem::hoverLeaveEvent(
     QGraphicsSceneHoverEvent * /*_event*/)
 {
   this->indexAngle = -999;
-  QApplication::setOverrideCursor(Qt::OpenHandCursor);
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
 
 /////////////////////////////////////////////////

@@ -1,0 +1,211 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <physics type="ode">
+      <gravity>0.000000 0.000000 0.00000</gravity>
+      <max_step_size>0.000100</max_step_size>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>200</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>1.000000</erp>
+          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.000000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>0.000000</real_time_update_rate>
+    </physics>
+    <model name="model_1">
+      <pose>0.000000 0.000000 2.100000 -1.57079 -0.000000 0.000000</pose>
+      <link name="link_1">
+        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <link name="link_2">
+        <pose>0.500000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder">
+          <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <link name="link_3">
+        <pose>1.000000 1.000000 1.000000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>1.000000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>1.000000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>1.000000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <laser_retro>100.000000</laser_retro>
+          <transparency>0.000000</transparency>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.000000 0.000000 -0.500000 0.000000 -0.000000 0.000000</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.100000</radius>
+              <length>1.000000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>1</gravity>
+        <self_collide>1</self_collide>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name="joint_02" type="revolute">
+        <parent>world</parent>
+        <child>link_2</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <limit>
+            <upper>-1000.0</upper>
+            <lower>1000.0</lower>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="joint_12" type="revolute">
+        <parent>link_2</parent>
+        <child>link_1</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="joint_23" type="revolute">
+        <parent>link_2</parent>
+        <child>link_3</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="joint_13" type="gearbox">
+        <!--
+              theta_1 = joint angle in the direction specified by <axis> from <gearbox_refrence_body> to <parent>
+              theta_2 = joint angle in the direction specified by <axis2> from <gearbox_refrence_body> to <child>
+              this gearbox constraint enforces that
+              theta_2 = - <gearbox_ratio> * theta_1
+            -->
+        <parent>link_1</parent>
+        <child>link_3</child>
+        <gearbox_ratio>-1.5</gearbox_ratio>
+        <gearbox_reference_body>link_2</gearbox_reference_body>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+        <axis2>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis2>
+      </joint>
+      <static>0</static>
+    </model>
+  </world>
+</sdf>

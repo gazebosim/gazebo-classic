@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,87 +14,88 @@
  * limitations under the License.
  *
 */
-#ifndef _LIGHTMAKER_HH_
-#define _LIGHTMAKER_HH_
 
+#ifndef GAZEBO_GUI_LIGHTMAKER_HH_
+#define GAZEBO_GUI_LIGHTMAKER_HH_
+
+#include <memory>
 #include <string>
+#include <ignition/math/Vector3.hh>
 
-#include "msgs/msgs.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/msgs/light.pb.h"
+#include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
 {
-  namespace rendering
-  {
-    class Light;
-  }
-
   namespace gui
   {
-    class LightMaker : public EntityMaker
+    class LightMakerPrivate;
+
+    /// \brief Used to insert a new light into the scene.
+    class GZ_GUI_VISIBLE LightMaker : public EntityMaker
     {
+      /// \brief Constructor
       public: LightMaker();
 
-      public: void Start(const rendering::UserCameraPtr _camera);
+      /// \brief Destructor
+      public: virtual ~LightMaker();
+
+      // Documentation inherited
+      public: void Start();
+
+      // Documentation inherited
       public: void Stop();
-      public: virtual bool IsActive() const;
 
-      public: void OnMousePush(const common::MouseEvent &_event);
+      /// \brief Initialize the light maker from an existing light in the scene.
+      /// \param[in] _lightName Name of existing light in the scene.
+      /// \return True if initialization is successful.
+      public: bool InitFromLight(const std::string &_lightName);
 
-      public: virtual void OnMouseMove(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &) {}
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d EntityPosition() const;
+
+      // Documentation inherited
+      protected: virtual void SetEntityPosition(
+          const ignition::math::Vector3d &_pos);
+
+      /// \brief Initialize the light maker.
+      /// \return True if the light maker is initialized successfully.
+      protected: virtual bool Init();
+
+      // Documentation inherited
       protected: virtual void CreateTheEntity();
 
-      protected: int state;
+      /// \brief Message that holds all the light information.
       protected: msgs::Light msg;
-      protected: transport::PublisherPtr lightPub;
-      private: static unsigned int counter;
+
+      /// \brief Type of the light being spawned.
       protected: std::string lightTypename;
-      private: rendering::Light *light;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LightMakerPrivate> dataPtr;
     };
 
-    class PointLightMaker : public LightMaker
+    /// \brief Used to insert a new point light into the scene.
+    class GZ_GUI_VISIBLE PointLightMaker : public LightMaker
     {
-      public: PointLightMaker() : LightMaker()
-              {
-                this->msg.set_type(msgs::Light::POINT);
-                this->msg.set_cast_shadows(false);
-                this->lightTypename = "point";
-              }
+      /// \brief Constructor
+      public: PointLightMaker();
     };
 
-    class SpotLightMaker : public LightMaker
+    /// \brief Used to insert a new spot light into the scene.
+    class GZ_GUI_VISIBLE SpotLightMaker : public LightMaker
     {
-      public: SpotLightMaker() : LightMaker()
-              {
-                this->msg.set_type(msgs::Light::SPOT);
-                msgs::Set(this->msg.mutable_direction(),
-                          math::Vector3(0, 0, -1));
-                this->msg.set_cast_shadows(false);
-
-                this->msg.set_spot_inner_angle(0.6);
-                this->msg.set_spot_outer_angle(1.0);
-                this->msg.set_spot_falloff(1.0);
-                this->lightTypename  = "spot";
-              }
+      /// \brief Constructor
+      public: SpotLightMaker();
     };
 
-    class DirectionalLightMaker : public LightMaker
+    /// \brief Used to insert a new directional light into the scene.
+    class GZ_GUI_VISIBLE DirectionalLightMaker : public LightMaker
     {
-      public: DirectionalLightMaker() : LightMaker()
-              {
-                this->msg.set_type(msgs::Light::DIRECTIONAL);
-                msgs::Set(this->msg.mutable_direction(),
-                          math::Vector3(.1, .1, -0.9));
-                this->msg.set_cast_shadows(true);
-
-                this->lightTypename  = "directional";
-              }
+      /// \brief Constructor
+      public: DirectionalLightMaker();
     };
   }
 }
 #endif
-
-
-

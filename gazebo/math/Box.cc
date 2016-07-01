@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 #include <math.h>
-#include "math/Box.hh"
+#include "gazebo/math/Box.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -30,8 +30,19 @@ Box::Box()
 
 
 //////////////////////////////////////////////////
-Box::Box(const Vector3 &_min, const Vector3 &_max)
-  : min(_min), max(_max), extent(EXTENT_FINITE)
+Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)
+  : extent(EXTENT_FINITE)
+{
+  this->min = _vec1;
+  this->min.SetToMin(_vec2);
+
+  this->max = _vec2;
+  this->max.SetToMax(_vec1);
+}
+
+//////////////////////////////////////////////////
+Box::Box(const ignition::math::Box &_box)
+  : min(_box.Min()), max(_box.Max()), extent(EXTENT_FINITE)
 {
 }
 
@@ -75,9 +86,7 @@ math::Vector3 Box::GetSize() const
 //////////////////////////////////////////////////
 math::Vector3 Box::GetCenter() const
 {
-  Vector3 size = this->GetSize();
-  size /= 2.0;
-  return this->min + size;
+  return this->min + (this->max - this->min) * 0.5;
 }
 
 
@@ -147,7 +156,7 @@ const Box &Box::operator+=(const Box &_b)
 }
 
 //////////////////////////////////////////////////
-bool Box::operator==(const Box &_b)
+bool Box::operator==(const Box &_b) const
 {
   return this->min == _b.min && this->max == _b.max;
 }
@@ -156,4 +165,26 @@ bool Box::operator==(const Box &_b)
 Box Box::operator-(const Vector3 &_v)
 {
   return Box(this->min - _v, this->max - _v);
+}
+
+//////////////////////////////////////////////////
+bool Box::Contains(const Vector3 &_p) const
+{
+  return _p.x >= this->min.x && _p.x <= this->max.x &&
+         _p.y >= this->min.y && _p.y <= this->max.y &&
+         _p.z >= this->min.z && _p.z <= this->max.z;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Box::Ign() const
+{
+  return ignition::math::Box(this->min.Ign(), this->max.Ign());
+}
+
+//////////////////////////////////////////////////
+Box &Box::operator=(const ignition::math::Box &_b)
+{
+  this->min = _b.Min();
+  this->max = _b.Max();
+  return *this;
 }

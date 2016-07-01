@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface SonarStamped
+/// \brief Message for a time stamped sonar value
+
+import "time.proto";
+import "sonar.proto";
+
+message SonarStamped
+{
+  // Time when the data was captured
+  required Time time       = 1;
+  required Sonar sonar     = 2;
+}

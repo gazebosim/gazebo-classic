@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
  */
 
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector2d.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -41,6 +41,12 @@ Vector2d::Vector2d(const double &_x, const double &_y)
 //////////////////////////////////////////////////
 Vector2d::Vector2d(const Vector2d &_pt)
   : x(_pt.x), y(_pt.y)
+{
+}
+
+//////////////////////////////////////////////////
+Vector2d::Vector2d(const ignition::math::Vector2d &_v)
+  : x(_v.X()), y(_v.Y())
 {
 }
 
@@ -72,12 +78,20 @@ void Vector2d::Set(double _x, double _y)
   this->y = _y;
 }
 
+//////////////////////////////////////////////////
+Vector2d &Vector2d::operator =(const Vector2d &_pt)
+{
+  this->x = _pt.x;
+  this->y = _pt.y;
+
+  return *this;
+}
 
 //////////////////////////////////////////////////
-Vector2d &Vector2d::operator =(const Vector2d &pt)
+Vector2d &Vector2d::operator=(const ignition::math::Vector2d &_pt)
 {
-  this->x = pt.x;
-  this->y = pt.y;
+  this->x = _pt.X();
+  this->y = _pt.Y();
 
   return *this;
 }
@@ -188,7 +202,7 @@ bool Vector2d::operator ==(const Vector2d &pt) const
 //////////////////////////////////////////////////
 bool Vector2d::IsFinite() const
 {
-  return finite(this->x) && finite(this->y);
+  return std::isfinite(this->x) && std::isfinite(this->y);
 }
 
 //////////////////////////////////////////////////
@@ -205,4 +219,14 @@ double Vector2d::operator[](unsigned int index) const
   }
 }
 
+//////////////////////////////////////////////////
+double Vector2d::Dot(const Vector2d &_v) const
+{
+  return (this->x * _v.x) + (this->y * _v.y);
+}
 
+//////////////////////////////////////////////////
+ignition::math::Vector2d Vector2d::Ign() const
+{
+  return ignition::math::Vector2d(this->x, this->y);
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,18 @@
 
 /*
 
-#include "common/Param.hh"
+#include "gazebo/common/Param.hh"
 #include "Entity.hh"
-#include "math/Pose.hh"
-#include "math/Vector3.hh"
-#include "physics/Collision.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 */
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/Collision.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 class btCollisionShape;
 
@@ -47,7 +50,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet collisions
-    class BulletCollision : public Collision
+    class GZ_PHYSICS_VISIBLE BulletCollision : public Collision
     {
       /// \brief Constructor
       public: BulletCollision(LinkPtr _parent);
@@ -91,6 +94,11 @@ namespace gazebo
 
       /// \brief Set the index of the compound shape
       public: void SetCompoundShapeIndex(int _index);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to BulletSurfaceParams.
+      /// \return Dynamically casted pointer to BulletSurfaceParams.
+      public: BulletSurfaceParamsPtr GetBulletSurface() const;
 
       protected: btCollisionShape *collisionShape;
 

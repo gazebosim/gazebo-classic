@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,17 @@
  * Date: 03 Apr 2007
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -30,7 +38,7 @@
 #include "gazebo/common/KeyFrame.hh"
 
 #include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/physics/RayShape.hh"
@@ -48,40 +56,38 @@ using namespace physics;
 Entity::Entity(BasePtr _parent)
   : Base(_parent)
 {
+  this->isStatic = false;
   this->isCanonicalLink = false;
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
 
   this->visualMsg = new msgs::Visual;
-  this->poseMsg = new msgs::Pose;
+  this->visualMsg->set_id(this->id);
+
+  if (this->world)
+    this->visualMsg->set_parent_name(this->world->GetName());
+  else
+  {
+    gzerr << "No world set when constructing an Entity.\n";
+    this->visualMsg->set_parent_name("no_world_name");
+  }
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::dynamic_pointer_cast<Entity>(this->parent);
+    this->visualMsg->set_parent_name(this->parentEntity->GetScopedName());
     this->SetStatic(this->parentEntity->IsStatic());
   }
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
+
+  this->scale = ignition::math::Vector3d::One;
 }
 
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  Base_V::iterator iter;
-
-  // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
-
-  delete this->visualMsg;
-  this->visualMsg = NULL;
-
-  delete this->poseMsg;
-  this->poseMsg = NULL;
-
-  this->visPub.reset();
-  this->requestPub.reset();
-  this->poseSub.reset();
-  this->node.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -97,24 +103,36 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->visualMsg->set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->GetValuePose("pose") +
+      this->worldPose = this->sdf->Get<math::Pose>("pose") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = this->sdf->GetValuePose("pose");
+      this->worldPose = this->sdf->Get<math::Pose>("pose");
 
-    this->initialRelativePose = this->sdf->GetValuePose("pose");
+    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
   }
 
   if (this->parent)
+  {
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+    this->visualMsg->set_parent_id(this->parent->GetId());
+  }
+  else
+  {
+    this->visualMsg->set_parent_name(this->world->GetName());
+    this->visualMsg->set_parent_id(0);
+  }
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
+
+  if (this->HasType(Base::MODEL))
+    this->visualMsg->set_type(msgs::Visual::MODEL);
+  if (this->HasType(Base::LINK))
+    this->visualMsg->set_type(msgs::Visual::LINK);
+  if (this->HasType(Base::COLLISION))
+    this->visualMsg->set_type(msgs::Visual::COLLISION);
 
   this->visPub->Publish(*this->visualMsg);
-
-  this->poseMsg->set_name(this->GetScopedName());
 
   if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;
@@ -139,7 +157,7 @@ void Entity::SetStatic(const bool &_s)
 
   this->isStatic = _s;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     EntityPtr e = boost::dynamic_pointer_cast<Entity>(*iter);
     if (e)
@@ -207,11 +225,7 @@ void Entity::StopAnimation()
 {
   this->animation.reset();
   this->onAnimationComplete.clear();
-  if (this->animationConnection)
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
-    this->animationConnection.reset();
-  }
+  this->animationConnection.reset();
 }
 
 //////////////////////////////////////////////////
@@ -271,7 +285,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
     {
       // force an update of all children
       for  (Base_V::iterator iter = this->children.begin();
-            iter != this->childrenEnd; ++iter)
+            iter != this->children.end(); ++iter)
       {
         if ((*iter)->HasType(ENTITY))
         {
@@ -305,23 +319,51 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
   // update all children pose, moving them with the model.
   // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-      iter != this->childrenEnd; ++iter)
+      iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
       EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
 
-      if (entity->IsCanonicalLink())
-        entity->worldPose = (entity->initialRelativePose + _pose);
+      if (entity->HasType(LINK))
+      {
+        if (entity->IsCanonicalLink())
+          entity->worldPose = (entity->initialRelativePose + _pose);
+        else
+        {
+          entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+          if (_publish)
+            entity->PublishPose();
+        }
+
+        if (_notify)
+          entity->UpdatePhysicsPose(false);
+
+        // Tell collisions that their current world pose is dirty (needs
+        // updating). We set a dirty flag instead of directly updating the
+        // value to improve performance.
+        for (Base_V::iterator iterC = (*iter)->children.begin();
+             iterC != (*iter)->children.end(); ++iterC)
+        {
+          if ((*iterC)->HasType(COLLISION))
+          {
+            CollisionPtr entityC =
+                boost::static_pointer_cast<Collision>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
+        }
+      }
+      else if (entity->HasType(MODEL))
+      {
+        // set pose of nested models
+        entity->SetWorldPoseModel(
+            (entity->worldPose - oldModelWorldPose) + _pose, _notify, _publish);
+      }
       else
       {
-        entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-        if (_publish)
-          entity->PublishPose();
+        gzerr << "SetWorldPoseModel error: unknown type of entity in Model."
+          << std::endl;
       }
-
-      if (_notify)
-        entity->UpdatePhysicsPose(false);
     }
   }
 }
@@ -336,26 +378,51 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   if (_notify)
     this->UpdatePhysicsPose(true);
 
-  // also update parent model's pose
-  if (this->parentEntity->HasType(MODEL))
+  if (!this->parentEntity->HasType(MODEL))
   {
-    this->parentEntity->worldPose.pos = _pose.pos -
-      this->parentEntity->worldPose.rot.RotateVector(
-          this->initialRelativePose.pos);
-    this->parentEntity->worldPose.rot = _pose.rot *
-      this->initialRelativePose.rot.GetInverse();
+    gzerr << "SetWorldPose for Canonical Body [" << this->GetName()
+        << "] but parent[" << this->parentEntity->GetName()
+        << "] is not a MODEL!" << std::endl;
+    return;
+  }
 
-    this->parentEntity->worldPose.Correct();
+  EntityPtr parentEnt = this->parentEntity;
+  ignition::math::Pose3d relativePose = this->initialRelativePose.Ign();
+  math::Pose updatePose = _pose;
+
+  // recursively update parent model pose based on new canonical link pose
+  while (parentEnt && parentEnt->HasType(MODEL))
+  {
+    // setting parent Model world pose from canonical link world pose
+    // where _pose is the canonical link's world pose
+    parentEnt->worldPose = math::Pose(-relativePose) + updatePose;
+
+    parentEnt->worldPose.Correct();
 
     if (_notify)
-      this->parentEntity->UpdatePhysicsPose(false);
+      parentEnt->UpdatePhysicsPose(false);
 
     if (_publish)
       this->parentEntity->PublishPose();
+
+    updatePose = parentEnt->worldPose;
+    relativePose = parentEnt->GetInitialRelativePose().Ign();
+
+    parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
-  else
-    gzerr << "SWP for CB[" << this->GetName() << "] but parent["
-      << this->parentEntity->GetName() << "] is not a MODEL!\n";
+
+  // Tell collisions that their current world pose is dirty (needs
+  // updating). We set a dirty flag instead of directly updating the
+  // value to improve performance.
+  for (Base_V::iterator iterC = this->children.begin();
+      iterC != this->children.end(); ++iterC)
+  {
+    if ((*iterC)->HasType(COLLISION))
+    {
+      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+      entityC->SetWorldPoseDirty();
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -419,7 +486,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (_updateChildren)
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       if ((*iter)->HasType(LINK))
       {
@@ -435,7 +502,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (this->IsStatic())
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
@@ -497,7 +564,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 {
   if (_msg->name() == this->GetScopedName())
   {
-    math::Pose p = msgs::Convert(*_msg);
+    ignition::math::Pose3d p = msgs::ConvertIgn(*_msg);
     this->SetWorldPose(p);
   }
 }
@@ -505,27 +572,45 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
+  // TODO: put this back in
+  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+
   if (this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        this->GetScopedName());
+    auto msg = msgs::CreateRequest("entity_delete", this->GetScopedName());
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
-  this->parentEntity.reset();
-  Base::Fini();
+  // Clean transport
+  {
+    this->posePub.reset();
+    this->requestPub.reset();
+    this->visPub.reset();
 
+    this->poseSub.reset();
+
+    if (this->node)
+      this->node->Fini();
+    this->node.reset();
+  }
+
+  this->animationConnection.reset();
   this->connections.clear();
-  this->node->Fini();
+
+  if (this->visualMsg)
+    delete this->visualMsg;
+  this->visualMsg = NULL;
+
+  this->parentEntity.reset();
+
+  Base::Fini();
 }
 
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
-  if (this->HasType(Base::MODEL))
-    this->SetWorldPose(this->initialRelativePose);
-  else
-    this->SetRelativePose(this->initialRelativePose);
+  this->SetRelativePose(this->initialRelativePose);
 }
 
 //////////////////////////////////////////////////
@@ -537,7 +622,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->GetValuePose("pose");
+  math::Pose newPose = _sdf->Get<math::Pose>("pose");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);
@@ -553,15 +638,14 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
-  offset.pos = kf.GetTranslation();
-  offset.rot = kf.GetRotation();
+  offset.pos = kf.Translation();
+  offset.rot = kf.Rotation();
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = _info.simTime;
 
   if (this->animation->GetLength() <= this->animation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
     if (this->onAnimationComplete)
     {
@@ -579,14 +663,8 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
-  math::Box box;
-  for (Base_V::const_iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    box += this->GetCollisionBoundingBoxHelper(*iter);
-  }
-
-  return box;
+  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
+  this->GetCollisionBoundingBoxHelper(base);
 }
 
 //////////////////////////////////////////////////
@@ -621,6 +699,7 @@ void Entity::PlaceOnEntity(const std::string &_entityName)
 void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)
 {
+  this->GetWorld()->GetPhysicsEngine()->InitForThread();
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 

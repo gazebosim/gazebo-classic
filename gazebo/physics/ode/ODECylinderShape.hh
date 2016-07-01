@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,17 @@
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE cylinder shape
-    class ODECylinderShape : public CylinderShape
+    class GZ_PHYSICS_VISIBLE ODECylinderShape : public CylinderShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.
@@ -43,12 +47,13 @@ namespace gazebo
         oParent =
           boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
-        if (oParent->GetCollisionId() == NULL)
+        if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
         else
           dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
       }
     };
+    /// \}
   }
 }
 #endif

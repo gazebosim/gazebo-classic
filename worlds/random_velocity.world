@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <gui>
+      <camera name="user_camera">
+        <track_visual>
+          <static>true</static>
+          <use_model_frame>false</use_model_frame>
+          <name>box</name>
+          <xyz>-3 0 1</xyz>
+        </track_visual>
+      </camera>
+    </gui>
+
+    <model name="box">
+      <pose>4 4 0.5 0 0 0</pose>
+      <link name="link">
+        <kinematic>true</kinematic>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.0</mu>
+                <mu2>0.0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <!-- Apply a random velocity to the specified link-->
+      <!-- In this example, we move a box around. A key property of the link
+           is the frictionless surface -->
+      <plugin name="random" filename="libRandomVelocityPlugin.so">
+
+        <!-- Name of the link in this model that receives the velocity -->
+        <link>link</link>
+
+        <!-- Initial velocity that is applied to the link -->
+        <initial_velocity>0 0.5 0</initial_velocity>
+
+        <!-- Scaling factor that is used to compute a new velocity -->
+        <velocity_factor>0.5</velocity_factor>
+
+        <!-- Time, in seconds, between new velocities -->
+        <update_period>5</update_period>
+
+        <!-- Clamp the Z velocity value to zero. You can also clamp x and
+             y values -->
+        <min_z>0</min_z>
+        <max_z>0</max_z>
+      </plugin>
+    </model>
+  </world>
+</sdf>

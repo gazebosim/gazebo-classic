@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _COMVISUAL_HH_
 #define _COMVISUAL_HH_
 
 #include <string>
 
-#include "rendering/Visual.hh"
-#include "msgs/msgs.hh"
-
-namespace ogre
-{
-  class SceneNode;
-}
+#include "gazebo/math/Pose.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,11 +31,9 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    class DynamicLines;
-
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class COMVisual : public Visual
+    class GZ_RENDERING_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -50,25 +41,31 @@ namespace gazebo
       public: COMVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: virtual ~COMVisual();
+      public: ~COMVisual();
+
+      // Inherited from parent class
+      public: virtual void Fini();
 
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
+      using Visual::Load;
 
       /// \brief Load from a message
       /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
-      /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual
-      private: void Load(const math::Pose &_pose);
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: math::Pose GetInertiaPose() const;
 
-      /// \brief Lines that make the cross marking the center of mass
-      private: DynamicLines *crossLines;
+      /// \brief Load using previously set member variables.
+      private: void Load();
 
-      /// \brief Box that make the cross marking the center of mass
-      private: Ogre::SceneNode *boxNode;
+      /// \brief Destroy all the movable objects attached to a scene node.
+      /// \param[in] _sceneNode Pointer to the scene node to process.
+      private: void DestroyAllAttachedMovableObjects(
+                        Ogre::SceneNode *_sceneNode);
     };
     /// \}
   }

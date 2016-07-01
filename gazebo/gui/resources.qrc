@@ -16,8 +16,12 @@
   <file>images/insertModel.png</file>
   <file>images/translate.png</file>
   <file>images/rotate.png</file>
+  <file>images/scale.png</file>
   <file>images/arrow.png</file>
   <file>images/down_arrow.png</file>
+  <file>images/branch-more.png</file>
+  <file>images/branch-end.png</file>
+  <file>images/vline.png</file>
   <file>images/box_selection.png</file>
   <file>images/redo.png</file>
   <file>images/rulers.png</file>
@@ -28,15 +32,74 @@
   <file>images/paste_object.png</file>
   <file>images/rotate_object.png</file>
   <file>images/scale_object.png</file>
-  <file>images/door.png</file>
-  <file>images/window.png</file>  
-  <file>images/stairs.png</file>
-  <file>images/wall.png</file> 
+  <file>images/door.svg</file>
+  <file>images/window.svg</file>
+  <file>images/stairs.svg</file>
+  <file>images/wall.svg</file>
   <file>images/record.png</file>
   <file>images/record_stop.png</file>
   <file>images/right_arrow.png</file>
   <file>images/left_arrow.png</file>
   <file>images/up_arrow.png</file>
-  <file>images/screenshot.png</file>  
+  <file>images/screenshot.png</file>
+  <file>images/align.png</file>
+  <file>images/magnet.png</file>
+  <file>images/x_min.png</file>
+  <file>images/x_center.png</file>
+  <file>images/x_max.png</file>
+  <file>images/y_min.png</file>
+  <file>images/y_center.png</file>
+  <file>images/y_max.png</file>
+  <file>images/z_min.png</file>
+  <file>images/z_center.png</file>
+  <file>images/z_max.png</file>
+  <file>images/draw_link.svg</file>
+  <file>images/up_spin_arrow.png</file>
+  <file>images/up_spin_arrow_disabled.png</file>
+  <file>images/down_spin_arrow.png</file>
+  <file>images/down_spin_arrow_disabled.png</file>
+  <file>images/log_play.png</file>
+  <file>images/log_pause.png</file>
+  <file>images/log_step_forward.png</file>
+  <file>images/log_step_back.png</file>
+  <file>images/log_rewind.png</file>
+  <file>images/log_forward.png</file>
+  <file>images/trashcan.png</file>
+  <file>images/log_record.png</file>
+  <file>images/view_angle_top.png</file>
+  <file>images/view_angle_bottom.png</file>
+  <file>images/view_angle_front.png</file>
+  <file>images/view_angle_back.png</file>
+  <file>images/view_angle_left.png</file>
+  <file>images/view_angle_right.png</file>
+  <file>images/view_angle_home.png</file>
+
+  <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
+  <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
+  <file alias='bricks.png'>../../media/materials/textures/bricks.png</file>
+  <file>images/com.png</file>
+  <file>images/splash.svg</file>
+  <file>images/swap-parent-child.png</file>
+  <file>images/child-link.png</file>
+  <file>images/settings.svg</file>
+  <file>images/graph_line.svg</file>
+  <file>images/graph_line_toolbar.svg</file>
+  <file>images/search.svg</file>
+  <file>images/model.svg</file>
+  <file>images/link.svg</file>
+  <file>images/joint.svg</file>
+
+  <file>fonts/Roboto-Black.ttf</file>
+  <file>fonts/Roboto-BlackItalic.ttf</file>
+  <file>fonts/Roboto-Bold.ttf</file>
+  <file>fonts/Roboto-BoldItalic.ttf</file>
+  <file>fonts/Roboto-Italic.ttf</file>
+  <file>fonts/Roboto-Light.ttf</file>
+  <file>fonts/Roboto-LightItalic.ttf</file>
+  <file>fonts/Roboto-Medium.ttf</file>
+  <file>fonts/Roboto-MediumItalic.ttf</file>
+  <file>fonts/Roboto-Regular.ttf</file>
+  <file>fonts/Roboto-Thin.ttf</file>
+  <file>fonts/Roboto-ThinItalic.ttf</file>
 </qresource>
 </RCC>

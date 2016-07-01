@@ -1,6 +1,7 @@
 /* generated code, do not edit. */
 
-#include "ode/matrix.h"
+#include <assert.h>
+#include "gazebo/ode/matrix.h"
 
 /* solve L*X=B, with B containing 1 right hand sides.
  * L is an n*n lower triangular matrix with ones on the diagonal.
@@ -13,7 +14,7 @@
  */
 
 static void dSolveL1_1 (const dReal *L, dReal *B, int n, int lskip1)
-{  
+{
   /* declare variables - Z matrix, p and q vectors, etc */
   dReal Z11,m11,Z21,m21,p1,q1,p2,*ex;
   const dReal *ell;
@@ -85,7 +86,7 @@ static void dSolveL1_1 (const dReal *L, dReal *B, int n, int lskip1)
  */
 
 static void dSolveL1_2 (const dReal *L, dReal *B, int n, int lskip1)
-{  
+{
   /* declare variables - Z matrix, p and q vectors, etc */
   dReal Z11,m11,Z12,m12,Z21,m21,Z22,m22,p1,q1,p2,q2,*ex;
   const dReal *ell;
@@ -169,11 +170,11 @@ static void dSolveL1_2 (const dReal *L, dReal *B, int n, int lskip1)
 
 
 void _dFactorLDLT (dReal *A, dReal *d, int n, int nskip1)
-{  
+{
   int i,j;
   dReal sum,*ell,*dee,dd,p1,p2,q1,q2,Z11,m11,Z21,m21,Z22,m22;
   if (n < 1) return;
-  
+
   for (i=0; i<=n-2; i += 2) {
     /* solve L*(D*l)=a, l is scaled elements in 2 x i block at A(i,0) */
     dSolveL1_2 (A,A+i*nskip1,i,nskip1);
@@ -307,7 +308,7 @@ void _dFactorLDLT (dReal *A, dReal *d, int n, int nskip1)
   switch (n-i) {
     case 0:
     break;
-    
+
     case 1:
     dSolveL1_1 (A,A+i*nskip1,i,nskip1);
     /* scale the elements in a 1 x i block at A(i,0), and also */
@@ -375,8 +376,10 @@ void _dFactorLDLT (dReal *A, dReal *d, int n, int nskip1)
     dee[0] = dRecip(Z11);
     /* done factorizing 1 x 1 block */
     break;
-    
-    default: *((char*)0)=0;  /* this should never happen! */
+
+    /* this should never happen! */
+    default:
+      assert(1);
   }
 }
 

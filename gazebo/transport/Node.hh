@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@
 #define _NODE_HH_
 
 #include <tbb/task.h>
+#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
 #include <list>
 #include <string>
 #include <vector>
 
-#include "transport/TransportTypes.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +36,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief Task used by Node::Publish to publish on a one-time publisher
-    class PublishTask : public tbb::task
+    class GZ_TRANSPORT_VISIBLE PublishTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[in] _pub Publisher to publish the message on.
@@ -53,6 +55,7 @@ namespace gazebo
               {
                 this->pub->WaitForConnection();
                 this->pub->Publish(*this->msg, true);
+                this->pub->SendMessage();
                 delete this->msg;
                 this->pub.reset();
                 return NULL;
@@ -72,7 +75,8 @@ namespace gazebo
     /// \class Node Node.hh transport/transport.hh
     /// \brief A node can advertise and subscribe topics, publish on
     ///        advertised topics and listen to subscribed topics.
-    class Node : public boost::enable_shared_from_this<Node>
+    class GZ_TRANSPORT_VISIBLE Node :
+      public boost::enable_shared_from_this<Node>
     {
       /// \brief Constructor
       public: Node();
@@ -156,6 +160,7 @@ namespace gazebo
               decodedTopic, _queueLimit, _hzRate);
 
         boost::mutex::scoped_lock lock(this->publisherMutex);
+        publisher->SetNode(shared_from_this());
         this->publishers.push_back(publisher);
 
         return publisher;
@@ -338,6 +343,10 @@ namespace gazebo
       private: boost::mutex publisherMutex;
       private: boost::mutex publisherDeleteMutex;
       private: boost::recursive_mutex incomingMutex;
+
+      /// \brief make sure we don't call ProcessingIncoming simultaneously
+      /// from separate threads.
+      private: boost::recursive_mutex processIncomingMutex;
 
       private: bool initialized;
     };

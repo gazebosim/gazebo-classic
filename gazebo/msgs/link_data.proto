@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LinkData
+/// \brief Timestamped link data
+
+import "vector3d.proto";
+import "time.proto";
+
+message LinkData
+{
+  required Time time             = 1;
+  required string name           = 2;
+  optional Vector3d linear_velocity  = 3;
+  optional Vector3d angular_velocity = 4;
+}

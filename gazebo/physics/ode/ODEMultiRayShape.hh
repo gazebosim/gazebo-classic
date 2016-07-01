@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,25 @@
 #define _ODEMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE specific version of MultiRayShape
-    class ODEMultiRayShape : public MultiRayShape
+    class GZ_PHYSICS_VISIBLE ODEMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
       public: explicit ODEMultiRayShape(CollisionPtr _parent);
+
+      /// \brief Constructor for a global multiray shape.
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      public: explicit ODEMultiRayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Destructor.
       public: virtual ~ODEMultiRayShape();
@@ -54,7 +62,12 @@ namespace gazebo
 
       /// \brief Ray space for collision detector.
       private: dSpaceID raySpaceId;
+
+      /// \brief Helper to get the correct ray shape in the UpdateCallback
+      /// function.
+      private: bool defaultUpdate = true;
     };
+    /// \}
   }
 }
 #endif

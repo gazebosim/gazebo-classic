@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /////////////////////////////////////////////////////////////////////////////
 // Defines
@@ -28,22 +30,6 @@
 #ifndef NULL
 #define NULL 0
 #endif
-
-/////////////////////////////////////////////////////////////////////////////
-// Macros
-/////////////////////////////////////////////////////////////////////////////
-
-#if defined(__GNUC__)
-#define GAZEBO_DEPRECATED(version) __attribute__((deprecated))
-#define GAZEBO_FORCEINLINE __attribute__((always_inline))
-#elif defined(MSVC)
-#define GAZEBO_DEPRECATED(version) ()
-#define GAZEBO_FORCEINLINE __forceinline
-#else
-#define GAZEBO_DEPRECATED(version) ()
-#define GAZEBO_FORCEINLINE
-#endif
-
 
 /// \file
 /// \ingroup gazebo_common
@@ -86,6 +72,7 @@ namespace gazebo
   namespace common
   {
     class Animation;
+    class Battery;
     class Color;
     class DiagnosticTimer;
     class Image;
@@ -96,10 +83,14 @@ namespace gazebo
     class Param;
     class PoseAnimation;
     class SkeletonAnimation;
+    class SphericalCoordinates;
     class Time;
 
     template <typename T>
     class ParamT;
+
+    /// \brief Speed of light.
+    static const double SpeedOfLight = 299792458;
 
     /// \def Param_V
     /// \brief std::vector of Param*
@@ -124,6 +115,14 @@ namespace gazebo
     /// \def DiagnosticTimerPtr
     /// \brief boost::shared_ptr to a DiagnosticTimer class
     typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
+
+    /// \def SphericalCoordinatesPtr
+    /// \brief Boost shared pointer to a SphericalCoordinates object
+    typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
+
+    /// \def BatteryPtr
+    /// \brief Standrd shared pointer to a Battery object
+    typedef std::shared_ptr<Battery> BatteryPtr;
   }
 
   namespace event

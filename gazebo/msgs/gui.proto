@@ -4,11 +4,12 @@ package gazebo.msgs;
 /// \interface GUI 
 /// \brief Message for a GUI
 
-
 import "gui_camera.proto";
+import "plugin.proto";
 
 message GUI
 {
   optional bool fullscreen  = 1;
   optional GUICamera camera = 2;
+  repeated Plugin plugin    = 3;
 }

@@ -1,0 +1,179 @@
+if (@PKG_NAME@_CONFIG_INCLUDED)
+  return()
+endif()
+set(@PKG_NAME@_CONFIG_INCLUDED TRUE)
+set(@PKG_NAME@_VERSION @GAZEBO_VERSION@)
+set(@PKG_NAME@_MAJOR_VERSION @GAZEBO_MAJOR_VERSION@)
+
+set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins")
+
+# The media path contains the location on disk where images,
+# materials scripts, shaders, and other related resources are stored.
+set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_MAJOR_VERSION@/media")
+
+# The model path contains the location on disk where models are stored.
+set(@PKG_NAME@_MODEL_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_MAJOR_VERSION@/models")
+
+# Set whether Gazebo was built with Bullet support
+set (GAZEBO_HAS_BULLET @HAVE_BULLET@)
+
+# Set whether Gazebo was built with Simbody support
+set (GAZEBO_HAS_SIMBODY @HAVE_SIMBODY@)
+
+include (FindPkgConfig)
+
+#################################################
+# @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
+# @PKG_NAME@_PROTO_LIBRARIES
+#
+# These three variables allow Gazebo messages to be used in other projects.
+#
+# The following examples are for demonstration purposes and are
+# incomplete. The first example shows how to use a Gazebo message in a
+# custom  proto file. The second example shows how to run 'protoc' against
+# custom proto files that make use Gazebo message definitions. The third
+# example shows how to include the correct directory when compiling a library
+# or executable that uses your custom messages.
+#
+# 1. Use a Gazebo message in a custom proto file:
+#
+# package my.msgs;
+# import "vector3d.proto";
+#
+# message MyMessage
+# {
+#   required gazebo.msgs.Vector3d p = 1;
+# }
+#
+# 2. Run protoc from a CMakeLists.txt to generate your message's
+#    header and source files:
+#
+#  add_custom_command(
+#    OUTPUT
+#      "${proto_filename}.pb.cc"
+#      "${proto_filename}.pb.h"
+#    COMMAND protoc
+#    ARGS --proto_path ${GAZEBO_PROTO_PATH} ${proto_file_out}
+#    COMMENT "Running C++ protocol buffer compiler on ${proto_filename}"
+#    VERBATIM)
+#
+# 3. When compiling your library or executable, make sure to use the following
+#    in the CMakeLists.txt file:
+#
+# include_directories(@PKG_NAME@_PROTO_INCLUDE_DIRS)
+# target_link_libraries(your_package @PKG_NAME@_PROTO_LIBRARIES)
+#
+set(@PKG_NAME@_PROTO_PATH
+  "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/gazebo/msgs/proto")
+find_library(gazebo_proto_msgs_lib gazebo_msgs
+  PATHS "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@" NO_DEFAULT_PATH)
+list(APPEND @PKG_NAME@_PROTO_LIBRARIES ${gazebo_proto_msgs_lib})
+list(APPEND @PKG_NAME@_PROTO_INCLUDE_DIRS
+  "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/gazebo/msgs")
+# End @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
+# @PKG_NAME@_PROTO_LIBRARIES
+
+list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@)
+
+list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@)
+list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins)
+
+list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@)
+list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@)
+
+if (GAZEBO_HAS_BULLET)
+  if (PKG_CONFIG_FOUND)
+    pkg_check_modules(BULLET bullet>=2.82)
+    if (NOT BULLET_FOUND)
+       pkg_check_modules(BULLET bullet2.82>=2.82)
+    endif()
+
+    if (BULLET_FOUND)
+      add_definitions(-DLIBBULLET_VERSION=${BULLET_VERSION})
+    else()
+      message(FATAL_ERROR "Error: Bullet > 2.82 not found, please install libbullet2.82-dev.")
+    endif()
+
+    if (BULLET_VERSION VERSION_GREATER 2.82)
+      add_definitions(-DLIBBULLET_VERSION_GT_282)
+    endif()
+
+    list(APPEND @PKG_NAME@_INCLUDE_DIRS ${BULLET_INCLUDE_DIRS})
+    list(APPEND @PKG_NAME@_LIBRARY_DIRS ${BULLET_LIBRARY_DIRS})
+    list(APPEND @PKG_NAME@_LIBRARIES ${BULLET_LIBRARIES})
+  else()
+    message(FATAL_ERROR "Error: pkg-config not found.")
+  endif()
+endif()
+
+if (GAZEBO_HAS_SIMBODY)
+  find_package(Simbody REQUIRED)
+  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Simbody_INCLUDE_DIR})
+  list(APPEND @PKG_NAME@_LIBRARIES ${Simbody_LIBRARIES})
+endif()
+
+# Visual Studio enables c++11 support by default
+if (NOT MSVC)
+  list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)
+endif()
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND
+    "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+  set(@PKG_NAME@_CXX_FLAGS "${@PKG_NAME@_CXX_FLAGS} -stdlib=libc++")
+endif ()
+
+foreach(lib @PKG_LIBRARIES@)
+  set(onelib "${lib}-NOTFOUND")
+  find_library(onelib ${lib}
+    PATHS "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@"
+    NO_DEFAULT_PATH
+    )
+  if(NOT onelib)
+    message(FATAL_ERROR "Library '${lib}' in package @PKG_NAME@ is not installed properly")
+  endif()
+  list(APPEND @PKG_NAME@_LIBRARIES ${onelib})
+endforeach()
+
+# Get the install prefix for OGRE
+execute_process(COMMAND pkg-config --variable=prefix OGRE
+  OUTPUT_VARIABLE OGRE_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Add the OGRE cmake path to CMAKE_MODULE_PATH
+set(CMAKE_MODULE_PATH
+  "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${OGRE_INSTALL_PREFIX}/lib/OGRE/cmake;${OGRE_INSTALL_PREFIX}/CMake;${CMAKE_MODULE_PATH}")
+
+# Find boost
+find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system
+  filesystem program_options regex iostreams date_time)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${Boost_LIBRARIES})
+
+# Find protobuf
+find_package(Protobuf REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${PROTOBUF_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${PROTOBUF_LIBRARIES})
+
+# Find SDFormat
+find_package(SDFormat REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${SDFormat_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${SDFormat_LIBRARIES})
+
+# Find OGRE
+find_package(OGRE REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${OGRE_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${OGRE_LIBRARIES})
+# When including OGRE, also include the Terrain and Paging components
+list(APPEND GAZEBO_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS}
+  ${OGRE_Paging_INCLUDE_DIRS})
+list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
+  ${OGRE_Paging_LIBRARIES})
+
+# Find Ignition Math
+find_package(ignition-math2 REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MATH_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MATH_LIBRARY_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-MATH_LIBRARIES})
+
+list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins)
+list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@)
+list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,49 +15,68 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
+
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
+#include "gazebo/gui/building/LevelInspectorDialogPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
+LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent)
+  : BaseInspectorDialog(_parent), dataPtr(new LevelInspectorDialogPrivate)
 {
   this->setObjectName("levelInspectorDialog");
   this->setWindowTitle(tr("Level Inspector"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QLabel *levelLabel = new QLabel(tr("Level Name: "));
-  this->levelNameLineEdit = new QLineEdit;
-  this->levelNameLineEdit->setPlaceholderText(tr("Level X"));
+  this->dataPtr->levelNameLineEdit = new QLineEdit;
+  this->dataPtr->levelNameLineEdit->setPlaceholderText(tr("Level X"));
+
+  this->InitColorComboBox();
+  QHBoxLayout *colorLayout = new QHBoxLayout;
+  QLabel *colorLabel = new QLabel(tr("Floor Color: "));
+  colorLayout->addWidget(colorLabel);
+  colorLayout->addWidget(this->colorComboBox);
+
+  this->InitTextureComboBox();
+  QHBoxLayout *textureLayout = new QHBoxLayout;
+  QLabel *textureLabel = new QLabel(tr("Floor Texture: "));
+  textureLayout->addWidget(textureLabel);
+  textureLayout->addWidget(this->textureComboBox);
+
+  QVBoxLayout *floorLayout = new QVBoxLayout;
+  floorLayout->addLayout(colorLayout);
+  floorLayout->addLayout(textureLayout);
+
+  this->dataPtr->floorWidget = new QWidget;
+  this->dataPtr->floorWidget->setLayout(floorLayout);
 
   /// TODO add the widgets back in after the functions is implemented
 /*  QLabel *floorThicknessLabel = new QLabel(tr("Floor Thickness: "));
-  this->floorThicknessSpinBox = new QDoubleSpinBox;
-  this->floorThicknessSpinBox->setRange(-1000, 1000);
-  this->floorThicknessSpinBox->setSingleStep(0.001);
-  this->floorThicknessSpinBox->setDecimals(3);
-  this->floorThicknessSpinBox->setValue(0.000);
+  this->dataPtr->floorThicknessSpinBox = new QDoubleSpinBox;
+  this->dataPtr->floorThicknessSpinBox->setRange(-1000, 1000);
+  this->dataPtr->floorThicknessSpinBox->setSingleStep(0.001);
+  this->dataPtr->floorThicknessSpinBox->setDecimals(3);
+  this->dataPtr->floorThicknessSpinBox->setValue(0.000);
 
   QLabel *heightLabel = new QLabel(tr("Height: "));
-  this->heightSpinBox = new QDoubleSpinBox;
-  this->heightSpinBox->setRange(-1000, 1000);
-  this->heightSpinBox->setSingleStep(0.001);
-  this->heightSpinBox->setDecimals(3);
-  this->heightSpinBox->setValue(0.000);
-
-  QLabel *materialLabel = new QLabel(tr("Floor Material: "));
-  this->materialComboBox = new QComboBox;
-  this->materialComboBox->addItem(QString("Hardwood"));*/
+  this->dataPtr->heightSpinBox = new QDoubleSpinBox;
+  this->dataPtr->heightSpinBox->setRange(-1000, 1000);
+  this->dataPtr->heightSpinBox->setSingleStep(0.001);
+  this->dataPtr->heightSpinBox->setDecimals(3);
+  this->dataPtr->heightSpinBox->setValue(0.000);*/
 
   QGridLayout *levelLayout = new QGridLayout;
   levelLayout->addWidget(levelLabel, 0, 0);
-  levelLayout->addWidget(this->levelNameLineEdit, 0, 1);
+  levelLayout->addWidget(this->dataPtr->levelNameLineEdit, 0, 1);
 /*  levelLayout->addWidget(floorThicknessLabel, 1, 0);
-  levelLayout->addWidget(this->floorThicknessSpinBox, 1, 1);
+  levelLayout->addWidget(this->dataPtr->floorThicknessSpinBox, 1, 1);
   levelLayout->addWidget(heightLabel, 2, 0);
-  levelLayout->addWidget(this->heightSpinBox, 2, 1);
-  levelLayout->addWidget(materialLabel, 3, 0);
-  levelLayout->addWidget(this->materialComboBox, 3, 1);*/
+  levelLayout->addWidget(this->dataPtr->heightSpinBox, 2, 1);*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -74,9 +93,11 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(levelLayout);
+  mainLayout->addWidget(this->dataPtr->floorWidget);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////
@@ -85,45 +106,35 @@ LevelInspectorDialog::~LevelInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-std::string LevelInspectorDialog::GetLevelName() const
+std::string LevelInspectorDialog::LevelName() const
 {
-  return this->levelNameLineEdit->text().toStdString();
+  return this->dataPtr->levelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-double LevelInspectorDialog::GetHeight() const
+double LevelInspectorDialog::Height() const
 {
-  return this->heightSpinBox->value();
+  return this->dataPtr->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
 void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 {
-  this->levelNameLineEdit->setText(QString(_levelName.c_str()));
+  this->dataPtr->levelNameLineEdit->setText(QString(_levelName.c_str()));
 }
 
 
 /////////////////////////////////////////////////
-void LevelInspectorDialog::SetHeight(double _height)
+void LevelInspectorDialog::SetHeight(const double _height)
 {
-  this->heightSpinBox->setValue(_height);
+  this->dataPtr->heightSpinBox->setValue(_height);
 }
 
 /////////////////////////////////////////////////
-void LevelInspectorDialog::OnCancel()
+void LevelInspectorDialog::ShowFloorWidget(const bool _show)
 {
-  this->close();
-}
-
-/////////////////////////////////////////////////
-void LevelInspectorDialog::OnApply()
-{
-  emit Applied();
-}
-
-/////////////////////////////////////////////////
-void LevelInspectorDialog::OnOK()
-{
-  emit Applied();
-  this->accept();
+  if (_show)
+    this->dataPtr->floorWidget->show();
+  else
+    this->dataPtr->floorWidget->hide();
 }

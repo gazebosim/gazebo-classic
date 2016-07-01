@@ -1,0 +1,262 @@
+<?xml version="1.0" ?>
+<sdf version="1.3">
+  <!-- model_1: pendulum rod body and a sphere point mass attached by fixed
+                joint at the end of the rod.
+       model_2: pendulum rod body with same mass properties as model_1.
+       model_3: same as model_2 but perpendicular to it.
+  -->
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>-25 -15 12.053900 0.000000 0.2 0.352194</pose>
+      </camera>
+    </gui>
+    <scene>
+      <ambient>0.5 0.5 0.5 1</ambient>
+      <background>0.5 0.5 0.5 1</background>
+      <shadows>false</shadows>
+    </scene>
+    <include><uri>model://sun</uri></include>
+    <physics type="ode">
+      <gravity>0.0 0.0 -9.81</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <dt>0.001</dt>
+          <iters>1000</iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0</cfm>
+          <erp>1.0</erp>
+          <contact_max_correcting_vel>0.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+    <model name="model_1">
+      <pose>0.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+      <link name="link_1">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>5.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+        </axis>
+      </joint>
+      <link name="link_2">
+        <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>5.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_sphere">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+        </visual>
+        <collision name="collision_sphere">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_1" type="revolute">
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>0</effort>
+            <velocity>0</velocity>
+          </limit>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+      <static>false</static>
+    </model>
+    <model name="model_2">
+      <pose>1.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+      <link name="link_1">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>10.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+        </axis>
+      </joint>
+      <static>false</static>
+    </model>
+    <model name="model_3">
+      <pose>0.0 -10.5 10.1 0.0 1.57079633 0.0</pose>
+      <link name="link_1">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>10.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <joint name="joint_0" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <axis>
+          <xyz>0.0 1.0 0.0</xyz>
+        </axis>
+      </joint>
+      <static>false</static>
+    </model>
+  </world>
+</sdf>

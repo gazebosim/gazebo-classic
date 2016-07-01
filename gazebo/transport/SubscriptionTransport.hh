@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 #ifndef _SUBSCRIPTIONTRANSPORT_HH_
 #define _SUBSCRIPTIONTRANSPORT_HH_
 
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
 
 #include "Connection.hh"
 #include "CallbackHelper.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +36,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Handles sending data over the wire to
     /// remote subscribers
-    class SubscriptionTransport : public CallbackHelper
+    class GZ_TRANSPORT_VISIBLE SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
       public: SubscriptionTransport();
@@ -46,12 +48,16 @@ namespace gazebo
       /// \param[in] _conn The connection to use
       /// \param[in] _latching If true, latch the latest message; if false,
       /// don't latch
-      public: void Init(const ConnectionPtr &_conn, bool _latching);
+      public: void Init(ConnectionPtr _conn, bool _latching);
 
       /// \brief Output a message to a connection
       /// \param[in] _newdata The message to be handled
       /// \return true if the message was handled successfully, false otherwise
-      public: virtual bool HandleData(const std::string &_newdata);
+      /// \param[in] _cb If non-null, callback to be invoked after
+      /// transmission is complete.
+      /// \param[in] _id ID associated with the message data.
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id);
 
       // Documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg);

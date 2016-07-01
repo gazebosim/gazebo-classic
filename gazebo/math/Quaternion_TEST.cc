@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Helpers.hh"
-#include "gazebo/common/Console.hh"
 #include "gazebo/math/Quaternion.hh"
 
 using namespace gazebo;
 
-TEST(QuaternionTest, Quaternion)
+class QuaternionTest : public ::testing::Test { };
+
+//////////////////////////////////////////////////
+TEST_F(QuaternionTest, Quaternion)
 {
   {
     math::Quaternion q;
@@ -131,8 +133,8 @@ TEST(QuaternionTest, Quaternion)
   q = q * 5.0;
   EXPECT_TRUE(q == math::Quaternion(7.67918, -1.184, 2.7592, 4.0149));
 
-  gzerr << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-  gzerr << q.RotateVectorReverse(math::Vector3(1, 2, 3)) << "\n";
+  std::cerr << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
+  std::cerr << q.RotateVectorReverse(math::Vector3(1, 2, 3)) << "\n";
 
   EXPECT_TRUE(q.RotateVectorReverse(math::Vector3(1, 2, 3)) ==
       math::Vector3(-0.104115, 0.4975, 3.70697));
@@ -173,9 +175,10 @@ TEST(QuaternionTest, Quaternion)
     math::Vector3 v = math::Vector3(1, 2, 3);
     math::Vector3 r1 = q.RotateVector(v);
     math::Vector3 r2 = q.RotateVectorReverse(v);
-    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-    gzdbg << " forward turns [" << v << "] to [" << r1 << "]\n";
-    gzdbg << " reverse turns [" << v << "] to [" << r2 << "]\n";
+    std::cout << "[" << q.w << ", " << q.x << ", "
+      << q.y << ", " << q.z << "]\n";
+    std::cout << " forward turns [" << v << "] to [" << r1 << "]\n";
+    std::cout << " reverse turns [" << v << "] to [" << r2 << "]\n";
     EXPECT_TRUE(r1 == math::Vector3(-1, -2, 3));
     EXPECT_TRUE(r2 == math::Vector3(-1, -2, 3));
   }
@@ -187,12 +190,13 @@ TEST(QuaternionTest, Quaternion)
     math::Vector3 v = math::Vector3(1, 2, 3);
     math::Vector3 r1 = q.RotateVector(v);
     math::Vector3 r2 = q.RotateVectorReverse(v);
-    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-    gzdbg << " forward turns [" << v << "] to [" << r1 << "]\n";
-    gzdbg << " reverse turns [" << v << "] to [" << r2 << "]\n";
-    gzdbg << " x axis [" << q.GetXAxis() << "]\n";
-    gzdbg << " y axis [" << q.GetYAxis() << "]\n";
-    gzdbg << " z axis [" << q.GetZAxis() << "]\n";
+    std::cout << "[" << q.w << ", " << q.x << ", "
+      << q.y << ", " << q.z << "]\n";
+    std::cout << " forward turns [" << v << "] to [" << r1 << "]\n";
+    std::cout << " reverse turns [" << v << "] to [" << r2 << "]\n";
+    std::cout << " x axis [" << q.GetXAxis() << "]\n";
+    std::cout << " y axis [" << q.GetYAxis() << "]\n";
+    std::cout << " z axis [" << q.GetZAxis() << "]\n";
     EXPECT_TRUE(r1 == math::Vector3(-2, 1, 3));
     EXPECT_TRUE(r2 == math::Vector3(2, -1, 3));
     EXPECT_TRUE(q.GetInverse().GetXAxis() == math::Vector3(0, -1, 0));
@@ -200,14 +204,38 @@ TEST(QuaternionTest, Quaternion)
     EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(0, 0, 1));
   }
 
+  // Test RPY fixed-body-frame convention:
+  // Rotate each unit vector in roll and pitch
+  {
+    q = math::Quaternion(M_PI/2.0, M_PI/2.0, 0);
+    math::Vector3 v1(1, 0, 0);
+    math::Vector3 r1 = q.RotateVector(v1);
+    // 90 degrees about X does nothing,
+    // 90 degrees about Y sends point down to -Z
+    EXPECT_EQ(r1, math::Vector3(0, 0, -1));
+
+    math::Vector3 v2(0, 1, 0);
+    math::Vector3 r2 = q.RotateVector(v2);
+    // 90 degrees about X sends point to +Z
+    // 90 degrees about Y sends point to +X
+    EXPECT_EQ(r2, math::Vector3(1, 0, 0));
+
+    math::Vector3 v3(0, 0, 1);
+    math::Vector3 r3 = q.RotateVector(v3);
+    // 90 degrees about X sends point to -Y
+    // 90 degrees about Y does nothing
+    EXPECT_EQ(r3, math::Vector3(0, -1, 0));
+  }
+
   {
     // now try a harder case (axis[1,2,3], rotation[0.3*pi])
     // verified with octave
     q.SetFromAxis(math::Vector3(1, 2, 3), 0.3*M_PI);
-    gzdbg << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
-    gzdbg << " x [" << q.GetInverse().GetXAxis() << "]\n";
-    gzdbg << " y [" << q.GetInverse().GetYAxis() << "]\n";
-    gzdbg << " z [" << q.GetInverse().GetZAxis() << "]\n";
+    std::cout << "[" << q.w << ", " << q.x << ", "
+      << q.y << ", " << q.z << "]\n";
+    std::cout << " x [" << q.GetInverse().GetXAxis() << "]\n";
+    std::cout << " y [" << q.GetInverse().GetYAxis() << "]\n";
+    std::cout << " z [" << q.GetInverse().GetZAxis() << "]\n";
     EXPECT_TRUE(q.GetInverse().GetXAxis() ==
                 math::Vector3(0.617229, -0.589769, 0.520770));
     EXPECT_TRUE(q.GetInverse().GetYAxis() ==
@@ -253,4 +281,124 @@ TEST(QuaternionTest, Quaternion)
                 -0.344106, 0.392882, 0.85278, 0,
                 0, 0, 0, 1));
   }
+
+  // Test quaternion multiplication (rotation) order of application
+  // if qa rotates frame o to p
+  //    qb rotates frame p to q
+  //    qc rotates frame q to r
+  //    qd rotates frame r to s
+  // then qd * qc * qb * qa rotates frame o to s
+  EXPECT_EQ(math::Quaternion(0, 0, 0),
+            math::Quaternion(0, -0.5*M_PI, 0)*
+            math::Quaternion(-0.5*M_PI, 0, 0)*
+            math::Quaternion(0,  0.5*M_PI, 0)*
+            math::Quaternion(0, 0,  0.5*M_PI));
+  EXPECT_EQ(math::Quaternion(0, 0, M_PI),
+            math::Quaternion(0, 0,  0.5*M_PI)*
+            math::Quaternion(0,  0.5*M_PI, 0)*
+            math::Quaternion(-0.5*M_PI, 0, 0)*
+            math::Quaternion(0, -0.5*M_PI, 0));
 }
+
+//////////////////////////////////////////////////
+TEST_F(QuaternionTest, Integrate)
+{
+  // Integrate by zero, expect no change
+  {
+    const math::Quaternion q(0.5, 0.5, 0.5, 0.5);
+    EXPECT_EQ(q, q.Integrate(math::Vector3::Zero, 1.0));
+    EXPECT_EQ(q, q.Integrate(math::Vector3::UnitX, 0.0));
+    EXPECT_EQ(q, q.Integrate(math::Vector3::UnitY, 0.0));
+    EXPECT_EQ(q, q.Integrate(math::Vector3::UnitZ, 0.0));
+  }
+
+  // Integrate along single axes,
+  // expect linear change in roll, pitch, yaw
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    math::Quaternion qRoll  = q.Integrate(math::Vector3::UnitX, 1.0);
+    math::Quaternion qPitch = q.Integrate(math::Vector3::UnitY, 1.0);
+    math::Quaternion qYaw   = q.Integrate(math::Vector3::UnitZ, 1.0);
+    EXPECT_EQ(qRoll.GetAsEuler(),  math::Vector3::UnitX);
+    EXPECT_EQ(qPitch.GetAsEuler(), math::Vector3::UnitY);
+    EXPECT_EQ(qYaw.GetAsEuler(),   math::Vector3::UnitZ);
+  }
+
+  // Integrate sequentially along single axes in order XYZ,
+  // expect rotations to match Euler Angles
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qX   = q.Integrate(math::Vector3::UnitX, angle);
+    math::Quaternion qXY  = qX.Integrate(math::Vector3::UnitY, angle);
+    EXPECT_EQ(qXY.GetAsEuler(), angle*math::Vector3(1, 1, 0));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qX   = q.Integrate(math::Vector3::UnitX, angle);
+    math::Quaternion qXZ  = qX.Integrate(math::Vector3::UnitZ, angle);
+    EXPECT_EQ(qXZ.GetAsEuler(), angle*math::Vector3(1, 0, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qY   = q.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qYZ  = qY.Integrate(math::Vector3::UnitZ, angle);
+    EXPECT_EQ(qYZ.GetAsEuler(), angle*math::Vector3(0, 1, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qX   = q.Integrate(math::Vector3::UnitX, angle);
+    math::Quaternion qXY  = qX.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qXYZ = qXY.Integrate(math::Vector3::UnitZ, angle);
+    EXPECT_EQ(qXYZ.GetAsEuler(), angle*math::Vector3::One);
+  }
+
+  // Integrate sequentially along single axes in order ZYX,
+  // expect rotations to not match Euler Angles
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
+    math::Quaternion qZY  = qZ.Integrate(math::Vector3::UnitY, angle);
+    EXPECT_NE(qZY.GetAsEuler(), angle*math::Vector3(0, 1, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
+    math::Quaternion qZX  = qZ.Integrate(math::Vector3::UnitX, angle);
+    EXPECT_NE(qZX.GetAsEuler(), angle*math::Vector3(1, 0, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
+    math::Quaternion qZY  = qZ.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qZYX = qZY.Integrate(math::Vector3::UnitX, angle);
+    EXPECT_NE(qZYX.GetAsEuler(), angle*math::Vector3(1, 1, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qY   = q.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qYX  = qY.Integrate(math::Vector3::UnitX, angle);
+    EXPECT_NE(qYX.GetAsEuler(), angle*math::Vector3(1, 1, 0));
+  }
+
+  // Integrate a full rotation about different axes,
+  // expect no change.
+  {
+    const math::Quaternion q(0.5, 0.5, 0.5, 0.5);
+    const double fourPi = 4 * M_PI;
+    math::Quaternion qX = q.Integrate(math::Vector3::UnitX, fourPi);
+    math::Quaternion qY = q.Integrate(math::Vector3::UnitY, fourPi);
+    math::Quaternion qZ = q.Integrate(math::Vector3::UnitZ, fourPi);
+    EXPECT_EQ(q, qX);
+    EXPECT_EQ(q, qY);
+    EXPECT_EQ(q, qZ);
+  }
+}
+

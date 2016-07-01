@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,30 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_SENSORS_IMUSENSOR_HH_
+#define GAZEBO_SENSORS_IMUSENSOR_HH_
 
-#ifndef _IMUSENSOR_HH_
-#define _IMUSENSOR_HH_
-
-#include <vector>
+#include <memory>
 #include <string>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class.
+    class ImuSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
     /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \brief An IMU sensor.
-    class ImuSensor: public Sensor
+    class GAZEBO_VISIBLE ImuSensor: public Sensor
     {
       /// \brief Constructor.
       public: ImuSensor();
@@ -51,85 +55,70 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
 
       /// \brief Returns the imu message
       /// \return Imu message.
-      public: msgs::IMU GetImuMessage() const;
+      /// \deprecated See ImuMessage()
+      public: msgs::IMU GetImuMessage() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Returns the angular velocity.
+      /// \brief Returns the imu message
+      /// \return Imu message.
+      public: msgs::IMU ImuMessage() const;
+
+      /// \brief Returns the angular velocity in the IMU sensor local frame.
+      /// \param[in] _noiseFree True if the returned measurement should
+      /// not use noise.
       /// \return Angular velocity.
-      public: math::Vector3 GetAngularVelocity() const;
+      public: ignition::math::Vector3d AngularVelocity(
+                  const bool _noiseFree = false) const;
 
-      /// \brief Returns the imu linear acceleration
+      /// \brief Returns the imu linear acceleration in the IMU sensor
+      /// local frame
+      /// \param[in] _noiseFree True if the returned measurement should
+      /// not use noise.
       /// \return Linear acceleration.
-      public: math::Vector3 GetLinearAcceleration() const;
+      public: ignition::math::Vector3d LinearAcceleration(
+                  const bool _noiseFree = false) const;
 
-      /// \brief get orientation of the IMU relative to the reference pose
+      /// \brief get orientation of the IMU relative to a reference pose
+      /// Initially, the reference pose is the boot up pose of the IMU,
+      /// but user can call either SetReferencePose to define current
+      /// pose as the reference frame, or call SetWorldToReferencePose
+      /// to define transform from world frame to reference frame.
       /// \return returns the orientation quaternion of the IMU relative to
       /// the imu reference pose.
-      public: math::Quaternion GetOrientation() const;
+      public: ignition::math::Quaterniond Orientation() const;
 
-      /// \brief Sets the current pose as the IMU reference pose
+      /// \brief Sets the current IMU pose as the reference NED pose,
+      /// i.e. X axis of the IMU is aligned with North,
+      ///      Y axis of the IMU is aligned with East,
+      ///      Z axis of the IMU is aligned with Downward (gravity) direction.
       public: void SetReferencePose();
 
-      /// \brief Imu reference pose
-      private: math::Pose referencePose;
+      // Documentation inherited.
+      public: virtual bool IsActive() const;
 
-      /// \brief Save previous imu linear velocity for computing acceleration.
-      private: math::Vector3 lastLinearVel;
+      /// \brief Sets the transform from world frame to IMU's reference frame.
+      /// For example, if this IMU works with respect to NED frame, then
+      /// call this function with the transform that transforms world frame
+      /// to NED frame. Subsequently, ImuSensor::Orientation will return
+      /// identity transform if the IMU is aligned with the NED frame.
+      /// This call replaces SetReferencePose.
+      /// \param _orientation current IMU orientation in NED
+      public: void SetWorldToReferencePose(
+        const ignition::math::Pose3d &_pose = ignition::math::Pose3d());
 
-      /// \brief Imu linear acceleration
-      private: math::Vector3 linearAcc;
+      /// \brief Callback when link data is received
+      /// \param[in] _msg Message containing link data
+      private: void OnLinkData(ConstLinkDataPtr &_msg);
 
-      /// \brief store gravity vector to be added to the imu output.
-      private: math::Vector3 gravity;
-
-      private: transport::PublisherPtr pub;
-      private: physics::LinkPtr parentEntity;
-      private: msgs::IMU imuMsg;
-
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
-      /// \brief If true, apply the noise model specified by other noise
-      /// parameters
-      private: bool noiseActive;
-
-      /// \brief Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to accelerations
-      private: double accelNoiseMean;
-
-      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to accelerations
-      private: double accelNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
-      private: double accelBias;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to rates
-      private: double rateNoiseMean;
-
-      /// \brief If noiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to rates
-      private: double rateNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
-      private: double rateBias;
-
-      /// \brief Prevent imuMsg update race condition when
-      private: mutable boost::mutex mutex;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<ImuSensorPrivate> dataPtr;
     };
     /// \}
   }

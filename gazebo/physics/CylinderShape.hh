@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,14 @@
 #ifndef _CYLINDERSHAPE_HH_
 #define _CYLINDERSHAPE_HH_
 
-#include "physics/Shape.hh"
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +40,7 @@ namespace gazebo
 
     /// \class CylinderShape CylinderShape.hh physics/physics.hh
     /// \brief Cylinder collision
-    class CylinderShape : public Shape
+    class GZ_PHYSICS_VISIBLE CylinderShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the shape.
@@ -66,6 +73,10 @@ namespace gazebo
       /// \param[in] _lenght New length.
       public: virtual void SetSize(double _radius, double _length);
 
+      /// \brief Set scale of cylinder.
+      /// \param[in] _scale Scale to set the cylinder to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
       public: void FillMsg(msgs::Geometry &_msg);
@@ -73,6 +84,9 @@ namespace gazebo
       /// \brief Update values based on a message.
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
     };
     /// \}
   }

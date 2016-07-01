@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,22 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Class to manager all sensors
- * Author: Nate Koenig
- * Date: 18 Dec 2009
- */
-
-#ifndef _SENSORMANAGER_HH_
-#define _SENSORMANAGER_HH_
+#ifndef _GAZEBO_SENSORMANAGER_HH_
+#define _GAZEBO_SENSORMANAGER_HH_
 
 #include <boost/thread.hpp>
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
+
+#include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sdf/sdf.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -42,7 +39,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief A simulation time event
-    class SimTimeEvent
+    class GAZEBO_VISIBLE SimTimeEvent
     {
       /// \brief The time at which to trigger the condition.
       public: common::Time time;
@@ -53,7 +50,7 @@ namespace gazebo
 
     /// \brief Monitors simulation time, and notifies conditions when
     /// a specified time has been reached.
-    class SimTimeEventHandler
+    class GAZEBO_VISIBLE SimTimeEventHandler
     {
       /// \brief Constructor
       public: SimTimeEventHandler();
@@ -79,9 +76,6 @@ namespace gazebo
       /// \brief The list of events to handle.
       private: std::list<SimTimeEvent*> events;
 
-      /// \brief Get sim time from the world.
-      private: physics::WorldPtr world;
-
       /// \brief Connect to the World::UpdateBegin event.
       private: event::ConnectionPtr updateConnection;
     };
@@ -91,7 +85,7 @@ namespace gazebo
     /// \{
     /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
-    class SensorManager : public SingletonT<SensorManager>
+    class GAZEBO_VISIBLE SensorManager : public SingletonT<SensorManager>
     {
       /// \brief This is a singletone class. Use SensorManager::Instance()
       /// to get a pointer to this class.
@@ -109,10 +103,6 @@ namespace gazebo
 
       /// \brief Init all the sensors
       public: void Init();
-
-      /// \brief Deprecated
-      /// \sa RunThreads
-      public: void Run() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Run sensor updates in separate threads.
       /// This will only run non-image based sensor updates.
@@ -137,11 +127,24 @@ namespace gazebo
       /// \return The name of the sensor
       public: std::string CreateSensor(sdf::ElementPtr _elem,
                                        const std::string &_worldName,
-                                       const std::string &_parentName);
+                                       const std::string &_parentName,
+                                       uint32_t _parentId);
+
+      /// \brief Add a sensor from an SDF element. This function will also Load
+      /// and Init the sensor.
+      /// \param[in] _elem The SDF element that describes the sensor
+      /// \param[in] _worldName Name of the world in which to create the sensor
+      /// \param[in] _parentName The name of the parent link which the sensor is
+      /// attached to.
+      /// \param[in] _parentId Unique id of the sensor to create.
+      public: void OnCreateSensor(sdf::ElementPtr _elem,
+                                  const std::string &_worldName,
+                                  const std::string &_parentName,
+                                  const uint32_t _parentId);
 
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.
-      /// \return A pointer to the sensor. NULL if not found.
+      /// \return A pointer to the sensor. nullptr if not found.
       public: SensorPtr GetSensor(const std::string &_name) const;
 
       /// \brief Get all the sensors.
@@ -204,7 +207,7 @@ namespace gazebo
                  /// \brief Get a sensor by name.
                  /// \param[in] _useLeafName False indicates that _name
                  /// should be compared against the scoped name of a sensor.
-                 /// \return Pointer to the matching sensor. NULL if no
+                 /// \return Pointer to the matching sensor. nullptr if no
                  /// sensor is found.
                  public: SensorPtr GetSensor(const std::string &_name,
                                              bool _useLeafName = false) const;
@@ -262,6 +265,9 @@ namespace gazebo
       ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
 
+      /// \brief True removes all sensors from all sensor containers.
+      private: bool removeAllSensors;
+
       /// \brief Mutex used when adding and removing sensors.
       private: mutable boost::recursive_mutex mutex;
 
@@ -269,7 +275,7 @@ namespace gazebo
       private: Sensor_V initSensors;
 
       /// \brief List of sensors that require initialization.
-      private: Sensor_V removeSensors;
+      private: std::vector<std::string> removeSensors;
 
       /// \brief A vector of SensorContainer pointers.
       private: typedef std::vector<SensorContainer*> SensorContainer_V;
@@ -285,6 +291,18 @@ namespace gazebo
 
       /// \brief Pointer to the sim time event handler.
       private: SimTimeEventHandler *simTimeEventHandler;
+
+      /// \brief All the worlds that have sensors.
+      private: std::map<std::string, physics::WorldPtr> worlds;
+
+      /// \brief Connect to the time reset event.
+      private: event::ConnectionPtr timeResetConnection;
+
+      /// \brief Connect to the create sensor event.
+      private: event::ConnectionPtr createSensorConnection;
+
+      /// \brief Connect to the remove sensor event.
+      private: event::ConnectionPtr removeSensorConnection;
     };
     /// \}
   }

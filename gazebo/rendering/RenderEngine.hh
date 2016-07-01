@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,22 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
+#ifndef _GAZEBO_RENDERING_RENDERENGINE_HH_
+#define _GAZEBO_RENDERING_RENDERENGINE_HH_
 
-#ifndef _RENDERENGINE_HH_
-#define _RENDERENGINE_HH_
-
-#include <vector>
+#include <memory>
 #include <string>
 
-#include "msgs/msgs.hh"
-#include "common/SingletonT.hh"
-#include "common/Event.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/common/SingletonT.hh"
+
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
   class Root;
-  class LogManager;
+  class OverlaySystem;
 }
 
 namespace gazebo
@@ -43,6 +38,9 @@ namespace gazebo
   /// \brief Rendering namespace
   namespace rendering
   {
+    // Forward declare private data.
+    class RenderEnginePrivate;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -50,7 +48,7 @@ namespace gazebo
     /// \brief Adaptor to Ogre3d
     ///
     /// Provides the interface to load, initialize the rendering engine.
-    class RenderEngine : public SingletonT<RenderEngine>
+    class GZ_RENDERING_VISIBLE RenderEngine : public SingletonT<RenderEngine>
     {
       /// \enum RenderPathType
       /// \brief The type of rendering path used by the rendering engine.
@@ -89,7 +87,8 @@ namespace gazebo
       /// \param[in] _enableVisualizations True enables visualization
       /// elements such as laser lines.
       public: ScenePtr CreateScene(const std::string &_name,
-                                   bool _enableVisualizations);
+                                   bool _enableVisualizations,
+                                   bool _isServer = false);
 
       /// \brief Remove a scene
       /// \param[in] _name The name of the scene to remove.
@@ -99,7 +98,7 @@ namespace gazebo
       /// \param[in] _name Name of the scene to retreive.
       /// \return A pointer to the Scene, or NULL if the scene doesn't
       /// exist.
-      public: ScenePtr GetScene(const std::string &_name);
+      public: ScenePtr GetScene(const std::string &_name="");
 
       /// \brief Get a scene by index. The index should be between 0 and
       /// GetSceneCount().
@@ -109,7 +108,12 @@ namespace gazebo
 
       /// \brief Get the number of scenes.
       /// \return The number of scenes created by the RenderEngine.
-      public: unsigned int GetSceneCount() const;
+      /// \deprecated See SceneCount()
+      public: unsigned int GetSceneCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of scenes.
+      /// \return The number of scenes created by the RenderEngine.
+      public: unsigned int SceneCount() const;
 
       /// \brief Add a new path for Ogre to search for resources.
       /// \param[in] _uri URI of the path. The uri should be of the form
@@ -120,6 +124,28 @@ namespace gazebo
       /// automatically determined based on the computers capabilities
       /// \return The RenderPathType
       public: RenderPathType GetRenderPathType() const;
+
+      /// \brief Get a pointer to the window manager.
+      /// \return Pointer to the window manager.
+      public: WindowManagerPtr GetWindowManager() const;
+
+      /// \brief Get a pointer to the Ogre root object.
+      /// \return Pointer to the Ogre root object.
+      public: Ogre::Root *Root() const;
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      /// \internal
+      /// \brief Get a pointer to the Ogre overlay system.
+      /// \return Pointer to the OGRE overlay system.
+      /// \deprecated See OverlaySystem()
+      public: Ogre::OverlaySystem *GetOverlaySystem() const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \internal
+      /// \brief Get a pointer to the Ogre overlay system.
+      /// \return Pointer to the OGRE overlay system.
+      public: Ogre::OverlaySystem *OverlaySystem() const;
+#endif
 
       /// \brief Create a render context.
       /// \return True if the context was created.
@@ -146,15 +172,6 @@ namespace gazebo
       /// \brief Check the rendering capabilities of the system.
       private: void CheckSystemCapabilities();
 
-      /// \brief Pointer to the root scene node
-      public: Ogre::Root *root;
-
-      /// \brief All of the scenes
-      private: std::vector< ScenePtr > scenes;
-
-      /// \brief Pointer the log manager
-      private: Ogre::LogManager *logManager;
-
       /// \brief ID for a dummy window. Used for gui-less operation
       protected: uint64_t dummyWindowId;
 
@@ -163,25 +180,14 @@ namespace gazebo
 
       /// \brief GLX context used to render the scenes.Used for gui-less
       /// operation.
-      protected: void* dummyContext;
-
-      /// \brief True if the GUI is enabled.
-      private: bool headless;
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Node for communications.
-      private: transport::NodePtr node;
-
-      /// \brief The type of render path used.
-      private: RenderPathType renderPathType;
+      protected: void *dummyContext;
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<RenderEnginePrivate> dataPtr;
     };
     /// \}
   }

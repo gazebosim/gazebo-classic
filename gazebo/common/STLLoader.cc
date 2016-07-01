@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <memory>
 
-#include "math/Helpers.hh"
-#include "common/Console.hh"
-#include "common/Mesh.hh"
-#include "common/STLLoader.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/STLLoader.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -46,7 +47,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
   if (!file)
   {
     gzerr << "Unable to open file[" << _filename << "]\n";
-    return NULL;
+    return nullptr;
   }
 
   Mesh *mesh = new Mesh();
@@ -55,12 +56,12 @@ Mesh *STLLoader::Load(const std::string &_filename)
   if (!this->ReadAscii(file, mesh))
   {
     fclose(file);
-    file = fopen(_filename.c_str(), "r");
+    file = fopen(_filename.c_str(), "rb");
     if (!this->ReadBinary(file, mesh))
       gzerr << "Unable to read STL[" << _filename << "]\n";
-    fclose(file);
   }
 
+  fclose(file);
   return mesh;
 }
 
@@ -81,10 +82,10 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   SubMesh *subMesh = new SubMesh();
 
   // Read the next line of the file into INPUT.
-  while (fgets (input, LINE_MAX_LEN, _filein) != NULL)
+  while (fgets (input, LINE_MAX_LEN, _filein) != nullptr)
   {
     // Advance to the first nonspace character in INPUT.
-    for (next = input; *next != '\0' && isspace(*next); next++);
+    for (next = input; *next != '\0' && iswspace(*next); next++);
 
     // Skip blank lines and comments.
     if (*next == '\0' || *next == '#' || *next == '!' || *next == '$')
@@ -99,16 +100,16 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     // FACET
     if (this->Leqi(token, const_cast<char*>("facet")))
     {
-      math::Vector3 normal;
+      ignition::math::Vector3d normal;
 
       // Get the XYZ coordinates of the normal vector to the face.
       sscanf(next, "%*s %e %e %e", &r1, &r2, &r3);
 
-      normal.x = r1;
-      normal.y = r2;
-      normal.z = r3;
+      normal.X(r1);
+      normal.Y(r2);
+      normal.Z(r3);
 
-      if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+      if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
       {
         result = false;
         break;
@@ -116,8 +117,8 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 
       for (; result; )
       {
-        math::Vector3 vertex;
-        if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+        ignition::math::Vector3d vertex;
+        if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
         {
           result = false;
           break;
@@ -128,16 +129,16 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         if (count != 3)
           break;
 
-        vertex.x = r1;
-        vertex.y = r2;
-        vertex.z = r3;
+        vertex.X(r1);
+        vertex.Y(r2);
+        vertex.Z(r3);
 
         subMesh->AddVertex(vertex);
         subMesh->AddNormal(normal);
         subMesh->AddIndex(subMesh->GetVertexIndex(vertex));
       }
 
-      if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+      if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
       {
         result = false;
         break;
@@ -168,8 +169,12 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     }
   }
 
+  result = subMesh->GetVertexCount() > 0;
+
   if (result)
     _mesh->AddSubMesh(subMesh);
+  else
+    delete subMesh;
 
   return result;
 }
@@ -181,17 +186,17 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   int iface;
   int face_num;
 
-  SubMesh *subMesh = new SubMesh();
+  std::unique_ptr<SubMesh> subMesh(new SubMesh());
 
   // 80 byte Header.
-  for (i = 0; i < 80; i++)
+  for (i = 0; i < 80; ++i)
     static_cast<char>(fgetc(_filein));
 
   // Number of faces.
   face_num = this->LongIntRead(_filein);
 
-  math::Vector3 normal;
-  math::Vector3 vertex;
+  ignition::math::Vector3d normal;
+  ignition::math::Vector3d vertex;
 
   // For each (triangular) face,
   // components of normal vector,
@@ -199,39 +204,39 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   // 2 byte "attribute".
   for (iface = 0; iface < face_num; iface++)
   {
-    if (!this->FloatRead(_filein, normal.x))
+    if (!this->FloatRead(_filein, normal.X()))
       return false;
-    if (!this->FloatRead(_filein, normal.y))
+    if (!this->FloatRead(_filein, normal.Y()))
       return false;
-    if (!this->FloatRead(_filein, normal.z))
+    if (!this->FloatRead(_filein, normal.Z()))
       return false;
 
-    if (!this->FloatRead(_filein, vertex.x))
+    if (!this->FloatRead(_filein, vertex.X()))
       return false;
-    if (!this->FloatRead(_filein, vertex.y))
+    if (!this->FloatRead(_filein, vertex.Y()))
       return false;
-    if (!this->FloatRead(_filein, vertex.z))
+    if (!this->FloatRead(_filein, vertex.Z()))
       return false;
 
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    if (!this->FloatRead(_filein, vertex.x))
+    if (!this->FloatRead(_filein, vertex.X()))
       return false;
-    if (!this->FloatRead(_filein, vertex.y))
+    if (!this->FloatRead(_filein, vertex.Y()))
       return false;
-    if (!this->FloatRead(_filein, vertex.z))
+    if (!this->FloatRead(_filein, vertex.Z()))
       return false;
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    if (!this->FloatRead(_filein, vertex.x))
+    if (!this->FloatRead(_filein, vertex.X()))
       return false;
-    if (!this->FloatRead(_filein, vertex.y))
+    if (!this->FloatRead(_filein, vertex.Y()))
       return false;
-    if (!this->FloatRead(_filein, vertex.z))
+    if (!this->FloatRead(_filein, vertex.Z()))
       return false;
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
@@ -242,7 +247,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
       return false;
   }
 
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(subMesh.release());
   return true;
 }
 
@@ -263,20 +268,20 @@ bool STLLoader::Leqi(char* _string1, char* _string2)
     nchar = nchar2;
 
   // The strings are not equal if they differ over their common length.
-  for (i = 0; i < nchar; i++)
+  for (i = 0; i < nchar; ++i)
     if (toupper (_string1[i]) != toupper (_string2[i]))
       return false;
 
   // The strings are not equal if the longer one includes nonblanks in the tail.
   if (nchar1 > nchar)
   {
-    for (i = nchar; i < nchar1; i++)
+    for (i = nchar; i < nchar1; ++i)
       if (_string1[i] != ' ')
         return false;
   }
   else if (nchar2 > nchar)
   {
-    for (i = nchar; i < nchar2; i++)
+    for (i = nchar; i < nchar2; ++i)
       if (_string2[i] != ' ')
         return false;
   }
@@ -293,11 +298,11 @@ int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
 
   icol = -1;
 
-  for (j = 0; j < _n; j++)
+  for (j = 0; j < _n; ++j)
   {
-    for (i = 0; i < _m; i++)
+    for (i = 0; i < _m; ++i)
     {
-      if (!math::equal(_a[i][j], _r[i]))
+      if (!ignition::math::equal(_a[i][j], _r[i]))
         break;
       if (i == _m-1)
         return j;

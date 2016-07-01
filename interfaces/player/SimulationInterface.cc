@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Simulation Interface for Player
- * Author: Nate Koenig
- * Date: 2 March 2006
- */
 
 #include <time.h>
 
@@ -27,7 +23,7 @@
 #include "player.h"
 
 #include "gazebo/transport/transport.hh"
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 
 #include "GazeboTime.hh"
 #include "GazeboDriver.hh"
@@ -43,9 +39,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
     GazeboDriver *_driver, ConfigFile *_cf, int _section)
 : GazeboInterface(_addr, _driver, _cf, _section)
 {
-  gazebo::load();
-  gazebo::init();
-  gazebo::run();
+  gazebo::client::setup();
 
   worldName = _cf->ReadString(_section, "world_name", "default");
 
@@ -79,7 +73,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
 // Destructor
 SimulationInterface::~SimulationInterface()
 {
-  gazebo::fini();
+  gazebo::client::shutdown();
   if (this->responseQueue)
   {
     delete this->responseQueue;
@@ -113,7 +107,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
@@ -135,7 +129,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
@@ -156,7 +150,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+      snprintf(this->pose3dReq.name, strlen(this->pose3dReq.name),
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
@@ -187,7 +181,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+      snprintf(this->pose3dReq.name, strlen(this->pose3dReq.name),
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 

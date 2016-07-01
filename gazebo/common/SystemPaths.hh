@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo configuration on this computer
- * Date: 3 May 2008
- */
-
 #ifndef _GAZEBO_SYSTEMPATHS_HH_
 #define _GAZEBO_SYSTEMPATHS_HH_
 
 #include <stdio.h>
 
 #define LINUX
-#ifdef WINDOWS
+#ifdef _WIN32
   #include <direct.h>
   #define GetCurrentDir _getcwd
 #else
@@ -32,11 +28,14 @@
   #define GetCurrentDir getcwd
 #endif
 
-#include <string>
+#include <boost/filesystem.hpp>
 #include <list>
+#include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -54,7 +53,7 @@ namespace gazebo
     ///            Should point to Ogre RenderSystem_GL.so et. al.
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class SystemPaths : public SingletonT<SystemPaths>
+    class GZ_COMMON_VISIBLE SystemPaths : public SingletonT<SystemPaths>
     {
       /// Constructor for SystemPaths
       private: SystemPaths();
@@ -83,6 +82,39 @@ namespace gazebo
       /// \return Right now, it just returns "/worlds"
       public: std::string GetWorldPathExtension();
 
+      /// Returns the default path suitable for temporary files.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp (Linux).
+      /// \deprecated See const std::string &TmpPath() const
+      public: std::string GetTmpPath() GAZEBO_DEPRECATED(8.0);
+
+      /// Returns the default path suitable for temporary files.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp (Linux).
+      public: const std::string &TmpPath() const;
+
+      /// Returns a unique temporary file for this instance of SystemPath.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp/gazebo_234123 (Linux).
+      /// \deprecated See const std::string &TmpInstancePath() const
+      public: std::string GetTmpInstancePath() GAZEBO_DEPRECATED(8.0);
+
+      /// Returns a unique temporary file for this instance of SystemPath.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp/gazebo_234123 (Linux).
+      public: const std::string &TmpInstancePath() const;
+
+      /// Returns the default temporary test path.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp/gazebo_test (Linux).
+      /// \deprecated See std::string DefaultTestPath() const
+      public: std::string GetDefaultTestPath() GAZEBO_DEPRECATED(8.0);
+
+      /// Returns the default temporary test path.
+      /// \return a full path name to directory.
+      /// E.g.: /tmp/gazebo_test (Linux).
+      public: std::string DefaultTestPath() const;
+
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
       /// \return Returns full path name to file
@@ -104,6 +136,11 @@ namespace gazebo
       /// \param[in] _path the directory to add
       public: void AddModelPaths(const std::string &_path);
 
+      /// \brief Add colon delimited paths to modelPaths and signal the update
+      /// to InsertModelWidget
+      /// \param[in] _path Path to be added to the current model path
+      public: void AddModelPathsUpdate(const std::string &_path);
+
       /// \brief Add colon delimited paths to ogre install
       /// \param[in] _path the directory to add
       public: void AddOgrePaths(const std::string &_path);
@@ -114,10 +151,13 @@ namespace gazebo
 
       /// \brief clear out SystemPaths#gazeboPaths
       public: void ClearGazeboPaths();
+
       /// \brief clear out SystemPaths#modelPaths
       public: void ClearModelPaths();
+
       /// \brief clear out SystemPaths#ogrePaths
       public: void ClearOgrePaths();
+
       /// \brief clear out SystemPaths#pluginPaths
       public: void ClearPluginPaths();
 
@@ -127,10 +167,13 @@ namespace gazebo
 
       /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateModelPaths();
+
       /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateGazeboPaths();
+
       /// \brief re-read SystemPaths#pluginPaths from environment variable
       private: void UpdatePluginPaths();
+
       /// \brief re-read SystemPaths#ogrePaths from environment variable
       private: void UpdateOgrePaths();
 
@@ -155,6 +198,10 @@ namespace gazebo
 
       private: std::string logPath;
 
+      /// \brief Event to notify InsertModelWidget that the model paths were
+      /// changed.
+      public: event::EventT<void (std::string)> updateModelRequest;
+
       /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
       public: bool modelPathsFromEnv;
 
@@ -168,6 +215,12 @@ namespace gazebo
       public: bool ogrePathsFromEnv;
 
       private: friend class SingletonT<SystemPaths>;
+
+      /// \brief Path to the default temporary directory
+      private: boost::filesystem::path tmpPath;
+
+      /// \brief Path to the instance temporary directory
+      private: boost::filesystem::path tmpInstancePath;
     };
     /// \}
   }

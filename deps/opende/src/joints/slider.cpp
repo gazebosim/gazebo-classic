@@ -145,16 +145,26 @@ dxJointSlider::getInfo1 ( dxJoint::Info1 *info )
             info->m = 6;
         }
     }
-
-    // joint damping
-    if ( use_damping )
-      info->m = 6;
 }
 
 
 void
 dxJointSlider::getInfo2 ( dxJoint::Info2 *info )
 {
+    // Added by OSRF
+    // If joint values of erp and cfm are negative, then ignore them.
+    // info->erp, info->cfm already have the global values from quickstep
+    if (this->erp >= 0)
+      info->erp = erp;
+    if (this->cfm >= 0)
+    {
+      info->cfm[0] = cfm;
+      info->cfm[1] = cfm;
+      info->cfm[2] = cfm;
+      info->cfm[3] = cfm;
+      info->cfm[4] = cfm;
+    }
+
     int i, s = info->rowskip;
     int s3 = 3 * s, s4 = 4 * s;
 
@@ -232,22 +242,6 @@ dxJointSlider::getInfo2 ( dxJoint::Info2 *info )
 
     // if the slider is powered, or has joint limits, add in the extra row
     limot.addLimot ( this, info, 5, ax1, 0 );
-
-    // joint damping
-    if (this->use_damping)
-    {
-      // added J1ld and J2ld for damping, only 1 row
-      info->J1ld[0] = ax1[0];
-      info->J1ld[1] = ax1[1];
-      info->J1ld[2] = ax1[2];
-      if ( this->node[1].body )
-      {
-        info->J2ld[0] = -ax1[0];
-        info->J2ld[1] = -ax1[1];
-        info->J2ld[2] = -ax1[2];
-      }
-      // there's no rhs for damping setup, all we want to use is the jacobian information above
-    }
 }
 
 
@@ -302,7 +296,20 @@ void dJointSetSliderParam ( dJointID j, int parameter, dReal value )
     dxJointSlider* joint = ( dxJointSlider* ) j;
     dUASSERT ( joint, "bad joint argument" );
     checktype ( joint, Slider );
-    joint->limot.set ( parameter, value );
+    switch (parameter)
+    {
+      case dParamERP:
+        joint->erp = value;
+        break;
+      case dParamCFM:
+        joint->cfm = value;
+        // dParamCFM label is also used for normal_cfm
+        joint->limot.set( parameter, value );
+        break;
+      default:
+        joint->limot.set( parameter, value );
+        break;
+    }
 }
 
 
@@ -311,7 +318,15 @@ dReal dJointGetSliderParam ( dJointID j, int parameter )
     dxJointSlider* joint = ( dxJointSlider* ) j;
     dUASSERT ( joint, "bad joint argument" );
     checktype ( joint, Slider );
-    return joint->limot.get ( parameter );
+    switch (parameter)
+    {
+      case dParamERP:
+        return joint->erp;
+      case dParamCFM:
+        return joint->cfm;
+      default:
+        return joint->limot.get( parameter );
+    }
 }
 
 

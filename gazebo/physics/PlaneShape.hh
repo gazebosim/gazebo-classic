@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #ifndef _PLANESHAPE_HH_
 #define _PLANESHAPE_HH_
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +37,7 @@ namespace gazebo
     ///
     /// This collision is used primarily for ground planes.  Note that while
     /// the plane in infinite, only the part near the camera is drawn.
-    class PlaneShape : public Shape
+    class GZ_PHYSICS_VISIBLE PlaneShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Link to which we are attached.
@@ -72,6 +72,10 @@ namespace gazebo
       /// \return Size of the plane.
       public: math::Vector2d GetSize() const;
 
+      /// \brief Set the scale of the plane.
+      /// \return _scale Scale to set the plane to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Fill a geometry message with data from this object.
       /// \param[out] _msg Message to fill.
       public: void FillMsg(msgs::Geometry &_msg);
@@ -80,6 +84,9 @@ namespace gazebo
       /// this object.
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: A persepective OGRE Camera
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
 
-#ifndef _RENDERING_CAMERA_HH_
-#define _RENDERING_CAMERA_HH_
+#ifndef _GAZEBO_RENDERING_CAMERA_HH_
+#define _GAZEBO_RENDERING_CAMERA_HH_
+
+#include <memory>
+#include <functional>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
@@ -28,18 +27,30 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Pose3.hh>
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Plane.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 
-#include "msgs/MessageTypes.hh"
-#include "rendering/RenderTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/PID.hh"
+#include "gazebo/common/Time.hh"
+
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Vector2i.hh"
+
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -50,16 +61,10 @@ namespace Ogre
   class Viewport;
   class SceneNode;
   class AnimationState;
-  class CompositorInstance;
 }
 
 namespace gazebo
 {
-  namespace common
-  {
-    class VideoEncoder;
-  }
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -67,7 +72,7 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
-    class GaussianNoiseCompositorListener;
+    class CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
@@ -77,7 +82,8 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera : public boost::enable_shared_from_this<Camera>
+    class GZ_RENDERING_VISIBLE Camera :
+      public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -93,7 +99,7 @@ namespace gazebo
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-       /// \brief Load the camera with default parmeters
+      /// \brief Load the camera with default parmeters
       public: virtual void Load();
 
       /// \brief Initialize the camera
@@ -101,17 +107,23 @@ namespace gazebo
 
       /// \brief Set the render Hz rate
       /// \param[in] _hz The Hz rate
-      public: void SetRenderRate(double _hz);
+      public: void SetRenderRate(const double _hz);
 
       /// \brief Get the render Hz rate
       /// \return The Hz rate
-      public: double GetRenderRate() const;
+      /// \deprecated See RenderRate()
+      public: double GetRenderRate() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Render the camera
-      ///
+      /// \brief Get the render Hz rate
+      /// \return The Hz rate
+      public: double RenderRate() const;
+
+      /// \brief Render the camera.
       /// Called after the pre-render signal. This function will generate
-      /// camera images
-      public: void Render();
+      /// camera images.
+      /// \param[in] _force Force camera to render. Ignore camera update
+      /// rate.
+      public: void Render(const bool _force = false);
 
       /// \brief Post render
       ///
@@ -130,13 +142,14 @@ namespace gazebo
       /// This function is called before the camera is destructed
       public: virtual void Fini();
 
-      /// Deprecated.
-      /// \sa GetInitialized
-      public: inline bool IsInitialized() const GAZEBO_DEPRECATED(1.5);
+      /// \brief Return true if the camera has been initialized
+      /// \return True if initialized was successful
+      /// \deprecated See Initialized()
+      public: bool GetInitialized() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return true if the camera has been initialized
       /// \return True if initialized was successful
-      public: bool GetInitialized() const;
+      public: bool Initialized() const;
 
       /// \internal
       /// \brief Set the ID of the window this camera is rendering into.
@@ -145,133 +158,316 @@ namespace gazebo
 
       /// \brief Get the ID of the window this camera is rendering into.
       /// \return The ID of the window.
-      public: unsigned int GetWindowId() const;
+      /// \deprecated See WindowId()
+      public: unsigned int GetWindowId() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the ID of the window this camera is rendering into.
+      /// \return The ID of the window.
+      public: unsigned int WindowId() const;
 
       /// \brief Set the scene this camera is viewing
       /// \param[in] _scene Pointer to the scene
       public: void SetScene(ScenePtr _scene);
 
-      /// \brief Get the global pose of the camera
-      /// \return Pose of the camera in the world coordinate frame
-      public: math::Pose GetWorldPose();
+      /// \brief Get the camera position in the world
+      /// \return The world position of the camera
+      /// \deprecated See function that returns an ignition::math object
+      /// \sa WorldPosition
+      public: math::Vector3 GetWorldPosition() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the camera position in the world
       /// \return The world position of the camera
-      public: math::Vector3 GetWorldPosition() const;
+      public: ignition::math::Vector3d WorldPosition() const;
 
       /// \brief Get the camera's orientation in the world
       /// \return The camera's orientation as a math::Quaternion
-      public: math::Quaternion GetWorldRotation() const;
+      /// \deprecated See function that returns an ignition::math object
+      /// \sa WorldRotation
+      public: math::Quaternion GetWorldRotation() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera's orientation in the world
+      /// \return The camera's orientation as an ignition::math::Quaterniond
+      public: ignition::math::Quaterniond WorldRotation() const;
 
       /// \brief Set the global pose of the camera
       /// \param[in] _pose The new math::Pose of the camera
-      public: virtual void SetWorldPose(const math::Pose &_pose);
+      /// \deprecated See function that accepts an ignition::math parameter.
+      public: virtual void SetWorldPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the global pose of the camera
+      /// \param[in] _pose The new ignition::math::Pose3d of the camera
+      public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Get the world pose.
+      /// \return The pose of the camera in the world coordinate frame.
+      /// \deprecated See function that returns an ignition::math object
+      /// \sa WorldPose
+      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the world pose.
+      /// \return The pose of the camera in the world coordinate frame.
+      public: ignition::math::Pose3d WorldPose() const;
 
       /// \brief Set the world position
       /// \param[in] _pos The new position of the camera
-      public: void SetWorldPosition(const math::Vector3 &_pos);
+      /// \deprecated See function that accepts an ignition::math parameter
+      public: void SetWorldPosition(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the world position
+      /// \param[in] _pos The new position of the camera
+      public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the world orientation
       /// \param[in] _quat The new orientation of the camera
-      public: void SetWorldRotation(const math::Quaternion &_quat);
+      /// \deprecated See function that accepts an ignition::math parameter
+      public: void SetWorldRotation(const math::Quaternion &_quat)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the world orientation
+      /// \param[in] _quat The new orientation of the camera
+      public: void SetWorldRotation(const ignition::math::Quaterniond &_quat);
 
       /// \brief Translate the camera
       /// \param[in] _direction The translation vector
-      public: void Translate(const math::Vector3 &_direction);
+      /// \deprecated See function that accepts an ignition::math parameter
+      public: void Translate(const math::Vector3 &_direction)
+              GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Rotate the camera around the yaw axis
+      /// \brief Translate the camera
+      /// \param[in] _direction The translation vector
+      public: void Translate(const ignition::math::Vector3d &_direction);
+
+      /// \brief Rotate the camera around the x-axis
       /// \param[in] _angle Rotation amount
-      public: void RotateYaw(math::Angle _angle);
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// is Ogre::TS_LOCAL
+      /// \deprecated See function the accepts an ignition::math parameter
+      public: void Roll(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_LOCAL) GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Rotate the camera around the pitch axis
+      /// \brief Rotate the camera around the x-axis
+      /// \param[in] _angle Rotation amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are RF_LOCAL, RF_PARENT, and RF_WORLD. Default is RF_LOCAL
+      public: void Roll(const ignition::math::Angle &_angle,
+                  ReferenceFrame _relativeTo = RF_LOCAL);
+
+      /// \brief Rotate the camera around the y-axis
       /// \param[in] _angle Pitch amount
-      public: void RotatePitch(math::Angle _angle);
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// is Ogre::TS_LOCAL
+      /// \deprecated See function the accepts an ignition::math parameter
+      public: void Pitch(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_LOCAL) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Rotate the camera around the y-axis
+      /// \param[in] _angle Pitch amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are RF_LOCAL, RF_PARENT, and RF_WORLD. Default is RF_LOCAL
+      public: void Pitch(const ignition::math::Angle &_angle,
+                  ReferenceFrame _relativeTo = RF_LOCAL);
+
+      /// \brief Rotate the camera around the z-axis
+      /// \param[in] _angle Rotation amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// is Ogre::TS_WORLD
+      /// \deprecated See function the accepts an ignition::math parameter
+      public: void Yaw(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_WORLD) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Rotate the camera around the z-axis
+      /// \param[in] _angle Rotation amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are RF_LOCAL, RF_PARENT, and RF_WORLD. Default is RF_WORLD
+      public: void Yaw(const ignition::math::Angle &_angle,
+                  ReferenceFrame _relativeTo = RF_WORLD);
 
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
       /// \param[in] _far Far clip distance in meters
-      public: void SetClipDist(float _near, float _far);
+      public: virtual void SetClipDist(const float _near, const float _far);
 
       /// \brief Set the camera FOV (horizontal)
-      /// \param[in] _radians Horizontal field of view
-      public: void SetHFOV(math::Angle _angle);
+      /// \param[in] _angle Horizontal field of view
+      /// \deprecated See function the accepts an ignition::math parameter
+      public: void SetHFOV(math::Angle _angle) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the camera FOV (horizontal)
+      /// \param[in] _angle Horizontal field of view
+      public: void SetHFOV(const ignition::math::Angle &_angle);
 
       /// \brief Get the camera FOV (horizontal)
       /// \return The horizontal field of view
-      public: math::Angle GetHFOV() const;
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa HFOV
+      public: math::Angle GetHFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera FOV (horizontal)
+      /// \return The horizontal field of view
+      public: ignition::math::Angle HFOV() const;
 
       /// \brief Get the camera FOV (vertical)
       /// \return The vertical field of view
-      public: math::Angle GetVFOV() const;
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa VFOV
+      public: math::Angle GetVFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera FOV (vertical)
+      /// \return The vertical field of view
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa VFOV
+      public: ignition::math::Angle VFOV() const;
 
       /// \brief Set the image size
       /// \param[in] _w Image width
       /// \param[in] _h Image height
-      public: void SetImageSize(unsigned int _w, unsigned int _h);
+      public: void SetImageSize(const unsigned int _w, const unsigned int _h);
 
       /// \brief Set the image height
       /// \param[in] _w Image width
-      public: void SetImageWidth(unsigned int _w);
+      public: void SetImageWidth(const unsigned int _w);
 
       /// \brief Set the image height
       /// \param[in] _h Image height
-      public: void SetImageHeight(unsigned int _h);
+      public: void SetImageHeight(const unsigned int _h);
 
       /// \brief Get the width of the image
       /// \return Image width
-      public: virtual unsigned int GetImageWidth() const;
+      /// \deprecated See ImageWidth()
+      public: virtual unsigned int GetImageWidth() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the width of the image
+      /// \return Image width
+      public: virtual unsigned int ImageWidth() const;
 
       /// \brief Get the width of the off-screen render texture
       /// \return Render texture width
-      public: unsigned int GetTextureWidth() const;
+      /// \deprecated See TextureWidth()
+      public: unsigned int GetTextureWidth() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the width of the off-screen render texture
+      /// \return Render texture width
+      public: unsigned int TextureWidth() const;
 
       /// \brief Get the height of the image
       /// \return Image height
-      public: virtual unsigned int GetImageHeight() const;
+      /// \deprecated See ImageHeight()
+      public: virtual unsigned int GetImageHeight() const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the height of the image
+      /// \return Image height
+      public: virtual unsigned int ImageHeight() const;
 
       /// \brief Get the depth of the image
       /// \return Depth of the image
-      public: unsigned int GetImageDepth() const;
+      /// \deprecated See ImageDepth()
+      public: unsigned int GetImageDepth() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the depth of the image
+      /// \return Depth of the image
+      public: unsigned int ImageDepth() const;
 
       /// \brief Get the string representation of the image format.
       /// \return String representation of the image format.
-      public: std::string GetImageFormat() const;
+      /// \deprecated See ImageFormat()
+      public: std::string GetImageFormat() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the string representation of the image format.
+      /// \return String representation of the image format.
+      public: std::string ImageFormat() const;
 
       /// \brief Get the height of the off-screen render texture
       /// \return Render texture height
-      public: unsigned int GetTextureHeight() const;
+      /// \deprecated See TextureHeight()
+      public: unsigned int GetTextureHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the height of the off-screen render texture
+      /// \return Render texture height
+      public: unsigned int TextureHeight() const;
 
       /// \brief Get the image size in bytes
       /// \return Size in bytes
-      public: size_t GetImageByteSize() const;
+      /// \deprecated See ImageByteSize()
+      public: size_t GetImageByteSize() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the image size in bytes
+      /// \return Size in bytes
+      public: size_t ImageByteSize() const;
 
       /// \brief Calculate image byte size base on a few parameters.
       /// \param[in] _width Width of an image
       /// \param[in] _height Height of an image
       /// \param[in] _format Image format
       /// \return Size of an image based on the parameters
+      /// \deprecated See ImageByteSize()
       public: static size_t GetImageByteSize(unsigned int _width,
                                              unsigned int _height,
-                                             const std::string &_format);
+                                             const std::string &_format)
+                                             GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Calculate image byte size base on a few parameters.
+      /// \param[in] _width Width of an image
+      /// \param[in] _height Height of an image
+      /// \param[in] _format Image format
+      /// \return Size of an image based on the parameters
+      public: static size_t ImageByteSize(const unsigned int _width,
+                                          const unsigned int _height,
+                                          const std::string &_format);
 
       /// \brief Get the Z-buffer value at the given image coordinate.
       /// \param[in] _x Image coordinate; (0, 0) specifies the top-left corner.
       /// \param[in] _y Image coordinate; (0, 0) specifies the top-left corner.
       /// \returns Image z value; note that this is abitrarily scaled and
       /// is @e not the same as the depth value.
-      public: double GetZValue(int _x, int _y);
+      /// \deprecated See ZValue()
+      public: double GetZValue(int _x, int _y) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the Z-buffer value at the given image coordinate.
+      /// \param[in] _x Image coordinate; (0, 0) specifies the top-left corner.
+      /// \param[in] _y Image coordinate; (0, 0) specifies the top-left corner.
+      /// \returns Image z value; note that this is abitrarily scaled and
+      /// is @e not the same as the depth value.
+      public: double ZValue(const int _x, const int _y);
 
       /// \brief Get the near clip distance
       /// \return Near clip distance
-      public: double GetNearClip();
+      /// \deprecated See NearClip()
+      public: double GetNearClip() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the near clip distance
+      /// \return Near clip distance
+      public: double NearClip() const;
 
       /// \brief Get the far clip distance
       /// \return Far clip distance
-      public: double GetFarClip();
+      /// \deprecated See FarClip()
+      public: double GetFarClip() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the far clip distance
+      /// \return Far clip distance
+      public: double FarClip() const;
 
       /// \brief Enable or disable saving
       /// \param[in] _enable Set to True to enable saving of frames
-      public: void EnableSaveFrame(bool _enable);
+      public: void EnableSaveFrame(const bool _enable);
+
+      /// \brief Return the value of this->captureData.
+      /// \return True if the camera is set to capture data.
+      /// \deprecated See CaptureData()
+      public: bool GetCaptureData() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the value of this->captureData.
+      /// \return True if the camera is set to capture data.
+      public: bool CaptureData() const;
 
       /// \brief Set the save frame pathname
       /// \param[in] _pathname Directory in which to store saved image frames
@@ -289,35 +485,78 @@ namespace gazebo
 
       /// \brief Get a pointer to the ogre camera
       /// \return Pointer to the OGRE camera
-      public: Ogre::Camera *GetOgreCamera() const;
+      /// \deprecated See OgreCamera()
+      public: Ogre::Camera *GetOgreCamera() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a pointer to the ogre camera
+      /// \return Pointer to the OGRE camera
+      public: Ogre::Camera *OgreCamera() const;
 
       /// \brief Get a pointer to the Ogre::Viewport
       /// \return Pointer to the Ogre::Viewport
-      public: Ogre::Viewport *GetViewport() const;
+      /// \deprecated See OgreViewport()
+      public: Ogre::Viewport *GetViewport() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a pointer to the Ogre::Viewport
+      /// \return Pointer to the Ogre::Viewport
+      public: Ogre::Viewport *OgreViewport() const;
 
       /// \brief Get the viewport width in pixels
       /// \return The viewport width
-      public: unsigned int GetViewportWidth() const;
+      /// \deprecated See ViewportWidth()
+      public: unsigned int GetViewportWidth() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the viewport width in pixels
+      /// \return The viewport width
+      public: unsigned int ViewportWidth() const;
 
       /// \brief Get the viewport height in pixels
       /// \return The viewport height
-      public: unsigned int GetViewportHeight() const;
+      /// \deprecated See ViewportHeight()
+      public: unsigned int GetViewportHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the viewport height in pixels
+      /// \return The viewport height
+      public: unsigned int ViewportHeight() const;
 
       /// \brief Get the viewport up vector
       /// \return The viewport up vector
-      public: math::Vector3 GetUp();
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa Up
+      public: math::Vector3 GetUp() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the viewport up vector
+      /// \return The viewport up vector
+      public: ignition::math::Vector3d Up() const;
 
       /// \brief Get the viewport right vector
       /// \return The viewport right vector
-      public: math::Vector3 GetRight();
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa Right
+      public: math::Vector3 GetRight() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the viewport right vector
+      /// \return The viewport right vector
+      public: ignition::math::Vector3d Right() const;
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() {return 0;}
+      /// \deprecated See AvgFPS()
+      public: virtual float GetAvgFPS() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the average FPS
+      /// \return The average frames per second
+      public: virtual float AvgFPS() const;
 
       /// \brief Get the triangle count
       /// \return The current triangle count
-      public: virtual unsigned int GetTriangleCount() {return 0;}
+      /// \deprecated See TriangleCount()
+      public: virtual unsigned int GetTriangleCount() const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the triangle count
+      /// \return The current triangle count
+      public: virtual unsigned int TriangleCount() const;
 
       /// \brief Set the aspect ratio
       /// \param[in] _ratio The aspect ratio (width / height) in pixels
@@ -325,7 +564,12 @@ namespace gazebo
 
       /// \brief Get the apect ratio
       /// \return The aspect ratio (width / height) in pixels
-      public: float GetAspectRatio() const;
+      /// \deprecated See AspectRatio()
+      public: float GetAspectRatio() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the apect ratio
+      /// \return The aspect ratio (width / height) in pixels
+      public: float AspectRatio() const;
 
       /// \brief Set the camera's scene node
       /// \param[in] _node The scene nodes to attach the camera to
@@ -333,22 +577,47 @@ namespace gazebo
 
       /// \brief Get the camera's scene node
       /// \return The scene node the camera is attached to
-      public: Ogre::SceneNode *GetSceneNode() const;
+      /// \deprecated See SceneNode()
+      public: Ogre::SceneNode *GetSceneNode() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Get the camera's pitch scene node
-      /// \return The pitch node the camera is attached to
-      public: Ogre::SceneNode *GetPitchNode() const;
+      /// \brief Get the camera's scene node
+      /// \return The scene node the camera is attached to
+      public: Ogre::SceneNode *SceneNode() const;
 
       /// \brief Get a pointer to the image data
       ///
       /// Get the raw image data from a camera's buffer.
       /// \param[in] _i Index of the camera's texture (0 = RGB, 1 = depth).
       /// \return Pointer to the raw data, null if data is not available.
-      public: virtual const unsigned char *GetImageData(unsigned int i = 0);
+      /// \deprecated See ImageData()
+      public: virtual const unsigned char *GetImageData(unsigned int i = 0)
+          GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Get the camera's name
+      /// \brief Get a pointer to the image data
+      ///
+      /// Get the raw image data from a camera's buffer.
+      /// \param[in] _i Index of the camera's texture (0 = RGB, 1 = depth).
+      /// \return Pointer to the raw data, null if data is not available.
+      public: virtual const unsigned char *ImageData(const unsigned int i = 0)
+          const;
+
+      /// \brief Get the camera's unscoped name
       /// \return The name of the camera
-      public: std::string GetName() const;
+      /// \deprecated See Name()
+      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera's unscoped name
+      /// \return The name of the camera
+      public: std::string Name() const;
+
+      /// \brief Get the camera's scoped name (scene_name::camera_name)
+      /// \return The name of the camera
+      /// \deprecated See ScopedName()
+      public: std::string GetScopedName() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera's scoped name (scene_name::camera_name)
+      /// \return The name of the camera
+      public: std::string ScopedName() const;
 
       /// \brief Set the camera's name
       /// \param[in] _name New name for the camera
@@ -359,7 +628,7 @@ namespace gazebo
 
       /// \brief Set whether to view the world in wireframe
       /// \param[in] _s Set to True to render objects as wireframe
-      public: void ShowWireframe(bool _s);
+      public: void ShowWireframe(const bool _s);
 
       /// \brief Get a world space ray as cast from the camera
       /// through the viewport
@@ -368,13 +637,27 @@ namespace gazebo
       /// \param[out] _origin Origin in the world coordinate frame of the
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
+      /// \deprecated See function that accepts ignition::math parameters.
+      /// \sa CameraToViewportRay
       public: void GetCameraToViewportRay(int _screenx, int _screeny,
-                                          math::Vector3 &_origin,
-                                          math::Vector3 &_dir);
+                  math::Vector3 &_origin, math::Vector3 &_dir)
+                  GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a world space ray as cast from the camera
+      /// through the viewport
+      /// \param[in] _screenx X coordinate in the camera's viewport, in pixels.
+      /// \param[in] _screeny Y coordinate in the camera's viewport, in pixels.
+      /// \param[out] _origin Origin in the world coordinate frame of the
+      /// resulting ray
+      /// \param[out] _dir Direction of the resulting ray
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: void CameraToViewportRay(const int _screenx, const int _screeny,
+                  ignition::math::Vector3d &_origin,
+                  ignition::math::Vector3d &_dir) const;
 
       /// \brief Set whether to capture data
       /// \param[in] _value Set to true to capture data into a memory buffer.
-      public: void SetCaptureData(bool _value);
+      public: void SetCaptureData(const bool _value);
 
       /// \brief Capture data once and save to disk
       public: void SetCaptureDataOnce();
@@ -401,8 +684,21 @@ namespace gazebo
       /// \param[in] _plane Plane on which to find the intersecting point
       /// \param[out] _result Point on the plane
       /// \return True if a valid point was found
+      /// \deprecated See function that accepts ignition::math parameters.
+      /// \sa WorldPointOnPlane
       public: bool GetWorldPointOnPlane(int _x, int _y,
-                  const math::Plane &_plane, math::Vector3 &_result);
+                  const math::Plane &_plane, math::Vector3 &_result)
+                  GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get point on a plane
+      /// \param[in] _x X coordinate in camera's viewport, in pixels
+      /// \param[in] _y Y coordinate in camera's viewport, in pixels
+      /// \param[in] _plane Plane on which to find the intersecting point
+      /// \param[out] _result Point on the plane
+      /// \return True if a valid point was found
+      public: bool WorldPointOnPlane(const int _x, const int _y,
+                  const ignition::math::Planed &_plane,
+                  ignition::math::Vector3d &_result);
 
       /// \brief Set the camera's render target
       /// \param[in] _target Pointer to the render target
@@ -417,8 +713,20 @@ namespace gazebo
       /// \param[in] _maxDist Maximum distance the camera is allowd to get from
       /// the visual
       public: void AttachToVisual(const std::string &_visualName,
-                  bool _inheritOrientation,
-                  double _minDist = 0.0, double _maxDist = 0.0);
+                  const bool _inheritOrientation,
+                  const double _minDist = 0.0, const double _maxDist = 0.0);
+
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      public: void AttachToVisual(uint32_t _id,
+                  const bool _inheritOrientation,
+                  const double _minDist = 0.0, const double _maxDist = 0.0);
 
       /// \brief Set the camera to track a scene node
       /// \param[in] _visualName Name of the visual to track
@@ -426,24 +734,36 @@ namespace gazebo
 
       /// \brief Get the render texture
       /// \return Pointer to the render texture
-      public: Ogre::Texture *GetRenderTexture() const;
+      /// \deprecated See RenderTexture()
+      public: Ogre::Texture *GetRenderTexture() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the render texture
+      /// \return Pointer to the render texture
+      public: Ogre::Texture *RenderTexture() const;
 
       /// \brief Get the camera's direction vector
       /// \return Direction the camera is facing
-      public: math::Vector3 GetDirection() const;
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa Direction
+      public: math::Vector3 GetDirection() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera's direction vector
+      /// \return Direction the camera is facing
+      public: ignition::math::Vector3d Direction() const;
 
       /// \brief Connect to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
       /// generated
       /// \return A pointer to the connection. This must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewImageFrame(T _subscriber)
-              {return newImageFrame.Connect(_subscriber);}
+      public: event::ConnectionPtr ConnectNewImageFrame(
+          std::function<void (const unsigned char *, unsigned int, unsigned int,
+          unsigned int, const std::string &)> _subscriber);
 
       /// \brief Disconnect from an image frame
       /// \param[in] _c The connection to disconnect
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
-              {newImageFrame.Disconnect(_c);}
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer
@@ -454,14 +774,18 @@ namespace gazebo
       /// \param[in] _filename Name of the file in which to write the frame
       /// \return True if saving was successful
       public: static bool SaveFrame(const unsigned char *_image,
-                  unsigned int _width, unsigned int _height, int _depth,
-                  const std::string &_format,
+                  const unsigned int _width, const unsigned int _height,
+                  const int _depth, const std::string &_format,
                   const std::string &_filename);
-
 
       /// \brief Get the last time the camera was rendered
       /// \return Time the camera was last rendered
-      public: common::Time GetLastRenderWallTime();
+      /// \deprecated See LastRenderWallTime()
+      public: common::Time GetLastRenderWallTime() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the last time the camera was rendered
+      /// \return Time the camera was last rendered
+      public: common::Time LastRenderWallTime() const;
 
       /// \brief Return true if the visual is within the camera's view
       /// frustum
@@ -482,8 +806,16 @@ namespace gazebo
       /// \sa Camera::MoveToPositions
       /// \param[in] _pose End position of the camera
       /// \param[in] _time Duration of the camera's movement
+      /// \deprecated See function that accepts ignition::math parameters.
       public: virtual bool MoveToPosition(const math::Pose &_pose,
-                                          double _time);
+                                          double _time) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Move the camera to a position (this is an animated motion).
+      /// \sa Camera::MoveToPositions
+      /// \param[in] _pose End position of the camera
+      /// \param[in] _time Duration of the camera's movement
+      public: virtual bool MoveToPosition(const ignition::math::Pose3d &_pose,
+                                          const double _time);
 
       /// \brief Move the camera to a series of poses (this is an
       /// animated motion).
@@ -492,16 +824,143 @@ namespace gazebo
       /// \param[in] _time Duration of the entire move
       /// \param[in] _onComplete Callback that is called when the move is
       /// complete
+      /// \deprecated See function that accepts ignition::math parameters.
       public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete = NULL);
+                                   std::function<void()> _onComplete = NULL)
+                                   GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Move the camera to a series of poses (this is an
+      /// animated motion).
+      /// \sa Camera::MoveToPosition
+      /// \param[in] _pts Vector of poses to move to
+      /// \param[in] _time Duration of the entire move
+      /// \param[in] _onComplete Callback that is called when the move is
+      /// complete
+      public: bool MoveToPositions(
+                  const std::vector<ignition::math::Pose3d> &_pts,
+                  const double _time,
+                  std::function<void()> _onComplete = NULL);
 
       /// \brief Get the path to saved screenshots.
       /// \return Path to saved screenshots.
-      public: std::string GetScreenshotPath() const;
+      /// \deprecated See ScreenshotPath()
+      public: std::string GetScreenshotPath() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the path to saved screenshots.
+      /// \return Path to saved screenshots.
+      public: std::string ScreenshotPath() const;
+
+      /// \brief Get the distortion model of this camera.
+      /// \return Distortion model.
+      /// \deprecated See LensDistortion() const;
+      public: DistortionPtr GetDistortion() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the distortion model of this camera.
+      /// \return Distortion model.
+      public: DistortionPtr LensDistortion() const;
+
+      /// \brief Set the type of projection used by the camera.
+      /// \param[in] _type The type of projection: "perspective" or
+      /// "orthographic".
+      /// \return True if successful.
+      /// \sa GetProjectionType()
+      public: virtual bool SetProjectionType(const std::string &_type);
+
+      /// \brief Return the projection type as a string.
+      /// \return "perspective" or "orthographic"
+      /// \sa SetProjectionType(const std::string &_type)
+      /// \deprecated See ProjectionType()
+      public: std::string GetProjectionType() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the projection type as a string.
+      /// \return "perspective" or "orthographic"
+      /// \sa SetProjectionType(const std::string &_type)
+      public: std::string ProjectionType() const;
+
+      /// \brief Return the projection matrix of this camera.
+      /// \return the projection matrix
+      public: ignition::math::Matrix4d ProjectionMatrix() const;
+
+      /// \brief Get the visual tracked by this camera.
+      /// \return Tracked visual.
+      public: VisualPtr TrackedVisual() const;
+
+      /// \brief Get whether this camera is static when tracking a model.
+      /// \return True if camera is static when tracking a model.
+      /// \sa SetTrackIsStatic(const bool _isStatic)
+      public: bool TrackIsStatic() const;
+
+      /// \brief Set whether this camera is static when tracking a model.
+      /// \param[in] _isStatic True means camera is static when tracking a
+      /// model.
+      /// \sa TrackIsStatic()
+      public: void SetTrackIsStatic(const bool _isStatic);
+
+      /// \brief Get whether this camera's position is relative to tracked
+      /// models.
+      /// \return True if camera's position is relative to tracked models.
+      /// \sa SetTrackUseModelFrame(const bool _useModelFrame)
+      public: bool TrackUseModelFrame() const;
+
+      /// \brief Set whether this camera's position is relative to tracked
+      /// models.
+      /// \param[in] _useModelFrame True means camera's position is relative to
+      /// tracked models.
+      /// \sa TrackUseModelFrame()
+      public: void SetTrackUseModelFrame(const bool _useModelFrame);
+
+      /// \brief Return the position of the camera when tracking a model.
+      /// \return Position of the camera.
+      /// \sa SetTrackPosition(const ignition::math::Vector3d &_pos)
+      public: ignition::math::Vector3d TrackPosition() const;
+
+      /// \brief Set the position of the camera when tracking a visual.
+      /// \param[in] _pos Position of the camera.
+      /// \sa TrackPosition()
+      public: void SetTrackPosition(const ignition::math::Vector3d &_pos);
+
+      /// \brief Return the minimum distance to the tracked visual.
+      /// \return Minimum distance to the model.
+      /// \sa SetTrackMinDistance(const double _dist)
+      public: double TrackMinDistance() const;
+
+      /// \brief Return the maximum distance to the tracked visual.
+      /// \return Maximum distance to the model.
+      /// \sa SetTrackMaxDistance(const double _dist)
+      public: double TrackMaxDistance() const;
+
+      /// \brief Set the minimum distance between the camera and tracked
+      /// visual.
+      /// \param[in] _dist Minimum distance between camera and visual.
+      /// \sa TrackMinDistance()
+      public: void SetTrackMinDistance(const double _dist);
+
+      /// \brief Set the maximum distance between the camera and tracked
+      /// visual.
+      /// \param[in] _dist Maximum distance between camera and visual.
+      /// \sa TrackMaxDistance()
+      public: void SetTrackMaxDistance(const double _dist);
+
+      /// \brief Get whether this camera inherits the yaw rotation of the
+      /// tracked model.
+      /// \return True if the camera inherits the yaw rotation of the tracked
+      /// model.
+      /// \sa SetTrackInheritYaw(const bool _inheritYaw)
+      public: bool TrackInheritYaw() const;
+
+      /// \brief Set whether this camera inherits the yaw rotation of the
+      /// tracked model.
+      /// \param[in] _inheritYaw True means camera inherits the yaw rotation of
+      /// the tracked model.
+      /// \sa TrackInheritYaw()
+      public: void SetTrackInheritYaw(const bool _inheritYaw);
 
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
+
+      /// \brief Read image data from pixel buffer
+      protected: void ReadPixelBuffer();
 
       /// \brief Implementation of the Camera::TrackVisual call
       /// \param[in] _visualName Name of the visual to track
@@ -523,8 +982,21 @@ namespace gazebo
       /// the visual
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(const std::string &_name,
-                     bool _inheritOrientation,
-                     double _minDist = 0, double _maxDist = 0);
+                     const bool _inheritOrientation,
+                     const double _minDist = 0, const double _maxDist = 0);
+
+      /// \brief Attach the camera to a scene node
+      /// \param[in] _id ID of the visual to attach the camera to
+      /// \param[in] _inheritOrientation True means camera acquires the visual's
+      /// orientation
+      /// \param[in] _minDist Minimum distance the camera is allowed to get to
+      /// the visual
+      /// \param[in] _maxDist Maximum distance the camera is allowd to get from
+      /// the visual
+      /// \return True on success
+      protected: virtual bool AttachToVisualImpl(uint32_t _id,
+                     const bool _inheritOrientation,
+                     const double _minDist = 0, const double _maxDist = 0);
 
       /// \brief Attach the camera to a visual
       /// \param[in] _visual The visual to attach the camera to
@@ -536,41 +1008,59 @@ namespace gazebo
       /// the visual
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
-                     bool _inheritOrientation,
-                     double _minDist = 0, double _maxDist = 0);
+                     const bool _inheritOrientation,
+                     const double _minDist = 0, const double _maxDist = 0);
 
       /// \brief Get the next frame filename based on SDF parameters
       /// \return The frame's filename
-      protected: std::string GetFrameFilename();
+      /// \deprecated See FrameFilename()
+      protected: std::string GetFrameFilename() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the next frame filename based on SDF parameters
+      /// \return The frame's filename
+      protected: std::string FrameFilename();
 
       /// \brief Internal function used to indicate that an animation has
       /// completed.
       protected: virtual void AnimationComplete();
 
+      /// \brief Update the camera's field of view.
+      protected: virtual void UpdateFOV();
+
+      /// \brief Set the clip distance based on stored SDF values
+      protected: virtual void SetClipDist();
+
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
-      /// \param[in] _dst Destination buffer for the image data
+      /// \param[out] _dst Destination buffer for the image data
       /// \param[in] _src Source image buffer
       /// \param[in] _format Format of the source buffer
       /// \param[in] _width Image width
       /// \param[in] _height Image height
-      private: void ConvertRGBToBAYER(unsigned char *_dst, unsigned char *_src,
-                   std::string _format, int _width, int _height);
-
-      /// \brief Set the clip distance based on stored SDF values
-      private: void SetClipDist();
+      private: void ConvertRGBToBAYER(unsigned char *_dst,
+          const unsigned char *_src, const std::string &_format,
+          const int _width, const int _height);
 
       /// \brief Get the OGRE image pixel format in
       /// \param[in] _format The Gazebo image format
       /// \return Integer representation of the Ogre image format
-      private: static int GetOgrePixelFormat(const std::string &_format);
+      private: static int OgrePixelFormat(const std::string &_format);
 
+      /// \brief Receive command message.
+      /// \param[in] _msg Camera Command message.
+      private: void OnCmdMsg(ConstCameraCmdPtr &_msg);
 
       /// \brief Create the ogre camera.
       private: void CreateCamera();
 
       /// \brief Name of the camera.
       protected: std::string name;
+
+      /// \brief Scene scoped name of the camera.
+      protected: std::string scopedName;
+
+      /// \brief Scene scoped name of the camera with a unique ID.
+      protected: std::string scopedUniqueName;
 
       /// \brief Camera's SDF values.
       protected: sdf::ElementPtr sdf;
@@ -590,13 +1080,10 @@ namespace gazebo
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 
-      /// \brief Scene node that controls camera position.
+      /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
 
-      /// \brief Scene nod that controls camera pitch.
-      protected: Ogre::SceneNode *pitchNode;
-
-      // \brief Buffer for a single image frame.
+      /// \brief Buffer for a single image frame.
       protected: unsigned char *saveFrameBuffer;
 
       /// \brief Buffer for a bayer image frame.
@@ -665,69 +1152,11 @@ namespace gazebo
       protected: common::Time prevAnimTime;
 
       /// \brief User callback for when an animation completes.
-      protected: boost::function<void()> onAnimationComplete;
+      protected: std::function<void()> onAnimationComplete;
 
-      /// \brief Pointer to image SDF element.
-      private: sdf::ElementPtr imageElem;
-
-      /// \brief Visual that the camera is tracking.
-      private: VisualPtr trackedVisual;
-
-      /// \brief Counter used to create unique camera names.
-      private: static unsigned int cameraCounter;
-
-      /// \brief Deferred shading geometry buffer.
-      private: Ogre::CompositorInstance *dsGBufferInstance;
-
-      /// \brief Deferred shading merge compositor.
-      private: Ogre::CompositorInstance *dsMergeInstance;
-
-      /// \brief Deferred lighting geometry buffer.
-      private: Ogre::CompositorInstance *dlGBufferInstance;
-
-      /// \brief Deferred lighting merge compositor.
-      private: Ogre::CompositorInstance *dlMergeInstance;
-
-      /// \brief Screen space ambient occlusion compositor.
-      private: Ogre::CompositorInstance *ssaoInstance;
-
-      /// \brief Gaussian noise compositor
-      private: Ogre::CompositorInstance *gaussianNoiseInstance;
-
-      /// \brief Gaussian noise compositor listener
-      private: boost::shared_ptr<GaussianNoiseCompositorListener>
-        gaussianNoiseCompositorListener;
-
-      /// \brief Queue of move positions.
-      private: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
-
-      /// \brief Render period.
-      private: common::Time renderPeriod;
-
-      /// \brief Video encoding format
-      private: std::string videoEncodeFormat;
-
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
-      /// \brief If true, apply the noise model specified by other
-      /// noise parameters
-      private: bool noiseActive;
-
-      /// \brief Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      /// \brief If noiseType==GAUSSIAN, noiseMean is the mean of the
-      /// distibution from which we sample
-      private: double noiseMean;
-
-      /// \brief If noiseType==GAUSSIAN, noiseStdDev is the standard
-      /// devation of the distibution from which we sample
-      private: double noiseStdDev;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<CameraPrivate> dataPtr;
     };
     /// \}
   }

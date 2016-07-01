@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,14 @@
  * Date: 14 July 2008
  */
 
-#include <unistd.h>
-#include <dirent.h>
-#include <string.h>
-
-#include <iostream>
 #include <boost/filesystem.hpp>
+#include <string>
 
-#include "math/Vector3.hh"
-#include "common/Common.hh"
-#include "common/Console.hh"
-#include "common/Image.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -46,7 +42,7 @@ Image::Image(const std::string &_filename)
 
   count++;
 
-  this->bitmap = NULL;
+  this->bitmap = nullptr;
   if (!_filename.empty())
   {
     std::string filename = common::find_file(_filename);
@@ -64,7 +60,7 @@ Image::~Image()
 
   if (this->bitmap)
     FreeImage_Unload(this->bitmap);
-  this->bitmap = NULL;
+  this->bitmap = nullptr;
 
   if (count == 0)
     FreeImage_DeInitialise();
@@ -84,7 +80,7 @@ int Image::Load(const std::string &_filename)
 
     if (this->bitmap)
       FreeImage_Unload(this->bitmap);
-    this->bitmap = NULL;
+    this->bitmap = nullptr;
 
     if (fifmt == FIF_PNG)
       this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), PNG_DEFAULT);
@@ -119,7 +115,7 @@ void Image::SetFromData(const unsigned char *_data, unsigned int _width,
 {
   if (this->bitmap)
     FreeImage_Unload(this->bitmap);
-  this->bitmap = NULL;
+  this->bitmap = nullptr;
 
   // int redmask = FI_RGBA_RED_MASK;
   int redmask = 0x0000ff;
@@ -270,7 +266,7 @@ unsigned int Image::GetBPP() const
 }
 
 //////////////////////////////////////////////////
-Color Image::GetPixel(unsigned int _x, unsigned int _y)
+Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 {
   Color clr;
 
@@ -346,7 +342,7 @@ Color Image::GetAvgColor()
 }
 
 //////////////////////////////////////////////////
-Color Image::GetMaxColor()
+Color Image::GetMaxColor() const
 {
   unsigned int x, y;
   Color clr;
@@ -373,14 +369,18 @@ Color Image::GetMaxColor()
 //////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
+#ifndef _WIN32
   this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
-      FILTER_BICUBIC);
+      FILTER_LANCZOS3);
+#else
+  gzerr << "Image::Rescale is not implemented on Windows.\n";
+#endif
 }
 
 //////////////////////////////////////////////////
 bool Image::Valid() const
 {
-  return this->bitmap != NULL;
+  return this->bitmap != nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -437,4 +437,3 @@ Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
 
   return UNKNOWN_PIXEL_FORMAT;
 }
-

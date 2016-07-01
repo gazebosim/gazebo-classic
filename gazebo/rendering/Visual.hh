@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,55 +14,72 @@
  * limitations under the License.
  *
 */
-/* Desc: Ogre Visual Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
 
-#ifndef _VISUAL_HH_
-#define _VISUAL_HH_
+#ifndef _GAZEBO_VISUAL_HH_
+#define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
-#include <list>
 #include <vector>
 
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Event.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Time.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/math/Box.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
   class MovableObject;
   class SceneNode;
-  class StaticGeometry;
-  class RibbonTrail;
-  class AnimationState;
-  class SkeletonInstance;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class WireBox;
+    class VisualPrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class Visual : public boost::enable_shared_from_this<Visual>
+    class GZ_RENDERING_VISIBLE Visual :
+      public std::enable_shared_from_this<Visual>
     {
+      /// \brief Type of visual
+      public: enum VisualType
+      {
+        /// \brief Entity visual
+        VT_ENTITY,
+        /// \brief Model visual
+        VT_MODEL,
+        /// \brief Link visual
+        VT_LINK,
+        /// \brief Visual visual
+        VT_VISUAL,
+        /// \brief Collision visual
+        VT_COLLISION,
+        /// \brief Sensor visual
+        VT_SENSOR,
+        /// \brief GUI visual
+        VT_GUI,
+        /// \brief Physics data visual
+        VT_PHYSICS
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
       /// \param[in] _parent Parent of the visual.
@@ -86,7 +103,7 @@ namespace gazebo
       public: void Init();
 
       /// \brief Helper for the destructor
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Clone the visual with a new name.
       /// \param[in] _name Name of the cloned Visual.
@@ -107,6 +124,14 @@ namespace gazebo
 
       /// \brief Update the visual.
       public: void Update();
+
+      /// \brief Get the visual SDF. Note that visuals are abstract. This SDF
+      /// could be associated with a visual that represents a model, a link,
+      /// a visual (inside a link), or a visualization object
+      /// (e.g. LaserVisual). Therefore this SDF may store more fields than
+      /// actually used.
+      /// \return SDF of the visual.
+      public: sdf::ElementPtr GetSDF() const;
 
       /// \brief Set the name of the visual
       /// \param[in] _name Name of the visual
@@ -173,32 +198,79 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Get the scale of the visual as inherited from all parents.
+      /// \return The derived scaling factor.
+      public: ignition::math::Vector3d DerivedScale() const;
+
+      /// \brief Get whether or not lighting is enabled.
+      /// \return True if lighting is enabled.
+      public: bool GetLighting() const;
+
+      /// \brief Set whether or not to enable or disable lighting.
+      /// \param[in] _lighting True to enable lighting.
+      public: void SetLighting(bool _lighting);
+
       /// \brief Set the material.
       /// \param[in] _materialName The name of the material.
       /// \param[in] _unique True to make the material unique, which
       /// allows the material to change without changing materials that
       /// originally had the same name.
+      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetMaterial(const std::string &_materialName,
-                               bool _unique = true);
+                               bool _unique = true, const bool _cascade = true);
 
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
-      public: void SetAmbient(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetAmbient(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
-      public: void SetDiffuse(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetDiffuse(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
-      public: void SetSpecular(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetSpecular(const common::Color &_color,
+          const bool _cascade = true);
 
-      /// \brief Attach visualization axes
-      public: void AttachAxes();
+      /// \brief Set the emissive value.
+      /// \param[in] _color The emissive color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: virtual void SetEmissive(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Get the ambient color of the visual.
+      /// \return Ambient color.
+      public: common::Color GetAmbient() const;
+
+      /// \brief Get the diffuse color of the visual.
+      /// \return Diffuse color.
+      public: common::Color GetDiffuse() const;
+
+      /// \brief Get the specular color of the visual.
+      /// \return Specular color.
+      public: common::Color GetSpecular() const;
+
+      /// \brief Get the emissive color of the visual.
+      /// \return Emissive color.
+      public: common::Color GetEmissive() const;
 
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
+
+      /// \brief Get whether wireframe is enabled for this visual.
+      /// \return True if wireframe is enabled for this visual.
+      public: bool Wireframe() const;
+
+      /// \brief Set the transparency of a single visual without calling
+      /// UpdateShaders.
+      /// \param[in] _sceneNode The target scene node.
+      private: void SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode);
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
@@ -209,14 +281,32 @@ namespace gazebo
       /// \return The transparency.
       public: float GetTransparency();
 
+      /// \brief Get the transparency of the visual as inherited from all
+      /// parents.
+      /// \return The derived transparency.
+      public: float DerivedTransparency() const;
+
+      /// \brief Set whether to inherit transparency from parent
+      /// \param[in] _inherit True to inherit transparency.
+      public: void SetInheritTransparency(const bool _inherit);
+
+      /// \brief Get whether this visual inherits transparency from parent
+      /// \return True if the visual inherits transparency.
+      public: bool InheritTransparency() const;
+
       /// \brief Set the visual to be visually highlighted. This is most
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.
-      public: void SetHighlighted(bool _highlighted);
+      public: virtual void SetHighlighted(bool _highlighted);
 
-      /// \brief Set the emissive value.
-      /// \param[in] _color The emissive color.
-      public: virtual void SetEmissive(const common::Color &_color);
+      /// \brief Get whether or not the visual is visually highlighted. This is
+      /// most often means that an object is selected by a user via the GUI.
+      /// \return True if the visual is highlighted.
+      public: bool GetHighlighted() const;
+
+      /// \brief Get whether the visual casts shadows.
+      /// \return True if the visual casts shadows.
+      public: bool GetCastShadows() const;
 
       /// \brief Set whether the visual should cast shadows.
       /// \param[in] _shadows True to enable shadows.
@@ -225,7 +315,7 @@ namespace gazebo
       /// \brief Set whether the visual is visible.
       /// \param[in] _visible set this node visible.
       /// \param[in] _cascade setting this parameter in children too.
-      public: void SetVisible(bool _visible, bool _cascade = true);
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
       /// \brief Toggle whether this visual is visible.
       public: void ToggleVisible();
@@ -264,7 +354,7 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose _pose);
+      public: void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
@@ -365,6 +455,29 @@ namespace gazebo
       /// visual.
       public: VisualPtr GetRootVisual();
 
+      /// \brief Get the nth ancestor counting from the world visual.
+      /// GetNthAncestor(0) returns the world visual. GetNthAncestor(1) returns
+      /// the RootVisual. GetNthAncestor(2) returns the ancestor which is a
+      /// child of the root visual and so on.
+      /// \param[in] _n Depth of the ancestor.
+      /// \return The nth ancestor counting from the world.
+      public: VisualPtr GetNthAncestor(unsigned int _n);
+
+      /// \brief Check if this visual is an ancestor of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is an ancestor.
+      public: bool IsAncestorOf(const rendering::VisualPtr _visual) const;
+
+      /// \brief Check if this visual is a descendant of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is a descendant.
+      public: bool IsDescendantOf(const rendering::VisualPtr _visual) const;
+
+      /// \brief Get the depth of this visual, where 0 is the depth of the
+      /// world visual.
+      /// \return This visual's depth.
+      public: unsigned int GetDepth() const;
+
       /// \brief Get the shader type.
       /// \return String of the shader type: "vertex", "pixel",
       /// "normal_map_object_space", "normal_map_tangent_space".
@@ -392,14 +505,14 @@ namespace gazebo
       /// \param[in] _flags The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: void SetVisibilityFlags(uint32_t _flags);
 
       /// \brief Get visibility flags for this visual and all children.
       /// \return The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: uint32_t GetVisibilityFlags();
 
       /// \brief Display the bounding box visual.
@@ -430,6 +543,14 @@ namespace gazebo
       /// \param[in] _show True to show center of mass visualizations.
       public: void ShowCOM(bool _show);
 
+      /// \brief Display inertia visuals.
+      /// \param[in] _show True to show inertia visualizations.
+      public: void ShowInertia(bool _show);
+
+      /// \brief Display link frame visuals.
+      /// \param[in] _show True to show link frame visualizations.
+      public: void ShowLinkFrame(bool _show);
+
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
@@ -446,20 +567,19 @@ namespace gazebo
       /// \param _name The unique name of the plugin to remove
       public: void RemovePlugin(const std::string &_name);
 
-      /// \brief Load all plugins
-      ///
-      /// Load all plugins specified in the SDF for the model.
-      private: void LoadPlugins();
+      /// \brief Get the id associated with this visual
+      public: uint32_t GetId() const;
 
-      private: void LoadPlugin(sdf::ElementPtr _sdf);
+      /// \brief Set the id associated with this visual
+      public: void SetId(uint32_t _id);
 
-      private: std::vector<VisualPluginPtr> plugins;
+      /// \brief Get the geometry type.
+      /// \return Type of geometry in string.
+      public: std::string GetGeometryType() const;
 
-      /// \brief Helper function to get the bounding box for a visual.
-      /// \param[in] _node Pointer to the Ogre Node to process.
-      /// \param[in] _box Current bounding box information.
-      private: void GetBoundsHelper(Ogre::SceneNode *_node,
-                                    math::Box &_box) const;
+      /// \brief Get the geometry size.
+      /// \return Size of geometry.
+      public: ignition::math::Vector3d GetGeometrySize() const;
 
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
@@ -473,14 +593,86 @@ namespace gazebo
       /// \brief Clear parents.
       public: void ClearParent();
 
-      /// \brief Pointer to the visual's scene.
-      protected: ScenePtr scene;
+      /// \brief Toggle layer visibility. If the visual is
+      /// on the specified layer its visibility will be toggled.
+      /// \param[in] _layer Index of the layer to toggle.
+      public: void ToggleLayer(const int32_t _layer);
 
-      /// \brief Pointer to the visual's scene node in Ogre.
-      protected: Ogre::SceneNode *sceneNode;
+      /// \brief Get type of visual.
+      /// \return Visual type.
+      public: Visual::VisualType GetType() const;
 
-      /// \brief Parent visual.
-      protected: VisualPtr parent;
+      /// \brief Set type of visual.
+      /// \param[in] _type Visual type.
+      public: void SetType(const Visual::VisualType _type);
+
+      /// \brief Get whether this visual uses RT shader system.
+      /// \return True if RT shader is used.
+      public: bool UseRTShader() const;
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type A msgs::Visual::Type enum.
+      /// \return VisualType enum.
+      public: static Visual::VisualType ConvertVisualType(
+          const msgs::Visual::Type &_type);
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type VisualType enum.
+      /// \return A msgs::Visual::Type enum.
+      public: static msgs::Visual::Type ConvertVisualType(
+          const Visual::VisualType &_type);
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _parent Parent of the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      protected: Visual(VisualPrivate &_dataPtr,
+                        const std::string &_name, VisualPtr _parent,
+                        bool _useRTShader = true);
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      protected: Visual(VisualPrivate &_dataPtr,
+                        const std::string &_name, ScenePtr _scene,
+                        bool _useRTShader = true);
+
+      /// \brief Helper function for initializing the visual with a scene as
+      /// its parent.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      private: void Init(const std::string &_name, ScenePtr _scene,
+          bool _useRTShader);
+
+      /// \brief Helper function for initializing the visual with a visual as
+      /// its parent.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      private: void Init(const std::string &_name, VisualPtr _parent,
+          bool _useRTShader);
+
+      /// \brief Load all plugins
+      /// Load all plugins specified in the SDF for the model.
+      private: void LoadPlugins();
+
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
+
+      /// \brief Helper function to get the bounding box for a visual.
+      /// \param[in] _node Pointer to the Ogre Node to process.
+      /// \param[in] _box Current bounding box information.
+      private: void GetBoundsHelper(Ogre::SceneNode *_node,
+                                    math::Box &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted
@@ -492,66 +684,18 @@ namespace gazebo
       private: void DestroyAllAttachedMovableObjects(
                    Ogre::SceneNode *_sceneNode);
 
-      /// \brief The SDF element for the visual.
-      private: sdf::ElementPtr sdf;
+      /// \brief Helper function to update the geometry object size based on
+      /// the scale of the visual.
+      /// \param[in] _scale Scale of visual
+      private: void UpdateGeomSize(const ignition::math::Vector3d &_scale);
 
-      /// \brief The unique name for the visual's material.
-      private: std::string myMaterialName;
+      /// \brief Helper function to update the transparency of the visual
+      /// \param[in] _cascade True to update the children's transparency too.
+      private: void UpdateTransparency(const bool _cascade = true);
 
-      /// \brief The original name for the visual's material.
-      private: std::string origMaterialName;
-
-      /// \brief Transparency value.
-      private: float transparency;
-
-      /// \brief True if the visual is static, which allows Ogre to improve
-      /// performance.
-      private: bool isStatic;
-
-      /// \brief Pointer to the static geometry.
-      private: Ogre::StaticGeometry *staticGeom;
-
-      /// \brief True if rendered.
-      private: bool visible;
-
-      /// \brief The ribbon train created by the visual.
-      private: Ogre::RibbonTrail *ribbonTrail;
-
-      /// \brief The visual's skeleton, used only for person simulation.
-      private: Ogre::SkeletonInstance *skeleton;
-
-      /// \brief Connection for the pre render event.
-      private: event::ConnectionPtr preRenderConnection;
-
-      /// \brief List of all the lines created
-      private: std::list<DynamicLines*> lines;
-
-      /// \brief Lines and their vertices connected to this visual.
-      private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
-
-      /// \brief Name of the visual.
-      private: std::string name;
-
-      /// \brief Children visuals.
-      private: std::vector<VisualPtr> children;
-
-      /// \brief Used to animate the visual.
-      private: Ogre::AnimationState *animState;
-
-      /// \brief Time of the previous animation step.
-      private: common::Time prevAnimTime;
-
-      /// \brief Callback for the animation complete event.
-      private: boost::function<void()> onAnimationComplete;
-
-      /// \brief True to use RT shader system
-      private: bool useRTShader;
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief A wire frame bounding box.
-      private: WireBox *boundingBox;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: VisualPrivate *dataPtr;
     };
     /// \}
   }

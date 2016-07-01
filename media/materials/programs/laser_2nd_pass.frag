@@ -7,12 +7,12 @@ varying float tex;
 
 void main()
 {
-  if ((gl_TexCoord[0].s < 0) || (gl_TexCoord[0].s > 1) || 
-      (gl_TexCoord[0].t < 0) || (gl_TexCoord[0].t > 1))
+  if ((gl_TexCoord[0].s < 0.0) || (gl_TexCoord[0].s > 1.0) || 
+      (gl_TexCoord[0].t < 0.0) || (gl_TexCoord[0].t > 1.0))
     gl_FragColor = vec4(1,1,1,1);
   else
   {
-    int int_tex = int(tex*1000);
+    int int_tex = int(tex * 1000.0);
     if (int_tex == 0)
       //gl_FragColor=vec4(1,0,0,1);
       gl_FragColor = texture2D( tex1, gl_TexCoord[0].st);

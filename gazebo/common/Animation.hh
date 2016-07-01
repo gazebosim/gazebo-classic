@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,19 @@
 
 #include <string>
 #include <vector>
+#include "gazebo/util/system.hh"
 
-namespace gazebo
+namespace ignition
 {
   namespace math
   {
     class Spline;
     class RotationSpline;
   }
+}
 
+namespace gazebo
+{
   /// \ingroup gazebo_common
   /// \brief Common namespace
 
@@ -43,7 +47,7 @@ namespace gazebo
     /// \class Animation Animation.hh common/common.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
-    class Animation
+    class GZ_COMMON_VISIBLE Animation
     {
       /// \brief Constructor
       /// \param[in] _name Name of the animation, should be unique
@@ -80,7 +84,7 @@ namespace gazebo
 
       /// \brief Get a key frame using an index value
       /// \param[in] _index The index of the key frame
-      /// \return A pointer the keyframe, NULL if the _index is invalid
+      /// \return A pointer the keyframe, nullptr if the _index is invalid
       public: KeyFrame* GetKeyFrame(unsigned int _index) const;
 
       /// \brief Get the two key frames that bound a time value
@@ -121,7 +125,7 @@ namespace gazebo
     /// \{
 
     /// \brief A pose animation.
-    class PoseAnimation : public Animation
+    class GZ_COMMON_VISIBLE PoseAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -152,10 +156,10 @@ namespace gazebo
       protected: void BuildInterpolationSplines() const;
 
       /// \brief smooth interpolation for position
-      private: mutable math::Spline *positionSpline;
+      private: mutable ignition::math::Spline *positionSpline;
 
       /// \brief smooth interpolation for rotation
-      private: mutable math::RotationSpline *rotationSpline;
+      private: mutable ignition::math::RotationSpline *rotationSpline;
     };
     /// \}
 
@@ -163,7 +167,7 @@ namespace gazebo
     /// \{
 
     /// \brief A numeric animation.
-    class NumericAnimation : public Animation
+    class GZ_COMMON_VISIBLE NumericAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.

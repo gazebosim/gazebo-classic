@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,25 @@
 #ifndef _ODEBOXSHAPE_HH_
 #define _ODEBOXSHAPE_HH_
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/BoxShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE Box shape
-    class ODEBoxShape : public BoxShape
+    class GZ_PHYSICS_VISIBLE ODEBoxShape : public BoxShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -50,13 +54,14 @@ namespace gazebo
         oParent = boost::dynamic_pointer_cast<ODECollision>(
             this->collisionParent);
 
-        if (oParent->GetCollisionId() == NULL)
+        if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
         else
           dGeomBoxSetLengths(oParent->GetCollisionId(),
                              _size.x, _size.y, _size.z);
       }
     };
+    /// \}
   }
 }
 #endif

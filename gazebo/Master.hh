@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +24,33 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
-#include "msgs/msgs.hh"
-#include "transport/Connection.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Connection.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  // Forward declare private data class
+  struct MasterPrivate;
+
   /// \class Master Master.hh gazebo_core.hh
-  /// \brief A ROS Master-like manager that directs gztopic connections, enables
-  ///        each gazebo network client to locate one another for peer-to-peer
-  ///        communication.
-  class Master
+  /// \brief A manager that directs topic connections, enables each gazebo
+  /// network client to locate one another for peer-to-peer communication.
+  class GAZEBO_VISIBLE Master
   {
     /// \def Map of unique id's to connections.
-    typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
+    public: typedef
+        std::map<unsigned int, transport::ConnectionPtr> Connection_M;
 
+    /// \def Map of publish messages to connections.
+    public: typedef
+        std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
+        PubList;
+
+    /// \def Map of subscribe messages to connections.
+    public: typedef
+        std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
+        SubList;
 
     /// \brief Constructor
     public: Master();
@@ -80,7 +93,7 @@ namespace gazebo
 
     /// \brief Accept a new connection
     /// \param[in] _newConnection The new connection
-    private: void OnAccept(const transport::ConnectionPtr &_newConnection);
+    private: void OnAccept(transport::ConnectionPtr _newConnection);
 
     /// \brief Get a publisher for the given topic
     /// \param[in] _topic Name of the topic
@@ -93,7 +106,6 @@ namespace gazebo
     /// \return The found connection, or NULL
     private: transport::ConnectionPtr FindConnection(const std::string &_host,
                                                      uint16_t _port);
-
 
     /// \brief Remove a connection.
     /// \param[in] _connIter Iterator to the connection to remove.
@@ -110,43 +122,9 @@ namespace gazebo
     /// remove a subscriber.
     private: void RemoveSubscriber(const msgs::Subscribe _sub);
 
-    /// \def Map of publish messages to connections.
-    typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
-      PubList;
-
-    /// \def Map of subscribe messages to connections.
-    typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
-      SubList;
-
-    /// \brief All the known publishers.
-    private: PubList publishers;
-
-    /// \brief All the known subscribers.
-    private: SubList subscribers;
-
-    /// \brief All the known connections.
-    private: Connection_M connections;
-
-    /// \brief All th worlds.
-    private: std::list<std::string> worldNames;
-
-    /// \brief Incoming messages.
-    private: std::list<std::pair<unsigned int, std::string> > msgs;
-
-    /// \brief Our server connection.
-    private: transport::ConnectionPtr connection;
-
-    /// \brief Thread to run the main loop.
-    private: boost::thread *runThread;
-
-    /// \brief True to stop Master.
-    private: bool stop;
-
-    /// \brief Mutex to protect connections.
-    private: boost::recursive_mutex connectionMutex;
-
-    /// \brief Mutex to protect msg bufferes.
-    private: boost::recursive_mutex msgsMutex;
+    /// \internal
+    /// \brief Pointer to private data.
+    private: std::unique_ptr<MasterPrivate> dataPtr;
   };
 }
 #endif

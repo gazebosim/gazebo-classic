@@ -23,7 +23,7 @@
 #ifndef _ODE_JOINTS_H_
 #define _ODE_JOINTS_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 #include "joint.h"
 
@@ -31,6 +31,9 @@
 #include "hinge.h"
 #include "slider.h"
 #include "screw.h"
+#include "dball.h"
+#include "dhinge.h"
+#include "gearbox.h"
 #include "contact.h"
 #include "universal.h"
 #include "hinge2.h"

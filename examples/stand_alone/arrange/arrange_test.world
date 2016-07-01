@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://table</uri>
+    </include>
+
+    <include>
+      <uri>model://cricket_ball</uri>
+      <pose> 0.6 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_block_10_2_1cm</uri>
+      <pose> 0.4 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_10cm</uri>
+      <pose> 0.2 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_7_5cm</uri>
+      <pose> 0.0 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_5cm</uri>
+      <pose>-0.2 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_2_5cm</uri>
+      <pose>-0.4 250 1.015 0 0 0</pose>
+    </include>
+
+    <plugin name="arrange_plugin" filename="libArrangePlugin.so">
+      <model_name>cricket_ball</model_name>
+      <model_name>wood_block_10_2_1cm</model_name>
+      <model_name>wood_cube_10cm</model_name>
+      <model_name>wood_cube_7_5cm</model_name>
+      <model_name>wood_cube_5cm</model_name>
+      <model_name>wood_cube_2_5cm</model_name>
+      <initial_arrangement>wood_blocks_stack</initial_arrangement>
+      <topic_name>~/arrange</topic_name>
+      <arrangement name="default">
+        <pose model="cricket_ball"       > 0.6 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_block_10_2_1cm"> 0.4 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_10cm"     > 0.2 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_7_5cm"    > 0.0 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_5cm"      >-0.2 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_2_5cm"    >-0.4 -0.25 1.015 0 0 0</pose>
+      </arrangement>
+      <arrangement name="cricket_ball">
+        <pose model="cricket_ball"       > 0.6 -0.25 1.015 0 0 0</pose>
+      </arrangement>
+      <arrangement name="wood_blocks">
+        <pose model="wood_block_10_2_1cm"> 0.4 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_10cm"     > 0.2 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_7_5cm"    > 0.0 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_5cm"      >-0.2 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_2_5cm"    >-0.4 -0.25 1.015 0 0 0</pose>
+      </arrangement>
+      <arrangement name="wood_blocks_stack">
+        <pose model="wood_cube_10cm"     > 0.2 -0.25 1.015 0 0 0</pose>
+        <pose model="wood_cube_7_5cm"    > 0.2 -0.25 1.115 0 0 0</pose>
+        <pose model="wood_cube_5cm"      > 0.2 -0.25 1.215 0 0 0</pose>
+        <pose model="wood_cube_2_5cm"    > 0.2 -0.25 1.315 0 0 0</pose>
+        <pose model="wood_block_10_2_1cm"> 0.2 -0.25 1.415 0 0 0</pose>
+      </arrangement>
+    </plugin>
+  </world>
+</sdf>

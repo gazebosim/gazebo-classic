@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,23 @@
  * Date: 14 Oct 2009
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
 #include <list>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/sdf.hh"
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/math/Helpers.hh"
-
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Event.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -41,6 +44,7 @@
 using namespace gazebo;
 using namespace physics;
 
+//////////////////////////////////////////////////
 RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   : Shape(CollisionPtr())
 {
@@ -127,6 +131,17 @@ void RayShape::SetLength(double _len)
 }
 
 //////////////////////////////////////////////////
+void RayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  /// TODO RayShape::SetScale not yet implemented.
+}
+
+//////////////////////////////////////////////////
 double RayShape::GetLength() const
 {
   return this->contactLen;
@@ -169,4 +184,34 @@ void RayShape::FillMsg(msgs::Geometry &/*_msg*/)
 //////////////////////////////////////////////////
 void RayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 {
+}
+
+//////////////////////////////////////////////////
+double RayShape::ComputeVolume() const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d RayShape::Start() const
+{
+  return this->relativeStartPos.Ign();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d RayShape::End() const
+{
+  return this->relativeEndPos.Ign();
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetCollisionName(const std::string &_name)
+{
+  this->collisionName = _name;
+}
+
+//////////////////////////////////////////////////
+std::string RayShape::CollisionName() const
+{
+  return this->collisionName;
 }

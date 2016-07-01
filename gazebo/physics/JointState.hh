@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,18 @@
 #ifndef _JOINTSTATE_HH_
 #define _JOINTSTATE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
 #include <string>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,10 +43,18 @@ namespace gazebo
 
     /// \class JointState JointState.hh physics/physics.hh
     /// \brief keeps track of state of a physics::Joint
-    class JointState : public State
+    class GZ_PHYSICS_VISIBLE JointState : public State
     {
       /// \brief Default constructor.
       public: JointState();
+
+      /// \brief Constructor.
+      /// \param[in] _joint Joint to get the state of.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
+      public: JointState(JointPtr _joint, const common::Time &_realTime,
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
       /// \param[in] _joint Joint to get the state of.
@@ -53,6 +68,13 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~JointState();
+
+      /// \brief Load.
+      /// \param[in] _joint Joint to get the state of.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      public: void Load(JointPtr _joint, const common::Time &_realTime,
+                  const common::Time &_simTime);
 
       /// \brief Load state from SDF element.
       /// \param[in] _elem SDf values to load from.
@@ -99,19 +121,19 @@ namespace gazebo
       /// \param[in] _out output stream.
       /// \param[in] _state Joint state to output.
       /// \return The stream.
-      public: friend std::ostream &operator<<(std::ostream &_out,
-                                     const gazebo::physics::JointState &_state)
+      public: inline friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::JointState &_state)
       {
-        _out << "    <joint name='" << _state.GetName() << "'>\n";
+        _out << "<joint name='" << _state.GetName() << "'>";
 
         int i = 0;
         for (std::vector<math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
-          _out << "      <angle axis='" << i << "'>" << (*iter) << "</angle>\n";
+          _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
         }
 
-        _out << "    </joint>\n";
+        _out << "</joint>";
 
         return _out;
       }

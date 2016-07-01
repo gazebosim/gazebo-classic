@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,11 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,10 +42,11 @@ namespace gazebo
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \brief Bullet physics engine wrapper
     /// \{
 
     /// \brief Bullet physics engine
-    class BulletPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE BulletPhysics : public PhysicsEngine
     {
       /// \enum BulletParam
       /// \brief Bullet physics parameter types.
@@ -156,23 +158,19 @@ namespace gazebo
 
       public: virtual void DebugPrint() const;
 
-      /// \brief Set a parameter of the bullet physics engine
-      /// \param[in] _param A parameter listed in the BulletParam enum
-      /// \param[in] _value The value to set to
-      public: virtual void SetParam(BulletParam _param,
-                  const boost::any &_value);
-
       /// Documentation inherited
-      public: virtual void SetParam(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
-      /// \brief Get an parameter of the physics engine
-      /// \param[in] _param A parameter listed in the BulletParam enum
-      /// \return The value of the parameter
-      public: virtual boost::any GetParam(BulletParam _param) const;
+      /// Documentation inherited
+      public: virtual bool GetParam(const std::string &_key,
+          boost::any &_value) const;
+
+      // Documentation inherited
+      public: virtual void SetSORPGSIters(unsigned int iters);
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;

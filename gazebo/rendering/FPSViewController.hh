@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@
 
 #include <string>
 
-#include "rendering/ViewController.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/rendering/ViewController.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +32,7 @@ namespace gazebo
 
     /// \class FPSViewController FPSViewController.hh rendering/rendering.hh
     /// \brief First Person Shooter style view controller
-    class FPSViewController : public ViewController
+    class GZ_RENDERING_VISIBLE FPSViewController : public ViewController
     {
       /// \brief Constructor
       /// \param[in] Camera to controll
@@ -41,6 +43,7 @@ namespace gazebo
 
       /// \brief Initialize the controller
       public: virtual void Init();
+      using ViewController::Init;
 
       /// \brief Update the camera position
       public: virtual void Update();
@@ -57,6 +60,21 @@ namespace gazebo
 
       // Documentation inherited from parent
       public: void HandleKeyPressEvent(const std::string &_key);
+
+      /// \brief The current velocity of the camera.
+      private: math::Pose velocity;
+
+      /// \brief Translation velocity factor along the x-axis
+      private: float xVelocityFactor;
+
+      /// \brief Translation velocity factor along the y-axis
+      private: float yVelocityFactor;
+
+      /// \brief Translation velocity along the x-axis
+      private: math::Vector3 xVelocity;
+
+      /// \brief Translation velocity along the y-axis
+      private: math::Vector3 yVelocity;
     };
     /// \}
   }

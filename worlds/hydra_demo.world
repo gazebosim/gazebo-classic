@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Load the plugin for Razer Hydra -->
+    <plugin name="hydra" filename="libHydraPlugin.so"></plugin>
+
+    <!-- A sphere controlled by Hydra-->
+    <model name="sphere">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+
+      <!-- Load a plugin to control the sphere with Hydra -->
+      <plugin name='sphere_ctroller' filename='libHydraDemoPlugin.so'></plugin>
+
+    </model>
+
+</world>
+</sdf>

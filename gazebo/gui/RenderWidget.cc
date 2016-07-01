@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,28 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/bind.hpp>
 #include <iomanip>
 
-#include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/common/CommonIface.hh"
+
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/building/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -36,10 +45,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("renderWidget");
-  this->show();
-
-  this->clear = false;
-  this->create = false;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -48,156 +53,49 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  QFrame *toolFrame = new QFrame;
-  toolFrame->setObjectName("toolFrame");
-  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  // Top toolbar
+  this->topToolbar = new TopToolbar();
 
-  QToolBar *toolbar = new QToolBar;
-  QHBoxLayout *toolLayout = new QHBoxLayout;
-  toolLayout->setContentsMargins(0, 0, 0, 0);
-
-  QActionGroup *actionGroup = new QActionGroup(toolFrame);
-  actionGroup->addAction(g_arrowAct);
-  actionGroup->addAction(g_translateAct);
-  actionGroup->addAction(g_rotateAct);
-
-  toolbar->addAction(g_arrowAct);
-  toolbar->addAction(g_translateAct);
-  toolbar->addAction(g_rotateAct);
-
-  toolbar->addSeparator();
-  toolbar->addAction(g_boxCreateAct);
-  toolbar->addAction(g_sphereCreateAct);
-  toolbar->addAction(g_cylinderCreateAct);
-  toolbar->addSeparator();
-  toolbar->addAction(g_pointLghtCreateAct);
-  toolbar->addAction(g_spotLghtCreateAct);
-  toolbar->addAction(g_dirLghtCreateAct);
-  toolbar->addSeparator();
-  toolbar->addAction(g_recordVideoAct);
-
-  toolbar->addAction(g_recordVideoFormatAct);
-
-  toolbar->addSeparator();
-  toolbar->addAction(g_screenshotAct);
-
-  toolLayout->addSpacing(10);
-  toolLayout->addWidget(toolbar);
-  toolFrame->setLayout(toolLayout);
-
+  // GLWigdet
   this->glWidget = new GLWidget(this->mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
-  this->buildingEditorWidget = new BuildingEditorWidget(this);
-  this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Expanding);
-  this->buildingEditorWidget->hide();
-
-  std::string msgStyleSheet =
-      "QLabel { background-color : #303030; color : #d0d0d0; }";
-  this->msgOverlayWidget = new QWidget(this->glWidget);
-  this->msgOverlayWidget->setWindowFlags(Qt::FramelessWindowHint);
-  this->msgOverlayWidget->setContentsMargins(0, 0, 0, 0);
-  this->msgOverlayLabel = new QLabel;
-  this->msgOverlayLabel->setStyleSheet(tr(msgStyleSheet.c_str()));
-
-  QVBoxLayout *msglayout = new QVBoxLayout;
-  msglayout->addWidget(this->msgOverlayLabel);
-  msglayout->setContentsMargins(0, 0, 0, 0);
-  this->msgOverlayWidget->setLayout(msglayout);
-  this->msgOverlayWidget->setVisible(false);
+  this->msgOverlayLabel = new QLabel(this->glWidget);
+  this->msgOverlayLabel->setStyleSheet(
+      "QLabel { background-color : white; color : gray; }");
+  this->msgOverlayLabel->setVisible(false);
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
-  TimePanel *timePanel = new TimePanel(this);
+  this->timePanel = new TimePanel(this);
 
   this->bottomFrame = new QFrame;
   this->bottomFrame->setObjectName("renderBottomFrame");
   this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  QSpinBox *stepSpinBox = new QSpinBox;
-  stepSpinBox->setRange(1, 9999);
-  connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
-      SLOT(OnStepValueChanged(int)));
-
-  QWidget *stepWidget = new QWidget;
-  QLabel *stepLabel = new QLabel(tr("Steps:"));
-  QVBoxLayout *stepLayout = new QVBoxLayout;
-  stepLayout->addWidget(stepLabel);
-  stepLayout->addWidget(stepSpinBox);
-  stepWidget->setLayout(stepLayout);
-
-  QLabel *stepToolBarLabel = new QLabel(tr("Steps:"));
-
-  QMenu *stepMenu = new QMenu;
-  this->stepButton = new QToolButton;
-  this->stepButton->setMaximumSize(35, stepButton->height());
-  QWidgetAction *stepAction = new QWidgetAction(stepMenu);
-  stepAction->setDefaultWidget(stepWidget);
-  stepMenu->addAction(stepAction);
-  this->stepButton->setMenu(stepMenu);
-  this->stepButton->setPopupMode(QToolButton::InstantPopup);
-  this->stepButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-  this->stepButton->setContentsMargins(0, 0, 0, 0);
-  this->OnStepValueChanged(1);
-
-  connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
-      SLOT(hide()));
-
-  QFrame *playFrame = new QFrame;
-  playFrame->setFrameShape(QFrame::NoFrame);
-  playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  playFrame->setFixedHeight(25);
-  QToolBar *playToolbar = new QToolBar;
-  playToolbar->addAction(g_playAct);
-  playToolbar->addAction(g_pauseAct);
-
-  QLabel *emptyLabel = new QLabel(tr("  "));
-  playToolbar->addWidget(emptyLabel);
-  playToolbar->addAction(g_stepAct);
-  playToolbar->addWidget(stepToolBarLabel);
-  playToolbar->addWidget(this->stepButton);
-
-  QHBoxLayout *playControlLayout = new QHBoxLayout;
-  playControlLayout->setContentsMargins(0, 0, 0, 0);
-  playControlLayout->addWidget(playToolbar);
-  playControlLayout->addItem(new QSpacerItem(15, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
-  playFrame->setLayout(playControlLayout);
-
-  bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
-  bottomPanelLayout->addWidget(playFrame, 0);
-  bottomPanelLayout->addWidget(timePanel, 0);
-  bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
+  bottomPanelLayout->addWidget(this->timePanel, 0);
   bottomPanelLayout->setSpacing(0);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   this->bottomFrame->setLayout(bottomPanelLayout);
 
-
   QFrame *render3DFrame = new QFrame;
   render3DFrame->setObjectName("render3DFrame");
   QVBoxLayout *render3DLayout = new QVBoxLayout;
-  render3DLayout->addWidget(toolFrame);
+  render3DLayout->addWidget(this->topToolbar);
   render3DLayout->addWidget(this->glWidget);
   render3DLayout->setContentsMargins(0, 0, 0, 0);
   render3DLayout->setSpacing(0);
   render3DFrame->setLayout(render3DLayout);
 
-  QSplitter *splitter = new QSplitter(this);
-  splitter->addWidget(this->buildingEditorWidget);
-  splitter->addWidget(render3DFrame);
+  this->splitter = new QSplitter(this);
+  this->splitter->addWidget(render3DFrame);
   QList<int> sizes;
   sizes.push_back(300);
-  sizes.push_back(300);
-  splitter->setSizes(sizes);
-  splitter->setStretchFactor(0, 1);
-  splitter->setStretchFactor(1, 1);
-  splitter->setOrientation(Qt::Vertical);
+  this->splitter->setSizes(sizes);
+  this->splitter->setStretchFactor(0, 1);
+  this->splitter->setOrientation(Qt::Vertical);
 
-  frameLayout->addWidget(splitter);
+  frameLayout->addWidget(this->splitter);
   frameLayout->addWidget(this->bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
@@ -210,143 +108,134 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->timer = new QTimer(this);
-  connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  this->timer->start(44);
+  this->connections.push_back(
+      gui::Events::ConnectFollow(
+        boost::bind(&RenderWidget::OnFollow, this, _1)));
 
-  this->msgDisplayTimer = new QTimer(this);
-  this->msgDisplayTimer->setSingleShot(true);
-  connect(this->msgDisplayTimer, SIGNAL(timeout()), this,
-      SLOT(OnClearOverlayMsg()));
+  // Load all GUI Plugins
+  std::string filenames = getINIProperty<std::string>(
+      "overlay_plugins.filenames", "");
+
+  // Split the colon separated libraries
+  auto pluginFilenames = common::split(filenames, ":");
+
+  // Load each plugin
+  for (std::vector<std::string>::iterator iter = pluginFilenames.begin();
+       iter != pluginFilenames.end(); ++iter)
+  {
+    // Make sure the string is not empty
+    if (!(*iter).empty())
+    {
+      // Try to create the plugin
+      gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(*iter, *iter);
+
+      if (!plugin)
+      {
+        gzerr << "Unable to create gui overlay plugin with filename["
+          << *iter << "]\n";
+      }
+      else
+      {
+        gzlog << "Loaded GUI plugin[" << *iter << "]\n";
+
+        // Set the plugin's parent and store the plugin
+        plugin->setParent(this->glWidget);
+        this->plugins.push_back(plugin);
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
+  this->glWidget = NULL;
+
+  delete this->topToolbar;
+  this->topToolbar = NULL;
+
+  // we created the scene here we are responsible for removing it.
+  rendering::remove_scene(gui::get_world());
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::update()
+void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
 {
-  if (this->clear)
+  if (static_cast<int>(_index) <= this->splitter->count())
   {
-    rendering::remove_scene(this->clearName);
-    this->clear = false;
-    return;
-  }
-  else if (this->create)
-  {
-    rendering::create_scene(this->createName, true);
-    this->create = false;
-    return;
-  }
+    // set equal size for now. There should always be at least one widget
+    // (render3DFrame) in the splitter.
+    int childCount = this->splitter->count();
+    GZ_ASSERT(childCount > 0,
+        "RenderWidget splitter has no child widget");
 
-  rendering::UserCameraPtr cam = this->glWidget->GetCamera();
+    QSize widgetSize = this->size();
+    int newSize = widgetSize.height() / (this->splitter->count()+1);
+    QList<int> newSizes;
+    for (int i = 0; i < childCount+1; ++i)
+      newSizes.append(newSize);
 
-  if (!cam || !cam->GetInitialized())
-  {
-    event::Events::preRender();
-    return;
-  }
-
-  // float fps = cam->GetAvgFPS();
-  // int triangleCount = cam->GetTriangleCount();
-  // math::Pose pose = cam->GetWorldPose();
-
-  // std::ostringstream stream;
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.x;
-  // this->xPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.y;
-  // this->yPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.z;
-  // this->zPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().x);
-  // this->rollEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().y);
-  // this->pitchEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().z);
-  // this->yawEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  /*stream << std::fixed << std::setprecision(1) << fps;
-  this->fpsEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
-
-  stream << std::fixed << std::setprecision(2) << triangleCount;
-  this->trianglesEdit->setText(tr(stream.str().c_str()));
-  */
-
-  this->glWidget->update();
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::ShowEditor(bool _show)
-{
-  if (_show)
-  {
-    this->buildingEditorWidget->show();
-    this->baseOverlayMsg = "[Building is View Only]";
-    this->OnClearOverlayMsg();
-    this->bottomFrame->hide();
+    this->splitter->insertWidget(_index, _widget);
+    this->splitter->setSizes(newSizes);
+    this->splitter->setStretchFactor(_index, 1);
   }
   else
-  {
-    this->buildingEditorWidget->hide();
-    this->baseOverlayMsg = "";
-    this->OnClearOverlayMsg();
+    gzerr << "Unable to add widget, index out of range " << std::endl;
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::ShowTimePanel(bool _show)
+{
+  if (_show)
     this->bottomFrame->show();
-  }
+  else
+    this->bottomFrame->hide();
+}
+
+/////////////////////////////////////////////////
+TimePanel *RenderWidget::GetTimePanel() const
+{
+  return this->timePanel;
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::RemoveScene(const std::string &_name)
 {
-  this->clear = true;
-  this->clearName = _name;
+  rendering::remove_scene(_name);
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::CreateScene(const std::string &_name)
 {
-  this->create = true;
-  this->createName = _name;
+  rendering::create_scene(_name, true);
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 {
-  std::string msg = _msg.empty() ? this->baseOverlayMsg
-      : this->baseOverlayMsg + " " + _msg;
+  std::string msg = this->baseOverlayMsg.empty() ? _msg
+      : this->baseOverlayMsg + "\n" + _msg;
   this->msgOverlayLabel->setText(tr(msg.c_str()));
   if (msg.empty())
   {
-    this->msgOverlayWidget->setVisible(false);
+    this->msgOverlayLabel->setVisible(false);
     return;
   }
-  this->msgOverlayWidget->resize(
+  this->msgOverlayLabel->resize(
       this->msgOverlayLabel->fontMetrics().width(tr(msg.c_str())),
       this->msgOverlayLabel->fontMetrics().height());
-    this->msgOverlayWidget->setVisible(true);
+  this->msgOverlayLabel->setVisible(true);
 
   if (_duration > 0)
-  {
-    this->msgDisplayTimer->start(_duration);
-  }
+    QTimer::singleShot(_duration, this, SLOT(OnClearOverlayMsg()));
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::SetOverlaysVisible(const bool _visible)
+{
+  for (auto const &plugin : this->plugins)
+    plugin->setVisible(_visible);
 }
 
 /////////////////////////////////////////////////
@@ -356,21 +245,57 @@ std::string RenderWidget::GetOverlayMsg() const
 }
 
 /////////////////////////////////////////////////
+void RenderWidget::ShowToolbar(const bool _show)
+{
+  if (this->topToolbar)
+  {
+    if (_show)
+    {
+      this->topToolbar->show();
+    }
+    else
+    {
+      this->topToolbar->hide();
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+TopToolbar *RenderWidget::GetToolbar() const
+{
+  return this->topToolbar;
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::OnClearOverlayMsg()
 {
   this->DisplayOverlayMsg("");
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnStepValueChanged(int _value)
+void RenderWidget::OnFollow(const std::string &_modelName)
 {
-  // text formating and resizing for better presentation
-  std::string numStr = QString::number(_value).toStdString();
-  QFont stepFont = this->stepButton->font();
-  stepFont.setPointSizeF(11 - numStr.size()/2.0);
-  this->stepButton->setFont(stepFont);
-  numStr.insert(numStr.end(), 4 - numStr.size(), ' ');
-  this->stepButton->setText(tr(numStr.c_str()));
+  if (_modelName.empty())
+  {
+    g_translateAct->setEnabled(true);
+    g_rotateAct->setEnabled(true);
+  }
+  else
+  {
+    g_translateAct->setEnabled(false);
+    g_rotateAct->setEnabled(false);
+  }
+}
 
-  emit gui::Events::inputStepSize(_value);
+/////////////////////////////////////////////////
+void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
+{
+  // Set the plugin's parent and store the plugin
+  _plugin->setParent(this->glWidget);
+  this->plugins.push_back(_plugin);
+
+  // Load the plugin.
+  _plugin->Load(_elem);
+
+  _plugin->show();
 }

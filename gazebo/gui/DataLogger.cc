@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,200 +15,197 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  // For _access()
+  #include <io.h>
+#endif
+
 #include <boost/filesystem.hpp>
 #include <stdio.h>
 
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/DataLoggerPrivate.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
-#include "gazebo/gui/DataLogger.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 DataLogger::DataLogger(QWidget *_parent)
-  : QDialog(_parent)
+  : QDialog(_parent),
+    dataPtr(new DataLoggerPrivate())
 {
+  this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
   // This name is used in the qt style sheet
   this->setObjectName("dataLogger");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Data Logger"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // The record button allows the user to start and pause data recording
-  this->recordButton = new QToolButton(this);
-  this->recordButton->setIcon(QPixmap(":/images/record.png"));
-  this->recordButton->setStatusTip(tr("Record a log file"));
-  this->recordButton->setCheckable(true);
-  this->recordButton->setChecked(false);
-  this->recordButton->setIconSize(QSize(30, 30));
-  this->recordButton->setObjectName("dataLoggerRecordButton");
-  connect(this->recordButton, SIGNAL(toggled(bool)),
+  this->dataPtr->recordButton = new QToolButton(this);
+  this->dataPtr->recordButton->setIcon(QPixmap(":/images/record.png"));
+  this->dataPtr->recordButton->setStatusTip(tr("Record a log file"));
+  this->dataPtr->recordButton->setCheckable(true);
+  this->dataPtr->recordButton->setChecked(false);
+  this->dataPtr->recordButton->setIconSize(QSize(30, 30));
+  this->dataPtr->recordButton->setObjectName("dataLoggerRecordButton");
+  connect(this->dataPtr->recordButton, SIGNAL(toggled(bool)),
           this, SLOT(OnRecord(bool)));
 
-  // Create the status frame, which contains the duration label, size
-  // label, and a one word text message.
-  // {
-  QFrame *statusFrame = new QFrame;
-  statusFrame->setFixedWidth(240);
-  statusFrame->setObjectName("dataLoggerStatusFrame");
-
   // Textual status information
-  this->statusLabel = new QLabel("Ready");
-  this->statusLabel->setObjectName("dataLoggerStatusLabel");
-  this->statusLabel->setFixedWidth(70);
+  this->dataPtr->statusLabel = new QLabel("Ready");
+  this->dataPtr->statusLabel->setObjectName("dataLoggerStatusLabel");
+  this->dataPtr->statusLabel->setStyleSheet(
+      "QLabel{padding-left: 14px; padding-top: 9px}");
 
   // Duration of logging
-  this->timeLabel = new QLabel("00:00:00.000");
-  this->timeLabel->setObjectName("dataLoggerTimeLabel");
-  this->timeLabel->setFixedWidth(90);
+  this->dataPtr->timeLabel = new QLabel("00:00:00.000");
+  this->dataPtr->timeLabel->setObjectName("dataLoggerTimeLabel");
+  this->dataPtr->timeLabel->setFixedWidth(90);
 
   // Size of log file
-  this->sizeLabel = new QLabel("0.00 B");
-  this->sizeLabel->setObjectName("dataLoggerSizeLabel");
+  this->dataPtr->sizeLabel = new QLabel("(0.00 B)");
+  this->dataPtr->sizeLabel->setObjectName("dataLoggerSizeLabel");
 
-  QHBoxLayout *timeLayout = new QHBoxLayout;
-  timeLayout->addStretch(1);
-  timeLayout->addWidget(this->statusLabel);
-  timeLayout->addSpacing(5);
-  timeLayout->addWidget(this->timeLabel);
+  // Horizontal separator
+  QFrame *separator = new QFrame();
+  separator->setFrameShape(QFrame::HLine);
+  separator->setLineWidth(1);
+  separator->setFixedHeight(30);
 
-  QHBoxLayout *sizeLayout = new QHBoxLayout;
-  sizeLayout->addStretch(1);
-  sizeLayout->addWidget(this->sizeLabel);
-
-  QVBoxLayout *statusFrameLayout = new QVBoxLayout;
-  statusFrameLayout->addLayout(timeLayout);
-  statusFrameLayout->addLayout(sizeLayout);
-
-  statusFrame->setLayout(statusFrameLayout);
-  // }
-
-  // Create the settings frame, where the user can input a save-to location
-  // {
-  QFrame *settingsMasterFrame = new QFrame;
-  settingsMasterFrame->setObjectName("dataLoggerSettingFrame");
-
-  this->logList = new QTextBrowser(this);
-  this->logList->setObjectName("dataLoggerRecordingsList");
-
-  QVBoxLayout *logListLayout = new QVBoxLayout;
-  logListLayout->addWidget(this->logList);
-
-  /*QHBoxLayout *filenameLayout = new QHBoxLayout;
-  this->filenameEdit = new QLineEdit;
-  this->filenameEdit->setText("~/.gazebo/log");
-  filenameLayout->addWidget(new QLabel("Save to:"));
-  filenameLayout->addWidget(this->filenameEdit);
-
-  this->browseButton = new QPushButton("Browse");
-  this->browseButton->setFixedHeight(23);
-  this->browseButton->setFocusPolicy(Qt::NoFocus);
-  connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
-
-  filenameLayout->addWidget(browseButton);
-  */
-
-  QHBoxLayout *settingExpandLayout = new QHBoxLayout;
-
-  this->settingExpandButton = new QPushButton("Recordings");
-  this->settingExpandButton->setObjectName("expandButton");
-  this->settingExpandButton->setCheckable(true);
-  this->settingExpandButton->setChecked(false);
-  this->settingExpandButton->setFocusPolicy(Qt::NoFocus);
-  connect(settingExpandButton, SIGNAL(toggled(bool)),
-          this, SLOT(OnToggleSettings(bool)));
-
-  settingExpandLayout->setContentsMargins(0, 0, 0, 0);
-  settingExpandLayout->addWidget(this->settingExpandButton);
-  settingExpandLayout->addStretch(1);
-
-  /// Create the frame that can be hidden by toggling the setting's button
-  this->settingsFrame = new QFrame;
-  QVBoxLayout *settingsLayout = new QVBoxLayout;
-  settingsLayout->setContentsMargins(2, 2, 2, 2);
-  settingsLayout->addLayout(logListLayout);
-  this->settingsFrame->setLayout(settingsLayout);
-  this->settingsFrame->hide();
-
-  QVBoxLayout *settingsMasterFrameLayout = new QVBoxLayout;
-  settingsMasterFrameLayout->setContentsMargins(2, 2, 2, 2);
-
-  settingsMasterFrameLayout->addLayout(settingExpandLayout);
-  settingsMasterFrameLayout->addWidget(this->settingsFrame);
-  settingsMasterFrame->setLayout(settingsMasterFrameLayout);
-  // }
-
-  // Layout to position the record button vertically
-  QVBoxLayout *buttonLayout = new QVBoxLayout;
-  buttonLayout->setContentsMargins(0, 0, 0, 0);
-  buttonLayout->addWidget(this->recordButton);
-  buttonLayout->addStretch(4);
-
-  // Layout to position the status information vertically
-  QVBoxLayout *statusLayout = new QVBoxLayout;
-  statusLayout->setContentsMargins(0, 0, 0, 0);
-  statusLayout->addWidget(statusFrame);
-
-  // Horizontal layout for the record button and status information
-  QHBoxLayout *topLayout = new QHBoxLayout;
-  topLayout->setContentsMargins(0, 0, 0, 0);
-  topLayout->addLayout(buttonLayout);
-  topLayout->addStretch(4);
-  topLayout->addLayout(statusLayout);
-
-  QHBoxLayout *destPathLayout = new QHBoxLayout;
-  this->destPath = new QLineEdit;
-  this->destPath->setReadOnly(true);
-  this->destPath->setObjectName("dataLoggerDestnationPathLabel");
-  this->destPath->setStyleSheet(
-      "QLineEdit {color: #aeaeae; font-size: 11px; "
-      "background-color: transparent;}");
-
-  QLabel *pathLabel = new QLabel("Path: ");
-  pathLabel->setStyleSheet(
-      "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
-
-  destPathLayout->setContentsMargins(0, 0, 0, 0);
-  destPathLayout->addSpacing(4);
-  destPathLayout->addWidget(pathLabel);
-  destPathLayout->addWidget(this->destPath);
-
-  QHBoxLayout *destURILayout = new QHBoxLayout;
-  this->destURI = new QLineEdit;
-  this->destURI->setReadOnly(true);
-  this->destURI->setObjectName("dataLoggerDestnationURILabel");
-  this->destURI->setStyleSheet(
-      "QLineEdit {color: #aeaeae; font-size: 11px; background: transparent}");
+  // Address label
   QLabel *uriLabel = new QLabel("Address: ");
   uriLabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
-  destURILayout->setContentsMargins(0, 0, 0, 0);
-  destURILayout->addSpacing(4);
-  destURILayout->addWidget(uriLabel);
-  destURILayout->addWidget(this->destURI);
+
+  // Address URI Line Edit
+  this->dataPtr->destURI = new QLineEdit;
+  this->dataPtr->destURI->setReadOnly(true);
+  this->dataPtr->destURI->setObjectName("dataLoggerDestnationURILabel");
+  this->dataPtr->destURI->setStyleSheet(
+      "QLineEdit {color: #aeaeae; font-size: 11px; background: transparent}");
+
+  // "Save to" label
+  QLabel *pathLabel = new QLabel("Save to: ");
+  pathLabel->setStyleSheet(
+      "QLabel {\
+         color: #aeaeae;\
+         font-size: 11px;\
+         background: transparent;\
+         padding-top: 4px;\
+       }");
+
+  // Destination path Text Edit
+  this->dataPtr->destPath = new QPlainTextEdit();
+  this->dataPtr->destPath->setObjectName("dataLoggerDestnationPathLabel");
+  this->dataPtr->destPath->setMinimumWidth(200);
+  this->dataPtr->destPath->setMaximumHeight(50);
+  this->dataPtr->destPath->setReadOnly(true);
+  this->dataPtr->destPath->setFrameStyle(QFrame::NoFrame);
+  this->dataPtr->destPath->setLineWrapMode(QPlainTextEdit::WidgetWidth);
+  this->dataPtr->destPath->setWordWrapMode(QTextOption::WrapAnywhere);
+  this->dataPtr->destPath->setStyleSheet(
+      "QPlainTextEdit {\
+         color: #aeaeae;\
+         font-size: 11px;\
+         background: transparent;\
+       }");
+
+  // Browser button
+  QPushButton *browseButton = new QPushButton("Browse");
+  browseButton->setFixedWidth(100);
+  browseButton->setFocusPolicy(Qt::NoFocus);
+  connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
+
+  // Button which toggles recordings
+  QRadioButton *recordingsButton = new QRadioButton();
+  recordingsButton->setChecked(false);
+  recordingsButton->setFocusPolicy(Qt::NoFocus);
+  recordingsButton->setText("Recordings");
+  recordingsButton->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
+  connect(recordingsButton, SIGNAL(toggled(bool)), this,
+      SLOT(OnToggleSettings(bool)));
+
+  // Insert widgets in the top layout
+  QGridLayout *topLayout = new QGridLayout();
+  topLayout->addWidget(this->dataPtr->recordButton, 0, 0, 2, 1);
+  topLayout->addWidget(this->dataPtr->statusLabel, 0, 1, 2, 2);
+  topLayout->addWidget(this->dataPtr->timeLabel, 0, 3);
+  topLayout->addWidget(this->dataPtr->sizeLabel, 1, 3);
+  topLayout->addWidget(separator, 2, 0, 1, 4);
+  topLayout->addWidget(uriLabel, 3, 0);
+  topLayout->addWidget(this->dataPtr->destURI, 3, 1, 1, 3);
+  topLayout->addWidget(pathLabel, 4, 0);
+  topLayout->addWidget(this->dataPtr->destPath, 4, 1, 1, 2);
+  topLayout->addWidget(browseButton, 4, 3);
+  topLayout->addWidget(recordingsButton, 5, 0, 1, 4);
+
+  // Align widgets within layout
+  topLayout->setAlignment(pathLabel, Qt::AlignTop | Qt::AlignRight);
+  topLayout->setAlignment(browseButton, Qt::AlignTop);
+  topLayout->setAlignment(this->dataPtr->statusLabel, Qt::AlignLeft);
+  topLayout->setAlignment(this->dataPtr->timeLabel, Qt::AlignRight);
+  topLayout->setAlignment(this->dataPtr->sizeLabel,
+      Qt::AlignRight | Qt::AlignTop);
+  topLayout->setAlignment(uriLabel, Qt::AlignRight);
+
+  // Put the layout in a widget to be able to control size
+  QWidget *topWidget = new QWidget();
+  topWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  topWidget->setLayout(topLayout);
+
+  // List of recorded logs
+  this->dataPtr->logList = new QTextBrowser(this);
+  this->dataPtr->logList->setObjectName("dataLoggerRecordingsList");
+
+  // Layout to hold the list
+  QVBoxLayout *settingsLayout = new QVBoxLayout;
+  settingsLayout->setContentsMargins(2, 2, 2, 2);
+  settingsLayout->addWidget(this->dataPtr->logList);
+
+  // Frame that can be hidden by toggling the expand button
+  this->dataPtr->settingsFrame = new QFrame();
+  this->dataPtr->settingsFrame->setObjectName("dataLoggerSettingFrame");
+  this->dataPtr->settingsFrame->setLayout(settingsLayout);
+  this->dataPtr->settingsFrame->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  this->dataPtr->settingsFrame->hide();
 
   // Mainlayout for the whole widget
-  // Create the main layout for this widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addLayout(topLayout);
-  mainLayout->addLayout(destURILayout);
-  mainLayout->addLayout(destPathLayout);
-  mainLayout->addWidget(settingsMasterFrame);
-
-  // Let the stylesheet handle the margin sizes
-  mainLayout->setContentsMargins(2, 2, 2, 2);
+  mainLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+  mainLayout->addWidget(topWidget);
+  mainLayout->addWidget(this->dataPtr->settingsFrame);
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
-  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
   // Create a QueuedConnection to set time. This is used for thread safety.
-  connect(this, SIGNAL(SetTime(QString)),
-          this->timeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(SetTime(QString)), this->dataPtr->timeLabel,
+      SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set size. This is used for thread safety.
-  connect(this, SIGNAL(SetSize(QString)),
-          this->sizeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
+  connect(this, SIGNAL(SetSize(QString)), this->dataPtr->sizeLabel,
+      SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Create a QueuedConnection to set destination path.
   // This is used for thread safety.
@@ -220,18 +217,57 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this, SIGNAL(SetDestinationURI(QString)),
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
+  connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+
+  // Timer used to blink the status label
+  this->dataPtr->statusTimer = new QTimer();
+  connect(this->dataPtr->statusTimer,
+      SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
+  this->dataPtr->statusTime = 0;
+
+  // Timer used to hide the confirmation dialog
+  this->dataPtr->confirmationDialog = NULL;
+  this->dataPtr->confirmationTimer = new QTimer(this);
+  connect(this->dataPtr->confirmationTimer, SIGNAL(timeout()), this,
+      SLOT(OnConfirmationTimeout()));
+
   // Create a node from communication.
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 
   // Advertise on the log control topic. The server listens to log control
   // messages.
-  this->pub = this->node->Advertise<msgs::LogControl>("~/log/control");
+  this->dataPtr->pub =
+      this->dataPtr->node->Advertise<msgs::LogControl>("~/log/control");
 
   // Subscribe to the log status topic. The server publishes log status
   // messages.
-  this->sub = this->node->Subscribe<msgs::LogStatus>("~/log/status",
-      &DataLogger::OnStatus, this);
+  this->dataPtr->sub = this->dataPtr->node->Subscribe<msgs::LogStatus>(
+      "~/log/status",  &DataLogger::OnStatus, this);
+
+  // Fill the path with the home folder - duplicated from util/LogRecord
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+
+  GZ_ASSERT(homePath, "HOME environment variable is missing");
+
+  if (!homePath)
+  {
+    common::SystemPaths *paths = common::SystemPaths::Instance();
+    this->dataPtr->basePath =
+        QString::fromStdString(paths->TmpPath() + "/gazebo");
+  }
+  else
+  {
+    this->dataPtr->basePath =
+        QString::fromStdString(boost::filesystem::path(homePath).string());
+  }
+
+  this->dataPtr->basePath = this->dataPtr->basePath + "/.gazebo/log/";
+  this->SetDestinationPath(this->dataPtr->basePath);
 }
 
 /////////////////////////////////////////////////
@@ -246,29 +282,65 @@ void DataLogger::OnRecord(bool _toggle)
   if (_toggle)
   {
     // Switch the icon
-    this->recordButton->setIcon(QPixmap(":/images/record_stop.png"));
+    this->dataPtr->recordButton->setIcon(QPixmap(":/images/record_stop.png"));
 
-    this->statusLabel->setText("Recording");
+    this->dataPtr->statusLabel->setText("Recording...");
+    this->dataPtr->statusTimer->start(100);
 
     // Tell the server to start data logging
     msgs::LogControl msg;
     msg.set_start(true);
-    this->pub->Publish(msg);
+    this->dataPtr->pub->Publish(msg);
   }
   // Otherwise pause data logging
   else
   {
     // Switch the icon
-    this->recordButton->setIcon(QPixmap(":/images/record.png"));
+    this->dataPtr->recordButton->setIcon(QPixmap(":/images/record.png"));
 
-    this->statusLabel->setText("Ready");
+    // Display confirmation
+    this->dataPtr->confirmationTimer->start(2000);
+    QLabel *confirmationLabel = new QLabel("Saved to \n" +
+        this->dataPtr->destPath->toPlainText());
+    confirmationLabel->setObjectName("dataLoggerConfirmationLabel");
+    QHBoxLayout *confirmationLayout = new QHBoxLayout();
+    confirmationLayout->addWidget(confirmationLabel);
+
+    if (this->dataPtr->confirmationDialog)
+      this->dataPtr->confirmationDialog->close();
+    this->dataPtr->confirmationDialog =
+        new QDialog(this, Qt::FramelessWindowHint);
+    this->dataPtr->confirmationDialog->setObjectName(
+        "dataLoggerConfirmationDialog");
+    this->dataPtr->confirmationDialog->setLayout(confirmationLayout);
+    this->dataPtr->confirmationDialog->setStyleSheet(
+        "QDialog {background-color: #eee}\
+         QLabel {color: #111}");
+    this->dataPtr->confirmationDialog->setModal(false);
+    this->dataPtr->confirmationDialog->show();
+    this->dataPtr->confirmationDialog->move(this->mapToGlobal(
+        QPoint((this->width()-this->dataPtr->confirmationDialog->width())*0.5,
+        this->height() + 10)));
+
+    // Change the status
+    this->dataPtr->statusLabel->setText("Ready");
+    this->dataPtr->statusLabel->setStyleSheet(
+        "QLabel {\
+           color: #aeaeae;\
+           padding-left: 14px;\
+           padding-top: 9px;\
+         }");
+    this->dataPtr->statusTimer->stop();
+
+    // Change the Save to box
+    this->SetDestinationPath(this->dataPtr->basePath);
 
     // Tell the server to stop data logging
     msgs::LogControl msg;
     msg.set_stop(true);
-    this->pub->Publish(msg);
+    this->dataPtr->pub->Publish(msg);
 
-    this->logList->append(this->destPath->text());
+    this->dataPtr->logList->append(this->dataPtr->destPath->toPlainText());
   }
 }
 
@@ -300,18 +372,18 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
   // If there is log file information in the message...
   if (_msg->has_log_file())
   {
-    // If there is file name information...
-    if (_msg->log_file().has_base_path())
+    // If there is file name information and we're recording...
+    if (_msg->log_file().has_base_path() &&
+        this->dataPtr->recordButton->isChecked())
     {
-      std::string basePath = _msg->log_file().base_path();
+      std::string logBasePath = _msg->log_file().base_path();
 
-      // Display the leaf log filename
-      if (_msg->log_file().has_full_path() && !basePath.empty())
+      // Display the log path
+      if (_msg->log_file().has_full_path() && !logBasePath.empty())
       {
-        std::string leaf = _msg->log_file().full_path();
-        if (!leaf.empty())
-          leaf = leaf.substr(basePath.size());
-        this->SetDestinationPath(QString::fromStdString(leaf));
+        std::string fullPath = _msg->log_file().full_path();
+        if (!fullPath.empty())
+          this->SetDestinationPath(QString::fromStdString(fullPath));
       }
     }
 
@@ -325,30 +397,30 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
     if (_msg->log_file().has_size() && _msg->log_file().has_size_units())
     {
       // Get the size of the log file.
-      stream << std::fixed << std::setprecision(2) << _msg->log_file().size();
-
+      stream << std::fixed << std::setprecision(2) << "(" <<
+          _msg->log_file().size();
 
       // Get the size units.
       switch (_msg->log_file().size_units())
       {
         case msgs::LogStatus::LogFile::BYTES:
-          stream << "B";
+          stream << "B)";
           break;
         case msgs::LogStatus::LogFile::K_BYTES:
-          stream << "KB";
+          stream << "KB)";
           break;
         case msgs::LogStatus::LogFile::M_BYTES:
-          stream << "MB";
+          stream << "MB)";
           break;
         default:
-          stream << "GB";
+          stream << "GB)";
           break;
       }
 
       this->SetSize(QString::fromStdString(stream.str()));
     }
     else
-      this->SetSize("0.00 B");
+      this->SetSize("(0.00 B)");
   }
 }
 
@@ -356,36 +428,46 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 void DataLogger::OnSetDestinationPath(QString _filename)
 {
   if (!_filename.isEmpty())
-    this->destPath->setText(_filename);
-  else
-    this->destPath->setText("");
+    this->dataPtr->destPath->setPlainText(_filename);
 }
 
 /////////////////////////////////////////////////
 void DataLogger::OnSetDestinationURI(QString _uri)
 {
   if (!_uri.isEmpty())
-    this->destURI->setText(_uri);
+    this->dataPtr->destURI->setText(_uri);
   else
-    this->destURI->setText("");
+    this->dataPtr->destURI->setText("");
 }
 
 /////////////////////////////////////////////////
 void DataLogger::OnToggleSettings(bool _checked)
 {
   if (_checked)
-    this->settingsFrame->show();
+    this->dataPtr->settingsFrame->show();
   else
-    this->settingsFrame->hide();
+    this->dataPtr->settingsFrame->hide();
 }
 
 /////////////////////////////////////////////////
 void DataLogger::OnBrowse()
 {
-  boost::filesystem::path path = QFileDialog::getExistingDirectory(this,
-      tr("Set log directory"), this->filenameEdit->text(),
-      QFileDialog::ShowDirsOnly |
-      QFileDialog::DontResolveSymlinks).toStdString();
+  QFileDialog fileDialog(this, tr("Set log directory"), QDir::homePath());
+  fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setFilter(QDir::AllDirs | QDir::Hidden);
+  fileDialog.setOptions(QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks);
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  if (fileDialog.exec() != QDialog::Accepted)
+    return;
+
+  QStringList selected = fileDialog.selectedFiles();
+  if (selected.empty())
+    return;
+
+  boost::filesystem::path path = selected[0].toStdString();
 
   // Make sure the  directory exists
   if (!boost::filesystem::exists(path))
@@ -412,7 +494,13 @@ void DataLogger::OnBrowse()
 
   // Make sure the path is writable.
   // Note: This is not cross-platform compatible.
+#ifdef _WIN32
+  // Check for write-only (2) and read-write (6)
+  if ((_access(path.string().c_str(), 2) != 0) &&
+      (_access(path.string().c_str(), 6) != 0))
+#else
   if (access(path.string().c_str(), W_OK) != 0)
+#endif
   {
     QMessageBox msgBox(this);
     std::ostringstream stream;
@@ -425,7 +513,39 @@ void DataLogger::OnBrowse()
   // Set the new base path
   msgs::LogControl msg;
   msg.set_base_path(path.string());
-  this->pub->Publish(msg);
+  this->dataPtr->pub->Publish(msg);
 
-  this->SetFilename(QString::fromStdString(path.string()));
+  this->dataPtr->basePath = QString::fromStdString(path.string());
+  this->SetDestinationPath(this->dataPtr->basePath);
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnBlinkStatus()
+{
+  this->dataPtr->statusTime += 1.0/10;
+
+  if (this->dataPtr->statusTime >= 1)
+    this->dataPtr->statusTime = 0;
+
+  this->dataPtr->statusLabel->setStyleSheet(QString::fromStdString(
+      "QLabel{color: rgb("+
+          std::to_string(255+(128*(this->dataPtr->statusTime-1)))+", "+
+          std::to_string(255+(128*(this->dataPtr->statusTime-1)))+", "+
+          std::to_string(255+(128*(this->dataPtr->statusTime-1)))+
+      "); "+
+      "padding-left: 15px; padding-top: 9px}"));
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnConfirmationTimeout()
+{
+  this->dataPtr->confirmationDialog->close();
+  this->dataPtr->confirmationTimer->stop();
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnCancel()
+{
+  if (this->dataPtr->recordButton->isChecked())
+    this->dataPtr->recordButton->click();
 }

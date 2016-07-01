@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 */
 #include <algorithm>
 
-#include "math/Spline.hh"
-#include "math/RotationSpline.hh"
-#include "common/Console.hh"
-#include "common/KeyFrame.hh"
-#include "common/Animation.hh"
+#include <ignition/math/Spline.hh>
+#include <ignition/math/RotationSpline.hh>
+
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -66,7 +67,7 @@ void Animation::SetLength(double _len)
 /////////////////////////////////////////////////
 void Animation::SetTime(double _time)
 {
-  if (!math::equal(_time, this->timePos))
+  if (!ignition::math::equal(_time, this->timePos))
   {
     this->timePos = _time;
     if (this->loop)
@@ -106,7 +107,7 @@ unsigned int Animation::GetKeyFrameCount() const
 /////////////////////////////////////////////////
 KeyFrame *Animation::GetKeyFrame(unsigned int _index) const
 {
-  KeyFrame *result = NULL;
+  KeyFrame *result = nullptr;
 
   if (_index < this->keyFrames.size())
     result = this->keyFrames[_index];
@@ -163,7 +164,7 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
   *_kf1 = *iter;
   t1 = (*_kf1)->GetTime();
 
-  if (math::equal(t1, t2))
+  if (ignition::math::equal(t1, t2))
     return 0.0;
   else
     return (_time - t1) / (t2 - t1);
@@ -179,8 +180,8 @@ PoseAnimation::PoseAnimation(const std::string &_name,
     double _length, bool _loop)
 : Animation(_name, _length, _loop)
 {
-  this->positionSpline = NULL;
-  this->rotationSpline = NULL;
+  this->positionSpline = nullptr;
+  this->rotationSpline = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -208,13 +209,13 @@ PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
 void PoseAnimation::BuildInterpolationSplines() const
 {
   if (!this->positionSpline)
-    this->positionSpline = new math::Spline();
+    this->positionSpline = new ignition::math::Spline();
 
   if (!this->rotationSpline)
-    this->rotationSpline = new math::RotationSpline();
+    this->rotationSpline = new ignition::math::RotationSpline();
 
-  this->positionSpline->SetAutoCalculate(false);
-  this->rotationSpline->SetAutoCalculate(false);
+  this->positionSpline->AutoCalculate(false);
+  this->rotationSpline->AutoCalculate(false);
 
   this->positionSpline->Clear();
   this->rotationSpline->Clear();
@@ -223,8 +224,8 @@ void PoseAnimation::BuildInterpolationSplines() const
       iter != this->keyFrames.end(); ++iter)
   {
     PoseKeyFrame *pkey = reinterpret_cast<PoseKeyFrame*>(*iter);
-    this->positionSpline->AddPoint(pkey->GetTranslation());
-    this->rotationSpline->AddPoint(pkey->GetRotation());
+    this->positionSpline->AddPoint(pkey->Translation());
+    this->rotationSpline->AddPoint(pkey->Rotation());
   }
 
   this->positionSpline->RecalcTangents();
@@ -253,15 +254,15 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
 
   k1 = reinterpret_cast<PoseKeyFrame*>(kBase1);
 
-  if (math::equal(t, 0.0))
+  if (ignition::math::equal(t, 0.0))
   {
-    _kf.SetTranslation(k1->GetTranslation());
-    _kf.SetRotation(k1->GetRotation());
+    _kf.Translation(k1->Translation());
+    _kf.Rotation(k1->Rotation());
   }
   else
   {
-    _kf.SetTranslation(this->positionSpline->Interpolate(firstKeyIndex, t));
-    _kf.SetRotation(this->rotationSpline->Interpolate(firstKeyIndex, t));
+    _kf.Translation(this->positionSpline->Interpolate(firstKeyIndex, t));
+    _kf.Rotation(this->rotationSpline->Interpolate(firstKeyIndex, t));
   }
 }
 
@@ -312,7 +313,7 @@ void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
   k1 = reinterpret_cast<NumericKeyFrame*>(kBase1);
   k2 = reinterpret_cast<NumericKeyFrame*>(kBase2);
 
-  if (math::equal(t, 0.0))
+  if (ignition::math::equal(t, 0.0))
   {
     // Just use k1
     _kf.SetValue(k1->GetValue());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,58 +15,93 @@
  *
 */
 
-/* Desc: A laser sensor using OpenGL
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
- */
-
-#include <dirent.h>
 #include <sstream>
 
-#include "sdf/sdf.hh"
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RTShaderSystem.hh"
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
-#include "common/Events.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
-#include "common/Mesh.hh"
-#include "common/MeshManager.hh"
-#include "common/Timer.hh"
-#include "sensors/GpuRaySensor.hh"
-#include "math/Pose.hh"
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #include "gazebo/common/win_dirent.h"
+#endif
 
-#include "rendering/Visual.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "rendering/GpuLaser.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/Timer.hh"
+
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/GpuLaser.hh"
+#include "gazebo/rendering/GpuLaserPrivate.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
-int GpuLaser::texCount = 0;
+int GpuLaserPrivate::texCount = 0;
 
 //////////////////////////////////////////////////
-GpuLaser::GpuLaser(const std::string &_namePrefix, Scene *_scene,
-                         bool _autoRender)
-: Camera(_namePrefix, _scene, _autoRender)
+GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
+                   const bool _autoRender)
+: Camera(_namePrefix, _scene, _autoRender),
+  dataPtr(new GpuLaserPrivate)
 {
-  this->laserBuffer = NULL;
-  this->laserScan = NULL;
-  this->mat_1st_pass = NULL;
-  this->mat_2nd_pass = NULL;
-  this->w2nd = 0;
-  this->h2nd = 0;
-  this->visual.reset();
+  this->dataPtr->laserBuffer = NULL;
+  this->dataPtr->laserScan = NULL;
+  this->dataPtr->matFirstPass = NULL;
+  this->dataPtr->matSecondPass = NULL;
+  for (int i = 0; i < 3; ++i)
+    this->dataPtr->firstPassTextures[i] = NULL;
+  this->dataPtr->secondPassTexture = NULL;
+  this->dataPtr->orthoCam = NULL;
+  this->dataPtr->w2nd = 0;
+  this->dataPtr->h2nd = 0;
+  this->cameraCount = 0;
+  this->dataPtr->textureCount = 0;
+  this->dataPtr->visual.reset();
 }
 
 //////////////////////////////////////////////////
 GpuLaser::~GpuLaser()
 {
+  delete [] this->dataPtr->laserBuffer;
+  delete [] this->dataPtr->laserScan;
+
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  {
+    if (this->dataPtr->firstPassTextures[i])
+    {
+      Ogre::TextureManager::getSingleton().remove(
+          this->dataPtr->firstPassTextures[i]->getName());
+    }
+  }
+  if (this->dataPtr->secondPassTexture)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->dataPtr->secondPassTexture->getName());
+  }
+
+  if (this->scene && this->dataPtr->orthoCam)
+    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
+
+  this->dataPtr->visual.reset();
+  this->dataPtr->texIdx.clear();
+  this->dataPtr->texCount = 0;
 }
 
 //////////////////////////////////////////////////
-void GpuLaser::Load(sdf::ElementPtr &_sdf)
+void GpuLaser::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
 }
@@ -81,10 +116,10 @@ void GpuLaser::Load()
 void GpuLaser::Init()
 {
   Camera::Init();
-  this->w2nd = this->GetImageWidth();
-  this->h2nd = this->GetImageHeight();
-  this->visual.reset(new Visual(this->GetName()+"_2nd_pass_canvas",
-     this->GetScene()->GetWorldVisual()));
+  this->dataPtr->w2nd = this->ImageWidth();
+  this->dataPtr->h2nd = this->ImageHeight();
+  this->dataPtr->visual.reset(new Visual(this->Name()+"second_pass_canvas",
+     this->GetScene()->WorldVisual()));
 }
 
 //////////////////////////////////////////////////
@@ -96,80 +131,89 @@ void GpuLaser::Fini()
 //////////////////////////////////////////////////
 void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 {
-  this->camera->yaw(Ogre::Radian(this->parent_sensor->GetHAngle()));
-  this->camera->pitch(Ogre::Radian(this->parent_sensor->GetVAngle()));
+  this->camera->yaw(Ogre::Radian(this->horzHalfAngle));
+  this->camera->pitch(Ogre::Radian(this->vertHalfAngle));
 
   this->CreateOrthoCam();
 
-  this->_textureCount = this->parent_sensor->GetCameraCount();
+  this->dataPtr->textureCount = this->cameraCount;
 
-  if (this->_textureCount == 2)
+  if (this->dataPtr->textureCount == 2)
   {
-    cameraYaws[0] = -this->parent_sensor->GetHFOV()/2;
-    cameraYaws[1] = +this->parent_sensor->GetHFOV();
-    cameraYaws[2] = 0;
-    cameraYaws[3] = -this->parent_sensor->GetHFOV()/2;
+    this->dataPtr->cameraYaws[0] = -this->hfov/2;
+    this->dataPtr->cameraYaws[1] = +this->hfov;
+    this->dataPtr->cameraYaws[2] = 0;
+    this->dataPtr->cameraYaws[3] = -this->hfov/2;
   }
   else
   {
-    cameraYaws[0] = -this->parent_sensor->GetHFOV();
-    cameraYaws[1] = +this->parent_sensor->GetHFOV();
-    cameraYaws[2] = +this->parent_sensor->GetHFOV();
-    cameraYaws[3] = -this->parent_sensor->GetHFOV();
+    this->dataPtr->cameraYaws[0] = -this->hfov;
+    this->dataPtr->cameraYaws[1] = +this->hfov;
+    this->dataPtr->cameraYaws[2] = +this->hfov;
+    this->dataPtr->cameraYaws[3] = -this->hfov;
   }
 
-  for (unsigned int i = 0; i < this->_textureCount; i++)
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
     std::stringstream texName;
-    texName << _textureName << "_1st_pass_" << i;
-    this->_1stPassTextures[i] =
+    texName << _textureName << "first_pass_" << i;
+    this->dataPtr->firstPassTextures[i] =
       Ogre::TextureManager::getSingleton().createManual(
       texName.str(), "General", Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(), this->GetImageHeight(), 0,
+      this->ImageWidth(), this->ImageHeight(), 0,
       Ogre::PF_FLOAT32_RGB, Ogre::TU_RENDERTARGET).getPointer();
 
     this->Set1stPassTarget(
-        this->_1stPassTextures[i]->getBuffer()->getRenderTarget(), i);
+        this->dataPtr->firstPassTextures[i]->getBuffer()->getRenderTarget(), i);
 
-    RTShaderSystem::AttachViewport(this->_1stPassViewports[i],
-                                   this->GetScene());
-    this->_1stPassTargets[i]->setAutoUpdated(false);
+    this->dataPtr->firstPassTargets[i]->setAutoUpdated(false);
   }
 
-  this->mat_1st_pass = (Ogre::Material*)(
+  this->dataPtr->matFirstPass = (Ogre::Material*)(
   Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1st").get());
 
-  this->mat_1st_pass->load();
+  this->dataPtr->matFirstPass->load();
 
-  this->_2ndPassTexture = Ogre::TextureManager::getSingleton().createManual(
-      _textureName + "_2nd_pass",
+  this->dataPtr->secondPassTexture =
+      Ogre::TextureManager::getSingleton().createManual(
+      _textureName + "second_pass",
       "General",
       Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(), this->GetImageHeight(), 0,
+      this->ImageWidth(), this->ImageHeight(), 0,
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
 
-  this->Set2ndPassTarget(this->_2ndPassTexture->getBuffer()->getRenderTarget());
-  RTShaderSystem::AttachViewport(this->_2ndPassViewport, this->GetScene());
-  this->_2ndPassTarget->setAutoUpdated(false);
+  this->Set2ndPassTarget(
+      this->dataPtr->secondPassTexture->getBuffer()->getRenderTarget());
 
-  this->mat_2nd_pass = (Ogre::Material*)(
+  this->dataPtr->secondPassTarget->setAutoUpdated(false);
+
+  this->dataPtr->matSecondPass = (Ogre::Material*)(
   Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan2nd").get());
 
-  this->mat_2nd_pass->load();
+  this->dataPtr->matSecondPass->load();
 
-  Ogre::TextureUnitState *tex_unit;
-  for (unsigned int i = 0; i < this->_textureCount; i++)
+  Ogre::TextureUnitState *texUnit;
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
-    unsigned int texIndex = texCount++;
-    tex_unit =
-      this->mat_2nd_pass->getTechnique(0)->getPass(0)->createTextureUnitState(
-        this->_1stPassTextures[i]->getName(), texIndex);
+    unsigned int texIndex = this->dataPtr->texCount++;
+    Ogre::Technique *technique = this->dataPtr->matSecondPass->getTechnique(0);
+    GZ_ASSERT(technique, "GpuLaser material script error: technique not found");
 
-    this->texIdx.push_back(texIndex);
+    Ogre::Pass *pass = technique->getPass(0);
+    GZ_ASSERT(pass, "GpuLaser material script error: pass not found");
 
-    tex_unit->setTextureFiltering(Ogre::TFO_NONE);
-    tex_unit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    if (!pass->getTextureUnitState(
+        this->dataPtr->firstPassTextures[i]->getName()))
+    {
+      texUnit = pass->createTextureUnitState(
+            this->dataPtr->firstPassTextures[i]->getName(), texIndex);
+
+      this->dataPtr->texIdx.push_back(texIndex);
+
+      texUnit->setTextureFiltering(Ogre::TFO_NONE);
+      texUnit->setTextureAddressingMode(Ogre::TextureUnitState::TAM_MIRROR);
+    }
   }
 
   this->CreateCanvas();
@@ -182,68 +226,78 @@ void GpuLaser::PostRender()
 //  postRenderT.Start();
 //  double blitDur = 0.0;
 //  double postRenderDur = 0.0;
-  for (unsigned int i = 0; i < this->_textureCount; i++)
-    this->_1stPassTargets[i]->swapBuffers();
 
-  this->_2ndPassTarget->swapBuffers();
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  {
+    this->dataPtr->firstPassTargets[i]->swapBuffers();
+  }
+
+  this->dataPtr->secondPassTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
-    unsigned int width = this->_2ndPassViewport->getActualWidth();
-    unsigned int height = this->_2ndPassViewport->getActualHeight();
+    unsigned int width = this->dataPtr->secondPassViewport->getActualWidth();
+    unsigned int height = this->dataPtr->secondPassViewport->getActualHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->_2ndPassTexture->getBuffer();
+    pixelBuffer = this->dataPtr->secondPassTexture->getBuffer();
 
     size_t size = Ogre::PixelUtil::getMemorySize(
                     width, height, 1, Ogre::PF_FLOAT32_RGB);
 
     // Blit the depth buffer if needed
-    if (!this->laserBuffer)
-      this->laserBuffer = new float[size];
+    if (!this->dataPtr->laserBuffer)
+      this->dataPtr->laserBuffer = new float[size];
 
-    memset(this->laserBuffer, 255, size);
+    memset(this->dataPtr->laserBuffer, 255, size);
 
-    Ogre::PixelBox dst_box(width, height,
-        1, Ogre::PF_FLOAT32_RGB, this->laserBuffer);
+    Ogre::PixelBox dstBox(width, height,
+        1, Ogre::PF_FLOAT32_RGB, this->dataPtr->laserBuffer);
 
 //    blitT.Start();
-    pixelBuffer->blitToMemory(dst_box);
+    pixelBuffer->blitToMemory(dstBox);
 //    blitDur = blitT.GetElapsed().Double();
 
-    if (!this->laserScan)
-      this->laserScan =  new float[this->w2nd * this->h2nd * 3];
+    if (!this->dataPtr->laserScan)
+    {
+      int len = this->dataPtr->w2nd * this->dataPtr->h2nd * 3;
+      this->dataPtr->laserScan = new float[len];
+    }
 
-    memcpy(this->laserScan, this->laserBuffer,
-           this->w2nd * this->h2nd * 3 * sizeof(this->laserScan[0]));
+    memcpy(this->dataPtr->laserScan, this->dataPtr->laserBuffer,
+           this->dataPtr->w2nd * this->dataPtr->h2nd * 3 *
+           sizeof(this->dataPtr->laserScan[0]));
 
-    this->newLaserFrame(this->laserScan, this->w2nd, this->h2nd, 3, "BLABLA");
+    this->dataPtr->newLaserFrame(this->dataPtr->laserScan, this->dataPtr->w2nd,
+        this->dataPtr->h2nd, 3, "BLABLA");
   }
 
   this->newData = false;
 //  postRenderDur = postRenderT.GetElapsed().Double();
 
-/*  std::cerr << " Render: " << this->lastRenderDuration * 1000
-            << " BLIT: " << blitDur * 1000
-            << " postRender: " << postRenderDur * 1000
-            << " TOTAL: " << (this->lastRenderDuration + postRenderDur) * 1000
-            << " Total - BLIT: " << (this->lastRenderDuration + postRenderDur
-            - blitDur) * 1000 << "\n";   */
+/*  std::cerr << " Render: " << this->dataPtr->lastRenderDuration * 1000
+              << " BLIT: " << blitDur * 1000
+              << " postRender: " << postRenderDur * 1000
+              << " TOTAL: "
+              << (this->dataPtr->lastRenderDuration + postRenderDur) * 1000
+              << " Total - BLIT: "
+              << (this->dataPtr->lastRenderDuration + postRenderDur - blitDur)
+                  * 1000 << "\n";   */
 }
 
 /////////////////////////////////////////////////
 void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
                    Ogre::Material *_material, Ogre::Camera *_cam,
-                   bool _updateTex)
+                   const bool _updateTex)
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
-  Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+  Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
-  renderSys = this->scene->GetManager()->getDestinationRenderSystem();
+  renderSys = this->scene->OgreSceneManager()->getDestinationRenderSystem();
   // Get pointer to the material pass
   pass = _material->getBestTechnique()->getPass(0);
 
@@ -251,7 +305,7 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
   // OgreSceneManager::_render function automatically sets farClip to 0.
   // Which normally equates to infinite distance. We don't want this. So
   // we have to set the distance every time.
-  _cam->setFarClipDistance(this->GetFarClip());
+  _cam->setFarClipDistance(this->FarClip());
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -278,14 +332,14 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
   if (_updateTex)
   {
     pass->getFragmentProgramParameters()->setNamedConstant("tex1",
-      this->texIdx[0]);
-    if (this->texIdx.size() > 0)
+      this->dataPtr->texIdx[0]);
+    if (this->dataPtr->texIdx.size() > 1)
     {
       pass->getFragmentProgramParameters()->setNamedConstant("tex2",
-        this->texIdx[1]);
-      if (this->texIdx.size() > 1)
+        this->dataPtr->texIdx[1]);
+      if (this->dataPtr->texIdx.size() > 2)
         pass->getFragmentProgramParameters()->setNamedConstant("tex3",
-          this->texIdx[1]);
+          this->dataPtr->texIdx[2]);
     }
   }
 
@@ -293,7 +347,7 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
   if (pass->hasVertexProgram())
   {
     renderSys->bindGpuProgram(
-    pass->getVertexProgram()->_getBindingDelegate());
+        pass->getVertexProgram()->_getBindingDelegate());
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
@@ -320,224 +374,233 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
 }
 
 /////////////////////////////////////////////////
-void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *rend,
+void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
       const Ogre::Pass* /*pass*/, const Ogre::AutoParamDataSource* /*source*/,
       const Ogre::LightList* /*lights*/, bool /*supp*/)
 {
   Ogre::Vector4 retro = Ogre::Vector4(0, 0, 0, 0);
   try
   {
-    retro = rend->getCustomParameter(1);
+    retro = _rend->getCustomParameter(1);
   }
   catch(Ogre::ItemIdentityException& e)
   {
-    rend->setCustomParameter(1, Ogre::Vector4(0, 0, 0, 0));
+    _rend->setCustomParameter(1, Ogre::Vector4(0, 0, 0, 0));
   }
 
-  Ogre::Pass *my_pass = this->current_mat->getBestTechnique()->getPass(0);
+  Ogre::Pass *pass = this->dataPtr->currentMat->getBestTechnique()->getPass(0);
   Ogre::RenderSystem *renderSys =
-                  this->scene->GetManager()->getDestinationRenderSystem();
+                  this->scene->OgreSceneManager()->getDestinationRenderSystem();
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  Ogre::Viewport *vp = this->current_target->getViewport(0);
+  Ogre::Viewport *vp = this->dataPtr->currentTarget->getViewport(0);
 
   renderSys->_setViewport(vp);
-  autoParamDataSource.setCurrentRenderable(rend);
-  autoParamDataSource.setCurrentPass(my_pass);
+  autoParamDataSource.setCurrentRenderable(_rend);
+  autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(this->current_target);
-  autoParamDataSource.setCurrentSceneManager(this->scene->GetManager());
+  autoParamDataSource.setCurrentRenderTarget(this->dataPtr->currentTarget);
+  autoParamDataSource.setCurrentSceneManager(this->scene->OgreSceneManager());
   autoParamDataSource.setCurrentCamera(this->camera, true);
 
-  my_pass->_updateAutoParams(&autoParamDataSource,
-            Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
-  my_pass->getFragmentProgramParameters()->setNamedConstant("retro", retro[0]);
+  pass->_updateAutoParams(&autoParamDataSource,
+      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+  pass->getFragmentProgramParameters()->setNamedConstant("retro", retro[0]);
   renderSys->bindGpuProgram(
-    my_pass->getVertexProgram()->_getBindingDelegate());
+      pass->getVertexProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
-    my_pass->getVertexProgramParameters(),
-    Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      pass->getVertexProgramParameters(),
+      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
 
   renderSys->bindGpuProgram(
-  my_pass->getFragmentProgram()->_getBindingDelegate());
+      pass->getFragmentProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
-  my_pass->getFragmentProgramParameters(),
-    Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
+      pass->getFragmentProgramParameters(),
+      Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::RenderImpl()
 {
-  common::Timer _1stPassTimer, _2ndPassTimer;
+  common::Timer firstPassTimer, secondPassTimer;
 
-  _1stPassTimer.Start();
+  firstPassTimer.Start();
 
-  Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+  Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
 
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   sceneMgr->_suppressRenderStateChanges(true);
-
   sceneMgr->addRenderObjectListener(this);
 
-  for (unsigned int i = 0; i < this->_textureCount; i++)
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
-    if (this->_textureCount>1)
-      this->RotateYaw(this->cameraYaws[i]);
+    if (this->dataPtr->textureCount > 1)
+    {
+      // Cannot call Camera::RotateYaw because it rotates in world frame,
+      // but we need rotation in camera local frame
+      this->sceneNode->roll(Ogre::Radian(this->dataPtr->cameraYaws[i]));
+    }
 
-    this->current_mat = this->mat_1st_pass;
-    this->current_target = this->_1stPassTargets[i];
+    this->dataPtr->currentMat = this->dataPtr->matFirstPass;
+    this->dataPtr->currentTarget = this->dataPtr->firstPassTargets[i];
 
-    this->UpdateRenderTarget(this->_1stPassTargets[i],
-                  this->mat_1st_pass, this->camera);
-    this->_1stPassTargets[i]->update(false);
+    this->UpdateRenderTarget(this->dataPtr->firstPassTargets[i],
+                  this->dataPtr->matFirstPass, this->camera);
+    this->dataPtr->firstPassTargets[i]->update(false);
   }
 
-  if (this->_textureCount > 1)
-    this->RotateYaw(this->cameraYaws[3]);
+  if (this->dataPtr->textureCount > 1)
+      this->sceneNode->roll(Ogre::Radian(this->dataPtr->cameraYaws[3]));
 
   sceneMgr->removeRenderObjectListener(this);
 
-  double _1stPassDur = _1stPassTimer.GetElapsed().Double();
-  _2ndPassTimer.Start();
+  double firstPassDur = firstPassTimer.GetElapsed().Double();
+  secondPassTimer.Start();
 
-  this->visual->SetVisible(true);
+  this->dataPtr->visual->SetVisible(true);
 
-  this->UpdateRenderTarget(this->_2ndPassTarget,
-                this->mat_2nd_pass, this->orthoCam, true);
-  this->_2ndPassTarget->update(false);
+  this->UpdateRenderTarget(this->dataPtr->secondPassTarget,
+                this->dataPtr->matSecondPass, this->dataPtr->orthoCam, true);
+  this->dataPtr->secondPassTarget->update(false);
 
-  this->visual->SetVisible(false);
+  this->dataPtr->visual->SetVisible(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
-  double _2ndPassDur = _2ndPassTimer.GetElapsed().Double();
-  this->lastRenderDuration = _1stPassDur + _2ndPassDur;
+  double secondPassDur = secondPassTimer.GetElapsed().Double();
+  this->dataPtr->lastRenderDuration = firstPassDur + secondPassDur;
 }
 
 //////////////////////////////////////////////////
 const float* GpuLaser::GetLaserData()
 {
-  return this->laserBuffer;
+  return this->LaserData();
+}
+
+//////////////////////////////////////////////////
+const float* GpuLaser::LaserData() const
+{
+  return this->dataPtr->laserBuffer;
 }
 
 /////////////////////////////////////////////////
 void GpuLaser::CreateOrthoCam()
 {
-  this->orthoCam = this->scene->GetManager()->createCamera(
-        this->GetName() + "_ortho_cam");
+  this->dataPtr->pitchNodeOrtho =
+    this->GetScene()->WorldVisual()->GetSceneNode()->createChildSceneNode();
+
+  this->dataPtr->orthoCam = this->scene->OgreSceneManager()->createCamera(
+        this->dataPtr->pitchNodeOrtho->getName() + "_ortho_cam");
 
   // Use X/Y as horizon, Z up
-  this->orthoCam->pitch(Ogre::Degree(90));
+  this->dataPtr->orthoCam->pitch(Ogre::Degree(90));
 
   // Don't yaw along variable axis, causes leaning
-  this->orthoCam->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  this->dataPtr->orthoCam->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
 
-  this->orthoCam->setDirection(1, 0, 0);
+  this->dataPtr->orthoCam->setDirection(1, 0, 0);
 
-  this->pitchNode_ortho =
-    this->GetScene()->GetWorldVisual()->GetSceneNode()->createChildSceneNode(
-      this->GetName()+"OrthoPitchNode");
+  this->dataPtr->pitchNodeOrtho->attachObject(this->dataPtr->orthoCam);
+  this->dataPtr->orthoCam->setAutoAspectRatio(true);
 
-  this->pitchNode_ortho->attachObject(this->orthoCam);
-  this->orthoCam->setAutoAspectRatio(true);
-
-  if (this->orthoCam)
+  if (this->dataPtr->orthoCam)
   {
-    this->orthoCam->setNearClipDistance(0.01);
-    this->orthoCam->setFarClipDistance(0.02);
-    this->orthoCam->setRenderingDistance(0.02);
+    this->dataPtr->orthoCam->setNearClipDistance(0.01);
+    this->dataPtr->orthoCam->setFarClipDistance(0.02);
+    this->dataPtr->orthoCam->setRenderingDistance(0.02);
 
-    this->orthoCam->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+    this->dataPtr->orthoCam->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
   }
 }
 
 /////////////////////////////////////////////////
-Ogre::Matrix4 GpuLaser::BuildScaledOrthoMatrix(float left, float right,
-           float bottom, float top, float near, float far)
+Ogre::Matrix4 GpuLaser::BuildScaledOrthoMatrix(const float _left,
+    const float _right, const float _bottom, const float _top,
+    const float _near, const float _far)
 {
-  float invw = 1 / (right - left);
-  float invh = 1 / (top - bottom);
-  float invd = 1 / (far - near);
+  float invw = 1 / (_right - _left);
+  float invh = 1 / (_top - _bottom);
+  float invd = 1 / (_far - _near);
 
   Ogre::Matrix4 proj = Ogre::Matrix4::ZERO;
   proj[0][0] = 2 * invw;
-  proj[0][3] = -(right + left) * invw;
+  proj[0][3] = -(_right + _left) * invw;
   proj[1][1] = 2 * invh;
-  proj[1][3] = -(top + bottom) * invh;
+  proj[1][3] = -(_top + _bottom) * invh;
   proj[2][2] = -2 * invd;
-  proj[2][3] = -(far + near) * invd;
+  proj[2][3] = -(_far + _near) * invd;
   proj[3][3] = 1;
 
   return proj;
 }
 
 //////////////////////////////////////////////////
-void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *target, unsigned int index)
+void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
+                                const unsigned int _index)
 {
-  this->_1stPassTargets[index] = target;
+  this->dataPtr->firstPassTargets[_index] = _target;
 
-  if (this->_1stPassTargets[index])
+  if (this->dataPtr->firstPassTargets[_index])
   {
     // Setup the viewport to use the texture
-    this->_1stPassViewports[index] =
-      this->_1stPassTargets[index]->addViewport(this->camera);
-    this->_1stPassViewports[index]->setClearEveryFrame(true);
-    this->_1stPassViewports[index]->setBackgroundColour(
-        Ogre::ColourValue(0.0, 0.0, 1.0));
-    this->_1stPassViewports[index]->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->dataPtr->firstPassViewports[_index] =
+      this->dataPtr->firstPassTargets[_index]->addViewport(this->camera);
+    this->dataPtr->firstPassViewports[_index]->setClearEveryFrame(true);
+    this->dataPtr->firstPassViewports[_index]->setOverlaysEnabled(false);
+    this->dataPtr->firstPassViewports[_index]->setShadowsEnabled(false);
+    this->dataPtr->firstPassViewports[_index]->setSkiesEnabled(false);
+    this->dataPtr->firstPassViewports[_index]->setBackgroundColour(
+        Ogre::ColourValue(this->farClip, 0.0, 1.0));
+    this->dataPtr->firstPassViewports[_index]->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
-  if (index == 0)
+  if (_index == 0)
   {
-    this->camera->setAspectRatio(this->parent_sensor->Get1stRatio());
-    this->camera->setFOVy(Ogre::Radian(this->parent_sensor->GetVFOV()));
+    this->camera->setAspectRatio(this->rayCountRatio);
+    this->camera->setFOVy(Ogre::Radian(this->vfov));
   }
 }
 
 //////////////////////////////////////////////////
-void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *target)
+void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
 {
-  this->_2ndPassTarget = target;
+  this->dataPtr->secondPassTarget = _target;
 
-  if (this->_2ndPassTarget)
+  if (this->dataPtr->secondPassTarget)
   {
     // Setup the viewport to use the texture
-    this->_2ndPassViewport = this->_2ndPassTarget->addViewport(this->orthoCam);
-    this->_2ndPassViewport->setClearEveryFrame(true);
-    this->_2ndPassViewport->setBackgroundColour(
+    this->dataPtr->secondPassViewport =
+        this->dataPtr->secondPassTarget->addViewport(this->dataPtr->orthoCam);
+    this->dataPtr->secondPassViewport->setClearEveryFrame(true);
+    this->dataPtr->secondPassViewport->setOverlaysEnabled(false);
+    this->dataPtr->secondPassViewport->setShadowsEnabled(false);
+    this->dataPtr->secondPassViewport->setSkiesEnabled(false);
+    this->dataPtr->secondPassViewport->setBackgroundColour(
         Ogre::ColourValue(0.0, 1.0, 0.0));
-    this->_2ndPassViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->dataPtr->secondPassViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
-      0, static_cast<float>(this->GetImageWidth() / 10.0),
-      0, static_cast<float>(this->GetImageHeight() / 10.0),
+      0, static_cast<float>(this->ImageWidth() / 10.0),
+      0, static_cast<float>(this->ImageHeight() / 10.0),
       0.01, 0.02);
 
-  this->orthoCam->setCustomProjectionMatrix(true, p);
+  this->dataPtr->orthoCam->setCustomProjectionMatrix(true, p);
 }
 
 /////////////////////////////////////////////////
-void GpuLaser::SetRangeCount(unsigned int _w, unsigned int _h)
+void GpuLaser::SetRangeCount(const unsigned int _w, const unsigned int _h)
 {
-  this->w2nd = _w;
-  this->h2nd = _h;
-}
-
-/////////////////////////////////////////////////
-void GpuLaser::SetParentSensor(sensors::GpuRaySensor *parent)
-{
-  this->parent_sensor = parent;
+  this->dataPtr->w2nd = _w;
+  this->dataPtr->h2nd = _h;
 }
 
 /////////////////////////////////////////////////
 void GpuLaser::CreateMesh()
 {
-  std::string meshName = this->GetName() + "_undistortion_mesh";
+  std::string meshName = this->Name() + "_undistortion_mesh";
 
   common::Mesh *mesh = new common::Mesh();
   mesh->SetName(meshName);
@@ -547,85 +610,85 @@ void GpuLaser::CreateMesh()
   double dx, dy;
   submesh->SetPrimitiveType(common::SubMesh::POINTS);
 
-  double view_height = this->GetImageHeight()/10.0;
+  double viewHeight = this->ImageHeight()/10.0;
 
-  if (h2nd == 1)
+  if (this->dataPtr->h2nd == 1)
     dy = 0;
   else
     dy = 0.1;
 
   dx = 0.1;
 
-  double start_x = dx;
-  double start_y = view_height;
+  double startX = dx;
+  double startY = viewHeight;
 
-  double phi = this->parent_sensor->GetVFOV() / 2;
+  double phi = this->vfov / 2;
 
-  double v_ang_min = -phi;
+  double vAngMin = -phi;
 
-  if (this->GetImageHeight() == 1)
+  if (this->ImageHeight() == 1)
     phi = 0;
 
-  unsigned int pts_on_line = 0;
-
-  for (unsigned int j = 0; j < this->h2nd; j++)
+  unsigned int ptsOnLine = 0;
+  for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
   {
     double gamma = 0;
-    if (this->h2nd != 1)
-      gamma = ((2 * phi / (this->h2nd - 1)) * j) + v_ang_min;
-    for (unsigned int i = 0; i < this->w2nd; i++)
+    if (this->dataPtr->h2nd != 1)
+      gamma = ((2 * phi / (this->dataPtr->h2nd - 1)) * j) + vAngMin;
+    for (unsigned int i = 0; i < this->dataPtr->w2nd; ++i)
     {
-      double hfov = this->_textureCount * this->parent_sensor->GetHFOV();
-      double theta = this->parent_sensor->GetHFOV() / 2;
-      double delta = ((hfov / (this->w2nd - 1)) * i);
+      double thfov = this->dataPtr->textureCount * this->hfov;
+      double theta = this->hfov / 2;
+      double delta = ((thfov / (this->dataPtr->w2nd - 1)) * i);
 
       unsigned int texture = delta / (theta*2);
 
-      if (texture > this->_textureCount-1)
+      if (texture > this->dataPtr->textureCount-1)
       {
         texture -= 1;
-        delta -= (hfov / (this->w2nd - 1));
+        delta -= (thfov / (this->dataPtr->w2nd - 1));
       }
 
       delta = delta - (texture * (theta*2));
 
       delta = delta - theta;
 
-      start_x -= dx;
-      if (pts_on_line == this->GetImageWidth())
+      startX -= dx;
+      if (ptsOnLine == this->ImageWidth())
       {
-        pts_on_line = 0;
-        start_x = 0;
-        start_y -= dy;
+        ptsOnLine = 0;
+        startX = 0;
+        startY -= dy;
       }
-      pts_on_line++;
-      submesh->AddVertex(texture/1000.0, start_x, start_y);
+      ptsOnLine++;
+      submesh->AddVertex(texture/1000.0, startX, startY);
 
       double u, v;
-      if (this->parent_sensor->IsHorizontal())
+      if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = -tan(gamma)/(2 * tan(phi)) + 0.5;
+        v = ignition::math::equal(phi, 0.0) ?
+            -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = -tan(delta)/(2 * tan(theta)) + 0.5;
+        u = ignition::math::equal(theta, 0.0) ?
+            -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
       }
-
       submesh->AddTexCoord(u, v);
     }
   }
 
-  for (unsigned int j = 0; j < (this->h2nd ); j++)
-    for (unsigned int i = 0; i < (this->w2nd ); i++)
-      submesh->AddIndex(this->w2nd * j + i);
+  for (unsigned int j = 0; j < (this->dataPtr->h2nd ); ++j)
+    for (unsigned int i = 0; i < (this->dataPtr->w2nd ); ++i)
+      submesh->AddIndex(this->dataPtr->w2nd * j + i);
 
   mesh->AddSubMesh(submesh);
 
-  this->undist_mesh = mesh;
+  this->dataPtr->undistMesh = mesh;
 
-  common::MeshManager::Instance()->AddMesh(this->undist_mesh);
+  common::MeshManager::Instance()->AddMesh(this->dataPtr->undistMesh);
 }
 
 /////////////////////////////////////////////////
@@ -633,32 +696,242 @@ void GpuLaser::CreateCanvas()
 {
   this->CreateMesh();
 
-  Ogre::Node *parent = this->visual->GetSceneNode()->getParent();
-  parent->removeChild(this->visual->GetSceneNode());
+  Ogre::Node *parent = this->dataPtr->visual->GetSceneNode()->getParent();
+  parent->removeChild(this->dataPtr->visual->GetSceneNode());
 
-  this->pitchNode_ortho->addChild(this->visual->GetSceneNode());
+  this->dataPtr->pitchNodeOrtho->addChild(
+      this->dataPtr->visual->GetSceneNode());
 
-  this->visual->InsertMesh(this->undist_mesh);
+  this->dataPtr->visual->InsertMesh(this->dataPtr->undistMesh);
 
   std::ostringstream stream;
-  std::string meshName = this->undist_mesh->GetName();
-  stream << this->visual->GetSceneNode()->getName() << "_ENTITY_" << meshName;
+  std::string meshName = this->dataPtr->undistMesh->GetName();
+  stream << this->dataPtr->visual->GetSceneNode()->getName()
+      << "_ENTITY_" << meshName;
 
-  this->object = (Ogre::MovableObject*)
-      (this->visual->GetSceneNode()->getCreator()->createEntity(stream.str(),
-        meshName));
+  this->dataPtr->object = (Ogre::MovableObject*)
+      (this->dataPtr->visual->GetSceneNode()->getCreator()->createEntity(
+      stream.str(), meshName));
 
-  this->visual->AttachObject(this->object);
-  this->object->setVisibilityFlags(GZ_VISIBILITY_ALL);
+  this->dataPtr->visual->AttachObject(this->dataPtr->object);
+  this->dataPtr->object->setVisibilityFlags(GZ_VISIBILITY_ALL
+      & ~GZ_VISIBILITY_SELECTABLE);
 
-  math::Pose pose;
-  pose.pos = math::Vector3(0.01, 0, 0);
-  pose.rot.SetFromEuler(math::Vector3(0, 0, 0));
+  ignition::math::Pose3d pose;
+  pose.Pos() = ignition::math::Vector3d(0.01, 0, 0);
+  pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
 
-  this->visual->SetPose(pose);
+  this->dataPtr->visual->SetPose(pose);
 
-  this->visual->SetMaterial("Gazebo/Green");
-  this->visual->SetAmbient(common::Color(0, 1, 0, 1));
-  this->visual->SetVisible(true);
-  this->scene->AddVisual(this->visual);
+  this->dataPtr->visual->SetMaterial("Gazebo/Green");
+  this->dataPtr->visual->SetAmbient(common::Color(0, 1, 0, 1));
+  this->dataPtr->visual->SetVisible(true);
+  this->scene->AddVisual(this->dataPtr->visual);
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetHorzHalfAngle(const double _angle)
+{
+  this->horzHalfAngle = _angle;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetVertHalfAngle(const double _angle)
+{
+  this->vertHalfAngle = _angle;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetHorzHalfAngle() const
+{
+  return this->HorzHalfAngle();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::HorzHalfAngle() const
+{
+  return this->horzHalfAngle;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetVertHalfAngle() const
+{
+  return this->VertHalfAngle();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::VertHalfAngle() const
+{
+  return this->vertHalfAngle;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetIsHorizontal(const bool _horizontal)
+{
+  this->isHorizontal = _horizontal;
+}
+
+//////////////////////////////////////////////////
+bool GpuLaser::IsHorizontal() const
+{
+  return this->isHorizontal;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetHorzFOV() const
+{
+  return this->HorzFOV();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::HorzFOV() const
+{
+  return this->hfov;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetVertFOV() const
+{
+  return this->VertFOV();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::VertFOV() const
+{
+  return this->vfov;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetHorzFOV(const double _hfov)
+{
+  this->hfov = _hfov;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetVertFOV(const double _vfov)
+{
+  this->vfov = _vfov;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetCosHorzFOV() const
+{
+  return this->CosHorzFOV();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::CosHorzFOV() const
+{
+  return this->chfov;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetCosHorzFOV(const double _chfov)
+{
+  this->chfov = _chfov;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetCosVertFOV() const
+{
+  return this->CosVertFOV();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::CosVertFOV() const
+{
+  return this->cvfov;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetCosVertFOV(const double _cvfov)
+{
+  this->cvfov = _cvfov;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetNearClip() const
+{
+  return this->NearClip();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::NearClip() const
+{
+  return this->nearClip;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetFarClip() const
+{
+  return this->FarClip();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::FarClip() const
+{
+  return this->farClip;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetNearClip(const double _near)
+{
+  this->nearClip = _near;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetFarClip(const double _far)
+{
+  this->farClip = _far;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetCameraCount() const
+{
+  return this->CameraCount();
+}
+
+//////////////////////////////////////////////////
+unsigned int GpuLaser::CameraCount() const
+{
+  return this->cameraCount;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetCameraCount(const unsigned int _cameraCount)
+{
+  this->cameraCount = _cameraCount;
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::GetRayCountRatio() const
+{
+  return this->RayCountRatio();
+}
+
+//////////////////////////////////////////////////
+double GpuLaser::RayCountRatio() const
+{
+  return this->rayCountRatio;
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::SetRayCountRatio(const double _rayCountRatio)
+{
+  this->rayCountRatio = _rayCountRatio;
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
+    std::function<void (const float *_frame, unsigned int _width,
+    unsigned int _height, unsigned int _depth,
+    const std::string &_format)> _subscriber)
+{
+  return this->dataPtr->newLaserFrame.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void GpuLaser::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
+{
+  this->dataPtr->newLaserFrame.Disconnect(_c->Id());
 }

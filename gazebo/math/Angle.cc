@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,16 @@
  */
 
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Angle.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace math;
+
+const Angle Angle::Zero = math::Angle(0);
+const Angle Angle::Pi = math::Angle(M_PI);
+const Angle Angle::HalfPi = math::Angle(M_PI * 0.5);
+const Angle Angle::TwoPi = math::Angle(M_PI * 2.0);
 
 //////////////////////////////////////////////////
 Angle::Angle()
@@ -42,6 +47,12 @@ Angle::Angle(double _radian)
 Angle::Angle(const Angle &_angle)
 {
   this->value = _angle.value;
+}
+
+//////////////////////////////////////////////////
+Angle::Angle(const ignition::math::Angle &_angle)
+{
+  this->value = _angle.Radian();
 }
 
 //////////////////////////////////////////////////
@@ -134,7 +145,7 @@ Angle Angle::operator/=(const Angle &angle)
 //////////////////////////////////////////////////
 bool Angle::operator ==(const Angle &angle) const
 {
-  return equal(this->value, angle.value);
+  return equal(this->value, angle.value, 0.001);
 }
 
 //////////////////////////////////////////////////
@@ -167,4 +178,22 @@ bool Angle::operator>=(const Angle &angle) const
   return this->value > angle.value || math::equal(this->value, angle.value);
 }
 
+//////////////////////////////////////////////////
+ignition::math::Angle Angle::Ign() const
+{
+  return ignition::math::Angle(this->value);
+}
 
+//////////////////////////////////////////////////
+Angle &Angle::operator=(const double &_angle)
+{
+  this->value = _angle;
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Angle &Angle::operator=(const ignition::math::Angle &_angle)
+{
+  this->value = _angle.Radian();
+  return *this;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact plugin
- * Author: Nate Koenig mod by John Hsu
- */
 #include "ContactPlugin.hh"
 
 using namespace gazebo;
@@ -38,7 +34,7 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   // Get the parent sensor.
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
 
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
@@ -49,7 +45,7 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 
   // Connect to the sensor update event.
   this->updateConnection = this->parentSensor->ConnectUpdated(
-      boost::bind(&ContactPlugin::OnUpdate, this));
+      std::bind(&ContactPlugin::OnUpdate, this));
 
   // Make sure the parent sensor is active.
   this->parentSensor->SetActive(true);
@@ -58,8 +54,9 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 /////////////////////////////////////////////////
 void ContactPlugin::OnUpdate()
 {
+  // Uncoment the following lines for debug output
   // Get all the contacts.
-  msgs::Contacts contacts;
+  /*msgs::Contacts contacts;
   contacts = this->parentSensor->GetContacts();
   for (int i = 0; i < contacts.contact_size(); ++i)
   {
@@ -79,11 +76,12 @@ void ContactPlugin::OnUpdate()
       std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
       std::cout << "   Normal force 1: "
                 << contacts.contact(i).normal(j).x() *
-                   contacts.contact(i).wrench(j).body_1_force().x() +
+                   contacts.contact(i).wrench(j).body_1_wrench().force().x() +
                    contacts.contact(i).normal(j).y() *
-                   contacts.contact(i).wrench(j).body_1_force().y() +
+                   contacts.contact(i).wrench(j).body_1_wrench().force().y() +
                    contacts.contact(i).normal(j).z() *
-                   contacts.contact(i).wrench(j).body_1_force().z() << "\n";
+                   contacts.contact(i).wrench(j).body_1_wrench().force().z()
+                   << "\n";
     }
-  }
+  }*/
 }

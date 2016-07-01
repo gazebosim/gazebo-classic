@@ -29,7 +29,7 @@ the standard ODE geometry primitives.
 #ifndef _ODE_COLLISION_STD_H_
 #define _ODE_COLLISION_STD_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 #include "collision_kernel.h"
 
 

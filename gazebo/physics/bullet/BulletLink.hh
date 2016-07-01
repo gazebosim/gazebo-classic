@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@
 #ifndef _BULLETLINK_HH_
 #define _BULLETLINK_HH_
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/util/system.hh"
 
 class btRigidBody;
 
@@ -34,13 +35,11 @@ namespace gazebo
   {
     class BulletMotionState;
 
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_bullet Bullet Physics
-    /// \brief bullet physics engine wrapper
+    /// \addtogroup gazebo_physics_bullet
     /// \{
 
     /// \brief Bullet Link class
-    class BulletLink : public Link
+    class GZ_PHYSICS_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
       public: BulletLink(EntityPtr _parent);
@@ -56,9 +55,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Fini();
-
-      // Documentation inherited.
-      public: virtual void Update();
 
       // Documentation inherited.
       public: virtual void OnPoseChange();
@@ -115,6 +111,10 @@ namespace gazebo
       /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
 
+      /// \internal
+      /// \brief Clear bullet collision cache needed when the body is resized.
+      public: void ClearCollisionCache();
+
       // Documentation inherited.
       public: virtual void SetLinearDamping(double _damping);
 
@@ -141,6 +141,10 @@ namespace gazebo
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
 
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
       // Documentation inherited.
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
@@ -150,13 +154,19 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetAutoDisable(bool _disable);
 
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
+
+      // Documentation inherited.
+      public: virtual void UpdateMass();
+
       /// \brief Pointer to bullet compound shape, which is a container
       ///        for other child shapes.
       private: btCollisionShape *compoundShape;
 
       /// \brief Pointer to bullet motion state, which manages updates to the
       ///        world pose from bullet.
-      private: BulletMotionStatePtr motionState;
+      public: BulletMotionStatePtr motionState;
 
       /// \brief Pointer to the bullet rigid body object.
       private: btRigidBody *rigidLink;

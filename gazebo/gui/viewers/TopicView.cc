@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,18 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/gui/viewers/ViewFactory.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -38,32 +45,32 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic View"));
   this->setObjectName("cameraSensor");
+  this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
 
   // Create the topic label and combo box
-  // {
   QHBoxLayout *topicLayout = new QHBoxLayout;
   QLabel *topicLabel = new QLabel(tr("Topic: "));
   this->topicCombo = new TopicCombo(this, this->msgTypeName,
       _viewType, this->node);
   this->topicCombo->setMinimumSize(300, 25);
   this->topicCombo->setObjectName("topicViewTopicCombo");
+  this->connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnTopicChanged(int)));
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);
   topicLayout->addWidget(this->topicCombo);
   topicLayout->addSpacing(10);
   topicLayout->addStretch(4);
-  // }
 
   // Create the Hz and bandwidth labels
-  // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
-  QLabel *hzLabel = new QLabel("Hz: ");
+  QLabel *hzLabel = new QLabel(tr("Hz: "));
   this->hzEdit = new QLineEdit;
   this->hzEdit->setReadOnly(true);
   this->hzEdit->setFixedWidth(80);
 
-  QLabel *bandwidthLabel = new QLabel("Bandwidth: ");
+  QLabel *bandwidthLabel = new QLabel(tr("Bandwidth: "));
   this->bandwidthEdit = new QLineEdit;
   this->bandwidthEdit->setReadOnly(true);
   this->bandwidthEdit->setFixedWidth(110);
@@ -76,7 +83,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   infoLayout->addWidget(bandwidthLabel);
   infoLayout->addWidget(this->bandwidthEdit);
   infoLayout->addStretch(4);
-  // }
 
   // Create the frame used to display information
   this->frame = new QFrame;
@@ -92,8 +98,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(_displayPeriod);
-
-  this->setWindowFlags(Qt::Window);
 }
 
 /////////////////////////////////////////////////
@@ -124,7 +128,7 @@ void TopicView::Update()
       }
 
       double avgDbl = 0;
-      if (this->dataTimes.size() != 0)
+      if (!this->dataTimes.empty())
         avgDbl = 1.0 / (avg.Double() / this->dataTimes.size());
 
       std::ostringstream stream;
@@ -214,21 +218,29 @@ void TopicView::SetTopic(const std::string &_topicName)
   this->msgTypeName = transport::getTopicMsgType(
       this->node->DecodeTopicName(_topicName));
 
+  if (this->msgTypeName.empty())
+  {
+    gzerr << "Can't find msg type for topic [" << _topicName << "]" <<
+        std::endl;
+    return;
+  }
+
   this->topicCombo->SetMsgTypeName(this->msgTypeName);
 
   this->msgSizes.clear();
   this->times.clear();
   std::string topicName = this->node->EncodeTopicName(_topicName);
 
-  disconnect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
-             this, SLOT(OnTopicChanged(int)));
-
   int index = this->topicCombo->findText(QString::fromStdString(topicName));
-  if (index >= 0)
-    this->topicCombo->setCurrentIndex(index);
+  if (index < 0)
+  {
+    gzerr << "Can't find topic [" << topicName << "]" << std::endl;
+    return;
+  }
 
-  connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
-          this, SLOT(OnTopicChanged(int)));
+  this->topicCombo->blockSignals(true);
+  this->topicCombo->setCurrentIndex(index);
+  this->topicCombo->blockSignals(false);
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,43 +14,30 @@
  * limitations under the License.
  *
  */
-#ifndef _MODEL_LIST_WIDGET_HH_
-#define _MODEL_LIST_WIDGET_HH_
+#ifndef _GAZEBO_GUI_MODELLISTWIDGET_HH_
+#define _GAZEBO_GUI_MODELLISTWIDGET_HH_
 
+#include <memory>
 #include <string>
-#include <list>
-#include <vector>
-#include <deque>
+#include <QItemDelegate>
+#include <QObject>
+#include <QWidget>
 
-#include "gui/qt.h"
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
-class QTreeWidget;
-class QTreeWidgetItem;
-class QPushButton;
-class QtTreePropertyBrowser;
-class QtVariantPropertyManager;
-class QtProperty;
-class QtTreePropertyItem;
 class QtBrowserItem;
-class QtVariantEditorFactory;
-
-namespace boost
-{
-  class recursive_mutex;
-  class mutex;
-}
+class QtProperty;
+class QTreeView;
+class QTreeWidgetItem;
 
 namespace gazebo
 {
   namespace gui
   {
-    class ModelEditWidget;
+    class ModelListWidgetPrivate;
 
-    class ModelListWidget : public QWidget
+    class GZ_GUI_VISIBLE ModelListWidget : public QWidget
     {
       Q_OBJECT
       public: ModelListWidget(QWidget *_parent = 0);
@@ -66,9 +53,12 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
-      private: void OnRequest(ConstRequestPtr &_msg);
 
-      private: void OnLightMsg(ConstLightPtr &_msg);
+      /// \brief An event callback to handle light update msgs.
+      /// \param[in] _msg Light message.
+      private: void OnLightUpdate(const msgs::Light &_msg);
+
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);
@@ -81,9 +71,9 @@ namespace gazebo
                    const google::protobuf::FieldDescriptor *_field);
 
       private: void FillMsg(QtProperty *_item,
-                   google::protobuf::Message *_message,
-                   const google::protobuf::Descriptor *_descriptor,
-                   QtProperty *_changedItem);
+                            google::protobuf::Message *_message,
+                            const google::protobuf::Descriptor *_descriptor,
+                            QtProperty *_changedItem);
 
       private: void FillGeometryMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
@@ -101,31 +91,38 @@ namespace gazebo
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
 
-      private: QtProperty *GetParentItemValue(const std::string &_name);
-      private: QtProperty *GetParentItemValue(QtProperty *_item,
+      private: QtProperty *ParentItemValue(const std::string &_name);
+      private: QtProperty *ParentItemValue(QtProperty *_item,
                                            const std::string &_name);
 
-      private: QtProperty *GetParentItem(const std::string &_name);
-      private: QtProperty *GetParentItem(QtProperty *_item,
-                                           const std::string &_name);
+      private: QtProperty *ParentItem(const std::string &_name);
+      private: QtProperty *ParentItem(QtProperty *_item,
+                                      const std::string &_name);
 
-      private: QtProperty *GetChildItemValue(const std::string &_name);
-      private: QtProperty *GetChildItemValue(QtProperty *_item,
-                                             const std::string &_name);
+      private: QtProperty *ChildItemValue(const std::string &_name);
+      private: QtProperty *ChildItemValue(QtProperty *_item,
+                                          const std::string &_name);
 
-      private: QtProperty *GetChildItem(const std::string &_name);
-      private: QtProperty *GetChildItem(QtProperty *_item,
-                                        const std::string &_name);
+      private: QtProperty *ChildItem(const std::string &_name);
+      private: QtProperty *ChildItem(QtProperty *_item,
+                                     const std::string &_name);
 
       private: bool HasChildItem(QtProperty *_parent, QtProperty *_child);
 
       private: void RemoveEntity(const std::string &_name);
 
-      private: QTreeWidgetItem *GetListItem(const std::string &_name,
-                                            QTreeWidgetItem *_parent);
+      private: QTreeWidgetItem *ListItem(const std::string &_name,
+                                         QTreeWidgetItem *_parent);
 
       private: void FillPropertyTree(const msgs::Model &_msg,
-                                     QtProperty *_parentItem);
+                                     QtProperty *_parent);
+
+      /// \brief Fill the property tree with plugin info.
+      /// \param[in] _msg The plugin message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const msgs::Plugin &_msg,
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Link &_msg,
                                      QtProperty *_parent);
@@ -137,13 +134,13 @@ namespace gazebo
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Surface &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Visual &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Geometry &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Scene &_msg,
                                      QtProperty *_parent);
@@ -151,14 +148,43 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Physics &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Wind &_msg,
+                                     QtProperty *_parent);
+
+      /// \brief Fill the property tree with atmosphere info.
+      /// \param[in] _msg The atmosphere message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const msgs::Atmosphere &_msg,
+                                     QtProperty *_parent);
+
       private: void FillPropertyTree(const msgs::Light &_msg,
-                                       QtProperty * /*_parent*/);
+                                     QtProperty *_parent);
 
       private: void FillVector3dProperty(const msgs::Vector3d &_msg,
                                          QtProperty *_parent);
 
       private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
+
+      /// \brief Fill the property tree with spherical coordinates info.
+      /// \param[in] _msg The spherical coordinates message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
+                                     QtProperty *_parent);
+
+      /// \brief Fill the property tree with user camera info taken from
+      /// rendering.
+      private: void FillUserCamera();
+
+      /// \brief Fill the property tree with grid info taken from rendering.
+      private: void FillGrid();
+
+      /// \brief Add a property to a parent property or to the property tree.
+      /// \param[in] _item Pointer to the property to be added.
+      /// \param[in] _parent Pointer to the parent property, if applicable.
+      private: void AddProperty(QtProperty *_item, QtProperty *_parent);
 
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
@@ -182,75 +208,29 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
-      private: QTreeWidget *modelTreeWidget;
-      private: QtTreePropertyBrowser *propTreeBrowser;
+      /// \brief Called when a wind property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void WindPropertyChanged(QtProperty *_item);
 
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr requestPub;
-      private: transport::PublisherPtr modelPub;
-      private: transport::PublisherPtr scenePub;
-      private: transport::PublisherPtr physicsPub;
-      private: transport::PublisherPtr lightPub;
+      /// \brief Called when an atmosphere property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void AtmospherePropertyChanged(QtProperty *_item);
 
-      private: transport::SubscriberPtr responseSub;
-      private: transport::SubscriberPtr requestSub;
-      private: transport::SubscriberPtr lightSub;
+      /// \brief Called when a GUI property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUIPropertyChanged(QtProperty *_item);
 
-      private: QTreeWidgetItem *sceneItem;
-      private: QTreeWidgetItem *physicsItem;
-      private: QTreeWidgetItem *modelsItem;
-      private: QTreeWidgetItem *lightsItem;
+      /// \brief Called when a GUI camera property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUICameraPropertyChanged(QtProperty *_item);
 
-      private: QtVariantPropertyManager *variantManager;
-      private: QtVariantEditorFactory *variantFactory;
-      private: boost::mutex *propMutex, *receiveMutex;
-      private: sdf::ElementPtr sdfElement;
-      private: std::string selectedEntityName;
-      private: bool fillingPropertyTree;
-      private: QtProperty *selectedProperty;
+      /// \brief Called when a GUI grid property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUIGridPropertyChanged(QtProperty *_item);
 
-      private: msgs::Request *requestMsg;
-
-      private: std::vector<event::ConnectionPtr> connections;
-
-      typedef std::list<msgs::Model> ModelMsgs_L;
-      private: ModelMsgs_L modelMsgs;
-
-      typedef std::list<msgs::Light> LightMsgs_L;
-      private: LightMsgs_L lightMsgs;
-
-      typedef std::list<std::string> RemoveEntity_L;
-      private: RemoveEntity_L removeEntityList;
-
-      private: msgs::Model modelMsg;
-      private: msgs::Link linkMsg;
-      private: msgs::Scene sceneMsg;
-      private: msgs::Joint jointMsg;
-      private: msgs::Physics physicsMsg;
-      private: msgs::Light lightMsg;
-
-      private: bool fillPropertyTree;
-      private: std::deque<std::string> fillTypes;
-
-      private: msgs::Light::LightType lightType;
-
-      /// \brief Type of physics engine.
-      private: msgs::Physics_Type physicsType;
-    };
-
-    class ModelListSheetDelegate: public QItemDelegate
-    {
-      Q_OBJECT
-      public: ModelListSheetDelegate(QTreeView *view, QWidget *parent);
-
-      public: virtual void paint(QPainter *painter,
-                  const QStyleOptionViewItem &option,
-                  const QModelIndex &index) const;
-
-      public: virtual QSize sizeHint(const QStyleOptionViewItem &opt,
-                  const QModelIndex &index) const;
-
-      private: QTreeView *m_view;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelListWidgetPrivate> dataPtr;
     };
   }
 }

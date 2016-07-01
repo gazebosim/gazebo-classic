@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,111 +14,88 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/bind.hpp>
 #include <sstream>
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "gui/Actions.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/TimePanel.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/gui/TimeWidget.hh"
+#include "gazebo/gui/LogPlayWidget.hh"
+#include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/TimePanelPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 TimePanel::TimePanel(QWidget *_parent)
-  : QWidget(_parent)
+  : QWidget(_parent), dataPtr(new TimePanelPrivate)
 {
   this->setObjectName("timePanel");
 
+  // Time Widget
+  this->dataPtr->timeWidget = new TimeWidget(this);
+  this->dataPtr->timeWidget->setObjectName("timeWidget");
+  connect(this, SIGNAL(SetTimeWidgetVisible(bool)),
+      this->dataPtr->timeWidget, SLOT(setVisible(bool)));
+
+  // LogPlay Widget
+  this->dataPtr->logPlayWidget = new LogPlayWidget(this);
+  this->dataPtr->logPlayWidget->setObjectName("logPlayWidget");
+  this->dataPtr->logPlayWidget->setVisible(false);
+  connect(this, SIGNAL(SetLogPlayWidgetVisible(bool)),
+      this->dataPtr->logPlayWidget, SLOT(setVisible(bool)));
+
+  // Layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
-
-  QFrame *frame = new QFrame;
-  QHBoxLayout *frameLayout = new QHBoxLayout;
-
-  this->percentRealTimeEdit = new QLineEdit;
-  this->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");
-  this->percentRealTimeEdit->setReadOnly(true);
-  this->percentRealTimeEdit->setFixedWidth(90);
-
-  this->simTimeEdit = new QLineEdit;
-  this->simTimeEdit->setObjectName("timePanelSimTime");
-  this->simTimeEdit->setReadOnly(true);
-  this->simTimeEdit->setFixedWidth(110);
-
-  this->realTimeEdit = new QLineEdit;
-  this->realTimeEdit->setObjectName("timePanelRealTime");
-  this->realTimeEdit->setReadOnly(true);
-  this->realTimeEdit->setFixedWidth(110);
-
-  this->iterationsEdit = new QLineEdit;
-  this->iterationsEdit->setReadOnly(true);
-  this->iterationsEdit->setFixedWidth(110);
-
-  QPushButton *timeResetButton = new QPushButton("Reset");
-  timeResetButton->setFocusPolicy(Qt::NoFocus);
-  connect(timeResetButton, SIGNAL(clicked()),
-          this, SLOT(OnTimeReset()));
-
-  frameLayout->addWidget(new QLabel(tr("Real Time Factor:")));
-  frameLayout->addWidget(this->percentRealTimeEdit);
-
-  frameLayout->addWidget(new QLabel(tr("Sim Time:")));
-  frameLayout->addWidget(this->simTimeEdit);
-
-  frameLayout->addWidget(new QLabel(tr("Real Time:")));
-  frameLayout->addWidget(this->realTimeEdit);
-
-  frameLayout->addWidget(new QLabel(tr("Iterations:")));
-  frameLayout->addWidget(this->iterationsEdit);
-
-  frameLayout->addWidget(timeResetButton);
-
-  frame->setLayout(frameLayout);
-  frame->layout()->setContentsMargins(0, 0, 0, 0);
-
-  mainLayout->addWidget(frame);
+  mainLayout->addWidget(this->dataPtr->timeWidget);
+  mainLayout->addWidget(this->dataPtr->logPlayWidget);
   this->setLayout(mainLayout);
 
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  // Transport
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &TimePanel::OnStats, this);
-  this->worldControlPub =
-    this->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
+      "~/world_stats", &TimePanel::OnStats, this);
 
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
+
+  // Timer
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(Update()));
   timer->start(33);
 
-  this->connections.push_back(
+  // Connections
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-        boost::bind(&TimePanel::OnFullScreen, this, _1)));
+      boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
-  this->show();
+  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
 
-  // Create a QueuedConnection to set iterations.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetIterations(QString)),
-          this->iterationsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+  QShortcut *space = new QShortcut(Qt::Key_Space, this);
+  QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));
 
-  // Create a QueuedConnection to set sim time.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetSimTime(QString)),
-          this->simTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
-
-  // Create a QueuedConnection to set real time.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetRealTime(QString)),
-          this->realTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+  this->dataPtr->paused = false;
 }
 
 /////////////////////////////////////////////////
-void TimePanel::OnFullScreen(bool & /*_value*/)
+void TimePanel::OnFullScreen(bool /*_value*/)
 {
   /*if (_value)
     this->hide();
@@ -130,109 +107,199 @@ void TimePanel::OnFullScreen(bool & /*_value*/)
 /////////////////////////////////////////////////
 TimePanel::~TimePanel()
 {
-  this->node.reset();
+  this->dataPtr->node.reset();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::OnPlayActionChanged()
+{
+  // Tests don't see external actions
+  if (!g_stepAct)
+    return;
+
+  if (this->IsPaused())
+  {
+    g_stepAct->setToolTip("Step the world");
+    g_stepAct->setEnabled(true);
+  }
+  else
+  {
+    g_stepAct->setToolTip("Pause the world before stepping");
+    g_stepAct->setEnabled(false);
+  }
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTimeFactor(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowRealTimeFactor(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTime(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowRealTime(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowSimTime(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowSimTime(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowIterations(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowIterations(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowFPS(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowFPS(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowStepWidget(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowStepWidget(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+bool TimePanel::IsPaused() const
+{
+  return this->dataPtr->paused;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::SetPaused(bool _paused)
+{
+  this->dataPtr->paused = _paused;
+
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->SetPaused(_paused);
+  else if (this->dataPtr->logPlayWidget->isVisible())
+    this->dataPtr->logPlayWidget->SetPaused(_paused);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::TogglePause()
+{
+  if (this->IsPaused())
+    g_playAct->trigger();
+  else
+    g_pauseAct->trigger();
 }
 
 /////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  std::ostringstream stream;
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
-  this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
-  if (this->simTimes.size() > 20)
-    this->simTimes.pop_front();
+  if (_msg->has_paused())
+    this->SetPaused(_msg->paused());
 
-  this->realTimes.push_back(msgs::Convert(_msg->real_time()));
-  if (this->realTimes.size() > 20)
-    this->realTimes.pop_front();
+  if (!this->isVisible())
+    return;
 
-  if (_msg->paused() && (g_playAct && !g_playAct->isVisible()))
+  this->dataPtr->simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  if (this->dataPtr->simTimes.size() > 20)
+    this->dataPtr->simTimes.pop_front();
+
+  this->dataPtr->realTimes.push_back(msgs::Convert(_msg->real_time()));
+  if (this->dataPtr->realTimes.size() > 20)
+    this->dataPtr->realTimes.pop_front();
+
+  if (_msg->has_log_playback_stats() &&
+      !this->dataPtr->logPlayWidget->isVisible())
   {
-    g_playAct->setVisible(true);
-    g_pauseAct->setVisible(false);
+    this->SetTimeWidgetVisible(false);
+    this->SetLogPlayWidgetVisible(true);
+    gui::Events::windowMode("LogPlayback");
   }
-  else if (!_msg->paused() && (g_pauseAct && !g_pauseAct->isVisible()))
+  else if (!_msg->has_log_playback_stats() &&
+      !this->dataPtr->timeWidget->isVisible())
   {
-    g_pauseAct->setVisible(true);
-    g_playAct->setVisible(false);
-  }
-
-  unsigned int day, hour, min, sec, msec;
-
-  // Set simulation time
-  {
-    stream.str("");
-
-    sec = _msg->sim_time().sec();
-
-    day = sec / 86400;
-    sec -= day * 86400;
-
-    hour = sec / 3600;
-    sec -= hour * 3600;
-
-    min = sec / 60;
-    sec -= min * 60;
-
-    msec = rint(_msg->sim_time().nsec() * 1e-6);
-
-    stream << std::setw(2) << std::setfill('0') << day << " ";
-    stream << std::setw(2) << std::setfill('0') << hour << ":";
-    stream << std::setw(2) << std::setfill('0') << min << ":";
-    stream << std::setw(2) << std::setfill('0') << sec << ".";
-    stream << std::setw(3) << std::setfill('0') << msec;
-
-    this->SetSimTime(QString::fromStdString(stream.str()));
+    this->SetTimeWidgetVisible(true);
+    this->SetLogPlayWidgetVisible(false);
+    gui::Events::windowMode("Simulation");
   }
 
-  // Set real time
+  if (this->dataPtr->timeWidget->isVisible())
   {
-    stream.str("");
+    // Set simulation time
+    this->dataPtr->timeWidget->EmitSetSimTime(QString::fromStdString(
+        msgs::Convert(_msg->sim_time()).FormattedString()));
 
-    sec = _msg->real_time().sec();
+    // Set real time
+    this->dataPtr->timeWidget->EmitSetRealTime(QString::fromStdString(
+        msgs::Convert(_msg->real_time()).FormattedString()));
 
-    day = sec / 86400;
-    sec -= day * 86400;
-
-    hour = sec / 3600;
-    sec -= hour * 3600;
-
-    min = sec / 60;
-    sec -= min * 60;
-
-    msec = rint(_msg->sim_time().nsec() * 1e-6);
-
-    stream << std::setw(2) << std::setfill('0') << day << " ";
-    stream << std::setw(2) << std::setfill('0') << hour << ":";
-    stream << std::setw(2) << std::setfill('0') << min << ":";
-    stream << std::setw(2) << std::setfill('0') << sec << ".";
-    stream << std::setw(3) << std::setfill('0') << msec;
-
-    this->SetRealTime(QString::fromStdString(stream.str()));
-  }
-
-  // Set the iterations
-  this->SetIterations(QString::fromStdString(
+    // Set the iterations
+    this->dataPtr->timeWidget->EmitSetIterations(QString::fromStdString(
         boost::lexical_cast<std::string>(_msg->iterations())));
+  }
+  else if (this->dataPtr->logPlayWidget->isVisible())
+  {
+    // Set current time
+    this->dataPtr->logPlayWidget->EmitSetCurrentTime(
+        msgs::Convert(_msg->sim_time()));
+
+    // Set start time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetStartTime(
+        msgs::Convert(_msg->log_playback_stats().start_time()));
+
+    // Set end time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetEndTime(
+        msgs::Convert(_msg->log_playback_stats().end_time()));
+  }
 }
 
 /////////////////////////////////////////////////
 void TimePanel::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  if (!this->isVisible())
+    return;
+
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+
+  // Avoid apparent race condition on start, seen on Windows.
+  if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
+    return;
 
   std::ostringstream percent;
 
   common::Time simAvg, realAvg;
   std::list<common::Time>::iterator simIter, realIter;
 
-  simIter = ++(this->simTimes.begin());
-  realIter = ++(this->realTimes.begin());
-  while (simIter != this->simTimes.end() && realIter != this->realTimes.end())
+  simIter = ++(this->dataPtr->simTimes.begin());
+  realIter = ++(this->dataPtr->realTimes.begin());
+  while (simIter != this->dataPtr->simTimes.end() &&
+      realIter != this->dataPtr->realTimes.end())
   {
-    simAvg += ((*simIter) - this->simTimes.front());
-    realAvg += ((*realIter) - this->realTimes.front());
+    simAvg += ((*simIter) - this->dataPtr->simTimes.front());
+    realAvg += ((*realIter) - this->dataPtr->realTimes.front());
     ++simIter;
     ++realIter;
   }
@@ -246,7 +313,22 @@ void TimePanel::Update()
   else
     percent << "0";
 
-  this->percentRealTimeEdit->setText(tr(percent.str().c_str()));
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->SetPercentRealTimeEdit(percent.str().c_str());
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (cam)
+  {
+    std::ostringstream avgFPS;
+    avgFPS << cam->AvgFPS();
+
+    if (this->dataPtr->timeWidget->isVisible())
+    {
+      // Set the avg fps
+      this->dataPtr->timeWidget->EmitSetFPS(QString::fromStdString(
+          boost::lexical_cast<std::string>(avgFPS.str().c_str())));
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -255,5 +337,17 @@ void TimePanel::OnTimeReset()
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(true);
-  this->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset time");
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::OnStepValueChanged(int _value)
+{
+  emit gui::Events::inputStepSize(_value);
 }

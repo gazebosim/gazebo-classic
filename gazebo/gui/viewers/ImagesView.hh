@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _IMAGESVIEW_HH_
-#define _IMAGESVIEW_HH_
+#ifndef _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
+#define _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
 
 #include <string>
-#include <utility>
-#include <vector>
 
-#include <boost/thread/mutex.hpp>
-
-#include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 #include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/viewers/TopicView.hh"
 
@@ -35,7 +28,9 @@ namespace gazebo
 {
   namespace gui
   {
-    class ImagesView : public TopicView
+    class ImagesViewPrivate;
+
+    class GZ_GUI_VISIBLE ImagesView : public TopicView
     {
       Q_OBJECT
 
@@ -61,24 +56,8 @@ namespace gazebo
       /// \param[in] _height Height of the image.
       private: void AddImage(int _width, int _height);
 
-      /// \brief A label is used to display the image data.
-      private: std::vector<QLabel *> imageLabels;
-
-      /// \brief Storage mechansim for image data.
-      private: std::vector<QPixmap> pixmaps;
-      private: std::vector<QImage> images;
-
-      /// \brief Pointer to the frame containing the images
-      private: QGridLayout *frameLayout;
-
-      /// \brief Mutex to protect the image vectors
-      private: boost::mutex mutex;
-
-      /// \brief Set to true to clear the images from the widget
-      private: bool clearImages;
-
-      /// \brief Vector of image sizes to add
-      private: std::vector<std::pair<int, int> > addImage;
+      /// \brief Private data.
+      private: ImagesViewPrivate *dataPtr;
     };
   }
 }

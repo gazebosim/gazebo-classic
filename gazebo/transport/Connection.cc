@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,39 @@
  *
 */
 
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
+#ifdef _WIN32
+  // For socket(), connect(), send(), and recv().
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  #include <iphlpapi.h>
+  // Type used for raw data on this platform.
+  typedef char raw_type;
+  #define snprintf _snprintf
+#else
+  // For data types
+  #include <sys/types.h>
+  // For socket(), connect(), send(), and recv()
+  #include <sys/socket.h>
+  // For gethostbyname()
+  #include <netdb.h>
+  // For inet_addr()
+  #include <arpa/inet.h>
+  // For close()
+  #include <unistd.h>
+  // For sockaddr_in
+  #include <netinet/in.h>
+  // Type used for raw data on this platform
+  typedef void raw_type;
+  #include <ifaddrs.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/common/Console.hh"
@@ -34,6 +59,8 @@
 
 using namespace gazebo;
 using namespace transport;
+
+extern void dummy_callback_fn(uint32_t);
 
 unsigned int Connection::idCounter = 0;
 IOManager *Connection::iomanager = NULL;
@@ -57,6 +84,10 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
+  this->isOpen = false;
+  this->dropMsgLogged = false;
+  this->headerBuffer = new char[HEADER_LENGTH+1];
+
   if (iomanager == NULL)
     iomanager = new IOManager();
 
@@ -67,6 +98,7 @@ Connection::Connection()
 
   this->acceptor = NULL;
   this->readQuit = false;
+  this->connectError = false;
   this->writeQueue.clear();
   this->writeCount = 0;
 
@@ -74,11 +106,25 @@ Connection::Connection()
                    boost::lexical_cast<std::string>(this->GetLocalPort());
 
   this->localAddress = this->GetLocalEndpoint().address().to_string();
+
+  // Get and set the IP white list from the GAZEBO_IP_WHITE_LIST environment
+  // variable.
+  char *whiteListEnv = getenv("GAZEBO_IP_WHITE_LIST");
+  if (whiteListEnv && !std::string(whiteListEnv).empty())
+  {
+    // Automatically add in the local addresses. This guarantees that
+    // Gazebo will run properly on the local machine.
+    this->ipWhiteList = "," + this->localAddress + ",127.0.0.1,"
+      + whiteListEnv + ",";
+  }
 }
 
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
+  delete [] this->headerBuffer;
+  this->headerBuffer = NULL;
+
   this->Shutdown();
 
   if (iomanager)
@@ -144,7 +190,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
       boost::bind(&Connection::OnConnect, this,
         boost::asio::placeholders::error, endpointIter));
 
-  // Wait for at most 2 seconds for a connection to be established.
+  // Wait for at most 60 seconds for a connection to be established.
   // The connectionCondition notification occurs in ::OnConnect.
   if (!this->connectCondition.timed_wait(lock,
         boost::posix_time::milliseconds(60000)) || this->connectError)
@@ -161,19 +207,27 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
     return false;
   }
 
+  this->isOpen = true;
+
   return true;
 }
 
 //////////////////////////////////////////////////
-void Connection::Listen(unsigned int port, const AcceptCallback &accept_cb)
+void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
 {
-  this->acceptCB = accept_cb;
+  this->acceptCB = _acceptCB;
 
   this->acceptor = new boost::asio::ip::tcp::acceptor(iomanager->GetIO());
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
   this->acceptor->open(endpoint.protocol());
   this->acceptor->set_option(
       boost::asio::ip::tcp::acceptor::reuse_address(true));
+  this->acceptor->set_option(
+      boost::asio::ip::tcp::acceptor::keep_alive(true));
+
+  // Enable TCP_NO_DELAY
+  this->acceptor->set_option(boost::asio::ip::tcp::no_delay(true));
+
   this->acceptor->bind(endpoint);
   this->acceptor->listen();
 
@@ -190,9 +244,22 @@ void Connection::OnAccept(const boost::system::error_code &e)
   // Call the accept callback if there isn't an error
   if (!e)
   {
-    // First start a new acceptor
-    this->acceptCB(this->acceptConn);
+    this->acceptConn->isOpen = true;
 
+    if (!this->ipWhiteList.empty() &&
+        this->ipWhiteList.find("," +
+          this->acceptConn->GetRemoteHostname() + ",") == std::string::npos)
+    {
+      gzlog << "Rejected connection from["
+        << this->acceptConn->GetRemoteHostname() << "], not in white list["
+        << this->ipWhiteList << "]\n";
+    }
+    else
+    {
+      this->acceptCB(this->acceptConn);
+    }
+
+    // First start a new acceptor
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket,
@@ -223,48 +290,33 @@ void Connection::StopRead()
 //////////////////////////////////////////////////
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
+  this->EnqueueMsg(_buffer, boost::bind(&dummy_callback_fn, _1), 0, _force);
+}
+
+//////////////////////////////////////////////////
+void Connection::EnqueueMsg(const std::string &_buffer,
+    boost::function<void(uint32_t)> _cb, uint32_t _id, bool _force)
+{
   // Don't enqueue empty messages
-  if (_buffer.empty())
+  if (_buffer.empty() || !this->IsOpen())
   {
     return;
   }
 
-  std::ostringstream header_stream;
+  snprintf(this->headerBuffer, HEADER_LENGTH + 1, "%08x",
+      static_cast<unsigned int>(_buffer.size()));
 
-  header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
-
-  if (header_stream.str().empty() ||
-      header_stream.str().size() != HEADER_LENGTH)
   {
-    // Something went wrong, inform the caller
-    boost::system::error_code error(boost::asio::error::invalid_argument);
-    gzerr << "Connection::Write error[" << error.message() << "]\n";
-    return;
-  }
-
-  /*if (_force)
-    {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    boost::asio::streambuf *buffer = new boost::asio::streambuf;
-    std::ostream os(buffer);
-    os << header_stream.str() << _buffer;
 
-    std::size_t written = 0;
-    written = boost::asio::write(*this->socket, buffer->data());
-    if (written != buffer->size())
-      gzerr << "Didn't write all the data\n";
-
-    delete buffer;
-    }
+    if (this->writeQueue.empty() ||
+        (this->writeCount > 0 && this->writeQueue.size() == 1) ||
+        (this->writeQueue.back().size()+_buffer.size() > 4096))
+      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
     else
-    {
-    */
-  {
-    boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-    this->writeQueue.push_back(header_stream.str());
-    this->writeQueue.push_back(_buffer);
+      this->writeQueue.back() += std::string(headerBuffer) + _buffer;
+    this->callbacks.push_back(std::make_pair(_cb, _id));
   }
-  // }
 
   if (_force)
   {
@@ -280,28 +332,20 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 /////////////////////////////////////////////////
 void Connection::ProcessWriteQueue(bool _blocking)
 {
+  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+
   if (!this->IsOpen())
   {
     return;
   }
 
-  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-
   // async_write should only be called when the last async_write has
-  // completed. Therefore we have to check the writeCount attribute
-  if (this->writeQueue.size() == 0 || this->writeCount > 0)
+  // completed. therefore we have to check the writeCount attribute
+  if (this->writeQueue.empty() || this->writeCount > 0)
   {
     return;
   }
 
-  boost::asio::streambuf *buffer(new boost::asio::streambuf);
-  std::ostream os(buffer);
-
-  for (unsigned int i = 0; i < this->writeQueue.size(); i++)
-  {
-    os << this->writeQueue[i];
-  }
-  this->writeQueue.clear();
   this->writeCount++;
 
   // Write the serialized data to the socket. We use
@@ -309,23 +353,32 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
-    boost::asio::async_write(*this->socket, buffer->data(),
-        boost::bind(&Connection::OnWrite, shared_from_this(),
-          boost::asio::placeholders::error, buffer));
+    this->callbackIndex = this->callbacks.size();
+    boost::asio::async_write(*this->socket,
+        boost::asio::buffer(this->writeQueue.front().c_str(),
+          this->writeQueue.front().size()),
+          boost::bind(&Connection::OnWrite, shared_from_this(),
+            boost::asio::placeholders::error));
   }
   else
   {
     try
     {
-      boost::asio::write(*this->socket, buffer->data());
+      boost::asio::write(*this->socket,
+          boost::asio::buffer(this->writeQueue.front().c_str(),
+            this->writeQueue.front().size()));
     }
     catch(...)
     {
       this->Shutdown();
     }
 
+    // Call the callback, in not NULL
+    if (!this->callbacks.front().first.empty())
+      this->callbacks.front().first(this->callbacks.front().second);
+
+    this->writeQueue.pop_front();
     this->writeCount--;
-    delete buffer;
   }
 }
 
@@ -342,13 +395,24 @@ std::string Connection::GetRemoteURI() const
 }
 
 //////////////////////////////////////////////////
-void Connection::OnWrite(const boost::system::error_code &_e,
-                         boost::asio::streambuf *_buffer)
+void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
+
+    for (unsigned int i = 0; i < this->callbackIndex; ++i)
+    {
+      if (!this->callbacks.empty())
+      {
+        if (!this->callbacks.front().first.empty())
+          this->callbacks.front().first(this->callbacks.front().second);
+        this->callbacks.pop_front();
+      }
+    }
+
+    if (!this->writeQueue.empty())
+      this->writeQueue.pop_front();
     this->writeCount--;
-    delete _buffer;
   }
 
   if (_e)
@@ -376,18 +440,8 @@ void Connection::Shutdown()
 bool Connection::IsOpen() const
 {
   bool result = this->socket && this->socket->is_open();
-  try
-  {
-    this->GetRemoteURI();
-  }
-  catch(...)
-  {
-    result = false;
-  }
-
-  return result;
+  return this->isOpen && result;
 }
-
 
 //////////////////////////////////////////////////
 void Connection::Close()
@@ -427,6 +481,10 @@ void Connection::Close()
     delete this->acceptor;
     this->acceptor = NULL;
   }
+
+  boost::recursive_mutex::scoped_lock lock2(this->writeMutex);
+  this->writeQueue.clear();
+  this->callbacks.clear();
 }
 
 //////////////////////////////////////////////////
@@ -485,7 +543,7 @@ bool Connection::Read(std::string &data)
   }
 
   // Parse the header to get the size of the incoming data packet
-  incoming_size = this->ParseHeader(header);
+  incoming_size = this->ParseHeader(std::string(header, HEADER_LENGTH));
   if (incoming_size > 0)
   {
     incoming.resize(incoming_size);
@@ -667,6 +725,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
   // GAZEBO_HOSTNAME have failed.
   if (addressIsUnspecified(address))
   {
+#ifndef _WIN32
     // the following is *nix implementation to get the external IP of the
     // current machine.
 
@@ -722,6 +781,82 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 
       address = address.loopback();
     }
+
+    freeifaddrs(ifaddr);
+// _WIN32
+#else
+  // Establish our default return value, in case everything below fails.
+  std::string retAddr("127.0.0.1");
+
+  // Look up our address.
+  ULONG outBufLen = 0;
+  PIP_ADAPTER_ADDRESSES addrs = NULL;
+
+  // Not sure whether these are the right flags, but they work
+  // on Windows 7
+  ULONG flags = (GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST |
+                 GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME);
+
+  // The first time, it'll fail; we're asking how much space is needed to
+  // store the result.
+  GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen);
+
+  // Allocate the required space.
+  addrs = new IP_ADAPTER_ADDRESSES[outBufLen];
+  ULONG ret;
+
+  // Now the call should succeed.
+  if ((ret = GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen)) ==
+      NO_ERROR)
+  {
+    // Iterate over all returned adapters, arbitrarily sticking with the
+    // last non-loopback one that we find.
+    for (PIP_ADAPTER_ADDRESSES curr = addrs; curr; curr = curr->Next)
+    {
+      // Iterate over all unicast addresses for this adapter
+      for (PIP_ADAPTER_UNICAST_ADDRESS unicast = curr->FirstUnicastAddress;
+           unicast; unicast = unicast->Next)
+      {
+        // Cast to get an IPv4 numeric address (the AF_INET flag used above
+        // ensures that we're only going to get IPv4 address here).
+        sockaddr_in* sockaddress =
+          reinterpret_cast<sockaddr_in*>(unicast->Address.lpSockaddr);
+
+        // Make it a dotted quad
+        char ipv4Str[3*4+3+1];
+
+        snprintf(ipv4Str, sizeof(ipv4Str), "%d.%d.%d.%d",
+          sockaddress->sin_addr.S_un.S_un_b.s_b1,
+          sockaddress->sin_addr.S_un.S_un_b.s_b2,
+          sockaddress->sin_addr.S_un.S_un_b.s_b3,
+          sockaddress->sin_addr.S_un.S_un_b.s_b4);
+
+        // Ignore loopback address (that's our default anyway)
+        if (!strcmp(ipv4Str, "127.0.0.1"))
+          continue;
+
+        retAddr = ipv4Str;
+      }
+    }
+  }
+  else
+  {
+    gzerr << "GetAdaptersAddresses() failed: " << ret << std::endl;
+  }
+
+  delete [] addrs;
+
+  if (retAddr == "127.0.0.1")
+  {
+    gzwarn <<
+      "Couldn't find a preferred IP via the GetAdaptersAddresses() call; "
+      "I'm assuming that your IP "
+      "address is 127.0.0.1.  This should work for local processes, "
+      "but will almost certainly not work if you have remote processes."
+      "Report to the disc-zmq development team to seek a fix." << std::endl;
+  }
+  address = boost::asio::ip::address_v4::from_string(retAddr);
+#endif
   }
 
   // Complain if we were unable to find a valid address
@@ -736,7 +871,12 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 bool Connection::ValidateIP(const std::string &_ip)
 {
   struct sockaddr_in sa;
+
+#ifdef _WIN32
+  int result = InetPton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+#else
   int result = inet_pton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+#endif
   return result != 0;
 }
 
@@ -745,7 +885,12 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
 {
   boost::asio::ip::tcp::endpoint ep;
   if (this->socket)
-    ep = this->socket->remote_endpoint();
+  {
+    boost::system::error_code ec;
+    ep = this->socket->remote_endpoint(ec);
+    if (ec)
+      gzerr << "Getting remote endpoint failed" << std::endl;
+  }
   return ep;
 }
 
@@ -828,4 +973,10 @@ void Connection::OnConnect(const boost::system::error_code &_error,
 unsigned int Connection::GetId() const
 {
   return this->id;
+}
+
+//////////////////////////////////////////////////
+std::string Connection::GetIPWhiteList() const
+{
+  return this->ipWhiteList;
 }

@@ -1,0 +1,245 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- to demonstrate force torque, we'll construct a model with
+    two bodies stacked vertically, with a (fixed joint connecting them).
+     link_1 frame is coincident with the world
+     link_2 frame is on the top of the two stacked cylinders
+     joint_12 frame is place in between the two cylinders
+     link_1 and link_2 have mass of 10 kilos
+     the com of link_1 is [0  3  5] in world coordinates
+     the com of link_2 is [0 -3 15] in world coordinates -->
+    <model name="model_1">
+        <pose>0 0 0 0 0 0</pose>
+      <link name="link_1">
+        <inertial>
+          <pose>0 -3 5 0 0 0</pose>
+          <inertia>
+            <ixx>100.0000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>100.000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>100.000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder1">
+          <pose>0 0 5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>5</radius>
+              <length>9.8</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <collision name="collision_cylinder1">
+          <pose>0 0 5 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>5</radius>
+              <length>9.8</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+
+      <link name="link_2">
+        <pose>0 0 20 1.5708 0 0</pose>
+        <inertial>
+          <pose>0 -5 -3 0 0 0</pose>
+          <inertia>
+            <ixx>100.000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>100.000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>100.000</izz>
+          </inertia>
+          <mass>10.000000</mass>
+        </inertial>
+        <visual name="visual_cylinder2">
+          <pose>0 -5 0 -1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>5</radius>
+              <length>9.8</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <collision name="collision_cylinder2">
+          <pose>0 -5 0 -1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>5</radius>
+              <length>9.8</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+
+      <joint name="joint_01" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <!-- joint_01 coincident with world and link_1 frame -->
+        <pose>0 0 0 0 0 0</pose>
+        <axis>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+        </axis>
+        <sensor name="force_torque_01_parent_and_parent_to_child" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>parent</frame>
+            <measure_direction>parent_to_child</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_01_parent_and_child_to_parent" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>parent</frame>
+            <measure_direction>child_to_parent</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_01_child_and_parent_to_child" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>child</frame>
+            <measure_direction>parent_to_child</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_01_child_and_child_to_parent" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>child</frame>
+            <measure_direction>child_to_parent</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_01_sensor_and_parent_to_child" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>sensor</frame>
+            <measure_direction>parent_to_child</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_01_sensor_and_child_to_parent" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>sensor</frame>
+            <measure_direction>child_to_parent</measure_direction>
+          </force_torque>
+        </sensor>
+        <physics>
+          <provide_feedback>true</provide_feedback>
+        </physics>
+      </joint>
+
+      <joint name="joint_12" type="revolute">
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <!-- joint_12 at the interface between the two cylinders -->
+        <pose>1.0 -10.0 0.0 0 -0.7854 0</pose>
+        <axis>
+          <limit>
+            <lower>-0.0</lower>
+            <upper>0.0</upper>
+            <effort>1000.000000</effort>
+            <velocity>1000.000000</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+        </axis>
+        <sensor name="force_torque_12_parent_and_parent_to_child" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>parent</frame>
+            <measure_direction>parent_to_child</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_12_parent_and_child_to_parent" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>parent</frame>
+            <measure_direction>child_to_parent</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_12_child_and_parent_to_child" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>child</frame>
+            <measure_direction>parent_to_child</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_12_child_and_child_to_parent" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>child</frame>
+            <measure_direction>child_to_parent</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_12_sensor_and_parent_to_child" type="force_torque">
+          <pose>0 0 0 0 -0.7854 0</pose>
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>sensor</frame>
+            <measure_direction>parent_to_child</measure_direction>
+          </force_torque>
+        </sensor>
+        <sensor name="force_torque_12_sensor_and_child_to_parent" type="force_torque">
+          <pose>0 0 0 0 -0.7854 0</pose>
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>sensor</frame>
+            <measure_direction>child_to_parent</measure_direction>
+          </force_torque>
+        </sensor>
+        <physics>
+          <provide_feedback>true</provide_feedback>
+        </physics>
+      </joint>
+    </model>
+  </world>
+</sdf>

@@ -5,13 +5,9 @@ package gazebo.msgs;
 /// \brief Message for a vector3 double
 
 
-import "header.proto";
-
 message Vector3d
 {
   required double x = 2;
   required double y = 3;
   required double z = 4;
 }
-
-

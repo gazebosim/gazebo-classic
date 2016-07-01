@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,15 @@
 #ifndef _SPHERESHAPE_HH_
 #define _SPHERESHAPE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +41,7 @@ namespace gazebo
 
     /// \class SphereShape SphereShape.hh physics/physics.hh
     /// \brief Sphere collision shape.
-    class SphereShape : public Shape
+    class GZ_PHYSICS_VISIBLE SphereShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -54,6 +61,10 @@ namespace gazebo
       /// \return Radius of the sphere.
       public: double GetRadius() const;
 
+      /// \brief Set the scale of the sphere.
+      /// \param[in] _scale Scale to set the sphere to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
+
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
       public: virtual void FillMsg(msgs::Geometry &_msg);
@@ -61,6 +72,9 @@ namespace gazebo
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
     };
     /// \}
   }

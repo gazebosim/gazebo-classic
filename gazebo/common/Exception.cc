@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
  * Date: 07 May 2007
  */
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -49,8 +49,8 @@ Exception::~Exception()
 //////////////////////////////////////////////////
 void Exception::Print() const
 {
-  gazebo::common::Console::Instance()->ColorErr("Exception",
-      this->file, this->line, 31) << *this << "\n";
+  (gazebo::common::Console::err(this->file, this->line)) << "EXCEPTION: "
+      << *this << std::endl;
 }
 
 //////////////////////////////////////////////////

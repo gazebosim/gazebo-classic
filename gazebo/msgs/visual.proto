@@ -9,20 +9,61 @@ import "pose.proto";
 import "geometry.proto";
 import "material.proto";
 import "plugin.proto";
+import "vector3d.proto";
 
 message Visual
 {
-  required string name         = 1;
-  optional string parent_name  = 2;
-  optional bool cast_shadows   = 3;
-  optional double transparency = 4;
-  optional double laser_retro  = 5;
-  optional Pose pose           = 6;
-  optional Geometry geometry   = 7;
-  optional Material material   = 8;
+  /// \brief Optional meta information for the visual. The information
+  /// contained within this element should be used to provide additional
+  /// feedback to an end user.
+  message Meta
+  {
+    /// \brief The layer in which this visual is displayed. The layer number
+    /// is useful for programs, such as Gazebo, that put visuals in different
+    /// layers for enhanced visualization.
+    optional int32 layer       = 1;
+  }
 
-  optional bool visible        = 9;
-  optional bool delete_me      = 11;
-  optional bool is_static      = 12;
-  optional Plugin plugin       = 13;
+  enum Type
+  {
+    /// \brief Entity visual
+    ENTITY    = 0;
+    /// \brief Model visual
+    MODEL     = 1;
+    /// \brief Link visual
+    LINK      = 2;
+    /// \brief Visual visual
+    VISUAL    = 3;
+    /// \brief Collision visual
+    COLLISION = 4;
+    /// \brief Sensor visual
+    SENSOR =    5;
+    /// \brief GUI visual
+    GUI =       6;
+    /// \brief Physics data visual
+    PHYSICS =   7;
+  }
+
+  required string name         = 1;
+  optional uint32 id           = 2;
+  required string parent_name  = 3;
+  optional uint32 parent_id    = 4;
+  optional bool cast_shadows   = 5;
+  optional double transparency = 6;
+  optional double laser_retro  = 7;
+  optional Pose pose           = 8;
+  optional Geometry geometry   = 9;
+  optional Material material   = 10;
+
+  optional bool visible        = 11;
+  optional bool delete_me      = 12;
+  optional bool is_static      = 13;
+  optional Plugin plugin       = 14;
+  optional Vector3d scale      = 15;
+
+  /// \brief Option meta information associated with this visual.
+  optional Meta meta           = 16;
+
+  /// \brief Type of visual.
+  optional Type type           = 17;
 }

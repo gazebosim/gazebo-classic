@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,17 @@
 #include <boost/filesystem.hpp>
 
 #include "test_config.h"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshManager.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/math/Vector3.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
+
+class MeshTest : public gazebo::testing::AutoLogFixture { };
 
 std::string asciiSTLBox =
 "solid MYSOLID\n\
@@ -117,15 +121,16 @@ endsolid MYSOLID";
 
 
 /////////////////////////////////////////////////
-TEST(MeshTest, Mesh)
+TEST_F(MeshTest, Mesh)
 {
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::remove_all(paths->DefaultTestPath());
+  boost::filesystem::create_directories(paths->DefaultTestPath());
 
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.mesh"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.3ds"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.xml"));
 
   const common::Mesh *mesh =
     common::MeshManager::Instance()->GetMesh("unit_box");
@@ -135,15 +140,14 @@ TEST(MeshTest, Mesh)
   EXPECT_EQ(static_cast<unsigned int>(24), mesh->GetTexCoordCount());
   EXPECT_EQ(static_cast<unsigned int>(0), mesh->GetMaterialCount());
 
-  math::Vector3 center, min, max;
+  ignition::math::Vector3d center, min, max;
   mesh->GetAABB(center, min, max);
-  EXPECT_TRUE(center == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(min == math::Vector3(-.5, -.5, -.5));
-  EXPECT_TRUE(max == math::Vector3(.5, .5, .5));
+  EXPECT_TRUE(center == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
+  EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
 
-
-  float *vertArray = NULL;
-  int *indArray = NULL;
+  float *vertArray = nullptr;
+  int *indArray = nullptr;
   mesh->FillArrays(&vertArray, &indArray);
 
   int i = 0;
@@ -184,26 +188,26 @@ TEST(MeshTest, Mesh)
   common::SubMesh *subMesh = new common::SubMesh();
   newMesh->AddSubMesh(subMesh);
 
-  std::vector<math::Vector3> verts;
-  std::vector<math::Vector3> norms;
+  std::vector<ignition::math::Vector3d> verts;
+  std::vector<ignition::math::Vector3d> norms;
 
   EXPECT_THROW(mesh->GetSubMesh(1), common::Exception);
 
   for (i = 0; i < 24; ++i)
   {
-    verts.push_back(mesh->GetSubMesh(0)->GetVertex(i));
-    norms.push_back(mesh->GetSubMesh(0)->GetNormal(i));
+    verts.push_back(mesh->GetSubMesh(0)->Vertex(i));
+    norms.push_back(mesh->GetSubMesh(0)->Normal(i));
   }
 
   subMesh->CopyVertices(verts);
   subMesh->CopyNormals(norms);
-  EXPECT_TRUE(subMesh->HasVertex(math::Vector3(-.5, -.5, -.5)));
-  EXPECT_FALSE(subMesh->HasVertex(math::Vector3(0, 0, 0)));
+  EXPECT_TRUE(subMesh->HasVertex(ignition::math::Vector3d(-.5, -.5, -.5)));
+  EXPECT_FALSE(subMesh->HasVertex(ignition::math::Vector3d(0, 0, 0)));
 
   newMesh->GetAABB(center, min, max);
-  EXPECT_TRUE(center == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(min == math::Vector3(-.5, -.5, -.5));
-  EXPECT_TRUE(max == math::Vector3(.5, .5, .5));
+  EXPECT_TRUE(center == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
+  EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
 
   subMesh->SetVertexCount(1);
   subMesh->SetIndexCount(1);
@@ -215,82 +219,83 @@ TEST(MeshTest, Mesh)
   EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetNormalCount());
   EXPECT_EQ(static_cast<unsigned int>(1), subMesh->GetTexCoordCount());
 
-  subMesh->SetVertex(0, math::Vector3(1, 2, 3));
-  EXPECT_TRUE(subMesh->GetVertex(0) == math::Vector3(1, 2, 3));
+  subMesh->SetVertex(0, ignition::math::Vector3d(1, 2, 3));
+  EXPECT_TRUE(subMesh->Vertex(0) == ignition::math::Vector3d(1, 2, 3));
 
-  subMesh->SetTexCoord(0, math::Vector2d(.1, .2));
-  EXPECT_TRUE(subMesh->GetTexCoord(0) == math::Vector2d(.1, .2));
+  subMesh->SetTexCoord(0, ignition::math::Vector2d(.1, .2));
+  EXPECT_TRUE(subMesh->TexCoord(0) == ignition::math::Vector2d(.1, .2));
 
-  newMesh->GenSphericalTexCoord(math::Vector3(0, 0, 0));
+  newMesh->GenSphericalTexCoord(ignition::math::Vector3d(0, 0, 0));
   delete newMesh;
 
-  std::ofstream stlFile("/tmp/gazebo_test/gazebo_stl_test.stl", std::ios::out);
+  std::ofstream stlFile((paths->DefaultTestPath() +
+      "/gazebo_stl_test.stl").c_str(), std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
   mesh = common::MeshManager::Instance()->Load(
-      "/tmp/gazebo_test/gazebo_stl_test-bad.stl");
-  EXPECT_EQ(NULL, mesh);
+      paths->DefaultTestPath() + "/gazebo_stl_test-bad.stl");
+  EXPECT_EQ(nullptr, mesh);
 
   mesh = common::MeshManager::Instance()->Load(
-      "/tmp/gazebo_test/gazebo_stl_test.stl");
+      paths->DefaultTestPath() + "/gazebo_stl_test.stl");
   mesh->GetAABB(center, min, max);
-  EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
-  EXPECT_TRUE(min == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(max == math::Vector3(1, 1, 1));
+  EXPECT_TRUE(center == ignition::math::Vector3d(0.5, 0.5, 0.5));
+  EXPECT_TRUE(min == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(paths->DefaultTestPath());
 }
 
 /////////////////////////////////////////////////
 // Test centering a submesh.
-TEST(MeshTest, MeshMove)
+TEST_F(MeshTest, MeshMove)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
+
+  // The default location of the box_offset is not centered
+  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
+  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
+
+  mesh->Center(ignition::math::Vector3d::Zero);
+
+  EXPECT_EQ(ignition::math::Vector3d(1.0, 1.0, 1.0), mesh->Max());
+  EXPECT_EQ(ignition::math::Vector3d(-1.0, -1.0, -1.0), mesh->Min());
+
+  mesh->Translate(ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(ignition::math::Vector3d(2.0, 3.0, 4.0), mesh->Max());
+  EXPECT_EQ(ignition::math::Vector3d(0.0, 1.0, 2.0), mesh->Min());
+}
+
+/////////////////////////////////////////////////
+// Test centering a submesh.
+TEST_F(MeshTest, SubMeshCenter)
 {
   common::ColladaLoader loader;
   common::Mesh *mesh = loader.Load(
       std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
 
   // The default location of the box_offest is not centered
-  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
-  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
-
-  mesh->Center();
-
-  EXPECT_EQ(math::Vector3(1.0, 1.0, 1.0), mesh->GetMax());
-  EXPECT_EQ(math::Vector3(-1.0, -1.0, -1.0), mesh->GetMin());
-
-  mesh->Translate(math::Vector3(1, 2, 3));
-  EXPECT_EQ(math::Vector3(2.0, 3.0, 4.0), mesh->GetMax());
-  EXPECT_EQ(math::Vector3(0.0, 1.0, 2.0), mesh->GetMin());
-}
-
-/////////////////////////////////////////////////
-// Test centering a submesh.
-TEST(MeshTest, SubMeshCenter)
-{
-  common::ColladaLoader loader;
-  common::Mesh *mesh = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
-
-  // The default location of the box_offest is not centered
-  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
-  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
+  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
 
   // Get the Cube submesh
   common::SubMesh submesh(mesh->GetSubMesh("Cube"));
 
-  submesh.Center(math::Vector3(1, 2, 3));
-  EXPECT_EQ(math::Vector3(0, 1, 2), submesh.GetMin());
-  EXPECT_EQ(math::Vector3(2, 3, 4), submesh.GetMax());
+  submesh.Center(ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(ignition::math::Vector3d(0, 1, 2), submesh.Min());
+  EXPECT_EQ(ignition::math::Vector3d(2, 3, 4), submesh.Max());
 
-  submesh.Translate(math::Vector3(1, 2, 3));
-  EXPECT_EQ(math::Vector3(1, 3, 5), submesh.GetMin());
-  EXPECT_EQ(math::Vector3(3, 5, 7), submesh.GetMax());
+  submesh.Translate(ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(ignition::math::Vector3d(1, 3, 5), submesh.Min());
+  EXPECT_EQ(ignition::math::Vector3d(3, 5, 7), submesh.Max());
 
   // The original mesh should not change
-  EXPECT_EQ(math::Vector3(5.46554, 2.18039, 4.8431), mesh->GetMax());
-  EXPECT_EQ(math::Vector3(3.46555, 0.180391, 2.8431), mesh->GetMin());
+  EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
+  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
 }
 
 /////////////////////////////////////////////////

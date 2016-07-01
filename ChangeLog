@@ -1,5 +1,0 @@
-0.10.0 (13-01-2009)
-  -Small redesgin of GUI
-	-Overhauled the internal model tree structure
-	-Added beginnings of support for other physics engine
-	-Added support for Collada files

@@ -1,0 +1,7 @@
+#ifndef GAZEBO_GUI_HH_
+#define GAZEBO_GUI_HH_
+
+// Automatically generated
+${gui_headers}
+
+#endif

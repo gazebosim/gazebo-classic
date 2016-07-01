@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,21 @@
 #ifndef _INERTIAL_HH_
 #define _INERTIAL_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sdf/sdf.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +42,7 @@ namespace gazebo
 
     /// \class Inertial Inertial.hh physics/physics.hh
     /// \brief A class for inertial information about a link
-    class Inertial
+    class GZ_PHYSICS_VISIBLE Inertial
     {
       /// \brief Default Constructor
       public: Inertial();

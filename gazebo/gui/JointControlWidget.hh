@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,36 @@
  * limitations under the License.
  *
  */
-#ifndef _JOINT_CONTROL_WIDGET_HH_
-#define _JOINT_CONTROL_WIDGET_HH_
+#ifndef _GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
+#define _GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 
+#include <memory>
 #include <string>
-#include <map>
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace msgs
+  {
+    class Model;
+  }
+
   namespace gui
   {
+    class JointControlWidgetPrivate;
     class JointForceControl;
+    class JointForceControlPrivate;
     class JointPIDPosControl;
+    class JointPIDPosControlPrivate;
     class JointPIDVelControl;
+    class JointPIDVelControlPrivate;
 
     /// \class JointControlWidget JointControlWidget
     /// gui/JointControlWidget.hh
     /// \brief Widget to control joints via application of force, position
     /// PID controller, or velocity PID controller.
-    class JointControlWidget : public QWidget
+    class GZ_GUI_VISIBLE JointControlWidget : public QWidget
     {
       Q_OBJECT
 
@@ -131,40 +139,14 @@ namespace gazebo
       /// \param[in] _modelMsg Message used to create the joint controls
       private: void LayoutVelocityTab(msgs::Model &_modelMsg);
 
-      /// \brief Node for coomunication.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher for joint messages.
-      private: transport::PublisherPtr jointPub;
-
-      /// \brief Sliders for force control
-      private: std::map<std::string, JointForceControl*> sliders;
-
-      /// \brief Sliders for position control
-      private: std::map<std::string, JointPIDPosControl*> pidPosSliders;
-
-      /// \brief Sliders for velocity control
-      private: std::map<std::string, JointPIDVelControl*> pidVelSliders;
-
-      /// \brief Label for the name of the current model being controlled.
-      private: QLabel *modelLabel;
-
-      /// \brief Tab widget for all the types of join control.
-      private: QTabWidget *tabWidget;
-
-      /// \brief Layout for the force controls.
-      private: QGridLayout *forceGridLayout;
-
-      /// \brief Layout for the position controls.
-      private: QGridLayout *positionGridLayout;
-
-      /// \brief Layout for the velocity controls.
-      private: QGridLayout *velocityGridLayout;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<JointControlWidgetPrivate> dataPtr;
     };
 
     /// \class JointForceControl JointForceControl gui/JointForceControl.hh
     /// \brief Widget to control joints via application of force
-    class JointForceControl : public QWidget
+    class GZ_GUI_VISIBLE JointForceControl : public QWidget
     {
       Q_OBJECT
 
@@ -192,17 +174,15 @@ namespace gazebo
       /// \param[in] _name Name of the joint.
       Q_SIGNALS: void changed(double _value, const std::string &_name);
 
-      /// \brief Name of the joint.
-      private: std::string name;
-
-      /// \brief Joint force slider.
-      private: QDoubleSpinBox *forceSpin;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<JointForceControlPrivate> dataPtr;
     };
 
     /// \class JointPIDPosControl JointPIDPosControlgui/JointPIDPosControl.hh
     /// \brief Widget to control joints via application of position
     /// PID controller.
-    class JointPIDPosControl : public QWidget
+    class GZ_GUI_VISIBLE JointPIDPosControl : public QWidget
     {
       Q_OBJECT
 
@@ -213,6 +193,9 @@ namespace gazebo
       /// \param[in] _index Row index into the grid layout.
       public: JointPIDPosControl(const std::string &_name,
                   QGridLayout *_layout, QWidget *_parent, int _index);
+
+      /// \brief Destructor.
+      public: virtual ~JointPIDPosControl();
 
       /// \brief Reset the controls.
       public: void Reset();
@@ -263,20 +246,15 @@ namespace gazebo
       /// \param[in] _name Name of the joint.
       Q_SIGNALS: void iChanged(double _value, const std::string &_name);
 
-      /// \brief Sliders for the position, P gain, I gain, and D gain.
-      private: QDoubleSpinBox *posSpin, *pGainSpin, *iGainSpin, *dGainSpin;
-
-      /// \brief Name of the joint.
-      private: std::string name;
-
-      /// \brief True if the units are radians.
-      private: bool radians;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<JointPIDPosControlPrivate> dataPtr;
     };
 
     /// \class JointPIDVelControl JointPIDVelControl gui/JointPIDVelControl.hh
     /// \brief Widget to control joints via application of a
     /// velocity PID controller.
-    class JointPIDVelControl : public QWidget
+    class GZ_GUI_VISIBLE JointPIDVelControl : public QWidget
     {
       Q_OBJECT
 
@@ -287,6 +265,9 @@ namespace gazebo
       /// \param[in] _index Row index into the grid layout.
       public: JointPIDVelControl(const std::string &_name,
                   QGridLayout *_layout, QWidget *_parent, int _index);
+
+      /// \brief Destructor.
+      public: virtual ~JointPIDVelControl();
 
       /// \brief Reset the controls.
       public: void Reset();
@@ -331,11 +312,9 @@ namespace gazebo
       /// \param[in] _name Name of the joint.
       Q_SIGNALS: void iChanged(double _value, const std::string &_name);
 
-      /// \brief Sliders for the position, P gain, I gain, and D gain.
-      private: QDoubleSpinBox *posSpin, *pGainSpin, *iGainSpin, *dGainSpin;
-
-      /// \brief Name of the joint.
-      private: std::string name;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<JointPIDVelControlPrivate> dataPtr;
     };
   }
 }

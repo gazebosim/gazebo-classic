@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.3">
+<sdf version="1.4">
   <world name="default">
 
     <!-- A ground plane -->
@@ -58,6 +58,9 @@
             </box>
           </geometry>
         </collision>
+        <sensor name="box_imu_sensor" type="imu">
+          <always_on>1</always_on>
+        </sensor>
       </link>
     </model>
 

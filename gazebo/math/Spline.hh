@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@
 
 #include <vector>
 
-#include "math/Vector3.hh"
-#include "math/Matrix4.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,63 +34,78 @@ namespace gazebo
 
     /// \class Spline Spline.hh math/gzmath.hh
     /// \brief Splines
-    class Spline
+    class GZ_MATH_VISIBLE Spline
     {
       /// \brief constructor
-      public: Spline();
+      /// \deprecated See ignition::math::Spline
+      public: Spline() GAZEBO_DEPRECATED(8.0);
 
       /// \brief destructor
-      public: ~Spline();
+      /// \deprecated See ignition::math::Spline
+      public: ~Spline() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the tension parameter. A value of 0 = Catmull-Rom
       /// spline.
       /// \param[in] _t Tension value between 0.0 and 1.0
-      public: void SetTension(double _t);
+      /// \deprecated See ignition::math::Spline
+      public: void SetTension(double _t) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the tension value
       /// \return The value of the tension, which is between 0.0 and 1.0
-      public: double GetTension() const;
+      /// \deprecated See ignition::math::Spline
+      public: double GetTension() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief  Adds a control point to the end of the spline.
       /// \param[in] _pt point to add
-      public: void AddPoint(const Vector3 &_pt);
+      /// \deprecated See ignition::math::Spline
+      public: void AddPoint(const Vector3 &_pt) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Gets the detail of one of the control points of the spline.
       /// \param[in] _index the control point index
       /// \return the control point, or [0,0,0] and a message on the error
       /// stream
-      public: Vector3 GetPoint(unsigned int _index) const;
+      /// \deprecated See ignition::math::Spline
+      public: Vector3 GetPoint(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief  Gets the number of control points in the spline.
       /// \return the count
-      public: unsigned int GetPointCount() const;
+      /// \deprecated See ignition::math::Spline
+      public: unsigned int GetPointCount() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the tangent value for a point
       /// \param[in] _index the control point index
-      public: Vector3 GetTangent(unsigned int _index) const;
+      /// \deprecated See ignition::math::Spline
+      public: Vector3 GetTangent(unsigned int _index) const
+           GAZEBO_DEPRECATED(8.0);
 
       /// \brief  Clears all the points in the spline.
-      public: void Clear();
+      /// \deprecated See ignition::math::Spline
+      public: void Clear() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Updates a single point in the spline.
       /// \remarks an error to the error stream is printed when the index is
       /// out of bounds
       /// \param[in] _index the control point index
       /// \param[in] _value the new position
-      public: void UpdatePoint(unsigned int _index, const Vector3 &_value);
+      /// \deprecated See ignition::math::Spline
+      public: void UpdatePoint(unsigned int _index, const Vector3 &_value)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns an interpolated point based on a parametric value
       ///        over the whole series.
       /// \param[in] _t parameter (range 0 to 1)
-      public: Vector3 Interpolate(double _t) const;
+      /// \deprecated See ignition::math::Spline
+      public: Vector3 Interpolate(double _t) const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Interpolates a single segment of the spline given a
       ///        parametric value.
       /// \param[in] _fromIndex The point index to treat as t = 0.
       ///        fromIndex + 1 is deemed to be t = 1
       /// \param[in] _t Parametric value
-      public: Vector3 Interpolate(unsigned int _fromIndex, double _t) const;
-
+      /// \deprecated See ignition::math::Spline
+      public: Vector3 Interpolate(unsigned int _fromIndex, double _t) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Tells the spline whether it should automatically
       ///        calculate tangents on demand as points are added.
@@ -105,13 +121,15 @@ namespace gazebo
       /// \param[in] _autoCalc If true, tangents are calculated for you whenever
       ///        a point changes. If false, you must call reclacTangents to
       ///        recalculate them when it best suits.
-      public: void SetAutoCalculate(bool _autoCalc);
+      /// \deprecated See ignition::math::Spline
+      public: void SetAutoCalculate(bool _autoCalc) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Recalculates the tangents associated with this spline.
       /// \remarks If you tell the spline not to update on demand by
       ///          calling setAutoCalculate(false) then you must call this
       ///          after completing your updates to the spline points.
-      public: void RecalcTangents();
+      /// \deprecated See ignition::math::Spline
+      public: void RecalcTangents() GAZEBO_DEPRECATED(8.0);
 
       /// \brief when true, the tangents are recalculated when the control
       /// point change

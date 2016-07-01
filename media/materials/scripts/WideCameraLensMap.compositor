@@ -1,0 +1,14 @@
+compositor WideCameraLensMap/ParametrisedMap
+{
+  technique
+  {
+    target_output
+    {
+      input none
+      pass render_quad
+      {
+        material Gazebo/WideLensMap
+      }
+    }
+  }
+}

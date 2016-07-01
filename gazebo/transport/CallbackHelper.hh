@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,14 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +41,7 @@ namespace gazebo
 
     /// \class CallbackHelper CallbackHelper.hh transport/transport.hh
     /// \brief A helper class to handle callbacks when messages arrive
-    class CallbackHelper
+    class GZ_TRANSPORT_VISIBLE CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _latching Set to true to make the callback helper
@@ -56,7 +58,11 @@ namespace gazebo
       /// \brief Process new incoming data
       /// \param[in] _newdata Incoming data to be processed
       /// \return true if successfully processed; false otherwise
-      public: virtual bool HandleData(const std::string &_newdata) = 0;
+      /// \param[in] _cb If non-null, callback to be invoked which signals
+      /// that transmission is complete.
+      /// \param[in] _id ID associated with the message data.
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id) = 0;
 
       /// \brief Process new incoming message
       /// \param[in] _newMsg Incoming message to be processed
@@ -72,6 +78,11 @@ namespace gazebo
       /// \return true if the callback is latching, false otherwise
       public: bool GetLatching() const;
 
+      /// \brief Set whether this callback is latching.
+      /// This function should only be used by the Transport library.
+      /// \param[in] _latch False to turn off latching.
+      public: void SetLatching(bool _latch);
+
       /// \brief Get the unique ID of this callback.
       /// \return The unique ID of this callback.
       public: unsigned int GetId() const;
@@ -79,6 +90,9 @@ namespace gazebo
       /// \brief True means that the callback helper will get the last
       /// published message on the topic.
       protected: bool latching;
+
+      /// \brief Mutex to protect the latching variable.
+      protected: mutable std::mutex latchingMutex;
 
       /// \brief A counter to generate the unique id of this callback.
       private: static unsigned int idCounter;
@@ -126,17 +140,22 @@ namespace gazebo
               }
 
       // documentation inherited
-      public: virtual bool HandleData(const std::string &_newdata)
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
+                this->SetLatching(false);
                 boost::shared_ptr<M> m(new M);
                 m->ParseFromString(_newdata);
                 this->callback(m);
+                if (!_cb.empty())
+                  _cb(_id);
                 return true;
               }
 
       // documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg)
               {
+                this->SetLatching(false);
                 this->callback(boost::dynamic_pointer_cast<M>(_newMsg));
                 return true;
               }
@@ -155,7 +174,7 @@ namespace gazebo
     /// \brief Used to connect publishers to subscribers, where the
     /// subscriber wants the raw data from the publisher. Raw means that the
     /// data has not been converted into a protobuf message.
-    class RawCallbackHelper : public CallbackHelper
+    class GZ_TRANSPORT_VISIBLE RawCallbackHelper : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
@@ -175,15 +194,20 @@ namespace gazebo
               }
 
       // documentation inherited
-      public: virtual bool HandleData(const std::string &_newdata)
+      public: virtual bool HandleData(const std::string &_newdata,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
+                this->SetLatching(false);
                 this->callback(_newdata);
+                if (!_cb.empty())
+                  _cb(_id);
                 return true;
               }
 
       // documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg)
               {
+                this->SetLatching(false);
                 std::string data;
                 _newMsg->SerializeToString(&data);
                 this->callback(data);

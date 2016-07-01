@@ -33,6 +33,7 @@
 #include <ou/assert.h>
 #include <ou/platform.h>
 #include <ou/namespace.h>
+#include <ou/ou_dll.h>
 
 #if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
 
@@ -155,7 +156,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // API declaration
 
-class CThreadLocalStorage
+class OU_VISIBLE CThreadLocalStorage
 {
 public: // Safe methods
 	/*
@@ -260,7 +261,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // Initialization/finalization
 
-class CTLSInitialization
+class OU_VISIBLE CTLSInitialization
 {
 public:
 	enum EINITIALIZATIONFLAGS

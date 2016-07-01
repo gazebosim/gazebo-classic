@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,22 @@
 */
 /* Desc: RFID Sensor Visualization Class
  * Author:
- * Date: 
+ * Date:
  */
 
-#include "transport/transport.hh"
-#include "rendering/Conversions.hh"
-#include "rendering/Scene.hh"
-#include "common/MeshManager.hh"
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
-#include "rendering/RFIDVisual.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/common/MeshManager.hh"
+
+#include "gazebo/rendering/RFIDVisualPrivate.hh"
+#include "gazebo/rendering/RFIDVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -32,12 +39,17 @@ using namespace rendering;
 /////////////////////////////////////////////////
 RFIDVisual::RFIDVisual(const std::string &_name, VisualPtr _vis,
                        const std::string &_topicName)
-: Visual(_name, _vis)
+  : Visual(*new RFIDVisualPrivate, _name, _vis)
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->scene->GetName());
+  RFIDVisualPrivate *dPtr =
+      reinterpret_cast<RFIDVisualPrivate *>(this->dataPtr);
 
-  this->rfidSub = this->node->Subscribe(_topicName, &RFIDVisual::OnScan, this);
+  dPtr->type = VT_SENSOR;
+
+  dPtr->node = transport::NodePtr(new transport::Node());
+  dPtr->node->Init(dPtr->scene->Name());
+
+  dPtr->rfidSub = dPtr->node->Subscribe(_topicName, &RFIDVisual::OnScan, this);
 
   common::MeshManager::Instance()->CreateSphere("rfid_sphere", 5.0, 20, 20);
   this->AttachMesh("rfid_sphere");

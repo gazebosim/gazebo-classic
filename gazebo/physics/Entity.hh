@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@
 
 #include <string>
 #include <vector>
+#include <ignition/math/Vector3.hh>
 
+#include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -37,6 +39,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -52,7 +55,7 @@ namespace gazebo
 
     /// \class Entity Entity.hh physics/physics.hh
     /// \brief Base class for all physics objects in Gazebo.
-    class Entity : public Base
+    class GZ_PHYSICS_VISIBLE Entity : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the entity.
@@ -70,6 +73,7 @@ namespace gazebo
 
       /// \brief Reset the entity.
       public: virtual void Reset();
+      using Base::Reset;
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF to update from.
@@ -101,7 +105,7 @@ namespace gazebo
 
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
-      public: inline const math::Pose &GetWorldPose() const
+      public: inline virtual const math::Pose &GetWorldPose() const
               {return this->worldPose;}
 
       /// \brief Get the pose of the entity relative to its parent.
@@ -235,8 +239,12 @@ namespace gazebo
       /// \return The dirty pose of the entity.
       public: const math::Pose &GetDirtyPose() const;
 
+      /// \brief This function is called when the entity's
+      /// (or one of its parents) pose of the parent has changed.
+      protected: virtual void OnPoseChange() = 0;
+
       /// \brief Publish the pose.
-      private: void PublishPose();
+      private: virtual void PublishPose();
 
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.
@@ -269,10 +277,6 @@ namespace gazebo
       /// \param[in] _msg The message to set the pose from.
       private: void OnPoseMsg(ConstPosePtr &_msg);
 
-      /// \brief This function is called when the entity's
-      /// (or one of its parents) pose of the parent has changed.
-      protected: virtual void OnPoseChange() = 0;
-
       /// \brief Handle a change of pose
       /// \param[in] update_children if set to true, will call OnPoseChange
       ///            for all children (1 level, non-recursive).
@@ -287,26 +291,11 @@ namespace gazebo
       /// \brief A helper that prevents numerous dynamic_casts.
       protected: EntityPtr parentEntity;
 
-      /// \brief
-      private: bool isStatic;
-
-      /// \brief Only used by Links. Included here for performance.
-      private: bool isCanonicalLink;
-
-      /// \brief The initial pose of the entity.
-      private: math::Pose initialRelativePose;
-
       /// \brief World pose of the entity.
-      private: math::Pose worldPose;
+      protected: mutable math::Pose worldPose;
 
       /// \brief Communication node.
       protected: transport::NodePtr node;
-
-      /// \brief Pose publisher.
-      private: transport::PublisherPtr posePub;
-
-      /// \brief Pose subscriber.
-      private: transport::SubscriberPtr poseSub;
 
       /// \brief Visual publisher.
       protected: transport::PublisherPtr visPub;
@@ -316,9 +305,6 @@ namespace gazebo
 
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
-
-      /// \brief Pose message container.
-      protected: msgs::Pose *poseMsg;
 
       /// \brief Current pose animation
       protected: common::PoseAnimationPtr animation;
@@ -337,6 +323,24 @@ namespace gazebo
 
       /// \brief The pose set by a physics engine.
       protected: math::Pose dirtyPose;
+
+      /// \brief Scale of the entity
+      protected: ignition::math::Vector3d scale;
+
+      /// \brief True if the object is static.
+      private: bool isStatic;
+
+      /// \brief Only used by Links. Included here for performance.
+      private: bool isCanonicalLink;
+
+      /// \brief The initial pose of the entity.
+      private: math::Pose initialRelativePose;
+
+      /// \brief Pose publisher.
+      private: transport::PublisherPtr posePub;
+
+      /// \brief Pose subscriber.
+      private: transport::SubscriberPtr poseSub;
 
       /// \brief Callback for when an animation completes.
       private: boost::function<void()> onAnimationComplete;

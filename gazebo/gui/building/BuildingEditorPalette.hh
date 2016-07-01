@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,23 @@
 #define _BUILDING_EDITOR_PALETTE_HH_
 
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    /// Forward declare private data class.
+    class BuildingEditorPalettePrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class BuildingEditorPalette BuildingEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class BuildingEditorPalette : public QWidget
+    class GZ_GUI_VISIBLE BuildingEditorPalette : public QWidget
     {
       Q_OBJECT
 
@@ -43,53 +46,78 @@ namespace gazebo
       /// \brief Destructor
       public: ~BuildingEditorPalette();
 
-      /// \brief Qt callback when the draw wall button is pressed.
-      private slots: void OnDrawWall();
+      /// \brief Get model name
+      /// \return Model name
+      public: std::string GetModelName() const;
 
-      // private slots: void OnImportImage();
+      /// \brief Get a pointer to the custom color dialog.
+      /// \return Pointer to the custom color dialog.
+      public: QColorDialog *CustomColorDialog() const;
 
-      /// \brief Qt callback when the draw window button is pressed.
-      private slots: void OnAddWindow();
+      /// \brief Qt callback when a brush is pressed.
+      /// \param[in] _buttonId Id of the button clicked.
+      private slots: void OnBrush(int _buttonId);
 
-      /// \brief Qt callback when the draw door button is pressed.
-      private slots: void OnAddDoor();
+      /// \brief Qt callback when the Model Name field is changed.
+      /// \param[in] _name New name.
+      private slots: void OnNameChanged(const QString &_name);
 
-      /// \brief Qt callback when the draw stairs button is pressed.
-      private slots: void OnAddStairs();
+      /// \brief Qt callback when custom color has been selected on the dialog.
+      /// \param[in] _color Selected color.
+      private slots: void OnCustomColor(const QColor _color);
 
-      /// \brief Qt callback when the discard button is pressed.
-      private slots: void OnDiscard();
-
-      /// \brief Qt callback when the save button is pressed.
-      private slots: void OnSave();
-
-      /// \brief Qt callback when the done button is pressed.
-      private slots: void OnDone();
+      /// \brief Cancel whatever is being drawn and uncheck all brushes.
+      private slots: void CancelDrawModes();
 
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
-      /// \param[in] _saveLocation Location to save the model to.
-      private: void OnSaveModel(const std::string &_saveName,
-          const std::string &_saveLocation);
+      private: void OnSaveModel(const std::string &_saveName);
 
-      /// \brief Event received when a building model has been discarded.
-      private: void OnDiscardModel();
+      /// \brief Event received when an editor item is selected.
+      /// \param[in] _mode Type of item to add or empty for none.
+      private: void OnCreateEditorItem(const std::string &_mode);
 
-      /// \brief A label that displays the name of the building model.
-      private: QLabel *modelNameLabel;
+      /// \brief Event received when the user starts a new building model.
+      private: void OnNewModel();
 
-      /// \brief Save button.
-      private: QPushButton *saveButton;
+      /// \brief Qt callback when the palette is pressed.
+      /// \param[in] _event Event.
+      private: void mousePressEvent(QMouseEvent *_event);
 
-      /// \brief Name of model.
-      private: std::string modelName;
+      /// \brief When the draw wall button is selected.
+      private: void OnDrawWall();
 
-      /// \brief Save location.
-      private: std::string saveLocation;
+      /// \brief When the draw window button is selected.
+      private: void OnAddWindow();
 
-      /// \brief A list of gui editor events connected to this palette.
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \brief When the draw door button is selected.
+      private: void OnAddDoor();
+
+      /// \brief When the draw stairs button is selected.
+      private: void OnAddStair();
+
+      /// \brief When a default color button is selected.
+      /// \param[in] _colorId Id of the color clicked.
+      private: void OnDefaultColor(int _colorId);
+
+      /// \brief Open a color dialog when the custom color button is clicked.
+      private: void OnCustomColorDialog();
+
+      /// \brief When any color is selected.
+      /// \param[in] _color Color selected.
+      private: void OnColor(QColor _color);
+
+      /// \brief When a default texture button is selected.
+      /// \param[in] _textureId Id of the texture clicked.
+      private: void OnTexture(int _textureId);
+
+      /// \brief When the import image button is selected.
+      private: void OnImportImage();
+
+      /// \internal
+      /// \brief Private data pointer
+      private: BuildingEditorPalettePrivate *dataPtr;
     };
     /// \}
   }

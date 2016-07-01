@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_UTIL_TYPES_HH_
-#define _GAZEBO_UTIL_TYPES_HH_
+#ifndef _GAZEBO_UTIL_UTILTYPES_HH_
+#define _GAZEBO_UTIL_UTILTYPES_HH_
 
-#include <boost/shared_ptr.hpp>
+#include <unordered_map>
+#include <memory>
+#include <string>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_util
@@ -29,12 +32,25 @@ namespace gazebo
   namespace util
   {
     class DiagnosticTimer;
+    class OpenALSink;
+    class OpenALSource;
 
     /// \def DiagnosticTimerPtr
-    /// \brief boost::shared_ptr to a DiagnosticTimer class
-    typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
+    /// \brief std::shared_ptr to a DiagnosticTimer class
+    typedef std::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
+
+    /// \def OpenALSinkPtr
+    /// \brief std::shared_ptr to a OpenALSink class
+    typedef std::shared_ptr<OpenALSink> OpenALSinkPtr;
+
+    /// \def OpenALSourcePtr
+    /// \brief std::shared_ptr to a OpenALSource class
+    typedef std::shared_ptr<OpenALSource> OpenALSourcePtr;
+
+    /// \def TimerMap
+    /// \brief Map of all the active timers.
+    typedef std::unordered_map<std::string, DiagnosticTimerPtr> TimerMap;
   }
 }
 /// \}
-
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/World.hh"
@@ -31,7 +37,8 @@ CollisionState::CollisionState()
 /////////////////////////////////////////////////
 CollisionState::CollisionState(const CollisionPtr _collision)
 : State(_collision->GetName(), _collision->GetWorld()->GetRealTime(),
-        _collision->GetWorld()->GetSimTime())
+        _collision->GetWorld()->GetSimTime(),
+        _collision->GetWorld()->GetIterations())
 {
   this->pose = _collision->GetRelativePose();
 }
@@ -53,11 +60,11 @@ CollisionState::~CollisionState()
 void CollisionState::Load(const sdf::ElementPtr _elem)
 {
   // Set the name
-  this->name = _elem->GetValueString("name");
+  this->name = _elem->Get<std::string>("name");
 
   // Set the pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->GetValuePose("pose");
+    this->pose = _elem->Get<math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 }

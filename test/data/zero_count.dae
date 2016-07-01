@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset><contributor><author></author><authoring_tool>FBX COLLADA exporter</authoring_tool><comments></comments></contributor><created>2014-12-03T19:17:38Z</created><keywords></keywords><modified>2014-12-03T19:17:38Z</modified><revision></revision><subject></subject><title></title><unit meter="1.000000" name="centimeter"></unit><up_axis>Z_UP</up_axis></asset>
+  <library_materials>
+    <material id="torso_diffuse" name="torso_diffuse">
+      <instance_effect url="#torso_diffuse-fx"/>
+    </material>
+    <material id="drc_extremities_diffuse" name="drc_extremities_diffuse">
+      <instance_effect url="#drc_extremities_diffuse-fx"/>
+    </material>
+    <material id="drc_head_diffuse" name="drc_head_diffuse">
+      <instance_effect url="#drc_head_diffuse-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="torso_diffuse-fx" name="torso_diffuse">
+      <profile_COMMON>
+        <technique sid="standard">
+          <phong>
+            <emission>
+              <color sid="emission">0.000000  0.000000 0.000000 1.000000</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0.588235  0.588235 0.588235 1.000000</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.588235  0.588235 0.588235 1.000000</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.000000  0.000000 0.000000 1.000000</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">2.000000</float>
+            </shininess>
+            <reflective>
+              <color sid="reflective">0.000000  0.000000 0.000000 1.000000</color>
+            </reflective>
+            <reflectivity>
+              <float sid="reflectivity">1.000000</float>
+            </reflectivity>
+            <transparent opaque="RGB_ZERO">
+              <color sid="transparent">1.000000  1.000000 1.000000 1.000000</color>
+            </transparent>
+            <transparency>
+              <float sid="transparency">0.000000</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="drc_extremities_diffuse-fx" name="drc_extremities_diffuse">
+      <profile_COMMON>
+        <technique sid="standard">
+          <phong>
+            <emission>
+              <color sid="emission">0.000000  0.000000 0.000000 1.000000</color>
+            </emission>
+            <specular>
+              <color sid="specular">0.000000  0.000000 0.000000 1.000000</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">2.000000</float>
+            </shininess>
+            <reflective>
+              <color sid="reflective">0.000000  0.000000 0.000000 1.000000</color>
+            </reflective>
+            <reflectivity>
+              <float sid="reflectivity">1.000000</float>
+            </reflectivity>
+            <transparent opaque="RGB_ZERO">
+              <color sid="transparent">1.000000  1.000000 1.000000 1.000000</color>
+            </transparent>
+            <transparency>
+              <float sid="transparency">0.000000</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="drc_head_diffuse-fx" name="drc_head_diffuse">
+      <profile_COMMON>
+        <technique sid="standard">
+          <phong>
+            <emission>
+              <color sid="emission">0.000000  0.000000 0.000000 1.000000</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0.588235  0.588235 0.588235 1.000000</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.588235  0.588235 0.588235 1.000000</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.000000  0.000000 0.000000 1.000000</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">2.000000</float>
+            </shininess>
+            <reflective>
+              <color sid="reflective">0.000000  0.000000 0.000000 1.000000</color>
+            </reflective>
+            <reflectivity>
+              <float sid="reflectivity">1.000000</float>
+            </reflectivity>
+            <transparent opaque="RGB_ZERO">
+              <color sid="transparent">1.000000  1.000000 1.000000 1.000000</color>
+            </transparent>
+            <transparency>
+              <float sid="transparency">0.000000</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="r_uglut-lib" name="r_uglutMesh">
+      <mesh>
+        <source id="r_uglut-POSITION">
+          <float_array id="r_uglut-POSITION-array" count="0">
+          </float_array>
+          <technique_common>
+            <accessor source="#r_uglut-POSITION-array" count="0" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="r_uglut-Normal0">
+          <float_array id="r_uglut-Normal0-array" count="0">
+          </float_array>
+          <technique_common>
+            <accessor source="#r_uglut-Normal0-array" count="0" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="r_uglut-UV0">
+          <float_array id="r_uglut-UV0-array" count="0">
+          </float_array>
+          <technique_common>
+            <accessor source="#r_uglut-UV0-array" count="0" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="r_uglut-VERTEX">
+          <input semantic="POSITION" source="#r_uglut-POSITION"/>
+        </vertices>
+        <triangles count="0" material="drc_extremities_diffuse"><input semantic="VERTEX" offset="0" source="#r_uglut-VERTEX"/><input semantic="NORMAL" offset="1" source="#r_uglut-Normal0"/><input semantic="TEXCOORD" offset="2" set="0" source="#r_uglut-UV0"/><p></p></triangles>
+        <triangles count="0" material="drc_head_diffuse"><input semantic="VERTEX" offset="0" source="#r_uglut-VERTEX"/><input semantic="NORMAL" offset="1" source="#r_uglut-Normal0"/><input semantic="TEXCOORD" offset="2" set="0" source="#r_uglut-UV0"/><p></p></triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="r_uglut" name="r_uglut">
+      <node name="r_uglut" id="r_uglut" sid="r_uglut"><matrix sid="matrix">0.010000 0.000000 0.000000 0.000000 0.000000 0.010000 0.000000 0.089000 0.000000 0.000000 0.010000 0.000000 0.000000 0.000000 0.000000 1.000000</matrix><instance_geometry url="#r_uglut-lib"><bind_material><technique_common><instance_material symbol="torso_diffuse" target="#torso_diffuse"/><instance_material symbol="drc_extremities_diffuse" target="#drc_extremities_diffuse"/><instance_material symbol="drc_head_diffuse" target="#drc_head_diffuse"/></technique_common></bind_material></instance_geometry><extra><technique profile="FCOLLADA"><visibility>1.000000</visibility></technique></extra></node>
+      <extra><technique profile="MAX3D"><frame_rate>30.000000</frame_rate></technique><technique profile="FCOLLADA"><start_time>0.000000</start_time><end_time>3.333333</end_time></technique></extra>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#r_uglut"></instance_visual_scene>
+  </scene>
+</COLLADA>

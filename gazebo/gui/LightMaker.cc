@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,40 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <iostream>
 #include <sstream>
 
-#include "transport/Node.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Light.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/LightMaker.hh"
+#include "gazebo/gui/LightMakerPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-unsigned int LightMaker::counter = 0;
-
 /////////////////////////////////////////////////
-LightMaker::LightMaker() : EntityMaker()
+LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
 {
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 
-  this->state = 0;
+  this->dataPtr->lightPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
 
-  msgs::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
-  msgs::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
+  msgs::Set(this->msg.mutable_diffuse(),
+      common::Color(0.5, 0.5, 0.5, 1));
+  msgs::Set(this->msg.mutable_specular(),
+      common::Color(0.1, 0.1, 0.1, 1));
 
   this->msg.set_attenuation_constant(0.5);
   this->msg.set_attenuation_linear(0.01);
@@ -48,104 +56,160 @@ LightMaker::LightMaker() : EntityMaker()
   this->msg.set_range(20);
 }
 
-/////////////////////////////////////////////////
-void LightMaker::Start(const rendering::UserCameraPtr _camera)
+//////////////////////////////////////////////////
+LightMaker::~LightMaker()
 {
-  this->camera = _camera;
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+}
 
-  this->light = new rendering::Light(this->camera->GetScene());
-  this->light->Load();
+/////////////////////////////////////////////////
+bool LightMaker::InitFromLight(const std::string &_lightName)
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
 
-  this->light->SetLightType(this->lightTypename);
-  this->light->SetPosition(math::Vector3(0, 0, 1));
+  if (this->dataPtr->light)
+  {
+    scene->RemoveLight(this->dataPtr->light);
+    this->dataPtr->light.reset();
+  }
+
+  rendering::LightPtr sceneLight = scene->GetLight(_lightName);
+  if (!sceneLight)
+  {
+    gzerr << "Light: '" << _lightName << "' does not exist." << std::endl;
+    return false;
+  }
+
+  this->dataPtr->light = sceneLight->Clone(_lightName + "_clone_tmp", scene);
+
+  if (!this->dataPtr->light)
+  {
+    gzerr << "Unable to clone\n";
+    return false;
+  }
+
+  this->lightTypename =  this->dataPtr->light->Type();
+  this->dataPtr->light->FillMsg(this->msg);
+
+  std::string newName = _lightName + "_clone";
+  int i = 0;
+  while (scene->GetLight(newName))
+  {
+    newName = _lightName + "_clone_" +
+      boost::lexical_cast<std::string>(i);
+    i++;
+  }
+
+  this->msg.set_name(newName);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LightMaker::Init()
+{
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
+
+  this->dataPtr->light.reset(new rendering::Light(scene));
+  this->dataPtr->light->Load();
+  scene->AddLight(this->dataPtr->light);
+
+  this->dataPtr->light->SetLightType(this->lightTypename);
+  this->dataPtr->light->SetPosition(ignition::math::Vector3d(0, 0, 1));
   if (this->lightTypename == "directional")
-    this->light->SetDirection(math::Vector3(.1, .1, -0.9));
+    this->dataPtr->light->SetDirection(ignition::math::Vector3d(.1, .1, -0.9));
 
-  std::ostringstream stream;
-  stream << "user_" << this->lightTypename << "_light_" << counter++;
-  this->msg.set_name(stream.str());
-  this->state = 1;
+  // Unique name
+  int counter = 0;
+  std::string lightName;
+  do
+  {
+    lightName = "user_" + this->lightTypename + "_light_" +
+        std::to_string(counter++);
+  } while (scene->GetLight(lightName));
+  this->msg.set_name(lightName);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void LightMaker::Start()
+{
+  EntityMaker::Start();
+
+  if (!this->dataPtr->light)
+    this->Init();
 }
 
 /////////////////////////////////////////////////
 void LightMaker::Stop()
 {
-  delete this->light;
-  this->light = NULL;
-
-  this->state = 0;
-  gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool LightMaker::IsActive() const
-{
-  return this->state > 0;
-}
-
-/////////////////////////////////////////////////
-void LightMaker::OnMousePush(const common::MouseEvent &/*_event*/)
-{
+  if (this->dataPtr->light)
+  {
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    if (scene)
+      scene->RemoveLight(this->dataPtr->light);
+    this->dataPtr->light.reset();
+  }
+  EntityMaker::Stop();
 }
 
 /////////////////////////////////////////////////
 void LightMaker::CreateTheEntity()
 {
   msgs::Set(this->msg.mutable_pose()->mutable_position(),
-            this->light->GetPosition());
+            this->dataPtr->light->Position());
   msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
-            math::Quaternion());
-  this->lightPub->Publish(this->msg);
-  this->camera.reset();
+            ignition::math::Quaterniond());
+  this->dataPtr->lightPub->Publish(this->msg);
 }
 
 /////////////////////////////////////////////////
-void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
+ignition::math::Vector3d LightMaker::EntityPosition() const
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
-  {
-    this->CreateTheEntity();
-    this->Stop();
-  }
+  return this->dataPtr->light->Position();
 }
 
 /////////////////////////////////////////////////
-// \TODO: This was copied from ModelMaker. Figure out a better way to
-// prevent code duplication.
-void LightMaker::OnMouseMove(const common::MouseEvent &_event)
+void LightMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 {
-  math::Vector3 pos = this->light->GetPosition();
+  this->dataPtr->light->SetPosition(_pos);
+}
 
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
+/////////////////////////////////////////////////
+PointLightMaker::PointLightMaker() : LightMaker()
+{
+  this->msg.set_type(msgs::Light::POINT);
+  this->msg.set_cast_shadows(false);
+  this->lightTypename = "point";
+}
 
-  // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
-                                       origin1, dir1);
+/////////////////////////////////////////////////
+SpotLightMaker::SpotLightMaker() : LightMaker()
+{
+  this->msg.set_type(msgs::Light::SPOT);
+  msgs::Set(this->msg.mutable_direction(),
+            ignition::math::Vector3d(0, 0, -1));
+  this->msg.set_cast_shadows(false);
 
-  // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
+  this->msg.set_spot_inner_angle(0.6);
+  this->msg.set_spot_outer_angle(1.0);
+  this->msg.set_spot_falloff(1.0);
+  this->lightTypename  = "spot";
+}
 
-  double dist1 = plane.Distance(origin1, dir1);
+/////////////////////////////////////////////////
+DirectionalLightMaker::DirectionalLightMaker() : LightMaker()
+{
+  this->msg.set_type(msgs::Light::DIRECTIONAL);
+  msgs::Set(this->msg.mutable_direction(),
+            ignition::math::Vector3d(.1, .1, -0.9));
+  this->msg.set_cast_shadows(true);
 
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  pos = p1;
-
-  if (!_event.shift)
-  {
-    if (ceil(pos.x) - pos.x <= .4)
-      pos.x = ceil(pos.x);
-    else if (pos.x - floor(pos.x) <= .4)
-      pos.x = floor(pos.x);
-
-    if (ceil(pos.y) - pos.y <= .4)
-      pos.y = ceil(pos.y);
-    else if (pos.y - floor(pos.y) <= .4)
-      pos.y = floor(pos.y);
-  }
-  pos.z = this->light->GetPosition().z;
-
-  this->light->SetPosition(pos);
+  this->lightTypename  = "directional";
 }

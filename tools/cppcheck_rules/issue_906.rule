@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<rule version="1">
+  <pattern>[^:] isinf</pattern>
+  <message>
+    <id>isinfWithoutNamespace</id>
+    <severity>warning</severity>
+    <summary>
+      Calling isinf without namespace prefix causes problems on osx.
+      Use std::isinf instead.
+    </summary>
+  </message>
+</rule>

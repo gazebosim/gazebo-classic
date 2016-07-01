@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 #include <string>
 
-#include "physics/physics.hh"
-#include "transport/transport.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 #include "plugins/SkidSteerDrivePlugin.hh"
 
 using namespace gazebo;
@@ -28,7 +28,6 @@ GZ_REGISTER_MODEL_PLUGIN(SkidSteerDrivePlugin)
 /////////////////////////////////////////////////
 SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 {
-  this->MaxForce = 5.0;
   this->wheelRadius = 0.0;
   this->wheelSeparation = 0.0;
 }
@@ -37,16 +36,17 @@ SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 {
   // Bounds checking on index
-  if (_index < 0 or _index >= NUMBER_OF_WHEELS)
+  if (_index < 0 || _index >= NUMBER_OF_WHEELS)
   {
     gzerr << "Joint index " << _index <<  " out of bounds [0, "
           << NUMBER_OF_WHEELS << "] in model " << this->model->GetName()
           << "." << std::endl;
+    return 1;
   }
 
   // Find the specified joint and add it to out list
-  this->Joints[_index] = this->model->GetJoint(_name);
-  if (!this->Joints[_index])
+  this->joints[_index] = this->model->GetJoint(_name);
+  if (!this->joints[_index])
   {
     gzerr << "Unable to find the " << _name
           <<  " joint in model " << this->model->GetName() << "." << std::endl;
@@ -59,7 +59,7 @@ int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
-                                sdf::ElementPtr   _sdf)
+                                sdf::ElementPtr /*_sdf*/)
 {
   this->model = _model;
 
@@ -67,32 +67,23 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   this->node->Init(this->model->GetWorld()->GetName());
 
   int err = 0;
+
   err += RegisterJoint(RIGHT_FRONT, "right_front");
   err += RegisterJoint(RIGHT_REAR,  "right_rear");
   err += RegisterJoint(LEFT_FRONT,  "left_front");
   err += RegisterJoint(LEFT_REAR,   "left_rear");
-  if (err > 0)
-  {
-    return;
-  }
 
-  if (_sdf->HasElement("MaxForce"))
-  {
-    this->MaxForce = _sdf->GetElement("MaxForce")->GetValueDouble();
-  }
-  else
-  {
-    gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
-  }
+  if (err > 0)
+    return;
 
   // This assumes that front and rear wheel spacing is identical
-  this->wheelSeparation = this->Joints[RIGHT_FRONT]->GetAnchor(0).Distance(
-                          this->Joints[LEFT_FRONT]->GetAnchor(0));
+  this->wheelSeparation = this->joints[RIGHT_FRONT]->GetAnchor(0).Distance(
+                          this->joints[LEFT_FRONT]->GetAnchor(0));
 
   // This assumes that the largest dimension of the wheel is the diameter
   // and that all wheels have the same diameter
   physics::EntityPtr wheelLink = boost::dynamic_pointer_cast<physics::Entity>(
-                                        this->Joints[RIGHT_FRONT]->GetChild() );
+                                        this->joints[RIGHT_FRONT]->GetChild() );
   if (wheelLink)
   {
     math::Box bb = wheelLink->GetBoundingBox();
@@ -127,15 +118,12 @@ void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 
-  for (int i = 0; i < NUMBER_OF_WHEELS; i++)
-    this->Joints[i]->SetMaxForce(0, this->MaxForce);
-
   double vel_lin = _msg->position().x() / this->wheelRadius;
-  double vel_rot = -1 * msgs::Convert(_msg->orientation()).GetAsEuler().z
+  double vel_rot = -1 * msgs::ConvertIgn(_msg->orientation()).Euler().Z()
                    * (this->wheelSeparation / this->wheelRadius);
 
-  this->Joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);
-  this->Joints[RIGHT_REAR ]->SetVelocity(0, vel_lin - vel_rot);
-  this->Joints[LEFT_FRONT ]->SetVelocity(0, vel_lin + vel_rot);
-  this->Joints[LEFT_REAR  ]->SetVelocity(0, vel_lin + vel_rot);
+  this->joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);
+  this->joints[RIGHT_REAR ]->SetVelocity(0, vel_lin - vel_rot);
+  this->joints[LEFT_FRONT ]->SetVelocity(0, vel_lin + vel_rot);
+  this->joints[LEFT_REAR  ]->SetVelocity(0, vel_lin + vel_rot);
 }

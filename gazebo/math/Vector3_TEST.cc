@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@
 
 using namespace gazebo;
 
-TEST(Vector3Test, Vector3)
+class Vector3Test : public ::testing::Test { };
+
+TEST_F(Vector3Test, Vector3)
 {
   math::Vector3 v;
 

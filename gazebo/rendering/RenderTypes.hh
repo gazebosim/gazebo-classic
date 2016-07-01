@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 #define _RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/gazebo_config.h"
+#include "gazebo/util/system.hh"
 
 /// \def GZ_VISIBILITY_ALL
 /// \brief Render everything visibility mask.
@@ -31,9 +33,9 @@
 /// \brief Render GUI visuals mask.
 #define GZ_VISIBILITY_GUI             0x00000001
 
-/// \def GZ_VISIBILITY_NOT_SELECTABLE
-/// \brief Render visuals that are not selectable mask.
-#define GZ_VISIBILITY_NOT_SELECTABLE  0x00000002
+/// \def GZ_VISIBILITY_SELECTABLE
+/// \brief Render visuals that are selectable mask.
+#define GZ_VISIBILITY_SELECTABLE      0x00000002
 
 namespace gazebo
 {
@@ -44,18 +46,35 @@ namespace gazebo
     class Camera;
     class UserCamera;
     class DepthCamera;
+    class WideAngleCamera;
     class GpuLaser;
     class DynamicLines;
     class Visual;
     class LaserVisual;
+    class LogicalCameraVisual;
+    class SonarVisual;
+    class WrenchVisual;
     class CameraVisual;
     class JointVisual;
     class AxisVisual;
     class ArrowVisual;
     class ContactVisual;
     class COMVisual;
+    class InertiaVisual;
     class RFIDVisual;
     class RFIDTagVisual;
+    class ApplyWrenchVisual;
+    class OriginVisual;
+    class LinkFrameVisual;
+    class WindowManager;
+    class SelectionObj;
+    class RayQuery;
+    class Distortion;
+    class Road2d;
+
+#ifdef HAVE_OCULUS
+    class OculusCamera;
+#endif
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -77,6 +96,10 @@ namespace gazebo
     /// \brief Shared pointer to DepthCamera
     typedef boost::shared_ptr<DepthCamera> DepthCameraPtr;
 
+    /// \def WideAngleCameraPtr
+    /// \brief Shared pointer to WideAngleCamera
+    typedef boost::shared_ptr<WideAngleCamera> WideAngleCameraPtr;
+
     /// \def GpuLaserPtr
     /// \brief Shared pointer to GpuLaser
     typedef boost::shared_ptr<GpuLaser> GpuLaserPtr;
@@ -87,43 +110,101 @@ namespace gazebo
 
     /// \def VisualPtr
     /// \brief Shared pointer to Visual
-    typedef boost::shared_ptr<Visual> VisualPtr;
+    typedef std::shared_ptr<Visual> VisualPtr;
+
+    /// \def VisualWeakPtr
+    /// \brief Weak pointer to Visual
+    typedef std::weak_ptr<Visual> VisualWeakPtr;
 
     /// \def LaserVisualPtr
     /// \brief Shared pointer to LaserVisual
-    typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
+    typedef std::shared_ptr<LaserVisual> LaserVisualPtr;
+
+    /// \def SonarVisualPtr
+    /// \brief Shared pointer to SonarVisual
+    typedef std::shared_ptr<SonarVisual> SonarVisualPtr;
+
+    /// \def WrenchVisualPtr
+    /// \brief Shared pointer to WrenchVisual
+    typedef std::shared_ptr<WrenchVisual> WrenchVisualPtr;
 
     /// \def CameraVisualPtr
     /// \brief Shared pointer to CameraVisual
-    typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
+    typedef std::shared_ptr<CameraVisual> CameraVisualPtr;
+
+    /// \def LogicalCameraVisualPtr
+    /// \brief Shared pointer to LogicalCameraVisual
+    typedef std::shared_ptr<LogicalCameraVisual> LogicalCameraVisualPtr;
 
     /// \def JointVisualPtr
     /// \brief Shared pointer to JointVisual
-    typedef boost::shared_ptr<JointVisual> JointVisualPtr;
+    typedef std::shared_ptr<JointVisual> JointVisualPtr;
 
     /// \def ContactVisualPtr
     /// \brief Shared pointer to ContactVisual
-    typedef boost::shared_ptr<ContactVisual> ContactVisualPtr;
+    typedef std::shared_ptr<ContactVisual> ContactVisualPtr;
 
     /// \def ArrowVisualPtr
     /// \brief Shared pointer to ArrowVisual
-    typedef boost::shared_ptr<ArrowVisual> ArrowVisualPtr;
+    typedef std::shared_ptr<ArrowVisual> ArrowVisualPtr;
 
     /// \def AxisVisualPtr
     /// \brief Shared pointer to AxisVisual
-    typedef boost::shared_ptr<AxisVisual> AxisVisualPtr;
+    typedef std::shared_ptr<AxisVisual> AxisVisualPtr;
 
     /// \def COMVisualPtr
     /// \brief Shared pointer to COMVisual
-    typedef boost::shared_ptr<COMVisual> COMVisualPtr;
+    typedef std::shared_ptr<COMVisual> COMVisualPtr;
+
+    /// \def InertiaVisualPtr
+    /// \brief Shared pointer to InertiaVisual
+    typedef std::shared_ptr<InertiaVisual> InertiaVisualPtr;
 
     /// \def RFIDVisual
     /// \brief Shared pointer to RFIDVisual
-    typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
+    typedef std::shared_ptr<RFIDVisual> RFIDVisualPtr;
 
     /// \def RFIDTagVisual
     /// \brief Shared pointer to RFIDTagVisual
-    typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
+    typedef std::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
+
+    /// \def ApplyWrenchVisualPtr
+    /// \brief Shared pointer to ApplyWrenchVisual
+    typedef std::shared_ptr<ApplyWrenchVisual> ApplyWrenchVisualPtr;
+
+    /// \def OriginVisualPtr
+    /// \brief Shared pointer to OriginVisual
+    typedef std::shared_ptr<OriginVisual> OriginVisualPtr;
+
+    /// \def LinkFrameVisualPtr
+    /// \brief Shared pointer to LinkFrameVisual
+    typedef std::shared_ptr<LinkFrameVisual> LinkFrameVisualPtr;
+
+    /// \def WindowManager
+    /// \brief Shared pointer to WindowManager
+    typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
+
+    /// \def SelectionObj
+    /// \brief Shared pointer to SelectionObj
+    typedef std::shared_ptr<SelectionObj> SelectionObjPtr;
+
+    /// \def RayQueryPtr
+    /// \brief Shared pointer to RayQuery
+    typedef boost::shared_ptr<RayQuery> RayQueryPtr;
+
+    /// \def DistortionPtr
+    /// \brief Shared pointer to Distortion
+    typedef boost::shared_ptr<Distortion> DistortionPtr;
+
+    /// \def Road2dPtr
+    /// \brief Shared pointer to Road2d
+    typedef std::shared_ptr<Road2d> Road2dPtr;
+
+#ifdef HAVE_OCULUS
+    /// \def OculusCameraPtr
+    /// \brief Shared pointer to OculusCamera
+    typedef boost::shared_ptr<OculusCamera> OculusCameraPtr;
+#endif
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable
@@ -152,6 +233,19 @@ namespace gazebo
 
       /// \brief N/A
       RENDERING_MESH_RESOURCE = 6
+    };
+
+    /// \brief Frame of reference
+    enum ReferenceFrame
+    {
+      /// \brief Local frame
+      RF_LOCAL,
+
+      /// \brief Parent frame
+      RF_PARENT,
+
+      /// \brief World frame
+      RF_WORLD
     };
   }
 }

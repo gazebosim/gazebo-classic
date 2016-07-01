@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 4 Apr 2007
  */
 
-#include "math/Helpers.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -40,6 +40,12 @@ Vector3::Vector3()
 //////////////////////////////////////////////////
 Vector3::Vector3(const double &_x, const double &_y, const double &_z)
     : x(_x), y(_y), z(_z)
+{
+}
+
+//////////////////////////////////////////////////
+Vector3::Vector3(const ignition::math::Vector3d &_v)
+: x(_v.X()), y(_v.Y()), z(_v.Z())
 {
 }
 
@@ -323,15 +329,16 @@ bool Vector3::operator ==(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-bool Vector3::operator!=(const Vector3 &pt) const
+bool Vector3::operator!=(const Vector3 &_pt) const
 {
-  return !(*this == pt);
+  return !(*this == _pt);
 }
 
 //////////////////////////////////////////////////
 bool Vector3::IsFinite() const
 {
-  return finite(this->x) && finite(this->y) && finite(this->z);
+  return std::isfinite(this->x) && std::isfinite(this->y) &&
+         std::isfinite(this->z);
 }
 
 //////////////////////////////////////////////////
@@ -350,6 +357,7 @@ double Vector3::operator[](unsigned int index) const
   }
 }
 
+//////////////////////////////////////////////////
 /// Round all values to _decimalPlaces
 void Vector3::Round(int _precision)
 {
@@ -358,10 +366,26 @@ void Vector3::Round(int _precision)
   this->z = precision(this->z, _precision);
 }
 
+//////////////////////////////////////////////////
 /// Returns true if the two vectors are exacatly equal
 bool Vector3::Equal(const Vector3 &_v) const
 {
   return math::equal(this->x, _v.x) &&
          math::equal(this->y, _v.y) &&
          math::equal(this->z, _v.z);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Vector3::Ign() const
+{
+  return ignition::math::Vector3d(this->x, this->y, this->z);
+}
+
+//////////////////////////////////////////////////
+Vector3 &Vector3::operator=(const ignition::math::Vector3d &_v)
+{
+  this->x = _v.X();
+  this->y = _v.Y();
+  this->z = _v.Z();
+  return *this;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,20 @@
 #ifndef _IMAGE_HH_
 #define _IMAGE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #ifdef BOOL
 #undef BOOL
 #endif
 #include <FreeImage.h>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/Color.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -65,7 +71,7 @@ namespace gazebo
 
     /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
-    class Image
+    class GZ_COMMON_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat
@@ -108,6 +114,7 @@ namespace gazebo
 
       /// \brief Load an image. Return 0 on success
       /// \param[in] _filename the path to the image file
+      /// \return 0 when the operation succeeds to open a file or -1 when fails.
       public: int Load(const std::string &_filename);
 
       /// \brief Save the image in PNG format
@@ -125,14 +132,14 @@ namespace gazebo
                                Image::PixelFormat _format);
 
       /// \brief Get the image as a data array
-      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _data Pointer to a nullptr array of char.
       /// \param[out] _count The resulting data array size
       public: void GetData(unsigned char **_data,
                            unsigned int &_count) const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
-      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _data Pointer to a nullptr array of char.
       /// \param[out] _count The resulting data array size
       public: void GetRGBData(unsigned char **_data,
                               unsigned int &_count) const;
@@ -164,7 +171,8 @@ namespace gazebo
       /// \brief Get a pixel color value
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
-      public: Color GetPixel(unsigned int _x, unsigned int _y);
+      /// \return The color of the given pixel
+      public: Color GetPixel(unsigned int _x, unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
@@ -172,7 +180,7 @@ namespace gazebo
 
       /// \brief Get the max color
       /// \return The max color
-      public: Color GetMaxColor();
+      public: Color GetMaxColor() const;
 
       /// \brief Rescale the image
       /// \param[in] _width New image width
@@ -185,7 +193,7 @@ namespace gazebo
 
       /// \brief Implementation of GetData
       private: void GetDataImpl(unsigned char **_data, unsigned int &_count,
-                        FIBITMAP *_img) const;
+          FIBITMAP *_img) const;
 
       /// \brief Count the number of images created. Used for initialising
       /// free image

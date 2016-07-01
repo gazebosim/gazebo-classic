@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,17 +32,17 @@ static const float PITCH_LIMIT_LOW = -M_PI*0.5 + 0.001;
 static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 
 //////////////////////////////////////////////////
-OrbitViewController::OrbitViewController(UserCameraPtr _camera)
-  : ViewController(_camera), distance(5.0f)
+OrbitViewController::OrbitViewController(UserCameraPtr _camera,
+    const std::string &_name)
+  : ViewController(_camera), yaw(0.0f), pitch(0.0f), distance(5.0f)
 {
   this->typeString = TYPE_STRING;
   this->init = false;
 
   // Create a visual that is used a reference point.
-  this->refVisual.reset(new Visual("OrbitViewController",
-                        this->camera->GetScene()));
+  this->refVisual.reset(new Visual(_name, this->camera->GetScene()));
 
-  this->refVisual->Init();
+  this->refVisual->Load();
   this->refVisual->AttachMesh("unit_sphere");
   this->refVisual->SetScale(math::Vector3(0.2, 0.2, 0.1));
   this->refVisual->SetCastShadows(false);
@@ -58,13 +58,15 @@ OrbitViewController::~OrbitViewController()
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::Init(const math::Vector3 &_focalPoint)
+void OrbitViewController::Init(const math::Vector3 &_focalPoint,
+    const double _yaw, const double _pitch)
 {
-  this->yaw = 0;
-  this->pitch = 0;
+  this->yaw = _yaw;
+  this->pitch = _pitch;
 
-  this->focalPoint = _focalPoint;
-  this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
+  this->focalPoint = _focalPoint.Ign();
+  this->distance = this->camera->WorldPosition().Distance(
+      this->focalPoint);
 
   this->init = true;
 }
@@ -73,46 +75,46 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
 void OrbitViewController::Init()
 {
   double dist = -1;
-  math::Vector3 fp;
+  ignition::math::Vector3d fp;
 
   // Try to get a point on a plane to use as the reference point
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
-  if (this->camera->GetWorldPointOnPlane(width/2.0, height/2.0,
-        math::Plane(math::Vector3(0, 0, 1)), fp))
+  if (this->camera->WorldPointOnPlane(width/2.0, height/2.0,
+        ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), fp))
   {
-    dist = this->camera->GetWorldPosition().Distance(fp);
+    dist = this->camera->WorldPosition().Distance(fp);
   }
 
   // If the plane is too far away.
   if (dist < 0 || dist > 20 || math::isnan(dist))
   {
     // First, see if the camera is looking at the origin.
-    math::Vector3 dir = this->camera->GetDirection();
+    ignition::math::Vector3d dir = this->camera->Direction();
     dir.Normalize();
-    math::Vector3 origin(0, 0, 0);
-    math::Vector3 cameraPos = this->camera->GetWorldPose().pos;
+    ignition::math::Vector3d origin(0, 0, 0);
+    ignition::math::Vector3d cameraPos = this->camera->WorldPose().Pos();
     double distOrigin = cameraPos.Distance(origin);
 
-    dist = origin.GetDistToLine(cameraPos, cameraPos + dir * distOrigin);
+    dist = origin.DistToLine(cameraPos, cameraPos + dir * distOrigin);
 
-    if (math::equal(dist, 0.0, 1e-3))
+    if (ignition::math::equal(dist, 0.0, 1e-3))
       dist = distOrigin;
     else
     {
       // If camera is not looking at the origin, see if the camera's
       // direction projected on the ground plane interescts the origin.
       // Otherwise, choose a default distance of 10m for the focal point
-      cameraPos.z = 0;
+      cameraPos.Z(0);
       distOrigin = cameraPos.Distance(origin);
-      dist = origin.GetDistToLine(cameraPos, cameraPos + dir * distOrigin);
-      if (math::equal(dist, 0.0, 1e-3))
+      dist = origin.DistToLine(cameraPos, cameraPos + dir * distOrigin);
+      if (ignition::math::equal(dist, 0.0, 1e-3))
         dist = distOrigin;
       else
         dist = 10;
 
-      cameraPos = this->camera->GetWorldPose().pos;
+      cameraPos = this->camera->WorldPose().Pos();
     }
     if (dist > 10)
       dist = 10.0;
@@ -148,42 +150,44 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   if (!this->enabled)
     return;
 
-  math::Vector2i drag = _event.pos - _event.prevPos;
+  ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();
 
-  math::Vector3 directionVec(0, 0, 0);
+  ignition::math::Vector3d directionVec(0, 0, 0);
 
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   // If the event is the initial press of a mouse button, then update
   // the focal point and distance.
-  if (_event.pressPos == _event.pos)
+  if (_event.PressPos() == _event.Pos())
   {
-    if (!this->camera->GetScene()->GetFirstContact(
-         this->camera, _event.pressPos, this->focalPoint))
+    if (!this->camera->GetScene()->FirstContact(
+         this->camera, _event.PressPos(), this->focalPoint))
     {
-      math::Vector3 origin, dir;
-      this->camera->GetCameraToViewportRay(
-          _event.pressPos.x, _event.pressPos.y, origin, dir);
+      ignition::math::Vector3d origin, dir;
+      this->camera->CameraToViewportRay(
+          _event.PressPos().X(), _event.PressPos().Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
-    this->distance = this->camera->GetWorldPose().pos.Distance(
+    this->distance = this->camera->WorldPose().Pos().Distance(
         this->focalPoint);
 
-    this->yaw = this->camera->GetWorldRotation().GetAsEuler().z;
-    this->pitch = this->camera->GetWorldRotation().GetAsEuler().y;
+    this->yaw = this->camera->WorldRotation().Euler().Z();
+    this->pitch = this->camera->WorldRotation().Euler().Y();
   }
 
   // Turn on the reference visual.
   this->refVisual->SetVisible(true);
 
-  // Middle mouse button is used to Orbit.
-  if (_event.buttons & common::MouseEvent::MIDDLE && _event.dragging)
+  // Middle mouse button or Shift + Left button is used to Orbit.
+  if (_event.Dragging() &&
+      (_event.Buttons() & common::MouseEvent::MIDDLE ||
+      (_event.Buttons() & common::MouseEvent::LEFT && _event.Shift())))
   {
     // Compute the delta yaw and pitch.
-    double dy = this->NormalizeYaw(drag.x * _event.moveScale * -0.4);
-    double dp = this->NormalizePitch(drag.y * _event.moveScale * 0.4);
+    double dy = this->NormalizeYaw(drag.X() * _event.MoveScale() * -0.4);
+    double dp = this->NormalizePitch(drag.Y() * _event.MoveScale() * 0.4);
 
     // Limit rotation to pitch only if the "y" key is pressed.
     if (!this->key.empty() && this->key == "y")
@@ -195,22 +199,21 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     this->Orbit(dy, dp);
   }
   // The left mouse button is used to translate the camera.
-  else if ((_event.buttons & common::MouseEvent::LEFT) && _event.dragging)
+  else if ((_event.Buttons() & common::MouseEvent::LEFT) && _event.Dragging())
   {
     this->distance =
-      this->camera->GetWorldPose().pos.Distance(this->focalPoint);
+      this->camera->WorldPose().Pos().Distance(this->focalPoint);
 
-
-    double fovY = this->camera->GetVFOV().Radian();
+    double fovY = this->camera->VFOV().Radian();
     double fovX = 2.0f * atan(tan(fovY / 2.0f) *
-        this->camera->GetAspectRatio());
+        this->camera->AspectRatio());
 
-    math::Vector3 translation;
+    ignition::math::Vector3d translation;
 
     double factor = 2.0;
 
     // The control key increases zoom speed by a factor of two.
-    if (_event.control)
+    if (_event.Control())
       factor *= 2.0;
 
     // If the "x", "y", or "z" key is pressed, then lock translation to the
@@ -218,13 +221,13 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     if (!this->key.empty())
     {
       if (this->key == "x")
-        translation.Set((drag.y / static_cast<float>(height)) *
+        translation.Set((drag.Y() / static_cast<float>(height)) *
                         this->distance * tan(fovY / 2.0) * factor, 0.0, 0.0);
       else if (this->key == "y")
-        translation.Set(0.0, (drag.x / static_cast<float>(width)) *
+        translation.Set(0.0, (drag.X() / static_cast<float>(width)) *
                         this->distance * tan(fovX / 2.0) * factor, 0.0);
       else if (this->key == "z")
-        translation.Set(0.0, 0.0, (drag.y / static_cast<float>(height)) *
+        translation.Set(0.0, 0.0, (drag.Y() / static_cast<float>(height)) *
                         this->distance * tan(fovY / 2.0) * factor);
       else
         gzerr << "Unable to handle key [" << this->key << "] in orbit view "
@@ -237,9 +240,9 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       // Translate in the "y" "z" plane.
       translation.Set(0.0,
-          (drag.x / static_cast<float>(width)) *
+          (drag.X() / static_cast<float>(width)) *
           this->distance * tan(fovX / 2.0) * factor,
-          (drag.y / static_cast<float>(height)) *
+          (drag.Y() / static_cast<float>(height)) *
           this->distance * tan(fovY / 2.0) * factor);
 
       // Translate in the local coordinate frame
@@ -247,35 +250,35 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     }
   }
   // The right mouse button is used to zoom the camera.
-  else if ((_event.buttons & common::MouseEvent::RIGHT) && _event.dragging)
+  else if ((_event.Buttons() & common::MouseEvent::RIGHT) && _event.Dragging())
   {
-    double fovY = this->camera->GetVFOV().Radian();
-    this->Zoom((-drag.y / static_cast<float>(height)) *
+    double fovY = this->camera->VFOV().Radian();
+    this->Zoom((-drag.Y() / static_cast<float>(height)) *
                this->distance * tan(fovY / 2.0) * 6.0);
   }
   // The scroll wheel controls zoom.
-  else if (_event.type == common::MouseEvent::SCROLL)
+  else if (_event.Type() == common::MouseEvent::SCROLL)
   {
-    if (!this->camera->GetScene()->GetFirstContact(
-         this->camera, _event.pos, this->focalPoint))
+    if (!this->camera->GetScene()->FirstContact(
+         this->camera, _event.Pos(), this->focalPoint))
     {
-      math::Vector3 origin, dir;
-      this->camera->GetCameraToViewportRay(
-          _event.pos.x, _event.pos.y, origin, dir);
+      ignition::math::Vector3d origin, dir;
+      this->camera->CameraToViewportRay(
+          _event.Pos().X(), _event.Pos().Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
-    this->distance = this->camera->GetWorldPose().pos.Distance(
+    this->distance = this->camera->WorldPose().Pos().Distance(
         this->focalPoint);
 
     int factor = 80;
 
     // The control key increases zoom speed by a factor of two.
-    if (_event.control)
+    if (_event.Control())
       factor *= 2;
 
     // This assumes that _event.scroll.y is -1 or +1
-    this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
+    this->Zoom(-(_event.Scroll().Y() * factor) * _event.MoveScale() *
                (this->distance / 5.0));
   }
   else
@@ -286,8 +289,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 void OrbitViewController::TranslateLocal(const math::Vector3 &_vec)
 {
   this->camera->SetWorldPosition(
-      this->camera->GetWorldPose().pos +
-      this->camera->GetWorldPose().rot * _vec);
+      this->camera->WorldPose().Pos() +
+      this->camera->WorldPose().Rot() * _vec.Ign());
   this->UpdateRefVisual();
 }
 
@@ -295,7 +298,7 @@ void OrbitViewController::TranslateLocal(const math::Vector3 &_vec)
 void OrbitViewController::TranslateGlobal(const math::Vector3 &_vec)
 {
   this->camera->SetWorldPosition(
-      this->camera->GetWorldPose().pos + _vec);
+      this->camera->WorldPose().Pos() + _vec.Ign());
   this->UpdateRefVisual();
 }
 
@@ -308,7 +311,7 @@ void OrbitViewController::SetDistance(float _d)
 //////////////////////////////////////////////////
 void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 {
-  this->focalPoint = _fp;
+  this->focalPoint = _fp.Ign();
   this->refVisual->SetPosition(this->focalPoint);
 }
 
@@ -346,7 +349,8 @@ void OrbitViewController::Zoom(float _amount)
 {
   this->distance -= _amount;
 
-  math::Vector3 delta = this->camera->GetWorldPosition() - this->focalPoint;
+  ignition::math::Vector3d delta = this->camera->WorldPosition() -
+    this->focalPoint;
   delta.Normalize();
   delta *= this->distance;
   this->camera->SetWorldPosition(this->focalPoint + delta);
@@ -375,8 +379,7 @@ void OrbitViewController::UpdateRefVisual()
 /////////////////////////////////////////////////
 void OrbitViewController::Orbit(double _dy, double _dp)
 {
-  Ogre::SceneNode *cameraNode = this->camera->GetSceneNode();
-  Ogre::SceneNode *pitchNode = this->camera->GetPitchNode();
+  Ogre::SceneNode *cameraNode = this->camera->SceneNode();
   Ogre::Node *parentNode = cameraNode->getParent();
   Ogre::Vector3 pos = cameraNode->_getDerivedPosition();
 
@@ -387,14 +390,13 @@ void OrbitViewController::Orbit(double _dy, double _dp)
 
   // Add the camera node to to the reference visual, and update the
   // reference visual's position.
-  this->refVisual->GetSceneNode()->addChild(this->camera->GetSceneNode());
+  this->refVisual->GetSceneNode()->addChild(this->camera->SceneNode());
   this->refVisual->SetPosition(this->focalPoint);
 
   // Move the camera to it's starting location. Now we can rotate the
   // reference visual, which in turns rotates the camera.
   cameraNode->_setDerivedPosition(pos);
   cameraNode->setOrientation(Ogre::Quaternion());
-  pitchNode->setOrientation(Ogre::Quaternion());
 
   // Rotate and update the reference visual.
   this->yaw = this->NormalizeYaw(this->yaw + _dy);
@@ -407,7 +409,7 @@ void OrbitViewController::Orbit(double _dy, double _dp)
     pos = cameraNode->_getDerivedPosition();
 
   // Store the new location of the camera
-  Ogre::Quaternion rot = pitchNode->_getDerivedOrientation();
+  Ogre::Quaternion rot = cameraNode->_getDerivedOrientation();
 
   // Detach the camera from the reference visual.
   this->refVisual->GetSceneNode()->removeChild(cameraNode);
@@ -417,9 +419,21 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   {
     parentNode->addChild(cameraNode);
     cameraNode->_setDerivedPosition(pos);
-    this->camera->SetWorldRotation(Conversions::Convert(rot));
+    this->camera->SetWorldRotation(Conversions::ConvertIgn(rot));
   }
 
   this->init = false;
   this->UpdateRefVisual();
+}
+
+/////////////////////////////////////////////////
+double OrbitViewController::Yaw() const
+{
+  return this->yaw;
+}
+
+/////////////////////////////////////////////////
+double OrbitViewController::Pitch() const
+{
+  return this->pitch;
 }

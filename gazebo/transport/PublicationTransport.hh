@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@
 #ifndef _PUBLICATIONTRANSPORT_HH_
 #define _PUBLICATIONTRANSPORT_HH_
 
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
 
-#include "transport/Connection.hh"
-#include "common/Event.hh"
+#include "gazebo/transport/Connection.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +37,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Reads data from a remote advertiser, and passes the data
     /// along to local subscribers
-    class PublicationTransport
+    class GZ_TRANSPORT_VISIBLE PublicationTransport
     {
       /// \brief Constructor
       /// \param[in] _topic Topic that we're publishing
@@ -72,9 +74,6 @@ namespace gazebo
       /// \return The topic type
       public: std::string GetMsgType() const;
 
-      /// \brief Called when connection is shutdown.
-      private: void OnConnectionShutdown();
-
       /// \brief Called when data is published.
       /// \param[in] _data Data to be published.
       private: void OnPublish(const std::string &_data);
@@ -90,9 +89,6 @@ namespace gazebo
 
       /// \brief Callback used when OnPublish is called.
       private: boost::function<void (const std::string &)> callback;
-
-      /// \brief Event listener for the connection's shutdown signal.
-      private: event::ConnectionPtr shutdownConnectionPtr;
 
       /// \brief Counter to give the publication transport a unique id.
       private: static int counter;

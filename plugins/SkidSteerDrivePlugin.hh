@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_SkidSteerDrive_PLUGIN_HH__
-#define __GAZEBO_SkidSteerDrive_PLUGIN_HH__
+#ifndef _GAZEBO_SkidSteerDrive_PLUGIN_HH_
+#define _GAZEBO_SkidSteerDrive_PLUGIN_HH_
 
 #include <string>
 
-#include "common/common.hh"
-#include "physics/physics.hh"
-#include "transport/TransportTypes.hh"
-#include "gazebo.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 #define NUMBER_OF_WHEELS 4
 
@@ -32,7 +32,7 @@ namespace gazebo
   /// \brief A gazebo model plugin that controls a four wheel skid-steer
   ///        robot via a gazebo topic. See the Pioneer3AT model in the
   ///        OSRF model database for an example use case.
-  class SkidSteerDrivePlugin : public ModelPlugin
+  class GAZEBO_VISIBLE SkidSteerDrivePlugin : public ModelPlugin
   {
     /// \brief Default Contstuctor
     public: SkidSteerDrivePlugin();
@@ -65,10 +65,7 @@ namespace gazebo
     private: physics::ModelPtr model;
 
     /// \brief Pointer to each wheel joint
-    private: physics::JointPtr Joints[NUMBER_OF_WHEELS];
-
-    /// \brief Max force limit for each wheel joint (Default 5.0)
-    private: double MaxForce;
+    private: physics::JointPtr joints[NUMBER_OF_WHEELS];
 
     /// \brief Distance between wheels on the same axis (Determined from SDF)
     private: double wheelSeparation;

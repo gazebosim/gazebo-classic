@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@
  */
 #include <boost/bind.hpp>
 
-#include "gazebo_config.h"
-#include "common/Console.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
 
-#include "physics/Link.hh"
-#include "physics/ode/ODESliderJoint.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODESliderJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -34,14 +35,13 @@ using namespace physics;
 ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
     : SliderJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateSlider(_worldId, NULL);
+  this->jointId = dJointCreateSlider(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODESliderJoint::~ODESliderJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////
@@ -51,19 +51,22 @@ void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
     dJointGetSliderAxis(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
+math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->jointId)
@@ -75,7 +78,7 @@ math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetVelocity(int /*index*/) const
+double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
 {
   double result = 0;
   if (this->jointId)
@@ -87,54 +90,35 @@ double ODESliderJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetVelocity(int /*index*/, double _angle)
+void ODESliderJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
-
-  if (this->jointId)
-    dJointSetSliderAxis(this->jointId, _axis.x, _axis.y, _axis.z);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-}
-
-//////////////////////////////////////////////////
-void ODESliderJoint::SetForce(int _index, double _effort)
-{
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
-  {
-    gzerr << "Calling ODEScrewJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
-  }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort if effortLimit is not negative
-  if (this->effortLimit[_index] >= 0.0)
-    _effort = math::clamp(_effort, -this->effortLimit[_index],
-      this->effortLimit[_index]);
-
-  ODEJoint::SetForce(_index, _effort);
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
+  // ODE needs global axis
+  math::Quaternion axisFrame = this->GetAxisFrame(0);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+
+  if (this->jointId)
+  {
+    dJointSetSliderAxis(this->jointId,
+                        globalAxis.x, globalAxis.y, globalAxis.z);
+  }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
+void ODESliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
+{
   if (this->jointId)
     dJointAddSliderForce(this->jointId, _effort);
   else
@@ -142,14 +126,14 @@ void ODESliderJoint::SetForce(int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetParam(int _parameter, double _value)
+void ODESliderJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
   dJointSetSliderParam(this->jointId, _parameter, _value);
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetParam(int _parameter) const
+double ODESliderJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
 
@@ -162,13 +146,15 @@ double ODESliderJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetMaxForce(int /*_index*/, double _t)
+math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  this->SetParam(dParamFMax, _t);
+  gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
+  return math::Vector3::Zero;
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetMaxForce(int /*_index*/)
+void ODESliderJoint::SetAnchor(unsigned int /*_index*/,
+  const math::Vector3 &/*_anchor*/)
 {
-  return this->GetParam(dParamFMax);
+  gzlog << "ODESliderJoint::SetAnchor not implemented.\n";
 }

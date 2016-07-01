@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_scale_widget.h>
@@ -301,12 +307,10 @@ void IncrementalPlot::Clear(const QString &_label)
 /////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
-  CurveData *curveData = NULL;
-
   for (CurveMap::iterator iter = this->curves.begin();
        iter != this->curves.end(); ++iter)
   {
-    curveData = static_cast<CurveData *>(iter->second->data());
+    CurveData *curveData = static_cast<CurveData *>(iter->second->data());
     curveData->Clear();
     delete iter->second;
   }

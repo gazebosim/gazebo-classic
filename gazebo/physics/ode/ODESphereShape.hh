@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,17 @@
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/SphereShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A ODE sphere shape
-    class ODESphereShape : public SphereShape
+    class GZ_PHYSICS_VISIBLE ODESphereShape : public SphereShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -46,12 +50,13 @@ namespace gazebo
           boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
 
         // Create the sphere geometry
-        if (oParent->GetCollisionId() == NULL)
+        if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreateSphere(0, _radius), true);
         else
           dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
       }
     };
+    /// \}
   }
 }
 #endif

@@ -1,6 +1,8 @@
 syntax: glob
 
+test/plugins/rest-web/node_modules
 build
 build_*
 Ogre.log
 .DS_Store
+*.swp

@@ -1,63 +1,68 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${BULLET_INCLUDE_DIRS})
-
-link_directories(${BULLET_LIBRARY_DIRS})
-
-add_definitions(${BULLET_CFLAGS})
-
-set (sources
-  BulletPhysics.cc
-  BulletLink.cc
-  BulletCollision.cc
-  BulletMotionState.cc
-  BulletTrimeshShape.cc
-  BulletJoint.cc
-  BulletHingeJoint.cc
-  BulletSliderJoint.cc
-  BulletUniversalJoint.cc
-  BulletBallJoint.cc
-  BulletHinge2Joint.cc
-  BulletScrewJoint.cc
-  BulletRayShape.cc
-  BulletMultiRayShape.cc
-  BulletHeightmapShape.cc
+set (sources ${sources}
+  bullet/BulletBallJoint.cc
+  bullet/BulletCollision.cc
+  bullet/BulletFixedJoint.cc
+  bullet/BulletHeightmapShape.cc
+  bullet/BulletHinge2Joint.cc
+  bullet/BulletHingeJoint.cc
+  bullet/BulletJoint.cc
+  bullet/BulletLink.cc
+  bullet/BulletMesh.cc
+  bullet/BulletMeshShape.cc
+  bullet/BulletMotionState.cc
+  bullet/BulletMultiRayShape.cc
+  bullet/BulletPhysics.cc
+  bullet/BulletPolylineShape.cc
+  bullet/BulletRayShape.cc
+  bullet/BulletScrewJoint.cc
+  bullet/BulletSliderJoint.cc
+  bullet/BulletSurfaceParams.cc
+  bullet/BulletUniversalJoint.cc
+  bullet/gzBtUniversalConstraint.cc
+  PARENT_SCOPE
 )
 
 set (headers
   bullet_inc.h
-  bullet_math.h
+  bullet_math_inc.h
   BulletBallJoint.hh
   BulletBoxShape.hh
   BulletCollision.hh
   BulletCylinderShape.hh
+  BulletFixedJoint.hh
   BulletHeightmapShape.hh
   BulletHinge2Joint.hh
   BulletHingeJoint.hh
   BulletJoint.hh
   BulletLink.hh
+  BulletMesh.hh
+  BulletMeshShape.hh
   BulletMotionState.hh
   BulletMultiRayShape.hh
   BulletPhysics.hh
   BulletPlaneShape.hh
-  BulletRaySensor.hh
+  BulletPolylineShape.hh
   BulletRayShape.hh
   BulletScrewJoint.hh
   BulletSliderJoint.hh
   BulletSphereShape.hh
-  BulletTrimeshShape.hh
+  BulletSurfaceParams.hh
   BulletTypes.hh
   BulletUniversalJoint.hh
+  gzBtUniversalConstraint.hh
 )
 
 set (gtest_sources
   BulletTypes_TEST.cc
+)
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics)
+
+set (gtest_fixture_sources
   BulletPhysics_TEST.cc
 )
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_fixture_sources}
+  EXTRA_LIBS gazebo_physics gazebo_test_fixture)
 
-gz_add_library(gazebo_physics_bullet ${sources})
-#add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
-target_link_libraries(gazebo_physics_bullet ${BULLET_LIBRARIES})
-
-gz_install_library(gazebo_physics_bullet)
+gz_install_includes("physics/bullet" ${headers})

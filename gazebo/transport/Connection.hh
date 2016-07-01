@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,12 @@
 #include <iostream>
 #include <iomanip>
 #include <deque>
+#include <utility>
 
-
-#include "common/Event.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/util/system.hh"
 
 #define HEADER_LENGTH 8
 
@@ -43,7 +44,7 @@ namespace gazebo
 {
   namespace transport
   {
-    extern bool is_stopped();
+    extern GZ_TRANSPORT_VISIBLE bool is_stopped();
 
     class IOManager;
     class Connection;
@@ -52,7 +53,7 @@ namespace gazebo
     /// \cond
     /// \brief A task instance that is created when data is read from
     /// a socket and used by TBB
-    class ConnectionReadTask : public tbb::task
+    class GZ_TRANSPORT_VISIBLE ConnectionReadTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[_in] _func Boost function pointer, which is the function
@@ -84,10 +85,20 @@ namespace gazebo
 
     /// \addtogroup gazebo_transport Transport
     /// \{
-
+    ///
+    /// \remarks
+    ///  Environment Variables:
+    ///   - GAZEBO_IP_WHITE_LIST: Comma separated list of valid IPs. Leave
+    /// this empty to accept connections from all addresses.
+    ///   - GAZEBO_IP: IP address to export. This will override the default
+    /// IP lookup.
+    ///   - GAZEBO_HOSTNAME: Hostame to export. Setting this will override
+    /// both GAZEBO_IP and the default IP lookup.
+    ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
-    class Connection : public boost::enable_shared_from_this<Connection>
+    class GZ_TRANSPORT_VISIBLE Connection :
+      public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
       public: Connection();
@@ -143,6 +154,17 @@ namespace gazebo
       /// \param[in] _buffer Data to write
       /// \param[in] _force If true, block until the data has been written
       /// to the socket, otherwise just enqueue the data for asynchronous write
+      /// \param[in] _cb If non-null, callback to be invoked after
+      /// transmission is complete.
+      /// \param[in] _id ID associated with the message data.
+      public: void EnqueueMsg(const std::string &_buffer,
+                  boost::function<void(uint32_t)> _cb, uint32_t _id,
+                  bool _force = false);
+
+      /// \brief Write data to the socket
+      /// \param[in] _buffer Data to write
+      /// \param[in] _force If true, block until the data has been written
+      /// to the socket, otherwise just enqueue the data for asynchronous write
       public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
 
       /// \brief Get the local URI
@@ -182,6 +204,7 @@ namespace gazebo
       public: template<typename Handler>
               void AsyncRead(Handler _handler)
               {
+                boost::mutex::scoped_lock lock(this->socketMutex);
                 if (!this->IsOpen())
                 {
                   gzerr << "AsyncRead on a closed socket\n";
@@ -212,14 +235,8 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  if (_e.message() != "End of File")
-                  {
-                    // This will occur when the other side closes the
-                    // connection. We don't want spew error messages in this
-                    // case.
-                    //
-                    // It's okay to do nothing here.
-                  }
+                  if (_e.message() == "End of file")
+                    this->isOpen = false;
                 }
                 else
                 {
@@ -278,8 +295,8 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  gzerr << "Error Reading data["
-                    << _e.message() << "]\n";
+                  if (_e.message() == "End of file")
+                    this->isOpen = false;
                 }
 
                 // Inform caller that data has been received
@@ -294,8 +311,10 @@ namespace gazebo
                 {
                   ConnectionReadTask *task = new(tbb::task::allocate_root())
                         ConnectionReadTask(boost::get<0>(_handler), data);
-
                   tbb::task::enqueue(*task);
+
+                  // Non-tbb version:
+                  // boost::get<0>(_handler)(data);
                 }
               }
 
@@ -307,10 +326,13 @@ namespace gazebo
               { return this->shutdown.Connect(_subscriber); }
 
       /// \brief Unregister a function to be called when the connection is
-      /// shut down \param[in] _subscriber Handle previously returned by
+      /// shut down
+      /// \param[in] _subscriber Handle previously returned by
       /// ConnectToShutdown()
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
-              {this->shutdown.Disconnect(_subscriber);}
+              GAZEBO_DEPRECATED(8.0)
+              {this->shutdown.Disconnect(_subscriber->Id());}
 
       /// \brief Handle on-write callbacks
       public: void ProcessWriteQueue(bool _blocking = false);
@@ -324,11 +346,15 @@ namespace gazebo
       /// \return True if the _ip is a valid.
       public: static bool ValidateIP(const std::string &_ip);
 
+      /// \brief Get the IP white list, from GAZEBO_IP_WHITE_LIST
+      /// environment variable.
+      /// \return GAZEBO_IP_WHITE_LIST
+      public: std::string GetIPWhiteList() const;
+
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.
-      private: void OnWrite(const boost::system::error_code &_e,
-                            boost::asio::streambuf *_b);
+      private: void OnWrite(const boost::system::error_code &_e);
 
       /// \brief Handle new connections, if this is a server
       /// \param[in] _e Error code for accept method
@@ -368,6 +394,11 @@ namespace gazebo
 
       /// \brief Outgoing data queue
       private: std::deque<std::string> writeQueue;
+
+      /// \brief List of callbacks, paired with writeQueue. The callbacks
+      /// are used to notify a publisher when a message is successfully sent.
+      private: std::deque<
+               std::pair<boost::function<void(uint32_t)>, uint32_t> > callbacks;
 
       /// \brief Mutex to protect new connections.
       private: boost::mutex connectMutex;
@@ -428,6 +459,22 @@ namespace gazebo
 
       /// \brief True if the connection has an error
       private: bool connectError;
+
+      /// \brief Comma separated list of valid IP addresses.
+      private: std::string ipWhiteList;
+
+      /// \brief Buffer for header information.
+      private: char *headerBuffer;
+
+      /// \brief Used to prevent too many log messages.
+      private: bool dropMsgLogged;
+
+      /// \brief Index into the callbacks buffer that marks the last
+      /// async_write.
+      private: unsigned int callbackIndex;
+
+      /// \brief True if the connection is open.
+      private: bool isOpen;
     };
     /// \}
   }

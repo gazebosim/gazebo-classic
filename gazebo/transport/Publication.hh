@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,18 @@
 #define _PUBLICATION_HH_
 
 #include <utility>
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <list>
 #include <string>
 #include <vector>
+#include <map>
 
-#include "transport/CallbackHelper.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/PublicationTransport.hh"
+#include "gazebo/transport/CallbackHelper.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/PublicationTransport.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +42,7 @@ namespace gazebo
     /// \class Publication Publication.hh transport/transport.hh
     /// \brief A publication for a topic. This facilitates transport of
     /// messages
-    class Publication
+    class GZ_TRANSPORT_VISIBLE Publication
     {
       /// \brief Constructor
       /// \param[in] _topic The topic we're publishing
@@ -86,6 +89,10 @@ namespace gazebo
       /// \return The number of callbacks
       public: unsigned int GetCallbackCount() const;
 
+      /// \brief Get the number of publishers.
+      /// \return The number of publishers.
+      public: unsigned int PublisherCount() const;
+
       /// \brief Get the number of nodes
       /// \return The number of nodes
       public: unsigned int GetNodeCount() const;
@@ -110,10 +117,36 @@ namespace gazebo
 
       /// \brief Publish data to remote subscribers
       /// \param[in] _msg Message to be published
-      /// \param[in] _cb If non-null, callback to be invoked after publishing
+      /// \param[in] _cb Callback to be invoked after publishing
       /// is completed
-      public: void Publish(MessagePtr _msg,
-                           const boost::function<void()> &_cb = NULL);
+      /// \return Number of remote subscribers that will receive the
+      /// message.
+      public: int Publish(MessagePtr _msg,
+                  boost::function<void(uint32_t)> _cb,
+                  uint32_t _id);
+
+      /// \brief Remove a publisher.
+      /// \param[in] _pub Pointer to publisher object to remove.
+      public: void RemovePublisher(PublisherPtr _pub);
+
+      /// \brief Remove a publisher, based on a publisher ID.
+      /// \param[in] _id ID of the publisher to remove.
+      /// \return True if successful.
+      public: bool RemovePublisher(const uint32_t id);
+
+      /// \brief Set the previous message for a publisher.
+      /// \param[in] _pubId ID of the publisher.
+      /// \param[in] _msg The previous message.
+      public: void SetPrevMsg(uint32_t _pubId, MessagePtr _msg);
+
+      /// \brief Get a previous message for a publisher.
+      /// \param[in] _pubId ID of the publisher.
+      /// \return Pointer to the previous message. NULL if there is no
+      /// previous message.
+      public: MessagePtr GetPrevMsg(uint32_t _pubId);
+
+      /// \brief Clear all previous messages for a publisher.
+      public: void ClearPrevMsgs();
 
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to
@@ -145,7 +178,7 @@ namespace gazebo
       /// \brief Type of message produced through the publication
       private: std::string msgType;
 
-      /// \brief Remove nodes that receieve messages.
+      /// \brief Remote nodes that receieve messages.
       private: std::list<CallbackHelperPtr> callbacks;
 
       /// \brief Local nodes that recieve messages.
@@ -174,6 +207,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of nodes id for removed.
       private: mutable boost::mutex nodeRemoveMutex;
+
+      /// \brief Publishers and their last messages.
+      private: std::map<uint32_t, MessagePtr> prevMsgs;
     };
     /// \}
   }
