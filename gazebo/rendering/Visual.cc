@@ -479,6 +479,11 @@ void Visual::Load()
   {
     this->SetTransparency(this->dataPtr->sdf->Get<float>("transparency"));
   }
+  // Update transparency the first time the visual is loaded. This is needed
+  // when attaching to a parent who is semi-transparent.
+  if (!ignition::math::equal(this->DerivedTransparency(),
+      this->dataPtr->transparency))
+    this->UpdateTransparency(true);
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));

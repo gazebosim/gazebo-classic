@@ -43,7 +43,7 @@ std::string GetVisualSDFString(const std::string &_name,
 {
   std::stringstream visualString;
   visualString
-      << "<sdf version='1.5'>"
+      << "<sdf version='" << SDF_VERSION <<"'>"
       << "  <visual name='" << _name << "'>"
       << "    <pose>" << _pose << "</pose>"
       << "    <geometry>";
@@ -369,10 +369,24 @@ TEST_F(Visual_TEST, Transparency)
   EXPECT_DOUBLE_EQ(sphereVis2->GetTransparency(), 0.5f);
 
   // test changing transparency property
-  sphereVis->SetTransparency(0.3f);
-  EXPECT_DOUBLE_EQ(sphereVis->GetTransparency(), 0.3f);
+  float trans = 0.3f;
+  sphereVis->SetTransparency(trans);
+  EXPECT_DOUBLE_EQ(sphereVis->GetTransparency(), trans);
   sphereVis2->SetTransparency(1.0f);
   EXPECT_DOUBLE_EQ(sphereVis2->GetTransparency(), 1.0f);
+
+  // Create another visual with geom as child of sphere_visual
+  // sphere_visual is already semi-transparency so boxVis should inherit
+  // this transparency
+  sdf::ElementPtr boxSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", boxSDF);
+  sdf::readString(GetVisualSDFString("box_visual", "box"), boxSDF);
+  gazebo::rendering::VisualPtr boxVis(
+      new gazebo::rendering::Visual("visual", sphereVis));
+  boxVis->Load(boxSDF);
+  EXPECT_FLOAT_EQ(boxVis->DerivedTransparency(), trans);
+  // check diffuse to verify they have the correct alpha value
+  EXPECT_FLOAT_EQ(boxVis->GetDiffuse().a, 1.0f-trans);
 }
 
 /////////////////////////////////////////////////
