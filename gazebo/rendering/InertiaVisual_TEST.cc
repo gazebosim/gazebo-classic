@@ -76,7 +76,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
   SpawnCamera("test_camera_model", cameraName,
       cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
-  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("inertia_rotations");
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
 
   const std::vector<std::string> inertiaVisualNames =
