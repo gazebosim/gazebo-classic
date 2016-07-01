@@ -27,22 +27,6 @@
 #include "test_config.h"
 
 /////////////////////////////////////////////////
-gazebo::math::Vector2i GetScreenSpaceCoords(gazebo::math::Vector3 _pt,
-    gazebo::rendering::CameraPtr _cam)
-{
-  // Convert from 3D world pos to 2D screen pos
-  Ogre::Vector3 pos = _cam->OgreCamera()->getProjectionMatrix() *
-      _cam->OgreCamera()->getViewMatrix() *
-      gazebo::rendering::Conversions::Convert(_pt);
-
-  gazebo::math::Vector2i screenPos;
-  screenPos.x = ((pos.x / 2.0) + 0.5) * _cam->ViewportWidth();
-  screenPos.y = (1 - ((pos.y / 2.0) + 0.5)) * _cam->ViewportHeight();
-
-  return screenPos;
-}
-
-/////////////////////////////////////////////////
 bool FindRedColor(gazebo::rendering::CameraPtr _cam)
 {
   // Get camera data
@@ -123,11 +107,12 @@ void ModelSnap_TEST::Highlight()
   gazebo::gui::g_snapAct->trigger();
 
   // select any triangle on the sphere
-  gazebo::math::Vector2i spherePt = GetScreenSpaceCoords(
-      model03Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
+  ignition::math::Vector2i spherePt =
+      cam->Project(model03Vis->GetWorldPose().pos.Ign() +
+      ignition::math::Vector3d(0.5, 0, 0));
 
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
-      QPoint(spherePt.x, spherePt.y));
+      QPoint(spherePt.X(), spherePt.Y()));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -150,10 +135,12 @@ void ModelSnap_TEST::Highlight()
     gazebo::gui::g_snapAct->trigger();
 
     // select the front face of the box
-    gazebo::math::Vector2i boxPt = GetScreenSpaceCoords(
-        model02Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
+    ignition::math::Vector2i boxPt =
+        cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+        ignition::math::Vector3d(0.5, 0, 0));
 
-    QTest::mouseRelease(glWidget, Qt::LeftButton, 0, QPoint(boxPt.x, boxPt.y));
+    QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+         QPoint(boxPt.X(), boxPt.Y()));
 
     this->ProcessEventsAndDraw(mainWindow);
 
@@ -210,18 +197,20 @@ void ModelSnap_TEST::Snap()
   gazebo::rendering::RayQuery rayQuery(cam);
 
   // select any triangle on the sphere
-  gazebo::math::Vector2i srcPt = GetScreenSpaceCoords(
-      model03Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
+  ignition::math::Vector2i srcPt =
+      cam->Project(model03Vis->GetWorldPose().pos.Ign() +
+      ignition::math::Vector3d(0.5, 0, 0));
   gazebo::math::Vector3 intersect;
   std::vector<gazebo::math::Vector3> verticesSrc;
-  rayQuery.SelectMeshTriangle(srcPt.x, srcPt.y, model03Vis, intersect,
+  rayQuery.SelectMeshTriangle(srcPt.X(), srcPt.Y(), model03Vis, intersect,
       verticesSrc);
 
   // select the front face of the box
-  gazebo::math::Vector2i destPt = GetScreenSpaceCoords(
-      model02Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
+  ignition::math::Vector2i destPt =
+      cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+      ignition::math::Vector3d(0.5, 0, 0));
   std::vector<gazebo::math::Vector3> verticesDest;
-  rayQuery.SelectMeshTriangle(destPt.x, destPt.y, model02Vis, intersect,
+  rayQuery.SelectMeshTriangle(destPt.X(), destPt.Y(), model02Vis, intersect,
       verticesDest);
 
   // Snap the sphere to the front face of the box.
@@ -250,17 +239,19 @@ void ModelSnap_TEST::Snap()
   gazebo::gui::ModelSnap::Instance()->Reset();
 
   // select the spherical face of the cylinder
-  gazebo::math::Vector2i srcPt2 = GetScreenSpaceCoords(
-      model01Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0.0), cam);
+  ignition::math::Vector2i srcPt2 =
+      cam->Project(model01Vis->GetWorldPose().pos.Ign() +
+      ignition::math::Vector3d(0.5, 0, 0.0));
   verticesSrc.clear();
-  rayQuery.SelectMeshTriangle(srcPt2.x, srcPt2.y, model01Vis, intersect,
+  rayQuery.SelectMeshTriangle(srcPt2.X(), srcPt2.Y(), model01Vis, intersect,
       verticesSrc);
 
   // select the top face of the box
-  gazebo::math::Vector2i destPt2 = GetScreenSpaceCoords(
-      model02Vis->GetWorldPose().pos + gazebo::math::Vector3(0.0, 0, 0.5), cam);
+  ignition::math::Vector2i destPt2 =
+      cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+      ignition::math::Vector3d(0.0, 0, 0.5));
   verticesDest.clear();
-  rayQuery.SelectMeshTriangle(destPt2.x, destPt2.y, model02Vis, intersect,
+  rayQuery.SelectMeshTriangle(destPt2.X(), destPt2.Y(), model02Vis, intersect,
       verticesDest);
 
   // Snap the cylinder to the top of the box.

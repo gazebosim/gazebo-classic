@@ -82,7 +82,6 @@ set(tests
   rayshape.cc
   region_events.cc
   rest_web.cc
-  road.cc
   saving_and_loading.cc
   sensor.cc
   server_fixture.cc
@@ -140,9 +139,6 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
-
-  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
-    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests
@@ -156,6 +152,7 @@ set(dri_tests
   camera_sensor.cc
   depth_camera.cc
   factory.cc
+  fiducial.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
@@ -164,6 +161,7 @@ set(dri_tests
   pr2.cc
   projector.cc
   rendering_sensor.cc
+  road.cc
   speed_pr2.cc
   world_reset.cc
 )
@@ -189,7 +187,4 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
-
-  set_target_properties(${TEST_TYPE}_model_editor_undo PROPERTIES
-    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
