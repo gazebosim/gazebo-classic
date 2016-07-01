@@ -70,7 +70,13 @@ namespace gazebo
         MOVING_LINK = 6,
 
         /// \brief Move a nested model.
-        MOVING_NESTED_MODEL = 7
+        MOVING_NESTED_MODEL = 7,
+
+        /// \brief Insert a model plugin.
+        INSERTING_MODEL_PLUGIN = 9,
+
+        /// \brief Delete a model plugin.
+        DELETING_MODEL_PLUGIN = 10
       };
 
       /// \brief Constructor

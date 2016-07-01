@@ -212,6 +212,9 @@ void Skeleton::AddVertNodeWeight(unsigned int _vertex, std::string _node,
 //////////////////////////////////////////////////
 unsigned int Skeleton::GetNumVertNodeWeights(unsigned int _vertex)
 {
+  if (_vertex > this->rawNW.size())
+    return 0;
+
   return this->rawNW[_vertex].size();
 }
 

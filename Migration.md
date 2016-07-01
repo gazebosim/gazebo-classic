@@ -16,6 +16,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/Road2d.hh**
+    + Modified to inherit from Visual class.
+
 1. **gazebo/common/Event.hh**
     + Connection(Event*, int) constructor changed to
       Connection(Event*, const int)
@@ -33,6 +36,14 @@ release will remove the deprecated code.
     + ***Replacement:*** DisconnectSetSelectedEntity
     + ***Removed:*** setSelectedLink
     + ***Replacement:*** setSelectedEntity
+    + ***Removed:*** event::EventT<void (std::string)> requestModelPluginRemoval;
+    + ***Replacement:*** event::EventT<void (std::string, bool)> requestModelPluginRemoval;
+    + ***Removed:*** event::EventT<void (std::string, std::string, std::string)> requestModelPluginInsertion;
+    + ***Replacement:*** event::EventT<void (std::string, std::string, std::string, bool)> requestModelPluginInsertion;
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Removed:*** event::EventT<void (const std::string &, const gazebo::math::Vector3 &)> Events::scaleEntity
+    + ***Replacement:*** event::EventT<void (const std::string &, const ignition::math::Vector3d &)> Events::scaleEntity
 
 1. **gazebo/common/CommonTypes.hh**
     + ***Removed:*** GAZEBO_DEPRECATED
@@ -45,6 +56,10 @@ release will remove the deprecated code.
     + ***Replacement:*** GAZEBO_FORCEINLINE
 
 ### Deprecations
+
+1. **gazebo/rendering/Road2d.hh**
+    + ***Deprecation:*** public: void Load(VisualPtr);
+    + ***Replacement:*** public: void Load(msgs::Road);
 
 1. **gazebo/common/Event.hh**
     + ***Deprecation:*** public: void Event::Disconnect(ConnectionPtr);
@@ -161,13 +176,23 @@ release will remove the deprecated code.
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
+
+1. **gazebo/math/SignalStats.hh**
+    + ***Deprecation:*** public: gazebo::math::SignalStatistic
+    + ***Replacement:*** public: ignition::math::SignalStatistic
+    + ***Deprecation:*** public: gazebo::math::SignalStats
+    + ***Replacement:*** public: ignition::math::SignalStats
+
 1. **gazebo/math/Spline.hh**
     + ***Deprecation:*** public: gazebo::math::Spline
     + ***Replacement:*** public: ignition::math::Spline
 
-1. **gazebo/math/RotationSpline.hh**
-    + ***Deprecation:*** public: gazebo::math::RotationSpline
-    + ***Replacement:*** public: ignition::math::RotationSpline
+1. **gazebo/math/Vector3Stats.hh**
+    + ***Deprecation:*** public: gazebo::math::Vector3Stats
+    + ***Replacement:*** public: ignition::math::Vector3Stats
 
 ### Deletions
 
@@ -181,6 +206,9 @@ release will remove the deprecated code.
     + EntityMakerPrivate class
     + Entity(EntityMakerPrivate&) constructor
     + EntityMakerPrivate *dataPtr
+    
+1. **gazebo/physics/Link.hh**
+    + std::vector<std::string> cgVisuals
 
 ## Gazebo 7.1.0 to 7.X
 

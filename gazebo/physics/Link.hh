@@ -668,9 +668,6 @@ namespace gazebo
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
-      /// \brief Center of gravity visual elements.
-      protected: std::vector<std::string> cgVisuals;
-
       /// \def Visuals_M
       /// \brief Map of unique ID to visual message.
       typedef std::map<uint32_t, msgs::Visual> Visuals_M;

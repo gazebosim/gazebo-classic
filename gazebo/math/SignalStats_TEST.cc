@@ -19,6 +19,10 @@
 
 #include "gazebo/math/SignalStats.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class SignalStatsTest : public ::testing::Test { };
