@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#include <thread>
-
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/gui/OculusWindow.hh"

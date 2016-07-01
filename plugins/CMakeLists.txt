@@ -52,6 +52,7 @@ set (plugins_single_header
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
+  FiducialCameraPlugin
   FollowerPlugin
   ForceTorquePlugin
   GpuRayPlugin

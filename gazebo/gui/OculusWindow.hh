@@ -18,6 +18,7 @@
 #define GAZEBO_GUI_OCULUS_WINDOW_HH_
 
 #include <string>
+#include <thread>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
