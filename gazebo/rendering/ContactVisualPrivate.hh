@@ -26,13 +26,6 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 
-
-namespace Ogre
-{
-  class Entity;
-  class SceneNode;
-}
-
 namespace gazebo
 {
   namespace rendering

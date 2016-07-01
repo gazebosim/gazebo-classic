@@ -22,11 +22,6 @@
 
 #include "gazebo/rendering/VisualPrivate.hh"
 
-namespace ogre
-{
-  class SceneNode;
-}
-
 namespace gazebo
 {
   namespace rendering
