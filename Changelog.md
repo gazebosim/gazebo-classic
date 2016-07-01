@@ -8,6 +8,9 @@
 1. Fix Road2d vertices and shadows
     * [Pull request #2362](https://bitbucket.org/osrf/gazebo/pull-request/2362)
 
+1. Plotting utility - plot window, canvas, variables
+    * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
+
 1. Rearrange GLWidget::OnMouseMove so that the more common use cases it
    fewer if statements. Use std::thread in place of boost in OculusWindow.
    Pragma statements to prevent warnings. Prevent variable hiding in
@@ -2375,4 +2378,3 @@ compilation on Windows.
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-
