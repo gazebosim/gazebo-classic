@@ -949,6 +949,12 @@ namespace gazebo
       /// \sa TrackInheritYaw()
       public: void SetTrackInheritYaw(const bool _inheritYaw);
 
+      /// \brief Project 3D world coordinates to 2D screen coordinates
+      /// \param[in] _pt 3D world coodinates
+      /// \return _pt 2D screen coordinates
+      public: ignition::math::Vector2i Project(
+          const ignition::math::Vector3d &_pt) const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 

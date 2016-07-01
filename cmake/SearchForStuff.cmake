@@ -543,7 +543,7 @@ endif()
 
 ########################################
 # Find QT
-find_package(Qt4 COMPONENTS QtWebKit QtCore QtGui QtXml QtXmlPatterns REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtXmlPatterns REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
