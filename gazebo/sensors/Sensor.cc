@@ -251,6 +251,10 @@ void Sensor::Update(const bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
   this->connections.clear();
 
   for (auto &it : this->noises)
@@ -260,13 +264,12 @@ void Sensor::Fini()
   this->active = false;
   this->plugins.clear();
 
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
-
   if (this->sdf)
     this->sdf->Reset();
   this->sdf.reset();
+
+  this->scene.reset();
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////
@@ -557,5 +560,5 @@ event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 //////////////////////////////////////////////////
 void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
 {
-  this->dataPtr->updated.Disconnect(_c);
+  this->dataPtr->updated.Disconnect(_c->Id());
 }

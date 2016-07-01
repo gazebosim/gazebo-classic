@@ -37,9 +37,6 @@
 
 #include "gazebo/math/Helpers.hh"
 
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Event.hh"
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/RayShape.hh"

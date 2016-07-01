@@ -395,6 +395,8 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
+  this->applyDamping.reset();
+
   // Remove all the sensors attached to the joint
   for (auto const &sensor : this->sensors)
   {
@@ -403,10 +405,9 @@ void Joint::Fini()
   this->sensors.clear();
 
   this->anchorLink.reset();
-  this->applyDamping.reset();
   this->childLink.reset();
-  this->model.reset();
   this->parentLink.reset();
+  this->model.reset();
   this->sdfJoint.reset();
 
   Base::Fini();
@@ -483,6 +484,7 @@ void Joint::Update()
 void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
+  /// \todo Update joint specific parameters. Issue #1954
 }
 
 //////////////////////////////////////////////////

@@ -2824,10 +2824,10 @@ namespace gazebo
         submeshElem->GetElement("name")->Set(_msg.submesh());
         if (_msg.has_center_submesh())
           submeshElem->GetElement("center")->Set(_msg.center_submesh());
-        if (_msg.has_scale())
-        {
-          meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
-        }
+      }
+      if (_msg.has_scale())
+      {
+        meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
       }
       return meshSDF;
     }
@@ -3004,6 +3004,18 @@ namespace gazebo
       {
         sdf::ElementPtr jointElem = modelSDF->AddElement("joint");
         jointElem = JointToSDF(_msg.joint(i), jointElem);
+      }
+
+      if (_msg.plugin_size() > 0)
+      {
+        while (modelSDF->HasElement("plugin"))
+          modelSDF->GetElement("plugin")->RemoveFromParent();
+      }
+
+      for (int i = 0; i < _msg.plugin_size(); ++i)
+      {
+        sdf::ElementPtr pluginElem = modelSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
       }
 
       if (_msg.link_size())

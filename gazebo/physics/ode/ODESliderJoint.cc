@@ -41,8 +41,7 @@ ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODESliderJoint::~ODESliderJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

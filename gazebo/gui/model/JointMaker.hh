@@ -28,8 +28,6 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
-
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/msgs/msgs.hh"

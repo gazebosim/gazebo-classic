@@ -543,7 +543,7 @@ endif()
 
 ########################################
 # Find QT
-find_package(Qt4 COMPONENTS QtWebKit QtCore QtGui QtXml QtXmlPatterns REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtXmlPatterns REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
@@ -660,7 +660,7 @@ endif ()
 # Find ignition math in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-math2 2.3 QUIET)
+  find_package(ignition-math2 2.4 QUIET)
   if (NOT ignition-math2_FOUND)
     message(STATUS "Looking for ignition-math2-config.cmake - not found")
     BUILD_ERROR ("Missing: Ignition math2 library.")
