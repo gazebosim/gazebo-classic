@@ -26,7 +26,6 @@
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/UtilTypes.hh"
 
 #include "gazebo/gazebo_config.h"

@@ -326,7 +326,13 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   // Delete the entity
   if (!name.empty())
+  {
     transport::requestNoReply(this->node, "entity_delete", name);
+
+    // Remove the entity from all modelStates in each ViewState.
+    for (auto &viewState : this->viewStates)
+      viewState->modelStates.erase(this->entityName);
+  }
 }
 
 /////////////////////////////////////////////////

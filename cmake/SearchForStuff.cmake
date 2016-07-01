@@ -543,7 +543,7 @@ endif()
 
 ########################################
 # Find QT
-find_package(Qt4 COMPONENTS QtWebKit QtCore QtGui QtXml QtXmlPatterns REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtXmlPatterns REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
@@ -660,7 +660,7 @@ endif ()
 # Find ignition math in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-math2 2.3 QUIET)
+  find_package(ignition-math2 2.4 QUIET)
   if (NOT ignition-math2_FOUND)
     message(STATUS "Looking for ignition-math2-config.cmake - not found")
     BUILD_ERROR ("Missing: Ignition math2 library.")
@@ -674,14 +674,8 @@ endif()
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
   find_package(ignition-transport1 QUIET)
-
   if (NOT ignition-transport1_FOUND)
-
-    find_package(ignition-transport0 QUIET)
-    if (NOT ignition-transport0_FOUND)
-      BUILD_WARNING ("Missing: Ignition Transport (libignition-transport1-dev or libignition-transport0-dev)")
-    endif()
-
+    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
   else()
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
     include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})

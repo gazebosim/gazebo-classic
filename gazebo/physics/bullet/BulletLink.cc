@@ -220,6 +220,8 @@ void BulletLink::Fini()
   this->bulletPhysics.reset();
   this->rigidLink = nullptr;
 
+  this->motionState.reset();
+
   if (this->compoundShape)
     delete this->compoundShape;
   this->compoundShape = nullptr;

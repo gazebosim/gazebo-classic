@@ -75,6 +75,10 @@ Q_DECLARE_METATYPE(common::Time)
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::string)
 
+// This makes it possible to use std::set<std::string> in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::set<std::string>)
+
 //////////////////////////////////////////////////
 void print_usage()
 {
@@ -259,13 +263,8 @@ bool gui::load()
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
-  // Register common::Time as a type that can be used in signals and slots.
-  // Q_DECLARE_METATYPE is also required, see above.
-  qRegisterMetaType<common::Time>();
-
-  // Register std::string as a type that can be used in signals and slots.
-  // Q_DECLARE_METATYPE is also required, see above.
-  qRegisterMetaType<std::string>();
+  if (!gui::register_metatypes())
+    std::cerr << "Unable to register Qt metatypes" << std::endl;
 
   g_splashScreen = new gui::SplashScreen();
 
@@ -372,6 +371,24 @@ rendering::UserCameraPtr gui::get_active_camera()
 bool gui::has_entity_name(const std::string &_name)
 {
   return g_main_win->HasEntityName(_name);
+}
+
+/////////////////////////////////////////////////
+bool gui::register_metatypes()
+{
+  // Register common::Time as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<common::Time>();
+
+  // Register std::string as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<std::string>();
+
+  // Register std::set<std::string> as a type that can be used in signals and
+  // slots. Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType< std::set<std::string> >();
+
+  return true;
 }
 
 /////////////////////////////////////////////////

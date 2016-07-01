@@ -20,8 +20,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <QDesktopServices>
 #include <functional>
 
+#include <ignition/math/Pose3.hh>
 #include <sdf/sdf.hh>
 #include <boost/algorithm/string.hpp>
 
@@ -49,7 +51,6 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiPlugin.hh"
-#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
@@ -246,9 +247,6 @@ MainWindow::MainWindow()
   this->dataPtr->dataLogger = new gui::DataLogger(this);
   connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
     OnDataLoggerClosed()));
-
-  // Hotkey dialog
-  this->dataPtr->hotkeyDialog = NULL;
 
   this->show();
 }
@@ -647,13 +645,7 @@ void MainWindow::About()
 /////////////////////////////////////////////////
 void MainWindow::HotkeyChart()
 {
-  // Opening for the first time
-  if (!this->dataPtr->hotkeyDialog)
-  {
-    this->dataPtr->hotkeyDialog = new HotkeyDialog(this);
-  }
-
-  this->dataPtr->hotkeyDialog->show();
+  QDesktopServices::openUrl(QUrl("http://gazebosim.org/hotkeys.html"));
 }
 
 /////////////////////////////////////////////////
@@ -1133,7 +1125,7 @@ void MainWindow::CreateActions()
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
 
   g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
-  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  g_hotkeyChartAct->setStatusTip(tr("Open hotkey chart in a browser"));
   connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
@@ -2276,12 +2268,6 @@ RenderWidget *MainWindow::RenderWidget() const
 }
 
 /////////////////////////////////////////////////
-RenderWidget *MainWindow::GetRenderWidget() const
-{
-  return this->RenderWidget();
-}
-
-/////////////////////////////////////////////////
 bool MainWindow::IsPaused() const
 {
   if (this->dataPtr->renderWidget)
@@ -2359,12 +2345,6 @@ Editor *MainWindow::Editor(const std::string &_name) const
     return iter->second.get();
 
   return NULL;
-}
-
-/////////////////////////////////////////////////
-Editor *MainWindow::GetEditor(const std::string &_name) const
-{
-  return this->Editor(_name);
 }
 
 /////////////////////////////////////////////////

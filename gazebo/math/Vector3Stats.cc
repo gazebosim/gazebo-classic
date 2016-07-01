@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #include "gazebo/math/Vector3StatsPrivate.hh"
 #include "gazebo/math/Vector3Stats.hh"
 

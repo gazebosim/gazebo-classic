@@ -27,7 +27,6 @@
 // TODO: remove this line
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/MathTypes.hh"
 #include "gazebo/util/system.hh"

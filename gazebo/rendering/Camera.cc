@@ -2209,6 +2209,12 @@ std::string Camera::ProjectionType() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
+}
+
+//////////////////////////////////////////////////
 event::ConnectionPtr Camera::ConnectNewImageFrame(
     std::function<void (const unsigned char *, unsigned int, unsigned int,
     unsigned int, const std::string &)> _subscriber)
@@ -2219,7 +2225,7 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 //////////////////////////////////////////////////
 void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 {
-  this->newImageFrame.Disconnect(_c);
+  this->newImageFrame.Disconnect(_c->Id());
 }
 
 /////////////////////////////////////////////////
@@ -2298,4 +2304,19 @@ bool Camera::TrackInheritYaw() const
 void Camera::SetTrackInheritYaw(const bool _inheritYaw)
 {
   this->dataPtr->trackInheritYaw = _inheritYaw;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2i Camera::Project(
+    const ignition::math::Vector3d &_pt) const
+{
+  // Convert from 3D world pos to 2D screen pos
+  Ogre::Vector3 pos = this->OgreCamera()->getProjectionMatrix() *
+      this->OgreCamera()->getViewMatrix() * Conversions::Convert(_pt);
+
+  ignition::math::Vector2i screenPos;
+  screenPos.X() = ((pos.x / 2.0) + 0.5) * this->ViewportWidth();
+  screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * this->ViewportHeight();
+
+  return screenPos;
 }

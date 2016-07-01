@@ -102,6 +102,106 @@ TEST_F(MsgsTest, BadPackage)
   EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
 }
 
+TEST_F(MsgsTest, ConvertDoubleToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(1.0);
+  EXPECT_EQ(msg.type(), msgs::Any::DOUBLE);
+  ASSERT_TRUE(msg.has_double_value());
+  EXPECT_DOUBLE_EQ(1, msg.double_value());
+}
+
+TEST_F(MsgsTest, ConvertIntToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(2);
+  EXPECT_EQ(msg.type(), msgs::Any::INT32);
+  ASSERT_TRUE(msg.has_int_value());
+  EXPECT_DOUBLE_EQ(2, msg.int_value());
+}
+
+TEST_F(MsgsTest, ConvertStringToAny)
+{
+  msgs::Any msg = msgs::ConvertAny("test_string");
+  EXPECT_EQ(msg.type(), msgs::Any::STRING);
+  ASSERT_TRUE(msg.has_string_value());
+  EXPECT_EQ("test_string", msg.string_value());
+}
+
+TEST_F(MsgsTest, ConvertBoolToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(true);
+
+  EXPECT_EQ(msg.type(), msgs::Any::BOOLEAN);
+  ASSERT_TRUE(msg.has_bool_value());
+  EXPECT_TRUE(msg.bool_value());
+}
+
+TEST_F(MsgsTest, ConvertVector3dToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(msg.type(), msgs::Any::VECTOR3D);
+  ASSERT_TRUE(msg.has_vector3d_value());
+
+  EXPECT_DOUBLE_EQ(1, msg.vector3d_value().x());
+  EXPECT_DOUBLE_EQ(2, msg.vector3d_value().y());
+  EXPECT_DOUBLE_EQ(3, msg.vector3d_value().z());
+}
+
+TEST_F(MsgsTest, ConvertColorToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(common::Color(.1, .2, .3, 1.0));
+  EXPECT_EQ(msg.type(), msgs::Any::COLOR);
+  ASSERT_TRUE(msg.has_color_value());
+
+  EXPECT_DOUBLE_EQ(0.1f, msg.color_value().r());
+  EXPECT_DOUBLE_EQ(0.2f, msg.color_value().g());
+  EXPECT_DOUBLE_EQ(0.3f, msg.color_value().b());
+  EXPECT_DOUBLE_EQ(1.0f, msg.color_value().a());
+}
+
+TEST_F(MsgsTest, ConvertPose3dToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Pose3d(
+      ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(4, 5, 6, 7)));
+
+  EXPECT_EQ(msg.type(), msgs::Any::POSE3D);
+  ASSERT_TRUE(msg.has_pose3d_value());
+
+  EXPECT_DOUBLE_EQ(1, msg.pose3d_value().position().x());
+  EXPECT_DOUBLE_EQ(2, msg.pose3d_value().position().y());
+  EXPECT_DOUBLE_EQ(3, msg.pose3d_value().position().z());
+
+  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().w(), 4.0));
+  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().x(), 5.0));
+  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().y(), 6.0));
+  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().z(), 7.0));
+}
+
+TEST_F(MsgsTest, ConvertQuaternionToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(
+      ignition::math::Quaterniond(1, 2, 3, 4));
+
+  EXPECT_EQ(msg.type(), msgs::Any::QUATERNIOND);
+  ASSERT_TRUE(msg.has_quaternion_value());
+
+  EXPECT_TRUE(math::equal(msg.quaternion_value().w(), 1.0));
+  EXPECT_TRUE(math::equal(msg.quaternion_value().x(), 2.0));
+  EXPECT_TRUE(math::equal(msg.quaternion_value().y(), 3.0));
+  EXPECT_TRUE(math::equal(msg.quaternion_value().z(), 4.0));
+}
+
+TEST_F(MsgsTest, ConvertTimeToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(common::Time(2, 123));
+
+  EXPECT_EQ(msg.type(), msgs::Any::TIME);
+  ASSERT_TRUE(msg.has_time_value());
+
+  EXPECT_EQ(2, msg.time_value().sec());
+  EXPECT_EQ(123, msg.time_value().nsec());
+}
+
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
   msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
@@ -130,7 +230,7 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
   EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
 }
 
-TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
+TEST_F(MsgsTest, ConvertMsgsQuaternionToMath)
 {
   msgs::Quaternion msg =
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
@@ -2517,6 +2617,7 @@ TEST_F(MsgsTest, MeshToSDF)
   sdf::ElementPtr meshSDF = msgs::MeshToSDF(msg);
 
   EXPECT_STREQ(meshSDF->Get<std::string>("uri").c_str(), "test_filename");
+  EXPECT_TRUE(meshSDF->HasElement("scale"));
   math::Vector3 scale = meshSDF->Get<math::Vector3>("scale");
   EXPECT_DOUBLE_EQ(scale.x, 0.1);
   EXPECT_DOUBLE_EQ(scale.y, 0.2);
@@ -2525,6 +2626,22 @@ TEST_F(MsgsTest, MeshToSDF)
   sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(), "test_submesh");
   EXPECT_TRUE(submeshElem->Get<bool>("center"));
+
+  // no submesh
+  msgs::MeshGeom msg2;
+  msg2.set_filename("test_filename2");
+  msgs::Set(msg2.mutable_scale(), ignition::math::Vector3d(1, 2, 3));
+
+  sdf::ElementPtr meshSDF2 = msgs::MeshToSDF(msg2);
+
+  EXPECT_STREQ(meshSDF2->Get<std::string>("uri").c_str(), "test_filename2");
+  EXPECT_TRUE(meshSDF2->HasElement("scale"));
+  math::Vector3 scale2 = meshSDF2->Get<math::Vector3>("scale");
+  EXPECT_DOUBLE_EQ(scale2.x, 1);
+  EXPECT_DOUBLE_EQ(scale2.y, 2);
+  EXPECT_DOUBLE_EQ(scale2.z, 3);
+
+  EXPECT_FALSE(meshSDF2->HasElement("submesh"));
 }
 
 /////////////////////////////////////////////////
@@ -3465,6 +3582,14 @@ TEST_F(MsgsTest, ModelToSDF)
   const ignition::math::Vector3d rearAxis(0, 0, 1);
   msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
 
+  // Add plugin
+  model.add_plugin();
+  ASSERT_EQ(model.plugin_size(), 1);
+  auto plugin = model.mutable_plugin(0);
+  plugin->set_name("plugin_name");
+  plugin->set_filename("plugin_filename");
+  plugin->set_innerxml("<plugin_param>param</plugin_param>");
+
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
   EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(modelSDF->Get<bool>("static"));
@@ -3494,6 +3619,12 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
       ignition::math::Pose3d());
+
+  sdf::ElementPtr pluginElem = modelSDF->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), "plugin_name");
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), "plugin_filename");
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }
 
 /////////////////////////////////////////////////

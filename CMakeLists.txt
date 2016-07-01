@@ -9,8 +9,8 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_MAJOR_VERSION 7)
-set (GAZEBO_MINOR_VERSION 1)
+set (GAZEBO_MAJOR_VERSION 8)
+set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -215,7 +215,13 @@ if(USE_UPSTREAM_CFLAGS)
 endif()
 
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+# For MSVC it is recommended to use /W4 instead of /Wall
+if (MSVC)
+  set(WARN_LEVEL "/W4")
+else()
+  set(WARN_LEVEL "-Wall")
+endif()
+filter_valid_compiler_flags(${WARN_LEVEL} -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
                                -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
 

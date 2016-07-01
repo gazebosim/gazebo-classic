@@ -25,8 +25,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/math/Vector2d.hh"
-
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/LaserView.hh"
 
@@ -465,7 +463,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     this->points.resize(this->ranges.size() * 2);
     this->noHitPoints.resize(this->ranges.size() * 2);
   }
-  else if (math::equal(this->rangeMin, 0.0) &&
+  else if (ignition::math::equal(this->rangeMin, 0.0) &&
       this->ranges.size() + 1 != this->points.size())
   {
     // A min range == 0 mean we just need a closing point at the (0, 0)

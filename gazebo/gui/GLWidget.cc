@@ -24,9 +24,10 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -362,6 +363,22 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
+  /// Switch between RTS modes
+  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
+      this->dataPtr->state != "make_entity")
+  {
+    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
+      g_rotateAct->trigger();
+    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
+      g_translateAct->trigger();
+    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
+      g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
+      g_snapAct->trigger();
+    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
+      g_arrowAct->trigger();
+  }
+
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
   this->dataPtr->keyEvent.shift =
@@ -416,22 +433,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     return;
 
   this->dataPtr->keyModifiers = _event->modifiers();
-
-  /// Switch between RTS modes
-  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
-      this->dataPtr->state != "make_entity")
-  {
-    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
-      g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
-      g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
-      g_scaleAct->trigger();
-    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
-      g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
-      g_arrowAct->trigger();
-  }
 
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
@@ -543,18 +544,24 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 {
   // Update the view depending on the current GUI state
-  if (this->dataPtr->state == "make_entity")
-    this->OnMouseMoveMakeEntity();
-  else if (this->dataPtr->state == "select")
+  if (this->dataPtr->state == "select")
+  {
     this->OnMouseMoveNormal();
+  }
   else if (this->dataPtr->state == "translate" ||
            this->dataPtr->state == "rotate"    ||
            this->dataPtr->state == "scale")
   {
     ModelManipulator::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
   }
+  else if (this->dataPtr->state == "make_entity")
+  {
+    this->OnMouseMoveMakeEntity();
+  }
   else if (this->dataPtr->state == "snap")
+  {
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
+  }
 
   return true;
 }
@@ -866,21 +873,16 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->dataPtr->userCamera);
   this->dataPtr->scene = _scene;
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(5, -5, 2);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  auto delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y, delta.x);
+  double yaw = atan2(delta.Y(), delta.X());
 
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
-}
-
-/////////////////////////////////////////////////
-rendering::ScenePtr GLWidget::GetScene() const
-{
-  return this->Scene();
+  double pitch = atan2(-delta.Z(),
+      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
+  this->dataPtr->userCamera->SetDefaultPose(ignition::math::Pose3d(camPos,
+        ignition::math::Quaterniond(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
@@ -897,12 +899,6 @@ void GLWidget::Clear()
   this->dataPtr->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
   this->dataPtr->keyModifiers = 0;
-}
-
-//////////////////////////////////////////////////
-rendering::UserCameraPtr GLWidget::GetCamera() const
-{
-  return this->Camera();
 }
 
 //////////////////////////////////////////////////
@@ -1334,7 +1330,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

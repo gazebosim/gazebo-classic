@@ -210,6 +210,7 @@ set (gtest_fixture_sources
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
   Wind_TEST.cc
+  World_TEST.cc
   WorldState_TEST.cc
 )
 
