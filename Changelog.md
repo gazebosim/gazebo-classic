@@ -5,6 +5,9 @@
 1. Add FiducialCameraPlugin for Camera Sensors
     * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
 
+1. Fix Road2d vertices and shadows
+    * [Pull request #2362](https://bitbucket.org/osrf/gazebo/pull-request/2362)
+
 1. Use single pixel selection buffer for mouse picking
     * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
 
@@ -100,8 +103,17 @@
     1. Undo insert / delete joints
         * [Pull request #2266](https://bitbucket.org/osrf/gazebo/pull-request/2266)
 
+    1. Undo insert / delete model plugins
+        * [Pull request #2334](https://bitbucket.org/osrf/gazebo/pull-request/2334)
+
     1. Undo translate, rotate, snap and align links and nested models
         * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
+
+1. Google Summer of Code Graphical interface for inserting plugins during simulation.
+
+    1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
+        * [Pull request #2323](https://bitbucket.org/osrf/gazebo/pull-request/2323)
+        * [Issue #1698](https://bitbucket.org/osrf/gazebo/pull-request/1698)
 
 ## Gazebo 7
 
