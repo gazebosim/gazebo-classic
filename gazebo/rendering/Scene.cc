@@ -2851,11 +2851,13 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       visual->ShowCOM(this->dataPtr->showCOMs);
       visual->ShowInertia(this->dataPtr->showInertias);
       visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
-      visual->ShowSkeleton(this->dataPtr->showSkeleton);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
       if (visual->GetType() == Visual::VT_MODEL)
+      {
+        visual->ShowSkeleton(this->dataPtr->showSkeleton);
         visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      }
       visual->SetWireframe(this->dataPtr->wireframe);
     }
   }
@@ -3453,7 +3455,8 @@ void Scene::ShowSkeleton(const bool _show)
   this->dataPtr->showSkeleton = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    visual.second->ShowSkeleton(_show);
+    if (visual.second->GetType() == Visual::VT_MODEL)
+      visual.second->ShowSkeleton(_show);
   }
 }
 

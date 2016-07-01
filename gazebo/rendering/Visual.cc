@@ -1014,14 +1014,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
   // check if material has color components, if so, set them.
   if (matColor)
   {
-    this->SetAmbient(matAmbient, false);
-    this->SetDiffuse(matDiffuse, false);
-    this->SetSpecular(matSpecular, false);
-    this->SetEmissive(matEmissive, false);
+    this->dataPtr->ambient = matAmbient;
+    this->dataPtr->diffuse = matDiffuse;
+    this->dataPtr->specular = matSpecular;
+    this->dataPtr->emissive = matEmissive;
   }
-
-  // Re-apply the transparency filter for the last known transparency value
-  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   try
   {
@@ -1497,7 +1494,7 @@ void Visual::UpdateTransparency(const bool _cascade)
     for (auto &child : this->dataPtr->children)
     {
       // Don't change some visualizations when link changes
-      if (!(this->GetType() == VT_LINK &&
+      if (child->InheritTransparency() && !(this->GetType() == VT_LINK &&
           (child->GetType() == VT_GUI ||
            child->GetType() == VT_PHYSICS ||
            child->GetType() == VT_SENSOR)))
@@ -2320,13 +2317,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     std::string newGeometryName = geometryName;
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
-        newGeometryName = _msg->geometry().mesh().filename();
+        newGeometryName = common::find_file(_msg->geometry().mesh().filename());
 
     if (newGeometryType != geometryType ||
         (newGeometryType == "mesh" && newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
-      float origTransparency = this->dataPtr->transparency;
 
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
@@ -2345,7 +2341,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       else if (newGeometryType == "mesh")
       {
         std::string filename = _msg->geometry().mesh().filename();
-        std::string meshName = common::find_file(filename);
+        std::string meshName = newGeometryName;
         std::string submeshName;
         bool centerSubmesh = false;
 
@@ -2377,8 +2373,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
       if (ent && ent->hasSkeleton())
         this->dataPtr->skeleton = ent->getSkeleton();
-      this->SetTransparency(origTransparency);
-      this->SetMaterial(origMaterial);
+      this->SetMaterial(origMaterial, false);
+      this->UpdateTransparency(true);
     }
 
     math::Vector3 geomScale(1, 1, 1);
