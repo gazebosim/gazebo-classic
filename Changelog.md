@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix InertiaVisual for non-diagonal inertia matrices
+    * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
+
 ## Gazebo 7.2.0 (2016-06-13)
 
 1. Fix right click view options after deleting and respawning a model.
