@@ -90,10 +90,15 @@ void TopicManager::Fini()
     this->Unadvertise(iter->first);
   }
 
-  for (auto subscribeNode : this->subscribedNodes)
-    for (auto node : subscribeNode.second)
+  for (auto &subscribeNode : this->subscribedNodes)
+  {
+    for (auto &node : subscribeNode.second)
+    {
       if (node)
         node->Fini();
+    }
+  }
+
   this->advertisedTopics.clear();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
   this->subscribedNodes.clear();
