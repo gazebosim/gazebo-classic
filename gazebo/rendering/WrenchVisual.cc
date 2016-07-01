@@ -100,15 +100,15 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
   dPtr->coneZVis->SetMaterial("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
   ignition::math::Quaterniond q;
-  q.Axis(0, 1, 0, IGN_DTOR(-90));
+  q.Axis(0, 1, 0, -IGN_PI_2);
   dPtr->coneXVis->SetRotation(q);
   dPtr->coneXVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
 
-  q.Axis(1, 0, 0, IGN_DTOR(90));
+  q.Axis(1, 0, 0, IGN_PI_2);
   dPtr->coneYVis->SetRotation(q);
   dPtr->coneYVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
 
-  q.Axis(1, 0, 0, IGN_DTOR(180));
+  q.Axis(1, 0, 0, IGN_PI);
   dPtr->coneZVis->SetRotation(q);
   dPtr->coneZVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
 
