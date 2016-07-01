@@ -1710,7 +1710,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(uint32_t _visualId,
+void Camera::AttachToVisual(const uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
@@ -1773,7 +1773,7 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(uint32_t _id,
+bool Camera::AttachToVisualImpl(const uint32_t _id,
     const bool _inheritOrientation, const double _minDist,
     const double _maxDist)
 {
