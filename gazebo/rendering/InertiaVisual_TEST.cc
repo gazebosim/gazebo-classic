@@ -15,7 +15,12 @@
  *
 */
 
+#include <string>
+#include <vector>
+
 #include <gtest/gtest.h>
+#include <ignition/math/Box.hh>
+
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -58,6 +63,71 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
 
   // verify scene's child count is the same as before the visual was created
   EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
+}
+
+/////////////////////////////////////////////////
+TEST_F(InertiaVisual_TEST, InertiaRotation)
+{
+  Load("worlds/inertia_rotations.world");
+
+  // FIXME need a camera otherwise test produces a gl vertex buffer error
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+  std::string cameraName = "test_camera";
+  SpawnCamera("test_camera_model", cameraName,
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("inertia_rotations");
+  ASSERT_NE(scene, nullptr);
+
+  const std::vector<std::string> inertiaVisualNames =
+  {
+    "box010409_ref::link_INERTIA_VISUAL__",
+    "box010409_x90::link_INERTIA_VISUAL__",
+    "box010409_y90::link_INERTIA_VISUAL__",
+    "box010409_z90::link_INERTIA_VISUAL__",
+    "box010409_x45::link_INERTIA_VISUAL__",
+    "box010409_y45::link_INERTIA_VISUAL__",
+    "box010409_z45::link_INERTIA_VISUAL__"
+  };
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  const int maxSleep = 50;
+  while (sleep < maxSleep)
+  {
+    bool found = true;
+    for (const auto name : inertiaVisualNames)
+    {
+      auto visual = scene->GetVisual(name);
+      if (visual == nullptr)
+      {
+        found = false;
+        break;
+      }
+    }
+    if (found)
+    {
+      break;
+    }
+    common::Time::MSleep(200);
+    sleep++;
+  }
+
+  // expect bounding box of size 0.1 x 0.4 x 0.9
+  const ignition::math::Box box(-0.05, -0.2, -0.45,
+                                 0.05,  0.2,  0.45);
+  for (const auto name : inertiaVisualNames)
+  {
+    gzdbg << "Check bounding box for "
+          << name
+          << std::endl;
+    auto visual = scene->GetVisual(name);
+    ASSERT_NE(visual, nullptr);
+    // need to set these flags in order to GetBoundingBox
+    visual->SetVisible(true);
+    visual->SetVisibilityFlags(GZ_VISIBILITY_ALL);
+    EXPECT_EQ(visual->GetBoundingBox().Ign(), box);
+  }
 }
 
 /////////////////////////////////////////////////
