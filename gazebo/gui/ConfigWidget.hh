@@ -749,6 +749,10 @@ namespace gazebo
       /// \brief Callback when a color config widget's value has changed.
       private slots: void OnColorValueChanged();
 
+      /// \brief Callback when a color config widget's value has changed from
+      /// the color picker.
+      private slots: void OnColorValueChanged(const QColor);
+
       /// \brief Callback when a pose config widget's value has changed.
       private slots: void OnPoseValueChanged();
 

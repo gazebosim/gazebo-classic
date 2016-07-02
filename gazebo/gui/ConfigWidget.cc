@@ -23,6 +23,7 @@
 #include "gazebo/common/MaterialDensity.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidgetPrivate.hh"
+#include "gazebo/gui/Conversions.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -1584,6 +1585,16 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   this->connect(colorASpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
+  // Color picker
+  auto customColorDialog = new QColorDialog(Qt::green, widget);
+  this->connect(customColorDialog, SIGNAL(currentColorChanged(const QColor)),
+      this, SLOT(OnColorValueChanged(const QColor)));
+
+  auto customColorButton = new QPushButton(tr("..."));
+  customColorButton->setMaximumWidth(30);
+  this->connect(customColorButton, SIGNAL(clicked()), customColorDialog,
+      SLOT(open()));
+
   // This is inside a group
   int level = _level + 1;
 
@@ -1599,6 +1610,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widgetLayout->addWidget(colorBSpinBox);
   widgetLayout->addWidget(colorALabel);
   widgetLayout->addWidget(colorASpinBox);
+  widgetLayout->addWidget(customColorButton);
 
   widgetLayout->setAlignment(colorRLabel, Qt::AlignRight);
   widgetLayout->setAlignment(colorGLabel, Qt::AlignRight);
@@ -3069,6 +3081,25 @@ void ConfigWidget::OnVector3dPresetChanged(const int _index)
 
   // Signal
   emit Vector3dValueChanged(widget->scopedName.c_str(), vec);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnColorValueChanged(const QColor _color)
+{
+  auto dialog = qobject_cast<QColorDialog *>(QObject::sender());
+
+  if (!dialog)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(dialog->parent());
+
+  if (!widget)
+    return;
+
+  this->UpdateColorWidget(widget, Conversions::Convert(_color));
+
+  emit ColorValueChanged(widget->scopedName.c_str(),
+      this->ColorWidgetValue(widget));
 }
 
 /////////////////////////////////////////////////
