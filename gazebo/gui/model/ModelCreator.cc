@@ -2725,7 +2725,33 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   sdf::ElementPtr newLinkElem = _link->linkSDF->Clone();
   newLinkElem->GetElement("pose")->Set(_link->Pose());
 
-  // visuals
+  // Remove old visuals and collisions
+  if (newLinkElem->HasElement("visual"))
+  {
+    auto oldVis = newLinkElem->GetElement("visual");
+    while (oldVis)
+    {
+      newLinkElem->RemoveChild(oldVis);
+      if (newLinkElem->HasElement("visual"))
+        oldVis = newLinkElem->GetElement("visual");
+      else
+        break;
+    }
+  }
+  if (newLinkElem->HasElement("collision"))
+  {
+    auto oldCol = newLinkElem->GetElement("collision");
+    while (oldCol)
+    {
+      newLinkElem->RemoveChild(oldCol);
+      if (newLinkElem->HasElement("collision"))
+        oldCol = newLinkElem->GetElement("collision");
+      else
+        break;
+    }
+  }
+
+  // Add visuals
   for (auto const &it : _link->visuals)
   {
     rendering::VisualPtr visual = it.first;
@@ -2737,7 +2763,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
     newLinkElem->InsertElement(visualElem);
   }
 
-  // collisions
+  // Add collisions
   for (auto const &colIt : _link->collisions)
   {
     sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
