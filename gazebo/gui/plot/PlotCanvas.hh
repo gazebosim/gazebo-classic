@@ -24,6 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -123,6 +124,22 @@ namespace gazebo
       /// \brief Get the title of the plot
       /// \return Title of the plot
       public: std::string Title() const;
+
+      /// \brief Export to PDF files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the files into.
+      /// \param[in] _type File type, such as PDFFile or CSVFile.
+      public: void Export(const std::string &_dirName,
+          const FileType _type) const;
+
+      /// \brief Export to PDF files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the PDF files
+      /// into.
+      private: void ExportPDF(const std::string &_dirName) const;
+
+      /// \brief Export to CSV files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the CSV files
+      /// into.
+      private: void ExportCSV(const std::string &_dirName) const;
 
       /// \brief Add a variable to a plot. Note this function
       /// only updates the plot but not the variable pill container.
