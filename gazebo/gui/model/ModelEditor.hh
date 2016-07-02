@@ -90,6 +90,10 @@ namespace gazebo
       /// \param[in] _show True to show the widget, false to hide it.
       private slots: void OnSchematicView(bool _show);
 
+      /// \brief Show the GUI inspector
+      /// \param[in] _show True to show the inspector, false to hide it.
+      private slots: void OnGUIInspector(bool _show);
+
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 

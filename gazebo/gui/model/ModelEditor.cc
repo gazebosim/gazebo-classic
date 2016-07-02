@@ -32,6 +32,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/model/GUIInspector.hh"
 #include "gazebo/gui/model/EditorMaterialSwitcher.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -130,6 +131,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
       this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
+
+  this->dataPtr->guiInspectorAct = new QAction(tr("GUI Inspector"), this);
+  this->dataPtr->guiInspectorAct->setStatusTip(tr("Show GUI Inspector"));
+  this->dataPtr->guiInspectorAct->setShortcut(tr("Ctrl+E"));
+  this->dataPtr->guiInspectorAct->setCheckable(true);
+  this->connect(this->dataPtr->guiInspectorAct, SIGNAL(toggled(bool)), this,
+      SLOT(OnGUIInspector(bool)));
 
   // Clone actions from main window
   this->dataPtr->showToolbarsAct =
@@ -334,6 +342,25 @@ void ModelEditor::OnSchematicView(bool _show)
 }
 
 /////////////////////////////////////////////////
+void ModelEditor::OnGUIInspector(bool _show)
+{
+  if (_show)
+  {
+    // Create for the first time
+    if (!this->dataPtr->guiInspector)
+    {
+      this->dataPtr->guiInspector = new GUIInspector();
+    }
+
+    this->dataPtr->guiInspector->show();
+  }
+  else if (this->dataPtr->guiInspector)
+  {
+    this->dataPtr->guiInspector->hide();
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelEditor::CreateMenus()
 {
   if (this->dataPtr->menuBar)
@@ -348,9 +375,11 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->saveAsAct);
   fileMenu->addAction(this->dataPtr->exitAct);
 
-  QMenu *cameraMenu = this->dataPtr->menuBar->addMenu(tr("&Camera"));
-  cameraMenu->addAction(this->dataPtr->cameraOrthoAct);
-  cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
+  QMenu *editMenu = this->dataPtr->menuBar->addMenu(tr("&Edit"));
+  editMenu->addAction(this->dataPtr->guiInspectorAct);
+  editMenu->addSeparator();
+  editMenu->addAction(this->dataPtr->cameraOrthoAct);
+  editMenu->addAction(this->dataPtr->cameraPerspectiveAct);
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showJointsAct);

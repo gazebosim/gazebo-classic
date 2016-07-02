@@ -28,6 +28,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class GUIInspector;
     class SchematicViewWidget;
     class ModelTreeWidget;
     class ModelEditorPalette;
@@ -77,8 +78,14 @@ namespace gazebo
       /// \brief Action to show/hide the schematic view.
       public: QAction *schematicViewAct;
 
+      /// \brief Action to show/hide the GUI inspector.
+      public: QAction *guiInspectorAct;
+
       /// \brief Pointer to the schematic view widget.
       public: SchematicViewWidget *svWidget;
+
+      /// \brief Pointer to the GUI inspector.
+      public: GUIInspector *guiInspector;
 
       /// \brief Pointer to the Insert model widget in main window.
       public: QWidget *insertModel;
