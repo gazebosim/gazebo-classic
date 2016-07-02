@@ -210,7 +210,7 @@ namespace gazebo
       private: double cmd;
 
       /// \brief Max command clamping value.
-      private: double cmdMax = 1.0;
+      private: double cmdMax = -1.0;
 
       /// \brief Min command clamping value.
       private: double cmdMin = 0.0;
