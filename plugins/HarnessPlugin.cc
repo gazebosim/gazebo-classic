@@ -308,7 +308,7 @@ void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
   }
   catch(...)
   {
-    gzerr << "Inavlid velocity data[" << _msg->data() << "]\n";
+    gzerr << "Invalid velocity data[" << _msg->data() << "]\n";
   }
 }
 

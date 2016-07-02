@@ -215,7 +215,7 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
       }
       catch(...)
       {
-        std::cerr << "Inavlid axis value[" << *elemIter << "]\n";
+        std::cerr << "Invalid axis value[" << *elemIter << "]\n";
       }
     }
   }
