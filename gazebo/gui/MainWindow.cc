@@ -1103,7 +1103,8 @@ void MainWindow::CreateActions()
 
   g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
   g_hotkeyChartAct->setStatusTip(tr("Open hotkey chart in a browser"));
-  this->connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
+  this->connect(g_hotkeyChartAct, SIGNAL(triggered()), this,
+      SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -1124,7 +1125,8 @@ void MainWindow::CreateActions()
   g_resetWorldAct->setShortcut(tr("Ctrl+R"));
   this->addAction(g_resetWorldAct);
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
-  this->connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
+  this->connect(g_resetWorldAct, SIGNAL(triggered()), this,
+      SLOT(OnResetWorld()));
 
   QActionGroup *editorGroup = new QActionGroup(this);
   // Exclusive doesn't allow all actions to be unchecked at the same time
@@ -1359,7 +1361,8 @@ void MainWindow::CreateActions()
   g_overlayAct->setEnabled(false);
   g_overlayAct->setCheckable(true);
   g_overlayAct->setChecked(false);
-  this->connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
+  this->connect(g_overlayAct, SIGNAL(triggered()), this,
+      SLOT(ShowGUIOverlays()));
 
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
   viewControlActionGroup->addAction(g_fpsAct);
@@ -1515,7 +1518,8 @@ void MainWindow::CreateActions()
   // we don't want the icon on the menu.
   QAction *viewAngleReset = new QAction(QIcon(":/images/view_angle_home.png"),
       tr("Reset View Angle"), this);
-  this->connect(g_resetAct, SIGNAL(triggered()), viewAngleReset, SLOT(trigger()));
+  this->connect(g_resetAct, SIGNAL(triggered()), viewAngleReset,
+      SLOT(trigger()));
 
   ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
   viewAngleWidget->setObjectName("viewAngleWidget");
@@ -2346,7 +2350,8 @@ QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
   this->connect(actionClone, SIGNAL(triggered()), _action, SLOT(trigger()));
   // Then the original action reports its checked state to the cloned action
   // without triggering it circularly.
-  this->connect(_action, SIGNAL(toggled(bool)), actionClone, SLOT(setChecked(bool)));
+  this->connect(_action, SIGNAL(toggled(bool)), actionClone,
+      SLOT(setChecked(bool)));
 
   return actionClone;
 }
