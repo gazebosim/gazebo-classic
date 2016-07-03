@@ -240,8 +240,8 @@ namespace gazebo
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
-      /// \brief Callback for diagnostics action.
-      private slots: void Diagnostics();
+      /// \brief Callback for plot action.
+      private slots: void Plot();
 
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
