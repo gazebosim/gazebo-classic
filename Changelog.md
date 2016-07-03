@@ -101,6 +101,9 @@
 1. Update depth camera sensor to publish depth data over a topic.
     * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
 
+1. Add color picker to config widget and fix visual and collision duplication.
+    * [Pull request #2381](https://bitbucket.org/osrf/gazebo/pull-request/2381)
+
 1. Model editor updates
 
     1. Undo / redo inserting and deleting links
