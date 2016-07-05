@@ -1586,7 +1586,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
       SLOT(OnColorValueChanged()));
 
   // Color picker
-  auto customColorDialog = new QColorDialog(Qt::green, widget);
+  auto customColorDialog = new QColorDialog(Qt::white, widget);
   this->connect(customColorDialog, SIGNAL(currentColorChanged(const QColor)),
       this, SLOT(OnColorValueChanged(const QColor)));
 
@@ -2564,6 +2564,16 @@ bool ConfigWidget::UpdateColorWidget(ConfigChildWidget *_widget,
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_color.g);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_color.b);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(_color.a);
+
+    // Color dialog
+    auto dialog = _widget->findChild<QColorDialog *>();
+    if (dialog)
+    {
+      dialog->blockSignals(true);
+      dialog->setCurrentColor(Conversions::Convert(_color));
+      dialog->blockSignals(false);
+    }
+
     return true;
   }
   else
