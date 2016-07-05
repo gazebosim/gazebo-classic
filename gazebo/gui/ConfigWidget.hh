@@ -521,6 +521,12 @@ namespace gazebo
       public: ConfigChildWidget *ConfigChildWidgetByName(
           const std::string &_name) const;
 
+      /// \brief Get a group widget by its name.
+      /// \param[in] _name Scoped name of the group widget.
+      /// \return The group widget with the given name or NULL if it wasn't
+      /// found.
+      public: GroupWidget *GroupWidgetByName(const std::string &_name) const;
+
       /// \brief Get the number of child widgets.
       /// \return The number of child widgets.
       public: unsigned int ConfigChildWidgetCount() const;

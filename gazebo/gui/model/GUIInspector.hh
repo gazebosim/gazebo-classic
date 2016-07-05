@@ -69,8 +69,22 @@ namespace gazebo
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New value.
-      private slots: void OnVector3dChanged(const QString &_name,
-          const ignition::math::Vector3d &_value);
+      private slots: void OnUIntChanged(const QString &_name,
+          const unsigned int _value);
+
+      /// \brief Qt callback when a Vector3d value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnDoubleChanged(const QString &_name,
+          const double _value);
+
+      /// \brief Qt callback when a Vector3d value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnColorChanged(const QString &_name,
+          const common::Color &_value);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();

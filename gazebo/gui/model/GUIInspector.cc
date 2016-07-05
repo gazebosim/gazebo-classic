@@ -16,7 +16,12 @@
 */
 
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/GUIInspector.hh"
+
+#include "gazebo/rendering/Grid.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
 namespace gazebo
 {
@@ -29,15 +34,15 @@ namespace gazebo
       /// \brief Config widget for configuring joint properties.
       public: ConfigWidget *configWidget;
 
-      /// \brief Ok button.
-      public: QPushButton *okButton;
-
-      /// \brief A list of gui editor events connected to this.
-      public: std::vector<event::ConnectionPtr> connections;
-
       /// \brief Message containing the data which was in the widget when first
       /// open.
       public: msgs::GUI originalDataMsg;
+
+      /// \brief Pointer to the default grid in the scene.
+      public: rendering::Grid *grid;
+
+      /// \brief Pointer to the user camera.
+      public: rendering::UserCameraPtr camera;
     };
   }
 }
@@ -49,41 +54,81 @@ using namespace gui;
 GUIInspector::GUIInspector(QWidget *_parent)
     : QDialog(_parent), dataPtr(new GUIInspectorPrivate)
 {
+  this->dataPtr->camera = gui::get_active_camera();
+  if (!this->dataPtr->camera)
+  {
+    gzerr << "Camera not found, inspector won't be created." << std::endl;
+    return;
+  }
+
+  // Get pointers from rendering
+  auto scene = this->dataPtr->camera->GetScene();
+  if (!scene)
+  {
+    gzerr << "Scene not found, inspector won't be created." << std::endl;
+    return;
+  }
+
+  this->dataPtr->grid = scene->GetGrid(0);
+  if (!this->dataPtr->grid)
+  {
+    gzerr << "Grid not found, inspector won't be created." << std::endl;
+    return;
+  }
+
   this->setObjectName("GUIInspectorDialog");
   this->setWindowTitle(tr("GUI Inspector"));
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // Config widget
+  msgs::GUI guiMsg;
   this->dataPtr->configWidget = new ConfigWidget;
+  this->dataPtr->configWidget->Load(&guiMsg);
 
-  // Camera
-  auto poseWidget = this->dataPtr->configWidget->CreatePoseWidget("Pose", 0);
-  this->dataPtr->configWidget->AddConfigChildWidget("camera::pose",
-      poseWidget);
+  // Hide unecessary fields
+  this->dataPtr->configWidget->SetWidgetVisible("camera::name", false);
+  this->dataPtr->configWidget->SetWidgetVisible("camera::view_controller",
+      false);
+  this->dataPtr->configWidget->SetWidgetVisible("camera::track", false);
+  this->dataPtr->configWidget->SetWidgetVisible("camera::projection_type",
+      false);
+  this->dataPtr->configWidget->SetWidgetVisible("grid::name", false);
 
-  auto camWidget =
-      this->dataPtr->configWidget->CreateGroupWidget("Camera", poseWidget, 0);
+  // Custom projections widget
+  std::vector<std::string> projs;
+  auto projWidget = this->dataPtr->configWidget->CreateEnumWidget(
+      "Projection type", projs, 1);
+  this->dataPtr->configWidget->AddConfigChildWidget("camera::projectionEnum",
+      projWidget);
 
-  // Grid
-
-
-  // Config layout
-  auto configLayout = new QVBoxLayout();
-  configLayout->addWidget(camWidget);
-  this->dataPtr->configWidget->setLayout(configLayout);
+  auto camGroup = this->dataPtr->configWidget->GroupWidgetByName("camera");
+  if (!camGroup)
+  {
+    gzerr << "Could not find camera group widget" << std::endl;
+    return;
+  }
+  qobject_cast<QVBoxLayout *>((qobject_cast<QGroupBox *>(
+      camGroup->childWidget->layout()->itemAt(0)->widget()))->layout())->
+      addWidget(projWidget);
 
   // Connect all value changes
-  connect(this->dataPtr->configWidget, SIGNAL(PoseValueChanged(const QString &,
+  this->connect(this->dataPtr->configWidget,
+      SIGNAL(PoseValueChanged(const QString &,
       const ignition::math::Pose3d &)), this,
       SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
 
-  // Connect vector value changes, for axes
-  connect(this->dataPtr->configWidget,
-      SIGNAL(Vector3dValueChanged(const QString &,
-      const ignition::math::Vector3d &)), this,
-      SLOT(OnVector3dChanged(const QString &,
-      const ignition::math::Vector3d &)));
+  this->connect(this->dataPtr->configWidget,
+      SIGNAL(UIntValueChanged(const QString &, const unsigned int)), this,
+      SLOT(OnUIntChanged(const QString &, const unsigned int)));
+
+  this->connect(this->dataPtr->configWidget,
+      SIGNAL(DoubleValueChanged(const QString &, const double)), this,
+      SLOT(OnDoubleChanged(const QString &, const double)));
+
+  this->connect(this->dataPtr->configWidget,
+      SIGNAL(ColorValueChanged(const QString &, const gazebo::common::Color &)),
+      this, SLOT(OnColorChanged(const QString &, const common::Color &)));
 
   // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
@@ -102,14 +147,14 @@ GUIInspector::GUIInspector(QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  this->dataPtr->okButton = new QPushButton(tr("OK"));
-  this->dataPtr->okButton->setEnabled(true);
-  connect(this->dataPtr->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+  auto okButton = new QPushButton(tr("OK"));
+  okButton->setEnabled(true);
+  connect(okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(resetButton);
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(this->dataPtr->okButton);
+  buttonsLayout->addWidget(okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   // Main layout
@@ -139,31 +184,57 @@ void GUIInspector::Update(ConstGUIPtr _guiMsg)
 
 /////////////////////////////////////////////////
 void GUIInspector::OnPoseChanged(const QString &/*_name*/,
-    const ignition::math::Pose3d &/*_pose*/)
+    const ignition::math::Pose3d &_value)
 {
+  if (_name == "camera::pose")
+    this->dataPtr->camera->SetWorldPose(_value);
 }
 
 /////////////////////////////////////////////////
-void GUIInspector::OnVector3dChanged(const QString &/*_name*/,
-    const ignition::math::Vector3d &/*_vec*/)
+void GUIInspector::OnUIntChanged(const QString &_name,
+    const unsigned int _value)
 {
+  if (_name == "grid::cell_count")
+    this->dataPtr->grid->SetCellCount(_value);
+  else if (_name == "grid::normal_cell_count")
+    this->dataPtr->grid->SetHeight(_value);
+}
+
+/////////////////////////////////////////////////
+void GUIInspector::OnDoubleChanged(const QString &_name, const double _value)
+{
+  if (_name == "grid::cell_size")
+    this->dataPtr->grid->SetCellLength(_value);
+  else if (_name == "grid::height_offset")
+    this->dataPtr->grid->SetHeightOffset(_value);
+}
+
+/////////////////////////////////////////////////
+void GUIInspector::OnColorChanged(const QString &/*_name*/,
+    const common::Color &_value)
+{
+  if (_name == "grid::line_color")
+    this->dataPtr->grid->SetColor(_value);
 }
 
 /////////////////////////////////////////////////
 void GUIInspector::Open()
 {
   // Fill widgets
+  // Camera
+  this->dataPtr->configWidget->SetPoseWidgetValue("camera::pose",
+      this->dataPtr->camera->WorldPose());
+
+
+  // Grid
+  this->dataPtr->configWidget->SetColorWidgetValue("grid::line_color",
+      this->dataPtr->grid->Color());
 
   // Keep original data in case user cancels
   auto msg = dynamic_cast<msgs::GUI *>(
       this->dataPtr->configWidget->Msg());
   if (msg)
     this->dataPtr->originalDataMsg.CopyFrom(*msg);
-
-  // Make sure the dialog opens with the proper fields showing
-  this->blockSignals(true);
-  this->RestoreOriginalData();
-  this->blockSignals(false);
 
   this->move(QCursor::pos());
   this->show();
@@ -172,15 +243,14 @@ void GUIInspector::Open()
 /////////////////////////////////////////////////
 void GUIInspector::RestoreOriginalData()
 {
-  msgs::GUIPtr guiPtr;
-  guiPtr.reset(new msgs::GUI);
-  guiPtr->CopyFrom(this->dataPtr->originalDataMsg);
+  msgs::GUIPtr msg;
+  msg.reset(new msgs::GUI);
+  msg->CopyFrom(this->dataPtr->originalDataMsg);
 
-  // Update default widgets
+  // Update widgets
   this->dataPtr->configWidget->blockSignals(true);
-  this->Update(guiPtr);
-
-  // Update custom widgets
+  this->Update(msg);
+  this->dataPtr->configWidget->blockSignals(false);
 }
 
 /////////////////////////////////////////////////

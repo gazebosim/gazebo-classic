@@ -78,7 +78,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
         << std::endl;
   }
 
-
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
 #ifdef HAVE_GRAPHVIZ
@@ -134,10 +133,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   this->dataPtr->guiInspectorAct = new QAction(tr("GUI Inspector"), this);
   this->dataPtr->guiInspectorAct->setStatusTip(tr("Show GUI Inspector"));
-  this->dataPtr->guiInspectorAct->setShortcut(tr("Ctrl+E"));
-  this->dataPtr->guiInspectorAct->setCheckable(true);
-  this->connect(this->dataPtr->guiInspectorAct, SIGNAL(toggled(bool)), this,
-      SLOT(OnGUIInspector(bool)));
+  this->connect(this->dataPtr->guiInspectorAct, SIGNAL(triggered()), this,
+      SLOT(OnGUIInspector()));
 
   // Clone actions from main window
   this->dataPtr->showToolbarsAct =
@@ -342,22 +339,15 @@ void ModelEditor::OnSchematicView(bool _show)
 }
 
 /////////////////////////////////////////////////
-void ModelEditor::OnGUIInspector(bool _show)
+void ModelEditor::OnGUIInspector()
 {
-  if (_show)
+  // Create for the first time
+  if (!this->dataPtr->guiInspector)
   {
-    // Create for the first time
-    if (!this->dataPtr->guiInspector)
-    {
-      this->dataPtr->guiInspector = new GUIInspector();
-    }
+    this->dataPtr->guiInspector = new GUIInspector();
+  }
 
-    this->dataPtr->guiInspector->show();
-  }
-  else if (this->dataPtr->guiInspector)
-  {
-    this->dataPtr->guiInspector->hide();
-  }
+  this->dataPtr->guiInspector->show();
 }
 
 /////////////////////////////////////////////////
@@ -375,13 +365,13 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->saveAsAct);
   fileMenu->addAction(this->dataPtr->exitAct);
 
-  QMenu *editMenu = this->dataPtr->menuBar->addMenu(tr("&Edit"));
-  editMenu->addAction(this->dataPtr->guiInspectorAct);
-  editMenu->addSeparator();
-  editMenu->addAction(this->dataPtr->cameraOrthoAct);
-  editMenu->addAction(this->dataPtr->cameraPerspectiveAct);
+  QMenu *cameraMenu = this->dataPtr->menuBar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(this->dataPtr->cameraOrthoAct);
+  cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
+  viewMenu->addAction(this->dataPtr->guiInspectorAct);
+  viewMenu->addSeparator();
   viewMenu->addAction(this->dataPtr->showJointsAct);
 
   QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
@@ -440,6 +430,9 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->ShowMenuBar();
     this->mainWindow->RenderWidget()->ShowTimePanel(true);
+
+    if (this->dataPtr->guiInspector)
+      this->dataPtr->guiInspector->hide();
   }
 
 #ifdef HAVE_GRAPHVIZ

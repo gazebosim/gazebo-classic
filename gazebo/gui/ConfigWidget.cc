@@ -576,7 +576,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
 
   const google::protobuf::Descriptor *d = _msg->GetDescriptor();
   if (!d)
-    return NULL;
+    return nullptr;
   unsigned int count = d->field_count();
 
   for (unsigned int i = 0; i < count ; ++i)
@@ -584,12 +584,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
     const google::protobuf::FieldDescriptor *field = d->field(i);
 
     if (!field)
-      return NULL;
+      return nullptr;
 
     const google::protobuf::Reflection *ref = _msg->GetReflection();
 
     if (!ref)
-      return NULL;
+      return nullptr;
 
     std::string name = field->name();
 
@@ -600,8 +600,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
       if (_update && !ref->HasField(*_msg, field))
         continue;
 
-      QWidget *newFieldWidget = NULL;
-      ConfigChildWidget *configChildWidget = NULL;
+      QWidget *newFieldWidget = nullptr;
+      ConfigChildWidget *configChildWidget = nullptr;
 
       bool newWidget = true;
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
@@ -1073,7 +1073,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
     return widget;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -1362,7 +1362,7 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   {
     gzerr << "Unknown type [" << _type << "]. Not creating string widget" <<
         std::endl;
-    return NULL;
+    return nullptr;
   }
 
   // Layout
@@ -3118,7 +3118,7 @@ void ConfigWidget::OnGeometryValueChanged()
     return;
 
   ConfigChildWidget *widget;
-  while (senderWidget->parent() != NULL)
+  while (senderWidget->parent() != nullptr)
   {
     senderWidget = qobject_cast<QWidget *>(senderWidget->parent());
     widget = qobject_cast<ConfigChildWidget *>(senderWidget);
@@ -3175,7 +3175,7 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
 bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
     ConfigChildWidget *_child)
 {
-  if (_name.empty() || _child == NULL)
+  if (_name.empty() || _child == nullptr)
   {
     gzerr << "Given name or child is invalid. Not adding child widget."
           << std::endl;
@@ -3520,7 +3520,27 @@ ConfigChildWidget *ConfigWidget::ConfigChildWidgetByName(
   if (iter != this->dataPtr->configWidgets.end())
     return iter->second;
   else
-    return NULL;
+    return nullptr;
+}
+
+/////////////////////////////////////////////////
+GroupWidget *ConfigWidget::GroupWidgetByName(const std::string &_name) const
+{
+  auto iter = this->dataPtr->configWidgets.find(_name);
+  if (iter != this->dataPtr->configWidgets.end())
+  {
+    if (iter->second->groupWidget)
+    {
+      GroupWidget *groupWidget =
+          qobject_cast<GroupWidget *>(iter->second->groupWidget);
+      if (groupWidget)
+      {
+        return groupWidget;
+      }
+    }
+  }
+
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

@@ -29,6 +29,7 @@ set (msgs
   geometry.proto
   gps.proto
   gps_sensor.proto
+  grid.proto
   gui_camera.proto
   gui.proto
   gz_string.proto

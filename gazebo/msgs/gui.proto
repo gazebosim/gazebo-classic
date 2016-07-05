@@ -2,14 +2,23 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface GUI
-/// \brief Message for a GUI
+/// \brief Message containing GUI information.
 
+import "grid.proto";
 import "gui_camera.proto";
 import "plugin.proto";
 
 message GUI
 {
-  optional bool fullscreen  = 1;
+  /// \brief Flag indicating if window should be in fuyll screen.
+  optional bool fullscreen = 1;
+
+  /// \brief Message containing information about the user camera.
   optional GUICamera camera = 2;
-  repeated Plugin plugin    = 3;
+
+  /// \brief Messages containing information about GUI plugins.
+  repeated Plugin plugin = 3;
+
+  /// \brief Message containing information about the grid.
+  optional Grid grid = 4;
 }
