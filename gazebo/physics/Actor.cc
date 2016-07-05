@@ -407,8 +407,11 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 
   // Get filename and extension
   std::string animFile = _sdf->Get<std::string>("filename");
+
   std::string extension = animFile.substr(animFile.rfind(".") + 1,
       animFile.size());
+  std::transform(extension.begin(), extension.end(), extension.begin(),
+      ::tolower);
 
   // Get scale
   double animScale = _sdf->Get<double>("scale");

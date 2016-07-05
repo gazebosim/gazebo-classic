@@ -88,25 +88,19 @@ TEST_F(ActorTest, TrajectoryFromSDF)
 
   ignition::math::Vector3d target(1.0, 0.0, 1.0);
   EXPECT_LT((target - actor->GetWorldPose().Ign().Pos()).Length(), 0.1);
-  EXPECT_EQ(actor->ScriptTime(), 4.0);
+
+  // Difference betwee script time and sim time is lower than update rate
+  EXPECT_LT(fabs(actor->ScriptTime() - world->GetSimTime().Double()), 1.0 / 30);
 
   // Pass some time and check actor is near the target pose
   world->Step(4000);
 
   target.Set(0.3, -1.0, 1.0);
   EXPECT_LT((target - actor->GetWorldPose().Ign().Pos()).Length(), 0.1);
-  EXPECT_EQ(actor->ScriptTime(), 8.0);
-}
 
-// TODO: test different combinations:
-//
-// - non-animated skin
-// - animated skin
-// - skin + animation (compatible)
-// - skin + animation (incompatible)
-// - skin + animation + trajectory
-// - trajectory
-//
+  // Difference betwee script time and sim time is lower than update rate
+  EXPECT_LT(fabs(actor->ScriptTime() - world->GetSimTime().Double()), 1.0 / 30);
+}
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
