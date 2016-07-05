@@ -41,18 +41,8 @@ VideoRecorder::~VideoRecorder()
 /////////////////////////////////////////////////
 void VideoRecorder::CreateActions()
 {
-  gzerr << " create actions "<< std::endl;
-  g_recordVideoAct = new QAction(QIcon(":/images/record.png"),
-      tr("Video"), this);
-  g_recordVideoAct->setStatusTip(tr("Record a video"));
-  g_recordVideoAct->setCheckable(true);
-  g_recordVideoAct->setChecked(false);
   connect(g_recordVideoAct, SIGNAL(triggered()), this,
       SLOT(RecordVideo()));
-
-  g_recordVideoFormatAct = new QWidgetAction(nullptr);
-  g_recordVideoFormatAct->setStatusTip(tr("Select video format"));
-  g_recordVideoFormatAct->setCheckable(false);
 
   QMenu *videoFormatSubmenu = new QMenu;
   std::vector<QAction *> formats;
@@ -65,9 +55,10 @@ void VideoRecorder::CreateActions()
     formats[i]->setCheckable(true);
     formatActGroup->addAction(formats[i]);
   }
+  formats[0]->setChecked(true);
+
   connect(videoFormatSubmenu, SIGNAL(triggered(QAction *)), this,
       SLOT(SetRecordVideoFormat(QAction *)));
-  formats[0]->setChecked(true);
 
   QToolButton *videoFormatButton = new QToolButton();
   videoFormatButton->setMenu(videoFormatSubmenu);

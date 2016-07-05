@@ -104,6 +104,7 @@ MainWindow::MainWindow()
   gui::set_world(this->dataPtr->node->GetTopicNamespace());
 
   this->dataPtr->videoRecorder = new VideoRecorder(this);
+  this->dataPtr->videoRecorder->CreateActions();
 
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -1411,6 +1412,16 @@ void MainWindow::CreateActions()
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
+  g_recordVideoAct = new QAction(QIcon(":/images/record.png"),
+      tr("Video"), this);
+  g_recordVideoAct->setStatusTip(tr("Record a video"));
+  g_recordVideoAct->setCheckable(true);
+  g_recordVideoAct->setChecked(false);
+
+  g_recordVideoFormatAct = new QWidgetAction(nullptr);
+  g_recordVideoFormatAct->setStatusTip(tr("Select video format"));
+  g_recordVideoFormatAct->setCheckable(false);
+
   g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
       tr("Copy"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
@@ -1571,8 +1582,6 @@ void MainWindow::CreateActions()
   g_redoHistoryAct->setEnabled(false);
 
   this->dataPtr->userCmdHistory = new UserCmdHistory();
-
-  this->dataPtr->videoRecorder->CreateActions();
 }
 
 /////////////////////////////////////////////////
