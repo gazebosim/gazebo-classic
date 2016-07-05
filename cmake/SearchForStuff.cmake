@@ -709,31 +709,44 @@ endif()
 
 ########################################
 # Find QWT (QT graphing library)
-#find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
-#  /usr/include
-#  /usr/local/include
-#  "$ENV{LIB_DIR}/include"
-#  "$ENV{INCLUDE}"
-#  PATH_SUFFIXES qwt-qt4 qwt qwt5
-#  )
-#
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
-#  /usr/lib
-#  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib"
-#  "$ENV{LIB}/lib"
-#  )
-#
-#if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-#  set(HAVE_QWT TRUE)
-#endif (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-#
-#if (HAVE_QWT)
-#  if (NOT QWT_FIND_QUIETLY)
-#    message(STATUS "Found Qwt: ${QWT_LIBRARY}")
-#  endif (NOT QWT_FIND_QUIETLY)
-#else ()
-#  if (QWT_FIND_REQUIRED)
-#    BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
-#  endif (QWT_FIND_REQUIRED)
-#endif ()
+find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
+  /usr/include
+  /usr/local/include
+  /usr/local/lib/qwt.framework/Headers
+  PATH_SUFFIXES qwt-qt4 qwt qwt5
+  )
+
+find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
+  /usr/lib
+  /usr/local/lib
+  /usr/local/lib/qwt.framework
+  )
+
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
+  set(HAVE_QWT TRUE)
+else()
+  set(HAVE_QWT FALSE)
+endif ()
+
+# version
+set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
+file ( STRINGS ${_VERSION_FILE} _VERSION_LINE REGEX "define[ ]+QWT_VERSION_STR" )
+if ( _VERSION_LINE )
+  string ( REGEX REPLACE ".*define[ ]+QWT_VERSION_STR[ ]+\"(.*)\".*" "\\1"
+      QWT_VERSION_STRING "${_VERSION_LINE}" )
+  string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1"
+      QWT_MAJOR_VERSION "${QWT_VERSION_STRING}" )
+  string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\2"
+      QWT_MINOR_VERSION "${QWT_VERSION_STRING}" )
+  string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\3"
+      QWT_PATCH_VERSION "${QWT_VERSION_STRING}" )
+  set(QWT_VERSION
+    ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
+endif ()
+
+if (HAVE_QWT)
+  message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
+else()
+  message (STATUS "Looking for qwt - not found")
+  BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
+endif ()

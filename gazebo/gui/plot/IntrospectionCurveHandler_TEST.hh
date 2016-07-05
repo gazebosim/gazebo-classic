@@ -14,26 +14,17 @@
  * limitations under the License.
  *
 */
-
-#ifndef _TEST_INTEGRATION_MODELMANIPULATION_HH_
-#define _TEST_INTEGRATION_MODELMANIPULATION_HH_
+#ifndef GAZEBO_GUI_PLOT_INTROSPECTIONCURVEHANDLER_TEST_HH_
+#define GAZEBO_GUI_PLOT_INTROSPECTIONCURVEHANDLER_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief Integration test for manipulating models through the GUI.
-class ModelManipulationTest : public QTestFixture
+/// \brief A test class for the IntrospectionCurveHandler.
+class IntrospectionCurveHandler_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Verify that model pose stops being updated while it is being
-  /// manipulated.
-  private slots: void StopProcessingPoseMsgs();
-
-  /// \brief Test switching modes using keyboard shortcuts.
-  private slots: void Shortcuts();
-
-  /// \brief Test manipulating models in local and global frames
-  private slots: void GlobalLocalFrames();
+  /// \brief Test adding and removing curves
+  private slots: void AddRemoveCurve();
 };
-
 #endif

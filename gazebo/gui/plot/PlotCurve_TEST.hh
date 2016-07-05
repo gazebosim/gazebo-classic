@@ -14,26 +14,23 @@
  * limitations under the License.
  *
 */
-
-#ifndef _TEST_INTEGRATION_MODELMANIPULATION_HH_
-#define _TEST_INTEGRATION_MODELMANIPULATION_HH_
+#ifndef GAZEBO_GUI_PLOT_PLOT_CURVE_TEST_HH_
+#define GAZEBO_GUI_PLOT_PLOT_CURVE_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief Integration test for manipulating models through the GUI.
-class ModelManipulationTest : public QTestFixture
+/// \brief A test class for the PlotCurve widget.
+class PlotCurve_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Verify that model pose stops being updated while it is being
-  /// manipulated.
-  private slots: void StopProcessingPoseMsgs();
+  /// \brief Test various setter and accessor functions
+  private slots: void Curve();
 
-  /// \brief Test switching modes using keyboard shortcuts.
-  private slots: void Shortcuts();
+  /// \brief Test creating plot curves and verify they have unique ids
+  private slots: void CurveId();
 
-  /// \brief Test manipulating models in local and global frames
-  private slots: void GlobalLocalFrames();
+  /// \brief Test adding points to the curve
+  private slots: void AddPoint();
 };
-
 #endif
