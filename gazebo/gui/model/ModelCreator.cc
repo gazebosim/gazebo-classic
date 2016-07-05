@@ -2726,29 +2726,15 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   newLinkElem->GetElement("pose")->Set(_link->Pose());
 
   // Remove old visuals and collisions
-  if (newLinkElem->HasElement("visual"))
+  while (newLinkElem->HasElement("visual"))
   {
     auto oldVis = newLinkElem->GetElement("visual");
-    while (oldVis)
-    {
-      newLinkElem->RemoveChild(oldVis);
-      if (newLinkElem->HasElement("visual"))
-        oldVis = newLinkElem->GetElement("visual");
-      else
-        break;
-    }
+    newLinkElem->RemoveChild(oldVis);
   }
-  if (newLinkElem->HasElement("collision"))
+  while (newLinkElem->HasElement("collision"))
   {
     auto oldCol = newLinkElem->GetElement("collision");
-    while (oldCol)
-    {
-      newLinkElem->RemoveChild(oldCol);
-      if (newLinkElem->HasElement("collision"))
-        oldCol = newLinkElem->GetElement("collision");
-      else
-        break;
-    }
+    newLinkElem->RemoveChild(oldCol);
   }
 
   // Add visuals

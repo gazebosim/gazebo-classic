@@ -1585,15 +1585,10 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   this->connect(colorASpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
-  // Color picker
-  auto customColorDialog = new QColorDialog(Qt::white, widget);
-  this->connect(customColorDialog, SIGNAL(currentColorChanged(const QColor)),
-      this, SLOT(OnColorValueChanged(const QColor)));
-
-  auto customColorButton = new QPushButton(tr("..."));
+  auto customColorButton = new QPushButton(tr("..."), widget);
   customColorButton->setMaximumWidth(30);
-  this->connect(customColorButton, SIGNAL(clicked()), customColorDialog,
-      SLOT(open()));
+  this->connect(customColorButton, SIGNAL(clicked()), this,
+      SLOT(OnCustomColorDialog()));
 
   // This is inside a group
   int level = _level + 1;
@@ -1627,6 +1622,39 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widget->widgets.push_back(colorASpinBox);
 
   return widget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnCustomColorDialog()
+{
+  auto button = qobject_cast<QPushButton *>(QObject::sender());
+  if (!button)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(button->parent());
+  if (!widget)
+    return;
+
+  // Current color
+  auto color = Conversions::Convert(this->ColorWidgetValue(widget));
+
+  auto dialog = widget->findChild<QColorDialog *>();
+  if (!dialog)
+  {
+    // Opening for the first time
+    dialog = new QColorDialog(color, widget);
+    dialog->setOption(QColorDialog::ShowAlphaChannel);
+    this->connect(dialog, SIGNAL(currentColorChanged(const QColor)), this,
+        SLOT(OnColorValueChanged(const QColor)));
+  }
+  else
+  {
+    dialog->blockSignals(true);
+    dialog->setCurrentColor(color);
+    dialog->blockSignals(false);
+  }
+
+  dialog->open();
 }
 
 /////////////////////////////////////////////////
@@ -2564,16 +2592,6 @@ bool ConfigWidget::UpdateColorWidget(ConfigChildWidget *_widget,
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_color.g);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_color.b);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(_color.a);
-
-    // Color dialog
-    auto dialog = _widget->findChild<QColorDialog *>();
-    if (dialog)
-    {
-      dialog->blockSignals(true);
-      dialog->setCurrentColor(Conversions::Convert(_color));
-      dialog->blockSignals(false);
-    }
-
     return true;
   }
   else
@@ -3094,7 +3112,7 @@ void ConfigWidget::OnVector3dPresetChanged(const int _index)
 }
 
 /////////////////////////////////////////////////
-void ConfigWidget::OnColorValueChanged(const QColor _color)
+void ConfigWidget::OnColorValueChanged(const QColor _value)
 {
   auto dialog = qobject_cast<QColorDialog *>(QObject::sender());
 
@@ -3106,10 +3124,10 @@ void ConfigWidget::OnColorValueChanged(const QColor _color)
   if (!widget)
     return;
 
-  this->UpdateColorWidget(widget, Conversions::Convert(_color));
+  auto color = Conversions::Convert(_value);
+  this->UpdateColorWidget(widget, color);
 
-  emit ColorValueChanged(widget->scopedName.c_str(),
-      this->ColorWidgetValue(widget));
+  emit ColorValueChanged(widget->scopedName.c_str(), color);
 }
 
 /////////////////////////////////////////////////
