@@ -38,13 +38,13 @@ void Palette_TEST::TopicsTab()
   }
 
   // Create a new plot window widget
-  auto palette = new gazebo::gui::Palette(NULL);
-  QVERIFY(palette != NULL);
+  auto palette = new gazebo::gui::Palette(nullptr);
+  QVERIFY(palette != nullptr);
 
   // Get the topics model
   auto topicsModel =
       palette->findChild<QStandardItemModel *>("plotTopicsModel");
-  QVERIFY(topicsModel != NULL);
+  QVERIFY(topicsModel != nullptr);
 
   // Check the model has as many rows as there are topics
   QCOMPARE(topicsModel->rowCount(), count);
@@ -62,18 +62,18 @@ void Palette_TEST::ModelsTab()
 
   // Get the number of models in the world
   auto world = gazebo::physics::get_world("default");
-  QVERIFY(world != NULL);
+  QVERIFY(world != nullptr);
 
   auto count = world->GetModelCount();
 
   // Create a new plot window widget
-  auto palette = new gazebo::gui::Palette(NULL);
-  QVERIFY(palette != NULL);
+  auto palette = new gazebo::gui::Palette(nullptr);
+  QVERIFY(palette != nullptr);
 
   // Get the models model
   auto modelsModel =
       palette->findChild<QStandardItemModel *>("plotModelsModel");
-  QVERIFY(modelsModel != NULL);
+  QVERIFY(modelsModel != nullptr);
 
   // Check the model has as many rows as there are top level models,
   // plus the title
@@ -91,7 +91,7 @@ void Palette_TEST::ModelsTab()
   // Get the new models model
   modelsModel =
       palette->findChild<QStandardItemModel *>("plotModelsModel");
-  QVERIFY(modelsModel != NULL);
+  QVERIFY(modelsModel != nullptr);
 
   // Check the model has as many rows as there are top level models,
   // plus the title

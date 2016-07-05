@@ -34,6 +34,7 @@
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
+
 #ifdef _WIN32
   const auto& gzstrtok = strtok_s;
 #else
