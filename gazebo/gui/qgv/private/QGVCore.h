@@ -19,10 +19,17 @@ License along with this library.
 #ifndef QGVCORE_H
 #define QGVCORE_H
 
+#ifndef _MSC_VER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
 #include <QPointF>
 #include <QPolygonF>
 #include <QPainterPath>
 #include <QColor>
+#ifndef _MSC_VER
+#pragma GCC diagnostic pop
+#endif
 
 // GraphViz headers
 #include <gvc.h>

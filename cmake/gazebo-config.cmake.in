@@ -11,6 +11,9 @@ set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo
 # materials scripts, shaders, and other related resources are stored.
 set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_MAJOR_VERSION@/media")
 
+# The model path contains the location on disk where models are stored.
+set(@PKG_NAME@_MODEL_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_MAJOR_VERSION@/models")
+
 # Set whether Gazebo was built with Bullet support
 set (GAZEBO_HAS_BULLET @HAVE_BULLET@)
 
