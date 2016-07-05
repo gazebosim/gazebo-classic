@@ -81,31 +81,38 @@ Q_DECLARE_METATYPE(std::set<std::string>)
 
 //////////////////////////////////////////////////
 // QT message handler that pipes qt messages into gazebo's console system.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
     const QString &_msg)
 {
-  QByteArray localMsg = _msg.toLocal8Bit();
+  std::string msg = _msg.toStdString();
+  msg += "(" + _context.function + ")";
+#else
+void messageHandler(QtMsgType _type, const char *_msg)
+{
+  const char *msg = _msg;
+#endif
+
   switch (_type)
   {
     case QtDebugMsg:
-      gzdbg << localMsg.constData() << "(" << _context.file
-       << ":" <<  _context.line << " " << _context.function << std::endl;
+      gzdbg << msg << std::endl;
       break;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
     case QtInfoMsg:
-      gzmsg << localMsg.constData() << "(" << _context.file
-       << ":" <<  _context.line << " " << _context.function << std::endl;
+      gzmsg << msg << std::endl;
       break;
 #endif
     case QtWarningMsg:
-      gzwarn << localMsg.constData() << "(" << _context.file
-       << ":" <<  _context.line << " " << _context.function << std::endl;
+      gzwarn << msg << std::endl;
       break;
     case QtFatalMsg:
     case QtCriticalMsg:
-      gzerr << localMsg.constData() << "(" << _context.file
-       << ":" <<  _context.line << " " << _context.function << std::endl;
+      gzerr << msg << std::endl;
+      break;
     default:
+      gzwarn << "Unknown QT Message type[" << _type << "]: "
+        << msg << std::endl;
       break;
   }
 }
@@ -292,7 +299,11 @@ bool gui::load()
   }
 
   // Register custom message handler
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   qInstallMessageHandler(messageHandler);
+#else
+  qInstallMsgHandler(messageHandler);
+#endif
 
   g_app = new QApplication(g_argc, g_argv);
   set_style();
