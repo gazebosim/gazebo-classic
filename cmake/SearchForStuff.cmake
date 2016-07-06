@@ -672,8 +672,7 @@ else ()
 endif ()
 
 ########################################
-# Find ignition math in unix platforms
-# In Windows we expect a call from configure.bat script with the paths
+# Find ignition math library
 find_package(ignition-math2 2.4 QUIET)
 if (NOT ignition-math2_FOUND)
   message(STATUS "Looking for ignition-math2-config.cmake - not found")
@@ -686,7 +685,6 @@ endif()
 
 ########################################
 # Find the Ignition_Transport library
-# In Windows we expect a call from configure.bat script with the paths
 find_package(ignition-transport1 QUIET)
 if (NOT ignition-transport1_FOUND)
   BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")

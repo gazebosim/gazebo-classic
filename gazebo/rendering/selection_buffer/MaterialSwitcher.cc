@@ -75,7 +75,7 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
           // OGRE 1.9 changes the shared pointer definition
           // But the 1.9 RC, which we're using on Windows, doesn't have the
           // staticCast change.  It will be in the final release.
-          #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
+          #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
           Ogre::MaterialPtr plainMaterial = static_cast<Ogre::MaterialPtr>(res);
           #else
           Ogre::MaterialPtr plainMaterial = res.staticCast<Ogre::Material>();

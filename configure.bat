@@ -40,15 +40,14 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
 @set TBB_INCLUDEDIR=%TBB_PATH%\include
 
-@set OGRE_VERSION=1.8.1
-@set OGRE_PATH=%cd%\..\..\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\%build_type%
+@set OGRE_VERSION=1.9.0
+@set OGRE_PATH=%cd%\..\..\OGRE-SDK-1.9.0-vc120-x64-12.03.2016
 @set OGRE_INCLUDE_DIR=%OGRE_PATH%\include;%OGRE_PATH%\include\OGRE;%OGRE_PATH%\include\OGRE\RTShaderSystem;%OGRE_PATH%\include\OGRE\Terrain;%OGRE_PATH%\include\OGRE\Paging
 @set OGRE_LIBRARY_DIR=%OGRE_PATH%\lib\%build_type%
 @set OGRE_PLUGIN_DIR=%OGRE_LIBRARY_DIR%\opt
 set OGRE_LIB_SUFFIX=.lib
 @if "%build_type%"=="Debug" set OGRE_LIB_SUFFIX=_d.lib
 @set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
-@set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
 
 @set DLFCN_WIN32_PATH=%cd%\..\..\dlfcn-win32-vc12-x64-release-debug\build\install\%build_type%
 @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
@@ -61,7 +60,7 @@ set OGRE_LIB_SUFFIX=.lib
 @set LIB=%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
 @set PATH=%QT5_BIN_DIR%;%PATH%
 
-cmake -G "NMake Makefiles"^
+cmake -Wno-dev -G "NMake Makefiles"^
     -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-TRANSPORT_CMAKE_PREFIX_PATH%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DUSE_EXTERNAL_TINYXML2:BOOL=False^
