@@ -16,6 +16,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/Road2d.hh**
+    + Modified to inherit from Visual class.
+
 1. **gazebo/common/Event.hh**
     + Connection(Event*, int) constructor changed to
       Connection(Event*, const int)
@@ -53,6 +56,10 @@ release will remove the deprecated code.
     + ***Replacement:*** GAZEBO_FORCEINLINE
 
 ### Deprecations
+
+1. **gazebo/rendering/Road2d.hh**
+    + ***Deprecation:*** public: void Load(VisualPtr);
+    + ***Replacement:*** public: void Load(msgs::Road);
 
 1. **gazebo/common/Event.hh**
     + ***Deprecation:*** public: void Event::Disconnect(ConnectionPtr);
@@ -258,6 +265,12 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/Actor.hh**
     + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
+
+1. **gazebo/physics/ContactManager.hh**
+    + Remove contact filters with names that contain `::`.
+      The `CreateFilter`, `HasFilter`, and `RemoveFilter` functions
+      now convert `::` strings to `/` in the filter name before acting.
+      These were not being deleted properly in previous versions.
 
 1. **gazebo/rendering/RenderTypes.hh**
     + typedefs for Visual and its derived classes have been changed from boost to std pointers.

@@ -137,7 +137,7 @@ set(GAZEBO_DEFAULT_MASTER_HOST localhost)
 set(GAZEBO_DEFAULT_MASTER_PORT 11345)
 set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
 set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
-set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo_models)
+set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
 set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
@@ -215,16 +215,16 @@ if(USE_UPSTREAM_CFLAGS)
 endif()
 
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-# For MSVC it is recommended to use /W4 instead of /Wall
 if (MSVC)
-  set(WARN_LEVEL "/W4")
+  # Default Windows-MSVC.cmake sets MSVC warning flag to /W3. Add some extra warning excludes.
+  set(WARN_LEVEL "/wd4005 /wd4068 /wd4244 /wd4267 /wd4996")
 else()
   set(WARN_LEVEL "-Wall")
 endif()
 filter_valid_compiler_flags(${WARN_LEVEL} -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
-                               -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
-			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-
+                            -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
+			                -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
+				   
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
 if (UNIX AND NOT APPLE)
