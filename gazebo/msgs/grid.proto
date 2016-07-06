@@ -1,0 +1,28 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Grid
+/// \brief Message for a grid
+
+import "color.proto";
+
+message Grid
+{
+  /// \brief Grid name.
+  optional string name = 1;
+
+  /// \brief Number of cells in each direction.
+  optional uint32 cell_count = 2;
+
+  /// \brief Number of cells in the normal direction.
+  optional uint32 normal_cell_count = 3;
+
+  /// \brief Length of each cell in each direction.
+  optional double cell_size = 4;
+
+  /// \brief Height offset.
+  optional double height_offset = 5;
+
+  /// \brief Line color.
+  optional Color line_color = 6;
+}
