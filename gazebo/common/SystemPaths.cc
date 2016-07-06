@@ -42,9 +42,9 @@ using namespace gazebo;
 using namespace common;
 
 #ifdef _WIN32
-static const std::string SystemPaths::PathDelimiter = ";";
+static const std::string PathDelimiter = ";";
 #else
-static const std::string SystemPaths::PathDelimiter = ":";
+static const std::string PathDelimiter = ":";
 #endif
 
 //////////////////////////////////////////////////
