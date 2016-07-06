@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_SAVEMODELDIALOG_TEST_HH_
-#define GAZEBO_GUI_SAVEMODELDIALOG_TEST_HH_
+#ifndef GAZEBO_GUI_SAVEENTITYDIALOG_TEST_HH_
+#define GAZEBO_GUI_SAVEENTITYDIALOG_TEST_HH_
 
 #include <string>
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the SaveModelDialog.
-class SaveModelDialog_TEST : public QTestFixture
+/// \brief A test class for the SaveEntityDialog.
+class SaveEntityDialog_TEST : public QTestFixture
 {
   Q_OBJECT
 
@@ -33,17 +33,17 @@ namespace gazebo
 {
   namespace gui
   {
-    class SaveModelDialog;
+    class SaveEntityDialog;
   }
 }
 
-/// \brief A helper class for testing the SaveModelDialog.
-class SaveModelDialogTestHelper : public QObject
+/// \brief A helper class for testing the SaveEntityDialog.
+class SaveEntityDialogTestHelper : public QObject
 {
   Q_OBJECT
 
   /// \brief Pointer to a SaveDiag
-  public: gazebo::gui::SaveModelDialog *dialog;
+  public: gazebo::gui::SaveEntityDialog *dialog;
 
   /// \brief Verify file dialog is working.
   private slots: void CheckFileDialog();

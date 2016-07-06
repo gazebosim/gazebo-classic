@@ -15,13 +15,13 @@
  *
 */
 
-#include "gazebo/gui/SaveModelDialog.hh"
-#include "gazebo/gui/SaveModelDialog_TEST.hh"
+#include "gazebo/gui/SaveEntityDialog.hh"
+#include "gazebo/gui/SaveEntityDialog_TEST.hh"
 
 #include "test_config.h"
 
 /////////////////////////////////////////////////
-void SaveModelDialogTestHelper::CheckFileDialog()
+void SaveEntityDialogTestHelper::CheckFileDialog()
 {
   QVERIFY(this->dialog);
 
@@ -38,9 +38,9 @@ void SaveModelDialogTestHelper::CheckFileDialog()
 }
 
 /////////////////////////////////////////////////
-void SaveModelDialog_TEST::SaveLocation()
+void SaveEntityDialog_TEST::SaveLocation()
 {
-  gazebo::gui::SaveModelDialog *saveDialog = new gazebo::gui::SaveModelDialog;
+  gazebo::gui::SaveEntityDialog *saveDialog = new gazebo::gui::SaveEntityDialog;
   QCoreApplication::processEvents();
 
   // Set the model name
@@ -68,7 +68,7 @@ void SaveModelDialog_TEST::SaveLocation()
   QVERIFY(browseButton);
 
   // set a path in the browse file dialog and verify value
-  SaveModelDialogTestHelper helper;
+  SaveEntityDialogTestHelper helper;
   helper.dialog = saveDialog;
   QTimer::singleShot(0, &helper, SLOT(CheckFileDialog()));
   browseButton->click();
@@ -83,4 +83,4 @@ void SaveModelDialog_TEST::SaveLocation()
 }
 
 // Generate a main function for the test
-QTEST_MAIN(SaveModelDialog_TEST)
+QTEST_MAIN(SaveEntityDialog_TEST)

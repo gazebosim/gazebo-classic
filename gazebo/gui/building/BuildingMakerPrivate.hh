@@ -38,7 +38,7 @@ namespace gazebo
   namespace gui
   {
     class BuildingModelManip;
-    class SaveModelDialog;
+    class SaveEntityDialog;
 
     /// \internal
     /// \brief Private data for BuildingMaker
@@ -109,7 +109,7 @@ namespace gazebo
       public: std::vector<event::ConnectionPtr> connections;
 
       /// \brief A dialog for setting building model name and save location.
-      public: std::unique_ptr<SaveModelDialog> saveDialog;
+      public: std::unique_ptr<SaveEntityDialog> saveDialog;
 
       /// \brief Visual that is currently hovered over by the mouse.
       public: rendering::VisualPtr hoverVis;
