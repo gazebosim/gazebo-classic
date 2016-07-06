@@ -55,8 +55,6 @@ namespace gazebo
     ///            for common::WorldPlugin
     class GZ_COMMON_VISIBLE SystemPaths : public SingletonT<SystemPaths>
     {
-      private: static const std::string PATH_DELIMITER;
-
       /// Constructor for SystemPaths
       private: SystemPaths();
 

@@ -221,9 +221,10 @@ if (MSVC)
 else()
   set(WARN_LEVEL "-Wall")
 endif()
-filter_valid_compiler_flags(${WARN_LEVEL} -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
-                            -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
-			                -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
+filter_valid_compiler_flags(${WARN_LEVEL}
+  -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+  -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
+	-Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
 				   
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
