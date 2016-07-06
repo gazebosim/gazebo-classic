@@ -68,12 +68,12 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
 
     // Create the joint
     physics::JointPtr joint = world->GetPhysicsEngine()->CreateJoint(jointType);
-    joint->SetModel(_model);
     if (joint)
     {
       // Load the joint
       try
       {
+        joint->SetModel(_model);
         joint->SetWorld(world);
 
         joint->Load(jointElem);
