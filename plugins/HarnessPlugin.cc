@@ -19,10 +19,10 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/Model.hh"
-#include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 
 #include "plugins/HarnessPlugin.hh"
@@ -68,12 +68,12 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
 
     // Create the joint
     physics::JointPtr joint = world->GetPhysicsEngine()->CreateJoint(jointType);
-    joint->SetModel(_model);
     if (joint)
     {
       // Load the joint
       try
       {
+        joint->SetModel(_model);
         joint->SetWorld(world);
 
         joint->Load(jointElem);
@@ -82,7 +82,8 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
       catch(gazebo::common::Exception &_e)
       {
         gzerr << "Unable to load joint[" << jointName << "]. "
-          << _e.GetErrorStr() << "]\n";
+              << _e.GetErrorStr()
+              << std::endl;
       }
     }
     else
@@ -97,7 +98,8 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   if (this->joints.empty())
   {
     gzerr << "No joints specified in the harness plugin."
-      << "The harness plugin will not run.\n";
+          << "The harness plugin will not run."
+          << std::endl;
     return;
   }
 
@@ -112,15 +114,17 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
     {
       this->detachIndex = 0;
       gzwarn << "Invalid <detach> joint name[" << jointName << "] in the "
-        << "harness plugin. The first joint will be used as the detach "
-        << "joint.\n";
+             << "harness plugin. The first joint will be used as the detach "
+             << "joint."
+             << std::endl;
     }
   }
   else
   {
     // Error reporting
     gzwarn << "A <detach> element is missing from the harness plugin. "
-      << "The first joint will be used as the detach joint.\n";
+           << "The first joint will be used as the detach joint."
+           << std::endl;
   }
 
   // Get the winch
@@ -139,16 +143,18 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
       {
         this->winchIndex = 0;
         gzwarn << "Invalid <joint> name[" << winchJointName << "] in the "
-          << "<winch> element of the harness plugin. The first joint will be "
-          << "used as the winch.\n";
+               << "<winch> element of the harness plugin.\n"
+               << "The first joint will be used as the winch."
+               << std::endl;
       }
     }
     else
     {
       // Error reporting
       gzwarn << "A <winch><joint>joint_name</joint></winch> element is "
-        << "missing from the harness plugin. The first joint will be used "
-        << "as the winch.\n";
+             << "missing from the harness plugin.\n"
+             << "The first joint will be used as the winch."
+             << std::endl;
     }
 
     // Load the Position PID controller
@@ -194,7 +200,8 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   {
     // Error reporting
     gzwarn << "A <winch> element is missing from the harness plugin. "
-      << "The first joint will be used as the winch.\n";
+           << "The first joint will be used as the winch."
+           << std::endl;
   }
 }
 
@@ -315,7 +322,8 @@ void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void HarnessPlugin::OnDetach(ConstGzStringPtr &_msg)
 {
-  if (_msg->data() == "true" || _msg->data() == "TRUE" ||
+  if (_msg->data() == "true" ||
+      _msg->data() == "TRUE" ||
       _msg->data() == "True")
   {
     this->Detach();
