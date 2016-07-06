@@ -696,6 +696,7 @@ if (OSVR_CLIENTKIT_LIBRARY AND OSVR_CLIENTKIT_HEADER)
   set(HAVE_OSVR TRUE)
 else()
   message(STATUS "Looking for libosvrClientKit and ClientKit.h - not found")
+  BUILD_WARNING("OpenSource Virtual Reality (OSVR) support will be disabled.")
   set(HAVE_OSVR FALSE)
 endif()
 
