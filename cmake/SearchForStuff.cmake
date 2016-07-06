@@ -687,6 +687,18 @@ if (GAZEBO_RUN_VALGRIND_TESTS AND NOT VALGRIND_PROGRAM)
   BUILD_WARNING("valgrind not found. Memory check tests will be skipped.")
 endif()
 
+########################################
+# Find OSVR SDK
+find_library(OSVR_CLIENTKIT_LIBRARY NAMES osvrClientKit)
+find_file(OSVR_CLIENTKIT_HEADER NAMES osvr/ClientKit/ClientKit.h)
+if (OSVR_CLIENTKIT_LIBRARY AND OSVR_CLIENTKIT_HEADER)
+  message(STATUS "Looking for libosvrClientKit and ClientKit.h - found")
+  set(HAVE_OSVR TRUE)
+else()
+  message(STATUS "Looking for libosvrClientKit and ClientKit.h - not found")
+  BUILD_WARNING("OpenSource Virtual Reality (OSVR) support will be disabled.")
+  set(HAVE_OSVR FALSE)
+endif()
 
 ########################################
 # Find QWT (QT graphing library)
