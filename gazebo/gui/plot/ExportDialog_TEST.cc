@@ -80,14 +80,14 @@ void ExportDialog_TEST::Empty()
 
   // Create a new plot canvas widget
   gazebo::gui::ExportDialog *exportDialog =
-    new gazebo::gui::ExportDialog(NULL, plots);
+    new gazebo::gui::ExportDialog(nullptr, plots);
 
-  QVERIFY(exportDialog != NULL);
+  QVERIFY(exportDialog != nullptr);
 
   exportDialog->show();
 
   auto listView = exportDialog->findChild<QListView *>("plotExportListView");
-  QVERIFY(listView != NULL);
+  QVERIFY(listView != nullptr);
   QVERIFY(listView->model()->columnCount() == 0);
   QVERIFY(listView->model()->rowCount() == 0);
 
@@ -105,8 +105,8 @@ void ExportDialog_TEST::OnePlot()
   std::list<gazebo::gui::PlotCanvas *> plots;
 
   // Create a new plot canvas widget
-  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
-  QVERIFY(plotCanvas != NULL);
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(nullptr);
+  QVERIFY(plotCanvas != nullptr);
   plotCanvas->show();
 
   // there should be an empty plot
@@ -116,16 +116,16 @@ void ExportDialog_TEST::OnePlot()
 
   // Create a new plot canvas widget
   gazebo::gui::ExportDialog *exportDialog =
-    new gazebo::gui::ExportDialog(NULL, plots);
+    new gazebo::gui::ExportDialog(nullptr, plots);
 
-  QVERIFY(exportDialog != NULL);
+  QVERIFY(exportDialog != nullptr);
 
   exportDialog->show();
   this->ProcessEventsAndDraw();
 
   // Get the list view, which holds the plotcanvas items.
   auto listView = exportDialog->findChild<QListView *>("plotExportListView");
-  QVERIFY(listView != NULL);
+  QVERIFY(listView != nullptr);
   QCOMPARE(listView->model()->columnCount(), 1);
   QCOMPARE(listView->model()->rowCount(), 1);
 
@@ -170,8 +170,8 @@ void ExportDialog_TEST::OnePlot()
 void ExportDialog_TEST::ExportPDF()
 {
   // Create a new plot canvas widget
-  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
-  QVERIFY(plotCanvas != NULL);
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(nullptr);
+  QVERIFY(plotCanvas != nullptr);
   plotCanvas->show();
 
   // Add a plot to the canvas
@@ -193,7 +193,7 @@ void ExportDialog_TEST::ExportPDF()
   struct dirent entry;
   struct dirent *result = nullptr;
   bool foundFile = false;
-  if ((dir = opendir(outputDir.c_str())) != NULL)
+  if ((dir = opendir(outputDir.c_str())) != nullptr)
   {
     // Check the directory contents for the correct pdf file.
     while (readdir_r(dir, &entry, &result) == 0 && result != nullptr)
@@ -224,8 +224,8 @@ void ExportDialog_TEST::ExportCSV()
   this->Load("worlds/shapes.world");
 
   // Create a new plot canvas widget
-  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
-  QVERIFY(plotCanvas != NULL);
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(nullptr);
+  QVERIFY(plotCanvas != nullptr);
   plotCanvas->show();
 
   // Add a plot to the canvas
@@ -256,7 +256,7 @@ void ExportDialog_TEST::ExportCSV()
   struct dirent entry;
   struct dirent *result = nullptr;
   bool foundFile = false;
-  if ((dir = opendir(outputDir.c_str())) != NULL)
+  if ((dir = opendir(outputDir.c_str())) != nullptr)
   {
     // Check the directory contents for the correct csv file.
     while (readdir_r(dir, &entry, &result) == 0 && result != nullptr)
