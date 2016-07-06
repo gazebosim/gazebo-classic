@@ -169,6 +169,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     rot = rot * this->dataPtr->mouseMoveVisStartPose.rot;
 
   _vis->SetWorldRotation(rot);
+  Events::moveEntity(_vis->GetName(), _vis->GetWorldPose().Ign(), false);
 }
 
 /////////////////////////////////////////////////
@@ -407,15 +408,15 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       return;
     }
 
-    math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
+    auto newScale = this->dataPtr->mouseVisualScale.Ign() * scale.Ign().Abs();
 
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
-      newScale = SnapPoint(newScale);
+      newScale = SnapPoint(newScale).Ign();
       // prevent setting zero scale
-      newScale.x = std::max(1e-4, newScale.x);
-      newScale.y = std::max(1e-4, newScale.y);
-      newScale.z = std::max(1e-4, newScale.z);
+      newScale.X(std::max(1e-4, newScale.X()));
+      newScale.Y(std::max(1e-4, newScale.Y()));
+      newScale.Z(std::max(1e-4, newScale.Z()));
     }
     _vis->SetScale(newScale);
     Events::scaleEntity(_vis->GetName(), newScale);
@@ -447,16 +448,16 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           geomScale = this->UpdateScale(_axis, scale, geomType);
         }
 
-        math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
-            * geomScale.GetAbs();
+        auto newScale = this->dataPtr->mouseChildVisualScale[i].Ign()
+            * geomScale.Ign().Abs();
 
         if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         {
-          newScale = SnapPoint(newScale);
+          newScale = SnapPoint(newScale).Ign();
           // prevent setting zero scale
-          newScale.x = std::max(1e-4, newScale.x);
-          newScale.y = std::max(1e-4, newScale.y);
-          newScale.z = std::max(1e-4, newScale.z);
+          newScale.X(std::max(1e-4, newScale.X()));
+          newScale.Y(std::max(1e-4, newScale.Y()));
+          newScale.Z(std::max(1e-4, newScale.Z()));
         }
 
         childVis->SetScale(newScale);
@@ -522,6 +523,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     pose.pos.z = _vis->GetWorldPose().pos.z;
 
   _vis->SetWorldPose(pose);
+  Events::moveEntity(_vis->GetName(), pose.Ign(), false);
 }
 
 /////////////////////////////////////////////////
@@ -623,8 +625,13 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   rendering::VisualPtr vis;
+  std::string manipState;
   rendering::VisualPtr mouseVis
-      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseStart,
+      manipState);
+
+  this->dataPtr->selectionObj->SetState(manipState);
+
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
   if (!this->dataPtr->keyEvent.key && (this->dataPtr->selectionObj->GetMode() ==
@@ -648,6 +655,8 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
     // If the root visual's ID can be found, it is a model in the main window
+    // TODO gui::get_entity_id always return 0 in QTestFixture due to NULL
+    // g_main_win
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
@@ -971,7 +980,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);

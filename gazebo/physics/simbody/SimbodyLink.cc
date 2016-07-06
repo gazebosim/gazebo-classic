@@ -59,7 +59,7 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
   this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
-  if (this->simbodyPhysics == NULL)
+  if (this->simbodyPhysics == nullptr)
     gzthrow("Not using the simbody physics engine");
 
   if (_sdf->HasElement("must_be_base_link"))
@@ -112,8 +112,8 @@ void SimbodyLink::Init()
 //////////////////////////////////////////////////
 void SimbodyLink::Fini()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->gravityModeConnection);
-  event::Events::DisconnectWorldUpdateEnd(this->staticLinkConnection);
+  this->gravityModeConnection.reset();
+  this->staticLinkConnection.reset();
   Link::Fini();
 }
 
@@ -187,7 +187,7 @@ void SimbodyLink::SetSelfCollide(bool /*_collide*/)
 
   SimbodyCollision *bcollision = dynamic_cast<SimbodyCollision*>(_collision);
 
-  if (_collision == NULL)
+  if (_collision == nullptr)
     gzthrow("requires SimbodyCollision");
 
   math::Pose relativePose = _collision->GetRelativePose();

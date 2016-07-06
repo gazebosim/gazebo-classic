@@ -2,6 +2,51 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Add FiducialCameraPlugin for Camera Sensors
+    * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
+
+1. Fix Road2d vertices and shadows
+    * [Pull request #2362](https://bitbucket.org/osrf/gazebo/pull-request/2362)
+
+1. Plotting utility - plot window, canvas, variables
+    * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
+
+1. Rearrange GLWidget::OnMouseMove so that the more common use cases it
+   fewer if statements. Use std::thread in place of boost in OculusWindow.
+   Pragma statements to prevent warnings. Prevent variable hiding in
+   WallSegmentItem.
+    * [Pull request #2376](https://bitbucket.org/osrf/gazebo/pull-request/2376)
+
+1. Use single pixel selection buffer for mouse picking
+    * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
+
+1. Windows plugins (with .dll extension) now accepted
+    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311/ensure-plugin-and-plugin-macros-are-always/)
+    * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
+
+1. Add Introspection Manager and Client util
+    * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
+
+1. Add plotting utility palatte
+    * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
+
+1. Refactor Event classes and improve memory management.
+    * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
+    * [Pull request #2317](https://bitbucket.org/osrf/gazebo/pull-request/2317)
+    * [Pull request #2329](https://bitbucket.org/osrf/gazebo/pull-request/2329)
+    * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
+
+1. Remove EntityMakerPrivate and move its members to derived classes
+    * [Pull request #2310](https://bitbucket.org/osrf/gazebo/pull-request/2310)
+
+1. Change NULL to nullptr.
+    * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
+    * [Pull request #2297](https://bitbucket.org/osrf/gazebo/pull-request/2297)
+    * [Pull request #2298](https://bitbucket.org/osrf/gazebo/pull-request/2298)
+    * [Pull request #2302](https://bitbucket.org/osrf/gazebo/pull-request/2302)
+    * [Pull request #2295](https://bitbucket.org/osrf/gazebo/pull-request/2295)
+    * [Pull request #2300](https://bitbucket.org/osrf/gazebo/pull-request/2300)
+
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
     * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)
@@ -10,9 +55,17 @@
     * [Pull request #2244](https://bitbucket.org/osrf/gazebo/pull-request/2244)
     * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
 
+1. Deprecate gazebo::math
+    * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
+
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
     * A contribution from Olivier Crave
+
+1. Server generates unique model names in case of overlap, and added allow_renaming field to factory message.
+    * [Pull request 2301](https://bitbucket.org/osrf/gazebo/pull-request/2301)
+    * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
 
 1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
     * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
@@ -22,6 +75,9 @@
 
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
+
+1. PIMPLize rendering/Grid
+    * [Pull request 2330](https://bitbucket.org/osrf/gazebo/pull-request/2330)
 
 1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
     * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
@@ -53,9 +109,49 @@
     1. Undo / redo inserting and deleting nested models
         * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
 
+    1. Undo insert / delete joints
+        * [Pull request #2266](https://bitbucket.org/osrf/gazebo/pull-request/2266)
+
+    1. Undo insert / delete model plugins
+        * [Pull request #2334](https://bitbucket.org/osrf/gazebo/pull-request/2334)
+
+    1. Undo translate, rotate, snap and align links and nested models
+        * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
+
+1. Google Summer of Code Graphical interface for inserting plugins during simulation.
+
+    1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
+        * [Pull request #2323](https://bitbucket.org/osrf/gazebo/pull-request/2323)
+        * [Issue #1698](https://bitbucket.org/osrf/gazebo/pull-request/1698)
+
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
+
+1. Redirect QT messages to Gazebo's console message handling system.
+    * [Pull request 2375](https://bitbucket.org/osrf/gazebo/pull-request/2375)
+
+1. Fix Model Manipulator switching between local and global frames
+    * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
+
+1. Remove contact filters with names that contain `::`
+    * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
+    * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1805)
+
+## Gazebo 7.2.0 (2016-06-13)
+
+1. Fix right click view options after deleting and respawning a model.
+    * [Pull request 2349](https://bitbucket.org/osrf/gazebo/pull-request/2349)
+    * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1985)
+
+1. Backport single pixel selection buffer for mouse picking
+    * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
+
+1. Prevent mouse pan and orbit from deselecting entities in model editor
+    * [Pull request 2333](https://bitbucket.org/osrf/gazebo/pull-request/2333)
+
+1. Handle model manipulation tool RTS shortcuts in keyPress
+    * [Pull request 2312](https://bitbucket.org/osrf/gazebo/pull-request/2312)
 
 1. Reset ODE joint force feedback after world reset
     * [Pull request 2255](https://bitbucket.org/osrf/gazebo/pull-request/2255)
@@ -64,11 +160,28 @@
     * [Pull request 2259](https://bitbucket.org/osrf/gazebo/pull-request/2259)
     * [Issue #1583](https://bitbucket.org/osrf/gazebo/issues/1583)
 
+1. PIMPLize gui/model/ModelEditorPalette
+    * [Pull request 2279](https://bitbucket.org/osrf/gazebo/pull-request/2279)
+
 1. Properly cleanup pointers when destroying a blank world.
     * [Pull request 2220](https://bitbucket.org/osrf/gazebo/pull-request/2220)
 
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
+
+1. Properly cleanup pointers when destroying a world with joints.
+    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
+
+1. Fix view control mouse focus in model editor
+    * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)
+    * [Issue #1791](https://bitbucket.org/osrf/gazebo/issues/1791)
+
+1. Server generates unique model names in case of overlap
+    * [Pull request 2296](https://bitbucket.org/osrf/gazebo/pull-request/2296)
+    * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
+
+1. Model Editor: Select and align nested models
+    * [Pull request 2282](https://bitbucket.org/osrf/gazebo/pull-request/2282)
 
 ## Gazebo 7.1.0 (2016-04-07)
 
@@ -203,6 +316,11 @@
 1. Model editor: Fix inserting custom links
     * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
     * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
+
+1. Model editor: Reset visual / collision insertion / deletion
+        * [Pull request #2254](https://bitbucket.org/osrf/gazebo/pull-request/2254)
+        * [Issue #1777](https://bitbucket.org/osrf/gazebo/issues/1777)
+        * [Issue #1852](https://bitbucket.org/osrf/gazebo/issues/1852)
 
 1. Building editor: Add layers to building levels
     * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
@@ -1047,6 +1165,22 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Fix mouse picking with transparent visuals
+    * [Pull request 2305](https://bitbucket.org/osrf/gazebo/pull-request/2305)
+    * [Issue #1956](https://bitbucket.org/osrf/gazebo/issue/1956)
+
+1. Backport fix for DepthCamera visibility mask
+    * [Pull request 2286](https://bitbucket.org/osrf/gazebo/pull-request/2286)
+    * [Pull request 2287](https://bitbucket.org/osrf/gazebo/pull-request/2287)
+
+1. Backport sensor reset fix
+    * [Pull request 2272](https://bitbucket.org/osrf/gazebo/pull-request/2272)
+    * [Issue #1917](https://bitbucket.org/osrf/gazebo/issue/1917)
+
+1. Fix model snap tool highlighting
+    * [Pull request 2293](https://bitbucket.org/osrf/gazebo/pull-request/2293)
+    * [Issue #1955](https://bitbucket.org/osrf/gazebo/issue/1955)
 
 ### Gazebo 5.3.0 (2015-04-07)
 

@@ -33,20 +33,20 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTLinkPrivate()
-        : dartPhysics(NULL),
-          dtBodyNode(NULL),
-          dartParentJoint(NULL),
+        : dartPhysics(nullptr),
+          dtBodyNode(nullptr),
+          dartParentJoint(nullptr),
           dartChildJoints {},
           staticLink(false),
-          dtWeldJointConst(NULL)
+          dtWeldJointConst(nullptr)
       {
       }
 
       /// \brief Default destructor
       public: ~DARTLinkPrivate()
       {
-        // We don't need to delete dtBodyNode because skeletone will delete
-        // dtBodyNode if it is registered to the skeletone.
+        // We don't need to delete dtBodyNode because skeleton will delete
+        // dtBodyNode if it is registered to the skeleton.
 
         delete dtWeldJointConst;
       }

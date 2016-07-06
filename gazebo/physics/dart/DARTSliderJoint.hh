@@ -26,6 +26,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief A slider joint
     class GZ_PHYSICS_VISIBLE DARTSliderJoint : public SliderJoint<DARTJoint>
     {
@@ -64,6 +67,7 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
+    /// \}
   }
 }
 #endif

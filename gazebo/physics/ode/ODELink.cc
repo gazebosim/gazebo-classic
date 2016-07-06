@@ -37,15 +37,13 @@ using namespace physics;
 ODELink::ODELink(EntityPtr _parent)
     : Link(_parent)
 {
-  this->linkId = NULL;
+  this->linkId = nullptr;
 }
 
 //////////////////////////////////////////////////
 ODELink::~ODELink()
 {
-  if (this->linkId)
-    dBodyDestroy(this->linkId);
-  this->linkId = NULL;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -54,7 +52,7 @@ void ODELink::Load(sdf::ElementPtr _sdf)
   this->odePhysics = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
-  if (this->odePhysics == NULL)
+  if (this->odePhysics == nullptr)
     gzthrow("Not using the ode physics engine");
 
   Link::Load(_sdf);
@@ -82,7 +80,7 @@ void ODELink::Init()
     }
   }
 
-  GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
+  GZ_ASSERT(this->sdf != nullptr, "Unable to initialize link, SDF is null");
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
@@ -93,7 +91,7 @@ void ODELink::Init()
 
   if (this->linkId)
   {
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     math::Vector3 cogVec = this->inertial->GetCoG();
     for (auto const &child : this->children)
     {
@@ -154,7 +152,7 @@ void ODELink::MoveCallback(dBodyID _id)
   self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
-  GZ_ASSERT(self->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(self->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 cog = self->dirtyPose.rot.RotateVector(
       self->inertial->GetCoG());
 
@@ -179,12 +177,13 @@ void ODELink::MoveCallback(dBodyID _id)
 //////////////////////////////////////////////////
 void ODELink::Fini()
 {
-  Link::Fini();
   if (this->linkId)
     dBodyDestroy(this->linkId);
-  this->linkId = NULL;
+  this->linkId = nullptr;
 
   this->odePhysics.reset();
+
+  Link::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -246,7 +245,7 @@ void ODELink::OnPoseChange()
 
   const math::Pose myPose = this->GetWorldPose();
 
-  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
@@ -311,7 +310,7 @@ void ODELink::UpdateCollisionOffsets()
 {
   if (this->linkId)
   {
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     math::Vector3 cogVec = this->inertial->GetCoG();
     for (auto const &child : this->children)
     {
@@ -395,7 +394,7 @@ void ODELink::UpdateMass()
   // The CoG must always be (0, 0, 0)
   math::Vector3 cog(0, 0, 0);
 
-  GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   // give ODE un-rotated inertia
   math::Matrix3 moi = this->inertial->GetMOI(
     math::Pose(this->inertial->GetCoG(), math::Quaternion()));
@@ -437,7 +436,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
   if (this->linkId)
   {
     dVector3 dvel;
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     math::Vector3 offsetFromCoG = _offset - this->inertial->GetCoG();
     dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
         offsetFromCoG.z, dvel);
@@ -462,7 +461,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
   {
     dVector3 dvel;
     math::Pose wPose = this->GetWorldPose();
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     math::Vector3 offsetFromCoG =
         wPose.rot.RotateVectorReverse(_q * _offset)
         - this->inertial->GetCoG();

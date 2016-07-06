@@ -34,7 +34,6 @@ QDialog
 
 QWidget#topicSelector,
 QWidget#cameraSensor,
-QWidget#diagnosticsPlot,
 QWidget#dataLogger
 {
   background-color: #303030;
@@ -147,11 +146,30 @@ QToolButton
   border: 0px solid #808080;
 }
 
+QWidget#plotEditTitle > QLabel:hover
+{
+  border-bottom: 1px solid white;
+}
+
+QToolBar#plotToolbar > QToolButton:hover
+{
+  border: 0px;
+  background-color: transparent;
+}
+
 QToolButton:hover
 {
   border: 1px outset #252525;
   background-color: #454545;
 }
+
+QToolButton:hover#plotCanvasTitleTool
+{
+  border: 0px;
+  background-color: transparent;
+  color: #ffffff;
+}
+
 
 QToolButton:pressed
 {
@@ -163,6 +181,32 @@ QToolButton:checked
 {
   border: 1px outset #252525;
   background-color: #454545;
+}
+
+QPushButton#plotPaletteCollapse
+{
+  padding: 4px;
+  font-weight: 300;
+  background-color: rgba(120,120,120,255);
+  color: #ffffff;
+  text-align: center;
+  border: 0px;
+  margin: 0px;
+  padding-bottom: 11px;
+}
+
+QPushButton#plotAddCanvas
+{
+  padding: 8px;
+  font-weight: 100;
+  font-size: 20px;
+  background-color: #f78e1e;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 2px;
+  border: 0px;
+  width: 20px;
+  height: 20px;
 }
 
 QPushButton#expandButton
@@ -286,6 +330,45 @@ QTreeView QHeaderView:section
   border: 0px;
 }
 
+QTreeView#plotTree::branch:selected:!active
+{
+  background-color: #dddddd;
+}
+
+QTreeView#plotTree::branch:selected:active
+{
+  background-color: #dddddd;
+}
+
+QTreeView#plotTree::branch:has-siblings:!adjoins-item
+{
+  border-image: url(:/images/vline.png) 0;
+}
+
+QTreeView#plotTree::branch:has-siblings:adjoins-item
+{
+  border-image: url(:/images/branch-more.png) 0;
+}
+
+QTreeView#plotTree::branch:!has-children:!has-siblings:adjoins-item
+{
+  border-image: url(:/images/branch-end.png) 0;
+}
+
+QTreeView#plotTree::branch:has-children:!has-siblings:closed,
+QTreeView#plotTree::branch:closed:has-children:has-siblings
+{
+  border-image: none;
+  image: url(:/images/right_arrow.png);
+}
+
+QTreeView#plotTree::branch:open:has-children:!has-siblings,
+QTreeView#plotTree::branch:open:has-children:has-siblings
+{
+  border-image: none;
+  image: url(:/images/down_arrow.png);
+}
+
 QLineEdit
 {
   color: #353535;
@@ -300,17 +383,13 @@ QLineEdit:disabled
 
 QPushButton
 {
-  /*
-  border: 2px outset #727272;
-  border-radius: 4px;
-  background: #737373;
-  */
-
-  color: #d0d0d0;
-  border: 2px solid #737373;
-  border-radius: 0px;
+  padding: 8px;
+  font-weight: 200;
+  color: #fefefe;
+  text-align: center;
+  border-radius: 2px;
+  border: 0px;
   selection-color: transparent;
-  padding: 2px;
   margin: 2px;
   background: #505050;
 }
@@ -758,4 +837,206 @@ QTextEdit#splashVersionTextEdit
 {
   color: #f58113;
   font-size: 10px;
+}
+
+QDialog#plotWindow
+{
+  background-color: #f2f2f2;
+  font-family: Roboto;
+}
+
+QLineEdit#plotLineEdit
+{
+  background-color: rgba(0, 0, 0, 0);
+  color: #333333;
+  border-bottom: 2px solid #f58113;
+  padding-bottom: 2px;
+  border-radius: 0px;
+  font-family: Roboto;
+}
+
+QLabel#plottingSearchLabel
+{
+  color: #f58113;
+  font-weight: 400;
+  margin-top: 15px;
+}
+
+QWidget#plotCanvas
+{
+  min-height: 300px;
+  min-width: 534px;
+  padding: 0px;
+  margin: 0px;
+}
+
+QScrollArea#plotScrollArea
+{
+  border-radius: 0px;
+  border: 0px;
+  padding:0px;
+  margin: 0px;
+  background-color: transparent;
+}
+
+QFrame#variableContainerFrame
+{
+  background-color: #ffffff;
+  border-radius: 0px;
+  border-bottom: 1px solid #a9a9a9;
+  margin: 0px;
+}
+
+QFrame#variableContainerFrame > QLabel
+{
+  color: #a9a9a9;
+}
+
+QFrame#variablePillFrame > QLabel
+{
+  color: #ffffff;
+}
+
+QFrame#variablePillFrame
+{
+  border-radius: 10px;
+  background-color: #2196f3;
+}
+
+QFrame#plotCanvasPlotFrame
+{
+  border: 0px;
+  border-radius: 0px;
+  background-color: transparent;
+}
+
+QFrame#plotCanvasTitleFrame
+{
+  background-color: #424242;
+}
+
+QFrame#plotCanvasTitleFrame > QLabel
+{
+  margin-left: 4px;
+}
+
+QFrame#plotCanvasFrame
+{
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  background-color: #ffffff;
+  border-radius: 0px;
+  padding: 0px;
+}
+
+QwtPlot#incrementalPlot
+{
+  background-color: #ffffff;
+}
+
+QwtPlot#incrementalPlot> QwtScaleWidget
+{
+  color: #a9a9a9;
+}
+
+QwtPlot#incrementalPlot > QwtLegend
+{
+  border: 1px solid #a9a9a9;
+  border-radius: 2px
+}
+
+QwtPlot#incrementalPlot > QwtLegend > QScrollArea
+{
+  background-color: #ffffff;
+}
+
+QwtPlot#incrementalPlot > QwtLegend > QwtLegendLabel
+{
+  background-color: #ffffff;
+}
+
+QTabBar#plottingTabBar::tab
+{
+  border-radius: 0px;
+  border: 0px;
+}
+
+QTabBar#plottingTabBar::tab:focus
+{
+  outline: 0px;
+}
+
+QTabBar#plottingTabBar::tab
+{
+  min-width: 8ex;
+  background-color: rgba(120,120,120,255);
+
+  margin: 0px;
+  padding: 10px;
+}
+
+QTabBar#plottingTabBar::tab:!selected
+{
+  color: rgba(240,240,240,180);
+  background-color: rgba(120,120,120,255);
+  border-bottom: 2px solid rgba(0,0,0,0);
+  font-weight: 400;
+}
+
+QTabBar#plottingTabBar::tab:!hover
+{
+  color: rgba(240,240,240,180);
+  background-color: rgba(120,120,120,255);
+  border-bottom: 2px solid rgba(0,0,0,0);
+  font-weight: 400;
+}
+
+QTabBar#plottingTabBar::tab:selected
+{
+  color: #f78e1e;
+  background-color: rgba(120,120,120,255);
+  border-bottom: 2px solid #f78e1e;
+  font-weight: 600;
+}
+
+QTabBar#plottingTabBar::tab:hover
+{
+  color: #f58113;
+  background-color: rgba(120,120,120,255);
+}
+
+QTabBar#plottingTabBar::tab:first:selected
+{
+  margin-left: 0;
+}
+
+QTabBar#plottingTabBar::tab:last:selected
+{
+  margin-right: 0;
+}
+
+QTabBar#plottingTabBar::tab::only-one
+{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+QTabBar#plottingTabBar
+{
+  background-color: rgba(120,120,120,255);
+  margin: 0px;
+  padding: 0px;
+}
+
+QTabBar#plottingTabBar::pane
+{
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+  color: #fafafa;
+}
+
+QFrame#plotPaletteFrame
+{
+  background-color: #e2e2e2;
 }

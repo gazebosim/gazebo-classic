@@ -62,7 +62,7 @@ SkeletonNode* Skeleton::GetNodeByName(std::string _name)
     if (iter->second->GetName() == _name)
       return iter->second;
 
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -73,7 +73,7 @@ SkeletonNode* Skeleton::GetNodeById(std::string _id)
     if (iter->second->GetId() == _id)
       return iter->second;
 
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -212,6 +212,9 @@ void Skeleton::AddVertNodeWeight(unsigned int _vertex, std::string _node,
 //////////////////////////////////////////////////
 unsigned int Skeleton::GetNumVertNodeWeights(unsigned int _vertex)
 {
+  if (_vertex > this->rawNW.size())
+    return 0;
+
   return this->rawNW[_vertex].size();
 }
 
@@ -231,7 +234,7 @@ unsigned int Skeleton::GetNumAnimations()
 SkeletonAnimation *Skeleton::GetAnimation(const unsigned int _i)
 {
   if (_i >= this->anims.size())
-    return NULL;
+    return nullptr;
 
   return this->anims[_i];
 }
@@ -322,7 +325,7 @@ void SkeletonNode::SetTransform(const ignition::math::Matrix4d &_trans,
 {
   this->transform = _trans;
 
-  if (this->parent == NULL)
+  if (this->parent == nullptr)
     this->modelTransform = _trans;
   else
     this->modelTransform = this->parent->ModelTransform() * _trans;
@@ -380,7 +383,7 @@ void SkeletonNode::SetModelTransform(
 {
   this->modelTransform = _trans;
 
-  if (this->parent == NULL)
+  if (this->parent == nullptr)
   {
     this->transform = _trans;
   }
@@ -447,7 +450,7 @@ SkeletonNode* SkeletonNode::GetChildByName(std::string _name)
     if (this->children[i]->GetName() == _name)
       return this->children[i];
 
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -457,7 +460,7 @@ SkeletonNode* SkeletonNode::GetChildById(std::string _id)
     if (this->children[i]->GetId() == _id)
       return this->children[i];
 
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////

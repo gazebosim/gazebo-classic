@@ -38,9 +38,9 @@ using namespace physics;
 BulletJoint::BulletJoint(BasePtr _parent)
   : Joint(_parent)
 {
-  this->constraint = NULL;
-  this->bulletWorld = NULL;
-  this->feedback = NULL;
+  this->constraint = nullptr;
+  this->bulletWorld = nullptr;
+  this->feedback = nullptr;
   this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
@@ -60,12 +60,14 @@ void BulletJoint::Fini()
     this->bulletWorld->removeConstraint(this->constraint);
     delete this->constraint;
   }
-  this->constraint = NULL;
-  this->bulletWorld = NULL;
+  this->constraint = nullptr;
+  this->bulletWorld = nullptr;
 
   if (this->feedback)
     delete this->feedback;
-  this->feedback = NULL;
+  this->feedback = nullptr;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -121,7 +123,7 @@ LinkPtr BulletJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
 
-  if (this->constraint == NULL)
+  if (this->constraint == nullptr)
     gzthrow("Attach bodies to the joint first");
 
   if (_index == 0 || _index == 1)
@@ -155,12 +157,14 @@ bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
+  this->applyDamping.reset();
+
   this->childLink.reset();
   this->parentLink.reset();
   if (this->constraint && this->bulletWorld)
     this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
-  this->constraint = NULL;
+  this->constraint = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -262,7 +266,7 @@ void BulletJoint::CacheForceTorque()
   // convert torque from about parent CG to joint anchor location
   if (this->parentLink)
   {
-    // get child pose, or it's the inertial world if childLink is NULL
+    // get child pose, or it's the inertial world if childLink is nullptr
     math::Pose childPose;
     if (this->childLink)
       childPose = this->childLink->GetWorldPose();
@@ -359,7 +363,7 @@ void BulletJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
-  GZ_ASSERT(this->constraint != NULL, "constraint should be valid");
+  GZ_ASSERT(this->constraint != nullptr, "constraint should be valid");
   return this->wrench;
 }
 
@@ -368,7 +372,7 @@ void BulletJoint::SetupJointFeedback()
 {
   if (this->provideFeedback)
   {
-    if (this->feedback == NULL)
+    if (this->feedback == nullptr)
     {
       this->feedback = new btJointFeedback;
       this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);

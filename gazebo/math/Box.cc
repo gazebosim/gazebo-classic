@@ -42,7 +42,7 @@ Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)
 
 //////////////////////////////////////////////////
 Box::Box(const ignition::math::Box &_box)
-  : min(_box.Min()), max(_box.Max())
+  : min(_box.Min()), max(_box.Max()), extent(EXTENT_FINITE)
 {
 }
 

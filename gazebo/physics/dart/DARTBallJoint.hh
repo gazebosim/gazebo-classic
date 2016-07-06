@@ -26,6 +26,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief An DARTBallJoint
     class GZ_PHYSICS_VISIBLE DARTBallJoint : public BallJoint<DARTJoint>
     {
@@ -78,6 +81,7 @@ namespace gazebo
       public: virtual bool SetLowStop(unsigned int _index,
                                       const math::Angle &_angle);
     };
+    /// \}
   }
 }
 #endif

@@ -235,6 +235,96 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const double _d)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::DOUBLE);
+      result.set_double_value(_d);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const int _i)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::INT32);
+      result.set_int_value(_i);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const std::string &_s)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::STRING);
+      result.set_string_value(_s);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const char *_s)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::STRING);
+      result.set_string_value(std::string(_s));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const bool _b)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::BOOLEAN);
+      result.set_bool_value(_b);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Vector3d &_v)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::VECTOR3D);
+      result.mutable_vector3d_value()->CopyFrom(Convert(_v));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const common::Color &_c)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::COLOR);
+      result.mutable_color_value()->CopyFrom(Convert(_c));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Pose3d &_p)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::POSE3D);
+      result.mutable_pose3d_value()->CopyFrom(Convert(_p));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Quaterniond &_q)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::QUATERNIOND);
+      result.mutable_quaternion_value()->CopyFrom(Convert(_q));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const common::Time &_t)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::TIME);
+      result.mutable_time_value()->CopyFrom(Convert(_t));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
     {
       msgs::Vector3d result;
@@ -1682,7 +1772,7 @@ namespace gazebo
       }
       else
       {
-        gzwarn << "Conversion of sensor type[" << type << "] not suppported."
+        gzwarn << "Conversion of sensor type[" << type << "] not supported."
           << std::endl;
       }
 
@@ -2734,10 +2824,10 @@ namespace gazebo
         submeshElem->GetElement("name")->Set(_msg.submesh());
         if (_msg.has_center_submesh())
           submeshElem->GetElement("center")->Set(_msg.center_submesh());
-        if (_msg.has_scale())
-        {
-          meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
-        }
+      }
+      if (_msg.has_scale())
+      {
+        meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
       }
       return meshSDF;
     }
@@ -2914,6 +3004,18 @@ namespace gazebo
       {
         sdf::ElementPtr jointElem = modelSDF->AddElement("joint");
         jointElem = JointToSDF(_msg.joint(i), jointElem);
+      }
+
+      if (_msg.plugin_size() > 0)
+      {
+        while (modelSDF->HasElement("plugin"))
+          modelSDF->GetElement("plugin")->RemoveFromParent();
+      }
+
+      for (int i = 0; i < _msg.plugin_size(); ++i)
+      {
+        sdf::ElementPtr pluginElem = modelSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
       }
 
       if (_msg.link_size())

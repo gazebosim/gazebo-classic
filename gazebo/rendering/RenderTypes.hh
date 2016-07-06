@@ -70,6 +70,7 @@ namespace gazebo
     class SelectionObj;
     class RayQuery;
     class Distortion;
+    class Road2d;
 
 #ifdef HAVE_OCULUS
     class OculusCamera;
@@ -194,6 +195,10 @@ namespace gazebo
     /// \def DistortionPtr
     /// \brief Shared pointer to Distortion
     typedef boost::shared_ptr<Distortion> DistortionPtr;
+
+    /// \def Road2dPtr
+    /// \brief Shared pointer to Road2d
+    typedef std::shared_ptr<Road2d> Road2dPtr;
 
 #ifdef HAVE_OCULUS
     /// \def OculusCameraPtr

@@ -94,10 +94,10 @@ const Mesh *MeshManager::Load(const std::string &_filename)
   if (!this->IsValidFilename(_filename))
   {
     gzerr << "Invalid mesh filename extension[" << _filename << "]\n";
-    return NULL;
+    return nullptr;
   }
 
-  Mesh *mesh = NULL;
+  Mesh *mesh = nullptr;
 
   std::string extension;
 
@@ -112,7 +112,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     std::map<std::string, Mesh*>::iterator iter;
     iter = this->meshes.find(_filename);
     delete iter->second;
-    iter->second = NULL;
+    iter->second = nullptr;
     this->meshes.erase(iter);
     */
   }
@@ -124,7 +124,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     extension = fullname.substr(fullname.rfind(".")+1, fullname.size());
     std::transform(extension.begin(), extension.end(),
         extension.begin(), ::tolower);
-    MeshLoader *loader = NULL;
+    MeshLoader *loader = nullptr;
 
     if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader = this->stlLoader;
@@ -140,7 +140,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       boost::mutex::scoped_lock lock(this->mutex);
       if (!this->HasMesh(_filename))
       {
-        if ((mesh = loader->Load(fullname)) != NULL)
+        if ((mesh = loader->Load(fullname)) != nullptr)
         {
           mesh->SetName(_filename);
           this->meshes.insert(std::make_pair(_filename, mesh));
@@ -229,7 +229,7 @@ const Mesh *MeshManager::GetMesh(const std::string &_name) const
   if (iter != this->meshes.end())
     return iter->second;
 
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////

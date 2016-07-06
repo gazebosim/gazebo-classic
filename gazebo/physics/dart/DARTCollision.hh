@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_DARTCOLLISION_HH_
 #define _GAZEBO_DARTCOLLISION_HH_
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/dart/dart_inc.h"
@@ -31,6 +30,9 @@ namespace gazebo
   {
     /// Forward declare private data class
     class DARTCollisionPrivate;
+
+    /// \addtogroup gazebo_physics_dart
+    /// \{
 
     /// \brief Base class for all DART collisions.
     class GZ_PHYSICS_VISIBLE DARTCollision : public Collision
@@ -93,6 +95,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTCollisionPrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

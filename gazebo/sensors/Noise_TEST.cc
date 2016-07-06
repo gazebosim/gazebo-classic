@@ -124,7 +124,7 @@ void GaussianNoise(sensors::NoisePtr _noise, unsigned int _count)
   sensors::GaussianNoiseModelPtr noiseModel =
       std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(_noise);
 
-  ASSERT_TRUE(noiseModel != NULL);
+  ASSERT_TRUE(noiseModel != nullptr);
 
   // Use constant input and repeatedly add noise to it.
   double x = 42.0;
@@ -360,7 +360,7 @@ TEST_F(NoiseTest, OnApplyNoise)
   // Verify that the custom callback function is called if noise type is
   // set to CUSTOM
   sensors::NoisePtr noise(new sensors::Noise(sensors::Noise::CUSTOM));
-  ASSERT_TRUE(noise != NULL);
+  ASSERT_TRUE(noise != nullptr);
   EXPECT_TRUE(noise->GetNoiseType() == sensors::Noise::CUSTOM);
 
   noise->SetCustomNoiseCallback(

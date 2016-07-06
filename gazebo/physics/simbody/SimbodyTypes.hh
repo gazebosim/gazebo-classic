@@ -26,6 +26,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_simbody
+    /// \{
+
     class SimbodyCollision;
     class SimbodyLink;
     class SimbodyModel;
@@ -51,5 +54,6 @@ namespace gazebo
     /// \def SimbodyRayShapePtr
     /// \brief Boost shared point to SimbodyRayShape
     typedef boost::shared_ptr<SimbodyRayShape> SimbodyRayShapePtr;
+    /// \}
   }
 }

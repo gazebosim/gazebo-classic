@@ -29,6 +29,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief A two axis hinge joint
     class GZ_PHYSICS_VISIBLE DARTHinge2Joint : public Hinge2Joint<DARTJoint>
     {
@@ -67,6 +70,7 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
+    /// \}
   }
 }
 #endif

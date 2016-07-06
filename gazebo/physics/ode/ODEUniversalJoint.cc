@@ -30,14 +30,13 @@ using namespace physics;
 ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId, BasePtr _parent)
     : UniversalJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateUniversal(_worldId, NULL);
+  this->jointId = dJointCreateUniversal(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODEUniversalJoint::~ODEUniversalJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////
