@@ -51,6 +51,7 @@ set (qt_tests_local
   CollisionConfig_TEST.cc
   EditorMaterialSwitcher_TEST.cc
   ExtrudeDialog_TEST.cc
+  GUIInspector_TEST.cc
   JointCreationDialog_TEST.cc
   JointInspector_TEST.cc
   JointMaker_TEST.cc

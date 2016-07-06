@@ -65,26 +65,40 @@ namespace gazebo
       private slots: void OnPoseChanged(const QString &_name,
           const ignition::math::Pose3d &_value);
 
-      /// \brief Qt callback when a Vector3d value has changed.
+      /// \brief Qt callback when an unsigned int value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnUIntChanged(const QString &_name,
           const unsigned int _value);
 
-      /// \brief Qt callback when a Vector3d value has changed.
+      /// \brief Qt callback when a double value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnDoubleChanged(const QString &_name,
           const double _value);
 
-      /// \brief Qt callback when a Vector3d value has changed.
+      /// \brief Qt callback when a color value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnColorChanged(const QString &_name,
-          const common::Color &_value);
+          const gazebo::common::Color &_value);
+
+      /// \brief Qt callback when an enum value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnEnumChanged(const QString &_name,
+          const QString &_value);
+
+      /// \brief Qt callback when a bool value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnBoolChanged(const QString &_name,
+          const bool _value);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();

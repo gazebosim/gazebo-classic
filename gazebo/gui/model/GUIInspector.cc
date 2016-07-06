@@ -15,7 +15,9 @@
  *
 */
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/GUIInspector.hh"
 
@@ -54,28 +56,6 @@ using namespace gui;
 GUIInspector::GUIInspector(QWidget *_parent)
     : QDialog(_parent), dataPtr(new GUIInspectorPrivate)
 {
-  this->dataPtr->camera = gui::get_active_camera();
-  if (!this->dataPtr->camera)
-  {
-    gzerr << "Camera not found, inspector won't be created." << std::endl;
-    return;
-  }
-
-  // Get pointers from rendering
-  auto scene = this->dataPtr->camera->GetScene();
-  if (!scene)
-  {
-    gzerr << "Scene not found, inspector won't be created." << std::endl;
-    return;
-  }
-
-  this->dataPtr->grid = scene->GetGrid(0);
-  if (!this->dataPtr->grid)
-  {
-    gzerr << "Grid not found, inspector won't be created." << std::endl;
-    return;
-  }
-
   this->setObjectName("GUIInspectorDialog");
   this->setWindowTitle(tr("GUI Inspector"));
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
@@ -97,6 +77,8 @@ GUIInspector::GUIInspector(QWidget *_parent)
 
   // Custom projections widget
   std::vector<std::string> projs;
+  projs.push_back("perspective");
+  projs.push_back("orthographic");
   auto projWidget = this->dataPtr->configWidget->CreateEnumWidget(
       "Projection type", projs, 1);
   this->dataPtr->configWidget->AddConfigChildWidget("camera::projectionEnum",
@@ -128,7 +110,15 @@ GUIInspector::GUIInspector(QWidget *_parent)
 
   this->connect(this->dataPtr->configWidget,
       SIGNAL(ColorValueChanged(const QString &, const gazebo::common::Color &)),
-      this, SLOT(OnColorChanged(const QString &, const common::Color &)));
+      this, SLOT(OnColorChanged(const QString &, const gazebo::common::Color &)));
+
+  this->connect(this->dataPtr->configWidget,
+      SIGNAL(EnumValueChanged(const QString &, const QString &)),
+      this, SLOT(OnEnumChanged(const QString &, const QString &)));
+
+  this->connect(this->dataPtr->configWidget,
+      SIGNAL(BoolValueChanged(const QString &, const bool)),
+      this, SLOT(OnBoolChanged(const QString &, const bool)));
 
   // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
@@ -169,6 +159,12 @@ GUIInspector::GUIInspector(QWidget *_parent)
 
   // Qt signal / slot connections
   connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
+
+  // Get rendering pointers
+  this->dataPtr->camera = gui::get_active_camera();
+
+  auto scene = this->dataPtr->camera->GetScene();
+  this->dataPtr->grid = scene->GetGrid(0);
 }
 
 /////////////////////////////////////////////////
@@ -183,10 +179,10 @@ void GUIInspector::Update(ConstGUIPtr _guiMsg)
 }
 
 /////////////////////////////////////////////////
-void GUIInspector::OnPoseChanged(const QString &/*_name*/,
+void GUIInspector::OnPoseChanged(const QString &_name,
     const ignition::math::Pose3d &_value)
 {
-  if (_name == "camera::pose")
+  if (_name == "camera::pose" && this->dataPtr->camera)
     this->dataPtr->camera->SetWorldPose(_value);
 }
 
@@ -194,39 +190,65 @@ void GUIInspector::OnPoseChanged(const QString &/*_name*/,
 void GUIInspector::OnUIntChanged(const QString &_name,
     const unsigned int _value)
 {
-  if (_name == "grid::cell_count")
+  if (_name == "grid::cell_count" && this->dataPtr->grid)
     this->dataPtr->grid->SetCellCount(_value);
-  else if (_name == "grid::normal_cell_count")
+  else if (_name == "grid::normal_cell_count" && this->dataPtr->grid)
     this->dataPtr->grid->SetHeight(_value);
 }
 
 /////////////////////////////////////////////////
 void GUIInspector::OnDoubleChanged(const QString &_name, const double _value)
 {
-  if (_name == "grid::cell_size")
+  if (_name == "grid::cell_size" && this->dataPtr->grid)
     this->dataPtr->grid->SetCellLength(_value);
-  else if (_name == "grid::height_offset")
+  else if (_name == "grid::height_offset" && this->dataPtr->grid)
     this->dataPtr->grid->SetHeightOffset(_value);
 }
 
 /////////////////////////////////////////////////
-void GUIInspector::OnColorChanged(const QString &/*_name*/,
-    const common::Color &_value)
+void GUIInspector::OnColorChanged(const QString &_name,
+    const gazebo::common::Color &_value)
 {
-  if (_name == "grid::line_color")
+  if (_name == "grid::line_color" && this->dataPtr->grid)
     this->dataPtr->grid->SetColor(_value);
+}
+
+/////////////////////////////////////////////////
+void GUIInspector::OnEnumChanged(const QString &_name, const QString &_value)
+{
+  if (_name == "camera::projectionEnum" && this->dataPtr->camera)
+    this->dataPtr->camera->SetProjectionType(_value.toStdString());
+}
+
+/////////////////////////////////////////////////
+void GUIInspector::OnBoolChanged(const QString &_name, const bool _value)
+{
+  if (_name == "fullscreen")
+    gui::Events::fullScreen(_value);
 }
 
 /////////////////////////////////////////////////
 void GUIInspector::Open()
 {
   // Fill widgets
+  this->dataPtr->configWidget->SetBoolWidgetValue("fulscreen",
+      g_fullScreenAct->isChecked());
+
   // Camera
   this->dataPtr->configWidget->SetPoseWidgetValue("camera::pose",
       this->dataPtr->camera->WorldPose());
-
+  this->dataPtr->configWidget->SetEnumWidgetValue("camera::projectionEnum",
+      this->dataPtr->camera->ProjectionType());
 
   // Grid
+  this->dataPtr->configWidget->SetUIntWidgetValue("grid::cell_count",
+      this->dataPtr->grid->CellCount());
+  this->dataPtr->configWidget->SetUIntWidgetValue("grid::normal_cell_count",
+      this->dataPtr->grid->Height());
+  this->dataPtr->configWidget->SetDoubleWidgetValue("grid::cell_size",
+      this->dataPtr->grid->CellLength());
+  this->dataPtr->configWidget->SetDoubleWidgetValue("grid::height_offset",
+      this->dataPtr->grid->HeightOffset());
   this->dataPtr->configWidget->SetColorWidgetValue("grid::line_color",
       this->dataPtr->grid->Color());
 
