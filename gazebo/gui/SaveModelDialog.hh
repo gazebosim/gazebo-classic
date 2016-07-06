@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SAVE_DIALOG_HH_
-#define _SAVE_DIALOG_HH_
+#ifndef GAZEBO_GUI_SAVEMODELDIALOG_HH_
+#define GAZEBO_GUI_SAVEMODELDIALOG_HH_
 
 #include <string>
 #include <sdf/sdf.hh>
@@ -27,14 +26,14 @@ namespace gazebo
 {
   namespace gui
   {
-    class SaveDialogPrivate;
+    class SaveModelDialogPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class SaveDialog SaveDialog.hh gui/gui.hh
+    /// \class SaveModelDialog SaveModelDialog.hh gui/gui.hh
     /// \brief Dialog for saving to file.
-    class GZ_GUI_VISIBLE SaveDialog : public QDialog
+    class GZ_GUI_VISIBLE SaveModelDialog : public QDialog
     {
       Q_OBJECT
 
@@ -50,10 +49,10 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _mode Mode of the dialog.
       /// \param[in] _parent Parent QWidget.
-      public: SaveDialog(int _mode = 0, QWidget *_parent = 0);
+      public: SaveModelDialog(int _mode = 0, QWidget *_parent = 0);
 
       /// \brief Destructor.
-      public: ~SaveDialog();
+      public: ~SaveModelDialog();
 
       /// \brief Get the model name.
       /// \return The model name.
@@ -137,7 +136,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: SaveDialogPrivate *dataPtr;
+      private: SaveModelDialogPrivate *dataPtr;
     };
     /// \}
   }

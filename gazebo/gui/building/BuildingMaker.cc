@@ -31,7 +31,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
-#include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/SaveModelDialog.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingMakerPrivate.hh"
@@ -105,7 +105,8 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
       gui::editor::Events::ConnectToggleEditMode(
       std::bind(&BuildingMaker::OnEdit, this, std::placeholders::_1)));
 
-  this->dataPtr->saveDialog.reset(new SaveDialog(SaveDialog::BUILDING));
+  this->dataPtr->saveDialog.reset(
+      new SaveModelDialog(SaveModelDialog::BUILDING));
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());

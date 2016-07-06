@@ -15,13 +15,13 @@
  *
 */
 
-#include "gazebo/gui/SaveDialog.hh"
-#include "gazebo/gui/SaveDialog_TEST.hh"
+#include "gazebo/gui/SaveModelDialog.hh"
+#include "gazebo/gui/SaveModelDialog_TEST.hh"
 
 #include "test_config.h"
 
 /////////////////////////////////////////////////
-void SaveDialogTestHelper::CheckFileDialog()
+void SaveModelDialogTestHelper::CheckFileDialog()
 {
   QVERIFY(this->dialog);
 
@@ -38,9 +38,9 @@ void SaveDialogTestHelper::CheckFileDialog()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog_TEST::SaveLocation()
+void SaveModelDialog_TEST::SaveLocation()
 {
-  gazebo::gui::SaveDialog *saveDialog = new gazebo::gui::SaveDialog;
+  gazebo::gui::SaveModelDialog *saveDialog = new gazebo::gui::SaveModelDialog;
   QCoreApplication::processEvents();
 
   // Set the model name
@@ -68,7 +68,7 @@ void SaveDialog_TEST::SaveLocation()
   QVERIFY(browseButton);
 
   // set a path in the browse file dialog and verify value
-  SaveDialogTestHelper helper;
+  SaveModelDialogTestHelper helper;
   helper.dialog = saveDialog;
   QTimer::singleShot(0, &helper, SLOT(CheckFileDialog()));
   browseButton->click();
@@ -83,4 +83,4 @@ void SaveDialog_TEST::SaveLocation()
 }
 
 // Generate a main function for the test
-QTEST_MAIN(SaveDialog_TEST)
+QTEST_MAIN(SaveModelDialog_TEST)

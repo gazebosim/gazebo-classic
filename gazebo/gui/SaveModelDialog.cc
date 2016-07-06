@@ -27,17 +27,46 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/SaveDialogPrivate.hh"
-#include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/SaveModelDialog.hh"
 
 #include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 using namespace gui;
 
+class gazebo::gui::SaveDialogPrivate
+{
+  /// \brief Widget container to hold advanced model saving options.
+  public: QWidget *advancedOptionsWidget;
+
+  /// \brief Label appearing at the top of the dialog box.
+  public: QLabel *messageLabel;
+
+  /// \brief Editable line that holds the model name.
+  public: QLineEdit* modelNameLineEdit;
+
+  /// \brief Editable line that holds the model's version.
+  public: QLineEdit* modelVersionLineEdit;
+
+  /// \brief Editable line that holds the model's description.
+  public: QLineEdit* modelDescriptionLineEdit;
+
+  /// \brief Editable line that holds the model's author's name.
+  public: QLineEdit* modelAuthorNameLineEdit;
+
+  /// \brief Editable line that holds the model's author's email.
+  public: QLineEdit* modelAuthorEmailLineEdit;
+
+  /// \brief Editable line that holds the model's save location.
+  public: QLineEdit* modelLocationLineEdit;
+
+  /// \brief The model's config file.
+  public: TiXmlDocument modelConfig;
+};
+
 /////////////////////////////////////////////////
-SaveDialog::SaveDialog(int _mode, QWidget *_parent)
-  : QDialog(_parent), dataPtr(new SaveDialogPrivate)
+SaveModelDialog::SaveModelDialog(int _mode, QWidget *_parent)
+  : QDialog(_parent), dataPtr(new SaveModelDialogPrivate)
 {
   this->setObjectName("saveDialog");
   this->setWindowTitle(tr("Save Model"));
@@ -179,62 +208,62 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-SaveDialog::~SaveDialog()
+SaveModelDialog::~SaveModelDialog()
 {
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetModelName() const
+std::string SaveModelDialog::GetModelName() const
 {
   return this->dataPtr->modelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetSaveLocation() const
+std::string SaveModelDialog::GetSaveLocation() const
 {
   return this->dataPtr->modelLocationLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetAuthorName() const
+std::string SaveModelDialog::GetAuthorName() const
 {
   return this->dataPtr->modelAuthorNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetAuthorEmail() const
+std::string SaveModelDialog::GetAuthorEmail() const
 {
   return this->dataPtr->modelAuthorEmailLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetDescription() const
+std::string SaveModelDialog::GetDescription() const
 {
   return this->dataPtr->modelDescriptionLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetVersion() const
+std::string SaveModelDialog::GetVersion() const
 {
   return this->dataPtr->modelVersionLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::SetModelName(const std::string &_name)
+void SaveModelDialog::SetModelName(const std::string &_name)
 {
   this->dataPtr->modelNameLineEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::SetSaveLocation(const std::string &_location)
+void SaveModelDialog::SetSaveLocation(const std::string &_location)
 {
   this->dataPtr->modelLocationLineEdit->setText(tr(_location.c_str()));
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::OnBrowse()
+void SaveModelDialog::OnBrowse()
 {
   QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
   fileDialog.setFileMode(QFileDialog::Directory);
@@ -258,19 +287,19 @@ void SaveDialog::OnBrowse()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::OnCancel()
+void SaveModelDialog::OnCancel()
 {
   this->close();
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::OnAcceptSave()
+void SaveModelDialog::OnAcceptSave()
 {
   this->accept();
 }
 
 /////////////////////////////////////////////////
-bool SaveDialog::OnSaveAs()
+bool SaveModelDialog::OnSaveAs()
 {
   if (this->exec() == QDialog::Accepted)
   {
@@ -338,7 +367,7 @@ bool SaveDialog::OnSaveAs()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::ToggleAdvancedOptions(bool _checked)
+void SaveModelDialog::ToggleAdvancedOptions(bool _checked)
 {
   if (_checked)
   {
@@ -351,7 +380,7 @@ void SaveDialog::ToggleAdvancedOptions(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::AddDirToModelPaths(const std::string &_path)
+void SaveModelDialog::AddDirToModelPaths(const std::string &_path)
 {
   std::string parentDirectory = boost::filesystem::path(_path)
                                   .parent_path().string();
@@ -396,7 +425,7 @@ void SaveDialog::AddDirToModelPaths(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetTemplateConfigString()
+std::string SaveModelDialog::GetTemplateConfigString()
 {
   std::ostringstream newModelStr;
   newModelStr << "<?xml version=\"1.0\"?>"
@@ -414,7 +443,7 @@ std::string SaveDialog::GetTemplateConfigString()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::GenerateConfig()
+void SaveModelDialog::GenerateConfig()
 {
   // Create an xml config file
   this->dataPtr->modelConfig.Clear();
@@ -484,7 +513,7 @@ void SaveDialog::GenerateConfig()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::SaveToConfig()
+void SaveModelDialog::SaveToConfig()
 {
   boost::filesystem::path path(this->GetSaveLocation());
   path = path / "model.config";
@@ -495,7 +524,7 @@ void SaveDialog::SaveToConfig()
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::SaveToSDF(sdf::SDFPtr _modelSDF)
+void SaveModelDialog::SaveToSDF(sdf::SDFPtr _modelSDF)
 {
   std::ofstream savefile;
   boost::filesystem::path path(this->GetSaveLocation());
@@ -515,7 +544,7 @@ void SaveDialog::SaveToSDF(sdf::SDFPtr _modelSDF)
 }
 
 /////////////////////////////////////////////////
-std::string SaveDialog::GetFolderNameFromModelName(const std::string
+std::string SaveModelDialog::GetFolderNameFromModelName(const std::string
     &_modelName)
 {
   // Auto-generate folder name based on model name
@@ -540,7 +569,7 @@ std::string SaveDialog::GetFolderNameFromModelName(const std::string
 }
 
 /////////////////////////////////////////////////
-void SaveDialog::ModelNameChangedOnDialog(QString _modelName)
+void SaveModelDialog::ModelNameChangedOnDialog(QString _modelName)
 {
   std::string folderName = this->GetFolderNameFromModelName(
       _modelName.toStdString());
