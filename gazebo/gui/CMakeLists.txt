@@ -8,6 +8,7 @@ link_directories(
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
   ${Qt5Core_INCLUDE_DIRS}
+  ${QWT_INCLUDE_DIR}
 )
 
 set (CMAKE_AUTOMOC ON)
@@ -203,6 +204,7 @@ target_link_libraries(gazebo_gui
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${QWT_LIBRARY}
 )
 
 if (UNIX)

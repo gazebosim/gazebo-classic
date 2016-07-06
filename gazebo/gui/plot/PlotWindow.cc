@@ -15,6 +15,7 @@
  *
 */
 #include <mutex>
+#include <QtGui/QDrag>
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <QtGui/QDrag>
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/plot/VariablePillContainer.hh"

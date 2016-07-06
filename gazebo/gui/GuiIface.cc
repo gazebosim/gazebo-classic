@@ -86,7 +86,7 @@ void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
     const QString &_msg)
 {
   std::string msg = _msg.toStdString();
-  msg += "(" + _context.function + ")";
+  msg += std::string("(") + _context.function + ")";
 #else
 void messageHandler(QtMsgType _type, const char *_msg)
 {
