@@ -15,6 +15,7 @@
  *
 */
 
+#include <memory>
 #include <functional>
 
 #include <ignition/math/Angle.hh>
@@ -40,7 +41,7 @@ namespace gazebo
     public: sensors::CameraSensorPtr parentSensor;
 
     /// \brief Selection buffer used for occlusion detection
-    public: rendering::SelectionBuffer *selectionBuffer = NULL;
+    public: std::unique_ptr<rendering::SelectionBuffer> selectionBuffer;
 
     /// \brief All event connections.
     public: std::vector<event::ConnectionPtr> connections;
@@ -100,7 +101,6 @@ ArduCopterIRLockPlugin::~ArduCopterIRLockPlugin()
 {
   this->dataPtr->connections.clear();
   this->dataPtr->parentSensor.reset();
-  delete this->dataPtr->selectionBuffer;
 }
 
 /////////////////////////////////////////////////
@@ -153,9 +153,9 @@ void ArduCopterIRLockPlugin::OnNewFrame(const unsigned char * /*_image*/,
   if (!this->dataPtr->selectionBuffer)
   {
     std::string cameraName = camera->OgreCamera()->getName();
-    this->dataPtr->selectionBuffer = new rendering::SelectionBuffer(cameraName,
-        scene->OgreSceneManager(),
-        camera->RenderTexture()->getBuffer()->getRenderTarget());
+    this->dataPtr->selectionBuffer.reset(
+        new rendering::SelectionBuffer(cameraName, scene->OgreSceneManager(),
+        camera->RenderTexture()->getBuffer()->getRenderTarget()));
   }
 
   for (const auto &f : this->dataPtr->fiducials)
