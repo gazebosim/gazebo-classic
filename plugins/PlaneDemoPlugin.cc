@@ -43,18 +43,18 @@ PlaneDemoPlugin::~PlaneDemoPlugin()
 void PlaneDemoPlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_model, "PlaneDemoPlugin _model pointer is NULL");
+  GZ_ASSERT(_model, "PlaneDemoPlugin _model pointer is nullptr");
   this->model = _model;
   this->modelName = _model->GetName();
   this->sdf = _sdf;
 
   this->world = this->model->GetWorld();
-  GZ_ASSERT(this->world, "PlaneDemoPlugin world pointer is NULL");
+  GZ_ASSERT(this->world, "PlaneDemoPlugin world pointer is nullptr");
 
   this->physics = this->world->GetPhysicsEngine();
-  GZ_ASSERT(this->physics, "PlaneDemoPlugin physics pointer is NULL");
+  GZ_ASSERT(this->physics, "PlaneDemoPlugin physics pointer is nullptr");
 
-  GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
+  GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is nullptr");
 
   gzerr << "model: " << this->model->GetName() << "\n";
 
@@ -69,7 +69,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         std::string jointName = enginePtr->Get<std::string>("joint_name");
         gzerr << jointName << "\n";
         physics::JointPtr joint = this->model->GetJoint(jointName);
-        if (joint.get() != NULL)
+        if (joint.get() != nullptr)
         {
           EngineControl ec;
           // ec.name = enginePtr->GetAttribute("name")->GetAsString();
@@ -102,7 +102,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         std::string linkName = thrusterPtr->Get<std::string>("link_name");
         gzerr << linkName << "\n";
         physics::LinkPtr link = this->model->GetLink(linkName);
-        if (link.get() != NULL)
+        if (link.get() != nullptr)
         {
           ThrusterControl tc;
           // tc.name = thrusterPtr->GetAttribute("name")->GetAsString();
@@ -131,7 +131,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
       std::string jointName = controlPtr->Get<std::string>("joint_name");
       gzerr << jointName << "\n";
       physics::JointPtr joint = this->model->GetJoint(jointName);
-      if (joint.get() != NULL)
+      if (joint.get() != nullptr)
       {
         JointControl jc;
         // jc.name = controlPtr->GetAttribute("name")->GetAsString();

@@ -56,13 +56,12 @@ bool getSdfParam(sdf::ElementPtr sdf, const std::string& name,
     param = sdf->GetElement(name)->Get<T>();
     return true;
   }
-  else
-  {
-    param = default_value;
-    if (verbose)
-      gzerr << "[ArduCopterPlugin] Please specify a value for parameter ["
-            << name << "].\n";
-  }
+
+  param = default_value;
+  if (verbose)
+    gzerr << "[ArduCopterPlugin] Please specify a value for parameter ["
+	<< name << "].\n";
+
   return false;
 }
 

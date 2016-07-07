@@ -39,7 +39,10 @@ ArduCopterPlugin::ArduCopterPlugin()
   int one = 1;
   setsockopt(this->handle, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
 
-  this->bind("127.0.0.1", 9002);
+  if (! this->bind("127.0.0.1", 9002))
+  {
+    gzerr << "Failed to connect to socket in 127.0.0.1 port 9002 \n";
+  }
 
   setsockopt(this->handle, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
   fcntl(this->handle, F_SETFL, fcntl(this->handle, F_GETFL, 0) | O_NONBLOCK);
@@ -125,11 +128,18 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         rotor.multiplier = 1;
         gzerr << "Please specify a turning"
-              << " direction multiplier ('cw' or 'ccw'). Default 1.\n";
+              << " direction multiplier ('cw' or 'ccw'). Default is ccw.\n";
       }
 
       getSdfParam<double>(rotorSDF, "rotorVelocitySlowdownSim",
         rotor.rotorVelocitySlowdownSim, 1);
+
+      if (rotor.rotorVelocitySlowdownSim < 0.0000001)
+      {
+        gzwarn << "rotorVelocitySlowdownSim can not be 0.0. Changed to default: "
+               << Rotor::kDefaultRotorVelocitySlowdownSim;
+        rotor.rotorVelocitySlowdownSim = Rotor::kDefaultRotorVelocitySlowdownSim;
+      }
 
       getSdfParam<double>(rotorSDF, "frequencyCutoff",
         rotor.frequencyCutoff, rotor.frequencyCutoff);
