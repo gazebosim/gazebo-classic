@@ -153,9 +153,11 @@ TopToolbar::TopToolbar(QWidget *_parent)
   QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
   spacerAction->setObjectName("toolbarSpacerAction");
 
-  // Screenshot / logging
+  // Screenshot / video / logging
   if (g_screenshotAct)
     this->dataPtr->toolbar->addAction(g_screenshotAct);
+  if (g_recordVideoAct)
+    this->dataPtr->toolbar->addAction(g_recordVideoAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
 
