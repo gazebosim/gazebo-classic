@@ -300,7 +300,10 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       if (rotorSDF->HasElement("linkName"))
         rotor.linkName = rotorSDF->Get<std::string>("linkName");
       else
-        gzerr << "Please specify a linkName for the rotor\n";
+      {
+        gzerr << "Please specify a linkName for the rotor. Aborting plugin.\n";
+        return;
+      }
 
       rotor.link = _model->GetLink(rotor.linkName);
       if (rotor.link == nullptr)
