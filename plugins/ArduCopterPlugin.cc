@@ -338,6 +338,14 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "rotorVelocitySlowdownSim",
           rotor.rotorVelocitySlowdownSim, 1);
 
+      if (math::equal(rotor.rotorVelocitySlowdownSim, 0.0))
+      {
+        gzerr << "rotor for joint [" << rotor.jointName
+              << "] rotorVelocitySlowdownSim is zero,"
+              << " aborting plugin.\n";
+        return;
+      }
+
       getSdfParam<double>(rotorSDF, "frequencyCutoff",
           rotor.frequencyCutoff, rotor.frequencyCutoff);
       getSdfParam<double>(rotorSDF, "samplingRate",
