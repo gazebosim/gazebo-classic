@@ -1772,7 +1772,7 @@ namespace gazebo
       }
       else
       {
-        gzwarn << "Conversion of sensor type[" << type << "] not suppported."
+        gzwarn << "Conversion of sensor type[" << type << "] not supported."
           << std::endl;
       }
 

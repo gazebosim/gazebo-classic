@@ -293,34 +293,51 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
-  // Default window size is entire desktop.
-  QSize winSize = QApplication::desktop()->screenGeometry().size();
-
   // Get the size properties from the INI file.
-  int winWidth = getINIProperty<int>("geometry.width", winSize.width());
-  int winHeight = getINIProperty<int>("geometry.height", winSize.height());
+  int winWidth = getINIProperty<int>("geometry.width", -1);
+  int winHeight = getINIProperty<int>("geometry.height", -1);
 
-  winWidth = winWidth < 0 ? winSize.width() : winWidth;
-  winHeight = winHeight < 0 ? winSize.height() : winHeight;
-
-  // Get the position properties from the INI file.
-  int winXPos = getINIProperty<int>("geometry.x", 0);
-  int winYPos = getINIProperty<int>("geometry.y", 0);
-
-  this->setGeometry(winXPos, winYPos, winWidth, winHeight);
-
-  if (this->width() > winWidth)
+  // Width or height were not specified. Therefore make the window
+  // maximized.
+  if (winWidth <= 0 || winHeight <= 0)
   {
-    gzwarn << "Requested geometry.width of " << winWidth
-           << " but the minimum width of the window is "
-           << this->width() << "." << std::endl;
+    // Output error if the gui.ini file has missing value.
+    if (winWidth > 0)
+    {
+      gzerr << "gui.ini file has width but not height specified. "
+       << "The main window will appear maximized.\n";
+    }
+
+    // Output error if the gui.ini file has missing value.
+    if (winHeight > 0)
+    {
+      gzerr << "gui.ini file has height but not width specified. "
+       << "The main window will appear maximized.\n";
+    }
+
+    this->showMaximized();
   }
-
-  if (this->height() > winHeight)
+  else
   {
-    gzwarn << "Requested geometry.height of " << winHeight
-           << " but the minimum height of the window is "
-           << this->height() << "." << std::endl;
+    // Get the position properties from the INI file.
+    int winXPos = getINIProperty<int>("geometry.x", 0);
+    int winYPos = getINIProperty<int>("geometry.y", 0);
+
+    this->setGeometry(winXPos, winYPos, winWidth, winHeight);
+
+    if (this->width() > winWidth)
+    {
+      gzwarn << "Requested geometry.width of " << winWidth
+        << " but the minimum width of the window is "
+        << this->width() << "." << std::endl;
+    }
+
+    if (this->height() > winHeight)
+    {
+      gzwarn << "Requested geometry.height of " << winHeight
+        << " but the minimum height of the window is "
+        << this->height() << "." << std::endl;
+    }
   }
 
   this->dataPtr->worldControlPub =

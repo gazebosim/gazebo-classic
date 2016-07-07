@@ -7,6 +7,11 @@
     * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
     * [Pull request #2382](https://bitbucket.org/osrf/gazebo/pull-request/2382)
 
+1. Renamed `gazebo/gui/SaveDialog` to `gazebo/gui/SaveEntityDialog`. A new
+   `SaveDialog` class will be added in a future pull request. The migration
+   guide will be updated with that pull request.
+    * [Pull request #2384](https://bitbucket.org/osrf/gazebo/pull-request/2384)
+
 1. Add FiducialCameraPlugin for Camera Sensors
     * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
 
@@ -126,6 +131,9 @@
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
+
+1. Redirect QT messages to Gazebo's console message handling system.
+    * [Pull request 2375](https://bitbucket.org/osrf/gazebo/pull-request/2375)
 
 1. Fix Model Manipulator switching between local and global frames
     * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
