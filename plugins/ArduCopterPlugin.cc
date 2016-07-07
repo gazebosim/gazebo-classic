@@ -225,7 +225,11 @@ ArduCopterPlugin::ArduCopterPlugin()
   setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
       &one, sizeof(one));
 
-  this->dataPtr->Bind("127.0.0.1", 9002);
+  if (!this->dataPtr->Bind("127.0.0.1", 9002))
+  {
+    gzerr << "failed to bind with 127.0.0.1:9002, aborting plugin.\n";
+    return;
+  }
 
   setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
       &one, sizeof(one));
