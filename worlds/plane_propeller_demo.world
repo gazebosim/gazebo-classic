@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.6">
   <world name="default">
     <gui>
       <camera name="user_camera">
@@ -27,11 +27,6 @@
     <include>
       <uri>model://sun</uri>
     </include>
-<!--
-    <include>
-      <uri>model://drc_terrain</uri>
-    </include>
--->
 
     <model name="ground_plane">
       <static>true</static>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: A 4-wheeled vehicle
- * Author: Nate Koenig
- */
+#ifndef GAZEBO_GAZEBO_SMALL2DGIMBALLPLUGIN_HH_
+#define GAZEBO_GAZEBO_SMALL2DGIMBALLPLUGIN_HH_
 
-#ifndef _GAZEBO_SMALL_2D_GIMBALL_PLUGIN_HH_
-#define _GAZEBO_SMALL_2D_GIMBALL_PLUGIN_HH_
-
-#include <string>
-#include <vector>
-
-#include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/transport/transport.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  // Forward declare private data class
+  class Small2dGimbalPluginPrivate;
+
   class GAZEBO_VISIBLE Small2dGimbalPlugin : public ModelPlugin
   {
     /// \brief Constructor
@@ -43,26 +37,8 @@ namespace gazebo
 
     private: void OnUpdate();
 
-    private: void OnStringMsg(ConstGzStringPtr &_msg);
-
-    private: std::vector<event::ConnectionPtr> connections;
-
-    private: transport::SubscriberPtr sub;
-
-    private: transport::PublisherPtr pub;
-
-    private: physics::ModelPtr model;
-
-    private: physics::JointPtr tiltJoint;
-
-    private: std::string status;
-
-    private: double command;
-
-    private: transport::NodePtr node;
-
-    private: common::PID pid;
-    private: common::Time lastUpdateTime;
+    /// \brief Private data pointer
+    private: std::unique_ptr<Small2dGimbalPluginPrivate> dataPtr;
   };
 }
 #endif
