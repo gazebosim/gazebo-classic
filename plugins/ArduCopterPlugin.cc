@@ -332,7 +332,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         rotor.multiplier = 1;
         gzerr << "Please specify a turning"
-          << " direction multiplier ('cw' or 'ccw'). Default 1.\n";
+          << " direction multiplier ('cw' or 'ccw'). Default 'ccw'.\n";
       }
 
       getSdfParam<double>(rotorSDF, "rotorVelocitySlowdownSim",
