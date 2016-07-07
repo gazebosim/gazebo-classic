@@ -2,6 +2,11 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Renamed `gazebo/gui/SaveDialog` to `gazebo/gui/SaveEntityDialog`. A new
+   `SaveDialog` class will be added in a future pull request. The migration
+   guide will be updated with that pull request.
+    * [Pull request #2384](https://bitbucket.org/osrf/gazebo/pull-request/2384)
+
 1. Add FiducialCameraPlugin for Camera Sensors
     * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
 
