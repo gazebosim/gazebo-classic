@@ -19,7 +19,7 @@
 @set GAZEBO_MODEL_PATH=%gz_root_path%\models
 @set GAZEBO_PLUGINS_PATH=%gz_build_path%\plugins
 @set GAZEBO_RESOURCE_PATH=%gz_root_path%
-@set OGRE_RESORCE_PATH=%deps_path%\OGRE-SDK-1.9.0-vc120-x64-12.03.2016\bin\%build_type%
+@set OGRE_RESOURCE_PATH=%deps_path%\OGRE-SDK-1.9.0-vc120-x64-12.03.2016\bin\%build_type%
 
 @set PATH=%deps_path%\boost_1_56_0\lib64-msvc-12.0;^
 %deps_path%\FreeImage-vc12-x64-release-debug\x64\%build_type%\DLL;^
