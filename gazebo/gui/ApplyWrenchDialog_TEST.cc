@@ -500,7 +500,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
 
   if (!found)
   {
-    QFAIL("Couldn't find forcce visual, interrupting test.");
+    QFAIL("Couldn't find force visual, interrupting test.");
     return;
   }
 
