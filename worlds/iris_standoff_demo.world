@@ -37,7 +37,6 @@ to fly iris with a ps2 joystick.
       </camera>
     </gui>
     <physics type="ode">
-      <gravity>0.0 0.0 -9.81</gravity>
       <ode>
         <solver>
           <type>quick</type>

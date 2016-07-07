@@ -7,7 +7,6 @@
       </camera>
     </gui>
     <physics type="ode">
-      <gravity>0.0 0.0 -10.00</gravity>
       <ode>
         <solver>
           <type>quick</type>
