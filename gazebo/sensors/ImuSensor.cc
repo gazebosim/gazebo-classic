@@ -54,12 +54,21 @@ ImuSensor::ImuSensor()
 //////////////////////////////////////////////////
 ImuSensor::~ImuSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
 void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
+
+  // Initialize orientation to identity.
+  msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
+      ignition::math::Quaterniond::Identity);
+
+  // initialize worldToReference transform as local frame
+  this->dataPtr->worldToReference = this->pose +
+    this->dataPtr->parentEntity->GetWorldPose().Ign();
 
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
@@ -201,11 +210,15 @@ void ImuSensor::Load(const std::string &_worldName)
     gzthrow("IMU has invalid parent[" + this->ParentName() +
             "]. Must be a link\n");
   }
-  this->dataPtr->referencePose = this->pose +
-    this->dataPtr->parentEntity->GetWorldPose().Ign();
-  this->dataPtr->lastLinearVel =
-    this->dataPtr->referencePose.Rot().RotateVector(
-        this->dataPtr->parentEntity->GetWorldLinearVel().Ign());
+
+  /////////////////////////////////////////////////////////////////
+  // compute the last linear velocity of the imu in the world frame
+  // for computing acceleration based on finite differencing
+  /////////////////////////////////////////////////////////////////
+  // next, account for vel in world frame of the imu
+  // given the imu frame is offset from link frame, and link is rotating
+  this->dataPtr->lastImuWorldLinearVel =
+      this->dataPtr->parentEntity->GetWorldLinearVel(this->pose.Pos()).Ign();
 }
 
 //////////////////////////////////////////////////
@@ -217,8 +230,19 @@ void ImuSensor::Init()
 //////////////////////////////////////////////////
 void ImuSensor::Fini()
 {
-  this->dataPtr->parentEntity->SetPublishData(false);
-  this->dataPtr->pub.reset();
+  // Clean transport
+  {
+    this->dataPtr->pub.reset();
+    this->dataPtr->linkDataSub.reset();
+  }
+
+  if (this->dataPtr->parentEntity)
+    this->dataPtr->parentEntity->SetPublishData(false);
+  this->dataPtr->parentEntity.reset();
+
+  this->dataPtr->incomingLinkData[0].reset();
+  this->dataPtr->incomingLinkData[1].reset();
+
   Sensor::Fini();
 }
 
@@ -273,8 +297,17 @@ ignition::math::Quaterniond ImuSensor::Orientation() const
 //////////////////////////////////////////////////
 void ImuSensor::SetReferencePose()
 {
-  this->dataPtr->referencePose =
-    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+  // this call sets the current imu pose as the imu's reference pose
+  this->SetWorldToReferencePose(
+      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+}
+
+//////////////////////////////////////////////////
+void ImuSensor::SetWorldToReferencePose(
+  const ignition::math::Pose3d &_pose)
+{
+  // worldToReference: from world frame to IMU Reference frame.
+  this->dataPtr->worldToReference = _pose;
 }
 
 //////////////////////////////////////////////////
@@ -310,45 +343,60 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
 
     this->dataPtr->imuMsg.set_entity_name(this->ParentName());
 
-    this->dataPtr->gravity =
-      this->world->GetPhysicsEngine()->GetGravity().Ign();
+    this->dataPtr->gravity = this->world->Gravity();
 
     msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 
     ignition::math::Pose3d parentEntityPose =
       this->dataPtr->parentEntity->GetWorldPose().Ign();
-    ignition::math::Pose3d imuPose = this->pose + parentEntityPose;
+    ignition::math::Pose3d imuWorldPose = this->pose + parentEntityPose;
 
     // Get the angular velocity
-    ignition::math::Vector3d imuWorldAngularVel = msgs::ConvertIgn(
+    ignition::math::Vector3d linkWorldAngularVel = msgs::ConvertIgn(
         msg.angular_velocity());
 
-    // Set the IMU angular velocity
-    this->dataPtr->angularVel = imuPose.Rot().Inverse().RotateVector(
-        imuWorldAngularVel);
+    /////////////////////////////////////////////////////////////////////
+    // Set the IMU angular velocity (defined in imu's local frame)
+    /////////////////////////////////////////////////////////////////////
+    this->dataPtr->angularVel = imuWorldPose.Rot().Inverse().RotateVector(
+        linkWorldAngularVel);
     msgs::Set(this->dataPtr->imuMsg.mutable_angular_velocity(),
         this->dataPtr->angularVel);
 
-    // Compute and set the IMU linear acceleration
-    ignition::math::Vector3d imuWorldLinearVel
+    /////////////////////////////////////////////////////////////////////
+    // Compute and set the IMU linear acceleration in the imu local frame
+    /////////////////////////////////////////////////////////////////////
+    // first get imu link's linear velocity in world frame
+    ignition::math::Vector3d linkWorldLinearVel
         = msgs::ConvertIgn(msg.linear_velocity());
-    // Get the correct vel for imu's that are at an offset from parent link
-    imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.Pos() - imuPose.Pos());
-    this->dataPtr->linearAcc = imuPose.Rot().Inverse().RotateVector(
-      (imuWorldLinearVel - this->dataPtr->lastLinearVel) / dt);
+    // next, account for vel in world frame of the imu
+    // given the imu frame is offset from link frame, and link is rotating
+    // compute the velocity of the imu axis origin in world frame
+    ignition::math::Vector3d imuWorldLinearVel = linkWorldLinearVel +
+        linkWorldAngularVel.Cross(imuWorldPose.Pos() - parentEntityPose.Pos());
+    // compute acceleration by differentiating velocity in world frame,
+    // and rotate into imu local frame
+    this->dataPtr->linearAcc = imuWorldPose.Rot().Inverse().RotateVector(
+      (imuWorldLinearVel - this->dataPtr->lastImuWorldLinearVel) / dt);
 
     // Add contribution from gravity
-    this->dataPtr->linearAcc -= imuPose.Rot().Inverse().RotateVector(
+    // Do we want to skip if link does not have gravity enabled?
+    //   e.g. if (this->dataPtr->parentEntity->GetGravityMode())
+    this->dataPtr->linearAcc -= imuWorldPose.Rot().Inverse().RotateVector(
         this->dataPtr->gravity);
+
+    // publish linear acceleration
     msgs::Set(this->dataPtr->imuMsg.mutable_linear_acceleration(),
         this->dataPtr->linearAcc);
 
     // Set the IMU orientation
+    // imu orientation with respect to reference frame
+    ignition::math::Quaterniond imuReferenceOrientation =
+      (imuWorldPose - this->dataPtr->worldToReference).Rot();
     msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
-              (imuPose - this->dataPtr->referencePose).Rot());
+      imuReferenceOrientation);
 
-    this->dataPtr->lastLinearVel = imuWorldLinearVel;
+    this->dataPtr->lastImuWorldLinearVel = imuWorldLinearVel;
 
     // Apply noise models
     for (auto const &keyNoise : this->noises)

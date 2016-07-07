@@ -30,7 +30,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
     : Collision(_parent)
 {
   this->SetName("Bullet_Collision");
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   this->surface.reset(new BulletSurfaceParams());
 }
 
@@ -39,7 +39,7 @@ BulletCollision::~BulletCollision()
 {
   /*
   delete this->collisionShape;
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   */
 }
 
@@ -58,8 +58,9 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  math::Pose pose = this->GetRelativePose();
-  BulletLinkPtr bbody = boost::dynamic_pointer_cast<BulletLink>(this->parent);
+  // math::Pose pose = this->GetRelativePose();
+  // BulletLinkPtr bbody =
+  //     boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
 }

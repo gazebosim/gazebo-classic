@@ -27,8 +27,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/common/CommonTypes.hh"
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Base.hh"

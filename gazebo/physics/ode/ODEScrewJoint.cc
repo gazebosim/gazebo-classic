@@ -37,14 +37,13 @@ using namespace physics;
 ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
     : ScrewJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateScrew(_worldId, NULL);
+  this->jointId = dJointCreateScrew(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODEScrewJoint::~ODEScrewJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

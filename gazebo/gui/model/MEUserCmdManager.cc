@@ -43,6 +43,16 @@ namespace gazebo
 
       /// \brief Fully scoped name of the entity involved in the command.
       public: std::string scopedName;
+
+      /// \brief If the command is related to a joint, this is its unique Id.
+      /// It's different from the scopedName and we need both.
+      public: std::string jointId;
+
+      /// \brief Pose before the command (to be used by undo).
+      public: ignition::math::Pose3d poseBefore;
+
+      /// \brief Pose after the command (to be used by redo).
+      public: ignition::math::Pose3d poseAfter;
     };
 
     /// \internal
@@ -109,6 +119,52 @@ void MEUserCmd::Undo()
   {
     model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
   }
+  // Inserting joint
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+     !this->dataPtr->jointId.empty())
+  {
+    model::Events::requestJointRemoval(this->dataPtr->jointId);
+  }
+  // Deleting joint
+  else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
+      this->dataPtr->sdf)
+  {
+    auto topModelName = this->dataPtr->scopedName;
+    size_t pIdx = topModelName.find("::");
+    if (pIdx != std::string::npos)
+      topModelName = topModelName.substr(0, pIdx);
+
+    model::Events::requestJointInsertion(this->dataPtr->sdf, topModelName);
+  }
+  // Moving a link
+  else if (this->dataPtr->type == MEUserCmd::MOVING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkMove(this->dataPtr->scopedName,
+        this->dataPtr->poseBefore);
+  }
+  // Moving a nested model
+  else if (this->dataPtr->type == MEUserCmd::MOVING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelMove(this->dataPtr->scopedName,
+        this->dataPtr->poseBefore);
+  }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName, false);
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml(), false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -138,6 +194,52 @@ void MEUserCmd::Redo()
   {
     model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
   }
+  // Inserting joint
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+     this->dataPtr->sdf)
+  {
+    auto topModelName = this->dataPtr->scopedName;
+    size_t pIdx = topModelName.find("::");
+    if (pIdx != std::string::npos)
+      topModelName = topModelName.substr(0, pIdx);
+
+    model::Events::requestJointInsertion(this->dataPtr->sdf, topModelName);
+  }
+  // Deleting joint
+  else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
+     !this->dataPtr->jointId.empty())
+  {
+    model::Events::requestJointRemoval(this->dataPtr->jointId);
+  }
+  // Moving a link
+  else if (this->dataPtr->type == MEUserCmd::MOVING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkMove(this->dataPtr->scopedName,
+        this->dataPtr->poseAfter);
+  }
+  // Moving a nested model
+  else if (this->dataPtr->type == MEUserCmd::MOVING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelMove(this->dataPtr->scopedName,
+        this->dataPtr->poseAfter);
+  }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml(), false);
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName, false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -162,6 +264,20 @@ void MEUserCmd::SetSDF(sdf::ElementPtr _sdf)
 void MEUserCmd::SetScopedName(const std::string &_name)
 {
   this->dataPtr->scopedName = _name;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetJointId(const std::string &_id)
+{
+  this->dataPtr->jointId = _id;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetPoseChange(const ignition::math::Pose3d &_before,
+    const ignition::math::Pose3d &_after)
+{
+  this->dataPtr->poseBefore = _before;
+  this->dataPtr->poseAfter = _after;
 }
 
 /////////////////////////////////////////////////

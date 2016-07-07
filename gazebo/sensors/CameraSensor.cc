@@ -168,7 +168,6 @@ void CameraSensor::Init()
 void CameraSensor::Fini()
 {
   this->imagePub.reset();
-  Sensor::Fini();
 
   if (this->camera)
   {
@@ -176,7 +175,8 @@ void CameraSensor::Fini()
   }
 
   this->camera.reset();
-  this->scene.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -280,7 +280,7 @@ const unsigned char *CameraSensor::ImageData() const
   if (this->camera)
     return this->camera->ImageData(0);
   else
-    return NULL;
+    return nullptr;
 }
 
 //////////////////////////////////////////////////

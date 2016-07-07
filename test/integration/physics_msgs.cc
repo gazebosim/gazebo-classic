@@ -52,12 +52,12 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
 
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // Set Gravity by publishing to "~/physics"
   transport::PublisherPtr physicsPub =
@@ -66,31 +66,30 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   // it doesn't actually seem to matter what type you set
   msg.set_type(msgs::Physics::Type_MIN);
 
-  std::vector<math::Vector3> gravity;
-  gravity.push_back(math::Vector3(0, 0, 9.81));
-  gravity.push_back(math::Vector3(0, 0, -20));
-  gravity.push_back(math::Vector3(0, 0, 20));
-  gravity.push_back(math::Vector3(0, 0, 0));
-  gravity.push_back(math::Vector3(0, 0, -9.81));
-  gravity.push_back(math::Vector3(1, 1, 9.81));
-  gravity.push_back(math::Vector3(2, 3, -20));
-  gravity.push_back(math::Vector3(2, -3, 20));
-  gravity.push_back(math::Vector3(-2, 3, 0));
-  gravity.push_back(math::Vector3(-2, -3, -9.81));
+  std::vector<ignition::math::Vector3d> gravityValues;
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, 9.81));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, -20));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, 20));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, 0));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, -9.81));
+  gravityValues.push_back(ignition::math::Vector3d(1, 1, 9.81));
+  gravityValues.push_back(ignition::math::Vector3d(2, 3, -20));
+  gravityValues.push_back(ignition::math::Vector3d(2, -3, 20));
+  gravityValues.push_back(ignition::math::Vector3d(-2, 3, 0));
+  gravityValues.push_back(ignition::math::Vector3d(-2, -3, -9.81));
 
-  for (std::vector<math::Vector3>::iterator iter = gravity.begin();
-       iter != gravity.end(); ++iter)
+  for (auto const &gravity : gravityValues)
   {
-    msgs::Set(msg.mutable_gravity(), (*iter).Ign());
+    msgs::Set(msg.mutable_gravity(), gravity);
     physicsPub->Publish(msg);
 
-    while (*iter != physics->GetGravity())
+    while (gravity != world->Gravity())
     {
       world->Step(1);
       common::Time::MSleep(1);
     }
 
-    EXPECT_EQ(*iter, physics->GetGravity());
+    EXPECT_EQ(gravity, world->Gravity());
   }
 }
 
@@ -406,11 +405,11 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -507,7 +506,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   }
 
   // Predict time of contact with ground plane.
-  double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.z));
+  double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();

@@ -35,14 +35,13 @@ using namespace physics;
 ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
     : HingeJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateHinge(_worldId, NULL);
+  this->jointId = dJointCreateHinge(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODEHingeJoint::~ODEHingeJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

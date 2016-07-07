@@ -34,6 +34,7 @@
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
+
 #ifdef _WIN32
   const auto& gzstrtok = strtok_s;
 #else
@@ -98,7 +99,7 @@ const char *common::getEnv(const char *_name)
   if (GetEnvironmentVariable(_name, buffer, buffSize))
     return buffer;
   else
-    return NULL;
+    return nullptr;
 #else
   return getenv(_name);
 #endif
@@ -117,7 +118,7 @@ std::vector<std::string> common::split(const std::string &_str,
   while (token)
   {
     tokens.push_back(token);
-    token = gzstrtok(NULL, _delim.c_str(), &saveptr);
+    token = gzstrtok(nullptr, _delim.c_str(), &saveptr);
   }
 
   free(str);

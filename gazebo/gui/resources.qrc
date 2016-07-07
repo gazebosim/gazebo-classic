@@ -19,6 +19,9 @@
   <file>images/scale.png</file>
   <file>images/arrow.png</file>
   <file>images/down_arrow.png</file>
+  <file>images/branch-more.png</file>
+  <file>images/branch-end.png</file>
+  <file>images/vline.png</file>
   <file>images/box_selection.png</file>
   <file>images/redo.png</file>
   <file>images/rulers.png</file>
@@ -70,7 +73,6 @@
   <file>images/view_angle_left.png</file>
   <file>images/view_angle_right.png</file>
   <file>images/view_angle_home.png</file>
-  <file>hotkeyTable.html</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
@@ -79,5 +81,25 @@
   <file>images/splash.svg</file>
   <file>images/swap-parent-child.png</file>
   <file>images/child-link.png</file>
+  <file>images/settings.svg</file>
+  <file>images/graph_line.svg</file>
+  <file>images/graph_line_toolbar.svg</file>
+  <file>images/search.svg</file>
+  <file>images/model.svg</file>
+  <file>images/link.svg</file>
+  <file>images/joint.svg</file>
+
+  <file>fonts/Roboto-Black.ttf</file>
+  <file>fonts/Roboto-BlackItalic.ttf</file>
+  <file>fonts/Roboto-Bold.ttf</file>
+  <file>fonts/Roboto-BoldItalic.ttf</file>
+  <file>fonts/Roboto-Italic.ttf</file>
+  <file>fonts/Roboto-Light.ttf</file>
+  <file>fonts/Roboto-LightItalic.ttf</file>
+  <file>fonts/Roboto-Medium.ttf</file>
+  <file>fonts/Roboto-MediumItalic.ttf</file>
+  <file>fonts/Roboto-Regular.ttf</file>
+  <file>fonts/Roboto-Thin.ttf</file>
+  <file>fonts/Roboto-ThinItalic.ttf</file>
 </qresource>
 </RCC>

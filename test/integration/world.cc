@@ -17,10 +17,23 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture
+class WorldTest : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
 {
+  /// \brief Test clearing an empty (blank) world.
+  /// \param[in] _physicsEngine Name of physics engine.
+  public: void ClearEmptyWorld(const std::string &_physicsEngine);
+
+  /// \brief Test Gravity, SetGravity
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void Gravity(const std::string &_physicsEngine);
+
+  /// \brief Test MagneticField, SetMagneticField
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MagneticField(const std::string &_physicsEngine);
 };
 
 /// \brief Pose after physics update
@@ -72,11 +85,17 @@ void onWorldUpdateEnd()
 }
 
 /////////////////////////////////////////////////
-TEST_F(WorldTest, ClearEmptyWorld)
+void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
 {
-  Load("worlds/blank.world");
+  this->Load("worlds/blank.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  gzdbg << "Engine: " << _physicsEngine << std::endl;
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -91,6 +110,12 @@ TEST_F(WorldTest, ClearEmptyWorld)
   // Now spawn something, and the model count should increase
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, ClearEmptyWorld)
+{
+  ClearEmptyWorld(GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -111,6 +136,81 @@ TEST_F(WorldTest, Clear)
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
 
   EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
+void WorldTest::Gravity(const std::string &_physicsEngine)
+{
+  this->Load("worlds/friction_demo.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  double dt = physics->GetMaxStepSize();
+
+  // expect value from world file
+  EXPECT_EQ(ignition::math::Vector3d(0, -1, -1), world->Gravity());
+
+  // set gravity to point up
+  const ignition::math::Vector3d gravity(0, 0, 10);
+  world->SetGravity(gravity);
+  EXPECT_EQ(gravity, world->Gravity());
+
+  // get initial pose and velocity of a box
+  auto model = world->GetModel("box_01_model");
+  ASSERT_TRUE(model != NULL);
+  auto initialPose = model->GetWorldPose().Ign();
+  auto initialVelocity = model->GetWorldLinearVel().Ign();
+  EXPECT_EQ(ignition::math::Vector3d::Zero, initialVelocity);
+
+  // step simulation and verify that box moves upwards
+  const int steps = 100;
+  world->Step(steps);
+  auto expectedVelocity = dt * steps * gravity;
+  auto velocity = model->GetWorldLinearVel().Ign();
+  auto expectedPosition = initialPose.Pos() + 0.5*(dt*steps) * expectedVelocity;
+  EXPECT_GT(velocity.Z(), 0.95*expectedVelocity.Z());
+  EXPECT_GT(model->GetWorldPose().Ign().Pos().Z(), 0.95*expectedPosition.Z());
+
+  // set gravity back to zero
+  world->SetGravity(ignition::math::Vector3d::Zero);
+  EXPECT_EQ(ignition::math::Vector3d::Zero, world->Gravity());
+
+  // step simulation and verify that velocity stays constant
+  world->Step(steps);
+  EXPECT_EQ(velocity, model->GetWorldLinearVel().Ign());
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, Gravity)
+{
+  Gravity(GetParam());
+}
+
+/////////////////////////////////////////////////
+void WorldTest::MagneticField(const std::string &_physicsEngine)
+{
+  this->Load("worlds/magnetometer.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // expect value from world file
+  EXPECT_EQ(ignition::math::Vector3d(1, 0, 0), world->MagneticField());
+
+  // set magnetic field to zero
+  world->SetMagneticField(ignition::math::Vector3d::Zero);
+  EXPECT_EQ(ignition::math::Vector3d::Zero, world->MagneticField());
+
+  // set magnetic field to ones
+  world->SetMagneticField(ignition::math::Vector3d::One);
+  EXPECT_EQ(ignition::math::Vector3d::One, world->MagneticField());
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, MagneticField)
+{
+  MagneticField(GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -466,10 +566,56 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   }
 
   // disconnect from world events
-  event::Events::DisconnectWorldUpdateBegin(worldUpdateBeginEventConnection);
-  event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
-  event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
+  worldUpdateBeginEventConnection.reset();
+  beforePhysicsUpdateConnection.reset();
+  worldUpdateEndEventConnection.reset();
 }
+
+/////////////////////////////////////////////////
+TEST_F(WorldTest, URI)
+{
+  Load("worlds/nested_model.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  EXPECT_EQ(world->URI().Str(), "data://world/default");
+
+  // Check a light.
+  auto light = world->Light("sun");
+  ASSERT_TRUE(light != NULL);
+  EXPECT_EQ(light->URI().Str(), "data://world/default/light/sun");
+
+  // Check a model.
+  auto model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model != NULL);
+  EXPECT_EQ(model->URI().Str(), "data://world/default/model/ground_plane");
+
+  auto link = model->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->URI().Str(),
+      "data://world/default/model/ground_plane/link/link");
+
+  // Check a nested model.
+  model = world->GetModel("model_00");
+  ASSERT_TRUE(model != NULL);
+  EXPECT_EQ(model->URI().Str(), "data://world/default/model/model_00");
+
+  link = model->GetLink("link_00");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->URI().Str(),
+      "data://world/default/model/model_00/link/link_00");
+
+  auto nestedModel = model->NestedModel("model_01");
+  ASSERT_TRUE(nestedModel != NULL);
+  EXPECT_EQ(nestedModel->URI().Str(),
+      "data://world/default/model/model_00/model/model_01");
+
+  link = nestedModel->GetLink("link_01");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->URI().Str(),
+      "data://world/default/model/model_00/model/model_01/link/link_01");
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

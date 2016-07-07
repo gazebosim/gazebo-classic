@@ -116,4 +116,4 @@ namespace gazebo
     /// \}
   }
 }
-#endif  // #ifndef _BULLETTYPES_HH
+#endif

@@ -49,6 +49,8 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Wind.hh"
 
+#include "gazebo/util/IntrospectionManager.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -768,7 +770,6 @@ void Link::SetWindEnabled(const bool _enable)
   }
   else
   {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
     this->updateConnection.reset();
     // Make sure wind velocity is null
     this->windLinearVel.Set(0, 0, 0);
@@ -1467,9 +1468,9 @@ double Link::GetWorldEnergyPotential() const
   // use origin as reference position
   // E = -m g^T z
   double m = this->GetInertial()->GetMass();
-  math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
+  auto g = this->GetWorld()->Gravity();
   math::Vector3 z = this->GetWorldCoGPose().pos;
-  return -m * g.Dot(z);
+  return -m * g.Dot(z.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -1688,4 +1689,67 @@ const ignition::math::Vector3d Link::RelativeWindLinearVel() const
 {
   return this->GetWorldPose().Ign().Rot().Inverse().RotateVector(
       this->windLinearVel);
+}
+
+/////////////////////////////////////////////////
+void Link::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  // Callbacks.
+  auto fLinkPose = [this]()
+  {
+    return this->GetWorldPose().Ign();
+  };
+
+  auto fLinkLinVel = [this]()
+  {
+    return this->GetWorldLinearVel().Ign();
+  };
+
+  auto fLinkAngVel = [this]()
+  {
+    return this->GetWorldAngularVel().Ign();
+  };
+
+  auto fLinkLinAcc = [this]()
+  {
+    return this->GetWorldLinearAccel().Ign();
+  };
+
+  auto fLinkAngAcc = [this]()
+  {
+    return this->GetWorldAngularAccel().Ign();
+  };
+
+  // Register items.
+  common::URI poseURI(uri);
+  poseURI.Query().Insert("p", "pose3d/world_pose");
+  this->introspectionItems.push_back(poseURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(poseURI.Str(), fLinkPose);
+
+  common::URI linVelURI(uri);
+  linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  this->introspectionItems.push_back(linVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linVelURI.Str(), fLinkLinVel);
+
+  common::URI angVelURI(uri);
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  this->introspectionItems.push_back(angVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angVelURI.Str(), fLinkAngVel);
+
+  common::URI linAccURI(uri);
+  linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  this->introspectionItems.push_back(linAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linAccURI.Str(), fLinkLinAcc);
+
+  common::URI angAccURI(uri);
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  this->introspectionItems.push_back(angAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angAccURI.Str(), fLinkAngAcc);
 }

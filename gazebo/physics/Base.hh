@@ -26,10 +26,10 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
+#include <vector>
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/URI.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
@@ -39,7 +39,8 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
@@ -250,6 +251,10 @@ namespace gazebo
       /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
 
+      /// \brief Remove a child by pointer.
+      /// \param[in] _child Pointer to the child.
+      public: void RemoveChild(physics::BasePtr _child);
+
       /// \brief Add a type specifier.
       /// \param[in] _type New type to append to this objects type
       /// definition.
@@ -317,6 +322,12 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      protected: virtual void UnregisterIntrospectionItems();
+
       /// \brief Compute the scoped name of this object based on its
       /// parents.
       /// \sa Base::GetScopedName
@@ -333,6 +344,9 @@ namespace gazebo
 
       /// \brief Pointer to the world.
       protected: WorldPtr world;
+
+      /// \brief All the introspection items regsitered for this.
+      protected: std::vector<common::URI> introspectionItems;
 
       /// \brief Set to true if the object should be saved.
       private: bool saveable;

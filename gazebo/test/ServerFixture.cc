@@ -254,22 +254,18 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
 
   ASSERT_NO_THROW(this->server = new Server());
 
-  if (!this->server->ParseArgs(argc, argv))
+  if (this->server->ParseArgs(argc, argv))
   {
-    ASSERT_NO_THROW(delete this->server);
-    this->server = NULL;
-    return;
+    if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+    {
+      ASSERT_NO_THROW(rendering::create_scene(
+            gazebo::physics::get_world()->GetName(), false, true));
+    }
+
+    ASSERT_NO_THROW(this->server->Run());
+
+    ASSERT_NO_THROW(this->server->Fini());
   }
-
-  if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
-  {
-    ASSERT_NO_THROW(rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true));
-  }
-
-  ASSERT_NO_THROW(this->server->Run());
-
-  ASSERT_NO_THROW(this->server->Fini());
 
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
@@ -529,7 +525,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   while (this->gotImage < 20)
     common::Time::MSleep(100);
 
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  // c will disconnect automatically when it goes out of scope
 }
 
 /////////////////////////////////////////////////

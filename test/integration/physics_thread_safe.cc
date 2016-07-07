@@ -52,7 +52,7 @@ void PhysicsThreadSafeTest::BlankWorld(const std::string &_physicsEngine)
 
   // The following lines cause a seg-fault on revision 031749b
   // This test passes if it doesn't seg-fault.
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   physics->SetGravity(g);
 }
 

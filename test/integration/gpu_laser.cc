@@ -200,8 +200,8 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   for (int i = 0; i < raySensor->RayCount(); ++i)
     EXPECT_DOUBLE_EQ(raySensor2->Range(i), GZ_DBL_INF);
 
-  raySensor->DisconnectNewLaserFrame(c);
-  raySensor2->DisconnectNewLaserFrame(c2);
+  c.reset();
+  c2.reset();
 
   delete [] scan;
   delete [] scan2;

@@ -60,14 +60,14 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // check mesh
   EXPECT_TRUE(common::MeshManager::Instance()->HasMesh(meshName));
   const common::Mesh *mesh = common::MeshManager::Instance()->GetMesh(meshName);
-  EXPECT_TRUE(mesh != NULL);
+  EXPECT_TRUE(mesh != nullptr);
 
   unsigned int submeshCount = mesh->GetSubMeshCount();
   EXPECT_EQ(submeshCount, 1u);
 
   // check submesh bounds
   const common::SubMesh *submesh = mesh->GetSubMesh(0);
-  EXPECT_TRUE(submesh != NULL);
+  EXPECT_TRUE(submesh != nullptr);
   EXPECT_EQ(ignition::math::Vector3d(0, 0, 0), submesh->Min());
   EXPECT_EQ(ignition::math::Vector3d(1.0, 1.0, 10.0), submesh->Max());
 
@@ -163,14 +163,14 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // check mesh
   EXPECT_TRUE(common::MeshManager::Instance()->HasMesh(meshName));
   const common::Mesh *mesh = common::MeshManager::Instance()->GetMesh(meshName);
-  EXPECT_TRUE(mesh != NULL);
+  EXPECT_TRUE(mesh != nullptr);
 
   unsigned int submeshCount = mesh->GetSubMeshCount();
   EXPECT_EQ(submeshCount, 1u);
 
   // check submesh bounds
   const common::SubMesh *submesh = mesh->GetSubMesh(0);
-  EXPECT_TRUE(submesh != NULL);
+  EXPECT_TRUE(submesh != nullptr);
   EXPECT_EQ(submesh->Min(), ignition::math::Vector3d(1.11704, 0.7599, 0));
   EXPECT_EQ(submesh->Max(), ignition::math::Vector3d(3.4323, 3.28672, 2.0));
 
