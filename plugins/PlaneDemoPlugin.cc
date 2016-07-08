@@ -129,7 +129,6 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
       if (enginePtr->HasElement("joint_name"))
       {
         std::string jointName = enginePtr->Get<std::string>("joint_name");
-        gzerr << jointName << "\n";
         physics::JointPtr joint = this->dataPtr->model->GetJoint(jointName);
         if (joint.get() != NULL)
         {
@@ -145,6 +144,12 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
             ec.incVal = enginePtr->Get<double>("inc_val");
           ec.torque = 0;
           this->dataPtr->engineControls.push_back(ec);
+          gzdbg << "joint [" << jointName << "] controlled by keyboard"
+                << " t[" << ec.maxTorque
+                << "] +[" << ec.incKey
+                << "] -[" << ec.decKey
+                << "] d[" << ec.incVal
+                << "].\n";
         }
       }
       // get next element
