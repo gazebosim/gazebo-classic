@@ -49,7 +49,7 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelAlign.hh"
-#include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/SaveEntityDialog.hh"
 #include "gazebo/gui/MainWindow.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
@@ -171,7 +171,7 @@ namespace gazebo
       public: std::string manipMode;
 
       /// \brief A dialog with options to save the model.
-      public: SaveDialog *saveDialog;
+      public: SaveEntityDialog *saveDialog;
 
       /// \brief Store the current save state of the model.
       public: ModelCreator::SaveState currentSaveState;
@@ -396,7 +396,7 @@ ModelCreator::ModelCreator(QObject *_parent)
     connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
   }
 
-  this->dataPtr->saveDialog = new SaveDialog(SaveDialog::MODEL);
+  this->dataPtr->saveDialog = new SaveEntityDialog(SaveEntityDialog::MODEL);
 
   this->Reset();
 }
@@ -1574,7 +1574,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 void ModelCreator::Reset()
 {
   delete this->dataPtr->saveDialog;
-  this->dataPtr->saveDialog = new SaveDialog(SaveDialog::MODEL);
+  this->dataPtr->saveDialog = new SaveEntityDialog(SaveEntityDialog::MODEL);
 
   this->dataPtr->jointMaker->Reset();
   this->dataPtr->selectedEntities.clear();

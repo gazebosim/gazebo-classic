@@ -88,6 +88,11 @@
   <file>images/model.svg</file>
   <file>images/link.svg</file>
   <file>images/joint.svg</file>
+  <file>images/file_upload.svg</file>
+  <file>images/select_all.svg</file>
+  <file>images/clear.svg</file>
+  <file>images/check_box_black.svg</file>
+  <file>images/check_box_outline_black.svg</file>
 
   <file>fonts/Roboto-Black.ttf</file>
   <file>fonts/Roboto-BlackItalic.ttf</file>
