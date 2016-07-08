@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
  * limitations under the License.
  *
 */
+#include <string>
+#include <vector>
 
+#include "gazebo/common/PID.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "Small2dGimbalPlugin.hh"
@@ -24,22 +27,46 @@ using namespace std;
 
 GZ_REGISTER_MODEL_PLUGIN(Small2dGimbalPlugin)
 
+/// \brief Private data class
+class gazebo::Small2dGimbalPluginPrivate
+{
+  public: void OnStringMsg(ConstGzStringPtr &_msg);
+
+  public: std::vector<event::ConnectionPtr> connections;
+
+  public: transport::SubscriberPtr sub;
+
+  public: transport::PublisherPtr pub;
+
+  public: physics::ModelPtr model;
+
+  public: physics::JointPtr tiltJoint;
+
+  public: double command = IGN_PI_2;
+
+  public: transport::NodePtr node;
+
+  public: common::PID pid;
+
+  public: common::Time lastUpdateTime;
+};
+
 /////////////////////////////////////////////////
 Small2dGimbalPlugin::Small2dGimbalPlugin()
-  :status("closed"), command(false)
+  : dataPtr(new Small2dGimbalPluginPrivate)
 {
-  this->pid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->command = M_PI/2.0;
+  this->dataPtr->pid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
 }
 
 /////////////////////////////////////////////////
 void Small2dGimbalPlugin::Load(physics::ModelPtr _model,
   sdf::ElementPtr /*_sdf*/)
 {
-  this->model = _model;
+  this->dataPtr->model = _model;
   std::string jointName = "gimbal_small_2d::tilt_joint";
-  this->tiltJoint = this->model->GetJoint(jointName);
-  if (!this->tiltJoint)
+  this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(jointName);
+
+  if (!this->dataPtr->tiltJoint)
   {
     gzerr << "Small2dGimbalPlugin::Load ERROR! Can't get joint '"
           << jointName << "' " << endl;
@@ -49,67 +76,64 @@ void Small2dGimbalPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void Small2dGimbalPlugin::Init()
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
 
-  this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
+  this->dataPtr->lastUpdateTime =
+    this->dataPtr->model->GetWorld()->GetSimTime();
 
-  std::string topic = std::string("~/") +  this->model->GetName() +
+  std::string topic = std::string("~/") +  this->dataPtr->model->GetName() +
     "/gimbal_tilt_cmd";
-  this->sub = this->node->Subscribe(topic,
-                                       &Small2dGimbalPlugin::OnStringMsg,
-                                       this);
+  this->dataPtr->sub = this->dataPtr->node->Subscribe(topic,
+      &Small2dGimbalPluginPrivate::OnStringMsg, this->dataPtr.get());
 
-  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+  this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&Small2dGimbalPlugin::OnUpdate, this)));
 
-  topic = std::string("~/") +  this->model->GetName() + "/gimbal_tilt_status";
-  this->pub = node->Advertise<gazebo::msgs::GzString>(topic);
+  topic = std::string("~/") +
+    this->dataPtr->model->GetName() + "/gimbal_tilt_status";
 
-  gzmsg << "Small2dGimbalPlugin::Init" << std::endl;
+  this->dataPtr->pub =
+    this->dataPtr->node->Advertise<gazebo::msgs::GzString>(topic);
 }
 
 /////////////////////////////////////////////////
-void Small2dGimbalPlugin::OnStringMsg(ConstGzStringPtr &_msg)
+void Small2dGimbalPluginPrivate::OnStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "Command received " << _msg->data() << std::endl;
   this->command = atof(_msg->data().c_str());
 }
 
 /////////////////////////////////////////////////
 void Small2dGimbalPlugin::OnUpdate()
 {
-  if (!this->tiltJoint)
+  if (!this->dataPtr->tiltJoint)
     return;
 
-  double angle = this->tiltJoint->GetAngle(0).Radian();
+  double angle = this->dataPtr->tiltJoint->GetAngle(0).Radian();
 
-  common::Time time = this->model->GetWorld()->GetSimTime();
-  if (time < this->lastUpdateTime)
+  common::Time time = this->dataPtr->model->GetWorld()->GetSimTime();
+  if (time < this->dataPtr->lastUpdateTime)
   {
-    gzerr << "time reset event\n";
-    this->lastUpdateTime = time;
+    this->dataPtr->lastUpdateTime = time;
     return;
   }
-  else if (time > this->lastUpdateTime)
+  else if (time > this->dataPtr->lastUpdateTime)
   {
-    double dt = (this->lastUpdateTime - time).Double();
-    double error = angle - this->command;
-    double force = this->pid.Update(error, dt);
-    this->tiltJoint->SetForce(0, force);
-    this->lastUpdateTime = time;
+    double dt = (this->dataPtr->lastUpdateTime - time).Double();
+    double error = angle - this->dataPtr->command;
+    double force = this->dataPtr->pid.Update(error, dt);
+    this->dataPtr->tiltJoint->SetForce(0, force);
+    this->dataPtr->lastUpdateTime = time;
   }
 
-  static int i =1000;
-  if (++i>100)
+  static int i = 1000;
+  if (++i > 100)
   {
     i = 0;
     std::stringstream ss;
     ss << angle;
     gazebo::msgs::GzString m;
     m.set_data(ss.str());
-    this->pub->Publish(m);
+    this->dataPtr->pub->Publish(m);
   }
 }
-
-

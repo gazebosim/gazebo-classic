@@ -15,9 +15,6 @@
  *
 */
 
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -28,35 +25,100 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(PlaneDemoPlugin)
 
+struct JointControl
+{
+  public: std::string name;
+  public: physics::JointPtr joint;
+  public: double cmd;
+  public: double incVal;
+  public: int incKey;
+  public: int decKey;
+  public: common::PID pid;
+};
+
+struct EngineControl
+{
+  public: std::string name;
+  public: physics::JointPtr joint;
+  public: double maxTorque;
+  public: int incKey;
+  public: int decKey;
+  public: double incVal;
+  public: double torque;
+};
+
+struct ThrusterControl
+{
+  public: std::string name;
+  public: physics::LinkPtr link;
+  public: double maxTorque;
+  public: int incKey;
+  public: int decKey;
+  public: math::Vector3 incVal;
+  public: math::Vector3 force;
+};
+
+/// \brief Private data class
+class gazebo::PlaneDemoPluginPrivate
+{
+  /// \brief Connection to World Update events.
+  public: event::ConnectionPtr updateConnection;
+
+  /// \brief Pointer to world.
+  public: physics::WorldPtr world;
+
+  /// \brief Pointer to physics engine.
+  public: physics::PhysicsEnginePtr physics;
+
+  /// \brief Pointer to model containing plugin.
+  public: physics::ModelPtr model;
+
+  /// \brief SDF for this plugin;
+  public: sdf::ElementPtr sdf;
+
+  public: std::vector<EngineControl> engineControls;
+
+  public: std::vector<ThrusterControl> thrusterControls;
+
+  public: std::vector<JointControl> jointControls;
+
+  public: common::Time lastUpdateTime;
+
+  public: bool stop;
+  public: void OnKeyHit();
+  public: std::unique_ptr<std::thread> keyHitThread;
+  public: std::mutex mutex;
+};
+
 /////////////////////////////////////////////////
 PlaneDemoPlugin::PlaneDemoPlugin()
+  : dataPtr(new PlaneDemoPluginPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 PlaneDemoPlugin::~PlaneDemoPlugin()
 {
-  this->stop = true;
+  this->dataPtr->stop = true;
 }
 
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_model, "PlaneDemoPlugin _model pointer is nullptr");
-  this->model = _model;
-  this->modelName = _model->GetName();
-  this->sdf = _sdf;
+  GZ_ASSERT(_model, "PlaneDemoPlugin _model pointer is NULL");
+  this->dataPtr->model = _model;
+  this->dataPtr->sdf = _sdf;
 
-  this->world = this->model->GetWorld();
-  GZ_ASSERT(this->world, "PlaneDemoPlugin world pointer is nullptr");
+  this->dataPtr->world = this->dataPtr->model->GetWorld();
+  GZ_ASSERT(this->dataPtr->world, "PlaneDemoPlugin world pointer is NULL");
 
-  this->physics = this->world->GetPhysicsEngine();
-  GZ_ASSERT(this->physics, "PlaneDemoPlugin physics pointer is nullptr");
+  this->dataPtr->physics = this->dataPtr->world->GetPhysicsEngine();
+  GZ_ASSERT(this->dataPtr->physics, "PlaneDemoPlugin physics pointer is NULL");
 
-  GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is nullptr");
+  GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
 
-  gzerr << "model: " << this->model->GetName() << "\n";
+  gzerr << "model: " << this->dataPtr->model->GetName() << "\n";
 
   // get engine controls
   if (_sdf->HasElement("engine"))
@@ -68,8 +130,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
       {
         std::string jointName = enginePtr->Get<std::string>("joint_name");
         gzerr << jointName << "\n";
-        physics::JointPtr joint = this->model->GetJoint(jointName);
-        if (joint.get() != nullptr)
+        physics::JointPtr joint = this->dataPtr->model->GetJoint(jointName);
+        if (joint.get() != NULL)
         {
           EngineControl ec;
           // ec.name = enginePtr->GetAttribute("name")->GetAsString();
@@ -83,7 +145,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           if (enginePtr->HasElement("inc_val"))
             ec.incVal = enginePtr->Get<double>("inc_val");
           ec.torque = 0;
-          this->engineControls.push_back(ec);
+          this->dataPtr->engineControls.push_back(ec);
         }
       }
       // get next element
@@ -100,9 +162,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
       if (thrusterPtr->HasElement("link_name"))
       {
         std::string linkName = thrusterPtr->Get<std::string>("link_name");
-        gzerr << linkName << "\n";
-        physics::LinkPtr link = this->model->GetLink(linkName);
-        if (link.get() != nullptr)
+        physics::LinkPtr link = this->dataPtr->model->GetLink(linkName);
+        if (link.get() != NULL)
         {
           ThrusterControl tc;
           // tc.name = thrusterPtr->GetAttribute("name")->GetAsString();
@@ -114,7 +175,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           if (thrusterPtr->HasElement("inc_val"))
             tc.incVal = thrusterPtr->Get<math::Vector3>("inc_val");
           tc.force = math::Vector3();
-          this->thrusterControls.push_back(tc);
+          this->dataPtr->thrusterControls.push_back(tc);
         }
       }
       // get next element
@@ -129,9 +190,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
     if (controlPtr->HasElement("joint_name"))
     {
       std::string jointName = controlPtr->Get<std::string>("joint_name");
-      gzerr << jointName << "\n";
-      physics::JointPtr joint = this->model->GetJoint(jointName);
-      if (joint.get() != nullptr)
+      physics::JointPtr joint = this->dataPtr->model->GetJoint(jointName);
+      if (joint.get() != NULL)
       {
         JointControl jc;
         // jc.name = controlPtr->GetAttribute("name")->GetAsString();
@@ -142,27 +202,34 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           jc.decKey = controlPtr->Get<int>("dec_key");
         if (controlPtr->HasElement("inc_val"))
           jc.incVal = controlPtr->Get<double>("inc_val");
+
         double p, i, d, iMax, iMin, cmdMax, cmdMin;
+
         if (controlPtr->HasElement("p"))
           p = controlPtr->Get<double>("p");
         else
           p = 0.0;
+
         if (controlPtr->HasElement("i"))
           i = controlPtr->Get<double>("i");
         else
           i = 0.0;
+
         if (controlPtr->HasElement("d"))
           d = controlPtr->Get<double>("d");
         else
           d = 0.0;
+
         if (controlPtr->HasElement("i_max"))
           iMax = controlPtr->Get<double>("i_max");
         else
           iMax = 0.0;
+
         if (controlPtr->HasElement("i_min"))
           iMin = controlPtr->Get<double>("i_min");
         else
           iMin = 0.0;
+
         if (controlPtr->HasElement("cmd_max"))
           cmdMax = controlPtr->Get<double>("cmd_max");
         else
@@ -185,16 +252,53 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::Init()
 {
-  this->lastUpdateTime = this->world->GetSimTime();
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->dataPtr->lastUpdateTime = this->dataPtr->world->GetSimTime();
+  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
           std::bind(&PlaneDemoPlugin::OnUpdate, this));
-  this->keyHitThread =
-    new std::thread(std::bind(&PlaneDemoPlugin::OnKeyHit, this));
-  this->stop = false;
+  this->dataPtr->keyHitThread.reset(
+    new std::thread(std::bind(&PlaneDemoPluginPrivate::OnKeyHit,
+        this->dataPtr.get())));
+  this->dataPtr->stop = false;
 }
 
 /////////////////////////////////////////////////
-void PlaneDemoPlugin::OnKeyHit()
+void PlaneDemoPlugin::OnUpdate()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  common::Time curTime = this->dataPtr->world->GetSimTime();
+  for (std::vector<EngineControl>::iterator ei =
+      this->dataPtr->engineControls.begin();
+      ei != this->dataPtr->engineControls.end(); ++ei)
+  {
+    // spin up engine
+    ei->joint->SetForce(0, ei->torque);
+  }
+
+  for (std::vector<ThrusterControl>::iterator
+    ti = this->dataPtr->thrusterControls.begin();
+    ti != this->dataPtr->thrusterControls.end(); ++ti)
+  {
+    // fire up thruster
+    math::Pose pose = ti->link->GetWorldPose();
+    ti->link->AddForce(pose.rot.RotateVector(ti->force));
+  }
+
+  for (std::vector<JointControl>::iterator ji =
+      this->dataPtr->jointControls.begin();
+      ji != this->dataPtr->jointControls.end(); ++ji)
+  {
+    // spin up joint control
+    double pos = ji->joint->GetAngle(0).Radian();
+    double error = pos - ji->cmd;
+    double force = ji->pid.Update(error,
+        curTime - this->dataPtr->lastUpdateTime);
+    ji->joint->SetForce(0, force);
+  }
+  this->dataPtr->lastUpdateTime = curTime;
+}
+
+/////////////////////////////////////////////////
+void PlaneDemoPluginPrivate::OnKeyHit()
 {
   char ch='x';
   ch = getchar();

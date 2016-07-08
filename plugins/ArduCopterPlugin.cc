@@ -14,14 +14,19 @@
  * limitations under the License.
  *
 */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
 
 #include <mutex>
 #include <string>
+#include <vector>
 #include <sdf/sdf.hh>
+#include <ignition/math/Filter.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
 #include "plugins/ArduCopterPlugin.hh"
@@ -30,37 +35,217 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(ArduCopterPlugin)
 
-////////////////////////////////////////////////////////////////////////////////
-ArduCopterPlugin::ArduCopterPlugin()
+/// \brief Obtains a parameter from sdf.
+/// \param[in] sdf Pointer to the sdf object.
+/// \param[in] name Name of the parameter.
+/// \param[out] param Param Variable to write the parameter to.
+/// \param[in] default_value Default value, if the parameter not available.
+/// \param[in] verbose If true, gzerror if the parameter is not available.
+template<class T>
+bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
+  T &_param, const T &_defaultValue, const bool &_verbose = false)
 {
-  // socket
-  this->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
-  fcntl(this->handle, F_SETFD, FD_CLOEXEC);
-  int one = 1;
-  setsockopt(this->handle, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
-
-  if (! this->bind("127.0.0.1", 9002))
+  if (_sdf->HasElement(_name))
   {
-    gzerr << "Failed to connect to socket in 127.0.0.1 port 9002 \n";
+    _param = _sdf->GetElement(_name)->Get<T>();
+    return true;
   }
 
-  setsockopt(this->handle, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-  fcntl(this->handle, F_SETFL, fcntl(this->handle, F_GETFL, 0) | O_NONBLOCK);
+  _param = _defaultValue;
+  if (_verbose)
+  {
+    gzerr << "[ArduCopterPlugin] Please specify a value for parameter ["
+      << _name << "].\n";
+  }
+  return false;
+}
+
+/// \brief A servo packet.
+struct ServoPacket
+{
+  /// \brief Motor speed data.
+  float motorSpeed[4];
+};
+
+struct fdmPacket
+{
+  double timestamp;
+  double imuAngularVelocityRPY[3];
+  double imuLinearAccelerationXYZ[3];
+  double imuOrientationQuat[4];
+  double velocityXYZ[3];
+  double positionXYZ[3];
+};
+
+/// \brief Rotor class
+class Rotor
+{
+  /// \brief Constructor
+  public: Rotor()
+  {
+    // most of these coefficients are not used yet.
+    this->rotorVelocitySlowdownSim = this->kDefaultRotorVelocitySlowdownSim;
+    this->frequencyCutoff = this->kDefaultFrequencyCutoff;
+    this->samplingRate = this->kDefaultSamplingRate;
+
+    this->pid.Init(0.1, 0, 0, 0, 0, 1.0, -1.0);
+  }
+
+  /// \brief rotor id
+  public: int id = 0;
+
+  /// \brief Max rotor propeller RPM.
+  public: double maxRpm = 838.0;
+
+  /// \brief Next command to be applied to the propeller
+  public: double cmd = 0;
+
+  /// \brief Velocity PID for motor control
+  public: common::PID pid;
+
+  /// \brief Control propeller joint.
+  public: std::string jointName;
+
+  /// \brief Control propeller joint.
+  public: physics::JointPtr joint;
+
+  /// \brief Control propeller link.
+  public: std::string linkName;
+
+  /// \brief Control propeller link.
+  public: physics::LinkPtr link;
+
+  /// \brief direction multiplier for this rotor
+  public: double multiplier = 1;
+
+  /// \brief unused coefficients
+  public: double rotorVelocitySlowdownSim;
+  public: double frequencyCutoff;
+  public: double samplingRate;
+  public: ignition::math::OnePole<double> velocityFilter;
+
+  public: static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
+  public: static constexpr double kDefaultFrequencyCutoff = 5.0;
+  public: static constexpr double kDefaultSamplingRate = 0.2;
+};
+
+// Private data class
+class gazebo::ArduCopterPluginPrivate
+{
+  /// \brief Bind to an adress and port
+  /// \param[in] _address Address to bind to.
+  /// \param[in] _port Port to bind to.
+  /// \return True on success.
+  public: bool Bind(const char *_address, const uint16_t _port)
+  {
+    struct sockaddr_in sockaddr;
+    this->MakeSockAddr(_address, _port, sockaddr);
+
+    if (bind(this->handle, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
+    {
+      return false;
+    }
+    return true;
+  }
+
+  /// \brief Make a socket
+  /// \param[in] _address Socket address.
+  /// \param[in] _port Socket port
+  /// \param[out] _sockaddr New socket address structure.
+  public: void MakeSockAddr(const char *_address, const uint16_t _port,
+    struct sockaddr_in &_sockaddr)
+  {
+    memset(&_sockaddr, 0, sizeof(_sockaddr));
+
+    #ifdef HAVE_SOCK_SIN_LEN
+      _sockaddr.sin_len = sizeof(_sockaddr);
+    #endif
+
+    _sockaddr.sin_port = htons(_port);
+    _sockaddr.sin_family = AF_INET;
+    _sockaddr.sin_addr.s_addr = inet_addr(_address);
+  }
+
+  /// \brief Receive data
+  /// \param[out] _buf Buffer that receives the data.
+  /// \param[in] _size Size of the buffer.
+  /// \param[in] _timeoutMS Milliseconds to wait for data.
+  public: ssize_t Recv(void *_buf, const size_t _size, uint32_t _timeoutMs)
+  {
+    fd_set fds;
+    struct timeval tv;
+
+    FD_ZERO(&fds);
+    FD_SET(this->handle, &fds);
+
+    tv.tv_sec = _timeoutMs / 1000;
+    tv.tv_usec = (_timeoutMs % 1000) * 1000UL;
+
+    if (select(this->handle+1, &fds, NULL, NULL, &tv) != 1)
+    {
+        return -1;
+    }
+
+    return recv(this->handle, _buf, _size, 0);
+  }
+
+  /// \brief Pointer to the update event connection.
+  public: event::ConnectionPtr updateConnection;
+
+  /// \brief Pointer to the model;
+  public: physics::ModelPtr model;
+
+  /// \brief array of propellers
+  public: std::vector<Rotor> rotors;
+
+  /// \brief keep track of controller update sim-time.
+  public: gazebo::common::Time lastControllerUpdateTime;
+
+  /// \brief Controller update mutex.
+  public: std::mutex mutex;
+
+  /// \brief Socket handle
+  public: int handle;
+
+  /// \brief Pointer to the link on which the IMU sensor is attached.
+  public: physics::LinkPtr imuLink;
+
+  /// \brief Pointer to an IMU sensor
+  public: sensors::ImuSensorPtr imuSensor;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+ArduCopterPlugin::ArduCopterPlugin()
+  : dataPtr(new ArduCopterPluginPrivate)
+{
+  // socket
+  this->dataPtr->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
+  fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
+  int one = 1;
+  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
+      &one, sizeof(one));
+
+  this->dataPtr->Bind("127.0.0.1", 9002);
+
+  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
+      &one, sizeof(one));
+
+  fcntl(this->dataPtr->handle, F_SETFL,
+      fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
 }
 
 /////////////////////////////////////////////////
 ArduCopterPlugin::~ArduCopterPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 /////////////////////////////////////////////////
 void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_model, "ArduCopterPlugin _model pointer is NULL");
-  GZ_ASSERT(_sdf, "ArduCopterPlugin _sdf pointer is NULL");
+  GZ_ASSERT(_model, "ArduCopterPlugin _model pointer is null");
+  GZ_ASSERT(_sdf, "ArduCopterPlugin _sdf pointer is null");
 
-  this->model = _model;
+  this->dataPtr->model = _model;
 
   // per rotor
   if (_sdf->HasElement("rotor"))
@@ -85,34 +270,46 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         else
         {
           gzwarn << "motorNumber not specified, use order parsed.\n";
-          rotor.id = this->rotors.size();
+          rotor.id = this->dataPtr->rotors.size();
         }
       }
 
       if (rotorSDF->HasElement("jointName"))
+      {
         rotor.jointName = rotorSDF->Get<std::string>("jointName");
+      }
       else
+      {
         gzerr << "Please specify a jointName,"
-              << " where the rotor is attached.\n";
+          << " where the rotor is attached.\n";
+      }
+
       // Get the pointer to the joint.
       rotor.joint = _model->GetJoint(rotor.jointName);
-      if (rotor.joint == NULL)
-        gzthrow("Couldn't find specified joint ["
-                << rotor.jointName << "].");
+      if (rotor.joint == nullptr)
+      {
+        gzerr << "Couldn't find specified joint ["
+            << rotor.jointName << "]. This plugin will not run.\n";
+        return;
+      }
 
       if (rotorSDF->HasElement("linkName"))
         rotor.linkName = rotorSDF->Get<std::string>("linkName");
       else
         gzerr << "Please specify a linkName for the rotor\n";
+
       rotor.link = _model->GetLink(rotor.linkName);
-      if (rotor.link == NULL)
-        gzthrow("Couldn't find specified link ["
-                << rotor.linkName << "].");
+      if (rotor.link == nullptr)
+      {
+        gzerr << "Couldn't find specified link ["
+            << rotor.linkName << "]. This plugin will not run\n";
+        return;
+      }
 
       if (rotorSDF->HasElement("turningDirection"))
       {
         std::string turningDirection = rotorSDF->Get<std::string>(
-          "turningDirection");
+            "turningDirection");
         // special cases mimic from rotors_gazebo_plugins
         if (turningDirection == "cw")
           rotor.multiplier = -1;
@@ -128,74 +325,80 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         rotor.multiplier = 1;
         gzerr << "Please specify a turning"
-              << " direction multiplier ('cw' or 'ccw'). Default is ccw.\n";
+          << " direction multiplier ('cw' or 'ccw'). Default 1.\n";
       }
 
       getSdfParam<double>(rotorSDF, "rotorVelocitySlowdownSim",
-        rotor.rotorVelocitySlowdownSim, 1);
-
-      if (rotor.rotorVelocitySlowdownSim < 0.0000001)
-      {
-        gzwarn << "rotorVelocitySlowdownSim can not be 0.0. Changed to default: "
-               << Rotor::kDefaultRotorVelocitySlowdownSim;
-        rotor.rotorVelocitySlowdownSim = Rotor::kDefaultRotorVelocitySlowdownSim;
-      }
+          rotor.rotorVelocitySlowdownSim, 1);
 
       getSdfParam<double>(rotorSDF, "frequencyCutoff",
-        rotor.frequencyCutoff, rotor.frequencyCutoff);
+          rotor.frequencyCutoff, rotor.frequencyCutoff);
       getSdfParam<double>(rotorSDF, "samplingRate",
-        rotor.samplingRate, rotor.samplingRate);
+          rotor.samplingRate, rotor.samplingRate);
 
-      /* use gazebo::math::Filter */
-      rotor.velocityFilter.SetFc(rotor.frequencyCutoff, rotor.samplingRate);
+      // use gazebo::math::Filter
+      rotor.velocityFilter.Fc(rotor.frequencyCutoff, rotor.samplingRate);
+
       // initialize filter to zero value
-      rotor.velocityFilter.SetValue(0.0);
+      rotor.velocityFilter.Set(0.0);
+
       // note to use this
       // rotorVelocityFiltered = velocityFilter.Process(rotorVelocityRaw);
 
       // Overload the PID parameters if they are available.
-      getSdfParam<double>(rotorSDF, "vel_p_gain", rotor.pGain, rotor.pGain);
-      getSdfParam<double>(rotorSDF, "vel_i_gain", rotor.iGain, rotor.iGain);
-      getSdfParam<double>(rotorSDF, "vel_d_gain", rotor.dGain, rotor.dGain);
-      getSdfParam<double>(rotorSDF, "vel_i_max", rotor.iMax, rotor.iMax);
-      getSdfParam<double>(rotorSDF, "vel_i_min", rotor.iMin, rotor.iMin);
-      getSdfParam<double>(rotorSDF, "vel_cmd_max", rotor.cmdMax, rotor.cmdMax);
-      getSdfParam<double>(rotorSDF, "vel_cmd_min", rotor.cmdMin, rotor.cmdMin);
+      double param;
+      getSdfParam<double>(rotorSDF, "vel_p_gain", param, rotor.pid.GetPGain());
+      rotor.pid.SetPGain(param);
 
-      // set PID parameters.
-      rotor.pid.Init(rotor.pGain, rotor.iGain, rotor.dGain,
-                     rotor.iMax, rotor.iMin,
-                     rotor.cmdMax, rotor.cmdMin);
+      getSdfParam<double>(rotorSDF, "vel_i_gain", param, rotor.pid.GetIGain());
+      rotor.pid.SetIGain(param);
+
+      getSdfParam<double>(rotorSDF, "vel_d_gain", param,  rotor.pid.GetDGain());
+      rotor.pid.SetDGain(param);
+
+      getSdfParam<double>(rotorSDF, "vel_i_max", param, rotor.pid.GetIMax());
+      rotor.pid.SetIMax(param);
+
+      getSdfParam<double>(rotorSDF, "vel_i_min", param, rotor.pid.GetIMin());
+      rotor.pid.SetIMin(param);
+
+      getSdfParam<double>(rotorSDF, "vel_cmd_max", param,
+          rotor.pid.GetCmdMax());
+      rotor.pid.SetCmdMax(param);
+
+      getSdfParam<double>(rotorSDF, "vel_cmd_min", param,
+          rotor.pid.GetCmdMin());
+      rotor.pid.SetCmdMin(param);
 
       // set pid initial command
       rotor.pid.SetCmd(0.0);
 
-      this->rotors.push_back(rotor);
+      this->dataPtr->rotors.push_back(rotor);
       rotorSDF = rotorSDF->GetNextElement("rotor");
     }
   }
 
   std::string imuLinkName;
   getSdfParam<std::string>(_sdf, "imuLinkName", imuLinkName, "iris/imu_link");
-  this->imuLink = this->model->GetLink(imuLinkName);
+  this->dataPtr->imuLink = this->dataPtr->model->GetLink(imuLinkName);
 
   // Get sensors
-  this->imuSensor =
-    std::dynamic_pointer_cast<sensors::ImuSensor>
-      (sensors::SensorManager::Instance()->GetSensor(
-        this->model->GetWorld()->GetName()
-        + "::" + this->model->GetScopedName()
-        + "::iris::iris/imu_link::imu_sensor"));
-  if (!this->imuSensor)
+  this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
+    (sensors::SensorManager::Instance()->GetSensor(
+      this->dataPtr->model->GetWorld()->GetName()
+      + "::" + this->dataPtr->model->GetScopedName()
+      + "::iris::iris/imu_link::imu_sensor"));
+
+  if (!this->dataPtr->imuSensor)
     gzerr << "imu_sensor not found\n" << "\n";
 
   // Controller time control.
-  this->lastControllerUpdateTime = 0;
+  this->dataPtr->lastControllerUpdateTime = 0;
 
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&ArduCopterPlugin::Update, this, _1));
+  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&ArduCopterPlugin::Update, this, _1));
 
   gzlog << "ArduCopter ready to fly. The force will be with you" << std::endl;
 }
@@ -203,54 +406,55 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ArduCopterPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  std::lock_guard<std::mutex> lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  gazebo::common::Time curTime = this->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
 
   // Update the control surfaces and publish the new state.
-  if (curTime > this->lastControllerUpdateTime)
+  if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
     this->SendState();
-    this->GetMotorCommand();
-    this->UpdatePIDs((curTime - this->lastControllerUpdateTime).Double());
+    this->MotorCommand();
+    this->UpdatePIDs((curTime -
+          this->dataPtr->lastControllerUpdateTime).Double());
   }
 
-  this->lastControllerUpdateTime = curTime;
+  this->dataPtr->lastControllerUpdateTime = curTime;
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::UpdatePIDs(double _dt)
+void ArduCopterPlugin::UpdatePIDs(const double _dt)
 {
   // Position PID for rotors
-  for (size_t i = 0; i < this->rotors.size(); ++i)
+  for (size_t i = 0; i < this->dataPtr->rotors.size(); ++i)
   {
-    double velTarget = this->rotors[i].multiplier * this->rotors[i].cmd /
-         this->rotors[i].rotorVelocitySlowdownSim;
-    double vel = this->rotors[i].joint->GetVelocity(0);
+    double velTarget = this->dataPtr->rotors[i].multiplier *
+      this->dataPtr->rotors[i].cmd /
+      this->dataPtr->rotors[i].rotorVelocitySlowdownSim;
+    double vel = this->dataPtr->rotors[i].joint->GetVelocity(0);
     double error = vel - velTarget;
-    double force = this->rotors[i].pid.Update(error, _dt);
-    this->rotors[i].joint->SetForce(0, force);
+    double force = this->dataPtr->rotors[i].pid.Update(error, _dt);
+    this->dataPtr->rotors[i].joint->SetForce(0, force);
   }
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::GetMotorCommand()
+void ArduCopterPlugin::MotorCommand()
 {
-  servo_packet pkt;
-  /*
-    we re-send the servo packet every 0.1 seconds until we get a
-    reply. This allows us to cope with some packet loss to the FDM
-  */
-  while (this->recv(&pkt, sizeof(pkt), 100) != sizeof(pkt))
+  ServoPacket pkt;
+  // we re-send the servo packet every 0.1 seconds until we get a
+  // reply. This allows us to cope with some packet loss to the FDM
+  while (this->dataPtr->Recv(&pkt, sizeof(pkt), 100) != sizeof(pkt))
   {
     // send_servos(input);
-    usleep(100);
+    gazebo::common::Time::NSleep(100);
   }
 
-  for (unsigned i = 0; i < this->rotors.size(); ++i)
+  for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
   {
-    // std::cout << i << ": " << pkt.motor_speed[i] << "\n";
-    this->rotors[i].cmd = this->rotors[i].maxRpm * pkt.motor_speed[i];
+    // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
+    this->dataPtr->rotors[i].cmd = this->dataPtr->rotors[i].maxRpm *
+      pkt.motorSpeed[i];
   }
 }
 
@@ -258,9 +462,9 @@ void ArduCopterPlugin::GetMotorCommand()
 void ArduCopterPlugin::SendState()
 {
   // send_fdm
-  fdm_packet pkt;
+  fdmPacket pkt;
 
-  pkt.timestamp = this->model->GetWorld()->GetSimTime().Double();
+  pkt.timestamp = this->dataPtr->model->GetWorld()->GetSimTime().Double();
 
   // asssumed that the imu orientation is:
   //   x forward
@@ -268,33 +472,37 @@ void ArduCopterPlugin::SendState()
   //   z down
 
   // get linear acceleration in body frame
-  ignition::math::Vector3d linearAccel = this->imuSensor->LinearAcceleration();
+  ignition::math::Vector3d linearAccel =
+    this->dataPtr->imuSensor->LinearAcceleration();
 
   // rotate gravity into imu frame, subtract it
   // math::Vector3 gravity =
-  //   this->model->GetWorld()->GetPhysicsEngine()->GetGravity();
+  //   this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetGravity();
   // linearAccel = linearAccel -
-  //   this->imuLink.GetWorldPose().rot.RotateVectorReverse(gravity);
+  //   this->dataPtr->imuLink.GetWorldPose().rot.RotateVectorReverse(gravity);
 
   // copy to pkt
-  pkt.imu_linear_acceleration_xyz[0] = linearAccel.X();
-  pkt.imu_linear_acceleration_xyz[1] = linearAccel.Y();
-  pkt.imu_linear_acceleration_xyz[2] = linearAccel.Z();
+  pkt.imuLinearAccelerationXYZ[0] = linearAccel.X();
+  pkt.imuLinearAccelerationXYZ[1] = linearAccel.Y();
+  pkt.imuLinearAccelerationXYZ[2] = linearAccel.Z();
   // gzerr << "lin accel [" << linearAccel << "]\n";
 
   // get angular velocity in body frame
-  ignition::math::Vector3d angularVel = this->imuSensor->AngularVelocity();
+  ignition::math::Vector3d angularVel =
+    this->dataPtr->imuSensor->AngularVelocity();
+
   // copy to pkt
-  pkt.imu_angular_velocity_rpy[0] = angularVel.X();
-  pkt.imu_angular_velocity_rpy[1] = angularVel.Y();
-  pkt.imu_angular_velocity_rpy[2] = angularVel.Z();
+  pkt.imuAngularVelocityRPY[0] = angularVel.X();
+  pkt.imuAngularVelocityRPY[1] = angularVel.Y();
+  pkt.imuAngularVelocityRPY[2] = angularVel.Z();
 
   // get orientation with offset added
-  // math::Quaternion worldQ = this->imuSensor->Orientation();
-  // pkt.imu_orientation_quat[0] = worldQ.w;
-  // pkt.imu_orientation_quat[1] = worldQ.x;
-  // pkt.imu_orientation_quat[2] = worldQ.y;
-  // pkt.imu_orientation_quat[3] = worldQ.z;
+  // ignition::math::Quaterniond worldQ =
+  // this->dataPtr->imuSensor->Orientation();
+  // pkt.imuOrientationQuat[0] = worldQ.W();
+  // pkt.imuOrientationQuat[1] = worldQ.X();
+  // pkt.imuOrientationQuat[2] = worldQ.Y();
+  // pkt.imuOrientationQuat[3] = worldQ.Z();
 
   // get inertial pose and velocity
   // position of the quadrotor in world frame
@@ -315,43 +523,51 @@ void ArduCopterPlugin::SendState()
 
   // gazeboToNED brings us from gazebo model: x-forward, y-right, z-down
   // to the aerospace convention: x-forward, y-left, z-up
-  math::Pose gazeboToNED =
-    math::Pose(math::Vector3(), math::Vector3(M_PI, 0, 0));
+  ignition::math::Pose3d gazeboToNED(0, 0, 0, IGN_PI, 0 ,0);
 
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down
-  math::Pose worldToModel = gazeboToNED + this->model->GetWorldPose();
+  ignition::math::Pose3d worldToModel = gazeboToNED +
+    this->dataPtr->model->GetWorldPose().Ign();
 
   // get transform from world NED to Model frame
-  math::Pose NEDToModel = worldToModel - gazeboToNED;
+  ignition::math::Pose3d NEDToModel = worldToModel - gazeboToNED;
 
   // gzerr << "ned to model [" << NEDToModel << "]\n";
-  pkt.position_xyz[0] = NEDToModel.pos.x;  // N
-  pkt.position_xyz[1] = NEDToModel.pos.y;  // E
-  pkt.position_xyz[2] = NEDToModel.pos.z;  // D
+
+  // N
+  pkt.positionXYZ[0] = NEDToModel.Pos().X();
+
+  // E
+  pkt.positionXYZ[1] = NEDToModel.Pos().Y();
+
+  // D
+  pkt.positionXYZ[2] = NEDToModel.Pos().Z();
+
   // This is the rotation from world NED frame to the quadrotor
   // frame.
   // gzerr << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
   // gzerr << "ned [" << gazeboToNED.rot.GetAsEuler() << "]\n";
   // gzerr << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
-  pkt.imu_orientation_quat[0] = NEDToModel.rot.w;
-  pkt.imu_orientation_quat[1] = NEDToModel.rot.x;
-  pkt.imu_orientation_quat[2] = NEDToModel.rot.y;
-  pkt.imu_orientation_quat[3] = NEDToModel.rot.z;
+  pkt.imuOrientationQuat[0] = NEDToModel.Rot().W();
+  pkt.imuOrientationQuat[1] = NEDToModel.Rot().X();
+  pkt.imuOrientationQuat[2] = NEDToModel.Rot().Y();
+  pkt.imuOrientationQuat[3] = NEDToModel.Rot().Z();
 
   // Get NED velocity in body frame *
   // or...
   // Get model velocity in NED frame
-  math::Vector3 velGazeboWorldFrame =
-    this->model->GetLink()->GetWorldLinearVel();
-  math::Vector3 velNEDFrame =
-    gazeboToNED.rot.RotateVectorReverse(velGazeboWorldFrame);
-  pkt.velocity_xyz[0] = velNEDFrame.x;
-  pkt.velocity_xyz[1] = velNEDFrame.y;
-  pkt.velocity_xyz[2] = velNEDFrame.z;
+  ignition::math::Vector3d velGazeboWorldFrame =
+    this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
+  ignition::math::Vector3d velNEDFrame =
+    gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
+  pkt.velocityXYZ[0] = velNEDFrame.X();
+  pkt.velocityXYZ[1] = velNEDFrame.Y();
+  pkt.velocityXYZ[2] = velNEDFrame.Z();
 
   struct sockaddr_in sockaddr;
-  this->make_sockaddr("127.0.0.1", 9003, sockaddr);
-  ::sendto(this->handle, &pkt, sizeof(pkt), 0,
+  this->dataPtr->MakeSockAddr("127.0.0.1", 9003, sockaddr);
+
+  ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
     (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }
