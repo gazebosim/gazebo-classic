@@ -89,9 +89,12 @@ void ModelData_TEST::Clone()
   QVERIFY(cloneLink->collisions.size() == 1);
   QVERIFY(cloneLink->Scales().size() == 2);
 
-  QCOMPARE(cloneLink->Scales()["model::" + cloneLinkName + "::collision"],
+  QCOMPARE(
+      cloneLink->Scales().find(
+        "model::" + cloneLinkName + "::collision")->second,
       ignition::math::Vector3d::One);
-  QCOMPARE(cloneLink->Scales()["model::" + cloneLinkName + "::visual"],
+  QCOMPARE(cloneLink->Scales().find(
+        "model::" + cloneLinkName + "::visual")->second,
       ignition::math::Vector3d::One);
 
   QVERIFY(cloneLink->linkVisual != NULL);
@@ -210,7 +213,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scales()[collisionVis->GetName()] == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -253,7 +256,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -307,7 +310,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -369,7 +372,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scales()[collisionVis->GetName()] == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -412,7 +415,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -471,7 +474,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -533,7 +536,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scales()[collisionVis->GetName()] == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -576,7 +579,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -631,7 +634,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -691,7 +694,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One * radius * 2;
-    QVERIFY(link->Scales()[collisionVis->GetName()] == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -734,7 +737,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -795,7 +798,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scales()[collisionVis->GetName()] == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -841,7 +844,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
     }
     // scale up
     for (unsigned int i = 1e5; i >= 1; i = i/10)
@@ -859,7 +862,7 @@ void ModelData_TEST::LinkScale()
       link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scales()[collisionVis->GetName()] == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
     }
     // verify against original mass and inertia values
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
