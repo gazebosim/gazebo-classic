@@ -221,8 +221,11 @@ void HarnessPlugin::Init()
     }
   }
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&HarnessPlugin::OnUpdate, this, std::placeholders::_1));
+  if (!this->joints.empty())
+  {
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        std::bind(&HarnessPlugin::OnUpdate, this, std::placeholders::_1));
+  }
 }
 
 /////////////////////////////////////////////////
