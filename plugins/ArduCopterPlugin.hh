@@ -60,7 +60,7 @@ namespace gazebo
     private: void MotorCommand();
 
     /// \brief Publish ArduCopter state.
-    private: void SendState();
+    private: void SendState() const;
 
     /// \brief Private data pointer.
     private: std::unique_ptr<ArduCopterPluginPrivate> dataPtr;
