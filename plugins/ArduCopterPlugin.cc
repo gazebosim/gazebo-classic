@@ -457,11 +457,14 @@ void ArduCopterPlugin::UpdatePIDs(const double _dt)
 void ArduCopterPlugin::MotorCommand()
 {
   ServoPacket pkt;
-  // we re-send the servo packet every 0.1 seconds until we get a
-  // reply. This allows us to cope with some packet loss to the FDM
   while (this->dataPtr->Recv(&pkt, sizeof(pkt), 100) != sizeof(pkt))
   {
+    // Experimental call below, uncomment to test:
+    //   re-send the servo packet every 0.1 seconds until we get a
+    //   reply. This allows us to cope with some packet loss to the FDM
     // send_servos(input);
+
+    // sleep before retry if Recv returned false
     gazebo::common::Time::NSleep(100);
   }
 
