@@ -2,14 +2,21 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Plotting utility
+    * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
+    * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
+    * [Pull request #2382](https://bitbucket.org/osrf/gazebo/pull-request/2382)
+
+1. Renamed `gazebo/gui/SaveDialog` to `gazebo/gui/SaveEntityDialog`. A new
+   `SaveDialog` class will be added in a future pull request. The migration
+   guide will be updated with that pull request.
+    * [Pull request #2384](https://bitbucket.org/osrf/gazebo/pull-request/2384)
+
 1. Add FiducialCameraPlugin for Camera Sensors
     * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
 
 1. Fix Road2d vertices and shadows
     * [Pull request #2362](https://bitbucket.org/osrf/gazebo/pull-request/2362)
-
-1. Plotting utility - plot window, canvas, variables
-    * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
 
 1. Rearrange GLWidget::OnMouseMove so that the more common use cases it
    fewer if statements. Use std::thread in place of boost in OculusWindow.
@@ -26,9 +33,6 @@
 
 1. Add Introspection Manager and Client util
     * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
-
-1. Add plotting utility palatte
-    * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
 
 1. Refactor Event classes and improve memory management.
     * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
@@ -75,6 +79,9 @@
 
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
+
+1. Generalize actors to work even if not all elements are specified
+    * [Pull request #2360](https://bitbucket.org/osrf/gazebo/pull-request/2360)
 
 1. PIMPLize rendering/Grid
     * [Pull request 2330](https://bitbucket.org/osrf/gazebo/pull-request/2330)
@@ -130,6 +137,9 @@
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
+
+1. Redirect QT messages to Gazebo's console message handling system.
+    * [Pull request 2375](https://bitbucket.org/osrf/gazebo/pull-request/2375)
 
 1. Fix Model Manipulator switching between local and global frames
     * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)

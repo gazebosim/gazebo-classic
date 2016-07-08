@@ -293,34 +293,51 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
-  // Default window size is entire desktop.
-  QSize winSize = QApplication::desktop()->screenGeometry().size();
-
   // Get the size properties from the INI file.
-  int winWidth = getINIProperty<int>("geometry.width", winSize.width());
-  int winHeight = getINIProperty<int>("geometry.height", winSize.height());
+  int winWidth = getINIProperty<int>("geometry.width", -1);
+  int winHeight = getINIProperty<int>("geometry.height", -1);
 
-  winWidth = winWidth < 0 ? winSize.width() : winWidth;
-  winHeight = winHeight < 0 ? winSize.height() : winHeight;
-
-  // Get the position properties from the INI file.
-  int winXPos = getINIProperty<int>("geometry.x", 0);
-  int winYPos = getINIProperty<int>("geometry.y", 0);
-
-  this->setGeometry(winXPos, winYPos, winWidth, winHeight);
-
-  if (this->width() > winWidth)
+  // Width or height were not specified. Therefore make the window
+  // maximized.
+  if (winWidth <= 0 || winHeight <= 0)
   {
-    gzwarn << "Requested geometry.width of " << winWidth
-           << " but the minimum width of the window is "
-           << this->width() << "." << std::endl;
+    // Output error if the gui.ini file has missing value.
+    if (winWidth > 0)
+    {
+      gzerr << "gui.ini file has width but not height specified. "
+       << "The main window will appear maximized.\n";
+    }
+
+    // Output error if the gui.ini file has missing value.
+    if (winHeight > 0)
+    {
+      gzerr << "gui.ini file has height but not width specified. "
+       << "The main window will appear maximized.\n";
+    }
+
+    this->showMaximized();
   }
-
-  if (this->height() > winHeight)
+  else
   {
-    gzwarn << "Requested geometry.height of " << winHeight
-           << " but the minimum height of the window is "
-           << this->height() << "." << std::endl;
+    // Get the position properties from the INI file.
+    int winXPos = getINIProperty<int>("geometry.x", 0);
+    int winYPos = getINIProperty<int>("geometry.y", 0);
+
+    this->setGeometry(winXPos, winYPos, winWidth, winHeight);
+
+    if (this->width() > winWidth)
+    {
+      gzwarn << "Requested geometry.width of " << winWidth
+        << " but the minimum width of the window is "
+        << this->width() << "." << std::endl;
+    }
+
+    if (this->height() > winHeight)
+    {
+      gzwarn << "Requested geometry.height of " << winHeight
+        << " but the minimum height of the window is "
+        << this->height() << "." << std::endl;
+    }
   }
 
   this->dataPtr->worldControlPub =
@@ -1103,7 +1120,8 @@ void MainWindow::CreateActions()
 
   g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
   g_hotkeyChartAct->setStatusTip(tr("Open hotkey chart in a browser"));
-  this->connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
+  this->connect(g_hotkeyChartAct, SIGNAL(triggered()), this,
+      SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -1124,7 +1142,8 @@ void MainWindow::CreateActions()
   g_resetWorldAct->setShortcut(tr("Ctrl+R"));
   this->addAction(g_resetWorldAct);
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
-  this->connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
+  this->connect(g_resetWorldAct, SIGNAL(triggered()), this,
+      SLOT(OnResetWorld()));
 
   QActionGroup *editorGroup = new QActionGroup(this);
   // Exclusive doesn't allow all actions to be unchecked at the same time
@@ -1359,7 +1378,8 @@ void MainWindow::CreateActions()
   g_overlayAct->setEnabled(false);
   g_overlayAct->setCheckable(true);
   g_overlayAct->setChecked(false);
-  this->connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
+  this->connect(g_overlayAct, SIGNAL(triggered()), this,
+      SLOT(ShowGUIOverlays()));
 
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
   viewControlActionGroup->addAction(g_fpsAct);
@@ -1515,7 +1535,8 @@ void MainWindow::CreateActions()
   // we don't want the icon on the menu.
   QAction *viewAngleReset = new QAction(QIcon(":/images/view_angle_home.png"),
       tr("Reset View Angle"), this);
-  this->connect(g_resetAct, SIGNAL(triggered()), viewAngleReset, SLOT(trigger()));
+  this->connect(g_resetAct, SIGNAL(triggered()), viewAngleReset,
+      SLOT(trigger()));
 
   ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
   viewAngleWidget->setObjectName("viewAngleWidget");
@@ -2346,7 +2367,8 @@ QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
   this->connect(actionClone, SIGNAL(triggered()), _action, SLOT(trigger()));
   // Then the original action reports its checked state to the cloned action
   // without triggering it circularly.
-  this->connect(_action, SIGNAL(toggled(bool)), actionClone, SLOT(setChecked(bool)));
+  this->connect(_action, SIGNAL(toggled(bool)), actionClone,
+      SLOT(setChecked(bool)));
 
   return actionClone;
 }
