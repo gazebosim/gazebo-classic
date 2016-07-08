@@ -118,9 +118,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
 
   GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
 
-  gzerr << "model: " << this->dataPtr->model->GetName() << "\n";
+  gzdbg << "using model: " << this->dataPtr->model->GetName() << "\n";
 
   // get engine controls
+  gzdbg << "loading engines.\n";
   if (_sdf->HasElement("engine"))
   {
     sdf::ElementPtr enginePtr = _sdf->GetElement("engine");
@@ -159,6 +160,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   }
 
   // get thruster controls
+  gzdbg << "loading thrusters.\n";
   if (_sdf->HasElement("thruster"))
   {
     sdf::ElementPtr thrusterPtr = _sdf->GetElement("thruster");
@@ -189,6 +191,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   }
 
   // get controls
+  gzdbg << "loading controls.\n";
   sdf::ElementPtr controlPtr = _sdf->GetElement("control");
   while (controlPtr)
   {
@@ -251,7 +254,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
     }
     // get next element
     controlPtr = controlPtr->GetNextElement("control");
+    // gzdbg << controlPtr << "\n";
   }
+
+  gzdbg << "Load done.\n";
 }
 
 /////////////////////////////////////////////////
@@ -264,51 +270,57 @@ void PlaneDemoPlugin::Init()
     new std::thread(std::bind(&PlaneDemoPluginPrivate::OnKeyHit,
         this->dataPtr.get())));
   this->dataPtr->stop = false;
+  gzdbg << "Init done.\n";
 }
 
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  common::Time curTime = this->dataPtr->world->GetSimTime();
-  for (std::vector<EngineControl>::iterator ei =
-      this->dataPtr->engineControls.begin();
-      ei != this->dataPtr->engineControls.end(); ++ei)
+  gzdbg << "executing OnUpdate.\n";
   {
-    // spin up engine
-    ei->joint->SetForce(0, ei->torque);
-  }
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    common::Time curTime = this->dataPtr->world->GetSimTime();
+    for (std::vector<EngineControl>::iterator ei =
+        this->dataPtr->engineControls.begin();
+        ei != this->dataPtr->engineControls.end(); ++ei)
+    {
+      // spin up engine
+      ei->joint->SetForce(0, ei->torque);
+    }
 
-  for (std::vector<ThrusterControl>::iterator
-    ti = this->dataPtr->thrusterControls.begin();
-    ti != this->dataPtr->thrusterControls.end(); ++ti)
-  {
-    // fire up thruster
-    math::Pose pose = ti->link->GetWorldPose();
-    ti->link->AddForce(pose.rot.RotateVector(ti->force));
-  }
+    for (std::vector<ThrusterControl>::iterator
+      ti = this->dataPtr->thrusterControls.begin();
+      ti != this->dataPtr->thrusterControls.end(); ++ti)
+    {
+      // fire up thruster
+      math::Pose pose = ti->link->GetWorldPose();
+      ti->link->AddForce(pose.rot.RotateVector(ti->force));
+    }
 
-  for (std::vector<JointControl>::iterator ji =
-      this->dataPtr->jointControls.begin();
-      ji != this->dataPtr->jointControls.end(); ++ji)
-  {
-    // spin up joint control
-    double pos = ji->joint->GetAngle(0).Radian();
-    double error = pos - ji->cmd;
-    double force = ji->pid.Update(error,
-        curTime - this->dataPtr->lastUpdateTime);
-    ji->joint->SetForce(0, force);
+    for (std::vector<JointControl>::iterator ji =
+        this->dataPtr->jointControls.begin();
+        ji != this->dataPtr->jointControls.end(); ++ji)
+    {
+      // spin up joint control
+      double pos = ji->joint->GetAngle(0).Radian();
+      double error = pos - ji->cmd;
+      double force = ji->pid.Update(error,
+          curTime - this->dataPtr->lastUpdateTime);
+      ji->joint->SetForce(0, force);
+    }
+    this->dataPtr->lastUpdateTime = curTime;
   }
-  this->dataPtr->lastUpdateTime = curTime;
 }
 
 /////////////////////////////////////////////////
 void PlaneDemoPluginPrivate::OnKeyHit()
 {
+  gzdbg << "executing OnKeyHit.\n";
   char ch='x';
   ch = getchar();
   while (!this->stop)
   {
+    gzdbg << "keyhit\n";
     std::lock_guard<std::mutex> lock(this->mutex);
     printf("you hit");
     printf(" '%c'(%i)", isprint(ch)?ch:'?', static_cast<int>(ch));
@@ -391,5 +403,6 @@ void PlaneDemoPluginPrivate::OnKeyHit()
         // gzerr << (int)ch << " : " << this->clIncKey << "\n";
       }
     }
+    usleep(500);
   }
 }
