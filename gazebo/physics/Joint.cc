@@ -265,7 +265,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       this->childLink = boost::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(scopedChildName));
 
-        parentModel = parentModel->GetParent();
+      parentModel = parentModel->GetParent();
     }
     if (!this->childLink)
     {
