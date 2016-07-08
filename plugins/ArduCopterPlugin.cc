@@ -493,12 +493,6 @@ void ArduCopterPlugin::SendState() const
   ignition::math::Vector3d linearAccel =
     this->dataPtr->imuSensor->LinearAcceleration();
 
-  // rotate gravity into imu frame, subtract it
-  // math::Vector3 gravity =
-  //   this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetGravity();
-  // linearAccel = linearAccel -
-  //   this->dataPtr->imuLink.GetWorldPose().rot.RotateVectorReverse(gravity);
-
   // copy to pkt
   pkt.imuLinearAccelerationXYZ[0] = linearAccel.X();
   pkt.imuLinearAccelerationXYZ[1] = linearAccel.Y();
@@ -513,14 +507,6 @@ void ArduCopterPlugin::SendState() const
   pkt.imuAngularVelocityRPY[0] = angularVel.X();
   pkt.imuAngularVelocityRPY[1] = angularVel.Y();
   pkt.imuAngularVelocityRPY[2] = angularVel.Z();
-
-  // get orientation with offset added
-  // ignition::math::Quaterniond worldQ =
-  // this->dataPtr->imuSensor->Orientation();
-  // pkt.imuOrientationQuat[0] = worldQ.W();
-  // pkt.imuOrientationQuat[1] = worldQ.X();
-  // pkt.imuOrientationQuat[2] = worldQ.Y();
-  // pkt.imuOrientationQuat[3] = worldQ.Z();
 
   // get inertial pose and velocity
   // position of the quadrotor in world frame
@@ -562,15 +548,16 @@ void ArduCopterPlugin::SendState() const
   // D
   pkt.positionXYZ[2] = NEDToModel.Pos().Z();
 
-  // This is the rotation from world NED frame to the quadrotor
-  // frame.
-  // gzerr << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
-  // gzerr << "ned [" << gazeboToNED.rot.GetAsEuler() << "]\n";
-  // gzerr << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
+  // imuOrientationQuat is the rotation from world NED frame
+  // to the quadrotor frame.
   pkt.imuOrientationQuat[0] = NEDToModel.Rot().W();
   pkt.imuOrientationQuat[1] = NEDToModel.Rot().X();
   pkt.imuOrientationQuat[2] = NEDToModel.Rot().Y();
   pkt.imuOrientationQuat[3] = NEDToModel.Rot().Z();
+
+  // gzdbg << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
+  // gzdbg << "ned [" << gazeboToNED.rot.GetAsEuler() << "]\n";
+  // gzdbg << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
 
   // Get NED velocity in body frame *
   // or...
