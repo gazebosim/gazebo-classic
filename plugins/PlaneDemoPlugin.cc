@@ -133,6 +133,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         if (joint.get() != NULL)
         {
           EngineControl ec;
+          // ec.name = enginePtr->GetAttribute("name")->GetAsString();
           ec.joint = joint;
           if (enginePtr->HasElement("max_torque"))
             ec.maxTorque = enginePtr->Get<double>("max_torque");
@@ -170,6 +171,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         if (link.get() != NULL)
         {
           ThrusterControl tc;
+          // tc.name = thrusterPtr->GetAttribute("name")->GetAsString();
           tc.link = link;
           if (thrusterPtr->HasElement("inc_key"))
             tc.incKey = thrusterPtr->Get<int>("inc_key");
@@ -197,6 +199,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
       if (joint.get() != NULL)
       {
         JointControl jc;
+        // jc.name = controlPtr->GetAttribute("name")->GetAsString();
         jc.joint = joint;
         if (controlPtr->HasElement("inc_key"))
           jc.incKey = controlPtr->Get<int>("inc_key");
@@ -236,12 +239,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           cmdMax = controlPtr->Get<double>("cmd_max");
         else
           cmdMax = 1000.0;
-
         if (controlPtr->HasElement("cmd_min"))
           cmdMin = controlPtr->Get<double>("cmd_min");
         else
           cmdMin = -1000.0;
-
         jc.pid.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
         jc.cmd = joint->GetAngle(0).Radian();
         jc.pid.SetCmd(jc.cmd);
@@ -355,7 +356,8 @@ void PlaneDemoPluginPrivate::OnKeyHit()
       }
     }
 
-    for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
+    for (std::vector<JointControl>::iterator
+      ji = this->jointControls.begin();
       ji != this->jointControls.end(); ++ji)
     {
       if (static_cast<int>(ch) == ji->incKey)
