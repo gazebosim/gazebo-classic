@@ -36,11 +36,11 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(ArduCopterPlugin)
 
 /// \brief Obtains a parameter from sdf.
-/// \param[in] sdf Pointer to the sdf object.
-/// \param[in] name Name of the parameter.
-/// \param[out] param Param Variable to write the parameter to.
-/// \param[in] default_value Default value, if the parameter not available.
-/// \param[in] verbose If true, gzerror if the parameter is not available.
+/// \param[in] _sdf Pointer to the sdf object.
+/// \param[in] _name Name of the parameter.
+/// \param[out] _param Param Variable to write the parameter to.
+/// \param[in] _default_value Default value, if the parameter not available.
+/// \param[in] _verbose If true, gzerror if the parameter is not available.
 template<class T>
 bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
   T &_param, const T &_defaultValue, const bool &_verbose = false)
@@ -474,7 +474,7 @@ void ArduCopterPlugin::MotorCommand()
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::SendState()
+void ArduCopterPlugin::SendState() const
 {
   // send_fdm
   fdmPacket pkt;
