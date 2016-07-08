@@ -120,6 +120,7 @@ auto standaloneValues = ::testing::Values(
   , "clone_simulation"
   , "custom_main"
   , "custom_main_pkgconfig"
+  , "harness"
   , "listener"
   , "publisher"
 #ifndef BUILD_TYPE_COVERAGE
