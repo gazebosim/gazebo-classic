@@ -144,7 +144,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick the third model - box
-  pickPt =cam->Project(model03Vis->GetWorldPose().pos.Ign());
+  pickPt = cam->Project(model03Vis->GetWorldPose().pos.Ign());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);

@@ -1352,8 +1352,7 @@ bool Camera::SaveFrame(const unsigned char *_image,
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
 
   // OGRE 1.9 renames codeToFile to encodeToFile
-  // Looks like 1.9RC, which we're using on Windows, doesn't have this change.
-  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
   pCodec->codeToFile(stream, filename, codecDataPtr);
   #else
   pCodec->encodeToFile(stream, filename, codecDataPtr);
@@ -1710,7 +1709,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(uint32_t _visualId,
+void Camera::AttachToVisual(const uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
@@ -1773,7 +1772,7 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(uint32_t _id,
+bool Camera::AttachToVisualImpl(const uint32_t _id,
     const bool _inheritOrientation, const double _minDist,
     const double _maxDist)
 {
