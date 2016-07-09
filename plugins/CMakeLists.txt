@@ -55,6 +55,7 @@ set (plugins_single_header
   FollowerPlugin
   ForceTorquePlugin
   GpuRayPlugin
+  HarnessPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin

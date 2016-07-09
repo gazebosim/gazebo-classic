@@ -2070,7 +2070,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
           _outStream << "  vec3 tangent = vec3(0.0, 0.0, -1.0);\n";
           break;
         default:
-          gzerr << "Inavlid terrain alignment\n";
+          gzerr << "Invalid terrain alignment\n";
           break;
       };
 
