@@ -436,7 +436,7 @@ void LinkData::SetScales(
 }
 
 /////////////////////////////////////////////////
-std::map<std::string, ignition::math::Vector3d> LinkData::Scales() const
+const std::map<std::string, ignition::math::Vector3d> &LinkData::Scales() const
 {
   return this->scales;
 }

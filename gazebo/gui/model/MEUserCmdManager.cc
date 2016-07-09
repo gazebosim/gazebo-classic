@@ -160,7 +160,7 @@ void MEUserCmd::Undo()
   }
   // Scaling a link
   else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
-      !this->dataPtr->scopedName.empty())
+           !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkScale(this->dataPtr->scopedName,
         this->dataPtr->scalesBefore);
@@ -242,7 +242,7 @@ void MEUserCmd::Redo()
   }
   // Scaling a link
   else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
-      !this->dataPtr->scopedName.empty())
+           !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkScale(this->dataPtr->scopedName,
         this->dataPtr->scalesAfter);
@@ -309,8 +309,9 @@ void MEUserCmd::SetScaleChange(
 {
   if (_before.size() != _after.size())
   {
-    gzwarn << "Number of scales before and after command are different, " <<
-        "some visual or collision might be scaled wrong." << std::endl;
+    gzwarn << "Number of scale operations before and after command are "
+      << "different, some visuals or collisions might be scaled wrong."
+      << std::endl;
   }
 
   this->dataPtr->scalesBefore = _before;

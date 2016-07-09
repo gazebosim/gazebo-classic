@@ -127,7 +127,7 @@ namespace gazebo
       public: void SetPoseChange(const ignition::math::Pose3d &_before,
           const ignition::math::Pose3d &_after);
 
-      /// \brief Set the scales before and after the command.
+      /// \brief Set the scale factors before and after the command.
       /// \param[in] _before Scales before the command, to be used by undo.
       /// \param[in] _after Scales after the command, to be used by redo.
       public: void SetScaleChange(

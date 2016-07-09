@@ -180,8 +180,8 @@ namespace gazebo
       public: std::recursive_mutex updateMutex;
 
       /// \brief A list of link names whose scale has changed externally,
-      /// and for each link, the list of scales for each of its visuals and
-      /// collisions.
+      /// and for each link, the list of scale factors for each of its
+      /// visuals and collisions.
       public: std::map<LinkData *,
           std::map<std::string, ignition::math::Vector3d>> linkScaleUpdate;
 
@@ -3211,7 +3211,7 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
 
 /////////////////////////////////////////////////
 void ModelCreator::OnRequestLinkScale(const std::string &_name,
-    std::map<std::string, ignition::math::Vector3d> _scales)
+    const std::map<std::string, ignition::math::Vector3d> &_scales)
 {
   auto link = this->dataPtr->allLinks.find(_name);
   if (link == this->dataPtr->allLinks.end())
@@ -3228,13 +3228,13 @@ void ModelCreator::OnRequestLinkScale(const std::string &_name,
     auto childVis = linkVis->GetChild(i);
 
     // Check if there is a new scale for this child
-    if (_scales.find(childVis->GetName()) == _scales.end())
+    auto scaleIter = _scales.find(childVis->GetName());
+    if (scaleIter == _scales.end())
     {
       continue;
     }
 
-    auto scale = _scales[childVis->GetName()];
-    childVis->SetScale(scale);
+    childVis->SetScale(scaleIter->second);
   }
 
   // Update link data and inspector
