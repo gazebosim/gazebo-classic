@@ -108,7 +108,14 @@ bool Video::Load(const std::string &_filename)
   // Find the first video stream
   for (unsigned int i = 0; i < this->formatCtx->nb_streams; ++i)
   {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     {
       this->videoStream = static_cast<int>(i);
       break;
@@ -122,7 +129,14 @@ bool Video::Load(const std::string &_filename)
   }
 
   // Get a pointer to the codec context for the video stream
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->codecCtx = this->formatCtx->streams[this->videoStream]->codec;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Find the decoder for the video stream
   codec = avcodec_find_decoder(this->codecCtx->codec_id);
@@ -213,8 +227,15 @@ bool Video::GetNextFrame(unsigned char **_buffer)
     while (tmpPacket.size > 0)
     {
       // sending data to libavcodec
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       int processedLength = avcodec_decode_video2(this->codecCtx, this->avFrame,
           &frameAvailable, &tmpPacket);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
       if (processedLength < 0)
       {
         gzerr << "Error while processing the data\n";
