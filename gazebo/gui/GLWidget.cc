@@ -332,6 +332,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (_event->key() == Qt::Key_Delete &&
       this->dataPtr->selectionLevel == SelectionLevels::MODEL)
   {
+    ModelManipulator::Instance()->Detach();
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     while (!this->dataPtr->selectedVisuals.empty())
     {
@@ -1150,8 +1151,8 @@ void GLWidget::OnManipMode(const std::string &_mode)
               = this->dataPtr->selectedVisuals.begin();
               it != --this->dataPtr->selectedVisuals.end();)
       {
-         (*it)->SetHighlighted(false);
-         it = this->dataPtr->selectedVisuals.erase(it);
+        (*it)->SetHighlighted(false);
+        it = this->dataPtr->selectedVisuals.erase(it);
       }
     }
   }

@@ -30,9 +30,6 @@ namespace gazebo
     /// \brief Private data for the Grid class.
     class GridPrivate
     {
-      /// \brief Pointer to the scene node
-      public: Ogre::SceneNode *sceneNode = nullptr;
-
       /// \brief Pointer to the manual object.
       public: Ogre::ManualObject *manualObject = nullptr;
 
@@ -62,6 +59,9 @@ namespace gazebo
 
       /// \brief Pointer to the scene.
       public: Scene *scene = nullptr;
+
+      /// \brief Grid visual that contains the grid lines
+      public: VisualPtr gridVis;
     };
   }
 }
@@ -94,16 +94,7 @@ Grid::Grid(Scene *_scene, const unsigned int _cellCount,
 //////////////////////////////////////////////////
 Grid::~Grid()
 {
-  if (this->dataPtr->scene && this->dataPtr->sceneNode)
-  {
-    this->dataPtr->scene->OgreSceneManager()->destroySceneNode(
-        this->dataPtr->sceneNode->getName());
-  }
-  if (this->dataPtr->scene && this->dataPtr->manualObject)
-  {
-    this->dataPtr->scene->OgreSceneManager()->destroyManualObject(
-        this->dataPtr->manualObject);
-  }
+  this->dataPtr->gridVis->Fini();
   this->dataPtr->material->unload();
 }
 
@@ -178,12 +169,12 @@ void Grid::Init()
   //    Ogre::RENDER_QUEUE_SKIES_EARLY+3);
   //    Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
-  Ogre::SceneNode *parent_node =
-      this->dataPtr->scene->OgreSceneManager()->getRootSceneNode();
-
-  this->dataPtr->sceneNode = parent_node->createChildSceneNode(
-      this->dataPtr->name);
-  this->dataPtr->sceneNode->attachObject(this->dataPtr->manualObject);
+  this->dataPtr->gridVis.reset(
+      new Visual(this->dataPtr->name, this->dataPtr->scene->WorldVisual(),
+      false));
+  this->dataPtr->gridVis->Load();
+  this->dataPtr->gridVis->GetSceneNode()->attachObject(
+      this->dataPtr->manualObject);
 
   std::stringstream ss;
   ss << this->dataPtr->name << "Material";
@@ -278,19 +269,19 @@ void Grid::SetUserData(const Ogre::Any &_data)
 //////////////////////////////////////////////////
 void Grid::Enable(const bool _enable)
 {
-  this->dataPtr->sceneNode->setVisible(_enable);
+  this->dataPtr->gridVis->SetVisible(_enable);
 }
 
 //////////////////////////////////////////////////
 Ogre::SceneNode *Grid::GetSceneNode()
 {
-  return this->SceneNode();
+  return this->dataPtr->gridVis->GetSceneNode();
 }
 
 //////////////////////////////////////////////////
-Ogre::SceneNode *Grid::SceneNode() const
+VisualPtr Grid::GridVisual() const
 {
-  return this->dataPtr->sceneNode;
+  return this->dataPtr->gridVis;
 }
 
 //////////////////////////////////////////////////

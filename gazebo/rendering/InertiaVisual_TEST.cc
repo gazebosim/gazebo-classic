@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/SonarVisual.hh"
+#include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class SonarVisual_TEST : public RenderingFixture
+class InertiaVisual_TEST : public RenderingFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(SonarVisual_TEST, SonarVisualTest)
+TEST_F(InertiaVisual_TEST, InertiaVisualTest)
 {
   Load("worlds/empty.world");
 
@@ -39,20 +39,22 @@ TEST_F(SonarVisual_TEST, SonarVisualTest)
 
   EXPECT_TRUE(scene != nullptr);
 
-  // get scene visual child count before we create any visuals
   EXPECT_TRUE(scene->WorldVisual() != nullptr);
   unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // test calling constructor and Load functions and make sure
   // there are no segfaults
-  gazebo::rendering::VisualPtr sonarVis(
-      new gazebo::rendering::SonarVisual(
-      "world_GUIONLY_sonar_vis", scene->WorldVisual(), ""));
-  sonarVis->Load();
+  gazebo::rendering::VisualPtr inertiaVis(new gazebo::rendering::InertiaVisual(
+      "inertia_vis", scene->WorldVisual()));
+  inertiaVis->Load();
+
+  EXPECT_EQ(inertiaVis->GetName(), "inertia_vis");
+  EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
+  EXPECT_TRUE(scene->GetVisual(inertiaVis->GetName()) != nullptr);
 
   // test destroying the visual
-  sonarVis->Fini();
-  EXPECT_EQ(sonarVis->GetChildCount(), 0u);
+  inertiaVis->Fini();
+  EXPECT_EQ(inertiaVis->GetChildCount(), 0u);
 
   // verify scene's child count is the same as before the visual was created
   EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
