@@ -178,10 +178,10 @@ TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
 
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  EXPECT_FLOAT_EQ(0.1f, msg.r());
+  EXPECT_FLOAT_EQ(0.2f, msg.g());
+  EXPECT_FLOAT_EQ(0.3f, msg.b());
+  EXPECT_FLOAT_EQ(1.0f, msg.a());
 }
 
 TEST_F(MsgsTest, ConvertMsgsColorToCommon)
@@ -189,10 +189,10 @@ TEST_F(MsgsTest, ConvertMsgsColorToCommon)
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
   common::Color v = msgs::Convert(msg);
 
-  EXPECT_TRUE(math::equal(0.1f, v.r));
-  EXPECT_TRUE(math::equal(0.2f, v.g));
-  EXPECT_TRUE(math::equal(0.3f, v.b));
-  EXPECT_TRUE(math::equal(1.0f, v.a));
+  EXPECT_FLOAT_EQ(0.1f, v.r);
+  EXPECT_FLOAT_EQ(0.2f, v.g);
+  EXPECT_FLOAT_EQ(0.3f, v.b);
+  EXPECT_FLOAT_EQ(1.0f, v.a);
 }
 
 TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
@@ -355,10 +355,10 @@ TEST_F(MsgsTest, SetColor)
 {
   msgs::Color msg;
   msgs::Set(&msg, common::Color(.1, .2, .3, 1.0));
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  EXPECT_FLOAT_EQ(0.1f, msg.r());
+  EXPECT_FLOAT_EQ(0.2f, msg.g());
+  EXPECT_FLOAT_EQ(0.3f, msg.b());
+  EXPECT_FLOAT_EQ(1.0f, msg.a());
 }
 
 TEST_F(MsgsTest, SetTime)
