@@ -21,18 +21,13 @@
 
 #include <sdf/sdf.hh>
 
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Pose3.hh>
 #include <ignition/math/Plane.hh>
-
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
-
-#include "gazebo/math/MathTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Plane.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Color.hh"
