@@ -27,11 +27,6 @@
     <include>
       <uri>model://sun</uri>
     </include>
-<!--
-    <include>
-      <uri>model://drc_terrain</uri>
-    </include>
--->
 
     <model name="ground_plane">
       <static>true</static>

@@ -455,7 +455,6 @@
       <joint name="wheel_2_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_2</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
             <lower>-1e16</lower>
@@ -475,7 +474,6 @@
       <joint name="wheel_3_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_3</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
             <lower>-1e16</lower>
@@ -495,7 +493,6 @@
       <joint name="rod_1_joint" type="revolute">
         <parent>body</parent>
         <child>rod_1</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
             <lower>-1e16</lower>
