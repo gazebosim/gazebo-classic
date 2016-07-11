@@ -124,10 +124,10 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
   msgs::Quaternion msg =
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
 
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
@@ -136,11 +136,10 @@ TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
   ignition::math::Quaterniond v = msgs::ConvertIgn(msg);
 
-  // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
-  EXPECT_TRUE(math::equal(v.X(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.Y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.Z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.W(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(v.X(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(v.Y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(v.Z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(v.W(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
@@ -153,10 +152,10 @@ TEST_F(MsgsTest, ConvertPoseMathToMsgs)
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.orientation().x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.orientation().y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.orientation().z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.orientation().w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
@@ -169,20 +168,20 @@ TEST_F(MsgsTest, ConvertMsgPoseToMath)
   EXPECT_DOUBLE_EQ(1, v.Pos().X());
   EXPECT_DOUBLE_EQ(2, v.Pos().Y());
   EXPECT_DOUBLE_EQ(3, v.Pos().Z());
-  EXPECT_TRUE(math::equal(v.Rot().X(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.Rot().Y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.Rot().Z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.Rot().W(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(v.Rot().X(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(v.Rot().Y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(v.Rot().Z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(v.Rot().W(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
 
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  EXPECT_FLOAT_EQ(0.1f, msg.r());
+  EXPECT_FLOAT_EQ(0.2f, msg.g());
+  EXPECT_FLOAT_EQ(0.3f, msg.b());
+  EXPECT_FLOAT_EQ(1.0f, msg.a());
 }
 
 TEST_F(MsgsTest, ConvertMsgsColorToCommon)
@@ -190,10 +189,10 @@ TEST_F(MsgsTest, ConvertMsgsColorToCommon)
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
   common::Color v = msgs::Convert(msg);
 
-  EXPECT_TRUE(math::equal(0.1f, v.r));
-  EXPECT_TRUE(math::equal(0.2f, v.g));
-  EXPECT_TRUE(math::equal(0.3f, v.b));
-  EXPECT_TRUE(math::equal(1.0f, v.a));
+  EXPECT_FLOAT_EQ(0.1f, v.r);
+  EXPECT_FLOAT_EQ(0.2f, v.g);
+  EXPECT_FLOAT_EQ(0.3f, v.b);
+  EXPECT_FLOAT_EQ(1.0f, v.a);
 }
 
 TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
@@ -235,7 +234,7 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_DOUBLE_EQ(123, v.Size().X());
   EXPECT_DOUBLE_EQ(456, v.Size().Y());
 
-  EXPECT_TRUE(math::equal(1.0, v.Offset()));
+  EXPECT_DOUBLE_EQ(1.0, v.Offset());
 }
 
 //////////////////////////////////////////////////
@@ -330,10 +329,10 @@ TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
   msgs::Set(&msg, ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, SetPose)
@@ -346,20 +345,20 @@ TEST_F(MsgsTest, SetPose)
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.orientation().x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.orientation().y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.orientation().z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.orientation().w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, SetColor)
 {
   msgs::Color msg;
   msgs::Set(&msg, common::Color(.1, .2, .3, 1.0));
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  EXPECT_FLOAT_EQ(0.1f, msg.r());
+  EXPECT_FLOAT_EQ(0.2f, msg.g());
+  EXPECT_FLOAT_EQ(0.3f, msg.b());
+  EXPECT_FLOAT_EQ(1.0f, msg.a());
 }
 
 TEST_F(MsgsTest, SetTime)
@@ -384,7 +383,7 @@ TEST_F(MsgsTest, SetPlane)
   EXPECT_DOUBLE_EQ(123, msg.size().x());
   EXPECT_DOUBLE_EQ(456, msg.size().y());
 
-  EXPECT_TRUE(math::equal(1.0, msg.d()));
+  EXPECT_DOUBLE_EQ(1.0, msg.d());
 }
 
 TEST_F(MsgsTest, Initialization)
@@ -1851,15 +1850,16 @@ TEST_F(MsgsTest, JointFromSDF)
 TEST_F(MsgsTest, LinkToSDF)
 {
   const std::string name("test_link");
-  const math::Pose pose(math::Vector3(3, 2, 1),
-                        math::Quaternion(0.5, -0.5, -0.5, 0.5));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(3, 2, 1),
+      ignition::math::Quaterniond(0.5, -0.5, -0.5, 0.5));
 
   msgs::Link linkMsg;
   linkMsg.set_name(name);
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
-  msgs::Set(linkMsg.mutable_pose(), pose.Ign());
+  msgs::Set(linkMsg.mutable_pose(), pose);
 
   const double laserRetro1 = 0.4;
   const double laserRetro2 = 0.5;
@@ -1889,7 +1889,7 @@ TEST_F(MsgsTest, LinkToSDF)
   EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
-  EXPECT_EQ(pose, linkSDF->Get<math::Pose>("pose"));
+  EXPECT_EQ(pose, linkSDF->Get<ignition::math::Pose3d>("pose"));
 
   sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");
   EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("laser_retro"), laserRetro1);
@@ -1918,9 +1918,10 @@ TEST_F(MsgsTest, CollisionToSDF)
   collisionMsg.set_name(name);
   collisionMsg.set_laser_retro(0.2);
   collisionMsg.set_max_contacts(5);
-  msgs::Set(collisionMsg.mutable_pose(),
-      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
-      ignition::math::Quaterniond(0, 0, 1, 0)));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(0, 0, 1, 0));
+  msgs::Set(collisionMsg.mutable_pose(), pose);
 
   // geometry - see GeometryToSDF for a more detailed test
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
@@ -1942,8 +1943,7 @@ TEST_F(MsgsTest, CollisionToSDF)
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("laser_retro"), 0.2);
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("max_contacts"), 5);
 
-  EXPECT_TRUE(collisionSDF->Get<math::Pose>("pose") ==
-      math::Pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0)));
+  EXPECT_EQ(collisionSDF->Get<ignition::math::Pose3d>("pose"), pose);
 
   sdf::ElementPtr geomElem = collisionSDF->GetElement("geometry");
   sdf::ElementPtr cylinderElem = geomElem->GetElement("cylinder");
@@ -1961,7 +1961,9 @@ TEST_F(MsgsTest, VisualToSDF)
 {
   const std::string name("visual");
   const double laserRetro = 0.2;
-  const math::Pose pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(0, 0, 1, 0));
   const double radius = 3.3;
   const std::string materialName("Gazebo/Grey");
   const std::string uri("pretend_this_is_a_URI");
@@ -1969,7 +1971,7 @@ TEST_F(MsgsTest, VisualToSDF)
   msgs::Visual visualMsg;
   visualMsg.set_name(name);
   visualMsg.set_laser_retro(laserRetro);
-  msgs::Set(visualMsg.mutable_pose(), pose.Ign());
+  msgs::Set(visualMsg.mutable_pose(), pose);
 
   // geometry - see GeometryToSDF for a more detailed test
   auto geomMsg = visualMsg.mutable_geometry();
@@ -1989,7 +1991,7 @@ TEST_F(MsgsTest, VisualToSDF)
 
   EXPECT_DOUBLE_EQ(visualSDF->Get<double>("laser_retro"), laserRetro);
 
-  EXPECT_EQ(pose, visualSDF->Get<math::Pose>("pose"));
+  EXPECT_EQ(pose, visualSDF->Get<ignition::math::Pose3d>("pose"));
 
   ASSERT_TRUE(visualSDF->HasElement("geometry"));
   sdf::ElementPtr geomElem = visualSDF->GetElement("geometry");
@@ -2029,15 +2031,15 @@ TEST_F(MsgsTest, VisualToSDF)
 TEST_F(MsgsTest, GeometryToSDF)
 {
   // box
+  const ignition::math::Vector3d boxSize(0.5, 0.75, 1.0);
   msgs::Geometry boxMsg;
   boxMsg.set_type(msgs::Geometry::BOX);
   msgs::BoxGeom *boxGeom = boxMsg.mutable_box();
-  msgs::Set(boxGeom->mutable_size(), ignition::math::Vector3d(0.5, 0.75, 1.0));
+  msgs::Set(boxGeom->mutable_size(), boxSize);
 
   sdf::ElementPtr boxSDF = msgs::GeometryToSDF(boxMsg);
   sdf::ElementPtr boxElem = boxSDF->GetElement("box");
-  EXPECT_TRUE(boxElem->Get<math::Vector3>("size") ==
-      math::Vector3(0.5, 0.75, 1.0));
+  EXPECT_EQ(boxElem->Get<ignition::math::Vector3d>("size"), boxSize);
 
   // cylinder
   msgs::Geometry cylinderMsg;
@@ -2070,10 +2072,10 @@ TEST_F(MsgsTest, GeometryToSDF)
 
   sdf::ElementPtr planeSDF = msgs::GeometryToSDF(planeMsg);
   sdf::ElementPtr planeElem = planeSDF->GetElement("plane");
-  EXPECT_TRUE(planeElem->Get<math::Vector3>("normal") ==
-      math::Vector3(0, 0, 1.0));
-  EXPECT_TRUE(planeElem->Get<math::Vector2d>("size") ==
-      math::Vector2d(0.5, 0.8));
+  EXPECT_TRUE(planeElem->Get<ignition::math::Vector3d>("normal") ==
+      ignition::math::Vector3d(0, 0, 1.0));
+  EXPECT_TRUE(planeElem->Get<ignition::math::Vector2d>("size") ==
+      ignition::math::Vector2d(0.5, 0.8));
 
   // image
   msgs::Geometry imageMsg;
@@ -2122,10 +2124,10 @@ TEST_F(MsgsTest, GeometryToSDF)
   sdf::ElementPtr heightmapElem = heightmapSDF->GetElement("heightmap");
   EXPECT_STREQ(heightmapElem->Get<std::string>("uri").c_str(),
       "test_heightmap_filename");
-  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("size") ==
-      math::Vector3(100, 200, 30));
-  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("pos") ==
-      math::Vector3(50, 100, 15));
+  EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("size") ==
+      ignition::math::Vector3d(100, 200, 30));
+  EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("pos") ==
+      ignition::math::Vector3d(50, 100, 15));
   EXPECT_TRUE(heightmapElem->Get<bool>("use_terrain_paging"));
 
   sdf::ElementPtr textureElem1 = heightmapElem->GetElement("texture");
@@ -2158,8 +2160,8 @@ TEST_F(MsgsTest, GeometryToSDF)
   sdf::ElementPtr meshElem = meshSDF->GetElement("mesh");
   EXPECT_STREQ(meshElem->Get<std::string>("uri").c_str(),
       "test_mesh_filename");
-  EXPECT_TRUE(meshElem->Get<math::Vector3>("scale") ==
-      math::Vector3(2.3, 1.2, 2.9));
+  EXPECT_TRUE(meshElem->Get<ignition::math::Vector3d>("scale") ==
+      ignition::math::Vector3d(2.3, 1.2, 2.9));
   sdf::ElementPtr submeshElem = meshElem->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(),
       "test_mesh_submesh");
@@ -2170,28 +2172,32 @@ TEST_F(MsgsTest, GeometryToSDF)
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
   msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
-  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(0.5, 0.7));
-  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(3.5, 4.7));
-  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(1000, 2000));
+  const ignition::math::Vector2d point1(0.5, 0.7);
+  const ignition::math::Vector2d point2(3.5, 4.7);
+  const ignition::math::Vector2d point3(1000, 2000);
+  msgs::Set(polylineGeom->add_point(), point1);
+  msgs::Set(polylineGeom->add_point(), point2);
+  msgs::Set(polylineGeom->add_point(), point3);
 
   sdf::ElementPtr polylineSDF = msgs::GeometryToSDF(polylineMsg);
   sdf::ElementPtr polylineElem = polylineSDF->GetElement("polyline");
   EXPECT_DOUBLE_EQ(polylineElem->Get<double>("height"), 2.33);
 
   sdf::ElementPtr pointElem1 = polylineElem->GetElement("point");
-  EXPECT_TRUE(pointElem1->Get<math::Vector2d>() == math::Vector2d(0.5, 0.7));
   sdf::ElementPtr pointElem2 = pointElem1->GetNextElement("point");
-  EXPECT_TRUE(pointElem2->Get<math::Vector2d>() == math::Vector2d(3.5, 4.7));
   sdf::ElementPtr pointElem3 = pointElem2->GetNextElement("point");
-  EXPECT_TRUE(pointElem3->Get<math::Vector2d>() == math::Vector2d(1000, 2000));
+  EXPECT_EQ(pointElem1->Get<ignition::math::Vector2d>(), point1);
+  EXPECT_EQ(pointElem2->Get<ignition::math::Vector2d>(), point2);
+  EXPECT_EQ(pointElem3->Get<ignition::math::Vector2d>(), point3);
 }
 
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, MeshToSDF)
 {
+  const ignition::math::Vector3d meshScale(0.1, 0.2, 0.3);
   msgs::MeshGeom msg;
   msg.set_filename("test_filename");
-  msgs::Set(msg.mutable_scale(), ignition::math::Vector3d(0.1, 0.2, 0.3));
+  msgs::Set(msg.mutable_scale(), meshScale);
   msg.set_submesh("test_submesh");
   msg.set_center_submesh(true);
 
@@ -2199,28 +2205,31 @@ TEST_F(MsgsTest, MeshToSDF)
 
   EXPECT_STREQ(meshSDF->Get<std::string>("uri").c_str(), "test_filename");
   EXPECT_TRUE(meshSDF->HasElement("scale"));
-  math::Vector3 scale = meshSDF->Get<math::Vector3>("scale");
-  EXPECT_DOUBLE_EQ(scale.x, 0.1);
-  EXPECT_DOUBLE_EQ(scale.y, 0.2);
-  EXPECT_DOUBLE_EQ(scale.z, 0.3);
+  ignition::math::Vector3d scale =
+      meshSDF->Get<ignition::math::Vector3d>("scale");
+  EXPECT_DOUBLE_EQ(scale.X(), meshScale.X());
+  EXPECT_DOUBLE_EQ(scale.Y(), meshScale.Y());
+  EXPECT_DOUBLE_EQ(scale.Z(), meshScale.Z());
 
   sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(), "test_submesh");
   EXPECT_TRUE(submeshElem->Get<bool>("center"));
 
   // no submesh
+  const ignition::math::Vector3d meshScale2(1, 2, 3);
   msgs::MeshGeom msg2;
   msg2.set_filename("test_filename2");
-  msgs::Set(msg2.mutable_scale(), ignition::math::Vector3d(1, 2, 3));
+  msgs::Set(msg2.mutable_scale(), meshScale2);
 
   sdf::ElementPtr meshSDF2 = msgs::MeshToSDF(msg2);
 
   EXPECT_STREQ(meshSDF2->Get<std::string>("uri").c_str(), "test_filename2");
   EXPECT_TRUE(meshSDF2->HasElement("scale"));
-  math::Vector3 scale2 = meshSDF2->Get<math::Vector3>("scale");
-  EXPECT_DOUBLE_EQ(scale2.x, 1);
-  EXPECT_DOUBLE_EQ(scale2.y, 2);
-  EXPECT_DOUBLE_EQ(scale2.z, 3);
+  ignition::math::Vector3d scale2 =
+      meshSDF2->Get<ignition::math::Vector3d>("scale");
+  EXPECT_DOUBLE_EQ(scale2.X(), meshScale2.X());
+  EXPECT_DOUBLE_EQ(scale2.Y(), meshScale2.Y());
+  EXPECT_DOUBLE_EQ(scale2.Z(), meshScale2.Z());
 
   EXPECT_FALSE(meshSDF2->HasElement("submesh"));
 }
@@ -2229,8 +2238,9 @@ TEST_F(MsgsTest, MeshToSDF)
 TEST_F(MsgsTest, InertialToSDF)
 {
   const double mass = 3.4;
-  const math::Pose pose = math::Pose(math::Vector3(1.2, 3.4, 5.6),
-      math::Quaternion(0.7071, 0.0, 0.7071, 0.0));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(1.2, 3.4, 5.6),
+      ignition::math::Quaterniond(0.7071, 0.0, 0.7071, 0.0));
   const double ixx = 0.0133;
   const double ixy = -0.0003;
   const double ixz = -0.0004;
@@ -2240,7 +2250,7 @@ TEST_F(MsgsTest, InertialToSDF)
 
   msgs::Inertial msg;
   msg.set_mass(mass);
-  msgs::Set(msg.mutable_pose(), pose.Ign());
+  msgs::Set(msg.mutable_pose(), pose);
   msg.set_ixx(ixx);
   msg.set_ixy(ixy);
   msg.set_ixz(ixz);
@@ -2254,7 +2264,7 @@ TEST_F(MsgsTest, InertialToSDF)
   EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), mass);
 
   EXPECT_TRUE(inertialSDF->HasElement("pose"));
-  EXPECT_EQ(inertialSDF->Get<math::Pose>("pose"), pose);
+  EXPECT_EQ(inertialSDF->Get<ignition::math::Pose3d>("pose"), pose);
 
   {
     ASSERT_TRUE(inertialSDF->HasElement("inertia"));
@@ -2345,14 +2355,14 @@ TEST_F(MsgsTest, SurfaceToSDF)
   // friction
   const double mu = 0.1;
   const double mu2 = 0.2;
-  const math::Vector3 fdir1(0.3, 0.4, 0.5);
+  const ignition::math::Vector3d fdir1(0.3, 0.4, 0.5);
   const double slip1 = 0.6;
   const double slip2 = 0.7;
 
   msgs::Friction *friction = msg.mutable_friction();
   friction->set_mu(mu);
   friction->set_mu2(mu2);
-  msgs::Set(friction->mutable_fdir1(), fdir1.Ign());
+  msgs::Set(friction->mutable_fdir1(), fdir1);
   friction->set_slip1(slip1);
   friction->set_slip2(slip2);
 
@@ -2376,7 +2386,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   sdf::ElementPtr frictionPhysicsElem = frictionElem->GetElement("ode");
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu"), mu);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu2"), mu2);
-  EXPECT_TRUE(frictionPhysicsElem->Get<math::Vector3>("fdir1") == fdir1);
+  EXPECT_EQ(frictionPhysicsElem->Get<ignition::math::Vector3d>("fdir1"), fdir1);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip1"), slip1);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip2"), slip2);
 
@@ -2890,8 +2900,8 @@ TEST_F(MsgsTest, AddBoxLink)
   EXPECT_EQ(model.link_size(), 0);
 
   const double mass = 1.0;
-  const math::Vector3 size(1, 1, 1);
-  msgs::AddBoxLink(model, mass, size.Ign());
+  const ignition::math::Vector3d size(1, 1, 1);
+  msgs::AddBoxLink(model, mass, size);
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -2921,7 +2931,7 @@ TEST_F(MsgsTest, AddBoxLink)
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
     }
 
     EXPECT_EQ(link.visual_size(), 1);
@@ -2929,12 +2939,12 @@ TEST_F(MsgsTest, AddBoxLink)
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddBoxLink(model, mass*massRatio, size.Ign());
+  msgs::AddBoxLink(model, mass*massRatio, size);
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -3094,13 +3104,14 @@ TEST_F(MsgsTest, AddSphereLink)
 TEST_F(MsgsTest, ModelToSDF)
 {
   const std::string name("test_bicycle");
-  const math::Pose pose(math::Vector3(6, 1, 7),
-                        math::Quaternion(0.5, 0.5, 0.5, 0.5));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(6, 1, 7),
+      ignition::math::Quaterniond(0.5, 0.5, 0.5, 0.5));
 
   msgs::Model model;
   model.set_name(name);
   model.set_is_static(false);
-  msgs::Set(model.mutable_pose(), pose.Ign());
+  msgs::Set(model.mutable_pose(), pose);
   EXPECT_EQ(model.link_size(), 0);
   EXPECT_EQ(model.joint_size(), 0);
 

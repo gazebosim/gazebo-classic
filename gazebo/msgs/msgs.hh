@@ -29,6 +29,8 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 
+// Remove gazebo/math includes in Gazebo8
+// Adding the word deprecation so that a grep will find this.
 #include "gazebo/math/MathTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
