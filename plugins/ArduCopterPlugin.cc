@@ -143,6 +143,8 @@ class gazebo::ArduCopterPluginPrivate
 
     if (bind(this->handle, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
+      shutdown(this->handle, 0);
+      close(this->handle);
       return false;
     }
     return true;
