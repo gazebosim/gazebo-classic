@@ -124,10 +124,10 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
   msgs::Quaternion msg =
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
 
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
@@ -136,11 +136,10 @@ TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
   ignition::math::Quaterniond v = msgs::ConvertIgn(msg);
 
-  // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
-  EXPECT_TRUE(math::equal(v.X(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.Y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.Z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.W(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(v.X(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(v.Y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(v.Z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(v.W(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
@@ -153,10 +152,10 @@ TEST_F(MsgsTest, ConvertPoseMathToMsgs)
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.orientation().x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.orientation().y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.orientation().z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.orientation().w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
@@ -169,10 +168,10 @@ TEST_F(MsgsTest, ConvertMsgPoseToMath)
   EXPECT_DOUBLE_EQ(1, v.Pos().X());
   EXPECT_DOUBLE_EQ(2, v.Pos().Y());
   EXPECT_DOUBLE_EQ(3, v.Pos().Z());
-  EXPECT_TRUE(math::equal(v.Rot().X(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.Rot().Y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.Rot().Z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.Rot().W(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(v.Rot().X(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(v.Rot().Y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(v.Rot().Z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(v.Rot().W(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
@@ -235,7 +234,7 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_DOUBLE_EQ(123, v.Size().X());
   EXPECT_DOUBLE_EQ(456, v.Size().Y());
 
-  EXPECT_TRUE(math::equal(1.0, v.Offset()));
+  EXPECT_DOUBLE_EQ(1.0, v.Offset());
 }
 
 //////////////////////////////////////////////////
@@ -330,10 +329,10 @@ TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
   msgs::Set(&msg, ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, SetPose)
@@ -346,10 +345,10 @@ TEST_F(MsgsTest, SetPose)
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.orientation().x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.orientation().y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.orientation().z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.orientation().w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, SetColor)
@@ -384,7 +383,7 @@ TEST_F(MsgsTest, SetPlane)
   EXPECT_DOUBLE_EQ(123, msg.size().x());
   EXPECT_DOUBLE_EQ(456, msg.size().y());
 
-  EXPECT_TRUE(math::equal(1.0, msg.d()));
+  EXPECT_DOUBLE_EQ(1.0, msg.d());
 }
 
 TEST_F(MsgsTest, Initialization)
