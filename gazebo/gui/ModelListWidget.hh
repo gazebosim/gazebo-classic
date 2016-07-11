@@ -117,6 +117,13 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parent);
 
+      /// \brief Fill the property tree with plugin info.
+      /// \param[in] _msg The plugin message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const msgs::Plugin &_msg,
+                                     QtProperty *_parent);
+
       private: void FillPropertyTree(const msgs::Link &_msg,
                                      QtProperty *_parent);
 
@@ -141,6 +148,16 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Physics &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Wind &_msg,
+                                     QtProperty *_parent);
+
+      /// \brief Fill the property tree with atmosphere info.
+      /// \param[in] _msg The atmosphere message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const msgs::Atmosphere &_msg,
+                                     QtProperty *_parent);
+
       private: void FillPropertyTree(const msgs::Light &_msg,
                                      QtProperty *_parent);
 
@@ -156,6 +173,13 @@ namespace gazebo
       /// the message data.
       private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
                                      QtProperty *_parent);
+
+      /// \brief Fill the property tree with user camera info taken from
+      /// rendering.
+      private: void FillUserCamera();
+
+      /// \brief Fill the property tree with grid info taken from rendering.
+      private: void FillGrid();
 
       /// \brief Add a property to a parent property or to the property tree.
       /// \param[in] _item Pointer to the property to be added.
@@ -184,9 +208,25 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
+      /// \brief Called when a wind property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void WindPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when an atmosphere property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void AtmospherePropertyChanged(QtProperty *_item);
+
       /// \brief Called when a GUI property is changed by the user.
       /// \param[in] _item The item that was changed.
       private: void GUIPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a GUI camera property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUICameraPropertyChanged(QtProperty *_item);
+
+      /// \brief Called when a GUI grid property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUIGridPropertyChanged(QtProperty *_item);
 
       /// \internal
       /// \brief Pointer to private data.

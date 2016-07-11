@@ -33,6 +33,8 @@
 #cmakedefine HDF5_INSTRUMENT 1
 #cmakedefine HAVE_GRAPHVIZ 1
 #cmakedefine HAVE_UUID 1
+#cmakedefine USE_EXTERNAL_TINYXML2 1
+#cmakedefine HAVE_OSVR 1
 
 #ifdef BUILD_TYPE_PROFILE
 #include <google/heap-checker.h>

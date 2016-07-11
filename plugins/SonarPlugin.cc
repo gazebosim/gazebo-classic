@@ -31,7 +31,7 @@ SonarPlugin::SonarPlugin()
 /////////////////////////////////////////////////
 SonarPlugin::~SonarPlugin()
 {
-  this->parentSensor->DisconnectUpdate(this->connection);
+  this->connection.reset();
   this->parentSensor.reset();
 }
 

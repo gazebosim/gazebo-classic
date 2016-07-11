@@ -108,6 +108,10 @@ namespace gazebo
     typedef boost::unordered_map<std::string,
         boost::shared_ptr<msgs::Joint const> > JointMsgs_M;
 
+    /// \def RoadMsgs_L
+    /// \brief List of road messages
+    typedef std::list<boost::shared_ptr<msgs::Road const> > RoadMsgs_L;
+
     /// \brief Private data for the Visual class
     class ScenePrivate
     {
@@ -201,6 +205,9 @@ namespace gazebo
       /// \brief List of skeleton message to process.
       public: SkeletonPoseMsgs_L skeletonPoseMsgs;
 
+      /// \brief List of road messages to process.
+      public: RoadMsgs_L roadMsgs;
+
       /// \brief Mutex to lock the various message buffers.
       public: std::mutex *receiveMutex;
 
@@ -252,6 +259,9 @@ namespace gazebo
       /// \brief Publish requests
       public: transport::PublisherPtr requestPub;
 
+      /// \brief Subscribe to roads topic
+      public: transport::SubscriberPtr roadSub;
+
       /// \brief Event connections
       public: std::vector<event::ConnectionPtr> connections;
 
@@ -297,6 +307,9 @@ namespace gazebo
 
       /// \brief True when all link frames should be visualized.
       public: bool showLinkFrames;
+
+      /// \brief True when all skeletons should be visualized.
+      public: bool showSkeleton;
 
       /// \brief True when all collisions should be visualized.
       public: bool showCollisions;

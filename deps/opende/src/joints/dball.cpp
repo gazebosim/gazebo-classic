@@ -21,7 +21,7 @@
  *************************************************************************/
 
 
-#include <ode/odeconfig.h>
+#include <gazebo/ode/odeconfig.h>
 #include "config.h"
 #include "dball.h"
 #include "joint_internal.h"

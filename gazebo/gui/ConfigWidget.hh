@@ -27,7 +27,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/gui/qt.h"
 
 namespace google
@@ -105,12 +104,58 @@ namespace gazebo
       /// \brief A button for selecting the mesh filename.
       public: QWidget *geomFilenameButton;
 
-      /// brief Callback when the geometry type is changed.
+      /// \brief Callback when the geometry type is changed.
       /// \param[in] _text New geometry type in string.
-      private slots: void GeometryChanged(const QString _text);
+      private slots: void OnGeometryTypeChanged(const QString &_text);
 
-      /// brief Callback when the file button is clicked.
+      /// \brief Callback when geometry size changes.
+      /// \param[in] _value Size value that changed.
+      private slots: void OnGeometrySizeChanged(const double _value);
+
+      /// \brief Callback when the file button is clicked.
       private slots: void OnSelectFile();
+
+      /// \brief Signal emitted when geometry changes.
+      Q_SIGNALS: void GeometryChanged();
+    };
+
+    /// \class DensityConfigWidget ConfigWidget.hh
+    /// \brief A widget for configuring density properties.
+    class GZ_GUI_VISIBLE DensityConfigWidget : public ConfigChildWidget
+    {
+      Q_OBJECT
+
+      /// \brief Constructor
+      public: DensityConfigWidget();
+
+      /// \brief Updates the widget's density value.
+      /// \param[in] _density New density value.
+      public: void SetDensity(const double _density);
+
+      /// \brief Accessor for the widget's density value.
+      /// \return The density.
+      public: double Density() const;
+
+      /// \brief Callback when the density combo box is changed.
+      /// \param[in] _text New density type in string.
+      private slots: void OnComboBoxChanged(const QString &_text);
+
+      /// \brief Callback when the density spin box is changed.
+      /// \param[in] _text New density value in string.
+      private slots: void OnSpinBoxChanged(const QString &_text);
+
+      /// \brief Signal emitted when density has changed.
+      /// \param[in] _value Density value.
+      Q_SIGNALS: void DensityValueChanged(const double &_value);
+
+      /// \brief A combo box for selecting a material density.
+      public: QComboBox *comboBox;
+
+      /// \brief A spin box for entering a density value.
+      public: QDoubleSpinBox *spinBox;
+
+      /// \brief Current density value.
+      private: double density;
     };
 
     /// \class EnumConfigWidget ConfigWidget.hh
@@ -160,37 +205,13 @@ namespace gazebo
 
       /// \brief Get the updated message.
       /// \return Updated message.
-      /// \deprecated See Msg().
-      public: google::protobuf::Message *GetMsg() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the updated message.
-      /// \return Updated message.
       public: google::protobuf::Message *Msg();
 
       /// \brief Create a human readable key, capitalizing the first letter
       /// and removing characters like "_".
       /// \param[in] _key Non-human-readable key.
       /// \return Human-readable key.
-      /// \deprecated See HumanReadableKey(const std::string &_key) const
-      public: std::string GetHumanReadableKey(const std::string &_key)
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Create a human readable key, capitalizing the first letter
-      /// and removing characters like "_".
-      /// \param[in] _key Non-human-readable key.
-      /// \return Human-readable key.
-      public: std::string HumanReadableKey(const std::string &_key) const;
-
-      /// \brief Returns the unit for a given key. For example, the key "mass"
-      /// returns "kg".
-      /// \param[in] _key The key.
-      /// \param[in] _jointType In case the field belongs to a joint, the
-      /// joint's type.
-      /// \return The unit.
-      /// \deprecated See UnitFromKey(const std::string &_key,
-      ///                             const std::string &_jointType = "") const
-      public: std::string GetUnitFromKey(const std::string &_key,
-          const std::string &_jointType = "") GAZEBO_DEPRECATED(7.0);
+      public: static std::string HumanReadableKey(const std::string &_key);
 
       /// \brief Returns the unit for a given key. For example, the key "mass"
       /// returns "kg".
@@ -200,17 +221,6 @@ namespace gazebo
       /// \return The unit.
       public: std::string UnitFromKey(const std::string &_key,
           const std::string &_jointType = "") const;
-
-      /// \brief Returns the range for a given key. For example, the key
-      /// "transparency" returns min == 0, max == 1.
-      /// \param[in] _key The key.
-      /// \param[out] _min The minimum value.
-      /// \param[out] _max The maximum value.
-      /// \deprecated See RangeFromKey(const std::string &_key,
-      ///                              double &_min,
-      ///                              double &_max) const
-      public: void GetRangeFromKey(const std::string &_key,
-          double &_min, double &_max) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns the range for a given key. For example, the key
       /// "transparency" returns min == 0, max == 1.
@@ -228,26 +238,12 @@ namespace gazebo
       /// \brief Get whether a child widget is visible.
       /// \param[in] _name Name of the child widget.
       /// \return True if the widget is visible.
-      /// \deprecated See WidgetVisible(const std::string &_name) const
-      public: bool GetWidgetVisible(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get whether a child widget is visible.
-      /// \param[in] _name Name of the child widget.
-      /// \return True if the widget is visible.
       public: bool WidgetVisible(const std::string &_name) const;
 
       /// \brief Set whether a child widget should be read-only.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _visible True to set the widget to be read-only.
       public: void SetWidgetReadOnly(const std::string &_name, bool _readOnly);
-
-      /// \brief Get whether a child widget is read-only.
-      /// \param[in] _name Name of the child widget.
-      /// \return True if the widget is read-only.
-      /// \deprecated See WidgetReadOnly(const std::string &_name) const
-      public: bool GetWidgetReadOnly(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get whether a child widget is read-only.
       /// \param[in] _name Name of the child widget.
@@ -294,15 +290,6 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
-      /// \deprecated See SetVector3dWidgetValue(const std::string &_name,
-      ///                                 const ignition::math::Vector3 &_value)
-      public: bool SetVector3WidgetValue(const std::string &_name,
-          const math::Vector3 &_value) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set a vector3 value to a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value to set to.
-      /// \return True if the value is set successfully.
       public: bool SetVector3dWidgetValue(const std::string &_name,
           const ignition::math::Vector3d &_value);
 
@@ -317,30 +304,8 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
-      /// \deprecated See SetPoseWidgetValue(const std::string &_name,
-      ///                                  const ignition::math::Pose3d &_value)
-      public: bool SetPoseWidgetValue(const std::string &_name,
-          const math::Pose &_value) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set a pose value to a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value to set to.
-      /// \return True if the value is set successfully.
       public: bool SetPoseWidgetValue(const std::string &_name,
           const ignition::math::Pose3d &_value);
-
-      /// \brief Set a geometry value to a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Type of geometry.
-      /// \param[in] _dimensions Dimensions of geometry.
-      /// \return True if the value is set successfully.
-      /// \deprecated See SetGeometryWidgetValue(const std::string &_name,
-      ///                           const std::string &_value,
-      ///                           const ignition::math::Vector3d &_dimensions,
-      ///                           const std::string &_uri = "")
-      public: bool SetGeometryWidgetValue(const std::string &_name,
-          const std::string &_value, const math::Vector3 &_dimensions,
-          const std::string &_uri = "") GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set a geometry value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -351,6 +316,13 @@ namespace gazebo
           const std::string &_value,
           const ignition::math::Vector3d &_dimensions,
           const std::string &_uri = "");
+
+      /// \brief Set a density value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Density value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetDensityWidgetValue(const std::string &_name,
+          const double _value);
 
       /// \brief Set an enum value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -381,21 +353,7 @@ namespace gazebo
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Integer value.
-      /// \deprecated See IntWidgetValue(const std::string &_name) const
-      public: int GetIntWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get an integer value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return Integer value.
       public: int IntWidgetValue(const std::string &_name) const;
-
-      /// \brief Get an unsigned integer value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return Unsigned integer value.
-      /// \deprecated See UIntWidgetValue(const std::string &_name) const
-      public: unsigned int GetUIntWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get an unsigned integer value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -405,21 +363,7 @@ namespace gazebo
       /// \brief Get a double value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Double value.
-      /// \deprecated See DoubleWidgetValue(const std::string &_name) const
-      public: double GetDoubleWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a double value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return Double value.
       public: double DoubleWidgetValue(const std::string &_name) const;
-
-      /// \brief Get a bool value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return Bool value.
-      /// \deprecated See BoolWidgetValue(const std::string &_name) const
-      public: bool GetBoolWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a bool value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -429,21 +373,7 @@ namespace gazebo
       /// \brief Get a string value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return String value.
-      /// \deprecated See StringWidgetValue(const std::string &_name) const
-      public: std::string GetStringWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a string value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return String value.
       public: std::string StringWidgetValue(const std::string &_name) const;
-
-      /// \brief Get a vector3 value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return Vector3 value.
-      /// \deprecated See Vector3dWidgetValue(const std::string &_name) const
-      public: math::Vector3 GetVector3WidgetValue(const std::string &_name)
-          const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -454,21 +384,7 @@ namespace gazebo
       /// \brief Get a color value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Color value.
-      /// \deprecated See ColorWidgetValue(const std::string &_name) const
-      public: common::Color GetColorWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a color value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return Color value.
       public: common::Color ColorWidgetValue(const std::string &_name) const;
-
-      /// \brief Get a pose value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \return Pose value.
-      /// \deprecated See PoseWidgetValue(const std::string &_name) const
-      public: math::Pose GetPoseWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a pose value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -481,26 +397,13 @@ namespace gazebo
       /// \param[out] _dimensions Dimensions of geometry.
       /// \param[out] _uri URI of the geometry mesh, if any.
       /// \return Type of geometry.
-      /// \deprecated See GeometryWidgetValue() function that accepts an
-      /// ignition math object.
-      public: std::string GetGeometryWidgetValue(const std::string &_name,
-          math::Vector3 &_dimensions, std::string &_uri) const
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a geometry value from a child widget.
-      /// \param[in] _name Name of the child widget.
-      /// \param[out] _dimensions Dimensions of geometry.
-      /// \param[out] _uri URI of the geometry mesh, if any.
-      /// \return Type of geometry.
       public: std::string GeometryWidgetValue(const std::string &_name,
           ignition::math::Vector3d &_dimensions, std::string &_uri) const;
 
-      /// \brief Get an enum value from a child widget.
+      /// \brief Get a density value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \return Enum value.
-      /// \deprecated See EnumWidgetValue(const std::string &_name)
-      public: std::string GetEnumWidgetValue(const std::string &_name) const
-          GAZEBO_DEPRECATED(7.0);
+      /// \return Density value.
+      public: double DensityWidgetValue(const std::string &_name) const;
 
       /// \brief Get an enum value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -587,6 +490,13 @@ namespace gazebo
       /// \return The newly created widget.
       public: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
           const std::vector<std::string> &_values, const int _level = 0);
+
+      /// \brief Create a widget for setting a density value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateDensityWidget(const std::string &_key,
+          const int _level = 0);
 
       /// \brief Register a child widget as a child of this widget, so it can
       /// be updated. Note that the widget is not automatically added to a
@@ -745,6 +655,13 @@ namespace gazebo
       /// \return True if the update completed successfully.
       private: bool UpdateEnumWidget(ConfigChildWidget *_widget,
           const std::string &_value);
+
+      /// \brief Update a child widget with a density value.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \param[in] _value Density value.
+      /// \return True if the update completed successfully.
+      private: bool UpdateDensityWidget(ConfigChildWidget *_widget,
+          const double _value);
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
@@ -910,6 +827,28 @@ namespace gazebo
       /// \param[in] _value New enum value string.
       Q_SIGNALS: void EnumValueChanged(const QString &_name,
           const QString &_value);
+
+      /// \brief Signal emitted when density value changes.
+      /// \param[in] _value Density value.
+      Q_SIGNALS: void DensityValueChanged(const double &_value);
+
+      /// \brief Signal emitted when mass value changes.
+      /// \param[in] _value Mass value.
+      Q_SIGNALS: void MassValueChanged(const double &_value);
+
+      /// \brief Callback when density value changes in child widget.
+      /// \param[in] _value Density value.
+      private slots: void OnDensityValueChanged(const double _value);
+
+      /// \brief Callback when mass value changes in child widget.
+      /// \param[in] _value Mass value.
+      private slots: void OnMassValueChanged(const double _value);
+
+      /// \brief Callback when geometry changes.
+      private slots: void OnGeometryChanged();
+
+      /// \brief Signal emitted when geometry changes.
+      Q_SIGNALS: void GeometryChanged();
 
       /// \brief Qt event filter currently used to filter mouse wheel events.
       /// \param[in] _obj Object that is watched by the event filter.

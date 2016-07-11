@@ -71,6 +71,14 @@ bool g_fullscreen = false;
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(common::Time)
 
+// This makes it possible to use std::string in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::string)
+
+// This makes it possible to use std::set<std::string> in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::set<std::string>)
+
 //////////////////////////////////////////////////
 // QT message handler that pipes qt messages into gazebo's console system.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -303,7 +311,6 @@ bool gui::load()
   if (!gui::register_metatypes())
     std::cerr << "Unable to register Qt metatypes" << std::endl;
 
-
   g_splashScreen = new gui::SplashScreen();
 
   g_main_win = new gui::MainWindow();
@@ -417,6 +424,14 @@ bool gui::register_metatypes()
   // Register common::Time as a type that can be used in signals and slots.
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<common::Time>();
+
+  // Register std::string as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<std::string>();
+
+  // Register std::set<std::string> as a type that can be used in signals and
+  // slots. Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType< std::set<std::string> >();
 
   return true;
 }

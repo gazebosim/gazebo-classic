@@ -586,6 +586,10 @@ namespace gazebo
       /// \param[in] _show True to enable link frame visualization.
       public: void ShowLinkFrames(const bool _show);
 
+      /// \brief Enable or disable skeleton visualization.
+      /// \param[in] _show True to enable skeleton visualization.
+      public: void ShowSkeleton(const bool _show);
+
       /// \brief Enable or disable joint visualization.
       /// \param[in] _show True to enable joint visualization.
       public: void ShowJoints(const bool _show);
@@ -791,6 +795,10 @@ namespace gazebo
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
       private: void OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg);
+
+      /// \brief Road message callback.
+      /// \param[in] _msg The message data.
+      private: void OnRoadMsg(ConstRoadPtr &_msg);
 
       /// \brief Create a new center of mass visual.
       /// \param[in] _msg Message containing the link data.

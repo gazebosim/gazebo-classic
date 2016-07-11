@@ -16,10 +16,10 @@
 */
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/gui/model/ModelEditorEvents.hh"
 
-#include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
+#include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -116,8 +116,11 @@ void ModelPluginInspector::OnRemove()
 {
   std::string pluginName =
       this->dataPtr->configWidget->StringWidgetValue("name");
+
   this->OnCancel();
-  model::Events::requestModelPluginRemoval(pluginName);
+
+  // User request from inspector
+  model::Events::requestModelPluginRemoval(pluginName, true);
 }
 
 /////////////////////////////////////////////////

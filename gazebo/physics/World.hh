@@ -41,6 +41,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -122,9 +123,17 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
+      /// \brief Get a reference to the atmosphere model used by the world.
+      /// \return Reference to the atmosphere model.
+      public: physics::Atmosphere &Atmosphere() const;
+
       /// \brief Return the preset manager.
       /// \return Pointer to the preset manager.
       public: PresetManagerPtr GetPresetManager() const;
+
+      /// \brief Get a reference to the wind used by the world.
+      /// \return Reference to the wind.
+      public: physics::Wind &Wind() const;
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
@@ -324,6 +333,22 @@ namespace gazebo
       /// \param[in] _enable True to enable the physics engine.
       public: void EnablePhysicsEngine(bool _enable);
 
+      /// \brief check if wind is enabled/disabled.
+      /// \param True if the wind is enabled.
+      public: bool WindEnabled() const;
+
+      /// \brief enable/disable wind.
+      /// \param[in] _enable True to enable the wind.
+      public: void SetWindEnabled(const bool _enable);
+
+      /// \brief check if atmosphere model is enabled/disabled.
+      /// \param True if the atmosphere model is enabled.
+      public: bool AtmosphereEnabled() const;
+
+      /// \brief enable/disable atmosphere model.
+      /// \param[in] _enable True to enable the atmosphere model.
+      public: void SetAtmosphereEnabled(const bool _enable);
+
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
 
@@ -401,9 +426,13 @@ namespace gazebo
       /// \param[in] _init True if sensors have been initialized.
       public: void _SetSensorsInitialized(const bool _init);
 
-      /// \brief Get a model name which doesn't overlap with any existing
-      /// models, by appending numbers to the given name. If _name is already,
-      /// unique, the returned value is the same.
+      /// \brief Return the URI of the world.
+      /// \return URI of this world.
+      public: common::URI URI() const;
+
+      /// \brief Get a model name which doesn't equal any existing
+      /// model's name, by appending numbers to the given name. If _name is
+      /// already unique, the returned value is the same.
       /// \param[in] _name Desired model name.
       /// \return Unique model name.
       public: std::string UniqueModelName(const std::string &_name);
@@ -552,6 +581,12 @@ namespace gazebo
 
       /// \brief Thread function for logging state data.
       private: void LogWorker();
+
+      /// \brief Register items in the introspection service.
+      private: void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      private: void UnregisterIntrospectionItems();
 
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.

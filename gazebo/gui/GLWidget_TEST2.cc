@@ -16,7 +16,6 @@
 */
 #include <boost/filesystem.hpp>
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"

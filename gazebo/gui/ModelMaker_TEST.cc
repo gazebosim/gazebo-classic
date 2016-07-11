@@ -32,7 +32,7 @@ void ModelMaker_TEST::SimpleShape()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -119,7 +119,7 @@ void ModelMaker_TEST::FromFile()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -210,7 +210,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -239,7 +239,8 @@ void ModelMaker_TEST::FromNestedModelFile()
 
   // Model data
   boost::filesystem::path path;
-  path = path / TEST_PATH / "models" / "deeply_nested_model.sdf";
+  path = path / TEST_PATH / "models" / "testdb" / "deeply_nested_model" /
+      "model.sdf";
 
   // Start the maker to make a model
   modelMaker->InitFromFile(path.string());
@@ -322,7 +323,7 @@ void ModelMaker_TEST::FromModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/box.world");
+  this->Load("worlds/box.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -419,7 +420,7 @@ void ModelMaker_TEST::FromNestedModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("test/worlds/deeply_nested_models.world");
+  this->Load("test/worlds/deeply_nested_models.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -508,15 +509,14 @@ void ModelMaker_TEST::FromNestedModel()
   modelMaker->OnMouseRelease(mouseEvent);
 
   // Check there's no clone in the scene -- the preview is gone
-  // FIXME visuals don't get removed
-  // vis = scene->GetVisual("model_00_clone_tmp");
-  // QVERIFY(vis == NULL);
-  // vis = scene->GetVisual("model_00_clone_tmp::model_01");
-  // QVERIFY(vis == NULL);
-  // vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02");
-  // QVERIFY(vis == NULL);
-  // vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
-  // QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00_clone_tmp");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
+  QVERIFY(vis == nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 

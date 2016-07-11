@@ -54,7 +54,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   this->dataPtr->dartPhysics = boost::dynamic_pointer_cast<DARTPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
-  if (this->dataPtr->dartPhysics == NULL)
+  if (this->dataPtr->dartPhysics == nullptr)
     gzthrow("Not using the dart physics engine");
 
   // Check if soft_contact element is contained in this link. If so,
@@ -84,7 +84,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
 
           if (softContactElem->HasElement("dart"))
           {
-            if (dartElem != NULL)
+            if (dartElem != nullptr)
             {
               gzerr << "DART supports only one deformable body in a link.\n";
               break;
@@ -101,7 +101,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (dartElem != NULL)
+  if (dartElem != nullptr)
   {
     // Create DART SoftBodyNode
     dart::dynamics::SoftBodyNode *dtSoftBodyNode
@@ -287,7 +287,7 @@ void DARTLink::OnPoseChange()
 
   // This is for the case this function called before DARTModel::Init() is
   // called.
-  if (joint == NULL)
+  if (joint == nullptr)
     return;
 
   dart::dynamics::FreeJoint *freeJoint =
@@ -355,7 +355,7 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
 
   // This is for the case this function called before DARTModel::Init() is
   // called.
-  if (joint == NULL)
+  if (joint == nullptr)
   {
     gzerr << "DARTModel::Init() should be called first.\n";
     return;
@@ -425,7 +425,7 @@ void DARTLink::SetAngularVel(const math::Vector3 &_vel)
 
   // This is for the case this function called before DARTModel::Init() is
   // called.
-  if (joint == NULL)
+  if (joint == nullptr)
   {
     gzerr << "DARTModel::Init() should be called first.\n";
     return;
@@ -639,7 +639,7 @@ void DARTLink::SetSelfCollide(bool _collide)
   // If this function is called before the body node is not added to a skeleton,
   // the body node does not have parent skeleton. So we just return here. Self
   // collision setting will be done later in DARTModel::Init().
-  if (dtBodyNode->getSkeleton() == NULL)
+  if (dtBodyNode->getSkeleton() == nullptr)
     return;
 
   dart::simulation::World *dtWorld = this->dataPtr->dartPhysics->GetDARTWorld();
@@ -795,7 +795,7 @@ void DARTLink::SetLinkStatic(bool _static)
     GetDARTWorld()->getConstraintSolver()->removeConstraint(
         this->dataPtr->dtWeldJointConst);
     delete this->dataPtr->dtWeldJointConst;
-    this->dataPtr->dtWeldJointConst = NULL;
+    this->dataPtr->dtWeldJointConst = nullptr;
   }
 
   this->dataPtr->staticLink = _static;

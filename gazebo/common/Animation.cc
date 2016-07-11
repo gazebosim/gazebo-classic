@@ -107,7 +107,7 @@ unsigned int Animation::GetKeyFrameCount() const
 /////////////////////////////////////////////////
 KeyFrame *Animation::GetKeyFrame(unsigned int _index) const
 {
-  KeyFrame *result = NULL;
+  KeyFrame *result = nullptr;
 
   if (_index < this->keyFrames.size())
     result = this->keyFrames[_index];
@@ -180,8 +180,8 @@ PoseAnimation::PoseAnimation(const std::string &_name,
     double _length, bool _loop)
 : Animation(_name, _length, _loop)
 {
-  this->positionSpline = NULL;
-  this->rotationSpline = NULL;
+  this->positionSpline = nullptr;
+  this->rotationSpline = nullptr;
 }
 
 /////////////////////////////////////////////////

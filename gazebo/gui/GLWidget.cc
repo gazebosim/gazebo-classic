@@ -24,9 +24,10 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -331,6 +332,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (_event->key() == Qt::Key_Delete &&
       this->dataPtr->selectionLevel == SelectionLevels::MODEL)
   {
+    ModelManipulator::Instance()->Detach();
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     while (!this->dataPtr->selectedVisuals.empty())
     {
@@ -540,18 +542,24 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 {
   // Update the view depending on the current GUI state
-  if (this->dataPtr->state == "make_entity")
-    this->OnMouseMoveMakeEntity();
-  else if (this->dataPtr->state == "select")
+  if (this->dataPtr->state == "select")
+  {
     this->OnMouseMoveNormal();
+  }
   else if (this->dataPtr->state == "translate" ||
            this->dataPtr->state == "rotate"    ||
            this->dataPtr->state == "scale")
   {
     ModelManipulator::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
   }
+  else if (this->dataPtr->state == "make_entity")
+  {
+    this->OnMouseMoveMakeEntity();
+  }
   else if (this->dataPtr->state == "snap")
+  {
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
+  }
 
   return true;
 }
@@ -863,21 +871,16 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->dataPtr->userCamera);
   this->dataPtr->scene = _scene;
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(5, -5, 2);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  auto delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y, delta.x);
+  double yaw = atan2(delta.Y(), delta.X());
 
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
-}
-
-/////////////////////////////////////////////////
-rendering::ScenePtr GLWidget::GetScene() const
-{
-  return this->Scene();
+  double pitch = atan2(-delta.Z(),
+      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
+  this->dataPtr->userCamera->SetDefaultPose(ignition::math::Pose3d(camPos,
+        ignition::math::Quaterniond(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
@@ -897,12 +900,6 @@ void GLWidget::Clear()
 }
 
 //////////////////////////////////////////////////
-rendering::UserCameraPtr GLWidget::GetCamera() const
-{
-  return this->Camera();
-}
-
-//////////////////////////////////////////////////
 rendering::UserCameraPtr GLWidget::Camera() const
 {
   return this->dataPtr->userCamera;
@@ -917,7 +914,7 @@ std::string GLWidget::OgreHandle() const
   ogreHandle = std::to_string(this->winId());
 #elif defined(WIN32)
   ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
+      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
@@ -1154,8 +1151,8 @@ void GLWidget::OnManipMode(const std::string &_mode)
               = this->dataPtr->selectedVisuals.begin();
               it != --this->dataPtr->selectedVisuals.end();)
       {
-         (*it)->SetHighlighted(false);
-         it = this->dataPtr->selectedVisuals.erase(it);
+        (*it)->SetHighlighted(false);
+        it = this->dataPtr->selectedVisuals.erase(it);
       }
     }
   }
@@ -1331,7 +1328,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

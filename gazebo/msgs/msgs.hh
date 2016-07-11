@@ -79,6 +79,66 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
+    /// \brief Convert a double to a msgs::Any
+    /// \param[in] _v The double to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const double _v);
+
+    /// \brief Convert an int to a msgs::Any
+    /// \param[in] _i The int to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const int _i);
+
+    /// \brief Convert a std::string to a msgs::Any
+    /// \param[in] _s The string to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const std::string &_s);
+
+    /// \brief Convert a string literal to a msgs::Any
+    /// \param[in] _s The string to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const char *_s);
+
+    /// \brief Convert a bool to a msgs::Any
+    /// \param[in] _b The bool to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const bool _b);
+
+    /// \brief Convert an ignition::math::Vector3d to a msgs::Any
+    /// \param[in] _v The vector to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const ignition::math::Vector3d &_v);
+
+    /// \brief Convert a common::Color to a msgs::Any
+    /// \param[in] _c The color to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const common::Color &_c);
+
+    /// \brief Convert an ignition::math::Pose3d to a msgs::Any
+    /// \param[in] _p The pose to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const ignition::math::Pose3d &_p);
+
+    /// \brief Convert an ignition::math::Quaternion to a msgs::Any
+    /// \param[in] _q The quaternion to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const ignition::math::Quaterniond &_q);
+
+    /// \brief Convert a common::Time to a msgs::Any
+    /// \param[in] _t The time to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const common::Time &_t);
+
     /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object
@@ -91,9 +151,9 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Vector2d Convert(const ignition::math::Vector2d &_v);
 
-    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaternion
+    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaterniond
     /// \param[in] _q The quaternion to convert
-    /// \return A msgs::Quaternion object
+    /// \return A msgs::Quaterniond object
     GAZEBO_VISIBLE
     msgs::Quaternion Convert(const ignition::math::Quaterniond &_q);
 
@@ -375,6 +435,9 @@ namespace gazebo
     /// \sa CameraSensorFromSDF
     /// \sa RaySensorFromSDF
     /// \sa ContactSensorFromSDF
+    /// \sa LogicalCameraSensorFromSDF
+    /// \sa GPSSensorFromSDF
+    /// \sa ImuSensorFromSDF
     GAZEBO_VISIBLE
     msgs::Sensor SensorFromSDF(sdf::ElementPtr _sdf);
 
@@ -560,6 +623,71 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Header *GetHeader(google::protobuf::Message &_message);
 
+    /// \brief Create a msgs::GPSSensor from a gps sensor SDF element
+    /// \param[in] _sdf The GPS sensor sdf element
+    /// \return The new msgs::GPSSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::GPSSensor GPSSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::SensorNoise from a sensor noise SDF element
+    /// \param[in] _sdf The sensor noise sdf element
+    /// \return The new msgs::SensorNoise object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::SensorNoise SensorNoiseFromSDF(sdf::ElementPtr _elem);
+
+    /// \brief Create a msgs::IMUSensor from an imu sensor SDF element
+    /// \param[in] _sdf The IMU sensor sdf element
+    /// \return The new msgs::IMUSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::IMUSensor IMUSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::LogicalCameraSensor from a logical camera sensor
+    //// SDF element
+    /// \param[in] _sdf The logical camera sensor sdf element
+    /// \return The new msgs::LogicalCameraSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::LogicalCameraSensor LogicalCameraSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create or update an SDF element from a msgs::LogicalCameraSensor
+    /// \param[in] _msg LogicalCameraSensor messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr LogicalCameraSensorToSDF(
+        const msgs::LogicalCameraSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create or update an SDF element from a msgs::IMUSensor
+    /// \param[in] _msg IMUSensor messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr IMUSensorToSDF(const msgs::IMUSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create or update an SDF element from a msgs::SensorNoise
+    /// \param[in] _msg SensorNoise messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr SensorNoiseToSDF(const msgs::SensorNoise &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create or update an SDF element from a msgs::GPSSensor
+    /// \param[in] _msg GPSSensor messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr GPSSensorToSDF(const msgs::GPSSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
     /// \}
   }
 }

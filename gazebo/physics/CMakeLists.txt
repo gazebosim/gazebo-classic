@@ -45,6 +45,9 @@ endif()
 
 set (sources ${sources}
   Actor.cc
+  AdiabaticAtmosphere.cc
+  Atmosphere.cc
+  AtmosphereFactory.cc
   Base.cc
   BoxShape.cc
   Collision.cc
@@ -82,12 +85,16 @@ set (sources ${sources}
   State.cc
   SurfaceParams.cc
   UserCmdManager.cc
+  Wind.cc
   World.cc
   WorldState.cc
 )
 
 set (headers
   Actor.hh
+  AdiabaticAtmosphere.hh
+  Atmosphere.hh
+  AtmosphereFactory.hh
   BallJoint.hh
   Base.hh
   BoxShape.hh
@@ -135,6 +142,7 @@ set (headers
   SurfaceParams.hh
   UniversalJoint.hh
   UserCmdManager.hh
+  Wind.hh
   World.hh
   WorldState.hh)
 
@@ -193,6 +201,8 @@ gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics)
 
 # unit tests with gazebo_test_fixture
 set (gtest_fixture_sources
+  Actor_TEST.cc
+  Atmosphere_TEST.cc
   ContactManager_TEST.cc
   Light_TEST.cc
   LightState_TEST.cc
@@ -200,6 +210,7 @@ set (gtest_fixture_sources
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
+  Wind_TEST.cc
   World_TEST.cc
   WorldState_TEST.cc
 )

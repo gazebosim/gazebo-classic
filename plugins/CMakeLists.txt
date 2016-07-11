@@ -14,9 +14,12 @@ include_directories(
 # which uses tinxyml. Not defining the link directory here will end up
 # failures in clang.
 link_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CURL_LIBDIR}
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
@@ -37,6 +40,7 @@ if (HAVE_UUID)
 endif()
 
 set (plugins_single_header
+  ActorPlugin
   ActuatorPlugin
   ArrangePlugin
   BreakableJointPlugin
@@ -47,6 +51,7 @@ set (plugins_single_header
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
+  FiducialCameraPlugin
   FollowerPlugin
   ForceTorquePlugin
   GpuRayPlugin
@@ -66,12 +71,15 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  WindPlugin
+)
 
 set (plugins_private_header
   ElevatorPlugin
   RandomVelocityPlugin
-  TransporterPlugin)
+  TransporterPlugin
+)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
@@ -94,7 +102,7 @@ foreach (src ${plugins_single_header})
   target_link_libraries(${src} libgazebo ${ogre_libraries})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${plugins_single_header})
+endforeach ()
 
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)
@@ -102,12 +110,7 @@ foreach (src ${plugins_private_header})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
   gz_install_includes("plugins" ${src}Private.hh)
-endforeach (src ${plugins_single_header})
-
-target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
-set_target_properties(BreakableJointPlugin PROPERTIES
-  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
-)
+endforeach ()
 
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
@@ -115,7 +118,7 @@ foreach (src ${GUIplugins})
   target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${GUIplugins})
+endforeach ()
 
 add_subdirectory(events)
 
