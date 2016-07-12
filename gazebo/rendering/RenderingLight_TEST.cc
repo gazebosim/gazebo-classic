@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,46 +16,44 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/SonarVisual.hh"
+#include "gazebo/rendering/Light.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class SonarVisual_TEST : public RenderingFixture
+class Light_TEST : public RenderingFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(SonarVisual_TEST, SonarVisualTest)
+TEST_F(Light_TEST, LightVisualTest)
 {
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
 
   if (!scene)
-      scene = gazebo::rendering::create_scene("default", false);
+    scene = gazebo::rendering::create_scene("default", false);
 
   EXPECT_TRUE(scene != nullptr);
 
-  // get scene visual child count before we create any visuals
-  EXPECT_TRUE(scene->WorldVisual() != nullptr);
-  unsigned int count = scene->WorldVisual()->GetChildCount();
+  // create a light
+  gazebo::rendering::LightPtr light(new gazebo::rendering::Light(scene));
+  light->Load();
 
-  // test calling constructor and Load functions and make sure
-  // there are no segfaults
-  gazebo::rendering::VisualPtr sonarVis(
-      new gazebo::rendering::SonarVisual(
-      "world_GUIONLY_sonar_vis", scene->WorldVisual(), ""));
-  sonarVis->Load();
+  std::string lightName = light->Name();
+  gazebo::rendering::VisualPtr lightVisual = scene->GetVisual(lightName);
+  EXPECT_TRUE(lightVisual != nullptr);
 
-  // test destroying the visual
-  sonarVis->Fini();
-  EXPECT_EQ(sonarVis->GetChildCount(), 0u);
+  scene->RemoveLight(light);
 
-  // verify scene's child count is the same as before the visual was created
-  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
+  // reset the pointer so that the destructor gets called
+  light.reset();
+
+  lightVisual = scene->GetVisual(lightName);
+  EXPECT_TRUE(lightVisual == nullptr);
 }
 
 /////////////////////////////////////////////////

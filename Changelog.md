@@ -27,8 +27,11 @@
 1. Use single pixel selection buffer for mouse picking
     * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
 
+1. Refactor Visual classes
+  * [Pull request #2331](https://bitbucket.org/osrf/gazebo/pull-requests/2331)
+
 1. Windows plugins (with .dll extension) now accepted
-    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311/ensure-plugin-and-plugin-macros-are-always/)
+    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311)
     * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
 
 1. Add Introspection Manager and Client util
@@ -143,6 +146,9 @@
 
 1. Fix Model Manipulator switching between local and global frames
     * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
+
+1. Added a harness plugin that supports lowering a model at a controlled rate
+    * [Pull request 2346](https://bitbucket.org/osrf/gazebo/pull-request/2346)
 
 1. Remove contact filters with names that contain `::`
     * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)

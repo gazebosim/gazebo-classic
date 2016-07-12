@@ -213,9 +213,13 @@ void ModelSnap_TEST::Snap()
   rayQuery.SelectMeshTriangle(destPt.X(), destPt.Y(), model02Vis, intersect,
       verticesDest);
 
+  this->ProcessEventsAndDraw(mainWindow);
+
   // Snap the sphere to the front face of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
       verticesSrc, verticesDest, model03Vis);
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   double xDiff = 0;
   double yDiff = 0;
