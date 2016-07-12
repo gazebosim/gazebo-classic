@@ -171,10 +171,10 @@ TEST_F(MsgsTest, ConvertPose3dToAny)
   EXPECT_DOUBLE_EQ(2, msg.pose3d_value().position().y());
   EXPECT_DOUBLE_EQ(3, msg.pose3d_value().position().z());
 
-  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().w(), 4.0));
-  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().x(), 5.0));
-  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().y(), 6.0));
-  EXPECT_TRUE(math::equal(msg.pose3d_value().orientation().z(), 7.0));
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().w(), 4.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().x(), 5.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().y(), 6.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().z(), 7.0);
 }
 
 TEST_F(MsgsTest, ConvertQuaternionToAny)
@@ -185,10 +185,10 @@ TEST_F(MsgsTest, ConvertQuaternionToAny)
   EXPECT_EQ(msg.type(), msgs::Any::QUATERNIOND);
   ASSERT_TRUE(msg.has_quaternion_value());
 
-  EXPECT_TRUE(math::equal(msg.quaternion_value().w(), 1.0));
-  EXPECT_TRUE(math::equal(msg.quaternion_value().x(), 2.0));
-  EXPECT_TRUE(math::equal(msg.quaternion_value().y(), 3.0));
-  EXPECT_TRUE(math::equal(msg.quaternion_value().z(), 4.0));
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().w(), 1.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().x(), 2.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().y(), 3.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().z(), 4.0);
 }
 
 TEST_F(MsgsTest, ConvertTimeToAny)
