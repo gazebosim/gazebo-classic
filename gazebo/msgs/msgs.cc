@@ -1899,9 +1899,9 @@ namespace gazebo
         if (distElem->HasElement("center"))
         {
           distortionMsg->mutable_center()->set_x(
-              distElem->Get<math::Vector2d>("center").x);
+              distElem->Get<ignition::math::Vector2d>("center").X());
           distortionMsg->mutable_center()->set_y(
-              distElem->Get<math::Vector2d>("center").y);
+              distElem->Get<ignition::math::Vector2d>("center").Y());
         }
       }
 
