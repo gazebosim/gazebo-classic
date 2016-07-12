@@ -63,18 +63,15 @@ void KeyboardGUIPlugin::OnKeyPress(gazebo::common::KeyEvent _event)
   msg.set_type(msgs::Any_ValueType_INT32);
   msg.set_int_value(_event.text[0]);
   this->keyboardPub->Publish(msg);
-  gzerr << "got key?\n";
 }
 
 /////////////////////////////////////////////////
 bool KeyboardGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
 {
-  gzerr << "got event?\n";
-  gzerr << _event->type() << " : " <<  QEvent::KeyPress << "\n";
-  // if (_event->type() == QEvent::KeyPress)
-  if (_event->type() == 51)
+  // gzdbg << _event->type() << " : " <<  QEvent::KeyPress << "\n";
+  // if (_event->type() == QEvent::KeyPress)  // why does this not work?
+  if (_event->type() == 51)  /// FIXME TODO
   {
-    gzerr << "got KeyPress event?\n";
     QKeyEvent *qtKeyEvent = (QKeyEvent *)_event;
 
     gazebo::common::KeyEvent gazeboKeyEvent;
