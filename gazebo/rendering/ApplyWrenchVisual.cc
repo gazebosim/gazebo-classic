@@ -129,6 +129,7 @@ void ApplyWrenchVisual::Load()
   Ogre::MovableObject *shaftObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
       this->GetName()+"_FORCE_SHAFT_", "axis_shaft"));
+  shaftObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   shaftObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
@@ -144,6 +145,7 @@ void ApplyWrenchVisual::Load()
   Ogre::MovableObject *headObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
       this->GetName()+"_FORCE_HEAD_", "axis_head"));
+  headObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
@@ -169,6 +171,7 @@ void ApplyWrenchVisual::Load()
   Ogre::MovableObject *tubeObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
       this->GetName()+"_TORQUE_TUBE_", "torque_tube"));
+  tubeObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   tubeObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
@@ -183,6 +186,7 @@ void ApplyWrenchVisual::Load()
   Ogre::MovableObject *torqueHeadObj =
       (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
       this->GetName()+"_TORQUE_HEAD_", "axis_head"));
+  torqueHeadObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   torqueHeadObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
@@ -516,4 +520,3 @@ void ApplyWrenchVisual::SetMode(Mode _mode)
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
   }
 }
-
