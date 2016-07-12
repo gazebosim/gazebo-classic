@@ -1,26 +1,47 @@
 ## Gazebo 7
 
-## Gazebo 7.x.x (2016-xx-xx)
+## Gazebo 7.3.0 (2016-07-11)
+
+1. Use ignition math in gazebo::msgs
+    * [Pull request 2389](https://bitbucket.org/osrf/gazebo/pull-request/2389)
+
+1. Parse command-line options for GUI plugins in Server to fix parsing of
+   positional argument for world file.
+   This fixes command-line parsing for `gazebo -g gui_plugin.so`.
+    * [Pull request 2387](https://bitbucket.org/osrf/gazebo/pull-request/2387)
+
+1. Added a harness plugin that supports lowering a model at a controlled rate
+    * [Pull request 2346](https://bitbucket.org/osrf/gazebo/pull-request/2346)
+
+1. Fix ogre log test on xenial+nvidia
+    * [Pull request 2374](https://bitbucket.org/osrf/gazebo/pull-request/2374)
 
 1. Redirect QT messages to Gazebo's console message handling system.
     * [Pull request 2375](https://bitbucket.org/osrf/gazebo/pull-request/2375)
 
-1. Fix Model Manipulator switching between local and global frames
-    * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
-
-1. Added a harness plugin that supports lowering a model at a controlled rate
-    * [Pull request 2346](https://bitbucket.org/osrf/gazebo/pull-request/2346)
+1. Fix buoyancy plugin when multiple link tags are used within the plugin
+    * [Pull request 2369](https://bitbucket.org/osrf/gazebo/pull-request/2369)
 
 1. Remove contact filters with names that contain `::`
     * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
     * [Issue 1805](https://bitbucket.org/osrf/gazebo/issues/1805)
 
+1. Fix Model Manipulator switching between local and global frames
+    * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
+
+1. Remove duplicate code from cmake config file caused by bad merge
+    * [Pull request 2347](https://bitbucket.org/osrf/gazebo/pull-request/2347)
+
+1. Properly cleanup pointers when destroying a world with joints.
+    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
+
 1. Fix right click view options after deleting and respawning a model.
     * [Pull request 2349](https://bitbucket.org/osrf/gazebo/pull-request/2349)
     * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1985)
 
-1. Properly cleanup pointers when destroying a world with joints.
-    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
+1. Implement missing function: LogicalCamera::Topic()
+    * [Pull request 2343](https://bitbucket.org/osrf/gazebo/pull-request/2343)
+    * [Issue 1980](https://bitbucket.org/osrf/gazebo/issues/1980)
 
 ## Gazebo 7.2.0 (2016-06-13)
 
