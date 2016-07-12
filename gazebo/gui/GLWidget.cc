@@ -229,17 +229,20 @@ void GLWidget::showEvent(QShowEvent *_event)
   QApplication::flush();
   QApplication::syncX();
 
-  // Get the window handle in a form that OGRE can use.
-  std::string winHandle = this->OgreHandle();
+  if (this->dataPtr->windowId <=0)
+  {
+    // Get the window handle in a form that OGRE can use.
+    std::string winHandle = this->OgreHandle();
 
-  // Create the OGRE render window
-  this->dataPtr->windowId =
-    rendering::RenderEngine::Instance()->GetWindowManager()->
-      CreateWindow(winHandle, this->width(), this->height());
+    // Create the OGRE render window
+    this->dataPtr->windowId =
+      rendering::RenderEngine::Instance()->GetWindowManager()->
+        CreateWindow(winHandle, this->width(), this->height());
 
-  // Attach the user camera to the window
-  rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->dataPtr->windowId, this->dataPtr->userCamera);
+    // Attach the user camera to the window
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->dataPtr->windowId, this->dataPtr->userCamera);
+  }
 
   // Let QT continue processing the show event.
   QWidget::showEvent(_event);
