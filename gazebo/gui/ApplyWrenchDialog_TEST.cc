@@ -407,6 +407,70 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
 
   // Find the box's torque visual
   bool found = false;
+  ignition::math::Vector2i
+      boxForceMousePoint(glWidget->width()/2 + 10, 0);
+  while (boxForceMousePoint.Y() < glWidget->height())
+  {
+    gazebo::rendering::VisualPtr vis = cam->GetVisual(boxForceMousePoint);
+    if (vis && vis == boxApplyWrenchVis->GetForceVisual())
+    {
+      found = true;
+      break;
+    }
+    boxForceMousePoint.Y() += 5;
+  }
+
+  if (!found)
+  {
+    QFAIL("Couldn't find force visual, interrupting test.");
+    return;
+  }
+
+  // Click on the box's force visual
+  QPoint boxForceClickPoint(boxForceMousePoint.X(), boxForceMousePoint.Y());
+  QTest::mouseMove(glWidget, boxForceClickPoint);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier,
+      boxForceClickPoint, 100);
+  QCoreApplication::processEvents();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that box dialog has focus
+  QVERIFY(applyWrenchDialogBox->isActiveWindow());
+  QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
+
+  // Check mode
+  QVERIFY(applyWrenchDialogBox->GetMode() ==
+      gazebo::gui::ApplyWrenchDialog::Mode::FORCE);
+
+  // Check that force spins changed to UnitX
+  QCOMPARE(spins[0]->value(), 1.0);
+  QCOMPARE(spins[1]->value(), 0.0);
+  QCOMPARE(spins[2]->value(), 0.0);
+  QCOMPARE(spins[3]->value(), 1.0);
+
+  // Check that torque visual is the only one highlighted
+  QVERIFY(boxApplyWrenchVis->GetForceVisual()->GetMaterialName().find(
+      "Gazebo/OrangeTransparentOverlay") != std::string::npos);
+  QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->GetMaterialName().find(
+      "Gazebo/DarkOrangeTransparentOverlay") != std::string::npos);
+
+  // Check that rot tool is visible and not highlighted
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Y));
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Z));
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetState() ==
+      gazebo::rendering::SelectionObj::SelectionMode::SELECTION_NONE);
+
+  // Find the box's torque visual
+  found = false;
   gazebo::math::Vector2i mousePoint(glWidget->width()/2, glWidget->height()/2);
   while (mousePoint.x < glWidget->width())
   {
@@ -421,7 +485,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
 
   if (!found)
   {
-    std::cout << "Couldn't find torque visual, interrupting test." << std::endl;
+    QFAIL("Couldn't find torque visual, interrupting test.");
     return;
   }
 
