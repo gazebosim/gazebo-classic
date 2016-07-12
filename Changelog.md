@@ -1,6 +1,6 @@
 ## Gazebo 7
 
-## Gazebo 7.3.0 (2016-07-11)
+## Gazebo 7.3.0 (2016-07-12)
 
 1. Fix selecting ApplyWrenchVisual's force torque visuals
     * [Pull request 2377](https://bitbucket.org/osrf/gazebo/pull-request/2377)
