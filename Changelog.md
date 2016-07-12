@@ -575,6 +575,9 @@ using the same arguments used in the command line.
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Fix buoyancy plugin when multiple link tags are used within the plugin
+    * [Pull request 2369](https://bitbucket.org/osrf/gazebo/pull-request/2369)
+
 1. Fix race condition in ~TimePanelPrivate (#1919)
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
 
