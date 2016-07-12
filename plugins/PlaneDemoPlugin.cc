@@ -84,10 +84,14 @@ class gazebo::PlaneDemoPluginPrivate
 
   public: common::Time lastUpdateTime;
 
-  public: bool stop;
-  public: void OnKeyHit();
-  public: std::unique_ptr<std::thread> keyHitThread;
+  public: void OnKeyHit(ConstAnyPtr &_msg);
   public: std::mutex mutex;
+
+  /// \brief Pointer to a node for communication.
+  public: transport::NodePtr gzNode;
+
+  /// \brief State subscriber.
+  public: transport::SubscriberPtr keyboardSub;
 };
 
 /////////////////////////////////////////////////
@@ -99,7 +103,6 @@ PlaneDemoPlugin::PlaneDemoPlugin()
 /////////////////////////////////////////////////
 PlaneDemoPlugin::~PlaneDemoPlugin()
 {
-  this->dataPtr->stop = true;
 }
 
 /////////////////////////////////////////////////
@@ -257,6 +260,12 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
     // gzdbg << controlPtr << "\n";
   }
 
+  // Initialize transport.
+  this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
+  this->dataPtr->gzNode->Init();
+  this->dataPtr->keyboardSub = this->dataPtr->gzNode->Subscribe<msgs::Any>(
+    "~/keyboard/keypress", &PlaneDemoPluginPrivate::OnKeyHit,
+    this->dataPtr.get());
   gzdbg << "Load done.\n";
 }
 
@@ -266,17 +275,13 @@ void PlaneDemoPlugin::Init()
   this->dataPtr->lastUpdateTime = this->dataPtr->world->GetSimTime();
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
           std::bind(&PlaneDemoPlugin::OnUpdate, this));
-  this->dataPtr->keyHitThread.reset(
-    new std::thread(std::bind(&PlaneDemoPluginPrivate::OnKeyHit,
-        this->dataPtr.get())));
-  this->dataPtr->stop = false;
   gzdbg << "Init done.\n";
 }
 
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
-  gzdbg << "executing OnUpdate.\n";
+  // gzdbg << "executing OnUpdate.\n";
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     common::Time curTime = this->dataPtr->world->GetSimTime();
@@ -313,12 +318,11 @@ void PlaneDemoPlugin::OnUpdate()
 }
 
 /////////////////////////////////////////////////
-void PlaneDemoPluginPrivate::OnKeyHit()
+void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
 {
-  gzdbg << "executing OnKeyHit.\n";
-  char ch='x';
-  ch = getchar();
-  while (!this->stop)
+  // gzdbg << "executing OnKeyHit.\n";
+  char ch=_msg->int_value();
+  // ch = getchar();
   {
     gzdbg << "keyhit\n";
     std::lock_guard<std::mutex> lock(this->mutex);
