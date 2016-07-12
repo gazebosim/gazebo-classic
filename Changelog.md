@@ -2,6 +2,10 @@
 
 ## Gazebo 7.3.0 (2016-07-11)
 
+1. Fix selecting ApplyWrenchVisual's force torque visuals
+    * [Pull request 2377](https://bitbucket.org/osrf/gazebo/pull-request/2377)
+    * [Issue 1999](https://bitbucket.org/osrf/gazebo/issues/1999)
+
 1. Use ignition math in gazebo::msgs
     * [Pull request 2389](https://bitbucket.org/osrf/gazebo/pull-request/2389)
 
