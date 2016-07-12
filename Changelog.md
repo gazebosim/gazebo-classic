@@ -13,13 +13,16 @@
 
 1. Remove contact filters with names that contain `::`
     * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
-    * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1805)
-
-## Gazebo 7.2.0 (2016-06-13)
+    * [Issue 1805](https://bitbucket.org/osrf/gazebo/issues/1805)
 
 1. Fix right click view options after deleting and respawning a model.
     * [Pull request 2349](https://bitbucket.org/osrf/gazebo/pull-request/2349)
     * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1985)
+
+1. Properly cleanup pointers when destroying a world with joints.
+    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
+
+## Gazebo 7.2.0 (2016-06-13)
 
 1. Backport single pixel selection buffer for mouse picking
     * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
@@ -45,9 +48,6 @@
 
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
-
-1. Properly cleanup pointers when destroying a world with joints.
-    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
 
 1. Fix view control mouse focus in model editor
     * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)
