@@ -38,7 +38,7 @@ namespace gazebo
     public: virtual ~KeyboardGUIPlugin();
 
     /// \brief Callback for a key press event.
-    /// \param[in] _keyEvent Key event
+    /// \param[in] _event Key event
     protected: void OnKeyPress(gazebo::common::KeyEvent _event);
 
     /// \brief SDF for this plugin.

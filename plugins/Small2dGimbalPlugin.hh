@@ -26,7 +26,7 @@ namespace gazebo
   // Forward declare private data class
   class Small2dGimbalPluginPrivate;
 
-  /// \brief A pluging for controlling the angle of a gimbal joint
+  /// \brief A plugin for controlling the angle of a gimbal joint
   class GAZEBO_VISIBLE Small2dGimbalPlugin : public ModelPlugin
   {
     /// \brief Constructor
