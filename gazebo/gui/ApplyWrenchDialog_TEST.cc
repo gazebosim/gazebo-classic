@@ -483,12 +483,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
     }
     mousePoint.x += 5;
     QTest::mouseMove(glWidget, QPoint(mousePoint.x, mousePoint.y));
-    // Process some events and draw the screen
-    {
-      gazebo::common::Time::MSleep(15);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow, 1, 15);
   }
 
   if (!found)
