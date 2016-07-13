@@ -34,6 +34,38 @@ void OnRequest(ConstRequestPtr &_msg)
     g_gotSetWireframe = true;
 }
 
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::MinimizeMaximize()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // repeat minimize and maximize a couple of times
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMinimized();
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMaximized();
+  this->ProcessEventsAndDraw(mainWindow);
+
+  mainWindow->showMinimized();
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMaximized();
+  this->ProcessEventsAndDraw(mainWindow);
+
+  mainWindow->close();
+  delete mainWindow;
+}
+
 /////////////////////////////////////////////////
 void MainWindow_TEST::StepState()
 {
