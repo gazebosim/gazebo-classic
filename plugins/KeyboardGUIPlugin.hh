@@ -14,12 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_KEYBOARD_PLUGIN_HH_
-#define _GAZEBO_GUI_KEYBOARD_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_KEYBOARDGUIPLUGIN_HH_
+#define GAZEBO_PLUGINS_KEYBOARDGUIPLUGIN_HH_
 
-#include <mutex>
 #include <gazebo/common/Plugin.hh>
-#include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 # include <gazebo/transport/transport.hh>
 # include <gazebo/gui/gui.hh>
@@ -39,8 +37,9 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~KeyboardGUIPlugin();
 
-    /// \brief Landing preset.
-    protected: void OnKeyPress(gazebo::common::KeyEvent gazeboKeyEvent);
+    /// \brief Callback for a key press event.
+    /// \param[in] _event Key event
+    protected: void OnKeyPress(gazebo::common::KeyEvent _event);
 
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
@@ -50,9 +49,6 @@ namespace gazebo
 
     /// \brief keyboard publisher.
     private: transport::PublisherPtr keyboardPub;
-
-    /// \brief Protection.
-    private: std::mutex mutex;
 
     /// \brief Pointer to the render widget.
     private: QWidget *renderWidget;

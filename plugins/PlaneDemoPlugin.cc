@@ -15,9 +15,10 @@
  *
 */
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Assert.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/common/PID.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/PlaneDemoPlugin.hh"
 
@@ -25,42 +26,76 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(PlaneDemoPlugin)
 
+/// \brief Joint controller
 struct JointControl
 {
-  public: std::string name;
+  /// \brief Pointer to the joint controlled by JointControl
   public: physics::JointPtr joint;
+
+  /// \brief PID command
   public: double cmd;
+
+  /// \brief Amount to increment the joint angle by on each update
   public: double incVal;
+
+  /// \brief Key for increasing the joint angle
   public: int incKey;
+
+  /// \brief Key for decreasing the joint angle
   public: int decKey;
+
+  /// \brief PID controller
   public: common::PID pid;
 };
 
+/// \brief Engine torque controller
 struct EngineControl
 {
-  public: std::string name;
+  /// \brief Pointer to the joint controlled by EngineControl
   public: physics::JointPtr joint;
+
+  /// \brief Max torque that can be applied to joint
   public: double maxTorque;
+
+  /// \brief Key for increasing the engine torque
   public: int incKey;
+
+  /// \brief Key for descreasing the engine torque
   public: int decKey;
+
+  /// \brief Amount to increment the engine torque by on each update
   public: double incVal;
+
+  /// \brief Torque applied to engine joint
   public: double torque;
 };
 
+/// \brief Thruster force controller
 struct ThrusterControl
 {
-  public: std::string name;
+  /// \brief Link controlled by ThrusterControl
   public: physics::LinkPtr link;
-  public: double maxTorque;
+
+  /// \brief Key for increasing the thruster force
   public: int incKey;
+
+  /// \brief Key for decreasing the thruster force
   public: int decKey;
-  public: math::Vector3 incVal;
-  public: math::Vector3 force;
+
+  /// \brief Amount to increment the engine torque by on each update
+  public: ignition::math::Vector3d incVal;
+
+  /// \brief Force applied to the thruster link
+  public: ignition::math::Vector3d force;
 };
 
 /// \brief Private data class
 class gazebo::PlaneDemoPluginPrivate
 {
+  /// \brief Callback when a keyboard message is received.
+  /// \param[in] _msg Message containing the key press value.
+  public: void OnKeyHit(ConstAnyPtr &_msg);
+
   /// \brief Connection to World Update events.
   public: event::ConnectionPtr updateConnection;
 
@@ -76,15 +111,19 @@ class gazebo::PlaneDemoPluginPrivate
   /// \brief SDF for this plugin;
   public: sdf::ElementPtr sdf;
 
+  /// \brief A list of controls for the engine
   public: std::vector<EngineControl> engineControls;
 
+  /// \brief A list of controls for the thruster
   public: std::vector<ThrusterControl> thrusterControls;
 
+  /// \brief A list of controls for the joint
   public: std::vector<JointControl> jointControls;
 
+  /// \brief Last update sim time
   public: common::Time lastUpdateTime;
 
-  public: void OnKeyHit(ConstAnyPtr &_msg);
+  /// \brief Mutex to protect updates
   public: std::mutex mutex;
 
   /// \brief Pointer to a node for communication.
@@ -183,8 +222,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           if (thrusterPtr->HasElement("dec_key"))
             tc.decKey = thrusterPtr->Get<int>("dec_key");
           if (thrusterPtr->HasElement("inc_val"))
-            tc.incVal = thrusterPtr->Get<math::Vector3>("inc_val");
-          tc.force = math::Vector3();
+            tc.incVal = thrusterPtr->Get<ignition::math::Vector3d>("inc_val");
+          tc.force = ignition::math::Vector3d::Zero;
           this->dataPtr->thrusterControls.push_back(tc);
         }
       }
@@ -323,7 +362,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
   std::lock_guard<std::mutex> lock(this->mutex);
 
   // gzdbg << "executing OnKeyHit.\n";
-  char ch=_msg->int_value();
+  char ch =_msg->int_value();
   gzdbg << "keyhit [" << ch
         << "] num [" << _msg->int_value() << "]\n";
 

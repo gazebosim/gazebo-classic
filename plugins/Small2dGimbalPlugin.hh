@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GAZEBO_SMALL2DGIMBALLPLUGIN_HH_
-#define GAZEBO_GAZEBO_SMALL2DGIMBALLPLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SMALL2DGIMBALLPLUGIN_HH_
+#define GAZEBO_PLUGINS_SMALL2DGIMBALLPLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -26,15 +26,19 @@ namespace gazebo
   // Forward declare private data class
   class Small2dGimbalPluginPrivate;
 
+  /// \brief A plugin for controlling the angle of a gimbal joint
   class GAZEBO_VISIBLE Small2dGimbalPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: Small2dGimbalPlugin();
 
+    // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    // Documentation Inherited.
     public: virtual void Init();
 
+    /// \brief Callback on world update
     private: void OnUpdate();
 
     /// \brief Private data pointer
