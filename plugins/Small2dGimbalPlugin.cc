@@ -30,24 +30,35 @@ GZ_REGISTER_MODEL_PLUGIN(Small2dGimbalPlugin)
 /// \brief Private data class
 class gazebo::Small2dGimbalPluginPrivate
 {
+  /// \brief Callback when a command string is received.
+  /// \param[in] _msg Mesage containing the command string
   public: void OnStringMsg(ConstGzStringPtr &_msg);
 
+  /// \brief A list of event connections
   public: std::vector<event::ConnectionPtr> connections;
 
+  /// \brief Subscriber to the gimbal command topic
   public: transport::SubscriberPtr sub;
 
+  /// \brief Publisher to the gimbal status topic
   public: transport::PublisherPtr pub;
 
+  /// \brief Parent model of this plugin
   public: physics::ModelPtr model;
 
+  /// \brief Joint for tilting the gimbal
   public: physics::JointPtr tiltJoint;
 
+  /// \brief Command that updates the gimbal tilt angle
   public: double command = IGN_PI_2;
 
+  /// \brief Pointer to the transport node
   public: transport::NodePtr node;
 
+  /// \brief PID controller for the gimbal
   public: common::PID pid;
 
+  /// \brief Last update sim time
   public: common::Time lastUpdateTime;
 };
 

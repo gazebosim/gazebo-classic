@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
+
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-#include <algorithm>
-#include <mutex>
-#include <gazebo/gui/GuiPlugin.hh>
-#include <gazebo/gui/Actions.hh>
+
 #include "KeyboardGUIPlugin.hh"
 
 using namespace gazebo;
@@ -72,7 +70,7 @@ bool KeyboardGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
   // if (_event->type() == QEvent::KeyPress)  // why does this not work?
   if (_event->type() == 51)  /// FIXME TODO
   {
-    QKeyEvent *qtKeyEvent = (QKeyEvent *)_event;
+    QKeyEvent *qtKeyEvent = dynamic_cast<QKeyEvent *>(_event);
 
     gazebo::common::KeyEvent gazeboKeyEvent;
     gazeboKeyEvent.key = qtKeyEvent->key();
@@ -82,4 +80,3 @@ bool KeyboardGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
   }
   return QObject::eventFilter(_obj, _event);
 }
-

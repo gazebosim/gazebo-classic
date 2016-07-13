@@ -67,13 +67,25 @@ struct ServoPacket
   float motorSpeed[4];
 };
 
+/// \brief Flight Dynamics Model packet that is sent back to the ArduCopter
 struct fdmPacket
 {
+  /// \brief packet timestamp
   double timestamp;
+
+  /// \brief IMU angular velocity
   double imuAngularVelocityRPY[3];
+
+  /// \brief IMU linear acceleration
   double imuLinearAccelerationXYZ[3];
+
+  /// \brief IMU quaternion orientation
   double imuOrientationQuat[4];
+
+  /// \brief Model velocity in NED frame
   double velocityXYZ[3];
+
+  /// \brief Model position in NED frame
   double positionXYZ[3];
 };
 
@@ -529,7 +541,7 @@ void ArduCopterPlugin::SendState() const
 
   // gazeboToNED brings us from gazebo model: x-forward, y-right, z-down
   // to the aerospace convention: x-forward, y-left, z-up
-  ignition::math::Pose3d gazeboToNED(0, 0, 0, IGN_PI, 0 ,0);
+  ignition::math::Pose3d gazeboToNED(0, 0, 0, IGN_PI, 0, 0);
 
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down

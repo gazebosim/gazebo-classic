@@ -17,17 +17,9 @@
 #ifndef GAZEBO_PLUGINS_PLANEDEMOPLUGIN_HH_
 #define GAZEBO_PLUGINS_PLANEDEMOPLUGIN_HH_
 
-#include <thread>
-#include <string>
-#include <vector>
-
-#include <ignition/math.hh>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/gazebo.hh"
-#include "gazebo/common/PID.hh"
 
 namespace gazebo
 {
