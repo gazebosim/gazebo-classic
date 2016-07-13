@@ -1,5 +1,11 @@
 ## Gazebo 7
 
+## Gazebo 7.X.X (201X-XX-XX)
+
+1. Fix MainWindow crash when window is minimized and maximized
+    * [Pull request 2392](https://bitbucket.org/osrf/gazebo/pull-request/2392)
+    * [Issue 2003](https://bitbucket.org/osrf/gazebo/issues/2003)
+
 ## Gazebo 7.3.0 (2016-07-12)
 
 1. Fix selecting ApplyWrenchVisual's force torque visuals
