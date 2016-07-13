@@ -1,5 +1,10 @@
 ## Gazebo 7
 
+## Gazebo 7.x.x (2016-xx-xx)
+
+1. Fix InertiaVisual for non-diagonal inertia matrices
+    * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
+
 ## Gazebo 7.3.0 (2016-07-12)
 
 1. Fix selecting ApplyWrenchVisual's force torque visuals
@@ -29,9 +34,6 @@
 1. Remove contact filters with names that contain `::`
     * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
     * [Issue 1805](https://bitbucket.org/osrf/gazebo/issues/1805)
-
-1. Fix InertiaVisual for non-diagonal inertia matrices
-    * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
 
 1. Fix Model Manipulator switching between local and global frames
     * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
