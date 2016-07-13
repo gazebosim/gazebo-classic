@@ -35,7 +35,7 @@ VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
 
   dPtr->type = VT_GUI;
   dPtr->video = new common::Video();
-  dPtr->video->Load("/home/nkoenig/Videos/pr2_risotto/risotto_robot.mp4");
+  dPtr->video->Load("/home/louisep/out-14.ogv");
 
   dPtr->width = dPtr->video->GetWidth();
   dPtr->height = dPtr->video->GetHeight();

@@ -74,12 +74,6 @@ namespace gazebo
     public: virtual void Load(rendering::VisualPtr _visual,
         sdf::ElementPtr _sdf);
 
-    // Documentation inherited
-    public: virtual void Reset();
-
-    /// \brief Update the plugin once every iteration of simulation.
-    private: void Update();
-
     /// \internal
     /// \brief Private data pointer
     private: std::unique_ptr<VideoPluginPrivate> dataPtr;

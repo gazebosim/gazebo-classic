@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include <gazebo/common/Events.hh>
+
+#include <gazebo/rendering/VideoVisual.hh>
 #include <gazebo/rendering/Visual.hh>
 #include "VideoPlugin.hh"
 
@@ -27,9 +28,6 @@ namespace gazebo
   {
     /// \brief Visual whose texture will be changed.
     public: rendering::VisualPtr visual;
-
-    /// \brief Connects to rendering update event.
-    public: event::ConnectionPtr updateConnection;
   };
 }
 
@@ -72,36 +70,6 @@ void VideoPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
     return;
   }
 
-  // Connect to the world update signal
-  this->dataPtr->updateConnection = event::Events::ConnectPreRender(
-      std::bind(&VideoPlugin::Update, this));
+  auto vis = new rendering::VideoVisual("VideoVisual", this->dataPtr->visual);
 }
 
-/////////////////////////////////////////////////
-void VideoPlugin::Reset()
-{
-}
-
-/////////////////////////////////////////////////
-void VideoPlugin::Update()
-{
-  if (!this->dataPtr->visual)
-  {
-    gzerr << "The visual is null." << std::endl;
-    return;
-  }
-
-  static float r=0.0, increment=0.0001;
-  if (r > 1.0) {
-      increment = -0.0001;
-      r = 1.0;
-  }
-  if (r < 0.0) {
-      r = 0.0;
-      increment = 0.0001;
-  }
-  common::Color c(r, 0.0, 0.0);
-  this->dataPtr->visual->SetAmbient(c);
-  this->dataPtr->visual->SetDiffuse(c);
-  r += increment;
-}
