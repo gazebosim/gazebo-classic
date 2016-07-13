@@ -320,93 +320,90 @@ void PlaneDemoPlugin::OnUpdate()
 /////////////////////////////////////////////////
 void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   // gzdbg << "executing OnKeyHit.\n";
   char ch=_msg->int_value();
-  // ch = getchar();
+  gzdbg << "keyhit [" << ch
+        << "] num [" << _msg->int_value() << "]\n";
+
+  for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
+    ei != this->engineControls.end(); ++ei)
   {
-    gzdbg << "keyhit\n";
-    std::lock_guard<std::mutex> lock(this->mutex);
-    printf("you hit");
-    printf(" '%c'(%i)", isprint(ch)?ch:'?', static_cast<int>(ch));
-
-    for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
-      ei != this->engineControls.end(); ++ei)
+    if (static_cast<int>(ch) == ei->incKey)
     {
-      if (static_cast<int>(ch) == ei->incKey)
-      {
-        // spin up motor
-        ei->torque += ei->incVal;
-        gzerr << "torque: " << ei->torque << "\n";
-      }
-      else if (static_cast<int>(ch) == ei->decKey)
-      {
-        ei->torque -= ei->incVal;
-        gzerr << "torque: " << ei->torque << "\n";
-      }
-      else
-      {
-        // ungetc( ch, stdin );
-        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
-      }
+      // spin up motor
+      ei->torque += ei->incVal;
+      gzerr << "torque: " << ei->torque << "\n";
     }
-
-    for (std::vector<ThrusterControl>::iterator
-      ti = this->thrusterControls.begin();
-      ti != this->thrusterControls.end(); ++ti)
+    else if (static_cast<int>(ch) == ei->decKey)
     {
-      if (static_cast<int>(ch) == ti->incKey)
-      {
-        // spin up motor
-        ti->force += ti->incVal;
-        gzerr << "force: " << ti->force << "\n";
-      }
-      else if (static_cast<int>(ch) == ti->decKey)
-      {
-        ti->force -= ti->incVal;
-        gzerr << "force: " << ti->force << "\n";
-      }
-      else
-      {
-        // ungetc( ch, stdin );
-        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
-      }
+      ei->torque -= ei->incVal;
+      gzerr << "torque: " << ei->torque << "\n";
     }
-
-    for (std::vector<JointControl>::iterator
-      ji = this->jointControls.begin();
-      ji != this->jointControls.end(); ++ji)
+    else
     {
-      if (static_cast<int>(ch) == ji->incKey)
-      {
-        // spin up motor
-        ji->cmd += ji->incVal;
-        ji->pid.SetCmd(ji->cmd);
-        gzerr << ji->joint->GetName()
-              << " cur: " << ji->joint->GetAngle(0).Radian()
-              << " cmd: " << ji->cmd << "\n";
-      }
-      else if (static_cast<int>(ch) == ji->decKey)
-      {
-        ji->cmd -= ji->incVal;
-        ji->pid.SetCmd(ji->cmd);
-        gzerr << ji->joint->GetName()
-              << " cur: " << ji->joint->GetAngle(0).Radian()
-              << " cmd: " << ji->cmd << "\n";
-      }
-      else if (static_cast<int>(ch) == 99)  // 'c' resets all control surfaces
-      {
-        ji->cmd = 0;
-        ji->pid.SetCmd(ji->cmd);
-        gzerr << ji->joint->GetName()
-              << " cur: " << ji->joint->GetAngle(0).Radian()
-              << " cmd: " << ji->cmd << "\n";
-      }
-      else
-      {
-        // ungetc( ch, stdin );
-        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
-      }
+      // ungetc( ch, stdin );
+      // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
-    usleep(500);
   }
+
+  for (std::vector<ThrusterControl>::iterator
+    ti = this->thrusterControls.begin();
+    ti != this->thrusterControls.end(); ++ti)
+  {
+    if (static_cast<int>(ch) == ti->incKey)
+    {
+      // spin up motor
+      ti->force += ti->incVal;
+      gzerr << "force: " << ti->force << "\n";
+    }
+    else if (static_cast<int>(ch) == ti->decKey)
+    {
+      ti->force -= ti->incVal;
+      gzerr << "force: " << ti->force << "\n";
+    }
+    else
+    {
+      // ungetc( ch, stdin );
+      // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+    }
+  }
+
+  for (std::vector<JointControl>::iterator
+    ji = this->jointControls.begin();
+    ji != this->jointControls.end(); ++ji)
+  {
+    if (static_cast<int>(ch) == ji->incKey)
+    {
+      // spin up motor
+      ji->cmd += ji->incVal;
+      ji->pid.SetCmd(ji->cmd);
+      gzerr << ji->joint->GetName()
+            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cmd: " << ji->cmd << "\n";
+    }
+    else if (static_cast<int>(ch) == ji->decKey)
+    {
+      ji->cmd -= ji->incVal;
+      ji->pid.SetCmd(ji->cmd);
+      gzerr << ji->joint->GetName()
+            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cmd: " << ji->cmd << "\n";
+    }
+    else if (static_cast<int>(ch) == 99)  // 'c' resets all control surfaces
+    {
+      ji->cmd = 0;
+      ji->pid.SetCmd(ji->cmd);
+      gzerr << ji->joint->GetName()
+            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cmd: " << ji->cmd << "\n";
+    }
+    else
+    {
+      // ungetc( ch, stdin );
+      // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+    }
+  }
+  usleep(500);
 }

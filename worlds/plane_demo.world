@@ -856,40 +856,40 @@
         -->
         <thruster name="thruster1">
           <link_name>body</link_name>
-          <inc_key>97</inc_key>
-          <dec_key>122</dec_key>
+          <inc_key>119</inc_key>
+          <dec_key>115</dec_key>
           <inc_val>-50 0 0</inc_val>
         </thruster>
         <control name="wing_left_control">
           <joint_name>wing_left_joint</joint_name>
-          <inc_key>67</inc_key>
+          <inc_key>100</inc_key>
           <inc_val>-0.02</inc_val>
-          <dec_key>68</dec_key>
+          <dec_key>97</dec_key>
           <p>1000</p>
           <i>0</i>
           <d>0</d>
         </control>
         <control name="wing_right_control">
           <joint_name>wing_right_joint</joint_name>
-          <inc_key>68</inc_key>
+          <inc_key>97</inc_key>
           <inc_val>0.02</inc_val>
-          <dec_key>67</dec_key>
+          <dec_key>100</dec_key>
           <p>1000</p>
           <i>0</i>
           <d>0</d>
         </control>
         <control name="elevator_control">
           <joint_name>elevator_joint</joint_name>
-          <inc_key>65</inc_key>
+          <inc_key>107</inc_key>
           <inc_val>0.02</inc_val>
-          <dec_key>66</dec_key>
+          <dec_key>106</dec_key>
           <p>100</p>
           <i>0</i>
           <d>0</d>
         </control>
         <control name="rudder_control">
           <joint_name>rudder_joint</joint_name>
-          <inc_key>119</inc_key>
+          <inc_key>101</inc_key>
           <inc_val>0.02</inc_val>
           <dec_key>113</dec_key>
           <p>100</p>
