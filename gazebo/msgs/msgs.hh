@@ -120,7 +120,7 @@ namespace gazebo
     msgs::Time Convert(const common::Time &_t);
 
     /// \brief Convert an ignition::math::Inertiald to a msgs::Inertial
-    /// \param[in] _m The Inertiald to convert
+    /// \param[in] _i The Inertiald to convert
     /// \return A msgs::Inertial object
     GAZEBO_VISIBLE
     msgs::Inertial Convert(const ignition::math::Inertiald &_i);
