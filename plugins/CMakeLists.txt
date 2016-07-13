@@ -66,7 +66,8 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  VideoPlugin)
 
 set (plugins_private_header
   ElevatorPlugin
