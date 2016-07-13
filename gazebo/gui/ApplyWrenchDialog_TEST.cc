@@ -471,7 +471,8 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
 
   // Find the box's torque visual
   found = false;
-  gazebo::math::Vector2i mousePoint(glWidget->width()/2, glWidget->height()/2);
+  gazebo::math::Vector2i mousePoint(glWidget->width()/2,
+                                    glWidget->height()/2 - 10);
   while (mousePoint.x < glWidget->width())
   {
     gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint);
@@ -481,6 +482,13 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
       break;
     }
     mousePoint.x += 5;
+    QTest::mouseMove(glWidget, QPoint(mousePoint.x, mousePoint.y));
+    // Process some events and draw the screen
+    {
+      gazebo::common::Time::MSleep(15);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
   }
 
   if (!found)
