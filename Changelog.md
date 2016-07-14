@@ -5,6 +5,11 @@
 1. Fix InertiaVisual for non-diagonal inertia matrices
     * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
 
+## Gazebo 7.3.1 (2016-07-13)
+
+1. Fix homebrew test failure of UNIT_ApplyWrenchDialog_TEST
+    * [Pull request 2393](https://bitbucket.org/osrf/gazebo/pull-request/2393)
+
 1. Fix MainWindow crash when window is minimized and maximized
     * [Pull request 2392](https://bitbucket.org/osrf/gazebo/pull-request/2392)
     * [Issue 2003](https://bitbucket.org/osrf/gazebo/issues/2003)
@@ -2292,3 +2297,4 @@ compilation on Windows.
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
+
