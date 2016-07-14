@@ -309,7 +309,8 @@ void MEUserCmd::SetScaleChange(
 {
   if (_before.size() != _after.size())
   {
-    gzwarn << "Number of scale operations before and after command are "
+    gzwarn << "Number of scale operations before [" << _before.size()
+      << "] and after [" << _after.size() << "] command are "
       << "different, some visuals or collisions might be scaled wrong."
       << std::endl;
   }

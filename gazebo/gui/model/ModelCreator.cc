@@ -2977,8 +2977,11 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       std::map<std::string, ignition::math::Vector3d> scales;
       for (unsigned int i = 0; i < linkVis->GetChildCount(); ++i)
       {
-        // Add to map of scales to update
         auto child = linkVis->GetChild(i);
+        if (child->GetType() == rendering::Visual::VT_GUI)
+          continue;
+
+        // Add to map of scales to update
         scales[child->GetName()] = linkVis->GetChild(i)->GetGeometrySize();
       }
       this->dataPtr->linkScaleUpdate[linksIt.second] = scales;
