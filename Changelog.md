@@ -1,6 +1,9 @@
 ## Gazebo 7
 
-## Gazebo 7.X.X (201X-XX-XX)
+## Gazebo 7.3.1 (2016-07-13)
+
+1. Fix homebrew test failure of UNIT_ApplyWrenchDialog_TEST
+    * [Pull request 2393](https://bitbucket.org/osrf/gazebo/pull-request/2393)
 
 1. Fix MainWindow crash when window is minimized and maximized
     * [Pull request 2392](https://bitbucket.org/osrf/gazebo/pull-request/2392)
