@@ -1,5 +1,14 @@
 ## Gazebo 7
 
+## Gazebo 7.3.1 (2016-07-13)
+
+1. Fix homebrew test failure of UNIT_ApplyWrenchDialog_TEST
+    * [Pull request 2393](https://bitbucket.org/osrf/gazebo/pull-request/2393)
+
+1. Fix MainWindow crash when window is minimized and maximized
+    * [Pull request 2392](https://bitbucket.org/osrf/gazebo/pull-request/2392)
+    * [Issue 2003](https://bitbucket.org/osrf/gazebo/issues/2003)
+
 ## Gazebo 7.3.0 (2016-07-12)
 
 1. Fix selecting ApplyWrenchVisual's force torque visuals
