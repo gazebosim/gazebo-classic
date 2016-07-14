@@ -131,6 +131,9 @@
     1. Undo translate, rotate, snap and align links and nested models
         * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
 
+    1. Undo scale links
+        * [Pull request #2368](https://bitbucket.org/osrf/gazebo/pull-request/2368)
+
 1. Google Summer of Code Graphical interface for inserting plugins during simulation.
 
     1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
