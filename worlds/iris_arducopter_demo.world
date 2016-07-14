@@ -4,25 +4,42 @@
 
 To run this demo, you must have following arducopter repo checked out:
 
-https://github.com/hsu/ardupilot/tree/gazebo_sitl
+$ git clone https://github.com/hsu/ardupilot.git -b gazebo_sitl
+
+Add correct path
+
+$ export PATH=$PATH:[path to ardupilot]/ArduCopter
+$ export PATH=$PATH:[path to ardupilot]/Tools/autotest
+
+Make sure you have the right compiler if you are compiling for ARM based platforms
+$ export PATH=/opt/gcc-arm-none-eabi-4_7-2014q2/bin:$PATH
 
 To start simulation, first run gazebo:
 
-gazebo worlds/iris_standoff_demo.world
+gazebo worlds/iris_arducopter_demo.world
 
 Gazebo starts up paused in a black screen. To start simulation,
 setup ArduCopter and run below in a separate terminal:
 
 sim_vehicle.sh -j 4 -f Gazebo
 
-This will start mavproxy, you can then do the usual mavprox commands with
-Gazebo, e.g.
+This will start mavproxy, easiest way to start flying is to first skip arming
+checks (e.g. RC calibration, etc.). And increase Failsafe EKF threshold to
+account for simulation errors:
 
 MAV> arm uncheck all
+MAV> param set FS_EKF_THRESH 1
+
+Takeoff:
+
+MAV> takeoff
+
+Or you can then do the usual mavprox commands within mavproxy shell:
+
 MAV> mode STABILIZE
 STABILIZE> arm throttle
 
-or
+Option to connect a joystick:
 
 STABILIZE> module load joystick
 
