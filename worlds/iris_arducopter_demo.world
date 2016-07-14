@@ -27,16 +27,19 @@ This will start mavproxy, easiest way to start flying is to first skip arming
 checks (e.g. RC calibration, etc.). And increase Failsafe EKF threshold to
 account for simulation errors:
 
-MAV> arm uncheck all
-MAV> param set FS_EKF_THRESH 1
+STABILIZE> arm uncheck all
+STABILIZE> param set FS_EKF_THRESH 1
 
 Takeoff:
 
-MAV> takeoff
+STABILIZE> mode LOITER
+LOITER> rc 3 1500
+LOITER> arm throttle
+LOITER> takeoff 10
 
 Or you can then do the usual mavprox commands within mavproxy shell:
 
-MAV> mode STABILIZE
+STABILIZE> mode STABILIZE
 STABILIZE> arm throttle
 
 Option to connect a joystick:
