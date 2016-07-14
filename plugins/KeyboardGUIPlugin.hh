@@ -17,14 +17,18 @@
 #ifndef GAZEBO_PLUGINS_KEYBOARDGUIPLUGIN_HH_
 #define GAZEBO_PLUGINS_KEYBOARDGUIPLUGIN_HH_
 
+#include <memory>
 #include <gazebo/common/Plugin.hh>
+
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include <gazebo/transport/transport.hh>
 # include <gazebo/gui/gui.hh>
 #endif
 
 namespace gazebo
 {
+  // Forward declare private data class
+  class KeyboardGUIPluginPrivate;
+
   /// \brief A GUI plugin that captures key strokes from gzclient GUI
   /// and publishes over gz transport topic
   class GAZEBO_VISIBLE KeyboardGUIPlugin : public GUIPlugin
@@ -39,25 +43,17 @@ namespace gazebo
 
     /// \brief Callback for a key press event.
     /// \param[in] _event Key event
-    protected: void OnKeyPress(gazebo::common::KeyEvent _event);
-
-    /// \brief SDF for this plugin.
-    private: sdf::ElementPtr sdf;
-
-    /// \brief Pointer to a node for communication.
-    private: transport::NodePtr gzNode;
-
-    /// \brief keyboard publisher.
-    private: transport::PublisherPtr keyboardPub;
-
-    /// \brief Pointer to the render widget.
-    private: QWidget *renderWidget;
+    protected: void OnKeyPress(const gazebo::common::KeyEvent &_event);
 
     /// \brief Qt event filter used to filter child widget events.
     /// \param[in] _obj Object that is watched by the event filter.
     /// \param[in] _event Qt event.
     /// \return True if the event is handled.
     private: bool eventFilter(QObject *_obj, QEvent *_event);
+
+    /// \internal
+    /// \brief Pointer to private data.
+    private: std::unique_ptr<KeyboardGUIPluginPrivate> dataPtr;
   };
 }
 
