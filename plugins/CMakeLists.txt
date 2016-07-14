@@ -39,6 +39,7 @@ endif()
 set (plugins_single_header
   ActuatorPlugin
   ArrangePlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
@@ -66,8 +67,7 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
-  VehiclePlugin
-  VideoPlugin)
+  VehiclePlugin)
 
 set (plugins_private_header
   ElevatorPlugin
