@@ -53,8 +53,6 @@ ModelAlign::ModelAlign()
 ModelAlign::~ModelAlign()
 {
   this->Clear();
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -101,47 +99,48 @@ void ModelAlign::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Transform(math::Box _bbox, math::Pose _worldPose,
-    std::vector<math::Vector3> &_vertices)
+void ModelAlign::Transform(ignition::math::Box _bbox,
+    ignition::math::Pose3d _worldPose,
+    std::vector<ignition::math::Vector3d> &_vertices)
 {
-  math::Vector3 center = _bbox.GetCenter();
+  auto center = _bbox.Center();
 
   // Get the 8 corners of the bounding box.
-  math::Vector3 v0 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
-  math::Vector3 v1 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
-  math::Vector3 v2 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
-  math::Vector3 v3 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
+  auto v0 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                               _bbox.YLength()/2.0,
+                                               _bbox.ZLength()/2.0);
+  auto v1 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                              _bbox.YLength()/2.0,
+                                              _bbox.ZLength()/2.0);
+  auto v2 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                              -_bbox.YLength()/2.0,
+                                               _bbox.ZLength()/2.0);
+  auto v3 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                             -_bbox.YLength()/2.0,
+                                              _bbox.ZLength()/2.0);
 
-  math::Vector3 v4 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
-  math::Vector3 v5 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
-  math::Vector3 v6 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
-  math::Vector3 v7 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
+  auto v4 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                               _bbox.YLength()/2.0,
+                                              -_bbox.ZLength()/2.0);
+  auto v5 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                              _bbox.YLength()/2.0,
+                                             -_bbox.ZLength()/2.0);
+  auto v6 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                              -_bbox.YLength()/2.0,
+                                              -_bbox.ZLength()/2.0);
+  auto v7 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                             -_bbox.YLength()/2.0,
+                                             -_bbox.ZLength()/2.0);
 
   // Transform corners into world spacce.
-  v0 = _worldPose.rot * v0 + _worldPose.pos;
-  v1 = _worldPose.rot * v1 + _worldPose.pos;
-  v2 = _worldPose.rot * v2 + _worldPose.pos;
-  v3 = _worldPose.rot * v3 + _worldPose.pos;
-  v4 = _worldPose.rot * v4 + _worldPose.pos;
-  v5 = _worldPose.rot * v5 + _worldPose.pos;
-  v6 = _worldPose.rot * v6 + _worldPose.pos;
-  v7 = _worldPose.rot * v7 + _worldPose.pos;
+  v0 = _worldPose.Rot() * v0 + _worldPose.Pos();
+  v1 = _worldPose.Rot() * v1 + _worldPose.Pos();
+  v2 = _worldPose.Rot() * v2 + _worldPose.Pos();
+  v3 = _worldPose.Rot() * v3 + _worldPose.Pos();
+  v4 = _worldPose.Rot() * v4 + _worldPose.Pos();
+  v5 = _worldPose.Rot() * v5 + _worldPose.Pos();
+  v6 = _worldPose.Rot() * v6 + _worldPose.Pos();
+  v7 = _worldPose.Rot() * v7 + _worldPose.Pos();
 
   _vertices.clear();
   _vertices.push_back(v0);
@@ -155,8 +154,8 @@ void ModelAlign::Transform(math::Box _bbox, math::Pose _worldPose,
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
-    math::Vector3 &_min, math::Vector3 &_max)
+void ModelAlign::MinMax(std::vector<ignition::math::Vector3d> _vertices,
+    ignition::math::Vector3d &_min, ignition::math::Vector3d &_max)
 {
   if (_vertices.empty())
     return;
@@ -167,19 +166,19 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
   // find min / max in world space;
   for (unsigned int i = 1; i < _vertices.size(); ++i)
   {
-    math::Vector3 v = _vertices[i];
-    if (_min.x > v.x)
-      _min.x = v.x;
-    if (_max.x < v.x)
-      _max.x = v.x;
-    if (_min.y > v.y)
-      _min.y = v.y;
-    if (_max.y < v.y)
-      _max.y = v.y;
-    if (_min.z > v.z)
-      _min.z = v.z;
-    if (_max.z < v.z)
-      _max.z = v.z;
+    auto v = _vertices[i];
+    if (_min.X() > v.X())
+      _min.X() = v.X();
+    if (_max.X() < v.X())
+      _max.X() = v.X();
+    if (_min.Y() > v.Y())
+      _min.Y() = v.Y();
+    if (_max.Y() < v.Y())
+      _max.Y() = v.Y();
+    if (_min.Z() > v.Z())
+      _min.Z() = v.Z();
+    if (_max.Z() < v.Z())
+      _max.Z() = v.Z();
   }
 }
 
@@ -190,8 +189,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 {
   if (_config == "reset" || _publish)
   {
-    std::map<rendering::VisualPtr, math::Pose>::iterator it =
-        this->dataPtr->originalVisualPose.begin();
+    auto it = this->dataPtr->originalVisualPose.begin();
     for (it; it != this->dataPtr->originalVisualPose.end(); ++it)
     {
       if (it->first)
@@ -227,36 +225,36 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
   }
 
-  math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
-  math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
-  targetBbox.min *= this->dataPtr->targetVis->GetScale();
-  targetBbox.max *= this->dataPtr->targetVis->GetScale();
+  auto targetWorldPose = this->dataPtr->targetVis->GetWorldPose().Ign();
+  auto targetBbox = this->dataPtr->targetVis->GetBoundingBox().Ign();
+  targetBbox.Min() *= this->dataPtr->targetVis->GetScale().Ign();
+  targetBbox.Max() *= this->dataPtr->targetVis->GetScale().Ign();
 
-  std::vector<math::Vector3> targetVertices;
+  std::vector<ignition::math::Vector3d> targetVertices;
   this->Transform(targetBbox, targetWorldPose, targetVertices);
 
-  math::Vector3 targetMin;
-  math::Vector3 targetMax;
-  this->GetMinMax(targetVertices, targetMin, targetMax);
+  ignition::math::Vector3d targetMin;
+  ignition::math::Vector3d targetMax;
+  this->MinMax(targetVertices, targetMin, targetMax);
 
   std::vector<rendering::VisualPtr> visualsToPublish;
   for (unsigned i = start; i < end; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
 
-    math::Pose worldPose = vis->GetWorldPose();
-    math::Box bbox = vis->GetBoundingBox();
-    bbox.min *= vis->GetScale();
-    bbox.max *= vis->GetScale();
+    auto worldPose = vis->GetWorldPose().Ign();
+    auto bbox = vis->GetBoundingBox().Ign();
+    bbox.Min() *= vis->GetScale().Ign();
+    bbox.Max() *= vis->GetScale().Ign();
 
-    std::vector<math::Vector3> vertices;
+    std::vector<ignition::math::Vector3d> vertices;
     this->Transform(bbox, worldPose, vertices);
 
-    math::Vector3 min;
-    math::Vector3 max;
-    this->GetMinMax(vertices, min, max);
+    ignition::math::Vector3d min;
+    ignition::math::Vector3d max;
+    this->MinMax(vertices, min, max);
 
-    math::Vector3 trans;
+    ignition::math::Vector3d trans;
     if (_config == "center")
     {
       trans = (targetMin + (targetMax-targetMin)/2) - (min + (max-min)/2);
@@ -294,17 +292,17 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
     if (_axis == "x")
     {
-      trans.y = trans.z = 0;
+      trans.Y() = trans.Z() = 0;
       vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
     }
     else if (_axis == "y")
     {
-      trans.x = trans.z = 0;
+      trans.X() = trans.Z() = 0;
       vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
     }
     else if (_axis == "z")
     {
-      trans.x = trans.y = 0;
+      trans.X() = trans.Y() = 0;
       vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
     }
 

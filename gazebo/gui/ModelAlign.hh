@@ -14,19 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MODEL_ALIGN_HH_
-#define _GAZEBO_GUI_MODEL_ALIGN_HH_
+#ifndef GAZEBO_GUI_MODELALIGN_HH_
+#define GAZEBO_GUI_MODELALIGN_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
+
+#include <ignition/math/Box.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/SingletonT.hh"
-
-#include "gazebo/math/Box.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -71,16 +72,17 @@ namespace gazebo
       /// \param[in] _vertices A list of input vertices.
       /// \param[out] _min Minimum x, y, z values.
       /// \param[out] _max Maximum x, y, z values.
-      private: void GetMinMax(std::vector<math::Vector3> _vertices,
-          math::Vector3 &_min, math::Vector3 &_max);
+      private: void MinMax(std::vector<ignition::math::Vector3d> _vertices,
+          ignition::math::Vector3d &_min, ignition::math::Vector3d &_max);
 
       /// \brief Transform a bounding box to the world space.
       /// \param[in] _bbox Input bounding box.
       /// \param[in] _worldPose Pose used to tranform the bounding box.
       /// \param[out] _vertices Vertices of the tranformed bounding box in
       /// world coordinates.
-      private: void Transform(math::Box _bbox, math::Pose _worldPose,
-          std::vector<math::Vector3> &_vertices);
+      private: void Transform(ignition::math::Box _bbox,
+          ignition::math::Pose3d _worldPose,
+          std::vector<ignition::math::Vector3d> &_vertices);
 
       /// \brief Change the transparency of the visual's leaf children to
       /// indicate a highlighted state or not. Must do it for each leaf as
@@ -94,7 +96,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ModelAlignPrivate *dataPtr;
+      private: std::unique_ptr<ModelAlignPrivate> dataPtr;
     };
   }
 }
