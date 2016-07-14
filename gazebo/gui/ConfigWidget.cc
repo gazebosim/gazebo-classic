@@ -1644,6 +1644,7 @@ void ConfigWidget::OnCustomColorDialog()
     // Opening for the first time
     dialog = new QColorDialog(color, widget);
     dialog->setOption(QColorDialog::ShowAlphaChannel);
+    dialog->setOption(QColorDialog::NoButtons);
     this->connect(dialog, SIGNAL(currentColorChanged(const QColor)), this,
         SLOT(OnColorValueChanged(const QColor)));
   }
