@@ -85,7 +85,7 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
   if (sdfElem->HasElement("color_a"))
     this->dataPtr->colorA = sdfElem->Get<common::Color>("color_a");
 
-  // Get color A
+  // Get color B
   this->dataPtr->colorB.Set(0, 0, 0, 1);
   if (sdfElem->HasElement("color_b"))
     this->dataPtr->colorB = sdfElem->Get<common::Color>("color_b");
