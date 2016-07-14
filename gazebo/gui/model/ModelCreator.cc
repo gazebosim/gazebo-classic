@@ -2978,7 +2978,8 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       for (unsigned int i = 0; i < linkVis->GetChildCount(); ++i)
       {
         auto child = linkVis->GetChild(i);
-        if (child->GetType() == rendering::Visual::VT_GUI)
+        if (child->GetType() == rendering::Visual::VT_GUI ||
+            child->GetType() == rendering::Visual::VT_PHYSICS)
           continue;
 
         // Add to map of scales to update
