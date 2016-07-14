@@ -21,7 +21,21 @@
   #include <Winsock2.h>
 #endif
 
+#include <gazebo/transport/Node.hh>
 #include "KeyboardGUIPlugin.hh"
+
+namespace gazebo
+{
+  /// \brief Private data for the KeyboardGUIPlugin class
+  class KeyboardGUIPluginPrivate
+  {
+    /// \brief Pointer to a node for communication.
+    public: transport::NodePtr gzNode;
+
+    /// \brief keyboard publisher.
+    public: transport::PublisherPtr keyboardPub;
+  };
+}
 
 using namespace gazebo;
 
@@ -30,45 +44,58 @@ GZ_REGISTER_GUI_PLUGIN(KeyboardGUIPlugin)
 
 /////////////////////////////////////////////////
 KeyboardGUIPlugin::KeyboardGUIPlugin()
-  : GUIPlugin()
+  : GUIPlugin(), dataPtr(new KeyboardGUIPluginPrivate)
 {
   gazebo::gui::MainWindow *mainWindow = gazebo::gui::get_main_window();
-  if (mainWindow)
+  if (!mainWindow)
   {
-    this->renderWidget = mainWindow->RenderWidget();
-    this->renderWidget->installEventFilter(this);
+    gzerr << "Couldn't get main window, keyboard events won't be filtered."
+        << std::endl;
+    return;
   }
+
+  auto renderWidget = mainWindow->RenderWidget();
+  if (!renderWidget)
+  {
+    gzerr << "Couldn't get render widget, keyboard events won't be filtered."
+        << std::endl;
+    return;
+  }
+
+  renderWidget->installEventFilter(this);
+
+  // Make this invisible
   this->move(0, 0);
   this->resize(0, 0);
 
   // Initialize transport.
-  this->gzNode = transport::NodePtr(new transport::Node());
-  this->gzNode->Init();
-  this->keyboardPub =
-    this->gzNode->Advertise<msgs::Any>("~/keyboard/keypress");
+  this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
+  this->dataPtr->gzNode->Init();
+  this->dataPtr->keyboardPub =
+      this->dataPtr->gzNode->Advertise<msgs::Any>("~/keyboard/keypress");
 }
 
 /////////////////////////////////////////////////
 KeyboardGUIPlugin::~KeyboardGUIPlugin()
 {
+  this->dataPtr->keyboardPub.reset();
+  this->dataPtr->gzNode->Fini();
 }
 
-
 /////////////////////////////////////////////////
-void KeyboardGUIPlugin::OnKeyPress(gazebo::common::KeyEvent _event)
+void KeyboardGUIPlugin::OnKeyPress(const gazebo::common::KeyEvent &_event)
 {
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_INT32);
   msg.set_int_value(_event.text[0]);
-  this->keyboardPub->Publish(msg);
+  this->dataPtr->keyboardPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 bool KeyboardGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
 {
-  // gzdbg << _event->type() << " : " <<  QEvent::KeyPress << "\n";
-  // if (_event->type() == QEvent::KeyPress)  // why does this not work?
-  if (_event->type() == 51)  /// FIXME TODO
+  // Check if there was a keypress in a child
+  if (_event->type() == QEvent::ShortcutOverride)
   {
     QKeyEvent *qtKeyEvent = dynamic_cast<QKeyEvent *>(_event);
 
