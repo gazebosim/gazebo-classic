@@ -749,6 +749,11 @@ namespace gazebo
       /// \brief Callback when a color config widget's value has changed.
       private slots: void OnColorValueChanged();
 
+      /// \brief Callback when a color config widget's value has changed from
+      /// the color picker.
+      /// \param[in] _value New color value
+      private slots: void OnColorValueChanged(const QColor _value);
+
       /// \brief Callback when a pose config widget's value has changed.
       private slots: void OnPoseValueChanged();
 
@@ -762,6 +767,10 @@ namespace gazebo
       /// \brief Callback when an enum config widget's enum value has changed.
       /// \param[in] _value New enum value in string.
       private slots: void OnEnumValueChanged(const QString &_value);
+
+      /// \brief Callback when an enum config widget's enum value has changed.
+      /// \param[in] _value New enum value in string.
+      private slots: void OnCustomColorDialog();
 
       /// \brief Signal that a uint config widget's value has changed.
       /// \param[in] _name Scoped name of widget.

@@ -898,6 +898,127 @@ void ModelEditorUndoTest::LinkTranslation()
 }
 
 /////////////////////////////////////////////////
+void ModelEditorUndoTest::LinkScaling()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  // Load a world with simple shapes
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera and scene
+  auto cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  auto scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  // Enter the model editor to edit the box model
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
+  gazebo::gui::g_editModelAct->trigger();
+  gazebo::gui::Events::editModel("box");
+
+  // Check undo/redo are disabled
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
+  QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+  // Get visual and collision initial scales
+  std::string linkName = "ModelPreview_1::link";
+  auto linkVis = scene->GetVisual(linkName + "::visual");
+  QVERIFY(linkVis != nullptr);
+  auto linkCol = scene->GetVisual(linkName + "::collision");
+  QVERIFY(linkCol != nullptr);
+
+  auto initialVisScale = linkVis->GetScale().Ign();
+  auto initialColScale = linkCol->GetScale().Ign();
+
+  // Move camera closer to model so we can easily click on it
+  cam->SetWorldPose(ignition::math::Pose3d(1.37, 0, 0.73, 0, 0.26, 3.1));
+
+  // Trigger scale mode
+  QVERIFY(gazebo::gui::g_scaleAct);
+  QVERIFY(!gazebo::gui::g_scaleAct->isChecked());
+  gazebo::gui::g_scaleAct->trigger();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Select link
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::PRESS);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetPos(mainWindow->width()/2.0, mainWindow->height()/2.0);
+  gazebo::gui::ModelManipulator::Instance()->OnMousePressEvent(mouseEvent);
+  gazebo::gui::ModelManipulator::Instance()->OnMouseReleaseEvent(mouseEvent);
+  gazebo::gui::ModelManipulator::Instance()->OnMousePressEvent(mouseEvent);
+
+  // Scale on X axis
+  gazebo::common::KeyEvent keyEvent;
+  keyEvent.key = Qt::Key_X;
+  gazebo::gui::ModelManipulator::Instance()->OnKeyPressEvent(keyEvent);
+
+  // Drag to scale
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  mouseEvent.SetDragging(true);
+  mouseEvent.SetPos(mainWindow->width()/3.0, mainWindow->height()/3.0);
+  gazebo::gui::ModelManipulator::Instance()->OnMouseMoveEvent(mouseEvent);
+
+  // Release scaling
+  gazebo::gui::MouseEventHandler::Instance()->HandleRelease(mouseEvent);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Undo -> Redo a few times
+  for (unsigned int j = 0; j < 3; ++j)
+  {
+    // Check undo is enabled
+    QVERIFY(gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check visual and collision scales have changed
+    QVERIFY(linkVis->GetScale().Ign() != initialVisScale);
+    QVERIFY(linkCol->GetScale().Ign() != initialColScale);
+
+    // Undo
+    gzmsg << "Undo scaling [" << linkName << "]" << std::endl;
+    gazebo::gui::g_undoAct->trigger();
+
+    // Check redo is enabled
+    QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check they're back to initial scale
+    QVERIFY(initialVisScale == linkVis->GetScale().Ign());
+    QVERIFY(initialColScale == linkCol->GetScale().Ign());
+
+    // Redo
+    gzmsg << "Redo scaling [" << linkName << "]" << std::endl;
+    gazebo::gui::g_redoAct->trigger();
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
+}
+
+/////////////////////////////////////////////////
 void ModelEditorUndoTest::NestedModelAlign()
 {
   this->resMaxPercentChange = 5.0;
