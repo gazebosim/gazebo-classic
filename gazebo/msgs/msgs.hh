@@ -31,6 +31,8 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 
+// Remove gazebo/math includes in Gazebo8
+// Adding the word deprecation so that a grep will find this.
 #include "gazebo/math/MathTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
@@ -117,13 +119,13 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Time Convert(const common::Time &_t);
 
-    /// \brief Convert a ignition::math::Inertiald to a msgs::Inertial
-    /// \param[in] _m The Inertiald to convert
+    /// \brief Convert an ignition::math::Inertiald to a msgs::Inertial
+    /// \param[in] _i The Inertiald to convert
     /// \return A msgs::Inertial object
     GAZEBO_VISIBLE
     msgs::Inertial Convert(const ignition::math::Inertiald &_i);
 
-    /// \brief Convert a ignition::math::MassMatrix3d to a msgs::Inertial
+    /// \brief Convert an ignition::math::MassMatrix3d to a msgs::Inertial
     /// \param[in] _m The MassMatrix3d to convert
     /// \return A msgs::Inertial object
     GAZEBO_VISIBLE

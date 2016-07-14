@@ -90,12 +90,12 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
     // Invalid inertia, load with default scale
     gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
           << "unable to visualize box of equivalent inertia." << std::endl;
-    this->Load(math::Pose(xyz, q));
+    this->Load(ignition::math::Pose3d(xyz, q));
   }
   else
   {
     // Apply additional rotation by boxRot
-    this->Load(math::Pose(xyz, q * boxRot), boxScale);
+    this->Load(ignition::math::Pose3d(xyz, q * boxRot), boxScale);
   }
 }
 
@@ -113,18 +113,18 @@ void InertiaVisual::Load(const math::Pose &_pose,
   ignition::math::Vector3d p4(0, 2*_scale.y, 0);
   ignition::math::Vector3d p5(-2*_scale.x, 0, 0);
   ignition::math::Vector3d p6(2*_scale.x, 0, 0);
-  p1 = _pose.rot.RotateVector(p1).Ign();
-  p2 = _pose.rot.RotateVector(p2).Ign();
-  p3 = _pose.rot.RotateVector(p3).Ign();
-  p4 = _pose.rot.RotateVector(p4).Ign();
-  p5 = _pose.rot.RotateVector(p5).Ign();
-  p6 = _pose.rot.RotateVector(p6).Ign();
-  p1 += _pose.pos.Ign();
-  p2 += _pose.pos.Ign();
-  p3 += _pose.pos.Ign();
-  p4 += _pose.pos.Ign();
-  p5 += _pose.pos.Ign();
-  p6 += _pose.pos.Ign();
+  p1 = _pose.Ign().Rot().RotateVector(p1);
+  p2 = _pose.Ign().Rot().RotateVector(p2);
+  p3 = _pose.Ign().Rot().RotateVector(p3);
+  p4 = _pose.Ign().Rot().RotateVector(p4);
+  p5 = _pose.Ign().Rot().RotateVector(p5);
+  p6 = _pose.Ign().Rot().RotateVector(p6);
+  p1 += _pose.Ign().Pos();
+  p2 += _pose.Ign().Pos();
+  p3 += _pose.Ign().Pos();
+  p4 += _pose.Ign().Pos();
+  p5 += _pose.Ign().Pos();
+  p6 += _pose.Ign().Pos();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");

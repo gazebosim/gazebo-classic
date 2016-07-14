@@ -1758,9 +1758,9 @@ namespace gazebo
         if (distElem->HasElement("center"))
         {
           distortionMsg->mutable_center()->set_x(
-              distElem->Get<math::Vector2d>("center").x);
+              distElem->Get<ignition::math::Vector2d>("center").X());
           distortionMsg->mutable_center()->set_y(
-              distElem->Get<math::Vector2d>("center").y);
+              distElem->Get<ignition::math::Vector2d>("center").Y());
         }
       }
 
@@ -2488,7 +2488,7 @@ namespace gazebo
       auto link = _model.mutable_link(linkCount-1);
 
       ignition::math::MassMatrix3d m;
-      if (!m.SetFromBox(_mass, _size, ignition::math::Quaterniond::Identity))
+      if (!m.SetFromBox(_mass, _size))
       {
         gzerr << "Error computing inertia, not setting" << std::endl;
       }
@@ -2514,8 +2514,7 @@ namespace gazebo
       auto link = _model.mutable_link(linkCount-1);
 
       ignition::math::MassMatrix3d m;
-      if (!m.SetFromCylinderZ(_mass, _length, _radius,
-                              ignition::math::Quaterniond::Identity))
+      if (!m.SetFromCylinderZ(_mass, _length, _radius))
       {
         gzerr << "Error computing inertia, not setting" << std::endl;
       }

@@ -455,8 +455,10 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
 
     EXPECT_EQ(model->GetWorldPose(), modelPose);
     EXPECT_EQ(link->GetWorldPose(), linkPose + modelPose);
-    EXPECT_EQ(link->GetWorldInertialPose(),
-              inertialPose + linkPose + modelPose);
+    // only check inertial position
+    // inertial rotation can vary (bullet for example)
+    EXPECT_EQ(link->GetWorldInertialPose().Ign().Pos(),
+              (inertialPose + linkPose + modelPose).Ign().Pos());
 
     // i=0: rotated model pose
     //  expect inertial pose to match model pose
@@ -472,19 +474,13 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       EXPECT_EQ(link->GetWorldPose(),
                 link->GetWorldInertialPose());
     }
-    // i=2: offset and rotated inertial pose
-    //  expect inertial pose to differ from link pose
-    else if (i == 2)
-    {
-      EXPECT_EQ(link->GetWorldPose().pos,
-                link->GetWorldInertialPose().pos);
-    }
+    // i=2: rotated inertial pose
     // i=3: off-diagonal inertia matrix terms
-    //  expect inertial pose to match link pose
-    else if (i == 3)
+    //  expect center-of-mass positions to match
+    else if (i == 2 || i == 3)
     {
-      EXPECT_EQ(link->GetWorldPose(),
-                link->GetWorldInertialPose());
+      EXPECT_EQ(link->GetWorldPose().Ign().Pos(),
+                link->GetWorldInertialPose().Ign().Pos());
     }
     // i=4: offset inertial pose
     //  expect inertial pose to differ from link pose

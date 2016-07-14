@@ -189,7 +189,8 @@ void ODELink::Fini()
 //////////////////////////////////////////////////
 void ODELink::SetGravityMode(bool _mode)
 {
-  this->sdf->GetElement("gravity")->Set(_mode);
+  if (this->sdf->HasElement("gravity"))
+    this->sdf->GetElement("gravity")->Set(_mode);
   if (this->linkId)
   {
     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
