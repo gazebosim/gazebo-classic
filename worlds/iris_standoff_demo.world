@@ -78,7 +78,7 @@ to fly iris with a ps2 joystick.
           </surface>
         </collision>
         <visual name="runway">
-          <pose>700 0 0.1 0 0 0</pose>
+          <pose>700 0 0.005 0 0 0</pose>
           <cast_shadows>false</cast_shadows>
           <geometry>
             <plane>
@@ -114,9 +114,9 @@ to fly iris with a ps2 joystick.
       </link>
     </model>
 
-    <model name="iris">
+    <model name="iris_demo">
       <include>
-        <uri>model://iris_test</uri>
+        <uri>model://iris</uri>
       </include>
 
       <include>

@@ -74,7 +74,7 @@ void Small2dGimbalPlugin::Load(physics::ModelPtr _model,
   sdf::ElementPtr /*_sdf*/)
 {
   this->dataPtr->model = _model;
-  std::string jointName = _model->GetName() + "::tilt_joint";
+  std::string jointName = _model->GetName() + "::gimbal_small_2d::tilt_joint";
   this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(jointName);
 
   if (!this->dataPtr->tiltJoint)
