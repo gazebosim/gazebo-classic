@@ -332,8 +332,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
       double newL = newSize.Z();
       double newR = newSize.X() * 0.5;
       // Get inertia properties of uniform cylinder
-      if (!m.SetFromCylinderZ(newMass, newL, newR,
-                              ignition::math::Quaterniond::Identity))
+      if (!m.SetFromCylinderZ(newMass, newL, newR))
       {
         gzerr << "Error computing inertia, not re-scaling" << std::endl;
       }
@@ -343,7 +342,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   if (boxInertia)
   {
     // Get inertia properties of uniform box
-    if (!m.SetFromBox(newMass, newSize, ignition::math::Quaterniond::Identity))
+    if (!m.SetFromBox(newMass, newSize))
     {
       gzerr << "Error computing inertia, not re-scaling" << std::endl;
     }
