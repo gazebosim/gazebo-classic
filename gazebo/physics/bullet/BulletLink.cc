@@ -86,6 +86,7 @@ void BulletLink::Init()
     mass = 0;
     this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
   }
+  btVector3 fallInertia(0, 0, 0);
 
   // diagonalize inertia matrix and add inertial pose rotation
   {
@@ -93,15 +94,12 @@ void BulletLink::Init()
     auto m = inertiald.MassMatrix();
     auto Idiag = m.PrincipalMoments();
     this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
+    fallInertia = BulletTypes::ConvertVector3(Idiag);
 
     auto inertialPose = inertiald.Pose();
     inertialPose.Rot() = inertialPose.Rot() * m.PrincipalAxesOffset();
     this->inertial->SetCoG(inertialPose);
   }
-  auto fallInertia = BulletTypes::ConvertVector3(
-    this->inertial->GetPrincipalMoments());
-  this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
-                                   fallInertia.z(), 0, 0, 0);
 
   /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
