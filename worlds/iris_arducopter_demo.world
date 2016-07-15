@@ -21,7 +21,12 @@ gazebo worlds/iris_arducopter_demo.world
 Gazebo starts up paused in a black screen. To start simulation,
 setup ArduCopter and run below in a separate terminal:
 
-sim_vehicle.sh -j 4 -f Gazebo
+sim_vehicle.sh -j 4 -f Gazebo -S 100
+
+Note the speed up (-S) is set to a large number, as long as this number
+is higher than simulation RTF we are ok. This is becuase simulation
+is blocking and waiting for ArduCopter, but ArduCopter is not waiting
+for anyone.
 
 This will start mavproxy, easiest way to start flying is to first skip arming
 checks (e.g. RC calibration, etc.). And increase Failsafe EKF threshold to
@@ -70,7 +75,7 @@ to fly iris with a ps2 joystick.
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <real_time_update_rate>400</real_time_update_rate>
+      <real_time_update_rate>0</real_time_update_rate>
       <max_step_size>0.0025</max_step_size>
     </physics>
 
