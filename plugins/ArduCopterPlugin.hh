@@ -50,20 +50,17 @@ namespace gazebo
 
     /// \brief Update the control surfaces controllers.
     /// \param[in] _info Update information provided by the server.
-    private: void Update(const common::UpdateInfo &_info);
+    private: void OnUpdate(const common::UpdateInfo &_info);
 
     /// \brief Update PID Joint controllers.
     /// \param[in] _dt time step size since last update.
-    private: void UpdatePIDs(const double _dt);
+    private: void ApplyMotorForces(const double _dt);
 
     /// \brief Reset PID Joint controllers.
     private: void ResetPIDs();
 
     /// \brief Receive motor commands from ArduCopter
     private: void ReceiveMotorCommand();
-
-    /// \brief Apply  motor commands from ArduCopter
-    private: void ApplyMotorCommand();
 
     /// \brief Send state to ArduCopter
     private: void SendState() const;
