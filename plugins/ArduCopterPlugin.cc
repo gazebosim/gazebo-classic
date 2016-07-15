@@ -31,6 +31,8 @@
 #include <gazebo/transport/transport.hh>
 #include "plugins/ArduCopterPlugin.hh"
 
+#define MAX_MOTORS 255
+
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(ArduCopterPlugin)
@@ -64,7 +66,7 @@ bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
 struct ServoPacket
 {
   /// \brief Motor speed data.
-  float motorSpeed[4];
+  float motorSpeed[MAX_MOTORS];
 };
 
 /// \brief Flight Dynamics Model packet that is sent back to the ArduCopter
@@ -441,7 +443,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Missed update count before we declare arduCopterOnline status false
   getSdfParam<int>(_sdf, "connectionTimeoutMaxCount",
-    this->dataPtr->connectionTimeoutMaxCount, 50);
+    this->dataPtr->connectionTimeoutMaxCount, 10);
 
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
@@ -463,8 +465,11 @@ void ArduCopterPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
   {
     this->SendState();
     this->ReceiveMotorCommand();
-    this->ApplyMotorForces((curTime -
-      this->dataPtr->lastControllerUpdateTime).Double());
+    if (this->dataPtr->arduCopterOnline)
+    {
+      this->ApplyMotorForces((curTime -
+        this->dataPtr->lastControllerUpdateTime).Double());
+    }
   }
 
   this->dataPtr->lastControllerUpdateTime = curTime;
@@ -476,7 +481,8 @@ void ArduCopterPlugin::ResetPIDs()
   // Reset velocity PID for rotors
   for (size_t i = 0; i < this->dataPtr->rotors.size(); ++i)
   {
-    this->dataPtr->rotors[i].pid.Reset();
+    this->dataPtr->rotors[i].cmd = 0;
+    // this->dataPtr->rotors[i].pid.Reset();
   }
 }
 
@@ -556,9 +562,17 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     // compute command based on requested motorSpeed
     for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
     {
-      // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
-      this->dataPtr->rotors[i].cmd = this->dataPtr->rotors[i].maxRpm *
-        pkt.motorSpeed[i];
+      if (i < MAX_MOTORS)
+      {
+        // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
+        this->dataPtr->rotors[i].cmd = this->dataPtr->rotors[i].maxRpm *
+          pkt.motorSpeed[i];
+      }
+      else
+      {
+        gzerr << "too many motors, skipping [" << i
+              << " > " << MAX_MOTORS << "].\n";
+      }
     }
   }
 }
