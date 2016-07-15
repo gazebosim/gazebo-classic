@@ -99,8 +99,8 @@ void ModelAlign::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Transform(ignition::math::Box _bbox,
-    ignition::math::Pose3d _worldPose,
+void ModelAlign::Transform(const ignition::math::Box &_bbox,
+    const ignition::math::Pose3d &_worldPose,
     std::vector<ignition::math::Vector3d> &_vertices)
 {
   auto center = _bbox.Center();
@@ -154,7 +154,7 @@ void ModelAlign::Transform(ignition::math::Box _bbox,
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::MinMax(std::vector<ignition::math::Vector3d> _vertices,
+void ModelAlign::MinMax(const std::vector<ignition::math::Vector3d> &_vertices,
     ignition::math::Vector3d &_min, ignition::math::Vector3d &_max)
 {
   if (_vertices.empty())
@@ -343,7 +343,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::SetHighlighted(rendering::VisualPtr _vis, bool _highlight)
+void ModelAlign::SetHighlighted(const rendering::VisualPtr &_vis,
+    const bool _highlight)
 {
   if (_vis->GetChildCount() != 0)
   {

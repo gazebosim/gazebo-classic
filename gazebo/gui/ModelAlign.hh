@@ -72,16 +72,18 @@ namespace gazebo
       /// \param[in] _vertices A list of input vertices.
       /// \param[out] _min Minimum x, y, z values.
       /// \param[out] _max Maximum x, y, z values.
-      private: void MinMax(std::vector<ignition::math::Vector3d> _vertices,
-          ignition::math::Vector3d &_min, ignition::math::Vector3d &_max);
+      private: void MinMax(
+          const std::vector<ignition::math::Vector3d> &_vertices,
+          ignition::math::Vector3d &_min,
+          ignition::math::Vector3d &_max);
 
       /// \brief Transform a bounding box to the world space.
       /// \param[in] _bbox Input bounding box.
       /// \param[in] _worldPose Pose used to tranform the bounding box.
       /// \param[out] _vertices Vertices of the tranformed bounding box in
       /// world coordinates.
-      private: void Transform(ignition::math::Box _bbox,
-          ignition::math::Pose3d _worldPose,
+      private: void Transform(const ignition::math::Box &_bbox,
+          const ignition::math::Pose3d &_worldPose,
           std::vector<ignition::math::Vector3d> &_vertices);
 
       /// \brief Change the transparency of the visual's leaf children to
@@ -89,7 +91,8 @@ namespace gazebo
       /// they might have different transparencies.
       /// \param[in] _vis Visual to be highlighted.
       /// \param[in] _highlight Whether to highlight or not.
-      private: void SetHighlighted(rendering::VisualPtr _vis, bool _highlight);
+      private: void SetHighlighted(const rendering::VisualPtr &_vis,
+          const bool _highlight);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelAlign>;
