@@ -19,7 +19,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
-#include <mutex>
+// // // // // // // // #include <mutex>
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
@@ -108,6 +108,9 @@ class Rotor
 
   /// \brief Max rotor propeller RPM.
   public: double maxRpm = 838.0;
+
+  /// \brief incoming ArduCopter motor speed command
+  public: double motorSpeed = 0.0;
 
   /// \brief Next command to be applied to the propeller
   public: double cmd = 0;
@@ -216,7 +219,7 @@ class gazebo::ArduCopterPluginPrivate
   public: gazebo::common::Time lastControllerUpdateTime;
 
   /// \brief Controller update mutex.
-  public: std::mutex mutex;
+  // public: std::mutex mutex;
 
   /// \brief Socket handle
   public: int handle;
@@ -226,6 +229,17 @@ class gazebo::ArduCopterPluginPrivate
 
   /// \brief Pointer to an IMU sensor
   public: sensors::ImuSensorPtr imuSensor;
+
+  /// \brief false before ardupilot controller is online
+  /// to allow gazebo to continue without waiting
+  public: bool arduCopterOnline;
+
+  /// \brief number of times ArduCotper skips update
+  public: int connectionTimeoutCount;
+
+  /// \brief number of times ArduCotper skips update
+  /// before marking ArduCopter offline
+  public: int connectionTimeoutMaxCount;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +258,10 @@ ArduCopterPlugin::ArduCopterPlugin()
     gzerr << "failed to bind with 127.0.0.1:9002, aborting plugin.\n";
     return;
   }
+
+  this->dataPtr->arduCopterOnline = false;
+
+  this->dataPtr->connectionTimeoutCount = 0;
 
   setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
       &one, sizeof(one));
@@ -424,6 +442,10 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Controller time control.
   this->dataPtr->lastControllerUpdateTime = 0;
 
+  // Missed update count before we declare arduCopterOnline status false
+  getSdfParam<int>(_sdf, "connectionTimeoutMaxCount",
+    this->dataPtr->connectionTimeoutMaxCount, 50);
+
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -435,7 +457,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ArduCopterPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  // std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
 
@@ -443,7 +465,8 @@ void ArduCopterPlugin::Update(const common::UpdateInfo &/*_info*/)
   if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
     this->SendState();
-    this->MotorCommand();
+    this->ReceiveMotorCommand();
+    this->ApplyMotorCommand();
     this->UpdatePIDs((curTime -
           this->dataPtr->lastControllerUpdateTime).Double());
   }
@@ -468,25 +491,73 @@ void ArduCopterPlugin::UpdatePIDs(const double _dt)
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::MotorCommand()
+void ArduCopterPlugin::ReceiveMotorCommand()
 {
   ServoPacket pkt;
-  while (this->dataPtr->Recv(&pkt, sizeof(pkt), 100) != sizeof(pkt))
+  int waitMs = 10;
+  if (this->dataPtr->arduCopterOnline)
   {
-    // Experimental call below, uncomment to test:
-    //   re-send the servo packet every 0.1 seconds until we get a
-    //   reply. This allows us to cope with some packet loss to the FDM
-    // send_servos(input);
-
-    // sleep before retry if Recv returned false
-    gazebo::common::Time::NSleep(100);
+    // increase timeout for receive once we detect packet from
+    // ArduCopter FCS.
+    waitMs = 1000;
+  }
+  else
+  {
+    // Otherwise skip quickly and do not set control force.
+    waitMs = 1;
   }
 
+  if (this->dataPtr->Recv(&pkt, sizeof(pkt), waitMs) != sizeof(pkt))
+  {
+    // didn't receive a packet
+    // gzerr << "no packet\n";
+    gazebo::common::Time::NSleep(100);
+    if (this->dataPtr->arduCopterOnline)
+    {
+      gzwarn << "Broken ArduCopter connection, count ["
+             << this->dataPtr->connectionTimeoutCount
+             << "/" << this->dataPtr->connectionTimeoutMaxCount
+             << "]\n";
+      if (++this->dataPtr->connectionTimeoutCount >
+        this->dataPtr->connectionTimeoutMaxCount)
+      {
+        this->dataPtr->connectionTimeoutCount = 0;
+        this->dataPtr->arduCopterOnline = false;
+        gzwarn << "Broken ArduCopter connection, setting motor forces to 0.\n";
+        for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
+        {
+          // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
+          this->dataPtr->rotors[i].motorSpeed = 0;
+        }
+      }
+    }
+  }
+  else
+  {
+    if (!this->dataPtr->arduCopterOnline)
+    {
+      gzdbg << "ArduCopter controller online detected.\n";
+      // made connection, set some flags
+      this->dataPtr->connectionTimeoutCount = 0;
+      this->dataPtr->arduCopterOnline = true;
+    }
+    // cache command
+    for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
+    {
+      // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
+      this->dataPtr->rotors[i].motorSpeed = pkt.motorSpeed[i];
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ArduCopterPlugin::ApplyMotorCommand()
+{
+  // apply command
   for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
   {
-    // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
     this->dataPtr->rotors[i].cmd = this->dataPtr->rotors[i].maxRpm *
-      pkt.motorSpeed[i];
+      this->dataPtr->rotors[i].motorSpeed;
   }
 }
 

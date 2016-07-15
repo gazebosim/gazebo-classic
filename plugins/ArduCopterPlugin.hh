@@ -56,10 +56,13 @@ namespace gazebo
     /// \param[in] _dt time step size since last update.
     private: void UpdatePIDs(const double _dt);
 
-    /// \brief Get motor commands from ArduCopter
-    private: void MotorCommand();
+    /// \brief Receive motor commands from ArduCopter
+    private: void ReceiveMotorCommand();
 
-    /// \brief Publish ArduCopter state.
+    /// \brief Apply  motor commands from ArduCopter
+    private: void ApplyMotorCommand();
+
+    /// \brief Send state to ArduCopter
     private: void SendState() const;
 
     /// \brief Private data pointer.
