@@ -56,6 +56,9 @@ namespace gazebo
     /// \param[in] _dt time step size since last update.
     private: void UpdatePIDs(const double _dt);
 
+    /// \brief Reset PID Joint controllers.
+    private: void ResetPIDs();
+
     /// \brief Receive motor commands from ArduCopter
     private: void ReceiveMotorCommand();
 

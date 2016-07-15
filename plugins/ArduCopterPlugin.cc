@@ -464,20 +464,42 @@ void ArduCopterPlugin::Update(const common::UpdateInfo &/*_info*/)
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
+    // Added detection for whether ArduCopter is online or not.
+    // If ArduCopter is detected (receive of fdm packet from someone),
+    // then socket receive wait time is increased from 1ms to 1 sec
+    // to accomodate network jitter.
+    // If ArduCopter is not detected, receive call blocks for 1ms
+    // on each call.
+    // Once ArduCopter presence is detected, it takes 15 (configurable)
+    // missed receives before declaring the FCS offline.
     this->SendState();
     this->ReceiveMotorCommand();
-    this->ApplyMotorCommand();
-    this->UpdatePIDs((curTime -
-          this->dataPtr->lastControllerUpdateTime).Double());
+    if (this->dataPtr->arduCopterOnline)
+    {
+      this->ApplyMotorCommand();
+      this->UpdatePIDs((curTime -
+        this->dataPtr->lastControllerUpdateTime).Double());
+    }
   }
 
   this->dataPtr->lastControllerUpdateTime = curTime;
 }
 
 /////////////////////////////////////////////////
+void ArduCopterPlugin::ResetPIDs()
+{
+  // Reset velocity PID for rotors
+  for (size_t i = 0; i < this->dataPtr->rotors.size(); ++i)
+  {
+    this->dataPtr->rotors[i].motorSpeed = 0;
+    this->dataPtr->rotors[i].pid.Reset();
+  }
+}
+
+/////////////////////////////////////////////////
 void ArduCopterPlugin::UpdatePIDs(const double _dt)
 {
-  // Position PID for rotors
+  // update velocity PID for rotors and apply force to joint
   for (size_t i = 0; i < this->dataPtr->rotors.size(); ++i)
   {
     double velTarget = this->dataPtr->rotors[i].multiplier *
@@ -523,12 +545,8 @@ void ArduCopterPlugin::ReceiveMotorCommand()
       {
         this->dataPtr->connectionTimeoutCount = 0;
         this->dataPtr->arduCopterOnline = false;
-        gzwarn << "Broken ArduCopter connection, setting motor forces to 0.\n";
-        for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
-        {
-          // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
-          this->dataPtr->rotors[i].motorSpeed = 0;
-        }
+        gzwarn << "Broken ArduCopter connection, resetting motor control.\n";
+        this->ResetPIDs();
       }
     }
   }
