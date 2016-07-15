@@ -19,7 +19,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
-// // // // // // // // #include <mutex>
+#include <mutex>
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
@@ -218,7 +218,7 @@ class gazebo::ArduCopterPluginPrivate
   public: gazebo::common::Time lastControllerUpdateTime;
 
   /// \brief Controller update mutex.
-  // public: std::mutex mutex;
+  public: std::mutex mutex;
 
   /// \brief Socket handle
   public: int handle;
@@ -456,19 +456,19 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ArduCopterPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
 {
-  // std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
 
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
-    this->SendState();
     this->ReceiveMotorCommand();
     if (this->dataPtr->arduCopterOnline)
     {
       this->ApplyMotorForces((curTime -
         this->dataPtr->lastControllerUpdateTime).Double());
+      this->SendState();
     }
   }
 
@@ -527,11 +527,18 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     // Otherwise skip quickly and do not set control force.
     waitMs = 1;
   }
-
-  if (this->dataPtr->Recv(&pkt, sizeof(pkt), waitMs) != sizeof(pkt))
+  ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(pkt), waitMs);
+  ssize_t expectedPktSize = sizeof(float)*this->dataPtr->rotors.size();
+  if ((recvSize == -1) || (recvSize != expectedPktSize))
   {
     // didn't receive a packet
     // gzerr << "no packet\n";
+    if (recvSize != -1)
+    {
+      gzerr << "got something weird: " << recvSize
+            << ", should be: " << sizeof(pkt) << "\n";
+    }
+
     gazebo::common::Time::NSleep(100);
     if (this->dataPtr->arduCopterOnline)
     {
