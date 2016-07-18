@@ -15,11 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_VISUAL_CONFIG_HH_
-#define _GAZEBO_VISUAL_CONFIG_HH_
+#ifndef GAZEBO_GUI_MODEL_VISUALCONFIG_HH_
+#define GAZEBO_GUI_MODEL_VISUALCONFIG_HH_
 
 #include <map>
 #include <string>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
@@ -111,7 +114,7 @@ namespace gazebo
       /// \param[in] _size Size of the geometry.
       /// \param[in] _uri URI of the geometry.
       public: void SetGeometry(const std::string &_name,
-          const math::Vector3 &_size, const std::string &_uri = "");
+          const ignition::math::Vector3d &_size, const std::string &_uri = "");
 
       /// \brief Get the geometry data of a visual
       /// \param[in] _name Name of visual.
@@ -195,6 +198,12 @@ namespace gazebo
 
       /// \brief Map of id to visual config widget.
       private: std::map<int, VisualConfigData *> configs;
+
+      /// \brief Map of visual config widgets which were deleted.
+      private: std::map<int, VisualConfigData *> deletedConfigs;
+
+      /// \brief Map of visual config widgets which were added.
+      private: std::map<int, VisualConfigData *> addedConfigs;
 
       /// \brief Counter for the number of visuals.
       private: int counter;

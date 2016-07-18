@@ -748,7 +748,9 @@ namespace gazebo
 
       /// \brief Disconnect from an image frame
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer
@@ -862,6 +864,16 @@ namespace gazebo
       /// \return "perspective" or "orthographic"
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
+
+      /// \brief Return the projection matrix of this camera.
+      /// \return the projection matrix
+      public: ignition::math::Matrix4d ProjectionMatrix() const;
+
+      /// \brief Project 3D world coordinates to 2D screen coordinates
+      /// \param[in] _pt 3D world coodinates
+      /// \return _pt 2D screen coordinates
+      public: ignition::math::Vector2i Project(
+          const ignition::math::Vector3d &_pt) const;
 
       /// \brief Get the visual tracked by this camera.
       /// \return Tracked visual.
@@ -1008,6 +1020,9 @@ namespace gazebo
       /// \brief Update the camera's field of view.
       protected: virtual void UpdateFOV();
 
+      /// \brief Set the clip distance based on stored SDF values
+      protected: virtual void SetClipDist();
+
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
       /// \param[out] _dst Destination buffer for the image data
@@ -1018,9 +1033,6 @@ namespace gazebo
       private: void ConvertRGBToBAYER(unsigned char *_dst,
           const unsigned char *_src, const std::string &_format,
           const int _width, const int _height);
-
-      /// \brief Set the clip distance based on stored SDF values
-      private: virtual void SetClipDist();
 
       /// \brief Get the OGRE image pixel format in
       /// \param[in] _format The Gazebo image format

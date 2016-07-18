@@ -48,6 +48,7 @@ DARTCollision::DARTCollision(LinkPtr _link)
 DARTCollision::~DARTCollision()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

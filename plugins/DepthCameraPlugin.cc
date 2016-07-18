@@ -31,6 +31,10 @@ DepthCameraPlugin::DepthCameraPlugin()
 /////////////////////////////////////////////////
 DepthCameraPlugin::~DepthCameraPlugin()
 {
+  this->newDepthFrameConnection.reset();
+  this->newRGBPointCloudConnection.reset();
+  this->newImageFrameConnection.reset();
+
   this->parentSensor.reset();
   this->depthCamera.reset();
 }

@@ -82,6 +82,9 @@ namespace gazebo
       /// \param[in] _id Unique id of an item.
       Q_SIGNALS: void itemDoubleClicked(QString _id);
 
+      /// \brief Store which item was clicked last.
+      public: QGraphicsItem *lastClickedItem = nullptr;
+
       /// \brief Scale (zoom level) of the editor view.
       private: double viewScale;
     };

@@ -23,7 +23,6 @@
 #define _ODECOLLISION_HH_
 
 #include "gazebo/physics/ode/ode_inc.h"
-#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"

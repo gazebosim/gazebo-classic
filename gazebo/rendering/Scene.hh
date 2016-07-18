@@ -796,6 +796,10 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: void OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg);
 
+      /// \brief Road message callback.
+      /// \param[in] _msg The message data.
+      private: void OnRoadMsg(ConstRoadPtr &_msg);
+
       /// \brief Create a new center of mass visual.
       /// \param[in] _msg Message containing the link data.
       /// \param[in] _linkVisual Pointer to the link's visual.

@@ -173,8 +173,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  if (this->dataPtr->preRenderConnection)
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+  this->Fini();
 
   delete this->dataPtr->boundingBox;
 
@@ -184,22 +183,12 @@ Visual::~Visual()
     delete *iter;
     */
   this->dataPtr->lines.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
-  {
-    // seems we never get into this block because Fini() runs first
-    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
-    this->dataPtr->sceneNode->removeAndDestroyAllChildren();
-    this->dataPtr->scene->OgreSceneManager()->destroySceneNode(
-        this->dataPtr->sceneNode->getName());
-    this->dataPtr->sceneNode = NULL;
-  }
-
   this->dataPtr->scene.reset();
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
   this->dataPtr->parent.reset();
   this->dataPtr->children.clear();
+  this->dataPtr->plugins.clear();
 
   delete this->dataPtr;
   this->dataPtr = 0;
@@ -208,7 +197,15 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
-  this->dataPtr->plugins.clear();
+  if (!this->dataPtr->scene)
+    return;
+
+  while (!this->dataPtr->children.empty())
+  {
+    VisualPtr childVis = this->dataPtr->children.front();
+    this->DetachVisual(childVis);
+    childVis->Fini();
+  }
 
   // Detach from the parent
   if (this->dataPtr->parent)
@@ -216,17 +213,16 @@ void Visual::Fini()
 
   if (this->dataPtr->sceneNode)
   {
-    this->dataPtr->sceneNode->detachAllObjects();
+    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->dataPtr->scene->OgreSceneManager()->destroySceneNode(
         this->dataPtr->sceneNode);
     this->dataPtr->sceneNode = NULL;
   }
 
-  if (this->dataPtr->preRenderConnection)
-  {
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
-    this->dataPtr->preRenderConnection.reset();
-  }
+  this->dataPtr->preRenderConnection.reset();
+
+  if (this->dataPtr->scene->GetVisual(this->dataPtr->id))
+    this->dataPtr->scene->RemoveVisual(this->dataPtr->id);
 
   this->dataPtr->scene.reset();
 }
@@ -277,15 +273,20 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
     else
       delete ent;
   }
+  this->dataPtr->lines.clear();
 
-  // Recurse to child SceneNodes
-  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
-
-  while (itChild.hasMoreElements())
+  // only recurse if there are no child visuals otherwise let them clean up
+  // after themselves in Fini()
+  if (this->dataPtr->children.empty())
   {
-    Ogre::SceneNode* pChildNode =
-        static_cast<Ogre::SceneNode*>(itChild.getNext());
-    this->DestroyAllAttachedMovableObjects(pChildNode);
+    // Recurse to child SceneNodes
+    Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+    while (itChild.hasMoreElements())
+    {
+      Ogre::SceneNode* pChildNode =
+          static_cast<Ogre::SceneNode*>(itChild.getNext());
+      this->DestroyAllAttachedMovableObjects(pChildNode);
+    }
   }
 }
 
@@ -478,6 +479,11 @@ void Visual::Load()
   {
     this->SetTransparency(this->dataPtr->sdf->Get<float>("transparency"));
   }
+  // Update transparency the first time the visual is loaded. This is needed
+  // when attaching to a parent who is semi-transparent.
+  if (!ignition::math::equal(this->DerivedTransparency(),
+      this->dataPtr->transparency))
+    this->UpdateTransparency(true);
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
@@ -578,8 +584,7 @@ void Visual::DetachVisual(VisualPtr _vis)
 //////////////////////////////////////////////////
 void Visual::DetachVisual(const std::string &_name)
 {
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
+  for (auto iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
@@ -588,7 +593,6 @@ void Visual::DetachVisual(const std::string &_name)
       this->dataPtr->children.erase(iter);
       if (this->dataPtr->sceneNode && childVis->GetSceneNode())
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
-      childVis->GetParent().reset();
       break;
     }
   }
@@ -1012,6 +1016,15 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
     this->dataPtr->myMaterialName = _materialName;
   }
 
+  // check if material has color components, if so, set them.
+  if (matColor)
+  {
+    this->dataPtr->ambient = matAmbient;
+    this->dataPtr->diffuse = matDiffuse;
+    this->dataPtr->specular = matSpecular;
+    this->dataPtr->emissive = matEmissive;
+  }
+
   try
   {
     for (unsigned int i = 0;
@@ -1029,38 +1042,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
           simpleRenderable->setMaterial(this->dataPtr->myMaterialName);
       }
     }
-
-    // Apply material to all child scene nodes
-    for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
-    {
-      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
-          this->dataPtr->sceneNode->getChild(i));
-      for (int j = 0; j < sn->numAttachedObjects(); ++j)
-      {
-        Ogre::MovableObject *obj = sn->getAttachedObject(j);
-
-        MovableText *text = dynamic_cast<MovableText *>(obj);
-        if (text)
-        {
-          common::Color ambient, diffuse, specular, emissive;
-          bool matFound = rendering::Material::GetMaterialAsColor(
-              this->dataPtr->myMaterialName, ambient, diffuse, specular,
-              emissive);
-
-          if (matFound)
-          {
-            text->SetColor(ambient);
-          }
-        }
-        else if (dynamic_cast<Ogre::Entity *>(obj))
-          ((Ogre::Entity *)obj)->setMaterialName(this->dataPtr->myMaterialName);
-        else
-        {
-          ((Ogre::SimpleRenderable *)obj)->setMaterial(
-              this->dataPtr->myMaterialName);
-        }
-      }
-    }
   }
   catch(Ogre::Exception &e)
   {
@@ -1069,18 +1050,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
            << this->dataPtr->sceneNode->getName()
            << ". Object will appear white.\n";
   }
-
-  // check if material has color components, if so, set them.
-  if (matColor)
-  {
-    this->SetAmbient(matAmbient, false);
-    this->SetDiffuse(matDiffuse, false);
-    this->SetSpecular(matSpecular, false);
-    this->SetEmissive(matEmissive, false);
-  }
-
-  // Re-apply the transparency filter for the last known transparency value
-  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   // Apply material to all child visuals
   if (_cascade)
@@ -1490,12 +1459,10 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           if (derivedTransparency > 0.0)
           {
             pass->setDepthWriteEnabled(false);
-            pass->setDepthCheckEnabled(true);
           }
           else
           {
             pass->setDepthWriteEnabled(true);
-            pass->setDepthCheckEnabled(true);
           }
 
           dc = pass->getDiffuse();
@@ -1532,7 +1499,7 @@ void Visual::UpdateTransparency(const bool _cascade)
     for (auto &child : this->dataPtr->children)
     {
       // Don't change some visualizations when link changes
-      if (!(this->GetType() == VT_LINK &&
+      if (child->InheritTransparency() && !(this->GetType() == VT_LINK &&
           (child->GetType() == VT_GUI ||
            child->GetType() == VT_PHYSICS ||
            child->GetType() == VT_SENSOR)))
@@ -2355,13 +2322,12 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     std::string newGeometryName = geometryName;
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
-        newGeometryName = _msg->geometry().mesh().filename();
+        newGeometryName = common::find_file(_msg->geometry().mesh().filename());
 
     if (newGeometryType != geometryType ||
         (newGeometryType == "mesh" && newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
-      float origTransparency = this->dataPtr->transparency;
 
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
@@ -2380,7 +2346,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       else if (newGeometryType == "mesh")
       {
         std::string filename = _msg->geometry().mesh().filename();
-        std::string meshName = common::find_file(filename);
+        std::string meshName = newGeometryName;
         std::string submeshName;
         bool centerSubmesh = false;
 
@@ -2412,8 +2378,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
       if (ent && ent->hasSkeleton())
         this->dataPtr->skeleton = ent->getSkeleton();
-      this->SetTransparency(origTransparency);
-      this->SetMaterial(origMaterial);
+      this->SetMaterial(origMaterial, false);
+      this->UpdateTransparency(true);
     }
 
     math::Vector3 geomScale(1, 1, 1);

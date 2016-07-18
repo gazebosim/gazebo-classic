@@ -201,6 +201,7 @@ gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics)
 
 # unit tests with gazebo_test_fixture
 set (gtest_fixture_sources
+  Actor_TEST.cc
   Atmosphere_TEST.cc
   ContactManager_TEST.cc
   Light_TEST.cc
@@ -210,6 +211,7 @@ set (gtest_fixture_sources
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
   Wind_TEST.cc
+  World_TEST.cc
   WorldState_TEST.cc
 )
 

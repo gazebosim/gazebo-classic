@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
+  any.proto
   atmosphere.proto
   axis.proto
   battery.proto
@@ -20,6 +21,7 @@ set (msgs
   density.proto
   diagnostics.proto
   distortion.proto
+  empty.proto
   factory.proto
   fluid.proto
   fog.proto
@@ -68,6 +70,8 @@ set (msgs
   model_v.proto
   packet.proto
   physics.proto
+  param.proto
+  param_v.proto
   planegeom.proto
   pid.proto
   plugin.proto
@@ -203,7 +207,6 @@ endif()
 
 target_link_libraries(gazebo_msgs
   gazebo_common
-  gazebo_math
   ${GZ_PROTOBUF_LIBRARY}
 )
 

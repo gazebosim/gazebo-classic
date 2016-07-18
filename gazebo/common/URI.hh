@@ -240,4 +240,3 @@ namespace gazebo
   }
 }
 #endif
-

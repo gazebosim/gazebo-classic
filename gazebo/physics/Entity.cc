@@ -225,11 +225,7 @@ void Entity::StopAnimation()
 {
   this->animation.reset();
   this->onAnimationComplete.clear();
-  if (this->animationConnection)
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
-    this->animationConnection.reset();
-  }
+  this->animationConnection.reset();
 }
 
 //////////////////////////////////////////////////
@@ -650,7 +646,6 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 
   if (this->animation->GetLength() <= this->animation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
     if (this->onAnimationComplete)
     {
