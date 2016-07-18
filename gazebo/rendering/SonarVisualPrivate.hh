@@ -22,6 +22,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace gazebo
@@ -56,6 +57,9 @@ namespace gazebo
 
       /// \brief True if we have received a message.
       public: bool receivedMsg;
+
+      /// \brief Pointer to the sonar cone visual.
+      public: VisualPtr coneVis;
     };
   }
 }
