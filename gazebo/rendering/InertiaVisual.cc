@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Inertial.hh>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Pose.hh"
@@ -74,40 +76,26 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
 {
   Visual::Load();
 
-  math::Vector3 xyz(_msg->inertial().pose().position().x(),
-                    _msg->inertial().pose().position().y(),
-                    _msg->inertial().pose().position().z());
-  math::Quaternion q(_msg->inertial().pose().orientation().w(),
-                     _msg->inertial().pose().orientation().x(),
-                     _msg->inertial().pose().orientation().y(),
-                     _msg->inertial().pose().orientation().z());
+  auto inertial = msgs::Convert(_msg->inertial());
+  auto xyz = inertial.Pose().Pos();
+  auto q = inertial.Pose().Rot();
 
-  // Use principal moments of inertia to scale Inertia visual
-  // \todo: rotate to match principal axes when product terms are nonzero
-  // This can be done with Eigen, or with code from the following paper:
-  // A Method for Fast Diagonalization of a 2x2 or 3x3 Real Symmetric Matrix
-  // http://arxiv.org/abs/1306.6291v3
-  double mass = _msg->inertial().mass();
-  double Ixx = _msg->inertial().ixx();
-  double Iyy = _msg->inertial().iyy();
-  double Izz = _msg->inertial().izz();
-  math::Vector3 boxScale;
-  if (mass < 0 || Ixx < 0 || Iyy < 0 || Izz < 0 ||
-      Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
+  // Use ignition::math::MassMatrix3 to compute
+  // equivalent box size and rotation
+  auto m = inertial.MassMatrix();
+  ignition::math::Vector3d boxScale;
+  ignition::math::Quaterniond boxRot;
+  if (!m.EquivalentBox(boxScale, boxRot))
   {
-    // Unrealistic inertia, load with default scale
+    // Invalid inertia, load with default scale
     gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
           << "unable to visualize box of equivalent inertia." << std::endl;
-    this->Load(math::Pose(xyz, q));
+    this->Load(ignition::math::Pose3d(xyz, q));
   }
   else
   {
-    // Compute dimensions of box with uniform density and equivalent inertia.
-    boxScale.x = sqrt(6*(Izz + Iyy - Ixx) / mass);
-    boxScale.y = sqrt(6*(Izz + Ixx - Iyy) / mass);
-    boxScale.z = sqrt(6*(Ixx + Iyy - Izz) / mass);
-
-    this->Load(math::Pose(xyz, q), boxScale);
+    // Apply additional rotation by boxRot
+    this->Load(ignition::math::Pose3d(xyz, q * boxRot), boxScale);
   }
 }
 
@@ -125,18 +113,18 @@ void InertiaVisual::Load(const math::Pose &_pose,
   ignition::math::Vector3d p4(0, 2*_scale.y, 0);
   ignition::math::Vector3d p5(-2*_scale.x, 0, 0);
   ignition::math::Vector3d p6(2*_scale.x, 0, 0);
-  p1 += _pose.pos.Ign();
-  p2 += _pose.pos.Ign();
-  p3 += _pose.pos.Ign();
-  p4 += _pose.pos.Ign();
-  p5 += _pose.pos.Ign();
-  p6 += _pose.pos.Ign();
-  p1 = _pose.rot.RotateVector(p1).Ign();
-  p2 = _pose.rot.RotateVector(p2).Ign();
-  p3 = _pose.rot.RotateVector(p3).Ign();
-  p4 = _pose.rot.RotateVector(p4).Ign();
-  p5 = _pose.rot.RotateVector(p5).Ign();
-  p6 = _pose.rot.RotateVector(p6).Ign();
+  p1 = _pose.Ign().Rot().RotateVector(p1);
+  p2 = _pose.Ign().Rot().RotateVector(p2);
+  p3 = _pose.Ign().Rot().RotateVector(p3);
+  p4 = _pose.Ign().Rot().RotateVector(p4);
+  p5 = _pose.Ign().Rot().RotateVector(p5);
+  p6 = _pose.Ign().Rot().RotateVector(p6);
+  p1 += _pose.Ign().Pos();
+  p2 += _pose.Ign().Pos();
+  p3 += _pose.Ign().Pos();
+  p4 += _pose.Ign().Pos();
+  p5 += _pose.Ign().Pos();
+  p6 += _pose.Ign().Pos();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");

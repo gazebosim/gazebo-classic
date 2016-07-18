@@ -1,9 +1,12 @@
 ## Gazebo 7
 
-## Gazebo 7.X.X (XXXX-XX-XX)
+## Gazebo 7.x.x (2016-xx-xx)
 
 1. Added a visual blinking plugin
     * [Pull request 2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
+
+1. Fix InertiaVisual for non-diagonal inertia matrices
+    * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
 
 ## Gazebo 7.3.1 (2016-07-13)
 
