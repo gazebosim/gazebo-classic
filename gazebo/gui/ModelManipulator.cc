@@ -628,11 +628,8 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 
   this->dataPtr->selectionObj->SetState(manipState);
 
-  // FIXME: Besides checking whether all keys have been released, we check
-  // if there are key modifiers currently pressed.
   // See issue #1510
-  bool keyPressed = !(QApplication::keyboardModifiers() & Qt::NoModifier) &&
-      !this->dataPtr->keyEvent.key;
+  bool keyPressed = QApplication::keyboardModifiers();
 
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
