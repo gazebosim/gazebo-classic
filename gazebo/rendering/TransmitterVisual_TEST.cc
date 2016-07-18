@@ -37,7 +37,11 @@ TEST_F(TransmitterVisual_TEST, TransmitterVisualTest)
   if (!scene)
       scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
+
+  // get scene visual child count before we create any visuals
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
+  unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // test calling constructor and Load functions and make sure
   // there are no segfaults
@@ -45,6 +49,13 @@ TEST_F(TransmitterVisual_TEST, TransmitterVisualTest)
       new gazebo::rendering::TransmitterVisual(
       "world_GUIONLY_transmitter_vis", scene->WorldVisual(), ""));
   transmitterVis->Load();
+
+  // test destroying the visual
+  transmitterVis->Fini();
+  EXPECT_EQ(transmitterVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////
