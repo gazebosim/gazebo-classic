@@ -182,8 +182,7 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
       ignition::math::Quaterniond(roll, pitch, yaw);
 
   // Move camera to that pose in 1s
-  cam->MoveToPosition(math::Pose(math::Vector3(newCamPos),
-      math::Quaternion(quat)), 1);
+  cam->MoveToPosition(ignition::math::Pose3d(newCamPos, quat), 1);
 }
 
 /////////////////////////////////////////////////
