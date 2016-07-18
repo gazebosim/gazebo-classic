@@ -1,5 +1,10 @@
 ## Gazebo 7
 
+## Gazebo 7.X.X (XXXX-XX-XX)
+
+1. Added a visual blinking plugin
+    * [Pull request 2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
+
 ## Gazebo 7.3.1 (2016-07-13)
 
 1. Fix homebrew test failure of UNIT_ApplyWrenchDialog_TEST
