@@ -26,7 +26,7 @@ set (headers_install
 )
 
 set (qt_tests_local
-  ImagesView_TEST.cc
+   #  ImagesView_TEST.cc
   LaserView_TEST.cc
 )
 
