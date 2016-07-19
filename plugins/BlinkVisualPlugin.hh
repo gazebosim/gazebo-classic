@@ -40,6 +40,10 @@ namespace gazebo
   ///      <!-- Period in seconds. Defaults to 1 s. -->
   ///      <period>1</period>
   ///
+  ///      <!-- True to use wall time, false to use sim time.
+  ///           Defaults to false. -->
+  ///      <use_wall_time>1</use_wall_time>
+  ///
   ///    </plugin>
   /// \endverbatim
   ///
@@ -58,6 +62,9 @@ namespace gazebo
 
     /// \brief Update the plugin once every iteration of simulation.
     private: void Update();
+
+    /// \brief Callback to receive world statistics.
+    private: void OnWorldStats(ConstWorldStatisticsPtr &_msg);
 
     /// \internal
     /// \brief Private data pointer

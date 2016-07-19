@@ -15,10 +15,14 @@
  *
 */
 
+#include <mutex>
+
 #include <gazebo/common/Color.hh>
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Time.hh>
+#include <gazebo/msgs/msgs.hh>
 #include <gazebo/rendering/Visual.hh>
+#include <gazebo/transport/Node.hh>
 #include "BlinkVisualPlugin.hh"
 
 namespace gazebo
@@ -45,6 +49,21 @@ namespace gazebo
 
     /// \brief Time the current cycle started.
     public: common::Time cycleStartTime;
+
+    /// \brief The current simulation time, got through the world_stats topic.
+    public: common::Time currentSimTime;
+
+    /// \brief Node used for communication.
+    public: transport::NodePtr node;
+
+    /// \brief Node used for communication.
+    public: std::mutex mutex;
+
+    /// \brief True to use wall time, false to use sim time.
+    public: bool useWallTime;
+
+    /// \brief Subscriber to the world statistics topic.
+    public: transport::SubscriberPtr statsSub;
   };
 }
 
@@ -60,6 +79,8 @@ BlinkVisualPlugin::BlinkVisualPlugin() : dataPtr(new BlinkVisualPluginPrivate)
 /////////////////////////////////////////////////
 BlinkVisualPlugin::~BlinkVisualPlugin()
 {
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -101,24 +122,52 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
     return;
   }
 
+  // Get whether to use wall time or sim time
+  this->dataPtr->useWallTime = false;
+  if (sdfElem->HasElement("use_wall_time"))
+    this->dataPtr->useWallTime = sdfElem->Get<bool>("use_wall_time");
+
+  if (this->dataPtr->period <= 0)
+  {
+    gzerr << "Period can't be lower than zero." << std::endl;
+    return;
+  }
+
   // Connect to the world update signal
   this->dataPtr->updateConnection = event::Events::ConnectPreRender(
       std::bind(&BlinkVisualPlugin::Update, this));
+
+  // Subscribe to world statistics to get sim time
+  if (!this->dataPtr->useWallTime)
+  {
+    this->dataPtr->node = transport::NodePtr(new transport::Node());
+    this->dataPtr->node->Init();
+
+    this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
+        "~/world_stats", &BlinkVisualPlugin::OnWorldStats, this);
+  }
 }
 
 /////////////////////////////////////////////////
 void BlinkVisualPlugin::Update()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   if (!this->dataPtr->visual)
   {
     gzerr << "The visual is null." << std::endl;
     return;
   }
 
-  if (this->dataPtr->cycleStartTime == common::Time::Zero)
-    this->dataPtr->cycleStartTime = common::Time::GetWallTime();
+  common::Time currentTime;
+  if (this->dataPtr->useWallTime)
+    currentTime = common::Time::GetWallTime();
+  else
+    currentTime = this->dataPtr->currentSimTime;
 
-  auto currentTime = common::Time::GetWallTime();
+  if (this->dataPtr->cycleStartTime == common::Time::Zero)
+    this->dataPtr->cycleStartTime = currentTime;
+
   auto elapsed = currentTime - this->dataPtr->cycleStartTime;
 
   // Restart cycle
@@ -154,4 +203,11 @@ void BlinkVisualPlugin::Update()
   this->dataPtr->visual->SetDiffuse(color);
   this->dataPtr->visual->SetAmbient(color);
   this->dataPtr->visual->SetTransparency(1-color.a);
+}
+
+/////////////////////////////////////////////////
+void BlinkVisualPlugin::OnWorldStats(ConstWorldStatisticsPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  this->dataPtr->currentSimTime = msgs::Convert(_msg->sim_time());
 }
