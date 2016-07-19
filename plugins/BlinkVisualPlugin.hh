@@ -42,7 +42,7 @@ namespace gazebo
   ///
   ///      <!-- True to use wall time, false to use sim time.
   ///           Defaults to false. -->
-  ///      <use_wall_time>1</use_wall_time>
+  ///      <use_wall_time>true</use_wall_time>
   ///
   ///    </plugin>
   /// \endverbatim

@@ -127,12 +127,6 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
   if (sdfElem->HasElement("use_wall_time"))
     this->dataPtr->useWallTime = sdfElem->Get<bool>("use_wall_time");
 
-  if (this->dataPtr->period <= 0)
-  {
-    gzerr << "Period can't be lower than zero." << std::endl;
-    return;
-  }
-
   // Connect to the world update signal
   this->dataPtr->updateConnection = event::Events::ConnectPreRender(
       std::bind(&BlinkVisualPlugin::Update, this));
