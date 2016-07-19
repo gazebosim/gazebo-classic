@@ -33,6 +33,9 @@ namespace gazebo
 {
   namespace common
   {
+    // Forward declare private data class
+    class VideoEncoderPrivate;
+
     /// \addtogroup gazebo_common
     /// \{
 
@@ -47,7 +50,8 @@ namespace gazebo
       public: virtual ~VideoEncoder();
 
       /// \brief Initialize the encoder
-      public: void Init();
+      /// \return True on success
+      public: bool Init();
 
       /// \brief True if the enoder is initialized, false otherwise
       public: bool IsInitialized();
@@ -56,32 +60,33 @@ namespace gazebo
       /// \param[in] _frame Image buffer to be encoded
       /// \param[in] _width Input frame width
       /// \param[in] _height Input frame height
-      public: void AddFrame(unsigned char *_frame, unsigned int _width,
-          unsigned int _height);
+      public: bool AddFrame(const unsigned char *_frame,
+                  const unsigned int _width, const unsigned int _height);
 
       /// \brief Add a single timestamped frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
       /// \param[in] _width Input frame width
       /// \param[in] _height Input frame height
       /// \param[in] _timestamp Timestamp of the image frame
-      public: void AddFrame(unsigned char *_frame, unsigned int _width,
-          unsigned int _height, common::Time _timestamp);
+      public: bool AddFrame(const unsigned char *_frame,
+                  const unsigned int _width, const unsigned int _height,
+                  const common::Time &_timestamp);
 
       /// \brief Write data buffer to to disk
       /// param[in] _filename File in which to save the encoded data
-      public: void SaveToFile(const std::string &_filename);
+      public: bool SaveToFile(const std::string &_filename);
 
       /// \brief Set the video encoding bit rate
       /// \param[in] _bitrate Video encoding bit rate
-      public: void SetBitRate(unsigned int _bitRate);
+      public: void SetBitRate(const unsigned int _bitRate);
 
       /// \brief Set the output frame width
       /// \param[in] _width Frame width in pixels
-      public: void SetFrameWidth(unsigned int _width);
+      public: void SetFrameWidth(const unsigned int _width);
 
       /// \brief Set the output frame height
       /// \param[in] _height Frame height in pixels
-      public: void SetFrameHeight(unsigned int _height);
+      public: void SetFrameHeight(const unsigned int _height);
 
       /// \brief Set the encoding format
       /// \param[in] _height Frame height
@@ -89,87 +94,19 @@ namespace gazebo
 
       /// \brief Get the encoding format
       /// \return Encoding format
-      public: std::string GetFormat() const;
+      public: std::string Format() const;
 
       /// \brief Reset to default video properties and clean up allocated
       /// memories.
       public: void Reset();
 
-      /// \brief Finalize encoding
-      public: void Fini();
+      /// \brief Finalize encoding. This will automatically be called
+      /// by SaveToFile
+      public: void End();
 
-      /// \brief free up open Video object, close files, streams
-      private: void Cleanup();
-
-      /// \brief libav main external API structure
-      private: AVCodecContext *codecCtx;
-
-      /// \brief libav muxing
-      private: AVOutputFormat *outputFormat;
-
-      /// \brief libav format I/O context
-      private: AVFormatContext *formatCtx;
-
-      /// \brief libav audio video stream
-      private: AVStream *videoStream;
-
-      /// \brief libav image data (used for storing RGB data)
-      private: AVPicture *avInPicture;
-//      private: AVPicture *pic;
-
-      /// \brief libav audio or video data (used for storing YUV data)
-      private: AVFrame *avOutFrame;
-
-      /// \brief Software scaling context
-      private: SwsContext *swsCtx;
-
-      /// \brief Size of the picture buffer
-      private: unsigned char *pictureBuf;
-
-      /// \brief True if the encoder is initialized
-      private: bool initialized;
-
-      /// \brief Video encoding bit rate
-      private: unsigned int bitRate;
-
-      /// \brief Output frame width
-      private: unsigned int frameWidth;
-
-      /// \brief Output frame height
-      private: unsigned int frameHeight;
-
-      /// \brief Temporary filename to write the file to.
-      private: std::string tmpFilename;
-
-      /// \brief Encoding format
-      private: std::string format;
-
-      /// \brief Handl to the output video file.
-      private: FILE *fileHandle;
-
-      /// \brief Number of bytes used from buffer.
-      private: int outSize;
-
-      /// \brief Target framerate.
-      private: unsigned int fps;
-
-      /// \brief Previous time when the frame is added.
-      private: common::Time timePrev;
-
-      /// \brief Encoding sample rate.
-      private: int sampleRate;
-
-      /// \brief total time elapsed.
-      private: double totalTime;
-
-      /// \brief Video presenetation time stamp.
-      private: int videoPts;
-
-      /// \brief Input frame width
-      private: unsigned int inFrameWidth;
-
-      /// \brief Input frame height
-      private: unsigned int inFrameHeight;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<VideoEncoderPrivate> dataPtr;
     };
     /// \}
   }
