@@ -63,8 +63,8 @@ namespace gazebo
     /// \brief Update the plugin once every iteration of simulation.
     private: void Update();
 
-    /// \brief Callback to receive world statistics.
-    private: void OnWorldStats(ConstWorldStatisticsPtr &_msg);
+    /// \brief Callback to receive info.
+    private: void OnInfo(ConstPosesStampedPtr &_msg);
 
     /// \internal
     /// \brief Private data pointer

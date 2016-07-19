@@ -1535,7 +1535,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   sdf::initFile("surface.sdf", sdf2);
   msgs::SurfaceToSDF(surfaceMsg2, sdf2);
 
-  ASSERT_TRUE(sdf2 != NULL);
+  ASSERT_TRUE(sdf2 != nullptr);
 
   ASSERT_TRUE(sdf2->HasElement("bounce"));
   EXPECT_DOUBLE_EQ(
@@ -3357,9 +3357,69 @@ TEST_F(MsgsTest, PluginToFromSDF)
   sdf2.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", sdf2);
   msgs::PluginToSDF(msg2, sdf2);
-  EXPECT_TRUE(sdf2 != NULL);
+  EXPECT_TRUE(sdf2 != nullptr);
   EXPECT_EQ(sdf2->Get<std::string>("name"), name);
   EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
   EXPECT_TRUE(sdf2->HasElement("plugin_param"));
   EXPECT_EQ(sdf2->Get<std::string>("plugin_param"), "param");
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, VisualPluginToFromSDF)
+{
+  // Create message
+  msgs::Visual msg1;
+
+  const std::string name("visual_name");
+  msg1.set_name(name);
+
+  const double radius = 3.3;
+  auto geomMsg = msg1.mutable_geometry();
+  geomMsg->set_type(msgs::Geometry::SPHERE);
+  geomMsg->mutable_sphere()->set_radius(radius);
+
+  std::string pluginName("plugin_name");
+  std::string filename("plugin_filename");
+  std::string innerxml("<plugin_param>param</plugin_param>\n");
+
+  auto pluginMsg = msg1.add_plugin();
+  pluginMsg->set_name(pluginName);
+  pluginMsg->set_filename(filename);
+  pluginMsg->set_innerxml(innerxml);
+
+  // To SDF
+  auto sdf1 = msgs::VisualToSDF(msg1);
+  ASSERT_TRUE(sdf1 != nullptr);
+
+  {
+    // Regression test: moved innerxml out of an extra <sdf> tag
+    EXPECT_TRUE(sdf1->HasElement("plugin"));
+    EXPECT_FALSE(sdf1->GetElement("plugin")->HasElement("sdf"));
+    EXPECT_TRUE(sdf1->GetElement("plugin")->HasElement("plugin_param"));
+  }
+
+  // Back to Msg
+  auto msg2 = msgs::VisualFromSDF(sdf1);
+
+  // Back to SDF
+  auto sdf2 = msgs::VisualToSDF(msg2);
+  ASSERT_TRUE(sdf2 != nullptr);
+
+  ASSERT_TRUE(sdf2->HasAttribute("name"));
+  EXPECT_EQ(sdf2->Get<std::string>("name"), name);
+
+  ASSERT_TRUE(sdf2->HasElement("geometry"));
+  auto geomElem = sdf2->GetElement("geometry");
+  ASSERT_TRUE(geomElem->HasElement("sphere"));
+  auto sphereElem = geomElem->GetElement("sphere");
+  EXPECT_TRUE(sphereElem->HasElement("radius"));
+  EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), radius);
+
+  ASSERT_TRUE(sdf2->HasElement("plugin"));
+  auto pluginElem = sdf2->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), pluginName);
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), filename);
+
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }

@@ -50,7 +50,7 @@ namespace gazebo
     /// \brief Time the current cycle started.
     public: common::Time cycleStartTime;
 
-    /// \brief The current simulation time, got through the world_stats topic.
+    /// \brief The current simulation time.
     public: common::Time currentSimTime;
 
     /// \brief Node used for communication.
@@ -62,8 +62,8 @@ namespace gazebo
     /// \brief True to use wall time, false to use sim time.
     public: bool useWallTime;
 
-    /// \brief Subscriber to the world statistics topic.
-    public: transport::SubscriberPtr statsSub;
+    /// \brief Subscriber to the world info topic.
+    public: transport::SubscriberPtr infoSub;
   };
 }
 
@@ -94,27 +94,20 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
   }
   this->dataPtr->visual = _visual;
 
-  if (!_sdf->HasElement("sdf"))
-  {
-    gzerr << "An <sdf> tag can't be found within the plugin." << std::endl;
-    return;
-  }
-  auto sdfElem = _sdf->GetElement("sdf");
-
   // Get color A
   this->dataPtr->colorA.Set(1, 0, 0, 1);
-  if (sdfElem->HasElement("color_a"))
-    this->dataPtr->colorA = sdfElem->Get<common::Color>("color_a");
+  if (_sdf->HasElement("color_a"))
+    this->dataPtr->colorA = _sdf->Get<common::Color>("color_a");
 
   // Get color B
   this->dataPtr->colorB.Set(0, 0, 0, 1);
-  if (sdfElem->HasElement("color_b"))
-    this->dataPtr->colorB = sdfElem->Get<common::Color>("color_b");
+  if (_sdf->HasElement("color_b"))
+    this->dataPtr->colorB = _sdf->Get<common::Color>("color_b");
 
   // Get the period
   this->dataPtr->period.Set(1);
-  if (sdfElem->HasElement("period"))
-    this->dataPtr->period = sdfElem->Get<double>("period");
+  if (_sdf->HasElement("period"))
+    this->dataPtr->period = _sdf->Get<double>("period");
 
   if (this->dataPtr->period <= 0)
   {
@@ -124,21 +117,24 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
 
   // Get whether to use wall time or sim time
   this->dataPtr->useWallTime = false;
-  if (sdfElem->HasElement("use_wall_time"))
-    this->dataPtr->useWallTime = sdfElem->Get<bool>("use_wall_time");
+  if (_sdf->HasElement("use_wall_time"))
+    this->dataPtr->useWallTime = _sdf->Get<bool>("use_wall_time");
 
   // Connect to the world update signal
   this->dataPtr->updateConnection = event::Events::ConnectPreRender(
       std::bind(&BlinkVisualPlugin::Update, this));
 
   // Subscribe to world statistics to get sim time
+  // Warning: topic ~/pose/local/info is meant for high-bandwidth local
+  // network access. It will kill the system if a remote gzclient tries to
+  // subscribe
   if (!this->dataPtr->useWallTime)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->Init();
 
-    this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
-        "~/world_stats", &BlinkVisualPlugin::OnWorldStats, this);
+    this->dataPtr->infoSub = this->dataPtr->node->Subscribe(
+        "~/pose/local/info", &BlinkVisualPlugin::OnInfo, this);
   }
 }
 
@@ -200,8 +196,8 @@ void BlinkVisualPlugin::Update()
 }
 
 /////////////////////////////////////////////////
-void BlinkVisualPlugin::OnWorldStats(ConstWorldStatisticsPtr &_msg)
+void BlinkVisualPlugin::OnInfo(ConstPosesStampedPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  this->dataPtr->currentSimTime = msgs::Convert(_msg->sim_time());
+  this->dataPtr->currentSimTime = msgs::Convert(_msg->time());
 }
