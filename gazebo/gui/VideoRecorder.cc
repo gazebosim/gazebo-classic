@@ -19,7 +19,7 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/SaveVideoDialog.hh"
+#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/VideoRecorder.hh"
 
@@ -97,16 +97,17 @@ void VideoRecorder::RecordVideo()
     std::string timestamp = common::Time::GetWallTimeAsISOString();
     boost::replace_all(timestamp, ":", "_");
 
-    SaveVideoDialog saveDialog;
-    saveDialog.SetModelName(friendlyName + "_" + timestamp);
+    SaveDialog saveDialog;
+    saveDialog.SetSaveName(friendlyName + "_" + timestamp);
     saveDialog.SetSaveLocation(QDir::homePath().toStdString());
     if (saveDialog.exec() == QDialog::Accepted)
     {
-      std::string name = saveDialog.ModelName();
+      std::string name = saveDialog.SaveName();
       std::string location = saveDialog.SaveLocation();
       cam->SaveVideo(location + "/" + name);
       emit MessageChanged(name + " saved in: " + location, 2000);
     }
+
     QWidget *defaultWidget = g_recordVideoFormatAct->defaultWidget();
     qobject_cast<QToolButton *>(defaultWidget)->setEnabled(true);
   }

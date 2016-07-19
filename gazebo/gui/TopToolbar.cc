@@ -160,6 +160,8 @@ TopToolbar::TopToolbar(QWidget *_parent)
     this->dataPtr->toolbar->addAction(g_recordVideoAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
+  if (g_plotAct)
+    this->dataPtr->toolbar->addAction(g_plotAct);
 
   // Layout
   QHBoxLayout *toolLayout = new QHBoxLayout;
@@ -195,6 +197,7 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
     // Simulation / Model Editor / Log Playback
     if (acts[i] == g_screenshotAct ||
         acts[i] == g_viewAngleButtonAct ||
+        acts[i] == g_plotAct ||
         acts[i]->objectName() == "toolbarSpacerAction")
     {
       acts[i]->setVisible(modelEditor || simulation || logPlayback);

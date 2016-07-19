@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include <boost/filesystem.hpp>
 
 #include <gazebo/gazebo_config.h>
@@ -147,6 +146,7 @@ void VideoEncoder::Init()
     return;
 
   std::string tmpFileNameFull = this->tmpFilename + "." + this->format;
+
   this->outputFormat = av_guess_format(NULL, tmpFileNameFull.c_str(), NULL);
   if (!this->outputFormat)
   {
@@ -345,25 +345,15 @@ void VideoEncoder::AddFrame(unsigned char *_frame, unsigned int _width,
   avPacket.size = 0;
 
   int ret = avcodec_encode_video2(this->codecCtx, &avPacket,
-      this->avOutFrame, &gotOutput);
+                                  this->avOutFrame, &gotOutput);
 
-  if (ret > 0)
+  if (ret >= 0)
   {
     this->codecCtx->coded_frame->pts = this->videoPts;
 
     // write the frame
     if (gotOutput)
     {
-      /*avPacket.pts= av_rescale_q(this->codecCtx->coded_frame->pts,
-          this->codecCtx->time_base, this->videoStream->time_base);
-
-      if (this->codecCtx->coded_frame->key_frame)
-        avPacket.flags |= AV_PKT_FLAG_KEY;
-
-      avPacket.stream_index= this->videoStream->index;
-      avPacket.data= this->outbuf;
-      avPacket.size= this->outSize;
-      */
       ret = av_interleaved_write_frame(this->formatCtx, &avPacket);
 
       if (ret < 0)
@@ -372,7 +362,7 @@ void VideoEncoder::AddFrame(unsigned char *_frame, unsigned int _width,
   }
   else
   {
-    gzerr << "Error encoding frame\n";
+    gzerr << "Error encoding frame[" << ret << "]\n";
   }
 
   av_free_packet(&avPacket);

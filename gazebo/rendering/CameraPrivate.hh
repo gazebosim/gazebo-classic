@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_CAMERAPRIVATE_HH_
-#define _GAZEBO_RENDERING_CAMERAPRIVATE_HH_
+#ifndef GAZEBO_RENDERING_CAMERAPRIVATE_HH_
+#define GAZEBO_RENDERING_CAMERAPRIVATE_HH_
 
 #include <deque>
 #include <mutex>
 #include <utility>
 #include <list>
+#include <string>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/PID.hh"

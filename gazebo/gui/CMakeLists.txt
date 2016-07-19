@@ -9,6 +9,7 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
+  ${QWT_INCLUDE_DIR}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -48,6 +49,7 @@ set (sources
   MouseEventHandler.cc
   RenderWidget.cc
   SaveDialog.cc
+  SaveEntityDialog.cc
   SpaceNav.cc
   SplashScreen.cc
   TimePanel.cc
@@ -87,6 +89,7 @@ set (qt_headers
   ModelRightMenu.hh
   RenderWidget.hh
   SaveDialog.hh
+  SaveEntityDialog.hh
   SplashScreen.hh
   TimePanel.hh
   TimeWidget.hh
@@ -139,7 +142,7 @@ set (qt_tests
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
-  SaveDialog_TEST.cc
+  SaveEntityDialog_TEST.cc
   SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
@@ -204,6 +207,7 @@ target_link_libraries(gazebo_gui
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${QWT_LIBRARY}
 )
 
 if (UNIX)

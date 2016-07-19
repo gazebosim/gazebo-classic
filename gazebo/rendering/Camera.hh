@@ -882,6 +882,12 @@ namespace gazebo
       /// \return the projection matrix
       public: ignition::math::Matrix4d ProjectionMatrix() const;
 
+      /// \brief Project 3D world coordinates to 2D screen coordinates
+      /// \param[in] _pt 3D world coodinates
+      /// \return _pt 2D screen coordinates
+      public: ignition::math::Vector2i Project(
+          const ignition::math::Vector3d &_pt) const;
+
       /// \brief Get the visual tracked by this camera.
       /// \return Tracked visual.
       public: VisualPtr TrackedVisual() const;
