@@ -17,6 +17,7 @@
 #ifndef GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 #define GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 
+#include <map>
 #include <string>
 #include <sdf/sdf.hh>
 
@@ -220,6 +221,14 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
             GAZEBO_DEPRECATED(8.0)
           { requestNestedModelInsertion.Disconnect(_subscriber->Id()); }
+
+        /// \brief Connect a Gazebo event to the request link scale signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkScale(
+            T _subscriber)
+          { return requestLinkScale.Connect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the request link move signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -798,6 +807,10 @@ namespace gazebo
         /// whether a new user command should be created.
         public: static event::EventT<void (std::string, std::string,
             std::string, bool)> requestModelPluginInsertion;
+
+        /// \brief Request to scale a link.
+        public: static event::EventT<void (std::string,
+            std::map<std::string, ignition::math::Vector3d>)> requestLinkScale;
 
         /// \brief Request to move a link.
         public: static event::EventT<void (std::string, ignition::math::Pose3d)>

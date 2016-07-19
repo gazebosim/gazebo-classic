@@ -121,13 +121,24 @@ namespace gazebo
       /// \param[in] _sdf Link SDF element.
       public: void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Get the scale of the link.
-      /// \return Scale of link.
-      public: ignition::math::Vector3d Scale() const;
+      /// \brief Get the scale of all of the link's children.
+      /// \return Scales of visuals and collisions.
+      public: const std::map<std::string, ignition::math::Vector3d> &Scales()
+              const;
 
-      /// \brief Set the scale of the link.
-      /// \param[in] _scale Scale of link.
-      public: void SetScale(const ignition::math::Vector3d &_scale);
+      /// \brief Update the scale of all the inspectors, making the necessary
+      /// conversions to update inertial information.
+      /// The scale is updated based on the current geometry of 3D visuals.
+      /// This does not alter the internal scale value returned by Scale().
+      /// \sa SetScale
+      public: void UpdateInspectorScale();
+
+      /// \brief Set the scales of the link. This function calls
+      /// UpdateInspectorScale.
+      /// \sa UpdateInspectorScale
+      /// \param[in] _scale Scales of all of the link's children.
+      public: void SetScales(
+          const std::map<std::string, ignition::math::Vector3d> &_scales);
 
       /// \brief Add a visual to the link.
       /// \param[in] _visual Visual to be added.
@@ -226,8 +237,9 @@ namespace gazebo
       /// \brief Inertia izz.
       private: double inertiaIzz;
 
-      /// \brief Scale of link.
-      public: ignition::math::Vector3d scale;
+      /// \brief Scale of all collisions and visuals in the link, indexed by
+      /// their visual's names.
+      public: std::map<std::string, ignition::math::Vector3d> scales;
 
       /// \brief Visual representing this link.
       public: rendering::VisualPtr linkVisual;
