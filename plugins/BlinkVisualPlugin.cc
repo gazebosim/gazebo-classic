@@ -79,6 +79,7 @@ BlinkVisualPlugin::BlinkVisualPlugin() : dataPtr(new BlinkVisualPluginPrivate)
 /////////////////////////////////////////////////
 BlinkVisualPlugin::~BlinkVisualPlugin()
 {
+  this->dataPtr->infoSub.reset();
   if (this->dataPtr->node)
     this->dataPtr->node->Fini();
 }
