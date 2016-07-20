@@ -79,7 +79,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Flag use to indicate if a parser failure has occurred
   bool xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-    tinyxml2::XML_NO_ERROR;
+    tinyxml2::XML_SUCCESS;
 
   // Parse the log file
   if (xmlParserFail)
@@ -112,7 +112,7 @@ void LogPlay::Open(const std::string &_logFile)
 
           // Retry loading the log file.
           xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-            tinyxml2::XML_NO_ERROR;
+            tinyxml2::XML_SUCCESS;
         }
       }
     }

@@ -85,19 +85,19 @@ bool SpaceNav::Load()
 
 #ifdef HAVE_SPNAV
   // Read deadband from [spacenav] in gui.ini
-  this->dataPtr->deadbandTrans.X() = getINIProperty<double>(
-      "spacenav.deadband_x", 0.1);
-  this->dataPtr->deadbandTrans.Y() = getINIProperty<double>(
-      "spacenav.deadband_y", 0.1);
-  this->dataPtr->deadbandTrans.Z() = getINIProperty<double>(
-      "spacenav.deadband_z", 0.1);
+  this->dataPtr->deadbandTrans.X(getINIProperty<double>(
+      "spacenav.deadband_x", 0.1));
+  this->dataPtr->deadbandTrans.Y(getINIProperty<double>(
+      "spacenav.deadband_y", 0.1));
+  this->dataPtr->deadbandTrans.Z(getINIProperty<double>(
+      "spacenav.deadband_z", 0.1));
 
-  this->dataPtr->deadbandRot.X() = getINIProperty<double>(
-      "spacenav.deadband_rx", 0.1);
-  this->dataPtr->deadbandRot.Y() = getINIProperty<double>(
-      "spacenav.deadband_ry", 0.1);
-  this->dataPtr->deadbandRot.Z() = getINIProperty<double>(
-      "spacenav.deadband_rz", 0.1);
+  this->dataPtr->deadbandRot.X(getINIProperty<double>(
+      "spacenav.deadband_rx", 0.1));
+  this->dataPtr->deadbandRot.Y(getINIProperty<double>(
+      "spacenav.deadband_ry", 0.1));
+  this->dataPtr->deadbandRot.Z(getINIProperty<double>(
+      "spacenav.deadband_rz", 0.1));
 
   // Read topic from [spacenav] in gui.ini
   std::string topic = getINIProperty<std::string>("spacenav.topic",
