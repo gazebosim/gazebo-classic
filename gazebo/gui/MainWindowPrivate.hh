@@ -18,6 +18,7 @@
 #define _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,7 +37,6 @@ namespace gazebo
   {
     class DataLogger;
     class Editor;
-    class HotkeyDialog;
     class InsertModelWidget;
     class ModelListWidget;
     class RenderWidget;
@@ -127,7 +127,7 @@ namespace gazebo
       public: int inputStepSize;
 
       /// \brief Map of all the editors to their names.
-      public: std::map<std::string, Editor *> editors;
+      public: std::map<std::string, std::unique_ptr<Editor> > editors;
 
       /// \brief List of all the align action groups.
       public: std::vector<QActionGroup *> alignActionGroups;
@@ -151,9 +151,6 @@ namespace gazebo
 
       /// \brief Data logger dialog.
       public: DataLogger *dataLogger;
-
-      /// \brief Hotkey chart dialog.
-      public: HotkeyDialog *hotkeyDialog;
 
       /// \brief Tab to insert models.
       public: InsertModelWidget *insertModel;

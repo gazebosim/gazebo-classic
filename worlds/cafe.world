@@ -1,0 +1,130 @@
+<!-- Usage notes are located in this file, look for "Usage"-->
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>0 -18 8.0 0 0.523 1.5707</pose>
+      </camera>
+    </gui>
+    <light name="sun" type="directional">
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>0 0.5 -0.9</direction>
+    </light>
+
+    <light name="point_light" type="point">
+      <pose>0 -0.377195 6.59868 0 -0 0</pose>
+      <diffuse>0.784314 0.784314 0.784314 1</diffuse>
+      <specular>0.0980392 0.0980392 0.0980392 1</specular>
+      <attenuation>
+        <range>50</range>
+        <constant>0.8</constant>
+        <linear>0</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://cafe</uri>
+    </include>
+
+    <include>
+      <name>table1</name>
+      <pose>0.5 -1.6 0.2 0 0 0</pose>
+      <uri>model://cafe_table</uri>
+    </include>
+
+    <include>
+      <name>table2</name>
+      <pose>2.4 -5.5 0.2 0 0 0</pose>
+      <uri>model://cafe_table</uri>
+    </include>
+
+    <include>
+      <name>table3</name>
+      <pose>-1.5 -5.5 0.2 0 0 0</pose>
+      <uri>model://cafe_table</uri>
+    </include>
+
+    <include>
+      <name>table4</name>
+      <pose>2.4 -9 0.2 0 0 0</pose>
+      <uri>model://cafe_table</uri>
+    </include>
+
+    <include>
+      <name>table5</name>
+      <pose>-1.5 -9 0.2 0 0 0</pose>
+      <uri>model://cafe_table</uri>
+    </include>
+
+    <!-- Usage: modify the <pose> elements of each actor to change their
+         starting location. Modify the <target> elements of each actor to
+         change their destination. The <target_weight> can be used to
+         tune the vector field used by the ActorPlugin to control the Actor. -->
+    <actor name="actor1">
+      <pose>0 1 1.25 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <scale>1.000000</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+
+      <plugin name="actor1_plugin" filename="libActorPlugin.so">
+        <target>0 -5 1.2138</target>
+        <target_weight>1.15</target_weight>
+        <obstacle_weight>1.8</obstacle_weight>
+        <animation_factor>5.1</animation_factor>
+        <!-- Usage: Modify the set of models that the vector field should
+             ignore when moving the actor -->
+        <ignore_obstacles>
+          <model>cafe</model>
+          <model>ground_plane</model>
+        </ignore_obstacles>
+      </plugin>
+    </actor>
+
+    <actor name="actor2">
+      <pose>-2 -2 1.25 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <scale>1.000000</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <plugin name="actor2_plugin" filename="libActorPlugin.so">
+        <target>3 2 1.24</target>
+        <target_weight>1.15</target_weight>
+        <obstacle_weight>1.8</obstacle_weight>
+        <animation_factor>5.1</animation_factor>
+        <ignore_obstacles>
+          <model>cafe</model>
+          <model>ground_plane</model>
+        </ignore_obstacles>
+      </plugin>
+    </actor>
+
+  </world>
+</sdf>

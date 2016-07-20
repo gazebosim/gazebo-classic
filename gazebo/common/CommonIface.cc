@@ -19,6 +19,10 @@
 #endif
 
 #include <cstdlib>
+#include <cstring>
+#include <string>
+#include <sys/stat.h>
+#include <vector>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -31,6 +35,12 @@
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
+
+#ifdef _WIN32
+  const auto& gzstrtok = strtok_s;
+#else
+  const auto& gzstrtok = strtok_r;
+#endif
 
 /////////////////////////////////////////////////
 void common::load()
@@ -46,6 +56,22 @@ void common::load()
 #endif
 }
 
+/////////////////////////////////////////////////
+std::string common::unique_file_path(const std::string &_pathAndName,
+    const std::string &_extension)
+{
+  std::string result = _pathAndName + "." + _extension;
+  int count = 1;
+  struct stat buf;
+
+  // Check if file exists and change name accordingly
+  while (stat(result.c_str(), &buf) != -1)
+  {
+    result = _pathAndName + "(" + std::to_string(count++) + ")." + _extension;
+  }
+
+  return result;
+}
 /////////////////////////////////////////////////
 void common::add_search_path_suffix(const std::string &_suffix)
 {
@@ -90,8 +116,28 @@ const char *common::getEnv(const char *_name)
   if (GetEnvironmentVariable(_name, buffer, buffSize))
     return buffer;
   else
-    return NULL;
+    return nullptr;
 #else
   return getenv(_name);
 #endif
+}
+
+/////////////////////////////////////////////////
+std::vector<std::string> common::split(const std::string &_str,
+    const std::string &_delim)
+{
+  std::vector<std::string> tokens;
+  char *saveptr;
+  char *str = strdup(_str.c_str());
+
+  auto token = gzstrtok(str, _delim.c_str(), &saveptr);
+
+  while (token)
+  {
+    tokens.push_back(token);
+    token = gzstrtok(nullptr, _delim.c_str(), &saveptr);
+  }
+
+  free(str);
+  return tokens;
 }

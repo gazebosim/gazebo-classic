@@ -15,11 +15,11 @@
  *
 */
 
-#ifndef ODE_INC_H_
-#define ODE_INC_H_
+#ifndef _GAZEBO_PHYSICS_ODE_ODE_INC_H_
+#define _GAZEBO_PHYSICS_ODE_ODE_INC_H_
 
 // This disables warning messages for ODE
 #pragma GCC system_header
-#include <ode/ode.h>
+#include <gazebo/ode/ode.h>
 
 #endif

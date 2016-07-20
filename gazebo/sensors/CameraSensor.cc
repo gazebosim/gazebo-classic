@@ -53,7 +53,6 @@ CameraSensor::CameraSensor()
 : Sensor(sensors::IMAGE),
   dataPtr(new CameraSensorPrivate)
 {
-  this->dataPtr->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
         std::bind(&CameraSensor::Render, this)));
@@ -143,7 +142,7 @@ void CameraSensor::Init()
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->ParentId(), true);
+    this->camera->AttachToVisual(this->ParentId(), true, 0, 0);
 
     if (cameraSdf->HasElement("noise"))
     {
@@ -281,7 +280,7 @@ const unsigned char *CameraSensor::ImageData() const
   if (this->camera)
     return this->camera->ImageData(0);
   else
-    return NULL;
+    return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -313,3 +312,16 @@ rendering::CameraPtr CameraSensor::Camera() const
 {
   return this->camera;
 }
+
+//////////////////////////////////////////////////
+bool CameraSensor::Rendered() const
+{
+  return this->dataPtr->rendered;
+}
+
+//////////////////////////////////////////////////
+void CameraSensor::SetRendered(const bool _value)
+{
+  this->dataPtr->rendered = _value;
+}
+

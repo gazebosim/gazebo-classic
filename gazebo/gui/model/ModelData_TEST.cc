@@ -46,6 +46,9 @@ void ModelData_TEST::Clone()
   this->ProcessEventsAndDraw(mainWindow);
 
   gui::LinkData *link = new gui::LinkData();
+  QVERIFY(link->visuals.empty());
+  QVERIFY(link->collisions.empty());
+  QVERIFY(link->Scales().empty());
 
   double mass = 1.0;
   ignition::math::Vector3d size = ignition::math::Vector3d::One;
@@ -63,22 +66,39 @@ void ModelData_TEST::Clone()
       new rendering::Visual("model::box_link::visual", linkVis));
   vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
   link->AddVisual(vis);
+  QVERIFY(link->visuals.size() == 1);
+  QVERIFY(link->collisions.empty());
+  QVERIFY(link->Scales().size() == 1);
 
   // add a collision visual
   rendering::VisualPtr collisionVis(
       new rendering::Visual("model::box_link::collision", linkVis));
   collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
   link->AddCollision(collisionVis);
+  QVERIFY(link->visuals.size() == 1);
+  QVERIFY(link->collisions.size() == 1);
+  QVERIFY(link->Scales().size() == 2);
 
   // verify clone link
   std::string cloneLinkName = "box_link_clone";
   gui::LinkData *cloneLink = link->Clone(cloneLinkName);
-  QCOMPARE(cloneLink->GetName(), cloneLinkName);
-  QCOMPARE(cloneLink->Scale(), ignition::math::Vector3d::One);
+  QCOMPARE(cloneLink->Name(), cloneLinkName);
   QCOMPARE(cloneLink->Pose(), ignition::math::Pose3d::Zero);
+
+  QVERIFY(cloneLink->visuals.size() == 1);
+  QVERIFY(cloneLink->collisions.size() == 1);
+  QVERIFY(cloneLink->Scales().size() == 2);
+
+  QCOMPARE(
+      cloneLink->Scales().find(
+        "model::" + cloneLinkName + "::collision")->second,
+      ignition::math::Vector3d::One);
+  QCOMPARE(cloneLink->Scales().find(
+        "model::" + cloneLinkName + "::visual")->second,
+      ignition::math::Vector3d::One);
+
   QVERIFY(cloneLink->linkVisual != NULL);
   QCOMPARE(cloneLink->linkVisual->GetName(), "model::" + cloneLinkName);
-  QVERIFY(cloneLink->Scale() == ignition::math::Vector3d::One);
 
   // verify clone link visual
   QCOMPARE(cloneLink->visuals.size(), link->visuals.size());
@@ -183,7 +203,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddBoxLink(model, mass, size);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
-    link->linkVisual = linkVis;
+    link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
@@ -193,7 +213,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scale() == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -227,11 +247,16 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(3.0, 2.0, 1.0);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -276,11 +301,16 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(1.2, 3.8, 2.5);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -332,7 +362,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddCylinderLink(model, mass, radius, length);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
-    link->linkVisual = linkVis;
+    link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
@@ -342,7 +372,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scale() == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -376,11 +406,16 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(8.5, 8.5, 1.5);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -430,11 +465,16 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(1.2, 1.2, 3.4);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -486,7 +526,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddSphereLink(model, mass, radius);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
-    link->linkVisual = linkVis;
+    link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
@@ -496,7 +536,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scale() == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -530,11 +570,16 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(2.5, 2.5, 2.5);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -580,11 +625,16 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(3.1, 3.1, 3.1);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -634,7 +684,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddSphereLink(model, mass, radius);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link2", scene));
-    link->linkVisual = linkVis;
+    link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
@@ -643,8 +693,8 @@ void ModelData_TEST::LinkScale()
     link->AddCollision(collisionVis);
 
     // verify scale
-    ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scale() == scale);
+    ignition::math::Vector3d scale = ignition::math::Vector3d::One * radius * 2;
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -678,12 +728,16 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(2.0, 2.0, 2.0);
-      collisionVis->SetScale(newScale *
-          ignition::math::Vector3d(radius*2, radius*2, radius*2));
-      link->SetScale(newScale);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
+      collisionVis->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
 
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -734,7 +788,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddSphereLink(model, mass, radius);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link3", scene));
-    link->linkVisual = linkVis;
+    link->SetLinkVisual(linkVis);
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
@@ -744,7 +798,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->Scale() == scale);
+    QVERIFY(link->Scales().find(collisionVis->GetName())->second == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -781,10 +835,16 @@ void ModelData_TEST::LinkScale()
       scaleFactor =  1.0/static_cast<double>(i);
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(scaleFactor, scaleFactor, scaleFactor);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
+
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
     }
     // scale up
     for (unsigned int i = 1e5; i >= 1; i = i/10)
@@ -793,10 +853,16 @@ void ModelData_TEST::LinkScale()
       scaleFactor =  1.0/static_cast<double>(i);
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(scaleFactor, scaleFactor, scaleFactor);
+
+      std::map<std::string, ignition::math::Vector3d> scales;
+
       collisionVis->SetScale(newScale);
-      link->SetScale(newScale);
+      scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
+
+      link->SetScales(scales);
+
       // verify new scale
-      QVERIFY(link->Scale() == newScale);
+      QVERIFY(link->Scales().find(collisionVis->GetName())->second == newScale);
     }
     // verify against original mass and inertia values
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
@@ -812,6 +878,394 @@ void ModelData_TEST::LinkScale()
   mainWindow->close();
   delete mainWindow;
   mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::LinkVolume()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  for (int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  //  Verify box volume calcs
+  {
+    gui::LinkData *link = new gui::LinkData();
+
+    ignition::math::Vector3d size(3, 4, 5);
+    double mass = 1.0;
+    double expectedVolume = 60.0;
+
+    msgs::Model model;
+    msgs::AddBoxLink(model, mass, size);
+
+    link->Load(msgs::LinkToSDF(model.link(0)));
+
+    rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
+    link->SetLinkVisual(linkVis);
+
+    rendering::VisualPtr collisionVis(
+        new rendering::Visual("box_link::collision", linkVis));
+
+    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddCollision(collisionVis);
+
+    double volume = link->ComputeVolume();
+    QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+    delete link;
+  }
+
+  // Verify sphere volume calcs
+  {
+    gui::LinkData *link = new gui::LinkData();
+
+    double mass = 1.0;
+    double radius = 1.5;
+    double expectedVolume = 14.137;
+
+    msgs::Model model;
+    msgs::AddSphereLink(model, mass, radius);
+
+    link->Load(msgs::LinkToSDF(model.link(0)));
+
+    rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
+    link->SetLinkVisual(linkVis);
+
+    rendering::VisualPtr collisionVis(
+        new rendering::Visual("sphere_link::collision", linkVis));
+
+    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddCollision(collisionVis);
+
+    double volume = link->ComputeVolume();
+    QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+    delete link;
+  }
+
+  // Verify cylinder volume calcs
+  {
+    gui::LinkData *link = new gui::LinkData();
+
+    double mass = 1.0;
+    double radius = 1.5;
+    double length = 5.0;
+    double expectedVolume = 35.343;
+
+    msgs::Model model;
+    msgs::AddCylinderLink(model, mass, radius, length);
+
+    link->Load(msgs::LinkToSDF(model.link(0)));
+
+    rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
+    link->SetLinkVisual(linkVis);
+
+    rendering::VisualPtr collisionVis(
+        new rendering::Visual("cylinder_link::collision", linkVis));
+
+    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddCollision(collisionVis);
+
+    double volume = link->ComputeVolume();
+    QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+    delete link;
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::BoxVolume()
+{
+  const double l = 3, w = 4, h = 5;
+  const double expectedVolume = 60;
+
+  msgs::Vector3d *size = new msgs::Vector3d();
+  size->set_x(l);
+  size->set_y(w);
+  size->set_z(h);
+
+  msgs::BoxGeom *box = new msgs::BoxGeom();
+  box->set_allocated_size(size);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_BOX);
+  geo->set_allocated_box(box);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  double volume = gui::LinkData::ComputeVolume(*col);
+  QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::CylinderVolume()
+{
+  const double r = 1.5, l = 5.0;
+  const double expectedVolume = 35.343;
+
+  msgs::CylinderGeom *cyl = new msgs::CylinderGeom();
+  cyl->set_radius(r);
+  cyl->set_length(l);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_CYLINDER);
+  geo->set_allocated_cylinder(cyl);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  double volume = gui::LinkData::ComputeVolume(*col);
+  QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::SphereVolume()
+{
+  const double r = 1.5;
+  const double expectedVolume = 14.137;
+
+  msgs::SphereGeom *sphere = new msgs::SphereGeom();
+  sphere->set_radius(r);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_SPHERE);
+  geo->set_allocated_sphere(sphere);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  double volume = gui::LinkData::ComputeVolume(*col);
+  QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::MeshVolume()
+{
+  const double l = 3, w = 4, h = 5;
+  const double expectedVolume = 60;
+
+  msgs::Vector3d *size = new msgs::Vector3d();
+  size->set_x(l);
+  size->set_y(w);
+  size->set_z(h);
+
+  msgs::BoxGeom *box = new msgs::BoxGeom();
+  box->set_allocated_size(size);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_MESH);
+  geo->set_allocated_box(box);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  double volume = gui::LinkData::ComputeVolume(*col);
+  QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::PolylineVolume()
+{
+  const double l = 3, w = 4, h = 5;
+  const double expectedVolume = 60;
+
+  msgs::Vector3d *size = new msgs::Vector3d();
+  size->set_x(l);
+  size->set_y(w);
+  size->set_z(h);
+
+  msgs::BoxGeom *box = new msgs::BoxGeom();
+  box->set_allocated_size(size);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_POLYLINE);
+  geo->set_allocated_box(box);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  double volume = gui::LinkData::ComputeVolume(*col);
+  QVERIFY(fabs(expectedVolume - volume) < 1e-3);
+
+  delete col;
+}
+
+void ModelData_TEST::SphereMomentOfInertia()
+{
+  const double r = 1.5;
+  const double m = 1.0;
+  const double expectedI = 0.9;
+
+  msgs::SphereGeom *sphere = new msgs::SphereGeom();
+  sphere->set_radius(r);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_SPHERE);
+  geo->set_allocated_sphere(sphere);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
+  QVERIFY(fabs(expectedI - I.X()) < 1e-3);
+  QVERIFY(fabs(expectedI - I.Y()) < 1e-3);
+  QVERIFY(fabs(expectedI - I.Z()) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::CylinderMomentOfInertia()
+{
+  const double r = 1.5, l = 5.0, m = 1.0;
+  const double expectedIx = 2.64583;
+  const double expectedIy = 2.64583;
+  const double expectedIz = 1.125;
+
+  msgs::CylinderGeom *cyl = new msgs::CylinderGeom();
+  cyl->set_radius(r);
+  cyl->set_length(l);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_CYLINDER);
+  geo->set_allocated_cylinder(cyl);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
+
+  QVERIFY(fabs(expectedIx - I.X()) < 1e-3);
+  QVERIFY(fabs(expectedIy - I.Y()) < 1e-3);
+  QVERIFY(fabs(expectedIz - I.Z()) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::BoxMomentOfInertia()
+{
+  const double l = 3, w = 4, h = 5, m = 1.0;
+  const double expectedIx = 3.41667;
+  const double expectedIy = 2.83333;
+  const double expectedIz = 2.08333;
+
+  msgs::Vector3d *size = new msgs::Vector3d();
+  size->set_x(l);
+  size->set_y(w);
+  size->set_z(h);
+
+  msgs::BoxGeom *box = new msgs::BoxGeom();
+  box->set_allocated_size(size);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_BOX);
+  geo->set_allocated_box(box);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
+
+  QVERIFY(fabs(expectedIx - I.X()) < 1e-3);
+  QVERIFY(fabs(expectedIy - I.Y()) < 1e-3);
+  QVERIFY(fabs(expectedIz - I.Z()) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::MeshMomentOfInertia()
+{
+  const double l = 3, w = 4, h = 5, m = 1.0;
+  const double expectedIx = 3.41667;
+  const double expectedIy = 2.83333;
+  const double expectedIz = 2.08333;
+
+  msgs::Vector3d *size = new msgs::Vector3d();
+  size->set_x(l);
+  size->set_y(w);
+  size->set_z(h);
+
+  msgs::BoxGeom *box = new msgs::BoxGeom();
+  box->set_allocated_size(size);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_MESH);
+  geo->set_allocated_box(box);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
+
+  QVERIFY(fabs(expectedIx - I.X()) < 1e-3);
+  QVERIFY(fabs(expectedIy - I.Y()) < 1e-3);
+  QVERIFY(fabs(expectedIz - I.Z()) < 1e-3);
+
+  delete col;
+}
+
+/////////////////////////////////////////////////
+void ModelData_TEST::PolylineMomentOfInertia()
+{
+  const double l = 3, w = 4, h = 5, m = 1.0;
+  const double expectedIx = 3.41667;
+  const double expectedIy = 2.83333;
+  const double expectedIz = 2.08333;
+
+  msgs::Vector3d *size = new msgs::Vector3d();
+  size->set_x(l);
+  size->set_y(w);
+  size->set_z(h);
+
+  msgs::BoxGeom *box = new msgs::BoxGeom();
+  box->set_allocated_size(size);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_POLYLINE);
+  geo->set_allocated_box(box);
+
+  msgs::Collision *col = new msgs::Collision();
+  col->set_allocated_geometry(geo);
+
+  ignition::math::Vector3d I = gui::LinkData::ComputeMomentOfInertia(*col, m);
+
+  QVERIFY(fabs(expectedIx - I.X()) < 1e-3);
+  QVERIFY(fabs(expectedIy - I.Y()) < 1e-3);
+  QVERIFY(fabs(expectedIz - I.Z()) < 1e-3);
+
+  delete col;
 }
 
 // Generate a main function for the test

@@ -16,10 +16,12 @@
 */
 
 #include <boost/filesystem.hpp>
+
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
-#include "gazebo/math/Rand.hh"
 
 /////////////////////////////////////////////////
 void DataLogger_TEST::RecordButton()
@@ -151,12 +153,12 @@ void DataLogger_TEST::StressTest()
         gazebo::common::SystemPaths::Instance();
 
     // Cleanup test directory.
-    boost::filesystem::remove_all(paths->GetDefaultTestPath());
+    boost::filesystem::remove_all(paths->DefaultTestPath());
 
     this->Load("worlds/empty.world");
 
     // Cleanup test directory.
-    boost::filesystem::remove_all(paths->GetDefaultTestPath());
+    boost::filesystem::remove_all(paths->DefaultTestPath());
 
     gazebo::transport::NodePtr node;
     gazebo::transport::PublisherPtr pub;
@@ -167,7 +169,7 @@ void DataLogger_TEST::StressTest()
     pub = node->Advertise<gazebo::msgs::LogControl>("~/log/control");
 
     gazebo::msgs::LogControl msg;
-    msg.set_base_path(paths->GetDefaultTestPath());
+    msg.set_base_path(paths->DefaultTestPath());
     pub->Publish(msg);
 
     // Create a new data logger widget
@@ -185,20 +187,20 @@ void DataLogger_TEST::StressTest()
       recordButton->toggle();
 
       // Sleep for random times
-      gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(10, 500));
+      gazebo::common::Time::MSleep(ignition::math::Rand::IntUniform(10, 500));
     }
 
     // There should be (count * 0.5) log directories in $TMP/gazebo_test
     // due to the record button being toggled.
     unsigned int dirCount = 0;
     for (boost::filesystem::directory_iterator
-          iter(paths->GetDefaultTestPath());
+          iter(paths->DefaultTestPath());
           iter != boost::filesystem::directory_iterator(); ++iter, ++dirCount)
     {
     }
 
     // Cleanup after ourselves.
-    boost::filesystem::remove_all(paths->GetDefaultTestPath());
+    boost::filesystem::remove_all(paths->DefaultTestPath());
 
     QVERIFY(dirCount == count / 2);
   }

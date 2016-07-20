@@ -26,6 +26,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -39,6 +40,7 @@ Base::Base(BasePtr _parent)
 {
   this->type = BASE;
   this->id = physics::getUniqueId();
+  this->typeStr = "base";
   this->saveable = true;
   this->selected = false;
 
@@ -78,6 +80,8 @@ void Base::Load(sdf::ElementPtr _sdf)
   }
 
   this->ComputeScopedName();
+
+  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -91,6 +95,8 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
+  this->UnregisterIntrospectionItems();
+
   // Remove self as a child of the parent
   if (this->parent)
   {
@@ -213,6 +219,23 @@ unsigned int Base::GetChildCount() const
 void Base::AddType(Base::EntityType _t)
 {
   this->type = this->type | (unsigned int)_t;
+
+  if (this->type & MODEL)
+    this->typeStr = "model";
+  else if (this->type & LINK)
+    this->typeStr = "link";
+  else if (this->type & COLLISION)
+    this->typeStr = "collision";
+  else if (this->type & ACTOR)
+    this->typeStr = "actor";
+  else if (this->type & LIGHT)
+    this->typeStr = "light";
+  else if (this->type & VISUAL)
+    this->typeStr = "visual";
+  else if (this->type & JOINT)
+    this->typeStr = "joint";
+  else if (this->type & SHAPE)
+    this->typeStr = "shape";
 }
 
 //////////////////////////////////////////////////
@@ -303,6 +326,48 @@ std::string Base::GetScopedName(bool _prependWorldName) const
 }
 
 //////////////////////////////////////////////////
+common::URI Base::URI() const
+{
+  common::URI uri;
+
+  uri.SetScheme("data");
+
+  BasePtr p = this->parent;
+  while (p)
+  {
+    if (p->GetParent())
+    {
+      uri.Path().PushFront(p->GetName());
+      uri.Path().PushFront(p->TypeStr());
+    }
+
+    p = p->GetParent();
+  }
+
+  uri.Path().PushBack(this->TypeStr());
+  uri.Path().PushBack(this->GetName());
+  uri.Path().PushFront(this->world->GetName());
+  uri.Path().PushFront("world");
+
+  return uri;
+}
+
+/////////////////////////////////////////////////
+void Base::RegisterIntrospectionItems()
+{
+  // nothing for now
+}
+
+/////////////////////////////////////////////////
+void Base::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
+}
+
+//////////////////////////////////////////////////
 void Base::ComputeScopedName()
 {
   BasePtr p = this->parent;
@@ -326,6 +391,12 @@ bool Base::HasType(const Base::EntityType &_t) const
 unsigned int Base::GetType() const
 {
   return this->type;
+}
+
+//////////////////////////////////////////////////
+std::string Base::TypeStr() const
+{
+  return this->typeStr;
 }
 
 //////////////////////////////////////////////////

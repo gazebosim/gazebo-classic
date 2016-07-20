@@ -198,6 +198,8 @@ void CollisionConfig_TEST::Restore()
   // Remove a collision and restore
   auto button = cc.findChild<QToolButton *>("removeCollisionButton_0");
   QVERIFY(button);
+
+  // Note that the confirmation dialog has been disabled for tests (issue #1963)
   button->click();
 
   QCOMPARE(cc.GetCollisionCount(), 1u);

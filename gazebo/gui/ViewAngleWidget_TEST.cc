@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/math/Helpers.hh"
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"

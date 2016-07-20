@@ -158,6 +158,8 @@ TopToolbar::TopToolbar(QWidget *_parent)
     this->dataPtr->toolbar->addAction(g_screenshotAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
+  if (g_plotAct)
+    this->dataPtr->toolbar->addAction(g_plotAct);
 
   // Layout
   QHBoxLayout *toolLayout = new QHBoxLayout;
@@ -193,6 +195,7 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
     // Simulation / Model Editor / Log Playback
     if (acts[i] == g_screenshotAct ||
         acts[i] == g_viewAngleButtonAct ||
+        acts[i] == g_plotAct ||
         acts[i]->objectName() == "toolbarSpacerAction")
     {
       acts[i]->setVisible(modelEditor || simulation || logPlayback);
@@ -206,10 +209,27 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
         acts[i] == g_copyAct ||
         acts[i] == g_pasteAct ||
         acts[i] == g_alignButtonAct ||
-        acts[i] == g_snapAct)
+        acts[i] == g_snapAct ||
+        acts[i] == g_undoAct ||
+        acts[i] == g_undoHistoryAct ||
+        acts[i] == g_redoAct ||
+        acts[i] == g_redoHistoryAct)
     {
       acts[i]->setVisible(modelEditor || simulation);
-      acts[i]->setEnabled(modelEditor || simulation);
+
+      // Some actions start disabled in the editor
+      if (modelEditor && (
+          acts[i] == g_copyAct ||
+          acts[i] == g_pasteAct ||
+          acts[i] == g_undoAct ||
+          acts[i] == g_undoHistoryAct ||
+          acts[i] == g_redoAct ||
+          acts[i] == g_redoHistoryAct))
+      {
+        acts[i]->setEnabled(false);
+      }
+      else
+        acts[i]->setEnabled(modelEditor || simulation);
 
       // Change preceding separator as well
       if (i > 0 && acts[i-1]->isSeparator())

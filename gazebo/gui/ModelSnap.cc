@@ -83,11 +83,7 @@ void ModelSnap::Clear()
   this->dataPtr->node.reset();
   this->dataPtr->userCmdPub.reset();
 
-  if (this->dataPtr->renderConnection)
-  {
-    event::Events::DisconnectRender(this->dataPtr->renderConnection);
-    this->dataPtr->renderConnection.reset();
-  }
+  this->dataPtr->renderConnection.reset();
 
   if (this->dataPtr->snapVisual)
   {
@@ -169,11 +165,7 @@ void ModelSnap::Reset()
       this->dataPtr->highlightVisual->SetVisible(false);
   }
 
-  if (this->dataPtr->renderConnection)
-  {
-    event::Events::DisconnectRender(this->dataPtr->renderConnection);
-    this->dataPtr->renderConnection.reset();
-  }
+  this->dataPtr->renderConnection.reset();
 }
 
 /////////////////////////////////////////////////
@@ -309,6 +301,9 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
   _visualSrc->SetWorldPose(
       math::Pose(_visualSrc->GetWorldPose().pos + translation,
       rotation * _visualSrc->GetWorldPose().rot));
+
+  Events::moveEntity(_visualSrc->GetName(), _visualSrc->GetWorldPose().Ign(),
+      true);
 
   this->PublishVisualPose(_visualSrc);
 }

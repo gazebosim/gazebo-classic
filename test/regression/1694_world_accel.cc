@@ -54,7 +54,7 @@ TEST_F(Issue1694Test, WorldAccel)
   physics::LinkPtr link = model->GetLink("box_link");
   ASSERT_TRUE(link != NULL);
 
-  const math::Vector3 g = world->GetPhysicsEngine()->GetGravity();
+  const auto g = world->Gravity();
 
   world->Step(1);
 

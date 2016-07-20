@@ -11,6 +11,17 @@ set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo
 # materials scripts, shaders, and other related resources are stored.
 set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_MAJOR_VERSION@/media")
 
+# The model path contains the location on disk where models are stored.
+set(@PKG_NAME@_MODEL_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_MAJOR_VERSION@/models")
+
+# Set whether Gazebo was built with Bullet support
+set (GAZEBO_HAS_BULLET @HAVE_BULLET@)
+
+# Set whether Gazebo was built with Simbody support
+set (GAZEBO_HAS_SIMBODY @HAVE_SIMBODY@)
+
+include (FindPkgConfig)
+
 #################################################
 # @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
 # @PKG_NAME@_PROTO_LIBRARIES
@@ -71,6 +82,37 @@ list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@)
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@)
 
+if (GAZEBO_HAS_BULLET)
+  if (PKG_CONFIG_FOUND)
+    pkg_check_modules(BULLET bullet>=2.82)
+    if (NOT BULLET_FOUND)
+       pkg_check_modules(BULLET bullet2.82>=2.82)
+    endif()
+
+    if (BULLET_FOUND)
+      add_definitions(-DLIBBULLET_VERSION=${BULLET_VERSION})
+    else()
+      message(FATAL_ERROR "Error: Bullet > 2.82 not found, please install libbullet2.82-dev.")
+    endif()
+
+    if (BULLET_VERSION VERSION_GREATER 2.82)
+      add_definitions(-DLIBBULLET_VERSION_GT_282)
+    endif()
+
+    list(APPEND @PKG_NAME@_INCLUDE_DIRS ${BULLET_INCLUDE_DIRS})
+    list(APPEND @PKG_NAME@_LIBRARY_DIRS ${BULLET_LIBRARY_DIRS})
+    list(APPEND @PKG_NAME@_LIBRARIES ${BULLET_LIBRARIES})
+  else()
+    message(FATAL_ERROR "Error: pkg-config not found.")
+  endif()
+endif()
+
+if (GAZEBO_HAS_SIMBODY)
+  find_package(Simbody REQUIRED)
+  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Simbody_INCLUDE_DIR})
+  list(APPEND @PKG_NAME@_LIBRARIES ${Simbody_LIBRARIES})
+endif()
+
 # Visual Studio enables c++11 support by default
 if (NOT MSVC)
   list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)
@@ -100,34 +142,33 @@ execute_process(COMMAND pkg-config --variable=prefix OGRE
 set(CMAKE_MODULE_PATH
   "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${OGRE_INSTALL_PREFIX}/lib/OGRE/cmake;${OGRE_INSTALL_PREFIX}/CMake;${CMAKE_MODULE_PATH}")
 
-foreach(dep @PKG_DEPENDS@)
-  if(NOT ${dep}_FOUND)
-    if (${dep} MATCHES "Boost")
-      find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system filesystem program_options regex iostreams date_time)
-    else()
-      find_package(${dep} REQUIRED)
-    endif()
-  endif()
-  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${${dep}_INCLUDE_DIRS})
+# Find boost
+find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system
+  filesystem program_options regex iostreams date_time)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${Boost_LIBRARIES})
 
-  # Protobuf needs to be capitalized to match PROTOBUF_LIBRARIES
-  if (${dep} STREQUAL "Protobuf")
-    string (TOUPPER ${dep} dep_lib)
-  else()
-    set (dep_lib ${dep})
-  endif()
+# Find protobuf
+find_package(Protobuf REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${PROTOBUF_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${PROTOBUF_LIBRARIES})
 
-  list(APPEND @PKG_NAME@_LIBRARIES ${${dep_lib}_LIBRARIES})
+# Find SDFormat
+find_package(SDFormat REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${SDFormat_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${SDFormat_LIBRARIES})
 
-  # When including OGRE, also include the Terrain and Paging components
-  if (${dep} STREQUAL "OGRE")
-    list(APPEND GAZEBO_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS}
-      ${OGRE_Paging_INCLUDE_DIRS})
-    list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
-      ${OGRE_Paging_LIBRARIES})
-  endif()
-endforeach()
+# Find OGRE
+find_package(OGRE REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${OGRE_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${OGRE_LIBRARIES})
+# When including OGRE, also include the Terrain and Paging components
+list(APPEND GAZEBO_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS}
+  ${OGRE_Paging_INCLUDE_DIRS})
+list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
+  ${OGRE_Paging_LIBRARIES})
 
+# Find Ignition Math
 find_package(ignition-math2 REQUIRED)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MATH_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MATH_LIBRARY_DIRS})

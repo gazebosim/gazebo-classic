@@ -46,6 +46,7 @@ Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
+    ("verbose", "Print extra information")
     ("help,h", "Print this help message");
 }
 
@@ -74,7 +75,7 @@ void Command::ListOptions()
   {
     pieces.clear();
     std::string formatName = (*iter)->format_name();
-    boost::split(pieces, formatName, boost::is_any_of(" "));
+    pieces = common::split(formatName, " ");
 
     if (pieces.empty())
     {
@@ -186,6 +187,11 @@ bool Command::Run(int _argc, char **_argv)
   {
     this->Help();
     return true;
+  }
+
+  if (this->vm.count("verbose"))
+  {
+    gazebo::common::Console::SetQuiet(false);
   }
 
   if (!this->TransportInit())
@@ -355,9 +361,7 @@ bool PhysicsCommand::RunImpl()
 
   if (this->vm.count("gravity"))
   {
-    std::vector<std::string> values;
-    boost::split(values, this->vm["gravity"].as<std::string>(),
-        boost::is_any_of(","));
+    auto values = common::split(this->vm["gravity"].as<std::string>(), ",");
 
     msg.mutable_gravity()->set_x(boost::lexical_cast<double>(values[0]));
     msg.mutable_gravity()->set_y(boost::lexical_cast<double>(values[1]));
@@ -759,8 +763,7 @@ bool CameraCommand::RunImpl()
 
         if (topicInfo.msg_type() == "gazebo.msgs.CameraCmd")
         {
-          std::vector<std::string> parts;
-          boost::split(parts, topics.data(i), boost::is_any_of("/"));
+          auto parts = common::split(topics.data(i), "/");
           std::cout << parts[parts.size()-2] << std::endl;
         }
       }

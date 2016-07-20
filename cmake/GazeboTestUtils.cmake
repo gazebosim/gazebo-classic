@@ -64,7 +64,7 @@ macro (gz_build_tests)
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-	    ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+      ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
     if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full

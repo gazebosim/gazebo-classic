@@ -68,7 +68,7 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   EXPECT_EQ(sensor->AngularVelocity(), ignition::math::Vector3d::Zero);
   EXPECT_EQ(sensor->LinearAcceleration(), ignition::math::Vector3d::Zero);
@@ -81,11 +81,11 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   if (_physicsEngine == "simbody")
@@ -95,7 +95,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   }
 
   double z = 3;
-  double gravityZ = physics->GetGravity().z;
+  double gravityZ = world->Gravity().Z();
   double stepSize = physics->GetMaxStepSize();
 
   std::string modelName = "imuModel";
@@ -111,7 +111,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   sensors::ImuSensorPtr imuSensor =
       std::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
 
-  ASSERT_TRUE(imuSensor != NULL);
+  ASSERT_TRUE(imuSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   imuSensor->SetActive(true);

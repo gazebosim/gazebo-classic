@@ -38,6 +38,7 @@ DARTPolylineShape::DARTPolylineShape(CollisionPtr _parent)
 DARTPolylineShape::~DARTPolylineShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

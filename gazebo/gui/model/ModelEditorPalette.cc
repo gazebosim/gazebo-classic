@@ -76,6 +76,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Cylinder button
   QToolButton *cylinderButton = new QToolButton(this);
+  cylinderButton->setObjectName("modelEditorPaletteCylinderButton");
   cylinderButton->setFixedSize(toolButtonSize);
   cylinderButton->setToolTip(tr("Cylinder"));
   cylinderButton->setIcon(QPixmap(":/images/cylinder.png"));
@@ -88,6 +89,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Sphere button
   QToolButton *sphereButton = new QToolButton(this);
+  sphereButton->setObjectName("modelEditorPaletteSphereButton");
   sphereButton->setFixedSize(toolButtonSize);
   sphereButton->setToolTip(tr("Sphere"));
   sphereButton->setIcon(QPixmap(":/images/sphere.png"));
@@ -100,6 +102,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Box button
   QToolButton *boxButton = new QToolButton(this);
+  boxButton->setObjectName("modelEditorPaletteBoxButton");
   boxButton->setFixedSize(toolButtonSize);
   boxButton->setToolTip(tr("Box"));
   boxButton->setIcon(QPixmap(":/images/box.png"));

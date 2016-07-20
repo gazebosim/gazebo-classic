@@ -211,11 +211,11 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
 
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -240,7 +240,7 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   world->Step(steps);
 
   // Expect boxes to be falling
-  double fallVelocity = g.z * stepTime;
+  double fallVelocity = g.Z() * stepTime;
   for (auto &iter : models)
   {
     auto links = iter.second->GetLinks();

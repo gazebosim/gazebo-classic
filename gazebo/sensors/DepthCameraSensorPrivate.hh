@@ -27,11 +27,11 @@ namespace gazebo
     /// \brief Depth camera sensor private data.
     class DepthCameraSensorPrivate
     {
-      /// \brief Pointer to the camera.
-      public: rendering::DepthCameraPtr camera;
+      /// \brief Depth data buffer.
+      public: float *depthBuffer = nullptr;
 
-      /// \brief True if the sensor was rendered.
-      public: bool rendered;
+      /// \brief Local pointer to the depthCamera.
+      public: rendering::DepthCameraPtr depthCamera;
     };
   }
 }

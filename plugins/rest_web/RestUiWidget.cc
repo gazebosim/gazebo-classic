@@ -161,7 +161,7 @@ void RestUiWidget::Update()
     this->msgRespQ.pop_front();
 
     // look for login error, and reenable the login menu if necessary
-    if (msg->type() == msgs::RestResponse::ERROR)
+    if (msg->type() == msgs::RestResponse::ERR)
     {
       this->loginMenuAction.setEnabled(true);
       this->logoutMenuAction.setEnabled(false);

@@ -103,8 +103,7 @@ void RTShaderSystem::Fini()
   // Finalize RTShader system.
   if (this->dataPtr->shaderGenerator != NULL)
   {
-    // On Windows, we're using 1.9RC1, which doesn't have a bunch of changes.
-#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
+#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
     Ogre::RTShader::ShaderGenerator::finalize();
 #else
     Ogre::RTShader::ShaderGenerator::destroy();
@@ -402,7 +401,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           if (!tmpdir)
           {
             common::SystemPaths *paths = common::SystemPaths::Instance();
-            tmpdir = const_cast<char*>(paths->GetTmpPath().c_str());
+            tmpdir = const_cast<char*>(paths->TmpPath().c_str());
           }
           // Get the user
           user = getenv("USER");
@@ -412,7 +411,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           cachePath = stream.str();
           // Create the directory
 #ifdef _WIN32
-          if (mkdir(cachePath.c_str()) != 0)
+          if (_mkdir(cachePath.c_str()) != 0)
 #else
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
 #endif
