@@ -20,7 +20,6 @@
 
 #include <memory>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -47,11 +46,6 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~CloneWindow();
-
-      /// \brief Get the port for the new gzserver specified by the user.
-      /// \return The port for the new gzserver.
-      /// \deprecated See Port() const
-      public: int GetPort() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the port for the new gzserver specified by the user.
       /// \return The port for the new gzserver.

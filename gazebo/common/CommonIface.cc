@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <sys/stat.h>
 #include <vector>
 
 #include <boost/filesystem/operations.hpp>
@@ -34,6 +35,7 @@
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
+
 #ifdef _WIN32
   const auto& gzstrtok = strtok_s;
 #else
@@ -54,6 +56,22 @@ void common::load()
 #endif
 }
 
+/////////////////////////////////////////////////
+std::string common::unique_file_path(const std::string &_pathAndName,
+    const std::string &_extension)
+{
+  std::string result = _pathAndName + "." + _extension;
+  int count = 1;
+  struct stat buf;
+
+  // Check if file exists and change name accordingly
+  while (stat(result.c_str(), &buf) != -1)
+  {
+    result = _pathAndName + "(" + std::to_string(count++) + ")." + _extension;
+  }
+
+  return result;
+}
 /////////////////////////////////////////////////
 void common::add_search_path_suffix(const std::string &_suffix)
 {

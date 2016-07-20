@@ -37,7 +37,6 @@ namespace gazebo
   {
     class DataLogger;
     class Editor;
-    class HotkeyDialog;
     class InsertModelWidget;
     class ModelListWidget;
     class RenderWidget;
@@ -152,9 +151,6 @@ namespace gazebo
 
       /// \brief Data logger dialog.
       public: DataLogger *dataLogger;
-
-      /// \brief Hotkey chart dialog.
-      public: HotkeyDialog *hotkeyDialog;
 
       /// \brief Tab to insert models.
       public: InsertModelWidget *insertModel;

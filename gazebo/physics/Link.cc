@@ -770,7 +770,6 @@ void Link::SetWindEnabled(const bool _enable)
   }
   else
   {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
     this->updateConnection.reset();
     // Make sure wind velocity is null
     this->windLinearVel.Set(0, 0, 0);
@@ -885,6 +884,11 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
   msgs::Set(_msg.mutable_pose(), relPose.Ign());
+
+  // The visual msgs name might not have been set if the link was created
+  // dynamically without using SDF.
+  if (!this->visualMsg->has_name())
+    this->visualMsg->set_name(this->GetScopedName());
 
   msgs::Set(this->visualMsg->mutable_pose(), relPose.Ign());
   _msg.add_visual()->CopyFrom(*this->visualMsg);

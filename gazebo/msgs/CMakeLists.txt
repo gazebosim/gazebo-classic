@@ -206,7 +206,6 @@ endif()
 
 target_link_libraries(gazebo_msgs
   gazebo_common
-  gazebo_math
   ${GZ_PROTOBUF_LIBRARY}
 )
 
