@@ -62,7 +62,7 @@ namespace gazebo
     /// \brief True to use wall time, false to use sim time.
     public: bool useWallTime;
 
-    /// \brief Subscriber to the world info topic.
+    /// \brief Subscriber to world info.
     public: transport::SubscriberPtr infoSub;
   };
 }
@@ -79,6 +79,7 @@ BlinkVisualPlugin::BlinkVisualPlugin() : dataPtr(new BlinkVisualPluginPrivate)
 /////////////////////////////////////////////////
 BlinkVisualPlugin::~BlinkVisualPlugin()
 {
+  this->dataPtr->infoSub.reset();
   if (this->dataPtr->node)
     this->dataPtr->node->Fini();
 }
@@ -127,7 +128,7 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
   // Subscribe to world statistics to get sim time
   // Warning: topic ~/pose/local/info is meant for high-bandwidth local
   // network access. It will kill the system if a remote gzclient tries to
-  // subscribe
+  // subscribe.
   if (!this->dataPtr->useWallTime)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -155,8 +156,11 @@ void BlinkVisualPlugin::Update()
   else
     currentTime = this->dataPtr->currentSimTime;
 
-  if (this->dataPtr->cycleStartTime == common::Time::Zero)
+  if (this->dataPtr->cycleStartTime == common::Time::Zero ||
+      this->dataPtr->cycleStartTime > currentTime)
+  {
     this->dataPtr->cycleStartTime = currentTime;
+  }
 
   auto elapsed = currentTime - this->dataPtr->cycleStartTime;
 
