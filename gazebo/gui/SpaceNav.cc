@@ -85,18 +85,18 @@ bool SpaceNav::Load()
 
 #ifdef HAVE_SPNAV
   // Read deadband from [spacenav] in gui.ini
-  this->dataPtr->deadbandTrans.x = getINIProperty<double>(
+  this->dataPtr->deadbandTrans.X() = getINIProperty<double>(
       "spacenav.deadband_x", 0.1);
-  this->dataPtr->deadbandTrans.y = getINIProperty<double>(
+  this->dataPtr->deadbandTrans.Y() = getINIProperty<double>(
       "spacenav.deadband_y", 0.1);
-  this->dataPtr->deadbandTrans.z = getINIProperty<double>(
+  this->dataPtr->deadbandTrans.Z() = getINIProperty<double>(
       "spacenav.deadband_z", 0.1);
 
-  this->dataPtr->deadbandRot.x = getINIProperty<double>(
+  this->dataPtr->deadbandRot.X() = getINIProperty<double>(
       "spacenav.deadband_rx", 0.1);
-  this->dataPtr->deadbandRot.y = getINIProperty<double>(
+  this->dataPtr->deadbandRot.Y() = getINIProperty<double>(
       "spacenav.deadband_ry", 0.1);
-  this->dataPtr->deadbandRot.z = getINIProperty<double>(
+  this->dataPtr->deadbandRot.Z() = getINIProperty<double>(
       "spacenav.deadband_rz", 0.1);
 
   // Read topic from [spacenav] in gui.ini
@@ -165,23 +165,23 @@ void SpaceNav::Run()
 
       case SPNAV_EVENT_MOTION:
         joystickMsg.mutable_translation()->set_x(
-            this->Deadband(this->dataPtr->deadbandTrans.x,
+            this->Deadband(this->dataPtr->deadbandTrans.X(),
               sev.motion.z / SCALE));
         joystickMsg.mutable_translation()->set_y(
-            this->Deadband(this->dataPtr->deadbandTrans.y,
+            this->Deadband(this->dataPtr->deadbandTrans.Y(),
               -sev.motion.x / SCALE));
         joystickMsg.mutable_translation()->set_z(
-            this->Deadband(this->dataPtr->deadbandTrans.z,
+            this->Deadband(this->dataPtr->deadbandTrans.Z(),
               sev.motion.y / SCALE));
 
         joystickMsg.mutable_rotation()->set_x(
-            this->Deadband(this->dataPtr->deadbandRot.x,
+            this->Deadband(this->dataPtr->deadbandRot.X(),
               sev.motion.rz / SCALE));
         joystickMsg.mutable_rotation()->set_y(
-            this->Deadband(this->dataPtr->deadbandRot.y,
+            this->Deadband(this->dataPtr->deadbandRot.Y(),
               -sev.motion.rx / SCALE));
         joystickMsg.mutable_rotation()->set_z(
-            this->Deadband(this->dataPtr->deadbandRot.z,
+            this->Deadband(this->dataPtr->deadbandRot.Z(),
               sev.motion.ry / SCALE));
 
         this->dataPtr->joyPub->Publish(joystickMsg);
