@@ -163,8 +163,11 @@ void BlinkVisualPlugin::Update()
   else
     currentTime = this->dataPtr->currentSimTime;
 
-  if (this->dataPtr->cycleStartTime == common::Time::Zero)
+  if (this->dataPtr->cycleStartTime == common::Time::Zero ||
+      this->dataPtr->cycleStartTime > currentTime)
+  {
     this->dataPtr->cycleStartTime = currentTime;
+  }
 
   auto elapsed = currentTime - this->dataPtr->cycleStartTime;
 
