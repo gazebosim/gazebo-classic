@@ -36,6 +36,16 @@ extern "C"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/VideoEncoder.hh"
 
+/*struct AVCodecContext;
+struct AVFrame;
+struct AVPicture;
+struct SwsContext;
+struct AVOutputFormat;
+struct AVFormatContext;
+struct AVStream;
+struct AVPacket;
+*/
+
 using namespace gazebo;
 using namespace common;
 
@@ -45,9 +55,7 @@ using namespace common;
 #define FPS_DEFAULT 25
 #define TMPFILENAME_DEFAULT "TMP_RECORDING"
 #define FORMAT_DEFAULT "ogv"
-#define TIMEPREV_DEFAULT 0
 #define SAMPLERATE_DEFAULT FPS_DEFAULT * 2
-#define TOTALTIME_DEFAULT 0
 #define VIDEOPTS_DEFAULT -1
 #define INFRAMEWIDTH_DEFAULT 0
 #define INFRAMEHEIGHT_DEFAULT 0
@@ -107,13 +115,13 @@ class gazebo::common::VideoEncoderPrivate
   public: unsigned int fps = FPS_DEFAULT;
 
   /// \brief Previous time when the frame is added.
-  public: common::Time timePrev = TIMEPREV_DEFAULT;
+  public: std::chrono::system_clock::time_point timePrev;
 
   /// \brief Encoding sample rate.
   public: int sampleRate = SAMPLERATE_DEFAULT;
 
-  /// \brief total time elapsed.
-  public: double totalTime = TOTALTIME_DEFAULT;
+  /// \brief total time elapsed, in seconds.
+  public: std::chrono::duration<double> totalTime;
 
   /// \brief Video presentation time stamp.
   public: int videoPts = VIDEOPTS_DEFAULT;
@@ -184,10 +192,10 @@ bool VideoEncoder::Init()
   if (this->dataPtr->initialized)
     return false;
 
+#ifdef HAVE_FFMPEG
   std::string tmpFileNameFull = this->dataPtr->tmpFilename + "." +
     this->dataPtr->format;
 
-#ifdef HAVE_FFMPEG
   this->dataPtr->outputFormat =
     av_guess_format(NULL, tmpFileNameFull.c_str(), NULL);
 
@@ -283,8 +291,6 @@ bool VideoEncoder::Init()
       this->dataPtr->pictureBuf, this->dataPtr->codecCtx->pix_fmt,
       this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height);
 
-  av_dump_format(this->dataPtr->formatCtx, 0, tmpFileNameFull.c_str(), 1);
-
   // setting mux preload and max delay avoids buffer underflow when writing to
   // mpeg format
   double muxMaxDelay = 0.7f;
@@ -331,23 +337,24 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     const unsigned int _width, const unsigned int _height)
 {
   return this->AddFrame(_frame, _width, _height,
-      common::Time::GetWallTime());
+      std::chrono::system_clock::now());
 }
 
 /////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
 bool VideoEncoder::AddFrame(const unsigned char *_frame,
     const unsigned int _width, const unsigned int _height,
-    const common::Time &_timestamp)
+    const std::chrono::system_clock::time_point &_timestamp)
 {
   if (!this->dataPtr->initialized)
     this->Init();
 
-  double dt = (_timestamp - this->dataPtr->timePrev).Double();
-  if (dt < 1.0/this->dataPtr->sampleRate)
+  auto dt = _timestamp - this->dataPtr->timePrev;
+  if (dt < std::chrono::duration<double>(1.0/this->dataPtr->sampleRate))
   {
-    gzwarn << "Time delta[" << dt << "] lower than Hz rate["
-           << 1.0/this->dataPtr->sampleRate << "]\n";
+    gzwarn << "Time delta["
+      << std::chrono::duration_cast<std::chrono::milliseconds>(dt).count()
+      << " ms] lower than Hz rate[" << 1.0/this->dataPtr->sampleRate << "]\n";
     return false;
   }
 
@@ -356,7 +363,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   int pts = 0;
   if (this->dataPtr->videoPts != -1)
   {
-    pts = this->dataPtr->fps * this->dataPtr->totalTime;
+    pts = this->dataPtr->fps * this->dataPtr->totalTime.count();
     this->dataPtr->totalTime += dt;
 
     if (this->dataPtr->videoPts == pts)
@@ -453,7 +460,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 #else
 bool VideoEncoder::AddFrame(const unsigned char */*_frame*/,
     const unsigned int /*_w*/, const unsigned int /*_h*/,
-    const common::Time &_timestamp)
+    const std::chrono::system_clock::time_point &_timestamp)
 {
   return false;
 }
@@ -506,9 +513,9 @@ void VideoEncoder::Reset()
   this->dataPtr->fps = FPS_DEFAULT;
   this->dataPtr->tmpFilename = TMPFILENAME_DEFAULT;
   this->dataPtr->format = FORMAT_DEFAULT;
-  this->dataPtr->timePrev = TIMEPREV_DEFAULT;
+  this->dataPtr->timePrev = {};
   this->dataPtr->sampleRate = SAMPLERATE_DEFAULT;
-  this->dataPtr->totalTime = TOTALTIME_DEFAULT;
+  this->dataPtr->totalTime = std::chrono::duration<double>(0);
   this->dataPtr->videoPts = VIDEOPTS_DEFAULT;
   this->dataPtr->inFrameWidth = INFRAMEWIDTH_DEFAULT;
   this->dataPtr->inFrameHeight = INFRAMEHEIGHT_DEFAULT;

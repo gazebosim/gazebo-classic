@@ -17,17 +17,9 @@
 #ifndef GAZEBO_COMMON_VIDEOENCODER_HH_
 #define GAZEBO_COMMON_VIDEOENCODER_HH_
 
-#include <gazebo/common/Time.hh>
+#include <chrono>
 #include <string>
-
-struct AVCodecContext;
-struct AVFrame;
-struct AVPicture;
-struct SwsContext;
-struct AVOutputFormat;
-struct AVFormatContext;
-struct AVStream;
-struct AVPacket;
+#include <gazebo/util/system.hh>
 
 namespace gazebo
 {
@@ -54,12 +46,14 @@ namespace gazebo
       public: bool Init();
 
       /// \brief True if the enoder is initialized, false otherwise
+      /// \return True if initialized.
       public: bool IsInitialized();
 
       /// \brief Add a single frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
       /// \param[in] _width Input frame width
       /// \param[in] _height Input frame height
+      /// \return True on success.
       public: bool AddFrame(const unsigned char *_frame,
                   const unsigned int _width, const unsigned int _height);
 
@@ -68,12 +62,14 @@ namespace gazebo
       /// \param[in] _width Input frame width
       /// \param[in] _height Input frame height
       /// \param[in] _timestamp Timestamp of the image frame
+      /// \return True on success.
       public: bool AddFrame(const unsigned char *_frame,
                   const unsigned int _width, const unsigned int _height,
-                  const common::Time &_timestamp);
+                  const std::chrono::system_clock::time_point &_timestamp);
 
       /// \brief Write data buffer to to disk
       /// param[in] _filename File in which to save the encoded data
+      /// \return True on success.
       public: bool SaveToFile(const std::string &_filename);
 
       /// \brief Set the video encoding bit rate
@@ -88,7 +84,7 @@ namespace gazebo
       /// \param[in] _height Frame height in pixels
       public: void SetFrameHeight(const unsigned int _height);
 
-      /// \brief Set the encoding format
+      /// \brief Set the encoding format, such as "ogv" or "mp4".
       /// \param[in] _height Frame height
       public: void SetFormat(const std::string &_format);
 
@@ -96,13 +92,13 @@ namespace gazebo
       /// \return Encoding format
       public: std::string Format() const;
 
-      /// \brief Reset to default video properties and clean up allocated
-      /// memories.
-      public: void Reset();
-
       /// \brief Finalize encoding. This will automatically be called
       /// by SaveToFile
       public: void End();
+
+      /// \brief Reset to default video properties and clean up allocated
+      /// memories.
+      public: void Reset();
 
       /// \internal
       /// \brief Private data pointer
