@@ -121,6 +121,7 @@ auto standaloneValues = ::testing::Values(
   , "clone_simulation"
   , "custom_main"
   , "custom_main_pkgconfig"
+  , "harness"
   , "introspection_client"
   , "listener"
   , "publisher"

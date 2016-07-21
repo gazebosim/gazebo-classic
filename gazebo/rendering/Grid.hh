@@ -80,12 +80,12 @@ namespace gazebo
 
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
-      /// \deprecated See SceneNode()
+      /// \deprecated See GridVisual()
       public: Ogre::SceneNode *GetSceneNode() GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Get the Ogre scene node associated with this grid
-      /// \return The Ogre scene node associated with this grid
-      public: Ogre::SceneNode *SceneNode() const;
+      /// \brief Get thevisual associated with this grid
+      /// \return The visual associated with this grid
+      public: VisualPtr GridVisual() const;
 
       /// \brief Sets user data on all ogre objects we own
       /// \param[in] _data The user data

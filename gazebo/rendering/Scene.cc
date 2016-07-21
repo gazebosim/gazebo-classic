@@ -2534,10 +2534,12 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       VisualPtr visPtr;
       try
       {
-        auto iter = this->dataPtr->visuals.find(
-            boost::lexical_cast<uint32_t>(_msg->data()));
+        uint32_t visId = boost::lexical_cast<uint32_t>(_msg->data());
+        auto iter = this->dataPtr->visuals.find(visId);
         if (iter != this->dataPtr->visuals.end())
           visPtr = iter->second;
+        else
+          visPtr = this->GetVisual(_msg->data());
       } catch(...)
       {
         visPtr = this->GetVisual(_msg->data());
@@ -2864,11 +2866,13 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       visual->ShowCOM(this->dataPtr->showCOMs);
       visual->ShowInertia(this->dataPtr->showInertias);
       visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
-      visual->ShowSkeleton(this->dataPtr->showSkeleton);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
       if (visual->GetType() == Visual::VT_MODEL)
+      {
+        visual->ShowSkeleton(this->dataPtr->showSkeleton);
         visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      }
       visual->SetWireframe(this->dataPtr->wireframe);
     }
   }
@@ -3254,10 +3258,11 @@ void Scene::RemoveVisual(uint32_t _id)
       else
         ++piter;
     }
-    this->RemoveVisualizations(vis);
-
-    vis->Fini();
     this->dataPtr->visuals.erase(iter);
+
+    this->RemoveVisualizations(vis);
+    vis->Fini();
+
     if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
         vis->GetId())
       this->dataPtr->selectedVis.reset();
@@ -3400,24 +3405,16 @@ void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
 {
-  std::vector<VisualPtr> toRemove;
   for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
-    Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
-        || visType == Visual::VT_GUI)
-    {
-      // do not remove ModelManipulator's SelectionObj
-      // FIXME remove this hardcoded check, issue #1832
-      if (std::dynamic_pointer_cast<SelectionObj>(childVis) != NULL)
-        continue;
 
-      toRemove.push_back(childVis);
-    }
+    // do not remove ModelManipulator's SelectionObj
+    // FIXME remove this hardcoded check, issue #1832
+    SelectionObjPtr vis = std::dynamic_pointer_cast<SelectionObj>(childVis);
+    if (vis != NULL)
+      vis->Detach();
   }
-  for (auto vis : toRemove)
-    this->RemoveVisual(vis);
 }
 
 /////////////////////////////////////////////////
@@ -3480,7 +3477,8 @@ void Scene::ShowSkeleton(const bool _show)
   this->dataPtr->showSkeleton = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    visual.second->ShowSkeleton(_show);
+    if (visual.second->GetType() == Visual::VT_MODEL)
+      visual.second->ShowSkeleton(_show);
   }
 }
 

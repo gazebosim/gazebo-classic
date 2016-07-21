@@ -14,25 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MESSAGES_UTILITY_HH_
-#define _GAZEBO_MESSAGES_UTILITY_HH_
+#ifndef GAZEBO_MSGS_MSGS_HH_
+#define GAZEBO_MSGS_MSGS_HH_
 
 #include <string>
 
 #include <sdf/sdf.hh>
 
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Pose3.hh>
+#include <ignition/math/Inertial.hh>
+#include <ignition/math/MassMatrix3.hh>
 #include <ignition/math/Plane.hh>
-
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
-
-#include "gazebo/math/MathTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Plane.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Color.hh"
@@ -151,9 +148,9 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Vector2d Convert(const ignition::math::Vector2d &_v);
 
-    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaterniond
+    /// \brief Convert a ignition::math::Quaterniond to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
-    /// \return A msgs::Quaterniond object
+    /// \return A msgs::Quaternion object
     GAZEBO_VISIBLE
     msgs::Quaternion Convert(const ignition::math::Quaterniond &_q);
 
@@ -174,6 +171,18 @@ namespace gazebo
     /// \return A msgs::Time object
     GAZEBO_VISIBLE
     msgs::Time Convert(const common::Time &_t);
+
+    /// \brief Convert an ignition::math::Inertiald to a msgs::Inertial
+    /// \param[in] _i The Inertiald to convert
+    /// \return A msgs::Inertial object
+    GAZEBO_VISIBLE
+    msgs::Inertial Convert(const ignition::math::Inertiald &_i);
+
+    /// \brief Convert an ignition::math::MassMatrix3d to a msgs::Inertial
+    /// \param[in] _m The MassMatrix3d to convert
+    /// \return A msgs::Inertial object
+    GAZEBO_VISIBLE
+    msgs::Inertial Convert(const ignition::math::MassMatrix3d &_m);
 
     /// \brief Convert a ignition::math::Planed to a msgs::PlaneGeom
     /// \param[in] _p The plane to convert
@@ -226,10 +235,16 @@ namespace gazebo
     ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q);
 
     /// \brief Convert a msgs::Pose to an ignition::math::Pose
-    /// \param[in] _q The pose to convert
+    /// \param[in] _p The pose to convert
     /// \return An ignition::math::Pose object
     GAZEBO_VISIBLE
     ignition::math::Pose3d ConvertIgn(const msgs::Pose &_p);
+
+    /// \brief Convert a msgs::Inertial to an ignition::math::Inertiald
+    /// \param[in] _i The inertial to convert
+    /// \return An ignition::math::Inertiald object
+    GAZEBO_VISIBLE
+    ignition::math::Inertiald Convert(const msgs::Inertial &_i);
 
     /// \brief Convert a msgs::Image to a common::Image
     /// \param[out] _img The common::Image container
@@ -304,6 +319,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v);
+
+    /// \brief Set a msgs::Inertial from an ignition::math::Inertiald
+    /// \param[out] _i A msgs::Inertial pointer
+    /// \param[in] _m An ignition::math::Inertiald reference
+    GAZEBO_VISIBLE
+    void Set(msgs::Inertial *_i, const ignition::math::Inertiald &_m);
+
+    /// \brief Set a msgs::Inertial from an ignition::math::MassMatrix3d
+    /// \param[out] _i A msgs::Inertial pointer
+    /// \param[in] _m An ignition::math::MassMatrix3d reference
+    GAZEBO_VISIBLE
+    void Set(msgs::Inertial *_i, const ignition::math::MassMatrix3d &_m);
 
     /// \brief Set a msgs::Plane from an ignition::math::Planed
     /// \param[out] _p A msgs::Plane pointer

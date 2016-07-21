@@ -18,6 +18,7 @@
 #ifndef GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 #define GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -438,6 +439,12 @@ namespace gazebo
 
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
+
+      /// \brief Callback when receiving a request to scale a link.
+      /// \param[in] _name Link name.
+      /// \param[in] _scales New scale for each child of the link.
+      private: void OnRequestLinkScale(const std::string &_name,
+          const std::map<std::string, ignition::math::Vector3d> &_scales);
 
       /// \brief Callback when receiving a request to move a link.
       /// \param[in] _name Link name.

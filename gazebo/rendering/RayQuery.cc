@@ -132,7 +132,8 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 void RayQuery::GetMeshVisuals(rendering::VisualPtr _visual,
     std::vector<rendering::VisualPtr> &_visuals)
 {
-  if (_visual->GetMeshName() != "")
+  if (!_visual->GetMeshName().empty() &&
+      (_visual->GetVisibilityFlags() & GZ_VISIBILITY_SELECTABLE))
     _visuals.push_back(_visual);
 
   for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
