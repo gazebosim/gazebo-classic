@@ -288,16 +288,24 @@ TEST_F(QuaternionTest, Quaternion)
   //    qc rotates frame q to r
   //    qd rotates frame r to s
   // then qd * qc * qb * qa rotates frame o to s
-  EXPECT_EQ(math::Quaternion(0, 0, 0),
-            math::Quaternion(0, -0.5*M_PI, 0)*
-            math::Quaternion(-0.5*M_PI, 0, 0)*
-            math::Quaternion(0,  0.5*M_PI, 0)*
-            math::Quaternion(0, 0,  0.5*M_PI));
-  EXPECT_EQ(math::Quaternion(0, 0, M_PI),
-            math::Quaternion(0, 0,  0.5*M_PI)*
-            math::Quaternion(0,  0.5*M_PI, 0)*
-            math::Quaternion(-0.5*M_PI, 0, 0)*
-            math::Quaternion(0, -0.5*M_PI, 0));
+  // and  qa * qb * qc * qd is applied in the reverse order
+  math::Quaternion qd(0, -0.5*M_PI, 0);
+  math::Quaternion qc(-0.5*M_PI, 0, 0);
+  math::Quaternion qb(0,  0.5*M_PI, 0);
+  math::Quaternion qa(0, 0,  0.5*M_PI);
+  math::Quaternion qdcba(0, 0, 0);
+  math::Quaternion qabcd(0, 0, M_PI);
+  EXPECT_EQ(qdcba, qd*qc*qb*qa);
+  EXPECT_EQ(qabcd, qa*qb*qc*qd);
+
+  // Test quaternion division (rotation) order of application
+  // if qa rotates frame o to p
+  //    qb rotates frame p to q
+  //    qc rotates frame q to r
+  //    qd rotates frame r to s
+  // then qd * qc * qb * qa rotates frame o to s
+  // then qd = qdcba * inv(qc * qb * qa)
+  EXPECT_EQ(qd, qdcba*(qc*qb*qa).GetInverse());
 }
 
 //////////////////////////////////////////////////
