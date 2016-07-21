@@ -361,7 +361,7 @@ URIPath &URI::Path()
 }
 
 /////////////////////////////////////////////////
-URIPath &URI::Path() const
+const URIPath &URI::Path() const
 {
   return this->dataPtr->path;
 }
@@ -373,7 +373,7 @@ URIQuery &URI::Query()
 }
 
 /////////////////////////////////////////////////
-URIQuery &URI::Query() const
+const URIQuery &URI::Query() const
 {
   return this->dataPtr->query;
 }
