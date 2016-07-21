@@ -70,7 +70,7 @@ TEST_F(ModelTest, PluginInfoFailures)
   bool success;
   common::URI pluginUri;
 
-  gzdbg << "Get all plugins" << std::endl;
+  gzmsg << "Get all plugins" << std::endl;
   {
     pluginUri.Parse("data://world/default/model/box/plugin/");
     model->PluginInfo(pluginUri, plugins, success);
@@ -79,7 +79,7 @@ TEST_F(ModelTest, PluginInfoFailures)
     EXPECT_EQ(plugins.plugins_size(), 0);
   }
 
-  gzdbg << "Wrong world" << std::endl;
+  gzmsg << "Wrong world" << std::endl;
   {
     pluginUri.Parse("data://world/wrong/model/box/plugin/");
     model->PluginInfo(pluginUri, plugins, success);
@@ -87,7 +87,7 @@ TEST_F(ModelTest, PluginInfoFailures)
     EXPECT_FALSE(success);
   }
 
-  gzdbg << "Wrong model" << std::endl;
+  gzmsg << "Wrong model" << std::endl;
   {
     pluginUri.Parse("data://world/default/model/cone/plugin/");
     model->PluginInfo(pluginUri, plugins, success);
@@ -95,7 +95,7 @@ TEST_F(ModelTest, PluginInfoFailures)
     EXPECT_FALSE(success);
   }
 
-  gzdbg << "Invalid URI" << std::endl;
+  gzmsg << "Invalid URI" << std::endl;
   {
     pluginUri = common::URI("tell me about your plugins");
     model->PluginInfo(pluginUri, plugins, success);
@@ -103,7 +103,7 @@ TEST_F(ModelTest, PluginInfoFailures)
     EXPECT_FALSE(success);
   }
 
-  gzdbg << "Unhandled URI" << std::endl;
+  gzmsg << "Unhandled URI" << std::endl;
   {
     pluginUri.Parse("data://world/default/plugin/");
     model->PluginInfo(pluginUri, plugins, success);
@@ -111,7 +111,7 @@ TEST_F(ModelTest, PluginInfoFailures)
     EXPECT_FALSE(success);
   }
 
-  gzdbg << "Inexistent nested model" << std::endl;
+  gzmsg << "Inexistent nested model" << std::endl;
   {
     pluginUri.Parse(
         "data://world/default/model/box/model/box_in_a_box/plugin");
@@ -120,7 +120,7 @@ TEST_F(ModelTest, PluginInfoFailures)
     EXPECT_FALSE(success);
   }
 
-  gzdbg << "Incomplete URI" << std::endl;
+  gzmsg << "Incomplete URI" << std::endl;
   {
     pluginUri.Parse("data://world/default/model/box");
     model->PluginInfo(pluginUri, plugins, success);
@@ -144,7 +144,7 @@ TEST_F(ModelTest, ModelPluginInfo)
   bool success;
   common::URI pluginUri;
 
-  gzdbg << "Get an existing plugin" << std::endl;
+  gzmsg << "Get an existing plugin" << std::endl;
   {
     pluginUri.Parse(
         "data://world/default/model/submarine/plugin/submarine_propeller_3");
@@ -155,7 +155,7 @@ TEST_F(ModelTest, ModelPluginInfo)
     EXPECT_EQ(plugins.plugins(0).name(), "submarine_propeller_3");
   }
 
-  gzdbg << "Get all plugins" << std::endl;
+  gzmsg << "Get all plugins" << std::endl;
   {
     pluginUri.Parse("data://world/default/model/submarine/plugin/");
     model->PluginInfo(pluginUri, plugins, success);
@@ -167,6 +167,34 @@ TEST_F(ModelTest, ModelPluginInfo)
     EXPECT_EQ(plugins.plugins(2).name(), "submarine_propeller_3");
     EXPECT_EQ(plugins.plugins(3).name(), "submarine_propeller_4");
     EXPECT_EQ(plugins.plugins(4).name(), "buoyancy");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(ModelTest, NestedModelPluginInfo)
+{
+  this->Load("test/worlds/deeply_nested_models.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("model_00");
+  ASSERT_TRUE(model != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get an existing plugin" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/model_00/model/model_01/model/model_02/"
+        "model/model_03/plugin/initial_velocity");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "initial_velocity");
   }
 }
 

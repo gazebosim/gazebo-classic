@@ -2941,35 +2941,37 @@ void World::PluginInfo(const common::URI &_pluginUri,
   }
 
   _plugins.clear_plugins();
+  _success = true;
 
   auto parts = common::split(_pluginUri.Path().Str(), "/");
-  bool worldFound = false;
-  for (size_t i = 0; i < parts.size(); i = i+2)
+  auto myParts = common::split(this->URI().Path().Str(), "/");
+
+  // Plugin URI should be longer than world URI
+  if (myParts.size() >= parts.size())
   {
-    // Check if it's about this world
-    if (parts[i] == "world")
+    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
+        this->URI().Str() << "]" << std::endl;
+    _success = false;
+    return;
+  }
+
+  // Check if all segments match up to this world
+  size_t i =0;
+  for ( ; i < myParts.size(); ++i)
+  {
+    if (parts[i] != myParts[i])
     {
-      if (worldFound)
-      {
-        gzwarn << "There's more than one world in [" << _pluginUri.Str() << "]"
-            << std::endl;
-        _success = false;
-        return;
-      }
-
-      if (parts[i+1] != this->GetName())
-      {
-        gzwarn << "World name [" << parts[i+1] << "] does not match world [" <<
-            this->GetName() << "]" << std::endl;
-        _success = false;
-        return;
-      }
-
-      worldFound = true;
-      continue;
+      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
+          this->URI().Str() << "]" << std::endl;
+      _success = false;
+      return;
     }
+  }
+
+  for (; i < parts.size(); i = i+2)
+  {
     // See if there is a model
-    else if (worldFound && parts[i] == "model")
+    if (parts[i] == "model")
     {
       auto model = this->GetModel(parts[i+1]);
 
@@ -2984,7 +2986,7 @@ void World::PluginInfo(const common::URI &_pluginUri,
       model->PluginInfo(_pluginUri, _plugins, _success);
       return;
     }
-    // TODO: World plugins
+    // TODO: Handle world plugins
     else
     {
       gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<

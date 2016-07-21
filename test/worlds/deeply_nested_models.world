@@ -115,6 +115,9 @@
                 </material>
               </visual>
             </link>
+            <plugin name="initial_velocity" filename="libInitialVelocityPlugin.so">
+              <linear>10 0 0</linear>
+            </plugin>
           </model>
         </model>
       </model>

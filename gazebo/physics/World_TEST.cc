@@ -206,7 +206,7 @@ TEST_F(WorldTest, ModelPluginInfo)
   bool success;
   common::URI pluginUri;
 
-  gzdbg << "Get an existing plugin" << std::endl;
+  gzmsg << "Get an existing plugin" << std::endl;
   {
     pluginUri.Parse(
         "data://world/default/model/submarine/plugin/submarine_propeller_3");
@@ -217,7 +217,7 @@ TEST_F(WorldTest, ModelPluginInfo)
     EXPECT_EQ(plugins.plugins(0).name(), "submarine_propeller_3");
   }
 
-  gzdbg << "Get all plugins" << std::endl;
+  gzmsg << "Get all plugins" << std::endl;
   {
     pluginUri.Parse("data://world/default/model/submarine/plugin/");
     world->PluginInfo(pluginUri, plugins, success);

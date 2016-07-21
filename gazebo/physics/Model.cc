@@ -1670,56 +1670,53 @@ void Model::PluginInfo(const common::URI &_pluginUri,
   }
 
   _plugins.clear_plugins();
+  _success = true;
 
   auto parts = common::split(_pluginUri.Path().Str(), "/");
-  bool modelFound = false;
-  for (size_t i = 0; i < parts.size(); i = i+2)
+  auto myParts = common::split(this->URI().Path().Str(), "/");
+
+  // Plugin URI should be longer than model URI
+  if (myParts.size() >= parts.size())
   {
-    // Check if it's the correct world
-    if (parts[i] == "world")
+    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
+        this->URI().Str() << "]" << std::endl;
+    _success = false;
+    return;
+  }
+
+  // Check if all segments match up to this model
+  size_t i =0;
+  for ( ; i < myParts.size(); ++i)
+  {
+    if (parts[i] != myParts[i])
     {
-      if (parts[i+1] != this->GetWorld()->GetName())
-      {
-        gzwarn << "World [" << parts[i+1] << "] does not match model [" <<
-            this->GetName() << "]'s world [" << this->GetWorld()->GetName() <<
-            "]" << std::endl;
-        _success = false;
-        return;
-      }
+      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
+          this->URI().Str() << "]" << std::endl;
+      _success = false;
+      return;
     }
-    // Check if it's about this model
-    else if (parts[i] == "model")
+  }
+
+  for (; i < parts.size(); i = i+2)
+  {
+    if (parts[i] == "model")
     {
       // Look in nested models
-      if (modelFound)
+      auto model = this->NestedModel(parts[i+1]);
+
+      if (!model)
       {
-        auto model = this->NestedModel(parts[i+1]);
-
-        if (!model)
-        {
-          gzwarn << "Model [" << parts[i+1] << "] not found in model [" <<
-              this->GetName() << "]" << std::endl;
-          _success = false;
-          return;
-        }
-
-        model->PluginInfo(_pluginUri, _plugins, _success);
-        return;
-      }
-
-      if (parts[i+1] != this->GetName())
-      {
-        gzwarn << "Model name [" << parts[i+1] << "] does not match model [" <<
+        gzwarn << "Model [" << parts[i+1] << "] not found in model [" <<
             this->GetName() << "]" << std::endl;
         _success = false;
         return;
       }
 
-      modelFound = true;
-      continue;
+      model->PluginInfo(_pluginUri, _plugins, _success);
+      return;
     }
     // Look for plugin
-    else if (modelFound && parts[i] == "plugin")
+    else if (parts[i] == "plugin")
     {
       // Return empty vector
       if (!this->sdf->HasElement("plugin"))
