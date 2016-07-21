@@ -184,6 +184,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: gazebo::math::OnePole
     + ***Replacement:*** public: ignition::math::OnePole
 
+1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** public: gazebo::math::mean
+    + ***Replacement:*** public: ignition::math::mean
+    + ***Deprecation:*** public: gazebo::math::min
+    + ***Replacement:*** public: ignition::math::min
+    + ***Deprecation:*** public: gazebo::math::variance
+    + ***Replacement:*** public: ignition::math::variance
+
 1. **gazebo/math/Kmeans.hh**
     + ***Deprecation:*** public: gazebo::math::Kmeans
     + ***Replacement:*** public: ignition::math::Kmeans

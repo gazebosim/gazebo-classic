@@ -25,6 +25,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include "gazebo/util/system.hh"
 
 /// \brief Double maximum value
 #define GZ_DBL_MAX std::numeric_limits<double>::max()
@@ -114,8 +115,11 @@ namespace gazebo
     /// \brief get mean of vector of values
     /// \param[in] _values the vector of values
     /// \return the mean
+    /// \deprecated See ignition::math::mean
     template<typename T>
-    inline T mean(const std::vector<T> &_values)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    mean(const std::vector<T> &_values)
     {
       T sum = 0;
       for (unsigned int i = 0; i < _values.size(); ++i)
@@ -126,8 +130,11 @@ namespace gazebo
     /// \brief get variance of vector of values
     /// \param[in] _values the vector of values
     /// \return the squared deviation
+    /// \deprecated See ignition::math::variance
     template<typename T>
-    inline T variance(const std::vector<T> &_values)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    variance(const std::vector<T> &_values)
     {
       T avg = mean<T>(_values);
 
@@ -153,8 +160,11 @@ namespace gazebo
     /// \brief get the minimum value of vector of values
     /// \param[in] _values the vector of values
     /// \return minimum
+    /// \deprecated See ignition::math::min
     template<typename T>
-    inline T min(const std::vector<T> &_values)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    min(const std::vector<T> &_values)
     {
       T min = std::numeric_limits<T>::max();
       for (unsigned int i = 0; i < _values.size(); ++i)
