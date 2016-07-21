@@ -62,15 +62,15 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Make sure that the sensor are correctly simulated
   world->Step(20);
 
   // Assume gravity on z axis
-  auto grav = world->Gravity();
+  ignition::math::Vector3d grav = world->Gravity();
   EXPECT_NEAR(grav[0], 0, TOL_GRAVITY);
   EXPECT_NEAR(grav[1], 0, TOL_GRAVITY);
 

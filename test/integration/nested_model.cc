@@ -48,16 +48,16 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // take a step to verify that simulation won't crash
   world->Step(1);
 
   // verify top level model
   physics::ModelPtr model;
-  EXPECT_NO_THROW(model = world->GetModel("model_00"));
+  EXPECT_NO_THROW(model = world->ModelByName("model_00"));
 
   if (_physicsEngine == "simbody")
   {
@@ -79,17 +79,17 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
     EXPECT_TRUE(model != NULL);
   }
 
-  EXPECT_EQ(model->GetWorldPose().Ign(),
+  EXPECT_EQ(model->WorldPose(),
       ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
 
   // verify top level model link
-  auto links = model->GetLinks();
+  auto links = model->Links();
   EXPECT_EQ(links.size(), 1u);
   physics::LinkPtr link = links[0];
   EXPECT_TRUE(link != NULL);
-  EXPECT_EQ(link->GetName(), "link_00");
-  EXPECT_EQ(link->GetScopedName(), "model_00::link_00");
-  EXPECT_EQ(link->GetWorldPose().Ign(),
+  EXPECT_EQ(link->Name(), "link_00");
+  EXPECT_EQ(link->ScopedName(), "model_00::link_00");
+  EXPECT_EQ(link->WorldPose(),
       ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
 
   // verify nested model
@@ -97,53 +97,53 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
   EXPECT_EQ(models.size(), 1u);
   physics::ModelPtr nestedModel = models[0];
   EXPECT_TRUE(nestedModel != NULL);
-  EXPECT_EQ(nestedModel->GetName(), "model_01");
-  EXPECT_EQ(nestedModel->GetScopedName(), "model_00::model_01");
-  EXPECT_EQ(nestedModel->GetWorldPose().Ign(),
+  EXPECT_EQ(nestedModel->Name(), "model_01");
+  EXPECT_EQ(nestedModel->ScopedName(), "model_00::model_01");
+  EXPECT_EQ(nestedModel->WorldPose(),
       ignition::math::Pose3d(1, 0, 0.5, 0, 0, 0));
 
   // verify nested model link
-  auto nestedModelLinks = nestedModel->GetLinks();
+  auto nestedModelLinks = nestedModel->Links();
   EXPECT_EQ(nestedModelLinks.size(), 1u);
   physics::LinkPtr nestedModelLink = nestedModelLinks[0];
   EXPECT_TRUE(nestedModelLink != NULL);
-  EXPECT_EQ(nestedModelLink->GetName(), "link_01");
-  EXPECT_EQ(nestedModelLink->GetScopedName(), "model_00::model_01::link_01");
-  EXPECT_EQ(nestedModelLink->GetWorldPose().Ign(),
+  EXPECT_EQ(nestedModelLink->Name(), "link_01");
+  EXPECT_EQ(nestedModelLink->ScopedName(), "model_00::model_01::link_01");
+  EXPECT_EQ(nestedModelLink->WorldPose(),
       ignition::math::Pose3d(1.25, 0, 0.5, 0, 0, 0));
 
   // verify canonical link
-  physics::LinkPtr canonicalLink = model->GetLink();
+  physics::LinkPtr canonicalLink = model->LinkByName();
   EXPECT_TRUE(canonicalLink != NULL);
-  EXPECT_EQ(canonicalLink->GetName(), "link_00");
-  EXPECT_EQ(canonicalLink->GetScopedName(), "model_00::link_00");
+  EXPECT_EQ(canonicalLink->Name(), "link_00");
+  EXPECT_EQ(canonicalLink->ScopedName(), "model_00::link_00");
 
   // there should be only one canonical link in the whole model tree
   // check if the nested model's canonical link is the same one as the top
   // level model
-  physics::LinkPtr canonicalLink2 = nestedModel->GetLink();
+  physics::LinkPtr canonicalLink2 = nestedModel->LinkByName();
   EXPECT_TRUE(canonicalLink2 != NULL);
-  EXPECT_EQ(canonicalLink2->GetName(), "link_00");
-  EXPECT_EQ(canonicalLink2->GetScopedName(), "model_00::link_00");
+  EXPECT_EQ(canonicalLink2->Name(), "link_00");
+  EXPECT_EQ(canonicalLink2->ScopedName(), "model_00::link_00");
 
   // verify model joint
-  EXPECT_EQ(model->GetJointCount(), 1u);
-  auto joints = model->GetJoints();
+  EXPECT_EQ(model->JointCount(), 1u);
+  auto joints = model->Joints();
   physics::JointPtr joint = joints[0];
   EXPECT_TRUE(joint != NULL);
-  EXPECT_EQ(joint->GetName(), "joint_00");
-  EXPECT_EQ(joint, model->GetJoint("joint_00"));
-  EXPECT_TRUE(joint->GetJointLink(0) != NULL);
-  EXPECT_TRUE(joint->GetJointLink(1) != NULL);
-  EXPECT_TRUE(joint->GetJointLink(0)->GetName() == "link_00" ||
-      joint->GetJointLink(0)->GetName() == "link_01");
-  EXPECT_TRUE(joint->GetJointLink(1)->GetName() == "link_00" ||
-      joint->GetJointLink(1)->GetName() == "link_01");
-  EXPECT_EQ(joint->GetMsgType(), msgs::Joint::REVOLUTE);
-  EXPECT_EQ(joint->GetLocalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint->Name(), "joint_00");
+  EXPECT_EQ(joint, model->JointByName("joint_00"));
+  EXPECT_TRUE(joint->JointLink(0) != NULL);
+  EXPECT_TRUE(joint->JointLink(1) != NULL);
+  EXPECT_TRUE(joint->JointLink(0)->Name() == "link_00" ||
+      joint->JointLink(0)->Name() == "link_01");
+  EXPECT_TRUE(joint->JointLink(1)->Name() == "link_00" ||
+      joint->JointLink(1)->Name() == "link_01");
+  EXPECT_EQ(joint->MsgType(), msgs::Joint::REVOLUTE);
+  EXPECT_EQ(joint->LocalAxis(0), ignition::math::Vector3d::UnitX);
 
   // verify nested model joint
-  EXPECT_EQ(nestedModel->GetJointCount(), 0u);
+  EXPECT_EQ(nestedModel->JointCount(), 0u);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,9 +168,9 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   std::ostringstream sdfStream;
   sdfStream << "<sdf version='" << SDF_VERSION << "'>"
@@ -246,13 +246,13 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
 
   // verify top level model
   physics::ModelPtr model;
-  model = world->GetModel("model_00");
+  model = world->ModelByName("model_00");
   EXPECT_TRUE(model != NULL);
-  EXPECT_EQ(model->GetWorldPose().Ign(),
+  EXPECT_EQ(model->WorldPose(),
       ignition::math::Pose3d(0, 0, 1, 0, 0, 0));
 
   // verify top level model link
-  auto links = model->GetLinks();
+  auto links = model->Links();
   EXPECT_EQ(links.size(), 0u);
 
   // verify nested model
@@ -260,25 +260,25 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
   EXPECT_EQ(models.size(), 1u);
   physics::ModelPtr nestedModel = models[0];
   EXPECT_TRUE(nestedModel != NULL);
-  EXPECT_EQ(nestedModel->GetName(), "model_01");
-  EXPECT_EQ(nestedModel->GetScopedName(), "model_00::model_01");
-  EXPECT_EQ(nestedModel->GetWorldPose().Ign(),
+  EXPECT_EQ(nestedModel->Name(), "model_01");
+  EXPECT_EQ(nestedModel->ScopedName(), "model_00::model_01");
+  EXPECT_EQ(nestedModel->WorldPose(),
       ignition::math::Pose3d(0, 1, 1, 0, 0, 0));
 
   // verify nested model links
-  auto nestedModelLinks = nestedModel->GetLinks();
+  auto nestedModelLinks = nestedModel->Links();
   EXPECT_EQ(nestedModelLinks.size(), 2u);
   physics::LinkPtr nestedModelLink = nestedModelLinks[0];
   EXPECT_TRUE(nestedModelLink != NULL);
-  EXPECT_EQ(nestedModelLink->GetName(), "link_01");
-  EXPECT_EQ(nestedModelLink->GetScopedName(), "model_00::model_01::link_01");
-  EXPECT_EQ(nestedModelLink->GetWorldPose().Ign(),
+  EXPECT_EQ(nestedModelLink->Name(), "link_01");
+  EXPECT_EQ(nestedModelLink->ScopedName(), "model_00::model_01::link_01");
+  EXPECT_EQ(nestedModelLink->WorldPose(),
       ignition::math::Pose3d(1, 1, 1, 0, 0, 0));
   physics::LinkPtr nestedModelLink2 = nestedModelLinks[1];
   EXPECT_TRUE(nestedModelLink2 != NULL);
-  EXPECT_EQ(nestedModelLink2->GetName(), "link_02");
-  EXPECT_EQ(nestedModelLink2->GetScopedName(), "model_00::model_01::link_02");
-  EXPECT_EQ(nestedModelLink2->GetWorldPose().Ign(),
+  EXPECT_EQ(nestedModelLink2->Name(), "link_02");
+  EXPECT_EQ(nestedModelLink2->ScopedName(), "model_00::model_01::link_02");
+  EXPECT_EQ(nestedModelLink2->WorldPose(),
       ignition::math::Pose3d(-1, 1, 1, 0, 0, 0));
 
   // verify nested-nested model
@@ -286,61 +286,61 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
   EXPECT_EQ(doubleNestedModels.size(), 1u);
   physics::ModelPtr doubleNestedModel = doubleNestedModels[0];
   EXPECT_TRUE(doubleNestedModel != NULL);
-  EXPECT_EQ(doubleNestedModel->GetName(), "model_02");
-  EXPECT_EQ(doubleNestedModel->GetScopedName(), "model_00::model_01::model_02");
-  EXPECT_EQ(doubleNestedModel->GetWorldPose().Ign(),
+  EXPECT_EQ(doubleNestedModel->Name(), "model_02");
+  EXPECT_EQ(doubleNestedModel->ScopedName(), "model_00::model_01::model_02");
+  EXPECT_EQ(doubleNestedModel->WorldPose(),
       ignition::math::Pose3d(0, 2.3, 1, 0, 0, 0));
 
   // verify nested-nested model links
-  auto doubleNestedModelLinks = doubleNestedModel->GetLinks();
+  auto doubleNestedModelLinks = doubleNestedModel->Links();
   EXPECT_EQ(doubleNestedModelLinks.size(), 1u);
   physics::LinkPtr doubleNestedModelLink = doubleNestedModelLinks[0];
   EXPECT_TRUE(doubleNestedModelLink != NULL);
-  EXPECT_EQ(doubleNestedModelLink->GetName(), "link_01");
-  EXPECT_EQ(doubleNestedModelLink->GetScopedName(),
+  EXPECT_EQ(doubleNestedModelLink->Name(), "link_01");
+  EXPECT_EQ(doubleNestedModelLink->ScopedName(),
       "model_00::model_01::model_02::link_01");
-  EXPECT_EQ(doubleNestedModelLink->GetWorldPose().Ign(),
+  EXPECT_EQ(doubleNestedModelLink->WorldPose(),
       ignition::math::Pose3d(1, 2.3, 1, 0, 0, 0));
 
   // verify canonical link
-  physics::LinkPtr canonicalLink = model->GetLink();
+  physics::LinkPtr canonicalLink = model->LinkByName();
   EXPECT_TRUE(canonicalLink != NULL);
-  EXPECT_EQ(canonicalLink->GetName(), "link_01");
-  EXPECT_EQ(canonicalLink->GetScopedName(), "model_00::model_01::link_01");
+  EXPECT_EQ(canonicalLink->Name(), "link_01");
+  EXPECT_EQ(canonicalLink->ScopedName(), "model_00::model_01::link_01");
 
   // there should be only one canonical link in the whole model tree
   // check if the nested model's canonical link is the same one as the top
   // level model
-  physics::LinkPtr canonicalLink2 = nestedModel->GetLink();
+  physics::LinkPtr canonicalLink2 = nestedModel->LinkByName();
   EXPECT_TRUE(canonicalLink2 != NULL);
-  EXPECT_EQ(canonicalLink2->GetName(), "link_01");
-  EXPECT_EQ(canonicalLink2->GetScopedName(), "model_00::model_01::link_01");
+  EXPECT_EQ(canonicalLink2->Name(), "link_01");
+  EXPECT_EQ(canonicalLink2->ScopedName(), "model_00::model_01::link_01");
 
-  physics::LinkPtr canonicalLink3 = doubleNestedModel->GetLink();
+  physics::LinkPtr canonicalLink3 = doubleNestedModel->LinkByName();
   EXPECT_TRUE(canonicalLink3 != NULL);
-  EXPECT_EQ(canonicalLink3->GetName(), "link_01");
-  EXPECT_EQ(canonicalLink3->GetScopedName(), "model_00::model_01::link_01");
+  EXPECT_EQ(canonicalLink3->Name(), "link_01");
+  EXPECT_EQ(canonicalLink3->ScopedName(), "model_00::model_01::link_01");
 
   // verify joint
-  EXPECT_EQ(model->GetJointCount(), 0u);
+  EXPECT_EQ(model->JointCount(), 0u);
 
   // verify nested model joint
-  EXPECT_EQ(nestedModel->GetJointCount(), 1u);
-  auto nestedModelJoints = nestedModel->GetJoints();
+  EXPECT_EQ(nestedModel->JointCount(), 1u);
+  auto nestedModelJoints = nestedModel->Joints();
   physics::JointPtr nestedModelJoint = nestedModelJoints[0];
   EXPECT_TRUE(nestedModelJoint != NULL);
-  EXPECT_EQ(nestedModelJoint->GetName(), "joint_01");
-  EXPECT_EQ(nestedModelJoint, nestedModel->GetJoint("joint_01"));
-  EXPECT_TRUE(nestedModelJoint->GetJointLink(0) != NULL);
-  EXPECT_TRUE(nestedModelJoint->GetJointLink(1) != NULL);
-  EXPECT_TRUE(nestedModelJoint->GetJointLink(0)->GetName() == "link_01" ||
-      nestedModelJoint->GetJointLink(0)->GetName() == "link_02");
-  EXPECT_TRUE(nestedModelJoint->GetJointLink(1)->GetName() == "link_01" ||
-      nestedModelJoint->GetJointLink(1)->GetName() == "link_02");
-  EXPECT_EQ(nestedModelJoint->GetMsgType(), msgs::Joint::PRISMATIC);
-  EXPECT_EQ(nestedModelJoint->GetLocalAxis(0), ignition::math::Vector3d::UnitZ);
-  EXPECT_EQ(nestedModelJoint->GetLowerLimit(0), -0.2);
-  EXPECT_EQ(nestedModelJoint->GetUpperLimit(0), 0.5);
+  EXPECT_EQ(nestedModelJoint->Name(), "joint_01");
+  EXPECT_EQ(nestedModelJoint, nestedModel->JointByName("joint_01"));
+  EXPECT_TRUE(nestedModelJoint->JointLink(0) != NULL);
+  EXPECT_TRUE(nestedModelJoint->JointLink(1) != NULL);
+  EXPECT_TRUE(nestedModelJoint->JointLink(0)->Name() == "link_01" ||
+      nestedModelJoint->JointLink(0)->Name() == "link_02");
+  EXPECT_TRUE(nestedModelJoint->JointLink(1)->Name() == "link_01" ||
+      nestedModelJoint->JointLink(1)->Name() == "link_02");
+  EXPECT_EQ(nestedModelJoint->MsgType(), msgs::Joint::PRISMATIC);
+  EXPECT_EQ(nestedModelJoint->LocalAxis(0), ignition::math::Vector3d::UnitZ);
+  EXPECT_EQ(nestedModelJoint->LowerLimit(0), -0.2);
+  EXPECT_EQ(nestedModelJoint->UpperLimit(0), 0.5);
 }
 
 /////////////////////////////////////////////////

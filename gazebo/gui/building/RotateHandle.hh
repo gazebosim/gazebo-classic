@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_ROTATEHANDLE_HH_
-#define _GAZEBO_GUI_ROTATEHANDLE_HH_
+#ifndef GAZEBO_GUI_BUILDING_ROTATEHANDLE_HH_
+#define GAZEBO_GUI_BUILDING_ROTATEHANDLE_HH_
 
 #include <memory>
 
@@ -39,7 +38,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// param[in] _parent Parent graphics item.
-      public: RotateHandle(QGraphicsItem *_parent = 0);
+      public: explicit RotateHandle(QGraphicsItem *_parent = 0);
 
       /// \brief Destructor
       public: ~RotateHandle();

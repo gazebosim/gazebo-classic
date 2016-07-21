@@ -101,7 +101,7 @@ void MultiCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (worldName.empty())
   {

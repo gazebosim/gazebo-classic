@@ -42,20 +42,20 @@ void CartDemoPlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->World()->Name());
 
   if (!_sdf->HasElement("steer"))
     gzerr << "CartTest plugin missing <steer> element\n";
 
   // get all joints
-  this->joints[0] = _model->GetJoint(
+  this->joints[0] = _model->JointByName(
     _sdf->GetElement("steer")->Get<std::string>());
   this->jointPIDs[0] = common::PID(
-    _sdf->GetElement("steer_pid")->Get<math::Vector3>().x,
-    _sdf->GetElement("steer_pid")->Get<math::Vector3>().y,
-    _sdf->GetElement("steer_pid")->Get<math::Vector3>().z,
-    _sdf->GetElement("steer_ilim")->Get<math::Vector2d>().y,
-    _sdf->GetElement("steer_ilim")->Get<math::Vector2d>().x);
+    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().X(),
+    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().Y(),
+    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().Z(),
+    _sdf->GetElement("steer_ilim")->Get<ignition::math::Vector2d>().Y(),
+    _sdf->GetElement("steer_ilim")->Get<ignition::math::Vector2d>().X());
   this->jointPositions[0] =
     _sdf->GetElement("steer_pos")->Get<double>();
   this->jointVelocities[0] =
@@ -63,14 +63,14 @@ void CartDemoPlugin::Load(physics::ModelPtr _model,
   this->jointMaxEfforts[0] =
     _sdf->GetElement("steer_eff")->Get<double>();
 
-  this->joints[1] = _model->GetJoint(
+  this->joints[1] = _model->JointByName(
     _sdf->GetElement("right")->Get<std::string>());
   this->jointPIDs[1] = common::PID(
-    _sdf->GetElement("right_pid")->Get<math::Vector3>().x,
-    _sdf->GetElement("right_pid")->Get<math::Vector3>().y,
-    _sdf->GetElement("right_pid")->Get<math::Vector3>().z,
-    _sdf->GetElement("right_ilim")->Get<math::Vector2d>().y,
-    _sdf->GetElement("right_ilim")->Get<math::Vector2d>().x);
+    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().X(),
+    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().Y(),
+    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().Z(),
+    _sdf->GetElement("right_ilim")->Get<ignition::math::Vector2d>().Y(),
+    _sdf->GetElement("right_ilim")->Get<ignition::math::Vector2d>().X());
   this->jointPositions[1] =
     _sdf->GetElement("right_pos")->Get<double>();
   this->jointVelocities[1] =
@@ -78,14 +78,14 @@ void CartDemoPlugin::Load(physics::ModelPtr _model,
   this->jointMaxEfforts[1] =
     _sdf->GetElement("right_eff")->Get<double>();
 
-  this->joints[2] = _model->GetJoint(
+  this->joints[2] = _model->JointByName(
     _sdf->GetElement("left")->Get<std::string>());
   this->jointPIDs[2] = common::PID(
-    _sdf->GetElement("left_pid")->Get<math::Vector3>().x,
-    _sdf->GetElement("left_pid")->Get<math::Vector3>().y,
-    _sdf->GetElement("left_pid")->Get<math::Vector3>().z,
-    _sdf->GetElement("left_ilim")->Get<math::Vector2d>().y,
-    _sdf->GetElement("left_ilim")->Get<math::Vector2d>().x);
+    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().X(),
+    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().Y(),
+    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().Z(),
+    _sdf->GetElement("left_ilim")->Get<ignition::math::Vector2d>().Y(),
+    _sdf->GetElement("left_ilim")->Get<ignition::math::Vector2d>().X());
   this->jointPositions[2] =
     _sdf->GetElement("left_pos")->Get<double>();
   this->jointVelocities[2] =
@@ -107,7 +107,7 @@ void CartDemoPlugin::Init()
 /////////////////////////////////////////////////
 void CartDemoPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->World()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
@@ -115,7 +115,7 @@ void CartDemoPlugin::OnUpdate()
   {
     // first joint, set position
     double pos_target = this->jointPositions[i];
-    double pos_curr = this->joints[i]->GetAngle(0).Radian();
+    double pos_curr = this->joints[i]->Angle(0).Radian();
     double max_cmd = this->jointMaxEfforts[i];
 
     double pos_err = pos_curr - pos_target;
@@ -141,8 +141,9 @@ void CartDemoPlugin::OnUpdate()
     {
       /* pid to velocity */
       double vel_target = this->jointVelocities[i];
-      double vel_curr = this->joints[i]->GetVelocity(0);
-      double max_cmd = 100.0;  // this->jointMaxEfforts[i];
+      double vel_curr = this->joints[i]->Velocity(0);
+      double max_cmd = 100.0;
+      // this->jointMaxEfforts[i];
 
       double vel_err = vel_curr - vel_target;
 
@@ -154,8 +155,9 @@ void CartDemoPlugin::OnUpdate()
     {
       // hold wheel positions
       double pos_target = this->jointPositions[i];
-      double pos_curr = this->joints[i]->GetAngle(0).Radian();
-      double max_cmd = 100;  // this->jointMaxEfforts[i];
+      double pos_curr = this->joints[i]->Angle(0).Radian();
+      double max_cmd = 100;
+      // this->jointMaxEfforts[i];
 
       double pos_err = pos_curr - pos_target;
 
@@ -166,9 +168,9 @@ void CartDemoPlugin::OnUpdate()
     }
 
     gzdbg << " wheel pos ["
-          << this->joints[i]->GetAngle(0).Radian()
+          << this->joints[i]->Angle(0).Radian()
           << "] vel ["
-          << this->joints[i]->GetVelocity(0)
+          << this->joints[i]->Velocity(0)
           << "] effort [" << eff << "]";
     this->joints[i]->SetForce(0, eff);
   }

@@ -32,7 +32,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyBoxShape : public BoxShape
     {
       /// \brief Constructor
-      public: SimbodyBoxShape(CollisionPtr _parent);
+      public: explicit SimbodyBoxShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyBoxShape();

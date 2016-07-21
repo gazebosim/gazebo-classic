@@ -55,12 +55,12 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
   // Get a pointer to the parent link. This will be used to adjust the
   // orientation of the logical camera.
   physics::EntityPtr parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
   this->dataPtr->parentLink =
-    boost::dynamic_pointer_cast<physics::Link>(parentEntity);
+    std::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   // Store parent model's name for use in the UpdateImpl function.
-  this->dataPtr->modelName = this->dataPtr->parentLink->GetModel()->GetName();
+  this->dataPtr->modelName = this->dataPtr->parentLink->ParentModel()->Name();
 }
 
 //////////////////////////////////////////////////
@@ -121,7 +121,7 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
 
     // Get the pose of the camera's parent.
     ignition::math::Pose3d myPose = this->pose +
-      this->dataPtr->parentLink->GetWorldPose().Ign();
+      this->dataPtr->parentLink->WorldPose();
 
     // Update the pose of the frustum.
     this->dataPtr->frustum.SetPose(myPose);
@@ -130,21 +130,21 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
     msgs::Set(this->dataPtr->msg.mutable_pose(), myPose);
 
     // Check all models for inclusion in the frustum.
-    for (auto const &model : this->world->GetModels())
+    for (auto const &model : this->world->Models())
     {
       // Add the the model to the output if it is in the frustum, and
       // we are not detecting ourselves.
-      if (this->dataPtr->modelName != model->GetName() &&
-          this->dataPtr->frustum.Contains(model->GetBoundingBox().Ign()))
+      if (this->dataPtr->modelName != model->Name() &&
+          this->dataPtr->frustum.Contains(model->BoundingBox()))
       {
         // Add new model msg
         msgs::LogicalCameraImage::Model *modelMsg =
           this->dataPtr->msg.add_model();
 
         // Set the name and pose reported by the sensor.
-        modelMsg->set_name(model->GetScopedName());
+        modelMsg->set_name(model->ScopedName());
         msgs::Set(modelMsg->mutable_pose(),
-            model->GetWorldPose().Ign() - myPose);
+            model->WorldPose() - myPose);
       }
     }
 

@@ -49,7 +49,6 @@ namespace gazebo
     class UserCmd;
     class UserCmdManager;
     class PhysicsEngine;
-    class Wind;
     class Atmosphere;
     class Mass;
     class Road;

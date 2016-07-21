@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MODELSTATE_HH_
-#define _GAZEBO_MODELSTATE_HH_
+#ifndef GAZEBO_PHYSICS_MODELSTATE_HH_
+#define GAZEBO_PHYSICS_MODELSTATE_HH_
 
 #include <vector>
 #include <string>
@@ -58,7 +57,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
       /// \param[in] _iterations Simulation iterations.
-      public: ModelState(const ModelPtr _model, const common::Time &_realTime,
+      public: ModelState(ModelPtr _model, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
@@ -66,7 +65,7 @@ namespace gazebo
       /// Build a ModelState from an existing Model.
       /// \param[in] _model Pointer to the model from which to gather state
       /// info.
-      public: explicit ModelState(const ModelPtr _model);
+      public: explicit ModelState(ModelPtr _model);
 
       /// \brief Constructor
       ///
@@ -85,7 +84,7 @@ namespace gazebo
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
       /// \param[in] _iterations Simulation iterations.
-      public: void Load(const ModelPtr _model, const common::Time &_realTime,
+      public: void Load(ModelPtr _model, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Load state from SDF element.
@@ -96,7 +95,12 @@ namespace gazebo
 
       /// \brief Get the stored model pose.
       /// \return The math::Pose of the Model.
-      public: const math::Pose &GetPose() const;
+      /// \deprecated See const ignition::math::Pose3d &Pose() const
+      public: math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the stored model pose.
+      /// \return The math::Pose of the Model.
+      public: const ignition::math::Pose3d &Pose() const;
 
       /// \brief Get the stored model scale.
       /// \return The scale of the Model.
@@ -110,19 +114,44 @@ namespace gazebo
       ///
       /// This returns the number of Links recorded.
       /// \return Number of LinkState recorded.
-      public: unsigned int GetLinkStateCount() const;
+      /// \deprecated See unsigned int LinkStateCount() const
+      public: unsigned int GetLinkStateCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the number of link states.
+      ///
+      /// This returns the number of Links recorded.
+      /// \return Number of LinkState recorded.
+      public: unsigned int LinkStateCount() const;
 
       /// \brief Get link states based on a regular expression.
       /// \param[in] _regex The regular expression.
       /// \return List of link states whose names match the regular
       /// expression.
-      public: LinkState_M GetLinkStates(const boost::regex &_regex) const;
+      /// \deprecated See LinkState_M LinkStates(
+      /// const boost::regex &_regex) const
+      public: LinkState_M GetLinkStates(const boost::regex &_regex) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get link states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of link states whose names match the regular
+      /// expression.
+      public: LinkState_M LinkStates(const boost::regex &_regex) const;
 
       /// \brief Get joint states based on a regular expression.
       /// \param[in] _regex The regular expression.
       /// \return List of joint states whose names match the regular
       /// expression.
-      public: JointState_M GetJointStates(const boost::regex &_regex) const;
+      /// \deprecated See JointState_M JointStates(
+      /// const boost::regex &_regex) const
+      public: JointState_M GetJointStates(const boost::regex &_regex) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get joint states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of joint states whose names match the regular
+      /// expression.
+      public: JointState_M JointStates(const boost::regex &_regex) const;
 
       /// \brief Get a link state by Link name
       ///
@@ -130,8 +159,18 @@ namespace gazebo
       /// matching name, if any.
       /// \param[in] _linkName Name of the LinkState
       /// \return State of the Link.
-      /// \throws common::Exception When _linkName is invalid.
-      public: LinkState GetLinkState(const std::string &_linkName) const;
+      /// \deprecated See LinkState LinkStateByName(
+      /// const std::string &_linkName) const
+      public: LinkState GetLinkState(const std::string &_linkName) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a link state by Link name
+      ///
+      /// Searches through all LinkStates. Returns the LinkState with the
+      /// matching name, if any.
+      /// \param[in] _linkName Name of the LinkState
+      /// \return State of the Link.
+      public: LinkState LinkStateByName(const std::string &_linkName) const;
 
       /// \brief Return true if there is a link with the specified name.
       /// \param[in] _linkName Name of the LinkState.
@@ -140,13 +179,25 @@ namespace gazebo
 
       /// \brief Get the link states.
       /// \return A map of link states.
-      public: const LinkState_M &GetLinkStates() const;
+      /// \deprecated See const LinkState_M &LinkStates() const
+      public: const LinkState_M &GetLinkStates() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the link states.
+      /// \return A map of link states.
+      public: const LinkState_M &LinkStates() const;
 
       /// \brief Get the number of joint states.
       ///
       /// Returns the number of JointStates recorded.
       /// \return Number of JointStates.
-      public: unsigned int GetJointStateCount() const;
+      /// \deprecated See unsigned int JointStateCount() const
+      public: unsigned int GetJointStateCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the number of joint states.
+      ///
+      /// Returns the number of JointStates recorded.
+      /// \return Number of JointStates.
+      public: unsigned int JointStateCount() const;
 
       /// \brief Get a Joint state.
       ///
@@ -154,8 +205,18 @@ namespace gazebo
       /// 0...ModelState::GetJointStateCount().
       /// \param[in] _index Index of a JointState.
       /// \return State of a Joint.
-      /// \throws common::Exception When _index is out of range.
-      public: JointState GetJointState(unsigned int _index) const;
+      /// \deprecated See JointState JointStateByIndex(
+      /// unsigned int _index) const
+      public: JointState GetJointState(unsigned int _index) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a Joint state.
+      ///
+      /// Return a JointState based on a index, where index is between
+      /// 0...ModelState::GetJointStateCount().
+      /// \param[in] _index Index of a JointState.
+      /// \return State of a Joint.
+      public: JointState JointStateByIndex(const unsigned int _index) const;
 
       /// \brief Get a Joint state by Joint name.
       ///
@@ -163,12 +224,27 @@ namespace gazebo
       /// matching name, if any.
       /// \param[in] _jointName Name of the JointState.
       /// \return State of the Joint.
-      /// \throws common::Exception When _jointName is invalid.
-      public: JointState GetJointState(const std::string &_jointName) const;
+      /// \deprecated See JointState JointStateByName(
+      /// const std::string &_jointName) const
+      public: JointState GetJointState(const std::string &_jointName) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a Joint state by Joint name.
+      ///
+      /// Searches through all JointStates. Returns the JointState with the
+      /// matching name, if any.
+      /// \param[in] _jointName Name of the JointState.
+      /// \return State of the Joint.
+      public: JointState JointStateByName(const std::string &_jointName) const;
 
       /// \brief Get the joint states.
       /// \return A map of joint states.
-      public: const JointState_M &GetJointStates() const;
+      /// \deprecated See const JointState_M &JointStates() const
+      public: const JointState_M &GetJointStates() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the joint states.
+      /// \return A map of joint states.
+      public: const JointState_M &JointStates() const;
 
       /// \brief Return true if there is a joint with the specified name.
       /// \param[in] _jointName Name of the Jointtate.
@@ -187,7 +263,6 @@ namespace gazebo
       /// the matching name, if any.
       /// \param[in] _modelName Name of the model state
       /// \return State of the Model.
-      /// \throws common::Exception When _modelName is invalid.
       public: ModelState NestedModelState(const std::string &_modelName) const;
 
       /// \brief Return true if there is a nested model with the specified name.
@@ -243,16 +318,16 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::ModelState &_state)
       {
-        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        ignition::math::Vector3d q(_state.pose.Rot().Euler());
         _out << std::fixed <<std::setprecision(3)
-          << "<model name='" << _state.GetName() << "'>"
+          << "<model name='" << _state.Name() << "'>"
           << "<pose>"
-          << _state.pose.pos.x << " "
-          << _state.pose.pos.y << " "
-          << _state.pose.pos.z << " "
-          << q.x << " "
-          << q.y << " "
-          << q.z << " "
+          << _state.pose.Pos().X() << " "
+          << _state.pose.Pos().Y() << " "
+          << _state.pose.Pos().Z() << " "
+          << q.X() << " "
+          << q.Y() << " "
+          << q.Z() << " "
           << "</pose>"
           << "<scale>"
           << _state.scale
@@ -284,7 +359,7 @@ namespace gazebo
       }
 
       /// \brief Pose of the model.
-      private: math::Pose pose;
+      private: ignition::math::Pose3d pose;
 
       /// \brief Scale of the model.
       private: ignition::math::Vector3d scale;

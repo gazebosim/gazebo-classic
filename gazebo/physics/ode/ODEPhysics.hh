@@ -94,7 +94,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _world The World that uses this physics engine.
-      public: ODEPhysics(WorldPtr _world);
+      public: explicit ODEPhysics(WorldPtr _world);
 
       /// \brief Destructor.
       public: virtual ~ODEPhysics();
@@ -210,7 +210,7 @@ namespace gazebo
       public: virtual void DebugPrint() const;
 
       // Documentation inherited
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(const uint32_t _seed);
 
       /// Documentation inherited
       public: virtual bool SetParam(const std::string &_key,

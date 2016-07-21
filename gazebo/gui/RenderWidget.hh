@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_RENDER_WIDGET_HH_
-#define _GAZEBO_RENDER_WIDGET_HH_
+#ifndef GAZEBO_GUI_RENDERWIDGET_HH_
+#define GAZEBO_GUI_RENDERWIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -37,7 +37,7 @@ namespace gazebo
     class GZ_GUI_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
-      public: RenderWidget(QWidget *_parent = 0);
+      public: explicit RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
       public: void RemoveScene(const std::string &_name);

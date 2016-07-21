@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/State.hh"
 
@@ -48,6 +47,12 @@ void State::Load(const sdf::ElementPtr /*_elem*/)
 /////////////////////////////////////////////////
 std::string State::GetName() const
 {
+  return this->Name();
+}
+
+/////////////////////////////////////////////////
+std::string State::Name() const
+{
   return this->name;
 }
 
@@ -60,11 +65,23 @@ void State::SetName(const std::string &_name)
 /////////////////////////////////////////////////
 common::Time State::GetWallTime() const
 {
+  return this->WallTime();
+}
+
+/////////////////////////////////////////////////
+common::Time State::WallTime() const
+{
   return this->wallTime;
 }
 
 /////////////////////////////////////////////////
 common::Time State::GetRealTime() const
+{
+  return this->RealTime();
+}
+
+/////////////////////////////////////////////////
+common::Time State::RealTime() const
 {
   return this->realTime;
 }
@@ -72,11 +89,23 @@ common::Time State::GetRealTime() const
 /////////////////////////////////////////////////
 common::Time State::GetSimTime() const
 {
+  return this->SimTime();
+}
+
+/////////////////////////////////////////////////
+common::Time State::SimTime() const
+{
   return this->simTime;
 }
 
 /////////////////////////////////////////////////
 uint64_t State::GetIterations() const
+{
+  return this->Iterations();
+}
+
+/////////////////////////////////////////////////
+uint64_t State::Iterations() const
 {
   return this->iterations;
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_COLLISIONSTATE_HH_
-#define _GAZEBO_PHYSICS_COLLISIONSTATE_HH_
+#ifndef GAZEBO_PHYSICS_COLLISIONSTATE_HH_
+#define GAZEBO_PHYSICS_COLLISIONSTATE_HH_
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
@@ -45,7 +45,7 @@ namespace gazebo
       /// Build a CollisionState from an existing Collision.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
-      public: explicit CollisionState(const CollisionPtr _collision);
+      public: explicit CollisionState(CollisionPtr _collision);
 
       /// \brief Constructor
       ///
@@ -64,7 +64,12 @@ namespace gazebo
 
       /// \brief Get the Collision pose
       /// \return The pose of the CollisionState
-      public: const math::Pose &GetPose() const;
+      /// \deprecated See const ignition::math::Pose3d &Pose() const
+      public: math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the Collision pose
+      /// \return The pose of the CollisionState
+      public: const ignition::math::Pose3d &Pose() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -104,7 +109,7 @@ namespace gazebo
       }
 
       /// \brief Pose of the Collision object.
-      private: math::Pose pose;
+      private: ignition::math::Pose3d pose;
     };
     /// \}
   }

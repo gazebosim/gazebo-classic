@@ -44,8 +44,7 @@ namespace gazebo
     {
       /// \brief Class constructor.
       /// \param[in] _world A reference to the world.
-      public: WindPrivate(physics::World &_world)
-        : world(_world)
+      public: explicit WindPrivate(physics::World &_world) : world(_world)
       {
       }
 
@@ -88,7 +87,7 @@ Wind::Wind(World &_world, sdf::ElementPtr _sdf)
   this->Load(_sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->world.GetName());
+  this->dataPtr->node->Init(this->dataPtr->world.Name());
   this->dataPtr->windSub = this->dataPtr->node->Subscribe("~/wind",
       &Wind::OnWindMsg, this);
 
@@ -125,7 +124,7 @@ ignition::math::Vector3d Wind::WorldLinearVel(const Entity *_entity) const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Wind::RelativeLinearVel(const Entity *_entity) const
 {
-  return _entity->GetWorldPose().Ign().Rot().Inverse().RotateVector(
+  return _entity->WorldPose().Rot().Inverse().RotateVector(
       this->WorldLinearVel(_entity));
 }
 

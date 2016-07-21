@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLET_BULLETPHYSICS_HH_
-#define _GAZEBO_PHYSICS_BULLET_BULLETPHYSICS_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETPHYSICS_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETPHYSICS_HH_
 
 #include <string>
 
@@ -71,7 +71,7 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      public: BulletPhysics(WorldPtr _world);
+      public: explicit BulletPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~BulletPhysics();

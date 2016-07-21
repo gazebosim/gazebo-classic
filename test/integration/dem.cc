@@ -41,7 +41,7 @@ TEST_F(Dem_TEST, GPS)
   Load("worlds/dem_gps.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  physics::ModelPtr model = world->GetModel("box1");
+  physics::ModelPtr model = world->ModelByName("box1");
   ASSERT_TRUE(model != NULL);
 
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
@@ -69,7 +69,7 @@ TEST_F(Dem_TEST, GPS)
 
   // Sensor altitude is the elevation of the terrain + the sensor position.
   EXPECT_NEAR(sensor->Altitude(),
-      elevation + model->GetWorldPose().pos.z, 1);
+      elevation + model->WorldPose().Pos().Z(), 1);
 }
 #endif
 

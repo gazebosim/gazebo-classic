@@ -173,7 +173,7 @@ void ModelEditorTest::SaveModelPose()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->GetWorldPose().pos ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   // Save all changes
@@ -186,7 +186,7 @@ void ModelEditorTest::SaveModelPose()
   // verify pose again
   QVERIFY(cylinder->GetWorldPose() == cylinderPose);
   QVERIFY(box->GetWorldPose() == boxPose);
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->GetWorldPose().pos ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;
@@ -289,7 +289,7 @@ void ModelEditorTest::JointInspectorUpdate()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify joint hotspot pose
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->GetWorldPose().pos ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   // get the joint inspector and populate it with data
@@ -327,7 +327,7 @@ void ModelEditorTest::JointInspectorUpdate()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify the joint hotspot visual pose is also updated
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->GetWorldPose().pos ==
       cylinderPose.Pos() + (spherePose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;

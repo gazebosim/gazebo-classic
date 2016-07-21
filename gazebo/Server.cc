@@ -340,9 +340,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     if (this->dataPtr->vm.count("profile"))
     {
       std::string profileName = this->dataPtr->vm["profile"].as<std::string>();
-      if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
+      if (physics::get_world()->PresetMgr()->HasProfile(profileName))
       {
-        physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
+        physics::get_world()->PresetMgr()->CurrentProfile(profileName);
         gzmsg << "Setting physics profile to [" << profileName << "]."
               << std::endl;
       }

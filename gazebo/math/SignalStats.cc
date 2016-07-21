@@ -135,6 +135,23 @@ SignalStats::SignalStats()
 }
 
 //////////////////////////////////////////////////
+SignalStats::SignalStats(const ignition::math::SignalStats &_s)
+  : dataPtr(new SignalStatsPrivate)
+{
+  for (std::map<std::string, double>::const_iterator iter = _s.Map().begin();
+       iter != _s.Map().end(); ++iter)
+  {
+    this->InsertStatistic(iter->first);
+  }
+
+  for (std::map<std::string, double>::const_iterator iter = _s.Map().begin();
+       iter != _s.Map().end(); ++iter)
+  {
+    this->InsertData(iter->second);
+  }
+}
+
+//////////////////////////////////////////////////
 SignalStats::~SignalStats()
 {
 }
@@ -248,3 +265,16 @@ void SignalStats::Reset()
   }
 }
 
+//////////////////////////////////////////////////
+ignition::math::SignalStats SignalStats::Ign() const
+{
+  ignition::math::SignalStats result;
+
+  for (auto const &statistic : this->dataPtr->stats)
+    result.InsertStatistic(statistic->ShortName());
+
+  for (auto const &statistic : this->dataPtr->stats)
+    result.InsertData(statistic->Value());
+
+  return result;
+}

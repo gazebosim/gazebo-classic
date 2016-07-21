@@ -182,50 +182,50 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  double dt = physics->GetMaxStepSize();
+  double dt = physics->MaxStepSize();
   unsigned int steps = 250;
 
   // Step forward, verify time increasing
   world->Step(steps);
-  double simTime = world->GetSimTime().Double();
+  double simTime = world->SimTime().Double();
   EXPECT_NEAR(simTime, dt*steps, dt);
 
   ignition::math::Pose3d initialPose(1, 2, 0.5, 0, 0, 1.57);
 
   // spawn a box with known initial pose
-  math::Vector3 size(1, 1, 1);
+  ignition::math::Vector3d size(1, 1, 1);
   SpawnBox("box", size, initialPose.Pos(), initialPose.Rot().Euler(), false);
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   // verify box pose
-  EXPECT_EQ(model->GetWorldPose(), initialPose);
+  EXPECT_EQ(model->WorldPose(), initialPose);
 
   // move box to new pose
   ignition::math::Pose3d newPose(4, 5, 0.5, 0, 0, 0);
   model->SetWorldPose(newPose);
-  EXPECT_EQ(model->GetWorldPose(), newPose);
+  EXPECT_EQ(model->WorldPose(), newPose);
 
   // Reset world repeatedly
   for (int i = 0; i < _resets; ++i)
   {
     // Reset world, verify time == 0
     world->Reset();
-    simTime = world->GetSimTime().Double();
+    simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, 0.0, dt);
 
     // Step forward, verify time increasing
     world->Step(steps);
-    simTime = world->GetSimTime().Double();
+    simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, dt*steps, dt);
   }
 
   // verify box has moved back to initial pose
-  EXPECT_EQ(model->GetWorldPose(), initialPose);
+  EXPECT_EQ(model->WorldPose(), initialPose);
 }
 
 /////////////////////////////////////////////////
@@ -268,19 +268,19 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  double dt = physics->GetMaxStepSize();
+  double dt = physics->MaxStepSize();
   unsigned int steps = 250;
 
   // Step forward, verify time increasing
   world->Step(steps);
-  double simTime = world->GetSimTime().Double();
+  double simTime = world->SimTime().Double();
   EXPECT_NEAR(simTime, dt*steps, dt);
 
-  physics::ModelPtr model = world->GetModel("model_00");
+  physics::ModelPtr model = world->ModelByName("model_00");
   ASSERT_TRUE(model != NULL);
 
   // store all initial pose
@@ -290,7 +290,7 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
   while (!models.empty())
   {
     physics::ModelPtr m = models.front();
-    modelPoses.push_back(m->GetWorldPose().Ign());
+    modelPoses.push_back(m->WorldPose());
     models.pop_front();
     for (const auto &nested : m->NestedModels())
       models.push_back(nested);
@@ -299,19 +299,19 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
   // move model to new pose
   ignition::math::Pose3d newPose(9, 5, 2.5, 0, 0, 0);
   model->SetWorldPose(newPose);
-  EXPECT_EQ(model->GetWorldPose(), newPose);
+  EXPECT_EQ(model->WorldPose(), newPose);
 
   // Reset world repeatedly
   for (int i = 0; i < _resets; ++i)
   {
     // Reset world, verify time == 0
     world->Reset();
-    simTime = world->GetSimTime().Double();
+    simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, 0.0, dt);
 
     // Step forward, verify time increasing
     world->Step(steps);
-    simTime = world->GetSimTime().Double();
+    simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, dt*steps, dt);
 
     // verify all nested models have moved back to initial pose
@@ -321,7 +321,7 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
     while (!models.empty())
     {
       physics::ModelPtr m = models.front();
-      EXPECT_EQ(m->GetWorldPose(), modelPosesCopy.front());
+      EXPECT_EQ(m->WorldPose(), modelPosesCopy.front());
       models.pop_front();
       modelPosesCopy.pop_front();
       for (const auto &nested : m->NestedModels())
@@ -374,16 +374,16 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  double dt = physics->GetMaxStepSize();
+  double dt = physics->MaxStepSize();
   unsigned int steps = 250;
 
   // Step forward, verify time increasing
   world->Step(steps);
-  double simTime = world->GetSimTime().Double();
+  double simTime = world->SimTime().Double();
   EXPECT_NEAR(simTime, dt*steps, dt);
 
   // Reset world repeatedly
@@ -391,12 +391,12 @@ void WorldResetTest::WorldName(const std::string &_physicsEngine,
   {
     // Reset world, verify time == 0
     world->Reset();
-    simTime = world->GetSimTime().Double();
+    simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, 0.0, dt);
 
     // Step forward, verify time increasing
     world->Step(steps);
-    simTime = world->GetSimTime().Double();
+    simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, dt*steps, dt);
   }
 }

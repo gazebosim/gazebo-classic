@@ -202,7 +202,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint viscous damping coefficient for this joint.
-      public: double Damping(const unsigned int _index) const ;
+      public: double Damping(const unsigned int _index) const;
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
@@ -232,7 +232,7 @@ namespace gazebo
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
       /// \deprecated See SpringStiffness(const unsigned int) const
-      public: double GetStiffness(unsigned int _index);
+      public: double GetStiffness(unsigned int _index) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns the current joint spring stiffness coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
@@ -580,7 +580,7 @@ namespace gazebo
       /// \param[in] index The index of the link(0 or 1).
       /// \return Force applied to the link.
       public: virtual ignition::math::Vector3d LinkForce(
-                  const unsigned int _index) const;
+                  const unsigned int _index) const = 0;
 
       /// \brief Get the torque applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -963,7 +963,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
       protected: virtual ignition::math::Angle AngleImpl(
-                     const unsigned int _index) const;
+                     const unsigned int _index) const = 0;
 
       /// \brief internal helper to find all links connected to the child link
       /// branching out from the children of the child link and any parent
@@ -1009,7 +1009,7 @@ namespace gazebo
 
       /// \brief Shared construction code.
       /// \param[in] _link Pointer to parent link
-      private: void ConstructionHelper(LinkPtr _Link);
+      private: void ConstructionHelper();
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.

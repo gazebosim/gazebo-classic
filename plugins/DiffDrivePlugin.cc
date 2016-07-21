@@ -39,10 +39,10 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->World()->Name());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
-      this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
+      this->model->Name() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
 
   if (!_sdf->HasElement("left_joint"))
     gzerr << "DiffDrive plugin missing <left_joint> element\n";
@@ -50,9 +50,9 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   if (!_sdf->HasElement("right_joint"))
     gzerr << "DiffDrive plugin missing <right_joint> element\n";
 
-  this->leftJoint = _model->GetJoint(
+  this->leftJoint = _model->JointByName(
       _sdf->GetElement("left_joint")->Get<std::string>());
-  this->rightJoint = _model->GetJoint(
+  this->rightJoint = _model->JointByName(
       _sdf->GetElement("right_joint")->Get<std::string>());
 
   if (!this->leftJoint)
@@ -63,19 +63,19 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
           << _sdf->GetElement("right_joint")->Get<std::string>() << "]\n";
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&DiffDrivePlugin::OnUpdate, this));
+          std::bind(&DiffDrivePlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::Init()
 {
-  this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
-      this->rightJoint->GetAnchor(0));
+  this->wheelSeparation = this->leftJoint->Anchor(0).Distance(
+      this->rightJoint->Anchor(0));
 
-  physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
-      this->leftJoint->GetChild());
+  physics::EntityPtr parent = std::dynamic_pointer_cast<physics::Entity>(
+      this->leftJoint->Child());
 
-  math::Box bb = parent->GetBoundingBox();
+  math::Box bb = parent->BoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
 }
@@ -101,12 +101,12 @@ void DiffDrivePlugin::OnUpdate()
   this->prevUpdateTime = currTime;
 
   // Distance travelled by front wheels
-  d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->GetVelocity(0);
-  d2 = stepTime.Double() * this->wheelRadius * this->rightJoint->GetVelocity(0);
+  d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->Velocity(0);
+  d2 = stepTime.Double() * this->wheelRadius * this->rightJoint->Velocity(0);
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->World()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   */
 

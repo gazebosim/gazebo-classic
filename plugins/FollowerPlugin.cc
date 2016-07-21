@@ -125,13 +125,13 @@ void FollowerPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // diff drive params
   if (_sdf->HasElement("left_joint"))
   {
-    this->dataPtr->leftJoint = _model->GetJoint(
+    this->dataPtr->leftJoint = _model->JointByName(
       _sdf->GetElement("left_joint")->Get<std::string>());
   }
 
   if (_sdf->HasElement("right_joint"))
   {
-    this->dataPtr->rightJoint = _model->GetJoint(
+    this->dataPtr->rightJoint = _model->JointByName(
         _sdf->GetElement("right_joint")->Get<std::string>());
   }
 
@@ -157,13 +157,13 @@ void FollowerPlugin::Init()
     return;
 
   this->dataPtr->wheelSeparation =
-      this->dataPtr->leftJoint->GetAnchor(0).Distance(
-      this->dataPtr->rightJoint->GetAnchor(0));
+      this->dataPtr->leftJoint->Anchor(0).Distance(
+      this->dataPtr->rightJoint->Anchor(0));
 
-  physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
-      this->dataPtr->leftJoint->GetChild());
+  physics::EntityPtr parent = std::dynamic_pointer_cast<physics::Entity>(
+      this->dataPtr->leftJoint->Child());
 
-  ignition::math::Box bb = parent->GetBoundingBox().Ign();
+  ignition::math::Box bb = parent->BoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->dataPtr->wheelRadius = bb.Size().Max() * 0.5;
 }
@@ -180,14 +180,14 @@ void FollowerPlugin::FindJoints()
 {
   // assumes the first two revolute joints are the ones connecting the
   // wheels to the chassis
-  auto joints = this->dataPtr->model->GetJoints();
+  auto joints = this->dataPtr->model->Joints();
   if (joints.size() < 2u)
     return;
 
   physics::Joint_V revJoints;
   for (const auto &j : joints)
   {
-    if (j->GetMsgType() == msgs::Joint::REVOLUTE)
+    if (j->MsgType() == msgs::Joint::REVOLUTE)
       revJoints.push_back(j);
   }
 
@@ -202,11 +202,11 @@ void FollowerPlugin::FindJoints()
 bool FollowerPlugin::FindSensor(const physics::ModelPtr &_model)
 {
   // loop through links to find depth sensor
-  for (const auto l : _model->GetLinks())
+  for (const auto l : _model->Links())
   {
-    for (unsigned int i = 0; i < l->GetSensorCount(); ++i)
+    for (unsigned int i = 0; i < l->SensorCount(); ++i)
     {
-      std::string sensorName = l->GetSensorName(i);
+      std::string sensorName = l->SensorName(i);
       sensors::SensorPtr sensor = sensors::get_sensor(sensorName);
       if (!sensor)
         continue;

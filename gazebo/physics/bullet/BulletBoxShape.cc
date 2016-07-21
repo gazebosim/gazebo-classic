@@ -107,7 +107,7 @@ void BulletBoxShape::SetSize(const ignition::math::Vector3d &_size)
       compoundShape->removeChildShape(shape);
       ignition::math::Pose3d relativePose =
         this->shapeDPtr->collisionParent->RelativePose();
-      relativePose.Pos() -= bLink->Inertial()->CoG();
+      relativePose.Pos() -= bLink->Inertia().CoG();
       compoundShape->addChildShape(
           BulletTypes::ConvertPose(relativePose), shape);
     }

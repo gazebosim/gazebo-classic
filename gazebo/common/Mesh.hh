@@ -223,7 +223,7 @@ namespace gazebo
       public: SubMesh();
 
       /// \brief Copy Constructor
-      public: SubMesh(const SubMesh *_mesh);
+      public: explicit SubMesh(const SubMesh *_mesh);
 
       /// \brief Destructor
       public: virtual ~SubMesh();

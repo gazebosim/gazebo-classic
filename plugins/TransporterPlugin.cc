@@ -112,7 +112,7 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   {
     // Create and initialize the node.
     this->dataPtr->node = transport::NodePtr(new transport::Node());
-    this->dataPtr->node->Init(_world->GetName());
+    this->dataPtr->node->Init(_world->Name());
 
     // Subscribe to the activation topic.
     this->dataPtr->activationSub = this->dataPtr->node->Subscribe(
@@ -147,7 +147,7 @@ void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
 void TransporterPlugin::Update()
 {
   // Get all the models
-  physics::Model_V models = this->dataPtr->world->GetModels();
+  physics::Model_V models = this->dataPtr->world->Models();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->padMutex);
 
@@ -159,13 +159,13 @@ void TransporterPlugin::Update()
       continue;
 
     // Get the model's pose
-    math::Pose modelPose = model->GetWorldPose();
+    ignition::math::Pose3d modelPose = model->WorldPose();
 
     // Iterate over all pads
     for (auto const &padIter : this->dataPtr->pads)
     {
       // Check if the model is in the pad's outgoing box.
-      if (padIter.second->outgoingBox.Contains(modelPose.pos))
+      if (padIter.second->outgoingBox.Contains(modelPose.Pos()))
       {
         // Get the destination pad
         auto const &destIter = this->dataPtr->pads.find(padIter.second->dest);
@@ -175,7 +175,7 @@ void TransporterPlugin::Update()
             (padIter.second->autoActivation || padIter.second->activated))
         {
           // Move the model
-          model->SetWorldPose(destIter->second->incomingPose);
+          model->SetWorldPose(destIter->second->incomingPose.Ign());
 
           // Deactivate the pad. This is used by manually activated pads.
           padIter.second->activated = false;

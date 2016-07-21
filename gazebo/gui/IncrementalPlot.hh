@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _INCREMENTAL_PLOT_HH_
-#define _INCREMENTAL_PLOT_HH_
+#ifndef GAZEBO_GUI__INCREMENTALPLOT_HH_
+#define GAZEBO_GUI__INCREMENTALPLOT_HH_
 
 #include <map>
 #include <list>
@@ -41,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
-      public: IncrementalPlot(QWidget *_parent = NULL);
+      public: explicit IncrementalPlot(QWidget *_parent = NULL);
 
       /// \brief Destructor
       public: virtual ~IncrementalPlot();

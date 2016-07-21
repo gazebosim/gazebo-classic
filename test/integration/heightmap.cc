@@ -59,15 +59,14 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
     return;
   }
 
-  physics::ModelPtr model = GetModel("heightmap");
+  physics::ModelPtr model = this->GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
-    model->GetLink("link")->GetCollision("collision");
+    model->LinkByName("link")->CollisionByName("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(
-        collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->Shape());
 
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
@@ -76,7 +75,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->Size() == ignition::math::Vector3d(129, 129, 10));
 
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
-  common::Image testImage = shape->GetImage();
+  common::Image testImage = shape->Image();
 
   common::SystemPaths *paths = common::SystemPaths::Instance();
   testImage.SavePNG(paths->TmpPath() + "/test_shape.png");
@@ -112,14 +111,14 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   }
 
   Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
-  physics::ModelPtr model = GetModel("heightmap");
+  physics::ModelPtr model = this->GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
-    model->GetLink("link")->GetCollision("collision");
+    model->LinkByName("link")->CollisionByName("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->Shape());
 
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
@@ -129,7 +128,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   {
     for (x = 0; x < shape->VertexCount().X(); ++x)
     {
-      EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
+      EXPECT_NEAR(shape->Height(x, y), 10.0, 1e-4);
     }
   }
 }
@@ -144,14 +143,14 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   }
 
   Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
-  physics::ModelPtr model = GetModel("heightmap");
+  physics::ModelPtr model = this->GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
-    model->GetLink("link")->GetCollision("collision");
+    model->LinkByName("link")->CollisionByName("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->Shape());
 
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
@@ -161,7 +160,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   {
     for (x = 0; x < shape->VertexCount().X(); ++x)
     {
-      EXPECT_EQ(shape->GetHeight(x, y), 10.0);
+      EXPECT_EQ(shape->Height(x, y), 10.0);
     }
   }
 }
@@ -218,15 +217,14 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
 
   Load("worlds/heightmap_test.world", true, _physicsEngine);
 
-  physics::ModelPtr model = GetModel("heightmap");
+  physics::ModelPtr model = this->GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
-    model->GetLink("link")->GetCollision("collision");
+    model->LinkByName("link")->CollisionByName("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(
-        collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->Shape());
 
   EXPECT_DOUBLE_EQ(shape->ComputeVolume(), 0);
 }
@@ -263,14 +261,14 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
       gzthrow("Unable to get heightmap");
   }
 
-  physics::ModelPtr model = GetModel("heightmap");
+  physics::ModelPtr model = ModelByName("heightmap");
   EXPECT_TRUE(model);
 
   physics::CollisionPtr collision =
-    model->GetLink("link")->GetCollision("collision");
+    model->LinkByName("link")->CollisionByName("collision");
 
   physics::HeightmapShapePtr shape =
-    boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
+    std::dynamic_pointer_cast<physics::HeightmapShape>(collision->Shape());
 
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
@@ -283,18 +281,18 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 
   float x, y;
 
-  for (y = 0; y < shape->GetSize().y && y < .3; y += 0.2)
+  for (y = 0; y < shape->GetSize().Y() && y < .3; y += 0.2)
   {
-    for (x = 0; x < shape->GetSize().x && x < 1; x += 0.2)
+    for (x = 0; x < shape->GetSize().X() && x < 1; x += 0.2)
     {
       // Compute the proper physics test point.
       int xi = rint(x);
       if (xi >= shape->GetSize().x)
-        xi = shape->GetSize().x - 1.0;
+        xi = shape->GetSize().X() - 1.0;
 
       int yi = rint(y);
       if (yi >= shape->GetSize().y)
-        yi = shape->GetSize().y - 1.0;
+        yi = shape->GetSize().Y() - 1.0;
 
       // Compute the proper render test point.
       double xd = xi - (shape->GetSize().x) * 0.5;

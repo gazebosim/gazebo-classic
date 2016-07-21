@@ -52,7 +52,7 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
 {
   this->simbodyLinkDPtr->simbodyPhysics =
     std::dynamic_pointer_cast<SimbodyPhysics>(
-      this->World()->GetPhysicsEngine());
+      this->World()->Physics());
 
   if (this->simbodyLinkDPtr->simbodyPhysics == nullptr)
   {
@@ -81,7 +81,7 @@ void SimbodyLink::Init()
 
   Link::Init();
 
-  ignition::math::Vector3d cogVec = this->simbodyLinkDPtr->inertial->CoG();
+  ignition::math::Vector3d cogVec = this->simbodyLinkDPtr->inertial.CoG();
 
   // Set the initial pose of the body
 
@@ -172,14 +172,14 @@ bool SimbodyLink::GravityMode() const
 {
   if (this->simbodyLinkDPtr->physicsInitialized)
   {
-    return this->simbodyLinkDPtr->simbodyPhysics->SimbodyGravity(
-        ).getBodyIsExcluded(
-      this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
-      this->simbodyLinkDPtr->masterMobod);
+    return this->simbodyLinkDPtr->simbodyPhysics->SimbodyGravity().
+      getBodyIsExcluded(
+          this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
+          this->simbodyLinkDPtr->masterMobod);
   }
   else
   {
-    gzlog << "GetGravityMode [" << this->simbodyLinkDPtr->gravityMode
+    gzlog << "GravityMode [" << this->simbodyLinkDPtr->gravityMode
           << "], but physics not initialized, returning cached value\n";
     return this->simbodyLinkDPtr->gravityMode;
   }
@@ -392,9 +392,8 @@ ignition::math::Vector3d SimbodyLink::WorldLinearVel(
   if (this->simbodyLinkDPtr->simbodyPhysics->PhysicsInitialized())
   {
     // lock physics update mutex to ensure thread safety
-    boost::recursive_mutex::scoped_lock lock(
-      *this->simbodyLinkDPtr->world->GetPhysicsEngine(
-        )->GetPhysicsUpdateMutex());
+    std::lock_guard<std::recursive_mutex> lock(
+      this->simbodyLinkDPtr->world->Physics()->PhysicsUpdateMutex());
 
     v = SimbodyPhysics::Vec3ToVector3Ign(
       this->simbodyLinkDPtr->masterMobod.findStationVelocityInGround(
@@ -423,9 +422,8 @@ ignition::math::Vector3d SimbodyLink::WorldLinearVel(
     SimTK::Vec3 pw(rwf * pf);
 
     // lock physics update mutex to ensure thread safety
-    boost::recursive_mutex::scoped_lock lock(
-      *this->simbodyLinkDPtr->world->GetPhysicsEngine(
-        )->GetPhysicsUpdateMutex());
+    std::lock_guard<std::recursive_mutex> lock(
+      this->simbodyLinkDPtr->world->Physics()->PhysicsUpdateMutex());
 
     const SimTK::Rotation &rwl =
       this->simbodyLinkDPtr->masterMobod.getBodyRotation(
@@ -453,9 +451,8 @@ ignition::math::Vector3d SimbodyLink::WorldCoGLinearVel() const
   if (this->simbodyLinkDPtr->simbodyPhysics->PhysicsInitialized())
   {
     // lock physics update mutex to ensure thread safety
-    boost::recursive_mutex::scoped_lock lock(
-      *this->simbodyLinkDPtr->world->GetPhysicsEngine(
-        )->GetPhysicsUpdateMutex());
+    std::lock_guard<std::recursive_mutex> lock(
+      this->simbodyLinkDPtr->world->Physics()->PhysicsUpdateMutex());
 
     SimTK::Vec3 station =
       this->simbodyLinkDPtr->masterMobod.getBodyMassCenterStation(
@@ -490,8 +487,8 @@ void SimbodyLink::SetAngularVel(const ignition::math::Vector3d &_vel)
 ignition::math::Vector3d SimbodyLink::WorldAngularVel() const
 {
   // lock physics update mutex to ensure thread safety
-  boost::recursive_mutex::scoped_lock lock(
-    *this->simbodyLinkDPtr->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+  std::lock_guard<std::recursive_mutex> lock(
+    this->simbodyLinkDPtr->world->Physics()->PhysicsUpdateMutex());
 
   SimTK::Vec3 w =
     this->simbodyLinkDPtr->masterMobod.getBodyAngularVelocity(
@@ -626,9 +623,9 @@ SimTK::MassProperties SimbodyLink::MassProperties() const
 
   if (!this->IsStatic())
   {
-    const SimTK::Real mass = this->simbodyLinkDPtr->inertial->Mass();
+    const SimTK::Real mass = this->simbodyLinkDPtr->inertial.Mass();
     SimTK::Transform xli = physics::SimbodyPhysics::Pose2Transform(
-        this->simbodyLinkDPtr->inertial->Pose());
+        this->simbodyLinkDPtr->inertial.Pose());
 
     // vector from Lo to com, exp. in L
     const SimTK::Vec3 &coml = xli.p();
@@ -638,12 +635,12 @@ SimTK::MassProperties SimbodyLink::MassProperties() const
 
     // Get mass-weighted central inertia, expressed in I frame.
     SimTK::Inertia ici(
-        this->simbodyLinkDPtr->inertial->IXX(),
-        this->simbodyLinkDPtr->inertial->IYY(),
-        this->simbodyLinkDPtr->inertial->IZZ(),
-        this->simbodyLinkDPtr->inertial->IXY(),
-        this->simbodyLinkDPtr->inertial->IXZ(),
-        this->simbodyLinkDPtr->inertial->IYZ());
+        this->simbodyLinkDPtr->inertial.IXX(),
+        this->simbodyLinkDPtr->inertial.IYY(),
+        this->simbodyLinkDPtr->inertial.IZZ(),
+        this->simbodyLinkDPtr->inertial.IXY(),
+        this->simbodyLinkDPtr->inertial.IXZ(),
+        this->simbodyLinkDPtr->inertial.IYZ());
     // Re-express the central inertia from the I frame to the L frame.
     // icl=ril*ici*ril
     SimTK::Inertia icl = ici.reexpress(~xli.R());

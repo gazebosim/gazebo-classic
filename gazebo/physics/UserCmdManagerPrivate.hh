@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
-#define _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_USERCMDMANAGER_PRIVATE_HH_
+#define GAZEBO_PHYSICS_USERCMDMANAGER_PRIVATE_HH_
 
 #include <string>
 #include <vector>
@@ -35,8 +35,11 @@ namespace gazebo
     /// \brief Private data for the UserCmdManager class
     class UserCmdPrivate
     {
-      /// \brief Pointer to the world.
-      public: WorldPtr world;
+      /// \brief Constructor
+      public: UserCmdPrivate(World &_world) : world(_world) {}
+
+      /// \brief Reference to the world.
+      public: World &world;
 
       /// \brief Whole world state the moment the user command was executed.
       public: WorldState startState;
@@ -61,8 +64,11 @@ namespace gazebo
     /// \brief Private data for the UserCmdManager class
     class UserCmdManagerPrivate
     {
-      /// \brief Pointer to the world.
-      public: WorldPtr world;
+      /// \brief Constructor
+      public: UserCmdManagerPrivate(World &_world) : world(_world) {}
+
+      /// \brief Reference to the world.
+      public: World &world;
 
       /// \brief Counter to generate unique ids for commands in a sequence.
       public: unsigned int idCounter;

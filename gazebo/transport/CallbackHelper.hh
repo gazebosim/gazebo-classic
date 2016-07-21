@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _CALLBACKHELPER_HH_
-#define _CALLBACKHELPER_HH_
+#ifndef GAZEBO_TRANSPORT_CALLBACKHELPER_HH_
+#define GAZEBO_TRANSPORT_CALLBACKHELPER_HH_
 
 #include <google/protobuf/message.h>
 #include <boost/function.hpp>
@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _latching Set to true to make the callback helper
       /// latching.
-      public: CallbackHelper(bool _latching = false);
+      public: explicit CallbackHelper(bool _latching = false);
 
       /// \brief Destructor
       public: virtual ~CallbackHelper();

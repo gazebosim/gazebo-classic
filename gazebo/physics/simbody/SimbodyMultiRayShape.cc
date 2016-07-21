@@ -32,7 +32,7 @@ SimbodyMultiRayShape::SimbodyMultiRayShape(CollisionPtr _parent)
 {
   this->SetName("Simbody Multiray Shape");
   this->physicsEngine = std::static_pointer_cast<SimbodyPhysics>(
-      this->multiRayShapeDPtr->collisionParent->World()->GetPhysicsEngine());
+      this->multiRayShapeDPtr->collisionParent->World()->Physics());
 }
 
 //////////////////////////////////////////////////

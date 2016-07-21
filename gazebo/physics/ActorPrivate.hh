@@ -109,7 +109,7 @@ namespace gazebo
       public: std::map<std::string, bool> interpolateX;
 
       /// \brief Last position of the actor
-      public: math::Vector3 lastPos;
+      public: ignition::math::Vector3d lastPos;
 
       /// \brief Length of the actor's path.
       public: double pathLength;
@@ -126,13 +126,12 @@ namespace gazebo
       /// \brief Where to send bone info.
       public: transport::PublisherPtr bonePosePub;
 
-      /// \brief Current script time
+      /// \brief Current script time.
       public: double scriptTime;
 
       /// \brief Custom trajectory.
       /// Used to control an actor with a plugin.
       public: TrajectoryInfoPtr customTrajectoryInfo;
-
     };
   }
 }

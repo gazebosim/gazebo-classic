@@ -41,7 +41,7 @@ namespace gazebo
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
       public: UserCmd(const unsigned int _id,
-                      physics::WorldPtr _world,
+                      physics::World &_world,
                       const std::string &_description,
                       const msgs::UserCmd::Type &_type);
 
@@ -78,7 +78,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _world Pointer to the world.
-      public: UserCmdManager(const WorldPtr _world);
+      public: explicit UserCmdManager(World &_world);
 
       /// \brief Destructor.
       public: virtual ~UserCmdManager();

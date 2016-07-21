@@ -14,14 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ENTITY_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_ENTITY_PRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_ENTITY_PRIVATE_HH_
+#define GAZEBO_PHYSICS_ENTITY_PRIVATE_HH_
 
 #include <functional>
+#include <vector>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 #include "gazebo/physics/BasePrivate.hh"
 
 namespace gazebo
@@ -43,6 +46,9 @@ namespace gazebo
 
       /// \brief Visual publisher.
       public: transport::PublisherPtr visPub;
+
+      /// \brief Pose publisher.
+      public: transport::PublisherPtr posePub;
 
       /// \brief Request publisher.
       public: transport::PublisherPtr requestPub;
@@ -87,8 +93,11 @@ namespace gazebo
       public: std::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
-      public: void (Entity::*setWorldPoseFunc)(
+      public: std::function<void(const ignition::math::Pose3d &,
+                  const bool, const bool)> setWorldPoseFunc;
+      /*public: void (Entity::*setWorldPoseFunc)(
                    const ignition::math::Pose3d &, const bool, const bool);
+                   */
     };
   }
 }

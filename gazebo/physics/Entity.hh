@@ -114,8 +114,7 @@ namespace gazebo
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
       /// \deprecated See WorldPose();
-      public: virtual const math::Pose &GetWorldPose() const
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual math::Pose GetWorldPose() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
@@ -272,7 +271,7 @@ namespace gazebo
 
       /// \brief Get the parent model, if one exists.
       /// \return Pointer to a model, or NULL if no parent model exists.
-      public: ModelPtr ParentModel() const;
+      public: Model *ParentModel();
 
       /// \brief Get a child collision entity, if one exists.
       /// \param[in] _name Name of the child collision object.
@@ -356,7 +355,7 @@ namespace gazebo
       /// value is propagated to the rest of the simulator.
       /// \return The dirty pose of the entity.
       /// \deprecated See DirtyPose()
-      public: const math::Pose &GetDirtyPose() const GAZEBO_DEPRECATED(7.0);
+      public: math::Pose GetDirtyPose() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns Entity#dirtyPose.
       ///
@@ -376,8 +375,7 @@ namespace gazebo
       protected: Entity(EntityPrivate &_dataPtr, BasePtr _parent);
 
       /// \brief Shared construction code.
-      /// \param[in] _link Pointer to parent link
-      private: void ConstructionHelper(LinkPtr _Link);
+      private: void ConstructionHelper();
 
       /// \brief Publish the pose.
       private: virtual void PublishPose();

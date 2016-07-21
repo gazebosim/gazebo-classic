@@ -35,9 +35,9 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
   Load("test/worlds/presets.world", false, physicsEngineName);
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -45,38 +45,38 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
   try
   {
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("max_step_size")), 0.01);
+        physicsEngine->Param("max_step_size")), 0.01);
     if (physicsEngineName == "ode" || physicsEngineName == "bullet")
     {
       EXPECT_FLOAT_EQ(boost::any_cast<double>(
-          physicsEngine->GetParam("min_step_size")), 0.001);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+          physicsEngine->Param("min_step_size")), 0.001);
+      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("cfm")),
           0.01);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("erp")),
           0.3);
       EXPECT_FLOAT_EQ(boost::any_cast<double>(
-          physicsEngine->GetParam("contact_surface_layer")), 0.002);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("sor")),
+          physicsEngine->Param("contact_surface_layer")), 0.002);
+      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("sor")),
           1.4);
-      EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
+      EXPECT_EQ(boost::any_cast<int>(physicsEngine->Param("iters")), 50);
     }
     if (physicsEngineName == "ode")
     {
       EXPECT_TRUE(boost::any_cast<bool>(
-          physicsEngine->GetParam("inertia_ratio_reduction")));
+          physicsEngine->Param("inertia_ratio_reduction")));
       EXPECT_FLOAT_EQ(boost::any_cast<double>(
-          physicsEngine->GetParam("contact_max_correcting_vel")), 200);
+          physicsEngine->Param("contact_max_correcting_vel")), 200);
     }
     if (physicsEngineName == "bullet")
     {
       EXPECT_FALSE(boost::any_cast<bool>(
-          physicsEngine->GetParam("split_impulse")));
+          physicsEngine->Param("split_impulse")));
     }
     if (physicsEngineName == "simbody")
     {
       EXPECT_FLOAT_EQ(
-          boost::any_cast<double>(physicsEngine->GetParam("accuracy")), 0.01);
-      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam(
+          boost::any_cast<double>(physicsEngine->Param("accuracy")), 0.01);
+      EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param(
           "max_transient_velocity")), 0.001);
     }
   }
@@ -92,9 +92,9 @@ TEST_F(PresetManagerTest, MultipleDefaults)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -108,9 +108,9 @@ TEST_F(PresetManagerTest, NoDefault)
   Load("test/worlds/presets_nodefault.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -124,9 +124,9 @@ TEST_F(PresetManagerTest, SetProfileParam)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -136,14 +136,14 @@ TEST_F(PresetManagerTest, SetProfileParam)
   try
   {
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("max_step_size")), 10.0);
+        physicsEngine->Param("max_step_size")), 10.0);
 
     // preset_2 is not the current profile, so we do not expect to see a change
     // in the physics engine when we change preset_2.
     EXPECT_TRUE(presetManager->SetProfileParam("preset_2", "max_step_size",
         20));
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("max_step_size")), 10.0);
+        physicsEngine->Param("max_step_size")), 10.0);
   }
   catch(const boost::bad_any_cast& e)
   {
@@ -157,9 +157,9 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
 
   if (!presetManager)
   {
@@ -176,13 +176,13 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   try
   {
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("max_step_size")), 0.02);
+        physicsEngine->Param("max_step_size")), 0.02);
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("min_step_size")), 0.002);
-    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 100);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+        physicsEngine->Param("min_step_size")), 0.002);
+    EXPECT_EQ(boost::any_cast<int>(physicsEngine->Param("iters")), 100);
+    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("cfm")),
         0.02);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("erp")),
         0.6);
   }
   catch(const boost::bad_any_cast& e)
@@ -197,9 +197,9 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -232,13 +232,13 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
   try
   {
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("max_step_size")), 0.03);
+        physicsEngine->Param("max_step_size")), 0.03);
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("min_step_size")), 0.003);
-    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 150);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+        physicsEngine->Param("min_step_size")), 0.003);
+    EXPECT_EQ(boost::any_cast<int>(physicsEngine->Param("iters")), 150);
+    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("cfm")),
         0.03);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("erp")),
         0.7);
   }
   catch(const boost::bad_any_cast& e)
@@ -252,9 +252,9 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
   Load("worlds/empty.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -262,22 +262,22 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
   try
   {
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("max_step_size")), 0.001);
-    EXPECT_EQ(boost::any_cast<int>(physicsEngine->GetParam("iters")), 50);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("cfm")),
+        physicsEngine->Param("max_step_size")), 0.001);
+    EXPECT_EQ(boost::any_cast<int>(physicsEngine->Param("iters")), 50);
+    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("cfm")),
         0.0);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("erp")),
+    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("erp")),
         0.2);
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("contact_max_correcting_vel")), 100);
+        physicsEngine->Param("contact_max_correcting_vel")), 100);
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("contact_surface_layer")), 0.001);
-    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->GetParam("sor")),
+        physicsEngine->Param("contact_surface_layer")), 0.001);
+    EXPECT_FLOAT_EQ(boost::any_cast<double>(physicsEngine->Param("sor")),
         1.3);
     EXPECT_FLOAT_EQ(boost::any_cast<double>(
-        physicsEngine->GetParam("min_step_size")), 0.0001);
+        physicsEngine->Param("min_step_size")), 0.0001);
     EXPECT_FALSE(boost::any_cast<bool>(
-        physicsEngine->GetParam("inertia_ratio_reduction")));
+        physicsEngine->Param("inertia_ratio_reduction")));
   }
   catch(const boost::bad_any_cast& e)
   {

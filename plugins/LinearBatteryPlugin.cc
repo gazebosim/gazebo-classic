@@ -49,14 +49,14 @@ void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Store the pointer to the model
   this->model = _parent;
-  this->world = _parent->GetWorld();
+  this->world = _parent->World();
 
   if (_sdf->HasElement("link_name"))
   {
     sdf::ElementPtr elem = _sdf->GetElement("link_name");
     GZ_ASSERT(elem, "Element link_name doesn't exist!");
     std::string linkName = elem->Get<std::string>();
-    this->link = this->model->GetLink(linkName);
+    this->link = this->model->LinkByName(linkName);
     GZ_ASSERT(link, "Link was NULL");
   }
   else
@@ -126,7 +126,7 @@ void LinearBatteryPlugin::Reset()
 /////////////////////////////////////////////////
 double LinearBatteryPlugin::OnUpdateVoltage(const common::BatteryPtr &_battery)
 {
-  double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = this->world->Physics()->MaxStepSize();
   double totalpower = 0.0;
   double k = dt / this->tau;
 

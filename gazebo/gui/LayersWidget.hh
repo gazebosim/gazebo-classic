@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_LAYERS_WIDGET_HH_
-#define _GAZEBO_LAYERS_WIDGET_HH_
+#ifndef GAZEBO_GUI_LAYERSWIDGET_HH_
+#define GAZEBO_GUI_LAYERSWIDGET_HH_
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget pointer.
-      public: LayersWidget(QWidget *_parent = 0);
+      public: explicit LayersWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~LayersWidget();

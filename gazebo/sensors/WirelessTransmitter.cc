@@ -87,8 +87,8 @@ void WirelessTransmitter::Init()
 
   // This ray will be used in SignalStrength() for checking obstacles
   // between the transmitter and a given point.
-  this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
-      this->world->GetPhysicsEngine()->CreateShape("ray",
+  this->dataPtr->testRay = std::dynamic_pointer_cast<RayShape>(
+      this->world->Physics()->CreateShape("ray",
         CollisionPtr()));
 }
 
@@ -96,7 +96,7 @@ void WirelessTransmitter::Init()
 bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
 {
   this->referencePose = this->pose +
-    this->parentEntity.lock()->GetWorldPose().Ign();
+    this->parentEntity.lock()->WorldPose();
 
   if (this->dataPtr->visualize)
   {
@@ -181,15 +181,15 @@ double WirelessTransmitter::SignalStrength(
   }
 
   // Acquire the mutex for avoiding race condition with the physics engine
-  boost::recursive_mutex::scoped_lock lock(*(
-        this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
+  std::lock_guard<std::recursive_mutex> lock(
+        this->world->Physics()->PhysicsUpdateMutex());
 
   // Compute the value of n depending on the obstacles between Tx and Rx
   double n = WirelessTransmitterPrivate::NEmpty;
 
   // Looking for obstacles between start and end points
   this->dataPtr->testRay->SetPoints(start, end);
-  this->dataPtr->testRay->GetIntersection(dist, entityName);
+  this->dataPtr->testRay->Intersection(dist, entityName);
 
   // ToDo: The ray intersects with my own collision model. Fix it.
   if (entityName != "")

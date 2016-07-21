@@ -19,6 +19,7 @@
 
 #include <atomic>
 #include <functional>
+#include <vector>
 #include <list>
 #include <map>
 #include <memory>

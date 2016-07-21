@@ -76,7 +76,7 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      public: DARTPhysics(WorldPtr _world);
+      public: explicit DARTPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~DARTPhysics();
@@ -106,7 +106,7 @@ namespace gazebo
       public: virtual std::string GetType() const;
 
       // Documentation inherited
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(const uint32_t _seed);
 
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);

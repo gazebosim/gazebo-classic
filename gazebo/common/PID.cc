@@ -107,6 +107,12 @@ void PID::Reset()
 }
 
 /////////////////////////////////////////////////
+double PID::Update(double _error, double _dt)
+{
+  return this->Update(_error, common::Time(_dt));
+}
+
+/////////////////////////////////////////////////
 double PID::Update(double _error, common::Time _dt)
 {
   double pTerm, dTerm, iTerm;

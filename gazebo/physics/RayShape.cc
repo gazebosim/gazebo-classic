@@ -51,8 +51,8 @@ RayShape::RayShape(CollisionPtr _parent)
   this->rayShapeDPtr->contactRetro = 0.0;
   this->rayShapeDPtr->contactFiducial = -1;
 
-  if (collisionParent)
-    this->collisionParent->SetSaveable(false);
+  if (this->rayShapeDPtr->collisionParent)
+    this->rayShapeDPtr->collisionParent->SetSaveable(false);
 }
 
 //////////////////////////////////////////////////
@@ -76,14 +76,14 @@ void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
   this->rayShapeDPtr->relativeStartPos = _posStart;
   this->rayShapeDPtr->relativeEndPos = _posEnd;
 
-  if (this->collisionParent)
+  if (this->rayShapeDPtr->collisionParent)
   {
     this->rayShapeDPtr->globalStartPos =
-      this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->rayShapeDPtr->relativeStartPos).Ign();
+      this->rayShapeDPtr->collisionParent->WorldPose().CoordPositionAdd(
+        this->rayShapeDPtr->relativeStartPos);
     this->rayShapeDPtr->globalEndPos =
-      this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->rayShapeDPtr->relativeEndPos).Ign();
+      this->rayShapeDPtr->collisionParent->WorldPose().CoordPositionAdd(
+        this->rayShapeDPtr->relativeEndPos);
   }
   else
   {
@@ -238,23 +238,23 @@ void RayShape::GetIntersection(double &_dist, std::string &_entity)
 //////////////////////////////////////////////////
 ignition::math::Vector3d RayShape::Start() const
 {
-  return this->relativeStartPos.Ign();
+  return this->rayShapeDPtr->relativeStartPos;
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d RayShape::End() const
 {
-  return this->relativeEndPos.Ign();
+  return this->rayShapeDPtr->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
 void RayShape::SetCollisionName(const std::string &_name)
 {
-  this->collisionName = _name;
+  this->rayShapeDPtr->collisionName = _name;
 }
 
 //////////////////////////////////////////////////
 std::string RayShape::CollisionName() const
 {
-  return this->collisionName;
+  return this->rayShapeDPtr->collisionName;
 }

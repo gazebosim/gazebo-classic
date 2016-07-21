@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_EDITOR_HH_
-#define _BUILDING_EDITOR_HH_
+#ifndef GAZEBO_GUI_BUILDING_BUILDING_EDITOR_HH_
+#define GAZEBO_GUI_BUILDING_BUILDING_EDITOR_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constuctor.
       /// \param[in] _mainWindow Pointer to the mainwindow.
-      public: BuildingEditor(MainWindow *_mainWindow);
+      public: explicit BuildingEditor(MainWindow *_mainWindow);
 
       /// \brief Destuctor.
       public: virtual ~BuildingEditor();

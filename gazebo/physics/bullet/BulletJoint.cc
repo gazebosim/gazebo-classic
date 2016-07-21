@@ -166,7 +166,7 @@ bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
-  this->applyDamping.reset();
+  this->bulletJointDPtr->applyDamping.reset();
 
   this->bulletJointDPtr->childLink.reset();
   this->bulletJointDPtr->parentLink.reset();
@@ -248,7 +248,7 @@ void BulletJoint::CacheForceTorque()
     // convert torque from about child CG to joint anchor location
     // cg position specified in child link frame
     ignition::math::Pose3d cgPose =
-      this->bulletJointDPtr->childLink->Inertial()->Pose();
+      this->bulletJointDPtr->childLink->Inertia().Pose();
 
     // anchorPose location of joint in child frame
     // childMomentArm: from child CG to joint location in child link frame
@@ -259,7 +259,7 @@ void BulletJoint::CacheForceTorque()
            ignition::math::Quaterniond())).Pos());
 
     // gzerr << "anchor [" << anchorPose
-    //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
+    //       << "] iarm[" << this->childLink->Inertia().Pose().Pos()
     //       << "] childMomentArm[" << childMomentArm
     //       << "] f1[" << this->bulletJointDPtr->wrench.body2Force
     //       << "] t1[" << this->bulletJointDPtr->wrench.body2Torque
@@ -298,7 +298,7 @@ void BulletJoint::CacheForceTorque()
 
     // parent cg specified in parent link frame
     ignition::math::Pose3d cgPose =
-      this->bulletJointDPtr->parentLink->Inertial()->Pose();
+      this->bulletJointDPtr->parentLink->Inertia().Pose();
 
     // get parent CG pose in child link frame
     ignition::math::Pose3d parentCGInChildLink =
@@ -394,7 +394,8 @@ void BulletJoint::CacheForceTorque()
         this->bulletJointDPtr->wrench.body1Torque);
     }
   }
-  this->bulletJointDPtr->wrench = this->bulletJointDPtr->wrench - wrenchAppliedWorld;
+  this->bulletJointDPtr->wrench =
+    this->bulletJointDPtr->wrench - wrenchAppliedWorld;
 }
 
 //////////////////////////////////////////////////
@@ -526,10 +527,10 @@ void BulletJoint::SaveForce(const unsigned int _index, const double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->AngleCount())
   {
-    if (this->bulletJointDPtr->forceAppliedTime < this->World()->GetSimTime())
+    if (this->bulletJointDPtr->forceAppliedTime < this->World()->SimTime())
     {
       // reset forces if time step is new
-      this->bulletJointDPtr->forceAppliedTime = this->World()->GetSimTime();
+      this->bulletJointDPtr->forceAppliedTime = this->World()->SimTime();
       this->bulletJointDPtr->forceApplied[0] =
         this->bulletJointDPtr->forceApplied[1] = 0;
     }

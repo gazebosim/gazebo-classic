@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A world state
- * Author: Nate Koenig
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -35,31 +31,55 @@ using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
-WorldState::WorldState()
+/*WorldState::WorldState()
   : State()
 {
-}
+}*/
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
-  : State(_world->GetName(), _world->GetRealTime(), _world->GetSimTime(),
-      _world->GetIterations())
+  : State(_world->Name(), _world->RealTime(), _world->SimTime(),
+      _world->Iterations())
 {
-  this->world = _world;
+  this->world = *(_world.get());
 
   // Add a state for all the models
-  Model_V models = _world->GetModels();
+  Model_V models = _world->Models();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    this->modelStates.insert(std::make_pair((*iter)->GetName(),
+    this->modelStates.insert(std::make_pair((*iter)->Name(),
           ModelState(*iter, this->realTime, this->simTime, this->iterations)));
   }
 
   // Add states for all the lights
   for (const auto &light : _world->Lights())
   {
-    this->lightStates.insert(std::make_pair(light->GetName(),
+    this->lightStates.insert(std::make_pair(light->Name(),
+          LightState(light, this->realTime, this->simTime, this->iterations)));
+  }
+}
+
+/////////////////////////////////////////////////
+WorldState::WorldState(const World &_world)
+  : State(_world.Name(), _world.RealTime(), _world.SimTime(),
+      _world.Iterations())
+{
+  this->world = _world;
+
+  // Add a state for all the models
+  Model_V models = _world.Models();
+  for (Model_V::const_iterator iter = models.begin();
+       iter != models.end(); ++iter)
+  {
+    this->modelStates.insert(std::make_pair((*iter)->Name(),
+          ModelState(*iter, this->realTime, this->simTime, this->iterations)));
+  }
+
+  // Add states for all the lights
+  for (const auto &light : _world.Lights())
+  {
+    this->lightStates.insert(std::make_pair(light->Name(),
           LightState(light, this->realTime, this->simTime, this->iterations)));
   }
 }
@@ -74,27 +94,32 @@ WorldState::WorldState(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 WorldState::~WorldState()
 {
-  this->world.reset();
   this->modelStates.clear();
   this->lightStates.clear();
 }
 
 /////////////////////////////////////////////////
-void WorldState::Load(const WorldPtr _world)
+void WorldState::Load(WorldPtr _world)
+{
+  this->Load(*(_world.get()));
+}
+
+/////////////////////////////////////////////////
+void WorldState::Load(const World &_world)
 {
   this->world = _world;
-  this->name = _world->GetName();
+  this->name = _world.Name();
   this->wallTime = common::Time::GetWallTime();
-  this->simTime = _world->GetSimTime();
-  this->realTime = _world->GetRealTime();
-  this->iterations = _world->GetIterations();
+  this->simTime = _world->SimTime();
+  this->realTime = _world->RealTime();
+  this->iterations = _world->Iterations();
 
   // Add a state for all the models
-  Model_V models = _world->GetModels();
+  Model_V models = _world->Models();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
+    this->modelStates[(*iter)->Name()].Load(*iter, this->realTime,
         this->simTime, this->iterations);
   }
 
@@ -103,7 +128,7 @@ void WorldState::Load(const WorldPtr _world)
   for (ModelState_M::iterator iter = this->modelStates.begin();
        iter != this->modelStates.end();)
   {
-    if (iter->second.GetRealTime() != this->realTime)
+    if (iter->second.RealTime() != this->realTime)
       this->modelStates.erase(iter++);
     else
       ++iter;
@@ -114,7 +139,7 @@ void WorldState::Load(const WorldPtr _world)
   Light_V lights = _world->Lights();
   for (const auto &light : lights)
   {
-    this->lightStates[light->GetName()].Load(light, this->realTime,
+    this->lightStates[light->Name()].Load(light, this->realTime,
         this->simTime, this->iterations);
   }
 }
@@ -174,11 +199,23 @@ void WorldState::Load(const sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void WorldState::SetWorld(const WorldPtr _world)
 {
+  this->SetWorld(*(_world.get()));
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetWorld(const World &_world)
+{
   this->world = _world;
 }
 
 /////////////////////////////////////////////////
 const ModelState_M &WorldState::GetModelStates() const
+{
+  return this->ModelStates();
+}
+
+/////////////////////////////////////////////////
+const ModelState_M &WorldState::ModelStates() const
 {
   return this->modelStates;
 }
@@ -191,6 +228,12 @@ const LightState_M &WorldState::LightStates() const
 
 /////////////////////////////////////////////////
 ModelState_M WorldState::GetModelStates(const boost::regex &_regex) const
+{
+  return this->ModelStates(_regex);
+}
+
+/////////////////////////////////////////////////
+ModelState_M WorldState::ModelStates(const boost::regex &_regex) const
 {
   ModelState_M result;
 
@@ -208,6 +251,12 @@ ModelState_M WorldState::GetModelStates(const boost::regex &_regex) const
 /////////////////////////////////////////////////
 unsigned int WorldState::GetModelStateCount() const
 {
+  return this->ModelStateCount();
+}
+
+/////////////////////////////////////////////////
+unsigned int WorldState::ModelStateCount() const
+{
   return this->modelStates.size();
 }
 
@@ -219,6 +268,12 @@ unsigned int WorldState::LightStateCount() const
 
 /////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
+{
+  return this->ModelStateByName(_modelName);
+}
+
+/////////////////////////////////////////////////
+ModelState WorldState::ModelStateByName(const std::string &_modelName) const
 {
   // Search for the model name
   ModelState_M::const_iterator iter = this->modelStates.find(_modelName);
@@ -232,6 +287,12 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
 
 /////////////////////////////////////////////////
 LightState WorldState::GetLightState(const std::string &_lightName) const
+{
+  return this->LightStateByName(_lightName);
+}
+
+/////////////////////////////////////////////////
+LightState WorldState::LightStateByName(const std::string &_lightName) const
 {
   // Search for the light name
   auto iter = this->lightStates.find(_lightName);
@@ -353,38 +414,38 @@ WorldState WorldState::operator-(const WorldState &_state) const
   for (ModelState_M::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
-    if (this->HasModelState(iter->second.GetName()))
+    if (this->HasModelState(iter->second.Name()))
     {
-      ModelState state = this->GetModelState(iter->second.GetName()) -
+      ModelState state = this->ModelStateByName(iter->second.Name()) -
         iter->second;
 
       if (!state.IsZero())
       {
-        result.modelStates.insert(std::make_pair(state.GetName(), state));
+        result.modelStates.insert(std::make_pair(state.Name(), state));
       }
     }
     else
     {
-      result.deletions.push_back(iter->second.GetName());
+      result.deletions.push_back(iter->second.Name());
     }
   }
 
   // Subtract the light states.
   for (const auto &light : _state.lightStates)
   {
-    if (this->HasLightState(light.second.GetName()))
+    if (this->HasLightState(light.second.Name()))
     {
-      LightState state = this->GetLightState(light.second.GetName()) -
+      LightState state = this->LightStateByName(light.second.Name()) -
           light.second;
 
       if (!state.IsZero())
       {
-        result.lightStates.insert(std::make_pair(state.GetName(), state));
+        result.lightStates.insert(std::make_pair(state.Name(), state));
       }
     }
     else
     {
-      result.deletions.push_back(light.second.GetName());
+      result.deletions.push_back(light.second.Name());
     }
   }
 
@@ -392,9 +453,9 @@ WorldState WorldState::operator-(const WorldState &_state) const
   for (ModelState_M::const_iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
   {
-    if (!_state.HasModelState(iter->second.GetName()) && this->world)
+    if (!_state.HasModelState(iter->second.Name()))
     {
-      ModelPtr model = this->world->GetModel(iter->second.GetName());
+      ModelPtr model = this->world.ModelByName(iter->second.Name());
       if (model)
         result.insertions.push_back(model->UnscaledSDF()->ToString(""));
     }
@@ -403,10 +464,10 @@ WorldState WorldState::operator-(const WorldState &_state) const
   // Add in the new light states
   for (const auto &light : this->lightStates)
   {
-    if (!_state.HasLightState(light.second.GetName()) && this->world)
+    if (!_state.HasLightState(light.second.Name()))
     {
-      LightPtr lightPtr = this->world->Light(light.second.GetName());
-      result.insertions.push_back(lightPtr->GetSDF()->ToString(""));
+      LightPtr lightPtr = this->world.LightByName(light.second.Name());
+      result.insertions.push_back(lightPtr->SDF()->ToString(""));
     }
   }
 
@@ -428,17 +489,17 @@ WorldState WorldState::operator+(const WorldState &_state) const
   for (ModelState_M::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
-    ModelState state = this->GetModelState(iter->second.GetName()) +
+    ModelState state = this->ModelStateByName(iter->second.Name()) +
       iter->second;
-    result.modelStates.insert(std::make_pair(state.GetName(), state));
+    result.modelStates.insert(std::make_pair(state.Name(), state));
   }
 
   // Add the light states.
   for (const auto &light : _state.lightStates)
   {
-    LightState state = this->GetLightState(light.second.GetName()) +
+    LightState state = this->LightStateByName(light.second.Name()) +
         light.second;
-    result.lightStates.insert(std::make_pair(state.GetName(), state));
+    result.lightStates.insert(std::make_pair(state.Name(), state));
   }
 
   return result;

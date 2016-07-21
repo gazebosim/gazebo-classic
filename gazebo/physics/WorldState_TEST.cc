@@ -66,16 +66,16 @@ TEST_F(WorldStateTest, SDFConstructor)
   physics::WorldState worldState(worldElem->GetElement("state"));
 
   // Check world state against values from the sdf string
-  EXPECT_EQ(worldState.GetModelStateCount(), 2u);
+  EXPECT_EQ(worldState.ModelStateCount(), 2u);
   EXPECT_EQ(worldState.LightStateCount(), 2u);
 
-  auto modelStates = worldState.GetModelStates();
+  auto modelStates = worldState.ModelStates();
   EXPECT_EQ(modelStates.size(), 2u);
-  EXPECT_EQ(modelStates["ground_plane"].GetPose(),
+  EXPECT_EQ(modelStates["ground_plane"].Pose(),
       ignition::math::Pose3d(1, 1, 1, 0, 0, 0));
-  EXPECT_EQ(modelStates["model_1"].GetPose(),
+  EXPECT_EQ(modelStates["model_1"].Pose(),
       ignition::math::Pose3d(2, 1, 1, 0, 0, 0));
-  EXPECT_EQ(modelStates["fake_model"].GetPose(),
+  EXPECT_EQ(modelStates["fake_model"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
   auto lightStates = worldState.LightStates();
@@ -99,12 +99,12 @@ TEST_F(WorldStateTest, WorldConstructor)
   physics::WorldState worldState(world);
 
   // Check world state
-  EXPECT_EQ(worldState.GetModelStateCount(), 1u);
+  EXPECT_EQ(worldState.ModelStateCount(), 1u);
   EXPECT_EQ(worldState.LightStateCount(), 1u);
 
-  auto modelStates = worldState.GetModelStates();
+  auto modelStates = worldState.ModelStates();
   EXPECT_EQ(modelStates.size(), 1u);
-  EXPECT_EQ(modelStates["ground_plane"].GetPose(),
+  EXPECT_EQ(modelStates["ground_plane"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
   auto lightStates = worldState.LightStates();
@@ -187,8 +187,8 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
   physics::WorldState worldState1(worldElem->GetElement("state"));
 
   // Check that the 2 states are of the same world, with same entities
-  EXPECT_EQ(worldState0.GetName(), worldState1.GetName());
-  EXPECT_EQ(worldState0.GetModelStateCount(), worldState1.GetModelStateCount());
+  EXPECT_EQ(worldState0.Name(), worldState1.Name());
+  EXPECT_EQ(worldState0.ModelStateCount(), worldState1.ModelStateCount());
   EXPECT_EQ(worldState0.LightStateCount(), worldState1.LightStateCount());
 
   // Check subtraction
@@ -203,16 +203,16 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
   EXPECT_EQ(insertions.size(), 0u);
 
   // Check that entities which are the same in both states were removed
-  EXPECT_EQ(worldState2.GetModelStateCount(), 2u);
+  EXPECT_EQ(worldState2.ModelStateCount(), 2u);
   EXPECT_EQ(worldState2.LightStateCount(), 1u);
 
-  auto modelStates = worldState2.GetModelStates();
+  auto modelStates = worldState2.ModelStates();
   EXPECT_EQ(modelStates.size(), 2u);
-  EXPECT_EQ(modelStates["sphere"].GetPose(),
+  EXPECT_EQ(modelStates["sphere"].Pose(),
       ignition::math::Pose3d(2, 2.5, 5.5, 0, 0, 0));
-  EXPECT_EQ(modelStates["cylinder"].GetPose(),
+  EXPECT_EQ(modelStates["cylinder"].Pose(),
       ignition::math::Pose3d(3, 7.5, 8.5, 0, 0, 0));
-  EXPECT_EQ(modelStates["fake_model"].GetPose(),
+  EXPECT_EQ(modelStates["fake_model"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
   auto lightStates = worldState2.LightStates();
@@ -234,18 +234,18 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
   EXPECT_EQ(insertions.size(), 0u);
 
   // Check that all entities are present
-  EXPECT_EQ(worldState2.GetModelStateCount(), 4u);
+  EXPECT_EQ(worldState2.ModelStateCount(), 4u);
   EXPECT_EQ(worldState2.LightStateCount(), 1u);
 
-  modelStates = worldState2.GetModelStates();
+  modelStates = worldState2.ModelStates();
   EXPECT_EQ(modelStates.size(), 4u);
-  EXPECT_EQ(modelStates["ground_plane"].GetPose(),
+  EXPECT_EQ(modelStates["ground_plane"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
-  EXPECT_EQ(modelStates["box"].GetPose(),
+  EXPECT_EQ(modelStates["box"].Pose(),
       ignition::math::Pose3d(0, 0, 1, 0, 0, 0));
-  EXPECT_EQ(modelStates["sphere"].GetPose(),
+  EXPECT_EQ(modelStates["sphere"].Pose(),
       ignition::math::Pose3d(2, 5.5, 6.5, 0, 0, 0));
-  EXPECT_EQ(modelStates["cylinder"].GetPose().pos,
+  EXPECT_EQ(modelStates["cylinder"].Pose().Pos(),
       ignition::math::Vector3d(3, 4.5, 9.5));
 
   lightStates = worldState2.LightStates();
@@ -257,7 +257,7 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
   worldState1 = worldState0;
 
   // Check states are equal
-  EXPECT_EQ(worldState0.GetName(), worldState1.GetName());
+  EXPECT_EQ(worldState0.Name(), worldState1.Name());
   EXPECT_TRUE((worldState0 - worldState1).IsZero());
 }
 
@@ -272,9 +272,9 @@ TEST_F(WorldStateTest, Times)
   physics::WorldState worldState(world);
 
   // Check default times
-  EXPECT_EQ(worldState.GetSimTime(), common::Time(0));
-  EXPECT_GT(worldState.GetWallTime(), common::Time(0));
-  EXPECT_EQ(worldState.GetRealTime(), common::Time(0));
+  EXPECT_EQ(worldState.SimTime(), common::Time(0));
+  EXPECT_GT(worldState.WallTime(), common::Time(0));
+  EXPECT_EQ(worldState.RealTime(), common::Time(0));
 
   // Set times
   worldState.SetSimTime(common::Time(1));
@@ -282,7 +282,7 @@ TEST_F(WorldStateTest, Times)
   worldState.SetRealTime(common::Time(3));
 
   // Check times
-  EXPECT_EQ(worldState.GetSimTime(), common::Time(1));
-  EXPECT_EQ(worldState.GetWallTime(), common::Time(2));
-  EXPECT_EQ(worldState.GetRealTime(), common::Time(3));
+  EXPECT_EQ(worldState.SimTime(), common::Time(1));
+  EXPECT_EQ(worldState.WallTime(), common::Time(2));
+  EXPECT_EQ(worldState.RealTime(), common::Time(3));
 }

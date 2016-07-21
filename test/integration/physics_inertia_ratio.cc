@@ -46,16 +46,16 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // verify lateral gravity
-  auto g = world->Gravity();
+  ignition::math::Vector3d g = world->Gravity();
   EXPECT_EQ(g, ignition::math::Vector3d(0.1, 0, -9.81));
 
   // get model
-  physics::ModelPtr model = world->GetModel("inertia_ratio");
+  physics::ModelPtr model = world->ModelByName("inertia_ratio");
   ASSERT_TRUE(model != NULL);
 
   // get links
-  physics::LinkPtr upperLink = model->GetLink("upper_link");
-  physics::LinkPtr lowerLink = model->GetLink("lower_link");
+  physics::LinkPtr upperLink = model->LinkByName("upper_link");
+  physics::LinkPtr lowerLink = model->LinkByName("lower_link");
   ASSERT_TRUE(upperLink != NULL);
   ASSERT_TRUE(lowerLink != NULL);
 
@@ -72,8 +72,8 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
     world->Step(1);
 
     // Get statistics on link rotations
-    upperAngles.InsertData(upperLink->GetWorldPose().Ign().Rot().Euler());
-    lowerAngles.InsertData(lowerLink->GetWorldPose().Ign().Rot().Euler());
+    upperAngles.InsertData(upperLink->WorldPose().Rot().Euler());
+    lowerAngles.InsertData(lowerLink->WorldPose().Rot().Euler());
   }
 
   // Expect out of plane angles to fall within limits

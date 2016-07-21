@@ -32,7 +32,7 @@ class GeneratorContext;
 /// \brief Google protobuf message generator for gazebo::msgs
 class GazeboGenerator : public CodeGenerator
 {
-  public: GazeboGenerator(const std::string &_name);
+  public: explicit GazeboGenerator(const std::string &_name);
 
   public: virtual ~GazeboGenerator();
 

@@ -399,9 +399,9 @@ bool PresetManager::CreateProfile(const std::string &_name)
     gzwarn << "Warning: profile [" << _name << "] already exists! Overwriting."
            << std::endl;
   }
-  this->dataPtr->presetProfiles.emplace(_name, _name);
+  this->dataPtr->presetProfiles.emplace(_name, Preset(_name));
 
-  if (!this->ProfileSDF(_name, this->dataPtr->physicsEngine->GetSDF()))
+  if (!this->ProfileSDF(_name, this->dataPtr->physicsEngine->SDF()))
     return false;
 
   return true;
@@ -505,7 +505,7 @@ void PresetManager::GeneratePresetFromSDF(const sdf::ElementPtr _elem,
   // physics engine is allowed.
   GZ_ASSERT(this->dataPtr->physicsEngine, "No physics engine in PresetManager");
   if (_elem->GetParent() && _elem->GetParent()->GetName() == "physics" &&
-      this->dataPtr->physicsEngine->GetType() != _elem->GetName())
+      this->dataPtr->physicsEngine->Type() != _elem->GetName())
   {
     return;
   }

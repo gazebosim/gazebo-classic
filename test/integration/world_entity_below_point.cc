@@ -44,23 +44,23 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
   modelNames.push_back("sphere");
 
   std::vector<std::string>::iterator iter;
-  math::Vector3 pos, testPos;
+  ignition::math::Vector3d pos, testPos;
   physics::ModelPtr model;
   physics::EntityPtr entity;
   for (iter = modelNames.begin(); iter != modelNames.end(); ++iter)
   {
-    model = world->GetModel(*iter);
+    model = world->ModelByName(*iter);
     ASSERT_TRUE(model != NULL);
-    pos = model->GetWorldPose().pos;
-    pos.z += 10;
+    pos = model->WorldPose().Pos();
+    pos.Z() += 10;
 
-    entity = world->GetEntityBelowPoint(pos);
+    entity = world->EntityBelowPoint(pos);
     if (entity)
     {
-      gzdbg << "hit: " << entity->GetScopedName()
-            << ", expected: " << model->GetScopedName()
+      gzdbg << "hit: " << entity->ScopedName()
+            << ", expected: " << model->ScopedName()
             << std::endl;
-      EXPECT_EQ(entity->GetParentModel()->GetName(), model->GetName());
+      EXPECT_EQ(entity->ParentModel()->Name(), model->Name());
     }
     else
     {
@@ -69,14 +69,14 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
     }
 
     testPos = pos;
-    testPos.z = pos.z + 5;
-    entity = world->GetEntityBelowPoint(testPos);
+    testPos.Z() = pos.Z() + 5;
+    entity = world->EntityBelowPoint(testPos);
     if (entity)
     {
-      gzdbg << "hit: " << entity->GetScopedName()
-            << ", expected: " << model->GetScopedName()
+      gzdbg << "hit: " << entity->ScopedName()
+            << ", expected: " << model->ScopedName()
             << std::endl;
-      EXPECT_EQ(entity->GetParentModel(), model);
+      EXPECT_EQ(entity->ParentModel(), model.get());
     }
     else
     {
@@ -87,13 +87,13 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 
   // Ground plane
   pos.Set(25, 25, 1);
-  entity = world->GetEntityBelowPoint(pos);
+  entity = world->EntityBelowPoint(pos);
   if (entity)
   {
-    gzdbg << "hit: " << entity->GetScopedName()
-          << ", expected: " << model->GetScopedName()
+    gzdbg << "hit: " << entity->ScopedName()
+          << ", expected: " << model->ScopedName()
           << std::endl;
-    EXPECT_EQ(entity->GetParentModel()->GetName(), "ground_plane");
+    EXPECT_EQ(entity->ParentModel()->Name(), "ground_plane");
   }
   else
   {
@@ -103,7 +103,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 
   // Expect no hit
   pos.Set(25, 25, -1);
-  entity = world->GetEntityBelowPoint(pos);
+  entity = world->EntityBelowPoint(pos);
   EXPECT_TRUE(entity == NULL);
 }
 

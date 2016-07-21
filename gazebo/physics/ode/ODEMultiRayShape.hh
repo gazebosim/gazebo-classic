@@ -52,8 +52,8 @@ namespace gazebo
                                           dGeomID _o2);
 
       // Documentation inhertited
-      protected: void AddRay(const ignition::math::Vector3d &_start,
-                     const ignition::math::Vector3d &_end);
+      public: void AddRay(const ignition::math::Vector3d &_start,
+                          const ignition::math::Vector3d &_end);
 
       /// \brief Space to contain the ray space, for efficiency.
       private: dSpaceID superSpaceId;

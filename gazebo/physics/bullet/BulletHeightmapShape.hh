@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLET_BULLETHEIGHTMAPSHAPE_HH_
-#define _GAZEBO_PHYSICS_BULLET_BULLETHEIGHTMAPSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETHEIGHTMAPSHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETHEIGHTMAPSHAPE_HH_
 
 #include <string>
 
@@ -38,7 +38,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
-      public: BulletHeightmapShape(CollisionPtr _parent);
+      public: explicit BulletHeightmapShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletHeightmapShape();

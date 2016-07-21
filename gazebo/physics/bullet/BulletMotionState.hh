@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLET_BULLETMOTIONSTATE_HH_
-#define _GAZEBO_PHYSICS_BULLET_BULLETMOTIONSTATE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETMOTIONSTATE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETMOTIONSTATE_HH_
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -37,7 +37,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletMotionState : public btMotionState
     {
       /// \brief Constructor
-      public: BulletMotionState(LinkPtr _link);
+      public: explicit BulletMotionState(LinkPtr _link);
 
       /// \brief Destructor
       public: virtual ~BulletMotionState();

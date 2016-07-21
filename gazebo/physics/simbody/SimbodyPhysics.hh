@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
-#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
+#ifndef GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
+#define GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
 
 #include <string>
 
@@ -45,7 +45,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyPhysics : public PhysicsEngine
     {
       /// \brief Constructor
-      public: SimbodyPhysics(WorldPtr _world);
+      public: explicit SimbodyPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~SimbodyPhysics();

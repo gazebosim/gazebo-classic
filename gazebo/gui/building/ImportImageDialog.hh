@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
-#define _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
+#ifndef GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
+#define GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
 
 #include <memory>
 
@@ -43,7 +42,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: ImportImageDialog(QWidget *_parent = 0);
+      public: explicit ImportImageDialog(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~ImportImageDialog();

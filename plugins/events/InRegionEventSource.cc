@@ -49,7 +49,7 @@ void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void InRegionEventSource::Init()
 {
-  this->model = this->world->GetModel(this->modelName);
+  this->model = this->world->ModelByName(this->modelName);
   if (!model)
   {
     gzerr << this->name << ": Model '" << this->modelName
@@ -82,10 +82,12 @@ void InRegionEventSource::Info() const
   for (auto v: this->region->boxes)
   {
     ss << "  Min ";
-    ss << "[" << v.min.x << ", " << v.min.y << ", " << v.min.z << "]";
+    ss << "[" << v.Min().X() << ", " << v.Min().Y() << ", "
+              << v.Min().Z() << "]";
     ss << std::endl;
     ss << "  Max ";
-    ss << "[" << v.max.x << ", " << v.max.y << ", " << v.max.z << "]\n";
+    ss << "[" << v.Max().X() << ", " << v.Max().Y() << ", "
+       << v.Max().Z() << "]\n";
   }
   ss << "  inside: " << this->isInside << std::endl;
   gzmsg << ss.str();

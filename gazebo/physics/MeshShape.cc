@@ -41,9 +41,9 @@ MeshShape::MeshShape(CollisionPtr _parent)
 : Shape(*new MeshShapePrivate, _parent),
   meshShapeDPtr(static_cast<MeshShapePrivate*>(this->shapeDPtr))
 {
-  this->meshShapeDPtr->meshShapeDPtr->submesh = NULL;
+  this->meshShapeDPtr->submesh = NULL;
   this->AddType(Base::MESH_SHAPE);
-  sdf::initFile("mesh_shape.sdf", this->sdf);
+  sdf::initFile("mesh_shape.sdf", this->meshShapeDPtr->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -54,14 +54,15 @@ MeshShape::~MeshShape()
 //////////////////////////////////////////////////
 void MeshShape::Init()
 {
-  std::string meshStr = this->sdf->Get<std::string>("uri");
+  std::string meshStr = this->meshShapeDPtr->sdf->Get<std::string>("uri");
 
   common::MeshManager *meshManager = common::MeshManager::Instance();
   this->meshShapeDPtr->mesh = meshManager->GetMesh(meshStr);
 
   if (!this->meshShapeDPtr->mesh)
   {
-    meshStr = common::find_file(this->sdf->Get<std::string>("uri"));
+    meshStr =
+      common::find_file(this->meshShapeDPtr->sdf->Get<std::string>("uri"));
 
     if (meshStr == "__default__" || meshStr.empty())
     {
@@ -73,13 +74,14 @@ void MeshShape::Init()
       gzerr << "Unable to load mesh from file[" << meshStr << "]\n";
   }
 
-  if (this->meshShapeDPtr->meshShapeDPtr->submesh)
-    delete this->meshShapeDPtr->meshShapeDPtr->submesh;
-  this->meshShapeDPtr->meshShapeDPtr->submesh = NULL;
+  if (this->meshShapeDPtr->submesh)
+    delete this->meshShapeDPtr->submesh;
+  this->meshShapeDPtr->submesh = NULL;
 
-  if (this->sdf->HasElement("submesh"))
+  if (this->meshShapeDPtr->sdf->HasElement("submesh"))
   {
-    sdf::ElementPtr submeshElem = this->sdf->GetElement("submesh");
+    sdf::ElementPtr submeshElem =
+      this->meshShapeDPtr->sdf->GetElement("submesh");
     std::string submeshName = submeshElem->Get<std::string>("name");
     if (submeshName != "__default__" && !submeshName.empty())
     {
@@ -87,10 +89,10 @@ void MeshShape::Init()
         this->meshShapeDPtr->mesh->GetSubMesh(submeshName);
       if (smesh)
       {
-        this->meshShapeDPtr->meshShapeDPtr->submesh = new common::SubMesh(
+        this->meshShapeDPtr->submesh = new common::SubMesh(
           this->meshShapeDPtr->mesh->GetSubMesh(submeshName));
 
-        if (!this->meshShapeDPtr->meshShapeDPtr->submesh)
+        if (!this->meshShapeDPtr->submesh)
           gzthrow("Unable to get submesh with name[" +
               submeshElem->Get<std::string>("name") + "]");
 
@@ -98,7 +100,7 @@ void MeshShape::Init()
         if (submeshElem->HasElement("center") &&
             submeshElem->Get<bool>("center"))
         {
-          this->meshShapeDPtr->meshShapeDPtr->submesh->Center(
+          this->meshShapeDPtr->submesh->Center(
               ignition::math::Vector3d::Zero);
         }
       }
@@ -115,7 +117,7 @@ void MeshShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 void MeshShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  this->sdf->GetElement("scale")->Set(_scale);
+  this->meshShapeDPtr->sdf->GetElement("scale")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
@@ -127,7 +129,7 @@ math::Vector3 MeshShape::GetSize() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d MeshShape::Size() const
 {
-  return this->sdf->Get<ignition::math::Vector3d>("scale");
+  return this->meshShapeDPtr->sdf->Get<ignition::math::Vector3d>("scale");
 }
 
 //////////////////////////////////////////////////
@@ -139,7 +141,7 @@ std::string MeshShape::GetMeshURI() const
 //////////////////////////////////////////////////
 std::string MeshShape::MeshURI() const
 {
-  return this->sdf->Get<std::string>("uri");
+  return this->meshShapeDPtr->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
@@ -147,12 +149,14 @@ void MeshShape::SetMesh(const std::string &_uri,
                         const std::string &_submesh,
                         const bool _center)
 {
-  this->sdf->GetElement("uri")->Set(_uri);
+  this->meshShapeDPtr->sdf->GetElement("uri")->Set(_uri);
 
   if (!_submesh.empty())
   {
-    this->sdf->GetElement("submesh")->GetElement("name")->Set(_submesh);
-    this->sdf->GetElement("submesh")->GetElement("center")->Set(_center);
+    this->meshShapeDPtr->sdf->GetElement("submesh")->GetElement("name")->Set(
+        _submesh);
+    this->meshShapeDPtr->sdf->GetElement("submesh")->GetElement("center")->Set(
+        _center);
   }
 
   this->Init();
@@ -162,7 +166,7 @@ void MeshShape::SetMesh(const std::string &_uri,
 void MeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
-  _msg.mutable_mesh()->CopyFrom(msgs::MeshFromSDF(this->sdf));
+  _msg.mutable_mesh()->CopyFrom(msgs::MeshFromSDF(this->meshShapeDPtr->sdf));
 }
 
 //////////////////////////////////////////////////

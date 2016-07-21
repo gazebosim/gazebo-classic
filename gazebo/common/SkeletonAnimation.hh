@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SKELETONANIMATION_HH_
-#define _GAZEBO_SKELETONANIMATION_HH_
+#ifndef GAZEBO_COMMON_SKELETONANIMATION_HH_
+#define GAZEBO_COMMON_SKELETONANIMATION_HH_
 
 #include <map>
 #include <utility>
@@ -42,7 +42,7 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
-      public: NodeAnimation(const std::string &_name);
+      public: explicit NodeAnimation(const std::string &_name);
 
       /// \brief Destructor. It empties the key frames list
       public: ~NodeAnimation();
@@ -129,7 +129,7 @@ namespace gazebo
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation
-      public: SkeletonAnimation(const std::string &_name);
+      public: explicit SkeletonAnimation(const std::string &_name);
 
       /// \brief The destructor. Clears the list without destroying
       /// the animations

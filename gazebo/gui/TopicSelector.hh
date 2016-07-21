@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _TOPICSELECTOR_HH_
-#define _TOPICSELECTOR_HH_
+#ifndef GAZEBO_GUI_TOPICSELECTOR_HH_
+#define GAZEBO_GUI_TOPICSELECTOR_HH_
 
 #include <string>
 
@@ -38,7 +38,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget pointer.
-      public: TopicSelector(QWidget *_parent = 0);
+      public: explicit TopicSelector(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~TopicSelector();

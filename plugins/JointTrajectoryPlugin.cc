@@ -40,12 +40,12 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 {
   // Get the world name.
   this->model = _parent;
-  this->world = this->model->GetWorld();
+  this->world = this->model->World();
 
-  // this->world->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  // this->world->PhysicsEngine()->SetGravity(math::Vector3(0,0,0));
 
-  for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
-                        j != this->model->GetJoints().end(); ++j)
+  for (physics::Joint_V::const_iterator j = this->model->Joints().begin();
+      j != this->model->Joints().end(); ++j)
     (*j)->SetPosition(0, 0);
 
   // New Mechanism for Updating every World Cycle
@@ -58,11 +58,11 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 // void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
 // {
-//   this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
+//   this->joint = this->world->PhysicsEngine()->CreateJoint("revolute",
 //       this->model);
 //
 //   this->joint->SetModel(this->model);
-//   math::Pose pose = _link->GetWorldPose();
+//   math::Pose pose = _link->WorldPose();
 //   // math::Pose  pose(math::Vector3(0, 0, 0.2),
 //                       math::Quaternion(1, 0, 0, 0));
 //   this->joint->Load(physics::LinkPtr(), _link, pose);
@@ -82,11 +82,11 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
-  common::Time cur_time = this->world->GetSimTime();
+  common::Time cur_time = this->world->SimTime();
 
-  // for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
-  //                       j != this->model->GetJoints().end(); ++j)
-  //   gzerr << cur_time << " " << (*j)->GetScopedName() << "\n";
+  // for (physics::Joint_V::const_iterator j = this->model->Joints().begin();
+  //                       j != this->model->Joints().end(); ++j)
+  //   gzerr << cur_time << " " << (*j)->ScopedName() << "\n";
 
   bool is_paused = this->world->IsPaused();
   if (!is_paused) this->world->SetPaused(true);

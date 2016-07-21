@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_PHYSICS_LIGHT_HH_
-#define _GAZEBO_PHYSICS_LIGHT_HH_
+#ifndef _GAZEBO_PHYSICS_LIGHTPRIVATE_HH_
+#define _GAZEBO_PHYSICS_LIGHTPRIVATE_HH_
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/EntityPrivate.hh"

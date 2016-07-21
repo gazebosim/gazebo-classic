@@ -210,13 +210,13 @@ LinkPtr Collision::Link() const
 //////////////////////////////////////////////////
 ModelPtr Collision::GetModel() const
 {
-  return this->Model();
+  return ModelPtr(this->ParentModel());
 }
 
 //////////////////////////////////////////////////
-ModelPtr Collision::Model() const
+Model *Collision::ParentModel() const
 {
-  return this->collDPtr->link->Model();
+  return this->collDPtr->link->ParentModel();
 }
 
 //////////////////////////////////////////////////
@@ -246,7 +246,6 @@ ShapePtr Collision::GetShape() const
 //////////////////////////////////////////////////
 ShapePtr Collision::Shape() const
 {
-
   return this->collDPtr->shape;
 }
 
@@ -476,7 +475,7 @@ CollisionState Collision::State() const
 /////////////////////////////////////////////////
 void Collision::SetState(const CollisionState &_state)
 {
-  this->SetRelativePose(_state.GetPose().Ign());
+  this->SetRelativePose(_state.Pose());
 }
 
 /////////////////////////////////////////////////

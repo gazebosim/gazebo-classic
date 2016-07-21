@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BASE_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_BASE_PRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_BASE_PRIVATE_HH_
+#define GAZEBO_PHYSICS_BASE_PRIVATE_HH_
+#include <string>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -53,6 +54,9 @@ namespace gazebo
 
       /// \brief The type of this object.
       public: unsigned int type;
+
+      /// \brief The string representation of the type of this object.
+      public: std::string typeStr;
 
       /// \brief True if selected.
       public: bool selected;

@@ -42,7 +42,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.
-      public: DARTJoint(BasePtr _parent);
+      public: explicit DARTJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTJoint();

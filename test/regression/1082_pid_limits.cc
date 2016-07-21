@@ -35,9 +35,8 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
-  gazebo::physics::JointControllerPtr jointController =
-    model->GetJointController();
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
+  gazebo::physics::JointControllerPtr jointController = model->JointCtrl();
 
   world->Step(100);
 
@@ -45,7 +44,7 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  math::Pose startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  math::Pose startPose = model->LinkByName("arm_elbow_pan")->WorldPose();
 
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -60,7 +59,7 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
 
   world->Step(500);
 
-  math::Pose endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  math::Pose endPose = model->LinkByName("arm_elbow_pan")->WorldPose();
 
   double diffDist = (startPose - endPose).pos.GetLength();
 
@@ -79,15 +78,14 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
-  gazebo::physics::JointControllerPtr jointController =
-    model->GetJointController();
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
+  gazebo::physics::JointControllerPtr jointController = model->JointCtrl();
 
   gazebo::transport::PublisherPtr pub =
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  math::Pose startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  math::Pose startPose = model->LinkByName("arm_elbow_pan")->WorldPose();
 
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -102,7 +100,7 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
 
   world->Step(500);
 
-  math::Pose endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  math::Pose endPose = model->LinkByName("arm_elbow_pan")->WorldPose();
 
   gzdbg << "Start Pose[" << startPose << "]\n";
   gzdbg << "End Pose[" << endPose << "]\n";

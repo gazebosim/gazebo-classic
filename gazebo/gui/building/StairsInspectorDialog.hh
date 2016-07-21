@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
-#define _GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
+#ifndef GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
+#define GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
 
 #include <memory>
 #include <string>
@@ -45,7 +45,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: StairsInspectorDialog(QWidget *_parent = 0);
+      public: explicit StairsInspectorDialog(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~StairsInspectorDialog();

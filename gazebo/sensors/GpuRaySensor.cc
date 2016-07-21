@@ -115,8 +115,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
         this->Type());
   }
 
-  this->dataPtr->parentEntity =
-    this->world->GetEntity(this->ParentName());
+  this->dataPtr->parentEntity = this->world->EntityByName(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
@@ -132,7 +131,7 @@ void GpuRaySensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (!worldName.empty())
   {
@@ -716,7 +715,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+      this->pose + this->dataPtr->parentEntity->WorldPose());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());

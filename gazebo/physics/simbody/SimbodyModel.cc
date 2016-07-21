@@ -76,14 +76,14 @@ void SimbodyModel::Init()
 
   for (unsigned int i = 0; i < this->GripperCount(); ++i)
   {
-    this->Gripper(i)->Init();
+    this->GripperByIndex(i)->Init();
   }
 
   // rebuild simbody state
   // this needs to happen before this->joints are used
   physics::SimbodyPhysicsPtr simbodyPhysics =
     std::dynamic_pointer_cast<physics::SimbodyPhysics>(
-      this->World()->GetPhysicsEngine());
+      this->World()->Physics());
 
   if (simbodyPhysics)
   {
@@ -130,7 +130,7 @@ void SimbodyModel::Init()
 //   // this needs to happen before this->joints are used
 //   physics::SimbodyPhysicsPtr simbodyPhysics =
 //     std::dynamic_pointer_cast<physics::SimbodyPhysics>(
-//       this->GetWorld()->GetPhysicsEngine());
+//       this->GetWorld()->Physics());
 //   if (simbodyPhysics)
 //     simbodyPhysics->InitModel(this);
 //

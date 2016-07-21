@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
-#define _GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
+#ifndef GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
+#define GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 
 #include <memory>
 #include <string>
@@ -49,7 +49,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent of the widget.
-      public: JointControlWidget(QWidget *_parent = 0);
+      public: explicit JointControlWidget(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: virtual ~JointControlWidget();

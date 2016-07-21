@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_TIME_WIDGET_HH_
-#define _GAZEBO_TIME_WIDGET_HH_
+#ifndef GAZEBO_GUI_TIMEWIDGET_HH_
+#define GAZEBO_GUI_TIMEWIDGET_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/TimePanel.hh"
@@ -34,7 +34,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget, commonly a TimePanel.
-      public: TimeWidget(QWidget *_parent = 0);
+      public: explicit TimeWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~TimeWidget();

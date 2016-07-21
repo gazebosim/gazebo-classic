@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _ODEPHYSICS_PRIVATE_HH_
-#define _ODEPHYSICS_PRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEPHYSICSPRIVATE_HH_
+#define GAZEBO_PHYSICS_ODE_ODEPHYSICSPRIVATE_HH_
 
 #include <map>
 #include <string>
@@ -24,6 +23,7 @@
 #include <utility>
 
 #include "gazebo/physics/Contact.hh"
+#include "gazebo/physics/PhysicsEnginePrivate.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
 
 namespace gazebo
@@ -45,7 +45,7 @@ namespace gazebo
       public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
     };
 
-    class ODEPhysicsPrivate
+    class ODEPhysicsPrivate : public PhysicsEnginePrivate
     {
       /// \brief Top-level world for all bodies
       public: dWorldID worldId;

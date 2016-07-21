@@ -50,11 +50,16 @@ namespace gazebo
 
       /// \brief Set the size.
       /// \param[in] _radius Radius of the sphere.
-      public: virtual void SetRadius(double _radius);
+      public: virtual void SetRadius(const double _radius);
 
       /// \brief Get the sphere's radius.
       /// \return Radius of the sphere.
-      public: double GetRadius() const;
+      /// \deprecated See double Radius() const
+      public: double GetRadius() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the sphere's radius.
+      /// \return Radius of the sphere.
+      public: double Radius() const;
 
       /// \brief Set the scale of the sphere.
       /// \param[in] _scale Scale to set the sphere to.

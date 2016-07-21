@@ -44,7 +44,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletJoint : public Joint
     {
       /// \brief Constructor
-      public: BulletJoint(BasePtr _parent);
+      public: explicit BulletJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletJoint();
@@ -146,10 +146,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void ApplyStiffnessDamping();
-
-      // Documentation inherited.
-      public: virtual void SetAxis(const unsigned int _index,
-                                   const ignition::math::Vector3d &_axis);
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest

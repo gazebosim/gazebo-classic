@@ -19,9 +19,9 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyFixedJoint.hh"
 
 using namespace gazebo;
@@ -48,7 +48,7 @@ void SimbodyFixedJoint::Load(sdf::ElementPtr _sdf)
 
 //////////////////////////////////////////////////
 void SimbodyFixedJoint::SetVelocity(const unsigned int /*_index*/,
-   const double /*_angle*/)
+    const double /*_angle*/)
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "SetVelocity that is not valid for joints of type fixed.\n";

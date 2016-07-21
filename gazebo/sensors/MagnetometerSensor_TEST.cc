@@ -95,9 +95,9 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Spawn a magnetometer sensor with a PI/2 aniclockwise rotation about Z axis
   std::string modelName = "magModel";

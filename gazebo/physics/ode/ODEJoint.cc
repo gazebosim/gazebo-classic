@@ -87,11 +87,13 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
   if (this->jointDPtr->sdf->HasElement("physics") &&
       this->jointDPtr->sdf->GetElement("physics")->HasElement("ode"))
   {
-    sdf::ElementPtr elem = this->jointDPtr->sdf->GetElement("physics")->GetElement("ode");
+    sdf::ElementPtr elem =
+      this->jointDPtr->sdf->GetElement("physics")->GetElement("ode");
 
     if (elem->HasElement("implicit_spring_damper"))
     {
-      this->odeJointDPtr->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
+      this->odeJointDPtr->useImplicitSpringDamper =
+        elem->Get<bool>("implicit_spring_damper");
     }
 
     // initializa both axis, \todo: make cfm, erp per axis
@@ -192,7 +194,8 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 
   ODELinkPtr odechild = std::dynamic_pointer_cast<ODELink>(
       this->jointDPtr->childLink);
-  ODELinkPtr odeparent = std::dynamic_pointer_cast<ODELink>(this->jointDPtr->parentLink);
+  ODELinkPtr odeparent = std::dynamic_pointer_cast<ODELink>(
+      this->jointDPtr->parentLink);
 
   if (odechild == nullptr && odeparent == nullptr)
     gzthrow("ODEJoint requires at least one ODE link\n");
@@ -215,9 +218,15 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
   else if (odechild && odeparent)
   {
     if (this->HasType(Base::HINGE2_JOINT))
-      dJointAttach(this->odeJointDPtr->jointId, odeparent->ODEId(), odechild->ODEId());
+    {
+      dJointAttach(
+          this->odeJointDPtr->jointId, odeparent->ODEId(), odechild->ODEId());
+    }
     else
-      dJointAttach(this->odeJointDPtr->jointId, odechild->ODEId(), odeparent->ODEId());
+    {
+      dJointAttach(
+          this->odeJointDPtr->jointId, odechild->ODEId(), odeparent->ODEId());
+    }
   }
 }
 
@@ -704,9 +713,8 @@ JointWrench ODEJoint::ForceTorque(const unsigned int /*_index*/) const
       // convert torque from about child CG to joint anchor location
       // cg position specified in child link frame
       ignition::math::Pose3d cgPose;
-      physics::InertialPtr inertial = this->jointDPtr->childLink->Inertial();
-      if (inertial)
-        cgPose = inertial->Pose();
+      const physics::Inertial inertial = this->jointDPtr->childLink->Inertia();
+      cgPose = inertial.Pose();
 
       // anchorPose location of joint in child frame
       // childMomentArm: from child CG to joint location in child link frame
@@ -756,9 +764,8 @@ JointWrench ODEJoint::ForceTorque(const unsigned int /*_index*/) const
 
       // parent cg specified in parent link frame
       ignition::math::Pose3d cgPose;
-      InertialPtr inertial = this->jointDPtr->parentLink->Inertial();
-      if (inertial)
-        cgPose = inertial->Pose();
+      const Inertial inertial = this->jointDPtr->parentLink->Inertia();
+      cgPose = inertial.Pose();
 
       // get parent CG pose in child link frame
       ignition::math::Pose3d parentCGInChildLink =
@@ -893,7 +900,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
      return;
   }
 
-  double dt = this->World()->GetPhysicsEngine()->MaxStepSize();
+  double dt = this->World()->Physics()->MaxStepSize();
   for (unsigned int i = 0; i < this->AngleCount(); ++i)
   {
     double angle = this->Angle(i).Radian();
@@ -932,8 +939,9 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
       }
       */
     }
-    else if (!ignition::math::equal(this->jointDPtr->dissipationCoefficient[i], 0.0) ||
-             !ignition::math::equal(this->jointDPtr->stiffnessCoefficient[i], 0.0))
+    else if (!ignition::math::equal(
+          this->jointDPtr->dissipationCoefficient[i], 0.0) ||
+        !ignition::math::equal(this->jointDPtr->stiffnessCoefficient[i], 0.0))
     {
       double kd = fabs(this->jointDPtr->dissipationCoefficient[i]);
       double kp = this->jointDPtr->stiffnessCoefficient[i];
@@ -945,7 +953,8 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
 
       // update if going into DAMPING_ACTIVE mode, or
       // if current applied damping value is not the same as predicted.
-      if (this->odeJointDPtr->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
+      if (this->odeJointDPtr->implicitDampingState[i] !=
+          ODEJoint::DAMPING_ACTIVE ||
           !ignition::math::equal(kd, this->odeJointDPtr->currentKd[i]) ||
           !ignition::math::equal(kp, this->odeJointDPtr->currentKp[i]))
       {
@@ -1139,9 +1148,14 @@ void ODEJoint::SetProvideFeedback(bool _enable)
     }
 
     if (this->odeJointDPtr->jointId)
-      dJointSetFeedback(this->odeJointDPtr->jointId, this->odeJointDPtr->feedback);
+    {
+      dJointSetFeedback(this->odeJointDPtr->jointId,
+          this->odeJointDPtr->feedback);
+    }
     else
+    {
       gzerr << "ODE Joint ID is invalid\n";
+    }
   }
 }
 
@@ -1166,11 +1180,12 @@ void ODEJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->AngleCount())
   {
-    if (this->odeJointDPtr->forceAppliedTime < this->World()->GetSimTime())
+    if (this->odeJointDPtr->forceAppliedTime < this->World()->SimTime())
     {
       // reset forces if time step is new
-      this->odeJointDPtr->forceAppliedTime = this->World()->GetSimTime();
-      this->odeJointDPtr->forceApplied[0] = this->odeJointDPtr->forceApplied[1] = 0;
+      this->odeJointDPtr->forceAppliedTime = this->World()->SimTime();
+      this->odeJointDPtr->forceApplied[0] =
+        this->odeJointDPtr->forceApplied[1] = 0;
     }
 
     this->odeJointDPtr->forceApplied[_index] += _force;

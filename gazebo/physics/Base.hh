@@ -27,6 +27,7 @@
 #include <memory>
 #include <sdf/sdf.hh>
 
+#include <gazebo/common/CommonTypes.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
 #include <gazebo/common/URI.hh>
 

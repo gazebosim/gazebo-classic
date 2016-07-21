@@ -66,7 +66,7 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
     std::static_pointer_cast<ODECollision>(this->rayShapeDPtr->collisionParent);
 
   this->physicsEngine = std::static_pointer_cast<ODEPhysics>(
-      this->shapeDPtr->collisionParent->World()->GetPhysicsEngine());
+      this->shapeDPtr->collisionParent->World()->Physics());
 
   GZ_ASSERT(collision->SpaceId() != 0, "Ray collision space is null");
   this->geomId = dCreateRay(collision->SpaceId(), 1.0);
@@ -128,8 +128,8 @@ void ODERayShape::Intersection(double &_dist, std::string &_entity)
     intersection.depth = 1000;
 
     {
-      boost::recursive_mutex::scoped_lock lock(
-          *this->physicsEngine->GetPhysicsUpdateMutex());
+      std::lock_guard<std::recursive_mutex> lock(
+          this->physicsEngine->PhysicsUpdateMutex());
 
       // Do collision detection
       dSpaceCollide2(this->geomId,

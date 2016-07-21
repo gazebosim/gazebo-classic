@@ -137,7 +137,7 @@ namespace gazebo
       /// \brief Get the center of gravity.
       /// \return The center of gravity.
       /// \deprecated See CoG() const
-      public: const math::Vector3 &GetCoG() const GAZEBO_DEPRECATED(7.0);
+      public: math::Vector3 GetCoG() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the center of gravity.
       /// \return The center of gravity.
@@ -305,12 +305,23 @@ namespace gazebo
       public: ignition::math::Matrix3d MOI(
                   const ignition::math::Pose3d &_pose) const;
 
+      /// \brief Get the equivalent inertia from a point in local Link frame
+      /// If you specify GetMOI(this->GetPose()), you should get
+      /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
+      /// If _pose is different from pose of the Inertial block, then
+      /// the MOI is rotated accordingly, and contributions from changes
+      /// in MOI location location due to point mass is added to the final MOI.
+      /// \param[in] _pos location in Link local frame
+      /// \return equivalent inertia at _pose
+      public: ignition::math::Matrix3d MOI(
+                  const ignition::math::Vector3d &_pos) const;
+
       /// \brief Get equivalent Inertia values with the Link frame offset,
       /// while holding the Pose of CoG constant in the world frame.
       /// \param[in] _frameOffset amount to offset the Link frame by, this
       /// is a transform defined in the Link frame.
       /// \return Inertial parameters with the shifted frame.
-      /// \deprecated See Inertial((const ignition::math::Pose3d &) const
+      /// \deprecated See operator()(const ignition::math::Pose3d &) const
       public: Inertial GetInertial(const math::Pose &_frameOffset) const
               GAZEBO_DEPRECATED(7.0);
 
@@ -322,6 +333,15 @@ namespace gazebo
       /// \deprecated See operator()(const ignition::math::Pose3d &) const
       public: Inertial operator()(
                   const ignition::math::Pose3d &_frameOffset) const;
+
+      /// \brief Get equivalent Inertia values with the Link frame offset,
+      /// while holding the Pose of CoG constant in the world frame.
+      /// \param[in] _frameOffset amount to offset the Link frame by, this
+      /// is a transform defined in the Link frame.
+      /// \return Inertial parameters with the shifted frame.
+      /// \deprecated See operator()(const ignition::math::Pose3d &) const
+      public: Inertial operator()(
+                  const ignition::math::Vector3d &_frameOffset) const;
 
       /// \brief Output operator.
       /// \param[in] _out Output stream.
@@ -351,11 +371,16 @@ namespace gazebo
 
       /// \brief Sets Moments of Inertia (MOI) from a Matrix3
       /// \param[in] Moments of Inertia as a Matrix3
-      public: void SetMOI(const math::Matrix3 &_moi);
+      /// \deprecated See versoin that accepts ignition math parameters
+      public: void SetMOI(const math::Matrix3 &_moi) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Sets Moments of Inertia (MOI) from a Matrix3
+      /// \param[in] Moments of Inertia as a Matrix3
+      public: void SetMOI(const ignition::math::Matrix3d &_moi);
 
       /// \internal
       /// \brief Private data pointer.
-      private: std::unique_ptr<InertialPrivate> *dataPtr;
+      private: std::unique_ptr<InertialPrivate> dataPtr;
     };
     /// \}
   }

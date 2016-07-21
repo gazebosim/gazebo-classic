@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/LightPrivate.hh"
@@ -30,7 +31,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Light::Light(BasePtr _parent)
-: Entity(new LightPrivate, _parent),
+: Entity(*new LightPrivate, _parent),
   lightDPtr(static_cast<LightPrivate*>(this->entityDPtr))
 {
   this->AddType(LIGHT);
@@ -49,10 +50,10 @@ void Light::Init()
 //////////////////////////////////////////////////
 void Light::ProcessMsg(const msgs::Light &_msg)
 {
-  this->SetName(this->world->StripWorldName(_msg.name()));
+  this->SetName(this->lightDPtr->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
   {
-    this->worldPose = msgs::ConvertIgn(_msg.pose());
+    this->lightDPtr->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
   this->lightDPtr->msg.MergeFrom(_msg);
@@ -74,14 +75,14 @@ void Light::SetState(const LightState &_state)
   if (this->lightDPtr->worldPose == _state.Pose())
     return;
 
-  this->worldPose = _state.Pose();
+  this->lightDPtr->worldPose = _state.Pose();
   this->PublishPose();
 }
 
 //////////////////////////////////////////////////
 void Light::PublishPose()
 {
-  this->world->PublishLightPose(std::dynamic_pointer_cast<Light>(
+  this->lightDPtr->world->PublishLightPose(std::dynamic_pointer_cast<Light>(
       shared_from_this()));
 }
 

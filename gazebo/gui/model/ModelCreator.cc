@@ -2410,7 +2410,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   // check using Qt for now
   if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
-    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
+    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
   pose.Pos().Z(this->dataPtr->mouseVisual->GetWorldPose().Ign().Pos().Z());
 

@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A world state
- * Author: Nate Koenig
- */
-
-#ifndef _WORLDSTATE_HH_
-#define _WORLDSTATE_HH_
+#ifndef GAZEBO_PHYSICS_WORLDSTATE_HH_
+#define GAZEBO_PHYSICS_WORLDSTATE_HH_
 
 #include <string>
 #include <vector>
@@ -47,13 +43,20 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE WorldState : public State
     {
       /// \brief Default constructor
-      public: WorldState();
+      public: WorldState() = delete;
 
       /// \brief Constructor.
       ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
-      public: explicit WorldState(const WorldPtr _world);
+      /// \deprecated See version that accepts a reference to a World.
+      public: explicit WorldState(WorldPtr _world) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      ///
+      /// Generate a WorldState from an instance of a World.
+      /// \param[in] _world Pointer to a world
+      public: explicit WorldState(const World &_world);
 
       /// \brief Constructor
       ///
@@ -68,7 +71,14 @@ namespace gazebo
       ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
-      public: void Load(const WorldPtr _world);
+      /// \deprecated See version that accepts a reference to a World
+      public: void Load(WorldPtr _world) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Load from a World pointer.
+      ///
+      /// Generate a WorldState from an instance of a World.
+      /// \param[in] _world Pointer to a world
+      public: void Load(const World &_world);
 
       /// \brief Load state from SDF element.
       ///
@@ -78,17 +88,36 @@ namespace gazebo
 
       /// \brief Set the world.
       /// \param[in] _world Pointer to the world.
-      public: void SetWorld(const WorldPtr _world);
+      /// \deprecated See version that accepts a reference to a World.
+      public: void SetWorld(WorldPtr _world) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the world.
+      /// \param[in] _world Reference to the world.
+      public: void SetWorld(const World &_world);
 
       /// \brief Get model states based on a regular expression.
       /// \param[in] _regex The regular expression.
       /// \return List of model states whose names match the regular
       /// expression.
-      public: ModelState_M GetModelStates(const boost::regex &_regex) const;
+      /// \deprecated See ModelState_M ModelStates(const boost::regex &_regex)
+      /// const;
+      public: ModelState_M GetModelStates(const boost::regex &_regex) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get model states based on a regular expression.
+      /// \param[in] _regex The regular expression.
+      /// \return List of model states whose names match the regular
+      /// expression.
+      public: ModelState_M ModelStates(const boost::regex &_regex) const;
 
       /// \brief Get the model states.
       /// \return A vector of model states.
-      public: const ModelState_M &GetModelStates() const;
+      /// \deprecated See const ModelState_M &ModelStates() const
+      public: const ModelState_M &GetModelStates() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the model states.
+      /// \return A vector of model states.
+      public: const ModelState_M &ModelStates() const;
 
       /// \brief Get the light states.
       /// \return A vector of light states.
@@ -98,7 +127,14 @@ namespace gazebo
       ///
       /// Returns the number of models in this instance.
       /// \return Number of models.
-      public: unsigned int GetModelStateCount() const;
+      /// \deprecated See unsigned int GetModelStateCount() const
+      public: unsigned int GetModelStateCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the number of model states.
+      ///
+      /// Returns the number of models in this instance.
+      /// \return Number of models.
+      public: unsigned int ModelStateCount() const;
 
       /// \brief Get the number of light states.
       ///
@@ -110,13 +146,31 @@ namespace gazebo
       /// \param[in] _modelName Name of the model state to get.
       /// \return The model state.
       /// \throws common::Exception When the _modelName doesn't exist.
-      public: ModelState GetModelState(const std::string &_modelName) const;
+      /// \deprecated See ModelState ModelStateByName(
+      /// const std::string &_modelName) const
+      public: ModelState GetModelState(const std::string &_modelName) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a model state by model name.
+      /// \param[in] _modelName Name of the model state to get.
+      /// \return The model state.
+      /// \throws common::Exception When the _modelName doesn't exist.
+      public: ModelState ModelStateByName(const std::string &_modelName) const;
 
       /// \brief Get a light state by light name.
       /// \param[in] _lightName Name of the light state to get.
       /// \return The light state.
       /// \throws common::Exception When the _lightName doesn't exist.
-      public: LightState GetLightState(const std::string &_lightName) const;
+      /// \deprecated See LightState LightStateByName(
+      /// const std::string &_lightName) const
+      public: LightState GetLightState(const std::string &_lightName) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a light state by light name.
+      /// \param[in] _lightName Name of the light state to get.
+      /// \return The light state.
+      /// \throws common::Exception When the _lightName doesn't exist.
+      public: LightState LightStateByName(const std::string &_lightName) const;
 
       /// \brief Return true if WorldState has a ModelState with the given
       /// name.
@@ -265,7 +319,7 @@ namespace gazebo
       private: std::vector<std::string> deletions;
 
       /// \brief Pointer to the world.
-      private: WorldPtr world;
+      private: const World &world;
     };
     /// \}
   }

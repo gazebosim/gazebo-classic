@@ -46,9 +46,9 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   WorldPtr world = get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
-  EXPECT_EQ(physics->GetType(), physicsEngineStr);
+  EXPECT_EQ(physics->Type(), physicsEngineStr);
 
   ODEPhysicsPtr odePhysics
       = std::static_pointer_cast<ODEPhysics>(physics);
@@ -353,7 +353,7 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr engine = world->Physics();
   ASSERT_TRUE(engine != nullptr);
 
   transport::NodePtr phyNode;

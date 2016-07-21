@@ -73,7 +73,7 @@ class JointTest : public ServerFixture,
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
               wait(common::Time(99, 0)),
-              noLinkPose(false), axis(math::Vector3(1, 0, 0)),
+              noLinkPose(false), axis(ignition::math::Vector3d(1, 0, 0)),
               useParentModelFrame(false)
             {
             }
@@ -97,22 +97,22 @@ class JointTest : public ServerFixture,
     public: common::Time wait;
 
     /// \brief Model pose for spawned model.
-    public: math::Pose modelPose;
+    public: ignition::math::Pose3d modelPose;
 
     /// \brief Child link pose for spawned model.
-    public: math::Pose childLinkPose;
+    public: ignition::math::Pose3d childLinkPose;
 
     /// \brief Parent link pose for spawned model.
-    public: math::Pose parentLinkPose;
+    public: ignition::math::Pose3d parentLinkPose;
 
     /// \brief Flag to disable including link pose per issue #978.
     public: bool noLinkPose;
 
     /// \brief Joint pose for spawned joint.
-    public: math::Pose jointPose;
+    public: ignition::math::Pose3d jointPose;
 
     /// \brief Axis value for spawned joint.
-    public: math::Vector3 axis;
+    public: ignition::math::Vector3d axis;
 
     /// \brief Use parent model frame (#494)
     public: bool useParentModelFrame;
@@ -152,7 +152,7 @@ class JointTest : public ServerFixture,
             msgs::Model msg;
             std::string modelName = this->GetUniqueString("joint_model");
             msg.set_name(modelName);
-            msgs::Set(msg.mutable_pose(), _opt.modelPose.Ign());
+            msgs::Set(msg.mutable_pose(), _opt.modelPose);
 
             if (!_opt.worldParent)
             {
@@ -163,7 +163,7 @@ class JointTest : public ServerFixture,
               link->set_name("parent");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.parentLinkPose.Ign());
+                msgs::Set(link->mutable_pose(), _opt.parentLinkPose);
               }
             }
             if (!_opt.worldChild)
@@ -175,14 +175,14 @@ class JointTest : public ServerFixture,
               link->set_name("child");
               if (!_opt.noLinkPose)
               {
-                msgs::Set(link->mutable_pose(), _opt.childLinkPose.Ign());
+                msgs::Set(link->mutable_pose(), _opt.childLinkPose);
               }
             }
             msg.add_joint();
             auto jointMsg = msg.mutable_joint(0);
             jointMsg->set_name("joint");
             jointMsg->set_type(msgs::ConvertJointType(_opt.type));
-            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose.Ign());
+            msgs::Set(jointMsg->mutable_pose(), _opt.jointPose);
             if (_opt.worldParent)
             {
               jointMsg->set_parent("world");
@@ -202,7 +202,7 @@ class JointTest : public ServerFixture,
 
             {
               auto axis = jointMsg->mutable_axis1();
-              msgs::Set(axis->mutable_xyz(), _opt.axis.Ign());
+              msgs::Set(axis->mutable_xyz(), _opt.axis);
               axis->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
             // Hack: hardcode a second axis for universal joints
@@ -217,7 +217,7 @@ class JointTest : public ServerFixture,
             auto model = this->SpawnModel(msg);
             physics::JointPtr joint;
             if (model != NULL)
-              joint = model->GetJoint("joint");
+              joint = model->JointByName("joint");
 
             return joint;
           }

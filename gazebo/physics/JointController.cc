@@ -41,13 +41,13 @@ JointController::JointController(ModelPtr _model)
 {
   this->dataPtr->model = _model;
 
-  if (this->dataPtr->model && this->dataPtr->model->GetWorld())
+  if (this->dataPtr->model && this->dataPtr->model->World())
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
-    this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
+    this->dataPtr->node->Init(this->dataPtr->model->World()->Name());
 
     this->dataPtr->jointCmdSub = this->dataPtr->node->Subscribe(
-        std::string("~/") + this->dataPtr->model->GetName() + "/joint_cmd",
+        std::string("~/") + this->dataPtr->model->Name() + "/joint_cmd",
         &JointController::OnJointCmd, this);
   }
   else
@@ -67,10 +67,10 @@ JointController::~JointController()
 /////////////////////////////////////////////////
 void JointController::AddJoint(JointPtr _joint)
 {
-  this->dataPtr->joints[_joint->GetScopedName()] = _joint;
-  this->dataPtr->posPids[_joint->GetScopedName()].Init(
+  this->dataPtr->joints[_joint->ScopedName()] = _joint;
+  this->dataPtr->posPids[_joint->ScopedName()].Init(
       1, 0.1, 0.01, 1, -1, 1000, -1000);
-  this->dataPtr->velPids[_joint->GetScopedName()].Init(
+  this->dataPtr->velPids[_joint->ScopedName()].Init(
       1, 0.1, 0.01, 1, -1, 1000, -1000);
 }
 
@@ -100,7 +100,7 @@ void JointController::Reset()
 /////////////////////////////////////////////////
 void JointController::Update()
 {
-  common::Time currTime = this->dataPtr->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->dataPtr->model->World()->SimTime();
   common::Time stepTime = currTime - this->dataPtr->prevUpdateTime;
   this->dataPtr->prevUpdateTime = currTime;
 
@@ -128,7 +128,7 @@ void JointController::Update()
            iter != this->dataPtr->positions.end(); ++iter)
       {
         double cmd = this->dataPtr->posPids[iter->first].Update(
-            this->dataPtr->joints[iter->first]->GetAngle(0).Radian() -
+            this->dataPtr->joints[iter->first]->Angle(0).Radian() -
             iter->second, stepTime);
         this->dataPtr->joints[iter->first]->SetForce(0, cmd);
       }
@@ -142,7 +142,7 @@ void JointController::Update()
            iter != this->dataPtr->velocities.end(); ++iter)
       {
         double cmd = this->dataPtr->velPids[iter->first].Update(
-            this->dataPtr->joints[iter->first]->GetVelocity(0) - iter->second,
+            this->dataPtr->joints[iter->first]->Velocity(0) - iter->second,
             stepTime);
         this->dataPtr->joints[iter->first]->SetForce(0, cmd);
       }
@@ -160,7 +160,7 @@ void JointController::Update()
           this->dataPtr->positions.end())
       {
         this->dataPtr->positions[iter->first] =
-          iter->second->GetAngle(0).Radian();
+          iter->second->Angle(0).Radian();
       }
     }
     this->SetJointPositions(this->dataPtr->positions);
@@ -328,12 +328,12 @@ void JointController::SetJointPositions(
       iter != this->dataPtr->joints.end(); ++iter)
   {
     // First try name without scope, i.e. joint_name
-    jiter = _jointPositions.find(iter->second->GetName());
+    jiter = _jointPositions.find(iter->second->Name());
 
     if (jiter == _jointPositions.end())
     {
       // Second try name with scope, i.e. model_name::joint_name
-      jiter = _jointPositions.find(iter->second->GetScopedName());
+      jiter = _jointPositions.find(iter->second->ScopedName());
       if (jiter == _jointPositions.end())
         continue;
     }

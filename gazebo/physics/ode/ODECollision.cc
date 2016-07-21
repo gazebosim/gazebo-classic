@@ -47,7 +47,8 @@ ODECollision::ODECollision(LinkPtr _link)
   this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
-      std::static_pointer_cast<ODELink>(this->odeCollisionDPtr->link)->SpaceId());
+      std::static_pointer_cast<ODELink>(
+        this->odeCollisionDPtr->link)->SpaceId());
 
   this->odeCollisionDPtr->surface.reset(new ODESurfaceParams());
 }
@@ -107,7 +108,8 @@ void ODECollision::OnPoseChange()
   {
     this->OnPoseChangeGlobal();
   }
-  else if (this->odeCollisionDPtr->collisionId && this->odeCollisionDPtr->placeable)
+  else if (this->odeCollisionDPtr->collisionId &&
+           this->odeCollisionDPtr->placeable)
   {
     this->OnPoseChangeRelative();
   }
@@ -123,7 +125,8 @@ void ODECollision::SetCollision(dGeomID _collisionId, const bool _placeable)
 
   if (dGeomGetSpace(this->odeCollisionDPtr->collisionId) == 0)
   {
-    dSpaceAdd(this->odeCollisionDPtr->spaceId, this->odeCollisionDPtr->collisionId);
+    dSpaceAdd(this->odeCollisionDPtr->spaceId,
+        this->odeCollisionDPtr->collisionId);
     GZ_ASSERT(dGeomGetSpace(this->odeCollisionDPtr->collisionId) != 0,
         "Collision ID is null");
   }
@@ -131,9 +134,15 @@ void ODECollision::SetCollision(dGeomID _collisionId, const bool _placeable)
   if (this->odeCollisionDPtr->collisionId && this->odeCollisionDPtr->placeable)
   {
     if (this->IsStatic())
-      this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeGlobal;
+    {
+      this->odeCollisionDPtr->onPoseChangeFunc =
+        &ODECollision::OnPoseChangeGlobal;
+    }
     else
-      this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeRelative;
+    {
+      this->odeCollisionDPtr->onPoseChangeFunc =
+        &ODECollision::OnPoseChangeRelative;
+    }
   }
   else
   {
@@ -254,7 +263,7 @@ void ODECollision::OnPoseChangeGlobal()
 
   // un-offset cog location
   ignition::math::Vector3d cogVec =
-    this->odeCollisionDPtr->link->Inertial()->CoG();
+    this->odeCollisionDPtr->link->Inertia().CoG();
   localPose.Pos() = localPose.Pos() - cogVec;
 
   q[0] = localPose.Rot().W();
@@ -279,7 +288,8 @@ void ODECollision::OnPoseChangeRelative()
   ignition::math::Pose3d localPose = this->RelativePose();
 
   // un-offset cog location
-  ignition::math::Vector3d cog_vec = this->odeCollisionDPtr->link->Inertial()->CoG();
+  ignition::math::Vector3d cog_vec =
+    this->odeCollisionDPtr->link->Inertia().CoG();
   localPose.Pos() = localPose.Pos() - cog_vec;
 
   q[0] = localPose.Rot().W();

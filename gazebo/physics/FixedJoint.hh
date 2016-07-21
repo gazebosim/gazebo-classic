@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_PHYSICS_FIXEDJOINT_HH_
-#define _GAZEBO_PHYSICS_FIXEDJOINT_HH_
+#ifndef GAZEBO_PHYSICS_FIXEDJOINT_HH_
+#define GAZEBO_PHYSICS_FIXEDJOINT_HH_
 
 #include "gazebo/util/system.hh"
 
@@ -34,7 +33,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
-      public: FixedJoint(BasePtr _parent) : T(_parent)
+      public: explicit FixedJoint(BasePtr _parent) : T(_parent)
       {
         this->AddType(Base::FIXED_JOINT);
       }

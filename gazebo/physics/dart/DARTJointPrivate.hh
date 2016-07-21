@@ -32,7 +32,8 @@ namespace gazebo
     class DARTJointPrivate
     {
       /// \brief Constructor
-      public: DARTJointPrivate(const DARTPhysicsPtr &_dartPhysicsEngine)
+      public: explicit DARTJointPrivate(
+                  const DARTPhysicsPtr &_dartPhysicsEngine)
         : forceApplied {0.0, 0.0},
           forceAppliedTime(),
           dartPhysicsEngine(_dartPhysicsEngine),

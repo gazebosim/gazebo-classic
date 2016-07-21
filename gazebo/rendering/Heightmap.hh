@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_HEIGHTMAP_HH_
-#define _GAZEBO_RENDERING_HEIGHTMAP_HH_
+#ifndef GAZEBO_RENDERING_HEIGHTMAP_HH_
+#define GAZEBO_RENDERING_HEIGHTMAP_HH_
 
 #include <vector>
 #include <string>
@@ -68,7 +68,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
-      public: Heightmap(ScenePtr _scene);
+      public: explicit Heightmap(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Heightmap();

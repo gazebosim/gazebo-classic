@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _INSERT_MODEL_WIDGET_HH_
-#define _INSERT_MODEL_WIDGET_HH_
+#ifndef GAZEBO_GUI_INSERT_MODEL_WIDGET_HH_
+#define GAZEBO_GUI_INSERT_MODEL_WIDGET_HH_
 
 
 #include <string>
@@ -43,7 +43,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
-      public: InsertModelWidget(QWidget *_parent = 0);
+      public: explicit InsertModelWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~InsertModelWidget();

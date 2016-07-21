@@ -97,13 +97,12 @@ namespace gazebo
 
       /// \brief Get the model this collision belongs to.
       /// \return The parent model.
-      /// \deprecated See Model() const
+      /// \deprecated See ParentModel() const
       public: ModelPtr GetModel() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the model this collision belongs to.
       /// \return The parent model.
-      /// \deprecated See Model() const
-      public: ModelPtr Model() const;
+      public: Model *ParentModel() const;
 
       // Documentation inherited
       public: virtual ignition::math::Box BoundingBox() const = 0;

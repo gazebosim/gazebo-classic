@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MATERIAL_HH_
-#define _MATERIAL_HH_
+#ifndef GAZEBO_COMMON_MATERIAL_HH_
+#define GAZEBO_COMMON_MATERIAL_HH_
 
 #include <string>
 #include <iostream>
@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
-      public: Material(const Color &_clr);
+      public: explicit Material(const Color &_clr);
 
       /// \brief Get the name of the material
       /// \return The name of the material

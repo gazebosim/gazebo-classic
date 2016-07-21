@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_GEARBOXJOINT_HH_
-#define _GAZEBO_PHYSICS_GEARBOXJOINT_HH_
+#ifndef GAZEBO_PHYSICS_GEARBOXJOINT_HH_
+#define GAZEBO_PHYSICS_GEARBOXJOINT_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -45,8 +45,9 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
-      public: GearboxJoint(BasePtr _parent)
-              : T(_parent)      {
+      public: explicit GearboxJoint(BasePtr _parent)
+              : T(_parent)
+      {
         this->AddType(Base::GEARBOX_JOINT);
       }
 

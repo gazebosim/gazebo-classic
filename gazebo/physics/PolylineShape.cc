@@ -15,10 +15,12 @@
  *
  */
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Console.hh"
+
+#include "gazebo/physics/PolylineShapePrivate.hh"
+#include "gazebo/physics/PolylineShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -50,9 +52,10 @@ void PolylineShape::Init()
   common::MeshManager::Instance()->CreateExtrudedPolyline(
       meshName, this->Vertices(), this->Height());
 
-  this->mesh = common::MeshManager::Instance()->GetMesh(meshName);
+  this->polylineShapeDPtr->mesh =
+    common::MeshManager::Instance()->GetMesh(meshName);
 
-  if (!this->mesh)
+  if (!this->polylineShapeDPtr->mesh)
     gzerr << "Unable to create polyline mesh\n";
 }
 

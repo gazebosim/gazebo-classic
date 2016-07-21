@@ -166,7 +166,7 @@ void DARTPhysics::UpdateCollision()
     // listening for contact information.
     Contact *contactFeedback = this->GetContactManager()->NewContact(
                                  collisionPtr1.get(), collisionPtr2.get(),
-                                 this->world->GetSimTime());
+                                 this->world->SimTime());
 
     if (!contactFeedback)
       continue;
@@ -225,7 +225,7 @@ void DARTPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  // common::Time currTime =  this->world->GetRealTime();
+  // common::Time currTime =  this->world->RealTime();
 
   this->dataPtr->dtWorld->setTimeStep(this->maxStepSize);
   this->dataPtr->dtWorld->step();
@@ -261,7 +261,7 @@ std::string DARTPhysics::GetType() const
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetSeed(uint32_t /*_seed*/)
+void DARTPhysics::SetSeed(const uint32_t /*_seed*/)
 {
   gzwarn << "Not implemented yet in DART.\n";
 }
@@ -330,7 +330,7 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new DARTRayShape(collision));
     else
-      shape.reset(new DARTRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new DARTRayShape(this->world->Physics()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 

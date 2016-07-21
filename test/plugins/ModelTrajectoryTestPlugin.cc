@@ -35,10 +35,10 @@ void ModelTrajectoryTestPlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->World()->Name());
 
   this->trajSub = this->node->Subscribe(std::string("~/") +
-      this->model->GetName() + "/pose_trajectory",
+      this->model->Name() + "/pose_trajectory",
       &ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg, this);
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -59,13 +59,13 @@ void ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg(
 /////////////////////////////////////////////////
 void ModelTrajectoryTestPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->World()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
   {
     // ignore everything else, get position and force only
-    math::Pose pose;
+    ignition::math::Pose3d pose;
     this->model->SetWorldPose(pose);
   }
 }

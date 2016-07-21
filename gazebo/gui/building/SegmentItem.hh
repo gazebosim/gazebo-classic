@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
-#define _GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
+#ifndef GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
+#define GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
 
 #include <memory>
 #include <vector>
@@ -47,7 +46,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent graphics item.
-      public: SegmentItem(QGraphicsItem *_parent = 0);
+      public: explicit SegmentItem(QGraphicsItem *_parent = 0);
 
       /// \brief Destructor
       public: ~SegmentItem();

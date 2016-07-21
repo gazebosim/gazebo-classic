@@ -42,14 +42,20 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
     std::dynamic_pointer_cast<sensors::ImuSensor>(_parent);
 
   this->world = physics::get_world(_parent->WorldName());
-  physics::EntityPtr entity = this->world->GetEntity(_parent->ParentName());
-  this->link = boost::dynamic_pointer_cast<physics::Link>(entity);
+  physics::EntityPtr entity = this->world->EntityByName(_parent->ParentName());
+  this->link = std::dynamic_pointer_cast<physics::Link>(entity);
 
   if (!this->link)
-    gzthrow("Imu sensor parent is not a Link.");
+  {
+    gzerr << "Imu sensor parent is not a Link.";
+    return;
+  }
 
   if (!this->parentSensor)
-    gzthrow("ImuSensorPlugin requires a imu sensor as its parent.");
+  {
+    gzerr << "ImuSensorPlugin requires a imu sensor as its parent.";
+    return;
+  }
 
   this->connection = this->parentSensor->ConnectUpdated(
         std::bind(&ImuSensorPlugin::OnUpdate, this, this->parentSensor));

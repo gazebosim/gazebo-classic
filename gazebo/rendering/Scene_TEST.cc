@@ -106,10 +106,10 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -196,10 +196,10 @@ TEST_F(Scene_TEST, VisualType)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -207,8 +207,10 @@ TEST_F(Scene_TEST, VisualType)
 
   // Spawn another box. The model loading process is slightly different so
   // check that its visuals also have the correct visual type.
-  SpawnBox("new_box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
-      math::Vector3(0, 0, 0));
+  SpawnBox("new_box",
+      ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(10, 10, 1),
+      ignition::math::Vector3d::Zero);
 
   // Wait until all models are inserted
   int sleep = 0;

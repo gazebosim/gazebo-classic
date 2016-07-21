@@ -84,7 +84,7 @@ TEST_F(LightStateTest, LightConstructor)
   EXPECT_TRUE(lightPtr != NULL);
 
   lightPtr->ProcessMsg(lightMsg);
-  EXPECT_EQ(lightPtr->GetWorldPose(), pose);
+  EXPECT_EQ(lightPtr->WorldPose(), pose);
 
   // Create the light state
   physics::LightState lightState(lightPtr, common::Time(1), common::Time(1), 1);
@@ -173,7 +173,7 @@ TEST_F(LightStateTest, Operators)
   physics::LightState lightState1(light1);
 
   // Check states are different
-  EXPECT_NE(lightState0.GetName(), lightState1.GetName());
+  EXPECT_NE(lightState0.Name(), lightState1.Name());
   EXPECT_NE(lightState0.Pose(), lightState1.Pose());
   EXPECT_FALSE((lightState0 - lightState1).IsZero());
 
@@ -192,7 +192,7 @@ TEST_F(LightStateTest, Operators)
   lightState1 = lightState0;
 
   // Check states are equal
-  EXPECT_EQ(lightState0.GetName(), lightState1.GetName());
+  EXPECT_EQ(lightState0.Name(), lightState1.Name());
   EXPECT_EQ(lightState0.Pose(), lightState1.Pose());
   EXPECT_TRUE((lightState0 - lightState1).IsZero());
 }

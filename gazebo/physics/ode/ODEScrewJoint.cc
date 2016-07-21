@@ -121,7 +121,7 @@ void ODEScrewJoint::SetAxis(const unsigned int /*_index*/,
   if (this->odeJointDPtr->parentLink)
   {
     globalAxis =
-      this->Parent()->Model()->WorldPose().Rot().RotateVector(_axis);
+      this->Parent()->ParentModel()->WorldPose().Rot().RotateVector(_axis);
   }
 
   if (this->odeJointDPtr->jointId)

@@ -104,7 +104,7 @@ void Sensor::Load(const std::string &_worldName)
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
 
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
   this->dataPtr->sensorPub =
     this->node->Advertise<msgs::Sensor>("~/sensor");
 }
@@ -183,7 +183,7 @@ bool Sensor::NeedsUpdate()
   if (this->dataPtr->category == IMAGE && this->scene)
     simTime = this->scene->SimTime();
   else
-    simTime = this->world->GetSimTime();
+    simTime = this->world->SimTime();
 
   // case when last update occurred in the future probably due to
   // world reset
@@ -210,7 +210,7 @@ void Sensor::Update(const bool _force)
     if (this->dataPtr->category == IMAGE && this->scene)
       simTime = this->scene->SimTime();
     else
-      simTime = this->world->GetSimTime();
+      simTime = this->world->SimTime();
 
     {
       std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
@@ -297,7 +297,7 @@ std::string Sensor::GetScopedName() const
 //////////////////////////////////////////////////
 std::string Sensor::ScopedName() const
 {
-  return this->world->GetName() + "::" +
+  return this->world->Name() + "::" +
          this->parentName + "::" + this->Name();
 }
 
@@ -510,7 +510,7 @@ std::string Sensor::GetWorldName() const
 //////////////////////////////////////////////////
 std::string Sensor::WorldName() const
 {
-  return this->world->GetName();
+  return this->world->Name();
 }
 
 //////////////////////////////////////////////////

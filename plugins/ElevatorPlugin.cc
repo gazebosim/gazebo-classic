@@ -88,7 +88,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   std::string liftJointName =
     this->dataPtr->sdf->Get<std::string>("lift_joint");
 
-  this->dataPtr->liftJoint = this->dataPtr->model->GetJoint(liftJointName);
+  this->dataPtr->liftJoint = this->dataPtr->model->JointByName(liftJointName);
   if (!this->dataPtr->liftJoint)
   {
     gzerr << "Unable to find lift joint[" << liftJointName << "].\n";
@@ -100,7 +100,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   std::string doorJointName =
     this->dataPtr->sdf->Get<std::string>("door_joint");
 
-  this->dataPtr->doorJoint = this->dataPtr->model->GetJoint(doorJointName);
+  this->dataPtr->doorJoint = this->dataPtr->model->JointByName(doorJointName);
   if (!this->dataPtr->doorJoint)
   {
     gzerr << "Unable to find door joint[" << doorJointName << "].\n";
@@ -120,7 +120,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Create the node for communication
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
+  this->dataPtr->node->Init(this->dataPtr->model->World()->Name());
 
   // Subscribe to the elevator topic.
   this->dataPtr->elevatorSub = this->dataPtr->node->Subscribe(elevatorTopic,
@@ -403,8 +403,7 @@ bool ElevatorPluginPrivate::DoorController::Update(
 
   double errorTarget = this->target == OPEN ? 1.0 : 0.0;
 
-  double doorError = this->doorJoint->GetAngle(0).Radian() -
-    errorTarget;
+  double doorError = this->doorJoint->Angle(0).Radian() - errorTarget;
 
   double doorForce = this->doorPID.Update(doorError,
       _info.simTime - this->prevSimTime);
@@ -452,7 +451,7 @@ bool ElevatorPluginPrivate::LiftController::Update(
     return false;
   }
 
-  double error = this->liftJoint->GetAngle(0).Radian() -
+  double error = this->liftJoint->Angle(0).Radian() -
     (this->floor * this->floorHeight);
 
   double force = this->liftPID.Update(error, _info.simTime - this->prevSimTime);

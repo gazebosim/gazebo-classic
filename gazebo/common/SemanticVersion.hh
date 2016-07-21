@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _v the string version. ex: "0.3.2"
-      public: SemanticVersion(const std::string &_v);
+      public: explicit SemanticVersion(const std::string &_v);
 
       /// \brief Copy constructor
       /// \param[in] _copy the other version

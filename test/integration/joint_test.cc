@@ -57,21 +57,21 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // create some fake links
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   ASSERT_TRUE(model != NULL);
-  physics::LinkPtr link = model->GetLink("link_1");
+  physics::LinkPtr link = model->LinkByName("link_1");
   ASSERT_TRUE(link != NULL);
 
   physics::LinkPtr parentLink;
   physics::LinkPtr childLink(link);
   physics::JointPtr joint;
-  math::Pose anchor;
-  math::Vector3 axis(1, 0, 0);
+  ignition::math::Pose3d anchor;
+  ignition::math::Vector3d axis(1, 0, 0);
   double upper = M_PI;
   double lower = -M_PI;
 
@@ -87,7 +87,7 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   {
     // try creating a joint
     {
-      joint = world->GetPhysicsEngine()->CreateJoint(
+      joint = world->Physics()->CreateJoint(
         "revolute", model);
       joint->Attach(parentLink, childLink);
       // load adds the joint to a vector of shared pointers kept
@@ -95,15 +95,15 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
       joint->Load(parentLink, childLink, anchor);
       // joint->SetAnchor(0, anchor);
       joint->SetAxis(0, axis);
-      joint->SetHighStop(0, upper);
-      joint->SetLowStop(0, lower);
+      joint->SetHighStop(0, ignition::math::Angle(upper));
+      joint->SetLowStop(0, ignition::math::Angle(lower));
 
       if (parentLink)
-        joint->SetName(parentLink->GetName() + std::string("_") +
-                       childLink->GetName() + std::string("_joint"));
+        joint->SetName(parentLink->Name() + std::string("_") +
+                       childLink->Name() + std::string("_joint"));
       else
         joint->SetName(std::string("world_") +
-                       childLink->GetName() + std::string("_joint"));
+                       childLink->Name() + std::string("_joint"));
       joint->Init();
       joint->SetAxis(0, axis);
     }
@@ -115,8 +115,8 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
       if (joint)
       {
         // reenable collision between the link pair
-        physics::LinkPtr parent = joint->GetParent();
-        physics::LinkPtr child = joint->GetChild();
+        physics::LinkPtr parent = joint->Parent();
+        physics::LinkPtr child = joint->Child();
         if (parent)
           parent->SetCollideMode("all");
         if (child)
@@ -159,20 +159,22 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("double_pendulum");
+  physics::ModelPtr model = world->ModelByName("double_pendulum");
   ASSERT_TRUE(model != NULL);
 
   {
-    physics::JointPtr joint = model->GetJoint("lower_joint");
+    physics::JointPtr joint = model->JointByName("lower_joint");
     ASSERT_TRUE(joint != NULL);
 
-    EXPECT_NEAR(joint->GetInertiaRatio(0), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitX), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitY), 87.50, 1e-2);
+    EXPECT_NEAR(joint->InertiaRatio(0), 3125, 1e-2);
+    EXPECT_NEAR(joint->InertiaRatio(
+          ignition::math::Vector3d::UnitX), 3125, 1e-2);
+    EXPECT_NEAR(
+        joint->InertiaRatio(ignition::math::Vector3d::UnitY), 87.50, 1e-2);
   }
 }
 
@@ -200,17 +202,19 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // All models should oscillate with the same frequency
-  physics::ModelPtr modelPrismatic = world->GetModel("model_3_prismatic");
-  physics::ModelPtr modelRevolute = world->GetModel("model_3_revolute");
-  physics::ModelPtr modelPlugin = world->GetModel("model_4_prismatic_plugin");
-  physics::ModelPtr modelContact = world->GetModel("model_5_soft_contact");
-  physics::ModelPtr modelPrismatic2 = world->GetModel("model_6_prismatic_sdf");
-  physics::ModelPtr modelRevolute2 = world->GetModel("model_7_revolute_sdf");
+  physics::ModelPtr modelPrismatic = world->ModelByName("model_3_prismatic");
+  physics::ModelPtr modelRevolute = world->ModelByName("model_3_revolute");
+  physics::ModelPtr modelPlugin =
+    world->ModelByName("model_4_prismatic_plugin");
+  physics::ModelPtr modelContact = world->ModelByName("model_5_soft_contact");
+  physics::ModelPtr modelPrismatic2 =
+    world->ModelByName("model_6_prismatic_sdf");
+  physics::ModelPtr modelRevolute2 = world->ModelByName("model_7_revolute_sdf");
 
   ASSERT_TRUE(modelPrismatic != NULL);
   ASSERT_TRUE(modelRevolute != NULL);
@@ -219,13 +223,13 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(modelPrismatic2 != NULL);
   ASSERT_TRUE(modelRevolute2 != NULL);
 
-  physics::LinkPtr linkPrismatic = modelPrismatic->GetLink("link_1");
-  physics::LinkPtr linkRevolute = modelRevolute->GetLink("link_1");
-  physics::LinkPtr linkPluginExplicit = modelPlugin->GetLink("link_1");
-  physics::LinkPtr linkPluginImplicit = modelPlugin->GetLink("link_2");
-  physics::LinkPtr linkContact = modelContact->GetLink("link_1");
-  physics::LinkPtr linkPrismatic2 = modelPrismatic2->GetLink("link");
-  physics::LinkPtr linkRevolute2 = modelRevolute2->GetLink("link");
+  physics::LinkPtr linkPrismatic = modelPrismatic->LinkByName("link_1");
+  physics::LinkPtr linkRevolute = modelRevolute->LinkByName("link_1");
+  physics::LinkPtr linkPluginExplicit = modelPlugin->LinkByName("link_1");
+  physics::LinkPtr linkPluginImplicit = modelPlugin->LinkByName("link_2");
+  physics::LinkPtr linkContact = modelContact->LinkByName("link_1");
+  physics::LinkPtr linkPrismatic2 = modelPrismatic2->LinkByName("link");
+  physics::LinkPtr linkRevolute2 = modelRevolute2->LinkByName("link");
 
   ASSERT_TRUE(linkPrismatic != NULL);
   ASSERT_TRUE(linkRevolute != NULL);
@@ -235,7 +239,7 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(linkPrismatic2 != NULL);
   ASSERT_TRUE(linkRevolute2 != NULL);
 
-  physics::JointPtr jointPluginImplicit = modelPlugin->GetJoint("joint_1");
+  physics::JointPtr jointPluginImplicit = modelPlugin->JointByName("joint_1");
   ASSERT_TRUE(jointPluginImplicit != NULL);
 
   int cyclesPrismatic = 0;
@@ -255,8 +259,8 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   double velRevolute2 = 1.0;
   const double vT = 0.01;
 
-  double energyPluginImplicit0 = linkPluginImplicit->GetWorldEnergy()
-        + jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
+  double energyPluginImplicit0 = linkPluginImplicit->WorldEnergy()
+        + jointPluginImplicit->WorldEnergyPotentialSpring(0);
 
   // check number of oscillations for each of the setup.  They should all
   // be the same.
@@ -268,84 +272,84 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     world->Step(1);
 
     // count up and down cycles
-    if (linkPrismatic->GetWorldLinearVel().z > vT && velPrismatic < -vT)
+    if (linkPrismatic->WorldLinearVel().Z() > vT && velPrismatic < -vT)
     {
       cyclesPrismatic++;
       velPrismatic = 1.0;
     }
-    else if (linkPrismatic->GetWorldLinearVel().z < -vT && velPrismatic > vT)
+    else if (linkPrismatic->WorldLinearVel().Z() < -vT && velPrismatic > vT)
     {
       cyclesPrismatic++;
       velPrismatic = -1.0;
     }
-    if (-linkRevolute->GetRelativeAngularVel().y > vT && velRevolute < -vT)
+    if (-linkRevolute->RelativeAngularVel().Y() > vT && velRevolute < -vT)
     {
       cyclesRevolute++;
       velRevolute = 1.0;
     }
-    else if (-linkRevolute->GetRelativeAngularVel().y < -vT && velRevolute > vT)
+    else if (-linkRevolute->RelativeAngularVel().Y() < -vT && velRevolute > vT)
     {
       cyclesRevolute++;
       velRevolute = -1.0;
     }
-    if (linkPluginExplicit->GetWorldLinearVel().z > vT &&
+    if (linkPluginExplicit->WorldLinearVel().Z() > vT &&
         velPluginExplicit < -vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = 1.0;
     }
-    else if (linkPluginExplicit->GetWorldLinearVel().z < -vT &&
+    else if (linkPluginExplicit->WorldLinearVel().Z() < -vT &&
              velPluginExplicit > vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = -1.0;
     }
-    if (linkPluginImplicit->GetWorldLinearVel().z > vT &&
+    if (linkPluginImplicit->WorldLinearVel().Z() > vT &&
              velPluginImplicit < -vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = 1.0;
     }
-    else if (linkPluginImplicit->GetWorldLinearVel().z < -vT &&
+    else if (linkPluginImplicit->WorldLinearVel().Z() < -vT &&
              velPluginImplicit > vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = -1.0;
     }
-    if (linkContact->GetWorldLinearVel().z > vT && velContact < -vT)
+    if (linkContact->WorldLinearVel().Z() > vT && velContact < -vT)
     {
       cyclesContact++;
       velContact = 1.0;
     }
-    else if (linkContact->GetWorldLinearVel().z < -vT && velContact > vT)
+    else if (linkContact->WorldLinearVel().Z() < -vT && velContact > vT)
     {
       cyclesContact++;
       velContact = -1.0;
     }
-    if (linkPrismatic2->GetWorldLinearVel().z > vT && velPrismatic2 < -vT)
+    if (linkPrismatic2->WorldLinearVel().Z() > vT && velPrismatic2 < -vT)
     {
       cyclesPrismatic2++;
       velPrismatic2 = 1.0;
     }
-    else if (linkPrismatic2->GetWorldLinearVel().z < -vT && velPrismatic2 > vT)
+    else if (linkPrismatic2->WorldLinearVel().Z() < -vT && velPrismatic2 > vT)
     {
       cyclesPrismatic2++;
       velPrismatic2 = -1.0;
     }
-    if (-linkRevolute2->GetRelativeAngularVel().y > vT && velRevolute2 < -vT)
+    if (-linkRevolute2->RelativeAngularVel().Y() > vT && velRevolute2 < -vT)
     {
       cyclesRevolute2++;
       velRevolute2 = 1.0;
     }
-    else if (-linkRevolute2->GetRelativeAngularVel().y < -vT &&
+    else if (-linkRevolute2->RelativeAngularVel().Y() < -vT &&
              velRevolute2 > vT)
     {
       cyclesRevolute2++;
       velRevolute2 = -1.0;
     }
 
-    double energy = linkPluginImplicit->GetWorldEnergy() +
-                   jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
+    double energy = linkPluginImplicit->WorldEnergy() +
+                   jointPluginImplicit->WorldEnergyPotentialSpring(0);
     if (_physicsEngine.compare("dart") == 0)
     {
       if (i == 0)
@@ -363,11 +367,11 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     }
     // gzdbg << i << "\n";
     // gzdbg << cyclesPrismatic << " : "
-    //       << linkPrismatic->GetWorldLinearVel() << "\n";
+    //       << linkPrismatic->WorldLinearVel() << "\n";
     // gzdbg << cyclesRevolute << " : "
-    //       << linkRevolute->GetRelativeAngularVel() << "\n";
+    //       << linkRevolute->RelativeAngularVel() << "\n";
     // gzdbg << cyclesContact << " : "
-    //       << linkContact->GetWorldLinearVel() << "\n";
+    //       << linkContact->WorldLinearVel() << "\n";
   }
   if (_physicsEngine.compare("ode") == 0)
   {
@@ -409,23 +413,25 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->Type(), _physicsEngine);
 
   // Spawn two boxes
-  SpawnBox("box1", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
-      math::Vector3::Zero, false);
-  SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
-      math::Vector3::Zero, false);
-  physics::ModelPtr model  = world->GetModel("box1");
-  physics::ModelPtr model2 = world->GetModel("box2");
+  SpawnBox("box1", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Vector3d::Zero, false);
+  SpawnBox("box2", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(-1, 0, 0.5),
+      ignition::math::Vector3d::Zero, false);
+  physics::ModelPtr model  = world->ModelByName("box1");
+  physics::ModelPtr model2 = world->ModelByName("box2");
   ASSERT_TRUE(model  != NULL);
   ASSERT_TRUE(model2 != NULL);
 
   // Get link pointers
-  physics::LinkPtr parent = model->GetLink();
-  physics::LinkPtr child  = model2->GetLink();
+  physics::LinkPtr parent = model->LinkByName();
+  physics::LinkPtr child  = model2->LinkByName();
 
   // Create dynamic joint
   std::string name = "dynamic_joint_unique";
@@ -434,11 +440,11 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   joint->Init();
 
   // Get model joints (used for visualization)
-  physics::Joint_V joints = model->GetJoints();
+  physics::Joint_V joints = model->Joints();
   bool jointFound = false;
   for (auto const &joint : joints)
   {
-    if (joint->GetName() == name)
+    if (joint->Name() == name)
     {
       jointFound = true;
       break;
@@ -454,7 +460,7 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
 
   // test remove joint
   EXPECT_TRUE(model->RemoveJoint(name));
-  joint = model->GetJoint(name);
+  joint = model->JointByName(name);
   EXPECT_TRUE(joint == NULL);
 
   // test that removing a non-existent joint will not break gazebo
@@ -469,7 +475,7 @@ TEST_F(JointTest, joint_SDF14)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   int i = 0;
@@ -482,25 +488,25 @@ TEST_F(JointTest, joint_SDF14)
   if (i > 20)
     gzthrow("Unable to get joint14_model");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
   EXPECT_TRUE(physicsEngine != NULL);
-  physics::ModelPtr model = world->GetModel("joint14_model");
+  physics::ModelPtr model = world->ModelByName("joint14_model");
   EXPECT_TRUE(model != NULL);
-  physics::LinkPtr link1 = model->GetLink("body1");
+  physics::LinkPtr link1 = model->LinkByName("body1");
   EXPECT_TRUE(link1 != NULL);
-  physics::LinkPtr link2 = model->GetLink("body2");
+  physics::LinkPtr link2 = model->LinkByName("body2");
   EXPECT_TRUE(link2 != NULL);
 
-  EXPECT_EQ(model->GetJointCount(), 1u);
-  physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
+  EXPECT_EQ(model->JointCount(), 1u);
+  physics::JointPtr joint = model->JointByName("joint14_revolute_joint");
   EXPECT_TRUE(joint != NULL);
 
-  physics::LinkPtr parent = joint->GetParent();
+  physics::LinkPtr parent = joint->Parent();
   EXPECT_TRUE(parent != NULL);
-  physics::LinkPtr child = joint->GetChild();
+  physics::LinkPtr child = joint->Child();
   EXPECT_TRUE(child != NULL);
-  EXPECT_EQ(parent->GetName(), "body2");
-  EXPECT_EQ(child->GetName(), "body1");
+  EXPECT_EQ(parent->Name(), "body2");
+  EXPECT_EQ(child->Name(), "body1");
 }
 
 TEST_P(JointTest, JointCreationDestructionTest)

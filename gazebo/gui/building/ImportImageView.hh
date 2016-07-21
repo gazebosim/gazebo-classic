@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_IMPORT_IMAGE_VIEW_HH_
-#define _GAZEBO_GUI_IMPORT_IMAGE_VIEW_HH_
+#ifndef GAZEBO_GUI_IMPORT_IMAGE_VIEW_HH_
+#define GAZEBO_GUI_IMPORT_IMAGE_VIEW_HH_
 
 #include <memory>
 #include <string>
@@ -47,7 +46,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
-      public: ImportImageView(ImportImageDialog *_parent = 0);
+      public: explicit ImportImageView(ImportImageDialog *_parent = 0);
 
       /// \brief Destructor
       public: ~ImportImageView();

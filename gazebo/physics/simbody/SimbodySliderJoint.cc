@@ -101,8 +101,8 @@ void SimbodySliderJoint::SetForceImpl(
 {
   if (_index < this->AngleCount())
   {
-    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces(
-        ).setOneMobilityForce(
+    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces().
+      setOneMobilityForce(
           this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
           this->simbodyJointDPtr->mobod,
           SimTK::MobilizerUIndex(_index), _torque);

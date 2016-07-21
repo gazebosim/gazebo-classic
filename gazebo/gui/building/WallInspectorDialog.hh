@@ -45,7 +45,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: WallInspectorDialog(QWidget *_parent = 0);
+      public: explicit WallInspectorDialog(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~WallInspectorDialog();

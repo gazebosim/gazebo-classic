@@ -32,7 +32,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
-      public: SimbodyMultiRayShape(CollisionPtr parent);
+      public: explicit SimbodyMultiRayShape(CollisionPtr parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyMultiRayShape();
@@ -41,7 +41,7 @@ namespace gazebo
       public: virtual void UpdateRays();
 
       // Documentation inherited.
-      protected: virtual void AddRay(const ignition::math::Vector3d &_start,
+      public: virtual void AddRay(const ignition::math::Vector3d &_start,
                              const ignition::math::Vector3d &_end);
 
       /// \brief Pointer to the physics engine.

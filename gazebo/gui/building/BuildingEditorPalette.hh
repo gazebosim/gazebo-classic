@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _BUILDING_EDITOR_PALETTE_HH_
-#define _BUILDING_EDITOR_PALETTE_HH_
+#ifndef GAZEBO_GUI_BUILDING_BUILDING_EDITOR_PALETTE_HH_
+#define GAZEBO_GUI_BUILDING_BUILDING_EDITOR_PALETTE_HH_
 
 #include <string>
 
@@ -41,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: BuildingEditorPalette(QWidget *_parent = 0);
+      public: explicit BuildingEditorPalette(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~BuildingEditorPalette();

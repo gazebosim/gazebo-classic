@@ -96,7 +96,7 @@ void Base::Load(sdf::ElementPtr _sdf)
     this->baseDPtr->parent->AddChild(shared_from_this());
   }
 
-  this->ComputeScopedName();
+  this->baseDPtr->ComputeScopedName();
 
   this->RegisterIntrospectionItems();
 }
@@ -145,7 +145,8 @@ void Base::Reset()
 void Base::Reset(Base::EntityType _resetType)
 {
   Base_V::iterator iter;
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+      iter != this->baseDPtr->children.end(); ++iter)
   {
     if ((*iter)->HasType(_resetType))
       (*iter)->Reset();
@@ -385,7 +386,7 @@ Base *Base::BaseByName(const std::string &_name) const
   if (this->ScopedName() == _name || this->Name() == _name)
     return const_cast<Base*>(this);
 
-  Base *result;
+  Base *result = nullptr;
 
   for (auto iter = this->baseDPtr->children.begin();
        iter != this->baseDPtr->children.end() && result == NULL; ++iter)
@@ -406,7 +407,7 @@ std::string Base::GetScopedName(bool _prependWorldName) const
 std::string Base::ScopedName(bool _prependWorldName) const
 {
   if (_prependWorldName && this->baseDPtr->world)
-    return this->baseDPtr->world->GetName() + "::" + this->baseDPtr->scopedName;
+    return this->baseDPtr->world->Name() + "::" + this->baseDPtr->scopedName;
   else
     return this->baseDPtr->scopedName;
 }
@@ -432,7 +433,7 @@ common::URI Base::URI() const
 
   uri.Path().PushBack(this->TypeStr());
   uri.Path().PushBack(this->Name());
-  uri.Path().PushFront(this->baseDPtr->world->GetName());
+  uri.Path().PushFront(this->baseDPtr->world->Name());
   uri.Path().PushFront("world");
 
   return uri;
@@ -474,7 +475,7 @@ unsigned int Base::Type() const
 //////////////////////////////////////////////////
 std::string Base::TypeStr() const
 {
-  return this->typeStr;
+  return this->baseDPtr->typeStr;
 }
 
 //////////////////////////////////////////////////
@@ -496,8 +497,11 @@ bool Base::SetSelected(const bool _s)
   this->baseDPtr->selected = _s;
 
   Base_V::iterator iter;
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+      iter != this->baseDPtr->children.end(); ++iter)
+  {
     (*iter)->SetSelected(_s);
+  }
 
   return true;
 }

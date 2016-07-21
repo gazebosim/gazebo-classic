@@ -32,7 +32,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletSphereShape : public SphereShape
     {
       /// \brief Constructor
-      public: BulletSphereShape(CollisionPtr _parent);
+      public: explicit BulletSphereShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletSphereShape();

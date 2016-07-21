@@ -244,14 +244,14 @@ namespace gazebo
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
       /// \deprecated See function that accepts ignition::math parameters.
-      protected: virtual void AddRay(const math::Vector3 &_start,
+      public: virtual void AddRay(const math::Vector3 &_start,
                      const math::Vector3 &_end) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
-      protected: virtual void AddRay(const ignition::math::Vector3d &_start,
-                     const ignition::math::Vector3d &_end);
+      public: virtual void AddRay(const ignition::math::Vector3d &_start,
+                  const ignition::math::Vector3d &_end);
 
       /// \brief Set the points of a ray.
       /// \param[in] _rayIndex Index of the ray to set.

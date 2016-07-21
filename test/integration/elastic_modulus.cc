@@ -81,10 +81,10 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     gzthrow("Unable to get sphere");
 
   // get models and links
-  physics::ModelPtr box_model = world->GetModel("box");
-  physics::LinkPtr box_link = box_model->GetLink("link");
-  physics::ModelPtr sphere_model = world->GetModel("sphere");
-  physics::LinkPtr sphere_link = sphere_model->GetLink("link");
+  physics::ModelPtr boxModel = world->ModelByName("box");
+  physics::LinkPtr boxLink = boxModel->LinkByName("link");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  physics::LinkPtr sphereLink = sphereModel->LinkByName("link");
 
   // Sleep to ensure transport topics are all advertised
   common::Time::MSleep(100);
@@ -167,8 +167,8 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     EXPECT_LT(fabs(d_convergence_error), PHYSICS_TOL);
 
     // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
-    double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
-                 box_link->GetWorldPose().pos.x) - minDepth;
+    double d2 = 1.0 - (sphereLink->WorldPose().Pos().X() -
+                 boxLink->WorldPose().Pos().X()) - minDepth;
 
     EXPECT_FLOAT_EQ(d1, d2);
 
@@ -203,7 +203,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     EXPECT_FLOAT_EQ(k_lin, k_lin_converged);
 
     gzdbg << "Contact State:\n"
-          << "  t [" << world->GetSimTime().Double()
+          << "  t [" << world->SimTime().Double()
           << "]\n f1 [" << f1
           << "]\n  E* [" << eStar
           << "]\n  R* [" << rStar

@@ -20,7 +20,6 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODELink.hh"
-#include "gazebo/physics/GearboxJointPrivate.hh"
 #include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEGearboxJoint.hh"
 
@@ -43,7 +42,7 @@ ODEGearboxJoint::~ODEGearboxJoint()
 void ODEGearboxJoint::Init()
 {
   Joint::Init();
-  LinkPtr link = this->jointDPtr->model->Link(this->referenceBody);
+  LinkPtr link = this->jointDPtr->model->LinkByName(this->referenceBody);
   this->SetReferenceBody(link);
 }
 

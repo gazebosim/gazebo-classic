@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLET_BULLETLINK_HH_
-#define _GAZEBO_PHYSICS_BULLET_BULLETLINK_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETLINK_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETLINK_HH_
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -39,7 +39,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
-      public: BulletLink(EntityPtr _parent);
+      public: explicit BulletLink(EntityPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletLink();

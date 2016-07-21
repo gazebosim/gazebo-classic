@@ -34,10 +34,10 @@ TEST_F(ContactManagerTest, CreateFilter)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
-  physics::ContactManager *manager = physics->GetContactManager();
+  physics::ContactManager *manager = physics->ContactMgr();
   ASSERT_TRUE(physics != NULL);
 
   EXPECT_EQ(manager->GetFilterCount(), 0u);
@@ -79,10 +79,10 @@ TEST_F(ContactManagerTest, RemoveFilter)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
-  physics::ContactManager *manager = physics->GetContactManager();
+  physics::ContactManager *manager = physics->ContactMgr();
   ASSERT_TRUE(physics != NULL);
 
   // Add one filter then remove it

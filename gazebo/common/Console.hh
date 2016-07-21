@@ -112,7 +112,7 @@ namespace gazebo
                  {
                    /// \brief Constructor.
                    /// \param[in] _filename Filename to write into.
-                   public: Buffer(const std::string &_filename);
+                   public: explicit Buffer(const std::string &_filename);
 
                    /// \brief Destructor.
                    public: virtual ~Buffer();
