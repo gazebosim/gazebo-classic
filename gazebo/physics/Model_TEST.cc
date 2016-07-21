@@ -56,9 +56,82 @@ TEST_F(ModelTest, Scale)
 }
 
 //////////////////////////////////////////////////
-TEST_F(ModelTest, PluginInfo)
+TEST_F(ModelTest, PluginInfoFailures)
 {
-  // Load a world with model plugins
+  this->Load("worlds/shapes.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("box");
+  ASSERT_TRUE(model != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzdbg << "Get all plugins" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 0);
+  }
+
+  gzdbg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse("data://world/wrong/model/box/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzdbg << "Wrong model" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/cone/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzdbg << "Invalid URI" << std::endl;
+  {
+    pluginUri = common::URI("tell me about your plugins");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzdbg << "Unhandled URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzdbg << "Inexistent nested model" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/box/model/box_in_a_box/plugin");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzdbg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(ModelTest, ModelPluginInfo)
+{
   this->Load("worlds/underwater.world", true);
 
   auto world = physics::get_world("default");
@@ -67,18 +140,34 @@ TEST_F(ModelTest, PluginInfo)
   auto model = world->GetModel("submarine");
   ASSERT_TRUE(model != nullptr);
 
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzdbg << "Get an existing plugin" << std::endl;
   {
-    common::URI pluginUri(
+    pluginUri.Parse(
         "data://world/default/model/submarine/plugin/submarine_propeller_3");
+    model->PluginInfo(pluginUri, plugins, success);
 
-    ignition::msgs::Plugin_V rep;
-    bool result;
-    model->PluginInfo(pluginUri, rep, result);
-
-    EXPECT_TRUE(result);
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "submarine_propeller_3");
   }
 
+  gzdbg << "Get all plugins" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/submarine/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
 
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 5);
+    EXPECT_EQ(plugins.plugins(0).name(), "submarine_propeller_1");
+    EXPECT_EQ(plugins.plugins(1).name(), "submarine_propeller_2");
+    EXPECT_EQ(plugins.plugins(2).name(), "submarine_propeller_3");
+    EXPECT_EQ(plugins.plugins(3).name(), "submarine_propeller_4");
+    EXPECT_EQ(plugins.plugins(4).name(), "buoyancy");
+  }
 }
 
 //////////////////////////////////////////////////

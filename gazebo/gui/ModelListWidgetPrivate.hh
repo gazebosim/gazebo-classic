@@ -130,6 +130,7 @@ namespace gazebo
       /// \brief Type of atmosphere model.
       public: msgs::Atmosphere_Type atmosphereType;
 
+      /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
     };
   }

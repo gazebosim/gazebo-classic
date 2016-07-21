@@ -110,111 +110,6 @@ void Model::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Model::PluginInfo(const common::URI &_uri,
-    ignition::msgs::Plugin_V &_rep, bool &_result)
-{
-  if (!_uri.Valid())
-  {
-    gzwarn << "URI [" << _uri.Str() <<
-        "] is not a valid. Plugin info won't be sent." << std::endl;
-    return;
-  }
-
-  auto parts = common::split(_uri.Path().Str(), "/");
-  bool modelFound = false;
-  for (size_t i = 0; i < parts.size(); i = i+2)
-  {
-    // Check if it's the correct world
-    if (parts[i] == "world")
-    {
-      if (parts[i+1] != this->GetWorld()->GetName())
-      {
-        gzwarn << "World [" << parts[i+1] << "] does not match model [" <<
-            this->GetName() << "]'s world [" << this->GetWorld()->GetName() <<
-            "]" << std::endl;
-        _result = false;
-        return;
-      }
-    }
-    // Check if it's about this model
-    else if (parts[i] == "model")
-    {
-      // Look in nested models
-      if (modelFound)
-      {
-        auto model = this->NestedModel(parts[i+1]);
-
-        if (!model)
-        {
-          gzwarn << "Model [" << parts[i+1] << "] not found in model [" <<
-              this->GetName() << "]" << std::endl;
-          _result = false;
-          return;
-        }
-//TODO
-        return;
-      }
-
-      if (parts[i+1] != this->GetName())
-      {
-        gzwarn << "Model name [" << parts[i+1] << "] does not match model [" <<
-            this->GetName() << "]" << std::endl;
-        _result = false;
-        return;
-      }
-
-      modelFound = true;
-      continue;
-    }
-    // Look for plugin
-    else if (modelFound && parts[i] == "plugin")
-    {
-      // Find correct plugin
-      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-      while (pluginElem)
-      {
-        auto pluginName = pluginElem->Get<std::string>("name");
-
-        // If asking for a specific plugin, skip all other plugins
-        if (i+1 < parts.size() && parts[i+1] != pluginName)
-        {
-          pluginElem = pluginElem->GetNextElement("plugin");
-          continue;
-        }
-
-        // Get plugin info from SDF
-        auto pluginMsg = _rep.add_plugins();
-        pluginMsg->CopyFrom(util::PluginSdfToIgnMsg(pluginElem));
-
-        pluginElem = pluginElem->GetNextElement("plugin");
-      }
-
-      // If asking for a specific plugin and it wasn't found
-      if (i+1 < parts.size() && _rep.plugins_size() == 0)
-      {
-        gzwarn << "Plugin [" << parts[i+1] << "] not found in model [" <<
-            this->URI().Str() << "]" << std::endl;
-        _result = false;
-        return;
-      }
-      _result = true;
-      return;
-    }
-    else
-    {
-      gzerr << "[" << parts[i] << "] in [" << _uri.Str() <<
-         "] cannot be handled." << std::endl;
-      _result = false;
-      return;
-    }
-  }
-
-  gzwarn << "Couldn't get information for plugin [" << _uri.Str() << "]" <<
-      std::endl;
-  _result = false;
-}
-
-//////////////////////////////////////////////////
 void Model::LoadLinks()
 {
   /// \TODO: check for duplicate model, and raise an error
@@ -1761,4 +1656,119 @@ LinkPtr Model::CreateLink(const std::string &_name)
   this->links.push_back(link);
 
   return link;
+}
+
+//////////////////////////////////////////////////
+void Model::PluginInfo(const common::URI &_pluginUri,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  if (!_pluginUri.Valid())
+  {
+    gzwarn << "URI [" << _pluginUri.Str() << "] is not a valid." << std::endl;
+    _success = false;
+    return;
+  }
+
+  _plugins.clear_plugins();
+
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
+  bool modelFound = false;
+  for (size_t i = 0; i < parts.size(); i = i+2)
+  {
+    // Check if it's the correct world
+    if (parts[i] == "world")
+    {
+      if (parts[i+1] != this->GetWorld()->GetName())
+      {
+        gzwarn << "World [" << parts[i+1] << "] does not match model [" <<
+            this->GetName() << "]'s world [" << this->GetWorld()->GetName() <<
+            "]" << std::endl;
+        _success = false;
+        return;
+      }
+    }
+    // Check if it's about this model
+    else if (parts[i] == "model")
+    {
+      // Look in nested models
+      if (modelFound)
+      {
+        auto model = this->NestedModel(parts[i+1]);
+
+        if (!model)
+        {
+          gzwarn << "Model [" << parts[i+1] << "] not found in model [" <<
+              this->GetName() << "]" << std::endl;
+          _success = false;
+          return;
+        }
+
+        model->PluginInfo(_pluginUri, _plugins, _success);
+        return;
+      }
+
+      if (parts[i+1] != this->GetName())
+      {
+        gzwarn << "Model name [" << parts[i+1] << "] does not match model [" <<
+            this->GetName() << "]" << std::endl;
+        _success = false;
+        return;
+      }
+
+      modelFound = true;
+      continue;
+    }
+    // Look for plugin
+    else if (modelFound && parts[i] == "plugin")
+    {
+      // Return empty vector
+      if (!this->sdf->HasElement("plugin"))
+      {
+        _success = true;
+        return;
+      }
+
+      // Find correct plugin
+      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        auto pluginName = pluginElem->Get<std::string>("name");
+
+        // If asking for a specific plugin, skip all other plugins
+        if (i+1 < parts.size() && parts[i+1] != pluginName)
+        {
+          pluginElem = pluginElem->GetNextElement("plugin");
+          continue;
+        }
+
+        // Get plugin info from SDF
+        auto pluginMsg = _plugins.add_plugins();
+        pluginMsg->CopyFrom(util::PluginSdfToIgnMsg(pluginElem));
+
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+
+      // If asking for a specific plugin and it wasn't found
+      if (i+1 < parts.size() && _plugins.plugins_size() == 0)
+      {
+        gzwarn << "Plugin [" << parts[i+1] << "] not found in model [" <<
+            this->URI().Str() << "]" << std::endl;
+        _success = false;
+        return;
+      }
+      _success = true;
+      return;
+    }
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
+         "] cannot be handled." << std::endl;
+      _success = false;
+      return;
+    }
+  }
+
+  gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+      << std::endl;
+  _success = false;
 }

@@ -253,7 +253,7 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/light/modify");
 
   // Ignition transport
-  std::string pluginInfoService(this->GetName() + "/info/plugin");
+  std::string pluginInfoService(this->GetName() + "/server/info/plugin");
   if (!this->dataPtr->ignNode.Advertise(pluginInfoService,
       &World::PluginInfoService, this))
   {
@@ -2924,17 +2924,25 @@ std::string World::UniqueModelName(const std::string &_name)
 
 //////////////////////////////////////////////////
 void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
-    ignition::msgs::Plugin_V &_rep, bool &_result)
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
-  common::URI uri(_req.data());
-  if (!uri.Valid())
+  this->PluginInfo(_req.data(), _plugins, _success);
+}
+
+//////////////////////////////////////////////////
+void World::PluginInfo(const common::URI &_pluginUri,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  if (!_pluginUri.Valid())
   {
-    gzwarn << "String [" << _req.data() <<
-        "] is not a valid URI. Plugin info won't be sent." << std::endl;
+    gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
+    _success = false;
     return;
   }
 
-  auto parts = common::split(uri.Path().Str(), "/");
+  _plugins.clear_plugins();
+
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
   bool worldFound = false;
   for (size_t i = 0; i < parts.size(); i = i+2)
   {
@@ -2943,9 +2951,9 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     {
       if (worldFound)
       {
-        gzwarn << "There's more than one world in [" << uri.Str() << "]" <<
-            std::endl;
-        _result = false;
+        gzwarn << "There's more than one world in [" << _pluginUri.Str() << "]"
+            << std::endl;
+        _success = false;
         return;
       }
 
@@ -2953,7 +2961,7 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
       {
         gzwarn << "World name [" << parts[i+1] << "] does not match world [" <<
             this->GetName() << "]" << std::endl;
-        _result = false;
+        _success = false;
         return;
       }
 
@@ -2969,24 +2977,24 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
       {
         gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
             this->GetName() << "]" << std::endl;
-        _result = false;
+        _success = false;
         return;
       }
 
-      model->PluginInfo(uri, _rep, _result);
+      model->PluginInfo(_pluginUri, _plugins, _success);
       return;
     }
     // TODO: World plugins
     else
     {
-      gzerr << "[" << parts[i] << "] in [" << uri.Str() <<
+      gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
          "] cannot be handled." << std::endl;
-      _result = false;
+      _success = false;
       return;
     }
   }
 
-  gzwarn << "Couldn't get information for plugin [" << uri.Str() << "]" <<
-      std::endl;
-  _result = false;
+  gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+      << std::endl;
+  _success = false;
 }

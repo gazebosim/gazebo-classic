@@ -255,7 +255,8 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       {
         if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
         {
-          std::string pluginInfoService(gui::get_world() + "/info/plugin");
+          std::string pluginInfoService(gui::get_world() +
+              "/server/info/plugin");
           ignition::msgs::StringMsg req;
           req.set_data(this->dataPtr->selectedEntityName);
 
@@ -3515,15 +3516,18 @@ void ModelListWidget::FillGrid()
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_rep,
-          const bool _result)
+void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
+    const bool _success)
 {
-  if (!_result)
+  if (!_success)
+  {
+    gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
     return;
+  }
 
   // We are assuming we get only one plugin in the vector
   this->dataPtr->propMutex->lock();
-  this->dataPtr->pluginMsg.CopyFrom(_rep.plugins(0));
+  this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
   this->dataPtr->fillTypes.push_back("Plugin");
   this->dataPtr->propMutex->unlock();
 }

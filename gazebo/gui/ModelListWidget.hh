@@ -232,8 +232,11 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void GUIGridPropertyChanged(QtProperty *_item);
 
-      private: void OnPluginInfo(const ignition::msgs::Plugin_V &_rep,
-          const bool _result);
+      /// \brief Callback when plugin info is received.
+      /// \param[in] _plugins Vector of plugins.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
 
       /// \internal
       /// \brief Pointer to private data.

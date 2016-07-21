@@ -416,8 +416,28 @@ namespace gazebo
       /// returns NULL if link _name already exists.
       public: LinkPtr CreateLink(const std::string &_name);
 
-      public: void PluginInfo(const common::URI &_uri,
-          ignition::msgs::Plugin_V &_rep, bool &_result);
+      /// \brief Get information about plugins in this model or one of its
+      /// children, according to the given _pluginUri. Some _pluginUri examples:
+      ///
+      /// * Info about a specific model plugin in this model:
+      ///    data://world/<world_name>/model/<this_name>/plugin/<plugin_name>
+      ///
+      /// * Info about all model plugins in this model (empty plugin name):
+      ///    data://world/<world_name>/model/<this_name>/plugin
+      ///
+      /// * Info about a model plugin in a nested model:
+      ///    data://world/<world_name>/model/<this_name>/model/
+      ///        <nested_model_name>/plugin/<plugin_name>
+      ///
+      /// * Info about a sensor plugin within this model:
+      ///    data://world/<world_name>/model/<this_name>/link/<link_name>/
+      ///    sensor/<sensor_name>/plugin/<plugin_name>
+      ///
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      public: void PluginInfo(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
