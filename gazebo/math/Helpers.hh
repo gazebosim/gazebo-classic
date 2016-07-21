@@ -83,7 +83,10 @@ namespace gazebo
     /// \brief check if a float is NaN
     /// \param[in] _v the value
     /// \return true if _v is not a number, false otherwise
-    inline bool isnan(float _v)
+    /// \deprecated See ignition::math::isnan
+    inline bool
+    GAZEBO_DEPRECATED(8.0)
+    isnan(float _v)
     {
       return (boost::math::isnan)(_v);
     }
@@ -91,7 +94,10 @@ namespace gazebo
     /// \brief check if a double is NaN
     /// \param[in] _v the value
     /// \return true if _v is not a number, false otherwise
-    inline bool isnan(double _v)
+    /// \deprecated See ignition::math::isnan
+    inline bool
+    GAZEBO_DEPRECATED(8.0)
+    isnan(double _v)
     {
       return (boost::math::isnan)(_v);
     }
@@ -99,7 +105,10 @@ namespace gazebo
     /// \brief Fix a nan value.
     /// \param[in] _v Value to correct.
     /// \return 0 if _v is NaN, _v otherwise.
-    inline float fixnan(float _v)
+    /// \deprecated See ignition::math::fixnan
+    inline float
+    GAZEBO_DEPRECATED(8.0)
+    fixnan(float _v)
     {
       return isnan(_v) || std::isinf(_v) ? 0.0f : _v;
     }
@@ -107,7 +116,10 @@ namespace gazebo
     /// \brief Fix a nan value.
     /// \param[in] _v Value to correct.
     /// \return 0 if _v is NaN, _v otherwise.
-    inline double fixnan(double _v)
+    /// \deprecated See ignition::math::fixnan
+    inline double
+    GAZEBO_DEPRECATED(8.0)
+    fixnan(double _v)
     {
       return isnan(_v) || std::isinf(_v) ? 0.0 : _v;
     }
@@ -147,8 +159,11 @@ namespace gazebo
     /// \brief get the maximum value of vector of values
     /// \param[in] _values the vector of values
     /// \return maximum
+    /// \deprecated See ignition::math::max
     template<typename T>
-    inline T max(const std::vector<T> &_values)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    max(const std::vector<T> &_values)
     {
       T max = std::numeric_limits<T>::min();
       for (unsigned int i = 0; i < _values.size(); ++i)
@@ -188,8 +203,11 @@ namespace gazebo
     /// \param[in] _a the number
     /// \param[in] _precision the precision
     /// \return the value for the specified precision
+    /// \deprecated See ignition::math::precision
     template<typename T>
-    inline T precision(const T &_a, const unsigned int &_precision)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    precision(const T &_a, const unsigned int &_precision)
     {
       if (!std::isinf(_a))
       {
@@ -205,7 +223,10 @@ namespace gazebo
     /// \brief is this a power of 2?
     /// \param[in] _x the number
     /// \return true if _x is a power of 2, false otherwise
-    inline bool isPowerOfTwo(unsigned int _x)
+    /// \deprecated See ignition::math::isPowerOfTwo
+    inline bool
+    GAZEBO_DEPRECATED(8.0)
+    isPowerOfTwo(unsigned int _x)
     {
       return ((_x != 0) && ((_x & (~_x + 1)) == _x));
     }
@@ -215,7 +236,10 @@ namespace gazebo
     /// \param[in] _x the number
     /// \return the same value if _x is already a power of two. Otherwise,
     /// it returns the smallest power of two that is greater than _x
-    inline unsigned int roundUpPowerOfTwo(unsigned int _x)
+    /// \deprecated See ignition::math::roundUpPowerOfTwo
+    inline unsigned int
+    GAZEBO_DEPRECATED(8.0)
+    roundUpPowerOfTwo(unsigned int _x)
     {
       if (_x == 0)
         return 1;
@@ -234,7 +258,10 @@ namespace gazebo
     /// \brief parse string into an integer
     /// \param[in] _input the string
     /// \return an integer, 0 or 0 and a message in the error stream
-    inline int parseInt(const std::string& _input)
+    /// \deprecated See ignition::math::parseInt
+    inline int
+    GAZEBO_DEPRECATED(8.0)
+    parseInt(const std::string& _input)
     {
       const char *p = _input.c_str();
       if (!*p || *p == '?')
@@ -267,7 +294,10 @@ namespace gazebo
     /// \param _input the string
     /// \return a floating point number (can be NaN) or 0 with a message in the
     /// error stream
-    inline double parseFloat(const std::string& _input)
+    /// \deprecated See ignition::math::parseFloat
+    inline double
+    GAZEBO_DEPRECATED(8.0)
+    parseFloat(const std::string& _input)
     {
       const char *p = _input.c_str();
       if (!*p || *p == '?')
