@@ -629,11 +629,11 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   this->dataPtr->selectionObj->SetState(manipState);
 
   // See issue #1510
-  bool keyPressed = QApplication::keyboardModifiers();
+  bool keyIsPressed = (QApplication::keyboardModifiers() != Qt::NoModifier);
 
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
-  if (!keyPressed && (this->dataPtr->selectionObj->GetMode() ==
+  if (!keyIsPressed && (this->dataPtr->selectionObj->GetMode() ==
        rendering::SelectionObj::SELECTION_NONE
       || (mouseVis && mouseVis != this->dataPtr->selectionObj->GetParent())))
   {
