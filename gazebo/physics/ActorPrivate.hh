@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ACTORPRIVATE_HH_
-#define _GAZEBO_PHYSICS_ACTORPRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_ACTORPRIVATE_HH_
+#define GAZEBO_PHYSICS_ACTORPRIVATE_HH_
 
 #include <map>
 #include <vector>
@@ -73,9 +73,6 @@ namespace gazebo
       /// \brief Time length of a scipt.
       public: double scriptLength;
 
-      /// \brief Time the scipt was last updated.
-      public: double lastScriptTime;
-
       /// \brief True if the animation should loop.
       public: bool loop;
 
@@ -128,6 +125,14 @@ namespace gazebo
 
       /// \brief Where to send bone info.
       public: transport::PublisherPtr bonePosePub;
+
+      /// \brief Current script time
+      public: double scriptTime;
+
+      /// \brief Custom trajectory.
+      /// Used to control an actor with a plugin.
+      public: TrajectoryInfoPtr customTrajectoryInfo;
+
     };
   }
 }

@@ -432,7 +432,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Actor::Init()
 {
-  this->scriptTime = 0;
+  this->actorDPtr->scriptTime = 0;
   this->actorDPtr->prevFrameTime = this->actorDPtr->world->GetSimTime();
   if (this->actorDPtr->autoStart)
     this->Play();
@@ -478,8 +478,8 @@ void Actor::Update()
 
   if (!this->actorDPtr->customTrajectoryInfo)
   {
-    this->actorDPtr->scriptTime = currentTime.Double() - this->actorDPtr->startDelay -
-              this->actorDPtr->playStartTime.Double();
+    this->actorDPtr->scriptTime = currentTime.Double() -
+      this->actorDPtr->startDelay - this->actorDPtr->playStartTime.Double();
 
     /// waiting for delayed start
     if (this->actorDPtr->scriptTime < 0)
@@ -493,14 +493,17 @@ void Actor::Update()
       }
       else
       {
-        this->actorDPtr->scriptTime = this->actorDPtr->scriptTime - this->actorDPtr->scriptLength;
-        this->actorDPtr->playStartTime = currentTime - this->actorDPtr->scriptTime;
+        this->actorDPtr->scriptTime = this->actorDPtr->scriptTime -
+          this->actorDPtr->scriptLength;
+        this->actorDPtr->playStartTime = currentTime -
+          this->actorDPtr->scriptTime;
       }
     }
 
     for (unsigned int i = 0; i < this->actorDPtr->trajInfo.size(); ++i)
     {
-      if (this->actorDPtr->trajInfo[i].startTime <= this->actorDPtr->scriptTime &&
+      if (this->actorDPtr->trajInfo[i].startTime <=
+          this->actorDPtr->scriptTime &&
           this->actorDPtr->trajInfo[i].endTime >= this->actorDPtr->scriptTime)
       {
         tinfo = &this->actorDPtr->trajInfo[i];
@@ -510,11 +513,13 @@ void Actor::Update()
 
     if (tinfo == NULL)
     {
-      gzerr << "Trajectory not found at " << this->actorDPtr->scriptTime << "\n";
+      gzerr << "Trajectory not found at "
+            << this->actorDPtr->scriptTime << "\n";
       return;
     }
 
-    this->actorDPtr->scriptTime = this->actorDPtr->scriptTime - tinfo->startTime;
+    this->actorDPtr->scriptTime = this->actorDPtr->scriptTime -
+      tinfo->startTime;
   }
   else
   {
@@ -585,7 +590,7 @@ void Actor::Update()
   if (!this->actorDPtr->customTrajectoryInfo)
     actorPose.Rot() = modelPose.Rot() * rootRot;
   else
-    actorPose.Rot() = modelPose.Rot() * this->GetWorldPose().Rot();
+    actorPose.Rot() = modelPose.Rot() * this->WorldPose().Rot();
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->actorDPtr->customTrajectoryInfo)
@@ -718,31 +723,31 @@ void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 //////////////////////////////////////////////////
 void Actor::SetScriptTime(const double _time)
 {
-  this->scriptTime = _time;
+  this->actorDPtr->scriptTime = _time;
 }
 
 //////////////////////////////////////////////////
 double Actor::ScriptTime() const
 {
-  return this->scriptTime;
+  return this->actorDPtr->scriptTime;
 }
 
 //////////////////////////////////////////////////
 const Actor::SkeletonAnimation_M &Actor::SkeletonAnimations() const
 {
-  return this->skelAnimation;
+  return this->actorDPtr->skelAnimation;
 }
 
 //////////////////////////////////////////////////
 void Actor::SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo)
 {
-  this->customTrajectoryInfo = _trajInfo;
+  this->actorDPtr->customTrajectoryInfo = _trajInfo;
 }
 
 //////////////////////////////////////////////////
 void Actor::ResetCustomTrajectory()
 {
-  this->customTrajectoryInfo.reset();
+  this->actorDPtr->customTrajectoryInfo.reset();
 }
 
 //////////////////////////////////////////////////

@@ -53,17 +53,18 @@ BulletJoint::~BulletJoint()
 //////////////////////////////////////////////////
 void BulletJoint::Fini()
 {
-  if (this->constraint && this->bulletWorld)
+  if (this->bulletJointDPtr->constraint && this->bulletJointDPtr->bulletWorld)
   {
-    this->bulletWorld->removeConstraint(this->constraint);
-    delete this->constraint;
+    this->bulletJointDPtr->bulletWorld->removeConstraint(
+        this->bulletJointDPtr->constraint);
+    delete this->bulletJointDPtr->constraint;
   }
-  this->constraint = NULL;
-  this->bulletWorld = NULL;
+  this->bulletJointDPtr->constraint = NULL;
+  this->bulletJointDPtr->bulletWorld = NULL;
 
-  if (this->feedback)
-    delete this->feedback;
-  this->feedback = NULL;
+  if (this->bulletJointDPtr->feedback)
+    delete this->bulletJointDPtr->feedback;
+  this->bulletJointDPtr->feedback = NULL;
 }
 
 //////////////////////////////////////////////////

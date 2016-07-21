@@ -423,21 +423,21 @@ common::URI Base::URI() const
 
   uri.SetScheme("data");
 
-  BasePtr p = this->parent;
+  BasePtr p = this->baseDPtr->parent;
   while (p)
   {
-    if (p->GetParent())
+    if (p->Parent())
     {
-      uri.Path().PushFront(p->GetName());
+      uri.Path().PushFront(p->Name());
       uri.Path().PushFront(p->TypeStr());
     }
 
-    p = p->GetParent();
+    p = p->Parent();
   }
 
   uri.Path().PushBack(this->TypeStr());
-  uri.Path().PushBack(this->GetName());
-  uri.Path().PushFront(this->world->GetName());
+  uri.Path().PushBack(this->Name());
+  uri.Path().PushFront(this->baseDPtr->world->GetName());
   uri.Path().PushFront("world");
 
   return uri;

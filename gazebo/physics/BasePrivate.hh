@@ -62,6 +62,9 @@ namespace gazebo
 
       /// \brief Local copy of the scoped name.
       public: std::string scopedName;
+
+      /// \brief The string representation of the type of this object.
+      public: std::string typeStr;
     };
   }
 }

@@ -223,20 +223,21 @@ void BulletLink::Init()
 //////////////////////////////////////////////////
 void BulletLink::Fini()
 {
-  if (this->bulletPhysics && this->rigidLink)
+  if (this->bulletLinkDPtr->bulletPhysics && this->bulletLinkDPtr->rigidLink)
   {
-    btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+    btDynamicsWorld *bulletWorld =
+      this->bulletLinkDPtr->bulletPhysics->DynamicsWorld();
     if (bulletWorld)
-      bulletWorld->removeRigidBody(this->rigidLink);
+      bulletWorld->removeRigidBody(this->bulletLinkDPtr->rigidLink);
 
-    delete this->rigidLink;
+    delete this->bulletLinkDPtr->rigidLink;
   }
-  this->bulletPhysics.reset();
-  this->rigidLink = NULL;
+  this->bulletLinkDPtr->bulletPhysics.reset();
+  this->bulletLinkDPtr->rigidLink = NULL;
 
-  if (this->compoundShape)
-    delete this->compoundShape;
-  this->compoundShape = NULL;
+  if (this->bulletLinkDPtr->compoundShape)
+    delete this->bulletLinkDPtr->compoundShape;
+  this->bulletLinkDPtr->compoundShape = NULL;
 
   Link::Fini();
 }
