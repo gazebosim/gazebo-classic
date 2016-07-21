@@ -22,7 +22,7 @@
 
 using namespace gazebo;
 
-class IgnMsgSdfTest : public gazebo::testing::AutoLogFixture{};
+class IgnMsgSdfTest : public gazebo::testing::AutoLogFixture {};
 
 /////////////////////////////////////////////////
 TEST_F(IgnMsgSdfTest, PluginSdfToIgnMsg)
