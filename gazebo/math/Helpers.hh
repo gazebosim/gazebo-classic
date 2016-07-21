@@ -102,6 +102,10 @@ namespace gazebo
       return (boost::math::isnan)(_v);
     }
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     /// \brief Fix a nan value.
     /// \param[in] _v Value to correct.
     /// \return 0 if _v is NaN, _v otherwise.
@@ -123,6 +127,9 @@ namespace gazebo
     {
       return isnan(_v) || std::isinf(_v) ? 0.0 : _v;
     }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 
     /// \brief get mean of vector of values
     /// \param[in] _values the vector of values
@@ -244,8 +251,15 @@ namespace gazebo
       if (_x == 0)
         return 1;
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       if (isPowerOfTwo(_x))
         return _x;
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 
       while (_x & (_x - 1))
         _x = _x & (_x - 1);
