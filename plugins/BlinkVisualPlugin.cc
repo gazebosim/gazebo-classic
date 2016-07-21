@@ -95,27 +95,20 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
   }
   this->dataPtr->visual = _visual;
 
-  if (!_sdf->HasElement("sdf"))
-  {
-    gzerr << "An <sdf> tag can't be found within the plugin." << std::endl;
-    return;
-  }
-  auto sdfElem = _sdf->GetElement("sdf");
-
   // Get color A
   this->dataPtr->colorA.Set(1, 0, 0, 1);
-  if (sdfElem->HasElement("color_a"))
-    this->dataPtr->colorA = sdfElem->Get<common::Color>("color_a");
+  if (_sdf->HasElement("color_a"))
+    this->dataPtr->colorA = _sdf->Get<common::Color>("color_a");
 
   // Get color B
   this->dataPtr->colorB.Set(0, 0, 0, 1);
-  if (sdfElem->HasElement("color_b"))
-    this->dataPtr->colorB = sdfElem->Get<common::Color>("color_b");
+  if (_sdf->HasElement("color_b"))
+    this->dataPtr->colorB = _sdf->Get<common::Color>("color_b");
 
   // Get the period
   this->dataPtr->period.Set(1);
-  if (sdfElem->HasElement("period"))
-    this->dataPtr->period = sdfElem->Get<double>("period");
+  if (_sdf->HasElement("period"))
+    this->dataPtr->period = _sdf->Get<double>("period");
 
   if (this->dataPtr->period <= 0)
   {
@@ -125,8 +118,8 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
 
   // Get whether to use wall time or sim time
   this->dataPtr->useWallTime = false;
-  if (sdfElem->HasElement("use_wall_time"))
-    this->dataPtr->useWallTime = sdfElem->Get<bool>("use_wall_time");
+  if (_sdf->HasElement("use_wall_time"))
+    this->dataPtr->useWallTime = _sdf->Get<bool>("use_wall_time");
 
   // Connect to the world update signal
   this->dataPtr->updateConnection = event::Events::ConnectPreRender(
