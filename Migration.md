@@ -176,6 +176,18 @@ release will remove the deprecated code.
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
+1. **gazebo/math/Filter.hh**
+    + ***Deprecation:*** public: gazebo::math::BiQuad
+    + ***Replacement:*** public: ignition::math::BiQuad
+    + ***Deprecation:*** public: gazebo::math::Filter
+    + ***Replacement:*** public: ignition::math::Filter
+    + ***Deprecation:*** public: gazebo::math::OnePole
+    + ***Replacement:*** public: ignition::math::OnePole
+
+1. **gazebo/math/Kmeans.hh**
+    + ***Deprecation:*** public: gazebo::math::Kmeans
+    + ***Replacement:*** public: ignition::math::Kmeans
+
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public: gazebo::math::RotationSpline
     + ***Replacement:*** public: ignition::math::RotationSpline

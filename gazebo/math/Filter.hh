@@ -38,6 +38,7 @@ namespace gazebo
 
   /// \class Filter Filter.hh math/gzmath.hh
   /// \brief Filter base class
+  /// \deprecated See ignition::math::Filter
   template <class T>
   class GZ_MATH_VISIBLE Filter
   {
@@ -71,11 +72,13 @@ namespace gazebo
   class GZ_MATH_VISIBLE OnePole : public Filter<T>
   {
     /// \brief Constructor.
+    /// \deprecated See ignition::math::OnePole
     public: OnePole() GAZEBO_DEPRECATED(8.0) : a0(0), b1(0) {}
 
     /// \brief Constructor.
     /// \param[in] _fc Cutoff frequency.
     /// \param[in] _fs Sample rate.
+    /// \deprecated See ignition::math::OnePole
     public: OnePole(double _fc, double _fs) GAZEBO_DEPRECATED(8.0)
       : a0(0), b1(0)
     {
@@ -161,6 +164,7 @@ namespace gazebo
   class GZ_MATH_VISIBLE BiQuad : public Filter<T>
   {
     /// \brief Constructor.
+    /// \deprecated See ignition::math::BiQuad
     public: BiQuad() GAZEBO_DEPRECATED(8.0)
       : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0)
     {
@@ -169,6 +173,7 @@ namespace gazebo
     /// \brief Constructor.
     /// \param[in] _fc Cutoff frequency.
     /// \param[in] _fs Sample rate.
+    /// \deprecated See ignition::math::BiQuad
     public: BiQuad(double _fc, double _fs) GAZEBO_DEPRECATED(8.0)
       : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0)
     {
