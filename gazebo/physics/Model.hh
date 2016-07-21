@@ -29,6 +29,8 @@
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include <ignition/msgs/plugin_v.pb.h>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
@@ -414,6 +416,9 @@ namespace gazebo
       /// returns NULL if link _name already exists.
       public: LinkPtr CreateLink(const std::string &_name);
 
+      public: void PluginInfo(const common::URI &_uri,
+          ignition::msgs::Plugin_V &_rep, bool &_result);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -442,10 +447,6 @@ namespace gazebo
 
       /// \brief Publish the scale.
       private: virtual void PublishScale();
-
-      /// \brief Called when a request message is received.
-      /// \param[in] _msg The request message.
-      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
@@ -486,12 +487,6 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
-
-      /// \brief Publisher for request response messages.
-      private: transport::PublisherPtr responsePub;
-
-      /// \brief Subscriber to request messages.
-      private: transport::SubscriberPtr requestSub;
 
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;

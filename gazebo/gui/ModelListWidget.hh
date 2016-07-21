@@ -23,6 +23,10 @@
 #include <QObject>
 #include <QWidget>
 
+#include <ignition/msgs/plugin.pb.h>
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
@@ -121,7 +125,7 @@ namespace gazebo
       /// \param[in] _msg The plugin message.
       /// \param[in] _parent Pointer to the qtproperty which will receive
       /// the message data.
-      private: void FillPropertyTree(const msgs::Plugin &_msg,
+      private: void FillPropertyTree(const ignition::msgs::Plugin &_msg,
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Link &_msg,
@@ -227,6 +231,9 @@ namespace gazebo
       /// \brief Called when a GUI grid property is changed by the user.
       /// \param[in] _item The item that was changed.
       private: void GUIGridPropertyChanged(QtProperty *_item);
+
+      private: void OnPluginInfo(const ignition::msgs::Plugin_V &_rep,
+          const bool _result);
 
       /// \internal
       /// \brief Pointer to private data.

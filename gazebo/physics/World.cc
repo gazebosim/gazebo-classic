@@ -252,6 +252,15 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
 
+  // Ignition transport
+  std::string pluginInfoService(this->GetName() + "/info/plugin");
+  if (!this->dataPtr->ignNode.Advertise(pluginInfoService,
+      &World::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << pluginInfoService << "]"
+        << std::endl;
+  }
+
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 
@@ -2911,4 +2920,73 @@ std::string World::UniqueModelName(const std::string &_name)
     result = _name + "_" + std::to_string(i++);
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::Plugin_V &_rep, bool &_result)
+{
+  common::URI uri(_req.data());
+  if (!uri.Valid())
+  {
+    gzwarn << "String [" << _req.data() <<
+        "] is not a valid URI. Plugin info won't be sent." << std::endl;
+    return;
+  }
+
+  auto parts = common::split(uri.Path().Str(), "/");
+  bool worldFound = false;
+  for (size_t i = 0; i < parts.size(); i = i+2)
+  {
+    // Check if it's about this world
+    if (parts[i] == "world")
+    {
+      if (worldFound)
+      {
+        gzwarn << "There's more than one world in [" << uri.Str() << "]" <<
+            std::endl;
+        _result = false;
+        return;
+      }
+
+      if (parts[i+1] != this->GetName())
+      {
+        gzwarn << "World name [" << parts[i+1] << "] does not match world [" <<
+            this->GetName() << "]" << std::endl;
+        _result = false;
+        return;
+      }
+
+      worldFound = true;
+      continue;
+    }
+    // See if there is a model
+    else if (worldFound && parts[i] == "model")
+    {
+      auto model = this->GetModel(parts[i+1]);
+
+      if (!model)
+      {
+        gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
+            this->GetName() << "]" << std::endl;
+        _result = false;
+        return;
+      }
+
+      model->PluginInfo(uri, _rep, _result);
+      return;
+    }
+    // TODO: World plugins
+    else
+    {
+      gzerr << "[" << parts[i] << "] in [" << uri.Str() <<
+         "] cannot be handled." << std::endl;
+      _result = false;
+      return;
+    }
+  }
+
+  gzwarn << "Couldn't get information for plugin [" << uri.Str() << "]" <<
+      std::endl;
+  _result = false;
 }

@@ -56,6 +56,32 @@ TEST_F(ModelTest, Scale)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ModelTest, PluginInfo)
+{
+  // Load a world with model plugins
+  this->Load("worlds/underwater.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("submarine");
+  ASSERT_TRUE(model != nullptr);
+
+  {
+    common::URI pluginUri(
+        "data://world/default/model/submarine/plugin/submarine_propeller_3");
+
+    ignition::msgs::Plugin_V rep;
+    bool result;
+    model->PluginInfo(pluginUri, rep, result);
+
+    EXPECT_TRUE(result);
+  }
+
+
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

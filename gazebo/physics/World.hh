@@ -32,6 +32,9 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -604,6 +607,11 @@ namespace gazebo
       /// ~/light/modify topic.
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightModifyMsg(ConstLightPtr &_msg);
+
+      /// \brief
+      /// \param[in]
+      private: void PluginInfoService(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::Plugin_V &_rep, bool &_result);
 
       /// \internal
       /// \brief Private data pointer.

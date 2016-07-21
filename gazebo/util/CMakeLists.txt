@@ -14,6 +14,7 @@ link_directories(${tinyxml2_LIBRARY_DIRS})
 
 set (sources
   Diagnostics.cc
+  IgnMsgSdf.cc
   IntrospectionClient.cc
   IntrospectionManager.cc
   LogPlay.cc
@@ -35,6 +36,7 @@ endif()
 
 set (headers
   Diagnostics.hh
+  IgnMsgSdf.hh
   IntrospectionClient.hh
   IntrospectionManager.hh
   LogPlay.hh
@@ -46,6 +48,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  IgnMsgSdf_TEST.cc
   IntrospectionClient_TEST.cc
   IntrospectionManager_TEST.cc
   LogPlay_TEST.cc

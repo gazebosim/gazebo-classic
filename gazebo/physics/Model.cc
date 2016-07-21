@@ -36,6 +36,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/URI.hh"
 
@@ -50,6 +51,7 @@
 
 #include "gazebo/transport/Node.hh"
 
+#include "gazebo/util/IgnMsgSdf.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/OpenAL.hh"
 
@@ -75,11 +77,6 @@ void Model::Load(sdf::ElementPtr _sdf)
   Entity::Load(_sdf);
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
-
-  this->requestSub = this->node->Subscribe("~/request",
-                                           &Model::OnRequest, this, true);
-  this->responsePub = this->node->Advertise<msgs::Response>(
-      "~/response");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
   if (this->sdf->HasElement("static"))
@@ -113,46 +110,108 @@ void Model::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Model::OnRequest(ConstRequestPtr &_msg)
+void Model::PluginInfo(const common::URI &_uri,
+    ignition::msgs::Plugin_V &_rep, bool &_result)
 {
-  std::lock_guard<std::mutex> lock(this->receiveMutex);
-
-  // Only handle requests for model plugins in this model
-  if (_msg->request() == "model_plugin_info" && this->sdf->HasElement("plugin")
-      && _msg->data().find(this->URI().Str()) != std::string::npos)
+  if (!_uri.Valid())
   {
-    // Find correct plugin
-    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-    while (pluginElem)
+    gzwarn << "URI [" << _uri.Str() <<
+        "] is not a valid. Plugin info won't be sent." << std::endl;
+    return;
+  }
+
+  auto parts = common::split(_uri.Path().Str(), "/");
+  bool modelFound = false;
+  for (size_t i = 0; i < parts.size(); i = i+2)
+  {
+    // Check if it's the correct world
+    if (parts[i] == "world")
     {
-      std::string pluginName = pluginElem->Get<std::string>("name");
-
-      if (_msg->data().find(pluginName) != std::string::npos)
+      if (parts[i+1] != this->GetWorld()->GetName())
       {
-        // Get plugin info from SDF
-        msgs::Plugin pluginMsg;
-        pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
-
-        // Publish response with plugin info
-        msgs::Response response;
-        response.set_id(_msg->id());
-        response.set_request(_msg->request());
-        response.set_response("success");
-        response.set_type(pluginMsg.GetTypeName());
-
-        std::string *serializedData = response.mutable_serialized_data();
-        pluginMsg.SerializeToString(serializedData);
-
-        this->responsePub->Publish(response);
-
+        gzwarn << "World [" << parts[i+1] << "] does not match model [" <<
+            this->GetName() << "]'s world [" << this->GetWorld()->GetName() <<
+            "]" << std::endl;
+        _result = false;
         return;
       }
-      pluginElem = pluginElem->GetNextElement("plugin");
     }
+    // Check if it's about this model
+    else if (parts[i] == "model")
+    {
+      // Look in nested models
+      if (modelFound)
+      {
+        auto model = this->NestedModel(parts[i+1]);
 
-    gzwarn << "Plugin [" << _msg->data() << "] not found in model [" <<
-        this->URI().Str() << "]" << std::endl;
+        if (!model)
+        {
+          gzwarn << "Model [" << parts[i+1] << "] not found in model [" <<
+              this->GetName() << "]" << std::endl;
+          _result = false;
+          return;
+        }
+//TODO
+        return;
+      }
+
+      if (parts[i+1] != this->GetName())
+      {
+        gzwarn << "Model name [" << parts[i+1] << "] does not match model [" <<
+            this->GetName() << "]" << std::endl;
+        _result = false;
+        return;
+      }
+
+      modelFound = true;
+      continue;
+    }
+    // Look for plugin
+    else if (modelFound && parts[i] == "plugin")
+    {
+      // Find correct plugin
+      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        auto pluginName = pluginElem->Get<std::string>("name");
+
+        // If asking for a specific plugin, skip all other plugins
+        if (i+1 < parts.size() && parts[i+1] != pluginName)
+        {
+          pluginElem = pluginElem->GetNextElement("plugin");
+          continue;
+        }
+
+        // Get plugin info from SDF
+        auto pluginMsg = _rep.add_plugins();
+        pluginMsg->CopyFrom(util::PluginSdfToIgnMsg(pluginElem));
+
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+
+      // If asking for a specific plugin and it wasn't found
+      if (i+1 < parts.size() && _rep.plugins_size() == 0)
+      {
+        gzwarn << "Plugin [" << parts[i+1] << "] not found in model [" <<
+            this->URI().Str() << "]" << std::endl;
+        _result = false;
+        return;
+      }
+      _result = true;
+      return;
+    }
+    else
+    {
+      gzerr << "[" << parts[i] << "] in [" << _uri.Str() <<
+         "] cannot be handled." << std::endl;
+      _result = false;
+      return;
+    }
   }
+
+  gzwarn << "Couldn't get information for plugin [" << _uri.Str() << "]" <<
+      std::endl;
+  _result = false;
 }
 
 //////////////////////////////////////////////////
