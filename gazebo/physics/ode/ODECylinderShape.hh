@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODECYLINDERSHAPE_HH_
-#define _GAZEBO_PHYSICS_ODECYLINDERSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODECYLINDERSHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODECYLINDERSHAPE_HH_
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/util/system.hh"
@@ -24,6 +24,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE cylinder shape
     class GZ_PHYSICS_VISIBLE ODECylinderShape : public CylinderShape
     {
@@ -37,6 +40,7 @@ namespace gazebo
       // Documentation inerited.
       public: void SetSize(const double _radius, const double _length);
     };
+    /// \}
   }
 }
 #endif

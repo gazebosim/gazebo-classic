@@ -36,9 +36,9 @@ BulletJoint::BulletJoint(BasePtr _parent)
 : Joint(*new BulletJointPrivate, _parent),
   bulletJointDPtr(static_cast<BulletJointPrivate*>(this->jointDPtr))
 {
-  this->bulletJointDPtr->constraint = NULL;
-  this->bulletJointDPtr->bulletWorld = NULL;
-  this->bulletJointDPtr->feedback = NULL;
+  this->bulletJointDPtr->constraint = nullptr;
+  this->bulletJointDPtr->bulletWorld = nullptr;
+  this->bulletJointDPtr->feedback = nullptr;
   this->bulletJointDPtr->stiffnessDampingInitialized = false;
   this->bulletJointDPtr->forceApplied[0] = 0;
   this->bulletJointDPtr->forceApplied[1] = 0;
@@ -59,12 +59,14 @@ void BulletJoint::Fini()
         this->bulletJointDPtr->constraint);
     delete this->bulletJointDPtr->constraint;
   }
-  this->bulletJointDPtr->constraint = NULL;
-  this->bulletJointDPtr->bulletWorld = NULL;
+  this->bulletJointDPtr->constraint = nullptr;
+  this->bulletJointDPtr->bulletWorld = nullptr;
 
   if (this->bulletJointDPtr->feedback)
     delete this->bulletJointDPtr->feedback;
-  this->bulletJointDPtr->feedback = NULL;
+  this->bulletJointDPtr->feedback = nullptr;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -126,7 +128,7 @@ LinkPtr BulletJoint::JointLink(const unsigned int _index) const
 {
   LinkPtr result;
 
-  if (this->bulletJointDPtr->constraint == NULL)
+  if (this->bulletJointDPtr->constraint == nullptr)
   {
     gzerr << "Attach bodies to the joint first";
     return result;
@@ -164,6 +166,8 @@ bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
+  this->applyDamping.reset();
+
   this->bulletJointDPtr->childLink.reset();
   this->bulletJointDPtr->parentLink.reset();
   if (this->bulletJointDPtr->constraint && this->bulletJointDPtr->bulletWorld)
@@ -172,7 +176,7 @@ void BulletJoint::Detach()
         this->bulletJointDPtr->constraint);
   }
   delete this->bulletJointDPtr->constraint;
-  this->bulletJointDPtr->constraint = NULL;
+  this->bulletJointDPtr->constraint = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -280,7 +284,7 @@ void BulletJoint::CacheForceTorque()
   // convert torque from about parent CG to joint anchor location
   if (this->bulletJointDPtr->parentLink)
   {
-    // get child pose, or it's the inertial world if childLink is NULL
+    // get child pose, or it's the inertial world if childLink is nullptr
     ignition::math::Pose3d childPose;
 
     if (this->bulletJointDPtr->childLink)
@@ -396,7 +400,7 @@ void BulletJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench BulletJoint::ForceTorque(const unsigned int /*_index*/) const
 {
-  GZ_ASSERT(this->bulletJointDPtr->constraint != NULL,
+  GZ_ASSERT(this->bulletJointDPtr->constraint != nullptr,
       "constraint should be valid");
   return this->bulletJointDPtr->wrench;
 }
@@ -406,7 +410,7 @@ void BulletJoint::SetupJointFeedback()
 {
   if (this->bulletJointDPtr->provideFeedback)
   {
-    if (this->bulletJointDPtr->feedback == NULL)
+    if (this->bulletJointDPtr->feedback == nullptr)
     {
       this->bulletJointDPtr->feedback = new btJointFeedback;
       this->bulletJointDPtr->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);

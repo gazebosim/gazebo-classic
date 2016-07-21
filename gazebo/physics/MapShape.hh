@@ -21,14 +21,17 @@
 #include <string>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/CommonTypes.hh"
-
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Image;
+  }
+
   namespace physics
   {
     class QuadNode;

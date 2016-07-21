@@ -29,6 +29,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTBoxShapePrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART Box shape
     class GZ_PHYSICS_VISIBLE DARTBoxShape : public BoxShape
     {
@@ -46,6 +49,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTBoxShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

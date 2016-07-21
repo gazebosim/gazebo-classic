@@ -31,9 +31,9 @@ using namespace physics;
 ODEMesh::ODEMesh()
 : odeMeshDPtr(new ODEMeshPrivate)
 {
-  this->odeMeshDPtr->odeData = NULL;
-  this->odeMeshDPtr->vertices = NULL;
-  this->odeMeshDPtr->indices = NULL;
+  this->odeMeshDPtr->odeData = nullptr;
+  this->odeMeshDPtr->vertices = nullptr;
+  this->odeMeshDPtr->indices = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -102,8 +102,8 @@ void ODEMesh::Init(const common::SubMesh *_subMesh,
   unsigned int numVertices = _subMesh->GetVertexCount();
   unsigned int numIndices = _subMesh->GetIndexCount();
 
-  this->odeMeshDPtr->vertices = NULL;
-  this->odeMeshDPtr->indices = NULL;
+  this->odeMeshDPtr->vertices = nullptr;
+  this->odeMeshDPtr->indices = nullptr;
 
   // Get all the vertex and index data
   _subMesh->FillArrays(&this->odeMeshDPtr->vertices,
@@ -131,8 +131,8 @@ void ODEMesh::Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
   unsigned int numVertices = _mesh->GetVertexCount();
   unsigned int numIndices = _mesh->GetIndexCount();
 
-  this->odeMeshDPtr->vertices = NULL;
-  this->odeMeshDPtr->indices = NULL;
+  this->odeMeshDPtr->vertices = nullptr;
+  this->odeMeshDPtr->indices = nullptr;
 
   // Get all the vertex and index data
   _mesh->FillArrays(&this->odeMeshDPtr->vertices, &this->odeMeshDPtr->indices);
@@ -148,7 +148,7 @@ void ODEMesh::CreateMesh(const unsigned int _numVertices,
     const ignition::math::Vector3d &_scale)
 {
   /// This will hold the vertex data of the triangle mesh
-  if (this->odeMeshDPtr->odeData == NULL)
+  if (this->odeMeshDPtr->odeData == nullptr)
     this->odeMeshDPtr->odeData = dGeomTriMeshDataCreate();
 
   // Scale the vertex data
@@ -168,7 +168,7 @@ void ODEMesh::CreateMesh(const unsigned int _numVertices,
       _numVertices, this->odeMeshDPtr->indices, _numIndices,
       3*sizeof(this->odeMeshDPtr->indices[0]));
 
-  if (_collision->CollisionId() == NULL)
+  if (_collision->CollisionId() == nullptr)
   {
     _collision->SetSpaceId(dSimpleSpaceCreate(_collision->SpaceId()));
     _collision->SetCollision(dCreateTriMesh(_collision->SpaceId(),

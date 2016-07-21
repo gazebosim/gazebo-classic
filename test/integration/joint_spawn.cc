@@ -454,7 +454,7 @@ TEST_P(JointSpawningTest_All, SpawnJointTypes)
 {
   if (this->jointType == "gearbox" && this->physicsEngine != "ode")
   {
-    gzerr << "Skip test, gearbox is only supported in ODE." <<
+    gzerr << "Skip test, gearbox is only supported in ODE. " <<
          "See issues: #859, #1914, #1915" << std::endl;
     return;
   }

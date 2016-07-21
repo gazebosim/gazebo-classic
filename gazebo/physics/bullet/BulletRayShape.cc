@@ -62,7 +62,7 @@ void BulletRayShape::Update()
             this->rayShapeDPtr->collisionParent);
 
     LinkPtr link = this->rayShapeDPtr->collisionParent->Link();
-    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+    GZ_ASSERT(link != nullptr, "Bullet link is null");
 
     this->rayShapeDPtr->globalStartPos = link->WorldPose().CoordPositionAdd(
           this->rayShapeDPtr->relativeStartPos);
@@ -110,7 +110,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
             this->rayShapeDPtr->collisionParent);
 
     LinkPtr link = this->rayShapeDPtr->collisionParent->Link();
-    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+    GZ_ASSERT(link != nullptr, "Bullet link is null");
 
     this->rayShapeDPtr->globalStartPos = link->WorldPose().CoordPositionAdd(
           this->rayShapeDPtr->relativeStartPos);
@@ -142,7 +142,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 
       BulletLink *link = static_cast<BulletLink *>(
           rayCallback.m_collisionObject->getUserPointer());
-      GZ_ASSERT(link != NULL, "Bullet link is NULL");
+      GZ_ASSERT(link != nullptr, "Bullet link is null");
       _entity = link->ScopedName();
     }
   }

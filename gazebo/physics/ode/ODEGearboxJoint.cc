@@ -31,7 +31,7 @@ using namespace physics;
 ODEGearboxJoint::ODEGearboxJoint(dWorldID _worldId, BasePtr _parent)
 : GearboxJoint<ODEJoint>(_parent)
 {
-  this->odeJointDPtr->jointId = dJointCreateGearbox(_worldId, NULL);
+  this->odeJointDPtr->jointId = dJointCreateGearbox(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -60,7 +60,7 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 {
   ODELinkPtr odelink = std::dynamic_pointer_cast<ODELink>(_body);
   dBodyID refId;
-  if (odelink == NULL)
+  if (odelink == nullptr)
   {
     gzwarn << "Reference body not valid, using inertial frame.\n";
     refId = 0;

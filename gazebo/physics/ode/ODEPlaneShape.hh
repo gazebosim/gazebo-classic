@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
-#define _GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/PlaneShape.hh"
@@ -25,6 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief An ODE Plane shape.
     class GZ_PHYSICS_VISIBLE ODEPlaneShape : public PlaneShape
     {
@@ -41,6 +44,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetAltitude(const ignition::math::Vector3d &_pos);
     };
+    /// \}
   }
 }
 #endif

@@ -41,6 +41,17 @@ Road::Road(BasePtr _parent)
 /////////////////////////////////////////////////
 Road::~Road()
 {
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+void Road::Fini()
+{
+  this->roadPub.reset();
+
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
 }
 
 /////////////////////////////////////////////////

@@ -211,7 +211,7 @@ void ImageGaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 {
-  GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is NULL");
+  GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is null");
 
   this->gaussianNoiseCompositorListener.reset(new
         GaussianNoiseCompositorListener(this->mean, this->stdDev));
@@ -228,11 +228,6 @@ void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 void ImageGaussianNoiseModel::Fini()
 {
   GaussianNoiseModel::Fini();
-  if (this->gaussianNoiseCompositorListener)
-  {
-    this->gaussianNoiseInstance->removeListener(
-      this->gaussianNoiseCompositorListener.get());
-  }
 }
 
 //////////////////////////////////////////////////

@@ -731,7 +731,10 @@ namespace gazebo
 
       /// \brief Disconnect to the add entity signal.
       /// \param[in] _conn Connection pointer to disconnect.
-      public: void DisconnectEnabled(event::ConnectionPtr &_conn);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectEnabled(event::ConnectionPtr &_conn)
+              GAZEBO_DEPRECATED(8.0)
+              {enabledSignal.Disconnect(_conn->Id());}
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
@@ -992,6 +995,9 @@ namespace gazebo
       /// \param[in] _dataPtr Protected data class
       /// \param[in] _parent Pointer to parent entity.
       protected: Link(LinkPrivate &_dataPtr, EntityPtr _parent);
+
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();

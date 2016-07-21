@@ -34,6 +34,8 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Joint.hh"
 
+#include "gazebo/util/IntrospectionManager.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -267,8 +269,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
     }
     if (!this->jointDPtr->parentLink)
     {
-      std::string parentNameThisModel =
-          parentName.substr(parentName.find("::"));
+      std::string parentNameThisModel;
+      auto doubleColon = parentName.find("::");
+      if (doubleColon != std::string::npos)
+      {
+        parentNameThisModel = parentName.substr(doubleColon);
+      }
+      else
+      {
+        parentNameThisModel = "::" + parentName;
+      }
       parentNameThisModel = parentModel->GetName() + parentNameThisModel;
 
       this->jointDPtr->parentLink = std::dynamic_pointer_cast<Link>(
@@ -289,11 +299,20 @@ void Joint::Load(sdf::ElementPtr _sdf)
       this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(scopedChildName));
 
-        parentModel = parentModel->GetParent();
+      parentModel = parentModel->GetParent();
     }
     if (!this->jointDPtr->childLink)
     {
-      std::string childNameThisModel = childName.substr(childName.find("::"));
+      std::string childNameThisModel;
+      auto doubleColon = childName.find("::");
+      if (doubleColon != std::string::npos)
+      {
+        childNameThisModel = childName.substr(doubleColon);
+      }
+      else
+      {
+        childNameThisModel = "::" + childName;
+      }
       childNameThisModel = parentModel->GetName() + childNameThisModel;
 
       this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
@@ -435,6 +454,8 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
+  this->jointDPtr->applyDamping.reset();
+
   // Remove all the sensors attached to the joint
   for (auto const &sensor : this->jointDPtr->sensors)
   {
@@ -443,10 +464,9 @@ void Joint::Fini()
   this->jointDPtr->sensors.clear();
 
   this->anchorLink.reset();
-  this->applyDamping.reset();
   this->childLink.reset();
-  this->model.reset();
   this->parentLink.reset();
+  this->model.reset();
   this->sdfJoint.reset();
 
   Base::Fini();
@@ -545,6 +565,7 @@ void Joint::Update()
 void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
+  /// \todo Update joint specific parameters. Issue #1954
 }
 
 //////////////////////////////////////////////////
@@ -1806,4 +1827,47 @@ void Joint::SetAxis(const unsigned int _index)
     this->jointDPtr->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
   else
     gzerr << "SetAxis index [" << _index << "] out of bounds\n";
+}
+
+/////////////////////////////////////////////////
+void Joint::RegisterIntrospectionItems()
+{
+  for (size_t i = 0; i < this->GetAngleCount(); ++i)
+  {
+    this->RegisterIntrospectionPosition(i);
+    this->RegisterIntrospectionVelocity(i);
+  }
+}
+
+/////////////////////////////////////////////////
+void Joint::RegisterIntrospectionPosition(const unsigned int _index)
+{
+  auto f = [this, _index]()
+  {
+    // For prismatic axes, Radian -> meters
+    return this->GetAngle(_index).Ign().Radian();
+  };
+
+  common::URI uri(this->URI());
+  uri.Query().Insert("p",
+      "axis/" + std::to_string(_index) + "/double/position");
+  this->introspectionItems.push_back(uri);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <double>(uri.Str(), f);
+}
+
+/////////////////////////////////////////////////
+void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
+{
+  auto f = [this, _index]()
+  {
+    return this->GetVelocity(_index);
+  };
+
+  common::URI uri(this->URI());
+  uri.Query().Insert("p",
+      "axis/" + std::to_string(_index) + "/double/velocity");
+  this->introspectionItems.push_back(uri);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <double>(uri.Str(), f);
 }

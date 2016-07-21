@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODE_ODEMESH_HH_
-#define _GAZEBO_PHYSICS_ODE_ODEMESH_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEMESH_HH_
+#define GAZEBO_PHYSICS_ODE_ODEMESH_HH_
 
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/ode/ode_inc.h"
@@ -25,6 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     // Forward declare private data
     class ODEMeshPrivate;
 
@@ -85,6 +88,7 @@ namespace gazebo
       /// \brief Private data pointer
       protected: ODEMeshPrivate *odeMeshDPtr;
     };
+    /// \}
   }
 }
 #endif

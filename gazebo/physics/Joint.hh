@@ -262,7 +262,10 @@ namespace gazebo
 
       /// \brief Disconnect a boost::slot the the joint update signal.
       /// \param[in] _conn Connection to disconnect.
-      public: void DisconnectJointUpdate(event::ConnectionPtr &_conn);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectJointUpdate(event::ConnectionPtr &_conn)
+              GAZEBO_DEPRECATED(8.0)
+              {jointUpdate.Disconnect(_conn->Id());}
 
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
@@ -992,6 +995,17 @@ namespace gazebo
       /// \return new child link pose at new joint position.
       protected: ignition::math::Pose3d ChildLinkPose(const unsigned int _index,
           const double _position) const;
+
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Register position items in the introspection service.
+      /// \param[in] _index Axis index.
+      private: void RegisterIntrospectionPosition(const unsigned int _index);
+
+      /// \brief Register velocity items in the introspection service.
+      /// \param[in] _index Axis index.
+      private: void RegisterIntrospectionVelocity(const unsigned int _index);
 
       /// \brief Shared construction code.
       /// \param[in] _link Pointer to parent link

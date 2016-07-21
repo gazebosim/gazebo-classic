@@ -30,6 +30,9 @@ namespace gazebo
     class ODESurfaceParams;
     class ODEPhysics;
 
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \def ODECollisionPtr
     /// \brief Boost shared point to ODECollision
     typedef std::shared_ptr<ODECollision> ODECollisionPtr;
@@ -53,5 +56,7 @@ namespace gazebo
     /// \def ODEPhysicsPtr
     /// \brief Boost shared pointer for ODEPhysics.
     typedef std::shared_ptr<ODEPhysics> ODEPhysicsPtr;
+
+    /// \}
   }
 }

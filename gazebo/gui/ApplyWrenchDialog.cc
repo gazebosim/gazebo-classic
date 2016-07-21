@@ -934,6 +934,11 @@ void ApplyWrenchDialog::AttachVisuals()
       this->dataPtr->applyWrenchVisual->GetParent() !=
       this->dataPtr->linkVisual)
   {
+    if (this->dataPtr->applyWrenchVisual->GetParent())
+    {
+      this->dataPtr->applyWrenchVisual->GetParent()->DetachVisual(
+          this->dataPtr->applyWrenchVisual);
+    }
     this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
     this->dataPtr->applyWrenchVisual->Resize();
   }

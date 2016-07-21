@@ -24,7 +24,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_physics_simbody
     /// \{
 
     /// \class SimbodyModel SimbodyModel.hh physics/physics.hh

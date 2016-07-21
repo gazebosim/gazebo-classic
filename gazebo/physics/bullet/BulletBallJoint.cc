@@ -30,9 +30,9 @@ using namespace physics;
 BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world, BasePtr _parent)
     : BallJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletJointDPtr->bulletWorld = _world;
-  this->bulletBall = NULL;
+  this->bulletBall = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -124,7 +124,7 @@ void BulletBallJoint::Init()
   this->bulletJointDPtr->constraint = this->bulletBall;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletJointDPtr->bulletWorld, "bullet world pointer is NULL");
+  GZ_ASSERT(this->bulletJointDPtr->bulletWorld, "bullet world pointer is null");
   this->bulletJointDPtr->bulletWorld->addConstraint(
       this->bulletJointDPtr->constraint);
 

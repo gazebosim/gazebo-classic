@@ -38,8 +38,8 @@ BulletLink::BulletLink(EntityPtr _parent)
 : Link(*new BulletLinkPrivate,_parent),
   bulletLinkDPtr(static_cast<BulletLinkPrivate*>(this->linkDPtr))
 {
-  this->bulletLinkDPtr->rigidLink = NULL;
-  this->bulletLinkDPtr->compoundShape = NULL;
+  this->bulletLinkDPtr->rigidLink = nullptr;
+  this->bulletLinkDPtr->compoundShape = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -67,18 +67,21 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
+  if (!this->bulletPhysics)
+    return;
+
   // Set the initial pose of the body
   this->bulletLinkDPtr->motionState.reset(new BulletMotionState(
     std::dynamic_pointer_cast<Link>(shared_from_this())));
 
   Link::Init();
 
-  GZ_ASSERT(this->bulletLinkDPtr->sdf != NULL,
-      "Unable to initialize link, SDF is NULL");
+  GZ_ASSERT(this->bulletLinkDPtr->sdf != nullptr,
+      "Unable to initialize link, SDF is null");
 
   this->SetKinematic(this->bulletLinkDPtr->sdf->Get<bool>("kinematic"));
 
-  GZ_ASSERT(this->bulletLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->bulletLinkDPtr->inertial != nullptr, "Inertial pointer is null");
   btScalar mass = this->bulletLinkDPtr->inertial->Mass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
@@ -182,7 +185,7 @@ void BulletLink::Init()
 
   btDynamicsWorld *bulletWorld =
     this->bulletLinkDPtr->bulletPhysics->DynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+  GZ_ASSERT(bulletWorld != nullptr, "Bullet dynamics world is null");
 
   // bullet supports setting bits to a rigid body but not individual
   // shapes/collisions so find the first child collision and set rigid body to
@@ -233,11 +236,13 @@ void BulletLink::Fini()
     delete this->bulletLinkDPtr->rigidLink;
   }
   this->bulletLinkDPtr->bulletPhysics.reset();
-  this->bulletLinkDPtr->rigidLink = NULL;
+  this->bulletLinkDPtr->rigidLink = nullptr;
+
+  this->bulletLinkDPtr->motionState.reset();
 
   if (this->bulletLinkDPtr->compoundShape)
     delete this->bulletLinkDPtr->compoundShape;
-  this->bulletLinkDPtr->compoundShape = NULL;
+  this->bulletLinkDPtr->compoundShape = nullptr;
 
   Link::Fini();
 }
@@ -314,7 +319,7 @@ void BulletLink::SetSelfCollide(const bool _collide)
 
   BulletCollision *bcollision = dynamic_cast<BulletCollision*>(_collision);
 
-  if (_collision == NULL)
+  if (_collision == nullptr)
     gzthrow("requires BulletCollision");
 
   btTransform trans;
@@ -412,7 +417,7 @@ ignition::math::Vector3d BulletLink::WorldLinearVel(
   }
 
   ignition::math::Pose3d wPose = this->WorldPose();
-  GZ_ASSERT(this->bulletLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->bulletLinkDPtr->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d offsetFromCoG = wPose.Rot() *
     (_offset - this->bulletLinkDPtr->inertial->CoG());
   btVector3 vel = this->bulletLinkDPtr->rigidLink->getVelocityInLocalPoint(
@@ -435,7 +440,7 @@ ignition::math::Vector3d BulletLink::WorldLinearVel(
   }
 
   ignition::math::Pose3d wPose = this->WorldPose();
-  GZ_ASSERT(this->bulletLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->bulletLinkDPtr->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d offsetFromCoG = _q*_offset
         - wPose.Rot() * this->bulletLinkDPtr->inertial->CoG();
   btVector3 vel = this->bulletLinkDPtr->rigidLink->getVelocityInLocalPoint(
@@ -543,7 +548,7 @@ void BulletLink::ClearCollisionCache()
 
   btDynamicsWorld *bulletWorld =
     this->bulletLinkDPtr->bulletPhysics->DynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
+  GZ_ASSERT(bulletWorld != nullptr, "Bullet dynamics world is null");
 
   bulletWorld->updateSingleAabb(this->bulletLinkDPtr->rigidLink);
   bulletWorld->getBroadphase()->getOverlappingPairCache()->

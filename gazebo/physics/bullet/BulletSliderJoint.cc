@@ -33,9 +33,9 @@ using namespace physics;
 BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
     : SliderJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletJointDPtr->bulletWorld = _world;
-  this->bulletSlider = NULL;
+  this->bulletSlider = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -171,9 +171,9 @@ void BulletSliderJoint::Init()
 
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->bulletJointDPtr->sdf != NULL, "Joint sdf member is NULL");
+  GZ_ASSERT(this->bulletJointDPtr->sdf != nullptr, "Joint sdf member is null");
   sdf::ElementPtr axisElem = this->bulletJointDPtr->sdf->GetElement("axis");
-  GZ_ASSERT(axisElem != NULL, "Joint axis sdf member is NULL");
+  GZ_ASSERT(axisElem != nullptr, "Joint axis sdf member is null");
   {
     sdf::ElementPtr limitElem;
     limitElem =
@@ -191,7 +191,7 @@ void BulletSliderJoint::Init()
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletJointDPtr->bulletWorld,
-      "bullet world pointer is NULL");
+      "bullet world pointer is null");
 
   this->bulletJointDPtr->bulletWorld->addConstraint(this->bulletSlider, true);
 

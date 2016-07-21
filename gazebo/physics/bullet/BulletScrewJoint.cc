@@ -98,9 +98,9 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
-    : ScrewJoint<BulletJoint>(_parent), bulletScrew(NULL)
+    : ScrewJoint<BulletJoint>(_parent), bulletScrew(nullptr)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletJointDPtr->bulletWorld = _world;
 }
 
@@ -246,7 +246,7 @@ void BulletScrewJoint::Init()
 
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->bulletJointDPtr->sdf != NULL, "Joint sdf member is NULL");
+  GZ_ASSERT(this->bulletJointDPtr->sdf != nullptr, "Joint sdf member is null");
   sdf::ElementPtr limitElem;
   limitElem =
     this->bulletJointDPtr->sdf->GetElement("axis")->GetElement("limit");
@@ -281,7 +281,7 @@ void BulletScrewJoint::Init()
   this->bulletJointDPtr->constraint = this->bulletScrew;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletJointDPtr->bulletWorld, "bullet world pointer is NULL");
+  GZ_ASSERT(this->bulletJointDPtr->bulletWorld, "bullet world pointer is null");
   this->bulletJointDPtr->bulletWorld->addConstraint(
       this->bulletJointDPtr->constraint);
 

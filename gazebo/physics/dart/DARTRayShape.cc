@@ -49,6 +49,8 @@ DARTRayShape::DARTRayShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 DARTRayShape::~DARTRayShape()
 {
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

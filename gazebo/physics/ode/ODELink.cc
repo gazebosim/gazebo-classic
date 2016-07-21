@@ -37,15 +37,13 @@ ODELink::ODELink(EntityPtr _parent)
 : Link(*new ODELinkPrivate, _parent),
   odeLinkDPtr(static_cast<ODELinkPrivate*>(this->linkDPtr))
 {
-  this->odeLinkDPtr->linkId = NULL;
+  this->odeLinkDPtr->linkId = nullptr;
 }
 
 //////////////////////////////////////////////////
 ODELink::~ODELink()
 {
-  if (this->odeLinkDPtr->linkId)
-    dBodyDestroy(this->odeLinkDPtr->linkId);
-  this->odeLinkDPtr->linkId = NULL;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -54,7 +52,7 @@ void ODELink::Load(sdf::ElementPtr _sdf)
   this->odeLinkDPtr->odePhysics = std::dynamic_pointer_cast<ODEPhysics>(
       this->World()->GetPhysicsEngine());
 
-  if (this->odeLinkDPtr->odePhysics == NULL)
+  if (this->odeLinkDPtr->odePhysics == nullptr)
   {
     gzerr << "Not using the ode physics engine. Unable to create an ODE Link\n";
     return;
@@ -86,8 +84,8 @@ void ODELink::Init()
     }
   }
 
-  GZ_ASSERT(this->odeLinkDPtr->sdf != NULL,
-      "Unable to initialize link, SDF is NULL");
+  GZ_ASSERT(this->odeLinkDPtr->sdf != nullptr,
+      "Unable to initialize link, SDF is null");
   this->SetKinematic(this->odeLinkDPtr->sdf->Get<bool>("kinematic"));
   this->SetGravityMode(this->odeLinkDPtr->sdf->Get<bool>("gravity"));
 
@@ -98,7 +96,7 @@ void ODELink::Init()
 
   if (this->odeLinkDPtr->linkId)
   {
-    GZ_ASSERT(this->linkDPtr->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->linkDPtr->inertial != nullptr, "Inertial pointer is null");
     ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial->CoG();
     for (auto const &child : this->odeLinkDPtr->children)
     {
@@ -159,7 +157,7 @@ void ODELink::MoveCallback(const dBodyID _id)
   self->odeLinkDPtr->dirtyPose.Rot().Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
-  GZ_ASSERT(self->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(self->odeLinkDPtr->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d cog = self->odeLinkDPtr->dirtyPose.Rot().RotateVector(
       self->odeLinkDPtr->inertial->CoG());
 
@@ -184,18 +182,21 @@ void ODELink::MoveCallback(const dBodyID _id)
 //////////////////////////////////////////////////
 void ODELink::Fini()
 {
-  Link::Fini();
   if (this->odeLinkDPtr->linkId)
     dBodyDestroy(this->odeLinkDPtr->linkId);
-  this->odeLinkDPtr->linkId = NULL;
+  this->odeLinkDPtr->linkId = nullptr;
 
   this->odeLinkDPtr->odePhysics.reset();
+
+  Link::Fini();
 }
 
 //////////////////////////////////////////////////
 void ODELink::SetGravityMode(const bool _mode)
 {
-  this->odeLinkDPtr->sdf->GetElement("gravity")->Set(_mode);
+  if (this->sdf->HasElement("gravity"))
+    this->odeLinkDPtr->sdf->GetElement("gravity")->Set(_mode);
+
   if (this->odeLinkDPtr->linkId)
   {
     dBodySetGravityMode(this->odeLinkDPtr->linkId, _mode ? 1: 0);
@@ -251,7 +252,7 @@ void ODELink::OnPoseChange()
 
   const ignition::math::Pose3d myPose = this->WorldPose();
 
-  GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->odeLinkDPtr->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d cog = myPose.Rot().RotateVector(
       this->odeLinkDPtr->inertial->CoG());
 
@@ -322,7 +323,7 @@ void ODELink::UpdateCollisionOffsets()
 {
   if (this->odeLinkDPtr->linkId)
   {
-    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->odeLinkDPtr->inertial != nullptr, "Inertial pointer is null");
     ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial->CoG();
     for (auto const &child : this->odeLinkDPtr->children)
     {
@@ -414,7 +415,7 @@ void ODELink::UpdateMass()
   // The CoG must always be (0, 0, 0)
   ignition::math::Vector3d cog(0, 0, 0);
 
-  GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->odeLinkDPtr->inertial != nullptr, "Inertial pointer is null");
 
   // give ODE un-rotated inertia
   ignition::math::Matrix3d moi = this->odeLinkDPtr->inertial->MOI(
@@ -459,7 +460,7 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
   if (this->odeLinkDPtr->linkId)
   {
     dVector3 dvel;
-    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->odeLinkDPtr->inertial != nullptr, "Inertial pointer is null");
 
     ignition::math::Vector3d offsetFromCoG = _offset -
       this->odeLinkDPtr->inertial->CoG();
@@ -489,7 +490,7 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
     dVector3 dvel;
     ignition::math::Pose3d wPose = this->WorldPose();
 
-    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->odeLinkDPtr->inertial != nullptr, "Inertial pointer is null");
 
     ignition::math::Vector3d offsetFromCoG =
         wPose.Rot().RotateVectorReverse(_q * _offset)

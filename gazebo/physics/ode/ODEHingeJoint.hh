@@ -28,6 +28,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A single axis hinge joint.
     class GZ_PHYSICS_VISIBLE ODEHingeJoint : public HingeJoint<ODEJoint>
     {
@@ -80,6 +83,7 @@ namespace gazebo
       protected: virtual void SetForceImpl(const unsigned int _index,
                      const double _effort);
     };
+    /// \}
   }
 }
 #endif

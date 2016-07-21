@@ -29,7 +29,7 @@ using namespace physics;
 ODEFixedJoint::ODEFixedJoint(dWorldID _worldId, BasePtr _parent)
 : FixedJoint<ODEJoint>(_parent)
 {
-  this->odeJointDPtr->jointId = dJointCreateFixed(_worldId, NULL);
+  this->odeJointDPtr->jointId = dJointCreateFixed(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODEBOXSHAPE_HH_
-#define _GAZEBO_PHYSICS_ODEBOXSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEBOXSHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODEBOXSHAPE_HH_
 
 #include <ignition/math/Vector3.hh>
 
@@ -26,6 +26,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE Box shape
     class GZ_PHYSICS_VISIBLE ODEBoxShape : public BoxShape
     {
@@ -39,6 +42,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetSize(const ignition::math::Vector3d &_size);
     };
+    /// \}
   }
 }
 #endif

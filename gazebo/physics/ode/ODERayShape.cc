@@ -59,7 +59,7 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine, dSpaceID _spaceId)
 ODERayShape::ODERayShape(CollisionPtr _parent)
 : RayShape(_parent)
 {
-  GZ_ASSERT(_parent, "Parent collision shape is NULL");
+  GZ_ASSERT(_parent, "Parent collision shape is null");
   this->SetName("ODE Ray Shape");
 
   ODECollisionPtr collision =
@@ -68,7 +68,7 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
   this->physicsEngine = std::static_pointer_cast<ODEPhysics>(
       this->shapeDPtr->collisionParent->World()->GetPhysicsEngine());
 
-  GZ_ASSERT(collision->SpaceId() != 0, "Ray collision space is NULL");
+  GZ_ASSERT(collision->SpaceId() != 0, "Ray collision space is null");
   this->geomId = dCreateRay(collision->SpaceId(), 1.0);
 
   // Create default ray with unit length
@@ -166,7 +166,7 @@ void ODERayShape::SetPoints(const ignition::math::Vector3d &_posStart,
 void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dContactGeom contact;
-  ODERayShape::Intersect *inter = NULL;
+  ODERayShape::Intersect *inter = nullptr;
 
   inter = static_cast<ODERayShape::Intersect*>(_data);
 
@@ -178,7 +178,7 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   else
   {
     ODECollision *collision1, *collision2;
-    ODECollision *hitCollision = NULL;
+    ODECollision *hitCollision = nullptr;
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)

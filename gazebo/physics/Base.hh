@@ -38,7 +38,8 @@ namespace gazebo
     // Forward declare private data class.
     class BasePrivate;
 
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
@@ -308,6 +309,10 @@ namespace gazebo
       /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
 
+      /// \brief Remove a child by pointer.
+      /// \param[in] _child Pointer to the child.
+      public: void RemoveChild(physics::BasePtr _child);
+
       /// \brief Add a type specifier.
       /// \param[in] _type New type to append to this objects type
       /// definition.
@@ -397,6 +402,12 @@ namespace gazebo
       /// \deprecated See SDF()
       public: virtual const sdf::ElementPtr GetSDF() GAZEBO_DEPRECATED(7.0);
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      protected: virtual void UnregisterIntrospectionItems();
+
       /// \brief Get the SDF values for the object.
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr SDF() const;
@@ -417,6 +428,9 @@ namespace gazebo
       /// \internal
       /// \brief Data pointer for private data
       protected: BasePrivate *baseDPtr;
+
+      /// \brief All the introspection items regsitered for this.
+      protected: std::vector<common::URI> introspectionItems;
     };
     /// \}
   }

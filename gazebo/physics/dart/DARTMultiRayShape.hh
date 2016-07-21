@@ -25,8 +25,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// Forward declare private data class
@@ -55,6 +54,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTMultiRayShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

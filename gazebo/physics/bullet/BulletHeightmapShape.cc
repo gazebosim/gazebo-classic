@@ -84,7 +84,8 @@ void BulletHeightmapShape::Init()
   bParent = std::dynamic_pointer_cast<BulletCollision>(
       this->heightmapShapeDPtr->collisionParent);
 
-  GZ_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
+  GZ_ASSERT(bParent != nullptr,
+      "Bullet collision parent of a heightmap is null");
 
   bParent->SetCollisionShape(this->heightFieldShape, false);
 
@@ -94,11 +95,11 @@ void BulletHeightmapShape::Init()
   BulletLinkPtr bLink = std::dynamic_pointer_cast<BulletLink>(
       bParent->Parent());
 
-  GZ_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");
+  GZ_ASSERT(bLink != nullptr, "Bullet heightmap does not have a link.");
 
   BulletMotionStatePtr motionState = bLink->MotionState();
 
-  GZ_ASSERT(motionState != NULL, "Invalid motion state for heightmap.");
+  GZ_ASSERT(motionState != nullptr, "Invalid motion state for heightmap.");
 
   btTransform tr;
   tr.setIdentity();

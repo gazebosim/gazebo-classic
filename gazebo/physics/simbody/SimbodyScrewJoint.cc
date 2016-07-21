@@ -326,7 +326,7 @@ bool SimbodyScrewJoint::SetHighStop(
       // check if limitForce is initialized
       if (this->simbodyJointDPtr->limitForce[_index].isEmptyHandle())
       {
-        gzerr << "child link is NULL, force element not initialized, "
+        gzerr << "child link is null, force element not initialized, "
               << "SetHighStop failed. Please file a report on issue tracker.\n";
         return false;
       }
@@ -404,7 +404,7 @@ bool SimbodyScrewJoint::SetLowStop(
       // check if limitForce is initialized
       if (this->simbodyJointDPtr->limitForce[_index].isEmptyHandle())
       {
-        gzerr << "child link is NULL, force element not initialized, "
+        gzerr << "child link is null, force element not initialized, "
               << "SetHighStop failed. Please file a report on issue tracker.\n";
         return false;
       }

@@ -357,9 +357,12 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 /////////////////////////////////////////////////
 void ContactManager::RemoveFilter(const std::string &_name)
 {
+  std::string name = _name;
+  boost::replace_all(name, "::", "/");
+
   boost::recursive_mutex::scoped_lock lock(*this->customMutex);
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter
-      = this->customContactPublishers.find(_name);
+      = this->customContactPublishers.find(name);
   if (iter != customContactPublishers.end())
   {
     ContactPublisher *contactPublisher = iter->second;
@@ -381,7 +384,10 @@ unsigned int ContactManager::GetFilterCount()
 /////////////////////////////////////////////////
 bool ContactManager::HasFilter(const std::string &_name)
 {
+  std::string name = _name;
+  boost::replace_all(name, "::", "/");
+
   boost::recursive_mutex::scoped_lock lock(*this->customMutex);
-  return this->customContactPublishers.find(_name) !=
+  return this->customContactPublishers.find(name) !=
       this->customContactPublishers.end();
 }

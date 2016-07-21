@@ -528,7 +528,7 @@ bool SimbodyJoint::SetHighStop(const unsigned int _index,
       }
       else
       {
-        gzerr << "child link is NULL, force element not initialized, "
+        gzerr << "child link is null, force element not initialized, "
               << "SetHighStop failed. Please file a report on issue tracker.\n";
         return false;
       }
@@ -566,7 +566,7 @@ bool SimbodyJoint::SetLowStop(
       }
       else
       {
-        gzerr << "child link is NULL, force element not initialized, "
+        gzerr << "child link is null, force element not initialized, "
               << "SetLowStop failed. Please file a report on issue tracker.\n";
         return false;
       }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODE_ODESPHERESHAPE_HH_
-#define _GAZEBO_PHYSICS_ODE_ODESPHERESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODESPHERESHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODESPHERESHAPE_HH_
 
 #include "gazebo/physics/SphereShape.hh"
 #include "gazebo/util/system.hh"
@@ -24,6 +24,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A ODE sphere shape
     class GZ_PHYSICS_VISIBLE ODESphereShape : public SphereShape
     {
@@ -37,6 +40,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetRadius(const double _radius);
     };
+    /// \}
   }
 }
 #endif

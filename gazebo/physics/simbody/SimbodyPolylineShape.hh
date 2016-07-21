@@ -26,6 +26,9 @@ namespace gazebo
   {
     class SimbodyMesh;
 
+    /// \addtogroup gazebo_physics_simbody
+    /// \{
+
     /// \brief Simbody polyline shape
     class GZ_PHYSICS_VISIBLE SimbodyPolylineShape : public PolylineShape
     {
@@ -45,6 +48,7 @@ namespace gazebo
       /// \brief Simbody collsion mesh helper class.
       private: SimbodyMesh *simbodyMesh;
     };
+    /// \}
   }
 }
 #endif

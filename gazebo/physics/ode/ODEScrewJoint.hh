@@ -26,6 +26,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A screw joint.
     class GZ_PHYSICS_VISIBLE ODEScrewJoint : public ScrewJoint<ODEJoint>
     {
@@ -103,6 +106,7 @@ namespace gazebo
       protected: virtual void SetForceImpl(const unsigned int _index,
                      const double _effort);
     };
+    /// \}
   }
 }
 #endif

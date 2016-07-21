@@ -54,7 +54,7 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
     std::dynamic_pointer_cast<SimbodyPhysics>(
       this->World()->GetPhysicsEngine());
 
-  if (this->simbodyLinkDPtr->simbodyPhysics == NULL)
+  if (this->simbodyLinkDPtr->simbodyPhysics == nullptr)
   {
     gzerr << "Not using the simbody physics engine\n";
     return;
@@ -115,10 +115,8 @@ void SimbodyLink::Init()
 //////////////////////////////////////////////////
 void SimbodyLink::Fini()
 {
-  event::Events::DisconnectWorldUpdateBegin(
-      this->simbodyLinkDPtr->gravityModeConnection);
-  event::Events::DisconnectWorldUpdateEnd(
-      this->simbodyLinkDPtr->staticLinkConnection);
+  this->simbodyLinkDPtr->gravityModeConnection.reset();
+  this->simbodyLinkDPtr->staticLinkConnection.reset();
   Link::Fini();
 }
 

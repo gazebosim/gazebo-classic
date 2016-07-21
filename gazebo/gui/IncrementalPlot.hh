@@ -24,8 +24,6 @@
 #include <qwt/qwt_plot_magnifier.h>
 #include <qwt/qwt_plot.h>
 
-#include "gazebo/math/Vector2d.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 

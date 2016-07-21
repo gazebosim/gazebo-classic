@@ -455,4 +455,3 @@ bool URI::Parse(const std::string &_str)
   return this->dataPtr->path.Parse(localPath) &&
          this->dataPtr->query.Parse(localQuery);
 }
-

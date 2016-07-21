@@ -32,7 +32,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
   bulletCollisionDPtr(static_cast<BulletCollisionPrivate*>(this->collDPtr))
 {
   this->SetName("Bullet_Collision");
-  this->bulletCollisionDPtr->collisionShape = NULL;
+  this->bulletCollisionDPtr->collisionShape = nullptr;
   this->bulletCollisionDPtr->surface.reset(new BulletSurfaceParams());
 }
 
@@ -56,9 +56,9 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  ignition::math::Pose3d pose = this->RelativePose();
-  BulletLinkPtr bbody = std::dynamic_pointer_cast<BulletLink>(
-      this->bulletCollisionDPtr->parent);
+  // math::Pose pose = this->GetRelativePose();
+  // BulletLinkPtr bbody =
+  //     boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
 }

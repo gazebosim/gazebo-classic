@@ -188,6 +188,4 @@ namespace gazebo
     /// \}
   }
 }
-
-// #ifndef _BULLETTYPES_HH
 #endif

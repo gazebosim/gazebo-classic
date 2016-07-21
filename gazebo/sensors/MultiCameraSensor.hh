@@ -77,7 +77,7 @@ namespace gazebo
 
       /// \brief Returns a pointer to a rendering::Camera.
       /// \param[in] _index Index of the camera to get
-      /// \return The Pointer to the camera sensor, NULL if the _index
+      /// \return The Pointer to the camera sensor, nullptr if the _index
       /// is invalid.
       /// \sa MultiCameraSensor::CameraCount
       public: rendering::CameraPtr Camera(const unsigned int _index) const;

@@ -20,7 +20,11 @@
 #include <string>
 #include <iostream>
 #include <sdf/sdf.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Color.hh"

@@ -37,6 +37,7 @@ DARTBoxShape::DARTBoxShape(DARTCollisionPtr _parent)
 DARTBoxShape::~DARTBoxShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -77,7 +78,7 @@ void DARTBoxShape::SetSize(const ignition::math::Vector3d &_size)
   DARTCollisionPtr dartCollisionParent =
       std::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
-  if (dartCollisionParent->GetDARTCollisionShape() == NULL)
+  if (dartCollisionParent->GetDARTCollisionShape() == nullptr)
   {
     dart::dynamics::BodyNode *dtBodyNode =
         dartCollisionParent->GetDARTBodyNode();

@@ -75,19 +75,19 @@ void RaySensor::Load(const std::string &_worldName)
   this->dataPtr->scanPub =
     this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
 
-  GZ_ASSERT(this->world != NULL,
+  GZ_ASSERT(this->world != nullptr,
       "RaySensor did not get a valid World pointer");
 
   physics::PhysicsEnginePtr physicsEngine =
     this->world->GetPhysicsEngine();
 
-  GZ_ASSERT(physicsEngine != NULL,
+  GZ_ASSERT(physicsEngine != nullptr,
       "Unable to get a pointer to the physics engine");
 
   this->dataPtr->laserCollision = physicsEngine->CreateCollision("multiray",
       this->ParentName());
 
-  GZ_ASSERT(this->dataPtr->laserCollision != NULL,
+  GZ_ASSERT(this->dataPtr->laserCollision != nullptr,
       "Unable to create a multiray collision using the physics engine.");
 
   this->dataPtr->laserCollision->SetName("ray_sensor_collision");
@@ -98,7 +98,7 @@ void RaySensor::Load(const std::string &_worldName)
     boost::dynamic_pointer_cast<physics::MultiRayShape>(
         this->dataPtr->laserCollision->GetShape());
 
-  GZ_ASSERT(this->dataPtr->laserShape != NULL,
+  GZ_ASSERT(this->dataPtr->laserShape != nullptr,
       "Unable to get the laser shape from the multi-ray collision.");
 
   this->dataPtr->laserShape->Load(this->sdf);
@@ -116,7 +116,7 @@ void RaySensor::Load(const std::string &_worldName)
   this->dataPtr->parentEntity =
     this->world->GetEntity(this->ParentName());
 
-  GZ_ASSERT(this->dataPtr->parentEntity != NULL,
+  GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
 }
 

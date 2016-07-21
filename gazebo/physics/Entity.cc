@@ -259,14 +259,9 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
 //////////////////////////////////////////////////
 void Entity::StopAnimation()
 {
-  this->entityDPtr->anmiation.reset();
+  this->entityDPtr->animation.reset();
   this->entityDPtr->onAnimationComplete.clear();
-  if (this->entityDPtr->animationConnection)
-  {
-    event::Events::DisconnectWorldUpdateBegin(
-        this->entityDPtr->animationConnection);
-    this->entityDPtr->animationConnection.reset();
-  }
+  this->entityDPtr->animationConnection.reset();
 }
 
 //////////////////////////////////////////////////
@@ -741,8 +736,6 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   if (this->entityDPtr->anmiation->GetLength() <=
       this->entityDPtr->anmiation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateBegin(
-        this->entityDPtr->animationConnection);
     this->entityDPtr->animationConnection.reset();
     if (this->entityDPtr->onAnimationComplete)
     {

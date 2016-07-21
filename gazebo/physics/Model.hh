@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <vector>
 #include <functional>
 
@@ -26,6 +27,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -630,6 +632,13 @@ namespace gazebo
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
+
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \brief Load all the links.
       private: void LoadLinks();

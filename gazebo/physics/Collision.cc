@@ -96,6 +96,7 @@ void Collision::ConstructionHelper(LinkPtr _link)
 //////////////////////////////////////////////////
 Collision::~Collision()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -109,10 +110,11 @@ void Collision::Fini()
     delete msg;
   }
 
-  Entity::Fini();
   this->collDPtr->link.reset();
   this->collDPtr->shape.reset();
   this->collDPtr->surface.reset();
+
+  Entity::Fini();
 }
 
 //////////////////////////////////////////////////

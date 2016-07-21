@@ -128,9 +128,9 @@ TEST_F(MeshTest, Mesh)
   boost::filesystem::remove_all(paths->DefaultTestPath());
   boost::filesystem::create_directories(paths->DefaultTestPath());
 
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
-  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.mesh"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.3ds"));
+  EXPECT_EQ(nullptr, common::MeshManager::Instance()->Load("break.xml"));
 
   const common::Mesh *mesh =
     common::MeshManager::Instance()->GetMesh("unit_box");
@@ -146,8 +146,8 @@ TEST_F(MeshTest, Mesh)
   EXPECT_TRUE(min == ignition::math::Vector3d(-.5, -.5, -.5));
   EXPECT_TRUE(max == ignition::math::Vector3d(.5, .5, .5));
 
-  float *vertArray = NULL;
-  int *indArray = NULL;
+  float *vertArray = nullptr;
+  int *indArray = nullptr;
   mesh->FillArrays(&vertArray, &indArray);
 
   int i = 0;
@@ -235,7 +235,7 @@ TEST_F(MeshTest, Mesh)
 
   mesh = common::MeshManager::Instance()->Load(
       paths->DefaultTestPath() + "/gazebo_stl_test-bad.stl");
-  EXPECT_EQ(NULL, mesh);
+  EXPECT_EQ(nullptr, mesh);
 
   mesh = common::MeshManager::Instance()->Load(
       paths->DefaultTestPath() + "/gazebo_stl_test.stl");

@@ -30,14 +30,13 @@ using namespace physics;
 ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
 : SliderJoint<ODEJoint>(_parent)
 {
-  this->odeJointDPtr->jointId = dJointCreateSlider(_worldId, NULL);
+  this->odeJointDPtr->jointId = dJointCreateSlider(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODESliderJoint::~ODESliderJoint()
 {
-  if (this->odeJointDPtr->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->odeJointDPtr->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

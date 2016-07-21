@@ -28,6 +28,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     // Forward declare private data class
     class ODEJointPrivate;
 
@@ -282,6 +285,7 @@ namespace gazebo
       /// \brief Private data pointer
       protected: ODEJointPrivate *odeJointDPtr;
     };
+    /// \}
   }
 }
 #endif

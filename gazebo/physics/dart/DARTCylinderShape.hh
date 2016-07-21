@@ -29,6 +29,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTCylinderShapePrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART cylinder shape
     class GZ_PHYSICS_VISIBLE DARTCylinderShape : public CylinderShape
     {
@@ -46,6 +49,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTCylinderShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

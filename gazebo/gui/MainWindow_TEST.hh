@@ -25,6 +25,9 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test minimizing and maximizing MainWindow
+  private slots: void MinimizeMaximize();
+
   /// \brief Test the step action state when simulation is running and paused.
   private slots: void StepState();
 

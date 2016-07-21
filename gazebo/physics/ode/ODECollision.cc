@@ -43,7 +43,7 @@ ODECollision::ODECollision(LinkPtr _link)
   odeCollisionDPtr(static_cast<ODECollisionPrivate*>(this->collDPtr))
 {
   this->SetName("ODE_Collision");
-  this->odeCollisionDPtr->collisionId = NULL;
+  this->odeCollisionDPtr->collisionId = nullptr;
   this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
@@ -57,7 +57,7 @@ ODECollision::~ODECollision()
 {
   if (this->odeCollisionDPtr->collisionId)
     dGeomDestroy(this->odeCollisionDPtr->collisionId);
-  this->odeCollisionDPtr->collisionId = NULL;
+  this->odeCollisionDPtr->collisionId = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -86,11 +86,11 @@ void ODECollision::Fini()
   /*
      if (this->odeCollisionDPtr->collisionId)
      dGeomDestroy(this->odeCollisionDPtr->collisionId);
-     this->odeCollisionDPtr->collisionId = NULL;
+     this->odeCollisionDPtr->collisionId = nullptr;
 
      if (this->odeCollisionDPtr->spaceId)
      dSpaceDestroy(this->odeCollisionDPtr->spaceId);
-     this->odeCollisionDPtr->spaceId = NULL;
+     this->odeCollisionDPtr->spaceId = nullptr;
      */
 
   Collision::Fini();
@@ -125,7 +125,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, const bool _placeable)
   {
     dSpaceAdd(this->odeCollisionDPtr->spaceId, this->odeCollisionDPtr->collisionId);
     GZ_ASSERT(dGeomGetSpace(this->odeCollisionDPtr->collisionId) != 0,
-        "Collision ID is NULL");
+        "Collision ID is null");
   }
 
   if (this->odeCollisionDPtr->collisionId && this->odeCollisionDPtr->placeable)

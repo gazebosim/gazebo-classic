@@ -25,6 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief An ODEBallJoint
     class GZ_PHYSICS_VISIBLE ODEBallJoint : public BallJoint<ODEJoint>
     {
@@ -83,6 +86,7 @@ namespace gazebo
       protected: virtual void SetForceImpl(const unsigned int _index,
                      const double _torque);
     };
+    /// \}
   }
 }
 #endif

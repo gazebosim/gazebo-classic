@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_COLLISION_HH_
-#define _GAZEBO_PHYSICS_COLLISION_HH_
+#ifndef GAZEBO_PHYSICS_COLLISION_HH_
+#define GAZEBO_PHYSICS_COLLISION_HH_
 
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"

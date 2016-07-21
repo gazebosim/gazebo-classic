@@ -47,8 +47,8 @@ void BulletMesh::Init(const common::SubMesh *_subMesh,
                       BulletCollisionPtr _collision,
                       const ignition::math::Vector3d &_scale)
 {
-  float *vertices = NULL;
-  int *indices = NULL;
+  float *vertices = nullptr;
+  int *indices = nullptr;
 
   unsigned int numVertices = _subMesh->GetVertexCount();
   unsigned int numIndices = _subMesh->GetIndexCount();
@@ -76,8 +76,8 @@ void BulletMesh::Init(const common::Mesh *_mesh,
                       BulletCollisionPtr _collision,
                       const ignition::math::Vector3d &_scale)
 {
-  float *vertices = NULL;
-  int *indices = NULL;
+  float *vertices = nullptr;
+  int *indices = nullptr;
 
   unsigned int numVertices = _mesh->GetVertexCount();
   unsigned int numIndices = _mesh->GetIndexCount();

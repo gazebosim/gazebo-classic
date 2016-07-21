@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 // We also include this winsock2 trick in Base.hh but it is used last,
 // so we need it again here.
 #ifdef _WIN32
@@ -25,6 +26,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 
@@ -72,25 +74,7 @@ void Base::ConstructionHelper()
 //////////////////////////////////////////////////
 Base::~Base()
 {
-  // remove self as a child of the parent
-  if (this->baseDPtr->parent)
-    this->baseDPtr->parent->RemoveChild(this->baseDPtr->id);
-
-  this->SetParent(BasePtr());
-
-  for (Base_V::iterator iter = this->baseDPtr->children.begin();
-       iter != this->baseDPtr->children.end(); ++iter)
-  {
-    if (*iter)
-      (*iter)->SetParent(BasePtr());
-  }
-  this->baseDPtr->children.clear();
-  if (this->baseDPtr->sdf)
-    this->baseDPtr->sdf->Reset();
-  this->baseDPtr->sdf.reset();
-
-  delete this->baseDPtr;
-  this->baseDPtr = NULL;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -112,7 +96,9 @@ void Base::Load(sdf::ElementPtr _sdf)
     this->baseDPtr->parent->AddChild(shared_from_this());
   }
 
-  this->baseDPtr->ComputeScopedName();
+  this->ComputeScopedName();
+
+  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -126,16 +112,28 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
-  Base_V::iterator iter;
+  this->UnregisterIntrospectionItems();
 
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
-    if (*iter)
-      (*iter)->Fini();
+  // Remove self as a child of the parent
+  if (this->parent)
+  {
+    auto temp = this->parent;
+    this->parent.reset();
 
-  this->baseDPtr->children.clear();
+    temp->RemoveChild(this->id);
+  }
 
-  this->baseDPtr->world.reset();
-  this->baseDPtr->parent.reset();
+  // Also destroy all children.
+  while (!this->children.empty())
+  {
+    auto child = this->children.front();
+    this->RemoveChild(child);
+  }
+  this->children.clear();
+
+  this->sdf.reset();
+
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////
@@ -246,23 +244,17 @@ void Base::AddChild(BasePtr _child)
     gzthrow("Cannot add a null _child to an entity");
 
   // Add this _child to our list
-  this->baseDPtr->children.push_back(_child);
+  if (std::find(this->children.begin(), this->children.end(), _child)
+      == this->children.end())
+  {
+    this->children.push_back(_child);
+  }
 }
 
 //////////////////////////////////////////////////
 void Base::RemoveChild(unsigned int _id)
 {
-  Base_V::iterator iter;
-  for (iter = this->baseDPtr->children.begin();
-       iter != this->baseDPtr->children.end(); ++iter)
-  {
-    if ((*iter)->Id() == _id)
-    {
-      (*iter)->Fini();
-      this->baseDPtr->children.erase(iter);
-      break;
-    }
-  }
+  this->RemoveChild(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -331,20 +323,23 @@ BasePtr Base::Child(const std::string &_name) const
 //////////////////////////////////////////////////
 void Base::RemoveChild(const std::string &_name)
 {
-  Base_V::iterator iter;
+  this->RemoveChild(this->GetByName(_name));
+}
 
-  for (iter = this->baseDPtr->children.begin();
-      iter != this->baseDPtr->children.end(); ++iter)
-  {
-    if ((*iter)->ScopedName() == _name)
-      break;
-  }
+//////////////////////////////////////////////////
+void Base::RemoveChild(physics::BasePtr _child)
+{
+  if (!_child)
+    return;
 
-  if (iter != this->baseDPtr->children.end())
-  {
-    (*iter)->Fini();
-    this->baseDPtr->children.erase(iter);
-  }
+  // Fini
+  _child->SetParent(nullptr);
+  _child->Fini();
+
+  // Remove from vector if still there
+  this->baseDPtr->children.erase(std::remove(this->baseDPtr->children.begin(),
+                                   this->baseDPtr->children.end(), _child),
+                                   this->baseDPtr->children.end());
 }
 
 //////////////////////////////////////////////////
@@ -441,6 +436,21 @@ common::URI Base::URI() const
   uri.Path().PushFront("world");
 
   return uri;
+}
+
+/////////////////////////////////////////////////
+void Base::RegisterIntrospectionItems()
+{
+  // nothing for now
+}
+
+/////////////////////////////////////////////////
+void Base::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
 }
 
 //////////////////////////////////////////////////

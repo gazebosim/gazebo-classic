@@ -27,6 +27,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTPolylineShapePrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART polyline shape
     class GZ_PHYSICS_VISIBLE DARTPolylineShape : public PolylineShape
     {
@@ -47,6 +50,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTPolylineShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif
