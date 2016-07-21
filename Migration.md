@@ -18,9 +18,9 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo::common::VisualPlugin**
-    + The custom inner xml inside visual plugins used to be wrapped in an extra
-      <sdf> tag. Now the inner xml should be accessed directly from the plugin's
-      sdf. For example, for the following plugin:
+    The custom inner xml inside visual plugins used to be wrapped in an extra
+    <sdf> tag. Now the inner xml should be accessed directly from the plugin's
+    sdf. For example, for the following plugin:
 
           <visual ...>
             <plugin ...>
