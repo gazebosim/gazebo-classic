@@ -205,13 +205,17 @@ namespace gazebo
       /// \return A reference to the path
       public: URIPath &Path();
 
-      /// \brief Get the path component
-      /// \return The path
-      public: URIPath Path() const;
+      /// \brief Get a const reference of the path component.
+      /// \return A const reference of the path.
+      public: URIPath &Path() const;
 
       /// \brief Get a mutable version of the query component
       /// \return A reference to the query
       public: URIQuery &Query();
+
+      /// \brief Get a const reference of the query component.
+      /// \return A const reference of the query.
+      public: URIQuery &Query() const;
 
       /// \brief Equal operator.
       /// \param[in] _uri Another URI.

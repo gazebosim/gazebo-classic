@@ -361,13 +361,19 @@ URIPath &URI::Path()
 }
 
 /////////////////////////////////////////////////
-URIPath URI::Path() const
+URIPath &URI::Path() const
 {
   return this->dataPtr->path;
 }
 
 /////////////////////////////////////////////////
 URIQuery &URI::Query()
+{
+  return this->dataPtr->query;
+}
+
+/////////////////////////////////////////////////
+URIQuery &URI::Query() const
 {
   return this->dataPtr->query;
 }
