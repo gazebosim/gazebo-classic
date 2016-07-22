@@ -565,6 +565,23 @@ namespace gazebo
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 
+      /// \brief Alters this joint's cached initial position per SDF.
+      /// This call will not change joint position dynamically, instead,
+      /// it simply changes the initial_position value, which is used
+      /// if the model is re-initialized.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _position joint's initial position.
+      public: void SetInitialPosition(unsigned int _index,
+        math::Angle _position);
+
+      /// \brief Returns this joint's cached initial position.
+      /// The initial position is only used if the model is re-initialized.
+      /// This value is specified by SDF (1.6+), and can be altered at run
+      /// time by Joint::SetInitialPosition.
+      /// \param[in] _index joint axis index.
+      /// \return joint's initial position.
+      public: math::Angle InitialPosition(unsigned int _index);
+
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -645,6 +662,9 @@ namespace gazebo
 
       /// \brief Store Joint position upper limit as specified in SDF
       protected: math::Angle upperLimit[MAX_JOINT_AXIS];
+
+      /// \brief Store Joint initial position
+      protected: math::Angle initialPosition[MAX_JOINT_AXIS];
 
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.

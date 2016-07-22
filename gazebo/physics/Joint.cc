@@ -53,6 +53,8 @@ Joint::Joint(BasePtr _parent)
   this->lowerLimit[1] = -1e16;
   this->upperLimit[0] =  1e16;
   this->upperLimit[1] =  1e16;
+  this->initialPosition[0] = 0;
+  this->initialPosition[1] = 0;
   this->dissipationCoefficient[0] = 0;
   this->dissipationCoefficient[1] = 0;
   this->stiffnessCoefficient[0] = 0;
@@ -372,6 +374,10 @@ void Joint::Init()
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
+    if (axisElem->HasElement("initial_position"))
+    {
+      this->SetInitialPosition(0, axisElem->Get<double>("initial_position"));
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -389,6 +395,10 @@ void Joint::Init()
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
+    if (axisElem->HasElement("initial_position"))
+    {
+      this->SetInitialPosition(1, axisElem->Get<double>("initial_position"));
+    }
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -1465,4 +1475,30 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   }
 
   return newWorldPose;
+}
+
+/////////////////////////////////////////////////
+void Joint::SetInitialPosition(unsigned int _index, math::Angle _position)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Set initial position error, _index[" << _index
+          << "] out of range" << std::endl;
+    return;
+  }
+
+  this->initialPosition[_index] = _position;
+}
+
+/////////////////////////////////////////////////
+math::Angle Joint::InitialPosition(unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Get initial position error, _index[" << _index
+          << "] out of range" << std::endl;
+    return 0;
+  }
+
+  return this->initialPosition[_index];
 }
