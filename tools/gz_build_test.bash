@@ -16,7 +16,7 @@ logfileSummary="${PREFIX}/gazebo_test-$timestamp-summary.txt"
 junit_prefix="${PREFIX}/gazebo_test-$timestamp"
 BUILD_ROOT=${PREFIX}/gazebo_build
 logfileRaw=$BUILD_ROOT/raw.log
-testCount=18
+testCount=15
 
 # Create catkin workspace
 cd 
@@ -145,6 +145,12 @@ do
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-OnReadHeader-backtrace.txt"
       elif grep DispatchDiscoveryMsg $CORE_BT_LOG; then
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-DispatchDiscoveryMsg-backtrace.txt"
+      elif grep World::BuildSceneMsg $CORE_BT_LOG && \
+           grep World::RemoveModel $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-RemoveModel_BuildSceneMsg-backtrace.txt"
+      elif grep World::BuildSceneMsg $CORE_BT_LOG && \
+           grep SimTk::StateImpl::getCacheEntry $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-SimTK_BuildSceneMsg-backtrace.txt"
       fi
     done
   done
