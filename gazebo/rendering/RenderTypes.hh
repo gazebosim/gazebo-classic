@@ -74,6 +74,9 @@ namespace gazebo
 #ifdef HAVE_OCULUS
     class OculusCamera;
 #endif
+#ifdef HAVE_OSVR
+    class OSVRCamera;
+#endif
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -199,6 +202,11 @@ namespace gazebo
     /// \def OculusCameraPtr
     /// \brief Shared pointer to OculusCamera
     typedef boost::shared_ptr<OculusCamera> OculusCameraPtr;
+#endif
+#ifdef HAVE_OSVR
+    /// \def OSVRCameraPtr
+    /// \brief Shared pointer to OSVRCamera
+    typedef boost::shared_ptr<OSVRCamera> OSVRCameraPtr;
 #endif
 
     /// \enum RenderOpType

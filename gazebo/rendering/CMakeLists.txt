@@ -144,6 +144,15 @@ if (HAVE_OCULUS)
   )
 endif ()
 
+if (HAVE_OSVR)
+  set (sources ${sources}
+    OSVRCamera.cc
+  )
+  set (headers ${headers}
+    OSVRCamera.hh
+  )
+endif ()
+
 set (gtest_sources
   RenderingConversions_TEST.cc
 )
@@ -199,6 +208,10 @@ target_link_libraries(gazebo_rendering
 
 if (HAVE_OCULUS)
   target_link_libraries(gazebo_rendering ${OculusVR_LIBRARIES})
+endif()
+
+if (HAVE_OSVR)
+  target_link_libraries(gazebo_rendering ${OSVR_CLIENTKIT_LIBRARY})
 endif()
 
 if (NOT APPLE AND NOT WIN32)

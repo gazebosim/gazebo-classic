@@ -126,6 +126,16 @@ if (HAVE_OCULUS)
   )
 endif ()
 
+if (HAVE_OSVR)
+  set (sources ${sources}
+    OSVRWindow.cc
+  )
+  set (qt_headers ${qt_headers}
+    OSVRWindow.hh
+  )
+endif ()
+
+
 set (qt_tests
   BuildingEditor_TEST.cc
   ConfigWidget_TEST.cc
