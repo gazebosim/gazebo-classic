@@ -77,6 +77,35 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // Create a system path watcher
   this->dataPtr->watcher = new QFileSystemWatcher();
 
+    m_button = new QPushButton("My Button", this);
+    // set size and location of the button
+    m_button->setGeometry(QRect(QPoint(1000, 0),
+    QSize(200, 50)));
+    mainLayout->addWidget(m_button);
+
+    // Connect button signal to appropriate slot
+    connect(m_button, SIGNAL (released()), this, SLOT (handleButton()));
+
+  /////////////////////
+  this->bandwidthEdit = new QLineEdit;
+  this->bandwidthEdit->setReadOnly(false);
+  this->bandwidthEdit->setFixedWidth(110);
+
+  mainLayout->addWidget(this->bandwidthEdit);
+
+      std::ostringstream stream;
+
+      double bandwidth = 100;
+
+      // Format the bandwidth output
+      stream << std::fixed << std::setprecision(2);
+
+      if (bandwidth < 1000)
+        stream << bandwidth << " B/s";
+
+      this->bandwidthEdit->setText(tr(stream.str().c_str()));
+
+
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
 
@@ -129,6 +158,14 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
+/////////////////////////////////////////////////
+void InsertModelWidget::handleButton()
+{
+  QString path = bandwidthEdit->text();
+  // std::cout << path.toStdString();
+  common::SystemPaths::Instance()->AddModelPaths(path.toStdString());
+  this->UpdateAllLocalPaths();
+}
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {

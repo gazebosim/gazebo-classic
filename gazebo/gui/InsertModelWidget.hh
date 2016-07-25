@@ -42,6 +42,12 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Output for the bandwidth info.
+      private: QLineEdit *bandwidthEdit;
+
+      private slots: void handleButton();
+      private: QPushButton *m_button;
+
       /// \brief Constructor
       public: InsertModelWidget(QWidget *_parent = 0);
 
@@ -91,6 +97,10 @@ namespace gazebo
 
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;
+
+      /// \brief Widget to edit the current day.
+      public: QLineEdit *pathAdd;
+
     };
   }
 }
