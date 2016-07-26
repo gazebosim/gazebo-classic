@@ -112,7 +112,7 @@ namespace gazebo
       /// tranlation part of _pose param is ignored.
       public: void SetWorldToReferencePose(
         const ignition::math::Pose3d &_pose = ignition::math::Pose3d())
-        GAZEBO_DEPRECATED(7.0);
+        GAZEBO_DEPRECATED(8.0);
 
       /// \brief Sets the rotation transform from world frame to IMU's
       /// reference frame.
