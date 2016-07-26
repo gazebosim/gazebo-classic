@@ -45,31 +45,23 @@ Joint::Joint(BasePtr _parent)
   : Base(_parent)
 {
   this->AddType(Base::JOINT);
-  this->effortLimit[0] = -1;
-  this->effortLimit[1] = -1;
-  this->velocityLimit[0] = -1;
-  this->velocityLimit[1] = -1;
-  this->lowerLimit[0] = -1e16;
-  this->lowerLimit[1] = -1e16;
-  this->upperLimit[0] =  1e16;
-  this->upperLimit[1] =  1e16;
-  this->initialPosition[0] = 0;
-  this->initialPosition[1] = 0;
-  this->dissipationCoefficient[0] = 0;
-  this->dissipationCoefficient[1] = 0;
-  this->stiffnessCoefficient[0] = 0;
-  this->stiffnessCoefficient[1] = 0;
-  this->springReferencePosition[0] = 0;
-  this->springReferencePosition[1] = 0;
+  for (unsigned int i = 0; i < MAX_JOINT_AXIS; ++i)
+  {
+    this->effortLimit[i] = -1;
+    this->velocityLimit[i] = -1;
+    this->lowerLimit[i] = -1e16;
+    this->upperLimit[i] =  1e16;
+    this->initialPosition[i] = 0;
+    this->dissipationCoefficient[i] = 0;
+    this->stiffnessCoefficient[i] = 0;
+    this->springReferencePosition[i] = 0;
+    this->stopStiffness[i] = 1e8;
+    this->stopDissipation[i] = 1.0;
+    this->axisParentModelFrame[i] = true;
+  }
   this->provideFeedback = false;
-  this->stopStiffness[0] = 1e8;
-  this->stopDissipation[0] = 1.0;
-  this->stopStiffness[1] = 1e8;
-  this->stopDissipation[1] = 1.0;
   // these flags are related to issue #494
   // set default to true for backward compatibility
-  this->axisParentModelFrame[0] = true;
-  this->axisParentModelFrame[1] = true;
 
   if (!this->sdfJoint)
   {
@@ -1478,7 +1470,8 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-void Joint::SetInitialPosition(unsigned int _index, math::Angle _position)
+void Joint::SetInitialPosition(unsigned int _index,
+  ignition::math::Angle _position)
 {
   if (_index >= this->GetAngleCount())
   {

@@ -283,24 +283,17 @@ void Model::Init()
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
   {
-    try
+    for (unsigned int i = 0; i < (*iter)->GetAngleCount(); ++i)
     {
-      for (unsigned int i = 0; i < (*iter)->GetAngleCount(); ++i)
-      {
-        // clamp initial position between joint limits
-        math::Angle position = math::clamp((*iter)->InitialPosition(i),
-          (*iter)->GetLowerLimit(i), (*iter)->GetUpperLimit(i));
-        // gzerr << "setting joint[" << i
-        //       << "] [" << (*iter)->GetName()
-        //       << "] to [" << position.Radian() << "]\n";
-        (*iter)->SetPosition(i, position.Radian());
-      }
+      // clamp initial position between joint limits
+      math::Angle position = math::clamp((*iter)->InitialPosition(i),
+        (*iter)->GetLowerLimit(i), (*iter)->GetUpperLimit(i));
+      gzdbg << "setting joint[" << i
+            << "] [" << (*iter)->GetName()
+            << "] to [" << position.Radian() << "]\n";
+      (*iter)->SetPosition(i, position.Radian());
     }
-    catch(...)
-    {
-      gzerr << "Init joint position failed" << std::endl;
-      return;
-    }
+
     // The following message used to be filled and sent in Model::LoadJoint
     // It is moved here, after Joint::Init, so that the joint properties
     // can be included in the message.
