@@ -42,12 +42,6 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Output for the bandwidth info.
-      private: QLineEdit *bandwidthEdit;
-
-      private slots: void handleButton();
-      private: QPushButton *m_button;
-
       /// \brief Constructor
       public: InsertModelWidget(QWidget *_parent = 0);
 
@@ -79,6 +73,9 @@ namespace gazebo
       /// \param[in] _path The path that was changed.
       private slots: void OnDirectoryChanged(const QString &_path);
 
+      /// \brief QT callback when addPath_button is clicked.
+      private slots: void handleButton();
+
       /// \brief check if path exists with special care to filesystem
       /// permissions
       /// \param[in] _path The path to check.
@@ -97,10 +94,12 @@ namespace gazebo
 
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;
+      
+      /// \brief Input for cutom paths.
+      private: QLineEdit *addPathEdit;
 
-      /// \brief Widget to edit the current day.
-      public: QLineEdit *pathAdd;
-
+      /// \breif Button to add a cutom models path.
+      private: QPushButton *addPath_button;
     };
   }
 }

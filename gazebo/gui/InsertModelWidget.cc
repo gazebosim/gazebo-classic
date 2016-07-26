@@ -71,40 +71,26 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
+  // set name, size and location of the button.
+  this->addPath_button = new QPushButton("Add Path", this);
+  this->addPath_button->setGeometry(QRect(QPoint(100, 0),
+  QSize(200, 50)));
+
+  mainLayout->addWidget(addPath_button);
+  // Connect button signal to appropriate slot
+  connect(this->addPath_button, SIGNAL (released()), this, SLOT (handleButton()));
+  this->addPathEdit = new QLineEdit;
+  this->addPathEdit->setReadOnly(false);
+  mainLayout->addWidget(this->addPathEdit);
+  const char* addPathEditLine = "Enter a cutom path";
+  this->addPathEdit->setText(tr(addPathEditLine));
+
+
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
   // Create a system path watcher
   this->dataPtr->watcher = new QFileSystemWatcher();
-
-    m_button = new QPushButton("My Button", this);
-    // set size and location of the button
-    m_button->setGeometry(QRect(QPoint(1000, 0),
-    QSize(200, 50)));
-    mainLayout->addWidget(m_button);
-
-    // Connect button signal to appropriate slot
-    connect(m_button, SIGNAL (released()), this, SLOT (handleButton()));
-
-  /////////////////////
-  this->bandwidthEdit = new QLineEdit;
-  this->bandwidthEdit->setReadOnly(false);
-  this->bandwidthEdit->setFixedWidth(110);
-
-  mainLayout->addWidget(this->bandwidthEdit);
-
-      std::ostringstream stream;
-
-      double bandwidth = 100;
-
-      // Format the bandwidth output
-      stream << std::fixed << std::setprecision(2);
-
-      if (bandwidth < 1000)
-        stream << bandwidth << " B/s";
-
-      this->bandwidthEdit->setText(tr(stream.str().c_str()));
-
 
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
@@ -161,9 +147,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 void InsertModelWidget::handleButton()
 {
-  QString path = bandwidthEdit->text();
-  // std::cout << path.toStdString();
-  common::SystemPaths::Instance()->AddModelPaths(path.toStdString());
+  common::SystemPaths::Instance()->AddModelPaths(addPathEdit->text().toStdString());
   this->UpdateAllLocalPaths();
 }
 /////////////////////////////////////////////////
