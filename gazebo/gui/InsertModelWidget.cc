@@ -76,7 +76,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->addPath_button->setGeometry(QRect(QPoint(100, 0),
   QSize(200, 50)));
 
-  mainLayout->addWidget(addPath_button);
+  mainLayout->addWidget(this->addPath_button);
   // Connect button signal to appropriate slot
   connect(this->addPath_button, SIGNAL (released()), this, SLOT (handleButton()));
   this->addPathEdit = new QLineEdit;
@@ -84,7 +84,6 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   mainLayout->addWidget(this->addPathEdit);
   const char* addPathEditLine = "Enter a cutom path";
   this->addPathEdit->setText(tr(addPathEditLine));
-
 
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
