@@ -36,7 +36,6 @@
 
 #include "gazebo/common/Assert.hh"
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
 
 using namespace gazebo;

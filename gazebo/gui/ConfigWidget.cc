@@ -23,6 +23,7 @@
 #include "gazebo/common/MaterialDensity.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidgetPrivate.hh"
+#include "gazebo/gui/Conversions.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -1584,6 +1585,11 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   this->connect(colorASpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
+  auto customColorButton = new QPushButton(tr("..."), widget);
+  customColorButton->setMaximumWidth(30);
+  this->connect(customColorButton, SIGNAL(clicked()), this,
+      SLOT(OnCustomColorDialog()));
+
   // This is inside a group
   int level = _level + 1;
 
@@ -1599,6 +1605,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widgetLayout->addWidget(colorBSpinBox);
   widgetLayout->addWidget(colorALabel);
   widgetLayout->addWidget(colorASpinBox);
+  widgetLayout->addWidget(customColorButton);
 
   widgetLayout->setAlignment(colorRLabel, Qt::AlignRight);
   widgetLayout->setAlignment(colorGLabel, Qt::AlignRight);
@@ -1615,6 +1622,40 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widget->widgets.push_back(colorASpinBox);
 
   return widget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnCustomColorDialog()
+{
+  auto button = qobject_cast<QPushButton *>(QObject::sender());
+  if (!button)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(button->parent());
+  if (!widget)
+    return;
+
+  // Current color
+  auto color = Conversions::Convert(this->ColorWidgetValue(widget));
+
+  auto dialog = widget->findChild<QColorDialog *>();
+  if (!dialog)
+  {
+    // Opening for the first time
+    dialog = new QColorDialog(color, widget);
+    dialog->setOption(QColorDialog::ShowAlphaChannel);
+    dialog->setOption(QColorDialog::NoButtons);
+    this->connect(dialog, SIGNAL(currentColorChanged(const QColor)), this,
+        SLOT(OnColorValueChanged(const QColor)));
+  }
+  else
+  {
+    dialog->blockSignals(true);
+    dialog->setCurrentColor(color);
+    dialog->blockSignals(false);
+  }
+
+  dialog->open();
 }
 
 /////////////////////////////////////////////////
@@ -3069,6 +3110,25 @@ void ConfigWidget::OnVector3dPresetChanged(const int _index)
 
   // Signal
   emit Vector3dValueChanged(widget->scopedName.c_str(), vec);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnColorValueChanged(const QColor _value)
+{
+  auto dialog = qobject_cast<QColorDialog *>(QObject::sender());
+
+  if (!dialog)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(dialog->parent());
+
+  if (!widget)
+    return;
+
+  auto color = Conversions::Convert(_value);
+  this->UpdateColorWidget(widget, color);
+
+  emit ColorValueChanged(widget->scopedName.c_str(), color);
 }
 
 /////////////////////////////////////////////////
