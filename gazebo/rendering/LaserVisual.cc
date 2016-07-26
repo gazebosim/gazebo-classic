@@ -69,11 +69,15 @@ LaserVisual::~LaserVisual()
   for (auto ray : dPtr->noHitRayFans)
     this->DeleteDynamicLine(ray);
 
+  for (auto ray : dPtr->deadzoneRayFans)
+    this->DeleteDynamicLine(ray);
+
   for (auto ray : dPtr->rayLines)
     this->DeleteDynamicLine(ray);
 
   dPtr->rayFans.clear();
   dPtr->noHitRayFans.clear();
+  dPtr->deadzoneRayFans.clear();
   dPtr->rayLines.clear();
 }
 
@@ -117,76 +121,100 @@ void LaserVisual::Update()
   unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
       dPtr->laserMsg->scan().vertical_count() : 1u;
 
+  double minRange = dPtr->laserMsg->scan().range_min();
+
+  // Process each ray fan
   for (unsigned int j = 0; j < vertCount; ++j)
   {
+    // Create a new raw fan, if there are not enough already allocated.
     if (j+1 > dPtr->rayFans.size())
     {
+      // Ray fans that fill in between the ray lines.
       dPtr->rayFans.push_back(
-          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
       dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
-      dPtr->rayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
-      // No hit ray fans display rays that do not hit obstacles.
+      // No hit ray triangle strip display rays that do not hit obstacles.
       dPtr->noHitRayFans.push_back(
-          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
       dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
-      dPtr->noHitRayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
+      // Deadzone ray fan displays area that is between the sensor's origin
+      // and start of the rays.
+      dPtr->deadzoneRayFans.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
+      dPtr->deadzoneRayFans[j]->setMaterial("Gazebo/BlackTransparent");
+      dPtr->deadzoneRayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
+
+      // Individual ray lines
       dPtr->rayLines.push_back(
           this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));
       dPtr->rayLines[j]->setMaterial("Gazebo/BlueLaser");
 
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
-    dPtr->rayFans[j]->SetPoint(0, offset.Pos());
-    dPtr->noHitRayFans[j]->SetPoint(0, offset.Pos());
+    dPtr->deadzoneRayFans[j]->SetPoint(0, offset.Pos());
 
     double angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
+
+    // Process each ray in the current fan.
     for (unsigned int i = 0; i < count; ++i)
     {
+      // Calculate the range of the ray
       double r = dPtr->laserMsg->scan().ranges(j*count + i);
+      bool inf = std::isinf(r);
+
       ignition::math::Quaterniond ray(
           ignition::math::Vector3d(0.0, -verticalAngle, angle));
+
       ignition::math::Vector3d axis = offset.Rot() * ray *
         ignition::math::Vector3d(1.0, 0.0, 0.0);
 
-      double hitRange = std::isinf(r) ? 0 : r;
+      // Check for infinite range read, which indicates the ray did not
+      // intersect an object.
+      double hitRange = inf ? 0 : r;
+
+      // Compute the start point of the ray
+      ignition::math::Vector3d startPt = (axis * minRange) + offset.Pos();
+
+      // Compute the end point of the ray
       ignition::math::Vector3d pt = (axis * hitRange) + offset.Pos();
 
-      double noHitRange =
-        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : hitRange;
+      double noHitRange = inf ? dPtr->laserMsg->scan().range_max() : hitRange;
+
+      // Compute the end point of the no-hit ray
       ignition::math::Vector3d noHitPt = (axis * noHitRange) + offset.Pos();
 
-      // Draw the lines that represent each simulated ray
+      // Draw the lines and strips that represent each simulated ray
       if (i >= dPtr->rayLines[j]->GetPointCount()/2)
       {
-        dPtr->rayLines[j]->AddPoint(offset.Pos());
-        if (std::isinf(r))
-          dPtr->rayLines[j]->AddPoint(noHitPt);
-        else
-          dPtr->rayLines[j]->AddPoint(pt);
+        dPtr->rayLines[j]->AddPoint(startPt);
+        dPtr->rayLines[j]->AddPoint(inf ? noHitPt : pt);
+
+        dPtr->rayFans[j]->AddPoint(startPt);
+        dPtr->rayFans[j]->AddPoint(inf ? startPt : pt);
+
+        dPtr->noHitRayFans[j]->AddPoint(startPt);
+        dPtr->noHitRayFans[j]->AddPoint(inf ? noHitPt : pt);
       }
       else
       {
-        dPtr->rayLines[j]->SetPoint(i*2, offset.Pos());
-        if (std::isinf(r))
-          dPtr->rayLines[j]->SetPoint(i*2+1, noHitPt);
-        else
-          dPtr->rayLines[j]->SetPoint(i*2+1, pt);
+        dPtr->rayLines[j]->SetPoint(i*2, startPt);
+        dPtr->rayLines[j]->SetPoint(i*2+1, inf ? noHitPt : pt);
+
+        dPtr->rayFans[j]->SetPoint(i*2, startPt);
+        dPtr->rayFans[j]->SetPoint(i*2+1, inf ? startPt : pt);
+
+        dPtr->noHitRayFans[j]->SetPoint(i*2, startPt);
+        dPtr->noHitRayFans[j]->SetPoint(i*2+1, inf ? noHitPt : pt);
       }
 
-      // Draw the triangle fan that fill in the gaps for the laser rays
-      if (i+1 >= dPtr->rayFans[j]->GetPointCount())
-      {
-        dPtr->rayFans[j]->AddPoint(pt);
-        dPtr->noHitRayFans[j]->AddPoint(noHitPt);
-      }
+      // Draw the triangle fan that indicates the dead zone.
+      if (i+1 >= dPtr->deadzoneRayFans[j]->GetPointCount())
+        dPtr->deadzoneRayFans[j]->AddPoint(startPt);
       else
-      {
-        dPtr->rayFans[j]->SetPoint(i+1, pt);
-        dPtr->noHitRayFans[j]->SetPoint(i+1, noHitPt);
-      }
+        dPtr->deadzoneRayFans[j]->SetPoint(i+1, startPt);
 
       angle += dPtr->laserMsg->scan().angle_step();
     }

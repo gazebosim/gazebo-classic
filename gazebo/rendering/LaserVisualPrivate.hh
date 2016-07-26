@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _LASERVISUAL_PRIVATE_HH_
-#define _LASERVISUAL_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_LASERVISUAL_PRIVATE_HH_
+#define GAZEBO_RENDERING_LASERVISUAL_PRIVATE_HH_
 
 #include <vector>
 
@@ -44,6 +43,10 @@ namespace gazebo
 
       /// \brief Renders laser data for rays that do not hit obstacles.
       public: std::vector<DynamicLines *> noHitRayFans;
+
+      /// \brief Renders a deadzone that is between the sensor's origin
+      /// and start of the rays.
+      public: std::vector<DynamicLines *> deadzoneRayFans;
 
       /// \brief Renders the laser data as a line list.
       public: std::vector<DynamicLines *> rayLines;

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_LASERVISUALIZATION_TEST_HH_
-#define _GAZEBO_LASERVISUALIZATION_TEST_HH_
+#ifndef GAZEBO_GUI_LASERVISUALIZATION_TEST_HH_
+#define GAZEBO_GUI_LASERVISUALIZATION_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
@@ -27,6 +26,10 @@ class LaserVisualization_TEST : public QTestFixture
 
   /// \brief Test that laser visualization draws lines correctly.
   private slots: void Lines();
+
+  /// \brief Test that laser visualization draws hit, no-hit, and deadzone
+  /// areas correctly.
+  private slots: void Areas();
 };
 
 #endif
