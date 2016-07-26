@@ -139,6 +139,11 @@ namespace gazebo
       public: std::vector<OculusCameraPtr> oculusCameras;
 #endif
 
+#ifdef HAVE_OSVR
+      /// \brief All the OSVR cameras.
+      public: std::vector<OSVRCameraPtr> osvrCameras;
+#endif
+
       /// \brief The ogre scene manager.
       public: Ogre::SceneManager *manager;
 

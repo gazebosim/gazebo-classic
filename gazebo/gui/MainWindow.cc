@@ -76,6 +76,9 @@
 #include "gazebo/gui/OculusWindow.hh"
 #endif
 
+#ifdef HAVE_OSVR
+#include "gazebo/gui/OSVRWindow.hh"
+#endif
 
 using namespace gazebo;
 using namespace gui;
@@ -281,6 +284,28 @@ void MainWindow::Load()
     }
     else
       gzlog << "Oculus: No visual link specified in for attaching the camera. "
+            << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
+#endif
+
+#ifdef HAVE_OSVR
+  int osvrAutoLaunch = getINIProperty<int>("osvr.autolaunch", 0);
+  int osvrX = getINIProperty<int>("osvr.x", 0);
+  int osvrY = getINIProperty<int>("osvr.y", 0);
+  std::string visual = getINIProperty<std::string>("osvr.visual", "");
+
+  if (osvrAutoLaunch == 1)
+  {
+    if (!visual.empty())
+    {
+      this->dataPtr->osvrWindow = new gui::OSVRWindow(
+        osvrX, osvrY, visual);
+
+      if (this->dataPtr->osvrWindow->CreateCamera())
+        this->dataPtr->osvrWindow->show();
+    }
+    else
+      gzlog << "OSVR: No visual link specified in for attaching the camera. "
             << "Did you forget to set ~/.gazebo/gui.ini?\n";
   }
 #endif
@@ -1055,6 +1080,37 @@ void MainWindow::ViewOculus()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewOSVR()
+{
+#ifdef HAVE_OSVR
+  rendering::ScenePtr scene = rendering::get_scene();
+  if (scene->OSVRCameraCount() != 0)
+  {
+    gzlog << "OSVR camera already exists." << std::endl;
+    return;
+  }
+
+  int osvrX = getINIProperty<int>("osvr.x", 0);
+  int osvrY = getINIProperty<int>("osvr.y", 0);
+  std::string visual = getINIProperty<std::string>("osvr.visual", "");
+
+  if (!visual.empty())
+  {
+    this->dataPtr->osvrWindow = new gui::OSVRWindow(
+        osvrX, osvrY, visual);
+
+    if (this->dataPtr->osvrWindow->CreateCamera())
+      this->dataPtr->osvrWindow->show();
+  }
+  else
+  {
+    gzlog << "OSVR: No visual link specified in for attaching the camera. "
+          << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
+#endif
+}
+
+/////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
   if (g_dataLoggerAct->isChecked())
@@ -1391,6 +1447,14 @@ void MainWindow::CreateActions()
   this->connect(g_viewOculusAct, SIGNAL(triggered()), this, SLOT(ViewOculus()));
 #ifndef HAVE_OCULUS
   g_viewOculusAct->setEnabled(false);
+#endif
+
+  printf("creating g_viewOSVRAct\n");
+  g_viewOSVRAct = new QAction(tr("OSVR HDK"), this);
+  g_viewOSVRAct->setStatusTip(tr("OSVR HDK Render Window"));
+  this->connect(g_viewOSVRAct, SIGNAL(triggered()), this, SLOT(ViewOSVR()));
+#ifndef HAVE_OSVR
+  g_viewOSVRAct->setEnabled(false);
 #endif
 
   g_cameraOrthoAct = new QAction(tr("Orthographic"), this);
@@ -1782,6 +1846,9 @@ void MainWindow::DeleteActions()
   delete g_viewOculusAct;
   g_viewOculusAct = nullptr;
 
+  delete g_viewOSVRAct;
+  g_viewOSVRAct = nullptr;
+
   delete g_dataLoggerAct;
   g_dataLoggerAct = nullptr;
 
@@ -1889,6 +1956,7 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_viewOculusAct);
+  windowMenu->addAction(g_viewOSVRAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
@@ -2420,6 +2488,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   // Window
   g_topicVisAct->setVisible(simOrLog);
   g_viewOculusAct->setVisible(simOrLog);
+  g_viewOSVRAct->setVisible(simOrLog);
   g_overlayAct->setVisible(simOrLog);
   g_showToolbarsAct->setVisible(simOrLog);
   g_fullScreenAct->setVisible(simOrLog);

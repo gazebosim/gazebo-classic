@@ -18,7 +18,7 @@
 #ifndef _GAZEBO_OSVR_WINDOW_HH_
 #define _GAZEBO_OSVR_WINDOW_HH_
 
-#include <boost/thread.hpp>
+#include <thread>
 #include <string>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -92,7 +92,7 @@ namespace gazebo
       private: std::string visualName;
 
       /// \brief Thread to attach OSVR camera to visual
-      private: boost::thread *attachCameraThread;
+      private: std::thread *attachCameraThread;
     };
   }
 }

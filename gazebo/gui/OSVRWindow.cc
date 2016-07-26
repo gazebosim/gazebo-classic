@@ -151,8 +151,8 @@ bool OSVRWindow::CreateCamera()
 void OSVRWindow::showEvent(QShowEvent *_event)
 {
   if (this->osvrCamera)
-    this->attachCameraThread = new boost::thread(
-        boost::bind(&OSVRWindow::AttachCameraToVisual, this));
+    this->attachCameraThread = new std::thread(
+        std::bind(&OSVRWindow::AttachCameraToVisual, this));
 
   if (this->windowId == -1)
   {

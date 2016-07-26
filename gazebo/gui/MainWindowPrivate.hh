@@ -31,6 +31,10 @@
 #include "gazebo/gui/OculusWindow.hh"
 #endif
 
+#ifdef HAVE_OSVR
+#include "gazebo/gui/OSVRWindow.hh"
+#endif
+
 namespace gazebo
 {
   namespace gui
@@ -138,6 +142,11 @@ namespace gazebo
 #ifdef HAVE_OCULUS
       /// \brief Window for Oculus VR set.
       public: OculusWindow *oculusWindow;
+#endif
+
+#ifdef HAVE_OSVR
+      /// \brief Window for Oculus VR set.
+      public: OSVRWindow *osvrWindow;
 #endif
 
       /// \brief Buffer of plugin messages to process.

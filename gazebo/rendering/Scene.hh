@@ -208,6 +208,22 @@ namespace gazebo
       public: uint32_t OculusCameraCount() const;
 #endif
 
+#ifdef HAVE_OSVR
+      /// \brief Create an OSVR camera
+      /// \param[in] _name Name of the new camera.
+      /// \return Pointer to the new camera.
+      public: OSVRCameraPtr CreateOSVRCamera(const std::string &_name);
+
+      /// \brief Get the number of cameras in this scene
+      /// \return Number of cameras.
+      /// \deprecated See OSVRCameraCount()
+      public: uint32_t GetOSVRCameraCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of cameras in this scene
+      /// \return Number of cameras.
+      public: uint32_t OSVRCameraCount() const;
+#endif
+
       /// \brief Create depth camera
       /// \param[in] _name Name of the new camera.
       /// \param[in] _autoRender True to allow Gazebo to automatically

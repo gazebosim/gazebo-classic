@@ -30,6 +30,10 @@
 #include "gazebo/gui/OculusWindow.hh"
 #endif
 
+#ifdef HAVE_OSVR
+#include "gazebo/gui/OSVRWindow.hh"
+#endif
+
 namespace gazebo
 {
   namespace gui
@@ -223,6 +227,7 @@ namespace gazebo
       private slots: void FPS();
       private slots: void Orbit();
       private slots: void ViewOculus();
+      private slots: void ViewOSVR();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();

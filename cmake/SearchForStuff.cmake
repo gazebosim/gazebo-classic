@@ -690,10 +690,12 @@ endif()
 ########################################
 # Find OSVR SDK
 find_library(OSVR_CLIENTKIT_LIBRARY NAMES osvrClientKit)
-find_file(OSVR_CLIENTKIT_HEADER NAMES osvr/ClientKit/ClientKit.h)
+find_path(OSVR_CLIENTKIT_HEADER NAMES osvr/ClientKit/ClientKit.h)
 if (OSVR_CLIENTKIT_LIBRARY AND OSVR_CLIENTKIT_HEADER)
   message(STATUS "Looking for libosvrClientKit and ClientKit.h - found")
   set(HAVE_OSVR TRUE)
+  include_directories(SYSTEM ${OSVR_CLIENTKIT_HEADER})
+  link_directories(${OSVR_CLIENTKIT_LIBRARY})
 else()
   message(STATUS "Looking for libosvrClientKit and ClientKit.h - not found")
   BUILD_WARNING("OpenSource Virtual Reality (OSVR) support will be disabled.")

@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_RENDERING_OSVR_CAMERA_PRIVATE_HH_
 #define _GAZEBO_RENDERING_OSVR_CAMERA_PRIVATE_HH_
 
-//#include <OVR_CAPI.h>
+#include "osvr/ClientKit/ClientKit.h"
 #include "gazebo/util/system.hh"
 
 namespace Ogre
@@ -41,6 +41,7 @@ namespace gazebo
                 rightViewport(NULL),
                 externalViewport(NULL),
                 externalSceneManager(NULL),
+                osvrContext(NULL),
                 node(NULL),
                 controlSub(NULL),
                 ready(false),
@@ -64,8 +65,11 @@ namespace gazebo
       /// and the external camera.
       public: Ogre::SceneManager *externalSceneManager;
 
-      /// \brief An OSVR Head-Mounted display.
-      //public: ovrHmd hmd;
+      /// \brief OSVR library context.
+      public: osvr::clientkit::ClientContext *osvrContext;
+
+      /// \brief OSVR interface to receive tracking data
+      public: osvr::clientkit::Interface osvrInterface;
 
       /// \brief Transport node for using gazebo pub/sub.
       public: transport::NodePtr node;

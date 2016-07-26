@@ -108,6 +108,7 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_viewWireframeAct;
 
     extern GZ_GUI_VISIBLE QAction *g_viewOculusAct;
+    extern GZ_GUI_VISIBLE QAction *g_viewOSVRAct;
 
     /// \brief Enable orthographic projection action
     extern GZ_GUI_VISIBLE QAction *g_cameraOrthoAct;

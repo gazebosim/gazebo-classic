@@ -77,6 +77,10 @@
 #include "gazebo/rendering/OculusCamera.hh"
 #endif
 
+#ifdef HAVE_OSVR
+#include "gazebo/rendering/OSVRCamera.hh"
+#endif
+
 using namespace gazebo;
 using namespace rendering;
 
@@ -695,6 +699,36 @@ uint32_t Scene::OculusCameraCount() const
   return this->dataPtr->oculusCameras.size();
 }
 #endif
+
+#ifdef HAVE_OSVR
+//////////////////////////////////////////////////
+OSVRCameraPtr Scene::CreateOSVRCamera(const std::string &_name)
+{
+  OSVRCameraPtr camera(new OSVRCamera(_name, shared_from_this()));
+
+  if (camera->Ready())
+  {
+    camera->Load();
+    camera->Init();
+    this->dataPtr->osvrCameras.push_back(camera);
+  }
+
+  return camera;
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::GetOSVRCameraCount() const
+{
+  return this->OSVRCameraCount();
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::OSVRCameraCount() const
+{
+  return this->dataPtr->osvrCameras.size();
+}
+#endif
+
 
 //////////////////////////////////////////////////
 UserCameraPtr Scene::CreateUserCamera(const std::string &_name,

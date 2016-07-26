@@ -95,11 +95,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual unsigned int GetImageHeight() const;
 
-      /// \brief Reset the Oculus Rift sensor orientation.
+      /// \brief Reset the OSVR sensor orientation.
       public: void ResetSensor();
 
-      /// \brief Used to check if Oculus is plugged in and can be used.
-      /// \return True when Oculus is ready to use.
+      /// \brief Used to check if OSVR is plugged in and can be used.
+      /// \return True when OSVR is ready to use.
       public: bool Ready();
 
       // Documentation inherited
