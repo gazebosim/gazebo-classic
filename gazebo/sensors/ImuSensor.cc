@@ -67,8 +67,8 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       ignition::math::Quaterniond::Identity);
 
   // initialize worldToReference transform as local frame
-  this->dataPtr->worldToReference = this->pose +
-    this->dataPtr->parentEntity->GetWorldPose().Ign();
+  this->dataPtr->worldToReference = (this->pose +
+    this->dataPtr->parentEntity->GetWorldPose().Ign()).Rot();
 
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
@@ -307,7 +307,16 @@ void ImuSensor::SetWorldToReferencePose(
   const ignition::math::Pose3d &_pose)
 {
   // worldToReference: from world frame to IMU Reference frame.
-  this->dataPtr->worldToReference = _pose;
+  gzwarn << "translation part of the argument is not used."
+         << " Use SetWorldToReferenceOrientation instead.\n";
+  this->dataPtr->worldToReference = _pose.Rot();
+}
+
+//////////////////////////////////////////////////
+void ImuSensor::SetWorldToReferenceOrientation(
+  const ignition::math::Quaterniond &_orientation)
+{
+  this->dataPtr->worldToReference = _orientation;
 }
 
 //////////////////////////////////////////////////
@@ -393,7 +402,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     // Set the IMU orientation
     // imu orientation with respect to reference frame
     ignition::math::Quaterniond imuReferenceOrientation =
-      (imuWorldPose - this->dataPtr->worldToReference).Rot();
+      (imuWorldPose.Rot() - this->dataPtr->worldToReference.Inverse());
     msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
       imuReferenceOrientation);
 
