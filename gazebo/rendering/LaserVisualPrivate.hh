@@ -38,11 +38,11 @@ namespace gazebo
       /// \brief Subscription to the laser data.
       public: transport::SubscriberPtr laserScanSub;
 
-      /// \brief Renders the laser data as a triangle fan.
-      public: std::vector<DynamicLines *> rayFans;
+      /// \brief Renders the laser data as a triangle strip.
+      public: std::vector<DynamicLines *> rayStrips;
 
       /// \brief Renders laser data for rays that do not hit obstacles.
-      public: std::vector<DynamicLines *> noHitRayFans;
+      public: std::vector<DynamicLines *> noHitRayStrip;
 
       /// \brief Renders a deadzone that is between the sensor's origin
       /// and start of the rays.

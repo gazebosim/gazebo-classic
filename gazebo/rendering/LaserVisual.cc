@@ -63,7 +63,7 @@ LaserVisual::~LaserVisual()
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  for (auto ray : dPtr->rayFans)
+  for (auto ray : dPtr->rayStrips)
     this->DeleteDynamicLine(ray);
 
   for (auto ray : dPtr->noHitRayFans)
@@ -75,7 +75,7 @@ LaserVisual::~LaserVisual()
   for (auto ray : dPtr->rayLines)
     this->DeleteDynamicLine(ray);
 
-  dPtr->rayFans.clear();
+  dPtr->rayStrips.clear();
   dPtr->noHitRayFans.clear();
   dPtr->deadzoneRayFans.clear();
   dPtr->rayLines.clear();
@@ -126,20 +126,22 @@ void LaserVisual::Update()
   // Process each ray fan
   for (unsigned int j = 0; j < vertCount; ++j)
   {
-    // Create a new raw fan, if there are not enough already allocated.
-    if (j+1 > dPtr->rayFans.size())
+    // Create a new render objects, if there are not enough already allocated.
+    if (j+1 > dPtr->rayStrip.size())
     {
-      // Ray fans that fill in between the ray lines.
-      dPtr->rayFans.push_back(
+      // Ray strips fill in-between the ray lines in areas that have
+      // intersected an object.
+      dPtr->rayStrips.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
-      dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
+      dPtr->rayStrips[j]->setMaterial("Gazebo/BlueLaser");
 
-      // No hit ray triangle strip display rays that do not hit obstacles.
-      dPtr->noHitRayFans.push_back(
+      // No hit ray strips fill in-between the ray lines in areas that have
+      // not intersected an object.
+      dPtr->noHitRayStrips.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
-      dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
+      dPtr->noHitRayStrips[j]->setMaterial("Gazebo/LightBlueLaser");
 
-      // Deadzone ray fan displays area that is between the sensor's origin
+      // Deadzone ray fans display areas that are between the sensor's origin
       // and start of the rays.
       dPtr->deadzoneRayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
@@ -158,7 +160,7 @@ void LaserVisual::Update()
     double angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
 
-    // Process each ray in the current fan.
+    // Process each ray in the current scan.
     for (unsigned int i = 0; i < count; ++i)
     {
       // Calculate the range of the ray
@@ -171,7 +173,7 @@ void LaserVisual::Update()
       ignition::math::Vector3d axis = offset.Rot() * ray *
         ignition::math::Vector3d(1.0, 0.0, 0.0);
 
-      // Check for infinite range read, which indicates the ray did not
+      // Check for infinite range, which indicates the ray did not
       // intersect an object.
       double hitRange = inf ? 0 : r;
 
@@ -192,22 +194,22 @@ void LaserVisual::Update()
         dPtr->rayLines[j]->AddPoint(startPt);
         dPtr->rayLines[j]->AddPoint(inf ? noHitPt : pt);
 
-        dPtr->rayFans[j]->AddPoint(startPt);
-        dPtr->rayFans[j]->AddPoint(inf ? startPt : pt);
+        dPtr->rayStrips[j]->AddPoint(startPt);
+        dPtr->rayStrips[j]->AddPoint(inf ? startPt : pt);
 
-        dPtr->noHitRayFans[j]->AddPoint(startPt);
-        dPtr->noHitRayFans[j]->AddPoint(inf ? noHitPt : pt);
+        dPtr->noHitRayStrips[j]->AddPoint(startPt);
+        dPtr->noHitRayStrips[j]->AddPoint(inf ? noHitPt : pt);
       }
       else
       {
         dPtr->rayLines[j]->SetPoint(i*2, startPt);
         dPtr->rayLines[j]->SetPoint(i*2+1, inf ? noHitPt : pt);
 
-        dPtr->rayFans[j]->SetPoint(i*2, startPt);
-        dPtr->rayFans[j]->SetPoint(i*2+1, inf ? startPt : pt);
+        dPtr->rayStrips[j]->SetPoint(i*2, startPt);
+        dPtr->rayStrips[j]->SetPoint(i*2+1, inf ? startPt : pt);
 
-        dPtr->noHitRayFans[j]->SetPoint(i*2, startPt);
-        dPtr->noHitRayFans[j]->SetPoint(i*2+1, inf ? noHitPt : pt);
+        dPtr->noHitRayStrips[j]->SetPoint(i*2, startPt);
+        dPtr->noHitRayStrips[j]->SetPoint(i*2+1, inf ? noHitPt : pt);
       }
 
       // Draw the triangle fan that indicates the dead zone.
