@@ -143,6 +143,8 @@ do
       rm $c
       if grep OnReadHeader $CORE_BT_LOG; then
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-OnReadHeader-backtrace.txt"
+      elif grep IOManager::Stop $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-IOManager-backtrace.txt"
       elif grep DispatchDiscoveryMsg $CORE_BT_LOG; then
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-DispatchDiscoveryMsg-backtrace.txt"
       elif grep World::BuildSceneMsg $CORE_BT_LOG && \
