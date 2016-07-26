@@ -108,9 +108,11 @@ namespace gazebo
       /// to NED frame. Subsequently, ImuSensor::Orientation will return
       /// identity transform if the IMU is aligned with the NED frame.
       /// This call replaces SetReferencePose.
-      /// \param _pose rotation from world frame to imu reference frame
+      /// \param _pose rotation from world frame to imu reference frame,
+      /// tranlation part of _pose param is ignored.
       public: void SetWorldToReferencePose(
-        const ignition::math::Pose3d &_pose = ignition::math::Pose3d());
+        const ignition::math::Pose3d &_pose = ignition::math::Pose3d())
+        GAZEBO_DEPRECATED(7.0);
 
       /// \brief Sets the rotation transform from world frame to IMU's
       /// reference frame.
@@ -118,8 +120,8 @@ namespace gazebo
       /// call this function with the transform that transforms world frame
       /// to NED frame. Subsequently, ImuSensor::Orientation will return
       /// identity transform if the IMU is aligned with the NED frame.
-      /// This call replaces SetReferencePose.
-      /// \param _orientation current IMU orientation in NED
+      /// This call replaces SetWorldToReferencePose.
+      /// \param _orientation rotation from world frame to imu reference frame.
       public: void SetWorldToReferenceOrientation(
         const ignition::math::Quaterniond &_orientation);
 
