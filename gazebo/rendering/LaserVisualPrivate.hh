@@ -42,7 +42,7 @@ namespace gazebo
       public: std::vector<DynamicLines *> rayStrips;
 
       /// \brief Renders laser data for rays that do not hit obstacles.
-      public: std::vector<DynamicLines *> noHitRayStrip;
+      public: std::vector<DynamicLines *> noHitRayStrips;
 
       /// \brief Renders a deadzone that is between the sensor's origin
       /// and start of the rays.

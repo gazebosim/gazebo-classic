@@ -66,7 +66,7 @@ LaserVisual::~LaserVisual()
   for (auto ray : dPtr->rayStrips)
     this->DeleteDynamicLine(ray);
 
-  for (auto ray : dPtr->noHitRayFans)
+  for (auto ray : dPtr->noHitRayStrips)
     this->DeleteDynamicLine(ray);
 
   for (auto ray : dPtr->deadzoneRayFans)
@@ -76,7 +76,7 @@ LaserVisual::~LaserVisual()
     this->DeleteDynamicLine(ray);
 
   dPtr->rayStrips.clear();
-  dPtr->noHitRayFans.clear();
+  dPtr->noHitRayStrips.clear();
   dPtr->deadzoneRayFans.clear();
   dPtr->rayLines.clear();
 }
@@ -127,7 +127,7 @@ void LaserVisual::Update()
   for (unsigned int j = 0; j < vertCount; ++j)
   {
     // Create a new render objects, if there are not enough already allocated.
-    if (j+1 > dPtr->rayStrip.size())
+    if (j+1 > dPtr->rayStrips.size())
     {
       // Ray strips fill in-between the ray lines in areas that have
       // intersected an object.
