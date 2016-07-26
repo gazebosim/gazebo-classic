@@ -31,6 +31,9 @@ class ModelManipulationTest : public QTestFixture
 
   /// \brief Test switching modes using keyboard shortcuts.
   private slots: void Shortcuts();
+
+  /// \brief Test manipulating models in local and global frames
+  private slots: void GlobalLocalFrames();
 };
 
 #endif

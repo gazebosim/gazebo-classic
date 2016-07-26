@@ -58,6 +58,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
+      // Remove this in gazebo8.
       public: virtual std::string GetTopic() const;
 
       /// \brief Get the near distance. This is the distance from the
@@ -94,6 +95,13 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual bool IsActive() const;
+
+      // Documentation inherited.
+      // Move this to the public section in gazebo8. Basically move this
+      // function up in this file to be grouped with other public functions
+      // per the Gazebo style guide. This should replace the GetTopic
+      // function.
+      public: virtual std::string Topic() const;
 
       // \internal
       // \brief Private data pointer

@@ -43,9 +43,7 @@ ODELink::ODELink(EntityPtr _parent)
 //////////////////////////////////////////////////
 ODELink::~ODELink()
 {
-  if (this->linkId)
-    dBodyDestroy(this->linkId);
-  this->linkId = NULL;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -179,18 +177,20 @@ void ODELink::MoveCallback(dBodyID _id)
 //////////////////////////////////////////////////
 void ODELink::Fini()
 {
-  Link::Fini();
   if (this->linkId)
     dBodyDestroy(this->linkId);
   this->linkId = NULL;
 
   this->odePhysics.reset();
+
+  Link::Fini();
 }
 
 //////////////////////////////////////////////////
 void ODELink::SetGravityMode(bool _mode)
 {
-  this->sdf->GetElement("gravity")->Set(_mode);
+  if (this->sdf->HasElement("gravity"))
+    this->sdf->GetElement("gravity")->Set(_mode);
   if (this->linkId)
   {
     dBodySetGravityMode(this->linkId, _mode ? 1: 0);

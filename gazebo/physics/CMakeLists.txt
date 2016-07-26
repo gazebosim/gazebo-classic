@@ -153,6 +153,7 @@ target_link_libraries(gazebo_physics
   gazebo_util
   gazebo_ode
   gazebo_opcode
+  ${Boost_LIBRARIES}
 )
 
 # Link in Bullet support if present
@@ -200,6 +201,7 @@ set (gtest_fixture_sources
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
+  World_TEST.cc
   WorldState_TEST.cc
 )
 
