@@ -140,7 +140,6 @@ void LaserVisualization_TEST::Areas()
   // Get camera data
   const unsigned char *data = cam->ImageData();
   unsigned int width = cam->ImageWidth();
-  unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
 
   int rPrev = 0;
@@ -324,17 +323,11 @@ void LaserVisualization_TEST::Areas()
   QVERIFY(avgDarkBlueBand2G > 109 && avgDarkBlueBand2G < 114);
   QVERIFY(avgDarkBlueBand2B > 249 && avgDarkBlueBand2B <= 255);
 
-  // Verify the position of the first white band
-  QVERIFY(whiteBand1Start > 921 && whiteBand1Start < 925);
-  QVERIFY(whiteBand1End > 937 && whiteBand1End < 941);
-
-  // Verify the position of the grey band
-  QVERIFY(greyBandStart > 1005 && greyBandStart < 1009);
-  QVERIFY(greyBandEnd > 1263 && greyBandEnd < 1268);
-
-  // Verify the position of the second white band
-  QVERIFY(whiteBand2Start > 1331 && whiteBand2Start < 1335);
-  QVERIFY(whiteBand2End > 1346 && whiteBand2End < 1351);
+  // Verify the bands are in the correct order
+  QVERIFY(whiteBand1Start > 0 && whiteBand1Start < whiteBand1End);
+  QVERIFY(greyBandStart > whiteBand1End && greyBandStart < greyBandEnd);
+  QVERIFY(whiteBand2Start > greyBandEnd && whiteBand2Start < whiteBand2End);
+  QVERIFY(whiteBand2End < width);
 
   mainWindow->close();
   delete mainWindow;
