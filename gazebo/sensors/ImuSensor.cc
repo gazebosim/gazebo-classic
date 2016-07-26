@@ -402,7 +402,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     // Set the IMU orientation
     // imu orientation with respect to reference frame
     ignition::math::Quaterniond imuReferenceOrientation =
-      (imuWorldPose.Rot() - this->dataPtr->worldToReference.Inverse());
+      (this->dataPtr->worldToReference.Inverse() * imuWorldPose.Rot());
     msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
       imuReferenceOrientation);
 
