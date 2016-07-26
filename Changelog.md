@@ -3,7 +3,7 @@
 ## Gazebo 7.x.x (2016-xx-xx)
 
 1. Added visualization of minimum range to laservisual.
-    * [Pull request 2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
+    * [Pull request 2409](https://bitbucket.org/osrf/gazebo/pull-request/2409)
     * [Issue 2018](https://bitbucket.org/osrf/gazebo/issues/2018)
 
 1. Fix InertiaVisual for non-diagonal inertia matrices
