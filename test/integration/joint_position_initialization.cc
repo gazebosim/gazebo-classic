@@ -98,11 +98,6 @@ void JointKinematicTest::JointInitialPositionTest(
   // let it conflict with Physics pose updates and make sure
   // internal model state stays consistent
 
-  double start_time;
-  double start_wall_time;
-  const double test_wall_duration = 2.0;
-  const double pub_rate = 10000.0;
-
   physics::Link_V links;
   links.push_back(model->GetLink("link_1"));
   links.push_back(model->GetLink("link_2"));
@@ -145,7 +140,59 @@ void JointKinematicTest::JointInitialPositionTest(
     EXPECT_NEAR((*ji)->GetVelocity(0), 0, TOL);
     if ((*ji)->GetName() == "joint_01")
     {
-      EXPECT_NEAR((*ji)->GetAngle(0), 0.5, TOL);
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0.5, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_12")
+    {
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0.7071, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_23")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0.0, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_34")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0.0, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_45")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0.0, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_52")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0.0, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_22a")
+    {
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0.7071, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_2a2b")
+    {
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), -0.7071, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_2b3a")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_3a4a")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_4a5a")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0, TOL);
+    }
+    else if ((*ji)->GetName() == "joint_5a2b")
+    {
+      // loop joint, so should stay 0
+      EXPECT_NEAR((*ji)->GetAngle(0).Radian(), 0, TOL);
     }
   }
 }
