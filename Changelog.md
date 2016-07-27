@@ -150,8 +150,8 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
-1. Fix Model Manipulator switching between local and global frames
-    * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
+1. Fix InertiaVisual for non-diagonal inertia matrices
+    * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
 
 ## Gazebo 7.3.1 (2016-07-13)
 
@@ -190,9 +190,8 @@
 
 1. Remove contact filters with names that contain `::`
     * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
-    * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1805)
+    * [Issue 1805](https://bitbucket.org/osrf/gazebo/issues/1805)
 
-## Gazebo 7.2.0 (2016-06-13)
 1. Fix Model Manipulator switching between local and global frames
     * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
 
@@ -236,9 +235,6 @@
 
 1. Properly cleanup pointers when destroying a world with models and lights.
     * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
-
-1. Properly cleanup pointers when destroying a world with joints.
-    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
 
 1. Fix view control mouse focus in model editor
     * [Pull request 2315](https://bitbucket.org/osrf/gazebo/pull-request/2315)
@@ -2452,4 +2448,3 @@ compilation on Windows.
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-
