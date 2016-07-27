@@ -1562,6 +1562,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             {
               GeometryIndices iv = inputValues[i];
               bool normEqual = false;
+              //bool texEqual = !inputs[TEXCOORD].empty();
               bool texEqual = false;
 
               if (!inputs[NORMAL].empty())
@@ -1579,8 +1580,13 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                 if (iv.normalIndex == remappedNormalIndex)
                   normEqual = true;
               }
+
               if (!inputs[TEXCOORD].empty())
               {
+                // \todo: Add support for multiple texture maps to SubMesh.
+                // Here we are only using the first texture coordinates, when
+                // multiple could have been specified.
+
                 // Get the vertex texcoord index value. If the texcoord is a
                 // duplicate then reset the index to the first instance of the
                 // duplicated texcoord
@@ -1590,8 +1596,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                 if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
                   remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
-                if (iv.texcoordIndex == remappedTexcoordIndex)
-                  texEqual = true;
+                texEqual = iv.texcoordIndex == remappedTexcoordIndex;
               }
 
               // if the vertex has matching normal and texcoord index values
@@ -1649,10 +1654,15 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             subMesh->AddNormal(norms[inputRemappedNormalIndex]);
             input.normalIndex = inputRemappedNormalIndex;
           }
-          if (!inputs[TEXCOORD].empty() )
+
+          if (!inputs[TEXCOORD].empty())
           {
+            // \todo: Add support for multiple texture maps to SubMesh.
+            // Here we are only using the first texture coordinates, when
+            // multiple could have been specified.
             unsigned int inputRemappedTexcoordIndex =
               values[inputs[TEXCOORD][0]];
+
             if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
             {
               inputRemappedTexcoordIndex =
@@ -1661,6 +1671,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
                 texcoords[inputRemappedTexcoordIndex].Y());
             input.texcoordIndex = inputRemappedTexcoordIndex;
+
           }
 
           // add the new gazebo submesh vertex index to the map
