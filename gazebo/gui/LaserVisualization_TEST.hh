@@ -27,9 +27,14 @@ class LaserVisualization_TEST : public QTestFixture
   /// \brief Test that laser visualization draws lines correctly.
   private slots: void Lines();
 
-  /// \brief Test that laser visualization draws hit, no-hit, and deadzone
-  /// areas correctly.
-  private slots: void Areas();
+  /// \brief Laser hit visualization.
+  private slots: void Hit();
+
+  /// \brief Laser no-hit visualization.
+  private slots: void Nohit();
+
+  /// \brief Test laser deadzone visualization.
+  private slots: void Deadzone();
 };
 
 #endif
