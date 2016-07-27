@@ -67,6 +67,7 @@ set (plugins_single_header
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
+  RTControlSynchronizationPlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin
