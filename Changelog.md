@@ -4,6 +4,17 @@
 
 1. Include basic support for GNU Precompiled Headers to reduce compile time
     * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
+
+1. Plotting utility
+    * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
+    * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
+    * [Pull request #2382](https://bitbucket.org/osrf/gazebo/pull-request/2382)
+
+1. Renamed `gazebo/gui/SaveDialog` to `gazebo/gui/SaveEntityDialog`. A new
+   `SaveDialog` class will be added in a future pull request. The migration
+   guide will be updated with that pull request.
+    * [Pull request #2384](https://bitbucket.org/osrf/gazebo/pull-request/2384)
+
 1. Add FiducialCameraPlugin for Camera Sensors
     * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
 
@@ -19,8 +30,11 @@
 1. Use single pixel selection buffer for mouse picking
     * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
 
+1. Refactor Visual classes
+  * [Pull request #2331](https://bitbucket.org/osrf/gazebo/pull-requests/2331)
+
 1. Windows plugins (with .dll extension) now accepted
-    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311/ensure-plugin-and-plugin-macros-are-always/)
+    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311)
     * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
 
 1. Add Introspection Manager and Client util
@@ -62,6 +76,9 @@
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
     * A contribution from Olivier Crave
 
+1. Add const accessors to uri path and query
+    * [Pull request #2400](https://bitbucket.org/osrf/gazebo/pull-request/2400)
+
 1. Server generates unique model names in case of overlap, and added allow_renaming field to factory message.
     * [Pull request 2301](https://bitbucket.org/osrf/gazebo/pull-request/2301)
     * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
@@ -74,6 +91,9 @@
 
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
+
+1. Generalize actors to work even if not all elements are specified
+    * [Pull request #2360](https://bitbucket.org/osrf/gazebo/pull-request/2360)
 
 1. PIMPLize rendering/Grid
     * [Pull request 2330](https://bitbucket.org/osrf/gazebo/pull-request/2330)
@@ -100,6 +120,9 @@
 1. Update depth camera sensor to publish depth data over a topic.
     * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
 
+1. Add color picker to config widget and fix visual and collision duplication.
+    * [Pull request #2381](https://bitbucket.org/osrf/gazebo/pull-request/2381)
+
 1. Model editor updates
 
     1. Undo / redo inserting and deleting links
@@ -117,6 +140,9 @@
     1. Undo translate, rotate, snap and align links and nested models
         * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
 
+    1. Undo scale links
+        * [Pull request #2368](https://bitbucket.org/osrf/gazebo/pull-request/2368)
+
 1. Google Summer of Code Graphical interface for inserting plugins during simulation.
 
     1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
@@ -130,15 +156,64 @@
 1. Fix Model Manipulator switching between local and global frames
     * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
 
+## Gazebo 7.3.1 (2016-07-13)
+
+1. Fix homebrew test failure of UNIT_ApplyWrenchDialog_TEST
+    * [Pull request 2393](https://bitbucket.org/osrf/gazebo/pull-request/2393)
+
+1. Fix MainWindow crash when window is minimized and maximized
+    * [Pull request 2392](https://bitbucket.org/osrf/gazebo/pull-request/2392)
+    * [Issue 2003](https://bitbucket.org/osrf/gazebo/issues/2003)
+
+## Gazebo 7.3.0 (2016-07-12)
+
+1. Fix selecting ApplyWrenchVisual's force torque visuals
+    * [Pull request 2377](https://bitbucket.org/osrf/gazebo/pull-request/2377)
+    * [Issue 1999](https://bitbucket.org/osrf/gazebo/issues/1999)
+
+1. Use ignition math in gazebo::msgs
+    * [Pull request 2389](https://bitbucket.org/osrf/gazebo/pull-request/2389)
+
+1. Parse command-line options for GUI plugins in Server to fix parsing of
+   positional argument for world file.
+   This fixes command-line parsing for `gazebo -g gui_plugin.so`.
+    * [Pull request 2387](https://bitbucket.org/osrf/gazebo/pull-request/2387)
+
+1. Added a harness plugin that supports lowering a model at a controlled rate
+    * [Pull request 2346](https://bitbucket.org/osrf/gazebo/pull-request/2346)
+
+1. Fix ogre log test on xenial+nvidia
+    * [Pull request 2374](https://bitbucket.org/osrf/gazebo/pull-request/2374)
+
+1. Redirect QT messages to Gazebo's console message handling system.
+    * [Pull request 2375](https://bitbucket.org/osrf/gazebo/pull-request/2375)
+
+1. Fix buoyancy plugin when multiple link tags are used within the plugin
+    * [Pull request 2369](https://bitbucket.org/osrf/gazebo/pull-request/2369)
+
 1. Remove contact filters with names that contain `::`
     * [Pull request 2363](https://bitbucket.org/osrf/gazebo/pull-request/2363)
     * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1805)
 
 ## Gazebo 7.2.0 (2016-06-13)
+1. Fix Model Manipulator switching between local and global frames
+    * [Pull request 2361](https://bitbucket.org/osrf/gazebo/pull-request/2361)
+
+1. Remove duplicate code from cmake config file caused by bad merge
+    * [Pull request 2347](https://bitbucket.org/osrf/gazebo/pull-request/2347)
+
+1. Properly cleanup pointers when destroying a world with joints.
+    * [Pull request 2309](https://bitbucket.org/osrf/gazebo/pull-request/2309)
 
 1. Fix right click view options after deleting and respawning a model.
     * [Pull request 2349](https://bitbucket.org/osrf/gazebo/pull-request/2349)
     * [Issue 1985](https://bitbucket.org/osrf/gazebo/issues/1985)
+
+1. Implement missing function: LogicalCamera::Topic()
+    * [Pull request 2343](https://bitbucket.org/osrf/gazebo/pull-request/2343)
+    * [Issue 1980](https://bitbucket.org/osrf/gazebo/issues/1980)
+
+## Gazebo 7.2.0 (2016-06-13)
 
 1. Backport single pixel selection buffer for mouse picking
     * [Pull request 2338](https://bitbucket.org/osrf/gazebo/pull-request/2338)
@@ -671,6 +746,9 @@ using the same arguments used in the command line.
 ## Gazebo 6.0
 
 ### Gazebo 6.X.X (201X-XX-XX)
+
+1. Fix buoyancy plugin when multiple link tags are used within the plugin
+    * [Pull request 2369](https://bitbucket.org/osrf/gazebo/pull-request/2369)
 
 1. Fix race condition in ~TimePanelPrivate (#1919)
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
