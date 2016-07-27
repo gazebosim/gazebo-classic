@@ -110,6 +110,7 @@ namespace gazebo
       /// This call replaces SetReferencePose.
       /// \param _pose rotation from world frame to imu reference frame,
       /// tranlation part of _pose param is ignored.
+      /// \deprecated See SetWorldToReferenceOrientation(Quaterniond)
       public: void SetWorldToReferencePose(
         const ignition::math::Pose3d &_pose = ignition::math::Pose3d())
         GAZEBO_DEPRECATED(8.0);
