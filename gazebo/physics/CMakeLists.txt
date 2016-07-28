@@ -183,6 +183,10 @@ if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
+if (USE_PCH)
+  add_pch(gazebo_physics physics_pch.hh)
+endif()
+
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 

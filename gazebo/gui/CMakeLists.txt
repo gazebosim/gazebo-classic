@@ -225,6 +225,10 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
 
+if (USE_PCH)
+  add_pch(gazebo_gui gui_pch.hh)
+endif()
+
 set (gtest_sources
   Conversions_TEST.cc
 )
