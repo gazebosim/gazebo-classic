@@ -508,12 +508,21 @@
           <pose>0.10 0 0 0 0 0</pose>
           <always_on>1</always_on>
         </sensor>
-        <sensor name="ball_floating_imu_sensor_custom" type="imu">
+        <sensor name="ball_floating_imu_sensor_custom_local" type="imu">
           <pose>0.10 0 0 0 0 0</pose>
           <always_on>1</always_on>
           <imu>
             <reference_frame_orientation imu_localization="CUSTOM">
-              <rpy parent_frame="world">0 0 0</rpy>
+              <rpy parent_frame="">0 3.1415927 0</rpy>
+            </reference_frame_orientation>
+          </imu>
+        </sensor>
+        <sensor name="ball_floating_imu_sensor_custom_world" type="imu">
+          <pose>0.10 0 0 0 0 0</pose>
+          <always_on>1</always_on>
+          <imu>
+            <reference_frame_orientation imu_localization="CUSTOM">
+              <rpy parent_frame="world">0 0 3.1415927</rpy>
             </reference_frame_orientation>
           </imu>
         </sensor>

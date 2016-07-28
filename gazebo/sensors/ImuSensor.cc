@@ -189,6 +189,22 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     gzlog << out.str();
   }
 
+  if (imuElem->HasElement("reference_frame_orientation"))
+  {
+    sdf::ElementPtr rpyElem = imuElem->GetElement("rpy");
+    std::string rpyFrameName =
+      rpyElem->GetAttribute("parent_frame")->GetAsString();
+    ignition::math::Vector3d rpy =
+      rpyElem->Get<ignition::math::Vector3d>("parent_frame");
+
+    // if using gravity, get x direction specification
+    sdf::ElementPtr imuDirXElem = imuElem->GetElement("imuDirX");
+    std::string imuDirXFrameName =
+      imuDirXElem->GetAttribute("parent_frame")->GetAsString();
+    ignition::math::Vector3d imuDirX =
+      imuDirXElem->Get<ignition::math::Vector3d>("parent_frame");
+  }
+
   // Start publishing measurements on the topic.
   this->dataPtr->parentEntity->SetPublishData(true);
 
