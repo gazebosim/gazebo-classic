@@ -128,6 +128,7 @@ void LaserVisualization_TEST::Hit()
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
+  std::cout << "Depth[" << depth << "]\n";
 
   for (unsigned int y = 0; y < height; ++y)
   {
@@ -175,6 +176,7 @@ void LaserVisualization_TEST::Nohit()
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
+  std::cout << "Depth[" << depth << "]\n";
 
   for (unsigned int y = 0; y < height; ++y)
   {
@@ -222,6 +224,7 @@ void LaserVisualization_TEST::Deadzone()
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
+  std::cout << "Depth[" << depth << "]\n";
 
   for (unsigned int y = 0; y < height; ++y)
   {
