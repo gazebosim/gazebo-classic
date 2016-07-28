@@ -115,7 +115,7 @@ void OSVRWindow::AttachCameraToVisual()
 
   if (tries >= 50)
   {
-    gzerr << "OSVR: visual [" << this->visualName << "] not found."
+    gzerr << "OSVR: visual [" << this->visualName << "] not found. "
           << "OSVR is not attached." << std::endl;
     return;
   }
@@ -178,8 +178,8 @@ void OSVRWindow::showEvent(QShowEvent *_event)
   this->setGeometry(this->xPos, this->yPos, 1920, 1080);
 
   // Make the window full screen
-  this->isFullScreen = true;
-  this->showFullScreen();
+  //this->isFullScreen = true;
+  //this->showFullScreen();
 }
 
 //////////////////////////////////////////////////

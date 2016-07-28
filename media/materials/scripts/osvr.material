@@ -1,0 +1,75 @@
+vertex_program OculusDistortionVertex glsl
+{
+  source OculusDistortionVertex.glsl
+	default_params
+	{
+		param_named eyeToSourceUVScale float2 1.0 1.0
+		param_named eyeToSourceUVOffset float2 0.0 0.0
+		param_named eyeRotationStart matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+		param_named eyeRotationEnd matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+fragment_program OculusDistortionFragment glsl
+{
+    source OculusDistortionFragment.glsl
+}
+
+
+material OSVR/LeftEye
+{
+  receive_shadows off
+
+  technique
+  {
+    pass OSVR/LeftEye
+    {
+	    //vertex_program_ref OculusDistortionVertex
+			//{
+			//}
+
+			//fragment_program_ref OculusDistortionFragment
+			//{
+			//	param_named diffuseMap int 0
+			//}
+
+      lighting off
+
+			texture_unit
+      {
+        ambient 0.3 0.1 0.1 1
+        diffuse 0.8 0.05 0.05 1
+        emissive 0 0 0 1
+      }
+    }
+  }
+}
+
+material OSVR/RightEye
+{
+  receive_shadows off
+
+  technique
+  {
+    pass OSVR/RightEye
+    {
+      //vertex_program_ref OculusDistortionVertex
+      //{
+      //}
+
+      //fragment_program_ref OculusDistortionFragment
+      //{
+      //  param_named diffuseMap int 0
+      //}
+
+      lighting off
+
+      texture_unit 
+      {
+        ambient 0.3 0.1 0.1 1
+        diffuse 0.8 0.05 0.05 1
+        emissive 0 0 0 1
+      }
+    }
+  }
+}

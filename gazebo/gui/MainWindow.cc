@@ -1449,7 +1449,6 @@ void MainWindow::CreateActions()
   g_viewOculusAct->setEnabled(false);
 #endif
 
-  printf("creating g_viewOSVRAct\n");
   g_viewOSVRAct = new QAction(tr("OSVR HDK"), this);
   g_viewOSVRAct->setStatusTip(tr("OSVR HDK Render Window"));
   this->connect(g_viewOSVRAct, SIGNAL(triggered()), this, SLOT(ViewOSVR()));

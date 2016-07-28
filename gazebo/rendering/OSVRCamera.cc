@@ -184,6 +184,7 @@ void OSVRCamera::Init()
 //////////////////////////////////////////////////
 void OSVRCamera::RenderImpl()
 {
+  printf("Render\n");
 #if 0
   ovrHmd_BeginFrameTiming(this->dataPtr->hmd, this->dataPtr->frameIndex);
 #endif
@@ -218,6 +219,7 @@ void OSVRCamera::Update()
   OSVR_ReturnCode rc = osvrGetOrientationState(
                            this->dataPtr->osvrInterface.get(),
                            &timestamp, &orient);
+  /*
   if (rc == OSVR_RETURN_SUCCESS)
   {
     if (this->dataPtr->osvrTrackingWarned)
@@ -234,9 +236,11 @@ void OSVRCamera::Update()
   }
   else if (!this->dataPtr->osvrTrackingWarned)
   {
+    this->sceneNode->setOrientation(Ogre::Quaternion(1, 0, 0, 0));
     gzmsg << "OSVR: didn't get an orientation. doh.\n";
     this->dataPtr->osvrTrackingWarned = true;
   }
+  */
 
   this->sceneNode->needUpdate();
 }
@@ -319,6 +323,7 @@ unsigned int OSVRCamera::GetImageHeight() const
 //////////////////////////////////////////////////
 void OSVRCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 {
+  printf("OSVRCamera::Resize()\n");
   if (this->viewport)
   {
     this->viewport->setDimensions(0, 0, 0.5, 1);
@@ -421,6 +426,7 @@ void OSVRCamera::MoveToVisual(VisualPtr _visual)
 //////////////////////////////////////////////////
 void OSVRCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
+  printf("OSVRCamera::SetRenderTarget()\n");
   this->renderTarget = _target;
   this->CreateDistortion();
 
@@ -454,23 +460,28 @@ void OSVRCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   if (this->GetScene()->GetSkyX() != NULL)
     rt->addListener(this->GetScene()->GetSkyX());
 
-#if 0
   // todo: not this
-  float fovLeft  = 90; //this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
-  float fovRight = 90; //this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
+  float fov_horiz = 90; //this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
+  //float fovRight = 90; //this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
+  float fov_vert = 90;
 
-  float combinedTanHalfFovHorizontal =
-    std::max(fovLeft.LeftTan, fovLeft.RightTan);
-  float combinedTanHalfFovVertical = std::max(fovLeft.UpTan, fovLeft.DownTan);
+  //float combinedTanHalfFovHorizontal =
+  //  std::max(fovLeft.LeftTan, fovLeft.RightTan);
+  //float combinedTanHalfFovVertical = std::max(fovLeft.UpTan, fovLeft.DownTan);
 
-  float aspectRatio = combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
+  float aspectRatio = fov_horiz / fov_vert; //combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
 
-  double vfov = 2.0 * atan(combinedTanHalfFovVertical);
+  //double vfov = 2.0 * atan(combinedTanHalfFovVertical);
   this->camera->setAspectRatio(aspectRatio);
-  this->camera->setFOVy(Ogre::Radian(vfov));
+  //this->camera->setFOVy(Ogre::Radian(vfov));
+  this->camera->setFOVy(Ogre::Radian(fov_vert * 3.1415f / 180.0f));
   this->dataPtr->rightCamera->setAspectRatio(aspectRatio);
-  this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
-#endif
+  //this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
+  this->dataPtr->rightCamera->setFOVy(Ogre::Radian(fov_vert * 3.1415f/180.0f));
+
+  Ogre::Matrix4 left_proj = this->camera->getProjectionMatrix();
+  gzmsg << "OSVR left projection matrix:\n" << left_proj << "\n\n";
+
 #if 0
   ovrMatrix4f projL = ovrMatrix4f_Projection(fovLeft, 0.001,
       g_defaultFarClip, true);
@@ -683,16 +694,40 @@ void OSVRCamera::CreateDistortion()
           Ogre::RenderOperation::OT_TRIANGLE_LIST);
     }
 
-#if 0
+    const float x = 10.0f;
+    const float y = 10.0f;
+    externalObj->position(0, 0, 0);
+    externalObj->textureCoord(0, 0);
+    externalObj->textureCoord(0, 0);
+    externalObj->textureCoord(0, 0);
+    externalObj->colour(1, 0, 1);
+
+    externalObj->position(x, 0, 0);
+    externalObj->textureCoord(1, 0);
+    externalObj->textureCoord(1, 0);
+    externalObj->textureCoord(1, 0);
+    externalObj->colour(1, 0, 1);
+
+    externalObj->position(x, y, 0);
+    externalObj->textureCoord(1, 1);
+    externalObj->textureCoord(1, 1);
+    externalObj->textureCoord(1, 1);
+    externalObj->colour(1, 0, 1);
+
+    externalObj->index(0);
+    externalObj->index(1);
+    externalObj->index(2);
+    /*
     for (unsigned int i = 0; i < meshData.VertexCount; ++i)
     {
-      ovrDistortionVertex v = meshData.pVertexData[i];
-      externalObj->position(v.ScreenPosNDC.x, v.ScreenPosNDC.y, 0);
-      externalObj->textureCoord(v.TanEyeAnglesR.x, v.TanEyeAnglesR.y);
-      externalObj->textureCoord(v.TanEyeAnglesG.x, v.TanEyeAnglesG.y);
-      externalObj->textureCoord(v.TanEyeAnglesB.x, v.TanEyeAnglesB.y);
+      //ovrDistortionVertex v = meshData.pVertexData[i];
+      //externalObj->position(v.ScreenPosNDC.x, v.ScreenPosNDC.y, 0);
+      //externalObj->textureCoord(v.TanEyeAnglesR.x, v.TanEyeAnglesR.y);
+      //externalObj->textureCoord(v.TanEyeAnglesG.x, v.TanEyeAnglesG.y);
+      //externalObj->textureCoord(v.TanEyeAnglesB.x, v.TanEyeAnglesB.y);
 
-      float vig = std::max(v.VignetteFactor, 0.0f);
+      //float vig = std::max(v.VignetteFactor, 0.0f);
+      float vig = 0.5; //std::max(v.VignetteFactor, 0.0f);
       externalObj->colour(vig, vig, vig, vig);
     }
 
@@ -700,8 +735,8 @@ void OSVRCamera::CreateDistortion()
     {
       externalObj->index(meshData.pIndexData[i]);
     }
+    */
 
-#endif
     // Manual render object complete
     externalObj->end();
 
@@ -714,7 +749,7 @@ void OSVRCamera::CreateDistortion()
 
   // Position the node in the scene
   meshNode->setPosition(0, 0, -1);
-  meshNode->setScale(1, 1, -1);
+  //meshNode->setScale(1, 1, -1);  // MQ this causes badness
 
   // Create the external camera
   this->dataPtr->externalCamera =
@@ -731,7 +766,7 @@ void OSVRCamera::CreateDistortion()
   this->dataPtr->externalViewport = this->renderTarget->addViewport(
       this->dataPtr->externalCamera);
   this->dataPtr->externalViewport->setBackgroundColour(
-      Ogre::ColourValue::Black);
+      Ogre::ColourValue::White);
   this->dataPtr->externalViewport->setOverlaysEnabled(true);
 
   // Set up IPD in meters:
@@ -739,6 +774,7 @@ void OSVRCamera::CreateDistortion()
   float ipd = 0.064f;
   this->camera->setPosition(-ipd * 0.5, 0, 0);
   this->dataPtr->rightCamera->setPosition(ipd * 0.5, 0, 0);
+  printf("done creating OSVR distortion setup\n");
 }
 
 /////////////////////////////////////////////////

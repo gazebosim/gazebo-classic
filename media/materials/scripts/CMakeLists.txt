@@ -11,6 +11,7 @@ grid.material
 kitchen.material
 noise.compositor
 oculus.material
+osvr.material
 perpixel.program
 picker.material
 ShadowCaster.material
