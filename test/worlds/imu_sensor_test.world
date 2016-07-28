@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.6">
   <world name="default">
+    <gravity>0.000000 0.000000 -9.810000</gravity>
     <physics type="ode">
-      <gravity>0.000000 0.000000 -9.810000</gravity>
       <ode>
         <solver>
           <type>quick</type>
@@ -507,9 +507,39 @@
         <sensor name="ball_floating_imu_sensor_2" type="imu">
           <pose>0.10 0 0 0 0 0</pose>
           <always_on>1</always_on>
-          <plugin name="ball_floating_imu_sensor_plugin_2" filename="libImuSensorPlugin.so">
-            <custom>1</custom>
-          </plugin>
+        </sensor>
+        <sensor name="ball_floating_imu_sensor_custom" type="imu">
+          <pose>0.10 0 0 0 0 0</pose>
+          <always_on>1</always_on>
+          <imu>
+            <reference_frame_orientation imu_localization="CUSTOM">
+              <rpy parent_frame="world">0 0 0</rpy>
+            </reference_frame_orientation>
+          </imu>
+        </sensor>
+        <sensor name="ball_floating_imu_sensor_ned" type="imu">
+          <pose>0.10 0 0 0 0 0</pose>
+          <always_on>1</always_on>
+          <imu>
+            <reference_frame_orientation imu_localization="NED"/>
+          </imu>
+        </sensor>
+        <sensor name="ball_floating_imu_sensor_sph" type="imu">
+          <pose>0.10 0 0 0 0 0</pose>
+          <always_on>1</always_on>
+          <imu>
+            <reference_frame_orientation imu_localization="SPH"/>
+          </imu>
+        </sensor>
+        <sensor name="ball_floating_imu_sensor_gravity" type="imu">
+          <pose>0.10 0 0 0 0 0</pose>
+          <always_on>1</always_on>
+          <imu>
+            <reference_frame_orientation imu_localization="GRAV">
+              <rpy parent_frame="world">0 0 0</rpy>
+              <imu_dir_x parent_frame="world">1 0 0</imu_dir_x>
+            </reference_frame_orientation>
+          </imu>
         </sensor>
       </link>
     </model>
