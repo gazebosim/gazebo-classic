@@ -118,6 +118,41 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
   common::SphericalCoordinates::SurfaceType st =
     common::SphericalCoordinates::EARTH_WGS84;
 
+  // Give no heading offset to confirm ENU frame
+  {
+    ignition::math::Angle lat(0.3), lon(-1.2), heading(0.0);
+    double elev = 354.1;
+    common::SphericalCoordinates sc(st, lat, lon, elev, heading);
+
+    // Check GlobalFromLocal with no heading offset
+    {
+      // local frame
+      ignition::math::Vector3d xyz;
+      // east, north, up
+      ignition::math::Vector3d enu;
+
+      xyz.Set(1, 0, 0);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_EQ(xyz, enu);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
+
+      xyz.Set(0, 1, 0);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_EQ(xyz, enu);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
+
+      xyz.Set(1, -1, 0);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_EQ(xyz, enu);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
+
+      xyz.Set(2243.52334, 556.35, 435.6553);
+      enu = sc.GlobalFromLocal(xyz);
+      EXPECT_EQ(xyz, enu);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
+    }
+  }
+
   {
     // Parameters
     ignition::math::Angle lat(0.3), lon(-1.2),
