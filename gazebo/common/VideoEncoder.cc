@@ -42,8 +42,6 @@ using namespace common;
 #define VIDEO_ENCODER_TMPFILENAME_DEFAULT "TMP_RECORDING"
 #define VIDEO_ENCODER_SAMPLERATE_DEFAULT VIDEO_ENCODER_FPS_DEFAULT * 2
 #define VIDEO_ENCODER_VIDEOPTS_DEFAULT -1
-//#define INFRAMEWIDTH_DEFAULT 0
-//#define INFRAMEHEIGHT_DEFAULT 0
 
 // Private data class
 class gazebo::common::VideoEncoderPrivate
@@ -114,12 +112,6 @@ class gazebo::common::VideoEncoderPrivate
 
   /// \brief Video presentation time stamp.
   public: int videoPts = VIDEO_ENCODER_VIDEOPTS_DEFAULT;
-
-  /// \brief Input frame width
-  // public: unsigned int inFrameWidth = INFRAMEWIDTH_DEFAULT;
-
-  /// \brief Input frame height
-  // public: unsigned int inFrameHeight = INFRAMEHEIGHT_DEFAULT;
 
   public: unsigned int frameCount = 0;
 };
@@ -358,22 +350,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   this->dataPtr->videoPts = pts;
   std::cout << "PTS[" << this->dataPtr->videoPts << "]\n";
 
-  // recreate the sws context on image resize
-  /*if (this->dataPtr->swsCtx)
-  {
-    if (this->dataPtr->inFrameWidth != this->dataPtr->width ||
-        this->dataPtr->inFrameHeight != this->dataPtr->height)
-    {
-      sws_freeContext(this->dataPtr->swsCtx);
-      this->dataPtr->swsCtx = nullptr;
-      if (this->dataPtr->avInPicture)
-      {
-        av_free(this->dataPtr->avInPicture);
-        this->dataPtr->avInPicture = nullptr;
-      }
-    }
-  }*/
-
   if (!this->dataPtr->swsCtx)
   {
     if (!this->dataPtr->avInPicture)
@@ -383,8 +359,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
           PIX_FMT_RGB24, this->dataPtr->width, this->dataPtr->height);
     }
 
-    //this->dataPtr->inFrameWidth = this->dataPtr->width;
-    //this->dataPtr->inFrameHeight = this->dataPtr->height;
     this->dataPtr->swsCtx = sws_getContext(
         this->dataPtr->width,
         this->dataPtr->height,
@@ -485,22 +459,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   this->dataPtr->videoPts = pts;
   std::cout << "PTS[" << this->dataPtr->videoPts << "]\n";
 
-  // recreate the sws context on image resize
-  /*if (this->dataPtr->swsCtx)
-  {
-    if (this->dataPtr->inFrameWidth != this->dataPtr->width ||
-        this->dataPtr->inFrameHeight != this->dataPtr->height)
-    {
-      sws_freeContext(this->dataPtr->swsCtx);
-      this->dataPtr->swsCtx = nullptr;
-      if (this->dataPtr->avInPicture)
-      {
-        av_free(this->dataPtr->avInPicture);
-        this->dataPtr->avInPicture = nullptr;
-      }
-    }
-  }*/
-
   if (!this->dataPtr->swsCtx)
   {
     if (!this->dataPtr->avInPicture)
@@ -510,8 +468,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
           PIX_FMT_RGB24, this->dataPtr->width, this->dataPtr->height);
     }
 
-    //this->dataPtr->inFrameWidth = this->dataPtr->width;
-    //this->dataPtr->inFrameHeight = this->dataPtr->height;
     this->dataPtr->swsCtx = sws_getContext(this->dataPtr->width,
         this->dataPtr->height, PIX_FMT_RGB24,
         this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height,
@@ -685,8 +641,6 @@ void VideoEncoder::Reset()
   this->dataPtr->sampleRate = VIDEO_ENCODER_SAMPLERATE_DEFAULT;
   this->dataPtr->totalTime = std::chrono::duration<double>(0);
   this->dataPtr->videoPts = VIDEO_ENCODER_VIDEOPTS_DEFAULT;
-  //this->dataPtr->inFrameWidth = INFRAMEWIDTH_DEFAULT;
-  //this->dataPtr->inFrameHeight = INFRAMEHEIGHT_DEFAULT;
 
   this->dataPtr->pictureBuf = nullptr;
 
