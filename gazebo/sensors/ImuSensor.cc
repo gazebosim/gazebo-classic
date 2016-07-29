@@ -251,7 +251,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       this->SetWorldToReferenceOrientation(
         sc->GetWorldToLocalFrame(common::SphericalCoordinates::NWU));
     }
-    else if (rfoLocalizationStrategy == "GRAV3")
+    else if (rfoLocalizationStrategy == "GRAV")
     {
       // if using gravity, get x direction specification
       sdf::ElementPtr imuDirXElem = rfoElem->GetElement("imuDirX");
@@ -261,6 +261,19 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         imuDirXElem->Get<ignition::math::Vector3d>();
 
       // find gravity direction.
+      ignition::math::Vector3d gDir = this->dataPtr->gravity.Normalize();
+      // gDir cannot have zero length
+      if (math::equal(gDir.Length(), 0.0))
+      {
+      }
+      // imuDirX cannot be parallel to gDir
+      if (math::equal(imuDirX.Cross(gDir).Length(), 0.0))
+      {
+      }
+      // imuDirX cannot have zero length
+      if (math::equal(imuDirX.Length(), 0.0))
+      {
+      }
       // do x-axis projection.
       // find y-axis using cross product.
       // define frame using basis axis.
