@@ -73,7 +73,7 @@ class gazebo::common::VideoEncoderPrivate
   /// \brief Size of the picture buffer
   public: unsigned char *pictureBuf = nullptr;
 
-  /// \brief Handl to the output video file.
+  /// \brief Handle to the output video file.
   public: FILE *fileHandle = nullptr;
 
   /// \brief True if the encoder is initialized
@@ -614,13 +614,11 @@ void VideoEncoder::Reset()
   if (good)
   {
     if (remove(tmpFileNameFull.c_str()) != 0)
-      perror("Error deleting file");
-    else
-      std::cout << "Deleted file\n";
+      gzerr << "Unable to remove file[" << tmpFileNameFull << "].\n";
   }
   else
   {
-    std::cout << "Not good[" << tmpFileNameFull  << "]\n";
+    gzerr << "Unable to find file[" << tmpFileNameFull << "] to remove.\n";
   }
 
   if (this->dataPtr->pictureBuf)
