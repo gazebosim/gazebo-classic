@@ -9,6 +9,8 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
+option(BUILD_OSX_BUNDLE "Build MacOSX bundle" ON)
+
 set (GAZEBO_MAJOR_VERSION 8)
 set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
@@ -26,6 +28,7 @@ set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake 
 ########################################
 # Package Creation:
 include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
+set (CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
 set (CPACK_PACKAGE_VERSION "${GAZEBO_VERSION_FULL}")
 set (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
 set (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
@@ -122,6 +125,19 @@ endif()
 # Enable screen tests by default
 if(NOT DEFINED ENABLE_SCREEN_TESTS)
   set(ENABLE_SCREEN_TESTS TRUE)
+endif()
+
+# MACOSX Bundle
+if (BUILD_OSX_BUNDLE)
+  SET(BUNDLE_INSTALL_BINARY_DIR ${PROJECT_BINARY_DIR}/INTEGRATION_locale_fix.app/Contents/MacOS/)
+  SET(BUNDLE_DATA_DEST_DIR ${BUNDLE_INSTALL_BINARY_DIR}/../Resources)
+  SET(CMAKE_INSTALL_FULL_DATAROOTDIR ${BUNDLE_DATA_DEST_DIR})
+  SET(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  #SET(MACOSX_BUNDLE_ICON_FILE QtTest.icns)
+  # set where in the bundle to put the icns file
+  #SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/doc/qtest.icns
+  #                            PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")

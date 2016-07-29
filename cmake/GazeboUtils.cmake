@@ -102,14 +102,20 @@ endmacro ()
 
 #################################################
 macro (gz_add_executable _name)
-  add_executable(${_name} ${ARGN})
+  if (BUILD_OSX_BUNDLE)
+    set (EXEC_MODIFIER "MACOSX_BUNDLE")
+  endif()
+
+  add_executable(${_name} ${EXEC_MODIFIER} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
 
 #################################################
 macro (gz_install_includes _subdir)
-  install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
+  if (NOT BUILD_OSX_BUNDLE)
+    install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
+  endif()
 endmacro()
 
 #################################################
