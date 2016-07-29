@@ -178,8 +178,8 @@ void OSVRWindow::showEvent(QShowEvent *_event)
   this->setGeometry(this->xPos, this->yPos, 1920, 1080);
 
   // Make the window full screen
-  //this->isFullScreen = true;
-  //this->showFullScreen();
+  this->isFullScreen = true;
+  this->showFullScreen();
 }
 
 //////////////////////////////////////////////////

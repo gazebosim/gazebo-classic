@@ -218,7 +218,6 @@ void OSVRCamera::Update()
   OSVR_ReturnCode rc = osvrGetOrientationState(
                            this->dataPtr->osvrInterface.get(),
                            &timestamp, &orient);
-  /*
   if (rc == OSVR_RETURN_SUCCESS)
   {
     if (this->dataPtr->osvrTrackingWarned)
@@ -235,11 +234,10 @@ void OSVRCamera::Update()
   }
   else if (!this->dataPtr->osvrTrackingWarned)
   {
-    this->sceneNode->setOrientation(Ogre::Quaternion(1, 0, 0, 0));
+    //this->sceneNode->setOrientation(Ogre::Quaternion(1, 0, 0, 0));
     gzmsg << "OSVR: didn't get an orientation. doh.\n";
     this->dataPtr->osvrTrackingWarned = true;
   }
-  */
 
   this->sceneNode->needUpdate();
 }
