@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Use precision 2 for FPS display in TimePanel
+    * [Pull request 2405](https://bitbucket.org/osrf/gazebo/pull-request/2405)
+
 1. Switch ImuSensor::worldToReference transform from Pose to Quaternion
     * [Pull request 2410](https://bitbucket.org/osrf/gazebo/pull-request/2410)
     * [Issue 1959](https://bitbucket.org/osrf/gazebo/issues/1959)
