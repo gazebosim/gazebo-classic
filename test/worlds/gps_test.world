@@ -12,12 +12,19 @@
     <!- -->
 
     <spherical_coordinates>
+      <world_orientation>ENU</world_orientation>
       <surface_model>EARTH_WGS84</surface_model>
       <latitude_deg>37.4</latitude_deg>
       <longitude_deg>-122.1</longitude_deg>
       <elevation>0.0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
+
+   <!-- add GetWorldToENUTransform(),
+            GetWorldToNEDTransform(), etc.
+        e.g. imu defined in NED, then
+        world to imu frame transform is given by GetWorldToNEDTransform().
+    -->
 
     <model name="pendulum_x">
       <pose>0 0 5.0  0 0 0</pose>

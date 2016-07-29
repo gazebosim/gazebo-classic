@@ -102,6 +102,13 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceType() const
 }
 
 //////////////////////////////////////////////////
+SphericalCoordinates::LocalFrameType SphericalCoordinates::GetLocalFrameType()
+  const
+{
+  return this->dataPtr->localFrameType;
+}
+
+//////////////////////////////////////////////////
 ignition::math::Angle SphericalCoordinates::LatitudeReference() const
 {
   return this->dataPtr->latitudeReference;
@@ -158,6 +165,77 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
       }
     default:
       gzerr << "Unknown surface type[" << this->dataPtr->surfaceType << "]\n";
+      break;
+  }
+}
+
+//////////////////////////////////////////////////
+void SphericalCoordinates::SetLocalFrameType(const LocalFrameType &_type)
+{
+  this->dataPtr->localFrameType = _type;
+
+  // store internally transform from gazebo world frame to ENU, use that
+  // to return transform to other LocalFrameType when requested by user.
+  switch (this->dataPtr->localFrameType)
+  {
+    case ENU:
+      {
+      this->dataPtr->worldToENU = ignition::math::Quaterniond();
+      break;
+      }
+    case NED:
+      {
+      // world is in NED, transform from NED to ENU is:
+      this->dataPtr->worldToENU = ignition::math::Quaterniond(
+        ignition::math::Vector3d(-M_PI, 0, 0.5*M_PI));
+      break;
+      }
+    case NWU:
+      {
+      // world is in NWU, transform from NWU to ENU is:
+      this->dataPtr->worldToENU = ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 0, -0.5*M_PI));
+      break;
+      }
+    default:
+      gzerr << "Unknown local frame type[" << this->dataPtr->localFrameType
+            << "]\n";
+      break;
+  }
+}
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond SphericalCoordinates::GetWorldToLocalFrame(
+  const LocalFrameType &_type)
+{
+  // store internally transform from gazebo world frame to ENU, use that
+  // to return transform to other LocalFrameType when requested by user.
+  switch (_type)
+  {
+    case ENU:
+      {
+      // stored in ENU, just return it.
+      return this->dataPtr->worldToENU;
+      break;
+      }
+    case NED:
+      {
+      // stored in ENU, world to NED = ENU to NED + world to ENU;
+      return ignition::math::Quaterniond(
+        ignition::math::Vector3d(M_PI, 0, .5*M_PI)) * this->dataPtr->worldToENU;
+      break;
+      }
+    case NWU:
+      {
+      // stored in ENU, world to NWU = ENU to NWU + world to ENU;
+      return ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 0, 0.5*M_PI)) * this->dataPtr->worldToENU;
+      break;
+      }
+    default:
+      gzerr << "Unknown local frame type[" << this->dataPtr->localFrameType
+            << "]\n";
+      return ignition::math::Quaterniond();
       break;
   }
 }

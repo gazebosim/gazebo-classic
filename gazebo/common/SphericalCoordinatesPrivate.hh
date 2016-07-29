@@ -42,6 +42,9 @@ namespace gazebo
       /// \brief Type of surface being used.
       public: SphericalCoordinates::SurfaceType surfaceType;
 
+      /// \brief Type of local world frame being used.
+      public: SphericalCoordinates::LocalFrameType localFrameType;
+
       /// \brief Latitude of reference point.
       public: ignition::math::Angle latitudeReference;
 
@@ -84,6 +87,9 @@ namespace gazebo
 
       /// \brief Cache sine head transform
       public: double sinHea;
+
+      /// \brief Cache transform from Gazebo World frame to ENU frame
+      public: ignition::math::Quaterniond worldToENU;
     };
     /// \}
   }

@@ -21,6 +21,7 @@
 
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Angle.hh"
@@ -60,11 +61,30 @@ namespace gazebo
                 /// \brief Earth centered, earth fixed Cartesian
                 ECEF = 2,
 
-                /// \brief Local tangent plane (East, North, Up)
+                /// \brief Local tangent plane as specified by
+                /// world_orientation keyword, before applying
+                /// heading_deg adjustment
                 GLOBAL = 3,
 
-                /// \brief Heading-adjusted tangent plane (X, Y, Z)
+                /// \brief Heading-adjusted (by heading_deg)
+                /// tangent plane (X, Y, Z), i.e. Gazebo world frame
                 LOCAL = 4
+              };
+
+      /// \enum LocalFrameType
+      /// \brief Unique identifiers for local frame types.
+      /// Mapping between compass directions, and up/down directionality
+      /// at earth surface.
+      public: enum LocalFrameType
+              {
+                /// \brief East(X), North(Y), Up(Z)
+                ENU = 1,
+
+                /// \brief North(X), East(Y), Down(Z)
+                NED = 2,
+
+                /// \brief North(X), West(Y), Up(Z)
+                NWU = 3
               };
 
       /// \brief Constructor.
@@ -188,6 +208,21 @@ namespace gazebo
       public: ignition::math::Vector3d
               PositionTransform(const ignition::math::Vector3d &_pos,
                   const CoordinateType &_in, const CoordinateType &_out) const;
+
+      /// \brief 
+      /// \param[in] _type
+      /// \return 
+      public: SphericalCoordinates::LocalFrameType GetLocalFrameType() const;
+
+      /// \brief 
+      /// \param[in] _type
+      public: void SetLocalFrameType(const LocalFrameType &_type);
+
+      /// \brief 
+      /// \param[in] _type
+      /// \return 
+      public: ignition::math::Quaterniond GetWorldToLocalFrame(
+        const LocalFrameType &_type);
 
       /// \brief Convert between velocity in SPHERICAL/ECEF/LOCAL/GLOBAL frame
       /// \param[in] _pos Velocity vector in frame defined by parameter _in

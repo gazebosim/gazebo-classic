@@ -189,20 +189,82 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     gzlog << out.str();
   }
 
+  // IMU localization strategy (issue #1959)
   if (imuElem->HasElement("reference_frame_orientation"))
   {
-    sdf::ElementPtr rpyElem = imuElem->GetElement("rpy");
+    sdf::ElementPtr rfoElem =
+      imuElem->GetElement("reference_frame_orientation");
+    std::string rfoLocalizationStrategy =
+      rfoElem->GetAttribute("imu_localization")->GetAsString();
+
+    gzdbg << "sensor [" << this->Name()
+          << "] localize using [" << rfoLocalizationStrategy
+          << "]\n";
+
+    // read transform
+    sdf::ElementPtr rpyElem = rfoElem->GetElement("rpy");
     std::string rpyFrameName =
       rpyElem->GetAttribute("parent_frame")->GetAsString();
     ignition::math::Vector3d rpy =
-      rpyElem->Get<ignition::math::Vector3d>("parent_frame");
+      rpyElem->Get<ignition::math::Vector3d>();
 
-    // if using gravity, get x direction specification
-    sdf::ElementPtr imuDirXElem = imuElem->GetElement("imuDirX");
-    std::string imuDirXFrameName =
-      imuDirXElem->GetAttribute("parent_frame")->GetAsString();
-    ignition::math::Vector3d imuDirX =
-      imuDirXElem->Get<ignition::math::Vector3d>("parent_frame");
+    common::SphericalCoordinatesPtr sc = this->world->GetSphericalCoordinates();
+    if (rfoLocalizationStrategy == "CUSTOM")
+    {
+      gzdbg << "IMU reports in frame [" << rpyFrameName
+            << "] with rpy [" << rpy << "].\n";
+      if (rpyFrameName == "")
+      {
+        // apply rpy in local frame
+        this->SetWorldToReferenceOrientation(
+          rpy * this->dataPtr->parentEntity->GetWorldPose().Ign().Rot());
+      }
+      else if (rpyFrameName == "world")
+      {
+        // apply rpy in world frame
+        this->SetWorldToReferenceOrientation(rpy);
+      }
+      else
+      {
+        // find frame
+        physics::EntityPtr parentFrame = this->world->GetEntity(rpyFrameName);
+        // apply rpy in parentFrame
+        this->SetWorldToReferenceOrientation(rpy);
+      }
+    }
+    else if (rfoLocalizationStrategy == "NED")
+    {
+      // get transform from world frame to NED frame
+      sc->GetWroldToLocalFrame(common::SphericalCoordinates::NED);
+    }
+    else if (rfoLocalizationStrategy == "ENU")
+    {
+      // get world orientation relative to ENU
+      sc->GetWroldToLocalFrame(common::SphericalCoordinates::ENU);
+    }
+    else if (rfoLocalizationStrategy == "NWU")
+    {
+      // get world orientation relative to NWU
+      sc->GetWroldToLocalFrame(common::SphericalCoordinates::NWU);
+    }
+    else if (rfoLocalizationStrategy == "GRAV3")
+    {
+      // if using gravity, get x direction specification
+      sdf::ElementPtr imuDirXElem = rfoElem->GetElement("imuDirX");
+      std::string imuDirXFrameName =
+        imuDirXElem->GetAttribute("parent_frame")->GetAsString();
+      ignition::math::Vector3d imuDirX =
+        imuDirXElem->Get<ignition::math::Vector3d>();
+
+      // find gravity direction.
+      // do x-axis projection.
+      // find y-axis using cross product.
+      // define frame using basis axis.
+    }
+    else
+    {
+      gzdbg << "defaults to IMU body local frame.\n";
+    }
   }
 
   // Start publishing measurements on the topic.

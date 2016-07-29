@@ -41,6 +41,14 @@
       <uri>model://ground_plane</uri>
     </include>
 
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>37.4</latitude_deg>
+      <longitude_deg>-122.1</longitude_deg>
+      <elevation>0.0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
     <model name="model_pendulum">
       <pose>0.0 0.0 10.2 1.57079633 0.0 0.0</pose>
       <link name="link_pendulum_rod">
@@ -531,13 +539,6 @@
           <always_on>1</always_on>
           <imu>
             <reference_frame_orientation imu_localization="NED"/>
-          </imu>
-        </sensor>
-        <sensor name="ball_floating_imu_sensor_sph" type="imu">
-          <pose>0.10 0 0 0 0 0</pose>
-          <always_on>1</always_on>
-          <imu>
-            <reference_frame_orientation imu_localization="SPH"/>
           </imu>
         </sensor>
         <sensor name="ball_floating_imu_sensor_gravity" type="imu">
