@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Include basic support for GNU Precompiled Headers to reduce compile time
+    * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
+
 1. Plotting utility
     * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
     * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
@@ -69,6 +72,9 @@
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
     * A contribution from Olivier Crave
+
+1. Add const accessors to uri path and query
+    * [Pull request #2400](https://bitbucket.org/osrf/gazebo/pull-request/2400)
 
 1. Server generates unique model names in case of overlap, and added allow_renaming field to factory message.
     * [Pull request 2301](https://bitbucket.org/osrf/gazebo/pull-request/2301)
