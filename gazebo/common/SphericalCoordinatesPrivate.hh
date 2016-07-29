@@ -54,8 +54,10 @@ namespace gazebo
       /// \brief Elevation of reference point relative to sea level in meters.
       public: double elevationReference;
 
-      /// \brief Heading offset, expressed as angle from East to
-      ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
+      /// \brief Heading offset, expressed as rotation needed to go from
+      /// local frame (e.g. ENU) to world frame. Positive in the sense
+      /// of yaw rotation in NED frame (e.g. shorter path when rotating
+      /// from North to East).
       public: ignition::math::Angle headingOffset;
 
       /// \brief Semi-major axis ellipse parameter

@@ -46,7 +46,7 @@
       <latitude_deg>37.4</latitude_deg>
       <longitude_deg>-122.1</longitude_deg>
       <elevation>0.0</elevation>
-      <heading_deg>0</heading_deg>
+      <heading_deg>90</heading_deg>
     </spherical_coordinates>
 
     <model name="model_pendulum">

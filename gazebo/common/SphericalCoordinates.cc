@@ -174,9 +174,9 @@ void SphericalCoordinates::SetLocalFrameType(const LocalFrameType &_type)
 {
   this->dataPtr->localFrameType = _type;
 
-  // rotation from world to LocalFrame due to heading
-  ignition::math::Quaterniond headingQ =
-    ignition::math::Quaterniond(0, 0, -this->dataPtr->headingOffset.Radian());
+  // rotation from world to ENU due to heading in ENU frame.
+  ignition::math::Quaterniond worldToENU =
+    ignition::math::Quaterniond(0, 0, this->dataPtr->headingOffset.Radian());
 
   // store internally transform from gazebo world frame to ENU, use that
   // to return transform to other LocalFrameType when requested by user.
@@ -184,21 +184,21 @@ void SphericalCoordinates::SetLocalFrameType(const LocalFrameType &_type)
   {
     case ENU:
       {
-      this->dataPtr->worldToENU = headingQ;
+      this->dataPtr->worldToENU = worldToENU;
       break;
       }
     case NED:
       {
       // world is in NED, transform from NED to ENU is:
       this->dataPtr->worldToENU = ignition::math::Quaterniond(
-        ignition::math::Vector3d(-M_PI, 0, 0.5*M_PI)) * headingQ;
+        ignition::math::Vector3d(-M_PI, 0, 0.5*M_PI)) * worldToENU;
       break;
       }
     case NWU:
       {
       // world is in NWU, transform from NWU to ENU is:
       this->dataPtr->worldToENU = ignition::math::Quaterniond(
-        ignition::math::Vector3d(0, 0, -0.5*M_PI)) * headingQ;
+        ignition::math::Vector3d(0, 0, -0.5*M_PI)) * worldToENU;
       break;
       }
     default:
