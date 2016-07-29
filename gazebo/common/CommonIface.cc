@@ -42,6 +42,16 @@ using namespace gazebo;
   const auto& gzstrtok = strtok_r;
 #endif
 
+#ifdef _WIN32
+# define GZ_PATH_MAX _MAX_PATH
+#elif defined(PATH_MAX)
+# define GZ_PATH_MAX PATH_MAX
+#elif defined(_XOPEN_PATH_MAX)
+# define GZ_PATH_MAX _XOPEN_PATH_MAX
+#else
+# define GZ_PATH_MAX _POSIX_PATH_MAX
+#endif
+
 /////////////////////////////////////////////////
 void common::load()
 {
@@ -140,4 +150,15 @@ std::vector<std::string> common::split(const std::string &_str,
 
   free(str);
   return tokens;
+}
+
+/////////////////////////////////////////////////
+std::string common::cwd()
+{
+  char buf[GZ_PATH_MAX + 1] = {'\0'};
+#ifdef _WIN32
+  return _getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
+#else
+  return getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
+#endif
 }

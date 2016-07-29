@@ -56,8 +56,6 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_dirLghtCreateAct;
 
     extern GZ_GUI_VISIBLE QAction *g_screenshotAct;
-    extern QAction *g_recordVideoAct;
-    extern QWidgetAction *g_recordVideoFormatAct;
 
     /// \brief Action to show/hide collision visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showCollisionsAct;

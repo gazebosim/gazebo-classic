@@ -148,3 +148,14 @@ void SaveDialog::showEvent(QShowEvent */*_event*/)
   this->dataPtr->nameLineEdit->selectAll();
 }
 
+/////////////////////////////////////////////////
+std::string SaveDialog::Message() const
+{
+  return this->dataPtr->messageLabel->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string SaveDialog::Title() const
+{
+  return this->windowTitle().toStdString();
+}

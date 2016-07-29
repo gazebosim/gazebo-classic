@@ -43,7 +43,6 @@ namespace gazebo
     class SpaceNav;
     class ToolsWidget;
     class UserCmdHistory;
-    class VideoRecorder;
 
     class MainWindowPrivate
     {
@@ -158,9 +157,6 @@ namespace gazebo
 
       /// \brief Class which manages user commands and undoing / redoing them.
       public: UserCmdHistory *userCmdHistory = nullptr;
-
-      /// \brief Video recording widget.
-      public: VideoRecorder *videoRecorder = nullptr;
     };
   }
 }

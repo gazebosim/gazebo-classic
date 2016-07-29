@@ -25,6 +25,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class VideoRecorder;
+
     /// \internal
     /// \brief Private data for the TopToolbar class
     class TopToolbarPrivate
@@ -34,6 +36,9 @@ namespace gazebo
 
       /// \brief Event based connections.
       public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Video recording widget.
+      public: VideoRecorder *videoRecorder = nullptr;
     };
   }
 }

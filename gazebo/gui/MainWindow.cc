@@ -43,7 +43,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 
-#include "gazebo/gui/VideoRecorder.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/CloneWindow.hh"
@@ -100,9 +99,6 @@ MainWindow::MainWindow()
   this->dataPtr->node->Init();
   gui::set_world(this->dataPtr->node->GetTopicNamespace());
 
-  this->dataPtr->videoRecorder = new VideoRecorder(this);
-  this->dataPtr->videoRecorder->CreateActions();
-
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
@@ -129,10 +125,6 @@ MainWindow::MainWindow()
   this->dataPtr->toolsWidget = new ToolsWidget();
 
   this->dataPtr->renderWidget = new gui::RenderWidget(mainWidget);
-
-  QObject::connect(this->dataPtr->videoRecorder,
-      SIGNAL(MessageChanged(std::string, int)),
-      this->dataPtr->renderWidget, SLOT(DisplayOverlayMsg(std::string, int)));
 
   this->CreateEditors();
 
@@ -1424,16 +1416,6 @@ void MainWindow::CreateActions()
   g_screenshotAct->setToolTip(tr("Take a screenshot"));
   this->connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
-
-  g_recordVideoAct = new QAction(QIcon(":/images/record.png"),
-      tr("Video"), this);
-  g_recordVideoAct->setStatusTip(tr("Record a video"));
-  g_recordVideoAct->setCheckable(true);
-  g_recordVideoAct->setChecked(false);
-
-  g_recordVideoFormatAct = new QWidgetAction(nullptr);
-  g_recordVideoFormatAct->setStatusTip(tr("Select video format"));
-  g_recordVideoFormatAct->setCheckable(false);
 
   g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
       tr("Copy"), this);

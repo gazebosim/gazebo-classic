@@ -20,6 +20,7 @@
 #include <string>
 #include <memory>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,9 +31,8 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class SaveVideoDialog SaveVideoDialog.hh
-    /// \brief Dialog for saving to file.
-    class SaveDialog : public QDialog
+    /// \brief Dialog for acquiring a save filename and path from a user.
+    class GZ_GUI_VISIBLE SaveDialog : public QDialog
     {
       Q_OBJECT
 
@@ -63,12 +63,22 @@ namespace gazebo
       /// \param[in] _msg Message to be displayed.
       public: void SetMessage(const std::string &_msg);
 
+      /// \brief Get the message that is displayed.
+      /// \return Message that is set using SetMessage
+      /// \sa SetMessage
+      public: std::string Message() const;
+
       /// \brief Set the tile of the dialog.
       /// \param[in] _title Title of dialog.
       public: void SetTitle(const std::string &_title);
 
+      /// \brief Get the title that is displayed.
+      /// \return Title that is set using SetTitle
+      /// \sa SetTitle
+      public: std::string Title() const;
+
       /// \brief Qt event emitted showing the dialog
-      protected: virtual void showEvent(QShowEvent *event);
+      private: virtual void showEvent(QShowEvent *event);
 
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();

@@ -80,8 +80,6 @@ QAction *gazebo::gui::g_dirLghtCreateAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_screenshotAct = 0;
-QAction *gazebo::gui::g_recordVideoAct = 0;
-QWidgetAction *gazebo::gui::g_recordVideoFormatAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showCollisionsAct = 0;

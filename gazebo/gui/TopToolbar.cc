@@ -24,6 +24,7 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/VideoRecorder.hh"
 #include "gazebo/gui/TopToolbarPrivate.hh"
 #include "gazebo/gui/TopToolbar.hh"
 
@@ -153,15 +154,63 @@ TopToolbar::TopToolbar(QWidget *_parent)
   QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
   spacerAction->setObjectName("toolbarSpacerAction");
 
-  // Screenshot / video / logging
+  // Screenshot / logging
   if (g_screenshotAct)
     this->dataPtr->toolbar->addAction(g_screenshotAct);
-  if (g_recordVideoAct)
-    this->dataPtr->toolbar->addAction(g_recordVideoAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
   if (g_plotAct)
     this->dataPtr->toolbar->addAction(g_plotAct);
+
+  // Record video
+  {
+    QWidgetAction *recordVideoAct = new QWidgetAction(this);
+    this->dataPtr->videoRecorder = new VideoRecorder(this);
+    recordVideoAct->setDefaultWidget(this->dataPtr->videoRecorder);
+
+    QToolButton *button = new QToolButton;
+    button->setObjectName("recordVideoButton");
+    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    button->setIcon(QIcon(":/images/video_camera_white.png"));
+    button->setToolTip(tr("Record a video"));
+
+    QMenu *menu = new QMenu(button);
+    menu->addAction(recordVideoAct);
+
+    button->setMenu(menu);
+    button->setPopupMode(QToolButton::InstantPopup);
+
+    this->dataPtr->toolbar->addWidget(button);
+
+    QGraphicsOpacityEffect *fade = new QGraphicsOpacityEffect(button);
+    button->setGraphicsEffect(fade);
+
+    QPropertyAnimation *animation = new QPropertyAnimation(fade, "opacity");
+    animation->setDuration(1000);
+    animation->setKeyValueAt(0, 0.1);
+    animation->setKeyValueAt(0.5, 1.0);
+    animation->setKeyValueAt(1.0, 0.1);
+    animation->setLoopCount(-1);
+
+    // Start the opacity animation when a recording begins
+    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStarted()),
+            animation, SLOT(start()));
+
+    // Stop the opacity animation when a recording ends
+    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStopped()),
+            animation, SLOT(stop()));
+
+    // Disable the fade effect on recording stop. This prevent the button
+    // from being partially faded when the animation stops.
+    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStopped()),
+            fade, SLOT(setEnabled(false)));
+
+    // Close the menu when a button is pressed.
+    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStarted()),
+            menu, SLOT(close()));
+    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStopped()),
+            menu, SLOT(close()));
+  }
 
   // Layout
   QHBoxLayout *toolLayout = new QHBoxLayout;

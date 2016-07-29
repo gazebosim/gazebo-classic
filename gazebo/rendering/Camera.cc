@@ -474,7 +474,7 @@ void Camera::RenderImpl()
 void Camera::ReadPixelBuffer()
 {
   if (this->newData && (this->captureData || this->captureDataOnce ||
-      this->dataPtr->encodeVideo))
+      this->dataPtr->videoEncoder.IsEncoding()))
   {
     size_t size;
     unsigned int width = this->ImageWidth();
@@ -563,7 +563,7 @@ void Camera::PostRender()
     this->lastRenderWallTime = common::Time::GetWallTime();
 
   if (this->newData && (this->captureData || this->captureDataOnce ||
-      this->dataPtr->encodeVideo))
+      this->dataPtr->videoEncoder.IsEncoding()))
   {
     unsigned int width = this->ImageWidth();
     unsigned int height = this->ImageHeight();
@@ -574,10 +574,9 @@ void Camera::PostRender()
       this->SaveFrame(this->FrameFilename());
       this->captureDataOnce = false;
     }
-    else if (this->dataPtr->encodeVideo)
+    else if (this->dataPtr->videoEncoder.IsEncoding())
     {
-        this->dataPtr->videoEncoder->AddFrame(
-            this->saveFrameBuffer, width, height);
+      this->dataPtr->videoEncoder.AddFrame(this->saveFrameBuffer);
     }
 
     if (this->sdf->HasElement("save") &&
@@ -1266,15 +1265,15 @@ bool Camera::SaveFrame(const std::string &_filename)
 //////////////////////////////////////////////////
 bool Camera::SaveVideo(const std::string &_filename)
 {
-  if (!this->dataPtr->videoEncoder ||
-      !this->dataPtr->videoEncoder->IsInitialized())
+  if (!this->dataPtr->videoEncoder.IsEncoding())
   {
-    gzwarn << "Video encoder not initialized\n";
+    gzwarn << "Video encoder is not started.\n";
     return false;
   }
 
-  this->dataPtr->videoEncoder->SaveToFile(_filename);
-  this->dataPtr->videoEncoder->Reset();
+  // This will stop video encoding, save the video file, and reset
+  // video encoding.
+  this->dataPtr->videoEncoder.SaveToFile(_filename);
   return true;
 }
 
@@ -1557,30 +1556,40 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
-void Camera::SetEncodeVideo(const bool _encode)
+bool Camera::StartVideo(const std::string &_format)
 {
-  if (this->dataPtr->encodeVideo == _encode)
-    return;
-
-  this->dataPtr->encodeVideo = _encode;
-
-  if (this->dataPtr->encodeVideo)
+  if (!this->dataPtr->videoEncoder.IsEncoding())
   {
-    if (!this->dataPtr->videoEncoder)
-    {
-      this->dataPtr->videoEncoder.reset(new common::VideoEncoder());
-    }
-
-    if (!this->dataPtr->videoEncodeFormat.empty())
-      this->dataPtr->videoEncoder->SetFormat(this->dataPtr->videoEncodeFormat);
-    this->dataPtr->videoEncoder->Init();
+    return this->dataPtr->videoEncoder.Start(
+        this->ImageWidth(), this->ImageHeight(), _format);
   }
+
+  return false;
 }
 
 //////////////////////////////////////////////////
-void Camera::SetEncodeVideoFormat(const std::string &_format)
+bool Camera::StopVideo()
 {
-  this->dataPtr->videoEncodeFormat = _format;
+  if (!this->dataPtr->videoEncoder.IsEncoding())
+  {
+    gzwarn << "Video encoder not started.\n";
+    return false;
+  }
+
+  return this->dataPtr->videoEncoder.Stop();
+}
+
+//////////////////////////////////////////////////
+bool Camera::ResetVideo()
+{
+  if (!this->dataPtr->videoEncoder.IsEncoding())
+  {
+    gzwarn << "Video encoder not started.\n";
+    return false;
+  }
+
+  this->dataPtr->videoEncoder.Reset();
+  return true;
 }
 
 //////////////////////////////////////////////////

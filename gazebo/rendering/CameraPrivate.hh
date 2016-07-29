@@ -119,7 +119,7 @@ namespace gazebo
       public: double trackMaxDistance;
 
       /// \brief Video encoder.
-      public: std::unique_ptr<common::VideoEncoder> videoEncoder;
+      public: common::VideoEncoder videoEncoder;
 
       /// \brief True to encode frames to video buffer.
       public: bool encodeVideo = false;

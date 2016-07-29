@@ -19,7 +19,14 @@
 
 #include <chrono>
 #include <string>
+#include "gazebo/common/Time.hh"
 #include <gazebo/util/system.hh>
+
+#define VIDEO_ENCODER_BITRATE_DEFAULT 2000000
+#define VIDEO_ENCODER_WIDTH_DEFAULT 1024
+#define VIDEO_ENCODER_HEIGHT_DEFAULT 768
+#define VIDEO_ENCODER_FPS_DEFAULT 25
+#define VIDEO_ENCODER_FORMAT_DEFAULT "ogv"
 
 namespace gazebo
 {
@@ -43,19 +50,22 @@ namespace gazebo
 
       /// \brief Initialize the encoder
       /// \return True on success
-      public: bool Init();
+      public: bool Start(
+                const unsigned int _width = VIDEO_ENCODER_WIDTH_DEFAULT,
+                const unsigned int _height = VIDEO_ENCODER_HEIGHT_DEFAULT,
+                const std::string &_format = VIDEO_ENCODER_FORMAT_DEFAULT,
+                const unsigned int _fps = VIDEO_ENCODER_FPS_DEFAULT,
+                const unsigned int _bitRate = VIDEO_ENCODER_BITRATE_DEFAULT);
+
+      /// \brief Stop encoding. This will also automatically be called
+      /// by SaveToFile
+      public: bool Stop();
 
       /// \brief True if the enoder is initialized, false otherwise
       /// \return True if initialized.
-      public: bool IsInitialized();
+      public: bool IsEncoding();
 
-      /// \brief Add a single frame to be encoded
-      /// \param[in] _frame Image buffer to be encoded
-      /// \param[in] _width Input frame width
-      /// \param[in] _height Input frame height
-      /// \return True on success.
-      public: bool AddFrame(const unsigned char *_frame,
-                  const unsigned int _width, const unsigned int _height);
+      public: bool AddFrame(const unsigned char *_frame);
 
       /// \brief Add a single timestamped frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
@@ -64,40 +74,23 @@ namespace gazebo
       /// \param[in] _timestamp Timestamp of the image frame
       /// \return True on success.
       public: bool AddFrame(const unsigned char *_frame,
-                  const unsigned int _width, const unsigned int _height,
-                  const std::chrono::system_clock::time_point &_timestamp);
+                  //const std::chrono::system_clock::time_point &_timestamp);
+                  const std::chrono::steady_clock::time_point &_timestamp);
+
+      public: bool AddFrame(const unsigned char *_frame,
+                  const common::Time &_timestamp);
 
       /// \brief Write data buffer to to disk
       /// param[in] _filename File in which to save the encoded data
       /// \return True on success.
       public: bool SaveToFile(const std::string &_filename);
 
-      /// \brief Set the video encoding bit rate
-      /// \param[in] _bitrate Video encoding bit rate
-      public: void SetBitRate(const unsigned int _bitRate);
-
-      /// \brief Set the output frame width
-      /// \param[in] _width Frame width in pixels
-      public: void SetFrameWidth(const unsigned int _width);
-
-      /// \brief Set the output frame height
-      /// \param[in] _height Frame height in pixels
-      public: void SetFrameHeight(const unsigned int _height);
-
-      /// \brief Set the encoding format, such as "ogv" or "mp4".
-      /// \param[in] _height Frame height
-      public: void SetFormat(const std::string &_format);
-
       /// \brief Get the encoding format
       /// \return Encoding format
       public: std::string Format() const;
 
-      /// \brief Finalize encoding. This will automatically be called
-      /// by SaveToFile
-      public: void End();
-
       /// \brief Reset to default video properties and clean up allocated
-      /// memories.
+      /// memories. This will also delete any temporary files.
       public: void Reset();
 
       /// \internal

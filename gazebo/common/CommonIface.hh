@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COMMONIFACE_HH_
-#define _COMMONIFACE_HH_
+#ifndef GAZEBO_COMMON_COMMONIFACE_HH_
+#define GAZEBO_COMMON_COMMONIFACE_HH_
 
 #include <string>
 #include <vector>
@@ -94,6 +93,11 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     std::string unique_file_path(const std::string &_pathAndName,
                                  const std::string &_extension);
+
+    /// \brief Get the current working directory
+    /// \return Name of the current directory
+    GZ_COMMON_VISIBLE
+    std::string cwd();
     /// \}
   }
 

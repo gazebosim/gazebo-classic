@@ -17,17 +17,20 @@
 #ifndef GAZEBO_GUI_VIDEORECORDER_HH_
 #define GAZEBO_GUI_VIDEORECORDER_HH_
 
-#include <string>
+#include <memory>
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class RenderWidget;
+    // Forward declare private data class.
+    class VideoRecorderPrivate;
 
-    class VideoRecorder : public QWidget
+    /// \brief Helper class for recording the user camera to a video
+    /// file.
+    class GZ_GUI_VISIBLE VideoRecorder : public QWidget
     {
       Q_OBJECT
 
@@ -38,29 +41,22 @@ namespace gazebo
       /// \brief Destructor
       public: ~VideoRecorder();
 
-      /// \brief Create Qt actions
-      public: void CreateActions();
+      /// \brief Signal emitted when a recording is started.
+      Q_SIGNALS: void recordingStarted();
 
-      /// \brief Qt signal emitted when a message needs to be displayed.
-      /// \param[in] _msg Message to be displayed
-      /// \param[in] _duration Duration to display the message for.
-      Q_SIGNALS: void MessageChanged(std::string _msg, int _duration);
+      /// \brief Signal emitted when a recording is stopped.
+      Q_SIGNALS: void recordingStopped();
+
+      /// \brief Qt callback when the record stop button is pressed.
+      private slots: void OnRecordStop();
 
       /// \brief Qt callback when the record video action is triggered.
-      private slots: void RecordVideo();
+      /// \param[in] _format Format to record (mp4, ogv, avi).
+      private slots: void OnRecordStart(const QString &_format);
 
-      /// \brief Qt callback when a video format menu action is triggered.
-      private slots: void SetRecordVideoFormat(QAction *_action);
-
-      /// \brief Qt callback when the record video format button is clicked.
-      private slots: void ShowVideoFormatMenu();
-
-      /// \brief Qt callback connected to a QTimer for displaying a blinking
-      /// recording text to the screen.
-      private slots: void DisplayRecordingMsg();
-
-      /// \brief Timer for displaying the video recording message.
-      private: QTimer *recordVideoTimer;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<VideoRecorderPrivate> dataPtr;
     };
   }
 }

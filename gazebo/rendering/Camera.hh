@@ -478,11 +478,6 @@ namespace gazebo
       /// \return True if saving was successful
       public: bool SaveFrame(const std::string &_filename);
 
-      /// \brief Save the last encoded video to disk
-      /// \param[in] _filename File in which to save the encoded video
-      /// \return True if saving was successful
-      public: bool SaveVideo(const std::string &_filename);
-
       /// \brief Get a pointer to the ogre camera
       /// \return Pointer to the OGRE camera
       /// \deprecated See OgreCamera()
@@ -662,13 +657,27 @@ namespace gazebo
       /// \brief Capture data once and save to disk
       public: void SetCaptureDataOnce();
 
-      /// \brief Set whether to encode frames to video buffer
-      /// \param[in] _value Set to true to encode to video buffer.
-      public: void SetEncodeVideo(bool _value);
+      /// \brief Turn on video recording.
+      /// \param[in] _format Video format.
+      /// \return True on success.
+      public: bool StartVideo(const std::string &_format);
 
-      /// \brief Set the video format to encode in
-      /// \param[in] _format Video format
-      public: void SetEncodeVideoFormat(const std::string &_format);
+      /// \brief Turn off video recording
+      /// \return True on success. The return value is set by
+      /// common::VideoEncoder::Stop().
+      public: bool StopVideo();
+
+      /// \brief Save the last encoded video to disk
+      /// \param[in] _filename File in which to save the encoded video
+      /// \return True if saving was successful
+      public: bool SaveVideo(const std::string &_filename);
+
+      /// \brief Reset video recording. This will call
+      /// common::VideoEncoder::Reset, which will cleanup temprary files and
+      /// set video encoding values to their default settings.
+      /// \sa common::VideoEncoder::Reset
+      /// \return True if reset was succesful.
+      public: bool ResetVideo();
 
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
@@ -1121,9 +1130,6 @@ namespace gazebo
 
       /// \brief True to capture a frame once and save to disk.
       protected: bool captureDataOnce;
-
-      /// \brief True to encode frames to video buffer.
-      protected: bool encodeVideo;
 
       /// \brief True if new data is available.
       protected: bool newData;

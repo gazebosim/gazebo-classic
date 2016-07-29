@@ -18,7 +18,8 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
-set (internal_qt_headers)
+set (internal_qt_headers
+  VideoRecorder.hh)
 
 set (sources
   Actions.cc
@@ -97,7 +98,6 @@ set (qt_headers
   TopicSelector.hh
   TopToolbar.hh
   UserCmdHistory.hh
-  VideoRecorder.hh
   ViewAngleWidget.hh
 )
 
@@ -142,6 +142,7 @@ set (qt_tests
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
+  SaveDialog_TEST.cc
   SaveEntityDialog_TEST.cc
   SplashScreen_TEST.cc
   TimePanel_TEST.cc
