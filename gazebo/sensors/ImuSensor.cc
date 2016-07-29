@@ -205,8 +205,9 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     sdf::ElementPtr rpyElem = rfoElem->GetElement("rpy");
     std::string rpyFrameName =
       rpyElem->GetAttribute("parent_frame")->GetAsString();
-    ignition::math::Vector3d rpy =
-      rpyElem->Get<ignition::math::Vector3d>();
+    ignition::math::Quaterniond rpy =
+      ignition::math::Quaterniond(
+      rpyElem->Get<ignition::math::Vector3d>());
 
     common::SphericalCoordinatesPtr sc = this->world->GetSphericalCoordinates();
     if (rfoLocalizationStrategy == "CUSTOM")
@@ -235,17 +236,20 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     else if (rfoLocalizationStrategy == "NED")
     {
       // get transform from world frame to NED frame
-      sc->GetWroldToLocalFrame(common::SphericalCoordinates::NED);
+      this->SetWorldToReferenceOrientation(
+        sc->GetWorldToLocalFrame(common::SphericalCoordinates::NED));
     }
     else if (rfoLocalizationStrategy == "ENU")
     {
       // get world orientation relative to ENU
-      sc->GetWroldToLocalFrame(common::SphericalCoordinates::ENU);
+      this->SetWorldToReferenceOrientation(
+        sc->GetWorldToLocalFrame(common::SphericalCoordinates::ENU));
     }
     else if (rfoLocalizationStrategy == "NWU")
     {
       // get world orientation relative to NWU
-      sc->GetWroldToLocalFrame(common::SphericalCoordinates::NWU);
+      this->SetWorldToReferenceOrientation(
+        sc->GetWorldToLocalFrame(common::SphericalCoordinates::NWU));
     }
     else if (rfoLocalizationStrategy == "GRAV3")
     {
