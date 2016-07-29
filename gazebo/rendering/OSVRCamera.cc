@@ -184,7 +184,6 @@ void OSVRCamera::Init()
 //////////////////////////////////////////////////
 void OSVRCamera::RenderImpl()
 {
-  printf("Render\n");
 #if 0
   ovrHmd_BeginFrameTiming(this->dataPtr->hmd, this->dataPtr->frameIndex);
 #endif
@@ -676,6 +675,9 @@ void OSVRCamera::CreateDistortion()
 #endif
     Ogre::ManualObject *externalObj;
 
+    const float x = 1.0f;
+    const float y = 1.0f;
+
     // create ManualObject
     if (eyeIndex == 0)
     {
@@ -684,6 +686,28 @@ void OSVRCamera::CreateDistortion()
             "OSVRRenderObjectLeft");
       externalObj->begin("OSVR/LeftEye",
           Ogre::RenderOperation::OT_TRIANGLE_LIST);
+
+      externalObj->colour(1, 1, 1);
+
+      externalObj->position(0, -y, 0);
+      externalObj->textureCoord(0, 0);
+
+      externalObj->position(-x,  y, 0);
+      externalObj->textureCoord(1, 1);
+
+      externalObj->position(0,  y, 0);
+      externalObj->textureCoord(0, 1);
+
+      externalObj->position(-x, -y, 0);
+      externalObj->textureCoord(1, 0);
+
+      externalObj->index(2);
+      externalObj->index(1);
+      externalObj->index(0);
+
+      externalObj->index(1);
+      externalObj->index(3);
+      externalObj->index(0);
     }
     else
     {
@@ -692,31 +716,30 @@ void OSVRCamera::CreateDistortion()
             "OSVRRenderObjectRight");
       externalObj->begin("OSVR/RightEye",
           Ogre::RenderOperation::OT_TRIANGLE_LIST);
+
+      externalObj->colour(1, 1, 1);
+
+      externalObj->position(0, -y, 0);
+      externalObj->textureCoord(0, 0);
+
+      externalObj->position(x,  y, 0);
+      externalObj->textureCoord(1, 1);
+
+      externalObj->position(0,  y, 0);
+      externalObj->textureCoord(0, 1);
+
+      externalObj->position(x, -y, 0);
+      externalObj->textureCoord(1, 0);
+
+      externalObj->index(0);
+      externalObj->index(1);
+      externalObj->index(2);
+
+      externalObj->index(0);
+      externalObj->index(3);
+      externalObj->index(1);
     }
 
-    const float x = 10.0f;
-    const float y = 10.0f;
-    externalObj->position(0, 0, 0);
-    externalObj->textureCoord(0, 0);
-    externalObj->textureCoord(0, 0);
-    externalObj->textureCoord(0, 0);
-    externalObj->colour(1, 0, 1);
-
-    externalObj->position(x, 0, 0);
-    externalObj->textureCoord(1, 0);
-    externalObj->textureCoord(1, 0);
-    externalObj->textureCoord(1, 0);
-    externalObj->colour(1, 0, 1);
-
-    externalObj->position(x, y, 0);
-    externalObj->textureCoord(1, 1);
-    externalObj->textureCoord(1, 1);
-    externalObj->textureCoord(1, 1);
-    externalObj->colour(1, 0, 1);
-
-    externalObj->index(0);
-    externalObj->index(1);
-    externalObj->index(2);
     /*
     for (unsigned int i = 0; i < meshData.VertexCount; ++i)
     {
@@ -766,7 +789,7 @@ void OSVRCamera::CreateDistortion()
   this->dataPtr->externalViewport = this->renderTarget->addViewport(
       this->dataPtr->externalCamera);
   this->dataPtr->externalViewport->setBackgroundColour(
-      Ogre::ColourValue::White);
+      Ogre::ColourValue::Black);
   this->dataPtr->externalViewport->setOverlaysEnabled(true);
 
   // Set up IPD in meters:
