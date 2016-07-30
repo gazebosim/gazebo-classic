@@ -228,9 +228,9 @@ void OSVRCamera::Update()
 
     this->sceneNode->setOrientation(Ogre::Quaternion(
         osvrQuatGetW(&orient),
-        osvrQuatGetX(&orient),
-        osvrQuatGetY(&orient),
-        osvrQuatGetZ(&orient)));  // may need to swap/invert some axes (?)
+        -osvrQuatGetZ(&orient),
+        -osvrQuatGetX(&orient),
+        osvrQuatGetY(&orient)));  // may need to swap/invert some axes (?)
   }
   else if (!this->dataPtr->osvrTrackingWarned)
   {
@@ -673,8 +673,10 @@ void OSVRCamera::CreateDistortion()
 #endif
     Ogre::ManualObject *externalObj;
 
-    const float x = 1.0f;
-    const float y = 1.0f;
+    //const float x = 1.0f;
+    //const float y = 1.0f;
+    const float margin = 0.1f;
+    const float inner_margin = margin, outer_margin = 1.0f - margin;
 
     // create ManualObject
     if (eyeIndex == 0)
@@ -687,17 +689,17 @@ void OSVRCamera::CreateDistortion()
 
       externalObj->colour(1, 1, 1);
 
-      externalObj->position(0, -y, 0);
-      externalObj->textureCoord(0, 0);
-
-      externalObj->position(-x,  y, 0);
+      externalObj->position(-inner_margin, -outer_margin, 0);
       externalObj->textureCoord(1, 1);
 
-      externalObj->position(0,  y, 0);
-      externalObj->textureCoord(0, 1);
+      externalObj->position(-outer_margin,  outer_margin, 0);
+      externalObj->textureCoord(0, 0);
 
-      externalObj->position(-x, -y, 0);
+      externalObj->position(-inner_margin,  outer_margin, 0);
       externalObj->textureCoord(1, 0);
+
+      externalObj->position(-outer_margin, -outer_margin, 0);
+      externalObj->textureCoord(0, 1);
 
       externalObj->index(2);
       externalObj->index(1);
@@ -717,17 +719,17 @@ void OSVRCamera::CreateDistortion()
 
       externalObj->colour(1, 1, 1);
 
-      externalObj->position(0, -y, 0);
-      externalObj->textureCoord(0, 0);
-
-      externalObj->position(x,  y, 0);
-      externalObj->textureCoord(1, 1);
-
-      externalObj->position(0,  y, 0);
+      externalObj->position(inner_margin, -outer_margin, 0);
       externalObj->textureCoord(0, 1);
 
-      externalObj->position(x, -y, 0);
+      externalObj->position(outer_margin,  outer_margin, 0);
       externalObj->textureCoord(1, 0);
+
+      externalObj->position(inner_margin,  outer_margin, 0);
+      externalObj->textureCoord(0, 0);
+
+      externalObj->position(outer_margin, -outer_margin, 0);
+      externalObj->textureCoord(1, 1);
 
       externalObj->index(0);
       externalObj->index(1);
