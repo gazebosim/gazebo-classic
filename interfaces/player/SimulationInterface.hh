@@ -26,6 +26,7 @@
 #include <string>
 
 #include "GazeboInterface.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"

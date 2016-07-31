@@ -57,6 +57,9 @@ event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 
 event::EventT<void (std::string, ignition::math::Pose3d)>
     model::Events::requestLinkMove;
+event::EventT<void (std::string,
+    std::map<std::string, ignition::math::Vector3d>)>
+    model::Events::requestLinkScale;
 
 // Joints
 event::EventT<void (std::string, std::string, std::string, std::string,
@@ -79,9 +82,10 @@ event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;
 event::EventT<void (std::string)> model::Events::modelPluginRemoved;
 
-event::EventT<void (std::string, std::string, std::string)>
+event::EventT<void (std::string, std::string, std::string, bool)>
     model::Events::requestModelPluginInsertion;
-event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;
+event::EventT<void (std::string, bool)>
+    model::Events::requestModelPluginRemoval;
 
 event::EventT<void (std::string)> model::Events::openModelPluginInspector;
 event::EventT<void (std::string)> model::Events::showModelPluginContextMenu;

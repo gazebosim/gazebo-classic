@@ -23,6 +23,7 @@
 #include "gazebo/common/MaterialDensity.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidgetPrivate.hh"
+#include "gazebo/gui/Conversions.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -90,12 +91,6 @@ void ConfigWidget::UpdateFromMsg(const google::protobuf::Message *_msg)
 }
 
 /////////////////////////////////////////////////
-google::protobuf::Message *ConfigWidget::GetMsg()
-{
-  return this->Msg();
-}
-
-/////////////////////////////////////////////////
 google::protobuf::Message *ConfigWidget::Msg()
 {
   this->UpdateMsg(this->dataPtr->configMsg);
@@ -109,13 +104,6 @@ std::string ConfigWidget::HumanReadableKey(const std::string &_key)
   humanKey[0] = std::toupper(humanKey[0]);
   std::replace(humanKey.begin(), humanKey.end(), '_', ' ');
   return humanKey;
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
-    const std::string &_jointType)
-{
-  return this->UnitFromKey(_key, _jointType);
 }
 
 /////////////////////////////////////////////////
@@ -194,13 +182,6 @@ std::string ConfigWidget::UnitFromKey(const std::string &_key,
 }
 
 /////////////////////////////////////////////////
-void ConfigWidget::GetRangeFromKey(const std::string &_key, double &_min,
-    double &_max)
-{
-  this->RangeFromKey(_key, _min, _max);
-}
-
-/////////////////////////////////////////////////
 void ConfigWidget::RangeFromKey(const std::string &_key, double &_min,
     double &_max) const
 {
@@ -227,12 +208,6 @@ void ConfigWidget::RangeFromKey(const std::string &_key, double &_min,
     _min = -1;
     _max = +1;
   }
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
-{
-  return this->WidgetVisible(_name);
 }
 
 /////////////////////////////////////////////////
@@ -273,12 +248,6 @@ void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
     }
     iter->second->setVisible(_visible);
   }
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
-{
-  return this->WidgetReadOnly(_name);
 }
 
 /////////////////////////////////////////////////
@@ -389,13 +358,6 @@ bool ConfigWidget::SetStringWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
-    const math::Vector3 &_value)
-{
-  return this->SetVector3dWidgetValue(_name, _value.Ign());
-}
-
-/////////////////////////////////////////////////
 bool ConfigWidget::SetVector3dWidgetValue(const std::string &_name,
     const ignition::math::Vector3d &_value)
 {
@@ -421,13 +383,6 @@ bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
-    const math::Pose &_value)
-{
-  return this->SetPoseWidgetValue(_name, _value.Ign());
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
     const ignition::math::Pose3d &_value)
 {
   auto iter = this->dataPtr->configWidgets.find(_name);
@@ -436,14 +391,6 @@ bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
     return this->UpdatePoseWidget(iter->second, _value);
 
   return false;
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
-    const std::string &_value, const math::Vector3 &_dimensions,
-    const std::string &_uri)
-{
-  return this->SetGeometryWidgetValue(_name, _value, _dimensions.Ign(), _uri);
 }
 
 /////////////////////////////////////////////////
@@ -484,12 +431,6 @@ bool ConfigWidget::SetEnumWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-int ConfigWidget::GetIntWidgetValue(const std::string &_name) const
-{
-  return this->IntWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 int ConfigWidget::IntWidgetValue(const std::string &_name) const
 {
   int value = 0;
@@ -499,12 +440,6 @@ int ConfigWidget::IntWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->IntWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-unsigned int ConfigWidget::GetUIntWidgetValue(const std::string &_name) const
-{
-  return this->UIntWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -520,12 +455,6 @@ unsigned int ConfigWidget::UIntWidgetValue(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-double ConfigWidget::GetDoubleWidgetValue(const std::string &_name) const
-{
-  return this->DoubleWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 double ConfigWidget::DoubleWidgetValue(const std::string &_name) const
 {
   double value = 0.0;
@@ -535,12 +464,6 @@ double ConfigWidget::DoubleWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->DoubleWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-bool ConfigWidget::GetBoolWidgetValue(const std::string &_name) const
-{
-  return this->BoolWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -556,12 +479,6 @@ bool ConfigWidget::BoolWidgetValue(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-std::string ConfigWidget::GetStringWidgetValue(const std::string &_name) const
-{
-  return this->StringWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 std::string ConfigWidget::StringWidgetValue(const std::string &_name) const
 {
   std::string value;
@@ -571,13 +488,6 @@ std::string ConfigWidget::StringWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->StringWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 ConfigWidget::GetVector3WidgetValue(const std::string &_name)
-    const
-{
-  return this->Vector3dWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -594,12 +504,6 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
 }
 
 /////////////////////////////////////////////////
-common::Color ConfigWidget::GetColorWidgetValue(const std::string &_name) const
-{
-  return this->ColorWidgetValue(_name);
-}
-
-/////////////////////////////////////////////////
 common::Color ConfigWidget::ColorWidgetValue(const std::string &_name) const
 {
   common::Color value;
@@ -609,12 +513,6 @@ common::Color ConfigWidget::ColorWidgetValue(const std::string &_name) const
   if (iter != this->dataPtr->configWidgets.end())
     value = this->ColorWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-math::Pose ConfigWidget::GetPoseWidgetValue(const std::string &_name) const
-{
-  return this->PoseWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -628,17 +526,6 @@ ignition::math::Pose3d ConfigWidget::PoseWidgetValue(const std::string &_name)
   if (iter != this->dataPtr->configWidgets.end())
     value = this->PoseWidgetValue(iter->second);
   return value;
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
-    math::Vector3 &_dimensions, std::string &_uri) const
-{
-  ignition::math::Vector3d dimensions;
-  std::string type = this->GeometryWidgetValue(_name, dimensions, _uri);
-  _dimensions = dimensions;
-
-  return type;
 }
 
 /////////////////////////////////////////////////
@@ -669,12 +556,6 @@ std::string ConfigWidget::GeometryWidgetValue(const std::string &_name,
   if (iter != this->dataPtr->configWidgets.end())
     type = this->GeometryWidgetValue(iter->second, _dimensions, _uri);
   return type;
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
-{
-  return this->EnumWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -737,7 +618,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
         case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           double value = ref->GetDouble(*_msg, field);
-          if (!math::equal(value, value))
+          if (!ignition::math::equal(value, value))
             value = 0;
           if (newWidget)
           {
@@ -760,7 +641,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
         case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           float value = ref->GetFloat(*_msg, field);
-          if (!math::equal(value, value))
+          if (!ignition::math::equal(value, value))
             value = 0;
           if (newWidget)
           {
@@ -1704,6 +1585,11 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   this->connect(colorASpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
+  auto customColorButton = new QPushButton(tr("..."), widget);
+  customColorButton->setMaximumWidth(30);
+  this->connect(customColorButton, SIGNAL(clicked()), this,
+      SLOT(OnCustomColorDialog()));
+
   // This is inside a group
   int level = _level + 1;
 
@@ -1719,6 +1605,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widgetLayout->addWidget(colorBSpinBox);
   widgetLayout->addWidget(colorALabel);
   widgetLayout->addWidget(colorASpinBox);
+  widgetLayout->addWidget(customColorButton);
 
   widgetLayout->setAlignment(colorRLabel, Qt::AlignRight);
   widgetLayout->setAlignment(colorGLabel, Qt::AlignRight);
@@ -1735,6 +1622,40 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widget->widgets.push_back(colorASpinBox);
 
   return widget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnCustomColorDialog()
+{
+  auto button = qobject_cast<QPushButton *>(QObject::sender());
+  if (!button)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(button->parent());
+  if (!widget)
+    return;
+
+  // Current color
+  auto color = Conversions::Convert(this->ColorWidgetValue(widget));
+
+  auto dialog = widget->findChild<QColorDialog *>();
+  if (!dialog)
+  {
+    // Opening for the first time
+    dialog = new QColorDialog(color, widget);
+    dialog->setOption(QColorDialog::ShowAlphaChannel);
+    dialog->setOption(QColorDialog::NoButtons);
+    this->connect(dialog, SIGNAL(currentColorChanged(const QColor)), this,
+        SLOT(OnColorValueChanged(const QColor)));
+  }
+  else
+  {
+    dialog->blockSignals(true);
+    dialog->setCurrentColor(color);
+    dialog->blockSignals(false);
+  }
+
+  dialog->open();
 }
 
 /////////////////////////////////////////////////
@@ -2412,13 +2333,14 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                       qobject_cast<QDoubleSpinBox *>(childWidget->widgets[k]);
                   rotValues.push_back(valueSpinBox->value());
                 }
-                math::Quaternion quat(rotValues[0], rotValues[1], rotValues[2]);
+                ignition::math::Quaterniond quat(rotValues[0], rotValues[1],
+                    rotValues[2]);
 
                 std::vector<double> quatValues;
-                quatValues.push_back(quat.x);
-                quatValues.push_back(quat.y);
-                quatValues.push_back(quat.z);
-                quatValues.push_back(quat.w);
+                quatValues.push_back(quat.X());
+                quatValues.push_back(quat.Y());
+                quatValues.push_back(quat.Z());
+                quatValues.push_back(quat.W());
                 const google::protobuf::Descriptor *quatValueDescriptor =
                     quatValueMsg->GetDescriptor();
                 for (unsigned int k = 0; k < quatValues.size(); ++k)
@@ -3188,6 +3110,25 @@ void ConfigWidget::OnVector3dPresetChanged(const int _index)
 
   // Signal
   emit Vector3dValueChanged(widget->scopedName.c_str(), vec);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnColorValueChanged(const QColor _value)
+{
+  auto dialog = qobject_cast<QColorDialog *>(QObject::sender());
+
+  if (!dialog)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(dialog->parent());
+
+  if (!widget)
+    return;
+
+  auto color = Conversions::Convert(_value);
+  this->UpdateColorWidget(widget, color);
+
+  emit ColorValueChanged(widget->scopedName.c_str(), color);
 }
 
 /////////////////////////////////////////////////
