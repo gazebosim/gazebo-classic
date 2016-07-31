@@ -137,10 +137,8 @@ set(headers
 gz_install_includes("" ${headers})
 
 if (BUILD_OSX_BUNDLE)
-  set (APPS gzserver
-            gzclient
-	    gazebo)
-  install (TARGETS APPS BUNDLE DESTINATION .)
+  set (APPS gzserver gazebo)
+  install (TARGETS ${APPS} BUNDLE DESTINATION .)
   INSTALL(CODE "
     # Needed for getting the right permissions when using brew
     set (BU_CHMOD_BUNDLE_ITEMS ON)
@@ -148,4 +146,3 @@ if (BUILD_OSX_BUNDLE)
       fixup_bundle(\"${APPS}\" \"\"  \"${CMAKE_BINARY_DIR}/src\")
   " COMPONENT Runtime)
 endif()
-
