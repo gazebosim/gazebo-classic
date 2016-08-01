@@ -197,18 +197,20 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
   ignition::math::Pose3d pivotRight = origRight;
   ignition::math::Pose3d grabRight = origRight;
 
-  pivotRight.Pos() += origRight.Rot() * ignition::math::Vector3d(-0.04, 0, 0);
-  grabRight.Pos() += origRight.Rot() * ignition::math::Vector3d(-0.12, 0, 0);
+  pivotRight.Pos() +=
+      origRight.Rot() * ignition::math::Vector3d(-0.04, 0, 0);
+  grabRight.Pos() +=
+      origRight.Rot() * ignition::math::Vector3d(-0.12, 0, 0);
 
   ignition::math::Pose3d origLeft(this->pos[0], this->quat[0]);
 
   ignition::math::Pose3d pivotLeft = origLeft;
   ignition::math::Pose3d grabLeft = origLeft;
 
-  pivotLeft.Pos() += origLeft.Rot().RotateVector(
-      ignition::math::Vector3d(-0.04, 0, 0));
-  grabLeft.Pos() += origLeft.Rot().RotateVector(
-      ignition::math::Vector3d(-0.12, 0, 0));
+  pivotLeft.Pos() +=
+      origLeft.Rot().RotateVector(ignition::math::Vector3d(-0.04, 0, 0));
+  grabLeft.Pos() +=
+      origLeft.Rot().RotateVector(ignition::math::Vector3d(-0.12, 0, 0));
 
   msgs::Hydra msg;
   msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
@@ -358,14 +360,14 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   // Put the raw position and orientation into Gazebo coordinate frame
   for (int i = 0; i < 2; ++i)
   {
-    this->pos[i].X() = -this->rawPos[3*i+1] * 0.001;
-    this->pos[i].Y() = -this->rawPos[3*i+0] * 0.001;
-    this->pos[i].Z() = -this->rawPos[3*i+2] * 0.001;
+    this->pos[i].X(-this->rawPos[3*i+1] * 0.001);
+    this->pos[i].Y(-this->rawPos[3*i+0] * 0.001);
+    this->pos[i].Z(-this->rawPos[3*i+2] * 0.001);
 
-    this->quat[i].W() = this->rawQuat[i*4+0] / 32768.0;
-    this->quat[i].X() = -this->rawQuat[i*4+2] / 32768.0;
-    this->quat[i].Y() = -this->rawQuat[i*4+1] / 32768.0;
-    this->quat[i].Z() = -this->rawQuat[i*4+3] / 32768.0;
+    this->quat[i].W(this->rawQuat[i*4+0] / 32768.0);
+    this->quat[i].X(-this->rawQuat[i*4+2] / 32768.0);
+    this->quat[i].Y(-this->rawQuat[i*4+1] / 32768.0);
+    this->quat[i].Z(-this->rawQuat[i*4+3] / 32768.0);
   }
 
   // Apply filters

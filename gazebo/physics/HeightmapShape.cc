@@ -20,6 +20,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <algorithm>
+#include <cmath>
+#include <string>
+#include <ignition/math/Helpers.hh>
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_GDAL
@@ -30,9 +34,6 @@
 # pragma GCC diagnostic pop
 #endif
 
-#include <algorithm>
-#include <cmath>
-#include <string>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Helpers.hh>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/MouseEvent.hh"
 
@@ -88,7 +89,7 @@ void OrbitViewController::Init()
   }
 
   // If the plane is too far away.
-  if (dist < 0 || dist > 20 || math::isnan(dist))
+  if (dist < 0 || dist > 20 || ignition::math::isnan(dist))
   {
     // First, see if the camera is looking at the origin.
     ignition::math::Vector3d dir = this->camera->Direction();

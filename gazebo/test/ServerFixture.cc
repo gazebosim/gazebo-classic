@@ -21,10 +21,10 @@
 #endif
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <ignition/math/Helpers.hh>
 #include <functional>
 
 #include "gazebo/gazebo.hh"
@@ -422,7 +422,7 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
     double diff = fabs(ignition::math::precision(_scanA[i], 10) -
-                ignition::math::precision(_scanB[i], 10));
+                       ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -453,7 +453,7 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
     else
     {
       diff = fabs(ignition::math::precision(_scanA[i], 10) -
-                ignition::math::precision(_scanB[i], 10));
+                  ignition::math::precision(_scanB[i], 10));
     }
 
     _diffSum += diff;

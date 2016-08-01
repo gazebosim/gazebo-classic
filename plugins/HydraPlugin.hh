@@ -19,6 +19,7 @@
 #define GAZEBO_RAZER_HYDRA_HH_
 
 #include <ignition/math/Filter.hh>
+#include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 #include <gazebo/common/Plugin.hh>
 
