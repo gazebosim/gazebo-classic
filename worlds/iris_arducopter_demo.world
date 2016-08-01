@@ -146,7 +146,7 @@ to fly iris with a ps2 joystick.
 
       <include>
         <uri>model://gimbal_small_2d</uri>
-        <pose>0 0 0.040 1.57 0 1.57</pose>
+        <pose>0 -0.01 0.070 1.57 0 1.57</pose>
       </include>
 
       <joint name="iris_gimbal_mount" type="revolute">
