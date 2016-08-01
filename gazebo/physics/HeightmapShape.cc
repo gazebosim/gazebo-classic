@@ -316,7 +316,7 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
-  int index =  y * this->vertSize + _x;
+  int index =  _y * this->vertSize + _x;
   if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
     return 0.0;
 
