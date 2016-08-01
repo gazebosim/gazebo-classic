@@ -19,6 +19,10 @@
 #include <gtest/gtest.h>
 #include "gazebo/math/Kmeans.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class KmeansTest : public ::testing::Test { };
