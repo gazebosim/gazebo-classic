@@ -36,7 +36,7 @@ TEST_F(IgnMsgSdfTest, PluginSdfToIgnMsg)
            <param2>true</param2>\
          </plugin>\
        </sdf>", sdf));
-  auto msg = util::PluginSdfToIgnMsg(sdf);
+  auto msg = util::Convert<ignition::msgs::Plugin>(sdf);
 
   EXPECT_TRUE(msg.has_name());
   EXPECT_EQ(msg.name(), "plugin_name");
@@ -58,7 +58,7 @@ TEST_F(IgnMsgSdfTest, PluginIgnMsgToSdf)
   msg.set_filename(filename);
   msg.set_innerxml(innerxml);
 
-  auto pluginSDF = util::PluginIgnMsgToSdf(msg);
+  auto pluginSDF = util::Convert(msg);
 
   EXPECT_TRUE(pluginSDF->HasAttribute("name"));
   EXPECT_EQ(pluginSDF->Get<std::string>("name"), name);
@@ -84,10 +84,10 @@ TEST_F(IgnMsgSdfTest, PluginToFromSDF)
   msg1.set_innerxml(innerxml);
 
   // To SDF
-  auto sdf1 = util::PluginIgnMsgToSdf(msg1);
+  auto sdf1 = util::Convert(msg1);
 
   // Back to Msg
-  auto msg2 = util::PluginSdfToIgnMsg(sdf1);
+  auto msg2 = util::Convert<ignition::msgs::Plugin>(sdf1);
   EXPECT_EQ(msg2.name(), name);
   EXPECT_EQ(msg2.filename(), filename);
   EXPECT_EQ(msg2.innerxml(), innerxml);
@@ -96,7 +96,7 @@ TEST_F(IgnMsgSdfTest, PluginToFromSDF)
   sdf::ElementPtr sdf2;
   sdf2.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", sdf2);
-  util::PluginIgnMsgToSdf(msg2, sdf2);
+  util::Convert(msg2, sdf2);
   EXPECT_TRUE(sdf2 != NULL);
   EXPECT_EQ(sdf2->Get<std::string>("name"), name);
   EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
