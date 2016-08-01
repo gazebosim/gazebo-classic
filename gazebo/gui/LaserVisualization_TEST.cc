@@ -128,7 +128,6 @@ void LaserVisualization_TEST::Hit()
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
-  std::cout << "Depth[" << depth << "]\n";
 
   for (unsigned int y = 0; y < height; ++y)
   {
@@ -137,9 +136,17 @@ void LaserVisualization_TEST::Hit()
       int r = data[y*(width*depth) + x];
       int g = data[y*(width*depth) + x+1];
       int b = data[y*(width*depth) + x+2];
+
+      // See issue #2027
+#ifndef __APPLE__
       QVERIFY(r > 118 && r < 126);
       QVERIFY(g > 118 && g < 126);
       QVERIFY(b == 255);
+#else
+      QVERIFY(r > 29 && r < 33);
+      QVERIFY(g > 29 && g < 33);
+      QVERIFY(b > 160 && b < 166);
+#endif
     }
   }
 
@@ -176,7 +183,6 @@ void LaserVisualization_TEST::Nohit()
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
-  std::cout << "Depth[" << depth << "]\n";
 
   for (unsigned int y = 0; y < height; ++y)
   {
@@ -185,9 +191,17 @@ void LaserVisualization_TEST::Nohit()
       int r = data[y*(width*depth) + x];
       int g = data[y*(width*depth) + x+1];
       int b = data[y*(width*depth) + x+2];
+
+      // See issue #2027
+#ifndef __APPLE__
       QVERIFY(r > 200 && r < 208);
       QVERIFY(g > 200 && g < 208);
       QVERIFY(b == 255);
+#else
+      QVERIFY(r > 49 && r < 53);
+      QVERIFY(g > 49 && g < 53);
+      QVERIFY(b > 100 && b < 104);
+#endif
     }
   }
 
@@ -224,7 +238,6 @@ void LaserVisualization_TEST::Deadzone()
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
-  std::cout << "Depth[" << depth << "]\n";
 
   for (unsigned int y = 0; y < height; ++y)
   {
@@ -233,9 +246,17 @@ void LaserVisualization_TEST::Deadzone()
       int r = data[y*(width*depth) + x];
       int g = data[y*(width*depth) + x+1];
       int b = data[y*(width*depth) + x+2];
+
+      // See issue #2027
+#ifndef __APPLE__
       QVERIFY(r > 124 && r < 132);
       QVERIFY(g > 124 && g < 132);
       QVERIFY(b > 124 && b < 132);
+#else
+      QVERIFY(r == 0);
+      QVERIFY(g == 0);
+      QVERIFY(b == 0);
+#endif
     }
   }
 
