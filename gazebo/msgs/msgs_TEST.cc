@@ -308,9 +308,7 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 
 TEST_F(MsgsTest, ConvertMathInertialToMsgs)
 {
-  const auto pose = ignition::math::Pose3d(
-    ignition::math::Vector3d(5, 6, 7),
-    ignition::math::Vector3d(0.4, 0.5, 0.6));
+  const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
   msgs::Inertial msg = msgs::Convert(
       ignition::math::Inertiald(
         ignition::math::MassMatrix3d(12.0,
@@ -330,9 +328,7 @@ TEST_F(MsgsTest, ConvertMathInertialToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsInertialToMath)
 {
-  const auto pose = ignition::math::Pose3d(
-    ignition::math::Vector3d(5, 6, 7),
-    ignition::math::Vector3d(0.4, 0.5, 0.6));
+  const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
   msgs::Inertial msg = msgs::Convert(
       ignition::math::Inertiald(
         ignition::math::MassMatrix3d(12.0,
@@ -532,9 +528,7 @@ TEST_F(MsgsTest, SetTime)
 
 TEST_F(MsgsTest, SetInertial)
 {
-  const auto pose = ignition::math::Pose3d(
-    ignition::math::Vector3d(5, 6, 7),
-    ignition::math::Vector3d(0.4, 0.5, 0.6));
+  const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
   msgs::Inertial msg;
   msgs::Set(&msg, ignition::math::Inertiald(
       ignition::math::MassMatrix3d(

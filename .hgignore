@@ -6,3 +6,5 @@ build_*
 Ogre.log
 .DS_Store
 *.swp
+*.gch
+*.pch
