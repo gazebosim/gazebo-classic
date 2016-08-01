@@ -446,7 +446,6 @@ void Camera::ReadPixelBuffer()
     // Get access to the buffer and make an image and write it to file
     size = Ogre::PixelUtil::getMemorySize(width, height, 1,
         static_cast<Ogre::PixelFormat>(this->imageFormat));
-    std::cout << "Image Format[" << this->imageFormat << "]\n";
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
