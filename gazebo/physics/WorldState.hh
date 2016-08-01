@@ -43,7 +43,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE WorldState : public State
     {
       /// \brief Default constructor
-      public: WorldState() = delete;
+      public: WorldState();
 
       /// \brief Constructor.
       ///
@@ -319,7 +319,7 @@ namespace gazebo
       private: std::vector<std::string> deletions;
 
       /// \brief Pointer to the world.
-      private: const World &world;
+      private: const World *world = nullptr;
     };
     /// \}
   }

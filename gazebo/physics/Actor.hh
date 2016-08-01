@@ -37,32 +37,8 @@ namespace gazebo
 
   namespace physics
   {
-    /// \brief Information about a trajectory for an Actor.
-    /// This doesn't contain the keyframes information, just duration.
-    class GZ_PHYSICS_VISIBLE TrajectoryInfo
-    {
-      /// \brief Constructor.
-      public: TrajectoryInfo();
-
-      /// \brief ID of the trajectory.
-      public: unsigned int id;
-
-      /// \brief Type of trajectory. If it matches the name of a skeleton
-      /// animation, they will be played together.
-      public: std::string type;
-
-      /// \brief Duration of this keyframe in seconds.
-      public: double duration;
-
-      /// \brief Start time of this keyframe within the trajectory, in seconds.
-      public: double startTime;
-
-      /// \brief End time of this keyframe within the trajectory, in seconds.
-      public: double endTime;
-
-      /// \brief True if the trajectory is translated.
-      public: bool translated;
-    };
+    // Forward declare private data.
+    class ActorPrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -72,10 +48,6 @@ namespace gazebo
     /// scriptable animation.
     class GZ_PHYSICS_VISIBLE Actor : public Model
     {
-      /// \brief Typedef the skeleton animation map, indexed by their names.
-      public: typedef std::map<std::string, common::SkeletonAnimation *>
-              SkeletonAnimation_M;
-
       /// \brief Constructor
       /// \param[in] _parent Parent object
       public: explicit Actor(BasePtr _parent);
@@ -110,10 +82,6 @@ namespace gazebo
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Get the SDF values for the actor.
-      /// \return Pointer to the SDF values.
-      public: virtual const sdf::ElementPtr GetSDF();
-
       /// \brief Set the current script time.
       /// \param[in] _time Time in seconds from the beginning of the current
       /// script loop.
@@ -129,7 +97,7 @@ namespace gazebo
       /// \brief Returns a dictionary of all the skeleton animations associated
       /// with the actor.
       /// \return A map of SkeletonAnimation, indexed by their name.
-      public: const SkeletonAnimation_M &SkeletonAnimations() const;
+      public: const common::SkeletonAnimation_M &SkeletonAnimations() const;
 
       /// \brief Set a custom trajectory for the actor, using one of the
       /// existing animations. This will override any trajectories previously
@@ -245,111 +213,16 @@ namespace gazebo
       /// \param[in] _skelMap Map of bone relationships.
       /// \param[in] _time Time over which to animate the set pose.
       private: void SetPose(
-                   std::map<std::string, ignition::math::Matrix4d> _frame,
-                   std::map<std::string, std::string> _skelMap,
+                   const std::map<std::string,
+                                  ignition::math::Matrix4d> &_frame,
+                   const std::map<std::string, std::string> &_skelMap,
                    const double _time);
 
-      /// \brief Pointer to the actor's mesh.
-      protected: const common::Mesh *mesh = nullptr;
-
-      /// \brief The actor's skeleton.
-      protected: common::Skeleton *skeleton = nullptr;
-
-      /// \brief Filename for the skin.
-      protected: std::string skinFile;
-
-      /// \brief Scaling factor to apply to the skin.
-      protected: double skinScale;
-
-      /// \brief Time to wait before starting the script. If running in a loop,
-      /// this time will be waited before starting each cycle.
-      protected: double startDelay;
-
-      /// \brief Total time length of the script, in seconds.
-      protected: double scriptLength;
-
-      /// \brief True if the animation should loop.
-      protected: bool loop;
-
-      /// \brief True if the actor is being updated.
-      protected: bool active;
-
-      /// \brief True if the actor should start running automatically,
-      /// otherwise it will only start once Play is called.
-      protected: bool autoStart;
-
-      /// \brief Pointer to the actor's canonical link.
-      protected: LinkPtr mainLink;
-
-      /// \brief Time of the previous frame.
-      protected: common::Time prevFrameTime;
-
-      /// \brief Time when the animation was started.
-      protected: common::Time playStartTime;
-
-      /// \brief Map of all the trajectories (pose animations) and their
-      /// indices. The indices here match the order in `trajInfo`.
-      /// \sa trajInfo
-      protected: std::map<unsigned int, common::PoseAnimation *> trajectories;
-
-      /// \brief A vector of trajectory information, which contains information
-      /// such as their durations, uniquely identifiable by their IDs. The IDs
-      /// here match those on the `trajectories` vector.
-      /// \sa trajectories
-      protected: std::vector<TrajectoryInfo> trajInfo;
-
-      /// \brief Map of skeleton animations, indexed by their names. The names
-      /// match those in `interpolateX` and `skelNodesMap`.
-      /// \sa interpolateX
-      /// \sa skelNodesMap
-      protected: SkeletonAnimation_M skelAnimation;
-
-      /// \brief Skeleton to node map:
-      /// * Skeleton animation name (should match those in `skelAnimation` and
-      /// `interpolateX`)
-      /// * Map holding:
-      ///     * Skeleton node names from skin
-      ///     * Skeleton node names from animation
-      /// \sa interpolateX
-      /// \sa skelAnimation
-      protected: std::map<std::string, std::map<std::string, std::string> >
-                                                            skelNodesMap;
-
-      /// \brief Map of animation types (the same name as in `skelAnimation` and
-      /// `skelNodesMap`) and whether they should be interpolated along X
-      // direction.
-      /// \sa skelAnimation
-      /// \sa skelNodesMap
-      protected: std::map<std::string, bool> interpolateX;
-
-      /// \brief Last position of the actor.
-      protected: ignition::math::Vector3d lastPos;
-
-      /// \brief Length of the actor's path.
-      protected: double pathLength;
-
-      /// \brief Id of the last trajectory
-      protected: unsigned int lastTraj;
-
-      /// \brief Name of the visual representing the skin.
-      protected: std::string visualName;
-
-      /// \brief ID for the visual representing the skin.
-      protected: uint32_t visualId;
-
-      /// \brief Publisher to send bone info.
-      protected: transport::PublisherPtr bonePosePub;
-
-      /// \brief Current time within the script, which is the current time minus
-      /// the time when the script started.
-      private: double scriptTime;
-
-      /// \brief Custom trajectory.
-      /// Used to control an actor with a plugin.
-      private: TrajectoryInfoPtr customTrajectoryInfo;
+      /// \internal
+      /// \brief Private data pointer
+      private: ActorPrivate *actorDPtr;
     };
     /// \}
   }
 }
 #endif
-

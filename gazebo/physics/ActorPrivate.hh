@@ -56,10 +56,10 @@ namespace gazebo
     class ActorPrivate : public ModelPrivate
     {
       /// \brief Pointer to the actor's mesh.
-      public: const common::Mesh *mesh;
+      public: const common::Mesh *mesh = nullptr;
 
       /// \brief The actor's skeleton.
-      public: common::Skeleton *skeleton;
+      public: common::Skeleton *skeleton = nullptr;
 
       /// \brief Filename for the skin.
       public: std::string skinFile;
@@ -67,10 +67,11 @@ namespace gazebo
       /// \brief Scaling factor to apply to the skin.
       public: double skinScale;
 
-      /// \brief Amount of time to delay start by.
+      /// \brief Time to wait before starting the script. If running in a loop,
+      /// this time will be waited before starting each cycle.
       public: double startDelay;
 
-      /// \brief Time length of a scipt.
+      /// \brief Total time length of the script, in seconds.
       public: double scriptLength;
 
       /// \brief True if the animation should loop.
@@ -79,10 +80,11 @@ namespace gazebo
       /// \brief True if the actor is being updated.
       public: bool active;
 
-      /// \brief True if the actor should start running automatically.
+      /// \brief True if the actor should start running automatically,
+      /// otherwise it will only start once Play is called.
       public: bool autoStart;
 
-      /// \brief Base link.
+      /// \brief Pointer to the actor's canonical link.
       public: LinkPtr mainLink;
 
       /// \brief Time of the previous frame.
@@ -91,42 +93,61 @@ namespace gazebo
       /// \brief Time when the animation was started.
       public: common::Time playStartTime;
 
-      /// \brief All the trajectories.
+      /// \brief Map of all the trajectories (pose animations) and their
+      /// indices. The indices here match the order in `trajInfo`.
+      /// \sa trajInfo
       public: std::map<unsigned int, common::PoseAnimation*> trajectories;
 
-      /// \brief Trajectory information
+      /// \brief A vector of trajectory information, which contains information
+      /// such as their durations, uniquely identifiable by their IDs. The IDs
+      /// here match those on the `trajectories` vector.
+      /// \sa trajectories
       public: std::vector<TrajectoryInfo> trajInfo;
 
-      /// \brief Skeleton animations
-      public: std::map<std::string, common::SkeletonAnimation*>
-                                                            skelAnimation;
+      /// \brief Map of skeleton animations, indexed by their names. The names
+      /// match those in `interpolateX` and `skelNodesMap`.
+      /// \sa interpolateX
+      /// \sa skelNodesMap
+      public: common::SkeletonAnimation_M skelAnimation;
 
-      /// \brief Skeleton to naode map
+      /// \brief Skeleton to node map:
+      /// * Skeleton animation name (should match those in `skelAnimation` and
+      /// `interpolateX`)
+      /// * Map holding:
+      ///     * Skeleton node names from skin
+      ///     * Skeleton node names from animation
+      /// \sa interpolateX
+      /// \sa skelAnimation
       public: std::map<std::string, std::map<std::string, std::string> >
                                                             skelNodesMap;
 
-      /// \brief True to interpolate along x direction.
+      /// \brief Map of animation types (the same name as in `skelAnimation` and
+      /// `skelNodesMap`) and whether they should be interpolated along X
+      // direction.
+      /// \sa skelAnimation
+      /// \sa skelNodesMap
       public: std::map<std::string, bool> interpolateX;
 
-      /// \brief Last position of the actor
+      /// \brief Last position of the actor.
       public: ignition::math::Vector3d lastPos;
 
       /// \brief Length of the actor's path.
       public: double pathLength;
 
-      /// \brief THe last trajectory
+      /// \brief Id of the last trajectory
       public: unsigned int lastTraj;
 
-      /// \brief Name of the visual
+      /// \brief Name of the visual representing the skin.
       public: std::string visualName;
 
-      /// \brief ID for this visual
+      /// \brief ID for the visual representing the skin.
       public: uint32_t visualId;
 
-      /// \brief Where to send bone info.
+      /// \brief Publisher to send bone info.
       public: transport::PublisherPtr bonePosePub;
 
-      /// \brief Current script time.
+      /// \brief Current time within the script, which is the current time minus
+      /// the time when the script started.
       public: double scriptTime;
 
       /// \brief Custom trajectory.

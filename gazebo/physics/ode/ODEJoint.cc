@@ -244,8 +244,8 @@ void ODEJoint::Detach()
 
   // By the time we get here, links and ODEIds might have already been
   // cleaned up
-  if ((odeParent == nullptr || odeParent->GetODEId() == nullptr) ||
-      (odeChild == nullptr || odeChild->GetODEId() == nullptr))
+  if ((odeParent == nullptr || odeParent->ODEId() == nullptr) ||
+      (odeChild == nullptr || odeChild->ODEId() == nullptr))
   {
     return;
   }

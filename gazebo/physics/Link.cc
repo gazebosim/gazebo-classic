@@ -1039,8 +1039,8 @@ void Link::FillMsg(msgs::Link &_msg)
 
   // The visual msgs name might not have been set if the link was created
   // dynamically without using SDF.
-  if (!this->visualMsg->has_name())
-    this->visualMsg->set_name(this->ScopedName());
+  if (!this->linkDPtr->visualMsg->has_name())
+    this->linkDPtr->visualMsg->set_name(this->ScopedName());
 
   msgs::Set(this->linkDPtr->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->linkDPtr->visualMsg);
@@ -1691,7 +1691,7 @@ double Link::WorldEnergyPotential() const
   // use origin as reference position
   // E = -m g^T z
   double m = this->Inertia().Mass();
-  ignition::math::Vector3d g = this->World()->Physics()->Gravity();
+  ignition::math::Vector3d g = this->linkDPtr->world->Gravity();
   ignition::math::Vector3d z = this->WorldCoGPose().Pos();
   return -m * g.Dot(z);
 }
@@ -1989,7 +1989,7 @@ event::ConnectionPtr Link::ConnectEnabled(std::function<void(bool)> _subscriber)
 //////////////////////////////////////////////////
 void Link::DisconnectEnabled(event::ConnectionPtr &_conn)
 {
-  this->linkDPtr->enabledSignal.Disconnect(_conn);
+  _conn.reset();
 }
 
 //////////////////////////////////////////////////
@@ -2120,27 +2120,27 @@ void Link::RegisterIntrospectionItems()
   // Callbacks.
   auto fLinkPose = [this]()
   {
-    return this->GetWorldPose().Ign();
+    return this->WorldPose();
   };
 
   auto fLinkLinVel = [this]()
   {
-    return this->GetWorldLinearVel().Ign();
+    return this->WorldLinearVel();
   };
 
   auto fLinkAngVel = [this]()
   {
-    return this->GetWorldAngularVel().Ign();
+    return this->WorldAngularVel();
   };
 
   auto fLinkLinAcc = [this]()
   {
-    return this->GetWorldLinearAccel().Ign();
+    return this->WorldLinearAccel();
   };
 
   auto fLinkAngAcc = [this]()
   {
-    return this->GetWorldAngularAccel().Ign();
+    return this->WorldAngularAccel();
   };
 
   // Register items.

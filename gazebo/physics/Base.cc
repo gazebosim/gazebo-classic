@@ -115,25 +115,25 @@ void Base::Fini()
   this->UnregisterIntrospectionItems();
 
   // Remove self as a child of the parent
-  if (this->parent)
+  if (this->baseDPtr->parent)
   {
-    auto temp = this->parent;
-    this->parent.reset();
+    auto temp = this->baseDPtr->parent;
+    this->baseDPtr->parent.reset();
 
-    temp->RemoveChild(this->id);
+    temp->RemoveChild(this->baseDPtr->id);
   }
 
   // Also destroy all children.
-  while (!this->children.empty())
+  while (!this->baseDPtr->children.empty())
   {
-    auto child = this->children.front();
-    this->RemoveChild(child);
+    BasePtr child = this->baseDPtr->children.front();
+    this->RemoveChild(child.get());
   }
-  this->children.clear();
+  this->baseDPtr->children.clear();
 
-  this->sdf.reset();
+  this->baseDPtr->sdf.reset();
 
-  this->world.reset();
+  this->baseDPtr->world.reset();
 }
 
 //////////////////////////////////////////////////
@@ -245,17 +245,18 @@ void Base::AddChild(BasePtr _child)
     gzthrow("Cannot add a null _child to an entity");
 
   // Add this _child to our list
-  if (std::find(this->children.begin(), this->children.end(), _child)
-      == this->children.end())
+  if (std::find(this->baseDPtr->children.begin(),
+        this->baseDPtr->children.end(), _child) ==
+      this->baseDPtr->children.end())
   {
-    this->children.push_back(_child);
+    this->baseDPtr->children.push_back(_child);
   }
 }
 
 //////////////////////////////////////////////////
 void Base::RemoveChild(unsigned int _id)
 {
-  this->RemoveChild(this->GetById(_id));
+  this->RemoveChild(this->BaseById(_id).get());
 }
 
 //////////////////////////////////////////////////
@@ -324,11 +325,11 @@ BasePtr Base::Child(const std::string &_name) const
 //////////////////////////////////////////////////
 void Base::RemoveChild(const std::string &_name)
 {
-  this->RemoveChild(this->GetByName(_name));
+  this->RemoveChild(this->BaseByName(_name));
 }
 
 //////////////////////////////////////////////////
-void Base::RemoveChild(physics::BasePtr _child)
+void Base::RemoveChild(physics::Base *_child)
 {
   if (!_child)
     return;
@@ -338,9 +339,14 @@ void Base::RemoveChild(physics::BasePtr _child)
   _child->Fini();
 
   // Remove from vector if still there
-  this->baseDPtr->children.erase(std::remove(this->baseDPtr->children.begin(),
-                                   this->baseDPtr->children.end(), _child),
-                                   this->baseDPtr->children.end());
+  for (Base_V::iterator iter = this->baseDPtr->children.begin();
+       iter != this->baseDPtr->children.end();)
+  {
+    if ((*iter).get() == _child)
+      iter = this->baseDPtr->children.erase(iter);
+    else
+      ++iter;
+  }
 }
 
 //////////////////////////////////////////////////

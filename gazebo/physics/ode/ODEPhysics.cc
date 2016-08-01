@@ -273,9 +273,9 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->Gravity()));
+      msgs::Convert(this->dataPtr->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->world->MagneticField()));
+      msgs::Convert(this->dataPtr->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->dataPtr->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->dataPtr->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->dataPtr->maxStepSize);

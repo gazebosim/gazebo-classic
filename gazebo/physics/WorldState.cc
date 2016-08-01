@@ -31,17 +31,17 @@ using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
-/*WorldState::WorldState()
-  : State()
+WorldState::WorldState()
+: State()
 {
-}*/
+}
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
   : State(_world->Name(), _world->RealTime(), _world->SimTime(),
       _world->Iterations())
 {
-  this->world = *(_world.get());
+  this->world = _world.get();
 
   // Add a state for all the models
   Model_V models = _world->Models();
@@ -65,7 +65,7 @@ WorldState::WorldState(const World &_world)
   : State(_world.Name(), _world.RealTime(), _world.SimTime(),
       _world.Iterations())
 {
-  this->world = _world;
+  this->world = &_world;
 
   // Add a state for all the models
   Model_V models = _world.Models();
@@ -107,7 +107,7 @@ void WorldState::Load(WorldPtr _world)
 /////////////////////////////////////////////////
 void WorldState::Load(const World &_world)
 {
-  this->world = _world;
+  this->world = &_world;
   this->name = _world.Name();
   this->wallTime = common::Time::GetWallTime();
   this->simTime = _world->SimTime();
@@ -205,7 +205,7 @@ void WorldState::SetWorld(const WorldPtr _world)
 /////////////////////////////////////////////////
 void WorldState::SetWorld(const World &_world)
 {
-  this->world = _world;
+  this->world = &_world;
 }
 
 /////////////////////////////////////////////////
@@ -455,7 +455,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   {
     if (!_state.HasModelState(iter->second.Name()))
     {
-      ModelPtr model = this->world.ModelByName(iter->second.Name());
+      ModelPtr model = this->world->ModelByName(iter->second.Name());
       if (model)
         result.insertions.push_back(model->UnscaledSDF()->ToString(""));
     }
@@ -466,7 +466,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   {
     if (!_state.HasLightState(light.second.Name()))
     {
-      LightPtr lightPtr = this->world.LightByName(light.second.Name());
+      LightPtr lightPtr = this->world->LightByName(light.second.Name());
       result.insertions.push_back(lightPtr->SDF()->ToString(""));
     }
   }

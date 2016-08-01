@@ -327,7 +327,7 @@ void World::Load(sdf::ElementPtr _sdf)
   // Initialize the world URI.
   this->dataPtr->uri.Clear();
   this->dataPtr->uri.SetScheme("data");
-  this->dataPtr->uri.Path().PushFront(this->GetName());
+  this->dataPtr->uri.Path().PushFront(this->Name());
   this->dataPtr->uri.Path().PushFront("world");
 
   this->RegisterIntrospectionItems();
@@ -906,8 +906,6 @@ void World::Fini()
     this->dataPtr->rootElement->Fini();
     this->dataPtr->rootElement.reset();
   }
-  this->dataPtr->prevStates[0].SetWorld(WorldPtr());
-  this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
@@ -2121,7 +2119,7 @@ void World::ProcessFactoryMsgs()
           }
 
           // Model with the given name already exists
-          if (this->GetModel(entityName))
+          if (this->ModelByName(entityName))
           {
             // If allow renaming is disabled
             if (!factoryMsg.allow_renaming())
@@ -2986,7 +2984,7 @@ void World::RegisterIntrospectionItems()
   this->dataPtr->introspectionItems.push_back(timeURI);
   // Add here all the items that might be introspected.
   gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
-      timeURI.Str(), std::bind(&World::GetSimTime, this));
+      timeURI.Str(), std::bind(&World::SimTime, this));
 }
 
 /////////////////////////////////////////////////
@@ -3004,7 +3002,7 @@ std::string World::UniqueModelName(const std::string &_name)
   std::string result = _name;
 
   int i = 0;
-  while (this->GetModel(result))
+  while (this->ModelByName(result))
     result = _name + "_" + std::to_string(i++);
 
   return result;

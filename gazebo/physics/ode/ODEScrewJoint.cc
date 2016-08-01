@@ -37,7 +37,7 @@ ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEScrewJoint::~ODEScrewJoint()
 {
-  this->deJointDPtr->applyDamping.reset();
+  this->odeJointDPtr->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

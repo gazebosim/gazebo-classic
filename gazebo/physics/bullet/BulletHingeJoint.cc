@@ -172,7 +172,7 @@ void BulletHingeJoint::Init()
   // TODO: velocity and effort limits.
   GZ_ASSERT(this->bulletJointDPtr->sdf != nullptr, "Joint sdf member is null");
   sdf::ElementPtr axisElem = this->bulletJointDPtr->sdf->GetElement("axis");
-  GZ_ASSERT(axisElem != null, "Joint axis sdf member is null");
+  GZ_ASSERT(axisElem != nullptr, "Joint axis sdf member is null");
   {
     sdf::ElementPtr limitElem;
     limitElem =

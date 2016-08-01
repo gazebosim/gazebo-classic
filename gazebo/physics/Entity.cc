@@ -282,7 +282,7 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
 void Entity::StopAnimation()
 {
   this->entityDPtr->animation.reset();
-  this->entityDPtr->onAnimationComplete.clear();
+  this->entityDPtr->onAnimationComplete = nullptr;
   this->entityDPtr->animationConnection.reset();
 }
 

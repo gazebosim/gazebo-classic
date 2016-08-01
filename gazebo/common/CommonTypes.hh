@@ -123,6 +123,10 @@ namespace gazebo
     /// \def BatteryPtr
     /// \brief Standrd shared pointer to a Battery object
     typedef std::shared_ptr<Battery> BatteryPtr;
+
+    /// \brief Typedef the skeleton animation map, indexed by their names.
+    typedef std::map<std::string, common::SkeletonAnimation *>
+      SkeletonAnimation_M;
   }
 
   namespace event

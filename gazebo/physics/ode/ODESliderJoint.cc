@@ -36,7 +36,7 @@ ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODESliderJoint::~ODESliderJoint()
 {
-  this->applyDamping.reset();
+  this->odeJointDPtr->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

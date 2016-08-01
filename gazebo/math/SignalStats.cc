@@ -278,3 +278,18 @@ ignition::math::SignalStats SignalStats::Ign() const
 
   return result;
 }
+
+//////////////////////////////////////////////////
+SignalStats &SignalStats::operator=(const ignition::math::SignalStats &_s)
+{
+  std::map<std::string, double> data = _s.Map();
+
+  for (std::map<std::string, double>::const_iterator iter =  data.begin();
+       iter != data.end(); ++iter)
+  {
+    this->InsertStatistic(iter->first);
+    this->InsertData(iter->second);
+  }
+
+  return *this;
+}

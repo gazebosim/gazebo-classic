@@ -398,7 +398,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.mutable_gravity()->CopyFrom(
       msgs::Convert(this->physicsEngineDPtr->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-        msgs::Convert(this->MagneticField()));
+        msgs::Convert(this->physicsEngineDPtr->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(
         this->physicsEngineDPtr->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(

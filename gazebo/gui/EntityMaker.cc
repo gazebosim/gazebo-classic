@@ -78,7 +78,7 @@ void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
 
   if (_event.Control())
   {
-    pos = ModelManipulator::SnapPoint(pos).Ign();
+    pos = ModelManipulator::SnapPoint(pos);
   }
   pos.Z(this->EntityPosition().Z());
 

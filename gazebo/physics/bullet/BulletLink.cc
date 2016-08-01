@@ -67,7 +67,7 @@ void BulletLink::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
-  if (!this->bulletPhysics)
+  if (!this->bulletLinkDPtr->bulletPhysics)
     return;
 
   // Set the initial pose of the body
@@ -280,7 +280,7 @@ void BulletLink::SetGravityMode(const bool _mode)
   else
   {
     ignition::math::Vector3d g =
-      this->bulletLinkDPtr->bulletPhysics->Gravity();
+      this->bulletLinkDPtr->world->Gravity();
     this->bulletLinkDPtr->rigidLink->setGravity(btVector3(g.X(), g.Y(), g.Z()));
     /*btScalar btMass = this->mass.GetAsDouble();
     btignition::math::Vector3d fallInertia(0, 0, 0);
@@ -420,7 +420,6 @@ ignition::math::Vector3d BulletLink::WorldLinearVel(
   }
 
   ignition::math::Pose3d wPose = this->WorldPose();
-  GZ_ASSERT(this->bulletLinkDPtr->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d offsetFromCoG = wPose.Rot() *
     (_offset - this->bulletLinkDPtr->inertial.CoG());
   btVector3 vel = this->bulletLinkDPtr->rigidLink->getVelocityInLocalPoint(

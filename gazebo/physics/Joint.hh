@@ -264,15 +264,14 @@ namespace gazebo
       /// \param[in] _conn Connection to disconnect.
       /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectJointUpdate(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0)
-              {jointUpdate.Disconnect(_conn->Id());}
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
       /// \deprecated See LocalAxis(const unsigned int ) const
       public: math::Vector3 GetLocalAxis(unsigned int _index) const
-              GAZEBO_DEPRECATED(7.0);
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.

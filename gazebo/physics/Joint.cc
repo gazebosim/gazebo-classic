@@ -1756,7 +1756,7 @@ event::ConnectionPtr Joint::ConnectJointUpdate(
 /////////////////////////////////////////////////
 void Joint::DisconnectJointUpdate(event::ConnectionPtr &_conn)
 {
-  this->jointDPtr->jointUpdate.Disconnect(_conn);
+  _conn.reset();
 }
 
 /////////////////////////////////////////////////
@@ -1842,7 +1842,7 @@ void Joint::SetAxis(const unsigned int _index,
 /////////////////////////////////////////////////
 void Joint::RegisterIntrospectionItems()
 {
-  for (size_t i = 0; i < this->GetAngleCount(); ++i)
+  for (size_t i = 0; i < this->AngleCount(); ++i)
   {
     this->RegisterIntrospectionPosition(i);
     this->RegisterIntrospectionVelocity(i);
@@ -1855,7 +1855,7 @@ void Joint::RegisterIntrospectionPosition(const unsigned int _index)
   auto f = [this, _index]()
   {
     // For prismatic axes, Radian -> meters
-    return this->GetAngle(_index).Ign().Radian();
+    return this->Angle(_index).Radian();
   };
 
   common::URI uri(this->URI());
@@ -1871,7 +1871,7 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
 {
   auto f = [this, _index]()
   {
-    return this->GetVelocity(_index);
+    return this->Velocity(_index);
   };
 
   common::URI uri(this->URI());

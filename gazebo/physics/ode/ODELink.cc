@@ -194,7 +194,7 @@ void ODELink::Fini()
 //////////////////////////////////////////////////
 void ODELink::SetGravityMode(const bool _mode)
 {
-  if (this->sdf->HasElement("gravity"))
+  if (this->odeLinkDPtr->sdf->HasElement("gravity"))
     this->odeLinkDPtr->sdf->GetElement("gravity")->Set(_mode);
 
   if (this->odeLinkDPtr->linkId)

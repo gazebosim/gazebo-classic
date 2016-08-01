@@ -32,7 +32,7 @@ ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEBallJoint::~ODEBallJoint()
 {
-  this->applyDamping.reset();
+  this->odeJointDPtr->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

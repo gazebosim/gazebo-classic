@@ -195,7 +195,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.mutable_gravity()->CopyFrom(
       msgs::Convert(this->simbodyPhysicsDPtr->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->world->MagneticField()));
+      msgs::Convert(this->simbodyPhysicsDPtr->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(
         this->simbodyPhysicsDPtr->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(
@@ -659,7 +659,7 @@ void SimbodyPhysics::UpdatePhysics()
   common::Time currTime = this->simbodyPhysicsDPtr->world->RealTime();
 
   // Simbody cannot step the integrator without a subsystem
-  const SimTK::State &s = this->integ->getState();
+  const SimTK::State &s = this->simbodyPhysicsDPtr->integ->getState();
   if (s.getNumSubsystems() == 0)
     return;
 
@@ -682,7 +682,7 @@ void SimbodyPhysics::UpdatePhysics()
     }
   }
 
-  this->simbodyPhysicsStepped = true;
+  this->simbodyPhysicsDPtr->simbodyPhysicsStepped = true;
 
   // debug
   // gzerr << "time [" << s.getTime()

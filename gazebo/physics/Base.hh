@@ -249,7 +249,7 @@ namespace gazebo
       /// \brief Get the number of children.
       /// \return The number of children.
       /// \deprecated See ChildCount()
-      public: unsigned int GetChildCount() const GAZEBO_DEPRECATED(7.0);
+      public: unsigned int GetChildCount() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the number of children.
       /// \return The number of children.
@@ -261,7 +261,7 @@ namespace gazebo
       /// \param[in] _id ID of the object to retreive.
       /// \return A pointer to the object, NULL if not found
       /// \deprecated See BaseById(const unsigned int)
-      public: BasePtr GetById(unsigned int _id) const GAZEBO_DEPRECATED(7.0);
+      public: BasePtr GetById(unsigned int _id) const GAZEBO_DEPRECATED(8.0);
       /// \endcond
 
       /// \cond
@@ -312,7 +312,7 @@ namespace gazebo
 
       /// \brief Remove a child by pointer.
       /// \param[in] _child Pointer to the child.
-      public: void RemoveChild(physics::BasePtr _child);
+      public: void RemoveChild(physics::Base *_child);
 
       /// \brief Add a type specifier.
       /// \param[in] _type New type to append to this objects type

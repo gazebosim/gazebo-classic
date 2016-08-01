@@ -143,9 +143,9 @@ ignition::math::Vector3Stats Vector3Stats::Ign() const
 //////////////////////////////////////////////////
 Vector3Stats &Vector3Stats::operator=(const ignition::math::Vector3Stats &_v)
 {
-  this->X() = _v.X();
-  this->Y() = _v.Y();
-  this->Z() = _v.Z();
-  this->Mag() = _v.Mag();
+  this->dataPtr->x = _v.X();
+  this->dataPtr->y = _v.Y();
+  this->dataPtr->z = _v.Z();
+  this->dataPtr->mag = _v.Mag();
   return *this;
 }

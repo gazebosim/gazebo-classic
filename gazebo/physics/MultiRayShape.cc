@@ -452,5 +452,5 @@ event::ConnectionPtr MultiRayShape::ConnectNewLaserScans(
 //////////////////////////////////////////////////
 void MultiRayShape::DisconnectNewLaserScans(event::ConnectionPtr &_conn)
 {
-  this->multiRayShapeDPtr->newLaserScans.Disconnect(_conn);
+  _conn.reset();
 }

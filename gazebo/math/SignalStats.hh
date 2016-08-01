@@ -197,6 +197,11 @@ namespace gazebo
       /// \return This as an ignition math object.
       public: ignition::math::SignalStats Ign() const;
 
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _v a new value
+      /// \return this
+      public: SignalStats &operator=(const ignition::math::SignalStats &_s);
+
       /// \brief Pointer to private data.
       protected: std::unique_ptr<SignalStatsPrivate> dataPtr;
     };

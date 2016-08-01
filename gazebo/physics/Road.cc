@@ -47,11 +47,11 @@ Road::~Road()
 /////////////////////////////////////////////////
 void Road::Fini()
 {
-  this->roadPub.reset();
+  this->roadDPtr->roadPub.reset();
 
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
+  if (this->roadDPtr->node)
+    this->roadDPtr->node->Fini();
+  this->roadDPtr->node.reset();
 }
 
 /////////////////////////////////////////////////

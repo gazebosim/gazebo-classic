@@ -739,8 +739,7 @@ namespace gazebo
       /// \param[in] _conn Connection pointer to disconnect.
       /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0)
-              {enabledSignal.Disconnect(_conn->Id());}
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill

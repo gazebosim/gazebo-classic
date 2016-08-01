@@ -139,12 +139,6 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->Gravity();
-}
-
-//////////////////////////////////////////////////
-ignition::math::Vector3d PhysicsEngine::Gravity() const
-{
   return this->physicsEngineDPtr->world->Gravity();
 }
 
@@ -384,7 +378,7 @@ bool PhysicsEngine::Param(const std::string &_key,
   else if (_key == "real_time_factor")
     _value = this->TargetRealTimeFactor();
   else if (_key == "gravity")
-    _value = this->Gravity();
+    _value = this->physicsEngineDPtr->world->Gravity();
   else if (_key == "magnetic_field")
     _value = this->physicsEngineDPtr->world->MagneticField();
   else
