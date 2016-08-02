@@ -265,6 +265,8 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
       // gDir cannot have zero length
       if (math::equal(gDir.Length(), 0.0))
       {
+        gzerr << "required gravity vector has zero length, unable to"
+              << " determined a direction to initialize IMU.\n";
       }
       // imuDirX cannot be parallel to gDir
       if (math::equal(imuDirX.Cross(gDir).Length(), 0.0))
