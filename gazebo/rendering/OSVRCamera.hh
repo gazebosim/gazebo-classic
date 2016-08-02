@@ -134,6 +134,11 @@ namespace gazebo
       /// \brief Apply distorsion to the render target.
       private: void CreateDistortion();
 
+      /// \brief A bit of geometry to project a polynomial approximation of
+      /// the inverse of the HDK 1.4 lens distortion. This function assumes
+      /// the inbound points are in the standard [0,0]-[1,1] texture space
+      private: void UndistortTexturePoint(float &x, float &y);
+
       /// \internal
       /// \brief Pointer to private data.
       private: OSVRCameraPrivate *dataPtr;

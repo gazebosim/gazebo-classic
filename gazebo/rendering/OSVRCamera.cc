@@ -675,8 +675,8 @@ void OSVRCamera::CreateDistortion()
 
     //const float x = 1.0f;
     //const float y = 1.0f;
-    const float margin = 0.1f;
-    const float inner_margin = margin, outer_margin = 1.0f - margin;
+    //const float margin = 0.1f;
+    //const float inner_margin = margin, outer_margin = 1.0f - margin;
 
     // create ManualObject
     if (eyeIndex == 0)
@@ -686,9 +686,122 @@ void OSVRCamera::CreateDistortion()
             "OSVRRenderObjectLeft");
       externalObj->begin("OSVR/LeftEye",
           Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    }
+    else
+    {
+      externalObj =
+        this->dataPtr->externalSceneManager->createManualObject(
+            "OSVRRenderObjectRight");
+      externalObj->begin("OSVR/RightEye",
+          Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    }
 
-      externalObj->colour(1, 1, 1);
+    const float eyeFlip = (eyeIndex == 0) ? -1.0f : 1.0f;
+    //const float eyeTexFlip = (eyeIndex == 0) ? 1.0f : 0.0f;
 
+    externalObj->colour(1, 1, 1);
+    externalObj->textureCoord(0.5, 0.5); //, 1);
+
+    const float border = 0; //0.1f;
+    const float s = 1.0f - 2.0f * border;
+
+    const float quadSize = 0.02f;
+    int vert_count = 0;
+
+    for (float x = 0.0f; x < 1.0f - quadSize * 0.9f; x += quadSize)
+    {
+      for (float y = 0.0f; y < 1.0f - quadSize * 0.9f; y += quadSize)
+      {
+        //const float r = rand() % 10000 * 0.0001f;
+        //const float g = rand() % 10000 * 0.0001f;
+        //const float b = rand() % 10000 * 0.0001f;
+
+        const float inner_x = eyeFlip * (border + x*s);
+        const float outer_x = eyeFlip * (border + (x + quadSize)*s);
+        const float lower_y = -s + 2*y*s;
+        const float upper_y = -s + 2*(y + quadSize)*s;
+
+        /*
+        printf("eye %d x=%.3f y=%.3f => (%.3f,%.3f) -> (%.3f, %.3f)\n",
+               eyeIndex,
+               x, y,
+               inner_x, lower_y,
+               outer_x, upper_y);
+        */
+
+        /*
+        externalObj->position(eyeFlip * border         , -(1.0f - border), 0);
+        externalObj->position(eyeFlip * (1.0f - border),  (1.0f - border), 0);
+        externalObj->position(-inner_margin,  outer_margin, 0);
+        */
+
+        const float t_inner_x = eyeIndex == 0 ? 1.0f - x : x;
+        const float t_outer_x = eyeIndex == 0 ? 1.0f - (x + quadSize) : (x + quadSize);
+
+        const float t_lower_y = 1.0f - y;
+        const float t_upper_y = 1.0f - (y + quadSize);
+
+        float tx, ty;
+
+        externalObj->position(inner_x, lower_y, 0);
+        //externalObj->textureCoord(eyeIndex == 0 ? t_outer_x : t_inner_x, t_upper_y);
+        tx = t_inner_x;
+        ty = t_lower_y;
+        UndistortTexturePoint(tx, ty);
+        externalObj->textureCoord(tx, ty); //eyeIndex == 0 ? t_outer_x : t_inner_x, t_upper_y);
+        //externalObj->colour(r, g, b); //, 1, 1);
+
+        externalObj->position(outer_x, upper_y, 0);
+        tx = t_outer_x;
+        ty = t_upper_y;
+        UndistortTexturePoint(tx, ty);
+        externalObj->textureCoord(tx, ty); //eyeIndex == 0 ? x : 1.0f - x, 0);
+        //externalObj->colour(r, g, b); //, 1, 1);
+
+        externalObj->position(inner_x, upper_y, 0);
+        tx = t_inner_x;
+        ty = t_upper_y;
+        UndistortTexturePoint(tx, ty);
+        externalObj->textureCoord(tx, ty); //eyeIndex == 0 ? 1 : 0, 0);
+        //externalObj->colour(r, g, b); //, 1, 1);
+
+        externalObj->position(outer_x, lower_y, 0);
+        tx = t_outer_x;
+        ty = t_lower_y;
+        UndistortTexturePoint(tx, ty);
+        externalObj->textureCoord(tx, ty); //eyeIndex == 0 ? 0 : 1, 1);
+        //externalObj->colour(r, g, b); //, 1, 1);
+
+
+        // now make two triangles out of the quad vertices, winding clockwise
+        if (eyeIndex == 0)
+        {
+          externalObj->index(vert_count + 2);
+          externalObj->index(vert_count + 1);
+          externalObj->index(vert_count + 0);
+
+          externalObj->index(vert_count + 1);
+          externalObj->index(vert_count + 3);
+          externalObj->index(vert_count + 0);
+        }
+        else
+        {
+          externalObj->index(vert_count + 0);
+          externalObj->index(vert_count + 1);
+          externalObj->index(vert_count + 2);
+
+          externalObj->index(vert_count + 0);
+          externalObj->index(vert_count + 3);
+          externalObj->index(vert_count + 1);
+        }
+
+        vert_count += 4;  // todo: be smarter. most are redundant.
+      }
+    }
+
+    /*
+    if (eyeIndex == 0)
+    {
       externalObj->position(-inner_margin, -outer_margin, 0);
       externalObj->textureCoord(1, 1);
 
@@ -711,12 +824,6 @@ void OSVRCamera::CreateDistortion()
     }
     else
     {
-      externalObj =
-        this->dataPtr->externalSceneManager->createManualObject(
-            "OSVRRenderObjectRight");
-      externalObj->begin("OSVR/RightEye",
-          Ogre::RenderOperation::OT_TRIANGLE_LIST);
-
       externalObj->colour(1, 1, 1);
 
       externalObj->position(inner_margin, -outer_margin, 0);
@@ -739,6 +846,7 @@ void OSVRCamera::CreateDistortion()
       externalObj->index(3);
       externalObj->index(1);
     }
+    */
 
     /*
     for (unsigned int i = 0; i < meshData.VertexCount; ++i)
@@ -812,3 +920,33 @@ void OSVRCamera::AdjustAspect(double _v)
     cam->setAspectRatio(cam->getAspectRatio() + _v);
   }
 }
+
+//////////////////////////////////////////////////
+void OSVRCamera::UndistortTexturePoint(float &x, float &y)
+{
+  const static int N = 6;
+  float c[N] = { 0, 1, -1.74, 5.15, -1.27, -2.23 };  // from OSVR SDK
+
+  const float sx = 1.0f, sy = 1.0f;  // optionally scale the projection
+  const float cx = 0.5f, cy = 0.5f;  // optionally alter center of projection
+  const float zx = sx * x - cx, zy = sy * y - cy;  // move to the origin
+
+  float norm = sqrt(zx * zx + zy * zy);
+  if (norm == 0)
+    norm = 1;  // deal with the undefined point at origin
+  const float norm_x = zx / norm;
+  const float norm_y = zy / norm;
+
+  // now evaluate the polynomial to scale the vector
+  float vec_exp = 1;  // raise to the power we need as we go
+  float poly_eval = 0;
+  for (int i = 1; i < N; i++)
+  {
+    vec_exp *= norm;
+    poly_eval += c[i] * vec_exp;
+  }
+
+  x = cx + poly_eval * norm_x;
+  y = cy + poly_eval * norm_y;
+}
+

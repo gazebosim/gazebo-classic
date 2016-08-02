@@ -37,6 +37,7 @@ material OSVR/LeftEye
 
 			texture_unit
       {
+        tex_address_mode border
       }
     }
   }
@@ -63,6 +64,7 @@ material OSVR/RightEye
 
       texture_unit 
       {
+        tex_address_mode border
       }
     }
   }
