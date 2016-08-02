@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for GUI mouse picking.
+/// \brief A test class for collada visualization.
 class ColladaVisualization : public QTestFixture
 {
   Q_OBJECT
