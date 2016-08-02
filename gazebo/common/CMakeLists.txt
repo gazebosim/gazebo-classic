@@ -157,6 +157,7 @@ set (gtest_sources
   SVGLoader_TEST.cc
   Time_TEST.cc
   URI_TEST.cc
+  VideoEncoder_TEST.cc
 )
 
 # Timer test fails on OSX

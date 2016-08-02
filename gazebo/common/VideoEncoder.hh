@@ -22,11 +22,11 @@
 #include "gazebo/common/Time.hh"
 #include <gazebo/util/system.hh>
 
-#define VIDEO_ENCODER_BITRATE_DEFAULT 2000000
-#define VIDEO_ENCODER_WIDTH_DEFAULT 1024
-#define VIDEO_ENCODER_HEIGHT_DEFAULT 768
+#define VIDEO_ENCODER_BITRATE_DEFAULT 400000
+#define VIDEO_ENCODER_WIDTH_DEFAULT 1280
+#define VIDEO_ENCODER_HEIGHT_DEFAULT 720
 #define VIDEO_ENCODER_FPS_DEFAULT 25
-#define VIDEO_ENCODER_FORMAT_DEFAULT "ogv"
+#define VIDEO_ENCODER_FORMAT_DEFAULT "mp4"
 
 namespace gazebo
 {
@@ -39,7 +39,8 @@ namespace gazebo
     /// \{
 
     /// \class VideoEncoder VideoEncoder.hh common/common.hh
-    /// \brief Handle video encoding using libavcodec
+    /// \brief The VideoEncoder class supports encoding a series of images
+    /// to a video format, and then writing the video to disk.
     class GZ_COMMON_VISIBLE VideoEncoder
     {
       /// \brief Constructor
@@ -48,7 +49,13 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~VideoEncoder();
 
-      /// \brief Initialize the encoder
+      /// \brief Start the encoder. This should be called once. Add new
+      /// frames to the video using the AddFrame function.
+      /// \param[in] _width Width in pixels of the output video.
+      /// \param[in] _height Height in pixels of the output video.
+      /// \param[in] _format String that represents the video type.
+      /// Supported types include: "avi", "ogv", mp4".
+      /// \param[in] _bitRate Bit rate to encode the video.
       /// \return True on success
       public: bool Start(
                 const unsigned int _width = VIDEO_ENCODER_WIDTH_DEFAULT,
@@ -57,15 +64,22 @@ namespace gazebo
                 const unsigned int _fps = VIDEO_ENCODER_FPS_DEFAULT,
                 const unsigned int _bitRate = VIDEO_ENCODER_BITRATE_DEFAULT);
 
-      /// \brief Stop encoding. This will also automatically be called
+      /// \brief Stop the encoder. This will also automatically be called
       /// by SaveToFile
+      /// \return True on success.
       public: bool Stop();
 
-      /// \brief True if the enoder is initialized, false otherwise
-      /// \return True if initialized.
+      /// \brief True if the enoder has been started, false otherwise
+      /// \return True if started.
       public: bool IsEncoding();
 
-      public: bool AddFrame(const unsigned char *_frame);
+      /// \brief Add a single frame to be encoded
+      /// \param[in] _frame Image buffer to be encoded
+      /// \param[in] _width Input frame width
+      /// \param[in] _height Input frame height
+      public: bool AddFrame(const unsigned char *_frame,
+                  const unsigned int _width,
+                  const unsigned int _height);
 
       /// \brief Add a single timestamped frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
@@ -74,13 +88,23 @@ namespace gazebo
       /// \param[in] _timestamp Timestamp of the image frame
       /// \return True on success.
       public: bool AddFrame(const unsigned char *_frame,
+                  const unsigned int _width,
+                  const unsigned int _height,
                   //const std::chrono::system_clock::time_point &_timestamp);
                   const std::chrono::steady_clock::time_point &_timestamp);
 
+      /// \brief Add a single frame to be encoded
+      /// \param[in] _frame Image buffer to be encoded
+      /// \param[in] _width Input frame width
+      /// \param[in] _height Input frame height
+      /// \param[in] _timestamp Timestamp of the image frame
+      /// \return True on success.
       public: bool AddFrame(const unsigned char *_frame,
+                  const unsigned int _width,
+                  const unsigned int _height,
                   const common::Time &_timestamp);
 
-      /// \brief Write data buffer to to disk
+      /// \brief Write the video to to disk
       /// param[in] _filename File in which to save the encoded data
       /// \return True on success.
       public: bool SaveToFile(const std::string &_filename);

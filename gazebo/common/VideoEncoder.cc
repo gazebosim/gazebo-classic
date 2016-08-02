@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <mutex>
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_FFMPEG
@@ -28,6 +29,7 @@ extern "C"
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 #include <libavutil/mathematics.h>
+#include <libavutil/opt.h>
 }
 #endif
 
@@ -38,10 +40,6 @@ extern "C"
 
 using namespace gazebo;
 using namespace common;
-
-#define VIDEO_ENCODER_TMPFILENAME_DEFAULT "TMP_RECORDING"
-#define VIDEO_ENCODER_SAMPLERATE_DEFAULT VIDEO_ENCODER_FPS_DEFAULT * 2
-#define VIDEO_ENCODER_VIDEOPTS_DEFAULT -1
 
 // Private data class
 class gazebo::common::VideoEncoderPrivate
@@ -83,13 +81,19 @@ class gazebo::common::VideoEncoderPrivate
   public: unsigned int bitRate = VIDEO_ENCODER_BITRATE_DEFAULT;
 
   /// \brief Output frame width
-  public: unsigned int width = VIDEO_ENCODER_WIDTH_DEFAULT;
+  public: unsigned int outWidth = VIDEO_ENCODER_WIDTH_DEFAULT;
 
   /// \brief Output frame height
-  public: unsigned int height = VIDEO_ENCODER_HEIGHT_DEFAULT;
+  public: unsigned int outHeight = VIDEO_ENCODER_HEIGHT_DEFAULT;
+
+  /// \brief Input frame width
+  public: unsigned int inWidth = 0;
+
+  /// \brief Input frame height
+  public: unsigned int inHeight = 0;
 
   /// \brief Temporary filename to write the file to.
-  public: std::string tmpFilename = VIDEO_ENCODER_TMPFILENAME_DEFAULT;
+  public: std::string tmpFilename = "TMP_RECORDING";
 
   /// \brief Encoding format
   public: std::string format = VIDEO_ENCODER_FORMAT_DEFAULT;
@@ -103,17 +107,19 @@ class gazebo::common::VideoEncoderPrivate
   public: gazebo::common::Time timePrev2;
 
   /// \brief Encoding sample rate.
-  public: int sampleRate = VIDEO_ENCODER_SAMPLERATE_DEFAULT;
+  public: int sampleRate = VIDEO_ENCODER_FPS_DEFAULT * 2;
 
   /// \brief total time elapsed, in seconds.
   public: std::chrono::duration<double> totalTime;
 
-  public: gazebo::common::Time totalTime2;
+  public: common::Time totalTime2;
 
   /// \brief Video presentation time stamp.
-  public: int videoPts = VIDEO_ENCODER_VIDEOPTS_DEFAULT;
+  public: int videoPts = -1;
 
   public: unsigned int frameCount = 0;
+
+  public: std::mutex mutex;
 };
 
 /////////////////////////////////////////////////
@@ -159,12 +165,20 @@ bool VideoEncoder::Start(const unsigned int _width,
   if (this->dataPtr->encoding)
     return false;
 
+  // Remove old temp file, if it exists.
+  if (common::exists(this->dataPtr->TmpFilename()))
+    std::remove(this->dataPtr->TmpFilename().c_str());
+
   this->dataPtr->bitRate = _bitRate;
-  this->dataPtr->width = _width;
-  this->dataPtr->height = _height;
+
+  // Must be divisible by two
+  this->dataPtr->outWidth = _width % 2 == 0 ? _width : _width + 1;
+  this->dataPtr->outHeight = _height % 2 == 0 ? _height : _height + 1;
+
   this->dataPtr->format = _format;
   this->dataPtr->fps = _fps;
   this->dataPtr->frameCount = 0;
+  this->dataPtr->totalTime2 = 0;
 
 #ifdef HAVE_FFMPEG
   std::string tmpFileNameFull = this->dataPtr->TmpFilename();
@@ -212,8 +226,8 @@ bool VideoEncoder::Start(const unsigned int _width,
   this->dataPtr->codecCtx->rc_min_rate = this->dataPtr->bitRate;
 
   // resolution must be a multiple of two
-  this->dataPtr->codecCtx->width = this->dataPtr->width;
-  this->dataPtr->codecCtx->height = this->dataPtr->height;
+  this->dataPtr->codecCtx->width = this->dataPtr->outWidth;
+  this->dataPtr->codecCtx->height = this->dataPtr->outHeight;
 
   // frames per second
   this->dataPtr->codecCtx->time_base.den = this->dataPtr->fps;
@@ -235,6 +249,12 @@ bool VideoEncoder::Start(const unsigned int _width,
     // This does not happen with normal video, it just happens here as
     // the motion of the chroma plane does not match the luma plane.
     this->dataPtr->codecCtx->mb_decision = 2;
+  }
+
+  //std::cout << "Codec[" << codec->name << "] Id[" << codec->id << "]\n";
+  if (codec->id == AV_CODEC_ID_H264)
+  {
+    av_opt_set(this->dataPtr->codecCtx->priv_data, "preset", "slow", 0);
   }
 
   // open it
@@ -306,64 +326,81 @@ bool VideoEncoder::IsEncoding()
 }
 
 /////////////////////////////////////////////////
-bool VideoEncoder::AddFrame(const unsigned char *_frame)
+bool VideoEncoder::AddFrame(const unsigned char *_frame,
+    const unsigned int _width,
+    const unsigned int _height)
 {
-  return this->AddFrame(_frame, common::Time::GetWallTime());
+  return this->AddFrame(_frame, _width, _height, common::Time::GetWallTime());
       //std::chrono::steady_clock::now());
 }
 
 /////////////////////////////////////////////////
 bool VideoEncoder::AddFrame(const unsigned char *_frame,
+    const unsigned int _width,
+    const unsigned int _height,
     const common::Time &_timestamp)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   if (!this->dataPtr->encoding)
   {
     gzerr << "Start encoding before adding a frame\n";
     return false;
   }
 
-  auto dt = _timestamp - this->dataPtr->timePrev2;
-  if (dt < 1.0/this->dataPtr->sampleRate)
-  {
-    gzwarn << "Time delta["
-      //<< std::chrono::duration_cast<std::chrono::milliseconds>(dt).count()
-      << " ms] lower than Hz rate[" << 1.0/this->dataPtr->sampleRate << "]\n";
+  common::Time dt = (_timestamp - this->dataPtr->timePrev2);
+  // std::cout << "DT[" << dt << "]\n";
+  /*if (dt.Double() < 1.0/(this->dataPtr->fps*2))
     return false;
-  }
+    */
 
-  this->dataPtr->timePrev2 = _timestamp;
-
-  int pts = 0;
-  if (this->dataPtr->videoPts != -1)
+  // std::cout << "VideoPts[" << this->dataPtr->videoPts << "]\n";
+  int pts = this->dataPtr->frameCount++;
+  /*if (this->dataPtr->videoPts != -1)
   {
-    //pts = (1.0 / this->dataPtr->fps) * 90 * this->dataPtr->totalTime.count();
-    pts = (1.0 / this->dataPtr->fps) * 9000 * (this->dataPtr->frameCount++);
+    pts = //this->dataPtr->fps * this->dataPtr->totalTime2.Double();
     this->dataPtr->totalTime2 += dt;
+    // std::cout << "TotalTime[" << this->dataPtr->totalTime2 << "]\n";
 
     if (this->dataPtr->videoPts == pts)
-    {
-      gzwarn << "Video presentation timestamp matches current timestamp\n";
       return false;
+  }*/
+
+  this->dataPtr->timePrev2 = _timestamp;
+  this->dataPtr->videoPts = pts;
+
+  // Cause the sws to be recreated on image resize
+  if (this->dataPtr->swsCtx &&
+      (this->dataPtr->inWidth != _width || this->dataPtr->inHeight != _height))
+  {
+    sws_freeContext(this->dataPtr->swsCtx);
+    this->dataPtr->swsCtx = nullptr;
+    if (this->dataPtr->avInPicture)
+    {
+      av_free(this->dataPtr->avInPicture);
+      this->dataPtr->avInPicture = nullptr;
     }
   }
 
-  this->dataPtr->videoPts = pts;
-  std::cout << "PTS[" << this->dataPtr->videoPts << "]\n";
-
   if (!this->dataPtr->swsCtx)
   {
+    this->dataPtr->inWidth = _width;
+    this->dataPtr->inHeight = _height;
+
     if (!this->dataPtr->avInPicture)
     {
       this->dataPtr->avInPicture = new AVPicture;
       avpicture_alloc(this->dataPtr->avInPicture,
-          PIX_FMT_RGB24, this->dataPtr->width, this->dataPtr->height);
+          PIX_FMT_RGB24, this->dataPtr->inWidth,
+          this->dataPtr->inHeight);
     }
 
     this->dataPtr->swsCtx = sws_getContext(
-        this->dataPtr->width,
-        this->dataPtr->height,
+        this->dataPtr->inWidth,
+        this->dataPtr->inHeight,
         PIX_FMT_RGB24,
-        this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height,
+        this->dataPtr->codecCtx->width,
+        this->dataPtr->codecCtx->height,
         this->dataPtr->codecCtx->pix_fmt,
         SWS_BICUBIC, nullptr, nullptr, nullptr);
 
@@ -376,14 +413,15 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   // encode
   memcpy(this->dataPtr->avInPicture->data[0], _frame,
-      this->dataPtr->width * this->dataPtr->height * 3);
+         this->dataPtr->inWidth * this->dataPtr->inHeight * 3);
 
   sws_scale(this->dataPtr->swsCtx, this->dataPtr->avInPicture->data,
       this->dataPtr->avInPicture->linesize,
-      0, this->dataPtr->height, this->dataPtr->avOutFrame->data,
+      0, this->dataPtr->inHeight, this->dataPtr->avOutFrame->data,
       this->dataPtr->avOutFrame->linesize);
 
   this->dataPtr->codecCtx->coded_frame->pts = this->dataPtr->videoPts;
+  this->dataPtr->avOutFrame->pts = this->dataPtr->videoPts;
 
   int gotOutput = 0;
   AVPacket avPacket;
@@ -391,16 +429,18 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   avPacket.data = nullptr;
   avPacket.size = 0;
 
+  // std::cout << "Encode video. pts=" << this->dataPtr->codecCtx->coded_frame->pts << "\n";
   int ret = avcodec_encode_video2(this->dataPtr->codecCtx, &avPacket,
                                   this->dataPtr->avOutFrame, &gotOutput);
 
   if (ret >= 0)
   {
-    this->dataPtr->codecCtx->coded_frame->pts = this->dataPtr->videoPts;
+    // this->dataPtr->codecCtx->coded_frame->pts = this->dataPtr->videoPts;
 
     // write the frame
     if (gotOutput)
     {
+      std::cout << "Write frame" << this->dataPtr->codecCtx->coded_frame->pts << "\n";
       ret = av_interleaved_write_frame(this->dataPtr->formatCtx, &avPacket);
 
       if (ret < 0)
@@ -409,6 +449,8 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
         return false;
       }
     }
+    else
+      gzerr << "Not got output\n";
   }
   else
   {
@@ -423,6 +465,8 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 /////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
 bool VideoEncoder::AddFrame(const unsigned char *_frame,
+    const unsigned int _width,
+    const unsigned int _height,
     const std::chrono::steady_clock::time_point &_timestamp)
 {
   if (!this->dataPtr->encoding)
@@ -459,17 +503,30 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   this->dataPtr->videoPts = pts;
   std::cout << "PTS[" << this->dataPtr->videoPts << "]\n";
 
+  // Cause the sws to be recreated on image resize
+  if (this->dataPtr->swsCtx &&
+      (this->dataPtr->inWidth != _width || this->dataPtr->inHeight != _height))
+  {
+    sws_freeContext(this->dataPtr->swsCtx);
+    this->dataPtr->swsCtx = nullptr;
+    if (this->dataPtr->avInPicture)
+    {
+      av_free(this->dataPtr->avInPicture);
+      this->dataPtr->avInPicture = nullptr;
+    }
+  }
+
   if (!this->dataPtr->swsCtx)
   {
     if (!this->dataPtr->avInPicture)
     {
       this->dataPtr->avInPicture = new AVPicture;
       avpicture_alloc(this->dataPtr->avInPicture,
-          PIX_FMT_RGB24, this->dataPtr->width, this->dataPtr->height);
+          PIX_FMT_RGB24, this->dataPtr->inWidth, this->dataPtr->inHeight);
     }
 
-    this->dataPtr->swsCtx = sws_getContext(this->dataPtr->width,
-        this->dataPtr->height, PIX_FMT_RGB24,
+    this->dataPtr->swsCtx = sws_getContext(this->dataPtr->inWidth,
+        this->dataPtr->inHeight, PIX_FMT_RGB24,
         this->dataPtr->codecCtx->width, this->dataPtr->codecCtx->height,
         this->dataPtr->codecCtx->pix_fmt,
         SWS_BICUBIC, nullptr, nullptr, nullptr);
@@ -483,13 +540,13 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   // encode
   memcpy(this->dataPtr->avInPicture->data[0], _frame,
-      this->dataPtr->width * this->dataPtr->height * 3);
+      this->dataPtr->inWidth * this->dataPtr->inHeight * 3);
 
-  sws_scale(this->dataPtr->swsCtx, this->dataPtr->avInPicture->data,
+  /*sws_scale(this->dataPtr->swsCtx, this->dataPtr->avInPicture->data,
       this->dataPtr->avInPicture->linesize,
-      0, this->dataPtr->height, this->dataPtr->avOutFrame->data,
+      0, this->dataPtr->inHeight, this->dataPtr->avOutFrame->data,
       this->dataPtr->avOutFrame->linesize);
-
+      **/
   this->dataPtr->codecCtx->coded_frame->pts = this->dataPtr->videoPts;
 
   int gotOutput = 0;
@@ -528,6 +585,8 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 }
 #else
 bool VideoEncoder::AddFrame(const unsigned char */*_frame*/,
+    const unsigned int /*_width*/,
+    const unsigned int /*_height*/,
     const std::chrono::steady_clock::time_point &_timestamp)
 {
   return false;
@@ -608,17 +667,10 @@ void VideoEncoder::Reset()
   // Remove the tmp video file, if it exists
   std::string tmpFileNameFull = this->dataPtr->TmpFilename();
 
-  std::ifstream f(tmpFileNameFull);
-  bool good = f.good();
-  f.close();
-  if (good)
+  if (common::isFile(tmpFileNameFull))
   {
     if (remove(tmpFileNameFull.c_str()) != 0)
       gzerr << "Unable to remove file[" << tmpFileNameFull << "].\n";
-  }
-  else
-  {
-    gzerr << "Unable to find file[" << tmpFileNameFull << "] to remove.\n";
   }
 
   if (this->dataPtr->pictureBuf)
@@ -630,18 +682,19 @@ void VideoEncoder::Reset()
   // set default values
   this->dataPtr->frameCount = 0;
   this->dataPtr->bitRate = VIDEO_ENCODER_BITRATE_DEFAULT;
-  this->dataPtr->width = VIDEO_ENCODER_WIDTH_DEFAULT;
-  this->dataPtr->height = VIDEO_ENCODER_HEIGHT_DEFAULT;
+  this->dataPtr->outWidth = VIDEO_ENCODER_WIDTH_DEFAULT;
+  this->dataPtr->outHeight = VIDEO_ENCODER_HEIGHT_DEFAULT;
+  this->dataPtr->inWidth = 0;
+  this->dataPtr->inHeight = 0;
   this->dataPtr->fps = VIDEO_ENCODER_FPS_DEFAULT;
-  this->dataPtr->tmpFilename = VIDEO_ENCODER_TMPFILENAME_DEFAULT;
   this->dataPtr->format = VIDEO_ENCODER_FORMAT_DEFAULT;
+  this->dataPtr->sampleRate = VIDEO_ENCODER_FPS_DEFAULT * 2;
+  this->dataPtr->tmpFilename = "TMP_RECORDING";
   this->dataPtr->timePrev = {};
-  this->dataPtr->sampleRate = VIDEO_ENCODER_SAMPLERATE_DEFAULT;
   this->dataPtr->totalTime = std::chrono::duration<double>(0);
-  this->dataPtr->videoPts = VIDEO_ENCODER_VIDEOPTS_DEFAULT;
+  this->dataPtr->videoPts = -1;
 
   this->dataPtr->pictureBuf = nullptr;
-
   this->dataPtr->codecCtx = nullptr;
   this->dataPtr->swsCtx = nullptr;
   this->dataPtr->avInPicture = nullptr;

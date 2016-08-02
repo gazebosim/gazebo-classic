@@ -98,6 +98,24 @@ namespace gazebo
     /// \return Name of the current directory
     GZ_COMMON_VISIBLE
     std::string cwd();
+
+    /// \brief Returns true if _path is a file or directory
+    /// \param[in] _path Path to check.
+    /// \return true if _path is a file or directory
+    GZ_COMMON_VISIBLE
+    bool exists(const std::string &_path);
+
+    /// \brief Check if the given path is a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory.
+    GZ_COMMON_VISIBLE
+    bool isDirectory(const std::string &_path);
+
+    /// \brief Check if the given path is a file.
+    /// \param[in] _path Path to a file.
+    /// \return True if _path is a file.
+    GZ_COMMON_VISIBLE
+    bool isFile(const std::string &_path);
     /// \}
   }
 

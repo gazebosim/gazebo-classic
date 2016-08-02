@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <fstream>
 #include <sys/stat.h>
 #include <vector>
 
@@ -161,4 +162,31 @@ std::string common::cwd()
 #else
   return getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
 #endif
+}
+
+/////////////////////////////////////////////////
+bool common::exists(const std::string &_path)
+{
+  return common::isFile(_path) ||
+         common::isDirectory(_path);
+}
+
+/////////////////////////////////////////////////
+bool common::isFile(const std::string &_path)
+{
+  std::ifstream f(_path);
+  return f.good();
+}
+
+/////////////////////////////////////////////////
+bool common::isDirectory(const std::string &_path)
+{
+  struct stat info;
+
+  if (stat(_path.c_str(), &info) != 0)
+    return false;
+  else if (info.st_mode & S_IFDIR)
+    return true;
+  else
+    return false;
 }
