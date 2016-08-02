@@ -21,27 +21,8 @@ namespace gazebo
 {
   namespace util
   {
-    /////////////////////////////////////////////
-    ignition::msgs::Plugin PluginSdfToIgnMsg(const sdf::ElementPtr _sdf)
-    {
-      ignition::msgs::Plugin result;
-
-      result.set_name(_sdf->Get<std::string>("name"));
-      result.set_filename(_sdf->Get<std::string>("filename"));
-
-      std::stringstream ss;
-      for (sdf::ElementPtr innerElem = _sdf->GetFirstElement();
-          innerElem; innerElem = innerElem->GetNextElement(""))
-      {
-        ss << innerElem->ToString("");
-      }
-      result.set_innerxml(ss.str());
-
-      return result;
-    }
-
     /////////////////////////////////////////////////
-    sdf::ElementPtr PluginIgnMsgToSdf(const ignition::msgs::Plugin &_msg,
+    sdf::ElementPtr Convert(const ignition::msgs::Plugin &_msg,
         sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr pluginSDF;
@@ -57,7 +38,7 @@ namespace gazebo
       }
 
       // Use the SDF parser to read all the inner xml.
-      std::string tmp = "<sdf version='1.5'>";
+      std::string tmp = "<sdf version='" SDF_VERSION "'>";
       tmp += "<plugin name='" + _msg.name() + "' filename='" +
         _msg.filename() + "'>";
       tmp += _msg.innerxml();
