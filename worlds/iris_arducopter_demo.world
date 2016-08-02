@@ -141,7 +141,7 @@ to fly iris with a ps2 joystick.
 
     <model name="iris_demo">
       <include>
-        <uri>model://iris</uri>
+        <uri>model://iris_with_standoffs</uri>
       </include>
 
       <include>

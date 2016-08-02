@@ -104,6 +104,7 @@
             <izz>0.469845106</izz>
           </inertia>
         </inertial>
+<!--
         <visual name="skid_pad">
           <pose>0 -0.05 0.025 0 0 0</pose>
           <geometry>
@@ -112,6 +113,7 @@
             </box>
           </geometry>
         </visual>
+-->
         <collision name="skid_pad">
           <pose>0 -0.05 0.025 0 0 0</pose>
           <geometry>
