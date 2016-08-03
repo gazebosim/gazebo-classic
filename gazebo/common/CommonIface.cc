@@ -21,9 +21,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <fcntl.h>
 #include <fstream>
 #include <sys/stat.h>
+#include <sys/sendfile.h>
 #include <vector>
+
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -189,4 +192,56 @@ bool common::isDirectory(const std::string &_path)
     return true;
   else
     return false;
+}
+
+/////////////////////////////////////////////////
+bool common::moveFile(const std::string &_existingFilename,
+                      const std::string &_newFilename)
+{
+  return copyFile(_existingFilename, _newFilename) &&
+         std::remove(_existingFilename.c_str()) == 0;
+}
+
+/////////////////////////////////////////////////
+bool common::copyFile(const std::string &_existingFilename,
+                      const std::string &_newFilename)
+{
+#ifdef _WIN32
+  return CopyFile(_existingFilename, _newFilename, false);
+#elif defined(__APPLE__)
+  std::ifstream in(_existingFilename.c_str(), fstream::binary);
+  std::ofstream out(_newFilename.c_str(), fstream::trunc|fstream::binary);
+  out << in.rdbuf();
+#else
+  int readFd;
+  int writeFd;
+  struct stat statBuf;
+  off_t offset = 0;
+
+  // Open the input file.
+  readFd = open(_existingFilename.c_str(), O_RDONLY);
+
+  // Stat the input file to obtain its size.
+  fstat(readFd, &statBuf);
+
+  // Open the output file for writing, with the same permissions as the
+  // source file.
+  writeFd = open(_newFilename.c_str(), O_WRONLY | O_CREAT, statBuf.st_mode);
+
+  while (offset >= 0 && offset < statBuf.st_size)
+  {
+    // Blast the bytes from one file to the other.
+    ssize_t written = sendfile(writeFd, readFd, &offset, statBuf.st_size);
+    if (written < 0)
+      break;
+
+    offset += written;
+  }
+
+  // Close up.
+  close (readFd);
+  close (writeFd);
+
+  return offset == statBuf.st_size;
+#endif
 }

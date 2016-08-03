@@ -116,6 +116,22 @@ namespace gazebo
     /// \return True if _path is a file.
     GZ_COMMON_VISIBLE
     bool isFile(const std::string &_path);
+
+    /// \brief Copy a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _newFilename Full path of the new file.
+    /// \return True on success.
+    GZ_COMMON_VISIBLE
+    bool copyFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Move a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _newFilename Full path of the new file.
+    /// \return True on success.
+    GZ_COMMON_VISIBLE
+    bool moveFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
     /// \}
   }
 

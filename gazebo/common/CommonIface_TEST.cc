@@ -105,6 +105,38 @@ TEST_F(CommonIface_TEST, split)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test file operations
+TEST_F(CommonIface_TEST, fileOps)
+{
+  EXPECT_FALSE(common::cwd().empty());
+  EXPECT_TRUE(common::exists(common::cwd()));
+  EXPECT_TRUE(common::isDirectory(common::cwd()));
+
+  EXPECT_TRUE(common::isFile(__FILE__));
+  EXPECT_FALSE(common::isDirectory(__FILE__));
+
+  std::ofstream tmpOut("test.tmp");
+  tmpOut << "Output" << std::endl;
+  tmpOut.close();
+
+  common::copyFile("test.tmp", "test2.tmp");
+  EXPECT_TRUE(common::exists("test.tmp"));
+  EXPECT_TRUE(common::exists("test2.tmp"));
+
+  common::moveFile("test2.tmp", "test3.tmp");
+  EXPECT_FALSE(common::exists("test2.tmp"));
+  EXPECT_TRUE(common::exists("test3.tmp"));
+
+  std::remove("test.tmp");
+
+  // This file shouldn't exist, but we'll try to remove just in case the
+  // test failed.
+  std::remove("test2.tmp");
+
+  std::remove("test3.tmp");
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

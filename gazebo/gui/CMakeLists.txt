@@ -49,7 +49,6 @@ set (sources
   ModelSnap.cc
   MouseEventHandler.cc
   RenderWidget.cc
-  SaveDialog.cc
   SaveEntityDialog.cc
   SpaceNav.cc
   SplashScreen.cc
@@ -89,7 +88,6 @@ set (qt_headers
   ModelListWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
-  SaveDialog.hh
   SaveEntityDialog.hh
   SplashScreen.hh
   TimePanel.hh
@@ -142,7 +140,6 @@ set (qt_tests
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
-  SaveDialog_TEST.cc
   SaveEntityDialog_TEST.cc
   SplashScreen_TEST.cc
   TimePanel_TEST.cc

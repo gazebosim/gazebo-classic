@@ -22,7 +22,7 @@
 #include "gazebo/common/Time.hh"
 #include <gazebo/util/system.hh>
 
-#define VIDEO_ENCODER_BITRATE_DEFAULT 400000
+#define VIDEO_ENCODER_BITRATE_DEFAULT 800000
 #define VIDEO_ENCODER_WIDTH_DEFAULT 1280
 #define VIDEO_ENCODER_HEIGHT_DEFAULT 720
 #define VIDEO_ENCODER_FPS_DEFAULT 25
