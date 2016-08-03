@@ -306,6 +306,7 @@ TEST_F(QuaternionTest, Quaternion)
   // then qd * qc * qb * qa rotates frame o to s
   // then qd = qdcba * inv(qc * qb * qa)
   EXPECT_EQ(qd, qdcba*(qc*qb*qa).GetInverse());
+  EXPECT_EQ(qa, qdcba*(qd*qc*qb).GetInverse());
 }
 
 //////////////////////////////////////////////////
