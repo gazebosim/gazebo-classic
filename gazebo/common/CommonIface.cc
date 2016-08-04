@@ -19,6 +19,11 @@
 #endif
 
 #include <cstdlib>
+#include <fstream>
+
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -31,6 +36,17 @@
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
+
+#ifdef _WIN32
+# define GZ_PATH_MAX _MAX_PATH
+#elif defined(PATH_MAX)
+# define GZ_PATH_MAX PATH_MAX
+#elif defined(_XOPEN_PATH_MAX)
+# define GZ_PATH_MAX _XOPEN_PATH_MAX
+#else
+# define GZ_PATH_MAX _POSIX_PATH_MAX
+#endif
+
 
 /////////////////////////////////////////////////
 void common::load()
@@ -93,5 +109,92 @@ const char *common::getEnv(const char *_name)
     return NULL;
 #else
   return getenv(_name);
+#endif
+}
+
+/////////////////////////////////////////////////
+std::string common::cwd()
+{
+  char buf[GZ_PATH_MAX + 1] = {'\0'};
+#ifdef _WIN32
+  return _getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
+#else
+  return getcwd(buf, sizeof(buf)) == nullptr ? "" : buf;
+#endif
+}
+
+/////////////////////////////////////////////////
+bool common::exists(const std::string &_path)
+{
+  return common::isFile(_path) || common::isDirectory(_path);
+}
+
+/////////////////////////////////////////////////
+bool common::isFile(const std::string &_path)
+{
+  std::ifstream f(_path);
+  return f.good();
+}
+
+/////////////////////////////////////////////////
+bool common::isDirectory(const std::string &_path)
+{
+  struct stat info;
+
+  if (stat(_path.c_str(), &info) != 0)
+    return false;
+  else if (info.st_mode & S_IFDIR)
+    return true;
+  else
+    return false;
+}
+
+/////////////////////////////////////////////////
+bool common::moveFile(const std::string &_existingFilename,
+                      const std::string &_newFilename)
+{
+  return copyFile(_existingFilename, _newFilename) &&
+         std::remove(_existingFilename.c_str()) == 0;
+}
+
+/////////////////////////////////////////////////
+bool common::copyFile(const std::string &_existingFilename,
+                      const std::string &_newFilename)
+{
+#ifdef _WIN32
+  return CopyFile(_existingFilename, _newFilename, false);
+#elif defined(__APPLE__)
+  std::ifstream in(_existingFilename.c_str(), fstream::binary);
+  std::ofstream out(_newFilename.c_str(), fstream::trunc|fstream::binary);
+  out << in.rdbuf();
+#else
+  int readFd;
+  int writeFd;
+  struct stat statBuf;
+  off_t offset = 0;
+
+  // Open the input file.
+  readFd = open(_existingFilename.c_str(), O_RDONLY);
+
+  // Stat the input file to obtain its size.
+  fstat(readFd, &statBuf);
+
+  // Open the output file for writing, with the same permissions as the
+  // source file.
+  writeFd = open(_newFilename.c_str(), O_WRONLY | O_CREAT, statBuf.st_mode);
+
+  while (offset >= 0 && offset < statBuf.st_size)
+  {
+    // Send the bytes from one file to the other.
+    ssize_t written = sendfile(writeFd, readFd, &offset, statBuf.st_size);
+    if (written < 0)
+      break;
+  }
+
+  // Close up.
+  close (readFd);
+  close (writeFd);
+
+  return offset == statBuf.st_size;
 #endif
 }
