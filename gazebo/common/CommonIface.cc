@@ -22,7 +22,6 @@
 #include <cstring>
 #include <string>
 #include <fstream>
-#include <vector>
 
 #include <fcntl.h>
 #include <sys/stat.h>
