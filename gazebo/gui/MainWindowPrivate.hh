@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
-#define _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MAINWINDOWPRIVATE_HH_
+#define GAZEBO_GUI_MAINWINDOWPRIVATE_HH_
 
 #include <map>
 #include <memory>
@@ -47,13 +47,13 @@ namespace gazebo
     class MainWindowPrivate
     {
       /// \brief Pointer to the render widget.
-      public: RenderWidget *renderWidget;
+      public: RenderWidget *renderWidget = nullptr;
 
       /// \brief Pointer to the tools widget.
-      public: ToolsWidget *toolsWidget;
+      public: ToolsWidget *toolsWidget = nullptr;
 
       /// \brief Pointer to the model list widget.
-      public: ModelListWidget *modelListWidget;
+      public: ModelListWidget *modelListWidget = nullptr;
 
       /// \brief Transport node used for communication.
       public: transport::NodePtr node;
@@ -99,32 +99,32 @@ namespace gazebo
       public: std::map<std::string, unsigned int> entities;
 
       /// \brief Message used to field requests.
-      public: msgs::Request *requestMsg;
+      public: msgs::Request *requestMsg = nullptr;
 
       /// \brief The left-hand tab widget
-      public: QTabWidget *tabWidget;
+      public: QTabWidget *tabWidget = nullptr;
 
       /// \brief Mainwindow's menubar
-      public: QMenuBar *menuBar;
+      public: QMenuBar *menuBar = nullptr;
 
       /// \brief The Edit menu.
-      public: QMenu *editMenu;
+      public: QMenu *editMenu = nullptr;
 
       /// \brief A layout for the menu bar.
-      public: QHBoxLayout *menuLayout;
+      public: QHBoxLayout *menuLayout = nullptr;
 
       /// \brief Used to control size of each pane.
-      public: QStackedWidget *leftColumn;
+      public: QStackedWidget *leftColumn = nullptr;
 
       /// \brief Map of names to widgets in the leftColumn QStackedWidget
       public: std::map<std::string, int> leftColumnStack;
 
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
-      public: std::string saveFilename;
+      public: std::string saveFilename = "";
 
       /// \brief User specified step size for manually stepping the world
-      public: int inputStepSize;
+      public: int inputStepSize = 1;
 
       /// \brief Map of all the editors to their names.
       public: std::map<std::string, std::unique_ptr<Editor> > editors;
@@ -133,11 +133,11 @@ namespace gazebo
       public: std::vector<QActionGroup *> alignActionGroups;
 
       /// \brief Space navigator interface.
-      public: SpaceNav *spacenav;
+      public: SpaceNav *spacenav = nullptr;
 
 #ifdef HAVE_OCULUS
       /// \brief Window for Oculus VR set.
-      public: OculusWindow *oculusWindow;
+      public: OculusWindow *oculusWindow = nullptr;
 #endif
 
       /// \brief Buffer of plugin messages to process.
@@ -147,16 +147,16 @@ namespace gazebo
       public: std::mutex pluginLoadMutex;
 
       /// \brief Splitter for the main window.
-      public: QSplitter *splitter;
+      public: QSplitter *splitter = nullptr;
 
       /// \brief Data logger dialog.
-      public: DataLogger *dataLogger;
+      public: DataLogger *dataLogger = nullptr;
 
       /// \brief Tab to insert models.
-      public: InsertModelWidget *insertModel;
+      public: InsertModelWidget *insertModel = nullptr;
 
       /// \brief Class which manages user commands and undoing / redoing them.
-      public: UserCmdHistory *userCmdHistory;
+      public: UserCmdHistory *userCmdHistory = nullptr;
     };
   }
 }
