@@ -121,7 +121,7 @@ namespace gazebo
 
       /// \brief The filename set via "Save As". This filename is used by
       /// the "Save" feature.
-      public: std::string saveFilename = "";
+      public: std::string saveFilename;
 
       /// \brief User specified step size for manually stepping the world
       public: int inputStepSize = 1;
