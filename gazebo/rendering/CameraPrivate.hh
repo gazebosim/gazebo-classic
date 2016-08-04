@@ -120,12 +120,6 @@ namespace gazebo
 
       /// \brief Video encoder.
       public: common::VideoEncoder videoEncoder;
-
-      /// \brief True to encode frames to video buffer.
-      public: bool encodeVideo = false;
-
-      /// \brief Video encoding format
-      public: std::string videoEncodeFormat = "";
     };
   }
 }

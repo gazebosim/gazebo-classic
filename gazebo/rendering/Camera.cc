@@ -531,7 +531,6 @@ void Camera::ReadPixelBuffer()
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
     pixelBuffer = this->renderTexture->getBuffer();
     pixelBuffer->blitToMemory(box);
-
 #else
     // There is a fix in ogre-1.8 for a buffer overrun problem in
     // OgreGLXWindow.cpp's copyContentsToMemory(). It fixes reading
@@ -577,7 +576,7 @@ void Camera::PostRender()
     }
     else if (this->dataPtr->videoEncoder.IsEncoding())
     {
-      this->dataPtr->videoEncoder.AddFrame(this->saveFrameBuffer,
+      this->dataPtr->videoEncoder.AddFrame(buffer,
           this->ImageWidth(), this->ImageHeight());
     }
 
@@ -1553,14 +1552,8 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 bool Camera::StartVideo(const std::string &_format)
 {
-  if (!this->dataPtr->videoEncoder.IsEncoding())
-  {
-    // 720p resolution by default.
-    return this->dataPtr->videoEncoder.Start(
-        this->ImageWidth(), this->ImageHeight(), _format);
-  }
-
-  return false;
+  return this->dataPtr->videoEncoder.Start(
+      this->ImageWidth(), this->ImageHeight(), _format);
 }
 
 //////////////////////////////////////////////////

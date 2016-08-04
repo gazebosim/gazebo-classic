@@ -101,7 +101,7 @@ namespace gazebo
 
     /// \brief Returns true if _path is a file or directory
     /// \param[in] _path Path to check.
-    /// \return true if _path is a file or directory
+    /// \return True if _path is a file or directory
     GZ_COMMON_VISIBLE
     bool exists(const std::string &_path);
 
@@ -118,8 +118,8 @@ namespace gazebo
     bool isFile(const std::string &_path);
 
     /// \brief Copy a file.
-    /// \param[in] _existingFilename Full path to an existing file.
-    /// \param[in] _newFilename Full path of the new file.
+    /// \param[in] _existingFilename Path to an existing file.
+    /// \param[in] _newFilename Path of the new file.
     /// \return True on success.
     GZ_COMMON_VISIBLE
     bool copyFile(const std::string &_existingFilename,

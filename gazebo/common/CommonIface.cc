@@ -21,12 +21,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include <fcntl.h>
 #include <fstream>
-#include <sys/stat.h>
-#include <sys/sendfile.h>
 #include <vector>
 
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -170,8 +170,7 @@ std::string common::cwd()
 /////////////////////////////////////////////////
 bool common::exists(const std::string &_path)
 {
-  return common::isFile(_path) ||
-         common::isDirectory(_path);
+  return common::isFile(_path) || common::isDirectory(_path);
 }
 
 /////////////////////////////////////////////////

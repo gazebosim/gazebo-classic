@@ -171,7 +171,7 @@ TopToolbar::TopToolbar(QWidget *_parent)
     QToolButton *button = new QToolButton;
     button->setObjectName("recordVideoButton");
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    button->setIcon(QIcon(":/images/video_camera_white.png"));
+    button->setIcon(QIcon(":/images/video_camera_white.svg"));
     button->setToolTip(tr("Record a video"));
 
     QMenu *menu = new QMenu(button);
