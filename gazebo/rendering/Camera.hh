@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_RENDERING_CAMERA_HH_
-#define _GAZEBO_RENDERING_CAMERA_HH_
+#ifndef GAZEBO_RENDERING_CAMERA_HH_
+#define GAZEBO_RENDERING_CAMERA_HH_
 
 #include <memory>
 #include <functional>
@@ -659,24 +658,30 @@ namespace gazebo
 
       /// \brief Turn on video recording.
       /// \param[in] _format Video format.
-      /// \return True on success.
+      /// \return True on success. The return value is set by
+      /// common::VideoEncoder::Start().
+      /// \sa common::VideoEncoder::Start
       public: bool StartVideo(const std::string &_format);
 
       /// \brief Turn off video recording
       /// \return True on success. The return value is set by
       /// common::VideoEncoder::Stop().
+      /// \sa common::VideoEncoder::Stop
       public: bool StopVideo();
 
       /// \brief Save the last encoded video to disk
       /// \param[in] _filename File in which to save the encoded video
-      /// \return True if saving was successful
+      /// \return True if saving was successful. The return value is set by
+      /// common::VideoEncoder::SaveToFile().
+      /// \sa common::VideoEncoder::SaveToFile
       public: bool SaveVideo(const std::string &_filename);
 
       /// \brief Reset video recording. This will call
       /// common::VideoEncoder::Reset, which will cleanup temprary files and
       /// set video encoding values to their default settings.
       /// \sa common::VideoEncoder::Reset
-      /// \return True if reset was succesful.
+      /// \return True if reset was succesful. Currently this function will
+      /// always return true.
       public: bool ResetVideo();
 
       /// \brief Set the render target

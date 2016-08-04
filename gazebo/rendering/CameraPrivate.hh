@@ -21,10 +21,10 @@
 #include <mutex>
 #include <utility>
 #include <list>
-#include <string>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/PID.hh"
+#include "gazebo/common/VideoEncoder.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 

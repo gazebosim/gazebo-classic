@@ -47,7 +47,7 @@ namespace gazebo
       /// \brief Signal emitted when a recording is stopped.
       Q_SIGNALS: void recordingStopped();
 
-      /// \brief Signal emitted when the record state changes.
+      /// \brief Signal emitted when the recording state changes.
       /// \param[out] _recording True if recording is enabled, false
       /// otherwise.
       Q_SIGNALS: void recordingChanged(bool _recording);

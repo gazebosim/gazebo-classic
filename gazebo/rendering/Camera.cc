@@ -1264,14 +1264,6 @@ bool Camera::SaveFrame(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-bool Camera::SaveVideo(const std::string &_filename)
-{
-  // This will stop video encoding, save the video file, and reset
-  // video encoding.
-  return this->dataPtr->videoEncoder.SaveToFile(_filename);
-}
-
-//////////////////////////////////////////////////
 std::string Camera::GetFrameFilename()
 {
   return FrameFilename();
@@ -1559,13 +1551,15 @@ bool Camera::StartVideo(const std::string &_format)
 //////////////////////////////////////////////////
 bool Camera::StopVideo()
 {
-  if (!this->dataPtr->videoEncoder.IsEncoding())
-  {
-    gzwarn << "Video encoder not started.\n";
-    return false;
-  }
-
   return this->dataPtr->videoEncoder.Stop();
+}
+
+//////////////////////////////////////////////////
+bool Camera::SaveVideo(const std::string &_filename)
+{
+  // This will stop video encoding, save the video file, and reset
+  // video encoding.
+  return this->dataPtr->videoEncoder.SaveToFile(_filename);
 }
 
 //////////////////////////////////////////////////
