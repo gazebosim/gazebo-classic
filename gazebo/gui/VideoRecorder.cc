@@ -48,8 +48,6 @@ VideoRecorder::VideoRecorder(QWidget *_parent)
   QAction *mp4Action = new QAction(QIcon(":/images/mp4.svg"),
       tr("Record mp4 video"), this);
   this->dataPtr->mp4Button->setDefaultAction(mp4Action);
-  //this->dataPtr->mp4Button = new QPushButton("MP4");
-  //this->dataPtr->mp4Button->setObjectName("materialFlat");
 
   // OGV recording button
   this->dataPtr->ogvButton = new QToolButton(this);

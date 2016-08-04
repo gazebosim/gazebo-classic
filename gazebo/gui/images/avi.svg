@@ -12,7 +12,7 @@
    width="32"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="avi.svg"
    style="fill:#ffffff">
   <metadata
@@ -43,10 +43,10 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="13.906433"
-     inkscape:cx="4.6226112"
-     inkscape:cy="29.86608"
-     inkscape:window-x="842"
-     inkscape:window-y="237"
+     inkscape:cx="-20.073689"
+     inkscape:cy="29.722262"
+     inkscape:window-x="2938"
+     inkscape:window-y="65"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <path
@@ -56,14 +56,14 @@
      style="fill:none" />
   <text
      xml:space="preserve"
-     style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
-     x="4.8881836"
-     y="21.017578"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+     x="4.2087097"
+     y="20.875214"
      id="text2983"
      sodipodi:linespacing="125%"><tspan
        sodipodi:role="line"
        id="tspan2985"
-       x="4.8881836"
-       y="21.017578"
-       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;font-family:Droid Sans;-inkscape-font-specification:Droid Sans">AVI</tspan></text>
+       x="4.2087097"
+       y="20.875214"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#ffffff">AVI</tspan></text>
 </svg>

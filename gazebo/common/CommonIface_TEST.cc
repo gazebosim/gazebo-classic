@@ -123,7 +123,7 @@ TEST_F(CommonIface_TEST, fileOps)
   EXPECT_TRUE(common::exists("test.tmp"));
   EXPECT_TRUE(common::exists("test2.tmp"));
 
-  common::moveFile("test2.tmp", "test3.tmp");
+  EXPECT_TRUE(common::moveFile("test2.tmp", "test3.tmp"));
   EXPECT_FALSE(common::exists("test2.tmp"));
   EXPECT_TRUE(common::exists("test3.tmp"));
 

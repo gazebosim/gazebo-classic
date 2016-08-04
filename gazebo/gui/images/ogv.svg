@@ -12,8 +12,8 @@
    width="32"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="avi.svg"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="ogv.svg"
    style="fill:#ffffff">
   <metadata
      id="metadata12">
@@ -23,7 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -43,27 +43,27 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="13.906433"
-     inkscape:cx="4.6226112"
+     inkscape:cx="-13.067044"
      inkscape:cy="29.86608"
-     inkscape:window-x="779"
-     inkscape:window-y="172"
+     inkscape:window-x="3015"
+     inkscape:window-y="257"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <path
-     d="M 0,8 H 24 V 32 H 0 z"
+     d="M 0,8 24,8 24,32 0,32 Z"
      id="path4"
      inkscape:connector-curvature="0"
      style="fill:none" />
   <text
      xml:space="preserve"
-     style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
-     x="0.9609375"
-     y="21.007324"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+     x="-0.64364624"
+     y="20.868683"
      id="text2983"
      sodipodi:linespacing="125%"><tspan
        sodipodi:role="line"
        id="tspan2985"
-       x="0.9609375"
-       y="21.007324"
-       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;font-family:Droid Sans;-inkscape-font-specification:Droid Sans">OGV</tspan></text>
+       x="-0.64364624"
+       y="20.868683"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#ffffff">OGV</tspan></text>
 </svg>
