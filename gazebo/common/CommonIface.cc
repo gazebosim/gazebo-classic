@@ -230,12 +230,10 @@ bool common::copyFile(const std::string &_existingFilename,
 
   while (offset >= 0 && offset < statBuf.st_size)
   {
-    // Blast the bytes from one file to the other.
+    // Send the bytes from one file to the other.
     ssize_t written = sendfile(writeFd, readFd, &offset, statBuf.st_size);
     if (written < 0)
       break;
-
-    offset += written;
   }
 
   // Close up.
