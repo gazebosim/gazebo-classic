@@ -86,7 +86,7 @@ class gazebo::common::VideoEncoderPrivate
   public: std::chrono::steady_clock::time_point timePrev;
 
   /// \brief Number of frames in the video
-  public: unsigned long int frameCount = 0;
+  public: uint64_t frameCount = 0;
 
   /// \brief Mutex for thread safety.
   public: std::mutex mutex;
@@ -127,9 +127,6 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
     case AV_LOG_WARNING:
       gzwarn << msg << std::endl;
       break;
-    case AV_LOG_INFO:
-    case AV_LOG_TRACE:
-    case AV_LOG_VERBOSE:
     default:
       gzmsg << msg << std::endl;
       break;
@@ -226,16 +223,16 @@ bool VideoEncoder::Start(const unsigned int _width,
     this->dataPtr->bitRate = _bitRate;
   }
 
-  // The resolution must be divisible by two
-  unsigned int outWidth = _width % 2 == 0 ? _width : _width + 1;
-  unsigned int outHeight = _height % 2 == 0 ? _height : _height + 1;
-
   // Store some info and reset the frame count.
   this->dataPtr->format = _format;
   this->dataPtr->fps = _fps;
   this->dataPtr->frameCount = 0;
 
 #ifdef HAVE_FFMPEG
+  // The resolution must be divisible by two
+  unsigned int outWidth = _width % 2 == 0 ? _width : _width + 1;
+  unsigned int outHeight = _height % 2 == 0 ? _height : _height + 1;
+
   std::string tmpFileNameFull = this->dataPtr->TmpFilename();
 
   AVOutputFormat *outputFormat =
@@ -324,7 +321,12 @@ bool VideoEncoder::Start(const unsigned int _width,
     return false;
   }
 
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 28, 1)
+  this->dataPtr->avOutFrame = avcodec_alloc_frame();
+#else
   this->dataPtr->avOutFrame = av_frame_alloc();
+#endif
+
   if (!this->dataPtr->avOutFrame)
   {
     gzerr << "Could not allocate video frame."
@@ -400,7 +402,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     const unsigned int _width,
     const unsigned int _height)
 {
-
   return this->AddFrame(_frame, _width, _height,
       std::chrono::steady_clock::now());
 }
@@ -534,7 +535,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   av_free_packet(&avPacket);
   return true;
-
 }
 #else
 bool VideoEncoder::AddFrame(const unsigned char */*_frame*/,
