@@ -176,22 +176,62 @@ release will remove the deprecated code.
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
+1. **gazebo/math/Filter.hh**
+    + ***Deprecation:*** public:   gazebo::math::BiQuad
+    + ***Replacement:*** public: ignition::math::BiQuad
+    + ***Deprecation:*** public:   gazebo::math::Filter
+    + ***Replacement:*** public: ignition::math::Filter
+    + ***Deprecation:*** public:   gazebo::math::OnePole
+    + ***Replacement:*** public: ignition::math::OnePole
+
+1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
+    + ***Replacement:*** public: double ignition::math::fixnan(double)
+    + ***Deprecation:*** public: float   gazebo::math::fixnan(float)
+    + ***Replacement:*** public: float ignition::math::fixnan(float)
+    + ***Deprecation:*** public: bool   gazebo::math::isnan(double)
+    + ***Replacement:*** public: bool ignition::math::isnan(double)
+    + ***Deprecation:*** public: bool   gazebo::math::isnan(float)
+    + ***Replacement:*** public: bool ignition::math::isnan(float)
+    + ***Deprecation:*** public: bool   gazebo::math::isPowerOfTwo(unsigned int)
+    + ***Replacement:*** public: bool ignition::math::isPowerOfTwo(unsigned int)
+    + ***Deprecation:*** public: T   gazebo::math::max(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::max(const std::vector<T> &)
+    + ***Deprecation:*** public: T   gazebo::math::mean(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::mean(const std::vector<T> &)
+    + ***Deprecation:*** public: T   gazebo::math::min(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::min(const std::vector<T> &)
+    + ***Deprecation:*** public: double   gazebo::math::parseFloat(const std::string &)
+    + ***Replacement:*** public: double ignition::math::parseFloat(const std::string &)
+    + ***Deprecation:*** public: int   gazebo::math::parseInt(const std::string &)
+    + ***Replacement:*** public: int ignition::math::parseInt(const std::string &)
+    + ***Deprecation:*** public: T   gazebo::math::precision(const T &, const unsigned int &)
+    + ***Replacement:*** public: T ignition::math::precision(const T &, const unsigned int &)
+    + ***Deprecation:*** public: unsigned int   gazebo::math::roundUpPowerOfTwo(unsigned int)
+    + ***Replacement:*** public: unsigned int ignition::math::roundUpPowerOfTwo(unsigned int)
+    + ***Deprecation:*** public: T   gazebo::math::variance(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::variance(const std::vector<T> &)
+
+1. **gazebo/math/Kmeans.hh**
+    + ***Deprecation:*** public:   gazebo::math::Kmeans
+    + ***Replacement:*** public: ignition::math::Kmeans
+
 1. **gazebo/math/RotationSpline.hh**
-    + ***Deprecation:*** public: gazebo::math::RotationSpline
+    + ***Deprecation:*** public:   gazebo::math::RotationSpline
     + ***Replacement:*** public: ignition::math::RotationSpline
 
 1. **gazebo/math/SignalStats.hh**
-    + ***Deprecation:*** public: gazebo::math::SignalStatistic
+    + ***Deprecation:*** public:   gazebo::math::SignalStatistic
     + ***Replacement:*** public: ignition::math::SignalStatistic
-    + ***Deprecation:*** public: gazebo::math::SignalStats
+    + ***Deprecation:*** public:   gazebo::math::SignalStats
     + ***Replacement:*** public: ignition::math::SignalStats
 
 1. **gazebo/math/Spline.hh**
-    + ***Deprecation:*** public: gazebo::math::Spline
+    + ***Deprecation:*** public:   gazebo::math::Spline
     + ***Replacement:*** public: ignition::math::Spline
 
 1. **gazebo/math/Vector3Stats.hh**
-    + ***Deprecation:*** public: gazebo::math::Vector3Stats
+    + ***Deprecation:*** public:   gazebo::math::Vector3Stats
     + ***Replacement:*** public: ignition::math::Vector3Stats
 
 ### Deletions

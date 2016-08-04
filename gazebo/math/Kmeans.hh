@@ -37,7 +37,8 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _obs Set of observations to cluster.
-      public: Kmeans(const std::vector<Vector3> &_obs);
+      /// \deprecated See ignition::math::Kmeans
+      public: Kmeans(const std::vector<Vector3> &_obs) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Kmeans();

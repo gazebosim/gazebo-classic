@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo.hh"
 #include "ServerFixture.hh"
@@ -393,12 +394,12 @@ void ServerFixture::PrintScan(const std::string &_name, double *_scan,
   for (unsigned int i = 0; i < _sampleCount-1; ++i)
   {
     if ((i+1) % 5 == 0)
-      printf("%13.10f,\n", math::precision(_scan[i], 10));
+      printf("%13.10f,\n", ignition::math::precision(_scan[i], 10));
     else
-      printf("%13.10f, ", math::precision(_scan[i], 10));
+      printf("%13.10f, ", ignition::math::precision(_scan[i], 10));
   }
   printf("%13.10f};\n",
-      math::precision(_scan[_sampleCount-1], 10));
+      ignition::math::precision(_scan[_sampleCount-1], 10));
   printf("static double *%s = __%s;\n", _name.c_str(),
       _name.c_str());
 }
@@ -413,8 +414,8 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+    double diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                       ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -444,8 +445,8 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
     }
     else
     {
-      diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+      diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                  ignition::math::precision(_scanB[i], 10));
     }
 
     _diffSum += diff;
