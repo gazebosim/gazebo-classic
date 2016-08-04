@@ -657,6 +657,16 @@ else ()
 endif ()
 
 ########################################
+# Find ignition msgs
+find_package(ignition-msgs0 0.4 QUIET)
+if (NOT ignition-msgs0_FOUND)
+  message(STATUS "Looking for ignition-msgs0-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs0 library.")
+else()
+  message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+endif()
+
+########################################
 # Find ignition math library
 find_package(ignition-math2 2.4 QUIET)
 if (NOT ignition-math2_FOUND)

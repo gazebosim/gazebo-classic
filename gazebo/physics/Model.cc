@@ -1740,7 +1740,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
 
         // Get plugin info from SDF
         auto pluginMsg = _plugins.add_plugins();
-        pluginMsg->CopyFrom(util::PluginSdfToIgnMsg(pluginElem));
+        pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
 
         pluginElem = pluginElem->GetNextElement("plugin");
       }

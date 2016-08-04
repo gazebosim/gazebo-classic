@@ -10,7 +10,7 @@ include_directories(${TBB_INCLUDEDIR}
                     ${tinyxml_INCLUDE_DIRS}
                     ${tinyxml2_INCLUDE_DIRS})
 
-link_directories(${tinyxml2_LIBRARY_DIRS})
+link_directories(${tinyxml2_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
 
 set (sources
   Diagnostics.cc
@@ -80,6 +80,7 @@ target_link_libraries(gazebo_util
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)

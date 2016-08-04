@@ -17,9 +17,12 @@
 #ifndef GAZEBO_UTIL_IGNMSGSDF_HH_
 #define GAZEBO_UTIL_IGNMSGSDF_HH_
 
-#include <ignition/msgs/plugin.pb.h>
+#include <string>
+
+#include <ignition/msgs/MessageTypes.hh>
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -29,8 +32,14 @@ namespace gazebo
     /// \brief Create an ignition::msgs::Plugin from a plugin SDF element.
     /// \param[in] _sdf The sdf element.
     /// \return The new ignition::msgs::Plugin object.
+    template<typename T>
     GAZEBO_VISIBLE
-    ignition::msgs::Plugin PluginSdfToIgnMsg(const sdf::ElementPtr _sdf);
+    T Convert(const sdf::ElementPtr /*_sdf*/)
+    {
+      gzerr << "Invalid convertion of SDF to type["
+            << typeid(T).name() << "]\n";
+      return T();
+    }
 
     /// \brief Create or update an SDF element from ignition::msgs::Plugin.
     /// \param[in] _msg Plugin messsage.
@@ -38,8 +47,36 @@ namespace gazebo
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
-    sdf::ElementPtr PluginIgnMsgToSdf(const ignition::msgs::Plugin &_plugin,
-        sdf::ElementPtr _sdf = sdf::ElementPtr());
+    sdf::ElementPtr Convert(const ignition::msgs::Plugin &_plugin,
+                            sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    // Specialization of conversion from SDF to ignition message for
+    // plugins.
+    template<>
+    ignition::msgs::Plugin Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::Plugin result;
+
+      if (_sdf->GetName() != "plugin")
+      {
+        gzerr << "Tried to convert SDF [" << _sdf->GetName() <<
+            "] into [plugin]" << std::endl;
+        return result;
+      }
+
+      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_filename(_sdf->Get<std::string>("filename"));
+
+      std::stringstream ss;
+      for (sdf::ElementPtr innerElem = _sdf->GetFirstElement();
+          innerElem; innerElem = innerElem->GetNextElement(""))
+      {
+        ss << innerElem->ToString("");
+      }
+      result.set_innerxml(ss.str());
+
+      return result;
+    }
   }
 }
 #endif
