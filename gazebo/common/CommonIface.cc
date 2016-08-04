@@ -26,7 +26,10 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
+
+#ifdef __linux__
 #include <sys/sendfile.h>
+#endif
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
