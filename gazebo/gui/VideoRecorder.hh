@@ -47,6 +47,11 @@ namespace gazebo
       /// \brief Signal emitted when a recording is stopped.
       Q_SIGNALS: void recordingStopped();
 
+      /// \brief Signal emitted when the record state changes.
+      /// \param[out] _recording True if recording is enabled, false
+      /// otherwise.
+      Q_SIGNALS: void recordingChanged(bool _recording);
+
       /// \brief Qt callback when the record stop button is pressed.
       private slots: void OnRecordStop();
 

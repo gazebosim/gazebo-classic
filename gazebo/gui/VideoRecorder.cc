@@ -112,6 +112,7 @@ void VideoRecorder::OnRecordStop()
 
   // Inform listeners that we have stopped recording
   emit recordingStopped();
+  emit recordingChanged(false);
 
   // Show the correct buttons
   this->dataPtr->mp4Button->show();
@@ -153,6 +154,7 @@ void VideoRecorder::OnRecordStart(const QString &_format)
   {
     // Tell listeners that we started recording
     emit recordingStarted();
+    emit recordingChanged(true);
 
     // Show the Stop button, and hide the record options
     this->dataPtr->mp4Button->hide();

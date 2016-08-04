@@ -43,8 +43,8 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="13.906433"
-     inkscape:cx="-13.067044"
-     inkscape:cy="29.86608"
+     inkscape:cx="-21.911871"
+     inkscape:cy="29.722262"
      inkscape:window-x="3015"
      inkscape:window-y="257"
      inkscape:window-maximized="0"
@@ -56,7 +56,7 @@
      style="fill:none" />
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#d1d1d1;fill-opacity:1;stroke:none;"
      x="-0.64364624"
      y="20.868683"
      id="text2983"
@@ -65,5 +65,5 @@
        id="tspan2985"
        x="-0.64364624"
        y="20.868683"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#ffffff">OGV</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#d1d1d1;fill-opacity:1;">OGV</tspan></text>
 </svg>

@@ -43,7 +43,7 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="13.906433"
-     inkscape:cx="-20.073689"
+     inkscape:cx="-28.918516"
      inkscape:cy="29.722262"
      inkscape:window-x="2938"
      inkscape:window-y="65"
@@ -56,7 +56,7 @@
      style="fill:none" />
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#d1d1d1;fill-opacity:1;stroke:none;"
      x="4.2087097"
      y="20.875214"
      id="text2983"
@@ -65,5 +65,5 @@
        id="tspan2985"
        x="4.2087097"
        y="20.875214"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#ffffff">AVI</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#d1d1d1;fill-opacity:1;">AVI</tspan></text>
 </svg>

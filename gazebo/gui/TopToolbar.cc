@@ -184,6 +184,7 @@ TopToolbar::TopToolbar(QWidget *_parent)
 
     QGraphicsOpacityEffect *fade = new QGraphicsOpacityEffect(button);
     button->setGraphicsEffect(fade);
+    fade->setEnabled(false);
 
     QPropertyAnimation *animation = new QPropertyAnimation(fade, "opacity");
     animation->setDuration(1000);
@@ -202,8 +203,8 @@ TopToolbar::TopToolbar(QWidget *_parent)
 
     // Disable the fade effect on recording stop. This prevent the button
     // from being partially faded when the animation stops.
-    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStopped()),
-            fade, SLOT(setEnabled(false)));
+    connect(this->dataPtr->videoRecorder, SIGNAL(recordingChanged(bool)),
+        fade, SLOT(setEnabled(bool)));
 
     // Close the menu when a button is pressed.
     connect(this->dataPtr->videoRecorder, SIGNAL(recordingStarted()),

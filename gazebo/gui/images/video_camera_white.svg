@@ -13,7 +13,7 @@
    width="24"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="video_camera_white.svg">
   <metadata
      id="metadata12">
@@ -42,7 +42,7 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="9.8333333"
-     inkscape:cx="12"
+     inkscape:cx="-4.0677967"
      inkscape:cy="12"
      inkscape:window-x="0"
      inkscape:window-y="24"
@@ -55,5 +55,5 @@
   <path
      d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"
      id="path6"
-     style="opacity:1" />
+     style="opacity:1;fill:#d1d1d1;fill-opacity:1" />
 </svg>

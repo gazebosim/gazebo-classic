@@ -43,10 +43,10 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="9.8333331"
-     inkscape:cx="-37.578251"
+     inkscape:cx="-50.086726"
      inkscape:cy="20.458282"
-     inkscape:window-x="3019"
-     inkscape:window-y="265"
+     inkscape:window-x="2740"
+     inkscape:window-y="351"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <path
@@ -56,7 +56,7 @@
      style="fill:none" />
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#d1d1d1;fill-opacity:1;stroke:none;"
      x="-0.51956177"
      y="21.103027"
      id="text2983"
@@ -65,5 +65,5 @@
        id="tspan2985"
        x="-0.51956177"
        y="21.103027"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#ffffff">MP4</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.375px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#d1d1d1;fill-opacity:1;">MP4</tspan></text>
 </svg>
