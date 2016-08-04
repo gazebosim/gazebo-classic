@@ -125,13 +125,14 @@
             <friction>
               <ode>
                 <mu>0</mu>
-                <mu2>0</mu2>
+                <mu2>1</mu2>
+                <fdir1>0 1 0</fdir1>
               </ode>
             </friction>
           </surface>
         </collision>
       </link>
-      <joint name="iris_gimbal_mount" type="revolute">
+      <joint name="skid_pad_mount" type="revolute">
         <parent>zephyr_delta_wing::wing</parent>
         <child>skid_pad</child>
         <axis>
