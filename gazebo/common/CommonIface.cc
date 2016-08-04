@@ -167,12 +167,15 @@ bool common::copyFile(const std::string &_existingFilename,
 #ifdef _WIN32
   return CopyFile(_existingFilename, _newFilename, false);
 #elif defined(__APPLE__)
-  std::ifstream in(_existingFilename.c_str(), fstream::binary);
-  std::ofstream out(_newFilename.c_str(), fstream::trunc|fstream::binary);
+  std::ifstream in(_existingFilename.c_str(), std::ifstream::binary);
+  std::ofstream out(_newFilename.c_str(),
+      std::ifstream::trunc | std::ifstream::binary);
   out << in.rdbuf();
+  out.close();
+  in.close();
 #else
-  int readFd;
-  int writeFd;
+  int readFd = 0;
+  int writeFd = 0;
   struct stat statBuf;
   off_t offset = 0;
 
@@ -194,9 +197,8 @@ bool common::copyFile(const std::string &_existingFilename,
       break;
   }
 
-  // Close up.
-  close (readFd);
-  close (writeFd);
+  close(readFd);
+  close(writeFd);
 
   return offset == statBuf.st_size;
 #endif
