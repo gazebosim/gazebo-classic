@@ -417,7 +417,8 @@ namespace gazebo
       public: LinkPtr CreateLink(const std::string &_name);
 
       /// \brief Get information about plugins in this model or one of its
-      /// children, according to the given _pluginUri. Some _pluginUri examples:
+      /// children, according to the given _pluginUri. Some accepted URI
+      /// patterns:
       ///
       /// * Info about a specific model plugin in this model:
       ///    data://world/<world_name>/model/<this_name>/plugin/<plugin_name>

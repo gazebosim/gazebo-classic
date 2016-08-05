@@ -25,7 +25,6 @@
 
 #include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
-#include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"

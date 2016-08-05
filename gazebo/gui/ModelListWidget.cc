@@ -27,6 +27,7 @@
 #include <google/protobuf/message.h>
 
 #include <ignition/math/Angle.hh>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include <sdf/sdf.hh>
 
@@ -251,24 +252,21 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      if (this->dataPtr->requestPub)
+      if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
       {
-        if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
-        {
-          std::string pluginInfoService(gui::get_world() +
-              "/server/info/plugin");
-          ignition::msgs::StringMsg req;
-          req.set_data(this->dataPtr->selectedEntityName);
+        std::string pluginInfoService(gui::get_world() +
+            "/server/info/plugin");
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
 
-          this->dataPtr->ignNode.Request(pluginInfoService, req,
-              &ModelListWidget::OnPluginInfo, this);
-        }
-        else
-        {
-          this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-              this->dataPtr->selectedEntityName);
-          this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
-        }
+        this->dataPtr->ignNode.Request(pluginInfoService, req,
+            &ModelListWidget::OnPluginInfo, this);
+      }
+      else if (this->dataPtr->requestPub)
+      {
+        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+            this->dataPtr->selectedEntityName);
+        this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
       mItem->setExpanded(!mItem->isExpanded());

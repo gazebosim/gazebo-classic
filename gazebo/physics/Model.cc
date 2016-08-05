@@ -1664,7 +1664,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
 {
   if (!_pluginUri.Valid())
   {
-    gzwarn << "URI [" << _pluginUri.Str() << "] is not a valid." << std::endl;
+    gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
     _success = false;
     return;
   }
@@ -1685,8 +1685,8 @@ void Model::PluginInfo(const common::URI &_pluginUri,
   }
 
   // Check if all segments match up to this model
-  size_t i =0;
-  for ( ; i < myParts.size(); ++i)
+  size_t i = 0;
+  for (; i < myParts.size(); ++i)
   {
     if (parts[i] != myParts[i])
     {
@@ -1697,6 +1697,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
     }
   }
 
+  // Iterate over parts following this model
   for (; i < parts.size(); i = i+2)
   {
     if (parts[i] == "model")
@@ -1726,7 +1727,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
       }
 
       // Find correct plugin
-      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+      auto pluginElem = this->sdf->GetElement("plugin");
       while (pluginElem)
       {
         auto pluginName = pluginElem->Get<std::string>("name");
