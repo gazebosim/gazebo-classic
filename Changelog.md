@@ -2,6 +2,10 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Added filesystem operations to the common library. Additions include
+   `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
+    * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
+
 1. Added visualization of minimum range to laservisual.
     * [Pull request 2412](https://bitbucket.org/osrf/gazebo/pull-request/2412)
     * [Issue 2018](https://bitbucket.org/osrf/gazebo/issues/2018)
