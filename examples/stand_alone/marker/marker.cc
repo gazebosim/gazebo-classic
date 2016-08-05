@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ int main(int _argc, char **_argv)
   ignition::msgs::Material *matMsg = markerMsg.mutable_material();
   matMsg->mutable_script()->set_name("Gazebo/BlueLaser");
 
-  // The rest of this function add different shapes and/or modifies shapes
-  // Read the std::cout statements to figure out what each node.Publish
-  // accomplishes.
+  // The rest of this function adds different shapes and/or modifies shapes.
+  // Read the terminal statements to figure out what each node.Request
+  // call accomplishes.
 
   std::cout << "Spawning a sphere at the origin\n";
   gazebo::common::Time::Sleep(4);

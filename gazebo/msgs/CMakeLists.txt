@@ -62,7 +62,6 @@ set (msgs
   logical_camera_image.proto
   logical_camera_sensor.proto
   magnetometer.proto
-  marker.proto
   material.proto
   meshgeom.proto
   model.proto
