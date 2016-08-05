@@ -173,6 +173,7 @@ bool common::copyFile(const std::string &_existingFilename,
   out << in.rdbuf();
   out.close();
   in.close();
+  return common::isFile(_newFilename);
 #else
   int readFd = 0;
   int writeFd = 0;
