@@ -49,6 +49,9 @@
 1. Remove EntityMakerPrivate and move its members to derived classes
     * [Pull request #2310](https://bitbucket.org/osrf/gazebo/pull-request/2310)
 
+1. Conversion between ign-msgs and sdf, for plugin
+    * [Pull request #2403](https://bitbucket.org/osrf/gazebo/pull-request/2403)
+
 1. Change NULL to nullptr.
     * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
     * [Pull request #2297](https://bitbucket.org/osrf/gazebo/pull-request/2297)
