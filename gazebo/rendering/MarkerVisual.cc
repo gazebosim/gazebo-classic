@@ -24,11 +24,32 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/MarkerVisualPrivate.hh"
 #include "gazebo/rendering/MarkerVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;
+
+/// \brief Private data for the marker Visual class.
+class gazebo::rendering::MarkerVisualPrivate : public VisualPrivate
+{
+  /// \brief Renders line segments
+  public: std::unique_ptr<DynamicLines> dynamicRenderable;
+
+  /// \brief Renders text.
+  public: std::unique_ptr<MovableText> text;
+
+  /// \brief Mutex to protect the contact message.
+  public: std::mutex mutex;
+
+  /// \brief The last marker message received.
+  public: ignition::msgs::Marker msg;
+
+  /// \brief Lifetime of the marker
+  public: common::Time lifetime;
+
+  /// \brief True when the marker has already been loaded.
+  public: bool loaded = false;
+};
 
 /////////////////////////////////////////////////
 MarkerVisual::MarkerVisual(const std::string &_name, VisualPtr _vis)
@@ -41,6 +62,7 @@ MarkerVisual::MarkerVisual(const std::string &_name, VisualPtr _vis)
 MarkerVisual::~MarkerVisual()
 {
   this->Fini();
+  this->dPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -122,8 +144,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
                                       _msg.pose().orientation().x(),
                                       _msg.pose().orientation().y(),
                                       _msg.pose().orientation().z()
-                                      )
-          ));
+                                      )));
   }
 
   // Set the marker's end time
@@ -140,29 +161,19 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   {
     // Detach from existing parent. Only detach if a parent exists
     // and is not the root node when the new parent name is not empty.
-    if (this->GetParent())/* && (!_msg.parent().empty() ||
-          this->GetParent()->GetName() !=
-          this->scene->GetWorldVisual()->GetName()))*/
-    {
+    if (this->GetParent())
       this->GetParent()->DetachVisual(shared_from_this());
-    }
 
     // Get the new parent
     VisualPtr parent = this->GetScene()->GetVisual(_msg.parent());
 
     // Attach to the new parent, if the parent is valid
     if (parent)
-    {
       parent->AttachVisual(shared_from_this());
-    }
     else if (_msg.parent().empty())
-    {
       this->GetScene()->WorldVisual()->AttachVisual(shared_from_this());
-    }
     else if (!_msg.parent().empty())
-    {
       gzerr << "No visual with the name[" << _msg.parent() << "]\n";
-    }
   }
 }
 
@@ -213,8 +224,8 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
     {
       this->dPtr->dynamicRenderable->AddPoint(
           ignition::math::Vector3d(_msg.point(i).x(),
-            _msg.point(i).y(),
-            _msg.point(i).z()));
+                                   _msg.point(i).y(),
+                                   _msg.point(i).z()));
     }
   }
   else
@@ -224,8 +235,8 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
     {
       this->dPtr->dynamicRenderable->AddPoint(
           ignition::math::Vector3d(_msg.point(i).x(),
-            _msg.point(i).y(),
-            _msg.point(i).z()));
+                                   _msg.point(i).y(),
+                                   _msg.point(i).z()));
     }
   }
 }

@@ -38,8 +38,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~MarkerManager();
 
-      /// \brief Subscribe to the ~/marker topic and connect to the
-      /// PreRenderEvent.
+      /// \brief Initialize the marker manager.
       /// \param[in] _scene Pointer to the scene.
       /// \return True on success
       private: bool Init(ScenePtr _scene);

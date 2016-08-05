@@ -153,11 +153,10 @@ void MarkerManagerPrivate::OnPreRender()
     }
 
     // Erase a namespace if it's empty
-    /*if (mit->second.empty())
+    if (mit->second.empty())
       mit = this->markers.erase(mit);
     else
       ++mit;
-      */
   }
 }
 
@@ -165,7 +164,7 @@ void MarkerManagerPrivate::OnPreRender()
 bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 {
   // Get the namespace, if it exists
-  std::string ns = "";
+  std::string ns;
   if (_msg.has_ns())
     ns = _msg.ns();
 
@@ -200,11 +199,12 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
       this->markers[ns][_msg.id()] = marker;
     }
   }
+  // Remove a single marker
   else if (_msg.action() == ignition::msgs::Marker::DELETE_MARKER)
   {
     std::map<uint64_t, MarkerVisualPtr>::iterator markerIter;
 
-    // Add the marker to an existing namespace, if the namespace exists.
+    // Remove the marker if it can be found.
     if (nsIter != this->markers.end() &&
         (markerIter = nsIter->second.find(_msg.id())) != nsIter->second.end())
     {
@@ -213,8 +213,10 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
       this->markers[ns].erase(markerIter);
     }
   }
+  // Remove all markers, or all markers in a namespace
   else if (_msg.action() == ignition::msgs::Marker::DELETE_ALL)
   {
+    // Remove all markers in the specified namespace
     if (nsIter != this->markers.end())
     {
       for (auto it = nsIter->second.begin(); it != nsIter->second.end(); ++it)
@@ -224,6 +226,7 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
       }
       nsIter->second.clear();
     }
+    // Remove all markers in all namespaces.
     else
     {
       for (nsIter = this->markers.begin();
@@ -256,9 +259,9 @@ void MarkerManagerPrivate::OnMarkerMsg(const ignition::msgs::Marker &_req,
 void MarkerManagerPrivate::OnList(const ignition::msgs::StringMsg & /*_req*/,
     ignition::msgs::Marker_V &_rep, bool &_result)
 {
-  std::cout << "OnMarkerMsgList\n";
   _result = true;
 
+  // Create the list of markers
   for (std::list<ignition::msgs::Marker>::const_iterator iter =
        this->markerMsgs.begin();
        iter != this->markerMsgs.end(); ++iter)

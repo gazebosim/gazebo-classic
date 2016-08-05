@@ -35,7 +35,9 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \brief Marker visualization
+    /// \brief A marker visualization. The MarkerManager class should
+    /// instantiate instances of this class.
+    /// \sa MarkerManager
     class GZ_RENDERING_VISIBLE MarkerVisual : public Visual
     {
       /// \brief Constructor.
