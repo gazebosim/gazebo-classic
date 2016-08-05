@@ -78,6 +78,9 @@ int Marker_TEST::MidWhiteWidth(const int _threshold)
 /////////////////////////////////////////////////
 void Marker_TEST::AddRemove()
 {
+  bool result;
+  ignition::msgs::StringMsg rep;
+
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -105,11 +108,7 @@ void Marker_TEST::AddRemove()
   std::string topicName = "/marker";
 
   // Publish to a Gazebo topic
-  //gazebo::transport::PublisherPtr pub =
   node.Advertise<ignition::msgs::Marker>(topicName);
-
-  // Wait for a subscriber to connect
-  // pub->WaitForConnection();
 
   // Create the marker message
   ignition::msgs::Marker markerMsg;
@@ -117,7 +116,7 @@ void Marker_TEST::AddRemove()
   markerMsg.set_id(0);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::SPHERE);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -128,7 +127,7 @@ void Marker_TEST::AddRemove()
 
   // Remove the shape
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
@@ -136,7 +135,7 @@ void Marker_TEST::AddRemove()
   // Add a box
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::BOX);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth > 1125);
@@ -149,7 +148,7 @@ void Marker_TEST::AddRemove()
                     ignition::math::Pose3d(2, 0, .5, 0, 0, 0));
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::CYLINDER);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth > 2165);
@@ -157,7 +156,7 @@ void Marker_TEST::AddRemove()
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
@@ -172,7 +171,7 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(0, 0, -10));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(0, 0, 10));
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth(180);
   QVERIFY(shapeWidth > 0);
@@ -190,7 +189,7 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(1, 0, 10));
   ignition::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(2, 0, 10));
   ignition::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(2, 0, -10));
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth(180);
   QVERIFY(shapeWidth > 10);
@@ -198,7 +197,7 @@ void Marker_TEST::AddRemove()
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   int count = this->WhiteCount(100);
   QVERIFY(count == 0);
@@ -216,16 +215,16 @@ void Marker_TEST::AddRemove()
           ignition::math::Rand::DblUniform(-1, 1),
           ignition::math::Rand::DblUniform(-1, 1)));
   }
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   count = this->WhiteCount(180);
-  std::cout << "Points Count[" << count << "]\n";
-  QVERIFY(count > 500);
+  std::cout << "Count[" << count << "]\n";
+  QVERIFY(count > 480);
   QVERIFY(count < 570);
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   QVERIFY(this->WhiteCount(100) == 0);
 
@@ -234,8 +233,8 @@ void Marker_TEST::AddRemove()
   markerMsg.set_type(ignition::msgs::Marker::TEXT);
   markerMsg.set_text("HELLO");
   ignition::msgs::Set(markerMsg.mutable_pose(),
-                    ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
-  node.Publish(topicName, markerMsg);
+                      ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth(250);
   QVERIFY(shapeWidth > 100);
@@ -243,7 +242,7 @@ void Marker_TEST::AddRemove()
 
   // Remove the text
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
@@ -263,7 +262,7 @@ void Marker_TEST::AddRemove()
     ignition::msgs::Set(markerMsg.add_point(),
         ignition::math::Vector3d(radius * cos(t), radius * sin(t), 0.05));
   }
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   std::cout << "Triangle fan count[" << shapeWidth << "]\n";
@@ -272,7 +271,7 @@ void Marker_TEST::AddRemove()
 
   // Remove the triangle fan
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
@@ -298,16 +297,16 @@ void Marker_TEST::AddRemove()
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(2, 2, 0.5));
 
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   std::cout << "Triangle list count[" << shapeWidth << "]\n";
   QVERIFY(shapeWidth > 5);
-  QVERIFY(shapeWidth < 20);
+  QVERIFY(shapeWidth < 30);
 
   // Remove the triangle list
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
@@ -330,7 +329,7 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(0, 2, 0.3));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(1, 2, 0.3));
-  node.Publish(topicName, markerMsg);
+  node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
   std::cout << "Triangle strip count[" << shapeWidth << "]\n";

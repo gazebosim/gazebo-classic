@@ -40,6 +40,7 @@ MarkerVisual::MarkerVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 MarkerVisual::~MarkerVisual()
 {
+  this->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -243,4 +244,19 @@ void MarkerVisual::Text(const ignition::msgs::Marker &_msg)
     this->dPtr->text->SetText(_msg.text());
     this->dPtr->text->Update();
   }
+}
+
+/////////////////////////////////////////////////
+void MarkerVisual::Fini()
+{
+  if (this->dPtr->dynamicRenderable)
+    this->DeleteDynamicLine(this->dPtr->dynamicRenderable.release());
+
+  if (this->dPtr->text && this->dPtr->text->getParentNode())
+  {
+    this->dPtr->text->detachFromParent();
+    this->GetSceneNode()->detachObject(this->dPtr->text.get());
+    this->dPtr->text.reset();
+  }
+  Visual::Fini();
 }

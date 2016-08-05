@@ -185,8 +185,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       &Scene::OnResponse, this, true);
   this->dataPtr->sceneSub =
       this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
-  this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
-      "~/world_stats", &Scene::OnStats, this);
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->dataPtr->sdf);
@@ -3621,10 +3619,4 @@ void Scene::ToggleLayer(const int32_t _layer)
   {
     visual.second->ToggleLayer(_layer);
   }
-}
-
-/////////////////////////////////////////////////
-void Scene::OnStats(ConstWorldStatisticsPtr &_msg)
-{
-  this->dataPtr->simTime = msgs::Convert(_msg->sim_time());
 }

@@ -657,16 +657,13 @@ else ()
 endif ()
 
 ########################################
-# Find ignition msgs in unix platforms
-# In Windows we expect a call from configure.bat script with the paths
-if (NOT WIN32)
-  find_package(ignition-msgs0 0.1 QUIET)
-  if (NOT ignition-msgs0_FOUND)
-    message(STATUS "Looking for ignition-msgs0-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition msgs0 library.")
-  else()
-    message(STATUS "Looking for ignition-msgs0-config.cmake - found")
-  endif()
+# Find ignition msgs
+find_package(ignition-msgs0 0.4 QUIET)
+if (NOT ignition-msgs0_FOUND)
+  message(STATUS "Looking for ignition-msgs0-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs0 library.")
+else()
+  message(STATUS "Looking for ignition-msgs0-config.cmake - found")
 endif()
 
 ########################################

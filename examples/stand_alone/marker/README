@@ -1,6 +1,7 @@
-Gazebo Publisher Example
+Gazebo Visualization Marker Example
 
-This is very simple example of how to publish a gazebo topic.
+This is example demonstrates how to create and modify visualization markers
+in Gazebo.
 
 ===================
 Build Instructions
@@ -20,10 +21,7 @@ Execute Instructions
 
  * Launch gazebo as usual then from the build directory above:
 
-  $ ./publisher
+  $ ./marker
 
- * In gazebo, from the menu bar select 'Window' > 'Topic Visualization'
- * Click the topic you are publishing [/vel_cmd]
- * Click ok
-
-
+ * The terminal will output messages indicating visualization changes that
+   will occur in Gazebo's render window.

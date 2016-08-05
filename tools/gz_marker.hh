@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TOOLS_MARKER_HH_
-#define _GAZEBO_TOOLS_MARKER_HH_
+#ifndef GAZEBO_TOOLS_MARKER_HH_
+#define GAZEBO_TOOLS_MARKER_HH_
 
 #include <string>
 #include <ignition/transport/Node.hh>
@@ -24,7 +24,7 @@
 namespace gazebo
 {
   /// \brief Marker command. This command line option to `gz` allows the
-  /// creation and deletion of visual markers.
+  /// creation, deletion, and modificiation of visual markers.
   class MarkerCommand : public Command
   {
     /// \brief Constructor
@@ -43,12 +43,12 @@ namespace gazebo
     /// \param[in] _ns Namespace for the marker
     /// \param[in] _id Marker id
     /// \param[in] _type Shape type. See the Type enum in
-    /// gazebo::msgs::Marker protobuf message
+    /// ignition::msgs::Marker protobuf message
     /// \param[in] _lifetime Length of time the marker should be visible.
     /// \param[in] _parent Name of a parent visual to attach a marker to.
     private: void Add(const std::string &_ns, const unsigned int _id,
                  const std::string &_type, const common::Time _lifetime,
-                 const std::string &_parent);
+                 const std::string &_parent, const std::string &_args);
 
     /// \brief Delete a marker.
     /// \param[in] _ns Namespace for the marker

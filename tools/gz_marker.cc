@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <google/protobuf/text_format.h>
 #include <ignition/transport.hh>
 #include <ignition/msgs.hh>
 
@@ -33,8 +34,8 @@ MarkerCommand::MarkerCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("world-name,w", po::value<std::string>(), "World name.")
     ("add,a", "Add or modify a visual marker")
+    ("args,r", "Arguments to add")
     ("namespace,n", po::value<std::string>(), "Namespace for the visual marker")
     ("id,i", po::value<unsigned int>(),
      "Positive integer value of a visual marker")
@@ -44,7 +45,7 @@ MarkerCommand::MarkerCommand()
     ("parent,p", po::value<std::string>(),
      "Name of a visual to which this marker should be attached.")
     ("lifetime,f", po::value<double>(),
-     "Time the marker should last before deletion")
+     "Simulation time the marker should last before deletion")
     ("delete,d", "Delete an existing visual marker")
     ("delete-all,x", "Delete all the visual markers")
     ("list,l", "Get a list of the visual markers");
@@ -53,32 +54,19 @@ MarkerCommand::MarkerCommand()
 /////////////////////////////////////////////////
 void MarkerCommand::HelpDetailed()
 {
-  std::cerr <<
-    "\tAdd, modify, or delete visual markers. If a name for the world, \n"
-    "\toption -w, is not specified, the first world found on \n"
-    "\tthe Gazebo master will be used.\n"
-    << std::endl;
+  std::cerr << "\tAdd, modify, or delete visual markers." << std::endl;
 }
 
 /////////////////////////////////////////////////
 bool MarkerCommand::RunImpl()
 {
-  std::string worldName;
-
-  if (this->vm.count("world-name"))
-    worldName = this->vm["world-name"].as<std::string>();
-
-  // this->node.reset(new transport::Node());
-  // this->node->Init(worldName);
-  // this->pub = this->node->Advertise<ignition::msgs::Marker>("~/marker");
-  // this->pub->WaitForConnection();
-
   node.Advertise<ignition::msgs::Marker>("/marker");
 
   std::string ns = "default";
   unsigned int id = 0;
   std::string type = "none";
   std::string parent;
+  std::string args;
   common::Time lifetime;
 
   if (this->vm.count("namespace"))
@@ -91,11 +79,13 @@ bool MarkerCommand::RunImpl()
     parent = this->vm["parent"].as<std::string>();
   if (this->vm.count("lifetime"))
     lifetime.Set(this->vm["lifetime"].as<double>());
+  if (this->vm.count("args"))
+    args = this->vm["args"].as<std::string>();
 
   if (this->vm.count("list"))
     this->List();
   else if (this->vm.count("add"))
-    this->Add(ns, id, type, lifetime, parent);
+    this->Add(ns, id, type, lifetime, parent, args);
   else if (this->vm.count("delete"))
     this->Delete(ns, id);
   else if (this->vm.count("delete-all"))
@@ -136,40 +126,66 @@ void MarkerCommand::List()
 /////////////////////////////////////////////////
 void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
     const std::string &_type, const common::Time _lifetime,
-    const std::string &_parent)
+    const std::string &_parent, const std::string &_args)
 {
+  // Construct the marker message
   ignition::msgs::Marker msg;
   msg.set_ns(_ns);
   msg.set_id(_id);
-
   msg.set_parent(_parent);
+  msg.set_action(ignition::msgs::Marker::ADD_MODIFY);
 
+  // Set lifetime if non-zero
   if (_lifetime > common::Time::Zero)
   {
     msg.mutable_lifetime()->set_sec(_lifetime.sec);
     msg.mutable_lifetime()->set_nsec(_lifetime.nsec);
   }
 
-  msg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   if (_type == "cube" || _type == "box")
+  {
     msg.set_type(ignition::msgs::Marker::BOX);
+  }
   else if (_type == "sphere")
+  {
     msg.set_type(ignition::msgs::Marker::SPHERE);
+  }
   else if (_type == "cylinder")
+  {
     msg.set_type(ignition::msgs::Marker::CYLINDER);
-  else if (_type == "line_list" || _type == "line-list")
+  }
+  else if (_type == "line_list" || _type == "line-list" ||
+           _type == "linelist" || _type == "lineList")
+  {
     msg.set_type(ignition::msgs::Marker::LINE_LIST);
-  else if (_type == "line_strip" || _type == "line-strip")
+  }
+  else if (_type == "line_strip" || _type == "line-strip" ||
+           _type == "linestrip" || _type == "lineStrip")
+  {
     msg.set_type(ignition::msgs::Marker::LINE_STRIP);
+  }
   else if (_type == "points")
+  {
     msg.set_type(ignition::msgs::Marker::POINTS);
+  }
   else if (_type == "text")
+  {
     msg.set_type(ignition::msgs::Marker::TEXT);
-  else if (_type == "triangle_fan" || _type == "triangle-fan")
+  }
+  else if (_type == "triangle_fan" || _type == "triangle-fan" ||
+           _type == "trianglefan" || _type == "triangleFan")
+  {
     msg.set_type(ignition::msgs::Marker::TRIANGLE_FAN);
-  else if (_type == "triangle_strip" || _type == "triangle-strip")
+  }
+  else if (_type == "triangle_strip" || _type == "triangle-strip" ||
+           _type == "trianglestrip" || _type == "triangleStrip")
+  {
     msg.set_type(ignition::msgs::Marker::TRIANGLE_STRIP);
+  }
 
+  google::protobuf::TextFormat::ParseFromString(_args, &msg);
+
+  std::cout << "Args[" << _args << "]\n";
   std::cout << msg.DebugString() << std::endl;
   bool result;
   ignition::msgs::StringMsg rep;

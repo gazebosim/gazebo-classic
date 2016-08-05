@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,79 @@
  * limitations under the License.
  *
 */
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Subscriber.hh"
+#include <ignition/transport/Node.hh>
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/MarkerVisual.hh"
-#include "gazebo/rendering/MarkerManagerPrivate.hh"
 #include "gazebo/rendering/MarkerManager.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
+/// Private data for the MarkerManager class
+class gazebo::rendering::MarkerManagerPrivate
+{
+  /// \def Marker_M
+  /// \brief Map of markers. The first key is a marker namespace, the
+  /// first value is the map of markers and their ids.
+  typedef std::map<std::string, std::map<uint64_t, MarkerVisualPtr>> Marker_M;
+
+  /// \def MarkerMsgs_L
+  /// \brief List of marker messages.
+  typedef std::list<ignition::msgs::Marker> MarkerMsgs_L;
+
+  /// \brief Process a marker message.
+  /// \param[in] _msg The message data.
+  public: bool ProcessMarkerMsg(const ignition::msgs::Marker &_msg);
+
+  /// \brief Update the markers. This function is called on
+  /// the PreRender event.
+  public: void OnPreRender();
+
+  /// \brief Callback that receives marker messages.
+  /// \param[in] _req The marker message.
+  /// \param[out] _rep The response message.
+  /// \param[out] _result True/false result.
+  public: void OnMarkerMsg(const ignition::msgs::Marker &_req,
+                           ignition::msgs::StringMsg &_rep, bool &_result);
+
+  /// \brief Service callback that returns a list of markers.
+  /// \param[in] _req Service request.
+  /// \param[out] _rep Service reply
+  /// \param[out] _result True on success.
+  public: void OnList(const ignition::msgs::StringMsg &_req,
+                      ignition::msgs::Marker_V &_rep, bool &_result);
+
+  /// \brief Ignition node
+  public: ignition::transport::Node node;
+
+  /// \brief Map of markers
+  public: Marker_M markers;
+
+  /// \brief List of marker message to process.
+  public: MarkerMsgs_L markerMsgs;
+
+  /// \brief Connect to the prerender signal
+  public: event::ConnectionPtr preRenderConnection;
+
+  /// \brief Mutex to protect message list.
+  public: std::mutex mutex;
+
+  /// \brief Pointer to the scene
+  public: ScenePtr scene;
+};
+
 /////////////////////////////////////////////////
 MarkerManager::MarkerManager()
-  : dataPtr(new MarkerManagerPrivate)
+: dataPtr(new MarkerManagerPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 MarkerManager::~MarkerManager()
 {
-  // this->dataPtr->node->Fini();
-  delete this->dataPtr;
 }
 
 /////////////////////////////////////////////////
@@ -53,48 +102,49 @@ bool MarkerManager::Init(ScenePtr _scene)
 
   // Advertise the list service
   if (!this->dataPtr->node.Advertise("/marker/list",
-        &MarkerManager::OnList, this))
+        &MarkerManagerPrivate::OnList, this->dataPtr.get()))
   {
     gzerr << "Unable to advertise to the /marker/list service.\n";
   }
 
   // Advertise to the marker service
   if (!this->dataPtr->node.Advertise("/marker",
-        &MarkerManager::OnMarkerMsg, this))
+        &MarkerManagerPrivate::OnMarkerMsg, this->dataPtr.get()))
   {
     gzerr << "Unable to advertise to the /marker service.\n";
   }
 
   // Process markers on PreRender
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
-      std::bind(&MarkerManager::OnPreRender, this));
+      std::bind(&MarkerManagerPrivate::OnPreRender, this->dataPtr.get()));
 
   return true;
 }
 
 /////////////////////////////////////////////////
-void MarkerManager::OnPreRender()
+void MarkerManagerPrivate::OnPreRender()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   // Process the marker messages.
-  for (auto markerIter = this->dataPtr->markerMsgs.begin();
-       markerIter != this->dataPtr->markerMsgs.end();)
+  for (auto markerIter = this->markerMsgs.begin();
+       markerIter != this->markerMsgs.end();)
   {
     if (this->ProcessMarkerMsg(*markerIter))
-      this->dataPtr->markerMsgs.erase(markerIter++);
+      this->markerMsgs.erase(markerIter++);
     else
       ++markerIter;
   }
 
   // Erase any markers that have a lifetime.
-  for (auto mit = this->dataPtr->markers.begin();
-       mit != this->dataPtr->markers.end(); ++mit)
+  for (auto mit = this->markers.begin();
+       mit != this->markers.end(); ++mit)
   {
     for (auto it = mit->second.cbegin(); it != mit->second.cend();)
     {
       // Erase a marker if it has a lifetime and it's expired.
       if (it->second->Lifetime() != common::Time::Zero &&
-          it->second->Lifetime() <= this->dataPtr->scene->SimTime())
+          it->second->Lifetime() <= this->scene->SimTime())
       {
         it = mit->second.erase(it);
       }
@@ -104,7 +154,7 @@ void MarkerManager::OnPreRender()
 
     // Erase a namespace if it's empty
     /*if (mit->second.empty())
-      mit = this->dataPtr->markers.erase(mit);
+      mit = this->markers.erase(mit);
     else
       ++mit;
       */
@@ -112,7 +162,7 @@ void MarkerManager::OnPreRender()
 }
 
 //////////////////////////////////////////////////
-bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
+bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 {
   // Get the namespace, if it exists
   std::string ns = "";
@@ -120,7 +170,7 @@ bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
     ns = _msg.ns();
 
   // Get the namespace that the marker belongs to
-  Marker_M::iterator nsIter = this->dataPtr->markers.find(ns);
+  Marker_M::iterator nsIter = this->markers.find(ns);
 
   // Add/modify a marker
   if (_msg.action() == ignition::msgs::Marker::ADD_MODIFY)
@@ -128,7 +178,7 @@ bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
     std::map<uint64_t, MarkerVisualPtr>::iterator markerIter;
 
     // Add the marker to an existing namespace, if the namespace exists.
-    if (nsIter != this->dataPtr->markers.end() &&
+    if (nsIter != this->markers.end() &&
         (markerIter = nsIter->second.find(_msg.id())) != nsIter->second.end())
     {
       markerIter->second->Load(_msg);
@@ -141,53 +191,51 @@ bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 
       // Create the new marker
       MarkerVisualPtr marker(new MarkerVisual(name,
-            this->dataPtr->scene->WorldVisual()));
+            this->scene->WorldVisual()));
 
       // Load the marker
       marker->Load(_msg);
 
       // Store the marker
-      this->dataPtr->markers[ns][_msg.id()] = marker;
+      this->markers[ns][_msg.id()] = marker;
     }
   }
   else if (_msg.action() == ignition::msgs::Marker::DELETE_MARKER)
   {
-    this->dataPtr->scene->PrintSceneGraph();
     std::map<uint64_t, MarkerVisualPtr>::iterator markerIter;
 
     // Add the marker to an existing namespace, if the namespace exists.
-    if (nsIter != this->dataPtr->markers.end() &&
+    if (nsIter != this->markers.end() &&
         (markerIter = nsIter->second.find(_msg.id())) != nsIter->second.end())
     {
       markerIter->second->Fini();
-      this->dataPtr->scene->RemoveVisual(markerIter->second);
-      this->dataPtr->markers[ns].erase(markerIter);
+      this->scene->RemoveVisual(markerIter->second);
+      this->markers[ns].erase(markerIter);
     }
-    this->dataPtr->scene->PrintSceneGraph();
   }
   else if (_msg.action() == ignition::msgs::Marker::DELETE_ALL)
   {
-    if (nsIter != this->dataPtr->markers.end())
+    if (nsIter != this->markers.end())
     {
       for (auto it = nsIter->second.begin(); it != nsIter->second.end(); ++it)
       {
         it->second->Fini();
-        this->dataPtr->scene->RemoveVisual(it->second);
+        this->scene->RemoveVisual(it->second);
       }
       nsIter->second.clear();
     }
     else
     {
-      for (nsIter = this->dataPtr->markers.begin();
-           nsIter != this->dataPtr->markers.end(); ++nsIter)
+      for (nsIter = this->markers.begin();
+           nsIter != this->markers.end(); ++nsIter)
       {
         for (auto it = nsIter->second.begin(); it != nsIter->second.end(); ++it)
         {
           it->second->Fini();
-          this->dataPtr->scene->RemoveVisual(it->second);
+          this->scene->RemoveVisual(it->second);
         }
       }
-      this->dataPtr->markers.clear();
+      this->markers.clear();
     }
   }
 
@@ -195,25 +243,25 @@ bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 }
 
 /////////////////////////////////////////////////
-void MarkerManager::OnMarkerMsg(const ignition::msgs::Marker &_req,
+void MarkerManagerPrivate::OnMarkerMsg(const ignition::msgs::Marker &_req,
     ignition::msgs::StringMsg &_rep, bool &_result)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  this->dataPtr->markerMsgs.push_back(_req);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  this->markerMsgs.push_back(_req);
   _result = true;
   _rep.set_data("success");
 }
 
 /////////////////////////////////////////////////
-void MarkerManager::OnList(const ignition::msgs::StringMsg & /*_req*/,
+void MarkerManagerPrivate::OnList(const ignition::msgs::StringMsg & /*_req*/,
     ignition::msgs::Marker_V &_rep, bool &_result)
 {
   std::cout << "OnMarkerMsgList\n";
   _result = true;
 
   for (std::list<ignition::msgs::Marker>::const_iterator iter =
-       this->dataPtr->markerMsgs.begin();
-       iter != this->dataPtr->markerMsgs.end(); ++iter)
+       this->markerMsgs.begin();
+       iter != this->markerMsgs.end(); ++iter)
   {
     _rep.add_marker()->CopyFrom(*iter);
   }

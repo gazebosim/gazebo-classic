@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERTYPES_HH_
-#define _GAZEBO_RENDERTYPES_HH_
+#ifndef GAZEBO_RENDERING_RENDERTYPES_HH_
+#define GAZEBO_RENDERING_RENDERTYPES_HH_
 
 #include <memory>
 

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MARKERVISUAL_HH_
-#define _GAZEBO_MARKERVISUAL_HH_
+#ifndef GAZEBO_RENDERING_MARKERVISUAL_HH_
+#define GAZEBO_RENDERING_MARKERVISUAL_HH_
 
 #include <string>
 #include <memory>
@@ -54,6 +53,9 @@ namespace gazebo
       /// \brief Get the lifetime of the marker
       /// \return Life time of the marker in simulation time.
       public: common::Time Lifetime() const;
+
+      // Documentation inherited
+      public: virtual void Fini();
 
       /// \brief Add or modify a marker
       /// \param[in] _msg The message that defines what to add or modify
