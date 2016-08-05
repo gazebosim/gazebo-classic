@@ -56,6 +56,10 @@ TEST_F(IgnMsgSdfTest, ConvertWrongType)
 
   // Error message is printed
   auto msg = util::Convert<ignition::msgs::Plugin>(sdf);
+  EXPECT_FALSE(msg.has_name());
+  EXPECT_FALSE(msg.has_filename());
+  EXPECT_FALSE(msg.has_innerxml());
+  EXPECT_EQ(msg.DebugString(), "");
 }
 
 /////////////////////////////////////////////////

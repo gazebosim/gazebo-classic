@@ -47,11 +47,10 @@ namespace gazebo
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
-    sdf::ElementPtr Convert(const ignition::msgs::Plugin &_plugin,
+    sdf::ElementPtr Convert(const ignition::msgs::Plugin &_msg,
                             sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    // Specialization of conversion from SDF to ignition message for
-    // plugins.
+    // Specialization of conversion from SDF to ignition message for plugins.
     template<>
     ignition::msgs::Plugin Convert(const sdf::ElementPtr _sdf)
     {
