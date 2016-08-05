@@ -164,6 +164,9 @@ bool common::moveFile(const std::string &_existingFilename,
 bool common::copyFile(const std::string &_existingFilename,
                       const std::string &_newFilename)
 {
+  if (_existingFilename == _newFilename)
+    return false;
+
 #ifdef _WIN32
   return CopyFile(_existingFilename.c_str(), _newFilename.c_str(), false);
 #elif defined(__APPLE__)
@@ -182,6 +185,8 @@ bool common::copyFile(const std::string &_existingFilename,
 
   // Open the input file.
   readFd = open(_existingFilename.c_str(), O_RDONLY);
+  if (readFd < 0)
+    return false;
 
   // Stat the input file to obtain its size.
   fstat(readFd, &statBuf);
