@@ -186,16 +186,15 @@ TEST_F(ModelTest, NestedModelPluginInfo)
   common::URI pluginUri;
 
   gzmsg << "Get an existing plugin" << std::endl;
-  {
-    pluginUri.Parse(
-        "data://world/default/model/model_00/model/model_01/model/model_02/"
-        "model/model_03/plugin/initial_velocity");
-    model->PluginInfo(pluginUri, plugins, success);
 
-    EXPECT_TRUE(success);
-    EXPECT_EQ(plugins.plugins_size(), 1);
-    EXPECT_EQ(plugins.plugins(0).name(), "initial_velocity");
-  }
+  pluginUri.Parse(
+      "data://world/default/model/model_00/model/model_01/model/model_02/"
+      "model/model_03/plugin/initial_velocity");
+  model->PluginInfo(pluginUri, plugins, success);
+
+  EXPECT_TRUE(success);
+  EXPECT_EQ(plugins.plugins_size(), 1);
+  EXPECT_EQ(plugins.plugins(0).name(), "initial_velocity");
 }
 
 //////////////////////////////////////////////////
