@@ -51,6 +51,14 @@ namespace gazebo
       /// \brief Check if input path is in the fileTreeWidget.
       public: bool LocalPathInFileWidget(const std::string &_path);
 
+      /// \brief Get the save location.
+      /// \return Path of the save location.
+      public: std::string GetSaveLocation() const;
+      
+      /// \brief Set the save location.
+      /// \param[in] _location Location to save to.
+      public: void SetSaveLocation(const std::string &_location);
+
       /// \brief Callback triggered when the ModelDatabase has returned
       /// the list of models.
       /// \param[in] _models The map of all models in the database.
@@ -73,7 +81,7 @@ namespace gazebo
       /// \param[in] _path The path that was changed.
       private slots: void OnDirectoryChanged(const QString &_path);
 
-      /// \brief QT callback when addPath_button is clicked.
+      /// \brief QT callback when addPathButton is clicked.
       private slots: void handleButton();
 
       /// \brief check if path exists with special care to filesystem
@@ -99,7 +107,7 @@ namespace gazebo
       private: QLineEdit *addPathEdit;
 
       /// \breif Button to add a cutom models path.
-      private: QPushButton *addPath_button;
+      private: QPushButton *addPathButton;
     };
   }
 }

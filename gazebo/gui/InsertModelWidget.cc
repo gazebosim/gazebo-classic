@@ -72,13 +72,13 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   frame->setLayout(frameLayout);
 
   // set name, size and location of the button.
-  this->addPath_button = new QPushButton("Add Path", this);
-  this->addPath_button->setGeometry(QRect(QPoint(100, 0),
+  this->addPathButton = new QPushButton("Add Path", this);
+  this->addPathButton->setGeometry(QRect(QPoint(100, 0),
   QSize(200, 50)));
 
-  mainLayout->addWidget(this->addPath_button);
+  mainLayout->addWidget(this->addPathButton);
   // Connect button signal to appropriate slot.
-  connect(this->addPath_button, SIGNAL(released()), this,
+  connect(this->addPathButton, SIGNAL(released()), this,
    SLOT(handleButton()));
   this->addPathEdit = new QLineEdit;
   this->addPathEdit->setReadOnly(false);
@@ -147,10 +147,43 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 void InsertModelWidget::handleButton()
 {
+  QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
+  fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setOptions(QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks);
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
+
+    // Substitute everything up to the model folder
+    std::string folder = this->GetSaveLocation();
+    folder = folder.substr(folder.rfind("/")+1);
+
+    this->SetSaveLocation(selected[0].toStdString() + "/" + folder);
+  
   common::SystemPaths::Instance()->AddModelPaths(
-    addPathEdit->text().toStdString());
+    this->GetSaveLocation());
   this->UpdateAllLocalPaths();
+  }
 }
+
+/////////////////////////////////////////////////
+void InsertModelWidget::SetSaveLocation(const std::string &_location)
+{
+  this->addPathEdit->setText(tr(_location.c_str()));
+}
+
+/////////////////////////////////////////////////
+std::string InsertModelWidget::GetSaveLocation() const
+{
+  return this->addPathEdit->text().toStdString();
+}
+
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
