@@ -79,12 +79,9 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   mainLayout->addWidget(this->addPathButton);
   // Connect button signal to appropriate slot.
   connect(this->addPathButton, SIGNAL(released()), this,
-   SLOT(handleButton()));
+   SLOT(HandleButton()));
   this->addPathEdit = new QLineEdit;
-  this->addPathEdit->setReadOnly(false);
-  mainLayout->addWidget(this->addPathEdit);
-  const char* addPathEditLine = "Enter a cutom path";
-  this->addPathEdit->setText(tr(addPathEditLine));
+  this->addPathEdit->setReadOnly(true);
 
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
@@ -145,7 +142,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-void InsertModelWidget::handleButton()
+void InsertModelWidget::HandleButton()
 {
   QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
   fileDialog.setFileMode(QFileDialog::Directory);
@@ -168,7 +165,7 @@ void InsertModelWidget::handleButton()
   
   common::SystemPaths::Instance()->AddModelPaths(
     this->GetSaveLocation());
-  this->UpdateAllLocalPaths();
+  this->UpdateLocalPath(this->GetSaveLocation());
   }
 }
 

@@ -82,7 +82,7 @@ namespace gazebo
       private slots: void OnDirectoryChanged(const QString &_path);
 
       /// \brief QT callback when addPathButton is clicked.
-      private slots: void handleButton();
+      private slots: void HandleButton();
 
       /// \brief check if path exists with special care to filesystem
       /// permissions
