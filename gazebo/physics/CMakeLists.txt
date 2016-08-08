@@ -3,7 +3,6 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 link_directories(
   ${CCD_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
-  ${IGNITION-MSGS_LIBRARY_DIRS}
 )
 
 # Build in ODE by default
@@ -163,7 +162,6 @@ target_link_libraries(gazebo_physics
   gazebo_ode
   gazebo_opcode
   ${Boost_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
 )
 
 # Link in Bullet support if present

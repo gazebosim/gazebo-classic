@@ -5,7 +5,6 @@ include ( ${QT_USE_FILE} )
 link_directories(
   ${Boost_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
-  ${IGNITION-MSGS_LIBRARY_DIRS}
 )
 
 include_directories(
