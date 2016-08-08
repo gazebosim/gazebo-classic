@@ -8,6 +8,7 @@ include_directories(
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
   ${IGNITION-MATH_INCLUDE_DIRS}
+  ${IGNITION-MSGS_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -20,6 +21,7 @@ link_directories(
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
   ${IGNITION-MATH_LIBRARY_DIRS}
+  ${IGNITION-MSGS_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
