@@ -93,27 +93,25 @@ TEST_F(CommonIface_TEST, fileOps)
   std::string line;
 
   std::ifstream testIn("test.tmp");
-  std::string testInContents;
-  while (std::getline(testIn, line))
-    testInContents += line;
+  std::string testInContent((std::istreambuf_iterator<char>(testIn)),
+                            (std::istreambuf_iterator<char>()));
 
   std::ifstream test2In("test2.tmp");
-  std::string test2InContents;
-  while (std::getline(test2In, line))
-    test2InContents += line;
+  std::string test2InContent((std::istreambuf_iterator<char>(test2In)),
+                             (std::istreambuf_iterator<char>()));
 
-  EXPECT_STREQ(testInContents.c_str(), test2InContents.c_str());
+
+  EXPECT_EQ(testInContent, test2InContent);
 
   EXPECT_TRUE(common::moveFile("test2.tmp", "test3.tmp"));
   EXPECT_FALSE(common::exists("test2.tmp"));
   EXPECT_TRUE(common::exists("test3.tmp"));
 
   std::ifstream test3In("test3.tmp");
-  std::string test3InContents;
-  while (std::getline(test3In, line))
-    test3InContents += line;
+  std::string test3InContent((std::istreambuf_iterator<char>(test3In)),
+                             (std::istreambuf_iterator<char>()));
 
-  EXPECT_STREQ(testInContents.c_str(), test3InContents.c_str());
+  EXPECT_EQ(testInContent, test3InContent);
 
   EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp"));
 
