@@ -20,7 +20,8 @@
 #include <memory>
 #include <gazebo/common/Plugin.hh>
 
-#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+// See: https://bugreports.qt-project.org/browse/QTBUG-22829
+#ifndef Q_MOC_RUN
 # include <gazebo/gui/gui.hh>
 #endif
 
