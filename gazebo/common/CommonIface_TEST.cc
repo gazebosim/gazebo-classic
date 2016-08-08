@@ -125,6 +125,21 @@ TEST_F(CommonIface_TEST, fileOps)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test file operations
+TEST_F(CommonIface_TEST, moreFileOps)
+{
+  EXPECT_FALSE(common::copyFile("__wrong__.tmp", "test2.tmp"));
+  EXPECT_TRUE(!common::exists("test2.tmp"));
+  EXPECT_FALSE(common::copyFile("test.tmp", "__wrong_dir__/__wrong__.tmp"));
+  EXPECT_TRUE(!common::exists("__wrong_dir__"));
+
+  EXPECT_FALSE(common::moveFile("__wrong__.tmp", "test3.tmp"));
+  EXPECT_TRUE(!common::exists("test3.tmp"));
+  EXPECT_FALSE(common::moveFile("test2.tmp", "__wrong_dir__/__wrong__.tmp"));
+  EXPECT_TRUE(!common::exists("__wrong_dir__"));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
