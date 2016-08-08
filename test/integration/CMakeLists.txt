@@ -144,6 +144,7 @@ set(dri_tests
 gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
+  collada_visualization.cc
   insert_model.cc
   mouse_pick.cc
   view_angle.cc
