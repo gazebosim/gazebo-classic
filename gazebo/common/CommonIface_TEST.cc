@@ -90,8 +90,6 @@ TEST_F(CommonIface_TEST, fileOps)
   EXPECT_TRUE(common::exists("test.tmp"));
   EXPECT_TRUE(common::exists("test2.tmp"));
 
-  std::string line;
-
   std::ifstream testIn("test.tmp");
   std::string testInContent((std::istreambuf_iterator<char>(testIn)),
                             (std::istreambuf_iterator<char>()));
