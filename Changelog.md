@@ -2,6 +2,9 @@
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Fix loading collada files with multiple texture coordinates.
+    * [Pull request 2419](https://bitbucket.org/osrf/gazebo/pull-request/2419)
+
 1. Add vector3 and quaternion rendering conversions
     * [Pull request 2276](https://bitbucket.org/osrf/gazebo/pull-request/2276)
 
