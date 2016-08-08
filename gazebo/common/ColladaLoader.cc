@@ -1562,7 +1562,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             {
               GeometryIndices iv = inputValues[i];
               bool normEqual = false;
-              //bool texEqual = !inputs[TEXCOORD].empty();
               bool texEqual = false;
 
               if (!inputs[NORMAL].empty())
@@ -1671,7 +1670,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
                 texcoords[inputRemappedTexcoordIndex].Y());
             input.texcoordIndex = inputRemappedTexcoordIndex;
-
           }
 
           // add the new gazebo submesh vertex index to the map
