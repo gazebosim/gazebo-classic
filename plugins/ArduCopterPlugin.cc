@@ -43,6 +43,7 @@ GZ_REGISTER_MODEL_PLUGIN(ArduCopterPlugin)
 /// \param[out] _param Param Variable to write the parameter to.
 /// \param[in] _default_value Default value, if the parameter not available.
 /// \param[in] _verbose If true, gzerror if the parameter is not available.
+/// \return True if the parameter was found in _sdf, false otherwise.
 template<class T>
 bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
   T &_param, const T &_defaultValue, const bool &_verbose = false)
