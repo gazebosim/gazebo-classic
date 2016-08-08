@@ -78,7 +78,7 @@ void KeyboardGUIPlugin::OnKeyPress(const gazebo::common::KeyEvent &_event)
 {
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_INT32);
-  msg.set_int_value(_event.text[0]);
+  msg.set_int_value(_event.key);
   this->dataPtr->keyboardPub->Publish(msg);
 }
 
@@ -91,11 +91,15 @@ bool KeyboardGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
     QKeyEvent *qtKeyEvent = dynamic_cast<QKeyEvent *>(_event);
 
     gazebo::common::KeyEvent gazeboKeyEvent;
-    gazeboKeyEvent.key = qtKeyEvent->key();
     gazeboKeyEvent.text = qtKeyEvent->text().toStdString();
+
+    // QKeyEvent::key() does not distiguish between lowercase and uppercase.
+    // Need to use QKeyEvent::text() to get the unicode character.
+    // Special keys (shift, ctrl) will have an empty text field.
+    gazeboKeyEvent.key = !gazeboKeyEvent.text.empty() ? gazeboKeyEvent.text[0] :
+      qtKeyEvent->key();
 
     this->OnKeyPress(gazeboKeyEvent);
   }
   return QObject::eventFilter(_obj, _event);
 }
-
