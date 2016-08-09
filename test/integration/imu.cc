@@ -378,11 +378,10 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   // test that SetReferenceOrientation sets orientation to argument
   // in this test case, assume world is NWU (X-North, Y-West, Z-Up),
   // then transform from NWU to NED is below:
-  ignition::math::Pose3d nwuToNEDReference =
-    ignition::math::Pose3d(ignition::math::Vector3d::Zero,
-                           ignition::math::Quaterniond(M_PI, 0, 0));
+  ignition::math::Quaterniond nwuToNEDReference =
+    ignition::math::Quaterniond(M_PI, 0, 0);
   // declare NED frame the reference frame for this IMU
-  ballFloatingImu->SetWorldToReferencePose(nwuToNEDReference);
+  ballFloatingImu->SetWorldToReferenceOrientation(nwuToNEDReference);
 
   // let messages propagate asynchronously
   world->Step(1000);
@@ -403,7 +402,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // imu orientation in world frame
   ignition::math::Quaterniond imuWorldOrientation =
-    imuOrientation * nwuToNEDReference.Rot();
+    imuOrientation * nwuToNEDReference;
 
   EXPECT_NEAR(imuWorldOrientation.W(), 1, IMU_TOL);
   EXPECT_NEAR(imuWorldOrientation.X(), 0, IMU_TOL);
@@ -436,7 +435,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   /* then transform from NWU to NED is below:                                 */
   /****************************************************************************/
   // declare NED frame the reference frame for this IMU
-  ballFloatingImu2->SetWorldToReferencePose(nwuToNEDReference);
+  ballFloatingImu2->SetWorldToReferenceOrientation(nwuToNEDReference);
 
   // let messages propagate asynchronously
   world->Step(1000);
@@ -451,7 +450,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // imu orientation in world frame
   ignition::math::Quaterniond imuWorldOrientation2 =
-    imuOrientation2 * nwuToNEDReference.Rot();
+    imuOrientation2 * nwuToNEDReference;
   ignition::math::Vector3d rpyWorld2 = imuWorldOrientation2.Euler();
   EXPECT_NEAR(rpyWorld2.X(), 0, IMU_TOL);
   EXPECT_NEAR(rpyWorld2.Y(), 0, IMU_TOL);
@@ -569,7 +568,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   /* and test if LinearAcceleration is expressed in local frame.              */
   /****************************************************************************/
   const double pitch = 0.5;
-  ballFloatingImu2->SetWorldToReferencePose(ignition::math::Pose3d());
+  ballFloatingImu2->SetWorldToReferenceOrientation(
+    ignition::math::Quaterniond());
   ballFloatingLink2->Reset();
   ballFloatingLink2->SetWorldPose(
       ignition::math::Pose3d(3.0, -3.40, 0.95, 0.0, pitch, 0.0));

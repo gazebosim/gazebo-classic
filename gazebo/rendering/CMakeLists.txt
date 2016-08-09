@@ -210,5 +210,9 @@ if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
+if (USE_PCH)
+  add_pch(gazebo_rendering rendering_pch.hh)
+endif()
+
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
