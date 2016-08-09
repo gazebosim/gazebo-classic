@@ -39,6 +39,7 @@ endif()
 set (plugins_single_header
   ActuatorPlugin
   ArrangePlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin

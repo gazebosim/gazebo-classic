@@ -22,6 +22,9 @@
 1. Ignore ffmpeg deprecation warnings to clean up CI since they are noted in #2002
     * [Pull request 2388](https://bitbucket.org/osrf/gazebo/pull-request/2388)
 
+1. Added a visual blinking plugin
+    * [Pull request 2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
+
 1. Fix InertiaVisual for non-diagonal inertia matrices
     * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
 
