@@ -27,7 +27,6 @@
 #include <google/protobuf/message.h>
 
 #include <ignition/math/Angle.hh>
-#include <ignition/msgs/stringmsg.pb.h>
 
 #include <sdf/sdf.hh>
 
@@ -73,6 +72,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 {
   this->setObjectName("modelList");
 
+qDebug() << "prille";
   this->dataPtr->requestMsg = nullptr;
   this->dataPtr->propMutex = new std::mutex();
   this->dataPtr->receiveMutex = new std::mutex();
@@ -252,21 +252,27 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
+      if (this->dataPtr->requestPub)
       {
-        std::string pluginInfoService(gui::get_world() +
-            "/server/info/plugin");
-        ignition::msgs::StringMsg req;
-        req.set_data(this->dataPtr->selectedEntityName);
+        if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
+        {
+          std::string service(gui::get_world() +
+              "/server/info/plugin");
+          ignition::msgs::StringMsg req;
+          req.set_data(this->dataPtr->selectedEntityName);
 
-        this->dataPtr->ignNode.Request(pluginInfoService, req,
-            &ModelListWidget::OnPluginInfo, this);
-      }
-      else if (this->dataPtr->requestPub)
-      {
-        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-            this->dataPtr->selectedEntityName);
-        this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+          gzerr << this->dataPtr->selectedEntityName << "bodo";
+
+          this->dataPtr->ignNode.Request(service, req,
+              &ModelListWidget::OnPluginInfo, this);
+        }
+        else
+        {
+          this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+              this->dataPtr->selectedEntityName);
+
+          this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+        }
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
       mItem->setExpanded(!mItem->isExpanded());
@@ -2789,6 +2795,18 @@ void ModelListWidget::OnCreateScene(const std::string &_name)
   this->dataPtr->propTreeBrowser->clear();
   this->InitTransport(_name);
 
+  std::string service(gui::get_world() +
+    "/server/list/plugin");
+
+gzerr << "gogo" << service;
+
+  ignition::msgs::StringMsg req;
+
+  // Before entityName. Fill this with some name?
+  req.set_data("data://world/default/plugin/");
+
+  this->dataPtr->ignNode.Request(service, req,
+      &ModelListWidget::OnPluginList, this);
   // this->requestMsg = msgs::CreateRequest("scene_info");
   // this->requestPub->Publish(*this->requestMsg);
 }
@@ -3517,15 +3535,74 @@ void ModelListWidget::FillGrid()
 void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
     const bool _success)
 {
+  qDebug() << "info";
   if (!_success)
   {
     gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
     return;
   }
 
+qDebug() << "plugin V";
   // We are assuming we get only one plugin in the vector
   this->dataPtr->propMutex->lock();
   this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
   this->dataPtr->fillTypes.push_back("Plugin");
   this->dataPtr->propMutex->unlock();
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::OnPluginList(const ignition::msgs::Plugin_V &_plugins,
+    const bool _success)
+{
+  qDebug() << "list";
+
+  qDebug() << "plugin ignition";
+  gzerr << "prille in error onpluginlis started";
+
+  if (!_success)
+  {
+    gzerr << "Failed to receive plugin list. Check server logs." << std::endl;
+    return;
+  }
+
+  QFont subheaderFont;
+  subheaderFont.setBold(true);
+
+  ignition::msgs::Plugin_V plugins;
+  plugins.CopyFrom(_plugins);
+
+  if (plugins.plugins_size() > 0)
+  {
+    // Add an world plugins item to the world tab tree
+    QTreeWidgetItem *topItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem *>(0),
+        QStringList(QString("%1").arg("World Plugins")));
+
+    topItem->setData(0, Qt::UserRole, QVariant("World Plugins"));
+    this->dataPtr->modelTreeWidget->addTopLevelItem(topItem);
+
+    for (int i = 0; i < plugins.plugins_size(); ++i)
+    {
+      std::string pluginName = plugins.plugins(i).name().c_str();
+
+      QTreeWidgetItem *pluginItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(
+              QString::fromStdString(pluginName))));
+
+      common::URI pluginUri;
+
+      pluginUri.SetScheme("data");
+
+      pluginUri.Path().PushBack("world");
+      pluginUri.Path().PushBack(gui::get_world());
+      pluginUri.Path().PushBack("plugin");
+      pluginUri.Path().PushBack(pluginName);
+
+      pluginItem->setData(0, Qt::UserRole,
+          QVariant(pluginUri.Str().c_str()));
+      pluginItem->setData(3, Qt::UserRole, QVariant("World_Plugin"));
+
+      this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
+    }
+  }
 }

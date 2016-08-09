@@ -440,7 +440,16 @@ namespace gazebo
       /// \return Unique model name.
       public: std::string UniqueModelName(const std::string &_name);
 
-      /// \brief Get information about plugins in this world or one of its
+      /// \brief Get information about plugins in this world 
+      /// according to the given _pluginUri. Some _pluginUri.
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfoService
+      public: void PluginList(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
+            /// \brief Get plugins in this world or one of its
       /// children, according to the given _pluginUri. Some _pluginUri examples:
       ///
       /// * Info about a specific world plugin in this world:
@@ -633,6 +642,14 @@ namespace gazebo
       /// \param[out] _success True if the info was successfully obtained.
       /// \sa PluginInfo
       private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
+      /// \brief Callback for "<this_name>/server/list/plugin" service.
+      /// \param[in] _request Request containing plugin URI.
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginList
+      private: void PluginListService(const ignition::msgs::StringMsg &_request,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \internal

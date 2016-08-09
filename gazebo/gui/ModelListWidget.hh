@@ -25,6 +25,7 @@
 
 #include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
@@ -235,6 +236,12 @@ namespace gazebo
       /// \param[in] _plugins Vector of plugins.
       /// \param[in] _success True if the info was successfully received.
       private: void OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
+
+      /// \brief Callback when plugin list is received.
+      /// \param[in] _plugins Vector of plugins.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnPluginList(const ignition::msgs::Plugin_V &_plugins,
           const bool _success);
 
       /// \internal
