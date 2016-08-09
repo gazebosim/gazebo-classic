@@ -115,8 +115,12 @@
                 </material>
               </visual>
             </link>
-            <plugin name="initial_velocity" filename="libInitialVelocityPlugin.so">
-              <linear>10 0 0</linear>
+            <plugin filename="libRegionEventBoxPlugin.so" name="region_event_box">
+              <event>
+                <name>model_in_region_event_box</name>
+                <type>inclusion</type>
+                <active>true</active>
+              </event>
             </plugin>
           </model>
         </model>
