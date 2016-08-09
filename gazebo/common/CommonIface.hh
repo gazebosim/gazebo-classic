@@ -99,6 +99,9 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     bool isFile(const std::string &_path);
 
+    GZ_COMMON_VISIBLE
+    std::string absPath(const std::string &_path);
+
     /// \brief Copy a file.
     /// \param[in] _existingFilename Path to an existing file.
     /// \param[in] _newFilename Path of the new file.
@@ -114,6 +117,33 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     bool moveFile(const std::string &_existingFilename,
                   const std::string &_newFilename);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[out] _result The new string that has had _key replaced
+    /// with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \sa  std::string replaceAll(const std::string &_orig,
+    /// const std::string &_key, const std::string &_replacement)
+    GZ_COMMON_VISIBLE
+    void replaceAll(std::string &_result,
+                    const std::string &_orig,
+                    const std::string &_key,
+                    const std::string &_replacement);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \return The new string that has had _key replaced with _replacement.
+    /// \sa void common::replaceAll(std::string &_result,
+    /// const std::string &_orig, const std::string &_key,
+    /// const std::string &_replacement)
+    GZ_COMMON_VISIBLE
+    std::string replaceAll(const std::string &_orig,
+                           const std::string &_key,
+                           const std::string &_replacement);
     /// \}
   }
 
