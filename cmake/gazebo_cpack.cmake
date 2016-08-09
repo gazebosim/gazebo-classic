@@ -1,6 +1,8 @@
 ################################################################################
 #Find available package generators
 
+include(CPack)
+
 # DEB
 if ("${CMAKE_SYSTEM}" MATCHES "Linux")
   find_program(DPKG_PROGRAM dpkg)

@@ -121,7 +121,11 @@ endmacro()
 #################################################
 macro (gz_install_library _name)
   set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION_FULL})
-  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+  if (BUILD_OSX_BUNDLE)
+    install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR})
+  else()
+    install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+  endif()
 endmacro ()
 
 #################################################

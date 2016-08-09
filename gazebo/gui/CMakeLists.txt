@@ -251,3 +251,14 @@ gz_install_executable(gzclient)
 if (UNIX)
   manpage(gzclient 1)
 endif()
+
+if (BUILD_OSX_BUNDLE)
+  install (TARGETS gzclient BUNDLE DESTINATION .)
+  set (APPS "${CMAKE_BINARY_DIR}/gzclient.app/Contents/MacOS/gzclient")
+  INSTALL(CODE "
+    # Needed for getting the right permissions when using brew
+    set (BU_CHMOD_BUNDLE_ITEMS ON)
+    include(BundleUtilities)
+      fixup_bundle(\"${APPSC}\" \"\"  \"${OGRE_LIBRARY_DIRS}\")
+  " COMPONENT Runtime)
+endif()

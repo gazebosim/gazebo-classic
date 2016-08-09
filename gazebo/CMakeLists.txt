@@ -137,12 +137,29 @@ set(headers
 gz_install_includes("" ${headers})
 
 if (BUILD_OSX_BUNDLE)
-  set (APPS gzserver gazebo)
-  install (TARGETS ${APPS} BUNDLE DESTINATION .)
+  install (TARGETS gzserver BUNDLE DESTINATION .)
+  set (APPS "${CMAKE_BINARY_DIR}/gzserver.app/Contents/MacOS/gzserver")
+  # Different libraries are not being installed into CMAKE_BINARY_DIR/lib
+  # don't know why :/
+  set (DIRS
+      ${OGRE_LIBRARY_DIRS} 
+      ${CMAKE_BINARY_DIR}/lib
+      ${CMAKE_BINARY_DIR}/gazebo/util
+      ${CMAKE_BINARY_DIR}/gazebo/sensors
+      ${CMAKE_BINARY_DIR}/gazebo/math
+      ${CMAKE_BINARY_DIR}/gazebo/msgs
+      ${CMAKE_BINARY_DIR}/gazebo/physics
+      ${CMAKE_BINARY_DIR}/gazebo/sensors
+      ${CMAKE_BINARY_DIR}/gazebo/transport
+      ${CMAKE_BINARY_DIR}/gazebo/common
+      ${CMAKE_BINARY_DIR}/gazebo/rendering)
+
+
+
   INSTALL(CODE "
     # Needed for getting the right permissions when using brew
     set (BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-      fixup_bundle(\"${APPS}\" \"\"  \"${CMAKE_BINARY_DIR}/src\")
+    fixup_bundle(\"${APPS}\" \"\"  \"${DIRS}\")
   " COMPONENT Runtime)
 endif()

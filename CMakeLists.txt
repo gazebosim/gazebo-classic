@@ -129,11 +129,19 @@ endif()
 
 # MACOSX Bundle
 if (BUILD_OSX_BUNDLE)
-  SET(BUNDLE_INSTALL_BINARY_DIR ${PROJECT_BINARY_DIR}/INTEGRATION_locale_fix.app/Contents/MacOS/)
+  # Need to disable all RPATH. It was added to gazebo libraries but not to gazebo binaries and BundleUtilities
+  # failed trying to remove it from binaries.
+  SET(CMAKE_SKIP_RPATH TRUE)
+  #SET(CMAKE_MACOSX_RPATH TRUE)
+  SET(BUNDLE_INSTALL_BINARY_DIR ${PROJECT_BINARY_DIR}/gazebo/Contents/MacOS/)
   SET(BUNDLE_DATA_DEST_DIR ${BUNDLE_INSTALL_BINARY_DIR}/../Resources)
   SET(CMAKE_INSTALL_FULL_DATAROOTDIR ${BUNDLE_DATA_DEST_DIR})
   SET(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
   SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  
+  set (LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+  set (BIN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin)
+
   #SET(MACOSX_BUNDLE_ICON_FILE QtTest.icns)
   # set where in the bundle to put the icns file
   #SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/doc/qtest.icns
