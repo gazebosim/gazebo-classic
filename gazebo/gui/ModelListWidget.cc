@@ -3523,7 +3523,9 @@ void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
     return;
   }
 
-  // We are assuming we get only one plugin in the vector
+  // We asked for only only one plugin
+  GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+
   this->dataPtr->propMutex->lock();
   this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
   this->dataPtr->fillTypes.push_back("Plugin");

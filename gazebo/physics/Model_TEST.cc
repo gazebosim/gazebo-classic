@@ -189,12 +189,12 @@ TEST_F(ModelTest, NestedModelPluginInfo)
 
   pluginUri.Parse(
       "data://world/default/model/model_00/model/model_01/model/model_02/"
-      "model/model_03/plugin/initial_velocity");
+      "model/model_03/plugin/region_event_box");
   model->PluginInfo(pluginUri, plugins, success);
 
   EXPECT_TRUE(success);
   EXPECT_EQ(plugins.plugins_size(), 1);
-  EXPECT_EQ(plugins.plugins(0).name(), "initial_velocity");
+  EXPECT_EQ(plugins.plugins(0).name(), "region_event_box");
 }
 
 //////////////////////////////////////////////////

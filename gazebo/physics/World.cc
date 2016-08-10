@@ -2933,15 +2933,14 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
 void World::PluginInfo(const common::URI &_pluginUri,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
+  _plugins.clear_plugins();
+  _success = true;
+
   if (!_pluginUri.Valid())
   {
     gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
-    _success = false;
     return;
   }
-
-  _plugins.clear_plugins();
-  _success = true;
 
   auto parts = common::split(_pluginUri.Path().Str(), "/");
   auto myParts = common::split(this->URI().Path().Str(), "/");
@@ -2951,7 +2950,6 @@ void World::PluginInfo(const common::URI &_pluginUri,
   {
     gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
         this->URI().Str() << "]" << std::endl;
-    _success = false;
     return;
   }
 
@@ -2963,7 +2961,6 @@ void World::PluginInfo(const common::URI &_pluginUri,
     {
       gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
           this->URI().Str() << "]" << std::endl;
-      _success = false;
       return;
     }
   }
@@ -2979,7 +2976,6 @@ void World::PluginInfo(const common::URI &_pluginUri,
       {
         gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
             this->GetName() << "]" << std::endl;
-        _success = false;
         return;
       }
 
@@ -2991,12 +2987,10 @@ void World::PluginInfo(const common::URI &_pluginUri,
     {
       gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
          "] cannot be handled." << std::endl;
-      _success = false;
       return;
     }
   }
 
   gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
       << std::endl;
-  _success = false;
 }
