@@ -227,13 +227,23 @@ bool common::copyFile(const std::string &_existingFilename,
 #ifdef _WIN32
   return CopyFile(absExistingFilename.c_str(), absNewFilename.c_str(), false);
 #elif defined(__APPLE__)
+  bool result = false;
   std::ifstream in(absExistingFilename.c_str(), std::ifstream::binary);
-  std::ofstream out(absNewFilename.c_str(),
-      std::ifstream::trunc | std::ifstream::binary);
-  out << in.rdbuf();
-  out.close();
+
+  if (in.good())
+  {
+    std::ofstream out(absNewFilename.c_str(),
+                      std::ifstream::trunc | std::ifstream::binary);
+    if (out.good())
+    {
+      out << in.rdbuf();
+      result = common::isFile(absNewFilename);
+    }
+    out.close();
+  }
   in.close();
-  return common::isFile(absNewFilename);
+
+  return result;
 #else
   int readFd = 0;
   int writeFd = 0;
