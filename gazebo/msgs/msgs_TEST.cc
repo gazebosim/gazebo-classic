@@ -1946,7 +1946,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   sdf::initFile("surface.sdf", sdf2);
   msgs::SurfaceToSDF(surfaceMsg2, sdf2);
 
-  ASSERT_TRUE(sdf2 != NULL);
+  ASSERT_TRUE(sdf2 != nullptr);
 
   ASSERT_TRUE(sdf2->HasElement("bounce"));
   EXPECT_DOUBLE_EQ(
@@ -3784,9 +3784,76 @@ TEST_F(MsgsTest, PluginToFromSDF)
   sdf2.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", sdf2);
   msgs::PluginToSDF(msg2, sdf2);
-  EXPECT_TRUE(sdf2 != NULL);
+  EXPECT_TRUE(sdf2 != nullptr);
   EXPECT_EQ(sdf2->Get<std::string>("name"), name);
   EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
   EXPECT_TRUE(sdf2->HasElement("plugin_param"));
   EXPECT_EQ(sdf2->Get<std::string>("plugin_param"), "param");
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, VisualPluginToFromSDF)
+{
+  const std::string visName("visual_name");
+  const double radius = 3.3;
+  std::string pluginName("plugin_name");
+  std::string filename("plugin_filename");
+  std::string innerxml("<plugin_param>param</plugin_param>\n");
+
+  // Create SDF
+  sdf::ElementPtr sdf1(new sdf::Element());
+  sdf::initFile("visual.sdf", sdf1);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <visual name='" + visName + "'>\
+           <geometry>\
+             <sphere><radius>" + std::to_string(radius) + "</radius></sphere>\
+           </geometry>\
+           <plugin name='" + pluginName + "' filename='" + filename + "'>\
+             " + innerxml + "\
+           </plugin>\
+         </visual>\
+      </sdf>", sdf1));
+
+  // To msg
+  auto msg1 = msgs::VisualFromSDF(sdf1);
+
+  // Back to SDF
+  auto sdf2 = msgs::VisualToSDF(msg1);
+  ASSERT_TRUE(sdf2 != nullptr);
+
+  // DEPRECATED: Remove this test in Gazebo8
+  {
+    EXPECT_TRUE(sdf2->HasElement("plugin"));
+    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("plugin_param"));
+
+    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("sdf"));
+    EXPECT_TRUE(sdf2->GetElement("plugin")->GetElement("sdf")->
+        HasElement("plugin_param"));
+  }
+
+  // Back to Msg
+  auto msg2 = msgs::VisualFromSDF(sdf2);
+
+  // Back to SDF
+  auto sdf3 = msgs::VisualToSDF(msg2);
+  ASSERT_TRUE(sdf3 != nullptr);
+
+  ASSERT_TRUE(sdf3->HasAttribute("name"));
+  EXPECT_EQ(sdf3->Get<std::string>("name"), visName);
+
+  ASSERT_TRUE(sdf3->HasElement("geometry"));
+  auto geomElem = sdf3->GetElement("geometry");
+  ASSERT_TRUE(geomElem->HasElement("sphere"));
+  auto sphereElem = geomElem->GetElement("sphere");
+  EXPECT_TRUE(sphereElem->HasElement("radius"));
+  EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), radius);
+
+  ASSERT_TRUE(sdf3->HasElement("plugin"));
+  auto pluginElem = sdf3->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), pluginName);
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), filename);
+
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }

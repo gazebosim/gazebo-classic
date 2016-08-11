@@ -22,6 +22,7 @@
 #include <cstring>
 #include <string>
 #include <fstream>
+#include <vector>
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -250,33 +251,106 @@ bool common::moveFile(const std::string &_existingFilename,
 }
 
 /////////////////////////////////////////////////
+void common::replaceAll(std::string &_result,
+                        const std::string &_orig,
+                        const std::string &_key,
+                        const std::string &_replacement)
+{
+  _result = _orig;
+  size_t pos = 0;
+  while ((pos = _result.find(_key, pos)) != std::string::npos)
+  {
+    _result = _result.replace(pos, _key.length(), _replacement);
+    pos += _key.length() > _replacement.length() ? 0 : _replacement.length();
+  }
+}
+
+/////////////////////////////////////////////////
+std::string common::replaceAll(const std::string &_orig,
+                               const std::string &_key,
+                               const std::string &_replacement)
+{
+  std::string result;
+  replaceAll(result, _orig, _key, _replacement);
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::string common::absPath(const std::string &_path)
+{
+  std::string result;
+
+  char path[GZ_PATH_MAX] = "";
+#ifdef _WIN32
+  if (GetFullPathName(_path.c_str(), GZ_PATH_MAX, &path[0], nullptr) != 0)
+#else
+  if (realpath(_path.c_str(), &path[0]) != nullptr)
+#endif
+    result = path;
+  else if (!_path.empty())
+  {
+    // If _path is an absolute path, then return _path.
+    // An absoluate path on Windows is a character followed by a colon and a
+    // forward-slash.
+    if (_path.compare(0, 1, "/") == 0 || _path.compare(1, 3, ":\\") == 0)
+      result = _path;
+    // Otherwise return the current working directory with _path appended.
+    else
+      result = common::cwd() + "/" + _path;
+  }
+
+  common::replaceAll(result, result, "//", "/");
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 bool common::copyFile(const std::string &_existingFilename,
                       const std::string &_newFilename)
 {
+  std::string absExistingFilename = common::absPath(_existingFilename);
+  std::string absNewFilename = common::absPath(_newFilename);
+
+  if (absExistingFilename == absNewFilename)
+    return false;
+
 #ifdef _WIN32
-  return CopyFile(_existingFilename, _newFilename, false);
+  return CopyFile(absExistingFilename.c_str(), absNewFilename.c_str(), false);
 #elif defined(__APPLE__)
-  std::ifstream in(_existingFilename.c_str(), std::ifstream::binary);
-  std::ofstream out(_newFilename.c_str(),
-      std::ifstream::trunc | std::ifstream::binary);
-  out << in.rdbuf();
-  out.close();
+  bool result = false;
+  std::ifstream in(absExistingFilename.c_str(), std::ifstream::binary);
+
+  if (in.good())
+  {
+    std::ofstream out(absNewFilename.c_str(),
+                      std::ifstream::trunc | std::ifstream::binary);
+    if (out.good())
+    {
+      out << in.rdbuf();
+      result = common::isFile(absNewFilename);
+    }
+    out.close();
+  }
   in.close();
+
+  return result;
 #else
-  int readFd;
-  int writeFd;
+  int readFd = 0;
+  int writeFd = 0;
   struct stat statBuf;
   off_t offset = 0;
 
   // Open the input file.
-  readFd = open(_existingFilename.c_str(), O_RDONLY);
+  readFd = open(absExistingFilename.c_str(), O_RDONLY);
+  if (readFd < 0)
+    return false;
 
   // Stat the input file to obtain its size.
   fstat(readFd, &statBuf);
 
   // Open the output file for writing, with the same permissions as the
   // source file.
-  writeFd = open(_newFilename.c_str(), O_WRONLY | O_CREAT, statBuf.st_mode);
+  writeFd = open(absNewFilename.c_str(), O_WRONLY | O_CREAT, statBuf.st_mode);
 
   while (offset >= 0 && offset < statBuf.st_size)
   {
@@ -286,7 +360,6 @@ bool common::copyFile(const std::string &_existingFilename,
       break;
   }
 
-  // Close up.
   close(readFd);
   close(writeFd);
 
