@@ -99,6 +99,9 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     bool isFile(const std::string &_path);
 
+    /// \brief Get the absolute path of a provided path.
+    /// \param[in] _path Relative or absolute path.
+    /// \return Absolute path
     GZ_COMMON_VISIBLE
     std::string absPath(const std::string &_path);
 

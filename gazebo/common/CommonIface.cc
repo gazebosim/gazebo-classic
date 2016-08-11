@@ -190,7 +190,7 @@ std::string common::absPath(const std::string &_path)
 {
   std::string result;
 
-  char path[GZ_PATH_MAX];
+  char path[GZ_PATH_MAX] = "";
 #ifdef _WIN32
   if (GetFullPathName(_path.c_str(), GZ_PATH_MAX, &path[0], nullptr) != 0)
 #else
@@ -202,7 +202,7 @@ std::string common::absPath(const std::string &_path)
     // If _path is an absolute path, then return _path.
     // An absoluate path on Windows is a character followed by a colon and a
     // forward-slash.
-    if (_path.find("/") == 0 || _path.find(":\\") == 1)
+    if (_path.compare(0, 1, "/") == 0 || _path.compare(1, 3, ":\\") == 0)
       result = _path;
     // Otherwise return the current working directory with _path appended.
     else
