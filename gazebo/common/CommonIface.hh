@@ -165,45 +165,6 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     std::string unique_file_path(const std::string &_pathAndName,
                                  const std::string &_extension);
-
-    /// \brief Get the current working directory
-    /// \return Name of the current directory
-    GZ_COMMON_VISIBLE
-    std::string cwd();
-
-    /// \brief Returns true if _path is a file or directory
-    /// \param[in] _path Path to check.
-    /// \return True if _path is a file or directory
-    GZ_COMMON_VISIBLE
-    bool exists(const std::string &_path);
-
-    /// \brief Check if the given path is a directory.
-    /// \param[in] _path Path to a directory.
-    /// \return True if _path is a directory.
-    GZ_COMMON_VISIBLE
-    bool isDirectory(const std::string &_path);
-
-    /// \brief Check if the given path is a file.
-    /// \param[in] _path Path to a file.
-    /// \return True if _path is a file.
-    GZ_COMMON_VISIBLE
-    bool isFile(const std::string &_path);
-
-    /// \brief Copy a file.
-    /// \param[in] _existingFilename Path to an existing file.
-    /// \param[in] _newFilename Path of the new file.
-    /// \return True on success.
-    GZ_COMMON_VISIBLE
-    bool copyFile(const std::string &_existingFilename,
-                  const std::string &_newFilename);
-
-    /// \brief Move a file.
-    /// \param[in] _existingFilename Full path to an existing file.
-    /// \param[in] _newFilename Full path of the new file.
-    /// \return True on success.
-    GZ_COMMON_VISIBLE
-    bool moveFile(const std::string &_existingFilename,
-                  const std::string &_newFilename);
     /// \}
   }
 
