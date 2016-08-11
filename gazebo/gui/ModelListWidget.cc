@@ -254,8 +254,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     {
       if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
       {
-        std::string pluginInfoService(gui::get_world() +
-            "/server/info/plugin");
+        std::string pluginInfoService("/physics/info/plugin");
         ignition::msgs::StringMsg req;
         req.set_data(this->dataPtr->selectedEntityName);
 
