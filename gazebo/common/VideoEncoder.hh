@@ -19,6 +19,7 @@
 
 #include <chrono>
 #include <string>
+#include <memory>
 #include <gazebo/util/system.hh>
 
 // Default bitrate (0) indicates that a bitrate should be calculated when
