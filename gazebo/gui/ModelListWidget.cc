@@ -239,6 +239,8 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
                                           const std::string &/*_mode*/)
 {
+  gzwarn << "selectoItemo";
+
   this->dataPtr->selectedEntityName = _name;
 
   this->dataPtr->propTreeBrowser->clear();
@@ -288,6 +290,19 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->fillTypes.push_back("Light");
 
       this->dataPtr->modelTreeWidget->setCurrentItem(lItem);
+    }
+    // World plugin
+    else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos && this->dataPtr->selectedEntityName.find("/world/") != std::string::npos)
+    {
+      std::string service(gui::get_world() +
+            "/server/info/plugin");
+      ignition::msgs::StringMsg req;
+      req.set_data(this->dataPtr->selectedEntityName);
+
+      gzerr << this->dataPtr->selectedEntityName << "bodo";
+
+      this->dataPtr->ignNode.Request(service, req,
+         &ModelListWidget::OnPluginInfo, this);
     }
   }
   else if (this->dataPtr->modelTreeWidget->currentItem())
@@ -2796,7 +2811,7 @@ void ModelListWidget::OnCreateScene(const std::string &_name)
   this->InitTransport(_name);
 
   std::string service(gui::get_world() +
-    "/server/list/plugin");
+    "/server/info/plugin");
 
 gzerr << "gogo" << service;
 
@@ -3542,8 +3557,9 @@ void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
     return;
   }
 
-qDebug() << "plugin V";
-  // We are assuming we get only one plugin in the vector
+  // We asked for only one plugin
+  GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+
   this->dataPtr->propMutex->lock();
   this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
   this->dataPtr->fillTypes.push_back("Plugin");
@@ -3598,9 +3614,11 @@ void ModelListWidget::OnPluginList(const ignition::msgs::Plugin_V &_plugins,
       pluginUri.Path().PushBack("plugin");
       pluginUri.Path().PushBack(pluginName);
 
+      gzwarn << pluginUri.Str();
+
       pluginItem->setData(0, Qt::UserRole,
           QVariant(pluginUri.Str().c_str()));
-      pluginItem->setData(3, Qt::UserRole, QVariant("World_Plugin"));
+      pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
 
       this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
     }

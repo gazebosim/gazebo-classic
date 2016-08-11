@@ -264,11 +264,11 @@ void World::Load(sdf::ElementPtr _sdf)
         << std::endl;
   }
 */
-  std::string pluginListService(this->GetName() + "/server/list/plugin");
-  if (!this->dataPtr->ignNode.Advertise(pluginListService,
-      &World::PluginListService, this))
+  std::string service(this->GetName() + "/server/info/plugin");
+  if (!this->dataPtr->ignNode.Advertise(service,
+      &World::PluginInfoService, this))
   {
-    gzerr << "Error advertising service [" << pluginListService << "]"
+    gzerr << "Error advertising service [" << service << "]"
         << std::endl;
   }
   
@@ -2953,17 +2953,16 @@ void World::PluginListService(const ignition::msgs::StringMsg &_req,
 void World::PluginInfo(const common::URI &_pluginUri,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
-  printf("%s\n", "asss");
+  _plugins.clear_plugins();
+  _success = true;
+
+  gzwarn << "prodo";
 
   if (!_pluginUri.Valid())
   {
     gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
-    _success = false;
     return;
   }
-
-  _plugins.clear_plugins();
-  _success = true;
 
   auto parts = common::split(_pluginUri.Path().Str(), "/");
   auto myParts = common::split(this->URI().Path().Str(), "/");
@@ -2973,7 +2972,6 @@ void World::PluginInfo(const common::URI &_pluginUri,
   {
     gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
         this->URI().Str() << "]" << std::endl;
-    _success = false;
     return;
   }
 
@@ -2985,7 +2983,6 @@ void World::PluginInfo(const common::URI &_pluginUri,
     {
       gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
           this->URI().Str() << "]" << std::endl;
-      _success = false;
       return;
     }
   }
@@ -3001,15 +2998,33 @@ void World::PluginInfo(const common::URI &_pluginUri,
       {
         gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
             this->GetName() << "]" << std::endl;
-        _success = false;
         return;
       }
 
       model->PluginInfo(_pluginUri, _plugins, _success);
       return;
     }
-    // TODO: Handle world plugins
 
+    gzwarn << "bef back";
+    // TODO: Handle world plugins
+    // No specific plugin -> display plugin names in GUI
+    if (parts.back() == "plugin")
+    {
+      gzwarn << "aft back";
+      // Fill names of world plugins into message
+      for (auto iter = this->dataPtr->plugins.begin();
+        iter != this->dataPtr->plugins.end(); ++iter)
+      {
+        ignition::msgs::Plugin *pluginMsg = _plugins.add_plugins();
+        pluginMsg->set_name((*iter)->GetHandle());
+        pluginMsg->set_filename((*iter)->GetFilename());
+      }
+      
+      _success = true;
+      return;
+    }
+
+    gzwarn << "plugins world starts";
     // Look for plugin
     if (parts[i] == "plugin")
     {
@@ -3055,14 +3070,12 @@ void World::PluginInfo(const common::URI &_pluginUri,
     {
       gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
          "] cannot be handled." << std::endl;
-      _success = false;
       return;
     }
   }
 
   gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
       << std::endl;
-  _success = false;
 }
 
 //////////////////////////////////////////////////
