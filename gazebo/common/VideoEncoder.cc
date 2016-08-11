@@ -92,63 +92,11 @@ class gazebo::common::VideoEncoderPrivate
   public: std::mutex mutex;
 };
 
-// FFMPEG log callback. We use this to redirect message to gazebo's console
-// messages.
-void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
-{
-  static char message[8192];
-
-  std::string msg = "ffmpeg ";
-
-  // Get the ffmpeg module.
-  if (_ptr)
-  {
-    AVClass *avc = *(AVClass**)_ptr;
-    const char *module = avc->item_name(_ptr);
-    if (module)
-      msg += std::string("[") + module + "] ";
-  }
-
-  // Create the actual message
-  vsnprintf(message, sizeof(message), _fmt, _args);
-  msg += message;
-
-  // Output to the appropriate stream.
-  switch (_level)
-  {
-    case AV_LOG_DEBUG:
-      // There are a lot of debug messages. So we'll just skip those.
-      break;
-    case AV_LOG_PANIC:
-    case AV_LOG_FATAL:
-    case AV_LOG_ERROR:
-      gzerr << msg << std::endl;
-      break;
-    case AV_LOG_WARNING:
-      gzwarn << msg << std::endl;
-      break;
-    default:
-      gzmsg << msg << std::endl;
-      break;
-  }
-}
-
 /////////////////////////////////////////////////
 VideoEncoder::VideoEncoder()
 : dataPtr(new VideoEncoderPrivate)
 {
-#ifdef HAVE_FFMPEG
-  // Register av once.
-  static bool first = true;
-  if (first)
-  {
-    first = false;
-    av_register_all();
-
-    // Set the log callback function.
-    av_log_set_callback(logCallback);
-  }
-#endif
+  common::load();
 }
 
 /////////////////////////////////////////////////
@@ -259,9 +207,16 @@ bool VideoEncoder::Start(const unsigned int _width,
 
   this->dataPtr->formatCtx = avformat_alloc_context();
   this->dataPtr->formatCtx->oformat = outputFormat;
+
+#ifdef WIN32
+  _snprintf(this->dataPtr->formatCtx->filename,
+      sizeof(this->dataPtr->formatCtx->filename),
+      "%s", tmpFileNameFull.c_str());
+#else
   snprintf(this->dataPtr->formatCtx->filename,
       sizeof(this->dataPtr->formatCtx->filename),
       "%s", tmpFileNameFull.c_str());
+#endif
 
   this->dataPtr->videoStream =
     avformat_new_stream(this->dataPtr->formatCtx, encoder);
@@ -304,7 +259,7 @@ bool VideoEncoder::Start(const unsigned int _width,
         "preset", "slow", 0);
   }
 
-  if (this->dataPtr->videoStream->codec->codec_id == CODEC_ID_MPEG1VIDEO)
+  if (this->dataPtr->videoStream->codec->codec_id == AV_CODEC_ID_MPEG1VIDEO)
   {
     // Needed to avoid using macroblocks in which some coeffs overflow.
     // This does not happen with normal video, it just happens here as
@@ -451,14 +406,14 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     {
       this->dataPtr->avInPicture = new AVPicture;
       avpicture_alloc(this->dataPtr->avInPicture,
-          PIX_FMT_RGB24, this->dataPtr->inWidth,
+          AV_PIX_FMT_RGB24, this->dataPtr->inWidth,
           this->dataPtr->inHeight);
     }
 
     this->dataPtr->swsCtx = sws_getContext(
         this->dataPtr->inWidth,
         this->dataPtr->inHeight,
-        PIX_FMT_RGB24,
+        AV_PIX_FMT_RGB24,
         this->dataPtr->videoStream->codec->width,
         this->dataPtr->videoStream->codec->height,
         this->dataPtr->videoStream->codec->pix_fmt,

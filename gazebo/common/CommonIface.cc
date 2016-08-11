@@ -36,6 +36,7 @@
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/ffmpeg_inc.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -59,6 +60,48 @@ using namespace gazebo;
 #endif
 
 /////////////////////////////////////////////////
+// avcodec log callback. We use this to redirect message to gazebo's console
+// messages.
+void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
+{
+  static char message[8192];
+
+  std::string msg = "ffmpeg ";
+
+  // Get the ffmpeg module.
+  if (_ptr)
+  {
+    AVClass *avc = *(AVClass**)_ptr;
+    const char *module = avc->item_name(_ptr);
+    if (module)
+      msg += std::string("[") + module + "] ";
+  }
+
+  // Create the actual message
+  vsnprintf(message, sizeof(message), _fmt, _args);
+  msg += message;
+
+  // Output to the appropriate stream.
+  switch (_level)
+  {
+    case AV_LOG_DEBUG:
+      // There are a lot of debug messages. So we'll just skip those.
+      break;
+    case AV_LOG_PANIC:
+    case AV_LOG_FATAL:
+    case AV_LOG_ERROR:
+      gzerr << msg << std::endl;
+      break;
+    case AV_LOG_WARNING:
+      gzwarn << msg << std::endl;
+      break;
+    default:
+      gzmsg << msg << std::endl;
+      break;
+  }
+}
+
+/////////////////////////////////////////////////
 void common::load()
 {
 #ifdef HAVE_FFMPEG
@@ -68,6 +111,9 @@ void common::load()
     first = false;
     avcodec_register_all();
     av_register_all();
+
+    // Set the log callback function.
+    av_log_set_callback(logCallback);
   }
 #endif
 }
