@@ -102,6 +102,106 @@ TEST_F(MsgsTest, BadPackage)
   EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
 }
 
+TEST_F(MsgsTest, ConvertDoubleToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(1.0);
+  EXPECT_EQ(msg.type(), msgs::Any::DOUBLE);
+  ASSERT_TRUE(msg.has_double_value());
+  EXPECT_DOUBLE_EQ(1, msg.double_value());
+}
+
+TEST_F(MsgsTest, ConvertIntToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(2);
+  EXPECT_EQ(msg.type(), msgs::Any::INT32);
+  ASSERT_TRUE(msg.has_int_value());
+  EXPECT_DOUBLE_EQ(2, msg.int_value());
+}
+
+TEST_F(MsgsTest, ConvertStringToAny)
+{
+  msgs::Any msg = msgs::ConvertAny("test_string");
+  EXPECT_EQ(msg.type(), msgs::Any::STRING);
+  ASSERT_TRUE(msg.has_string_value());
+  EXPECT_EQ("test_string", msg.string_value());
+}
+
+TEST_F(MsgsTest, ConvertBoolToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(true);
+
+  EXPECT_EQ(msg.type(), msgs::Any::BOOLEAN);
+  ASSERT_TRUE(msg.has_bool_value());
+  EXPECT_TRUE(msg.bool_value());
+}
+
+TEST_F(MsgsTest, ConvertVector3dToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(msg.type(), msgs::Any::VECTOR3D);
+  ASSERT_TRUE(msg.has_vector3d_value());
+
+  EXPECT_DOUBLE_EQ(1, msg.vector3d_value().x());
+  EXPECT_DOUBLE_EQ(2, msg.vector3d_value().y());
+  EXPECT_DOUBLE_EQ(3, msg.vector3d_value().z());
+}
+
+TEST_F(MsgsTest, ConvertColorToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(common::Color(.1, .2, .3, 1.0));
+  EXPECT_EQ(msg.type(), msgs::Any::COLOR);
+  ASSERT_TRUE(msg.has_color_value());
+
+  EXPECT_DOUBLE_EQ(0.1f, msg.color_value().r());
+  EXPECT_DOUBLE_EQ(0.2f, msg.color_value().g());
+  EXPECT_DOUBLE_EQ(0.3f, msg.color_value().b());
+  EXPECT_DOUBLE_EQ(1.0f, msg.color_value().a());
+}
+
+TEST_F(MsgsTest, ConvertPose3dToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Pose3d(
+      ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(4, 5, 6, 7)));
+
+  EXPECT_EQ(msg.type(), msgs::Any::POSE3D);
+  ASSERT_TRUE(msg.has_pose3d_value());
+
+  EXPECT_DOUBLE_EQ(1, msg.pose3d_value().position().x());
+  EXPECT_DOUBLE_EQ(2, msg.pose3d_value().position().y());
+  EXPECT_DOUBLE_EQ(3, msg.pose3d_value().position().z());
+
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().w(), 4.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().x(), 5.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().y(), 6.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().z(), 7.0);
+}
+
+TEST_F(MsgsTest, ConvertQuaternionToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(
+      ignition::math::Quaterniond(1, 2, 3, 4));
+
+  EXPECT_EQ(msg.type(), msgs::Any::QUATERNIOND);
+  ASSERT_TRUE(msg.has_quaternion_value());
+
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().w(), 1.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().x(), 2.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().y(), 3.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().z(), 4.0);
+}
+
+TEST_F(MsgsTest, ConvertTimeToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(common::Time(2, 123));
+
+  EXPECT_EQ(msg.type(), msgs::Any::TIME);
+  ASSERT_TRUE(msg.has_time_value());
+
+  EXPECT_EQ(2, msg.time_value().sec());
+  EXPECT_EQ(123, msg.time_value().nsec());
+}
+
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
   msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
@@ -1529,7 +1629,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   sdf::initFile("surface.sdf", sdf2);
   msgs::SurfaceToSDF(surfaceMsg2, sdf2);
 
-  ASSERT_TRUE(sdf2 != NULL);
+  ASSERT_TRUE(sdf2 != nullptr);
 
   ASSERT_TRUE(sdf2->HasElement("bounce"));
   EXPECT_DOUBLE_EQ(
@@ -3351,9 +3451,76 @@ TEST_F(MsgsTest, PluginToFromSDF)
   sdf2.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", sdf2);
   msgs::PluginToSDF(msg2, sdf2);
-  EXPECT_TRUE(sdf2 != NULL);
+  EXPECT_TRUE(sdf2 != nullptr);
   EXPECT_EQ(sdf2->Get<std::string>("name"), name);
   EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
   EXPECT_TRUE(sdf2->HasElement("plugin_param"));
   EXPECT_EQ(sdf2->Get<std::string>("plugin_param"), "param");
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, VisualPluginToFromSDF)
+{
+  const std::string visName("visual_name");
+  const double radius = 3.3;
+  std::string pluginName("plugin_name");
+  std::string filename("plugin_filename");
+  std::string innerxml("<plugin_param>param</plugin_param>\n");
+
+  // Create SDF
+  sdf::ElementPtr sdf1(new sdf::Element());
+  sdf::initFile("visual.sdf", sdf1);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <visual name='" + visName + "'>\
+           <geometry>\
+             <sphere><radius>" + std::to_string(radius) + "</radius></sphere>\
+           </geometry>\
+           <plugin name='" + pluginName + "' filename='" + filename + "'>\
+             " + innerxml + "\
+           </plugin>\
+         </visual>\
+      </sdf>", sdf1));
+
+  // To msg
+  auto msg1 = msgs::VisualFromSDF(sdf1);
+
+  // Back to SDF
+  auto sdf2 = msgs::VisualToSDF(msg1);
+  ASSERT_TRUE(sdf2 != nullptr);
+
+  // DEPRECATED: Remove this test in Gazebo8
+  {
+    EXPECT_TRUE(sdf2->HasElement("plugin"));
+    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("plugin_param"));
+
+    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("sdf"));
+    EXPECT_TRUE(sdf2->GetElement("plugin")->GetElement("sdf")->
+        HasElement("plugin_param"));
+  }
+
+  // Back to Msg
+  auto msg2 = msgs::VisualFromSDF(sdf2);
+
+  // Back to SDF
+  auto sdf3 = msgs::VisualToSDF(msg2);
+  ASSERT_TRUE(sdf3 != nullptr);
+
+  ASSERT_TRUE(sdf3->HasAttribute("name"));
+  EXPECT_EQ(sdf3->Get<std::string>("name"), visName);
+
+  ASSERT_TRUE(sdf3->HasElement("geometry"));
+  auto geomElem = sdf3->GetElement("geometry");
+  ASSERT_TRUE(geomElem->HasElement("sphere"));
+  auto sphereElem = geomElem->GetElement("sphere");
+  EXPECT_TRUE(sphereElem->HasElement("radius"));
+  EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), radius);
+
+  ASSERT_TRUE(sdf3->HasElement("plugin"));
+  auto pluginElem = sdf3->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), pluginName);
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), filename);
+
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }

@@ -2,6 +2,11 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Added filesystem operations to the common library. Additions include
+   `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
+    * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
+
+
 1. Fix loading collada files with multiple texture coordinates.
     * [Pull request 2413](https://bitbucket.org/osrf/gazebo/pull-request/2413)
 
@@ -19,11 +24,17 @@
 1. Include Boost_LIBRARIES  in the linking of gazebo_physics
     * [Pull request 2402](https://bitbucket.org/osrf/gazebo/pull-request/2402)
 
+1. Backported KeyboardGUIPlugin and msgs::Any
+    * [Pull request 2416](https://bitbucket.org/osrf/gazebo/pull-request/2416)
+
 1. Use XML_SUCCESS enum instead of XML_NO_ERROR, which has been deleted in tinyxml2 4.0
     * [Pull request 2397](https://bitbucket.org/osrf/gazebo/pull-request/2397)
 
 1. Ignore ffmpeg deprecation warnings to clean up CI since they are noted in #2002
     * [Pull request 2388](https://bitbucket.org/osrf/gazebo/pull-request/2388)
+
+1. Added a visual blinking plugin
+    * [Pull request 2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
 
 1. Fix InertiaVisual for non-diagonal inertia matrices
     * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
