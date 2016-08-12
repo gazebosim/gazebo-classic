@@ -1584,7 +1584,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
               {
                 // \todo: Add support for multiple texture maps to SubMesh.
                 // Here we are only using the first texture coordinates, when
-                // multiple could have been specified.
+                // multiple could have been specified. See Gazebo issue #532.
 
                 // Get the vertex texcoord index value. If the texcoord is a
                 // duplicate then reset the index to the first instance of the
