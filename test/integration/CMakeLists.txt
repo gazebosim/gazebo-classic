@@ -50,6 +50,7 @@ set(tests
   joint_force_torque.cc
   joint_gearbox.cc
   joint_get_force_torque.cc
+  joint_position_initialization.cc
   joint_revolute.cc
   joint_screw.cc
   joint_set_position_test.cc
