@@ -196,10 +196,14 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
       // Load the marker
       marker->Load(_msg);
 
+      // Compute the layer for the marker.
       if (nsIter == this->markers.end())
+      {
+        marker->SetLayer(this->markers.size());
         rendering::Events::newLayer(this->markers.size());
-
-      marker->SetLayer(this->markers.size());
+      }
+      else
+        marker->SetLayer(std::distance(this->markers.begin(), nsIter));
 
       // Store the marker
       this->markers[ns][_msg.id()] = marker;
