@@ -107,8 +107,15 @@ void Marker_TEST::AddRemove()
 
   std::string topicName = "/marker";
 
+  std::vector<std::string> serviceList;
+  node.ServiceList(serviceList);
+
+  QVERIFY(std::find(serviceList.begin(), serviceList.end(), topicName)
+          != serviceList.end());
+
   // Publish to a Gazebo topic
   node.Advertise<ignition::msgs::Marker>(topicName);
+
 
   // Create the marker message
   ignition::msgs::Marker markerMsg;
@@ -117,6 +124,7 @@ void Marker_TEST::AddRemove()
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::SPHERE);
   node.Request(topicName, markerMsg, 5000u, rep, result);
+  QVERIFY(result != false);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -187,8 +195,10 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(1, 0, -10));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(1, 0, 10));
-  ignition::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(2, 0, 10));
-  ignition::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(2, 0, -10));
+  ignition::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(2, 0, 10));
+  ignition::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(2, 0, -10));
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth(180);

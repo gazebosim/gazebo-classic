@@ -74,7 +74,7 @@ namespace gazebo
       private: void Text(const ignition::msgs::Marker &_msg);
 
       /// \brief Private data pointer
-      private: MarkerVisualPrivate *dataPtr;
+      private: MarkerVisualPrivate *dPtr;
     };
     /// \endcond
   }
