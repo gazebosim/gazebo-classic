@@ -59,6 +59,10 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
+      /// \brief Populate a marker message.
+      /// \param[in] _msg The message to populate.
+      public: void FillMsg(ignition::msgs::Marker &_msg);
+
       /// \brief Add or modify a marker
       /// \param[in] _msg The message that defines what to add or modify
       private: void AddModify(const ignition::msgs::Marker &_msg);

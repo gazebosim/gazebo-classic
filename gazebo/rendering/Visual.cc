@@ -3077,6 +3077,12 @@ void Visual::ToggleLayer(const int32_t _layer)
 }
 
 //////////////////////////////////////////////////
+void Visual::SetLayer(const int32_t _layer)
+{
+  this->dataPtr->layer = _layer;
+}
+
+//////////////////////////////////////////////////
 Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
 {
   Visual::VisualType visualType = Visual::VT_ENTITY;

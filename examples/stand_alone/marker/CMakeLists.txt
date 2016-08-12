@@ -1,13 +1,5 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-find_package(ignition-transport 1 REQUIRED)
-include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
-link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
-
-find_package(ignition-msgs 0 REQUIRED)
-include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
-link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
-
 find_package(gazebo REQUIRED)
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})

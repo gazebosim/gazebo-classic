@@ -598,6 +598,10 @@ namespace gazebo
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
 
+      /// \brief Set the layer this visual belongs to.
+      /// \param[in] _layer Index of the layer.
+      public: void SetLayer(const int32_t _layer);
+
       /// \brief Get type of visual.
       /// \return Visual type.
       public: Visual::VisualType GetType() const;

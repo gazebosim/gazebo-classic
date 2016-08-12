@@ -24,6 +24,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/MovableText.hh"
+#include "gazebo/rendering/VisualPrivate.hh"
 #include "gazebo/rendering/MarkerVisual.hh"
 
 using namespace gazebo;
@@ -87,6 +89,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   // Set the type of visual
   if (this->dPtr->msg.type() != _msg.type())
   {
+    this->dPtr->msg.set_type(_msg.type());
     switch (_msg.type())
     {
       case ignition::msgs::Marker::BOX:
@@ -270,4 +273,20 @@ void MarkerVisual::Fini()
     this->dPtr->text.reset();
   }
   Visual::Fini();
+}
+
+/////////////////////////////////////////////////
+void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
+{
+  _msg.mutable_lifetime()->set_sec(this->dPtr->lifetime.sec);
+  _msg.mutable_lifetime()->set_nsec(this->dPtr->lifetime.nsec);
+  ignition::msgs::Set(_msg.mutable_pose(), this->GetPose().Ign());
+
+  if (this->dPtr->text)
+    _msg.set_text(this->dPtr->text->GetText());
+
+  if (this->GetParent())
+    _msg.set_parent(this->GetParent()->GetName());
+
+  _msg.set_type(this->dPtr->msg.type());
 }

@@ -17,6 +17,7 @@
 #include <ignition/transport/Node.hh>
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/MarkerVisual.hh"
@@ -138,7 +139,7 @@ void MarkerManagerPrivate::OnPreRender()
 
   // Erase any markers that have a lifetime.
   for (auto mit = this->markers.begin();
-       mit != this->markers.end(); ++mit)
+       mit != this->markers.end();)
   {
     for (auto it = mit->second.cbegin(); it != mit->second.cend();)
     {
@@ -194,6 +195,11 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 
       // Load the marker
       marker->Load(_msg);
+
+      if (nsIter == this->markers.end())
+        rendering::Events::newLayer(this->markers.size());
+
+      marker->SetLayer(this->markers.size());
 
       // Store the marker
       this->markers[ns][_msg.id()] = marker;
@@ -262,10 +268,16 @@ void MarkerManagerPrivate::OnList(const ignition::msgs::StringMsg & /*_req*/,
   _result = true;
 
   // Create the list of markers
-  for (std::list<ignition::msgs::Marker>::const_iterator iter =
-       this->markerMsgs.begin();
-       iter != this->markerMsgs.end(); ++iter)
+  for (Marker_M::const_iterator mIter = this->markers.begin();
+       mIter != this->markers.end(); ++mIter)
   {
-    _rep.add_marker()->CopyFrom(*iter);
+    for (std::map<uint64_t, MarkerVisualPtr>::const_iterator iter =
+        mIter->second.begin(); iter != mIter->second.end(); ++iter)
+    {
+      ignition::msgs::Marker *markerMsg = _rep.add_marker();
+      markerMsg->set_ns(mIter->first);
+      markerMsg->set_id(iter->first);
+      iter->second->FillMsg(*markerMsg);
+    }
   }
 }

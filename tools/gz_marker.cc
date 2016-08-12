@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <tuple>
+
 #include <google/protobuf/text_format.h>
 #include <ignition/transport.hh>
 #include <ignition/msgs.hh>
@@ -60,6 +62,16 @@ void MarkerCommand::HelpDetailed()
 /////////////////////////////////////////////////
 bool MarkerCommand::RunImpl()
 {
+  std::vector<std::string> serviceList;
+  node.ServiceList(serviceList);
+
+  if (std::find(serviceList.begin(), serviceList.end(), "/marker")
+      == serviceList.end())
+  {
+    std::cerr << "Error: /marker service not present on network.\n";
+    return false;
+  }
+
   node.Advertise<ignition::msgs::Marker>("/marker");
 
   std::string ns = "default";
@@ -102,7 +114,7 @@ void MarkerCommand::List()
   ignition::msgs::StringMsg req;
   req.set_data("list");
 
-  ignition::msgs::StringMsg_V rep;
+  ignition::msgs::Marker_V rep;
   bool result;
   bool executed = this->node.Request("/marker/list", req, 5000u, rep, result);
 
@@ -110,7 +122,81 @@ void MarkerCommand::List()
   {
     if (result)
     {
-      std::cout << "HERE\n";
+      std::map<std::string,
+        std::vector<std::tuple<uint64_t, std::string, std::string>>> data;
+
+      // Organize the data
+      for (int i = 0; i < rep.marker_size(); ++i)
+      {
+        std::string ns = rep.marker(i).has_ns() ? rep.marker(i).ns() : "";
+        uint64_t id = rep.marker(i).has_id() ? rep.marker(i).id() : 0;
+        std::string layer = rep.marker(i).layer();
+        std::string type;
+        switch (rep.marker(i).type())
+        {
+          case ignition::msgs::Marker::NONE:
+            type = "none";
+            break;
+          case ignition::msgs::Marker::BOX:
+            type = "box";
+            break;
+          case ignition::msgs::Marker::CYLINDER:
+            type = "cylinder";
+            break;
+          case ignition::msgs::Marker::LINE_LIST:
+            type = "line_list";
+            break;
+          case ignition::msgs::Marker::LINE_STRIP:
+            type = "line_strip";
+            break;
+          case ignition::msgs::Marker::POINTS:
+            type = "points";
+            break;
+          case ignition::msgs::Marker::SPHERE:
+            type = "sphere";
+            break;
+          case ignition::msgs::Marker::TEXT:
+            type = "text";
+            break;
+          case ignition::msgs::Marker::TRIANGLE_FAN:
+            type = "triangle_fan";
+            break;
+          case ignition::msgs::Marker::TRIANGLE_LIST:
+            type = "triangle_list";
+            break;
+          case ignition::msgs::Marker::TRIANGLE_STRIP:
+            type = "triangle_strip";
+            break;
+          default:
+            type = "unknown";
+            break;
+        };
+
+        data[ns].push_back(std::make_tuple(id, layer, type));
+      }
+
+      for (auto const d : data)
+      {
+        std::cout << "NAMESPACE " << d.first << std::endl;
+        for (auto const m : d.second)
+        {
+          uint64_t id = std::get<0>(m);
+          std::cout << "  ID " << id;
+          if (id < 10)
+            std::cout << "    ";
+          else if (id < 100)
+            std::cout << "   ";
+          else if (id < 1000)
+            std::cout << "  ";
+          else
+            std::cout << " ";
+          std::string type = std::get<2>(m) ;
+          std::cout << "TYPE " << type;
+          for (unsigned int i = 0; i < 15 - type.size(); ++i)
+            std::cout << " ";
+          std::cout << "LAYER " << std::get<1>(m) << std::endl;
+        }
+      }
     }
     else
     {
@@ -183,7 +269,10 @@ void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
     msg.set_type(ignition::msgs::Marker::TRIANGLE_STRIP);
   }
 
-  google::protobuf::TextFormat::ParseFromString(_args, &msg);
+  if (!_args.empty())
+  {
+    google::protobuf::TextFormat::ParseFromString(_args, &msg);
+  }
 
   std::cout << "Args[" << _args << "]\n";
   std::cout << msg.DebugString() << std::endl;
@@ -199,7 +288,11 @@ void MarkerCommand::Delete(const std::string &_ns, const unsigned int _id)
   msg.set_ns(_ns);
   msg.set_id(_id);
   msg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  this->node.Publish("/marker", msg);
+
+  bool result;
+  ignition::msgs::StringMsg rep;
+
+  this->node.Request("/marker", msg, 5000u, rep, result);
 }
 
 /////////////////////////////////////////////////
@@ -207,5 +300,9 @@ void MarkerCommand::DeleteAll()
 {
   ignition::msgs::Marker msg;
   msg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  this->node.Publish("/marker", msg);
+
+  bool result;
+  ignition::msgs::StringMsg rep;
+
+  this->node.Request("/marker", msg, 5000u, rep, result);
 }
