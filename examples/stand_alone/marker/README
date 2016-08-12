@@ -1,7 +1,7 @@
 Gazebo Visualization Marker Example
 
-This is example demonstrates how to create and modify visualization markers
-in Gazebo.
+This is example demonstrates how to create, modify, and delete visualization
+markers in Gazebo.
 
 ===================
 Build Instructions

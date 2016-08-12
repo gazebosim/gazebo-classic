@@ -15,9 +15,8 @@
  *
 */
 #include <ignition/transport/Node.hh>
-#include "gazebo/common/Events.hh"
 
-#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/common/Events.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/MarkerVisual.hh"
@@ -30,8 +29,8 @@ using namespace rendering;
 class gazebo::rendering::MarkerManagerPrivate
 {
   /// \def Marker_M
-  /// \brief Map of markers. The first key is a marker namespace, the
-  /// first value is the map of markers and their ids.
+  /// \brief Map of markers. The key is a marker namespace, the
+  /// value is the map of markers in the namespace and their ids.
   typedef std::map<std::string, std::map<uint64_t, MarkerVisualPtr>> Marker_M;
 
   /// \def MarkerMsgs_L
@@ -103,7 +102,7 @@ bool MarkerManager::Init(ScenePtr _scene)
 
   // Advertise the list service
   if (!this->dataPtr->node.Advertise("/marker/list",
-        &MarkerManagerPrivate::OnList, this->dataPtr.get()))
+      &MarkerManagerPrivate::OnList, this->dataPtr.get()))
   {
     gzerr << "Unable to advertise to the /marker/list service.\n";
   }
@@ -195,15 +194,6 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 
       // Load the marker
       marker->Load(_msg);
-
-      // Compute the layer for the marker.
-      if (nsIter == this->markers.end())
-      {
-        marker->SetLayer(this->markers.size());
-        rendering::Events::newLayer(this->markers.size());
-      }
-      else
-        marker->SetLayer(std::distance(this->markers.begin(), nsIter));
 
       // Store the marker
       this->markers[ns][_msg.id()] = marker;

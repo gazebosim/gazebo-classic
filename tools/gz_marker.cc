@@ -37,7 +37,7 @@ MarkerCommand::MarkerCommand()
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
     ("add,a", "Add or modify a visual marker")
-    ("args,r", "Arguments to add")
+    ("msg,m", po::value<std::string>(), "Specify and send a marker message.")
     ("namespace,n", po::value<std::string>(), "Namespace for the visual marker")
     ("id,i", po::value<unsigned int>(),
      "Positive integer value of a visual marker")
@@ -56,7 +56,60 @@ MarkerCommand::MarkerCommand()
 /////////////////////////////////////////////////
 void MarkerCommand::HelpDetailed()
 {
-  std::cerr << "\tAdd, modify, or delete visual markers." << std::endl;
+  std::cerr << "\tAdd, modify, or delete visual markers.\n\n";
+  std::cerr << "Option Details\n"
+
+    << "-a, --add: No argument\n"
+    << "  This option indicates that a marker should be added or modified.\n"
+    << "  Use this in conjunction with -t to specify a marker type,\n"
+    << "  -i to specify a marker id, -p to specify a parent, -f to specify \n"
+    << "  a lifetime for the marker, or -n to specify a namespace.\n"
+
+    << "-n, --namespace: string argument\n"
+    << "  Namespaces allow markers to be grouped. This option can be used\n"
+    << "  the -a command. the default namespace is \"default\".\n"
+
+    << "-i, --id: integer argument\n"
+    << "  Each marker has a unique id. Use this option with the -a command\n"
+    << "  to assign an id to a marker. If -i is not specified, a value of\n"
+    << "  zero will be used.\n"
+
+    << "-t, --type: string argument\n"
+    << "  Use this command with -a to specify a marker type. The string \n"
+    << "  argument must be one of: sphere, box, cylinder, line_list, \n"
+    << "  line_strip, points, sphere, text, triangle_fan, triangle_list, \n"
+    << "  triangle_strip.\n"
+
+    << "-p, --parent: string argument\n"
+    << "  A marker can be attached to an existing visual. Use this command\n"
+    << "  with -a to specify a parent visual. By default a marker is not\n"
+    << "  attached to a parent visual.\n"
+
+    << "-f, --lifetime: double argument\n"
+    << "  A marker's lifetime is the number of seconds that it will exist.\n"
+    << "  Time starts counting when the marker is created. By default a \n"
+    << "  marker has an infite lifetime.\n"
+
+    << "-d, --delete: integer argument\n"
+    << "  This option will delete a single marker, if a marker exists with\n"
+    << "  the specified id. The integer argument is the id of the marker to\n"
+    << "  delete.\n"
+
+    << "-x, --delete-all: no argument\n"
+    << "   Delete all markers.\n"
+
+    << "-l, --list: no argument\n"
+    << "   List all markers.\n"
+
+    << "-m, --msg: string argument\n"
+    << "  Use this option to send a custom marker message. This option will\n"
+    << "  override all other command line options. Details about the marker\n"
+    << "  message can be found using: \n"
+    << "     $ ign msg -i ign_msgs.Marker\n\n"
+    << "  Example:\n"
+    << "     $ gz marker -m 'action: ADD_MODIFY, type: SPHERE, id: 2,"
+    << " scale: {x:0.2, y:0.4, z:1.2}'\n"
+    << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -78,7 +131,6 @@ bool MarkerCommand::RunImpl()
   unsigned int id = 0;
   std::string type = "none";
   std::string parent;
-  std::string args;
   common::Time lifetime;
 
   if (this->vm.count("namespace"))
@@ -91,13 +143,13 @@ bool MarkerCommand::RunImpl()
     parent = this->vm["parent"].as<std::string>();
   if (this->vm.count("lifetime"))
     lifetime.Set(this->vm["lifetime"].as<double>());
-  if (this->vm.count("args"))
-    args = this->vm["args"].as<std::string>();
 
-  if (this->vm.count("list"))
+  if (this->vm.count("msg"))
+    this->Msg(this->vm["msg"].as<std::string>());
+  else if (this->vm.count("list"))
     this->List();
   else if (this->vm.count("add"))
-    this->Add(ns, id, type, lifetime, parent, args);
+    this->Add(ns, id, type, lifetime, parent);
   else if (this->vm.count("delete"))
     this->Delete(ns, id);
   else if (this->vm.count("delete-all"))
@@ -123,14 +175,14 @@ void MarkerCommand::List()
     if (result)
     {
       std::map<std::string,
-        std::vector<std::tuple<uint64_t, std::string, std::string>>> data;
+        std::vector<std::tuple<uint64_t, int32_t, std::string>>> data;
 
       // Organize the data
       for (int i = 0; i < rep.marker_size(); ++i)
       {
         std::string ns = rep.marker(i).has_ns() ? rep.marker(i).ns() : "";
         uint64_t id = rep.marker(i).has_id() ? rep.marker(i).id() : 0;
-        std::string layer = rep.marker(i).layer();
+        int32_t layer = rep.marker(i).layer();
         std::string type;
         switch (rep.marker(i).type())
         {
@@ -212,7 +264,7 @@ void MarkerCommand::List()
 /////////////////////////////////////////////////
 void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
     const std::string &_type, const common::Time _lifetime,
-    const std::string &_parent, const std::string &_args)
+    const std::string &_parent)
 {
   // Construct the marker message
   ignition::msgs::Marker msg;
@@ -269,16 +321,22 @@ void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
     msg.set_type(ignition::msgs::Marker::TRIANGLE_STRIP);
   }
 
-  if (!_args.empty())
-  {
-    google::protobuf::TextFormat::ParseFromString(_args, &msg);
-  }
-
-  std::cout << "Args[" << _args << "]\n";
-  std::cout << msg.DebugString() << std::endl;
   bool result;
   ignition::msgs::StringMsg rep;
   this->node.Request("/marker", msg, 5000u, rep, result);
+}
+
+/////////////////////////////////////////////////
+void MarkerCommand::Msg(const std::string &_msg)
+{
+  if (!_msg.empty())
+  {
+    ignition::msgs::Marker msg;
+    google::protobuf::TextFormat::ParseFromString(_msg, &msg);
+    bool result;
+    ignition::msgs::StringMsg rep;
+    this->node.Request("/marker", msg, 5000u, rep, result);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -100,8 +100,6 @@ set (headers
   LogicalCameraVisual.hh
   SonarVisual.hh
   Light.hh
-  MarkerManager.hh
-  MarkerVisual.hh
   Material.hh
   MovableText.hh
   OrbitViewController.hh
@@ -129,6 +127,12 @@ set (headers
   WindowManager.hh
   WrenchVisual.hh
   ogre_gazebo.h
+)
+
+# This captures headers that should not be installed.
+set (internal_headers
+  MarkerManager.hh
+  MarkerVisual.hh
 )
 
 if (${OGRE_VERSION} VERSION_GREATER 1.7.4)

@@ -32,9 +32,7 @@ namespace gazebo
     // Forward declare private data class
     class MarkerVisualPrivate;
 
-    /// \addtogroup gazebo_rendering
-    /// \{
-
+    /// \cond
     /// \brief A marker visualization. The MarkerManager class should
     /// instantiate instances of this class.
     /// \sa MarkerManager
@@ -76,9 +74,9 @@ namespace gazebo
       private: void Text(const ignition::msgs::Marker &_msg);
 
       /// \brief Private data pointer
-      private: MarkerVisualPrivate *dPtr;
+      private: MarkerVisualPrivate *dataPtr;
     };
-    /// \}
+    /// \endcond
   }
 }
 #endif

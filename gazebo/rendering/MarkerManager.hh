@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_RENDERING_MARKER_MANAGER_HH_
-#define GAZEBO_RENDERING_MARKER_MANAGER_HH_
+#ifndef GAZEBO_RENDERING_MARKERMANAGER_HH_
+#define GAZEBO_RENDERING_MARKERMANAGER_HH_
 
 #include <ignition/msgs.hh>
 #include "gazebo/rendering/RenderTypes.hh"
@@ -27,7 +27,7 @@ namespace gazebo
     // Forwared declare private data class.
     class MarkerManagerPrivate;
 
-    /// \internal
+    /// \cond
     /// \brief Creates, deletes, and maintains marker visuals. Only the
     /// Scene class should instantiate and use this class.
     class MarkerManager
@@ -50,6 +50,7 @@ namespace gazebo
       /// Make sure the Scene can access Init()
       private: friend class Scene;
     };
+    /// \endcond
   }
 }
 #endif

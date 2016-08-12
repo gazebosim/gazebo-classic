@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_RENDERING_SCENE_HH_
-#define _GAZEBO_RENDERING_SCENE_HH_
+#ifndef GAZEBO_RENDERING_SCENE_HH_
+#define GAZEBO_RENDERING_SCENE_HH_
 
 #include <memory>
 #include <string>
@@ -69,6 +68,34 @@ namespace gazebo
 
     /// \class Scene Scene.hh rendering/rendering.hh
     /// \brief Representation of an entire scene graph.
+    ///
+    /// ## Visualization Markers
+    /// Visualization markers are shapes and meshes that have no kinematic
+    /// or dynamic properties. Their primary use is to visually augment the
+    /// rendering scene.
+    ///
+    /// See `gazebo/examples/stand_alone/marker` for an example program that
+    /// manipulates visualization markers.
+    ///
+    /// The `gz marker` command line tool can also be used to manipulate
+    /// visualization markers. For more information use:
+    ///
+    ///    $ gz marker -h
+    ///
+    /// ### Visualization marker services
+    /// The following [Ignition Transport](
+    /// http://ignitionrobotics.org/libraries/transport) services
+    /// can be use to create,
+    /// modify, delete, and list visualization markers.
+    ///
+    /// 1. /marker
+    ///   * Request message type: ign_msgs.Marker
+    ///   * Response mssage type: ign_msgs.StringMsg
+    ///   * Purpose: Add, modify, or delete a visualization marker.
+    /// 1. /marker/list
+    ///   * Request message type: ign_msgs.StringMsg (can be empty string)
+    ///   * Response mssage type: ign_msgs.Marker_V
+    ///   * Purpose: Get the list of markers.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
     class GZ_RENDERING_VISIBLE Scene :

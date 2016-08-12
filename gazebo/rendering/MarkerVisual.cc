@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -22,6 +21,7 @@
 #endif
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/MovableText.hh"
@@ -57,22 +57,22 @@ class gazebo::rendering::MarkerVisualPrivate : public VisualPrivate
 MarkerVisual::MarkerVisual(const std::string &_name, VisualPtr _vis)
 : Visual(*new MarkerVisualPrivate, _name, _vis)
 {
-  this->dPtr = reinterpret_cast<MarkerVisualPrivate *>(this->dataPtr);
+  this->dataPtr = reinterpret_cast<MarkerVisualPrivate *>(this->dataPtr);
 }
 
 /////////////////////////////////////////////////
 MarkerVisual::~MarkerVisual()
 {
   this->Fini();
-  this->dPtr = nullptr;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
 void MarkerVisual::Load(const ignition::msgs::Marker &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->dPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  if (!this->dPtr->loaded)
+  if (!this->dataPtr->loaded)
     Visual::Load();
 
   if (_msg.action() == ignition::msgs::Marker::ADD_MODIFY)
@@ -80,16 +80,16 @@ void MarkerVisual::Load(const ignition::msgs::Marker &_msg)
     this->AddModify(_msg);
   }
 
-  this->dPtr->loaded = true;
+  this->dataPtr->loaded = true;
 }
 
 /////////////////////////////////////////////////
 void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
 {
   // Set the type of visual
-  if (this->dPtr->msg.type() != _msg.type())
+  if (this->dataPtr->msg.type() != _msg.type())
   {
-    this->dPtr->msg.set_type(_msg.type());
+    this->dataPtr->msg.set_type(_msg.type());
     switch (_msg.type())
     {
       case ignition::msgs::Marker::BOX:
@@ -155,7 +155,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
       (_msg.lifetime().sec() > 0 ||
        (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
   {
-    this->dPtr->lifetime = this->GetScene()->SimTime() +
+    this->dataPtr->lifetime = this->GetScene()->SimTime() +
       gazebo::common::Time(_msg.lifetime().sec(),_msg.lifetime().nsec());
   }
 
@@ -178,43 +178,49 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
     else if (!_msg.parent().empty())
       gzerr << "No visual with the name[" << _msg.parent() << "]\n";
   }
+
+  if (_msg.has_layer())
+  {
+    rendering::Events::newLayer(_msg.layer());
+    this->SetLayer(_msg.layer());
+  }
 }
 
 /////////////////////////////////////////////////
 common::Time MarkerVisual::Lifetime() const
 {
-  return this->dPtr->lifetime;
+  return this->dataPtr->lifetime;
 }
 
 /////////////////////////////////////////////////
 void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 {
-  if (!this->dPtr->dynamicRenderable)
+  if (!this->dataPtr->dynamicRenderable)
   {
     switch (_msg.type())
     {
       case ignition::msgs::Marker::LINE_STRIP:
-        this->dPtr->dynamicRenderable.reset(
+        this->dataPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_LINE_STRIP));
         break;
       case ignition::msgs::Marker::LINE_LIST:
-        this->dPtr->dynamicRenderable.reset(
+        this->dataPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));
         break;
       case ignition::msgs::Marker::POINTS:
-        this->dPtr->dynamicRenderable.reset(
+        this->dataPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_POINT_LIST));
         break;
       case ignition::msgs::Marker::TRIANGLE_FAN:
-        this->dPtr->dynamicRenderable.reset(
+        this->dataPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
         break;
       case ignition::msgs::Marker::TRIANGLE_LIST:
-        this->dPtr->dynamicRenderable.reset(
+        this->dataPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_LIST));
         break;
       case ignition::msgs::Marker::TRIANGLE_STRIP:
-        this->dPtr->dynamicRenderable.reset(
+        this->dataPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
         break;
       default:
@@ -225,7 +231,7 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 
     for (int i = 0; i < _msg.point_size(); ++i)
     {
-      this->dPtr->dynamicRenderable->AddPoint(
+      this->dataPtr->dynamicRenderable->AddPoint(
           ignition::math::Vector3d(_msg.point(i).x(),
                                    _msg.point(i).y(),
                                    _msg.point(i).z()));
@@ -233,10 +239,10 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
   }
   else
   {
-    this->dPtr->dynamicRenderable->Clear();
+    this->dataPtr->dynamicRenderable->Clear();
     for (int i = 0; i < _msg.point_size(); ++i)
     {
-      this->dPtr->dynamicRenderable->AddPoint(
+      this->dataPtr->dynamicRenderable->AddPoint(
           ignition::math::Vector3d(_msg.point(i).x(),
                                    _msg.point(i).y(),
                                    _msg.point(i).z()));
@@ -247,30 +253,30 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 /////////////////////////////////////////////////
 void MarkerVisual::Text(const ignition::msgs::Marker &_msg)
 {
-  if (!this->dPtr->text)
+  if (!this->dataPtr->text)
   {
-    this->dPtr->text.reset(new MovableText());
-    this->dPtr->text->Load(this->GetName() + "__TEXT__", _msg.text());
-    this->GetSceneNode()->attachObject(this->dPtr->text.get());
+    this->dataPtr->text.reset(new MovableText());
+    this->dataPtr->text->Load(this->GetName() + "__TEXT__", _msg.text());
+    this->GetSceneNode()->attachObject(this->dataPtr->text.get());
   }
   else
   {
-    this->dPtr->text->SetText(_msg.text());
-    this->dPtr->text->Update();
+    this->dataPtr->text->SetText(_msg.text());
+    this->dataPtr->text->Update();
   }
 }
 
 /////////////////////////////////////////////////
 void MarkerVisual::Fini()
 {
-  if (this->dPtr->dynamicRenderable)
-    this->DeleteDynamicLine(this->dPtr->dynamicRenderable.release());
+  if (this->dataPtr->dynamicRenderable)
+    this->DeleteDynamicLine(this->dataPtr->dynamicRenderable.release());
 
-  if (this->dPtr->text && this->dPtr->text->getParentNode())
+  if (this->dataPtr->text && this->dataPtr->text->getParentNode())
   {
-    this->dPtr->text->detachFromParent();
-    this->GetSceneNode()->detachObject(this->dPtr->text.get());
-    this->dPtr->text.reset();
+    this->dataPtr->text->detachFromParent();
+    this->GetSceneNode()->detachObject(this->dataPtr->text.get());
+    this->dataPtr->text.reset();
   }
   Visual::Fini();
 }
@@ -278,15 +284,15 @@ void MarkerVisual::Fini()
 /////////////////////////////////////////////////
 void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
 {
-  _msg.mutable_lifetime()->set_sec(this->dPtr->lifetime.sec);
-  _msg.mutable_lifetime()->set_nsec(this->dPtr->lifetime.nsec);
+  _msg.mutable_lifetime()->set_sec(this->dataPtr->lifetime.sec);
+  _msg.mutable_lifetime()->set_nsec(this->dataPtr->lifetime.nsec);
   ignition::msgs::Set(_msg.mutable_pose(), this->GetPose().Ign());
 
-  if (this->dPtr->text)
-    _msg.set_text(this->dPtr->text->GetText());
+  if (this->dataPtr->text)
+    _msg.set_text(this->dataPtr->text->GetText());
 
   if (this->GetParent())
     _msg.set_parent(this->GetParent()->GetName());
 
-  _msg.set_type(this->dPtr->msg.type());
+  _msg.set_type(this->dataPtr->msg.type());
 }
