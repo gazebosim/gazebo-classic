@@ -1,0 +1,109 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <gui>
+      <!-- A plugin for controlling the Cessna with the keyboard -->
+      <plugin name="cessna_keyboard" filename="libCessnaGUIPlugin.so"/>
+
+      <camera name="user_camera">
+        <pose>-16 0 4 0 0 0</pose>
+      </camera>
+    </gui>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="runway">
+          <pose>700 0 0.1 0 0 0</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1829 45</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Runway</name>
+            </script>
+          </material>
+        </visual>
+
+        <visual name="grass">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grass</name>
+            </script>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <model name="ur10_1">
+      <include>
+        <uri>model://ur10</uri>
+        <pose>0 0 1 0 0 0</pose>
+      </include>
+
+      <joint name="ur10_base" type="revolute">
+        <parent>world</parent>
+        <child>ur10::base</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <limit>
+              <cfm>0.0</cfm>
+              <erp>0.0</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <!-- Plugins for controlling the thrust and control surfaces -->
+      <plugin name="cntl_sync" filename="libRTControlSynchronizationPlugin.so">
+      </plugin>
+    </model>
+
+  </world>
+</sdf>

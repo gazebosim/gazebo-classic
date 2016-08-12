@@ -64,11 +64,14 @@ class gazebo::RTControlSynchronizationPluginPrivate
     if (_timeoutMs != 0)
     {
       common::Time curWallTime = common::Time::GetWallTime();
-      if (curWallTime >= this->delayWindowStart + this->delayWindowSize)
+      if (curWallTime >= this->delayWindowStartTime + this->delayWindowSize)
       {
-        this->delayWindowStart = curWallTime;
+        this->delayWindowStartTime = curWallTime;
         this->delayInWindow = common::Time(0.0);
       }
+
+      gzerr << "delay " << this->delayInWindow.Double()
+            << " / " <<  this->delayMaxPerWindow << "\n";
 
       common::Time delayInStepSum(0.0);
       if (this->delayInWindow < this->delayMaxPerWindow)
@@ -80,12 +83,14 @@ class gazebo::RTControlSynchronizationPluginPrivate
 
           double age = _curTime.Double() - this->lastCommand.timestamp.Double();
 
-          // printf("age %f stamp %f\n", age,
-          //       this->atlasCommand.header.stamp.toSec()*1000);
-          // fflush(stdout);
+          // gzerr << "age " << age << " stamp " << 
+          //       this->lastCommand.timestamp.Double() << "\n";
+          printf("age %f lastCommand stamp %f\n", age,
+                this->lastCommand.timestamp.Double());
+          fflush(stdout);
 
           // if age is small enough, skip, otherwise, wait finite amount
-          // for AtlasCommand messages to catchup.
+          // for command messages to catchup.
           if (age <= 0.001 * _timeoutMs)
             break;
 
@@ -95,15 +100,19 @@ class gazebo::RTControlSynchronizationPluginPrivate
           std::chrono::system_clock::time_point
             now = std::chrono::system_clock::now();
 
-          long int delayMsInt = floor(1e6*std::min(
+          long int delayUsInt = floor(1e6*std::min(
               (this->delayMaxPerStep - delayInStepSum).Double(),
               (this->delayMaxPerWindow - this->delayInWindow).Double()));
-          std::chrono::microseconds delay(delayMsInt);
+          // delayUsInt = 1000;
+          std::chrono::microseconds delay(delayUsInt);
 
           std::chrono::time_point<std::chrono::system_clock> timeout =
             now + delay;
 
-          // common::Time tmp(boost::detail::get_timespec(timeout));
+          gzerr << "delayUsInt: " << delayUsInt << "\n";
+          // gzerr << "timeout: " << delayUsInt << "\n";
+
+          // common::Time tmp(std::detail::get_timespec(timeout));
           // printf("timeout %f wall %f min(%f, %f)\n",
           //     tmp.Double(), delayTime.Double(),
           //     (this->delayMaxPerStep - delayInStepSum).Double(),
@@ -112,7 +121,8 @@ class gazebo::RTControlSynchronizationPluginPrivate
           // convert now to common::Time
           // common::Time delayTime(std::chrono::get_timespec(now));
           gzerr << "now: "
-                << std::chrono::time_point_cast<std::chrono::microseconds>(now).time_since_epoch().count() << "\n";
+                << std::chrono::time_point_cast<std::chrono::microseconds>(
+                   now).time_since_epoch().count() << "\n";
           timespec tv;
           /*
           // std::chrono::seconds const sec =
@@ -128,6 +138,7 @@ class gazebo::RTControlSynchronizationPluginPrivate
           */
           common::Time delayTime(tv);
 
+          gzerr << "waiting\n";
           if (this->delayCondition.wait_until(lock, timeout) !=
               std::cv_status::timeout)
           {
@@ -137,12 +148,12 @@ class gazebo::RTControlSynchronizationPluginPrivate
               gzwarn << "controller synchronization timedout: "
                      << "delay budget exhausted.\n";
             else
-              gzwarn << "AtlasPlugin controller synchronization timedout: "
+              gzwarn << "controller synchronization timedout: "
                      << "message lost or controller stopped.\n";
 
             // printf("sim %f timed out with %f delayed %f\n",
             //       _curTime.Double()*1000,
-            //       this->atlasCommand.header.stamp.toSec()*1000,
+            //       this->command.header.stamp.toSec()*1000,
             //       delayTime.Double()*1000);
             // fflush(stdout);
           }
@@ -150,11 +161,11 @@ class gazebo::RTControlSynchronizationPluginPrivate
           {
             delayTime = common::Time::GetWallTime() - delayTime;
             if (delayTime >= this->delayMaxPerStep)
-              gzwarn << "AtlasPlugin controller synchronization timeout: "
+              gzwarn << "controller synchronization timeout: "
                      << "waited full duration, but timed_wait returned true.\n";
             // printf("nsim %f otified with %f delayed %f\n",
             //       _curTime.Double()*1000,
-            //       this->atlasCommand.header.stamp.toSec()*1000,
+            //       this->command.header.stamp.toSec()*1000,
             //       delayTime.Double()*1000);
             // fflush(stdout);
           }
@@ -178,7 +189,7 @@ class gazebo::RTControlSynchronizationPluginPrivate
       this->delayStatistics.delay_in_step = delayInStepSum.Double();
       this->delayStatistics.delay_in_window = this->delayInWindow.Double();
       this->delayStatistics.delay_window_remain =
-        ((this->delayWindowStart + this->delayWindowSize) -
+        ((this->delayWindowStartTime + this->delayWindowSize) -
          curWallTime).Double();
       this->pubDelayStatisticsQueue->push(
         this->delayStatistics, this->pubDelayStatistics);
@@ -195,13 +206,13 @@ class gazebo::RTControlSynchronizationPluginPrivate
       if ((_curTime - this->lastControllerStatisticsTime).Double() >=
         1.0/this->statsUpdateRate)
       {
-        atlas_msgs::ControllerStatistics msg;
+        control_stats_msgs::ControllerStatistics msg;
         msg.header.stamp = ros::Time(_curTime.sec, _curTime.nsec);
-        msg.command_age = this->atlasCommandAge;
-        msg.command_age_mean = this->atlasCommandAgeMean;
-        msg.command_age_variance = this->atlasCommandAgeVariance /
-          (this->atlasCommandAgeBuffer.size() - 1);
-        msg.command_age_window_size = this->atlasCommandAgeBufferDuration;
+        msg.command_age = this->commandAge;
+        msg.command_age_mean = this->commandAgeMean;
+        msg.command_age_variance = this->commandAgeVariance /
+          (this->commandAgeBuffer.size() - 1);
+        msg.command_age_window_size = this->commandAgeBufferDuration;
 
         this->pubControllerStatisticsQueue->push(msg,
           this->pubControllerStatistics);
@@ -222,7 +233,7 @@ class gazebo::RTControlSynchronizationPluginPrivate
   public: common::Time delayWindowSize;
 
   /// \brief Marks the start of a non-moving delay window.
-  public: common::Time delayWindowStart;
+  public: common::Time delayWindowStartTime;
 
   /// \brief Within each window, simulation will wait at
   /// most a total of delayMaxPerWindow seconds.
@@ -245,17 +256,17 @@ class gazebo::RTControlSynchronizationPluginPrivate
   /// \brief Publish controller synchronization delay information.
   /*
   public: gazebo::transport::Publisher pubDelayStatistics;
-  public: PubQueue<atlas_msgs::SynchronizationStatistics>::Ptr
+  public: PubQueue<control_stats_msgs::SynchronizationStatistics>::Ptr
     pubDelayStatisticsQueue;
-  public: atlas_msgs::SynchronizationStatistics delayStatistics;
+  public: control_stats_msgs::SynchronizationStatistics delayStatistics;
   public: common::Time lastControllerStatisticsTime;
   */
 
   /// \brief Keep track of number of controller stats connections
-  public: int controllerStatsConnectCount;
+  // public: int controllerStatsConnectCount;
 
   /// \brief Mutex to protect controllerStatsConnectCount.
-  public: std::mutex statsConnectionMutex;
+  // public: std::mutex statsConnectionMutex;
 
   ////////////////////////////////////////////////////////////////////////////
   //                                                                        //
@@ -282,15 +293,23 @@ RTControlSynchronizationPlugin::RTControlSynchronizationPlugin()
   // default control synchronization delay settings
   // to trigger synchronization delay, set
   // timeoutMs to non-zero
-  this->timeoutMs = 1;
+  this->timeoutMs = 1000;
 
   // synchronization variables
+  // rolling window for keeping track of timing enforcement and statistics
   this->dataPtr->delayWindowSize = common::Time(5.0);
-  this->dataPtr->delayMaxPerWindow = common::Time(0.25);
-  this->dataPtr->delayMaxPerStep = common::Time(0.025);
-  this->dataPtr->delayWindowStart = common::Time(0.0);
+  // max amount of delay in the rolling window
+  this->dataPtr->delayMaxPerWindow = common::Time(5.0);
+  // allowed jitter per simulation step
+  this->dataPtr->delayMaxPerStep = common::Time(1.0);
+
+  // beginning of the delay window in sim time
+  this->dataPtr->delayWindowStartTime = common::Time(0.0);
+  // current delay duration in the window (in sim time)
   this->dataPtr->delayInWindow = common::Time(0.0);
-  this->dataPtr->controllerStatsConnectCount = 0;
+  // subscribers to the control stats
+  // this->dataPtr->controllerStatsConnectCount = 0;
+  this->dataPtr->lastCommand.timestamp = common::Time(0.0);
 }
 
 /////////////////////////////////////////////////
@@ -310,12 +329,26 @@ void RTControlSynchronizationPlugin::Load(physics::ModelPtr _model, sdf::Element
   // This event is broadcast by gzserver on every simulation step.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&RTControlSynchronizationPlugin::OnUpdate, this, _1));
+
+  // Initialize transport.
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  std::string prefix = "~/" + this->dataPtr->model->GetName() + "/";
+
+  // publish state
+  gzdbg << "publishing stuff to [" << prefix + "state" << "/\n";
+  this->statePub = this->node->Advertise<msgs::Any>(prefix + "state");
+
+  // listen to incoming robot commands
+  gzdbg << "subscribing to robot command on [" << prefix + "control" << "/\n";
+  this->controlSub = this->node->Subscribe(prefix + "control",
+    &RTControlSynchronizationPlugin::RobotCommandIn, this);
 }
 
 /////////////////////////////////////////////////
 void RTControlSynchronizationPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  // std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
   double dt = (curTime - this->dataPtr->lastUpdateTime).Double();
@@ -324,10 +357,14 @@ void RTControlSynchronizationPlugin::OnUpdate(const common::UpdateInfo &_info)
   // Update the control surfaces and publish the new state.
   if (dt > 0.0)
   {
+    gzdbg << "t[" << curTime.Double() << "]: RobotStateOut\n";
     this->RobotStateOut();
+    gzdbg << "EnforceSynchronizationDelay(" << curTime.Double() << ", "
+          << this->timeoutMs << ")\n";
     this->dataPtr->EnforceSynchronizationDelay(curTime, this->timeoutMs);
-    this->RobotCommandIn();
+    gzdbg << "ApplyRobotCommandToSim\n";
     this->ApplyRobotCommandToSim(dt);
+    gzdbg << "Publish stats\n";
     this->dataPtr->PublishConstrollerStatistics(curTime);
   }
 }
@@ -343,7 +380,7 @@ void RTControlSynchronizationPlugin::ApplyRobotCommandToSim(const double _dt)
 }
 
 /////////////////////////////////////////////////
-void RTControlSynchronizationPlugin::RobotCommandIn()
+void RTControlSynchronizationPlugin::RobotCommandIn(ConstAnyPtr &_msg)
 {
   // receive robot command from the outside world and tick simulation
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -351,6 +388,9 @@ void RTControlSynchronizationPlugin::RobotCommandIn()
   // do whatever needed to be done here to receive the robot command
   // from the controller, usually copy to a local buffer
   this->ReceiveRobotCommand();
+
+  this->dataPtr->lastCommand.timestamp =
+    this->dataPtr->model->GetWorld()->GetSimTime();
 
   // tic simulation
   this->dataPtr->delayCondition.notify_all();

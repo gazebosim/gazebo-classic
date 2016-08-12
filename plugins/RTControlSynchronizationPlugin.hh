@@ -20,6 +20,7 @@
 #include <sdf/sdf.hh>
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/transport/transport.hh>
 
 namespace gazebo
 {
@@ -57,10 +58,10 @@ namespace gazebo
     protected: virtual void ApplyRobotCommandToSim(const double _dt);
 
     /// \brief Receive robot commands from controller
-    protected: void RobotCommandIn();
+    protected: virtual void ReceiveRobotCommand();
 
     /// \brief Receive robot commands from controller
-    protected: virtual void ReceiveRobotCommand();
+    protected: void RobotCommandIn(ConstAnyPtr &_msg);
 
     /// \brief Send robot state to controller
     protected: void RobotStateOut();
@@ -73,6 +74,15 @@ namespace gazebo
 
     /// \brief Private data pointer.
     private: std::unique_ptr<RTControlSynchronizationPluginPrivate> dataPtr;
+
+    /// \brief Node used for using Gazebo communications.
+    private: transport::NodePtr node;
+
+    /// \brief Subscriber pointer.
+    private: transport::SubscriberPtr controlSub;
+
+    /// \brief Publisher pointer.
+    private: transport::PublisherPtr statePub;
   };
 }
 #endif
