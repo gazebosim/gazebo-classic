@@ -1198,6 +1198,7 @@ void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
   }
 
   this->dataPtr->diffuse = _color;
+  this->UpdateTransparency();
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("diffuse")->Set(_color);

@@ -20,7 +20,8 @@
 #include <memory>
 #include <gazebo/common/Plugin.hh>
 
-#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+// See: https://bugreports.qt-project.org/browse/QTBUG-22829
+#ifndef Q_MOC_RUN
 # include <gazebo/gui/gui.hh>
 #endif
 
@@ -30,7 +31,7 @@ namespace gazebo
   class KeyboardGUIPluginPrivate;
 
   /// \brief A GUI plugin that captures key strokes from gzclient GUI
-  /// and publishes over gz transport topic
+  /// and publishes over gz transport topic `~/keyboard/keypress`
   class GAZEBO_VISIBLE KeyboardGUIPlugin : public GUIPlugin
   {
     Q_OBJECT
