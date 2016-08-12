@@ -934,7 +934,7 @@
         <parent>link_2a</parent>
         <child>link_2b</child>
         <axis>
-          <initial_position>8</initial_position>
+          <initial_position>-8</initial_position>
           <xyz>0 0 1</xyz>
           <limit>
             <upper>0.7071</upper>
@@ -1097,7 +1097,7 @@
         <parent>link_5a</parent>
         <child>link_2b</child>
         <axis>
-          <initial_position>13</initial_position>
+          <initial_position>-13</initial_position>
           <xyz>0 0 1</xyz>
           <limit>
             <upper>0.7071</upper>
