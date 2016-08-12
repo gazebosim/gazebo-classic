@@ -47,6 +47,7 @@ using namespace common;
 class gazebo::common::VideoEncoderPrivate
 {
   /// \brief Get the full filename of the temporary video file
+  /// \return Full filename of the temporary video file.
   public: std::string TmpFilename() const;
 
   /// \brief libav format I/O context
@@ -55,16 +56,16 @@ class gazebo::common::VideoEncoderPrivate
   /// \brief libav audio video stream
   public: AVStream *videoStream = nullptr;
 
-  /// \brief libav image data (used for storing RGB data)
+  /// \brief libav input image data
   public: AVPicture *avInPicture = nullptr;
 
-  /// \brief libav audio or video data (used for storing YUV data)
+  /// \brief libav output video frame
   public: AVFrame *avOutFrame = nullptr;
 
   /// \brief Software scaling context
   public: SwsContext *swsCtx = nullptr;
 
-  /// \brief True if the encoder is initialized
+  /// \brief True if the encoder is running
   public: bool encoding = false;
 
   /// \brief Video encoding bit rate
@@ -96,6 +97,7 @@ class gazebo::common::VideoEncoderPrivate
 VideoEncoder::VideoEncoder()
 : dataPtr(new VideoEncoderPrivate)
 {
+  // Make sure libav is loaded.
   common::load();
 }
 
@@ -124,7 +126,7 @@ bool VideoEncoder::Start(const unsigned int _width,
                          const unsigned int _fps,
                          const unsigned int _bitRate)
 {
-  // Do not all Start to be called more than once, without Stop or Reset
+  // Do not allow Start to be called more than once without Stop or Reset
   // being called first.
   if (this->dataPtr->encoding)
     return false;
@@ -188,8 +190,8 @@ bool VideoEncoder::Start(const unsigned int _width,
 
   if (!outputFormat)
   {
-    gzerr << "Could not deduce output format from file extension: "
-        << "using MPEG.\n";
+    gzwarn << "Could not deduce output format from file extension."
+           << "Using MPEG.\n";
     outputFormat = av_guess_format("mpeg", NULL, NULL);
   }
 
@@ -270,8 +272,7 @@ bool VideoEncoder::Start(const unsigned int _width,
   // Open it
   if (avcodec_open2(this->dataPtr->videoStream->codec, encoder, nullptr) < 0)
   {
-    gzerr << "Could not open codec."
-      << "Video encoding is not started\n";
+    gzerr << "Could not open codec. Video encoding is not started\n";
     this->Reset();
     return false;
   }
@@ -284,8 +285,7 @@ bool VideoEncoder::Start(const unsigned int _width,
 
   if (!this->dataPtr->avOutFrame)
   {
-    gzerr << "Could not allocate video frame."
-      << "Video encoding is not started\n";
+    gzerr << "Could not allocate video frame. Video encoding is not started\n";
     this->Reset();
     return false;
   }
@@ -339,7 +339,7 @@ bool VideoEncoder::Start(const unsigned int _width,
   this->dataPtr->encoding = true;
   return true;
 #else
-  gzwarn << "Encoding capability not available! "
+  gzwarn << "Encoding capability not available. "
       << "Please install libavcodec, libavformat and libswscale dev packages."
       << std::endl;
   return false;
@@ -354,11 +354,11 @@ bool VideoEncoder::IsEncoding()
 
 /////////////////////////////////////////////////
 bool VideoEncoder::AddFrame(const unsigned char *_frame,
-    const unsigned int _width,
-    const unsigned int _height)
+                            const unsigned int _width,
+                            const unsigned int _height)
 {
   return this->AddFrame(_frame, _width, _height,
-      std::chrono::steady_clock::now());
+                        std::chrono::steady_clock::now());
 }
 
 /////////////////////////////////////////////////
@@ -431,13 +431,14 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
          this->dataPtr->inWidth * this->dataPtr->inHeight * 3);
 
   sws_scale(this->dataPtr->swsCtx,
-      this->dataPtr->avInPicture->data,
-      this->dataPtr->avInPicture->linesize,
-      0, this->dataPtr->inHeight,
-      this->dataPtr->avOutFrame->data,
-      this->dataPtr->avOutFrame->linesize);
+            this->dataPtr->avInPicture->data,
+            this->dataPtr->avInPicture->linesize,
+            0, this->dataPtr->inHeight,
+            this->dataPtr->avOutFrame->data,
+            this->dataPtr->avOutFrame->linesize);
 
   this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
+
   int gotOutput = 0;
   AVPacket avPacket;
   av_init_packet(&avPacket);
@@ -470,7 +471,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
             this->dataPtr->videoStream->time_base);
       }
 
-      // Wriate frame to disk
+      // Write frame to disk
       ret = av_interleaved_write_frame(this->dataPtr->formatCtx, &avPacket);
 
       if (ret < 0)
@@ -527,7 +528,7 @@ bool VideoEncoder::SaveToFile(const std::string &_filename)
   if (!result)
   {
     gzerr << "Unable to rename file from[" << this->dataPtr->TmpFilename()
-      << "] to [" << _filename << "]\n";
+          << "] to [" << _filename << "]\n";
   }
 
   this->Reset();
@@ -554,6 +555,7 @@ void VideoEncoder::Reset()
       av_freep(&this->dataPtr->formatCtx->streams[i]->codec);
       av_freep(&this->dataPtr->formatCtx->streams[i]);
     }
+
     // This frees the context and all the streams
     av_free(this->dataPtr->formatCtx);
     this->dataPtr->formatCtx = nullptr;

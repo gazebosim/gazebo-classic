@@ -86,7 +86,7 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
   switch (_level)
   {
     case AV_LOG_DEBUG:
-      // There are a lot of debug messages. So we'll just skip those.
+      // There are a lot of debug messages. So we'll skip those.
       break;
     case AV_LOG_PANIC:
     case AV_LOG_FATAL:

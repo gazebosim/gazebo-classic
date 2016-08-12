@@ -108,6 +108,15 @@ VideoRecorder::~VideoRecorder()
 void VideoRecorder::OnRecordStop()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
+
+  // This should never happen...but just in case.
+  if (!cam)
+  {
+    gzerr << "Unable to get pointer to user camera. "
+      << "Can't stop video recording\n";
+    return;
+  }
+
   cam->StopVideo();
 
   // Inform listeners that we have stopped recording
@@ -150,6 +159,15 @@ void VideoRecorder::OnRecordStart(const QString &_format)
 {
   // Get the user camera, and start recording in the specified format
   rendering::UserCameraPtr cam = gui::get_active_camera();
+
+  // This should never happen...but just in case.
+  if (!cam)
+  {
+    gzerr << "Unable to get pointer to user camera. "
+      << "Can't start video recording\n";
+    return;
+  }
+
   if (cam->StartVideo(_format.toStdString()))
   {
     // Tell listeners that we started recording

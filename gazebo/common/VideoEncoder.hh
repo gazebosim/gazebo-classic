@@ -52,7 +52,8 @@ namespace gazebo
       public: virtual ~VideoEncoder();
 
       /// \brief Start the encoder. This should be called once. Add new
-      /// frames to the video using the AddFrame function.
+      /// frames to the video using the AddFrame function. Use SaveToFile
+      /// when the video is complete.
       /// \param[in] _width Width in pixels of the output video.
       /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
