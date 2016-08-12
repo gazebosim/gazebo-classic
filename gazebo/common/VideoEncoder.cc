@@ -456,14 +456,14 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
       avPacket.stream_index = this->dataPtr->videoStream->index;
 
       // Scale timestamp appropriately.
-      if (avPacket.pts != AV_NOPTS_VALUE)
+      if (avPacket.pts != static_cast<int64_t>(AV_NOPTS_VALUE))
       {
         avPacket.pts = av_rescale_q(avPacket.pts,
             this->dataPtr->videoStream->codec->time_base,
             this->dataPtr->videoStream->time_base);
       }
 
-      if (avPacket.dts != AV_NOPTS_VALUE)
+      if (avPacket.dts != static_cast<int64_t>(AV_NOPTS_VALUE))
       {
         avPacket.dts = av_rescale_q(
             avPacket.dts,
