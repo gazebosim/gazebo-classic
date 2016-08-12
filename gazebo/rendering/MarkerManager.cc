@@ -28,6 +28,10 @@ using namespace rendering;
 /// Private data for the MarkerManager class
 class gazebo::rendering::MarkerManagerPrivate
 {
+  /// \def MarkerVisualPtr
+  /// \brief Shared pointer to MarkerVisual
+  typedef std::shared_ptr<MarkerVisual> MarkerVisualPtr;
+
   /// \def Marker_M
   /// \brief Map of markers. The key is a marker namespace, the
   /// value is the map of markers in the namespace and their ids.
