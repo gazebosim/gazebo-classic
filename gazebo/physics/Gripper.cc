@@ -22,6 +22,8 @@
 
 #include <boost/bind.hpp>
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -223,8 +225,8 @@ void Gripper::HandleAttach()
         this->prevDiff = diff;
 
         this->diffs[this->diffIndex] = dd;
-        double var = math::variance<double>(this->diffs);
-        double max = math::max<double>(this->diffs);
+        double var = ignition::math::variance<double>(this->diffs);
+        double max = ignition::math::max<double>(this->diffs);
 
         if (var < 1e-5 && max < 1e-5)
         {

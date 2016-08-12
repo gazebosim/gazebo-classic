@@ -47,7 +47,6 @@
 #include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiPlugin.hh"
@@ -88,18 +87,12 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
-  this->dataPtr->renderWidget = NULL;
-  this->dataPtr->menuLayout = NULL;
-  this->dataPtr->menuBar = NULL;
   this->setObjectName("mainWindow");
 
   // Do these things first.
   {
     this->CreateActions();
   }
-
-  this->dataPtr->inputStepSize = 1;
-  this->dataPtr->requestMsg = NULL;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -177,7 +170,7 @@ MainWindow::MainWindow()
   this->setWindowTitle(tr(title.c_str()));
 
 #ifdef HAVE_OCULUS
-  this->dataPtr->oculusWindow = NULL;
+  this->dataPtr->oculusWindow = nullptr;
 #endif
 
   this->dataPtr->connections.push_back(
@@ -252,7 +245,7 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow()
 {
   delete this->dataPtr->userCmdHistory;
-  this->dataPtr->userCmdHistory = NULL;
+  this->dataPtr->userCmdHistory = nullptr;
 
   // Cleanup global actions
   this->DeleteActions();
@@ -390,14 +383,14 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   if (this->dataPtr->oculusWindow)
   {
     delete this->dataPtr->oculusWindow;
-    this->dataPtr->oculusWindow = NULL;
+    this->dataPtr->oculusWindow = nullptr;
   }
 #endif
   delete this->dataPtr->renderWidget;
 
   // Cleanup the space navigator
   delete this->dataPtr->spacenav;
-  this->dataPtr->spacenav = NULL;
+  this->dataPtr->spacenav = nullptr;
 
   emit Close();
 
@@ -1611,7 +1604,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   this->dataPtr->menuBar->clear();
 
-  QMenuBar *newMenuBar = NULL;
+  QMenuBar *newMenuBar = nullptr;
   if (!_bar)
   {
     // Get the main window's menubar
@@ -1628,7 +1621,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   if (!newMenuBar)
   {
-    gzerr << "Unable to set NULL menu bar" << std::endl;
+    gzerr << "Unable to set nullptr menu bar" << std::endl;
     return;
   }
 
@@ -2158,7 +2151,7 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
   }
 
   delete this->dataPtr->requestMsg;
-  this->dataPtr->requestMsg = NULL;
+  this->dataPtr->requestMsg = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -2343,7 +2336,7 @@ Editor *MainWindow::Editor(const std::string &_name) const
   if (iter != this->dataPtr->editors.end())
     return iter->second.get();
 
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -2352,7 +2345,7 @@ QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
   if (!_action || !_parent)
   {
     gzwarn << "Missing action or parent. Not cloning action." << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   QAction *actionClone = new QAction(_action->text(), _parent);

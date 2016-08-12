@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Include basic support for GNU Precompiled Headers to reduce compile time
+    * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
+
 1. Plotting utility
     * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
     * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
@@ -46,6 +49,9 @@
 1. Remove EntityMakerPrivate and move its members to derived classes
     * [Pull request #2310](https://bitbucket.org/osrf/gazebo/pull-request/2310)
 
+1. Conversion between ign-msgs and sdf, for plugin
+    * [Pull request #2403](https://bitbucket.org/osrf/gazebo/pull-request/2403)
+
 1. Change NULL to nullptr.
     * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
     * [Pull request #2297](https://bitbucket.org/osrf/gazebo/pull-request/2297)
@@ -65,6 +71,7 @@
 1. Deprecate gazebo::math
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
+    * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
@@ -146,6 +153,36 @@
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
+
+1. Added filesystem operations to the common library. Additions include
+   `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
+    * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
+
+1. Added visualization of minimum range to laservisual.
+    * [Pull request 2412](https://bitbucket.org/osrf/gazebo/pull-request/2412)
+    * [Issue 2018](https://bitbucket.org/osrf/gazebo/issues/2018)
+
+1. Use precision 2 for FPS display in TimePanel
+    * [Pull request 2405](https://bitbucket.org/osrf/gazebo/pull-request/2405)
+
+1. Switch ImuSensor::worldToReference transform from Pose to Quaternion
+    * [Pull request 2410](https://bitbucket.org/osrf/gazebo/pull-request/2410)
+    * [Issue 1959](https://bitbucket.org/osrf/gazebo/issues/1959)
+
+1. Include Boost_LIBRARIES  in the linking of gazebo_physics
+    * [Pull request 2402](https://bitbucket.org/osrf/gazebo/pull-request/2402)
+
+1. Backported KeyboardGUIPlugin and msgs::Any
+    * [Pull request 2416](https://bitbucket.org/osrf/gazebo/pull-request/2416)
+
+1. Use XML_SUCCESS enum instead of XML_NO_ERROR, which has been deleted in tinyxml2 4.0
+    * [Pull request 2397](https://bitbucket.org/osrf/gazebo/pull-request/2397)
+
+1. Ignore ffmpeg deprecation warnings to clean up CI since they are noted in #2002
+    * [Pull request 2388](https://bitbucket.org/osrf/gazebo/pull-request/2388)
+
+1. Added a visual blinking plugin
+    * [Pull request 2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
 
 1. Fix InertiaVisual for non-diagonal inertia matrices
     * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)

@@ -21,6 +21,11 @@
 #include <gazebo/math/Vector3.hh>
 #include <gazebo/math/Quaternion.hh>
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace gazebo
 {
   /// \ingroup gazebo_math
@@ -33,24 +38,28 @@ namespace gazebo
 
   /// \class Filter Filter.hh math/gzmath.hh
   /// \brief Filter base class
+  /// \deprecated See ignition::math::Filter
   template <class T>
   class GZ_MATH_VISIBLE Filter
   {
     /// \brief Destructor.
-    public: virtual ~Filter() {}
+    public: virtual ~Filter() GAZEBO_DEPRECATED(8.0) {}
 
     /// \brief Set the output of the filter.
     /// \param[in] _val New value.
-    public: virtual void SetValue(const T &_val) { y0 = _val; }
+    public: virtual void SetValue(const T &_val) GAZEBO_DEPRECATED(8.0)
+    { y0 = _val; }
 
     /// \brief Set the cutoff frequency and sample rate.
     /// \param[in] _fc Cutoff frequency.
     /// \param[in] _fs Sample rate.
-    public: virtual void SetFc(double _fc, double _fs) = 0;
+    public: virtual void SetFc(double _fc, double _fs)
+            GAZEBO_DEPRECATED(8.0) = 0;
 
     /// \brief Get the output of the filter.
     /// \return Filter's output.
-    public: inline virtual const T& GetValue() { return y0; }
+    public: inline virtual const T& GetValue() GAZEBO_DEPRECATED(8.0)
+    { return y0; }
 
     /// \brief Output.
     protected: T y0;
@@ -63,12 +72,14 @@ namespace gazebo
   class GZ_MATH_VISIBLE OnePole : public Filter<T>
   {
     /// \brief Constructor.
-    public: OnePole() : a0(0), b1(0) {}
+    /// \deprecated See ignition::math::OnePole
+    public: OnePole() GAZEBO_DEPRECATED(8.0) : a0(0), b1(0) {}
 
     /// \brief Constructor.
     /// \param[in] _fc Cutoff frequency.
     /// \param[in] _fs Sample rate.
-    public: OnePole(double _fc, double _fs)
+    /// \deprecated See ignition::math::OnePole
+    public: OnePole(double _fc, double _fs) GAZEBO_DEPRECATED(8.0)
       : a0(0), b1(0)
     {
       this->SetFc(_fc, _fs);
@@ -153,7 +164,8 @@ namespace gazebo
   class GZ_MATH_VISIBLE BiQuad : public Filter<T>
   {
     /// \brief Constructor.
-    public: BiQuad()
+    /// \deprecated See ignition::math::BiQuad
+    public: BiQuad() GAZEBO_DEPRECATED(8.0)
       : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0)
     {
     }
@@ -161,7 +173,8 @@ namespace gazebo
     /// \brief Constructor.
     /// \param[in] _fc Cutoff frequency.
     /// \param[in] _fs Sample rate.
-    public: BiQuad(double _fc, double _fs)
+    /// \deprecated See ignition::math::BiQuad
+    public: BiQuad(double _fc, double _fs) GAZEBO_DEPRECATED(8.0)
       : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0)
     {
       this->SetFc(_fc, _fs);
@@ -245,4 +258,7 @@ namespace gazebo
   }
 }
 
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 #endif
