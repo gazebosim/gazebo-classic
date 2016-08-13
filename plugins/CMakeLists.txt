@@ -90,6 +90,7 @@ endif()
 
 set (GUIplugins
   CessnaGUIPlugin
+  LookAtDemoPlugin
   TimerGUIPlugin
 )
 

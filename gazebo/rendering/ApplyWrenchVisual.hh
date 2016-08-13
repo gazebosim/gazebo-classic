@@ -140,13 +140,6 @@ namespace gazebo
       /// and visibility accordingly.
       /// \param[in] _mode New mode.
       public: void SetMode(Mode _mode);
-
-      /// \brief Get the rotation to point the positive Z axis to the
-      /// given direction.
-      /// \param[in] _dir Direction vector.
-      /// \return Resulting quaternion
-      private: ignition::math::Quaterniond QuaternionFromVector(
-          const ignition::math::Vector3d &_dir);
     };
     /// \}
   }

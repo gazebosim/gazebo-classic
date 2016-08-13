@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Matrix4.hh>
+
 #include "gazebo/common/MeshManager.hh"
 
 #include "gazebo/rendering/Material.hh"
@@ -215,17 +217,6 @@ void ApplyWrenchVisual::Load()
 }
 
 ///////////////////////////////////////////////////
-ignition::math::Quaterniond ApplyWrenchVisual::QuaternionFromVector(
-    const ignition::math::Vector3d &_vec)
-{
-  double roll = 0;
-  double pitch = -atan2(_vec.Z(), sqrt(pow(_vec.X(), 2) + pow(_vec.Y(), 2)));
-  double yaw = atan2(_vec.Y(), _vec.X());
-
-  return ignition::math::Quaterniond(roll, pitch, yaw);
-}
-
-///////////////////////////////////////////////////
 void ApplyWrenchVisual::SetCoM(const math::Vector3 &_comVector)
 {
   this->SetCoM(_comVector.Ign());
@@ -358,7 +349,8 @@ void ApplyWrenchVisual::UpdateForceVisual()
     normVec = ignition::math::Vector3d::UnitX;
 
   // Set rotation in the vector direction
-  ignition::math::Quaterniond quat = this->QuaternionFromVector(normVec);
+  auto quat = ignition::math::Matrix4d::LookAt(ignition::math::Vector3d::Zero,
+      normVec).Rotation();
   dPtr->forceVisual->SetRotation(quat * ignition::math::Quaterniond(
       ignition::math::Vector3d(0, M_PI/2.0, 0)));
 
@@ -392,7 +384,8 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
     normVec = ignition::math::Vector3d::UnitX;
 
   // Set rotation in the vector direction
-  ignition::math::Quaterniond quat = this->QuaternionFromVector(normVec);
+  auto quat = ignition::math::Matrix4d::LookAt(ignition::math::Vector3d::Zero,
+      normVec).Rotation();
   dPtr->torqueVisual->SetRotation(quat * ignition::math::Quaterniond(
       ignition::math::Vector3d(0, M_PI/2.0, 0)));
 
