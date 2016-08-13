@@ -3522,7 +3522,7 @@ void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
     return;
   }
 
-  // We asked for only only one plugin
+  // We asked for only one plugin
   GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
 
   this->dataPtr->propMutex->lock();
