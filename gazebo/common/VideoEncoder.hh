@@ -96,7 +96,7 @@ namespace gazebo
                   const unsigned int _height,
                   const std::chrono::steady_clock::time_point &_timestamp);
 
-      /// \brief Write the video to to disk
+      /// \brief Write the video to disk
       /// param[in] _filename File in which to save the encoded data
       /// \return True on success.
       public: bool SaveToFile(const std::string &_filename);

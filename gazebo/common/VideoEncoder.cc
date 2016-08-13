@@ -230,7 +230,7 @@ bool VideoEncoder::Start(const unsigned int _width,
   // Make sure the codec is valid
   if (!this->dataPtr->videoStream->codec)
   {
-    gzerr << "Could not allocated video codex context."
+    gzerr << "Could not allocate video codex context."
           << "Video encoding is not started\n";
     this->Reset();
     return false;

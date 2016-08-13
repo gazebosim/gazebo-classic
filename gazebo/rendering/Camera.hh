@@ -677,7 +677,7 @@ namespace gazebo
       public: bool SaveVideo(const std::string &_filename);
 
       /// \brief Reset video recording. This will call
-      /// common::VideoEncoder::Reset, which will cleanup temprary files and
+      /// common::VideoEncoder::Reset, which will cleanup temporary files and
       /// set video encoding values to their default settings.
       /// \sa common::VideoEncoder::Reset
       /// \return True if reset was succesful. Currently this function will
