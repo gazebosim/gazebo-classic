@@ -132,6 +132,9 @@ namespace gazebo
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
+
+      /// \brief Indicated if GUI plugin request message is sent.
+      public: bool guiInfoRequested;
     };
   }
 }

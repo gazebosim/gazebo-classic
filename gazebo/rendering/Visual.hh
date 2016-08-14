@@ -26,9 +26,13 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/math/Box.hh"
@@ -38,6 +42,9 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
+
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/transport/Node.hh"
 
 namespace Ogre
 {
@@ -563,6 +570,21 @@ namespace gazebo
                                const std::string &_name,
                                sdf::ElementPtr _sdf);
 
+      /// \brief Get plugins in this visual acording to
+      /// the given _pluginUri. Some _pluginUri examples:
+      ///
+      /// * Info about a specific sensor plugin in this world:
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/visual/<visual_name>/plugin/<plugin_name>
+      ///
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfoService
+      public: void PluginInfo(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
+
       /// \brief Remove a running plugin
       /// \param _name The unique name of the plugin to remove
       public: void RemovePlugin(const std::string &_name);
@@ -692,6 +714,14 @@ namespace gazebo
       /// \brief Helper function to update the transparency of the visual
       /// \param[in] _cascade True to update the children's transparency too.
       private: void UpdateTransparency(const bool _cascade = true);
+
+      /// \brief Callback for "<this_name>/server/info/plugin" service.
+      /// \param[in] _request Request containing plugin URI.
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfo
+      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \internal
       /// \brief Pointer to private data.

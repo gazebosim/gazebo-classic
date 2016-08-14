@@ -22,6 +22,9 @@
 #include <string>
 #include <vector>
 
+#include <ignition/msgs/plugin.pb.h>
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -157,6 +160,9 @@ namespace gazebo
 
       /// \brief Class which manages user commands and undoing / redoing them.
       public: UserCmdHistory *userCmdHistory = nullptr;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
     };
   }
 }

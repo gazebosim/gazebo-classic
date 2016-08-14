@@ -238,6 +238,12 @@ namespace gazebo
       private: void OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
           const bool _success);
 
+      /// \brief Callback when GUI plugin list is received.
+      /// \param[in] _plugins Vector of plugins.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
+
       /// \brief Callback when plugin list is received.
       /// \param[in] _plugins Vector of plugins.
       /// \param[in] _success True if the info was successfully received.

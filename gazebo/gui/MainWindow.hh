@@ -25,6 +25,11 @@
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/common/URI.hh"
+
+#include <ignition/msgs/plugin.pb.h>
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #ifdef HAVE_OCULUS
 #include "gazebo/gui/OculusWindow.hh"
@@ -99,6 +104,25 @@ namespace gazebo
       /// \brief Add a menu to the main window menu bar.
       /// \param[in] _menu Menu to be added.
       public: void AddMenu(QMenu *_menu);
+
+      /// \brief Get plugins in this world or one of its
+      /// children, according to the given _pluginUri. Some _pluginUri examples:
+      ///
+      /// * Info about a specific world plugin in this world:
+      ///    data://gui/plugin/<plugin_name>
+      ///
+      /// * Info about all world plugins in this world (empty plugin name):
+      ///    data://gui/plugin
+      ///
+      /// * Info about a model plugin in a child model:
+      ///    data://world/<this_name>/model/<model_name>/plugin/<plugin_name>
+      ///
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfoService
+      public: void PluginInfo(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \brief Show a custom menubar. If NULL is used, the default menubar
       /// is shown.
@@ -309,6 +333,14 @@ namespace gazebo
       /// \brief Callback when window mode has changed.
       /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
       private: void OnWindowMode(const std::string &_mode);
+
+      /// \brief Callback for "gui/server/info/plugin" service.
+      /// \param[in] _request Request containing plugin URI.
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfo
+      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \internal
       /// \brief Private data pointer

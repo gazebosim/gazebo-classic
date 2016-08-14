@@ -1119,21 +1119,15 @@ namespace gazebo
       // Set plugins of the visual
       if (_sdf->HasElement("plugin"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("plugin");
-        msgs::Plugin *plgnMsg = result.mutable_plugin();
-        // if (elem->HasElement("name"))
-          plgnMsg->set_name(elem->Get<std::string>("name"));
-        // if (elem->HasElement("filename"))
-          plgnMsg->set_filename(elem->Get<std::string>("filename"));
-
-        std::stringstream ss;
-        for (sdf::ElementPtr innerElem = elem->GetFirstElement();
-            innerElem;
-            innerElem = innerElem->GetNextElement(""))
+        printf("%s\n", "bloblo");
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
         {
-          ss << innerElem->ToString("");
+          auto pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+          pluginElem = pluginElem->GetNextElement("plugin");
         }
-        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
       return result;
@@ -1541,10 +1535,10 @@ namespace gazebo
       }
 
       // Set plugins of the visual
-      if (_msg.has_plugin())
+      for (int i = 0; i < _msg.plugin_size(); ++i)
       {
-        sdf::ElementPtr pluginElem = visualSDF->GetElement("plugin");
-        pluginElem = PluginToSDF(_msg.plugin(), pluginElem);
+        sdf::ElementPtr pluginElem = visualSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
       }
 
       return visualSDF;
@@ -1821,6 +1815,19 @@ namespace gazebo
       {
         gzwarn << "Conversion of sensor type[" << type << "] not supported."
           << std::endl;
+      }
+
+      if (_sdf->HasElement("plugin"))
+      {
+        printf("%s\n", "bloblo");
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          auto pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
       }
 
       return result;
@@ -2425,6 +2432,7 @@ namespace gazebo
           distortionElem->GetElement("p2")->Set(distortionMsg.p2());
         }
       }
+
       return cameraSDF;
     }
 
