@@ -17,6 +17,7 @@
 #ifndef GAZEBO_PLUGINS_LOOKATDEMOPLUGIN_HH_
 #define GAZEBO_PLUGINS_LOOKATDEMOPLUGIN_HH_
 
+#include <gazebo/transport/transport.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
@@ -51,25 +52,47 @@ namespace gazebo
     public: LookAtDemoPlugin();
 
     /// \brief Destructor
-    public: virtual ~LookAtDemoPlugin() {};
+    public: virtual ~LookAtDemoPlugin();
 
     // Documentation inherited
-    public: void Load(sdf::ElementPtr _elem);
+    public: void Load(sdf::ElementPtr /*_elem*/);
 
-    /// \brief Callback when a value changes
+    /// \brief Callback when a value changes.
+    /// \param[in] _newValue The new value.
     private slots: void OnChange(const double _newValue);
 
+    /// \brief Box holding the eye X value.
     private: QDoubleSpinBox *eyeX;
+
+    /// \brief Box holding the eye Y value.
     private: QDoubleSpinBox *eyeY;
+
+    /// \brief Box holding the eye Z value.
     private: QDoubleSpinBox *eyeZ;
 
+    /// \brief Box holding the target X value.
     private: QDoubleSpinBox *targetX;
+
+    /// \brief Box holding the target Y value.
     private: QDoubleSpinBox *targetY;
+
+    /// \brief Box holding the target Z value.
     private: QDoubleSpinBox *targetZ;
 
+    /// \brief Box holding the up X value.
     private: QDoubleSpinBox *upX;
+
+    /// \brief Box holding the up Y value.
     private: QDoubleSpinBox *upY;
+
+    /// \brief Box holding the up Z value.
     private: QDoubleSpinBox *upZ;
+
+    /// \brief Node for communication.
+    private: transport::NodePtr node;
+
+    /// \brief To publish model modify messages.
+    private: transport::PublisherPtr modelModifyPub;
   };
 }
 
