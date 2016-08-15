@@ -41,6 +41,7 @@ set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
   ArrangePlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
@@ -88,6 +89,7 @@ endif()
 
 set (GUIplugins
   CessnaGUIPlugin
+  KeyboardGUIPlugin
   TimerGUIPlugin
 )
 

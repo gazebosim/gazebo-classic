@@ -47,7 +47,6 @@
 #include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiPlugin.hh"
