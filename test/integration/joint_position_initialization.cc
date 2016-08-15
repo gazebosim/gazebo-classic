@@ -37,7 +37,6 @@ void JointKinematicTest::JointInitialPositionTest(
 {
   // init random seed
   srand(time(NULL));
-  unsigned int seed = time(NULL);
 
   if (_physicsEngine == "bullet")
   {
