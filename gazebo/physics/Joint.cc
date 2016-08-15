@@ -1523,7 +1523,8 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
 }
 
 /////////////////////////////////////////////////
-void Joint::SetInitialPosition(unsigned int _index, math::Angle _position)
+void Joint::SetInitialPosition(unsigned int _index,
+  ignition::math::Angle _position)
 {
   if (_index >= this->GetAngleCount())
   {
