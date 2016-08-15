@@ -27,22 +27,29 @@ GZ_REGISTER_SENSOR_PLUGIN(RayPlugin)
 /////////////////////////////////////////////////
 RayPlugin::RayPlugin()
 {
+gzdbg << "RayPlugin" << std::endl;
 }
 
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
-  this->parentSensor->LaserShape()->DisconnectNewLaserScans(
-      this->newLaserScansConnection);
+gzdbg << "~RayPlugin" << std::endl;
+  if (this->newLaserScansConnection)
+  {
+gzdbg << "~RayPlugin " << this->newLaserScansConnection << std::endl;
+}
   this->newLaserScansConnection.reset();
-
+gzdbg << "~RayPlugin" << std::endl;
   this->parentSensor.reset();
+gzdbg << "~RayPlugin" << std::endl;
   this->world.reset();
+gzdbg << "~RayPlugin" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
+gzdbg << "RayPlugin" << std::endl;
   // Get then name of the parent sensor
   this->parentSensor =
     std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
@@ -55,10 +62,12 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
   this->newLaserScansConnection =
     this->parentSensor->LaserShape()->ConnectNewLaserScans(
       std::bind(&RayPlugin::OnNewLaserScans, this));
+gzdbg << "RayPlugin" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void RayPlugin::OnNewLaserScans()
 {
+gzdbg << "RayPlugin" << std::endl;
   /* overload with useful callback here */
 }

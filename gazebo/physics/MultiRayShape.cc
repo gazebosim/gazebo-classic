@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/MultiRayShape.hh"
@@ -40,6 +41,14 @@ MultiRayShape::MultiRayShape(CollisionPtr _parent)
 MultiRayShape::~MultiRayShape()
 {
   this->rays.clear();
+
+  int count = 0;
+  while (this->newLaserScans.ConnectionCount() > 0)
+  {
+    this->newLaserScans.Disconnect(count);
+    count++;
+  }
+  gzdbg << "~MultiRayShape" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -186,6 +195,7 @@ void MultiRayShape::Update()
   }
 
   // do actual collision checks
+gzdbg << "Update" << std::endl;
   this->UpdateRays();
 
   // for plugin

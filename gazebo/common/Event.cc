@@ -80,19 +80,30 @@ Connection::Connection(Event *_e, int _i)
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
+gzdbg << "A  " << this << std::endl;
   common::Time diffTime = common::Time::GetWallTime() -
     this->dataPtr->creationTime;
-  if ((this->dataPtr->event && !this->dataPtr->event->GetSignaled()) &&
-      diffTime < common::Time(0, 10000))
-    gzwarn << "Warning: Deleteing a connection right after creation. "
-          << "Make sure to save the ConnectionPtr from a Connect call\n";
+gzdbg << "A  " << this << " ---  " << diffTime << "   " << this->dataPtr->event  << std::endl;
+gzdbg << "A  " << this << " ---  " << (diffTime < common::Time(0, 10000)) << std::endl;
+gzdbg << "A  " << this << " ---  " << diffTime << "   " << this->dataPtr->event  << std::endl;
+//  if ((this->dataPtr->event && !this->dataPtr->event->GetSignaled()) &&
+//      diffTime < common::Time(0, 10000))
+//  {
+  //  gzwarn << "Warning: Deleteing a connection right after creation. "
+    //      << "Make sure to save the ConnectionPtr from a Connect call\n";
+//  }
+gzdbg << "A  " << this << std::endl;
 
   if (this->dataPtr->event && this->dataPtr->id >= 0)
   {
+gzdbg << "A  " << this << std::endl;
     this->dataPtr->event->Disconnect(this->dataPtr->id);
+gzdbg << "A  " << this << std::endl;
     this->dataPtr->id = -1;
+gzdbg << "A  " << this << std::endl;
     this->dataPtr->event = NULL;
   }
+gzdbg << "B  " << this << std::endl;
 }
 
 //////////////////////////////////////////////////

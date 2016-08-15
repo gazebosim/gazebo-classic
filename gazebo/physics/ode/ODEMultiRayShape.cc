@@ -33,6 +33,7 @@ using namespace physics;
 ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
   : MultiRayShape(_parent)
 {
+gzdbg << this << "  ODEMultiRayShape::ODEMultiRayShape  " << std::endl;
   this->SetName("ODE Multiray Shape");
 
   // Create a space to contain the ray space
@@ -56,6 +57,7 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 ODEMultiRayShape::~ODEMultiRayShape()
 {
+gzdbg << this << "  ~ODEMultiRayShape::ODEMultiRayShape" << std::endl;
   dSpaceSetCleanup(this->raySpaceId, 0);
   dSpaceDestroy(this->raySpaceId);
 
@@ -66,6 +68,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 //////////////////////////////////////////////////
 void ODEMultiRayShape::UpdateRays()
 {
+gzdbg << " UpdateRays" << std::endl;
   ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
@@ -87,6 +90,7 @@ void ODEMultiRayShape::UpdateRays()
 //////////////////////////////////////////////////
 void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
+gzdbg << " UpdateCallback" << std::endl;
   dContactGeom contact;
   ODEMultiRayShape *self = NULL;
 

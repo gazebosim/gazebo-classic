@@ -56,6 +56,7 @@ RaySensor::RaySensor()
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -97,6 +98,7 @@ void RaySensor::Load(const std::string &_worldName)
   this->dataPtr->laserShape =
     boost::dynamic_pointer_cast<physics::MultiRayShape>(
         this->dataPtr->laserCollision->GetShape());
+gzdbg << this->Name() << "  " << this->dataPtr->laserShape << std::endl;
 
   GZ_ASSERT(this->dataPtr->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
@@ -130,9 +132,12 @@ void RaySensor::Init()
 //////////////////////////////////////////////////
 void RaySensor::Fini()
 {
-  Sensor::Fini();
-
   this->dataPtr->scanPub.reset();
+  if (this->node)
+  {
+    this->node->Fini();
+    this->node.reset();
+  }
 
   if (this->dataPtr->laserCollision)
   {
@@ -145,6 +150,10 @@ void RaySensor::Fini()
     this->dataPtr->laserShape->Fini();
     this->dataPtr->laserShape.reset();
   }
+
+  this->dataPtr->parentEntity.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -430,6 +439,7 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
+gzdbg << "UpdateImpl" << std::endl;
   this->dataPtr->laserShape->Update();
   this->lastMeasurementTime = this->world->GetSimTime();
 

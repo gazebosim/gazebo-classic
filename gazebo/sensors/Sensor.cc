@@ -74,6 +74,7 @@ Sensor::Sensor(SensorCategory _cat)
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
+gzerr << this <<  " SENSOR KILLED " << std::endl;
   this->Fini();
 }
 
@@ -204,6 +205,7 @@ bool Sensor::NeedsUpdate()
 //////////////////////////////////////////////////
 void Sensor::Update(const bool _force)
 {
+gzdbg << this << " Update" << std::endl;
   if (this->IsActive() || _force)
   {
     common::Time simTime;

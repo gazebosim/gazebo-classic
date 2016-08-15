@@ -629,6 +629,7 @@ namespace gazebo
       }
       this->myDataPtr->connections[index].reset(new EventConnection<T>(true,
           new boost::function<T>(_subscriber)));
+std::cout << "Connect " << index << std::endl;
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -640,7 +641,9 @@ namespace gazebo
       if (!_c)
         return;
 
+std::cout << "Disconnect " << _c << "   " << _c->GetId() << std::endl;
       this->Disconnect(_c->GetId());
+std::cout << "Disconnect " << _c << std::endl;
       _c->dataPtr->event = NULL;
       _c->dataPtr->id = -1;
     }

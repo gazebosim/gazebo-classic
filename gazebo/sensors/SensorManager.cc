@@ -576,6 +576,7 @@ void SensorManager::SensorContainer::RunLoop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Update(bool _force)
 {
+gzdbg << "Update" << std::endl;
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.empty())

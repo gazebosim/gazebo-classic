@@ -213,19 +213,22 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
-  if (this->world && this->world->GetRunning())
-  {
-    std::string entityName =
-        this->world->GetEntity(this->ParentName())->GetScopedName();
-    std::string filterName = entityName + "::" + this->Name();
-
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(filterName);
-  }
-
   this->dataPtr->contactSub.reset();
   this->dataPtr->contactsPub.reset();
+
+  if (this->world && this->world->GetPhysicsEngine())
+  {
+    auto parent = this->world->GetEntity(this->ParentName());
+    if (parent)
+    {
+      std::string entityName = parent->GetScopedName();
+      std::string filterName = entityName + "::" + this->Name();
+
+      physics::ContactManager *mgr =
+          this->world->GetPhysicsEngine()->GetContactManager();
+      mgr->RemoveFilter(filterName);
+    }
+  }
 
   this->dataPtr->collisions.clear();
 
