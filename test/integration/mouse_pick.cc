@@ -351,9 +351,7 @@ void MousePickingTest::Transparency()
   QVERIFY(!model02Vis->GetHighlighted());
   QVERIFY(model03Vis->GetHighlighted());
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0, -3.0, 0.5),
-      gazebo::math::Vector3(0, 0, 1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0, -3.0, 0.5, 0, 0, 1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -371,9 +369,7 @@ void MousePickingTest::Transparency()
   // try mouse picking in translate mode
   gazebo::gui::g_translateAct->trigger();
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0.1, 3.0, 0.6),
-      gazebo::math::Vector3(0, 0, -1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0.1, 3.0, 0.6, 0, 0, -1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -391,9 +387,7 @@ void MousePickingTest::Transparency()
   QVERIFY(!model02Vis->GetHighlighted() && !model02LinkVis->GetHighlighted());
   QVERIFY(model03Vis->GetHighlighted() || model03LinkVis->GetHighlighted());
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0.1, -3.0, 0.6),
-      gazebo::math::Vector3(0, 0, 1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0.1, -3.0, 0.6, 0, 0, 1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
