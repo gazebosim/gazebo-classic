@@ -69,8 +69,15 @@ namespace gazebo
     /// \brief Send robot state to controller
     protected: virtual void SendRobotState();
 
-    /// \brief timeout
-    private: int timeoutMs;
+    /// \brief Expected update interval.
+    /// If the age of the current command is older than this interval
+    /// than we will pause simulation to wait for external
+    /// controller to send a new command.
+    /// For example, if the external real-time controller is running
+    /// at 1kHz, then simulation should expect a new command within
+    /// 1 millisecond of the last received command, i.e. command age
+    /// should be less than 1 millisecon.
+    private: double timeoutMs;
 
     /// \brief Private data pointer.
     private: std::unique_ptr<RTControlSynchronizationPluginPrivate> dataPtr;

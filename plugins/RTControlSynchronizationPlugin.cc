@@ -64,35 +64,48 @@ class gazebo::RTControlSynchronizationPluginPrivate
     if (_timeoutMs != 0)
     {
       common::Time curWallTime = common::Time::GetWallTime();
+      // on initial entry, this->delayWindowStartTime = 0 sim time
       if (curWallTime >= this->delayWindowStartTime + this->delayWindowSize)
       {
         this->delayWindowStartTime = curWallTime;
         this->delayInWindow = common::Time(0.0);
       }
 
-      gzerr << "delay " << this->delayInWindow.Double()
-            << " / " <<  this->delayMaxPerWindow << "\n";
+      gzdbg << "we have delayed this much time in current window: ["
+            << this->delayInWindow.Double()
+            << " / " <<  this->delayMaxPerWindow.Double() << "]\n";
 
       common::Time delayInStepSum(0.0);
       if (this->delayInWindow < this->delayMaxPerWindow)
       {
+
         while (delayInStepSum < this->delayMaxPerStep &&
                this->delayInWindow < this->delayMaxPerWindow)
         {
+          gzdbg << "we have delayed this much time in current step: ["
+                << delayInStepSum.Double()
+                << " / " <<  this->delayMaxPerStep.Double()
+                << "] total delay in window ["
+                << this->delayInWindow.Double()
+                << " / " <<  this->delayMaxPerWindow.Double() << "]\n";
+
           std::unique_lock<std::mutex> lock(this->mutex);
 
+          // compute sim time age of last received command
           double age = _curTime.Double() - this->lastCommand.timestamp.Double();
 
-          // gzerr << "age " << age << " stamp " << 
-          //       this->lastCommand.timestamp.Double() << "\n";
-          printf("age %f lastCommand stamp %f\n", age,
-                this->lastCommand.timestamp.Double());
+          printf("age %f sec sim time. lastCommand stamp %f sec."
+                 "timeout %f sec\n", age,
+                this->lastCommand.timestamp.Double(), 0.001*_timeoutMs);
           fflush(stdout);
 
           // if age is small enough, skip, otherwise, wait finite amount
           // for command messages to catchup.
           if (age <= 0.001 * _timeoutMs)
             break;
+
+          gzdbg << "age[" << age << "] > timeoutMs["
+                << 0.001*_timeoutMs << "]\n";
 
           // calculate amount of time to wait based on rules
           // std::chrono::time_point<std::chrono::high_resolution_clock,
@@ -109,8 +122,8 @@ class gazebo::RTControlSynchronizationPluginPrivate
           std::chrono::time_point<std::chrono::system_clock> timeout =
             now + delay;
 
-          gzerr << "delayUsInt: " << delayUsInt << "\n";
-          // gzerr << "timeout: " << delayUsInt << "\n";
+          gzdbg << "delayUsInt: " << delayUsInt << "\n";
+          // gzdbg << "timeout: " << delayUsInt << "\n";
 
           // common::Time tmp(std::detail::get_timespec(timeout));
           // printf("timeout %f wall %f min(%f, %f)\n",
@@ -120,25 +133,19 @@ class gazebo::RTControlSynchronizationPluginPrivate
 
           // convert now to common::Time
           // common::Time delayTime(std::chrono::get_timespec(now));
-          gzerr << "now: "
-                << std::chrono::time_point_cast<std::chrono::microseconds>(
-                   now).time_since_epoch().count() << "\n";
+          long int nowNano =
+            std::chrono::time_point_cast<std::chrono::nanoseconds>(
+                   now).time_since_epoch().count();
+          gzdbg << "time_since_epoc nanoseconds: now: "
+                << nowNano << "\n";
           timespec tv;
-          /*
-          // std::chrono::seconds const sec =
-          std::chrono::duration<double, std::ratio<1>> sec =
-            std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::system_clock::now() - now);
-          tv.tv_sec  = static_cast<int>(sec.count());
-          tv.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(
-            now - sec).count();
-
-          tv.tv_sec  = static_cast<int>(sec.count());
-          tv.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(
-          */
+          tv.tv_nsec  = static_cast<int>(nowNano % 1000000000);
+          tv.tv_sec = static_cast<int>((nowNano-tv.tv_nsec)/1000000000);
           common::Time delayTime(tv);
+          gzdbg << "time_since_epoc sec: now: "
+                << delayTime.Double() << "\n";
 
-          gzerr << "waiting\n";
+          gzdbg << "waiting\n";
           if (this->delayCondition.wait_until(lock, timeout) !=
               std::cv_status::timeout)
           {
@@ -162,7 +169,8 @@ class gazebo::RTControlSynchronizationPluginPrivate
             delayTime = common::Time::GetWallTime() - delayTime;
             if (delayTime >= this->delayMaxPerStep)
               gzwarn << "controller synchronization timeout: "
-                     << "waited full duration, but timed_wait returned true.\n";
+                     << "waited full duration [" << delayTime.Double()
+                     << "] but timed_wait returned true.\n";
             // printf("nsim %f otified with %f delayed %f\n",
             //       _curTime.Double()*1000,
             //       this->command.header.stamp.toSec()*1000,
@@ -293,7 +301,7 @@ RTControlSynchronizationPlugin::RTControlSynchronizationPlugin()
   // default control synchronization delay settings
   // to trigger synchronization delay, set
   // timeoutMs to non-zero
-  this->timeoutMs = 1000;
+  this->timeoutMs = 1.0;
 
   // synchronization variables
   // rolling window for keeping track of timing enforcement and statistics
@@ -360,7 +368,7 @@ void RTControlSynchronizationPlugin::OnUpdate(const common::UpdateInfo &_info)
     gzdbg << "t[" << curTime.Double() << "]: RobotStateOut\n";
     this->RobotStateOut();
     gzdbg << "EnforceSynchronizationDelay(" << curTime.Double() << ", "
-          << this->timeoutMs << ")\n";
+          << this->timeoutMs << " ms)\n";
     this->dataPtr->EnforceSynchronizationDelay(curTime, this->timeoutMs);
     gzdbg << "ApplyRobotCommandToSim\n";
     this->ApplyRobotCommandToSim(dt);
