@@ -73,10 +73,6 @@ namespace gazebo
       /// \param[in] _visual Visual to move the camera to.
       public: void MoveToVisual(VisualPtr _visual);
 
-      // Doxygen automatically pulls in the correct documentation.
-      public: virtual bool MoveToPosition(const math::Pose &_pose,
-                                          double _time);
-
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visualName Name of the visual to move the camera to.
       public: void MoveToVisual(const std::string &_visualName);

@@ -363,12 +363,6 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 }
 
 //////////////////////////////////////////////////
-bool OculusCamera::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  return Camera::MoveToPosition(_pose.Ign(), _time);
-}
-
-//////////////////////////////////////////////////
 void OculusCamera::MoveToVisual(const std::string &_name)
 {
   VisualPtr visualPtr = this->scene->GetVisual(_name);
