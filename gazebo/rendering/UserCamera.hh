@@ -80,9 +80,12 @@ namespace gazebo
       /// \brief Finialize
       public: void Fini();
 
-      /// \brief Set the pose in the world coordinate frame.
-      /// \param[in] _pose New pose of the camera.
-      public: virtual void SetWorldPose(const math::Pose &_pose);
+      // Documentation inherited.
+      public: virtual void SetWorldPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited.
+      public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the default pose in the world coordinate frame and set
       /// that as the current camera world pose.
@@ -135,10 +138,6 @@ namespace gazebo
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.
       public: void MoveToVisual(VisualPtr _visual);
-
-      // Doxygen automatically pulls in the correct documentation.
-      public: virtual bool MoveToPosition(const math::Pose &_pose,
-                                          double _time);
 
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visualName Name of the visual to move the camera to.

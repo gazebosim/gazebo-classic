@@ -42,6 +42,8 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
+#include "gazebo/math/Pose.hh"
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -156,6 +158,12 @@ namespace gazebo
       /// \brief Get the camera's orientation in the world
       /// \return The camera's orientation as an ignition::math::Quaterniond
       public: ignition::math::Quaterniond WorldRotation() const;
+
+      /// \brief Set the global pose of the camera
+      /// \param[in] _pose The new math::Pose of the camera
+      /// \deprecated See function that accepts an ignition::math parameter.
+      public: virtual void SetWorldPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the global pose of the camera
       /// \param[in] _pose The new ignition::math::Pose3d of the camera
