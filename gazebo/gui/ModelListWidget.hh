@@ -238,6 +238,18 @@ namespace gazebo
       private: void OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
           const bool _success);
 
+      /// \brief Callback when sensor info is received.
+      /// \param[in] _plugins Vector of sensors.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnSensorInfo(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
+
+      /// \brief Callback when visual info is received.
+      /// \param[in] _plugins Vector of visuals.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnVisualInfo(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
+
       /// \brief Callback when GUI plugin list is received.
       /// \param[in] _plugins Vector of plugins.
       /// \param[in] _success True if the info was successfully received.

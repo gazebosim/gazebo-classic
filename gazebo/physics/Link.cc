@@ -207,6 +207,16 @@ void Link::Load(sdf::ElementPtr _sdf)
   std::string topicName = "~/" + this->GetScopedName() + "/wrench";
   boost::replace_all(topicName, "::", "/");
   this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
+
+  printf("%s\n", this->URI());
+
+  std::string service("sensor/server/info");
+  if (!this->dataPtr->ignNode.Advertise(service,
+    &Sensor::SensorInfoService, this))
+  {
+  gzerr << "Error advertising service [" << service << "]"
+      << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////

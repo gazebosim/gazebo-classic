@@ -1884,6 +1884,72 @@ TEST_F(Visual_TEST, VisibilityFlags)
   }
 }
 
+// TODO: Integrate visual blink plugin!!
+/*
+//////////////////////////////////////////////////
+TEST_F(Visual_TEST, VisualPluginInfo)
+{
+  this->Load("worlds/depth_camera.world", true);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get an existing plugin" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/camera_model/link/my_link/sensor/camera/visual/<name>/plugin/blink");
+    this->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "depth_camera_plugin");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(VisualTest, PluginInfoFailures)
+{
+  this->Load("worlds/wind_demo.world", true);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get all plugins" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 0);
+  }
+
+  gzmsg << "Wrong visual" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/camera_model/link/my_link/visual/<wrong_name>/plugin/blink");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = common::URI("tell me about your plugins");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/camera_model/link/my_link/visual/<visual_name>/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+*/
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

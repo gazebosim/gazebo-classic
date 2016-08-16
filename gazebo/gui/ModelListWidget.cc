@@ -319,6 +319,19 @@
         this->dataPtr->ignNode.Request(service, req,
            &ModelListWidget::OnPluginInfo, this);
       }
+      // Sensor
+      else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
+        && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
+      {
+        std::string service("sensor/server/info");
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        gzerr << this->dataPtr->selectedEntityName << "bodo new gui";
+
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnSensorInfo, this);
+      }
       // Sensor plugin
       else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
         && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
@@ -331,6 +344,19 @@
 
         this->dataPtr->ignNode.Request(service, req,
            &ModelListWidget::OnPluginInfo, this);
+      }
+      // Visual
+      else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
+        && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
+      {
+        std::string service("visual/server/info");
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        gzerr << this->dataPtr->selectedEntityName << "bodo new gui";
+
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnVisualInfo, this);
       }
       // Visual plugin
       else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
@@ -3768,6 +3794,44 @@
     this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
     this->dataPtr->fillTypes.push_back("Plugin");
     this->dataPtr->propMutex->unlock();
+  }
+
+  /////////////////////////////////////////////////
+  void ModelListWidget::OnSensorInfo(const ignition::msgs::Plugin_V &_plugins,
+      const bool _success)
+  {/*
+    if (!_success)
+    {
+      gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
+      return;
+    }
+
+    // We asked for only one plugin
+    GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+
+    this->dataPtr->propMutex->lock();
+    this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
+    this->dataPtr->fillTypes.push_back("Plugin");
+    this->dataPtr->propMutex->unlock();*/
+  }
+
+  /////////////////////////////////////////////////
+  void ModelListWidget::OnVisualInfo(const ignition::msgs::Plugin_V &_plugins,
+      const bool _success)
+  {/*
+    if (!_success)
+    {
+      gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
+      return;
+    }
+
+    // We asked for only one plugin
+    GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+
+    this->dataPtr->propMutex->lock();
+    this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
+    this->dataPtr->fillTypes.push_back("Plugin");
+    this->dataPtr->propMutex->unlock();*/
   }
 
   /////////////////////////////////////////////////

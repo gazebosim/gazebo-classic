@@ -63,7 +63,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 
- #include "gazebo/util/IgnMsgSdf.hh"
+#include "gazebo/util/IgnMsgSdf.hh"
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/IntrospectionManager.hh"

@@ -32,6 +32,9 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/util/IgnMsgSdf.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/URI.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -52,6 +55,14 @@ SensorManager::SensorManager()
 
   // sensors::OTHER container
   this->sensorContainers.push_back(new SensorContainer());
+
+  std::string service("sensor/server/info/plugin");
+  if (!this->dataPtr->ignNode.Advertise(service,
+      &Sensor::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << service << "]"
+    << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -703,9 +714,6 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   SensorContainer::Update(_force);
 }
 
-
-
-
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()
 {
@@ -770,4 +778,208 @@ void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
     else
       ++iter;
   }
+}
+/*
+  //////////////////////////////////////////////////
+  void SensorManager::PluginInfoService(const ignition::msgs::StringMsg &_req,
+      ignition::msgs::Plugin_V &_plugins, bool &_success)
+  {
+    gzerr << "salome" << _success;
+    this->PluginInfo(_req.data(), _plugins, _success);
+  }
+
+  //////////////////////////////////////////////////
+  void SensorManager::PluginInfo(const common::URI &_pluginUri,
+      ignition::msgs::Plugin_V &_plugins, bool &_success)
+  {
+    _plugins.clear_plugins();
+    _success = true;
+
+    if (!_pluginUri.Valid())
+    {
+      gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
+      return;
+    }
+
+    auto parts = common::split(_pluginUri.Path().Str(), "/");
+    //auto myParts = common::split(this->URI().Path().Str(), "/");
+  
+    // Plugin URI should be longer than world URI
+    if (myParts.size() >= parts.size())
+    {
+      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
+          this->URI().Str() << "]" << std::endl;
+      return;
+    }
+
+    // Check if all segments match up to this world
+    //size_t i = 0;
+    for ( ; i < myParts.size(); ++i)
+    {
+      if (parts[i] != myParts[i])
+      {
+        gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
+            this->URI().Str() << "]" << std::endl;
+        return;
+      }
+    }
+  
+  for (; i < parts.size(); i = i+2)
+  {
+    if (parts[i] == "sensor")
+    {
+      // Look in nested models
+      auto sensor = this->NestedSensor(parts[i+1]);
+
+      if (!sensor)
+      {
+        gzwarn << "Sensor [" << parts[i+1] << "] not found in sensor [" <<
+            this->GetName() << "]" << std::endl;
+        return;
+      }
+
+      sensor->PluginInfo(_pluginUri, _plugins, _success);
+      return;
+    }
+      // Look for plugin
+      if (_pluginUri.Str().find("sensor"))
+      {
+        // Return empty vector
+        if (this->GetName != )
+        {
+          _success = true;
+          return;
+        }
+
+        // Find correct plugin
+        sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          auto pluginName = pluginElem->Get<std::string>("name");
+
+          // If asking for a specific plugin, skip all other plugins
+          if (i+1 < parts.size() && parts[i+1] != pluginName) 
+          {
+            pluginElem = pluginElem->GetNextElement("plugin");
+            continue;
+          }
+
+          if (_pluginUri.Str().find(pluginName) != std::string::npos)
+          {
+          // Get plugin info from SDF
+          auto pluginMsg = _plugins.add_plugins();
+          pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
+
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
+      }
+  
+        // If asking for a specific plugin and it wasn't found
+        if (i+1 < parts.size() && _plugins.plugins_size() == 0)
+        {
+          gzwarn << "Plugin [" << parts[i+1] << "] not found in world [" <<
+              this->URI().Str() << "]" << std::endl;
+          _success = false;
+          return;
+        }
+  
+        _success = true;
+        return;
+      }
+      else
+      {
+        gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
+           "] cannot be handled." << std::endl;
+        return;
+      }
+    }
+
+    gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+        << std::endl;
+  }
+*/
+
+//////////////////////////////////////////////////
+void Link::SensorInfoService(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  gzerr << "salome" << _success;
+  this->SensorInfo(_req.data(), _sensors, _success);
+}
+
+//////////////////////////////////////////////////
+void Link::SensorInfo(const common::URI &_sensorUri,
+    ignition::msgs::Sensor_V &_sensors, bool &_success)
+{
+  _sensors.clear_plugins();
+  _success = true;
+
+  if (!_sensorUri.Valid())
+  {
+    gzwarn << "URI [" << _sensorUri.Str() << "] is not valid." << std::endl;
+    return;
+  }
+
+  auto parts = common::split(_sensorUri.Path().Str(), "/");
+  
+  for (size_t i = 0; i < parts.size(); i = i+2)
+  {
+    // See if there is a sensor
+    if (parts[i] == "sensor")
+    {
+      auto sensor = this->GetSensor(parts[i+1]);
+
+      if (!sensor)
+      {
+        gzwarn << "Sensor [" << parts[i+1] << "] not found" //in world [" <<
+            //this->GetName() << "]" 
+        << std::endl;
+        return;
+      }
+
+      // Create URI for fetched sensor
+      common::URI sensorUri;
+      sensorUri.SetScheme("data");
+      sensorUri.Path().PushBack(sensor->ScopedName());
+
+      auto myParts = common::split(sensorUri.Path().Str(), "/");
+
+      // Check if all segments match up to this sensors scopedName,
+      // e.g. world/<this_name>/model/<model_name>/link/<link_name>
+      // for nested models e.g. world/<this_name>/model/<model_name>
+      // /model/<model_name>/link/<link_name>
+      for (size_t j = myParts.size() - 1; j >= 0; --j)
+      {
+        if (parts[i] != myParts[i])
+        {
+          gzwarn << "Sensor [" << _sensorUri.Str() << "] does not match sensor [" <<
+              sensorUri.Str() << "]" << std::endl;
+          return;
+        }
+      }
+
+      // Add properties
+      auto sensorMsg = _sensors.add_sensors();
+      sensorMsg.set_name(sensor->Name());
+      sensorMsg.set_parent(sensor->ParentName());
+      sensorMsg.set_type(sensor->Type());
+      sensorMsg.set_always_on();
+      sensorMsg.set_update_rate(sensor->UpdateRate());
+      sensorMsg.set_visualize(sensor->Visualize());
+      sensorMsg.set_topic(sensor->Topic());
+      sensorMsg.set_pose(sensor->Pose());
+
+      _success = true;
+      return;
+    }
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
+  }
+
+  gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+      << std::endl;
 }

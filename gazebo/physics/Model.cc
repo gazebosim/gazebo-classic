@@ -1687,7 +1687,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
   }
 
   // Check if all segments match up to this model
-  size_t i =0;
+  size_t i = 0;
   for ( ; i < myParts.size(); ++i)
   {
     if (parts[i] != myParts[i])

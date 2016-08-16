@@ -37,8 +37,6 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
-#include <ignition/transport.hh>
-
 namespace Ogre
 {
   class MovableObject;
@@ -210,9 +208,6 @@ namespace gazebo
 
       /// \brief True if wireframe mode is enabled
       public: bool wireframe;
-
-      /// \brief Node for ignition transport communication.
-      public: ignition::transport::Node ignNode;
     };
     /// \}
   }

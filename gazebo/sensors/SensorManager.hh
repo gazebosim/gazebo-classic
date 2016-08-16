@@ -25,11 +25,16 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+ #include <ignition/msgs.hh>
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/common/URI.hh"
 
 namespace gazebo
 {
@@ -151,6 +156,34 @@ namespace gazebo
       /// \return Vector of all the sensors.
       public: Sensor_V GetSensors() const;
 
+      /// \brief Get plugins in this sensor acording to
+      /// the given _pluginUri. Some _pluginUri examples:
+      ///
+      /// * Info about a specific sensor plugin in this world:
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/sensor/<sensor_name>/plugin/<plugin_name>
+      ///
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfoService
+      public: void PluginInfo(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
+      /// \brief Get sensor properties acording to
+      /// the given _sensorUri. Some _sensorUri examples:
+      ///
+      /// * Info about a specific sensor:
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/sensor/<sensor_name>
+      ///
+      /// \param[in] _sensorUri URI for the desired sensor properties.
+      /// \param[out] _sensors Message containing vector of sensors.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa SensorInfoService
+      public: void SensorInfo(const common::URI & _sensorUri,
+          ignition::msgs::Sensor_V &_sensors, bool &_success);
+
       /// \brief Remove a sensor
       /// \param[in] _name The name of the sensor to remove.
       public: void RemoveSensor(const std::string &_name);
@@ -168,6 +201,22 @@ namespace gazebo
       /// \brief Add a new sensor to a sensor container.
       /// \param[in] _sensor Pointer to a sensor to add.
       private: void AddSensor(SensorPtr _sensor);
+
+      /// \brief Callback for "<this_name>/server/info/plugin" service.
+      /// \param[in] _request Request containing plugin URI.
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfo
+      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
+      /// \brief Callback for "<this_name>/server/info" service.
+      /// \param[in] _request Request containing sensor URI.
+      /// \param[out] _sensors Message containing vector of sensors.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa SensorInfo
+      private: void SensorInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Sensor_V &_sensors, bool &_success);
 
       /// \cond
       /// \brief A container for sensors of a specific type. This is used to

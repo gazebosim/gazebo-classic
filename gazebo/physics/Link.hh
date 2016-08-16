@@ -221,17 +221,7 @@ namespace gazebo
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
       public: virtual void AddTorque(const math::Vector3 &_torque) = 0;
-/*
-      /// \brief Get information about plugins in the children sensor or visual
-      /// of this link, according to the given _pluginUri. This function
-      /// just forwards the _pluginUri to sensors and visuals.
-      ///
-      /// \param[in] _pluginUri URI for the desired plugin(s).
-      /// \param[out] _plugins Message containing vector of plugins.
-      /// \param[out] _success True if the info was successfully obtained.
-      public: void PluginInfo(const common::URI &_pluginUri,
-          ignition::msgs::Plugin_V &_plugins, bool &_success);
-*/
+
       /// \brief Add a torque to the body, components are relative to the
       /// body's own frame of reference.
       /// \param[in] _torque Torque value to add.

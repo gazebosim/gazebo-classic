@@ -41,9 +41,6 @@
   #include "gazebo/sensors/SensorPrivate.hh"
   #include "gazebo/sensors/Sensor.hh"
   #include "gazebo/sensors/SensorManager.hh"
-   
-  #include "gazebo/util/IgnMsgSdf.hh"
-  #include "gazebo/common/CommonIface.hh"
 
   using namespace gazebo;
   using namespace sensors;
@@ -110,14 +107,6 @@
     this->node->Init(this->world->GetName());
     this->dataPtr->sensorPub =
       this->node->Advertise<msgs::Sensor>("~/sensor");
-
-  	std::string service("sensor/server/info/plugin");
-  	if (!this->dataPtr->ignNode.Advertise(service,
-  	  &Sensor::PluginInfoService, this))
-  	{
-  	gzerr << "Error advertising service [" << service << "]"
-  	    << std::endl;
-  	}
   }
 
   //////////////////////////////////////////////////
@@ -572,123 +561,4 @@
   void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
   {
     this->dataPtr->updated.Disconnect(_c->Id());
-  }
-
-  //////////////////////////////////////////////////
-  void Sensor::PluginInfoService(const ignition::msgs::StringMsg &_req,
-      ignition::msgs::Plugin_V &_plugins, bool &_success)
-  {
-    gzerr << "salome" << _success;
-    this->PluginInfo(_req.data(), _plugins, _success);
-  }
-
-  //////////////////////////////////////////////////
-  void Sensor::PluginInfo(const common::URI &_pluginUri,
-      ignition::msgs::Plugin_V &_plugins, bool &_success)
-  {
-    _plugins.clear_plugins();
-    _success = true;
-
-    if (!_pluginUri.Valid())
-    {
-      gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
-      return;
-    }
-
-    auto parts = common::split(_pluginUri.Path().Str(), "/");
-    //auto myParts = common::split(this->URI().Path().Str(), "/");
-  /*
-    // Plugin URI should be longer than world URI
-    if (myParts.size() >= parts.size())
-    {
-      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
-          this->URI().Str() << "]" << std::endl;
-      return;
-    }
-
-    // Check if all segments match up to this world*/
-    //size_t i = 0;
-    /*for ( ; i < myParts.size(); ++i)
-    {
-      if (parts[i] != myParts[i])
-      {
-        gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
-            this->URI().Str() << "]" << std::endl;
-        return;
-      }
-    }
-  */
-    for (int i = 0; i < parts.size(); ++i)
-    {
-    /*  // See if there is a model
-      if (parts[i] == "model")
-      {
-        auto model = this->GetModel(parts[i+1]);
-
-        if (!model)
-        {
-          gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
-              this->GetName() << "]" << std::endl;
-          return;
-        }
-
-        model->PluginInfo(_pluginUri, _plugins, _success);
-        return;
-      }
-  */
-      // Look for plugin
-      if (_pluginUri.Str().find("plugin"))
-      {
-        // Return empty vector
-        if (!this->sdf->HasElement("plugin"))
-        {
-          _success = true;
-          return;
-        }
-
-        // Find correct plugin
-        sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-        while (pluginElem)
-        {
-          auto pluginName = pluginElem->Get<std::string>("name");
-
-          // If asking for a specific plugin, skip all other plugins
-          if (i+1 < parts.size() && parts[i+1] != pluginName) 
-          {
-            pluginElem = pluginElem->GetNextElement("plugin");
-            continue;
-          }
-
-          if (_pluginUri.Str().find(pluginName) != std::string::npos)
-          {
-          // Get plugin info from SDF
-          auto pluginMsg = _plugins.add_plugins();
-          pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
-
-          pluginElem = pluginElem->GetNextElement("plugin");
-        }
-      }
-  /*
-        // If asking for a specific plugin and it wasn't found
-        if (i+1 < parts.size() && _plugins.plugins_size() == 0)
-        {
-          gzwarn << "Plugin [" << parts[i+1] << "] not found in world [" <<
-              this->URI().Str() << "]" << std::endl;
-          _success = false;
-          return;
-        }
-  */
-        _success = true;
-        return;
-      }
-      else
-      {
-        gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
-           "] cannot be handled." << std::endl;
-        return;
-      }
-    }
-
-    gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
-        << std::endl;
   }

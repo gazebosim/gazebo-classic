@@ -25,9 +25,6 @@
 #include <sdf/sdf.hh>
 #include <ignition/math/Pose3.hh>
 
-#include <ignition/msgs/plugin_v.pb.h>
-#include <ignition/msgs/stringmsg.pb.h>
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
@@ -269,20 +266,6 @@ namespace gazebo
       /// \return The sensor's noise model for the given noise type
       public: NoisePtr Noise(const SensorNoiseType _type) const;
 
-      /// \brief Get plugins in this sensor acording to
-      /// the given _pluginUri. Some _pluginUri examples:
-      ///
-      /// * Info about a specific sensor plugin in this world:
-      ///    data://world/<this_name>/model/<model_name>/link/
-      ///    <link_name>/sensor/<sensor_name>/plugin/<plugin_name>
-      ///
-      /// \param[in] _pluginUri URI for the desired plugin(s).
-      /// \param[out] _plugins Message containing vector of plugins.
-      /// \param[out] _success True if the info was successfully obtained.
-      /// \sa PluginInfoService
-      public: void PluginInfo(const common::URI &_pluginUri,
-          ignition::msgs::Plugin_V &_plugins, bool &_success);
-
       /// \brief This gets overwritten by derived sensor types.
       ///        This function is called during Sensor::Update.
       ///        And in turn, Sensor::Update is called by
@@ -342,14 +325,6 @@ namespace gazebo
 
       /// \brief Noise added to sensor data
       protected: std::map<SensorNoiseType, NoisePtr> noises;
-
-      /// \brief Callback for "<this_name>/server/info/plugin" service.
-      /// \param[in] _request Request containing plugin URI.
-      /// \param[out] _plugins Message containing vector of plugins.
-      /// \param[out] _success True if the info was successfully obtained.
-      /// \sa PluginInfo
-      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
-          ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \internal
       /// \brief Data pointer for private data

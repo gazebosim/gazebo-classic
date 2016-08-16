@@ -231,7 +231,85 @@ TEST_F(WorldTest, ModelPluginInfo)
     EXPECT_EQ(plugins.plugins(4).name(), "buoyancy");
   }
 }
+/*
+//////////////////////////////////////////////////
+TEST_F(WorldTest, WorldPluginInfo)
+{
+  this->Load("worlds/wind_demo.world", true);
 
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get an existing plugin" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/plugin/wind");
+    this->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "wind");
+  }
+
+  gzmsg << "Get all plugins" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/plugin/");
+    this->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "wind");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(ModelTest, PluginInfoFailures)
+{
+  this->Load("worlds/wind_demo.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get all plugins" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+  }
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse("data://world/wrong/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = common::URI("tell me about your plugins");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+*/
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
