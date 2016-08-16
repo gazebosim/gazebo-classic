@@ -330,9 +330,7 @@ void MousePickingTest::Transparency()
   // mouse picking in arrow mode
   gazebo::gui::g_arrowAct->trigger();
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0, 3.0, 0.5),
-      gazebo::math::Vector3(0, 0, -1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0, 3.0, 0.5, 0, 0, -1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
