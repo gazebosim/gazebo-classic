@@ -145,18 +145,24 @@ class gazebo::RTControlSynchronizationPluginPrivate
           gzdbg << "time_since_epoc sec: now: "
                 << delayTime.Double() << "\n";
 
-          gzdbg << "waiting\n";
+          gzdbg << "--------------- wait_until ---------------\n";
           if (this->delayCondition.wait_until(lock, timeout) !=
               std::cv_status::timeout)
           {
             delayTime = common::Time::GetWallTime() - delayTime;
             if ((this->delayInWindow >= this->delayMaxPerWindow) ||
                 (delayInStepSum >= this->delayMaxPerStep))
-              gzwarn << "controller synchronization timedout: "
-                     << "delay budget exhausted.\n";
-            else
-              gzwarn << "controller synchronization timedout: "
-                     << "message lost or controller stopped.\n";
+            {
+              gzdbg << "controller synchronization: "
+                    << "phew, got command in time, but budget exhausted,"
+                    << " simulation stops waiting for incoming command.\n";
+            }
+            // else
+            {
+              gzdbg << "controller synchronization: "
+                    << "got message within specified duration window,"
+                    << " all good.\n";
+            }
 
             // printf("sim %f timed out with %f delayed %f\n",
             //       _curTime.Double()*1000,
@@ -167,10 +173,15 @@ class gazebo::RTControlSynchronizationPluginPrivate
           else
           {
             delayTime = common::Time::GetWallTime() - delayTime;
+            gzwarn << "controller synchronization timeout: "
+                   << "waited full duration budget [" << delayTime.Double()
+                   << "] but timed_wait returned true.\n";
             if (delayTime >= this->delayMaxPerStep)
-              gzwarn << "controller synchronization timeout: "
-                     << "waited full duration [" << delayTime.Double()
-                     << "] but timed_wait returned true.\n";
+            {
+            }
+            else
+            {
+            }
             // printf("nsim %f otified with %f delayed %f\n",
             //       _curTime.Double()*1000,
             //       this->command.header.stamp.toSec()*1000,
@@ -178,12 +189,12 @@ class gazebo::RTControlSynchronizationPluginPrivate
             // fflush(stdout);
           }
 
-          // printf(" sum before (%f, %f) ",
-          //   delayInStepSum.Double(),
-          //   this->delayInWindow.Double());
-
           delayInStepSum += delayTime;
           this->delayInWindow += delayTime;
+
+          printf("finished wait step delay(%f) window delay(%f)\n",
+            delayInStepSum.Double(),
+            this->delayInWindow.Double());
 
           // printf(" after (%f, %f)\n",
           //   delayInStepSum.Double(),
@@ -193,6 +204,8 @@ class gazebo::RTControlSynchronizationPluginPrivate
         //   delayInStepSum.Double(), this->delayMaxPerStep.Double(),
         //   this->delayInWindow.Double(), this->delayMaxPerWindow.Double());
       }
+
+      gzdbg << "************* exiting update *************\n";
       /*
       this->delayStatistics.delay_in_step = delayInStepSum.Double();
       this->delayStatistics.delay_in_window = this->delayInWindow.Double();
@@ -380,6 +393,10 @@ void RTControlSynchronizationPlugin::OnUpdate(const common::UpdateInfo &_info)
 /////////////////////////////////////////////////
 void RTControlSynchronizationPlugin::RobotStateOut()
 {
+  msgs::Any msg;
+  msg.set_type(msgs::Any_ValueType_DOUBLE);
+  msg.set_double_value(0);
+  this->statePub->Publish();
 }
 
 /////////////////////////////////////////////////

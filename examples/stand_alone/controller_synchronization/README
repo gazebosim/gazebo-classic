@@ -1,0 +1,32 @@
+Gazebo Harness Example
+
+This example relies on the `worlds/controller_synchronization_demo.world` to lower an object in a
+controlled manner.
+
+===================
+Build Instructions
+===================
+
+ * From this directory:
+
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ make
+
+
+===================
+Execute Instructions
+===================
+
+1. Launch gazebo using the controller_synchronization_demo.world:
+
+```
+gazebo --verbose worlds/controller_synchronization_demo.world
+```
+
+1. From this build directory, run `robot_controller` and provide a target real-time update rate (Hz)
+
+```
+$ ./robot_controller -0.1
+```
