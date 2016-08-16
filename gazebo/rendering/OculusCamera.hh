@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "gazebo/math/Pose.hh"
+
 #include "gazebo/rendering/Camera.hh"
 
 namespace gazebo

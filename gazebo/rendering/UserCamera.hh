@@ -20,6 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector2i.hh"
+
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"

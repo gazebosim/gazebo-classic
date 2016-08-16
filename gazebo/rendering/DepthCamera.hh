@@ -82,11 +82,6 @@ namespace gazebo
 
       /// \brief All things needed to get back z buffer for depth data
       /// \return The z-buffer as a float array
-      /// \deprecated See DepthData()
-      public: virtual const float *GetDepthData() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief All things needed to get back z buffer for depth data
-      /// \return The z-buffer as a float array
       public: virtual const float *DepthData() const;
 
       /// \brief Set the render target, which renders the depth data
