@@ -224,7 +224,7 @@ endif()
 filter_valid_compiler_flags(${WARN_LEVEL}
   -Wextra -Wno-long-long -Wno-unused-value -Wfloat-equal -Wshadow
   -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-				   
+
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
 if (UNIX AND NOT APPLE)
@@ -258,8 +258,7 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS}
-                           ${IGNITION-MSGS_INCLUDE_DIRS})
+include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization

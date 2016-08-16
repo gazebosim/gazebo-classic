@@ -2927,7 +2927,7 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
   _plugins.clear_plugins();
-  _success = true;
+  _success = false;
 
   common::URI pluginUri = _req.data();
   if (!pluginUri.Valid())
