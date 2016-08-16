@@ -396,7 +396,7 @@ void RTControlSynchronizationPlugin::RobotStateOut()
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_DOUBLE);
   msg.set_double_value(0);
-  this->statePub->Publish();
+  this->statePub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
