@@ -51,6 +51,11 @@ void ColladaVisualization::MultipleTextureCoordinates()
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
 
+  std::cout << "TRIANGLE COUNT[" << cam->GetTriangleCount() << "]\n";
+
+  // There should be two triangles.
+  QVERIFY(cam->GetTriangleCount() == 2);
+
   // The triangle should be all white.
   for (unsigned int y = 0; y < height; ++y)
   {
@@ -60,7 +65,7 @@ void ColladaVisualization::MultipleTextureCoordinates()
       int g = data[y*(width*depth) + x+1];
       int b = data[y*(width*depth) + x+2];
 
-      std::cout << "XY[" << x << " " << y << " RGB[" << r << " " << g << " " << b << "]\n";
+      //std::cout << "XY[" << x << " " << y << " RGB[" << r << " " << g << " " << b << "]\n";
       /*QVERIFY(r == 255);
       QVERIFY(g == 255);
       QVERIFY(b == 255);
