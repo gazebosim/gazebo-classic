@@ -43,10 +43,10 @@ void ColladaVisualization::MultipleTextureCoordinates()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  std::cout << "TRIANGLE COUNT[" << cam->GetTriangleCount() << "]\n";
+  std::cout << "TRIANGLE COUNT[" << cam->TriangleCount() << "]\n";
 
   // There should be two triangles.
-  QVERIFY(cam->GetTriangleCount() == 2);
+  QVERIFY(cam->TriangleCount() == 2);
 
   mainWindow->close();
   delete mainWindow;
