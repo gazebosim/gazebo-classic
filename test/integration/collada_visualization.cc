@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "collada_visualization.hh"
@@ -41,29 +42,16 @@ void ColladaVisualization::MultipleTextureCoordinates()
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
 
-  cam->SetCaptureData(true);
-
-  this->ProcessEventsAndDraw(mainWindow);
-
-  // Get camera data
-  const unsigned char *data = cam->ImageData();
-  unsigned int width = cam->ImageWidth();
-  unsigned int height = cam->ImageHeight();
-  unsigned int depth = cam->ImageDepth();
-
-  // The triangle should be all white.
-  for (unsigned int y = 0; y < height; ++y)
+  for (size_t i = 0; i < _repeat; ++i)
   {
-    for (unsigned int x = 0; x < width*depth; x += depth)
-    {
-      int r = data[y*(width*depth) + x];
-      int g = data[y*(width*depth) + x+1];
-      int b = data[y*(width*depth) + x+2];
-      QVERIFY(r == 255);
-      QVERIFY(g == 255);
-      QVERIFY(b == 255);
-    }
+    gazebo::common::Time::MSleep(_ms);
+    QCoreApplication::processEvents();
+    if (mainWindow)
+      mainWindow->repaint();
   }
+
+  // There should be two triangles.
+  QVERIFY(cam->TriangleCount() == 2);
 
   mainWindow->close();
   delete mainWindow;
