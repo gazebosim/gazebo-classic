@@ -1077,7 +1077,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   }
   else if (this->dataPtr->mouseEvent.buttons == common::MouseEvent::RIGHT)
   {
-    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().GetAsEuler();
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
     double pitch = (delta.Y() * 0.01) + rpy.Y();
@@ -1095,7 +1095,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   else if (this->dataPtr->mouseEvent.buttons & common::MouseEvent::LEFT &&
            this->dataPtr->mouseEvent.buttons & common::MouseEvent::RIGHT)
   {
-    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().GetAsEuler();
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
     double roll = (delta.X() * 0.01) + rpy.X();
