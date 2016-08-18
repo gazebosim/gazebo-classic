@@ -20,12 +20,16 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Box.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -70,7 +74,7 @@ namespace gazebo
       public: common::KeyEvent keyEvent;
 
       /// \brief True if the model manipulator is initialized.
-      public: bool initialized;
+      public: bool initialized = false;
 
       /// \brief Scale of the visual attached to the mouse.
       public: ignition::math::Vector3d mouseVisualScale;
@@ -82,7 +86,7 @@ namespace gazebo
       public: ignition::math::Box mouseVisualBbox;
 
       /// \brief True to manipulate model in global frame.
-      public: bool globalManip;
+      public: bool globalManip = false;
 
       /// \brief True when a model is being manipulated, false otherwise.
       public: bool transparent = false;

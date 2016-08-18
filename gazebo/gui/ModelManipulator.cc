@@ -46,9 +46,6 @@ using namespace gui;
 ModelManipulator::ModelManipulator()
   : dataPtr(new ModelManipulatorPrivate)
 {
-  this->dataPtr->manipMode = "";
-  this->dataPtr->globalManip = false;
-  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
