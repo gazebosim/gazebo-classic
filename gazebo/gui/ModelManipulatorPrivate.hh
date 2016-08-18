@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI__MODELMANIPULATORPRIVATE_HH_
-#define GAZEBO_GUI__MODELMANIPULATORPRIVATE_HH_
+#ifndef GAZEBO_GUI_MODELMANIPULATORPRIVATE_HH_
+#define GAZEBO_GUI_MODELMANIPULATORPRIVATE_HH_
 
 #include <string>
 #include <vector>
