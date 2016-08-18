@@ -44,7 +44,7 @@ void ColladaVisualization::MultipleTextureCoordinates()
   this->ProcessEventsAndDraw(mainWindow);
 
   // There should be two triangles.
-  QVERIFY(cam->TriangleCount() == 2);
+  QCOMPARE(cam->TriangleCount(), 2u);
 
   mainWindow->close();
   delete mainWindow;
