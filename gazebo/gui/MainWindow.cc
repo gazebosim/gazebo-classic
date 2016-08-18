@@ -2494,10 +2494,10 @@
       if (parts.back() == "plugin")
       {
         gzwarn << this->dataPtr->pluginMsgs.size();
+        printf("%s\n", "in back");
 
         if (this->dataPtr->pluginMsgs.size() > 0)
         {
-
           // Fill names of world plugins into message
           for (auto iter = this->dataPtr->pluginMsgs.begin();
               iter != this->dataPtr->pluginMsgs.end(); ++iter)
@@ -2513,6 +2513,7 @@
         else
         {
           _success = false;
+          gzwarn << "pluginMsgs in GUI MainWindow still not loaded." << std::endl;
           return;
         }
       }

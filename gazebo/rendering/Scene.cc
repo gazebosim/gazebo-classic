@@ -73,6 +73,8 @@
 #include "gazebo/rendering/ScenePrivate.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/common/URI.hh"
+#include "gazebo/util/IgnMsgSdf.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #ifdef HAVE_OCULUS
 #include "gazebo/rendering/OculusCamera.hh"
@@ -320,7 +322,7 @@ void Scene::Load()
 
   std::string service("visual/server/info");
   if (!this->dataPtr->ignNode.Advertise(service,
-    &Sensor::VisualInfoService, this))
+    &Scene::VisualInfoService, this))
   {
   gzerr << "Error advertising service [" << service << "]"
       << std::endl;
@@ -3622,61 +3624,189 @@ void Scene::ToggleLayer(const int32_t _layer)
   }
 }
 
+//////////////////////////////////////////////////
+void Scene::VisualInfoService(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::Visual_V &_visuals, bool &_success)
+{
+  gzerr << "salomeCLUB" << _success;
+  this->VisualInfo(_req.data(), _visuals, _success);
+}
 
-  //////////////////////////////////////////////////
-  void Link::VisualInfoService(const ignition::msgs::StringMsg &_req,
-      ignition::msgs::Visual_V &_visuals, bool &_success)
-  {/*
-    gzerr << "salome" << _success;
-    this->VisualsInfo(_req.data(), _visuals, _success);*/
+//////////////////////////////////////////////////
+void Scene::VisualInfo(const common::URI & _visualUri,
+    ignition::msgs::Visual_V &_visuals, bool &_success)
+{/*
+  _visuals.clear_visuals();
+  _success = true;
+
+  printf("%s\n", "BIER BITTE!!!");
+
+  if (!_visualUri.Valid())
+  {
+    gzwarn << "URI [" << _visualUri.Str() << "] is not valid." << std::endl;
+    return;
   }
 
-  //////////////////////////////////////////////////
-  void Link::VisualInfo(const common::URI &_visualUri,
-      ignition::msgs::Visual_V &_visual, bool &_success)
-  {/*
-    _visuals.clear_visuals();
-    _success = true;
+  auto parts = common::split(_visualUri.Path().Str(), "/");
+  
+  gzwarn << _visualUri.Str();
+  gzwarn << parts.size();
 
-    if (!_visualUri.Valid())
+  for (unsigned int i = 0; i < parts.size(); i = i+2)
+  {
+    gzwarn << parts[i].c_str();
+
+    // See if there is a visual
+    if (parts[i] == "visual")
     {
-      gzwarn << "URI [" << _visualUri.Str() << "] is not valid." << std::endl;
+      auto visual = this->GetVisual(parts[i+1]);
+
+      if (!visual)
+      {
+        gzwarn << "Visual [" << parts[i+1] << "] not found" //in world [" <<
+            //this->GetName() << "]" 
+        << std::endl;
+        return;
+      }
+
+      // Create URI for fetched visual
+      common::URI visualUri;
+      visualUri.SetScheme("data");
+      visualUri.Path().PushBack(visual->ScopedName());
+
+      auto myParts = common::split(visualUri.Path().Str(), "/");
+
+      // Check if all segments match up to this visuals scopedName,
+      // e.g. world/<this_name>/model/<model_name>/link/<link_name>
+      // for nested models e.g. world/<this_name>/model/<model_name>
+      // /model/<model_name>/link/<link_name>
+      for (size_t j = myParts.size() - 1; j >= 0; --j)
+      {
+        if (parts[i] != myParts[i])
+        {
+          gzwarn << "Visual [" << _visualUri.Str() << "] does not match visual [" <<
+              visualUri.Str() << "]" << std::endl;
+          return;
+        }
+      }
+
+      // Add properties
+      auto visualMsg = _visuals.add_visuals();
+      //visualMsg->set_name(visual->Name());
+      //visualMsg->set_parent(visual->ParentName());
+      visualMsg->set_transparency(visual->GetTransparency());
+
+      _success = true;
       return;
     }
-
-    auto parts = common::split(_visualUri.Path().Str(), "/");
-    auto myParts = common::split(this->URI().Path().Str(), "/");
-  
-    // Visual URI should be longer than link URI
-    if (myParts.size() >= parts.size())
+    else
     {
-      gzwarn << "Visual [" << _visualUri.Str() << "] does not match world [" <<
+      gzwarn << "Segment [" << parts[i] << "] in [" << _visualUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
+  }
+
+  gzwarn << "Couldn't get information for plugin [" << _visualUri.Str() << "]"
+      << std::endl;
+}
+
+//////////////////////////////////////////////////
+void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  gzerr << "salome" << _success;
+  this->PluginInfo(_req.data(), _plugins, _success);
+}
+
+//////////////////////////////////////////////////
+void World::PluginInfo(const common::URI &_pluginUri,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  _plugins.clear_plugins();
+  _success = true;
+
+
+  if (!_pluginUri.Valid())
+  {
+    gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
+    return;
+  }
+
+  auto parts = common::split(_visualUri.Path().Str(), "/");
+  
+  gzwarn << _visualUri.Str();
+  gzwarn << parts.size();
+
+  for (unsigned int i = 0; i < parts.size(); i = i+2)
+  {
+    gzwarn << parts[i].c_str();
+
+    // See if there is a plugin
+    if (parts[i] == "plugin")
+    {
+      printf("%s\n", parts[i-1].c_str());
+      // Get plugin visual to verify the URI
+      auto visual = this->GetVisual(parts[i-1]);
+
+      if (!visual)
+      {
+        gzwarn << "Visual [" << parts[i+1] << "] for plugin [" << parts[i-1] << 
+        "] not found" << std::endl;
+        return;
+      }
+111
+      // Create URI for fetched visual
+      common::URI visualUri;
+      visualUri.SetScheme("data");
+      visualUri.Path().PushBack(visual->ScopedName());
+
+      auto myParts = common::split(visualUri.Path().Str(), "/");
+
+      // Check if all segments match up to this visuals scopedName,
+      // e.g. world/<this_name>/model/<model_name>/link/<link_name>
+      // for nested models e.g. world/<this_name>/model/<model_name>
+      // /model/<model_name>/link/<link_name>
+      for (size_t j = myParts.size() - 1; j >= 0; --j)
+      {
+        if (parts[i] != myParts[i])
+        { 1
+          gzwarn << "Visual [" << _visualUri.Str() << "] does not match visual [" <<
+              visualUri.Str() << "]" << std::endl;
+          return;
+        }
+      }
+
+  // Plugin URI should be longer than world URI
+  if (myParts.size() >= parts.size())
+  {
+    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
+        this->URI().Str() << "]" << std::endl;
+    return;
+  }
+
+  // Check if all segments match up to this world
+  size_t i = 0;
+  for ( ; i < myParts.size(); ++i)
+  {
+    if (parts[i] != myParts[i])
+    {
+      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
           this->URI().Str() << "]" << std::endl;
       return;
     }
+  }
 
-    // Check if all segments match up to this link
-    size_t i = 0;
-    for ( ; i < myParts.size(); ++i)
-    {
-      if (parts[i] != myParts[i])
-      {
-        gzwarn << "Visual [" << _visualUri.Str() << "] does not match link [" <<
-            this->URI().Str() << "]" << std::endl;
-        return;
-      }
-    }
-  
   for (; i < parts.size(); i = i+2)
   {
-    if (parts[i] == "visual")
+    // See if there is a model
+    if (parts[i] == "model")
     {
-      // Look in nested visuals
-      auto Visual = this->NestedVisual(parts[i+1]);
+      auto model = this->GetModel(parts[i+1]);
 
       if (!model)
       {
-        gzwarn << "Model [" << parts[i+1] << "] not found in model [" <<
+        gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
             this->GetName() << "]" << std::endl;
         return;
       }
@@ -3684,69 +3814,76 @@ void Scene::ToggleLayer(const int32_t _layer)
       model->PluginInfo(_pluginUri, _plugins, _success);
       return;
     }
-    // Look for plugin
-    else if (parts[i] == "plugin")
+
+    gzwarn << "bef back";
+    // TODO: Handle world plugins
+    // No specific plugin -> display plugin names in GUI
+    if (parts.back() == "plugin")
     {
-      // Return empty vector
-      if (!this->sdf->HasElement("plugin"))
+      gzwarn << "aft back";
+      // Fill names of world plugins into message
+      for (auto iter = this->dataPtr->plugins.begin();
+        iter != this->dataPtr->plugins.end(); ++iter)
       {
-        _success = true;
-        return;
+        ignition::msgs::Plugin *pluginMsg = _plugins.add_plugins();
+        pluginMsg->set_name((*iter)->GetHandle());
+        pluginMsg->set_filename((*iter)->GetFilename());
       }
-
-      // Look for plugin
-      if (_sensorUri.Str().find("sensor"))
-      {
-        // Return empty vector
-        if (!this->sdf->HasElement("sensor"))
-        {
-          _success = true;
-          return;
-        }
-
-        // Find correct plugin
-        sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-        while (pluginElem)
-        {
-          auto pluginName = pluginElem->Get<std::string>("name");
-
-          // If asking for a specific plugin, skip all other plugins
-          if (i+1 < parts.size() && parts[i+1] != pluginName) 
-          {
-            pluginElem = pluginElem->GetNextElement("plugin");
-            continue;
-          }
-
-          if (_pluginUri.Str().find(pluginName) != std::string::npos)
-          {
-          // Get plugin info from SDF
-          auto pluginMsg = _plugins.add_plugins();
-          pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
-
-          pluginElem = pluginElem->GetNextElement("plugin");
-        }
-      }
-  
-        // If asking for a specific plugin and it wasn't found
-        if (i+1 < parts.size() && _plugins.plugins_size() == 0)
-        {
-          gzwarn << "Plugin [" << parts[i+1] << "] not found in world [" <<
-              this->URI().Str() << "]" << std::endl;
-          _success = false;
-          return;
-        }
-  
-        _success = true;
-        return;
-      }
-      else
-      {
-        gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
-           "] cannot be handled." << std::endl;
-        return;
-      }
+      
+      _success = true;
+      return;
     }
 
-    gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
-        << std::endl;*/
+    gzwarn << "plugins world starts";
+    // Look for plugin
+    if (parts[i] == "plugin")
+    {
+      // Return empty vector
+      if (!this->dataPtr->sdf->HasElement("plugin"))
+      {
+        _success = true;
+        return;
+      }
+
+      // Find correct plugin
+      sdf::ElementPtr pluginElem = this->dataPtr->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        auto pluginName = pluginElem->Get<std::string>("name");
+
+        // If asking for a specific plugin, skip all other plugins
+        if (i+1 < parts.size() && parts[i+1] != pluginName)
+        {
+          pluginElem = pluginElem->GetNextElement("plugin");
+          continue;
+        }
+
+        // Get plugin info from SDF
+        auto pluginMsg = _plugins.add_plugins();
+        pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
+
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+
+      // If asking for a specific plugin and it wasn't found
+      if (i+1 < parts.size() && _plugins.plugins_size() == 0)
+      {
+        gzwarn << "Plugin [" << parts[i+1] << "] not found in world [" <<
+            this->URI().Str() << "]" << std::endl;
+        _success = false;
+        return;
+      }
+      _success = true;
+      return;
+    }
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
   }
+
+  gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+      << std::endl;*/
+}

@@ -26,8 +26,9 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/sensor_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
- #include <ignition/msgs.hh>
+#include <ignition/transport.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -215,7 +216,7 @@ namespace gazebo
       /// \param[out] _sensors Message containing vector of sensors.
       /// \param[out] _success True if the info was successfully obtained.
       /// \sa SensorInfo
-      private: void SensorInfoService(const ignition::msgs::StringMsg &_request,
+      private: void SensorInfoService(const ignition::msgs::StringMsg &_req,
           ignition::msgs::Sensor_V &_sensors, bool &_success);
 
       /// \cond
@@ -352,6 +353,9 @@ namespace gazebo
 
       /// \brief Connect to the remove sensor event.
       private: event::ConnectionPtr removeSensorConnection;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
     };
     /// \}
   }

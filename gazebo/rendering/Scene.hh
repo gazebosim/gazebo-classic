@@ -29,6 +29,8 @@
 
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
@@ -40,6 +42,11 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 #include "gazebo/common/URI.hh"
+
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/visual_v.pb.h>
+#include <ignition/transport/Node.hh>
+#include <ignition/msgs/stringmsg.pb.h>
 
 namespace SkyX
 {
@@ -611,7 +618,7 @@ namespace gazebo
       /// \return True if clouds are displayed.
       /// \deprecated See ShowClouds()
       public: bool GetShowClouds() const GAZEBO_DEPRECATED(7.0);
-
+/*
       /// \brief Get plugins in this world or one of its
       /// children, according to the given _pluginUri. Some _pluginUri examples:
       ///
@@ -630,7 +637,7 @@ namespace gazebo
       /// \sa PluginInfoService
       public: void PluginInfo(const common::URI &_pluginUri,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
-
+*/
       /// \brief Get visual properties acording to
       /// the given _visualUri. Some _visualUri examples:
       ///
@@ -856,7 +863,7 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
           VisualPtr _linkVisual);
-
+/*
       /// \brief Callback for "<this_name>/server/info/plugin" service.
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
@@ -864,7 +871,7 @@ namespace gazebo
       /// \sa PluginInfo
       private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
-
+*/
       /// \brief Callback for "<this_name>/server/info" service.
       /// \param[in] _request Request containing visual URI.
       /// \param[out] _visuals Message containing vector of visuals.

@@ -323,7 +323,8 @@
       else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
         && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
       {
-        std::string service("sensor/server/info");
+        printf("%s\n", "SAUSE BRAUSE  ");
+        std::string service("sensor/server/info/pluginnew");
         ignition::msgs::StringMsg req;
         req.set_data(this->dataPtr->selectedEntityName);
 
@@ -366,7 +367,7 @@
         ignition::msgs::StringMsg req;
 
         this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnPluginInfo, this);
+           &ModelListWidget::OnVisualInfo, this);
       }
     }
     else if (this->dataPtr->modelTreeWidget->currentItem())
@@ -402,6 +403,12 @@
         this->FillPropertyTree(this->dataPtr->jointMsg, nullptr);
       else if (this->dataPtr->fillTypes[0] == "Plugin")
         this->FillPropertyTree(this->dataPtr->pluginMsg, nullptr);
+      else if (this->dataPtr->fillTypes[0] == "Visual")
+      {
+      qDebug() << "up";
+      this->FillPropertyTree(this->dataPtr->visualMsg, nullptr);
+      qDebug() << "up2";
+      }
       else if (this->dataPtr->fillTypes[0] == "Scene")
         this->FillPropertyTree(this->dataPtr->sceneMsg, nullptr);
       else if (this->dataPtr->fillTypes[0] == "Physics")
@@ -3816,22 +3823,26 @@
   }
 
   /////////////////////////////////////////////////
-  void ModelListWidget::OnVisualInfo(const ignition::msgs::Plugin_V &_plugins,
+  void ModelListWidget::OnVisualInfo(const ignition::msgs::Visual_V &_visuals,
       const bool _success)
-  {/*
+  {
     if (!_success)
     {
-      gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
+      gzerr << "Failed to receive visual info. Check server logs." << std::endl;
       return;
     }
 
+    printf("%d\n", _visuals.visuals().size());
+
     // We asked for only one plugin
-    GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+    GZ_ASSERT(_visuals.visuals().size() == 1, "Wrong number of visuals");
 
     this->dataPtr->propMutex->lock();
-    this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
-    this->dataPtr->fillTypes.push_back("Plugin");
-    this->dataPtr->propMutex->unlock();*/
+    this->dataPtr->visualMsg.CopyFrom(_visuals.visuals(0));
+    this->dataPtr->fillTypes.push_back("Visual");
+    this->dataPtr->propMutex->unlock();
+    printf("%s\n", "YESSSSSSSSSSSSSSSSSSSSSSSSS");
+
   }
 
   /////////////////////////////////////////////////

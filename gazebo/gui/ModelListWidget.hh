@@ -25,6 +25,7 @@
 
 #include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
+ #include <ignition/msgs/visual_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/msgs/msgs.hh"
@@ -247,7 +248,7 @@ namespace gazebo
       /// \brief Callback when visual info is received.
       /// \param[in] _plugins Vector of visuals.
       /// \param[in] _success True if the info was successfully received.
-      private: void OnVisualInfo(const ignition::msgs::Plugin_V &_plugins,
+      private: void OnVisualInfo(const ignition::msgs::Visual_V &_visuals,
           const bool _success);
 
       /// \brief Callback when GUI plugin list is received.

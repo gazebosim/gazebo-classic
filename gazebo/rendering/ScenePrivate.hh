@@ -33,6 +33,11 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/visual_v.pb.h>
+#include <ignition/transport/Node.hh>
+#include <ignition/msgs/stringmsg.pb.h>
+
 namespace SkyX
 {
   class SkyX;
@@ -339,6 +344,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
     };
   }
 }

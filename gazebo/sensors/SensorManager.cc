@@ -55,14 +55,6 @@ SensorManager::SensorManager()
 
   // sensors::OTHER container
   this->sensorContainers.push_back(new SensorContainer());
-
-  std::string service("sensor/server/info/plugin");
-  if (!this->dataPtr->ignNode.Advertise(service,
-      &Sensor::PluginInfoService, this))
-  {
-    gzerr << "Error advertising service [" << service << "]"
-    << std::endl;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -232,6 +224,23 @@ void SensorManager::Init()
         std::placeholders::_3, std::placeholders::_4));
 
   this->initialized = true;
+
+  printf("%s\n", "BALEA");
+  std::string service("sensor/server/info/pluginnew");
+  if (!this->ignNode.Advertise(service,
+      &SensorManager::SensorInfoService, this))
+  {
+    gzerr << "Error advertising service [" << service << "]"
+    << std::endl;
+  }
+
+  std::string Pluginservice("sensor/server/info/plugin");
+  if (!this->ignNode.Advertise(service,
+      &SensorManager::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << service << "]"
+    << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -779,19 +788,19 @@ void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
       ++iter;
   }
 }
-/*
+
   //////////////////////////////////////////////////
   void SensorManager::PluginInfoService(const ignition::msgs::StringMsg &_req,
       ignition::msgs::Plugin_V &_plugins, bool &_success)
   {
-    gzerr << "salome" << _success;
+    gzerr << "HACKA";
     this->PluginInfo(_req.data(), _plugins, _success);
   }
 
   //////////////////////////////////////////////////
   void SensorManager::PluginInfo(const common::URI &_pluginUri,
       ignition::msgs::Plugin_V &_plugins, bool &_success)
-  {
+  {/*
     _plugins.clear_plugins();
     _success = true;
 
@@ -895,24 +904,26 @@ void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
     }
 
     gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
-        << std::endl;
+        << std::endl;*/
   }
-*/
+
 
 //////////////////////////////////////////////////
-void Link::SensorInfoService(const ignition::msgs::StringMsg &_req,
-    ignition::msgs::Plugin_V &_plugins, bool &_success)
+void SensorManager::SensorInfoService(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::Sensor_V &_sensors, bool &_success)
 {
-  gzerr << "salome" << _success;
+  gzerr << "salomeCLUB" << _success;
   this->SensorInfo(_req.data(), _sensors, _success);
 }
 
 //////////////////////////////////////////////////
-void Link::SensorInfo(const common::URI &_sensorUri,
+void SensorManager::SensorInfo(const common::URI &_sensorUri,
     ignition::msgs::Sensor_V &_sensors, bool &_success)
 {
-  _sensors.clear_plugins();
+  _sensors.clear_sensors();
   _success = true;
+
+  printf("%s\n", "BIER BITTE!!!");
 
   if (!_sensorUri.Valid())
   {
@@ -922,7 +933,7 @@ void Link::SensorInfo(const common::URI &_sensorUri,
 
   auto parts = common::split(_sensorUri.Path().Str(), "/");
   
-  for (size_t i = 0; i < parts.size(); i = i+2)
+  for (unsigned int i = 0; i < parts.size(); i = i+2)
   {
     // See if there is a sensor
     if (parts[i] == "sensor")
@@ -948,7 +959,7 @@ void Link::SensorInfo(const common::URI &_sensorUri,
       // e.g. world/<this_name>/model/<model_name>/link/<link_name>
       // for nested models e.g. world/<this_name>/model/<model_name>
       // /model/<model_name>/link/<link_name>
-      for (size_t j = myParts.size() - 1; j >= 0; --j)
+      for (unsigned int j = myParts.size() - 1; j >= 0; --j)
       {
         if (parts[i] != myParts[i])
         {
@@ -960,26 +971,26 @@ void Link::SensorInfo(const common::URI &_sensorUri,
 
       // Add properties
       auto sensorMsg = _sensors.add_sensors();
-      sensorMsg.set_name(sensor->Name());
-      sensorMsg.set_parent(sensor->ParentName());
-      sensorMsg.set_type(sensor->Type());
-      sensorMsg.set_always_on();
-      sensorMsg.set_update_rate(sensor->UpdateRate());
-      sensorMsg.set_visualize(sensor->Visualize());
-      sensorMsg.set_topic(sensor->Topic());
-      sensorMsg.set_pose(sensor->Pose());
+      sensorMsg->set_name(sensor->Name());
+      sensorMsg->set_parent(sensor->ParentName());
+      sensorMsg->set_type(sensor->Type());
+      //sensorMsg->set_always_on();
+      sensorMsg->set_update_rate(sensor->UpdateRate());
+      sensorMsg->set_visualize(sensor->Visualize());
+      sensorMsg->set_topic(sensor->Topic());
+      //sensorMsg->set_pose(sensor->Pose());
 
       _success = true;
       return;
     }
     else
     {
-      gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
+      gzwarn << "Segment [" << parts[i] << "] in [" << _sensorUri.Str() <<
          "] cannot be handled." << std::endl;
       return;
     }
   }
 
-  gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+  gzwarn << "Couldn't get information for plugin [" << _sensorUri.Str() << "]"
       << std::endl;
 }
