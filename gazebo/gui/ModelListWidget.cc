@@ -381,6 +381,8 @@
   {
     if (this->dataPtr->guiInfoRequested == false)
     {
+      printf("%s\n", "Karotte");
+      gzwarn << "Karotte";
       std::string service("gui/server/info/plugin");
       ignition::msgs::StringMsg req;
       req.set_data("data://gui/plugin/");
@@ -388,6 +390,7 @@
       this->dataPtr->ignNode.Request(service, req,
           &ModelListWidget::OnGUIPluginList, this);
     }
+    printf("%s\n", "Bombe");
 
     if (!this->dataPtr->fillTypes.empty())
     {

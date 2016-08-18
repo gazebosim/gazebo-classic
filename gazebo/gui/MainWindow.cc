@@ -368,6 +368,8 @@
     this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
     this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
+    printf("%s\n", "BLOBARINA");
+    gzwarn << "BLOBARINA";
     std::string service("gui/server/info/plugin");
     if (!this->dataPtr->ignNode.Advertise(service,
         &MainWindow::PluginInfoService, this))
@@ -2448,7 +2450,7 @@
   void MainWindow::PluginInfoService(const ignition::msgs::StringMsg &_req,
       ignition::msgs::Plugin_V &_plugins, bool &_success)
   {
-    gzerr << "salome" << _success;
+    gzerr << "salomeLUUB" << _success;
     this->PluginInfo(_req.data(), _plugins, _success);
   }
 
