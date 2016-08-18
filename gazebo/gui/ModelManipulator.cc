@@ -1061,7 +1061,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   // Rotate the visual using the middle mouse button
   if (this->dataPtr->mouseEvent.buttons == common::MouseEvent::MIDDLE)
   {
-    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().GetAsEuler();
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
     double yaw = (delta.X() * 0.01) + rpy.Z();
