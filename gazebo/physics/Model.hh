@@ -180,7 +180,7 @@ namespace gazebo
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
