@@ -55,9 +55,7 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
   EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), 0.0, 1e-3);
 
-  // Prepare harness publishers
-  auto detachPub =
-    this->node->Advertise<msgs::GzString>("~/box/harness/detach");
+  // Prepare harness publisher
   auto velocityPub =
     this->node->Advertise<msgs::GzString>("~/box/harness/velocity");
   msgs::GzString msg;
