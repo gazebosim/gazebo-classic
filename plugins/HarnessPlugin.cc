@@ -64,31 +64,16 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   while (jointElem)
   {
     std::string jointName = jointElem->Get<std::string>("name");
-    std::string jointType = jointElem->Get<std::string>("type");
-
-    // Create the joint
-    physics::JointPtr joint = world->GetPhysicsEngine()->CreateJoint(jointType);
-    if (joint)
+    try
     {
-      // Load the joint
-      try
-      {
-        joint->SetModel(_model);
-        joint->SetWorld(world);
-
-        joint->Load(jointElem);
-        this->joints.push_back(joint);
-      }
-      catch(gazebo::common::Exception &_e)
-      {
-        gzerr << "Unable to load joint[" << jointName << "]. "
-              << _e.GetErrorStr()
-              << std::endl;
-      }
+      auto joint = _model->CreateJoint(jointElem);
+      this->joints.push_back(joint);
     }
-    else
+    catch(gazebo::common::Exception &_e)
     {
-      gzerr << "Unable to create joint[" << jointName << "\n";
+      gzerr << "Unable to load joint[" << jointName << "]. "
+            << _e.GetErrorStr()
+            << std::endl;
     }
 
     jointElem = jointElem->GetNextElement("joint");
