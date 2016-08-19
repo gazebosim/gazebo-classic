@@ -30,12 +30,12 @@ void StateIn(ConstAnyPtr &_msg)
   state = _msg->double_value();
 
   // do some calculations
-
+  usleep(500);
 
   // publish new command
   gazebo::msgs::Any msg;
   msg.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
-  msg.set_double_value(10.);
+  msg.set_double_value(_msg->double_value());
   controlPub->Publish(msg);
 }
 

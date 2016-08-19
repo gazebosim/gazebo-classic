@@ -58,16 +58,15 @@ class gazebo::RTControlSynchronizationPluginPrivate
   public: Command lastCommand;
 
   /// \brief enforce delay policy
-  public: void EnforceSynchronizationDelay(const common::Time &_curTime,
-    int _controllerPeriod)
+  public: void EnforceSynchronizationDelay(const common::Time &_simTime,
+    const common::Time &_realTime, double _controllerPeriod)
   {
-    if (_controllerPeriod != 0)
+    if (_controllerPeriod >= 0.0)
     {
-      common::Time curWallTime = common::Time::GetWallTime();
       // on initial entry, this->delayWindowStartTime = 0 sim time
-      if (curWallTime >= this->delayWindowStartTime + this->delayWindowSize)
+      if (_realTime >= this->delayWindowStartTime + this->delayWindowSize)
       {
-        this->delayWindowStartTime = curWallTime;
+        this->delayWindowStartTime = _realTime;
         this->delayInWindow = common::Time(0.0);
       }
 
@@ -92,20 +91,22 @@ class gazebo::RTControlSynchronizationPluginPrivate
           std::unique_lock<std::mutex> lock(this->mutex);
 
           // compute sim time age of last received command
-          double age = _curTime.Double() - this->lastCommand.timestamp.Double();
+          double age = _simTime.Double() - this->lastCommand.timestamp.Double();
 
-          printf("age %f sec sim time. lastCommand stamp %f sec."
-                 "timeout %f sec\n", age,
-                this->lastCommand.timestamp.Double(), 0.001*_controllerPeriod);
-          fflush(stdout);
+          // printf("age %f sec sim time. lastCommand stamp %f sec."
+          //        "timeout %f s\n", age,
+          //         this->lastCommand.timestamp.Double(),
+          //        _controllerPeriod);
+          // fflush(stdout);
 
           // if age is small enough, skip, otherwise, wait finite amount
           // for command messages to catchup.
-          if (age <= 0.001 * _controllerPeriod)
+          if (age < _controllerPeriod || math::equal(age, _controllerPeriod))
             break;
 
+          gzdbg << "--------------- delay calc ---------------\n";
           gzdbg << "age[" << age << "] > controllerPeriod["
-                << 0.001*_controllerPeriod << "]\n";
+                << _controllerPeriod << " s]\n";
 
           // calculate amount of time to wait based on rules
           // std::chrono::time_point<std::chrono::high_resolution_clock,
@@ -122,7 +123,7 @@ class gazebo::RTControlSynchronizationPluginPrivate
           std::chrono::time_point<std::chrono::system_clock> timeout =
             now + delay;
 
-          gzdbg << "delayUsInt: " << delayUsInt << "\n";
+          gzdbg << "    delayUsInt: " << delayUsInt << "\n";
           // gzdbg << "timeout: " << delayUsInt << "\n";
 
           // common::Time tmp(std::detail::get_timespec(timeout));
@@ -136,16 +137,15 @@ class gazebo::RTControlSynchronizationPluginPrivate
           long int nowNano =
             std::chrono::time_point_cast<std::chrono::nanoseconds>(
                    now).time_since_epoch().count();
-          gzdbg << "time_since_epoc nanoseconds: now: "
+          gzdbg << "    time_since_epoc nanoseconds: now: "
                 << nowNano << "\n";
           timespec tv;
           tv.tv_nsec  = static_cast<int>(nowNano % 1000000000);
           tv.tv_sec = static_cast<int>((nowNano-tv.tv_nsec)/1000000000);
           common::Time delayTime(tv);
-          gzdbg << "time_since_epoc sec: now: "
+          gzdbg << "    time_since_epoc sec: now: "
                 << delayTime.Double() << "\n";
 
-          gzdbg << "--------------- wait_until ---------------\n";
           if (this->delayCondition.wait_until(lock, timeout) !=
               std::cv_status::timeout)
           {
@@ -153,19 +153,25 @@ class gazebo::RTControlSynchronizationPluginPrivate
             if ((this->delayInWindow >= this->delayMaxPerWindow) ||
                 (delayInStepSum >= this->delayMaxPerStep))
             {
-              gzdbg << "controller synchronization: "
-                    << "phew, got command in time, but budget exhausted,"
-                    << " simulation stops waiting for incoming command.\n";
+              gzwarn << "    controller synchronization: "
+                    << "got command in time, but budget exhausted."
+                    << " step budget[" << this->delayInWindow.Double()
+                    << " / " <<  this->delayMaxPerWindow.Double()
+                    << " s], window budget[" << delayInStepSum.Double()
+                    << " / " << this->delayMaxPerStep.Double()
+                    << " s].\n";
             }
-            // else
+
             {
-              gzdbg << "controller synchronization: "
-                    << "got message within specified duration window,"
-                    << " all good.\n";
+              gzdbg << "    controller synchronization: "
+                    << "got message within specified duration for step["
+                    << delayTime.Double()
+                    << " / " << this->delayMaxPerStep.Double()
+                    << " s] all good.\n";
             }
 
             // printf("sim %f timed out with %f delayed %f\n",
-            //       _curTime.Double()*1000,
+            //       _simTime.Double()*1000,
             //       this->command.header.stamp.toSec()*1000,
             //       delayTime.Double()*1000);
             // fflush(stdout);
@@ -173,7 +179,7 @@ class gazebo::RTControlSynchronizationPluginPrivate
           else
           {
             delayTime = common::Time::GetWallTime() - delayTime;
-            gzwarn << "controller synchronization timeout: "
+            gzwarn << "    controller synchronization timeout: "
                    << "waited full duration budget [" << delayTime.Double()
                    << "] but timed_wait returned true.\n";
             if (delayTime >= this->delayMaxPerStep)
@@ -183,7 +189,7 @@ class gazebo::RTControlSynchronizationPluginPrivate
             {
             }
             // printf("nsim %f otified with %f delayed %f\n",
-            //       _curTime.Double()*1000,
+            //       _simTime.Double()*1000,
             //       this->command.header.stamp.toSec()*1000,
             //       delayTime.Double()*1000);
             // fflush(stdout);
@@ -192,9 +198,12 @@ class gazebo::RTControlSynchronizationPluginPrivate
           delayInStepSum += delayTime;
           this->delayInWindow += delayTime;
 
-          printf("finished wait step delay(%f) window delay(%f)\n",
-            delayInStepSum.Double(),
-            this->delayInWindow.Double());
+          gzdbg << "    finished wait. step delay total["
+                << delayInStepSum.Double() << "] window delay total["
+                << this->delayInWindow.Double() << "].\n";
+          // printf("    finished wait step delay(%f) window delay(%f)\n",
+          //   delayInStepSum.Double(),
+          //   this->delayInWindow.Double());
 
           // printf(" after (%f, %f)\n",
           //   delayInStepSum.Double(),
@@ -211,14 +220,14 @@ class gazebo::RTControlSynchronizationPluginPrivate
       this->delayStatistics.delay_in_window = this->delayInWindow.Double();
       this->delayStatistics.delay_window_remain =
         ((this->delayWindowStartTime + this->delayWindowSize) -
-         curWallTime).Double();
+         _realTime).Double();
       this->pubDelayStatisticsQueue->push(
         this->delayStatistics, this->pubDelayStatistics);
       */
     }
   }
 
-  public: void PublishConstrollerStatistics(const common::Time &_curTime)
+  public: void PublishConstrollerStatistics(const common::Time &/*_curTime*/)
   {
     /*
     /// publish controller statistics diagnostics, damages, etc.
@@ -320,6 +329,9 @@ RTControlSynchronizationPlugin::RTControlSynchronizationPlugin()
 
   // timestamp of the last command received
   this->dataPtr->lastCommand.timestamp = common::Time(0.0);
+
+  // timestamp of the world step update
+  this->dataPtr->lastUpdateTime = common::Time(0.0);
 }
 
 /////////////////////////////////////////////////
@@ -346,7 +358,7 @@ void RTControlSynchronizationPlugin::Load(physics::ModelPtr _model,
     {
       gzwarn << "<expected_controller_update_rate> is zero, not enforcing"
              << " synchronization.\n";
-      this->controllerPeriod = 0.0;
+      this->controllerPeriod = -1.0;
     }
     else
     {
@@ -356,11 +368,12 @@ void RTControlSynchronizationPlugin::Load(physics::ModelPtr _model,
   else
   {
     gzwarn << "<expected_controller_update_rate> is not set.\n";
-    double physicsUpdatePeriod = _model->PhysicsEngine()->GetUpdatePeriod();
+    double physicsUpdatePeriod =
+      _model->GetWorld()->GetPhysicsEngine()->GetUpdatePeriod();
     if (math::equal(physicsUpdatePeriod, 0.0))
     {
       this->controllerHz = 0.0;
-      this->controllerPeriod = 0.0;
+      this->controllerPeriod = -1.0;
       gzwarn << " ... and physics update period is zero, not enforcing"
              << " synchronization.\n";
     }
@@ -448,22 +461,30 @@ void RTControlSynchronizationPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
   // std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
-  double dt = (curTime - this->dataPtr->lastUpdateTime).Double();
-  this->dataPtr->lastUpdateTime = curTime;
+  gazebo::common::Time simTime = _info.simTime;
+  double dt = (simTime - this->dataPtr->lastUpdateTime).Double();
+  this->dataPtr->lastUpdateTime = simTime;
 
   // Update the control surfaces and publish the new state.
   if (dt > 0.0)
   {
-    gzdbg << "t[" << curTime.Double() << "]: RobotStateOut\n";
+    gzdbg << "------------------------\n";
+    gzdbg << "t[" << simTime.Double() << "]\n";
+
+    gzdbg << "*RobotStateOut\n";
     this->RobotStateOut();
-    gzdbg << "EnforceSynchronizationDelay(" << curTime.Double() << ", "
-          << this->controllerPeriod << " ms)\n";
-    this->dataPtr->EnforceSynchronizationDelay(curTime, this->controllerPeriod);
-    gzdbg << "ApplyRobotCommandToSim\n";
+
+    gzdbg << "*EnforceSynchronizationDelay(" << simTime.Double() << ", "
+          << ", " << _info.realTime.Double() << ", "
+          << this->controllerPeriod << " s)\n";
+    this->dataPtr->EnforceSynchronizationDelay(simTime,
+     _info.realTime, this->controllerPeriod);
+
+    gzdbg << "*ApplyRobotCommandToSim\n";
     this->ApplyRobotCommandToSim(dt);
-    gzdbg << "Publish stats\n";
-    this->dataPtr->PublishConstrollerStatistics(curTime);
+
+    gzdbg << "*Publish stats\n";
+    this->dataPtr->PublishConstrollerStatistics(simTime);
   }
 }
 
@@ -472,12 +493,13 @@ void RTControlSynchronizationPlugin::RobotStateOut()
 {
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_DOUBLE);
-  msg.set_double_value(0);
+  msg.set_double_value(this->dataPtr->model->GetWorld()->GetSimTime().Double());
   this->statePub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
-void RTControlSynchronizationPlugin::ApplyRobotCommandToSim(const double _dt)
+void RTControlSynchronizationPlugin::ApplyRobotCommandToSim(
+  const double /*_dt*/)
 {
 }
 
@@ -493,7 +515,8 @@ void RTControlSynchronizationPlugin::RobotCommandIn(ConstAnyPtr &_msg)
 
   /// \TODO require that the incoming control command has a timestamp
   this->dataPtr->lastCommand.timestamp =
-    this->dataPtr->model->GetWorld()->GetSimTime();
+    _msg->double_value();
+    // this->dataPtr->model->GetWorld()->GetSimTime();
 
   // tic simulation
   this->dataPtr->delayCondition.notify_all();
