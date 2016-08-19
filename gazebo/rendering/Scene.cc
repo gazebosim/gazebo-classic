@@ -76,6 +76,8 @@
 #include "gazebo/util/IgnMsgSdf.hh"
 #include "gazebo/common/CommonIface.hh"
 
+//#include "gazebo/gui/GuiIface.hh"
+
 #ifdef HAVE_OCULUS
 #include "gazebo/rendering/OculusCamera.hh"
 #endif
@@ -3633,84 +3635,54 @@ void Scene::VisualInfoService(const ignition::msgs::StringMsg &_req,
 }
 
 //////////////////////////////////////////////////
-void Scene::VisualInfo(const common::URI & _visualUri,
+void Scene::VisualInfo(const std::string _visualName,
     ignition::msgs::Visual_V &_visuals, bool &_success)
-{/*
+{
   _visuals.clear_visuals();
   _success = true;
 
   printf("%s\n", "BIER BITTE!!!");
 
-  if (!_visualUri.Valid())
+  if (_visualName.empty())
   {
-    gzwarn << "URI [" << _visualUri.Str() << "] is not valid." << std::endl;
+    gzwarn << "visual name [" << _visualName << "] is empty." << std::endl;
     return;
   }
 
-  auto parts = common::split(_visualUri.Path().Str(), "/");
-  
-  gzwarn << _visualUri.Str();
-  gzwarn << parts.size();
-
-  for (unsigned int i = 0; i < parts.size(); i = i+2)
+  // See if there is a visual
+  if (_visualName.find("visual/") != std::string::npos)
   {
-    gzwarn << parts[i].c_str();
+    auto visualparts = common::split(_visualName, ":");
 
-    // See if there is a visual
-    if (parts[i] == "visual")
+    printf("%s\n", visualparts.back().c_str());
+
+    auto visual = this->GetVisual();
+
+    printf("%d\n", VisualCount());
+
+    if (!visual)
     {
-      auto visual = this->GetVisual(parts[i+1]);
-
-      if (!visual)
-      {
-        gzwarn << "Visual [" << parts[i+1] << "] not found" //in world [" <<
-            //this->GetName() << "]" 
-        << std::endl;
-        return;
-      }
-
-      // Create URI for fetched visual
-      common::URI visualUri;
-      visualUri.SetScheme("data");
-      visualUri.Path().PushBack(visual->ScopedName());
-
-      auto myParts = common::split(visualUri.Path().Str(), "/");
-
-      // Check if all segments match up to this visuals scopedName,
-      // e.g. world/<this_name>/model/<model_name>/link/<link_name>
-      // for nested models e.g. world/<this_name>/model/<model_name>
-      // /model/<model_name>/link/<link_name>
-      for (size_t j = myParts.size() - 1; j >= 0; --j)
-      {
-        if (parts[i] != myParts[i])
-        {
-          gzwarn << "Visual [" << _visualUri.Str() << "] does not match visual [" <<
-              visualUri.Str() << "]" << std::endl;
-          return;
-        }
-      }
-
-      // Add properties
-      auto visualMsg = _visuals.add_visuals();
-      //visualMsg->set_name(visual->Name());
-      //visualMsg->set_parent(visual->ParentName());
-      visualMsg->set_transparency(visual->GetTransparency());
-
-      _success = true;
-      return;
-    }
-    else
-    {
-      gzwarn << "Segment [" << parts[i] << "] in [" << _visualUri.Str() <<
-         "] cannot be handled." << std::endl;
-      return;
-    }
-  }
-
-  gzwarn << "Couldn't get information for plugin [" << _visualUri.Str() << "]"
+      gzwarn << "Visual [" << visualparts.back() << "] not found"
       << std::endl;
-}
+      return;
+    }
 
+    // Add properties
+    auto visualMsg = _visuals.add_visuals();
+    //visualMsg->set_name(visual->Name());
+    //visualMsg->set_parent(visual->ParentName());
+    visualMsg->set_transparency(visual->GetTransparency());
+
+    _success = true;
+    return;
+  }
+  else
+  {
+    gzwarn << "Couldn't get information for plugin [" << _visualName << "]"
+    << std::endl;
+  }
+}
+/*
 //////////////////////////////////////////////////
 void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
@@ -3720,7 +3692,7 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
 }
 
 //////////////////////////////////////////////////
-void World::PluginInfo(const common::URI &_pluginUri,
+void Scene::PluginInfo(const common::URI &_pluginUri,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
   _plugins.clear_plugins();
@@ -3755,7 +3727,7 @@ void World::PluginInfo(const common::URI &_pluginUri,
         "] not found" << std::endl;
         return;
       }
-111
+
       // Create URI for fetched visual
       common::URI visualUri;
       visualUri.SetScheme("data");
@@ -3885,5 +3857,5 @@ void World::PluginInfo(const common::URI &_pluginUri,
   }
 
   gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
-      << std::endl;*/
-}
+      << std::endl;
+}*/

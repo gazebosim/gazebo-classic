@@ -348,10 +348,13 @@
       }
       // Visual
       else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
-        && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
+        && this->dataPtr->selectedEntityName.find("visual/") != std::string::npos)
       {
         std::string service("visual/server/info");
         ignition::msgs::StringMsg req;
+
+        printf("%s\n", this->dataPtr->selectedEntityName.c_str());
+
         req.set_data(this->dataPtr->selectedEntityName);
 
         gzerr << this->dataPtr->selectedEntityName << "bodo new gui";
@@ -527,7 +530,7 @@
               int index = visualName.rfind("::") + 2;
               std::string visualNameShort = visualName.substr(index,
                                                           visualName.size() - index);
-
+/*
               common::URI visualUri;
 
               visualUri.SetScheme("data");
@@ -539,14 +542,15 @@
               visualUri.Path().PushBack("link");
               visualUri.Path().PushBack(linkNameShort);
               visualUri.Path().PushBack("visual");
-              visualUri.Path().PushBack(visualName);
+              visualUri.Path().PushBack(visualName);*/
+
+              visualName = "visual/" + visualName;
 
               QTreeWidgetItem *visualItem = new QTreeWidgetItem(linkItem,
                   QStringList(QString("%1").arg(
                   QString::fromStdString(visualNameShort))));
 
-              visualItem->setData(0, Qt::UserRole, QVariant(visualUri.Str().
-                c_str()));
+              visualItem->setData(0, Qt::UserRole, QVariant(visualName.c_str()));
               visualItem->setData(3, Qt::UserRole, QVariant("Visual"));
 
               this->dataPtr->modelTreeWidget->addTopLevelItem(visualItem);

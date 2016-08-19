@@ -649,7 +649,7 @@ namespace gazebo
       /// \param[out] _visuals Message containing vector of visuals.
       /// \param[out] _success True if the info was successfully obtained.
       /// \sa VisualInfoService
-      public: void VisualInfo(const common::URI & _visualUri,
+      public: void VisualInfo(const std::string _visualName,
           ignition::msgs::Visual_V &_visuals, bool &_success);
 
       /// \brief Get whether or not clouds are displayed.
