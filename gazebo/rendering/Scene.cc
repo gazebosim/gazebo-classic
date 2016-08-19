@@ -3656,7 +3656,7 @@ void Scene::VisualInfo(const std::string _visualName,
 
     printf("%s\n", visualparts.back().c_str());
 
-    auto visual = this->GetVisual();
+    auto visual = this->GetVisual(visualparts.back());
 
     printf("%d\n", VisualCount());
 
