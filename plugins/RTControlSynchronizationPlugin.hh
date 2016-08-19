@@ -77,7 +77,8 @@ namespace gazebo
     /// at 1kHz, then simulation should expect a new command within
     /// 1 millisecond of the last received command, i.e. command age
     /// should be less than 1 millisecon.
-    private: double timeoutMs;
+    private: double controllerPeriod;
+    private: double controllerHz;
 
     /// \brief Private data pointer.
     private: std::unique_ptr<RTControlSynchronizationPluginPrivate> dataPtr;

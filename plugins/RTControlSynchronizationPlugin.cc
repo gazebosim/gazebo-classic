@@ -59,9 +59,9 @@ class gazebo::RTControlSynchronizationPluginPrivate
 
   /// \brief enforce delay policy
   public: void EnforceSynchronizationDelay(const common::Time &_curTime,
-    int _timeoutMs)
+    int _controllerPeriod)
   {
-    if (_timeoutMs != 0)
+    if (_controllerPeriod != 0)
     {
       common::Time curWallTime = common::Time::GetWallTime();
       // on initial entry, this->delayWindowStartTime = 0 sim time
@@ -96,16 +96,16 @@ class gazebo::RTControlSynchronizationPluginPrivate
 
           printf("age %f sec sim time. lastCommand stamp %f sec."
                  "timeout %f sec\n", age,
-                this->lastCommand.timestamp.Double(), 0.001*_timeoutMs);
+                this->lastCommand.timestamp.Double(), 0.001*_controllerPeriod);
           fflush(stdout);
 
           // if age is small enough, skip, otherwise, wait finite amount
           // for command messages to catchup.
-          if (age <= 0.001 * _timeoutMs)
+          if (age <= 0.001 * _controllerPeriod)
             break;
 
-          gzdbg << "age[" << age << "] > timeoutMs["
-                << 0.001*_timeoutMs << "]\n";
+          gzdbg << "age[" << age << "] > controllerPeriod["
+                << 0.001*_controllerPeriod << "]\n";
 
           // calculate amount of time to wait based on rules
           // std::chrono::time_point<std::chrono::high_resolution_clock,
@@ -264,6 +264,10 @@ class gazebo::RTControlSynchronizationPluginPrivate
   /// most delayMaxPerStep seconds to receive information from controller.
   public: common::Time delayMaxPerStep;
 
+  /// \brief do we wait indefinitely if wait budget is exhausted
+  /// in the current window/step?
+  public: bool delayBudgetExhaustWait;
+
   /// \brief Within each window, simulation will wait at
   /// most a total of delayMaxPerWindow seconds.
   public: common::Time delayInWindow;
@@ -311,25 +315,14 @@ class gazebo::RTControlSynchronizationPluginPrivate
 RTControlSynchronizationPlugin::RTControlSynchronizationPlugin()
   : dataPtr(new RTControlSynchronizationPluginPrivate)
 {
-  // default control synchronization delay settings
-  // to trigger synchronization delay, set
-  // timeoutMs to non-zero
-  this->timeoutMs = 1.0;
-
-  // synchronization variables
-  // rolling window for keeping track of timing enforcement and statistics
-  this->dataPtr->delayWindowSize = common::Time(5.0);
-  // max amount of delay in the rolling window
-  this->dataPtr->delayMaxPerWindow = common::Time(5.0);
-  // allowed jitter per simulation step
-  this->dataPtr->delayMaxPerStep = common::Time(1.0);
-
-  // beginning of the delay window in sim time
+  // internal variable to track beginning of the delay window (in sim time)
   this->dataPtr->delayWindowStartTime = common::Time(0.0);
-  // current delay duration in the window (in sim time)
+
+  // internal variable to track current delay duration in
+  // the window (in real-time)
   this->dataPtr->delayInWindow = common::Time(0.0);
-  // subscribers to the control stats
-  // this->dataPtr->controllerStatsConnectCount = 0;
+
+  // timestamp of the last command received
   this->dataPtr->lastCommand.timestamp = common::Time(0.0);
 }
 
@@ -339,12 +332,50 @@ RTControlSynchronizationPlugin::~RTControlSynchronizationPlugin()
 }
 
 /////////////////////////////////////////////////
-void RTControlSynchronizationPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+void RTControlSynchronizationPlugin::Load(physics::ModelPtr _model,
+  sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "_model pointer is null");
   GZ_ASSERT(_sdf, "_sdf pointer is null");
 
+  // model
   this->dataPtr->model = _model;
+
+  // default control synchronization delay.
+  // set to zero to disable synchronization delays on simulator
+  if (_sdf->HasElement("expected_controller_update_rate"))
+  {
+    this->controllerHz = _sdf->Get<double>("expected_controller_update_rate");
+    if (math::equal(this->controllerHz, 0.0))
+    {
+      gzwarn << "<expected_controller_update_rate> is zero, not enforcing"
+             << " synchronization.\n";
+      this->controllerPeriod = 0.0;
+    }
+    else
+    {
+      this->controllerPeriod = 1.0/this->controllerHz;
+    }
+  }
+  else
+  {
+    gzwarn << "<expected_controller_update_rate> is not set.\n";
+    double physicsUpdatePeriod = _model->PhysicsEngine()->GetUpdatePeriod();
+    if (math::equal(physicsUpdatePeriod, 0.0))
+    {
+      this->controllerHz = 0.0;
+      this->controllerPeriod = 0.0;
+      gzwarn << " ... and physics update period is zero, not enforcing"
+             << " synchronization.\n";
+    }
+    else
+    {
+      this->controllerPeriod = physicsUpdatePeriod;
+      this->controllerHz = 1.0/this->controllerPeriod;
+      gzwarn << " ... using physics update rate [" << this->controllerHz
+             << "] Hz as the expected controller update rate.\n";
+    }
+  }
 
   // Connect to the update event.
   // This event is broadcast by gzserver on every simulation step.
@@ -364,6 +395,69 @@ void RTControlSynchronizationPlugin::Load(physics::ModelPtr _model, sdf::Element
   gzdbg << "subscribing to robot command on [" << prefix + "control" << "/\n";
   this->controlSub = this->node->Subscribe(prefix + "control",
     &RTControlSynchronizationPlugin::RobotCommandIn, this);
+
+
+  // read params from sdf
+  this->dataPtr->delayWindowSize = common::Time(5.0);
+  if (_sdf->HasElement("delay_window_size"))
+  {
+    this->dataPtr->delayWindowSize = common::Time(
+      _sdf->Get<double>("delay_window_size"));
+  }
+  else
+  {
+    gzdbg << "<delay_window_size> not set, using ["
+          << this->dataPtr->delayWindowSize
+          << "] sim-time seconds by default.\n";
+  }
+  // max amount of delay in the rolling window
+  this->dataPtr->delayMaxPerWindow = common::Time(5.0);
+  if (_sdf->HasElement("delay_max_per_window"))
+  {
+    this->dataPtr->delayMaxPerWindow = common::Time(
+      _sdf->Get<double>("delay_max_per_window"));
+  }
+  else
+  {
+    gzdbg << "<delay_max_per_window> not set, using ["
+          << this->dataPtr->delayMaxPerWindow.Double()
+          << "] real-time seconds by default.\n";
+  }
+  gzdbg << "The controller synchronizer will delay simulation step"
+        << " by up to [" << this->dataPtr->delayMaxPerWindow.Double()
+        << "] real-time seconds per every ["
+        << this->dataPtr->delayMaxPerWindow.Double()
+        << "] sim-time seconds window.\n";
+
+  // allowed real-time jitter per simulation step
+  this->dataPtr->delayMaxPerStep = common::Time(1.0);
+  if (_sdf->HasElement("delay_max_per_step"))
+  {
+    this->dataPtr->delayMaxPerStep = common::Time(
+      _sdf->Get<double>("delay_max_per_step"));
+  }
+  else
+  {
+    gzdbg << "<delay_max_per_step> not set, using ["
+          << this->dataPtr->delayMaxPerStep.Double()
+          << "] real-time seconds by default.\n";
+  }
+  gzdbg << "The controller synchronizer will delay simulation step"
+        << " by up to [" << this->dataPtr->delayMaxPerStep
+        << "] real-time seconds per every simulation step.\n";
+
+  // if budgets are exhausted, do we block physics update indefinitely?
+  this->dataPtr->delayBudgetExhaustWait = false;
+  if (_sdf->HasElement("delay_budget_exhaust_wait"))
+  {
+    this->dataPtr->delayBudgetExhaustWait =
+      _sdf->Get<bool>("delay_budget_exhaust_wait");
+  }
+  else
+  {
+    gzdbg << "<delay_budget_exhaust_wait> not set, will not block"
+          << " physics update if budget is exhausted in window/step.\n";
+  }
 }
 
 /////////////////////////////////////////////////
@@ -381,8 +475,8 @@ void RTControlSynchronizationPlugin::OnUpdate(const common::UpdateInfo &_info)
     gzdbg << "t[" << curTime.Double() << "]: RobotStateOut\n";
     this->RobotStateOut();
     gzdbg << "EnforceSynchronizationDelay(" << curTime.Double() << ", "
-          << this->timeoutMs << " ms)\n";
-    this->dataPtr->EnforceSynchronizationDelay(curTime, this->timeoutMs);
+          << this->controllerPeriod << " ms)\n";
+    this->dataPtr->EnforceSynchronizationDelay(curTime, this->controllerPeriod);
     gzdbg << "ApplyRobotCommandToSim\n";
     this->ApplyRobotCommandToSim(dt);
     gzdbg << "Publish stats\n";
@@ -414,6 +508,7 @@ void RTControlSynchronizationPlugin::RobotCommandIn(ConstAnyPtr &_msg)
   // from the controller, usually copy to a local buffer
   this->ReceiveRobotCommand();
 
+  /// \TODO require that the incoming control command has a timestamp
   this->dataPtr->lastCommand.timestamp =
     this->dataPtr->model->GetWorld()->GetSimTime();
 

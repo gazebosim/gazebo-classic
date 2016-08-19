@@ -102,6 +102,12 @@
       </joint>
       <!-- Plugins for controlling the thrust and control surfaces -->
       <plugin name="cntl_sync" filename="libRTControlSynchronizationPlugin.so">
+        <delay_window_size>5</delay_window_size>
+        <delay_max_per_window>3</delay_max_per_window>
+        <delay_max_per_step>1</delay_max_per_step>
+        <delay_budget_exhaust_wait>0</delay_budget_exhaust_wait>
+        <expected_controller_update_rate>1000</expected_controller_update_rate>
+        <topic>/synchronization_statistics</topic>
       </plugin>
     </model>
 
