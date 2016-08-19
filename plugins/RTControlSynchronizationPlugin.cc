@@ -264,10 +264,6 @@ class gazebo::RTControlSynchronizationPluginPrivate
   /// most delayMaxPerStep seconds to receive information from controller.
   public: common::Time delayMaxPerStep;
 
-  /// \brief do we wait indefinitely if wait budget is exhausted
-  /// in the current window/step?
-  public: bool delayBudgetExhaustWait;
-
   /// \brief Within each window, simulation will wait at
   /// most a total of delayMaxPerWindow seconds.
   public: common::Time delayInWindow;
@@ -445,19 +441,6 @@ void RTControlSynchronizationPlugin::Load(physics::ModelPtr _model,
   gzdbg << "The controller synchronizer will delay simulation step"
         << " by up to [" << this->dataPtr->delayMaxPerStep
         << "] real-time seconds per every simulation step.\n";
-
-  // if budgets are exhausted, do we block physics update indefinitely?
-  this->dataPtr->delayBudgetExhaustWait = false;
-  if (_sdf->HasElement("delay_budget_exhaust_wait"))
-  {
-    this->dataPtr->delayBudgetExhaustWait =
-      _sdf->Get<bool>("delay_budget_exhaust_wait");
-  }
-  else
-  {
-    gzdbg << "<delay_budget_exhaust_wait> not set, will not block"
-          << " physics update if budget is exhausted in window/step.\n";
-  }
 }
 
 /////////////////////////////////////////////////
