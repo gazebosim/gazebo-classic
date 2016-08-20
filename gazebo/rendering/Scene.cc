@@ -334,7 +334,7 @@ void Scene::Load()
   if (!this->dataPtr->ignNode.Advertise(pluginService,
     &Scene::PluginInfoService, this))
   {
-  gzerr << "Error advertising service [" << service << "]"
+  gzerr << "Error advertising service [" << pluginService << "]"
       << std::endl;
   }
 }

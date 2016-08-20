@@ -298,10 +298,9 @@
       {
         std::string service(gui::get_world() +
               "/server/info/plugin");
+
         ignition::msgs::StringMsg req;
         req.set_data(this->dataPtr->selectedEntityName);
-
-        gzerr << this->dataPtr->selectedEntityName << "bodo";
 
         this->dataPtr->ignNode.Request(service, req,
            &ModelListWidget::OnPluginInfo, this);
@@ -311,10 +310,9 @@
         && this->dataPtr->selectedEntityName.find("/gui/") != std::string::npos)
       {
         std::string service("gui/server/info/plugin");
+
         ignition::msgs::StringMsg req;
         req.set_data(this->dataPtr->selectedEntityName);
-
-        gzerr << this->dataPtr->selectedEntityName << "bodo new gui";
 
         this->dataPtr->ignNode.Request(service, req,
            &ModelListWidget::OnPluginInfo, this);
@@ -323,12 +321,10 @@
       else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
         && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
       {
-        printf("%s\n", "SAUSE BRAUSE  ");
         std::string service("sensor/server/info/pluginnew");
+
         ignition::msgs::StringMsg req;
         req.set_data(this->dataPtr->selectedEntityName);
-
-        gzerr << this->dataPtr->selectedEntityName << "bodo new gui";
 
         this->dataPtr->ignNode.Request(service, req,
            &ModelListWidget::OnSensorInfo, this);
@@ -338,26 +334,21 @@
         && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
       {
         std::string service("sensor/server/info/plugin");
+
         ignition::msgs::StringMsg req;
         req.set_data(this->dataPtr->selectedEntityName);
-
-        gzerr << this->dataPtr->selectedEntityName << "bodo new gui";
 
         this->dataPtr->ignNode.Request(service, req,
            &ModelListWidget::OnPluginInfo, this);
       }
       // Visual
       else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
-        && this->dataPtr->selectedEntityName.find("visual/") != std::string::npos)
+        && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
       {
         std::string service("visual/server/info");
+
         ignition::msgs::StringMsg req;
-
-        printf("%s\n", this->dataPtr->selectedEntityName.c_str());
-
         req.set_data(this->dataPtr->selectedEntityName);
-
-        gzerr << this->dataPtr->selectedEntityName << "bodo new gui";
 
         this->dataPtr->ignNode.Request(service, req,
            &ModelListWidget::OnVisualInfo, this);
@@ -367,10 +358,12 @@
         && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
       {
         std::string service("visual/server/info/plugin");
+
         ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
 
         this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnVisualInfo, this);
+           &ModelListWidget::OnPluginInfo, this);
       }
     }
     else if (this->dataPtr->modelTreeWidget->currentItem())

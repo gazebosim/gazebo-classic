@@ -2928,7 +2928,6 @@ std::string World::UniqueModelName(const std::string &_name)
 void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
-  gzerr << "salome" << _success;
   this->PluginInfo(_req.data(), _plugins, _success);
 }
 
@@ -2938,8 +2937,6 @@ void World::PluginInfo(const common::URI &_pluginUri,
 {
   _plugins.clear_plugins();
   _success = true;
-
-  gzwarn << "prodo";
 
   if (!_pluginUri.Valid())
   {
@@ -2987,13 +2984,9 @@ void World::PluginInfo(const common::URI &_pluginUri,
       model->PluginInfo(_pluginUri, _plugins, _success);
       return;
     }
-
-    gzwarn << "bef back";
-    // TODO: Handle world plugins
-    // No specific plugin -> display plugin names in GUI
-    if (parts.back() == "plugin")
+    // No specific plugin (last element plugin tag) -> return all plugins
+    else if (_pluginUri.Str().find("/plugin"))
     {
-      gzwarn << "aft back";
       // Fill names of world plugins into message
       for (auto iter = this->dataPtr->plugins.begin();
         iter != this->dataPtr->plugins.end(); ++iter)
@@ -3006,10 +2999,8 @@ void World::PluginInfo(const common::URI &_pluginUri,
       _success = true;
       return;
     }
-
-    gzwarn << "plugins world starts";
-    // Look for plugin
-    if (parts[i] == "plugin")
+    // Look for specific plugin
+    else if (parts[i] == "plugin")
     {
       // Return empty vector
       if (!this->dataPtr->sdf->HasElement("plugin"))
