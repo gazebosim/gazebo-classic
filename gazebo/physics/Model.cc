@@ -1542,7 +1542,12 @@ bool Model::RemoveJoint(const std::string &_name)
   if (joint)
   {
     this->world->SetPaused(true);
+    if (this->jointController)
+    {
+      this->jointController->RemoveJoint(joint);
+    }
     joint->Detach();
+    joint->Fini();
 
     this->joints.erase(
       std::remove(this->joints.begin(), this->joints.end(), joint),
