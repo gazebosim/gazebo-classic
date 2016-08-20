@@ -1,92 +1,94 @@
-  /*
-   * Copyright (C) 2012-2016 Open Source Robotics Foundation
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *     http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *
-   */
-  #ifdef _WIN32
-    // Ensure that Winsock2.h is included before Windows.h, which can get
-    // pulled in by anybody (e.g., Boost).
-    #include <Winsock2.h>
-  #endif
+/*
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
-  #include <QDesktopServices>
-  #include <functional>
+#include <QDesktopServices>
+#include <functional>
 
-  #include <ignition/math/Pose3.hh>
-  #include <sdf/sdf.hh>
-  #include <boost/algorithm/string.hpp>
+#include <ignition/math/Pose3.hh>
+#include <sdf/sdf.hh>
+#include <boost/algorithm/string.hpp>
 
-  #include "gazebo/gazebo_config.h"
-  #include "gazebo/gazebo_client.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/gazebo_client.hh"
 
-  #include "gazebo/common/Console.hh"
-  #include "gazebo/common/Events.hh"
-  #include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
-  #include "gazebo/msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-  #include "gazebo/rendering/RenderEvents.hh"
-  #include "gazebo/rendering/Scene.hh"
-  #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
-  #include "gazebo/transport/Node.hh"
-  #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/TransportIface.hh"
 
-  #include "gazebo/gui/Actions.hh"
-  #include "gazebo/gui/AlignWidget.hh"
-  #include "gazebo/gui/CloneWindow.hh"
-  #include "gazebo/gui/DataLogger.hh"
-  #include "gazebo/gui/GLWidget.hh"
-  #include "gazebo/gui/GuiEvents.hh"
-  #include "gazebo/gui/GuiIface.hh"
-  #include "gazebo/gui/GuiPlugin.hh"
-  #include "gazebo/gui/InsertModelWidget.hh"
-  #include "gazebo/gui/LayersWidget.hh"
-  #include "gazebo/gui/ModelListWidget.hh"
-  #include "gazebo/gui/RenderWidget.hh"
-  #include "gazebo/gui/SpaceNav.hh"
-  #include "gazebo/gui/TimePanel.hh"
-  #include "gazebo/gui/ToolsWidget.hh"
-  #include "gazebo/gui/TopicSelector.hh"
-  #include "gazebo/gui/TopToolbar.hh"
-  #include "gazebo/gui/UserCmdHistory.hh"
-  #include "gazebo/gui/ViewAngleWidget.hh"
-  #include "gazebo/gui/plot/PlotWindow.hh"
-  #include "gazebo/gui/building/BuildingEditor.hh"
-  #include "gazebo/gui/model/ModelEditor.hh"
-  #include "gazebo/gui/terrain/TerrainEditor.hh"
-  #include "gazebo/gui/viewers/ViewFactory.hh"
-  #include "gazebo/gui/viewers/TopicView.hh"
-  #include "gazebo/gui/viewers/ImageView.hh"
-  #include "gazebo/gui/MainWindow.hh"
-  #include "gazebo/gui/MainWindowPrivate.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/CloneWindow.hh"
+#include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiPlugin.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/LayersWidget.hh"
+#include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/SpaceNav.hh"
+#include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/UserCmdHistory.hh"
+#include "gazebo/gui/ViewAngleWidget.hh"
+#include "gazebo/gui/plot/PlotWindow.hh"
+#include "gazebo/gui/building/BuildingEditor.hh"
+#include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/MainWindowPrivate.hh"
 
-  #ifdef HAVE_OCULUS
-  #include "gazebo/gui/OculusWindow.hh"
-  #endif
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
+#endif
 
+using namespace gazebo;
+using namespace gui;
 
-  using namespace gazebo;
-  using namespace gui;
+#define MINIMUM_TAB_WIDTH 250
 
-  #define MINIMUM_TAB_WIDTH 250
+extern bool g_fullscreen;
 
-  extern bool g_fullscreen;
+/////////////////////////////////////////////////
+MainWindow::MainWindow()
+  : dataPtr(new MainWindowPrivate)
+{
+  this->setObjectName("mainWindow");
 
-  /////////////////////////////////////////////////
-  MainWindow::MainWindow()
-    : dataPtr(new MainWindowPrivate)
+  // Do these things first.
   {
     this->setObjectName("mainWindow");
 
