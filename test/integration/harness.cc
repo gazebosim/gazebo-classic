@@ -27,10 +27,81 @@ using namespace gazebo;
 class Harness : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
+  /// \brief Detach the box and expect it to fall.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void DetachPaused(const std::string &_physicsEngine);
+
   /// \brief Lower, stop, then raise harness.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void LowerStopRaise(const std::string &_physicsEngine);
 };
+
+////////////////////////////////////////////////////////////////////////
+void Harness::DetachPaused(const std::string &_physicsEngine)
+{
+  Load("worlds/harness.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_NE(world , nullptr);
+
+  const auto gravity = world->Gravity();
+  EXPECT_EQ(gravity, ignition::math::Vector3d(0, 0, -9.8));
+
+  auto model = world->GetModel("box");
+  ASSERT_NE(model, nullptr);
+
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_NE(physics, nullptr);
+  const double dt = physics->GetMaxStepSize();
+  EXPECT_NEAR(dt, 1e-3, 1e-6);
+
+  {
+    auto joint = model->GetJoint("joint1");
+    ASSERT_NE(joint, nullptr);
+
+    // Take a few steps and confirm that the model remains in place
+    world->Step(50);
+    EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
+    EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), 0.0, 1e-3);
+  }
+
+  // Detach message harness via transport topic
+  auto detachPub =
+    this->node->Advertise<msgs::GzString>("~/box/harness/detach");
+  msgs::GzString msg;
+  msg.set_data("true");
+  detachPub->Publish(msg);
+  common::Time::MSleep(300);
+
+  // Expect joint to be deleted without taking another step
+  EXPECT_EQ(model->GetJoint("joint1"), nullptr);
+
+  // Now step forward and expect it to fall
+  const auto initialPose = model->GetWorldPose().Ign();
+  const double fallTime = 0.15;
+  world->Step(fallTime / dt);
+
+  const auto vel = model->GetWorldLinearVel().Ign();
+  EXPECT_NEAR(vel.X(), 0, 2e-3);
+  EXPECT_NEAR(vel.Y(), 0, 2e-3);
+  EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 2e-3);
+  EXPECT_EQ(model->GetWorldPose().Ign().Pos(),
+            initialPose.Pos() + 0.5*gravity * std::pow(fallTime, 2));
+}
+
+TEST_P(Harness, DetachPaused)
+{
+  const std::string physicsEngine = GetParam();
+  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  {
+    gzerr << "Skipping test for "
+          << physicsEngine
+          << " since it doesn't support dynamic creation/destruction of joints"
+          << ", see issues #862, #903."
+          << std::endl;
+    return;
+  }
+  DetachPaused(physicsEngine);
+}
 
 ////////////////////////////////////////////////////////////////////////
 void Harness::LowerStopRaise(const std::string &_physicsEngine)
