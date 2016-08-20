@@ -254,8 +254,23 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 /////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
-  this->joints[this->detachIndex]->Detach();
+  if (this->detachIndex < 0 || this->detachIndex >= this->joints.size())
+  {
+    gzerr << "No known joint to detach" << std::endl;
+    return;
+  }
+  const auto detachName = this->joints[this->detachIndex]->GetName();
+  physics::BasePtr parent = this->joints[this->detachIndex]->Base::GetParent();
+
+  auto model = boost::dynamic_pointer_cast<physics::Model>(parent);
+  if (!model)
+  {
+    gzerr << "Can't get valid model pointer" << std::endl;
+    return;
+  }
   (this->joints[this->detachIndex]).reset();
+  model->RemoveJoint(detachName);
+  this->detachIndex = -1;
 
   this->prevSimTime == common::Time::Zero;
 
