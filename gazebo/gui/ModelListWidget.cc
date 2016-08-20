@@ -530,27 +530,16 @@
               int index = visualName.rfind("::") + 2;
               std::string visualNameShort = visualName.substr(index,
                                                           visualName.size() - index);
-/*
               common::URI visualUri;
-
               visualUri.SetScheme("data");
-
-              visualUri.Path().PushBack("world");
-              visualUri.Path().PushBack(gui::get_world());
-              visualUri.Path().PushBack("model");
-              visualUri.Path().PushBack((*iter).name());
-              visualUri.Path().PushBack("link");
-              visualUri.Path().PushBack(linkNameShort);
               visualUri.Path().PushBack("visual");
-              visualUri.Path().PushBack(visualName);*/
-
-              visualName = "visual/" + visualName;
+              visualUri.Path().PushBack(visualName);
 
               QTreeWidgetItem *visualItem = new QTreeWidgetItem(linkItem,
                   QStringList(QString("%1").arg(
                   QString::fromStdString(visualNameShort))));
 
-              visualItem->setData(0, Qt::UserRole, QVariant(visualName.c_str()));
+              visualItem->setData(0, Qt::UserRole, QVariant(visualUri.Str().c_str()));
               visualItem->setData(3, Qt::UserRole, QVariant("Visual"));
 
               this->dataPtr->modelTreeWidget->addTopLevelItem(visualItem);
@@ -575,13 +564,6 @@
 
                 common::URI pluginUri;
                 pluginUri.SetScheme("data");
-
-                pluginUri.Path().PushBack("world");
-                pluginUri.Path().PushBack(gui::get_world());
-                pluginUri.Path().PushBack("model");
-                pluginUri.Path().PushBack((*iter).name());
-                pluginUri.Path().PushBack("link");
-                pluginUri.Path().PushBack(linkNameShort);
                 pluginUri.Path().PushBack("visual");
                 pluginUri.Path().PushBack(visualName);
                 pluginUri.Path().PushBack("plugin");
@@ -2795,6 +2777,68 @@
         tr("geometry"));
     _parent->addSubProperty(topItem);
     this->FillPropertyTree(_msg.geometry(), topItem);
+  }
+
+  /////////////////////////////////////////////////
+  void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
+                                         QtProperty *_parent)
+  {
+
+    QtProperty *topItem = nullptr;
+    QtVariantProperty *item = nullptr;
+
+    // Name value
+    item = this->dataPtr->variantManager->addProperty(QVariant::String,
+                                             tr("name"));
+
+    printf("%s\n", _msg.name().c_str());
+    item->setValue(_msg.name().c_str());
+    item->setEnabled(false);
+    this->AddProperty(item, _parent);
+
+    // Laser Retro value
+    item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+                                             tr("laser_retro"));
+    if (_msg.has_laser_retro())
+      item->setValue(_msg.laser_retro());
+    else
+      item->setValue(0.0);
+    item->setEnabled(false);
+    this->AddProperty(item, _parent);
+
+    // cast shadows value
+    item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+                                             tr("cast_shadows"));
+    if (_msg.has_cast_shadows())
+      item->setValue(_msg.cast_shadows());
+    else
+      item->setValue(true);
+    item->setEnabled(false);
+    this->AddProperty(item, _parent);
+
+    // transparency
+    item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+                                             tr("transparency"));
+    if (_msg.has_transparency())
+      item->setValue(_msg.transparency());
+    else
+      item->setValue(0.0);
+    item->setEnabled(false);
+    this->AddProperty(item, _parent);
+/*
+    // Pose value
+    topItem = this->dataPtr->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(),
+        tr("pose"));
+    _parent->addSubProperty(topItem);
+    this->FillPoseProperty(_msg.pose(), topItem);
+*//*
+    // Geometry shape value
+    topItem = this->dataPtr->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(),
+        tr("geometry"));
+    _parent->addSubProperty(topItem);
+    this->FillPropertyTree(_msg.geometry(), topItem);*/
   }
 
   /////////////////////////////////////////////////

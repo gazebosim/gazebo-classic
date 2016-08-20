@@ -144,6 +144,9 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Visual &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const ignition::msgs::Visual &_msg,
+                                     QtProperty *_parent);
+
       private: void FillPropertyTree(const msgs::Geometry &_msg,
                                      QtProperty *_parent);
 

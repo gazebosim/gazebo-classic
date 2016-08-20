@@ -111,7 +111,7 @@ namespace gazebo
       public: ignition::msgs::Plugin pluginMsg;
 
       /// \brief Keep latest visual message.
-      public: ignition::msgs::Plugin visualMsg;
+      public: ignition::msgs::Visual visualMsg;
 
       public: msgs::Physics physicsMsg;
       public: msgs::Wind windMsg;

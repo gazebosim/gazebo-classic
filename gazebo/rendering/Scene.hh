@@ -618,7 +618,7 @@ namespace gazebo
       /// \return True if clouds are displayed.
       /// \deprecated See ShowClouds()
       public: bool GetShowClouds() const GAZEBO_DEPRECATED(7.0);
-/*
+
       /// \brief Get plugins in this world or one of its
       /// children, according to the given _pluginUri. Some _pluginUri examples:
       ///
@@ -637,7 +637,7 @@ namespace gazebo
       /// \sa PluginInfoService
       public: void PluginInfo(const common::URI &_pluginUri,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
-*/
+
       /// \brief Get visual properties acording to
       /// the given _visualUri. Some _visualUri examples:
       ///
@@ -649,7 +649,7 @@ namespace gazebo
       /// \param[out] _visuals Message containing vector of visuals.
       /// \param[out] _success True if the info was successfully obtained.
       /// \sa VisualInfoService
-      public: void VisualInfo(const std::string _visualName,
+      public: void VisualInfo(const common::URI _visualUri,
           ignition::msgs::Visual_V &_visuals, bool &_success);
 
       /// \brief Get whether or not clouds are displayed.
@@ -863,15 +863,15 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
           VisualPtr _linkVisual);
-/*
+
       /// \brief Callback for "<this_name>/server/info/plugin" service.
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
       /// \param[out] _success True if the info was successfully obtained.
       /// \sa PluginInfo
-      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
+      private: void PluginInfoService(const ignition::msgs::StringMsg &_req,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
-*/
+
       /// \brief Callback for "<this_name>/server/info" service.
       /// \param[in] _request Request containing visual URI.
       /// \param[out] _visuals Message containing vector of visuals.
