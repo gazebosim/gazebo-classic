@@ -2462,8 +2462,12 @@ void MainWindow::PluginInfo(const common::URI &_pluginUri,
     return;
   }
 
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
+
+  gzwarn << _pluginUri.Str();
+
   // No specific plugin (last element plugin tag) -> return all plugins
-  if (_pluginUri.Str().find("/plugin"))
+  if (parts.size() == 2)
   {
     if (this->dataPtr->pluginMsgs.size() > 0)
     {
@@ -2486,8 +2490,8 @@ void MainWindow::PluginInfo(const common::URI &_pluginUri,
       return;
     }
   }
-// Look for specific plugin
-  else if (_pluginUri.Str().find("/plugin/"))
+  // Look for specific plugin
+  else if (parts.size() == 3)
   {
   // Return empty vector
     if (this->dataPtr->pluginMsgs.size() <= 0)
@@ -2520,8 +2524,8 @@ void MainWindow::PluginInfo(const common::URI &_pluginUri,
   }
   else
   {
-    gzwarn << "No GUI plugin element found in URI [" << _pluginUri.Str() <<
-    "]" << std::endl;  
+    gzwarn << "GUI URI [" << _pluginUri.Str() <<
+    "] is malformed" << std::endl;  
   }
 
   _success = false;

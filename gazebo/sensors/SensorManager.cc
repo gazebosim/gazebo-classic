@@ -225,7 +225,6 @@ void SensorManager::Init()
 
   this->initialized = true;
 
-  printf("%s\n", "BALEA");
   std::string service("sensor/server/info/pluginnew");
   if (!this->ignNode.Advertise(service,
       &SensorManager::SensorInfoService, this))

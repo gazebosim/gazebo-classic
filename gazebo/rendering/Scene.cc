@@ -3680,8 +3680,12 @@ void Scene::VisualInfo(const common::URI _visualUri,
   auto visualMsg = _visuals.add_visuals();
   visualMsg->set_name(visual->GetName());
   visualMsg->set_parent_name(visual->GetParent()->GetName());
+  visualMsg->set_cast_shadows(visual->GetCastShadows());
   printf("%s\n", "test2");
   visualMsg->set_transparency(visual->GetTransparency());
+  // TODO No set_pose/geo function??
+  //visualMsg->set_pose(visual->GetPose());
+  //visualMsg->set_geometry(visual->GetGeometrySize());
 
   printf("%s\n", "test3");
 
