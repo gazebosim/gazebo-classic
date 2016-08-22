@@ -77,8 +77,9 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   msg.set_data("true");
   detachPub->Publish(msg);
 
-  // Expect joint to be deleted without taking another step
-  for (int i = 0; i < 400; ++i)
+  // Need to take world step before joint can be deleted
+  world->Step(1);
+  for (int i = 0; i < 1000; ++i)
   {
     if (!model->GetJoint("joint1"))
     {
@@ -91,7 +92,8 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   // Now step forward and expect it to fall
   const auto initialPose = model->GetWorldPose().Ign();
   const double fallTime = 0.15;
-  world->Step(fallTime / dt);
+  // subtract one since we already took 1 step after publishing to detach
+  world->Step(fallTime / dt - 1);
 
   const auto vel = model->GetWorldLinearVel().Ign();
   EXPECT_NEAR(vel.X(), 0, 2e-3);
@@ -99,6 +101,11 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 2e-3);
   EXPECT_EQ(model->GetWorldPose().Ign().Pos(),
             initialPose.Pos() + 0.5*gravity * std::pow(fallTime, 2));
+
+  // Send another detach command and take some more world steps
+  // to confirm it doesn't crash
+  detachPub->Publish(msg);
+  world->Step(15);
 
   // Send a velocity command and take some more world steps
   // to confirm it doesn't crash
@@ -163,7 +170,8 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
   msg.set_data("true");
   detachPub->Publish(msg);
 
-  // Expect joint to be deleted without taking another step
+  // Need to take a world step before joint can be deleted
+  common::Time::MSleep(10);
   for (int i = 0; i < 400; ++i)
   {
     if (!model->GetJoint("joint1"))

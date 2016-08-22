@@ -227,6 +227,12 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   if (this->winchIndex < 0 ||
       this->winchIndex >= static_cast<int>(this->joints.size()))
   {
+    if (this->detachIndex >= 0 &&
+        this->detachIndex < static_cast<int>(this->joints.size()))
+    {
+      gzmsg << "Detaching harness joint" << std::endl;
+      this->Detach();
+    }
     gzerr << "No known winch joint to control" << std::endl;
     return;
   }
@@ -345,6 +351,6 @@ void HarnessPlugin::OnDetach(ConstGzStringPtr &_msg)
       _msg->data() == "TRUE" ||
       _msg->data() == "True")
   {
-    this->Detach();
+    this->winchIndex = -1;
   }
 }
