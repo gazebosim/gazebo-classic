@@ -254,7 +254,8 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 /////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
-  if (this->detachIndex < 0 || this->detachIndex >= this->joints.size())
+  if (this->detachIndex < 0 ||
+      this->detachIndex >= static_cast<int>(this->joints.size()))
   {
     gzerr << "No known joint to detach" << std::endl;
     return;
