@@ -311,6 +311,7 @@ TEST_F(ModelTest, PluginInfoFailures)
 }
 */
 //////////////////////////////////////////////////
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

@@ -664,6 +664,8 @@ if (NOT ignition-msgs0_FOUND)
   BUILD_ERROR ("Missing: Ignition msgs0 library.")
 else()
   message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+  include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
+  link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################

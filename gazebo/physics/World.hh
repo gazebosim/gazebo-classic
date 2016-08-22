@@ -627,11 +627,22 @@ namespace gazebo
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightModifyMsg(ConstLightPtr &_msg);
 
-      /// \brief Callback for "<this_name>/server/info/plugin" service.
+      /// \brief Callback for "<this_name>/physics/info/plugin" service.
+      /// Get information about plugins in this world or one of its
+      /// children, according to the given _pluginUri. Some _pluginUri examples:
+      ///
+      /// * Info about a specific world plugin in this world:
+      ///    data://world/<this_name>/plugin/<plugin_name>
+      ///
+      /// * Info about all world plugins in this world (empty plugin name):
+      ///    data://world/<this_name>/plugin
+      ///
+      /// * Info about a model plugin in a child model:
+      ///    data://world/<this_name>/model/<model_name>/plugin/<plugin_name>
+      ///
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
       /// \param[out] _success True if the info was successfully obtained.
-      /// \sa PluginInfo
       private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
 

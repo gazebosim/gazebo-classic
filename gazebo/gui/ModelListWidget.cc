@@ -260,21 +260,15 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       {
         if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
         {
-          std::string service(gui::get_world() +
-              "/server/info/plugin");
-          ignition::msgs::StringMsg req;
-          req.set_data(this->dataPtr->selectedEntityName);
-
-          this->dataPtr->ignNode.Request(service, req,
-              &ModelListWidget::OnPluginInfo, this);
+          this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
+              this->dataPtr->selectedEntityName);
         }
         else
         {
           this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-              this->dataPtr->selectedEntityName);
-
-          this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+           this->dataPtr->selectedEntityName);
         }
+        this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
       mItem->setExpanded(!mItem->isExpanded());
