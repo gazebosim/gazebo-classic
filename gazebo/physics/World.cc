@@ -2932,7 +2932,7 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
   common::URI pluginUri = _req.data();
   if (!pluginUri.Valid())
   {
-    gzwarn << "URI [" << pluginUri.Str() << "] is not valid." << std::endl;
+    gzwarn << "URI [" << _req.data() << "] is not valid." << std::endl;
     return;
   }
 
@@ -2953,7 +2953,7 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
   {
     if (parts[i] != myParts[i])
     {
-      gzwarn << "Plugin [" << pluginUri.Str() << "] does not match model [" <<
+      gzwarn << "Plugin [" << pluginUri.Str() << "] does not match world [" <<
           this->URI().Str() << "]" << std::endl;
       return;
     }
