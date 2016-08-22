@@ -224,6 +224,13 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   }
   common::Time dt = _info.simTime - this->prevSimTime;
 
+  if (this->winchIndex < 0 ||
+      this->winchIndex >= static_cast<int>(this->joints.size()))
+  {
+    gzerr << "No known winch joint to control" << std::endl;
+    return;
+  }
+
   double pError = 0;
   if (ignition::math::equal(this->winchTargetVel, 0.0f))
   {
@@ -272,6 +279,7 @@ void HarnessPlugin::Detach()
   (this->joints[this->detachIndex]).reset();
   model->RemoveJoint(detachName);
   this->detachIndex = -1;
+  this->winchIndex = -1;
 
   this->prevSimTime == common::Time::Zero;
 
@@ -288,6 +296,13 @@ double HarnessPlugin::WinchVelocity() const
 /////////////////////////////////////////////////
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
+  if (this->winchIndex < 0 ||
+      this->winchIndex >= static_cast<int>(this->joints.size()))
+  {
+    gzerr << "No known winch joint to set velocity" << std::endl;
+    return;
+  }
+
   this->winchTargetVel = _value;
   if (ignition::math::equal(_value, 0.0f))
   {
