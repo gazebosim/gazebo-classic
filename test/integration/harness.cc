@@ -99,6 +99,14 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 2e-3);
   EXPECT_EQ(model->GetWorldPose().Ign().Pos(),
             initialPose.Pos() + 0.5*gravity * std::pow(fallTime, 2));
+
+  // Send a velocity command and take some more world steps
+  // to confirm it doesn't crash
+  auto velocityPub =
+    this->node->Advertise<msgs::GzString>("~/box/harness/velocity");
+  msg.set_data(std::to_string(0.0));
+  velocityPub->Publish(msg);
+  world->Step(15);
 }
 
 TEST_P(Harness, DetachPaused)
