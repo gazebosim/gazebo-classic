@@ -5,7 +5,6 @@ set (sources GazeboDriver.cc
              Position2dInterface.cc
              LaserInterface.cc
              CameraInterface.cc
-             ../../gazebo/gazebo.cc
 )
              #Position3dInterface.cc
              #FiducialInterface.cc
@@ -35,9 +34,11 @@ gz_add_library(gazebo_player ${sources})
 target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
 libgazebo_client
 gazebo_common
-gazebo_transport
 gazebo_msgs
 gazebo_math
+gazebo_physics
+gazebo_sensors
+gazebo_transport
 gazebo_util
 )
 
