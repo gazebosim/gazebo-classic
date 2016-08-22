@@ -52,9 +52,7 @@
 
 #include "gazebo/transport/Node.hh"
 
- 
- #include "gazebo/util/IgnMsgSdf.hh"
-
+#include "gazebo/util/IgnMsgSdf.hh"
 
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/OpenAL.hh"

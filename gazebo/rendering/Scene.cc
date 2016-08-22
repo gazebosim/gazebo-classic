@@ -3638,7 +3638,6 @@ void Scene::ToggleLayer(const int32_t _layer)
 void Scene::VisualInfoService(const ignition::msgs::StringMsg &_req,
           ignition::msgs::Visual_V &_visuals, bool &_success)
 {
-  gzerr << "salomeCLUB" << _success;
   this->VisualInfo(_req.data(), _visuals, _success);
 }
 
@@ -3648,8 +3647,6 @@ void Scene::VisualInfo(const common::URI _visualUri,
 {
   _visuals.clear_visuals();
   _success = true;
-
-  printf("%s\n", "BIER BITTE!!!");
 
   if (!_visualUri.Valid())
   {
@@ -3675,19 +3672,15 @@ void Scene::VisualInfo(const common::URI _visualUri,
     return;
   }
 
-  printf("%s\n", "test");
   // Add properties
   auto visualMsg = _visuals.add_visuals();
   visualMsg->set_name(visual->GetName());
   visualMsg->set_parent_name(visual->GetParent()->GetName());
   visualMsg->set_cast_shadows(visual->GetCastShadows());
-  printf("%s\n", "test2");
   visualMsg->set_transparency(visual->GetTransparency());
-  // TODO No set_pose/geo function??
+  // TODO No set_pose/geo function??  
   //visualMsg->set_pose(visual->GetPose());
   //visualMsg->set_geometry(visual->GetGeometrySize());
-
-  printf("%s\n", "test3");
 
   _success = true;
   return;
@@ -3697,7 +3690,6 @@ void Scene::VisualInfo(const common::URI _visualUri,
 void Scene::PluginInfoService(const ignition::msgs::StringMsg &_req,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
-  gzerr << "salome" << _success;
   this->PluginInfo(_req.data(), _plugins, _success);
 }
 
@@ -3707,8 +3699,6 @@ void Scene::PluginInfo(const common::URI &_pluginUri,
 {
   _plugins.clear_plugins();
   _success = true;
-
-  printf("%s\n", "BIER BITTE!!!");
 
   if (!_pluginUri.Valid())
   {

@@ -200,7 +200,7 @@ target_link_libraries(gazebo_rendering
   ${OPENGL_LIBRARIES}
   ${tinyxml_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
-  ${IGNITION-MESSAGES_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 if (HAVE_OCULUS)

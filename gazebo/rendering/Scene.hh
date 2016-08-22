@@ -47,6 +47,8 @@
 #include <ignition/msgs/visual_v.pb.h>
 #include <ignition/transport/Node.hh>
 #include <ignition/msgs/stringmsg.pb.h>
+#include "gazebo/util/IgnMsgSdf.hh"
+#include "gazebo/common/CommonIface.hh"
 
 namespace SkyX
 {
@@ -242,7 +244,7 @@ namespace gazebo
       public: uint32_t CameraCount() const;
 
       /// \brief Get a camera based on an index. Index must be between
-      /// 0 and Scene::GetCameraCount.
+      /// 0 a*nd Scene::GetCameraCount.
       /// \param[in] _index Index of the camera to get.
       /// \return Pointer to the camera. Or NULL if the index is invalid.
       public: CameraPtr GetCamera(const uint32_t _index) const;
