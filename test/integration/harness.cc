@@ -70,9 +70,16 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   msgs::GzString msg;
   msg.set_data("true");
   detachPub->Publish(msg);
-  common::Time::MSleep(300);
 
   // Expect joint to be deleted without taking another step
+  for (int i=0; i < 400; ++i)
+  {
+    if (!model->GetJoint("joint1"))
+    {
+      break;
+    }
+    common::Time::MSleep(10);
+  };
   EXPECT_EQ(model->GetJoint("joint1"), nullptr);
 
   // Now step forward and expect it to fall
