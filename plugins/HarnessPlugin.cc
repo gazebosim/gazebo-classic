@@ -282,15 +282,16 @@ void HarnessPlugin::Detach()
     gzerr << "Can't get valid model pointer" << std::endl;
     return;
   }
+
+  // We no longer need to update
+  this->updateConnection.reset();
+
   (this->joints[this->detachIndex]).reset();
   model->RemoveJoint(detachName);
   this->detachIndex = -1;
   this->winchIndex = -1;
 
   this->prevSimTime == common::Time::Zero;
-
-  // We no longer need to update
-  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////
