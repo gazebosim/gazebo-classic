@@ -56,6 +56,7 @@ set (plugins_single_header
   FiducialCameraPlugin
   FollowerPlugin
   ForceTorquePlugin
+  GimbalSmall2dPlugin
   GpuRayPlugin
   HarnessPlugin
   ImuSensorPlugin
@@ -72,7 +73,6 @@ set (plugins_single_header
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
-  Small2dGimbalPlugin
   SonarPlugin
   SphereAtlasDemoPlugin
   VehiclePlugin
