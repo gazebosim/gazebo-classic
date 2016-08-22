@@ -31,6 +31,12 @@ class Harness : public ServerFixture,
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DetachPaused(const std::string &_physicsEngine);
 
+  /// \brief Detach the box and expect it to fall, while sim is unpaused
+  /// and physics updates are unthrottled (running as fast as possible).
+  /// This tests thread safety.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void DetachUnpaused(const std::string &_physicsEngine);
+
   /// \brief Lower, stop, then raise harness.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void LowerStopRaise(const std::string &_physicsEngine);
@@ -72,7 +78,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   detachPub->Publish(msg);
 
   // Expect joint to be deleted without taking another step
-  for (int i=0; i < 400; ++i)
+  for (int i = 0; i < 400; ++i)
   {
     if (!model->GetJoint("joint1"))
     {
@@ -108,6 +114,72 @@ TEST_P(Harness, DetachPaused)
     return;
   }
   DetachPaused(physicsEngine);
+}
+
+////////////////////////////////////////////////////////////////////////
+void Harness::DetachUnpaused(const std::string &_physicsEngine)
+{
+  Load("worlds/harness.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_NE(world , nullptr);
+  world->SetPaused(false);
+  EXPECT_FALSE(world->IsPaused());
+
+  const auto gravity = world->Gravity();
+  EXPECT_EQ(gravity, ignition::math::Vector3d(0, 0, -9.8));
+
+  auto model = world->GetModel("box");
+  ASSERT_NE(model, nullptr);
+
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_NE(physics, nullptr);
+  const double dt = physics->GetMaxStepSize();
+  EXPECT_NEAR(dt, 1e-3, 1e-6);
+  physics->SetRealTimeUpdateRate(0.0);
+  EXPECT_DOUBLE_EQ(physics->GetRealTimeUpdateRate(), 0.0);
+
+  {
+    auto joint = model->GetJoint("joint1");
+    ASSERT_NE(joint, nullptr);
+
+    // Take a few steps and confirm that the model remains in place
+    common::Time::MSleep(50);
+    EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-1);
+    EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), 0.0, 1e-2);
+  }
+
+  // Detach message harness via transport topic
+  auto detachPub =
+    this->node->Advertise<msgs::GzString>("~/box/harness/detach");
+  msgs::GzString msg;
+  msg.set_data("true");
+  detachPub->Publish(msg);
+
+  // Expect joint to be deleted without taking another step
+  for (int i = 0; i < 400; ++i)
+  {
+    if (!model->GetJoint("joint1"))
+    {
+      break;
+    }
+    common::Time::MSleep(10);
+  };
+  EXPECT_EQ(model->GetJoint("joint1"), nullptr);
+}
+
+TEST_P(Harness, DetachUnpaused)
+{
+  const std::string physicsEngine = GetParam();
+  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  {
+    gzerr << "Skipping test for "
+          << physicsEngine
+          << " since it doesn't support dynamic creation/destruction of joints"
+          << ", see issues #862, #903."
+          << std::endl;
+    return;
+  }
+  DetachUnpaused(physicsEngine);
 }
 
 ////////////////////////////////////////////////////////////////////////
