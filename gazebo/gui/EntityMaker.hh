@@ -23,6 +23,11 @@
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
   /// \ingroup gazebo_gui
   /// \brief gui namespace
   namespace gui
