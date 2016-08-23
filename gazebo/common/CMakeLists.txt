@@ -1,8 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-if (WIN32)
- add_definitions(-DBUILDING_DLL_GZ_COMMON)
-endif()
+add_definitions(-DBUILDING_DLL_GZ_COMMON)
 
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
