@@ -19,11 +19,15 @@
 
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
   /// \ingroup gazebo_gui
   /// \brief gui namespace
   namespace gui
