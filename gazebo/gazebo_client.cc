@@ -62,24 +62,6 @@ bool gazebo::client::setup(int _argc, char **_argv)
     gzerr << "Unable to setup Gazebo\n";
     return false;
   }
-
-  common::Time waitTime(1, 0);
-  int waitCount = 0;
-  int maxWaitCount = 10;
-
-  // Wait for namespaces.
-  while (!gazebo::transport::waitForNamespaces(waitTime) &&
-      (waitCount++) < maxWaitCount)
-  {
-    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
-  }
-
-  if (waitCount >= maxWaitCount)
-  {
-    gzerr << "Waited " << (waitTime * waitCount).Double()
-      << " seconds for namespaces. Giving up.\n";
-  }
-
   return true;
 }
 

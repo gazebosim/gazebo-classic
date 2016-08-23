@@ -52,8 +52,9 @@ namespace gazebo
       /// \param[in] _joint Joint to get the state of.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: JointState(JointPtr _joint, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
       /// \param[in] _joint Joint to get the state of.

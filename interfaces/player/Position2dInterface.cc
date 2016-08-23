@@ -77,9 +77,9 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Pose msg;
     gazebo::msgs::Set(msg.mutable_position(),
-                      gazebo::math::Vector3(cmd->vel.px, cmd->vel.py, 0));
+                      ignition::math::Vector3d(cmd->vel.px, cmd->vel.py, 0));
     gazebo::msgs::Set(msg.mutable_orientation(),
-                      gazebo::math::Quaternion(0, 0, -cmd->vel.pa));
+                      ignition::math::Quaterniond(0, 0, -cmd->vel.pa));
     this->velPub->Publish(msg);
 
     result = 0;
@@ -237,9 +237,9 @@ void Position2dInterface::OnPoseMsg(ConstPosesStampedPtr &_msg)
 
     data.pos.px = _msg->pose(i).position().x();
     data.pos.py = _msg->pose(i).position().y();
-    gazebo::math::Quaternion quat =
-      gazebo::msgs::Convert(_msg->pose(i).orientation());
-    data.pos.pa = quat.GetYaw();
+    ignition::math::Quaterniond quat =
+      gazebo::msgs::ConvertIgn(_msg->pose(i).orientation());
+    data.pos.pa = quat.Yaw();
 
     this->driver->Publish(this->device_addr,
         PLAYER_MSGTYPE_DATA,

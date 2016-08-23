@@ -33,8 +33,8 @@ TEST_F(RoadTest, Texture)
     << "<material>"
     << "<script>"
     << "<name>primary</name>"
-    << "</material>"
     << "</script>"
+    << "</material>"
     << "</road></sdf>";
 
   sdf::ElementPtr roadSDF(new sdf::Element);

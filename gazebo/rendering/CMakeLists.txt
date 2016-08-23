@@ -41,11 +41,13 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
   Material.cc
   MovableText.cc
   OrbitViewController.cc
+  OriginVisual.cc
   OrthoViewController.cc
   Projector.cc
   RayQuery.cc
@@ -97,11 +99,13 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LinkFrameVisual.hh
   SonarVisual.hh
   Light.hh
   Material.hh
   MovableText.hh
   OrbitViewController.hh
+  OriginVisual.hh
   OrthoViewController.hh
   Projector.hh
   RayQuery.hh
@@ -144,6 +148,9 @@ set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  LinkFrameVisual_TEST.cc
+  OriginVisual_TEST.cc
+  Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc

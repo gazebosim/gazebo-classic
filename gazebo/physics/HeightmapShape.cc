@@ -133,7 +133,7 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (sphericalCoordinates)
   {
-    math::Angle latitude, longitude;
+    ignition::math::Angle latitude, longitude;
     double elevation;
 
     this->dem.GetGeoReferenceOrigin(latitude, longitude);
@@ -249,7 +249,7 @@ void HeightmapShape::Init()
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->GetSize(), this->scale, this->flipY, this->heights);
+      this->GetSize().Ign(), this->scale.Ign(), this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
@@ -296,8 +296,8 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
     }
   }
 
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
   _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
 }
 

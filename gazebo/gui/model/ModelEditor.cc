@@ -20,6 +20,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
@@ -107,6 +108,10 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       this->mainWindow->CloneAction(g_showToolbarsAct, this);
   this->dataPtr->fullScreenAct =
       this->mainWindow->CloneAction(g_fullScreenAct, this);
+  this->dataPtr->cameraOrthoAct =
+      this->mainWindow->CloneAction(g_cameraOrthoAct, this);
+  this->dataPtr->cameraPerspectiveAct =
+      this->mainWindow->CloneAction(g_cameraPerspectiveAct, this);
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -166,9 +171,14 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(screwJointAct);
   jointActionGroup->setExclusive(true);
 
-  this->dataPtr->jointSeparatorAct = toolbar->addSeparator();
-  toolbar->addAction(this->dataPtr->jointAct);
-  this->dataPtr->jointTypeAct = toolbar->addWidget(this->dataPtr->jointButton);
+  QAction *toolbarSpacer = toolbar->findChild<QAction *>(
+      "toolbarSpacerAction");
+  GZ_ASSERT(toolbarSpacer, "Toolbar spacer not found");
+
+  this->dataPtr->jointSeparatorAct = toolbar->insertSeparator(toolbarSpacer);
+  toolbar->insertAction(toolbarSpacer, this->dataPtr->jointAct);
+  this->dataPtr->jointTypeAct = toolbar->insertWidget(toolbarSpacer,
+      this->dataPtr->jointButton);
   this->dataPtr->jointAct->setVisible(false);
   this->dataPtr->jointSeparatorAct->setVisible(false);
   this->dataPtr->jointTypeAct->setVisible(false);
@@ -292,6 +302,10 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->saveAsAct);
   fileMenu->addAction(this->dataPtr->exitAct);
 
+  QMenu *cameraMenu = this->dataPtr->menuBar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(this->dataPtr->cameraOrthoAct);
+  cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
+
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showJointsAct);
 
@@ -400,7 +414,9 @@ void ModelEditor::ToggleToolbar()
         actions[i] == g_copyAct ||
         actions[i] == g_pasteAct ||
         actions[i] == g_alignButtonAct ||
-        actions[i] == g_snapAct)
+        actions[i] == g_viewAngleButtonAct ||
+        actions[i] == g_snapAct ||
+        actions[i]->objectName() == "toolbarSpacerAction")
     {
       actions[i]->setVisible(true);
       if (i > 0 && actions[i-1]->isSeparator())

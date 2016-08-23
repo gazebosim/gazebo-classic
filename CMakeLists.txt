@@ -246,6 +246,9 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+include_directories(SYSTEM
+  ${IGNITION-MATH_INCLUDE_DIRS}
+)
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -352,6 +355,7 @@ else (build_errors)
   # without internal interdependencies
   set(PKG_LIBRARIES
     gazebo
+    gazebo_client
     gazebo_gui_building
     gazebo_gui_viewers
     gazebo_gui_model

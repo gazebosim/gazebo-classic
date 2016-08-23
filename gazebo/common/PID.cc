@@ -19,7 +19,7 @@
 #include <cmath>
 #include <stdio.h>
 
-#include "gazebo/math/Helpers.hh"
+#include <ignition/math/Helpers.hh>
 #include "PID.hh"
 
 using namespace gazebo;
@@ -112,8 +112,11 @@ double PID::Update(double _error, common::Time _dt)
   double pTerm, dTerm, iTerm;
   this->pErr = _error;
 
-  if (_dt == common::Time(0, 0) || math::isnan(_error) || std::isinf(_error))
+  if (_dt == common::Time(0, 0) || ignition::math::isnan(_error) ||
+      std::isinf(_error))
+  {
     return 0.0;
+  }
 
   // Calculate proportional contribution to command
   pTerm = this->pGain * this->pErr;
@@ -148,9 +151,9 @@ double PID::Update(double _error, common::Time _dt)
   this->cmd = -pTerm - iTerm - dTerm;
 
   // Check the command limits
-  if (!math::equal(this->cmdMax, 0.0) && this->cmd > this->cmdMax)
+  if (!ignition::math::equal(this->cmdMax, 0.0) && this->cmd > this->cmdMax)
     this->cmd = this->cmdMax;
-  if (!math::equal(this->cmdMin, 0.0) && this->cmd < this->cmdMin)
+  if (!ignition::math::equal(this->cmdMin, 0.0) && this->cmd < this->cmdMin)
     this->cmd = this->cmdMin;
 
   return this->cmd;

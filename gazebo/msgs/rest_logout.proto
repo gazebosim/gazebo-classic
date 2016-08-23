@@ -1,0 +1,11 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestLogout
+/// \brief Message for login out of a REST service.
+
+message RestLogout
+{
+  /// \brief the web service url
+  optional string url      = 1;
+}

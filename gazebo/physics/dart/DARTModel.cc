@@ -23,27 +23,28 @@
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTModel.hh"
 
+#include "gazebo/physics/dart/DARTModelPrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTModel::DARTModel(BasePtr _parent)
-  : Model(_parent), dtSkeleton(NULL)
+  : Model(_parent), dataPtr(new DARTModelPrivate())
 {
 }
 
 //////////////////////////////////////////////////
 DARTModel::~DARTModel()
 {
-  if (dtSkeleton)
-    delete dtSkeleton;
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
 void DARTModel::Load(sdf::ElementPtr _sdf)
 {
   // create skeleton of DART
-  this->dtSkeleton = new dart::dynamics::Skeleton();
+  this->dataPtr->dtSkeleton = new dart::dynamics::Skeleton();
 
   Model::Load(_sdf);
 }
@@ -56,11 +57,11 @@ void DARTModel::Init()
   //----------------------------------------------
   // Name
   std::string modelName = this->GetName();
-  this->dtSkeleton->setName(modelName.c_str());
+  this->dataPtr->dtSkeleton->setName(modelName.c_str());
 
   //----------------------------------------------
   // Static
-  this->dtSkeleton->setMobile(!this->IsStatic());
+  this->dataPtr->dtSkeleton->setMobile(!this->IsStatic());
 
   //----------------------------------------------
   // Check if this link is free floating body
@@ -84,11 +85,11 @@ void DARTModel::Init()
       dtBodyNode->setParentJoint(newFreeJoint);
     }
 
-    dtSkeleton->addBodyNode(dtBodyNode);
+    this->dataPtr->dtSkeleton->addBodyNode(dtBodyNode);
   }
 
   // Add the skeleton to the world
-  this->GetDARTWorld()->addSkeleton(dtSkeleton);
+  this->GetDARTWorld()->addSkeleton(this->dataPtr->dtSkeleton);
 
   // Self collision
   // Note: This process should be done after this skeleton is added to the
@@ -117,7 +118,7 @@ void DARTModel::Init()
   // collidable.
   if (hasPairOfSelfCollidableLinks)
   {
-    this->dtSkeleton->enableSelfCollision();
+    this->dataPtr->dtSkeleton->enableSelfCollision();
 
     dart::simulation::World *dtWorld = this->GetDARTPhysics()->GetDARTWorld();
     dart::collision::CollisionDetector *dtCollDet =
@@ -170,29 +171,29 @@ void DARTModel::Fini()
 //////////////////////////////////////////////////
 void DARTModel::BackupState()
 {
-  dtConfig = this->dtSkeleton->getPositions();
-  dtVelocity = this->dtSkeleton->getVelocities();
+  this->dataPtr->dtConfig = this->dataPtr->dtSkeleton->getPositions();
+  this->dataPtr->dtVelocity = this->dataPtr->dtSkeleton->getVelocities();
 }
 
 //////////////////////////////////////////////////
 void DARTModel::RestoreState()
 {
-  GZ_ASSERT(static_cast<size_t>(dtConfig.size()) ==
-            this->dtSkeleton->getNumDofs(),
+  GZ_ASSERT(static_cast<size_t>(this->dataPtr->dtConfig.size()) ==
+            this->dataPtr->dtSkeleton->getNumDofs(),
             "Cannot RestoreState, invalid size");
-  GZ_ASSERT(static_cast<size_t>(dtVelocity.size()) ==
-            this->dtSkeleton->getNumDofs(),
+  GZ_ASSERT(static_cast<size_t>(this->dataPtr->dtVelocity.size()) ==
+            this->dataPtr->dtSkeleton->getNumDofs(),
             "Cannot RestoreState, invalid size");
 
-  this->dtSkeleton->setPositions(dtConfig);
-  this->dtSkeleton->setVelocities(dtVelocity);
-  this->dtSkeleton->computeForwardKinematics(true, true, false);
+  this->dataPtr->dtSkeleton->setPositions(this->dataPtr->dtConfig);
+  this->dataPtr->dtSkeleton->setVelocities(this->dataPtr->dtVelocity);
+  this->dataPtr->dtSkeleton->computeForwardKinematics(true, true, false);
 }
 
 //////////////////////////////////////////////////
 dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 {
-  return dtSkeleton;
+  return this->dataPtr->dtSkeleton;
 }
 
 //////////////////////////////////////////////////

@@ -29,6 +29,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTCollisionPrivate;
+
     /// \brief Base class for all DART collisions.
     class GZ_PHYSICS_VISIBLE DARTCollision : public Collision
     {
@@ -79,24 +82,16 @@ namespace gazebo
                                          bool _placeable = true);
 
       /// \brief Get DART collision shape.
-      public: dart::dynamics::Shape* GetDARTCollisionShape() const;
+      public: dart::dynamics::Shape *GetDARTCollisionShape() const;
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to DARTSurfaceParams.
       /// \return Dynamically casted pointer to DARTSurfaceParams.
       public: DARTSurfaceParamsPtr GetDARTSurface() const;
 
-      /// \brief DART body node associated with this collision.
-      private: dart::dynamics::BodyNode *dtBodyNode;
-
-      /// \brief DART collision shape associated with this collision.
-      private: dart::dynamics::Shape *dtCollisionShape;
-
-      /// \brief Category bits for collision detection
-      private: unsigned int categoryBits;
-
-      /// \brief Collide bits for collision detection
-      private: unsigned int collideBits;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTCollisionPrivate *dataPtr;
     };
   }
 }

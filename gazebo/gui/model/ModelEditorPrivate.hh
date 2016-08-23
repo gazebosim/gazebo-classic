@@ -89,6 +89,12 @@ namespace gazebo
       /// \brief Fullscreen action cloned from main window.
       public: QAction *fullScreenAct;
 
+      /// \brief Camera orthographic view action cloned from main window.
+      public: QAction *cameraOrthoAct;
+
+      /// \brief Camera perspective view action cloned from main window.
+      public: QAction *cameraPerspectiveAct;
+
       /// \brief Save the main window paused state to use when returning.
       public: bool mainWindowPaused;
     };

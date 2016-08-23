@@ -243,8 +243,8 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
   rightPaddle->set_button_center(this->buttons[12]);
   rightPaddle->set_button_joy(this->buttons[13]);
 
-  msgs::Set(rightPaddle->mutable_pose(), grabRight);
-  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
+  msgs::Set(rightPaddle->mutable_pose(), grabRight.Ign());
+  msgs::Set(leftPaddle->mutable_pose(), grabLeft.Ign());
 
   this->pub->Publish(msg);
 }

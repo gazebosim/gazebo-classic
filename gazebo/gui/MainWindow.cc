@@ -56,6 +56,7 @@
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/ViewAngleWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -221,6 +222,10 @@ MainWindow::MainWindow()
   // Use a signal/slot to load plugins. This makes the process thread safe.
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
+
+  // Create data logger dialog
+  this->dataLogger = new gui::DataLogger(this);
+  connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
 
   this->show();
 }
@@ -775,6 +780,8 @@ void MainWindow::OnFullScreen(bool _value)
     this->toolsWidget->show();
     this->menuBar->show();
   }
+  g_fullScreenAct->setChecked(_value);
+  g_fullscreen = _value;
 }
 
 /////////////////////////////////////////////////
@@ -790,20 +797,7 @@ void MainWindow::OnShowToolbars(bool _value)
     this->GetRenderWidget()->GetTimePanel()->hide();
     this->GetRenderWidget()->GetToolbar()->hide();
   }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::Reset()
-{
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = camPos - lookAt;
-
-  double yaw = atan2(delta.x, delta.y);
-  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+  g_showToolbarsAct->setChecked(_value);
 }
 
 /////////////////////////////////////////////////
@@ -823,6 +817,15 @@ void MainWindow::ShowGrid()
   msgs::Scene msg;
   msg.set_name(gui::get_world());
   msg.set_grid(g_showGridAct->isChecked());
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowOrigin()
+{
+  msgs::Scene msg;
+  msg.set_name(gui::get_world());
+  msg.set_origin_visual(g_showOriginAct->isChecked());
   this->scenePub->Publish(msg);
 }
 
@@ -885,6 +888,21 @@ void MainWindow::ShowInertia()
   else
     transport::requestNoReply(this->node->GetTopicNamespace(),
         "hide_inertia", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowLinkFrame()
+{
+  if (g_showLinkFrameAct->isChecked())
+  {
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_link_frame", "all");
+  }
+  else
+  {
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_link_frame", "all");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -957,8 +975,21 @@ void MainWindow::ViewOculus()
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
-  gui::DataLogger *dataLogger = new gui::DataLogger(this);
-  dataLogger->show();
+  if (g_dataLoggerAct->isChecked())
+  {
+    this->dataLogger->show();
+  }
+  else
+  {
+    this->dataLogger->close();
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnDataLoggerClosed()
+{
+  // Uncheck action on toolbar when user closes dialog
+  g_dataLoggerAct->setChecked(false);
 }
 
 /////////////////////////////////////////////////
@@ -1162,10 +1193,8 @@ void MainWindow::CreateActions()
       SLOT(CreateDirectionalLight()));
   this->CreateDisabledIcon(":/images/directionallight.png", g_dirLghtCreateAct);
 
-  g_resetAct = new QAction(tr("Reset Camera"), this);
-  g_resetAct->setStatusTip(tr("Move camera to pose"));
-  connect(g_resetAct, SIGNAL(triggered()), this,
-      SLOT(Reset()));
+  g_resetAct = new QAction(tr("Reset View Angle"), this);
+  g_resetAct->setStatusTip(tr("Move camera to initial pose"));
 
   g_showCollisionsAct = new QAction(tr("Collisions"), this);
   g_showCollisionsAct->setStatusTip(tr("Show Collisions"));
@@ -1180,6 +1209,13 @@ void MainWindow::CreateActions()
   g_showGridAct->setChecked(true);
   connect(g_showGridAct, SIGNAL(triggered()), this,
           SLOT(ShowGrid()));
+
+  g_showOriginAct = new QAction(tr("Origin"), this);
+  g_showOriginAct->setStatusTip(tr("Show World Origin"));
+  g_showOriginAct->setCheckable(true);
+  g_showOriginAct->setChecked(true);
+  connect(g_showOriginAct, SIGNAL(triggered()), this,
+          SLOT(ShowOrigin()));
 
   g_transparentAct = new QAction(tr("Transparent"), this);
   g_transparentAct->setStatusTip(tr("Transparent"));
@@ -1208,6 +1244,13 @@ void MainWindow::CreateActions()
   g_showInertiaAct->setChecked(false);
   connect(g_showInertiaAct, SIGNAL(triggered()), this,
       SLOT(ShowInertia()));
+
+  g_showLinkFrameAct = new QAction(tr("Link Frames"), this);
+  g_showLinkFrameAct->setStatusTip(tr("Show link frames"));
+  g_showLinkFrameAct->setCheckable(true);
+  g_showLinkFrameAct->setChecked(false);
+  connect(g_showLinkFrameAct, SIGNAL(triggered()), this,
+      SLOT(ShowLinkFrame()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1285,9 +1328,13 @@ void MainWindow::CreateActions()
   projectionActionGroup->addAction(g_cameraPerspectiveAct);
   projectionActionGroup->setExclusive(true);
 
-  g_dataLoggerAct = new QAction(tr("&Log Data"), this);
+  g_dataLoggerAct = new QAction(QIcon(":images/log_record.png"),
+      tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
+  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setCheckable(true);
+  g_dataLoggerAct->setChecked(false);
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
@@ -1386,6 +1433,40 @@ void MainWindow::CreateActions()
   g_alignAct->setDefaultWidget(alignWidget);
   g_alignAct->setEnabled(false);
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
+
+  // set up view angle actions and widget
+  QAction *viewAngleTop = new QAction(QIcon(":/images/view_angle_top.png"),
+      tr("View from the top"), this);
+  QAction *viewAngleBottom = new QAction(
+      QIcon(":/images/view_angle_bottom.png"),
+      tr("View from the bottom"), this);
+  QAction *viewAngleFront = new QAction(QIcon(":/images/view_angle_front.png"),
+      tr("View from the front"), this);
+  QAction *viewAngleBack = new QAction(QIcon(":/images/view_angle_back.png"),
+      tr("View from the back"), this);
+  QAction *viewAngleLeft = new QAction(QIcon(":/images/view_angle_left.png"),
+      tr("View from the left"), this);
+  QAction *viewAngleRight = new QAction(QIcon(":/images/view_angle_right.png"),
+      tr("View from the right"), this);
+
+  // Create another action instead of using g_resetAct here directly because
+  // we don't want the icon on the menu.
+  QAction *viewAngleReset = new QAction(QIcon(":/images/view_angle_home.png"),
+      tr("Reset View Angle"), this);
+  connect(g_resetAct, SIGNAL(triggered()), viewAngleReset, SLOT(trigger()));
+
+  ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
+  viewAngleWidget->setObjectName("viewAngleWidget");
+  viewAngleWidget->Add(ViewAngleWidget::TOP, viewAngleTop);
+  viewAngleWidget->Add(ViewAngleWidget::BOTTOM, viewAngleBottom);
+  viewAngleWidget->Add(ViewAngleWidget::FRONT, viewAngleFront);
+  viewAngleWidget->Add(ViewAngleWidget::BACK, viewAngleBack);
+  viewAngleWidget->Add(ViewAngleWidget::LEFT, viewAngleLeft);
+  viewAngleWidget->Add(ViewAngleWidget::RIGHT, viewAngleRight);
+  viewAngleWidget->Add(ViewAngleWidget::RESET, viewAngleReset);
+
+  g_viewAngleAct = new QWidgetAction(this);
+  g_viewAngleAct->setDefaultWidget(viewAngleWidget);
 }
 
 /////////////////////////////////////////////////
@@ -1406,6 +1487,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->setMenuBar(this->menuBar);
 
+    // populate main window's menu bar with menus from normal simulation mode
     this->CreateMenuBar();
   }
 
@@ -1418,12 +1500,20 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     // Note: for some reason we can not call menuBar() again,
     // so manually retrieving the menubar from the mainwindow.
     QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
-    newMenuBar = menuBars[0];
+    if (!menuBars.empty())
+      newMenuBar = menuBars[0];
   }
   else
   {
     newMenuBar = _bar;
   }
+
+  if (!newMenuBar)
+  {
+    gzerr << "Unable to set NULL menu bar" << std::endl;
+    return;
+  }
+
   QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
   for (int i = 0; i < menus.size(); ++i)
   {
@@ -1529,6 +1619,9 @@ void MainWindow::DeleteActions()
   delete g_showGridAct;
   g_showGridAct = 0;
 
+  delete g_showOriginAct;
+  g_showOriginAct = 0;
+
   delete g_transparentAct;
   g_transparentAct = 0;
 
@@ -1540,6 +1633,9 @@ void MainWindow::DeleteActions()
 
   delete g_showInertiaAct;
   g_showInertiaAct = 0;
+
+  delete g_showLinkFrameAct;
+  g_showLinkFrameAct = 0;
 
   delete g_showContactsAct;
   g_showContactsAct = 0;
@@ -1588,6 +1684,9 @@ void MainWindow::DeleteActions()
 
   delete g_cameraPerspectiveAct;
   g_cameraPerspectiveAct = 0;
+
+  delete g_viewAngleAct;
+  g_viewAngleAct = 0;
 }
 
 
@@ -1630,6 +1729,7 @@ void MainWindow::CreateMenuBar()
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
+  viewMenu->addAction(g_showOriginAct);
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_transparentAct);
@@ -1640,11 +1740,11 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
+  viewMenu->addAction(g_showLinkFrameAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
-  windowMenu->addAction(g_dataLoggerAct);
   windowMenu->addAction(g_viewOculusAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_overlayAct);
@@ -1664,7 +1764,25 @@ void MainWindow::CreateMenuBar()
 /////////////////////////////////////////////////
 void MainWindow::AddMenu(QMenu *_menu)
 {
-  this->menuBar->addMenu(_menu);
+  if (!_menu)
+    return;
+
+  // Get the main window's menubar
+  // Note: for some reason we can not call menuBar() again,
+  // so manually retrieving the menubar from the mainwindow.
+  QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+  if (!menuBars.empty())
+  {
+    // Note: addMenu(QMenu *) works the first time but when
+    // ShowMenuBar() is called more than once which results in menus being
+    // re-added, (e.g. when switching between model editor and simulation modes)
+    // _menu does not show up in the menu bar.
+    // So workaround is to use addMenu(QString)
+    QMenu *newMenu = menuBars[0]->addMenu(_menu->title());
+
+    for (auto &menuAct : _menu->actions())
+      newMenu->addAction(menuAct);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1723,7 +1841,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
 
-      cam->SetWorldPose(cam_pose);
+      cam->SetDefaultPose(cam_pose);
       cam->SetUseSDFPose(true);
     }
 

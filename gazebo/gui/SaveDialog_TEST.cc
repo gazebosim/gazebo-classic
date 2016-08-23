@@ -29,7 +29,7 @@ void SaveDialogTestHelper::CheckFileDialog()
   QVERIFY(fileDialog);
 
   // set default path to home dir.
-  fileDialog->selectFile(QDir::homePath());
+  fileDialog->setDirectory(QDir::homePath());
 
   // hit enter to close dialog
   QTest::keyClick(fileDialog, Qt::Key_Enter);
@@ -49,6 +49,10 @@ void SaveDialog_TEST::SaveLocation()
 
   // Get folder name from model name
   std::string folderName = saveDialog->GetFolderNameFromModelName(modelName);
+  const std::string expectedFolderName("model_name");
+  std::cout << "folderName:         " << folderName << std::endl;
+  std::cout << "expectedFolderName: " << expectedFolderName << std::endl;
+  QVERIFY(folderName == expectedFolderName);
 
   // find the browse button
   QList<QPushButton *> pushButtons = saveDialog->findChildren<QPushButton *>();
@@ -68,8 +72,12 @@ void SaveDialog_TEST::SaveLocation()
   helper.dialog = saveDialog;
   QTimer::singleShot(0, &helper, SLOT(CheckFileDialog()));
   browseButton->click();
-  QVERIFY(saveDialog->GetSaveLocation() == QDir::homePath().toStdString() +
-      "/" + folderName);
+  const std::string actualSaveLocation(saveDialog->GetSaveLocation());
+  const std::string expectedSaveLocation(
+    QDir::homePath().toStdString() +  "/"  + folderName);
+  std::cout << "actualSaveLocation:   " << actualSaveLocation << std::endl;
+  std::cout << "expectedSaveLocation: " << expectedSaveLocation << std::endl;
+  QVERIFY(actualSaveLocation == expectedSaveLocation);
 
   delete saveDialog;
 }

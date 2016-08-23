@@ -9,6 +9,7 @@ add_definitions(${BULLET_CFLAGS})
 set (sources
   BulletBallJoint.cc
   BulletCollision.cc
+  BulletFixedJoint.cc
   BulletHeightmapShape.cc
   BulletHinge2Joint.cc
   BulletHingeJoint.cc
@@ -35,6 +36,7 @@ set (headers
   BulletBoxShape.hh
   BulletCollision.hh
   BulletCylinderShape.hh
+  BulletFixedJoint.hh
   BulletHeightmapShape.hh
   BulletHinge2Joint.hh
   BulletHingeJoint.hh

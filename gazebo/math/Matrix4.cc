@@ -51,6 +51,16 @@ Matrix4::Matrix4(const Matrix4 &_m)
 }
 
 //////////////////////////////////////////////////
+Matrix4::Matrix4(const ignition::math::Matrix4d &_m)
+{
+  this->Set(_m(0, 0), _m(0, 1), _m(0, 2), _m(0, 3),
+            _m(1, 0), _m(1, 1), _m(1, 2), _m(1, 3),
+            _m(2, 0), _m(2, 1), _m(2, 2), _m(2, 3),
+            _m(3, 0), _m(3, 1), _m(3, 2), _m(3, 3));
+}
+
+
+//////////////////////////////////////////////////
 Matrix4::Matrix4(double _v00, double _v01, double _v02, double _v03,
                  double _v10, double _v11, double _v12, double _v13,
                  double _v20, double _v21, double _v22, double _v23,
@@ -214,6 +224,16 @@ void Matrix4::SetScale(const Vector3 &_s)
 Matrix4 &Matrix4::operator =(const Matrix4 &_mat)
 {
   memcpy(this->m, _mat.m, sizeof(this->m[0][0])*16);
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Matrix4 &Matrix4::operator=(const ignition::math::Matrix4d &_m)
+{
+  this->Set(_m(0, 0), _m(0, 1), _m(0, 2), _m(0, 3),
+            _m(1, 0), _m(1, 1), _m(1, 2), _m(1, 3),
+            _m(2, 0), _m(2, 1), _m(2, 2), _m(2, 3),
+            _m(3, 0), _m(3, 1), _m(3, 2), _m(3, 3));
   return *this;
 }
 
@@ -479,4 +499,14 @@ Matrix4 Matrix4::Inverse() const
 math::Pose Matrix4::GetAsPose() const
 {
   return math::Pose(this->GetTranslation(), this->GetRotation());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Matrix4::Ign() const
+{
+  return ignition::math::Matrix4d(
+      this->m[0][0], this->m[0][1], this->m[0][2], this->m[0][3],
+      this->m[1][0], this->m[1][1], this->m[1][2], this->m[1][3],
+      this->m[2][0], this->m[2][1], this->m[2][2], this->m[2][3],
+      this->m[3][0], this->m[3][1], this->m[3][2], this->m[3][3]);
 }

@@ -45,7 +45,7 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
     return;
   }
 
-  sensors::NoisePtr noise = _parent->GetNoise();
+  sensors::NoisePtr noise = _parent->GetNoise(sensors::RAY_NOISE);
 
   if (noise)
   {

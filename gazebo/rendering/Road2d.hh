@@ -79,7 +79,7 @@ namespace gazebo
                  public: std::string name;
 
                  /// \brief Point that make up the middle of the road.
-                 public: std::vector<math::Vector3> points;
+                 public: std::vector<ignition::math::Vector3d> points;
 
                  /// \brief Width of the road.
                  public: double width;

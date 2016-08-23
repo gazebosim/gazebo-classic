@@ -19,7 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6
@@ -75,7 +75,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
     << "        <type>custom</type>"
     << "      </noise>"
     << "    </ray>"
-    << "    <plugin name ='laser' filename='" << pluginFileName << "'>"
+    << "    <plugin name ='laser' filename='" << pluginFileName << "'/>"
     << "  </sensor>"
     << "</link>"
     << "</model>"

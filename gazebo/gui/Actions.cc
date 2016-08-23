@@ -88,6 +88,8 @@ QAction *gazebo::gui::g_showCollisionsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showGridAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_showOriginAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showContactsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showJointsAct = 0;
@@ -95,6 +97,8 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showCOMAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showInertiaAct = 0;
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_showLinkFrameAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GZ_GUI_VISIBLE
@@ -141,3 +145,9 @@ QWidgetAction *gazebo::gui::g_alignAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_alignButtonAct = 0;
+
+GZ_GUI_VISIBLE
+QWidgetAction *gazebo::gui::g_viewAngleAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_viewAngleButtonAct = 0;

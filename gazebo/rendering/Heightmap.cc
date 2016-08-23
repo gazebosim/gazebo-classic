@@ -100,8 +100,8 @@ Heightmap::~Heightmap()
 //////////////////////////////////////////////////
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
-  this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
-  this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
+  this->terrainSize = msgs::ConvertIgn(_msg->geometry().heightmap().size());
+  this->terrainOrigin = msgs::ConvertIgn(_msg->geometry().heightmap().origin());
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
@@ -351,7 +351,7 @@ void Heightmap::Load()
     geomMsg.ParseFromString(response->serialized_data());
 
     // Copy the height data.
-    this->terrainSize = msgs::Convert(geomMsg.heightmap().size());
+    this->terrainSize = msgs::ConvertIgn(geomMsg.heightmap().size());
     this->heights.resize(geomMsg.heightmap().heights().size());
     memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());

@@ -273,7 +273,7 @@ namespace gazebo
       private slots: void OnDelete();
 
       /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
-      private: std::vector<math::Vector3> UnitVectors;
+      private: std::vector<ignition::math::Vector3d> unitVectors;
 
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;

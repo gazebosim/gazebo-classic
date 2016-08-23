@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "gazebo/common/MeshExporter.hh"
-#include "gazebo/math/MathTypes.hh"
 #include "gazebo/util/system.hh"
 
 class TiXmlElement;

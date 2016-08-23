@@ -19,68 +19,104 @@
 using namespace gazebo;
 using namespace common;
 
-  KeyFrame::KeyFrame(double _time)
+/////////////////////////////////////////////////
+KeyFrame::KeyFrame(double _time)
 : time(_time)
 {
 }
 
+/////////////////////////////////////////////////
 KeyFrame::~KeyFrame()
 {
 }
 
+/////////////////////////////////////////////////
 double KeyFrame::GetTime() const
 {
   return this->time;
 }
 
 
-
-  PoseKeyFrame::PoseKeyFrame(double _time)
+/////////////////////////////////////////////////
+PoseKeyFrame::PoseKeyFrame(double _time)
 : KeyFrame(_time)
 {
 }
 
+/////////////////////////////////////////////////
 PoseKeyFrame::~PoseKeyFrame()
 {
 }
 
+/////////////////////////////////////////////////
 void PoseKeyFrame::SetTranslation(const math::Vector3 &_trans)
+{
+  this->translate.Set(_trans.x, _trans.y, _trans.z);
+}
+
+/////////////////////////////////////////////////
+void PoseKeyFrame::Translation(const ignition::math::Vector3d &_trans)
 {
   this->translate = _trans;
 }
 
-const math::Vector3 &PoseKeyFrame::GetTranslation() const
+/////////////////////////////////////////////////
+math::Vector3 PoseKeyFrame::GetTranslation() const
+{
+  return gazebo::math::Vector3(this->translate.X(), this->translate.Y(),
+                               this->translate.Z());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d PoseKeyFrame::Translation() const
 {
   return this->translate;
 }
 
+/////////////////////////////////////////////////
 void PoseKeyFrame::SetRotation(const math::Quaternion &_rot)
+{
+  this->rotate.Set(_rot.w, _rot.x, _rot.y, _rot.z);
+}
+
+/////////////////////////////////////////////////
+void PoseKeyFrame::Rotation(const ignition::math::Quaterniond &_rot)
 {
   this->rotate = _rot;
 }
 
-const math::Quaternion &PoseKeyFrame::GetRotation() const
+/////////////////////////////////////////////////
+math::Quaternion PoseKeyFrame::GetRotation() const
+{
+  return gazebo::math::Quaternion(this->rotate.W(),
+      this->rotate.X(), this->rotate.Y(), this->rotate.Z());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Quaterniond PoseKeyFrame::Rotation() const
 {
   return this->rotate;
 }
 
-  NumericKeyFrame::NumericKeyFrame(double _time)
+/////////////////////////////////////////////////
+NumericKeyFrame::NumericKeyFrame(double _time)
 : KeyFrame(_time)
 {
 }
 
+/////////////////////////////////////////////////
 NumericKeyFrame::~NumericKeyFrame()
 {
 }
 
+/////////////////////////////////////////////////
 void NumericKeyFrame::SetValue(const double &_value)
 {
   this->value = _value;
 }
 
+/////////////////////////////////////////////////
 const double &NumericKeyFrame::GetValue() const
 {
   return this->value;
 }
-
-

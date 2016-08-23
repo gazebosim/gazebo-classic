@@ -61,6 +61,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
 
+      // Documentation inherited.
+      public: virtual void CacheForceTorque();
+
       /// \brief Get an ODE joint parameter.
       ///
       /// The default function does nothing. This should be

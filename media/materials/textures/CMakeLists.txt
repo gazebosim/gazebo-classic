@@ -25,6 +25,7 @@ set (files
   random.png
   residential.jpg
   road1.jpg
+  runway.png
   secondary.jpg
   sidewalk.jpg
   steps.jpeg

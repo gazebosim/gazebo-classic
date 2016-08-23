@@ -52,18 +52,18 @@ TEST_F(AnimationTest, PoseAnimation)
   anim.SetLength(10.0);
   EXPECT_DOUBLE_EQ(10.0, anim.GetLength());
 
-  key->SetTranslation(math::Vector3(0, 0, 0));
-  EXPECT_TRUE(key->GetTranslation() == math::Vector3(0, 0, 0));
+  key->Translation(ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(key->Translation() == ignition::math::Vector3d(0, 0, 0));
 
-  key->SetRotation(math::Quaternion(0, 0, 0));
-  EXPECT_TRUE(key->GetRotation() == math::Quaternion(0, 0, 0));
+  key->Rotation(ignition::math::Quaterniond(0, 0, 0));
+  EXPECT_TRUE(key->Rotation() == ignition::math::Quaterniond(0, 0, 0));
 
   key = anim.CreateKeyFrame(10.0);
-  key->SetTranslation(math::Vector3(10, 20, 30));
-  EXPECT_TRUE(key->GetTranslation() == math::Vector3(10, 20, 30));
+  key->Translation(ignition::math::Vector3d(10, 20, 30));
+  EXPECT_TRUE(key->Translation() == ignition::math::Vector3d(10, 20, 30));
 
-  key->SetRotation(math::Quaternion(0.1, 0.2, 0.3));
-  EXPECT_TRUE(key->GetRotation() == math::Quaternion(0.1, 0.2, 0.3));
+  key->Rotation(ignition::math::Quaterniond(0.1, 0.2, 0.3));
+  EXPECT_TRUE(key->Rotation() == ignition::math::Quaterniond(0.1, 0.2, 0.3));
 
   anim.AddTime(5.0);
   EXPECT_DOUBLE_EQ(5.0, anim.GetTime());
@@ -73,10 +73,10 @@ TEST_F(AnimationTest, PoseAnimation)
 
   common::PoseKeyFrame interpolatedKey(-1.0);
   anim.GetInterpolatedKeyFrame(interpolatedKey);
-  EXPECT_TRUE(interpolatedKey.GetTranslation() ==
-      math::Vector3(3.76, 7.52, 11.28));
-  EXPECT_TRUE(interpolatedKey.GetRotation() ==
-      math::Quaternion(0.0302776, 0.0785971, 0.109824));
+  EXPECT_TRUE(interpolatedKey.Translation() ==
+      ignition::math::Vector3d(3.76, 7.52, 11.28));
+  EXPECT_TRUE(interpolatedKey.Rotation() ==
+      ignition::math::Quaterniond(0.0302776, 0.0785971, 0.109824));
 }
 
 TEST_F(AnimationTest, NumericAnimation)

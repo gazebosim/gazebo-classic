@@ -24,7 +24,8 @@ namespace gazebo
 {
   namespace physics
   {
-    class DARTMesh;
+    /// Forward declare private data class
+    class DARTPolylineShapePrivate;
 
     /// \brief DART polyline shape
     class GZ_PHYSICS_VISIBLE DARTPolylineShape : public PolylineShape
@@ -42,8 +43,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
-      /// \brief DART collsion mesh helper class.
-      private: DARTMesh *dartMesh;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTPolylineShapePrivate *dataPtr;
     };
   }
 }

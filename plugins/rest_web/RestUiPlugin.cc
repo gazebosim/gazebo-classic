@@ -92,20 +92,33 @@ void RestUiPlugin::OnMainWindowReady()
   std::string menuStr("&");
   menuStr += this->menuTitle;
   QMenu *menu = new QMenu(QString(menuStr.c_str()));
+
   QAction *loginAct = new QAction(QString("&Login"), menu);
-  loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
+  loginAct->setStatusTip(QString("Login to web service"));
+  QAction *logoutAct = new QAction(QString("Log&out"), menu);
+  logoutAct->setStatusTip(QString("Logout from web service"));
+  logoutAct->setEnabled(false);
+
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
   // the RestUiPlugin class is not a QT object
   this->widget = new RestUiWidget(mainWindow,
-                            this->menuTitle.c_str(),
-                            this->loginTitle.c_str(),
-                            this->urlLabel.c_str(),
-                            this->defaultUrl.c_str());
+                                  *loginAct,
+                                  *logoutAct,
+                                  this->menuTitle.c_str(),
+                                  this->loginTitle.c_str(),
+                                  this->urlLabel.c_str(),
+                                  this->defaultUrl.c_str());
 
   QObject::connect(loginAct, SIGNAL(triggered()),
                    this->widget, SLOT(Login()));
   menu->addAction(loginAct);
+
+  QObject::connect(logoutAct, SIGNAL(triggered()),
+                   this->widget, SLOT(Logout()));
+
+  menu->addAction(logoutAct);
+
   mainWindow->AddMenu(menu);
 }
 

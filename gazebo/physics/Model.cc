@@ -871,11 +871,11 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
-  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+  msgs::Set(_msg.mutable_pose(), this->GetWorldPose().Ign());
   _msg.set_id(this->GetId());
-  msgs::Set(_msg.mutable_scale(), this->scale);
+  msgs::Set(_msg.mutable_scale(), this->scale.Ign());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose().Ign());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
@@ -909,7 +909,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
-    this->SetWorldPose(msgs::Convert(_msg.pose()));
+    this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
   {
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
@@ -921,7 +921,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     this->SetStatic(_msg.is_static());
 
   if (_msg.has_scale())
-    this->SetScale(msgs::Convert(_msg.scale()));
+    this->SetScale(msgs::ConvertIgn(_msg.scale()));
 }
 
 //////////////////////////////////////////////////

@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/test/ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 class ServerFixtureTest : public ServerFixture,

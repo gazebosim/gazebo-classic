@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Two dimensional vector
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
+#ifndef _GAZEBO_VECTOR2D_HH_
+#define _GAZEBO_VECTOR2D_HH_
 
-#ifndef _VECTOR2D_HH_
-#define _VECTOR2D_HH_
+#include <ignition/math/Vector2.hh>
 
 #include <math.h>
 #include <iostream>
@@ -50,6 +47,10 @@ namespace gazebo
       /// \param[in] _v the value
       public: Vector2d(const Vector2d &_v);
 
+      /// \brief Copy constructor for ignition math
+      /// \param[in] _v the value
+      public: Vector2d(const ignition::math::Vector2d &_v);
+
       /// \brief Destructor
       public: virtual ~Vector2d();
 
@@ -75,6 +76,11 @@ namespace gazebo
       /// \param[in] _v a value for x and y element
       /// \return this
       public: Vector2d &operator =(const Vector2d &_v);
+
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _v a value for x and y element
+      /// \return this
+      public: Vector2d &operator=(const ignition::math::Vector2d &_v);
 
       /// \brief Assignment operator
       /// \param[in] _v the value for x and y element
@@ -162,6 +168,10 @@ namespace gazebo
       /// \param[in] _index the index
       /// \return the value, or 0 if _index is out of bounds
       public: double operator[](unsigned int _index) const;
+
+      /// \brief Convert this vector to an ignition::math::Vector2d.
+      /// \return This vector as an ignition::math::Vector2d.
+      public: ignition::math::Vector2d Ign() const;
 
       /// \brief x data
       public: double x;

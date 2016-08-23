@@ -20,7 +20,7 @@
 // #include "gazebo/physics/Joint.hh"
 // #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 
 using namespace gazebo;

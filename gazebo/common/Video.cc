@@ -33,7 +33,7 @@ using namespace common;
 //
 //   f = fopen(filename, "w");
 //   fprintf(f, "P6\n%d %d\n%d\n", xsize, ysize, 255);
-//   for(i = 0; i < ysize; i++)
+//   for(i = 0; i < ysize; ++i)
 //     fwrite(buf + i * wrap, 1, xsize * 3, f);
 //   fclose(f);
 // }

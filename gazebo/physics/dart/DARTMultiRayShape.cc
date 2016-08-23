@@ -25,22 +25,23 @@
 #include "gazebo/physics/dart/DARTRayShape.hh"
 #include "gazebo/physics/dart/DARTMultiRayShape.hh"
 
+#include "gazebo/physics/dart/DARTMultiRayShapePrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
-  : MultiRayShape(_parent)
+  : MultiRayShape(_parent),
+    dataPtr(new DARTMultiRayShapePrivate())
 {
   this->SetName("DART_multiray_shape");
-  this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
 DARTMultiRayShape::~DARTMultiRayShape()
 {
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////

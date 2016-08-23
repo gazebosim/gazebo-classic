@@ -114,12 +114,10 @@ void RestUiLoginDialog::SlotAcceptLogin()
   QString user = editUsername->text();
   QString pass = editPassword->text();
   QString u = editUrl->text();
-  username = user.toStdString();
-  password = pass.toStdString();
-  url = u.toStdString();
-  qApp->processEvents();
-  emit AcceptLogin(u, user, pass);
-  // close the dialog with success exit code
+
+  this->username = user.toStdString();
+  this->password = pass.toStdString();
+  this->url = u.toStdString();
   accept();
 }
 

@@ -50,9 +50,9 @@ MeshMaker::MeshMaker()
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::MESH);
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            ignition::math::Quaterniond());
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(),
-            math::Vector3());
+            ignition::math::Vector3d());
 }
 
 /////////////////////////////////////////////////
@@ -116,13 +116,13 @@ void MeshMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  math::Pose pose = msgs::Convert(this->visualMsg->pose());
+  ignition::math::Pose3d pose = msgs::ConvertIgn(this->visualMsg->pose());
 
   math::Vector3 origin1, dir1, p1;
   math::Vector3 origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  this->camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -133,24 +133,24 @@ void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
   // Compute two points on the plane. The first point is the current
   // mouse position, the second is the previous mouse position
   p1 = origin1 + dir1 * dist1;
-  pose.pos = p1;
+  pose.Pos() = p1.Ign();
 
-  if (!_event.shift)
+  if (!_event.Shift())
   {
-    if (ceil(pose.pos.x) - pose.pos.x <= .4)
-      pose.pos.x = ceil(pose.pos.x);
-    else if (pose.pos.x - floor(pose.pos.x) <= .4)
-      pose.pos.x = floor(pose.pos.x);
+    if (ceil(pose.Pos().X()) - pose.Pos().X() <= .4)
+      pose.Pos().X() = ceil(pose.Pos().X());
+    else if (pose.Pos().X() - floor(pose.Pos().X()) <= .4)
+      pose.Pos().X() = floor(pose.Pos().X());
 
-    if (ceil(pose.pos.y) - pose.pos.y <= .4)
-      pose.pos.y = ceil(pose.pos.y);
-    else if (pose.pos.y - floor(pose.pos.y) <= .4)
-      pose.pos.y = floor(pose.pos.y);
+    if (ceil(pose.Pos().Y()) - pose.Pos().Y() <= .4)
+      pose.Pos().Y() = ceil(pose.Pos().Y());
+    else if (pose.Pos().Y() - floor(pose.Pos().Y()) <= .4)
+      pose.Pos().Y() = floor(pose.Pos().Y());
 
-    if (ceil(pose.pos.z) - pose.pos.z <= .4)
-      pose.pos.z = ceil(pose.pos.z);
-    else if (pose.pos.z - floor(pose.pos.z) <= .4)
-      pose.pos.z = floor(pose.pos.z);
+    if (ceil(pose.Pos().Z()) - pose.Pos().Z() <= .4)
+      pose.Pos().Z() = ceil(pose.Pos().Z());
+    else if (pose.Pos().Z() - floor(pose.Pos().Z()) <= .4)
+      pose.Pos().Z() = floor(pose.Pos().Z());
   }
 
   msgs::Set(this->visualMsg->mutable_pose(), pose);

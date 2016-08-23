@@ -15,6 +15,7 @@
  *
 */
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
 #include "gazebo/gazebo.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -47,7 +48,8 @@ namespace gazebo
       physicsMsg.set_max_step_size(0.01);
 
       // Change gravity
-      msgs::Set(physicsMsg.mutable_gravity(), math::Vector3(0.01, 0, 0.1));
+      msgs::Set(physicsMsg.mutable_gravity(),
+          ignition::math::Vector3d(0.01, 0, 0.1));
       physicsPub->Publish(physicsMsg);
     }
   };
