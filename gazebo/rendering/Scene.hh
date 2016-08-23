@@ -30,6 +30,7 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/visual_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/common/Events.hh"
@@ -43,12 +44,7 @@
 #include "gazebo/util/system.hh"
 #include "gazebo/common/URI.hh"
 
-#include <ignition/msgs/plugin_v.pb.h>
-#include <ignition/msgs/visual_v.pb.h>
-#include <ignition/transport/Node.hh>
 #include <ignition/msgs/stringmsg.pb.h>
-#include "gazebo/util/IgnMsgSdf.hh"
-#include "gazebo/common/CommonIface.hh"
 
 namespace SkyX
 {
@@ -244,7 +240,7 @@ namespace gazebo
       public: uint32_t CameraCount() const;
 
       /// \brief Get a camera based on an index. Index must be between
-      /// 0 a*nd Scene::GetCameraCount.
+      /// 0 and Scene::GetCameraCount.
       /// \param[in] _index Index of the camera to get.
       /// \return Pointer to the camera. Or NULL if the index is invalid.
       public: CameraPtr GetCamera(const uint32_t _index) const;
@@ -621,17 +617,17 @@ namespace gazebo
       /// \deprecated See ShowClouds()
       public: bool GetShowClouds() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Get plugins in this world or one of its
-      /// children, according to the given _pluginUri. Some _pluginUri examples:
+      /// \brief Get plugin from one of the visuals
+      /// according to the given _pluginUri. Some _pluginUri examples:
       ///
-      /// * Info about a specific world plugin in this world:
-      ///    data://world/<this_name>/plugin/<plugin_name>
+      /// * Info about a specific visual plugin in this scene:
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/visual/<visual_name>/plugin/<plugin_name>
       ///
-      /// * Info about all world plugins in this world (empty plugin name):
-      ///    data://world/<this_name>/plugin
+      /// * Info about all visual plugins in this scene (empty plugin name):
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/visual/<visual_name>/plugin/
       ///
-      /// * Info about a model plugin in a child model:
-      ///    data://world/<this_name>/model/<model_name>/plugin/<plugin_name>
       ///
       /// \param[in] _pluginUri URI for the desired plugin(s).
       /// \param[out] _plugins Message containing vector of plugins.

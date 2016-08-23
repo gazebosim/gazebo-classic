@@ -260,7 +260,7 @@ void World::Load(sdf::ElementPtr _sdf)
   if (!this->dataPtr->ignNode.Advertise(pluginInfoService,
       &World::PluginInfoService, this))
   {
-    gzerr << "Error advertising service [" << service << "]"
+    gzerr << "Error advertising service [" << pluginInfoService << "]"
         << std::endl;
   }
   
@@ -2939,6 +2939,8 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     return;
   }
 
+printf("%s\n", "jo");
+
   auto parts = common::split(pluginUri.Path().Str(), "/");
   auto myParts = common::split(this->URI().Path().Str(), "/");
 
@@ -2976,25 +2978,12 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
         return;
       }
 
+printf("%s\n", "balea");
       model->PluginInfo(pluginUri, _plugins, _success);
       return;
     }
-    // No specific plugin (last element plugin tag) -> return all plugins
-    else if (_pluginUri.Str().find("/plugin"))
-    {
-      // Fill names of world plugins into message
-      for (auto iter = this->dataPtr->plugins.begin();
-        iter != this->dataPtr->plugins.end(); ++iter)
-      {
-        ignition::msgs::Plugin *pluginMsg = _plugins.add_plugins();
-        pluginMsg->set_name((*iter)->GetHandle());
-        pluginMsg->set_filename((*iter)->GetFilename());
-      }
-      
-      _success = true;
-      return;
-    }
-    // Look for specific plugin
+    // Return specific plugin or in case there is no plugin name
+    // return all plugins
     else if (parts[i] == "plugin")
     {
       // Return empty vector

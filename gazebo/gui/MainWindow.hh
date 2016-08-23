@@ -27,7 +27,6 @@
 #include "gazebo/util/system.hh"
 #include "gazebo/common/URI.hh"
 
-#include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
@@ -105,17 +104,14 @@ namespace gazebo
       /// \param[in] _menu Menu to be added.
       public: void AddMenu(QMenu *_menu);
 
-      /// \brief Get plugins in this world or one of its
-      /// children, according to the given _pluginUri. Some _pluginUri examples:
+      /// \brief Get GUI plugins according to the given 
+      /// _pluginUri. Some _pluginUri examples:
       ///
-      /// * Info about a specific world plugin in this world:
-      ///    data://gui/plugin/<plugin_name>
+      /// * Info about a specific GUI plugin:
+      ///    data://gui/gzclient/plugin/<plugin_name>
       ///
-      /// * Info about all world plugins in this world (empty plugin name):
-      ///    data://gui/plugin
-      ///
-      /// * Info about a model plugin in a child model:
-      ///    data://world/<this_name>/model/<model_name>/plugin/<plugin_name>
+      /// * Info about all GUI plugins (empty plugin name):
+      ///    data://gui/gzclient/plugin
       ///
       /// \param[in] _pluginUri URI for the desired plugin(s).
       /// \param[out] _plugins Message containing vector of plugins.

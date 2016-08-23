@@ -355,7 +355,7 @@ namespace gazebo
       private: event::ConnectionPtr removeSensorConnection;
 
       /// \brief Node for ignition transport communication.
-      public: ignition::transport::Node ignNode;
+      private: ignition::transport::Node ignNode;
     };
     /// \}
   }

@@ -32,11 +32,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-
-#include <ignition/msgs/plugin_v.pb.h>
-#include <ignition/msgs/visual_v.pb.h>
 #include <ignition/transport/Node.hh>
-#include <ignition/msgs/stringmsg.pb.h>
 
 namespace SkyX
 {

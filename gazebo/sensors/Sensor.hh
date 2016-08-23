@@ -32,10 +32,8 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/common/URI.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
-#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {

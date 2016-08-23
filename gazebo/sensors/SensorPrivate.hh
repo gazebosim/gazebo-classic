@@ -28,8 +28,6 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
-#include <ignition/transport.hh>
-
 namespace gazebo
 {
   namespace sensors
@@ -59,9 +57,6 @@ namespace gazebo
       /// \brief An SDF pointer that allows us to only read the sensor.sdf
       /// file once, which in turns limits disk reads.
       public: static sdf::ElementPtr sdfSensor;
-
-      /// \brief Node for ignition transport communication.
-      public: ignition::transport::Node ignNode;
     };
     /// \}
   }

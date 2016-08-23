@@ -27,6 +27,7 @@
 #include <google/protobuf/message.h>
 
 #include <ignition/math/Angle.hh>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include <sdf/sdf.hh>
 
@@ -77,8 +78,6 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->dataPtr->requestMsg = nullptr;
   this->dataPtr->propMutex = new std::mutex();
   this->dataPtr->receiveMutex = new std::mutex();
-
-  this->dataPtr->fillTypes.push_back("");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->dataPtr->modelTreeWidget = new QTreeWidget();
@@ -178,7 +177,6 @@ ModelListWidget::~ModelListWidget()
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
-
   if (_item)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
@@ -256,18 +254,19 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      if (this->dataPtr->requestPub)
+      if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
       {
-        if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
-        {
-          this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
-              this->dataPtr->selectedEntityName);
-        }
-        else
-        {
-          this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-           this->dataPtr->selectedEntityName);
-        }
+        std::string pluginInfoService("/physics/info/plugin");
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        this->dataPtr->ignNode.Request(pluginInfoService, req,
+            &ModelListWidget::OnPluginInfo, this);
+      }
+      else if (this->dataPtr->requestPub)
+      {
+        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+            this->dataPtr->selectedEntityName);
         this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
@@ -291,8 +290,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       && this->dataPtr->selectedEntityName.find("/sensor/") == std::string::npos
       && this->dataPtr->selectedEntityName.find("/visual/") == std::string::npos)
     {
-      std::string service(gui::get_world() +
-            "/server/info/plugin");
+      std::string service("/physics/info/plugin");
 
       ignition::msgs::StringMsg req;
       req.set_data(this->dataPtr->selectedEntityName);
@@ -304,7 +302,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
       && this->dataPtr->selectedEntityName.find("/gui/") != std::string::npos)
     {
-      std::string service("gui/server/info/plugin");
+      std::string service("/gui/info/plugin");
 
       ignition::msgs::StringMsg req;
       req.set_data(this->dataPtr->selectedEntityName);
@@ -316,10 +314,12 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
       && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
     {
-      std::string service("sensor/server/info");
+      std::string service("/sensors/info/sensor");
 
       ignition::msgs::StringMsg req;
       req.set_data(this->dataPtr->selectedEntityName);
+
+      printf("%s\n", "balea2");
 
       this->dataPtr->ignNode.Request(service, req,
          &ModelListWidget::OnSensorInfo, this);
@@ -328,7 +328,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
       && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
     {
-      std::string service("sensor/server/info/plugin");
+      std::string service("/sensors/info/plugin");
 
       ignition::msgs::StringMsg req;
       req.set_data(this->dataPtr->selectedEntityName);
@@ -340,7 +340,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
       && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
     {
-      std::string service("visual/server/info");
+      std::string service("/rendering/info/visual");
 
       ignition::msgs::StringMsg req;
       req.set_data(this->dataPtr->selectedEntityName);
@@ -352,7 +352,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
       && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
     {
-      std::string service("visual/server/info/plugin");
+      std::string service("/rendering/info/plugin");
 
       ignition::msgs::StringMsg req;
       req.set_data(this->dataPtr->selectedEntityName);
@@ -372,9 +372,9 @@ void ModelListWidget::Update()
 {
   if (this->dataPtr->guiInfoRequested == false)
   {
-    std::string service("gui/server/info/plugin");
+    std::string service("/gui/info/plugin");
     ignition::msgs::StringMsg req;
-    req.set_data("data://gui/plugin/");
+    req.set_data("data://gui/gzclient/plugin/");
 
     this->dataPtr->ignNode.Request(service, req,
         &ModelListWidget::OnGUIPluginList, this);
@@ -404,7 +404,11 @@ void ModelListWidget::Update()
     else if (this->dataPtr->fillTypes[0] == "Wind")
       this->FillPropertyTree(this->dataPtr->windMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Light")
+      this->FillPropertyTree(this->dataPtr->lightMsg, nullptr);
+    else if (this->dataPtr->fillTypes[0] == "Spherical Coordinates")
+      this->FillPropertyTree(this->dataPtr->sphericalCoordMsg, nullptr);
     this->dataPtr->fillingPropertyTree = false;
+    this->dataPtr->fillTypes.pop_front();
   }
 
   if (!this->dataPtr->modelTreeWidget->currentItem())
@@ -413,7 +417,6 @@ void ModelListWidget::Update()
     this->dataPtr->propTreeBrowser->clear();
   }
 
-  this->dataPtr->fillTypes.clear();
   this->ProcessRemoveEntity();
   this->ProcessModelMsgs();
   this->ProcessLightMsgs();
@@ -2709,7 +2712,8 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
   item->setValue(_msg.name().c_str());
   item->setEnabled(false);
   this->AddProperty(item, _parent);
-/* TODO No GetLaser function
+/* TODO We can not retrieve the laser retro value without a 
+  // GetLaserRetro() function
   // Laser Retro value
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
                                            tr("laser_retro"));
@@ -2739,7 +2743,7 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
     item->setValue(0.0);
   item->setEnabled(false);
   this->AddProperty(item, _parent);
-/*
+/* TODO pose and geometry of pluginMsg are unknown
   // Pose value
   topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
@@ -3013,18 +3017,16 @@ void ModelListWidget::OnCreateScene(const std::string &_name)
   this->dataPtr->propTreeBrowser->clear();
   this->InitTransport(_name);
 
-  std::string service(gui::get_world() +
-    "/server/info/plugin");
-
-gzerr << "gogo" << service;
+  std::string service("/physics/info/plugin");
 
   ignition::msgs::StringMsg req;
 
   // Before entityName. Fill this with some name?
-  req.set_data("data://world/default/plugin/");
+
+  req.set_data("data://world/" + gui::get_world() + "/plugin/");
 
   this->dataPtr->ignNode.Request(service, req,
-      &ModelListWidget::OnPluginList, this);
+      &ModelListWidget::OnWorldPluginList, this);
   // this->requestMsg = msgs::CreateRequest("scene_info");
   // this->requestPub->Publish(*this->requestMsg);
 }
@@ -3752,18 +3754,22 @@ void ModelListWidget::FillGrid()
 void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
     const bool _success)
 {
+printf("%s\n", "chara");  
   if (!_success)
   {
     gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
     return;
   }
 
+printf("%s\n", "char");
   // We asked for only one plugin
   GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
 
   this->dataPtr->propMutex->lock();
   this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
+  printf("%s\n", "char2");
   this->dataPtr->fillTypes.push_back("Plugin");
+  printf("%s\n", "char5");
   this->dataPtr->propMutex->unlock();
 }
 
@@ -3773,16 +3779,16 @@ void ModelListWidget::OnSensorInfo(const ignition::msgs::Plugin_V &_plugins,
 {/*
   if (!_success)
   {
-    gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
+    gzerr << "Failed to receive sensor info. Check server logs." << std::endl;
     return;
   }
 
-  // We asked for only one plugin
-  GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+  // We asked for only one sensor
+  GZ_ASSERT(_sensors.sensors().size() == 1, "Wrong number of sensors");
 
   this->dataPtr->propMutex->lock();
-  this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
-  this->dataPtr->fillTypes.push_back("Plugin");
+  this->dataPtr->pluginMsg.CopyFrom(_sensors.sensors(0));
+  this->dataPtr->fillTypes.push_back("Sensor");
   this->dataPtr->propMutex->unlock();*/
 }
 
@@ -3810,11 +3816,9 @@ void ModelListWidget::OnVisualInfo(const ignition::msgs::Visual_V &_visuals,
 void ModelListWidget::OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
     const bool _success)
 {
-  gzerr << "prille in error onpluginlis started";
-
   if (!_success)
   {
-    gzerr << "Failed to receive plugin list. Check server logs." << std::endl;
+    gzerr << "Failed to receive plugin list. Check client logs." << std::endl;
     return;
   }
 
@@ -3853,6 +3857,7 @@ void ModelListWidget::OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
       pluginUri.SetScheme("data");
 
       pluginUri.Path().PushBack("gui");
+      pluginUri.Path().PushBack("gzclient");
       pluginUri.Path().PushBack("plugin");
       pluginUri.Path().PushBack(pluginName);
 
@@ -3866,7 +3871,7 @@ void ModelListWidget::OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnPluginList(const ignition::msgs::Plugin_V &_plugins,
+void ModelListWidget::OnWorldPluginList(const ignition::msgs::Plugin_V &_plugins,
     const bool _success)
 {
   if (!_success)

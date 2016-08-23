@@ -449,9 +449,6 @@ namespace gazebo
       /// * Info about all world plugins in this world (empty plugin name):
       ///    data://world/<this_name>/plugin
       ///
-      /// * Info about a model plugin in a child model:
-      ///    data://world/<this_name>/model/<model_name>/plugin/<plugin_name>
-      ///
       /// \param[in] _pluginUri URI for the desired plugin(s).
       /// \param[out] _plugins Message containing vector of plugins.
       /// \param[out] _success True if the info was successfully obtained.

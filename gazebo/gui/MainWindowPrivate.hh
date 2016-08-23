@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-#include <ignition/msgs/plugin.pb.h>
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/gazebo_config.h"

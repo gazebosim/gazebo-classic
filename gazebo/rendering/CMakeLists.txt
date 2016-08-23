@@ -195,6 +195,7 @@ gz_add_library(gazebo_rendering ${sources})
 target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
+  gazebo_util
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}

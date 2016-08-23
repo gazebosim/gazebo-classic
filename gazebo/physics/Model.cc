@@ -30,7 +30,6 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -53,7 +52,6 @@
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/util/IgnMsgSdf.hh"
-
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/OpenAL.hh"
 
@@ -1673,6 +1671,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
     return;
   }
 
+printf("%s\n", "model");
   auto parts = common::split(_pluginUri.Path().Str(), "/");
   auto myParts = common::split(this->URI().Path().Str(), "/");
 
@@ -1686,7 +1685,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
 
   // Check if all segments match up to this model
   size_t i = 0;
-  for ( ; i < myParts.size(); ++i)
+  for (; i < myParts.size(); ++i)
   {
     if (parts[i] != myParts[i])
     {
@@ -1696,6 +1695,8 @@ void Model::PluginInfo(const common::URI &_pluginUri,
     }
   }
 
+printf("%s\n", "model2");
+  // Iterate over parts following this model
   for (; i < parts.size(); i = i+2)
   {
     if (parts[i] == "model")
@@ -1724,7 +1725,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
       }
 
       // Find correct plugin
-      sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+      auto pluginElem = this->sdf->GetElement("plugin");
       while (pluginElem)
       {
         auto pluginName = pluginElem->Get<std::string>("name");
@@ -1750,6 +1751,7 @@ void Model::PluginInfo(const common::URI &_pluginUri,
             this->URI().Str() << "]" << std::endl;
         return;
       }
+      printf("%s\n", "model");
       _success = true;
       return;
     }

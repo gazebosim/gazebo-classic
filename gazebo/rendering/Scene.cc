@@ -23,10 +23,12 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
+#include <ignition/msgs/Utility.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -74,9 +76,6 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/common/URI.hh"
 #include "gazebo/util/IgnMsgSdf.hh"
-#include "gazebo/common/CommonIface.hh"
-
-//#include "gazebo/gui/GuiIface.hh"
 
 #ifdef HAVE_OCULUS
 #include "gazebo/rendering/OculusCamera.hh"
@@ -322,7 +321,7 @@ void Scene::Load()
       RenderEngine::Instance()->OverlaySystem());
 #endif
 
-  std::string service("visual/server/info");
+  std::string service("/rendering/info/visual");
   if (!this->dataPtr->ignNode.Advertise(service,
     &Scene::VisualInfoService, this))
   {
@@ -330,7 +329,7 @@ void Scene::Load()
       << std::endl;
   }
 
-  std::string pluginService("visual/server/info/plugin");
+  std::string pluginService("/rendering/info/plugin");
   if (!this->dataPtr->ignNode.Advertise(pluginService,
     &Scene::PluginInfoService, this))
   {
@@ -3646,7 +3645,7 @@ void Scene::VisualInfo(const common::URI _visualUri,
     ignition::msgs::Visual_V &_visuals, bool &_success)
 {
   _visuals.clear_visuals();
-  _success = true;
+  _success = false;
 
   if (!_visualUri.Valid())
   {
@@ -3679,7 +3678,7 @@ void Scene::VisualInfo(const common::URI _visualUri,
   visualMsg->set_cast_shadows(visual->GetCastShadows());
   visualMsg->set_transparency(visual->GetTransparency());
   // TODO No set_pose/geo function??  
-  //visualMsg->set_pose(visual->GetPose());
+  ignition::msgs::Set(visualMsg->mutable_pose(), visual->GetPose().Ign());
   //visualMsg->set_geometry(visual->GetGeometrySize());
 
   _success = true;
@@ -3698,7 +3697,7 @@ void Scene::PluginInfo(const common::URI &_pluginUri,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
   _plugins.clear_plugins();
-  _success = true;
+  _success = false;
 
   if (!_pluginUri.Valid())
   {

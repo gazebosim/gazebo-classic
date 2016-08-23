@@ -260,7 +260,7 @@ namespace gazebo
       /// \brief Callback when plugin list is received.
       /// \param[in] _plugins Vector of plugins.
       /// \param[in] _success True if the info was successfully received.
-      private: void OnPluginList(const ignition::msgs::Plugin_V &_plugins,
+      private: void OnWorldPluginList(const ignition::msgs::Plugin_V &_plugins,
           const bool _success);
 
       /// \internal

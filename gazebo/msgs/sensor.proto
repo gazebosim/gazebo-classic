@@ -67,5 +67,5 @@ message Sensor
   optional IMUSensor imu          = 16;
 
   /// \brief An array of plugins.
-  repeated Plugin plugin          = 17;
+  repeated Plugin plugin       = 17;
 }

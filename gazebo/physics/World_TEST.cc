@@ -204,13 +204,12 @@ TEST_F(WorldTest, ModelPluginInfo)
 
   ignition::msgs::Plugin_V plugins;
   bool success;
-  common::URI pluginUri;
+  ignition::msgs::StringMsg req;
 
   gzmsg << "Get an existing plugin" << std::endl;
   {
-    pluginUri.Parse(
-        "data://world/default/model/submarine/plugin/submarine_propeller_3");
-    world->PluginInfo(pluginUri, plugins, success);
+    req.set_data("data://world/default/model/submarine/plugin/submarine_propeller_3");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
@@ -219,8 +218,8 @@ TEST_F(WorldTest, ModelPluginInfo)
 
   gzmsg << "Get all plugins" << std::endl;
   {
-    pluginUri.Parse("data://world/default/model/submarine/plugin/");
-    world->PluginInfo(pluginUri, plugins, success);
+    req.set_data("data://world/default/model/submarine/plugin/");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 5);
@@ -237,6 +236,9 @@ TEST_F(WorldTest, WorldPluginInfo)
 {
   this->Load("worlds/wind_demo.world", true);
 
+// Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+
   ignition::msgs::Plugin_V plugins;
   bool success;
   common::URI pluginUri;
@@ -245,7 +247,7 @@ TEST_F(WorldTest, WorldPluginInfo)
   {
     pluginUri.Parse(
         "data://world/default/plugin/wind");
-    this->PluginInfo(pluginUri, plugins, success);
+    mainWindow->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
@@ -256,7 +258,7 @@ TEST_F(WorldTest, WorldPluginInfo)
   {
     pluginUri.Parse(
         "data://world/default/plugin/");
-    this->PluginInfo(pluginUri, plugins, success);
+    mainWindow->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);

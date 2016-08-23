@@ -55,6 +55,24 @@ SensorManager::SensorManager()
 
   // sensors::OTHER container
   this->sensorContainers.push_back(new SensorContainer());
+
+  printf("%s\n", "bala");
+
+  std::string sensorService("/sensors/info/sensor");
+  if (!this->ignNode.Advertise(sensorService,
+      &SensorManager::SensorInfoService, this))
+  {
+    gzerr << "Error advertising service [" << sensorService << "]"
+    << std::endl;
+  }
+
+  std::string pluginService("/sensors/info/plugin");
+  if (!this->ignNode.Advertise(pluginService,
+      &SensorManager::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << pluginService << "]"
+    << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -224,22 +242,6 @@ void SensorManager::Init()
         std::placeholders::_3, std::placeholders::_4));
 
   this->initialized = true;
-
-  std::string service("sensor/server/info/pluginnew");
-  if (!this->ignNode.Advertise(service,
-      &SensorManager::SensorInfoService, this))
-  {
-    gzerr << "Error advertising service [" << service << "]"
-    << std::endl;
-  }
-
-  std::string Pluginservice("sensor/server/info/plugin");
-  if (!this->ignNode.Advertise(service,
-      &SensorManager::PluginInfoService, this))
-  {
-    gzerr << "Error advertising service [" << service << "]"
-    << std::endl;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -792,7 +794,6 @@ void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
   void SensorManager::PluginInfoService(const ignition::msgs::StringMsg &_req,
       ignition::msgs::Plugin_V &_plugins, bool &_success)
   {
-    gzerr << "HACKA";
     this->PluginInfo(_req.data(), _plugins, _success);
   }
 
@@ -911,7 +912,7 @@ void SimTimeEventHandler::OnUpdate(const common::UpdateInfo &_info)
 void SensorManager::SensorInfoService(const ignition::msgs::StringMsg &_req,
           ignition::msgs::Sensor_V &_sensors, bool &_success)
 {
-  gzerr << "salomeCLUB" << _success;
+  printf("%s\n", "bolek");
   this->SensorInfo(_req.data(), _sensors, _success);
 }
 
@@ -921,8 +922,6 @@ void SensorManager::SensorInfo(const common::URI &_sensorUri,
 {
   _sensors.clear_sensors();
   _success = true;
-
-  printf("%s\n", "BIER BITTE!!!");
 
   if (!_sensorUri.Valid())
   {

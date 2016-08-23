@@ -70,7 +70,7 @@ TEST_F(ModelTest, PluginInfoFailures)
   bool success;
   common::URI pluginUri;
 
-  gzmsg << "Get all plugins" << std::endl;
+  gzmsg << "Model has no plugins" << std::endl;
   {
     pluginUri.Parse("data://world/default/model/box/plugin/");
     model->PluginInfo(pluginUri, plugins, success);
