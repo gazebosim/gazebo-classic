@@ -112,8 +112,8 @@ app.post('/events/new',
 
 app.use(express.static(__dirname));
 
-console.log('Listening on port 3000');
+console.log('Listening on port 5000');
 //httpServer.listen(80);
 //httpsServer.listen(443);
-httpsServer.listen(3000);
+httpsServer.listen(5000);
 

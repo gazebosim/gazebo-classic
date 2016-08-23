@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A ODE sphere shape
-    class GZ_PHYSICS_ODE_VISIBLE ODESphereShape : public SphereShape
+    class GZ_PHYSICS_VISIBLE ODESphereShape : public SphereShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -53,6 +56,7 @@ namespace gazebo
           dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
       }
     };
+    /// \}
   }
 }
 #endif

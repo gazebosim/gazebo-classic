@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,21 +100,6 @@ void ODEFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzwarn << "ODEFixedJoint: called method "
          << "SetVelocity that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-void ODEFixedJoint::SetMaxForce(unsigned int /*index*/, double /*_t*/)
-{
-  gzwarn << "ODEFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double ODEFixedJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzwarn << "ODEFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
-  return 0.0;
 }
 
 //////////////////////////////////////////////////

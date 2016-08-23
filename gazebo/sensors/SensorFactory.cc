@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
 void RegisterSonarSensor();
+void RegisterWideAngleCameraSensor();
 void RegisterWirelessReceiver();
 void RegisterWirelessTransmitter();
 
@@ -61,16 +62,17 @@ void SensorFactory::RegisterAll()
   RegisterContactSensor();
   RegisterDepthCameraSensor();
   RegisterForceTorqueSensor();
-  RegisterImuSensor();
   RegisterGpsSensor();
   RegisterGpuRaySensor();
+  RegisterImuSensor();
   RegisterLogicalCameraSensor();
-  RegisterMultiCameraSensor();
   RegisterMagnetometerSensor();
+  RegisterMultiCameraSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
   RegisterSonarSensor();
+  RegisterWideAngleCameraSensor();
   RegisterWirelessReceiver();
   RegisterWirelessTransmitter();
 }

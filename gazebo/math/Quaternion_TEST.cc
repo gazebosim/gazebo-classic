@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Quaternion.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class QuaternionTest : public gazebo::testing::AutoLogFixture { };
+class QuaternionTest : public ::testing::Test { };
 
 //////////////////////////////////////////////////
 TEST_F(QuaternionTest, Quaternion)
@@ -282,6 +281,23 @@ TEST_F(QuaternionTest, Quaternion)
                 -0.344106, 0.392882, 0.85278, 0,
                 0, 0, 0, 1));
   }
+
+  // Test quaternion multiplication (rotation) order of application
+  // if qa rotates frame o to p
+  //    qb rotates frame p to q
+  //    qc rotates frame q to r
+  //    qd rotates frame r to s
+  // then qd * qc * qb * qa rotates frame o to s
+  EXPECT_EQ(math::Quaternion(0, 0, 0),
+            math::Quaternion(0, -0.5*M_PI, 0)*
+            math::Quaternion(-0.5*M_PI, 0, 0)*
+            math::Quaternion(0,  0.5*M_PI, 0)*
+            math::Quaternion(0, 0,  0.5*M_PI));
+  EXPECT_EQ(math::Quaternion(0, 0, M_PI),
+            math::Quaternion(0, 0,  0.5*M_PI)*
+            math::Quaternion(0,  0.5*M_PI, 0)*
+            math::Quaternion(-0.5*M_PI, 0, 0)*
+            math::Quaternion(0, -0.5*M_PI, 0));
 }
 
 //////////////////////////////////////////////////

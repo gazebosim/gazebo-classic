@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,8 @@ void Distortion::SetCamera(CameraPtr _camera)
   }
 
   // seems to work best with a square distortion map texture
-  unsigned int texSide = _camera->GetImageHeight() > _camera->GetImageWidth() ?
-      _camera->GetImageHeight() : _camera->GetImageWidth();
+  unsigned int texSide = _camera->ImageHeight() > _camera->ImageWidth() ?
+      _camera->ImageHeight() : _camera->ImageWidth();
   unsigned int texWidth = texSide;
   unsigned int texHeight = texSide;
   unsigned int imageSize = texWidth * texHeight;
@@ -212,11 +212,11 @@ void Distortion::SetCamera(CameraPtr _camera)
       "Gazebo/CameraDistortionMap");
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
-      _camera->GetViewport(), "CameraDistortionMap/Default");
+      _camera->OgreViewport(), "CameraDistortionMap/Default");
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 
   // create the distortion map texture
-  std::string texName = _camera->GetName() + "_distortionTex";
+  std::string texName = _camera->Name() + "_distortionTex";
   Ogre::TexturePtr renderTexture =
       Ogre::TextureManager::getSingleton().createManual(
           texName,

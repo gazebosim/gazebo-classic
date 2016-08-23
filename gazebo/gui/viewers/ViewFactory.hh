@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,12 +35,12 @@ namespace gazebo
     /// \brief Prototype for view factory functions
     typedef TopicView* (*ViewFactoryFn) (QWidget *_parent);
 
-    /// \addtogroup gazebo_views
+    /// \addtogroup gazebo_gui
     /// \{
     /// \class ViewFactory ViewFactory.hh gui/viewers/ViewFactory.hh
     /// \brief The view factory creates GUI widgets to visualize data on
     /// a topic.
-    class GZ_GUI_VIEWERS_VISIBLE ViewFactory
+    class GZ_GUI_VISIBLE ViewFactory
     {
       /// \brief Register all known views
       public: static void RegisterAll();
@@ -76,11 +76,11 @@ namespace gazebo
     /// \param[in] msgtype Type of message to visualize.
     /// \param[in] classname C++ class name for the view.
     #define GZ_REGISTER_STATIC_VIEWER(msgtype, classname) \
-    GZ_GUI_VIEWERS_VISIBLE TopicView *New##classname(QWidget *_parent) \
+    GZ_GUI_VISIBLE TopicView *New##classname(QWidget *_parent) \
     { \
       return new gazebo::gui::classname(_parent); \
     } \
-    GZ_GUI_VIEWERS_VISIBLE \
+    GZ_GUI_VISIBLE \
     void Register##classname() \
     {\
       ViewFactory::RegisterView(msgtype, New##classname);\

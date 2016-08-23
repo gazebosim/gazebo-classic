@@ -215,8 +215,8 @@ Model with a revolute joint
         </link>
 
         <joint name='joint' type='revolute'>
-          <parent>needle</parent>
-          <child>base</child>
+          <parent>base</parent>
+          <child>needle</child>
 
           <pose>0 0 0 0 0 0</pose>
           <axis>

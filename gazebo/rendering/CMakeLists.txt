@@ -7,12 +7,6 @@ include_directories(SYSTEM
   skyx/include
 )
 
-if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
-  add_subdirectory(deferred_shading)
-endif()
-
-add_subdirectory(skyx)
-add_subdirectory(selection_buffer)
 
 if (WIN32)
   include_directories(${libdl_include_dir})
@@ -66,6 +60,7 @@ set (sources
   VideoVisual.cc
   ViewController.cc
   Visual.cc
+  WideAngleCamera.cc
   WireBox.cc
   WindowManager.cc
   WrenchVisual.cc
@@ -126,11 +121,19 @@ set (headers
   VideoVisual.hh
   ViewController.hh
   Visual.hh
+  WideAngleCamera.hh
   WireBox.hh
   WindowManager.hh
   WrenchVisual.hh
   ogre_gazebo.h
 )
+
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
+  add_subdirectory(deferred_shading)
+endif()
+
+add_subdirectory(selection_buffer)
+add_subdirectory(skyx)
 
 if (HAVE_OCULUS)
   set (sources ${sources}
@@ -145,12 +148,13 @@ set (gtest_sources
   RenderingConversions_TEST.cc
 )
 
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_rendering)
 
 set (gtest_sources_dri
   COMVisual_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
+  InertiaVisual_TEST.cc
   JointVisual_TEST.cc
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
@@ -161,7 +165,8 @@ set (gtest_sources_dri
   Visual_TEST.cc
 )
 
-gz_build_dri_tests(${gtest_sources_dri})
+gz_build_dri_tests(${gtest_sources_dri}
+  EXTRA_LIBS gazebo_rendering gazebo_test_fixture)
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
@@ -175,7 +180,8 @@ link_directories(
   ${ogre_library_dirs}
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING")
+set (CMAKE_CXX_FLAGS
+  "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB")
 if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
 endif()
@@ -185,8 +191,6 @@ gz_add_library(gazebo_rendering ${sources})
 target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
-  gazebo_skyx
-  gazebo_selection_buffer
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
@@ -199,10 +203,6 @@ endif()
 
 if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
-endif()
-
-if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
-  target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
 endif()
 
 gz_install_library(gazebo_rendering)

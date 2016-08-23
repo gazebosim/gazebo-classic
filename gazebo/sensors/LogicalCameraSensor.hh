@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 #define _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 #include <sdf/sdf.hh>
 
@@ -57,6 +58,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
+      // Remove this in gazebo8.
       public: virtual std::string GetTopic() const;
 
       /// \brief Get the near distance. This is the distance from the
@@ -86,17 +88,24 @@ namespace gazebo
       public: msgs::LogicalCameraImage Image() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // \brief Finalize the logical camera
       protected: virtual void Fini();
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
+
+      // Documentation inherited.
+      // Move this to the public section in gazebo8. Basically move this
+      // function up in this file to be grouped with other public functions
+      // per the Gazebo style guide. This should replace the GetTopic
+      // function.
+      public: virtual std::string Topic() const;
 
       // \internal
       // \brief Private data pointer
-      private: LogicalCameraSensorPrivate *dataPtr;
+      private: std::unique_ptr<LogicalCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

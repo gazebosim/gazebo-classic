@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 
 using namespace gazebo;
-class Scene_TEST : public ServerFixture
+class Scene_TEST : public RenderingFixture
 {
 };
 
@@ -35,33 +35,33 @@ TEST_F(Scene_TEST, AddRemoveCameras)
   ASSERT_TRUE(scene != NULL);
 
   // verify no cameras are currently in the scene
-  EXPECT_EQ(scene->GetCameraCount(), 0u);
+  EXPECT_EQ(scene->CameraCount(), 0u);
 
   // create a camera and verify count
   rendering::CameraPtr camera = scene->CreateCamera("test_camera", false);
-  EXPECT_EQ(scene->GetCameraCount(), 1u);
+  EXPECT_EQ(scene->CameraCount(), 1u);
   EXPECT_TRUE(scene->GetCamera("test_camera") == camera);
 
   // create another camera and verify count
   rendering::CameraPtr camera2 = scene->CreateCamera("test_camera2", false);
-  EXPECT_EQ(scene->GetCameraCount(), 2u);
+  EXPECT_EQ(scene->CameraCount(), 2u);
   EXPECT_TRUE(scene->GetCamera("test_camera2") == camera2);
 
   // Remove a camera and check that it has been removed
-  scene->RemoveCamera(camera->GetName());
-  EXPECT_EQ(scene->GetCameraCount(), 1u);
+  scene->RemoveCamera(camera->Name());
+  EXPECT_EQ(scene->CameraCount(), 1u);
   EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
   EXPECT_TRUE(scene->GetCamera("test_camera2") != NULL);
 
   // remove non-existent camera
   scene->RemoveCamera("no_such_camera");
-  EXPECT_EQ(scene->GetCameraCount(), 1u);
+  EXPECT_EQ(scene->CameraCount(), 1u);
   EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
   EXPECT_TRUE(scene->GetCamera("test_camera2") != NULL);
 
   // Remove the remaining camera and check that it has been removed
-  scene->RemoveCamera(camera2->GetName());
-  EXPECT_EQ(scene->GetCameraCount(), 0u);
+  scene->RemoveCamera(camera2->Name());
+  EXPECT_EQ(scene->CameraCount(), 0u);
   EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
   EXPECT_TRUE(scene->GetCamera("test_camera2") == NULL);
 }
@@ -76,26 +76,26 @@ TEST_F(Scene_TEST, AddRemoveVisuals)
   ASSERT_TRUE(scene != NULL);
 
   // Check that it has two visuals, the world and origin visuals
-  EXPECT_EQ(scene->GetVisualCount(), 2u);
+  EXPECT_EQ(scene->VisualCount(), 2u);
   EXPECT_TRUE(scene->GetVisual("__world_node__") != NULL);
 
   // Add a visual and check that it has been added
   rendering::VisualPtr visual1;
   visual1.reset(new rendering::Visual("visual1", scene));
   scene->AddVisual(visual1);
-  EXPECT_EQ(scene->GetVisualCount(), 3u);
+  EXPECT_EQ(scene->VisualCount(), 3u);
   EXPECT_TRUE(scene->GetVisual("visual1") != NULL);
 
   // Add a visual and check that it has been added
   rendering::VisualPtr visual2;
   visual2.reset(new rendering::Visual("visual2", scene));
   scene->AddVisual(visual2);
-  EXPECT_EQ(scene->GetVisualCount(), 4u);
+  EXPECT_EQ(scene->VisualCount(), 4u);
   EXPECT_TRUE(scene->GetVisual("visual2") != NULL);
 
   // Remove a visual and check that it has been removed
   scene->RemoveVisual(visual1);
-  EXPECT_EQ(scene->GetVisualCount(), 3u);
+  EXPECT_EQ(scene->VisualCount(), 3u);
   EXPECT_FALSE(scene->GetVisual("visual1"));
 }
 

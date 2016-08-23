@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ namespace gazebo
   {
     class SimbodyMesh;
 
+    /// \addtogroup gazebo_physics_simbody
+    /// \{
+
     /// \brief Simbody polyline shape
     class GZ_PHYSICS_VISIBLE SimbodyPolylineShape : public PolylineShape
     {
@@ -45,6 +48,7 @@ namespace gazebo
       /// \brief Simbody collsion mesh helper class.
       private: SimbodyMesh *simbodyMesh;
     };
+    /// \}
   }
 }
 #endif

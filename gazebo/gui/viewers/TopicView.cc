@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,25 +45,25 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic View"));
   this->setObjectName("cameraSensor");
+  this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
 
   // Create the topic label and combo box
-  // {
   QHBoxLayout *topicLayout = new QHBoxLayout;
   QLabel *topicLabel = new QLabel(tr("Topic: "));
   this->topicCombo = new TopicCombo(this, this->msgTypeName,
       _viewType, this->node);
   this->topicCombo->setMinimumSize(300, 25);
   this->topicCombo->setObjectName("topicViewTopicCombo");
+  this->connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnTopicChanged(int)));
 
   topicLayout->addSpacing(10);
   topicLayout->addWidget(topicLabel);
   topicLayout->addWidget(this->topicCombo);
   topicLayout->addSpacing(10);
   topicLayout->addStretch(4);
-  // }
 
   // Create the Hz and bandwidth labels
-  // {
   QHBoxLayout *infoLayout = new QHBoxLayout;
   QLabel *hzLabel = new QLabel(tr("Hz: "));
   this->hzEdit = new QLineEdit;
@@ -83,7 +83,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   infoLayout->addWidget(bandwidthLabel);
   infoLayout->addWidget(this->bandwidthEdit);
   infoLayout->addStretch(4);
-  // }
 
   // Create the frame used to display information
   this->frame = new QFrame;
@@ -99,8 +98,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(_displayPeriod);
-
-  this->setWindowFlags(Qt::Window);
 }
 
 /////////////////////////////////////////////////
@@ -221,21 +218,29 @@ void TopicView::SetTopic(const std::string &_topicName)
   this->msgTypeName = transport::getTopicMsgType(
       this->node->DecodeTopicName(_topicName));
 
+  if (this->msgTypeName.empty())
+  {
+    gzerr << "Can't find msg type for topic [" << _topicName << "]" <<
+        std::endl;
+    return;
+  }
+
   this->topicCombo->SetMsgTypeName(this->msgTypeName);
 
   this->msgSizes.clear();
   this->times.clear();
   std::string topicName = this->node->EncodeTopicName(_topicName);
 
-  disconnect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
-             this, SLOT(OnTopicChanged(int)));
-
   int index = this->topicCombo->findText(QString::fromStdString(topicName));
-  if (index >= 0)
-    this->topicCombo->setCurrentIndex(index);
+  if (index < 0)
+  {
+    gzerr << "Can't find topic [" << topicName << "]" << std::endl;
+    return;
+  }
 
-  connect(this->topicCombo, SIGNAL(currentIndexChanged(int)),
-          this, SLOT(OnTopicChanged(int)));
+  this->topicCombo->blockSignals(true);
+  this->topicCombo->setCurrentIndex(index);
+  this->topicCombo->blockSignals(false);
 }
 
 /////////////////////////////////////////////////

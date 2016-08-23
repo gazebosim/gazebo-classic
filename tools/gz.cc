@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1018,27 +1018,14 @@ bool SDFCommand::RunImpl()
     if (!boost::filesystem::exists(path))
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
 
-    TiXmlDocument xmlDoc;
-    if (xmlDoc.LoadFile(path.string()))
+    if (sdf::convertFile(path.string(), sdf::SDF::Version(), sdf))
     {
-      if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::Version(), true))
-      {
-        // Create an XML printer to control formatting
-        TiXmlPrinter printer;
-        printer.SetIndent("  ");
-        xmlDoc.Accept(&printer);
-
-        // Output the XML
-        std::ofstream stream(path.string().c_str(), std::ios_base::out);
-        stream << printer.Str();
-        stream.close();
-
-        std::cout << "Success\n";
-      }
+      sdf->Write(path.string());
+      std::cout << "Success\n";
     }
     else
     {
-      std::cerr << "Unable to load file[" << path.string() << "]\n";
+      std::cerr << "Unable to convert file[" << path.string() << "]\n";
       return false;
     }
   }

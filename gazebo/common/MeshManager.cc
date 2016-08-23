@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 #include <sys/stat.h>
 #include <string>
 #include <map>
@@ -195,29 +196,12 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void MeshManager::GetMeshAABB(const Mesh *_mesh, math::Vector3 &_center,
-    math::Vector3 &_minXYZ, math::Vector3 &_maxXYZ)
-{
-  ignition::math::Vector3d center, minXYZ, maxXYZ;
-  this->GetMeshAABB(_mesh, center, minXYZ, maxXYZ);
-  _center = center;
-  _minXYZ = minXYZ;
-  _maxXYZ = maxXYZ;
-}
-
-//////////////////////////////////////////////////
 void MeshManager::GetMeshAABB(const Mesh *_mesh,
     ignition::math::Vector3d &_center,
     ignition::math::Vector3d &_minXYZ, ignition::math::Vector3d &_maxXYZ)
 {
   if (this->HasMesh(_mesh->GetName()))
     this->meshes[_mesh->GetName()]->GetAABB(_center, _minXYZ, _maxXYZ);
-}
-
-//////////////////////////////////////////////////
-void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, math::Vector3 _center)
-{
-  this->GenSphericalTexCoord(_mesh, _center.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -322,30 +306,12 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 
 //////////////////////////////////////////////////
 void MeshManager::CreatePlane(const std::string &_name,
-    const math::Plane &_plane,
-    const math::Vector2d &_segments,
-    const math::Vector2d &_uvTile)
-{
-  this->CreatePlane(_name, _plane.Ign(), _segments.Ign(), _uvTile.Ign());
-}
-
-//////////////////////////////////////////////////
-void MeshManager::CreatePlane(const std::string &_name,
     const ignition::math::Planed &_plane,
     const ignition::math::Vector2d &_segments,
     const ignition::math::Vector2d &_uvTile)
 {
   this->CreatePlane(_name, _plane.Normal(), _plane.Offset(), _plane.Size(),
       _segments, _uvTile);
-}
-
-//////////////////////////////////////////////////
-void MeshManager::CreatePlane(const std::string &_name,
-    const math::Vector3 &_normal, double _d, const math::Vector2d &_size,
-    const math::Vector2d &_segments, const math::Vector2d &_uvTile)
-{
-  this->CreatePlane(_name, _normal.Ign(), _d, _size.Ign(), _segments.Ign(),
-      _uvTile.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -422,13 +388,6 @@ void MeshManager::CreatePlane(const std::string &_name,
   }
 
   this->Tesselate2DMesh(subMesh, _segments.X() + 1, _segments.Y() + 1, false);
-}
-
-//////////////////////////////////////////////////
-void MeshManager::CreateBox(const std::string &_name,
-    const math::Vector3 &_sides, const math::Vector2d &_uvCoords)
-{
-  this->CreateBox(_name, _sides.Ign(), _uvCoords.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -535,22 +494,6 @@ void MeshManager::CreateBox(const std::string &_name,
 
 //////////////////////////////////////////////////
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
-    const std::vector<std::vector<math::Vector2d> > &_polys, double _height)
-{
-  std::vector<std::vector<ignition::math::Vector2d> > polys;
-  for (auto const &polyVec : _polys)
-  {
-    std::vector<ignition::math::Vector2d> newVec;
-    for (auto const &poly : polyVec)
-      newVec.push_back(poly.Ign());
-    polys.push_back(newVec);
-  }
-
-  this->CreateExtrudedPolyline(_name, polys, _height);
-}
-
-//////////////////////////////////////////////////
-void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     const std::vector<std::vector<ignition::math::Vector2d> > &_polys,
     double _height)
 {
@@ -586,7 +529,6 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -691,6 +633,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   if (normals.size() != edges.size())
   {
     gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
+    delete mesh;
     return;
   }
 
@@ -761,6 +704,9 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
       subMesh->AddNormal(normals[i]);
     }
   }
+
+  this->meshes.insert(std::make_pair(_name, mesh));
+  return;
 }
 
 //////////////////////////////////////////////////
@@ -1321,13 +1267,6 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 }
 
 #ifdef HAVE_GTS
-//////////////////////////////////////////////////
-void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
-    const Mesh *_m2, int _operation, const math::Pose &_offset)
-{
-  this->CreateBoolean(_name, _m1, _m2, _operation, _offset.Ign());
-}
-
 //////////////////////////////////////////////////
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
     const Mesh *_m2, int _operation, const ignition::math::Pose3d &_offset)

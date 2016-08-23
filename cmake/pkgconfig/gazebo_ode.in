@@ -7,4 +7,4 @@ Description: Gazebo Exported ODE Libraries
 Version: @GAZEBO_VERSION_FULL@
 Requires:
 Libs: -Wl,-rpath,${prefix}/@CMAKE_INSTALL_LIBDIR@ -L${prefix}/@CMAKE_INSTALL_LIBDIR@ -lgazebo_ode
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@
+CFlags: -I${includedir}/gazebo-@GAZEBO_MAJOR_VERSION@

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,15 +33,15 @@ common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
 }
 
 //////////////////////////////////////////////////
-Ogre::Vector3 Conversions::Convert(const math::Vector3 &v)
+Ogre::Vector3 Conversions::Convert(const math::Vector3 &_v)
 {
-  return Ogre::Vector3(v.x, v.y, v.z);
+  return Ogre::Vector3(_v.x, _v.y, _v.z);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
+math::Vector3 Conversions::Convert(const Ogre::Vector3 &_v)
 {
-  return math::Vector3(v.x, v.y, v.z);
+  return math::Vector3(_v.x, _v.y, _v.z);
 }
 
 //////////////////////////////////////////////////
@@ -96,4 +96,36 @@ Ogre::Matrix4 Conversions::Convert(const ignition::math::Matrix4d &_m)
                        _m(1, 0), _m(1, 1), _m(1, 2), _m(1, 3),
                        _m(2, 0), _m(2, 1), _m(2, 2), _m(2, 3),
                        _m(3, 0), _m(3, 1), _m(3, 2), _m(3, 3));
+}
+
+//////////////////////////////////////////////////
+ReferenceFrame Conversions::Convert(const Ogre::Node::TransformSpace &_ts)
+{
+  switch (_ts)
+  {
+    case Ogre::Node::TS_LOCAL:
+      return RF_LOCAL;
+    case Ogre::Node::TS_PARENT:
+      return RF_PARENT;
+    case Ogre::Node::TS_WORLD:
+      return RF_WORLD;
+    default:
+      return RF_LOCAL;
+  }
+}
+
+//////////////////////////////////////////////////
+Ogre::Node::TransformSpace Conversions::Convert(const ReferenceFrame &_rf)
+{
+  switch (_rf)
+  {
+    case RF_LOCAL:
+      return Ogre::Node::TS_LOCAL;
+    case RF_PARENT:
+      return Ogre::Node::TS_PARENT;
+    case RF_WORLD:
+      return Ogre::Node::TS_WORLD;
+    default:
+      return Ogre::Node::TS_LOCAL;
+  }
 }

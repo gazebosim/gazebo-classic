@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,44 @@ bool g_fullscreen = false;
 // This makes it possible to use common::Time in QT signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(common::Time)
+
+//////////////////////////////////////////////////
+// QT message handler that pipes qt messages into gazebo's console system.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
+    const QString &_msg)
+{
+  std::string msg = _msg.toStdString();
+  msg += "(" + _context.function + ")";
+#else
+void messageHandler(QtMsgType _type, const char *_msg)
+{
+  const char *msg = _msg;
+#endif
+
+  switch (_type)
+  {
+    case QtDebugMsg:
+      gzdbg << msg << std::endl;
+      break;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+    case QtInfoMsg:
+      gzmsg << msg << std::endl;
+      break;
+#endif
+    case QtWarningMsg:
+      gzwarn << msg << std::endl;
+      break;
+    case QtFatalMsg:
+    case QtCriticalMsg:
+      gzerr << msg << std::endl;
+      break;
+    default:
+      gzwarn << "Unknown QT Message type[" << _type << "]: "
+        << msg << std::endl;
+      break;
+  }
+}
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -252,6 +290,13 @@ bool gui::load()
     snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
 
+  // Register custom message handler
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  qInstallMessageHandler(messageHandler);
+#else
+  qInstallMsgHandler(messageHandler);
+#endif
+
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
@@ -272,7 +317,7 @@ bool gui::load()
 unsigned int gui::get_entity_id(const std::string &_name)
 {
   if (g_main_win)
-    return g_main_win->GetEntityId(_name);
+    return g_main_win->EntityId(_name);
   else
     return 0;
 }

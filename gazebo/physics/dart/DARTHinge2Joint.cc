@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ DARTHinge2Joint::DARTHinge2Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTHinge2Joint::~DARTHinge2Joint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
@@ -187,50 +187,6 @@ void DARTHinge2Joint::SetVelocity(unsigned int _index, double _vel)
     this->dataPtr->dtJoint->setVelocity(1, _vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
-}
-
-//////////////////////////////////////////////////
-double DARTHinge2Joint::GetMaxForce(unsigned int _index)
-{
-  double result = 0.0;
-
-  if (_index == 0)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dataPtr->dtJoint->getForceLowerLimit(0);
-    result = this->dataPtr->dtJoint->getForceUpperLimit(0);
-  }
-  else if (_index == 1)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dataPtr->dtJoint->getForceLowerLimit(1);
-    result = this->dataPtr->dtJoint->getForceUpperLimit(1);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-void DARTHinge2Joint::SetMaxForce(unsigned int _index, double _force)
-{
-  if (_index == 0)
-  {
-    this->dataPtr->dtJoint->setForceLowerLimit(0, -_force);
-    this->dataPtr->dtJoint->setForceUpperLimit(0, _force);
-  }
-  else if (_index == 1)
-  {
-    this->dataPtr->dtJoint->setForceLowerLimit(1, -_force);
-    this->dataPtr->dtJoint->setForceUpperLimit(1, _force);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
 }
 
 //////////////////////////////////////////////////

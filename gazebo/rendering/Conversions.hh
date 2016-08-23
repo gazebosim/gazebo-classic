@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef _CONVERSIONS_HH_
-#define _CONVERSIONS_HH_
+#ifndef _GAZEBO_CONVERSIONS_HH_
+#define _GAZEBO_CONVERSIONS_HH_
+
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -99,6 +102,18 @@ namespace gazebo
       /// \param[in] _m ignition math Matrix4d
       /// \return Ogre Matrix4
       public: static Ogre::Matrix4 Convert(const ignition::math::Matrix4d &_m);
+
+      /// \brief Return the equivalent ogre transform space
+      /// \param[in] _rf gazebo reference frame to convert
+      /// \return Ogre node transform space
+      public: static Ogre::Node::TransformSpace Convert(
+          const ReferenceFrame &_rf);
+
+      /// \brief Return the equivalent gazebo reference frame
+      /// \param[in] _ts Ogre node transform space to convert
+      /// \return Gazebo reference frame
+      public: static ReferenceFrame Convert(
+          const Ogre::Node::TransformSpace &_ts);
     };
     /// \}
   }

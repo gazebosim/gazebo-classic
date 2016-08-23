@@ -46,11 +46,7 @@
       <uri>model://bowl</uri>
     </include>
 
-
-
-
     <plugin name="SimEvents" filename="libSimEventsPlugin.so">
-
       <session></session>
 
       <region>

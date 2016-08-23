@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,22 +58,6 @@ double SimbodyFixedJoint::GetVelocity(unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GetVelocity that is not valid for joints of type fixed.\n";
-  return 0.0;
-}
-
-//////////////////////////////////////////////////
-void SimbodyFixedJoint::SetMaxForce(unsigned int /*_index*/,
-                                    double /*_force*/)
-{
-  gzwarn << "SimbodyFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyFixedJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzwarn << "SimbodyFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
   return 0.0;
 }
 

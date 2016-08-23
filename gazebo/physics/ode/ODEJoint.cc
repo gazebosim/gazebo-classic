@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,14 +55,25 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->Fini();
+}
 
-  delete this->feedback;
+//////////////////////////////////////////////////
+void ODEJoint::Fini()
+{
+  this->applyDamping.reset();
+
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = NULL;
+
   this->Detach();
 
   if (this->jointId)
     dJointDestroy(this->jointId);
+  this->jointId = NULL;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -203,9 +214,20 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
+  auto odeChild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
+  auto odeParent = boost::dynamic_pointer_cast<ODELink>(this->parentLink);
+
   Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
+
+  // By the time we get here, links and ODEIds might have already been
+  // cleaned up
+  if ((odeParent == NULL || odeParent->GetODEId() == NULL) ||
+      (odeChild == NULL || odeChild->GetODEId() == NULL))
+  {
+    return;
+  }
 
   if (this->jointId)
     dJointAttach(this->jointId, 0, 0);
@@ -621,6 +643,8 @@ void ODEJoint::Reset()
     dJointReset(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
+
+  this->forceAppliedTime = common::Time::Zero;
 
   Joint::Reset();
 }

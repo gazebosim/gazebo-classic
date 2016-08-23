@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,8 +99,9 @@ namespace gazebo
       /// \brief Torque vector.
       public: math::Vector3 torqueVector;
 
-      /// \brief Publishes the wrench message.
-      public: transport::PublisherPtr wrenchPub;
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
 
       /// \brief Visual of the targeted link.
       public: rendering::VisualPtr linkVisual;

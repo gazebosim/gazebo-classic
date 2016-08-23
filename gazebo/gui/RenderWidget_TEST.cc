@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@
 /////////////////////////////////////////////////
 void RenderWidget_TEST::InsertWidget()
 {
-  this->Load("empty.world");
-
   // Create a new render widget
   gazebo::gui::RenderWidget *renderWidget = new gazebo::gui::RenderWidget;
+
+  this->Load("empty.world");
 
   // Get the splitter widget
   QSplitter *splitter = renderWidget->findChild<QSplitter *>();

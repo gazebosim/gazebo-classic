@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ DARTFixedJoint::DARTFixedJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTFixedJoint::~DARTFixedJoint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
@@ -100,21 +100,6 @@ double DARTFixedJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzwarn << "DARTFixedJoint: called method "
          << "GetVelocity that is not valid for joints of type fixed.\n";
-  return 0.0;
-}
-
-//////////////////////////////////////////////////
-void DARTFixedJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
-{
-  gzwarn << "DARTFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double DARTFixedJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzwarn << "DARTFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
   return 0.0;
 }
 

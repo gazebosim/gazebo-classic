@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _TERRAIN_EDITOR_PALETTE_HH_
-#define _TERRAIN_EDITOR_PALETTE_HH_
+#ifndef _GAZEBO_GUI_TERRAINEDITORPALETTE_HH_
+#define _GAZEBO_GUI_TERRAINEDITORPALETTE_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -35,12 +36,14 @@ namespace gazebo
 
   namespace gui
   {
+    class TerrainEditorPalettePrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class TerrainEditorPalette TerrainEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class GZ_GUI_TERRAIN_VISIBLE TerrainEditorPalette : public QWidget
+    class GZ_GUI_VISIBLE TerrainEditorPalette : public QWidget
     {
       Q_OBJECT
 
@@ -67,8 +70,8 @@ namespace gazebo
       /// \param[in] _heightmap Heightmap on which to apply the modification.
       /// \return True if the brush was applied
       private: bool Apply(const common::MouseEvent &_event,
-                   rendering::CameraPtr _camera,
-                   rendering::Heightmap *_heightmap);
+                          rendering::CameraPtr _camera,
+                          rendering::Heightmap *_heightmap) const;
 
       /// \brief Set the current state.
       /// \param[in] _state String state(lower, raise, flatten ...). Empty
@@ -126,32 +129,9 @@ namespace gazebo
       /// \param[in] _value The new value.
       private slots: void OnHeightSlider(int _value);
 
-      /// \brief Spin to control the outside size of the brush.
-      private: QDoubleSpinBox *outsideRadiusSpin;
-
-      /// \brief Slider to control the outside size of the brush.
-      private: QSlider *outsideRadiusSlider;
-
-      /// \brief Spin to control the inside size of the brush.
-      private: QDoubleSpinBox *insideRadiusSpin;
-
-      /// \brief Slider to control the inside size of the brush.
-      private: QSlider *insideRadiusSlider;
-
-      /// \brief Spin to control the weight of the brush.
-      private: QDoubleSpinBox *weightSpin;
-
-      /// \brief Slider to control the weight of the brush.
-      private: QSlider *weightSlider;
-
-      /// \brief Spin to control the weight of the brush.
-      private: QDoubleSpinBox *heightSpin;
-
-      /// \brief Slider to control the weight of the brush.
-      private: QSlider *heightSlider;
-
-      /// \brief The current brush state.
-      private: std::string state;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<TerrainEditorPalettePrivate> dataPtr;
     };
   }
 }

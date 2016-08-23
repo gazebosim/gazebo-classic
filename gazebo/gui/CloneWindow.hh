@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  *
  */
 
-#ifndef _GAZEBO_CLONE_WINDOW_HH_
-#define _GAZEBO_CLONE_WINDOW_HH_
+#ifndef _GAZEBO_GUI_CLONEWINDOW_HH_
+#define _GAZEBO_GUI_CLONEWINDOW_HH_
 
+#include <memory>
+
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -25,13 +28,16 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \addtogroup gazebo_gui
+    class CloneWindowPrivate;
+
+    /// \addtogroup gazebo_gui GUI
+    /// \brief The graphical user interface
     /// \{
 
-    /// \class CloneConfig CloneConfig.hh gui/CloneConfig.hh
+    /// \class CloneWindow CloneWindow.hh gui/CloneWindow.hh
     /// \brief A dialog window used to set some parameters before cloning a
     /// simulation.
-    class GAZEBO_VISIBLE CloneWindow : public QDialog
+    class GZ_GUI_VISIBLE CloneWindow : public QDialog
     {
       Q_OBJECT
 
@@ -44,12 +50,17 @@ namespace gazebo
 
       /// \brief Get the port for the new gzserver specified by the user.
       /// \return The port for the new gzserver.
-      public: int GetPort();
+      /// \deprecated See Port() const
+      public: int GetPort() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the port for the new gzserver specified by the user.
+      /// \return The port for the new gzserver.
+      public: int Port() const;
 
       /// \brief True if the stored port is a valid one. A valid port is an
       /// integer number in the 1025-65535 range.
       /// \return True when the port is valid or false otherwise.
-      public: bool IsValidPort();
+      public: bool IsValidPort() const;
 
       /// \brief Callback when okay button is selected.
       private slots: void OnOkay();
@@ -60,17 +71,9 @@ namespace gazebo
       /// \brief Update the member variables after the user pressed okay.
       private: void Update();
 
-      /// \brief Button used to finalize port selection.
-      private: QPushButton *okayButton;
-
-      /// \brief QT widget for reading the port used in the cloned server.
-      private: QLineEdit *portEdit;
-
-      /// \brief Port used for the cloned server.
-      private: int port;
-
-      /// \brief Used to flag if the text entered by the user is a valid port.
-      private: bool validPort;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<CloneWindowPrivate> dataPtr;
     };
   }
 }

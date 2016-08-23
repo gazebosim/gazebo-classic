@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ DARTBallJoint::DARTBallJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
@@ -75,17 +75,6 @@ double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "DARTBallJoint::GetVelocity not implemented" << std::endl;
   return 0;
-}
-
-//////////////////////////////////////////////////
-double DARTBallJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
 }
 
 //////////////////////////////////////////////////

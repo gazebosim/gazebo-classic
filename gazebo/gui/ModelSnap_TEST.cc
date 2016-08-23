@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@ gazebo::math::Vector2i GetScreenSpaceCoords(gazebo::math::Vector3 _pt,
     gazebo::rendering::CameraPtr _cam)
 {
   // Convert from 3D world pos to 2D screen pos
-  Ogre::Vector3 pos = _cam->GetOgreCamera()->getProjectionMatrix() *
-      _cam->GetOgreCamera()->getViewMatrix() *
+  Ogre::Vector3 pos = _cam->OgreCamera()->getProjectionMatrix() *
+      _cam->OgreCamera()->getViewMatrix() *
       gazebo::rendering::Conversions::Convert(_pt);
 
   gazebo::math::Vector2i screenPos;
-  screenPos.x = ((pos.x / 2.0) + 0.5) * _cam->GetViewportWidth();
-  screenPos.y = (1 - ((pos.y / 2.0) + 0.5)) * _cam->GetViewportHeight();
+  screenPos.x = ((pos.x / 2.0) + 0.5) * _cam->ViewportWidth();
+  screenPos.y = (1 - ((pos.y / 2.0) + 0.5)) * _cam->ViewportHeight();
 
   return screenPos;
 }
@@ -46,10 +46,10 @@ gazebo::math::Vector2i GetScreenSpaceCoords(gazebo::math::Vector3 _pt,
 bool FindRedColor(gazebo::rendering::CameraPtr _cam)
 {
   // Get camera data
-  const unsigned char *data = _cam->GetImageData();
-  unsigned int width = _cam->GetImageWidth();
-  unsigned int height = _cam->GetImageHeight();
-  unsigned int depth = _cam->GetImageDepth();
+  const unsigned char *data = _cam->ImageData();
+  unsigned int width = _cam->ImageWidth();
+  unsigned int height = _cam->ImageHeight();
+  unsigned int depth = _cam->ImageDepth();
 
   // scan image and find red pixels
   for (unsigned int y = 0; y < height; ++y)
@@ -98,13 +98,7 @@ void ModelSnap_TEST::Highlight()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(!FindRedColor(cam));
 
@@ -135,13 +129,7 @@ void ModelSnap_TEST::Highlight()
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
       QPoint(spherePt.x, spherePt.y));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify that a triangle is highlighted by checking for red pixels.
   QVERIFY(FindRedColor(cam));
@@ -153,13 +141,7 @@ void ModelSnap_TEST::Highlight()
     // cancel and reset snap
     gazebo::gui::g_arrowAct->trigger();
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // verify that no triangles are highlighted
     QVERIFY(!FindRedColor(cam));
@@ -173,13 +155,7 @@ void ModelSnap_TEST::Highlight()
 
     QTest::mouseRelease(glWidget, Qt::LeftButton, 0, QPoint(boxPt.x, boxPt.y));
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // verify that a triangle is highlighted
     QVERIFY(FindRedColor(cam));
@@ -213,13 +189,7 @@ void ModelSnap_TEST::Snap()
 
   gazebo::rendering::Events::createScene("default");
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Rand.hh"
 #include "gazebo/math/SignalStats.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class SignalStatsTest : public gazebo::testing::AutoLogFixture { };
+class SignalStatsTest : public ::testing::Test { };
 
 TEST_F(SignalStatsTest, SignalMean)
 {

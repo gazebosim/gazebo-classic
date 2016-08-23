@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private class attributes for InsertModelWidget.
-    class GAZEBO_VISIBLE InsertModelWidgetPrivate
+    class GZ_GUI_VISIBLE InsertModelWidgetPrivate
     {
       /// \brief Widget that display all the models that can be inserted.
       public: QTreeWidget *fileTreeWidget;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,14 @@ ModelRightMenu::ModelRightMenu()
   // this->skeletonAction->setCheckable(true);
   // connect(this->skeletonAction, SIGNAL(triggered()), this,
   //         SLOT(OnSkeleton()));
+
+  // Window mode
+  this->windowMode = "Simulation";
+
+  // Event connections
+  this->connections.push_back(
+      gui::Events::ConnectWindowMode(
+      boost::bind(&ModelRightMenu::OnWindowMode, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -165,6 +173,7 @@ ModelRightMenu::~ModelRightMenu()
 void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
+  // Find out the entity type
   if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
     this->entityName = _entityName.substr(0, _entityName.find("::"));
@@ -176,19 +185,26 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
 
   QMenu menu;
 
+  // Move To
   menu.addAction(this->moveToAct);
+
+  // Follow
   menu.addAction(this->followAct);
 
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LINK)
+  // Apply Force/Torque
+  if (this->windowMode == "Simulation" &&
+      (_type == EntityTypes::MODEL || _type == EntityTypes::LINK))
     menu.addAction(this->applyWrenchAct);
 
   if (_type == EntityTypes::MODEL)
   {
-    // disable editing planes for now
     rendering::UserCameraPtr cam = gui::get_active_camera();
     rendering::ScenePtr scene = cam->GetScene();
     rendering::VisualPtr vis = scene->GetVisual(this->entityName);
-    if (vis && !vis->IsPlane())
+
+    // Edit Model
+    /// \todo Support editing planes
+    if (vis && !vis->IsPlane() && this->windowMode == "Simulation")
     {
       menu.addSeparator();
       menu.addAction(this->editAct);
@@ -214,20 +230,24 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     }
   }
 
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  if (this->windowMode == "Simulation" &&
+      (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT))
   {
     if (g_copyAct && g_pasteAct)
     {
       menu.addSeparator();
+      // Copy
       menu.addAction(g_copyAct);
+      // Paste
       menu.addAction(g_pasteAct);
     }
 
     menu.addSeparator();
+    // Delete
     menu.addAction(g_deleteAct);
   }
 
-  // \todo Reimplement these features.
+  /// \todo Reimplement these features.
   // menu.addAction(this->skeletonAction);
 
   menu.exec(_pt);
@@ -307,7 +327,13 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   // Delete the entity
   if (!name.empty())
+  {
     transport::requestNoReply(this->node, "entity_delete", name);
+
+    // Remove the entity from all modelStates in each ViewState.
+    for (auto &viewState : this->viewStates)
+      viewState->modelStates.erase(this->entityName);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -380,6 +406,12 @@ void ViewState::Callback()
     transport::requestNoReply(this->parent->node, this->uncheckRequest,
                               this->parent->entityName);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnWindowMode(const std::string &_mode)
+{
+  this->windowMode = _mode;
 }
 
 /// \todo Reimplement these functions.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,12 +92,6 @@ namespace gazebo
       /// \param[in] _b Blue value (range 0 to 1)
       /// \param[in] _a Alpha value (0=transparent, 1=opaque)
       public: void Set(float _r = 1, float _g = 1 , float _b = 1, float _a = 1);
-
-      /// \brief Get the color in HSV colorspace
-      /// \return HSV values in a math::Vector3 format
-      /// \deprecated See HSV() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetAsHSV() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the color in HSV colorspace
       /// \return HSV values in an ignition::math::Vector3d format.

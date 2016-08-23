@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -316,10 +316,11 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
-  if (_x < 0 || _y < 0)
+  int index =  _y * this->vertSize + _x;
+  if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
     return 0.0;
 
-  return this->heights[_y * this->vertSize + _x];
+  return this->heights[index];
 }
 
 /////////////////////////////////////////////////

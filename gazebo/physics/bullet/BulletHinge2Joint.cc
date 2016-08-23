@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,14 +127,14 @@ math::Angle BulletHinge2Joint::GetAngle(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 double BulletHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented";
+  gzerr << "BulletHinge2Joint::GetVelocity not implemented" << std::endl;
   return 0;
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
-  gzerr << "Not implemented";
+  gzerr << "BulletHinge2Joint::SetVelocity not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -152,20 +152,7 @@ void BulletHinge2Joint::SetAxis(unsigned int /*_index*/,
 void BulletHinge2Joint::SetForceImpl(unsigned int /*_index*/,
     double /*_torque*/)
 {
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-void BulletHinge2Joint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-double BulletHinge2Joint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return 0;
+  gzerr << "BulletHinge2Joint::SetForceImpl not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////

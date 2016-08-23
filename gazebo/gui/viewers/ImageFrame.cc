@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ ImageFrame::~ImageFrame()
 /////////////////////////////////////////////////
 void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 {
-  QPainter painter(this);
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  QPainter painter(this);
 
   if (!this->dataPtr->image.isNull())
   {
@@ -73,6 +73,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
   img.GetRGBData(&rgbData, rgbDataSize);
 
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
       _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height()))
   {
@@ -82,7 +84,6 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
   // Store the image data
   memcpy(this->dataPtr->image.bits(), rgbData, rgbDataSize);
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   this->update();
   delete [] rgbData;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ DARTScrewJoint::DARTScrewJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTScrewJoint::~DARTScrewJoint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
@@ -213,39 +213,6 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
                          const_cast<DARTScrewJoint*>(this)->GetThreadPitch());
     // TODO: The ScrewJoint::GetThreadPitch() function is not const. As an
     // workaround, we use const_cast here until #1686 is resolved.
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-void DARTScrewJoint::SetMaxForce(unsigned int _index, double _force)
-{
-  if (_index == 0)
-  {
-    this->dataPtr->dtJoint->setForceLowerLimit(0, -_force);
-    this->dataPtr->dtJoint->setForceUpperLimit(0, _force);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-}
-
-//////////////////////////////////////////////////
-double DARTScrewJoint::GetMaxForce(unsigned int _index)
-{
-  double result = 0.0;
-
-  if (_index == 0)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dataPtr->dtJoint->getForceLowerLimit(0);
-    result = this->dataPtr->dtJoint->getForceUpperLimit(0);
   }
   else
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <functional>
 #include "plugins/GpuRayPlugin.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
 
@@ -31,7 +32,7 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(_sensor);
 
   if (!this->parentSensor)
   {
@@ -39,12 +40,13 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
     return;
   }
 
-  this->width = this->parentSensor->GetRangeCount();
-  this->height = this->parentSensor->GetVerticalRangeCount();
+  this->width = this->parentSensor->RangeCount();
+  this->height = this->parentSensor->VerticalRangeCount();
 
   this->newLaserFrameConnection = this->parentSensor->ConnectNewLaserFrame(
-      boost::bind(&GpuRayPlugin::OnNewLaserFrame,
-        this, _1, _2, _3, _4, _5));
+      std::bind(&GpuRayPlugin::OnNewLaserFrame, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+        std::placeholders::_4, std::placeholders::_5));
 
   this->parentSensor->SetActive(true);
 }

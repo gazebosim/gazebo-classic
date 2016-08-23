@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "test/util.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Conversions.hh"
 
 using namespace gazebo;
@@ -100,6 +101,24 @@ TEST_F(Conversions_TEST, Vector3)
 
   EXPECT_EQ(rendering::Conversions::ConvertIgn(v1), v2);
   EXPECT_EQ(rendering::Conversions::Convert(v2), v1);
+}
+
+/////////////////////////////////////////////////
+TEST_F(Conversions_TEST, TransformSpace)
+{
+  EXPECT_EQ(rendering::Conversions::Convert(Ogre::Node::TS_LOCAL),
+      rendering::RF_LOCAL);
+  EXPECT_EQ(rendering::Conversions::Convert(Ogre::Node::TS_PARENT),
+      rendering::RF_PARENT);
+  EXPECT_EQ(rendering::Conversions::Convert(Ogre::Node::TS_WORLD),
+      rendering::RF_WORLD);
+
+  EXPECT_EQ(rendering::Conversions::Convert(rendering::RF_LOCAL),
+      Ogre::Node::TS_LOCAL);
+  EXPECT_EQ(rendering::Conversions::Convert(rendering::RF_PARENT),
+      Ogre::Node::TS_PARENT);
+  EXPECT_EQ(rendering::Conversions::Convert(rendering::RF_WORLD),
+      Ogre::Node::TS_WORLD);
 }
 
 /////////////////////////////////////////////////

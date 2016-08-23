@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,41 +113,6 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
   bool result = gazebo::setupServer(_args.size(), &pointers[0]);
 
   // Deallocate memory for the command line arguments allocated with strdup.
-  for (size_t i = 0; i < pointers.size(); ++i)
-    free(pointers.at(i));
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-bool gazebo::setupClient(int _argc, char **_argv)
-{
-  if (!gazebo_shared::setup("client-", _argc, _argv, g_plugins))
-  {
-    gzerr << "Unable to setup Gazebo\n";
-    return false;
-  }
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool gazebo::setupClient(const std::vector<std::string> &_args)
-{
-  std::vector<char *> pointers(_args.size());
-  std::transform(_args.begin(), _args.end(), pointers.begin(),
-                 g_vectorStringDup());
-  pointers.push_back(0);
-
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  bool result = gazebo::setupClient(_args.size(), &pointers[0]);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
-
-  // Deallocate memory for the command line arguments alloocated with strdup.
   for (size_t i = 0; i < pointers.size(); ++i)
     free(pointers.at(i));
 

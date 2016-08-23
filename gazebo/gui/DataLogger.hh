@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  *
  */
-#ifndef _DATALOGGER_HH_
-#define _DATALOGGER_HH_
+#ifndef _GAZEBO_GUI_DATALOGGER_HH_
+#define _GAZEBO_GUI_DATALOGGER_HH_
 
-#include "gazebo/transport/TransportTypes.hh"
+#include <memory>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -26,12 +27,14 @@ namespace gazebo
 {
   namespace gui
   {
+    class DataLoggerPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class DataLogger DataLogger.hh gui/DataLogger.hh
     /// \brief A widget that provides data logging functionality.
-    class GAZEBO_VISIBLE DataLogger : public QDialog
+    class GZ_GUI_VISIBLE DataLogger : public QDialog
     {
       Q_OBJECT
 
@@ -91,56 +94,9 @@ namespace gazebo
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);
 
-      /// \brief Node to handle communication.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher for log control messages.
-      private: transport::PublisherPtr pub;
-
-      /// \brief Subscriber for log status messages.
-      private: transport::SubscriberPtr sub;
-
-      /// \brief The button used to start and pause logging.
-      private: QToolButton *recordButton;
-
-      /// \brief Label to display the log time.
-      private: QLabel *timeLabel;
-
-      /// \brief Log base path.
-      private: QString basePath;
-
-      /// \brief Line edit to display the log destination path.
-      private: QLineEdit *destPath;
-
-      /// \brief Label to display the log destination uri.
-      private: QLineEdit *destURI;
-
-      /// \brief Label to display the log file size.
-      private: QLabel *sizeLabel;
-
-      /// \brief Label to display status information.
-      private: QLabel *statusLabel;
-
-      /// \brief Timer used to blink the status label.
-      private: QTimer *statusTimer;
-
-      /// \brief Keep track of the time the status label blinks.
-      private: double statusTime;
-
-      /// \brief Name of the log file path
-      private: QLineEdit *filenameEdit;
-
-      /// \brief Frame that holds settings.
-      private: QFrame *settingsFrame;
-
-      // private: QListWidget *logList;
-      private: QTextBrowser *logList;
-
-      /// \brief Dialog that displays confirmation after saving.
-      private: QDialog *confirmationDialog;
-
-      /// \brief Timer used to timeout confirmation dialog.
-      private: QTimer *confirmationTimer;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<DataLoggerPrivate> dataPtr;
     };
     /// \}
   }
