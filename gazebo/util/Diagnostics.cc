@@ -23,11 +23,11 @@
 
 #include <functional>
 #include <iomanip>
+#include <ignition/math/SignalStats.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/math/SignalStats.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/util/DiagnosticsPrivate.hh"
 #include "gazebo/util/Diagnostics.hh"
@@ -402,9 +402,9 @@ void DiagnosticTimer::InsertData(const std::string &_name,
   auto iter = this->dataPtr->stats.find(_name);
   if (iter == this->dataPtr->stats.end())
   {
-    this->dataPtr->stats[_name] = math::SignalStats();
-    iter = this->dataPtr->stats.find(_name);
-    iter->second.InsertStatistics("mean,maxAbs,min,var");
+    ignition::math::SignalStats newStat;
+    newStat.InsertStatistics("mean,maxAbs,min,var");
+    this->dataPtr->stats[_name] = newStat;
   }
   iter->second.InsertData(_time.Double());
 }

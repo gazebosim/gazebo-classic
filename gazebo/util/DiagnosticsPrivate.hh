@@ -21,9 +21,9 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
+#include <ignition/math/SignalStats.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/math/SignalStats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Event.hh"
@@ -71,7 +71,8 @@ namespace gazebo
       public: common::Time cumulativeTime;
 
       /// \brief Timing statistics map.
-      public: typedef boost::unordered_map<std::string, math::SignalStats>
+      public: typedef
+              boost::unordered_map<std::string, ignition::math::SignalStats>
               SignalStatsMap;
 
       /// \brief Timing statistics.
