@@ -143,7 +143,6 @@ namespace gazebo
       }
 
       return visualSDF;
-
     }
 
     /////////////////////////////////////////////////
@@ -766,6 +765,632 @@ namespace gazebo
           if (submeshElem->HasElement("center"))
             result.set_center_submesh(submeshElem->Get<bool>("center"));
         }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr Convert(const ignition::msgs::CameraSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr cameraSDF;
+
+      if (_sdf)
+      {
+        cameraSDF = _sdf;
+      }
+      else
+      {
+        cameraSDF.reset(new sdf::Element);
+        sdf::initFile("camera.sdf", cameraSDF);
+      }
+
+      if (_msg.has_horizontal_fov())
+      {
+        cameraSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
+      }
+      if (_msg.has_image_size())
+      {
+        auto imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("width")->Set(_msg.image_size().x());
+        imageElem->GetElement("height")->Set(_msg.image_size().y());
+      }
+      if (_msg.has_image_format())
+      {
+        auto imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("format")->Set(_msg.image_format());
+      }
+      if (_msg.has_near_clip() || _msg.has_far_clip())
+      {
+        auto clipElem = cameraSDF->GetElement("clip");
+        if (_msg.has_near_clip())
+          clipElem->GetElement("near")->Set(_msg.near_clip());
+        if (_msg.has_far_clip())
+          clipElem->GetElement("far")->Set(_msg.far_clip());
+      }
+
+      if (_msg.has_distortion())
+      {
+        auto distortionMsg = _msg.distortion();
+        auto distortionElem = cameraSDF->GetElement("distortion");
+
+        if (distortionMsg.has_center())
+        {
+          distortionElem->GetElement("center")->Set(
+              ignition::msgs::Convert(distortionMsg.center()));
+        }
+        if (distortionMsg.has_k1())
+        {
+          distortionElem->GetElement("k1")->Set(distortionMsg.k1());
+        }
+        if (distortionMsg.has_k2())
+        {
+          distortionElem->GetElement("k2")->Set(distortionMsg.k2());
+        }
+        if (distortionMsg.has_k3())
+        {
+          distortionElem->GetElement("k3")->Set(distortionMsg.k3());
+        }
+        if (distortionMsg.has_p1())
+        {
+          distortionElem->GetElement("p1")->Set(distortionMsg.p1());
+        }
+        if (distortionMsg.has_p2())
+        {
+          distortionElem->GetElement("p2")->Set(distortionMsg.p2());
+        }
+      }
+      return cameraSDF;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::CameraSensor Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::CameraSensor result;
+
+      result.set_horizontal_fov(_sdf->Get<double>("horizontal_fov"));
+
+      result.mutable_image_size()->set_x(
+          _sdf->GetElement("image")->Get<int>("width"));
+      result.mutable_image_size()->set_y(
+          _sdf->GetElement("image")->Get<int>("height"));
+
+      if (_sdf->GetElement("image")->HasElement("format"))
+      {
+        result.set_image_format(
+            _sdf->GetElement("image")->Get<std::string>("format"));
+      }
+
+      result.set_near_clip(_sdf->GetElement("clip")->Get<double>("near"));
+      result.set_far_clip(_sdf->GetElement("clip")->Get<double>("far"));
+
+      if (_sdf->HasElement("save"))
+      {
+        result.set_save_enabled(_sdf->GetElement("save")->Get<bool>("enabled"));
+        result.set_save_path(
+            _sdf->GetElement("save")->Get<std::string>("path"));
+      }
+
+      if (_sdf->HasElement("distortion"))
+      {
+        auto distElem = _sdf->GetElement("distortion");
+        auto distortionMsg = result.mutable_distortion();
+
+        if (distElem->HasElement("k1"))
+          distortionMsg->set_k1(distElem->Get<double>("k1"));
+
+        if (distElem->HasElement("k2"))
+          distortionMsg->set_k2(distElem->Get<double>("k2"));
+
+        if (distElem->HasElement("k3"))
+          distortionMsg->set_k3(distElem->Get<double>("k3"));
+
+        if (distElem->HasElement("p1"))
+          distortionMsg->set_p1(distElem->Get<double>("p1"));
+
+        if (distElem->HasElement("p2"))
+          distortionMsg->set_p2(distElem->Get<double>("p2"));
+
+        if (distElem->HasElement("center"))
+        {
+          distortionMsg->mutable_center()->set_x(
+              distElem->Get<ignition::math::Vector2d>("center").X());
+          distortionMsg->mutable_center()->set_y(
+              distElem->Get<ignition::math::Vector2d>("center").Y());
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::ContactSensor Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::ContactSensor result;
+      result.set_collision_name(_sdf->Get<std::string>("collision"));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr Convert(const ignition::msgs::GPSSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr gpsSDF;
+
+      if (_sdf)
+      {
+        gpsSDF = _sdf;
+      }
+      else
+      {
+        gpsSDF.reset(new sdf::Element);
+        sdf::initFile("gps.sdf", gpsSDF);
+      }
+
+      if (_msg.has_position())
+      {
+        if (_msg.position().has_horizontal_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("position_sensing")->GetElement(
+              "horizontal")->GetElement("noise");
+          noiseElem->PrintValues("  ");
+          Convert(_msg.position().horizontal_noise(), noiseElem);
+        }
+
+        if (_msg.position().has_vertical_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("position_sensing")->GetElement(
+              "vertical")->GetElement("noise");
+          Convert(_msg.position().vertical_noise(), noiseElem);
+        }
+      }
+
+      if (_msg.has_velocity())
+      {
+        if (_msg.velocity().has_horizontal_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("velocity_sensing")->GetElement(
+              "horizontal")->GetElement("noise");
+          Convert(_msg.velocity().horizontal_noise(), noiseElem);
+        }
+
+        if (_msg.velocity().has_vertical_noise())
+        {
+          auto noiseElem = gpsSDF->GetElement("velocity_sensing")->GetElement(
+              "vertical")->GetElement("noise");
+          Convert(_msg.velocity().vertical_noise(), noiseElem);
+        }
+      }
+
+      return gpsSDF;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::GPSSensor Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::GPSSensor result;
+
+      // The two types of sensing
+      std::array<std::string, 2> sensing =
+        {{"position_sensing", "velocity_sensing"}};
+
+      // The two dimensions for each of sensing types.
+      std::array<std::string, 2> dimensions = {{"horizontal", "vertical"}};
+
+      // Process each sensing
+      for (auto const &sense : sensing)
+      {
+        // Make sure the element exists
+        if (_sdf->HasElement(sense))
+        {
+          auto senseElem = _sdf->GetElement(sense);
+
+          // Process each dimension
+          for (auto const &dim : dimensions)
+          {
+            if (senseElem->HasElement(dim))
+            {
+              auto dimElem = senseElem->GetElement(dim);
+
+              // Add noise
+              if (dimElem->HasElement("noise"))
+              {
+                auto noiseElem = dimElem->GetElement("noise");
+                ignition::msgs::SensorNoise *noiseMsg;
+
+                if (sense == "position_sensing")
+                {
+                  if (dim == "horizontal")
+                  {
+                    noiseMsg = result.mutable_position()->
+                      mutable_horizontal_noise();
+                  }
+                  else
+                  {
+                    noiseMsg = result.mutable_position()->
+                      mutable_vertical_noise();
+                  }
+                }
+                else
+                {
+                  if (dim == "horizontal")
+                  {
+                    noiseMsg = result.mutable_velocity()->
+                      mutable_horizontal_noise();
+                  }
+                  else
+                  {
+                    noiseMsg = result.mutable_velocity()->
+                      mutable_vertical_noise();
+                  }
+                }
+
+                noiseMsg->CopyFrom(Convert<ignition::msgs::SensorNoise>(
+                    noiseElem));
+              }
+            }
+          }
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr Convert(const ignition::msgs::IMUSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr imuSDF;
+
+      if (_sdf)
+      {
+        imuSDF = _sdf;
+      }
+      else
+      {
+        imuSDF.reset(new sdf::Element);
+        sdf::initFile("imu.sdf", imuSDF);
+      }
+
+      if (_msg.has_angular_velocity())
+      {
+        if (_msg.angular_velocity().has_x_noise())
+        {
+          auto noiseElem = imuSDF->GetElement("angular_velocity")->GetElement(
+              "x")->GetElement("noise");
+          Convert(_msg.angular_velocity().x_noise(), noiseElem);
+        }
+
+        if (_msg.angular_velocity().has_y_noise())
+        {
+          auto noiseElem = imuSDF->GetElement("angular_velocity")->GetElement(
+              "y")->GetElement("noise");
+          Convert(_msg.angular_velocity().y_noise(), noiseElem);
+        }
+
+        if (_msg.angular_velocity().has_z_noise())
+        {
+          auto noiseElem = imuSDF->GetElement("angular_velocity")->GetElement(
+              "z")->GetElement("noise");
+          Convert(_msg.angular_velocity().z_noise(), noiseElem);
+        }
+      }
+
+      if (_msg.has_linear_acceleration())
+      {
+        if (_msg.linear_acceleration().has_x_noise())
+        {
+          auto noiseElem = imuSDF->GetElement(
+              "linear_acceleration")->GetElement("x")->GetElement("noise");
+          Convert(_msg.linear_acceleration().x_noise(), noiseElem);
+        }
+
+        if (_msg.linear_acceleration().has_y_noise())
+        {
+          auto noiseElem = imuSDF->GetElement(
+              "linear_acceleration")->GetElement("y")->GetElement("noise");
+          Convert(_msg.linear_acceleration().y_noise(), noiseElem);
+        }
+
+        if (_msg.linear_acceleration().has_z_noise())
+        {
+          auto noiseElem = imuSDF->GetElement(
+              "linear_acceleration")->GetElement("z")->GetElement("noise");
+          Convert(_msg.linear_acceleration().z_noise(), noiseElem);
+        }
+      }
+
+      return imuSDF;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::IMUSensor Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::IMUSensor result;
+
+      std::array<std::string, 2> senses =
+        {{"angular_velocity", "linear_acceleration"}};
+
+      std::array<std::string, 3> dimensions = {{"x", "y", "z"}};
+
+      for (auto const &sense : senses)
+      {
+        if (_sdf->HasElement(sense))
+        {
+          auto senseElem = _sdf->GetElement(sense);
+          for (auto const &dim : dimensions)
+          {
+            if (senseElem->HasElement(dim))
+            {
+              auto dimElem = senseElem->GetElement(dim);
+              auto noiseElem = dimElem->GetElement("noise");
+              ignition::msgs::SensorNoise *noiseMsg;
+
+              if (sense == "angular_velocity")
+              {
+                if (dim == "x")
+                {
+                  noiseMsg = result.mutable_angular_velocity()->
+                    mutable_x_noise();
+                }
+                else if (dim == "y")
+                {
+                  noiseMsg = result.mutable_angular_velocity()->
+                    mutable_y_noise();
+                }
+                else
+                {
+                  noiseMsg = result.mutable_angular_velocity()->
+                    mutable_z_noise();
+                }
+              }
+              else
+              {
+                if (dim == "x")
+                {
+                  noiseMsg = result.mutable_linear_acceleration()->
+                    mutable_x_noise();
+                }
+                else if (dim == "y")
+                {
+                  noiseMsg = result.mutable_linear_acceleration()->
+                    mutable_y_noise();
+                }
+                else
+                {
+                  noiseMsg = result.mutable_linear_acceleration()->
+                    mutable_z_noise();
+                }
+              }
+
+              noiseMsg->CopyFrom(Convert<ignition::msgs::SensorNoise>(
+                  noiseElem));
+            }
+          }
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr Convert(const ignition::msgs::LogicalCameraSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr logicalSDF;
+
+      if (_sdf)
+      {
+        logicalSDF = _sdf;
+      }
+      else
+      {
+        logicalSDF.reset(new sdf::Element);
+        sdf::initFile("logical_camera.sdf", logicalSDF);
+      }
+
+      logicalSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
+      logicalSDF->GetElement("aspect_ratio")->Set(_msg.aspect_ratio());
+      logicalSDF->GetElement("near")->Set(_msg.near_clip());
+      logicalSDF->GetElement("far")->Set(_msg.far_clip());
+
+      return logicalSDF;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::LogicalCameraSensor Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::LogicalCameraSensor result;
+      result.set_near_clip(_sdf->Get<double>("near"));
+      result.set_far_clip(_sdf->Get<double>("far"));
+      result.set_horizontal_fov(_sdf->Get<double>("horizontal_fov"));
+      result.set_aspect_ratio(_sdf->Get<double>("aspect_ratio"));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::RaySensor Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::RaySensor result;
+      auto rangeElem = _sdf->GetElement("range");
+      auto scanElem = _sdf->GetElement("scan");
+      auto hscanElem = scanElem->GetElement("horizontal");
+      auto vscanElem = scanElem->GetElement("vertical");
+
+      result.set_horizontal_samples(hscanElem->Get<int>("samples"));
+      result.set_horizontal_resolution(hscanElem->Get<double>("resolution"));
+      result.set_horizontal_min_angle(hscanElem->Get<double>("min_angle"));
+      result.set_horizontal_max_angle(hscanElem->Get<double>("max_angle"));
+
+      result.set_vertical_samples(vscanElem->Get<int>("samples"));
+      result.set_vertical_resolution(vscanElem->Get<double>("resolution"));
+      result.set_vertical_min_angle(vscanElem->Get<double>("min_angle"));
+      result.set_vertical_max_angle(vscanElem->Get<double>("max_angle"));
+
+      result.set_range_min(rangeElem->Get<double>("min"));
+      result.set_range_max(rangeElem->Get<double>("max"));
+      result.set_range_resolution(rangeElem->Get<double>("resolution"));
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr Convert(const ignition::msgs::SensorNoise &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr noiseSDF;
+
+      if (_sdf)
+      {
+        noiseSDF = _sdf;
+      }
+      else
+      {
+        noiseSDF.reset(new sdf::Element);
+        sdf::initFile("noise.sdf", noiseSDF);
+      }
+
+      if (_msg.type() == ignition::msgs::SensorNoise::NONE)
+      {
+        noiseSDF->GetAttribute("type")->Set("none");
+      }
+      else if (_msg.type() == ignition::msgs::SensorNoise::GAUSSIAN)
+      {
+        noiseSDF->GetAttribute("type")->Set("gaussian");
+      }
+      else if (_msg.type() == ignition::msgs::SensorNoise::GAUSSIAN_QUANTIZED)
+      {
+        noiseSDF->GetAttribute("type")->Set("gaussian_quantized");
+      }
+
+      if (_msg.has_mean())
+        noiseSDF->GetElement("mean")->Set(_msg.mean());
+
+      if (_msg.has_stddev())
+        noiseSDF->GetElement("stddev")->Set(_msg.stddev());
+
+      if (_msg.has_bias_mean())
+        noiseSDF->GetElement("bias_mean")->Set(_msg.bias_mean());
+
+      if (_msg.has_bias_stddev())
+        noiseSDF->GetElement("bias_stddev")->Set(_msg.bias_stddev());
+
+      if (_msg.has_precision())
+        noiseSDF->GetElement("precision")->Set(_msg.precision());
+
+      return noiseSDF;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::SensorNoise Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::SensorNoise result;
+
+      auto noiseType = _sdf->Get<std::string>("type");
+
+      if (noiseType == "none")
+        result.set_type(ignition::msgs::SensorNoise::NONE);
+      else if (noiseType == "gaussian")
+        result.set_type(ignition::msgs::SensorNoise::GAUSSIAN);
+      else if (noiseType == "gaussian_quantized")
+        result.set_type(ignition::msgs::SensorNoise::GAUSSIAN_QUANTIZED);
+      else
+      {
+        gzerr << "Invalid sensor noise type["
+          << noiseType << "]. Using 'none'.\n";
+
+        result.set_type(ignition::msgs::SensorNoise::NONE);
+      }
+
+      if (_sdf->HasElement("mean"))
+        result.set_mean(_sdf->Get<double>("mean"));
+
+      if (_sdf->HasElement("stddev"))
+        result.set_stddev(_sdf->Get<double>("stddev"));
+
+      if (_sdf->HasElement("bias_mean"))
+        result.set_bias_mean(_sdf->Get<double>("bias_mean"));
+
+      if (_sdf->HasElement("bias_stddev"))
+        result.set_bias_stddev(_sdf->Get<double>("bias_stddev"));
+
+      if (_sdf->HasElement("precision"))
+        result.set_precision(_sdf->Get<double>("precision"));
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    template<>
+    ignition::msgs::Sensor Convert(const sdf::ElementPtr _sdf)
+    {
+      ignition::msgs::Sensor result;
+      std::string type = _sdf->Get<std::string>("type");
+      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_type(type);
+
+      if (_sdf->HasElement("always_on"))
+        result.set_always_on(_sdf->Get<bool>("always_on"));
+
+      if (_sdf->HasElement("update_rate"))
+        result.set_update_rate(_sdf->Get<double>("update_rate"));
+
+      if (_sdf->HasElement("pose"))
+      {
+        ignition::msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
+
+      if (_sdf->HasElement("visualize"))
+        result.set_visualize(_sdf->Get<bool>("visualize"));
+
+      if (_sdf->HasElement("topic"))
+        result.set_topic(_sdf->Get<std::string>("topic"));
+
+      if (type == "camera")
+      {
+        result.mutable_camera()->CopyFrom(
+            Convert<ignition::msgs::CameraSensor>(_sdf->GetElement("camera")));
+      }
+      else if (type == "ray")
+      {
+        result.mutable_ray()->CopyFrom(Convert<ignition::msgs::RaySensor>(
+            _sdf->GetElement("ray")));
+      }
+      else if (type == "contact")
+      {
+        result.mutable_contact()->CopyFrom(
+            Convert<ignition::msgs::ContactSensor>(
+            _sdf->GetElement("contact")));
+      }
+      else if (type == "gps")
+      {
+        result.mutable_gps()->CopyFrom(
+            Convert<ignition::msgs::GPSSensor>(_sdf->GetElement("gps")));
+      }
+      else if (type == "logical_camera")
+      {
+        result.mutable_logical_camera()->CopyFrom(
+            Convert<ignition::msgs::LogicalCameraSensor>(
+            _sdf->GetElement("logical_camera")));
+      }
+      else if (type == "imu")
+      {
+        result.mutable_imu()->CopyFrom(
+          Convert<ignition::msgs::IMUSensor>(_sdf->GetElement("imu")));
+      }
+      else
+      {
+        gzwarn << "Conversion of sensor type[" << type << "] not supported."
+          << std::endl;
       }
 
       return result;

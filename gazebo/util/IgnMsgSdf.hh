@@ -131,6 +131,85 @@ namespace gazebo
     template<>
     ignition::msgs::MeshGeom Convert(const sdf::ElementPtr _sdf);
 
+    /// \brief Create or update an SDF element from
+    /// ignition::msgs::CameraSensor.
+    /// \param[in] _msg Sensor messsage.
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr Convert(const ignition::msgs::CameraSensor &_msg,
+                            sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::CameraSensor Convert(const sdf::ElementPtr _sdf);
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::ContactSensor Convert(const sdf::ElementPtr _sdf);
+
+    /// \brief Create or update an SDF element from ignition::msgs::GPSSensor.
+    /// \param[in] _msg Sensor messsage.
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr Convert(const ignition::msgs::GPSSensor &_msg,
+                            sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::GPSSensor Convert(const sdf::ElementPtr _sdf);
+
+    /// \brief Create or update an SDF element from ignition::msgs::IMUSensor.
+    /// \param[in] _msg Sensor messsage.
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr Convert(const ignition::msgs::IMUSensor &_msg,
+                            sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::IMUSensor Convert(const sdf::ElementPtr _sdf);
+
+    /// \brief Create or update an SDF element from
+    /// ignition::msgs::LogicalCameraSensor.
+    /// \param[in] _msg Sensor messsage.
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr Convert(const ignition::msgs::LogicalCameraSensor &_msg,
+                            sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::LogicalCameraSensor Convert(const sdf::ElementPtr _sdf);
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::RaySensor Convert(const sdf::ElementPtr _sdf);
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::Sensor Convert(const sdf::ElementPtr _sdf);
+
+    /// \brief Create or update an SDF element from ignition::msgs::SensorNoise.
+    /// \param[in] _msg Sensor noise messsage.
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr Convert(const ignition::msgs::SensorNoise &_msg,
+                            sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    // Specialization of conversion from SDF to ignition message for sensors.
+    template<>
+    ignition::msgs::SensorNoise Convert(const sdf::ElementPtr _sdf);
+
     /// \brief Convert a common::Color to ignition::msgs::Color.
     /// \param[in] _c The color to convert,
     /// \return An ignition::msgs::Color object,

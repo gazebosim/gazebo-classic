@@ -19,6 +19,7 @@
 
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
