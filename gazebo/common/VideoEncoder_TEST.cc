@@ -30,7 +30,8 @@ TEST_F(VideoEncoderTest, StartStop)
   VideoEncoder video;
   EXPECT_FALSE(video.IsEncoding());
   EXPECT_STREQ(video.Format().c_str(), VIDEO_ENCODER_FORMAT_DEFAULT);
-  EXPECT_EQ(video.BitRate(), VIDEO_ENCODER_BITRATE_DEFAULT);
+  EXPECT_EQ(video.BitRate(), static_cast<unsigned int>(
+        VIDEO_ENCODER_BITRATE_DEFAULT));
 
 #ifdef HAVE_FFMPEG
   video.Start();
