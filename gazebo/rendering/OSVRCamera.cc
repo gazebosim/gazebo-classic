@@ -903,8 +903,8 @@ void OSVRCamera::CreateDistortion()
   // Set up IPD in meters:
   //float ipd = ovrHmd_GetFloat(this->dataPtr->hmd, OVR_KEY_IPD,  0.064f);
   float ipd = 0.064f;
-  this->camera->setPosition(-ipd * 0.5, 0, 0);
-  this->dataPtr->rightCamera->setPosition(ipd * 0.5, 0, 0);
+  this->camera->setPosition(0, ipd*0.5, 0);
+  this->dataPtr->rightCamera->setPosition(0, -ipd*0.5, 0);
   printf("done creating OSVR distortion setup\n");
 }
 
