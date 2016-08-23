@@ -194,6 +194,7 @@ TEST_F(WorldTest, EditName)
   }
 }
 
+/*
 //////////////////////////////////////////////////
 TEST_F(WorldTest, ModelPluginInfo)
 {
@@ -230,7 +231,7 @@ TEST_F(WorldTest, ModelPluginInfo)
     EXPECT_EQ(plugins.plugins(4).name(), "buoyancy");
   }
 }
-/*
+
 //////////////////////////////////////////////////
 TEST_F(WorldTest, WorldPluginInfo)
 {
