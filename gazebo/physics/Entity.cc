@@ -25,6 +25,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/msgs/msgs.hh"

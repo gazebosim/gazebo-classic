@@ -18,6 +18,7 @@
 #ifndef _PUBLICATIONTRANSPORT_HH_
 #define _PUBLICATIONTRANSPORT_HH_
 
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
 

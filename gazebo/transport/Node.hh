@@ -19,6 +19,7 @@
 #define _NODE_HH_
 
 #include <tbb/task.h>
+#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
 #include <list>

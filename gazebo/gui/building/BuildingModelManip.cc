@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/common/Exception.hh"

@@ -161,6 +161,9 @@ namespace gazebo
 
       public: void SetDirtyPose(const math::Pose &_pose);
 
+      // Documentation inherited.
+      public: virtual void UpdateMass();
+
       /// \brief Internal call to change effect of gravity on Link
       /// based on gravityMode if gravityModeDirty is true.
       private: void ProcessSetGravityMode();

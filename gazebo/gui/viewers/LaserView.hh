@@ -145,6 +145,9 @@ namespace gazebo
                  /// \brief The vector of points to draw.
                  private: std::vector<QPointF> points;
 
+                 /// \brief The vector of points to draw for rays with no hit.
+                 private: std::vector<QPointF> noHitPoints;
+
                  /// \brief The vector of range values, as returned by the
                  /// laser sensor.
                  private: std::vector<double> ranges;

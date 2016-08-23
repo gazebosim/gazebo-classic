@@ -14,6 +14,7 @@ set (sources
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  LogicalCameraSensor.cc
   MagnetometerSensor.cc
   MultiCameraSensor.cc
   Noise.cc
@@ -40,6 +41,7 @@ set (headers
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  LogicalCameraSensor.hh
   MagnetometerSensor.hh
   MultiCameraSensor.hh
   Noise.hh
@@ -74,6 +76,7 @@ set (gtest_sources
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
+  DepthCameraSensor_TEST.cc
   GpuRaySensor_TEST.cc
   SensorManager_TEST.cc
 )

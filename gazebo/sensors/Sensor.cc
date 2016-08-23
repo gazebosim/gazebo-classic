@@ -38,6 +38,7 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/LogicalCameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -172,8 +173,17 @@ bool Sensor::NeedsUpdate()
   else
     simTime = this->world->GetSimTime();
 
+  // case when last update occurred in the future probably due to
+  // world reset
   if (simTime <= this->lastMeasurementTime)
+  {
+    // Rendering sensors also set the lastMeasurementTime variable in Render()
+    // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
+    // could be outdated when the world is reset. In this case reset
+    // the variables back to 0.
+    this->ResetLastUpdateTime();
     return false;
+  }
 
   return (simTime - this->lastMeasurementTime +
       this->updateDelay) >= this->updatePeriod;
@@ -298,6 +308,26 @@ ignition::math::Pose3d Sensor::Pose() const
 }
 
 //////////////////////////////////////////////////
+void Sensor::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->pose = _pose;
+
+  // Update the visualization with the pose information.
+  if (this->sensorPub && this->GetVisualize())
+  {
+    msgs::Sensor msg;
+    msg.set_name(this->GetName());
+    msg.set_id(this->GetId());
+    msg.set_parent(this->GetParentName());
+    msg.set_parent_id(this->GetParentId());
+    msg.set_type(this->GetType());
+    msg.set_visualize(true);
+    msgs::Set(msg.mutable_pose(), this->pose);
+    this->sensorPub->Publish(msg);
+  }
+}
+
+//////////////////////////////////////////////////
 double Sensor::GetUpdateRate()
 {
   if (this->updatePeriod.Double() > 0.0)
@@ -359,17 +389,32 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   _msg.set_parent_id(this->GetParentId());
   msgs::Set(_msg.mutable_pose(), this->Pose());
 
-  _msg.set_visualize(this->GetVisualize());
+  _msg.set_always_on(this->IsActive());
   _msg.set_topic(this->GetTopic());
+  _msg.set_update_rate(this->GetUpdateRate());
+  _msg.set_visualize(this->GetVisualize());
 
-  if (this->GetType() == "camera")
+  if (this->GetType() == "logical_camera")
+  {
+    LogicalCameraSensor *camSensor = static_cast<LogicalCameraSensor*>(this);
+    msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
+    camMsg->set_near(camSensor->Near());
+    camMsg->set_far(camSensor->Far());
+    camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
+    camMsg->set_aspect_ratio(camSensor->AspectRatio());
+  }
+  else if (this->GetType() == "camera")
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
+    auto cam = camSensor->GetCamera();
+    camMsg->set_horizontal_fov(cam->GetHFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
-    rendering::DistortionPtr distortion =
-        camSensor->GetCamera()->GetDistortion();
+    camMsg->set_image_format(cam->GetImageFormat());
+    camMsg->set_near_clip(cam->GetNearClip());
+    camMsg->set_far_clip(cam->GetFarClip());
+    auto distortion = cam->GetDistortion();
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
@@ -471,4 +516,6 @@ void Sensor::ResetLastUpdateTime()
 {
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
+  this->lastMeasurementTime = 0.0;
+  this->updateDelay = 0.0;
 }

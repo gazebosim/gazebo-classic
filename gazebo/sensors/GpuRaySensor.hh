@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <string>
+#include <boost/function.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include <ignition/math/Angle.hh>

@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 

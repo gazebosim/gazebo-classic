@@ -26,6 +26,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -37,6 +38,8 @@
 #include <set>
 #include <string>
 #include <vector>
+
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
@@ -690,7 +693,8 @@ void World::Step()
     this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
     double stepTime = this->dataPtr->physicsEngine->GetMaxStepSize();
-    if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+    if (!this->IsPaused() || this->dataPtr->stepInc > 0
+        || this->dataPtr->needsReset)
     {
       // query timestep to allow dynamic time step size updates
       this->dataPtr->simTime += stepTime;
@@ -758,6 +762,7 @@ void World::Update()
     else if (this->dataPtr->resetModelOnly)
       this->ResetEntities(Base::MODEL);
     this->dataPtr->needsReset = false;
+    return;
   }
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
@@ -1083,6 +1088,10 @@ void World::ResetTime()
   this->dataPtr->startTime = common::Time::GetWallTime();
   this->dataPtr->realTimeOffset = common::Time(0);
   this->dataPtr->iterations = 0;
+
+  if (this->IsPaused())
+    this->dataPtr->pauseStartTime = this->dataPtr->startTime;
+
   sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
 
@@ -1102,6 +1111,7 @@ void World::Reset()
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
+    ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
@@ -1238,6 +1248,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_seed())
   {
     math::Rand::SetSeed(_data->seed());
+    ignition::math::Rand::Seed(_data->seed());
     this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
 

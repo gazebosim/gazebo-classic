@@ -54,6 +54,169 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, WorldReset)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn sensors of various sizes to test speed
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;  // 106 fps
+  double updateRate = 10;
+  math::Pose setPose, testPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  imageCount = 0;
+  img = new unsigned char[width * height*3];
+  event::ConnectionPtr c =
+      camSensor->GetCamera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer;
+  timer.Start();
+
+  // let the camera render for 2 seconds at 10 Hz
+  int total_images = 20;
+  while (imageCount < total_images && timer.GetElapsed().Double() < 4)
+    common::Time::MSleep(10);
+  EXPECT_GE(imageCount, total_images);
+  common::Time dt = timer.GetElapsed();
+  EXPECT_GT(dt.Double(), 1.0);
+  EXPECT_LT(dt.Double(), 3.0);
+
+  // reset the world and verify
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  common::Time simTime = world->GetSimTime().Double();
+  world->Reset();
+  EXPECT_TRUE(world->GetSimTime() == common::Time(0.0) ||
+      world->GetSimTime() < simTime);
+
+  // verify that the camera can continue to render and generate images at
+  // the specified rate
+  imageCount = 0;
+  timer.Reset();
+  timer.Start();
+  while (imageCount < total_images && timer.GetElapsed().Double() < 4)
+    common::Time::MSleep(10);
+  dt = timer.GetElapsed();
+  EXPECT_GE(imageCount, total_images);
+  EXPECT_GT(dt.Double(), 1.0);
+  EXPECT_LT(dt.Double(), 3.0);
+
+  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  delete img;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, MultipleCameraSameName)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;  // 106 fps
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName =
+      "default::" + modelName + "::body::" + cameraName;
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != NULL);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != NULL);
+  rendering::CameraPtr camera = camSensor->GetCamera();
+  EXPECT_TRUE(camera != NULL);
+
+  // spawn second camera sensor with same name but attached to a different model
+  std::string modelName2 = modelName + "_2";
+  SpawnCamera(modelName2, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName2 =
+      "default::" + modelName2 + "::body::" + cameraName;
+  sensors::SensorPtr sensor2 = sensors::get_sensor(sensorScopedName2);
+  EXPECT_TRUE(sensor2 != NULL);
+  sensors::CameraSensorPtr camSensor2 =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+  EXPECT_TRUE(camSensor2 != NULL);
+  rendering::CameraPtr camera2 = camSensor2->GetCamera();
+  EXPECT_TRUE(camera2 != NULL);
+
+  // verify that the sensors and cameras are not the same
+  EXPECT_TRUE(camSensor != camSensor2);
+  EXPECT_TRUE(camera != camera2);
+
+  // get camera scene and verify camera count
+  rendering::ScenePtr scene = camera->GetScene();
+  EXPECT_TRUE(scene != NULL);
+  EXPECT_EQ(scene->GetCameraCount(), 2u);
+
+  // remove the second camera sensor first and check that it does not remove
+  // the first one with the same name
+  sensors::remove_sensor(sensorScopedName2);
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sensors::get_sensor(sensorScopedName2) != NULL && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  sensor2 = sensors::get_sensor(sensorScopedName2);
+  EXPECT_TRUE(sensor2 == NULL);
+  sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != NULL);
+
+  // verify the first camera is still there
+  EXPECT_EQ(scene->GetCameraCount(), 1u);
+  EXPECT_TRUE(camera == scene->GetCamera(0));
+
+  std::string renderingCameraName = camera->GetName();
+
+  // remove the first camera sensor and there should be no sensors or cameras
+  // left
+  sensors::remove_sensor(sensorScopedName);
+  sleep = 0;
+  while (sensors::get_sensor(sensorScopedName) != NULL && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor == NULL);
+  camera = scene->GetCamera(renderingCameraName);
+  EXPECT_TRUE(camera == NULL);
+  EXPECT_EQ(scene->GetCameraCount(), 0u);
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, CheckThrottle)
 {
   Load("worlds/empty_test.world");
@@ -100,6 +263,72 @@ TEST_F(CameraSensor, CheckThrottle)
   EXPECT_LT(rate, 11.0);
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
   delete img;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, FillMsg)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn sensors of various sizes to test speed
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+
+  // test resolution, my machine gets about 106 fps
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 0;
+  math::Pose setPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  msgs::Sensor msg;
+  sensor->FillMsg(msg);
+
+  // Required fields
+  EXPECT_EQ(msg.name(), cameraName);
+  EXPECT_EQ(msg.parent(), sensor->GetParentName());
+  EXPECT_EQ(msg.type(), "camera");
+
+  // Optional fields
+  ASSERT_TRUE(msg.has_always_on());
+  EXPECT_EQ(msg.always_on(), sensor->IsActive());
+
+  ASSERT_TRUE(msg.has_pose());
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()), sensor->Pose());
+
+  ASSERT_TRUE(msg.has_topic());
+  EXPECT_EQ(msg.topic(), sensor->GetTopic());
+
+  ASSERT_TRUE(msg.has_update_rate());
+  EXPECT_EQ(msg.update_rate(), sensor->GetUpdateRate());
+
+  ASSERT_TRUE(msg.has_visualize());
+  EXPECT_EQ(msg.visualize(), sensor->GetVisualize());
+
+  ASSERT_FALSE(msg.has_contact());
+  ASSERT_FALSE(msg.has_ray());
+  ASSERT_TRUE(msg.has_camera());
+  auto cameraMsg = msg.camera();
+  auto cam = camSensor->GetCamera();
+  EXPECT_EQ(cameraMsg.horizontal_fov(), cam->GetHFOV().Radian());
+  EXPECT_EQ(cameraMsg.image_size().x(), camSensor->GetImageWidth());
+  EXPECT_EQ(cameraMsg.image_size().y(), camSensor->GetImageHeight());
+  EXPECT_EQ(cameraMsg.image_format(), cam->GetImageFormat());
+  EXPECT_EQ(cameraMsg.near_clip(), cam->GetNearClip());
+  EXPECT_EQ(cameraMsg.far_clip(), cam->GetFarClip());
 }
 
 /////////////////////////////////////////////////

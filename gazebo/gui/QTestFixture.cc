@@ -20,6 +20,7 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+#include <boost/bind.hpp>
 #include <unistd.h>
 
 #include "gazebo/common/Console.hh"
@@ -69,6 +70,9 @@ void QTestFixture::init()
   this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
   gazebo::rendering::load();
+
+  if (!gazebo::gui::register_metatypes())
+    gzerr << "Unable to register Qt metatypes" << std::endl;
 }
 
 /////////////////////////////////////////////////

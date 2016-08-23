@@ -40,5 +40,15 @@ void common::AVFrameUnref(AVFrame *_frame)
 #endif
 }
 
+//////////////////////////////////////////////////
+void common::AVPacketUnref(AVPacket *_packet)
+{
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 24, 102)
+  av_packet_unref(_packet);
+#else
+  av_free_packet(_packet);
+#endif
+}
+
 // ifdef HAVE_FFMPEG
 #endif

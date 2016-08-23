@@ -18,6 +18,7 @@
  * Desc: Pressure sensor plugin
  * Author: Steve Peters
  */
+#include <boost/algorithm/string.hpp>
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
 

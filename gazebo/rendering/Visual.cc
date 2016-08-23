@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
@@ -96,6 +98,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -134,6 +137,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -184,6 +188,7 @@ Visual::~Visual()
 
   if (this->dataPtr->sceneNode != NULL)
   {
+    // seems we never get into this block because Fini() runs first
     this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->scene->GetManager()->destroySceneNode(
@@ -243,6 +248,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
     result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
+  result->SetInheritTransparency(this->InheritTransparency());
 
   result->SetName(_name);
   return result;
@@ -288,6 +294,7 @@ void Visual::Init()
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
+  this->dataPtr->wireframe = false;
 
   if (this->dataPtr->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
@@ -572,7 +579,6 @@ void Visual::DetachVisual(const std::string &_name)
       this->dataPtr->children.erase(iter);
       if (this->dataPtr->sceneNode)
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
-      childVis->GetParent().reset();
       break;
     }
   }
@@ -1291,13 +1297,19 @@ common::Color Visual::GetEmissive() const
 //////////////////////////////////////////////////
 void Visual::SetWireframe(bool _show)
 {
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  if (this->dataPtr->type == VT_GUI || this->dataPtr->type == VT_PHYSICS ||
+      this->dataPtr->type == VT_SENSOR)
+    return;
+
+  for (auto &iter : this->dataPtr->children)
   {
-    (*iter)->SetWireframe(_show);
+    iter->SetWireframe(_show);
   }
 
+  if (this->dataPtr->wireframe == _show)
+    return;
+
+  this->dataPtr->wireframe = _show;
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
   {
@@ -1340,10 +1352,18 @@ void Visual::SetWireframe(bool _show)
 }
 
 //////////////////////////////////////////////////
+bool Visual::Wireframe() const
+{
+  return this->dataPtr->wireframe;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
-  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects();
-      i++)
+  float derivedTransparency = this->dataPtr->inheritTransparency ?
+      this->DerivedTransparency() : this->dataPtr->transparency;
+
+  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
     Ogre::MovableObject *obj = _sceneNode->getAttachedObject(i);
@@ -1357,7 +1377,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
       continue;
 
     // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); ++j)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
@@ -1383,7 +1403,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
             pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
           }
 
-          if (this->dataPtr->transparency > 0.0)
+          if (derivedTransparency > 0.0)
           {
             pass->setDepthWriteEnabled(false);
             pass->setDepthCheckEnabled(true);
@@ -1395,24 +1415,54 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           }
 
           dc = pass->getDiffuse();
-          dc.a = (1.0f - this->dataPtr->transparency);
+          dc.a = (1.0f - derivedTransparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
-
 
           for (unitStateCount = 0; unitStateCount <
               pass->getNumTextureUnitStates(); ++unitStateCount)
           {
             auto textureUnitState = pass->getTextureUnitState(unitStateCount);
 
-            textureUnitState->setAlphaOperation(
-                Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
-                1.0 - this->dataPtr->transparency);
+            if (textureUnitState->getColourBlendMode().operation ==
+                Ogre::LBX_SOURCE1)
+            {
+              textureUnitState->setAlphaOperation(
+                  Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
+                  1.0 - derivedTransparency);
+            }
           }
         }
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+void Visual::UpdateTransparency(const bool _cascade)
+{
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
+
+  if (_cascade)
+  {
+    for (auto child : this->dataPtr->children)
+    {
+      // Don't change some visualizations when link changes
+      if (!(this->GetType() == VT_LINK &&
+          (child->GetType() == VT_GUI ||
+           child->GetType() == VT_PHYSICS ||
+           child->GetType() == VT_SENSOR)))
+      {
+        child->UpdateTransparency(_cascade);
+      }
+    }
+  }
+
+  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
+    RTShaderSystem::Instance()->UpdateShaders();
+
+  this->dataPtr->sdf->GetElement("transparency")->Set(
+      this->dataPtr->transparency);
 }
 
 //////////////////////////////////////////////////
@@ -1424,33 +1474,20 @@ void Visual::SetTransparency(float _trans)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  for (auto child : this->dataPtr->children)
-  {
-    // Don't change some visualizations when link changes
-    if (!(this->GetType() == VT_LINK &&
-        (child->GetType() == VT_GUI ||
-         child->GetType() == VT_PHYSICS ||
-         child->GetType() == VT_SENSOR)))
-    {
-      child->SetTransparency(_trans);
-    }
-  }
+  // cascade is true by default in gazebo versions <= 6
+  this->UpdateTransparency(true);
+}
 
-  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
+//////////////////////////////////////////////////
+void Visual::SetInheritTransparency(const bool _inherit)
+{
+  this->dataPtr->inheritTransparency = _inherit;
+}
 
-  // For child nodes' scene nodes
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
-  {
-    Ogre::SceneNode *childSceneNode = dynamic_cast<Ogre::SceneNode*>(
-        this->dataPtr->sceneNode->getChild(i));
-
-    this->SetTransparencyInnerLoop(childSceneNode);
-  }
-
-  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
-    RTShaderSystem::Instance()->UpdateShaders();
-
-  this->dataPtr->sdf->GetElement("transparency")->Set(_trans);
+//////////////////////////////////////////////////
+bool Visual::InheritTransparency() const
+{
+  return this->dataPtr->inheritTransparency;
 }
 
 //////////////////////////////////////////////////
@@ -1502,6 +1539,29 @@ bool Visual::GetHighlighted() const
 float Visual::GetTransparency()
 {
   return this->dataPtr->transparency;
+}
+
+//////////////////////////////////////////////////
+float Visual::DerivedTransparency() const
+{
+  if (!this->InheritTransparency())
+    return this->dataPtr->transparency;
+
+  float derivedTransparency = this->dataPtr->transparency;
+
+  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr vis = this->GetParent();
+
+  while (vis && vis != worldVis)
+  {
+    derivedTransparency = 1 - ((1 - derivedTransparency) *
+        (1 - vis->GetTransparency()));
+    if (!vis->InheritTransparency())
+      break;
+    vis = vis->GetParent();
+  }
+
+  return derivedTransparency;
 }
 
 //////////////////////////////////////////////////

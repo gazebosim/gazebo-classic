@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/gui/OculusWindow.hh"
 #include "gazebo/rendering/OculusCamera.hh"

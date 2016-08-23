@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include <google/protobuf/descriptor.h>
 #include <set>
 #include "gazebo/transport/IOManager.hh"

@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"

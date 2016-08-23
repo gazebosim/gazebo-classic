@@ -18,6 +18,7 @@
 #define _TOPICMANAGER_HH_
 
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <map>
 #include <list>
 #include <string>

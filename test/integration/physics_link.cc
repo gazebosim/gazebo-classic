@@ -15,6 +15,7 @@
  *
 */
 #include <string.h>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"

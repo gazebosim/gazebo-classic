@@ -476,12 +476,11 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.0.0)
+set (SDFormat_MIN_VERSION 3.1.1)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
-
 if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
-  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
+  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}, <4. Required for reading and writing SDF files.")
 else()
   message (STATUS "Looking for SDFormat - found")
 endif()

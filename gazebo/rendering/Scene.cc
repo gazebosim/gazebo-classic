@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -32,6 +33,7 @@
 #include "gazebo/rendering/SonarVisual.hh"
 #include "gazebo/rendering/WrenchVisual.hh"
 #include "gazebo/rendering/CameraVisual.hh"
+#include "gazebo/rendering/LogicalCameraVisual.hh"
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
@@ -339,8 +341,7 @@ void Scene::Init()
   // Create Fog
   if (this->dataPtr->sdf->HasElement("fog"))
   {
-    boost::shared_ptr<sdf::Element> fogElem =
-        this->dataPtr->sdf->GetElement("fog");
+    sdf::ElementPtr fogElem = this->dataPtr->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
                  fogElem->Get<common::Color>("color"),
                  fogElem->Get<double>("density"),
@@ -651,8 +652,7 @@ UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 //////////////////////////////////////////////////
 void Scene::RemoveCamera(const std::string &_name)
 {
-  std::vector<CameraPtr>::iterator iter;
-  for (iter = this->dataPtr->cameras.begin();
+  for (auto iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
@@ -1912,6 +1912,8 @@ void Scene::PreRender()
         std::front_inserter(this->dataPtr->linkMsgs));
   }
 
+  RTShaderSystem::Instance()->Update();
+
   {
     boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
 
@@ -2082,6 +2084,32 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       }
     }
   }
+  else if (_msg->type() == "logical_camera" && _msg->visualize())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent_id());
+    if (!parentVis)
+      return false;
+
+    Visual_M::iterator iter = this->dataPtr->visuals.find(_msg->id());
+    if (iter == this->dataPtr->visuals.end())
+    {
+      LogicalCameraVisualPtr cameraVis(new LogicalCameraVisual(
+            _msg->name()+"_GUIONLY_logical_camera_vis", parentVis));
+
+      // need to call AttachVisual in order for cameraVis to be added to
+      // parentVis' children list so that it can be properly deleted.
+      parentVis->AttachVisual(cameraVis);
+
+      cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
+      cameraVis->SetId(_msg->id());
+      cameraVis->Load(_msg->logical_camera());
+      this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
+    }
+    else if (_msg->has_pose())
+    {
+      iter->second->SetPose(msgs::ConvertIgn(_msg->pose()));
+    }
+  }
   else if (_msg->type() == "contact" && _msg->visualize() &&
            !_msg->topic().empty())
   {
@@ -2151,17 +2179,18 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
   }
 
-  if (!this->GetVisual(_msg->name() + "_COM_VISUAL__"))
+  std::string linkName = linkVis->GetName();
+  if (!this->GetVisual(linkName + "_COM_VISUAL__"))
   {
     this->CreateCOMVisual(_msg, linkVis);
   }
 
-  if (!this->GetVisual(_msg->name() + "_INERTIA_VISUAL__"))
+  if (!this->GetVisual(linkName + "_INERTIA_VISUAL__"))
   {
     this->CreateInertiaVisual(_msg, linkVis);
   }
 
-  if (!this->GetVisual(_msg->name() + "_LINK_FRAME_VISUAL__"))
+  if (!this->GetVisual(linkName + "_LINK_FRAME_VISUAL__"))
   {
     this->CreateLinkFrameVisual(_msg, linkVis);
   }
@@ -2583,7 +2612,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
-      visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      if (visual->GetType() == Visual::VT_MODEL)
+        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
     }
   }
@@ -3029,7 +3059,7 @@ Heightmap *Scene::GetHeightmap() const
 /////////////////////////////////////////////////
 void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
+  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
   comVis->SetVisible(this->dataPtr->showCOMs);
@@ -3049,7 +3079,7 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  InertiaVisualPtr inertiaVis(new InertiaVisual(_msg->name() +
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
       "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_msg);
   inertiaVis->SetVisible(this->dataPtr->showInertias);
@@ -3067,9 +3097,9 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-void Scene::CreateLinkFrameVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 {
-  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_msg->name() +
+  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->GetName() +
       "_LINK_FRAME_VISUAL__", _linkVisual));
   linkFrameVis->Load();
   linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);
@@ -3084,7 +3114,8 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
     Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
+       || visType == Visual::VT_GUI)
     {
       toRemove.push_back(childVis);
     }
@@ -3112,12 +3143,8 @@ void Scene::SetTransparent(bool _show)
   this->dataPtr->transparent = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    if (visual.second->GetType() != Visual::VT_GUI &&
-        visual.second->GetType() != Visual::VT_PHYSICS &&
-        visual.second->GetType() != Visual::VT_SENSOR)
-    {
+    if (visual.second->GetType() == Visual::VT_MODEL)
       visual.second->SetTransparency(_show ? 0.5 : 0.0);
-    }
   }
 }
 

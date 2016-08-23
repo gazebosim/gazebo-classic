@@ -49,7 +49,6 @@ set (headers
   BulletPhysics.hh
   BulletPlaneShape.hh
   BulletPolylineShape.hh
-  BulletRaySensor.hh
   BulletRayShape.hh
   BulletScrewJoint.hh
   BulletSliderJoint.hh

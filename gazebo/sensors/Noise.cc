@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/function.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 

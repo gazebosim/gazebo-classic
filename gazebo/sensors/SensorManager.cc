@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 
@@ -556,7 +557,7 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
 
     // We match on the scoped name (model::link::sensor) because multiple
-    // sensors with the name leaf name make exists in a world.
+    // sensors with the same leaf name may exists in a world.
     if ((_useLeafName && (*iter)->GetName() == _name) ||
         (!_useLeafName && (*iter)->GetScopedName() == _name))
     {

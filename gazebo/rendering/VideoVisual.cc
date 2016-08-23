@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Video.hh"
 #include "gazebo/common/Events.hh"

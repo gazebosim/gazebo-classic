@@ -198,6 +198,15 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 }
 
 /////////////////////////////////////////////////
+/// \brief Set pose
+TEST_F(Sensor_TEST, SetPose)
+{
+  sensors::Sensor sensor(gazebo::sensors::OTHER);
+  sensor.SetPose(ignition::math::Pose3d(0, 1, 2, 3, 4, 5));
+  EXPECT_EQ(sensor.Pose(), ignition::math::Pose3d(0, 1, 2, 3, 4, 5));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

@@ -42,6 +42,26 @@ COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 COMVisual::~COMVisual()
 {
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+}
+
+/////////////////////////////////////////////////
+void COMVisual::Fini()
+{
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
@@ -132,7 +152,7 @@ void COMVisual::Load()
   sphereObj->setCastShadows(false);
 
   dPtr->sphereNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE_");
 
   dPtr->sphereNode->attachObject(sphereObj);
   dPtr->sphereNode->setScale(sphereRadius*2, sphereRadius*2, sphereRadius*2);
@@ -178,4 +198,34 @@ math::Pose COMVisual::GetInertiaPose() const
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
   return dPtr->inertiaPose;
+}
+
+/////////////////////////////////////////////////
+void COMVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
+{
+  if (!_sceneNode)
+    return;
+
+  // Destroy all the attached objects
+  Ogre::SceneNode::ObjectIterator itObject =
+    _sceneNode->getAttachedObjectIterator();
+
+  while (itObject.hasMoreElements())
+  {
+    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
+    if (ent->getMovableType() != DynamicLines::GetMovableType())
+      this->dataPtr->scene->GetManager()->destroyEntity(ent);
+    else
+      delete ent;
+  }
+
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode* pChildNode =
+        static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
 }

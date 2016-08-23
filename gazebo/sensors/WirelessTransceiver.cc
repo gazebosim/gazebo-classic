@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"

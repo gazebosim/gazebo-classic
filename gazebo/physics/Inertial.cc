@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include "gazebo/physics/Inertial.hh"
 
 using namespace gazebo;

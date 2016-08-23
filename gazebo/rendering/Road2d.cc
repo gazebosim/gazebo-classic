@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include <algorithm>
 
 #include "gazebo/transport/transport.hh"

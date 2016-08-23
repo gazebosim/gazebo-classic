@@ -55,6 +55,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  logical_camera_sensor.cc
   model.cc
   model_database.cc
   noise.cc
@@ -66,10 +67,13 @@ set(tests
   physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
+  physics_msgs_inertia.cc
   physics_presets.cc
+  physics_solver.cc
   physics_thread_safe.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   rest_web.cc
   road.cc
   sensor.cc
@@ -142,6 +146,8 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  mouse_pick.cc
+  view_angle.cc
 )
 
 gz_build_qt_tests(${qt_tests})

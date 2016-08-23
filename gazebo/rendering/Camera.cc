@@ -15,17 +15,23 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
   #include <dirent.h>
 #else
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
 #endif
 
@@ -183,8 +189,11 @@ void Camera::Load()
   // created for visualization purposes.
   if (this->name.find("_GUIONLY_") == std::string::npos)
   {
+    std::string topicName = this->GetName();
+    boost::replace_all(topicName, "::", "/");
+
     this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
-        "~/" + this->GetName() + "/cmd", &Camera::OnCmdMsg, this, true);
+        "~/" + topicName + "/cmd", &Camera::OnCmdMsg, this, true);
   }
 
   if (this->sdf->HasElement("distortion"))
@@ -1806,4 +1815,10 @@ std::string Camera::GetProjectionType() const
   {
     return "perspective";
   }
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
 }

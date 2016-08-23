@@ -264,6 +264,42 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(prisAxis1Msg.friction(), 0.0);
   QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
 
+  // Add a fixed joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_FIXED);
+  gui::JointData *fixedJointData =
+      jointMaker->CreateJoint(boxLink, cylinderLink);
+  jointMaker->CreateHotSpot(fixedJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 3u);
+
+  // verify connected joints
+  boxJointData =
+      jointMaker->GetJointDataByLink("box::link");
+  QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 2u);
+
+  cylinderJointData =
+      jointMaker->GetJointDataByLink("cylinder::link");
+  QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 2u);
+
+  gui::JointData *fixedJoint = cylinderJointData[0];
+  QVERIFY(fixedJoint != NULL);
+  QVERIFY(fixedJoint->inspector != NULL);
+
+  // verify default values
+  QVERIFY(msgs::ConvertJointType(fixedJoint->jointMsg->type()) == "fixed");
+  QCOMPARE(msgs::ConvertIgn(fixedJoint->jointMsg->pose()),
+      ignition::math::Pose3d::Zero);
+  qFuzzyCompare(fixedJoint->jointMsg->cfm(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->bounce(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->fudge_factor(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->limit_cfm(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->limit_erp(), 0.2);
+  qFuzzyCompare(fixedJoint->jointMsg->suspension_cfm(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->suspension_erp(), 0.2);
+
+  // fixed joint has no axes.
+  QVERIFY(!fixedJoint->jointMsg->has_axis1());
+  QVERIFY(!fixedJoint->jointMsg->has_axis2());
+
   delete jointMaker;
   mainWindow->close();
   delete mainWindow;

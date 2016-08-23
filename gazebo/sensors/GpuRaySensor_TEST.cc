@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
 #include "gazebo/test/ServerFixture.hh"
@@ -85,7 +86,6 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   while (scanCount < 10 && i < 300)
   {
     common::Time::MSleep(10);
-    mgr->Update();
     i++;
   }
   EXPECT_LT(i, 300);

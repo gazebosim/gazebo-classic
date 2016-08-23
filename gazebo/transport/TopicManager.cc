@@ -24,6 +24,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publication.hh"

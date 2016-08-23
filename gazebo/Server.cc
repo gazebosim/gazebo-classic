@@ -30,6 +30,8 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -176,6 +178,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     try
     {
       math::Rand::SetSeed(this->vm["seed"].as<double>());
+      ignition::math::Rand::Seed(this->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -467,7 +470,10 @@ void Server::Run()
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
+  sigact.sa_flags = 0;
   sigact.sa_handler = Server::SigInt;
+  if (sigemptyset(&sigact.sa_mask) != 0)
+    std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
 #endif

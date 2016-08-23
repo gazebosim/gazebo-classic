@@ -64,6 +64,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     bool has_entity_name(const std::string &_name);
 
+    /// \brief Register the Qt metatypes
+    /// \return True on success.
+    GZ_GUI_VISIBLE
+    bool register_metatypes();
+
     /// \brief Locate and load the INI configuration file.
     /// If the GAZEBO_GUI_INI_FILE environment variable is set and contains
     /// valid content, load and return true. If GAZEBO_GUI_INI_FILE is

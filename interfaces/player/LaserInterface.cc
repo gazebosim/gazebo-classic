@@ -19,6 +19,7 @@
  * Date: 2 March 2006
  */
 
+#include <boost/algorithm/string.hpp>
 #include <math.h>
 #include <iostream>
 

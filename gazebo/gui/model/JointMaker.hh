@@ -77,8 +77,10 @@ namespace gazebo
         JOINT_SCREW,
         /// \brief Universal joint
         JOINT_UNIVERSAL,
-        /// \brief Revolute joint
-        JOINT_BALL
+        /// \brief Ball joint
+        JOINT_BALL,
+        /// \brief Gearbox joint
+        JOINT_GEARBOX
       };
 
       /// \brief Constructor

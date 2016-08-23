@@ -38,6 +38,11 @@
 #include "step_dart_pgs_wrapper.h"
 #endif
 
+#ifdef HAVE_BULLET
+#include "step_bullet_lemke_wrapper.h"
+#include "step_bullet_pgs_wrapper.h"
+#endif
+
 #ifdef HDF5_INSTRUMENT
 #include <ode/h5dump.h>
 #endif
@@ -746,6 +751,24 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
         dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
 #endif
       }
+      else if (solver_type == BULLET_LEMKE)
+      {
+#ifdef HAVE_BULLET
+#ifdef LIBBULLET_VERSION_GT_282
+        dSolveLCP_bullet_lemke(m, A, lambda, rhs, lo, hi);
+#endif
+#else
+        dMessage(d_ERR_LCP, "HAVE_BULLET is NOT defined");
+#endif
+      }
+      else if (solver_type == BULLET_PGS)
+      {
+#ifdef HAVE_BULLET
+        dSolveLCP_bullet_pgs(m, A, lambda, rhs, lo, hi, findex);
+#else
+        dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
+#endif
+      }
       else
       {
         dMessage(d_ERR_LCP, "Unrecognized Solver Type");
@@ -842,8 +865,21 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     // (over the given timestep)
     IFTIMING(dTimerNow ("update position"));
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
+    dReal *cforcecurr = cforce;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+         cforcecurr+=8, ++bodycurr)
+    {
       dxBody *b = *bodycurr;
+      {
+        // sum all forces (external and constraint) into facc and tacc
+        // so dBodyGetForce and dBodyGetTorque returns total force and torque
+        // on the body
+        for (unsigned int j = 0; j < 3; ++j)
+        {
+          b->facc[j] += cforcecurr[j];
+          b->tacc[j] += cforcecurr[4+j];
+        }
+      }
       dxStepBody (b,stepsize);
     }
   }

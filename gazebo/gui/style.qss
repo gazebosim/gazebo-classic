@@ -552,6 +552,11 @@ QWidget#toolsWidget > QFrame
   background-color: #808080;
 }
 
+QWidget#buildingEditorPaletteScroll
+{
+  background-color: #808080;
+}
+
 QWidget#renderWidget > QWidget
 {
   padding: 0px;

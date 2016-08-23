@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "gazebo/transport/ConnectionManager.hh"
 #include "gazebo/transport/SubscriptionTransport.hh"
 

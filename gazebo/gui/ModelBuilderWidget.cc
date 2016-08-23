@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 

@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+
 #include <iomanip>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"

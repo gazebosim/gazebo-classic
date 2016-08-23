@@ -275,12 +275,6 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     return;
   }
 
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issues #1096.\n";
-    return;
-  }
-
   // Load our screw joint test world
   Load("worlds/screw_joint_test.world", true, _physicsEngine);
 

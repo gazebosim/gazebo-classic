@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 

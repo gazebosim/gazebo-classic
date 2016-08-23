@@ -31,6 +31,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 }
@@ -48,6 +49,11 @@ namespace gazebo
     /// \brief Helper function to avoid deprecation warnings.
     GZ_COMMON_VISIBLE
     void AVFrameUnref(AVFrame *_frame);
+
+    /// \brief Helper function to avoid deprecation warnings.
+    /// \param[in] _packet AVPacket structure that stores compressed data
+    GZ_COMMON_VISIBLE
+    void AVPacketUnref(AVPacket *_packet);
   }
 }
 // ifdef HAVE_FFMPEG

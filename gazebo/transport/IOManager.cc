@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include <iostream>
 #include "gazebo/transport/IOManager.hh"
 

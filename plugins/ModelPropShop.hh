@@ -70,7 +70,7 @@ namespace gazebo
     private: rendering::LightPtr light;
 
     /// \brief Pointer to the sdf document.
-    private: boost::shared_ptr<sdf::SDF> sdf;
+    private: sdf::SDFPtr sdf;
 
     /// \brief Name of the model.
     private: std::string modelName;

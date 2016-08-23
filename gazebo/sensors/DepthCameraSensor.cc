@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include <sstream>
 
 #include "gazebo/physics/World.hh"

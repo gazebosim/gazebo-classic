@@ -25,6 +25,10 @@ class TimeWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test that the TimeWidget gets correct time from the server
+  /// on reset.
+  private slots: void Reset();
+
   /// \brief Test that the TimeWidget gets valid times from the server.
   private slots: void ValidTimes();
 

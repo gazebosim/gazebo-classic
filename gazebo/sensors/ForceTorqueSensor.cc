@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Joint.hh"

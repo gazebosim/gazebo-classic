@@ -18,6 +18,7 @@
 #include "InRegionEventSource.hh"
 #include "ExistenceEventSource.hh"
 #include "OccupiedEventSource.hh"
+#include "JointEventSource.hh"
 
 #include "SimEventsPlugin.hh"
 
@@ -81,22 +82,26 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   this->requestSub = this->node->Subscribe("~/request",
       &SimEventsPlugin::OnRequest, this);
 
-  // regions are defined outside of events, so that they can be shared
-  // between events....
-  // and we read them first
-  sdf::ElementPtr child = this->sdf->GetElement("region");
-  while (child)
+  // read regions, if any
+  if (this->sdf->HasElement("region"))
   {
-    Region *r = new Region;
-    r->Load(child);
-    RegionPtr region;
-    region.reset(r);
-    this->regions[region->name] = region;
-    child = child->GetNextElement("region");
+    // regions are defined outside of events, so that they can be shared
+    // between events....
+    // and we read them first
+    sdf::ElementPtr child = this->sdf->GetElement("region");
+    while (child)
+    {
+      Region *r = new Region;
+      r->Load(child);
+      RegionPtr region;
+      region.reset(r);
+      this->regions[region->name] = region;
+      child = child->GetNextElement("region");
+    }
   }
 
   // Reading events
-  child = this->sdf->GetElement("event");
+  sdf::ElementPtr child = this->sdf->GetElement("event");
   while (child)
   {
     // get name and type of each event
@@ -125,11 +130,15 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     {
       event.reset(new ExistenceEventSource(this->pub, this->world) );
     }
+    else if (eventType == "joint")
+    {
+      event.reset(new JointEventSource(this->pub, this->world));
+    }
     else
     {
       std::string m;
-      m = "Unknown event name: \"" + eventName;
-      m += "\" of type: \"" + eventType + "\" in SimEvents plugin";
+      m = "Event \"" + eventName;
+      m += "\" is of unknown type: \"" + eventType + "\" in SimEvents plugin";
       throw SimEventsException(m.c_str());
     }
 

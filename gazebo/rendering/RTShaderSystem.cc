@@ -27,6 +27,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -35,6 +36,10 @@
 #define MINOR_VERSION 7
 using namespace gazebo;
 using namespace rendering;
+
+// added here in gazebo6 for backward compatibility, do not merge forward
+// A flag to indicate if shaders need update
+static bool updateShaders = false;
 
 //////////////////////////////////////////////////
 RTShaderSystem::RTShaderSystem()
@@ -224,16 +229,7 @@ void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 //////////////////////////////////////////////////
 void RTShaderSystem::UpdateShaders()
 {
-  if (!this->initialized)
-    return;
-
-  std::list<Visual*>::iterator iter;
-
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-
-  // Update all the shaders
-  for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
-    this->GenerateShaders(*iter);
+  updateShaders = true;
 }
 
 //////////////////////////////////////////////////
@@ -564,4 +560,21 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 {
   return dynamic_cast<Ogre::PSSMShadowCameraSetup *>(this->pssmSetup.get());
+}
+
+/////////////////////////////////////////////////
+void RTShaderSystem::Update()
+{
+  if (!this->initialized || !updateShaders)
+    return;
+
+  std::list<Visual*>::iterator iter;
+
+  boost::mutex::scoped_lock lock(*this->entityMutex);
+
+  // Update all the shaders
+  for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
+    this->GenerateShaders(*iter);
+
+  updateShaders = false;
 }

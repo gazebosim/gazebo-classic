@@ -19,6 +19,7 @@
 #define _GAZEBO_RENDERING_CAMERA_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <list>
@@ -541,6 +542,10 @@ namespace gazebo
       /// \return "perspective" or "orthographic"
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string GetProjectionType() const;
+
+      /// \brief Return the projection matrix of this camera.
+      /// \return the projection matrix
+      public: ignition::math::Matrix4d ProjectionMatrix() const;
 
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();

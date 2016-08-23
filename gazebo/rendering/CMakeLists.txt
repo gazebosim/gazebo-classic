@@ -44,6 +44,7 @@ set (sources
   LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
+  LogicalCameraVisual.cc
   Material.cc
   MovableText.cc
   OrbitViewController.cc
@@ -100,6 +101,7 @@ set (headers
   JointVisual.hh
   LaserVisual.hh
   LinkFrameVisual.hh
+  LogicalCameraVisual.hh
   SonarVisual.hh
   Light.hh
   Material.hh
@@ -139,7 +141,9 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources)
+set (gtest_sources
+  RenderingConversions_TEST.cc
+)
 
 gz_build_tests(${gtest_sources})
 
