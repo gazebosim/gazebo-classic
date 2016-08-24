@@ -38,8 +38,8 @@ include_directories(${TBB_INCLUDEDIR})
 
 # Be sure to locate this definition *after* add_subdirectories
 # in order to get the proper visibility when building libs
+add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
 if (WIN32)
-  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
   include_directories(${libdl_include_dir})
 endif()
 

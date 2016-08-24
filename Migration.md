@@ -57,6 +57,48 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/gui/ModelManipulator.hh**
+    + ***Deprecation:*** public: void RotateEntity(rendering::VisualPtr &_vis,
+                                                   const math::Vector3 &_axis,
+                                                   bool _local = false);
+    + ***Replacement:*** public: void RotateEntity(rendering::VisualPtr &_vis,
+                                                   const ignition::math::Vector3d &_axis,
+                                                   const bool _local = false)
+    + ***Deprecation:*** public: void TranslateEntity(rendering::VisualPtr &_vis,
+                                                      const math::Vector3 &_axis,
+                                                      bool _local = false)
+    + ***Replacement:*** public: void TranslateEntity(rendering::VisualPtr &_vis,
+                                                      const ignition::math::Vector3d &_axis,
+                                                      const bool _local = false);
+    + ***Deprecation:*** public: void ScaleEntity(rendering::VisualPtr &_vis,
+                                                  const math::Vector3 &_axis,
+                                                  bool _local = false)
+    + ***Replacement:*** public: void ScaleEntity(rendering::VisualPtr &_vis,
+                                                  const ignition::math::Vector3d &_axis,
+                                                  const bool _local = false)
+    + ***Deprecation:*** public: static math::Vector3 SnapPoint(const math::Vector3 &_point,
+                                                                double _interval = 1.0,
+                                                                double _sensitivity = 0.4);
+    + ***Replacement:*** public: static ignition::math::Vector3d SnapPoinit(const ignition::math::Vector3d &_point,
+                                                                            const double _interval = 1.0,
+                                                                            const double _sensitivity = 0.4)
+    + ***Deprecation:*** public: static math::Vector3 GetMousePositionOnPlane(rendering::CameraPtr _camera,
+                                                                              const common::MouseEvent &_event)
+    + ***Replacement:*** public: static ignition::math::Vector3d MousePositionOnPlane(rendering::CameraPtr _camera,
+                                                                                      const common::MouseEvent &_event)
+    + ***Deprecation:*** public: static math::Vector3 GetMouseMoveDistance(rendering::CameraPtr _camera,
+                                                                           const math::Vector2i &_start,
+                                                                           const math::Vector2i &_end,
+                                                                           const math::Pose &_pose,
+                                                                           const math::Vector3 &_axis,
+                                                                           bool _local)
+    + ***Replacement:*** public: static ignition::math::Vector3d MouseMoveDistance(rendering::CameraPtr _camera,
+                                                                                   const ignition::math::Vector2i &_start,
+                                                                                   const ignition::math::Vector2i &_end,
+                                                                                   const ignition::math::Pose3d &_pose,
+                                                                                   const ignition::math::Vector3d &_axis,
+                                                                                   const bool _local)
+
 1. **gazebo/rendering/Road2d.hh**
     + ***Deprecation:*** public: void Load(VisualPtr);
     + ***Replacement:*** public: void Load(msgs::Road);
@@ -246,7 +288,7 @@ release will remove the deprecated code.
     + EntityMakerPrivate class
     + Entity(EntityMakerPrivate&) constructor
     + EntityMakerPrivate *dataPtr
-    
+
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
 
