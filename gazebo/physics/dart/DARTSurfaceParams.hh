@@ -20,7 +20,6 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/util/system.hh"
