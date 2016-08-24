@@ -423,11 +423,13 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Get sensors
+  std::string imuName;
+  getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
   this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
     (sensors::SensorManager::Instance()->GetSensor(
       this->dataPtr->model->GetWorld()->GetName()
       + "::" + this->dataPtr->model->GetScopedName()
-      + "::iris::iris/imu_link::imu_sensor"));
+      + "::" + imuName));
 
   if (!this->dataPtr->imuSensor)
     gzerr << "imu_sensor not found\n" << "\n";

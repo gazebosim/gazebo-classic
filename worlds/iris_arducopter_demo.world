@@ -653,7 +653,7 @@ to fly iris with a ps2 joystick.
         <link_name>iris::rotor_3</link_name>
       </plugin>
       <plugin name="arducopter_plugin" filename="libArduCopterPlugin.so">
-        <imuLinkName>iris::iris/imu_link</imuLinkName>
+        <imuName>iris::iris/imu_link::imu_sensor</imuName>
         <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
         <rotor id="0">
           <vel_p_gain>0.2</vel_p_gain>
