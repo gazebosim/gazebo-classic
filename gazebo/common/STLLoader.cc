@@ -47,7 +47,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
   if (!file)
   {
     gzerr << "Unable to open file[" << _filename << "]\n";
-    return NULL;
+    return nullptr;
   }
 
   Mesh *mesh = new Mesh();
@@ -56,7 +56,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
   if (!this->ReadAscii(file, mesh))
   {
     fclose(file);
-    file = fopen(_filename.c_str(), "r");
+    file = fopen(_filename.c_str(), "rb");
     if (!this->ReadBinary(file, mesh))
       gzerr << "Unable to read STL[" << _filename << "]\n";
   }
@@ -82,10 +82,10 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   SubMesh *subMesh = new SubMesh();
 
   // Read the next line of the file into INPUT.
-  while (fgets (input, LINE_MAX_LEN, _filein) != NULL)
+  while (fgets (input, LINE_MAX_LEN, _filein) != nullptr)
   {
     // Advance to the first nonspace character in INPUT.
-    for (next = input; *next != '\0' && isspace(*next); next++);
+    for (next = input; *next != '\0' && iswspace(*next); next++);
 
     // Skip blank lines and comments.
     if (*next == '\0' || *next == '#' || *next == '!' || *next == '$')
@@ -109,7 +109,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       normal.Y(r2);
       normal.Z(r3);
 
-      if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+      if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
       {
         result = false;
         break;
@@ -118,7 +118,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       for (; result; )
       {
         ignition::math::Vector3d vertex;
-        if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+        if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
         {
           result = false;
           break;
@@ -138,7 +138,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         subMesh->AddIndex(subMesh->GetVertexIndex(vertex));
       }
 
-      if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+      if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
       {
         result = false;
         break;

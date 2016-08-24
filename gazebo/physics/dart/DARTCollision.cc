@@ -48,6 +48,7 @@ DARTCollision::DARTCollision(LinkPtr _link)
 DARTCollision::~DARTCollision()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -70,15 +71,14 @@ void DARTCollision::Init()
   // Offset
   if (this->dataPtr->dtCollisionShape)
   {
-    // TODO: Don't change offset of shape until dart supports plane shape.
     boost::shared_ptr<DARTPlaneShape> planeShape =
         boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
 
     if (!planeShape)
     {
       math::Pose relativePose = this->GetRelativePose();
-      this->dataPtr->dtCollisionShape->setOffset(
-            DARTTypes::ConvVec3(relativePose.pos));
+      this->dataPtr->dtCollisionShape->setLocalTransform(
+            DARTTypes::ConvPose(relativePose));
     }
     else
     {
@@ -88,8 +88,9 @@ void DARTCollision::Init()
             this->dataPtr->dtCollisionShape);
       dtBoxShape->setSize(Eigen::Vector3d(2100, 2100, 2100.0));
       dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100.0/2.0));
-      // gzerr << "plane box modified\n";
     }
+    // TODO: Remove this specialized code for plane shape once
+    // https://github.com/dartsim/dart/issues/114 is resolved.
   }
 }
 

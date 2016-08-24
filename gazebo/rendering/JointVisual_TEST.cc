@@ -39,6 +39,10 @@ TEST_F(JointVisual_TEST, JointVisualTest)
 
   EXPECT_TRUE(scene != NULL);
 
+  // get scene visual child count before we create any visuals
+  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  unsigned int count = scene->WorldVisual()->GetChildCount();
+
   // create a fake child visual where the joint visual will be attached to
   gazebo::rendering::VisualPtr childVis;
   childVis.reset(
@@ -168,6 +172,14 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
   EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
   EXPECT_FALSE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
+
+  // test destroying the visuals
+  childVis->Fini();
+  EXPECT_EQ(childVis->GetChildCount(), 0u);
+  EXPECT_EQ(jointVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

@@ -30,14 +30,13 @@ using namespace physics;
 ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
 : BallJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateBall(_worldId, NULL);
+  this->jointId = dJointCreateBall(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODEBallJoint::~ODEBallJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////

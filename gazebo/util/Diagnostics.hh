@@ -40,6 +40,8 @@ namespace gazebo
     class DiagnosticTimerPrivate;
 
     /// \addtogroup gazebo_util Utility
+    /// \brief Useful utility functions that typically rely on the transport
+    /// library.
     /// \{
 
 #ifdef ENABLE_DIAGNOSTICS

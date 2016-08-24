@@ -152,7 +152,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
 void ForceTorqueSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  GZ_ASSERT(this->world != NULL,
+  GZ_ASSERT(this->world != nullptr,
       "ForceTorqueSensor did not get a valid World pointer");
 
   this->dataPtr->parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
@@ -300,5 +300,5 @@ event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
 //////////////////////////////////////////////////
 void ForceTorqueSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
 {
-  this->dataPtr->update.Disconnect(_conn);
+  this->dataPtr->update.Disconnect(_conn->Id());
 }

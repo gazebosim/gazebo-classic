@@ -188,6 +188,8 @@ void LinkInspector::SetLinkId(const std::string &_id)
 /////////////////////////////////////////////////
 void LinkInspector::Open()
 {
+  emit this->Opened();
+
   this->dataPtr->linkConfig->Init();
   this->dataPtr->visualConfig->Init();
   this->dataPtr->collisionConfig->Init();
@@ -271,7 +273,7 @@ void LinkInspector::OnMassValueChanged(const double _value)
   if (volume > 0.0)
   {
     double density = _value / volume;
-    if (!math::equal(this->dataPtr->linkConfig->Density(), density))
+    if (!ignition::math::equal(this->dataPtr->linkConfig->Density(), density))
     {
       ignition::math::Vector3d I = ComputeInertia(_value);
       this->dataPtr->linkConfig->SetDensity(density);

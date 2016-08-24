@@ -198,6 +198,25 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    void Set(msgs::Inertial *_i, const ignition::math::MassMatrix3d &_m)
+    {
+      _i->set_mass(_m.Mass());
+      _i->set_ixx(_m.IXX());
+      _i->set_iyy(_m.IYY());
+      _i->set_izz(_m.IZZ());
+      _i->set_ixy(_m.IXY());
+      _i->set_ixz(_m.IXZ());
+      _i->set_iyz(_m.IYZ());
+    }
+
+    /////////////////////////////////////////////////
+    void Set(msgs::Inertial *_i, const ignition::math::Inertiald &_m)
+    {
+      msgs::Set(_i, _m.MassMatrix());
+      msgs::Set(_i->mutable_pose(), _m.Pose());
+    }
+
+    /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
     {
       Set(_p->mutable_normal(), _v.Normal());
@@ -232,6 +251,96 @@ namespace gazebo
       {
         delete[] data;
       }
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const double _d)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::DOUBLE);
+      result.set_double_value(_d);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const int _i)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::INT32);
+      result.set_int_value(_i);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const std::string &_s)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::STRING);
+      result.set_string_value(_s);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const char *_s)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::STRING);
+      result.set_string_value(std::string(_s));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const bool _b)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::BOOLEAN);
+      result.set_bool_value(_b);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Vector3d &_v)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::VECTOR3D);
+      result.mutable_vector3d_value()->CopyFrom(Convert(_v));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const common::Color &_c)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::COLOR);
+      result.mutable_color_value()->CopyFrom(Convert(_c));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Pose3d &_p)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::POSE3D);
+      result.mutable_pose3d_value()->CopyFrom(Convert(_p));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Quaterniond &_q)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::QUATERNIOND);
+      result.mutable_quaternion_value()->CopyFrom(Convert(_q));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const common::Time &_t)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::TIME);
+      result.mutable_time_value()->CopyFrom(Convert(_t));
+      return result;
     }
 
     /////////////////////////////////////////////////
@@ -290,6 +399,22 @@ namespace gazebo
       msgs::Time result;
       result.set_sec(_t.sec);
       result.set_nsec(_t.nsec);
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    msgs::Inertial Convert(const ignition::math::Inertiald &_i)
+    {
+      msgs::Inertial result;
+      msgs::Set(&result, _i);
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    msgs::Inertial Convert(const ignition::math::MassMatrix3d &_m)
+    {
+      msgs::Inertial result;
+      msgs::Set(&result, _m);
       return result;
     }
 
@@ -530,6 +655,18 @@ namespace gazebo
     {
       return ignition::math::Pose3d(ConvertIgn(_p.position()),
                                     ConvertIgn(_p.orientation()));
+    }
+
+    /////////////////////////////////////////////
+    ignition::math::Inertiald Convert(const msgs::Inertial &_i)
+    {
+      auto pose = msgs::ConvertIgn(_i.pose());
+      return ignition::math::Inertiald(
+        ignition::math::MassMatrix3d(
+          _i.mass(),
+          ignition::math::Vector3d(_i.ixx(), _i.iyy(), _i.izz()),
+          ignition::math::Vector3d(_i.ixy(), _i.ixz(), _i.iyz())),
+        pose);
     }
 
     /////////////////////////////////////////////
@@ -982,21 +1119,20 @@ namespace gazebo
       // Set plugins of the visual
       if (_sdf->HasElement("plugin"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("plugin");
-        msgs::Plugin *plgnMsg = result.mutable_plugin();
-        // if (elem->HasElement("name"))
-          plgnMsg->set_name(elem->Get<std::string>("name"));
-        // if (elem->HasElement("filename"))
-          plgnMsg->set_filename(elem->Get<std::string>("filename"));
-
-        std::stringstream ss;
-        for (sdf::ElementPtr innerElem = elem->GetFirstElement();
-            innerElem;
-            innerElem = innerElem->GetNextElement(""))
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
         {
-          ss << innerElem->ToString("");
+          msgs::Plugin *pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(PluginFromSDF(pluginElem));
+
+          // DEPRECATED in Gazebo7, remove in Gazebo8
+          // duplicate innerxml contents into an <sdf> tag to keep backwards
+          // compatibility
+          pluginMsg->set_innerxml(pluginMsg->innerxml() +
+              "\n<sdf>" + pluginMsg->innerxml() + "</sdf>");
+
+          pluginElem = pluginElem->GetNextElement("plugin");
         }
-        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
       return result;
@@ -1404,10 +1540,10 @@ namespace gazebo
       }
 
       // Set plugins of the visual
-      if (_msg.has_plugin())
+      for (int i = 0; i < _msg.plugin_size(); ++i)
       {
-        sdf::ElementPtr pluginElem = visualSDF->GetElement("plugin");
-        pluginElem = PluginToSDF(_msg.plugin(), pluginElem);
+        sdf::ElementPtr pluginElem = visualSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
       }
 
       return visualSDF;
@@ -1682,7 +1818,7 @@ namespace gazebo
       }
       else
       {
-        gzwarn << "Conversion of sensor type[" << type << "] not suppported."
+        gzwarn << "Conversion of sensor type[" << type << "] not supported."
           << std::endl;
       }
 
@@ -1809,9 +1945,9 @@ namespace gazebo
         if (distElem->HasElement("center"))
         {
           distortionMsg->mutable_center()->set_x(
-              distElem->Get<math::Vector2d>("center").x);
+              distElem->Get<ignition::math::Vector2d>("center").X());
           distortionMsg->mutable_center()->set_y(
-              distElem->Get<math::Vector2d>("center").y);
+              distElem->Get<ignition::math::Vector2d>("center").Y());
         }
       }
 
@@ -2734,10 +2870,10 @@ namespace gazebo
         submeshElem->GetElement("name")->Set(_msg.submesh());
         if (_msg.has_center_submesh())
           submeshElem->GetElement("center")->Set(_msg.center_submesh());
-        if (_msg.has_scale())
-        {
-          meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
-        }
+      }
+      if (_msg.has_scale())
+      {
+        meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
       }
       return meshSDF;
     }
@@ -2914,6 +3050,18 @@ namespace gazebo
       {
         sdf::ElementPtr jointElem = modelSDF->AddElement("joint");
         jointElem = JointToSDF(_msg.joint(i), jointElem);
+      }
+
+      if (_msg.plugin_size() > 0)
+      {
+        while (modelSDF->HasElement("plugin"))
+          modelSDF->GetElement("plugin")->RemoveFromParent();
+      }
+
+      for (int i = 0; i < _msg.plugin_size(); ++i)
+      {
+        sdf::ElementPtr pluginElem = modelSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
       }
 
       if (_msg.link_size())

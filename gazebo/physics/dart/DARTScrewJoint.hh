@@ -28,6 +28,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief A screw joint.
     class GZ_PHYSICS_VISIBLE DARTScrewJoint : public ScrewJoint<DARTJoint>
     {
@@ -93,6 +96,7 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
+    /// \}
   }
 }
 #endif

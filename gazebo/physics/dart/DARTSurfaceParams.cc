@@ -34,6 +34,7 @@ DARTSurfaceParams::DARTSurfaceParams()
 DARTSurfaceParams::~DARTSurfaceParams()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -43,12 +44,12 @@ void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
   SurfaceParams::Load(_sdf);
 
   if (!_sdf)
-    gzerr << "Surface _sdf is NULL" << std::endl;
+    gzerr << "Surface _sdf is null" << std::endl;
   else
   {
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
     if (!frictionElem)
-      gzerr << "Surface friction sdf member is NULL" << std::endl;
+      gzerr << "Surface friction sdf member is null" << std::endl;
     {
       // Note this should not be looking in the "ode" block
       // Update this when sdformat has bullet friction parameters
@@ -56,7 +57,7 @@ void DARTSurfaceParams::Load(sdf::ElementPtr _sdf)
       // https://bitbucket.org/osrf/sdformat/issue/31
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
       if (!frictionOdeElem)
-        gzerr << "Surface friction ode sdf member is NULL" << std::endl;
+        gzerr << "Surface friction ode sdf member is null" << std::endl;
       else
       {
         this->dataPtr->frictionPyramid->SetMuPrimary(

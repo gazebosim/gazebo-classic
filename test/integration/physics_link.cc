@@ -16,8 +16,8 @@
 */
 #include <string.h>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Vector3Stats.hh>
 
-#include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -294,18 +294,18 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   ASSERT_EQ(I0, link->GetWorldInertiaMatrix());
 
   // Compute initial angular momentum
-  const math::Vector3 H0(I0 * w0);
-  ASSERT_EQ(H0, link->GetWorldAngularMomentum());
-  const double H0mag = H0.GetLength();
+  const auto H0((I0 * w0).Ign());
+  ASSERT_EQ(H0, link->GetWorldAngularMomentum().Ign());
+  const double H0mag = H0.Length();
 
-  math::Vector3Stats angularMomentumError;
+  ignition::math::Vector3Stats angularMomentumError;
   const std::string stat("maxAbs");
   EXPECT_TRUE(angularMomentumError.InsertStatistic(stat));
   const int steps = 5000;
   for (int i = 0; i < steps; ++i)
   {
     world->Step(1);
-    math::Vector3 H = link->GetWorldAngularMomentum();
+    auto H = link->GetWorldAngularMomentum().Ign();
     angularMomentumError.InsertData((H - H0) / H0mag);
   }
   if (_physicsEngine == "dart")
@@ -339,7 +339,7 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // Get gravity magnitude
-  double g = physics->GetGravity().GetLength();
+  double g = world->Gravity().Length();
 
   // Spawn a box
   double z0 = 10.0;

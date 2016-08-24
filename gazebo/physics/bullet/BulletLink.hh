@@ -35,9 +35,7 @@ namespace gazebo
   {
     class BulletMotionState;
 
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_bullet Bullet Physics
-    /// \brief bullet physics engine wrapper
+    /// \addtogroup gazebo_physics_bullet
     /// \{
 
     /// \brief Bullet Link class

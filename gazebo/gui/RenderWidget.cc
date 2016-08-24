@@ -20,9 +20,10 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <iomanip>
+
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -114,10 +115,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
   // Load all GUI Plugins
   std::string filenames = getINIProperty<std::string>(
       "overlay_plugins.filenames", "");
-  std::vector<std::string> pluginFilenames;
 
   // Split the colon separated libraries
-  boost::split(pluginFilenames, filenames, boost::is_any_of(":"));
+  auto pluginFilenames = common::split(filenames, ":");
 
   // Load each plugin
   for (std::vector<std::string>::iterator iter = pluginFilenames.begin();

@@ -1352,8 +1352,7 @@ bool Camera::SaveFrame(const unsigned char *_image,
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
 
   // OGRE 1.9 renames codeToFile to encodeToFile
-  // Looks like 1.9RC, which we're using on Windows, doesn't have this change.
-  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
   pCodec->codeToFile(stream, filename, codecDataPtr);
   #else
   pCodec->encodeToFile(stream, filename, codecDataPtr);
@@ -1710,7 +1709,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(uint32_t _visualId,
+void Camera::AttachToVisual(const uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
@@ -1773,7 +1772,7 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(uint32_t _id,
+bool Camera::AttachToVisualImpl(const uint32_t _id,
     const bool _inheritOrientation, const double _minDist,
     const double _maxDist)
 {
@@ -2209,6 +2208,12 @@ std::string Camera::ProjectionType() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
+}
+
+//////////////////////////////////////////////////
 event::ConnectionPtr Camera::ConnectNewImageFrame(
     std::function<void (const unsigned char *, unsigned int, unsigned int,
     unsigned int, const std::string &)> _subscriber)
@@ -2219,7 +2224,7 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 //////////////////////////////////////////////////
 void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 {
-  this->newImageFrame.Disconnect(_c);
+  this->newImageFrame.Disconnect(_c->Id());
 }
 
 /////////////////////////////////////////////////
@@ -2298,4 +2303,19 @@ bool Camera::TrackInheritYaw() const
 void Camera::SetTrackInheritYaw(const bool _inheritYaw)
 {
   this->dataPtr->trackInheritYaw = _inheritYaw;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2i Camera::Project(
+    const ignition::math::Vector3d &_pt) const
+{
+  // Convert from 3D world pos to 2D screen pos
+  Ogre::Vector3 pos = this->OgreCamera()->getProjectionMatrix() *
+      this->OgreCamera()->getViewMatrix() * Conversions::Convert(_pt);
+
+  ignition::math::Vector2i screenPos;
+  screenPos.X() = ((pos.x / 2.0) + 0.5) * this->ViewportWidth();
+  screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * this->ViewportHeight();
+
+  return screenPos;
 }
