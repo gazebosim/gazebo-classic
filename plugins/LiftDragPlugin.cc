@@ -109,10 +109,12 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   // blade forward (-drag) direction in link frame
   if (_sdf->HasElement("forward"))
     this->forward = _sdf->Get<math::Vector3>("forward");
+  this->forward.Normalize();
 
   // blade upward (+lift) direction in link frame
   if (_sdf->HasElement("upward"))
     this->upward = _sdf->Get<math::Vector3>("upward");
+  this->upward.Normalize();
 
   if (_sdf->HasElement("area"))
     this->area = _sdf->Get<double>("area");
@@ -159,14 +161,16 @@ void LiftDragPlugin::OnUpdate()
 {
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
-  math::Vector3 velI = this->link->GetWorldLinearVel(this->cp);
+  math::Vector3 vel = this->link->GetWorldLinearVel(this->cp);
+  math::Vector3 velI = vel;
+  velI.Normalize();
 
   // smoothing
   // double e = 0.8;
-  // this->velSmooth = e*velI + (1.0 - e)*velSmooth;
-  // velI = this->velSmooth;
+  // this->velSmooth = e*vel + (1.0 - e)*velSmooth;
+  // vel = this->velSmooth;
 
-  if (velI.GetLength() <= 0.01)
+  if (vel.GetLength() <= 0.01)
     return;
 
   // pose of body
@@ -195,7 +199,7 @@ void LiftDragPlugin::OnUpdate()
   const double maxRatio = 1.0;
   // check sweep (angle between velI and lift-drag-plane)
   double sinSweepAngle = math::clamp(
-      spanwiseI.Dot(velI) / velI.GetLength(), minRatio, maxRatio);
+      spanwiseI.Dot(velI), minRatio, maxRatio);
 
   // get cos from trig identity
   double cosSweepAngle = 1.0 - sinSweepAngle * sinSweepAngle;
@@ -214,34 +218,32 @@ void LiftDragPlugin::OnUpdate()
   // projected = spanwiseI Xcross ( vector Xcross spanwiseI)
   //
   // so,
-  // velocity in lift-drag plane (expressed in inertial frame) is:
-  math::Vector3 velInLDPlane = spanwiseI.Cross(velI.Cross(spanwiseI));
+  // removing spanwise velocity from vel
+  math::Vector3 velInLDPlane = vel - vel.Dot(spanwiseI)*velI;
 
   // get direction of drag
   math::Vector3 dragDirection = -velInLDPlane;
   dragDirection.Normalize();
 
   // get direction of lift
-  math::Vector3 liftDirection = spanwiseI.Cross(velInLDPlane);
-  liftDirection.Normalize();
+  math::Vector3 liftI = spanwiseI.Cross(velInLDPlane);
+  liftI.Normalize();
 
   // get direction of moment
   math::Vector3 momentDirection = spanwiseI;
 
-  double forwardVelocity = forwardI.GetLength() * velInLDPlane.GetLength();
-  double cosAlpha = math::clamp(
-    forwardI.Dot(velInLDPlane) / forwardVelocity, minRatio, maxRatio);
+  // compute angle between upwardI and liftI
+  // in general, given vectors a and b:
+  //   cos(theta) = a.Dot(b)/(a.Length()*b.Lenghth())
+  // given upwardI and liftI are both unit vectors, we can drop the denominator
+  //   cos(theta) = a.Dot(b)
+  double cosAlpha = math::clamp(liftI.Dot(upwardI), minRatio, maxRatio);
 
-  // gzerr << "ca " << forwardI.Dot(velInLDPlane) /
-  //   (forwardI.GetLength() * velInLDPlane.GetLength()) << "\n";
-
-  // get sign of alpha
-  // take upwards component of velocity in lift-drag plane.
-  // if sign == upward, then alpha is negative
-  double upwardVelocity = upwardI.GetLength() + velInLDPlane.GetLength();
-  double alphaSign = -upwardI.Dot(velInLDPlane)/upwardVelocity;
-
-  if (alphaSign > 0.0)
+  // Is alpha positive or negative? Test:
+  // forwardI points toward zero alpha
+  // if forwardI is in the same direction as lift, alpha is positive.
+  // liftI is in the same direction as forwardI?
+  if (liftI.Dot(forwardI) >= 0.0)
     this->alpha = this->alpha0 + acos(cosAlpha);
   else
     this->alpha = this->alpha0 - acos(cosAlpha);
@@ -285,7 +287,7 @@ void LiftDragPlugin::OnUpdate()
   }
 
   // compute lift force at cp
-  math::Vector3 lift = cl * q * this->area * liftDirection;
+  math::Vector3 lift = cl * q * this->area * liftI;
 
   // compute cd at cp, check for stall, correct for sweep
   double cd;
@@ -354,31 +356,32 @@ void LiftDragPlugin::OnUpdate()
   //
   // if ((this->link->GetName() == "wing_1" ||
   //      this->link->GetName() == "wing_2") &&
-  //     (velI.GetLength() > 50.0 &&
-  //      velI.GetLength() < 50.0))
+  //     (vel.GetLength() > 50.0 &&
+  //      vel.GetLength() < 50.0))
   if (0)
   {
-    gzerr << "=============================\n";
-    gzerr << "Link: [" << this->link->GetName()
+    gzdbg << "=============================\n";
+    gzdbg << "sensor: [" << this->GetHandle() << "]\n";
+    gzdbg << "Link: [" << this->link->GetName()
           << "] pose: [" << pose
           << "] dynamic pressure: [" << q << "]\n";
-    gzerr << "spd: [" << velI.GetLength()
-          << "] velI: [" << velI << "]\n";
-    gzerr << "spd sweep: [" << velInLDPlane.GetLength()
-          << "] velI in LD plane: [" << velInLDPlane << "]\n";
-    gzerr << "forward (inertial): " << forwardI << "\n";
-    gzerr << "upward (inertial): " << upwardI << "\n";
-    gzerr << "lift dir (inertial): " << liftDirection << "\n";
-    gzerr << "Span direction (normal to LD plane): " << spanwiseI << "\n";
-    gzerr << "sweep: " << this->sweep << "\n";
-    gzerr << "alpha: " << this->alpha << "\n";
-    gzerr << "lift: " << lift << "\n";
-    gzerr << "drag: " << drag << " cd: "
-    << cd << " cda: " << this->cda << "\n";
-    gzerr << "moment: " << moment << "\n";
-    gzerr << "cp momentArm: " << momentArm << "\n";
-    gzerr << "force: " << force << "\n";
-    gzerr << "torque: " << torque << "\n";
+    gzdbg << "spd: [" << vel.GetLength()
+          << "] vel: [" << vel << "]\n";
+    gzdbg << "LD plane spd: [" << velInLDPlane.GetLength()
+          << "] vel : [" << velInLDPlane << "]\n";
+    gzdbg << "forward (inertial): " << forwardI << "\n";
+    gzdbg << "upward (inertial): " << upwardI << "\n";
+    gzdbg << "lift dir (inertial): " << liftI << "\n";
+    gzdbg << "Span direction (normal to LD plane): " << spanwiseI << "\n";
+    gzdbg << "sweep: " << this->sweep << "\n";
+    gzdbg << "alpha: " << this->alpha << "\n";
+    gzdbg << "lift: " << lift << "\n";
+    gzdbg << "drag: " << drag << " cd: "
+          << cd << " cda: " << this->cda << "\n";
+    gzdbg << "moment: " << moment << "\n";
+    gzdbg << "cp momentArm: " << momentArm << "\n";
+    gzdbg << "force: " << force << "\n";
+    gzdbg << "torque: " << torque << "\n";
   }
 
   // Correct for nan or inf

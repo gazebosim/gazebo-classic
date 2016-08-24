@@ -4,33 +4,57 @@
 
 To run this demo, you must have following arducopter repo checked out:
 
-https://github.com/hsu/ardupilot/tree/gazebo_sitl
+$ git clone https://github.com/hsu/ardupilot.git -b gazebo_sitl
+
+Add correct path
+
+$ export PATH=$PATH:[path to ardupilot]/ArduCopter
+$ export PATH=$PATH:[path to ardupilot]/Tools/autotest
+
+Make sure you have the right compiler if you are compiling for ARM based platforms
+$ export PATH=/opt/gcc-arm-none-eabi-4_7-2014q2/bin:$PATH
 
 To start simulation, first run gazebo:
 
-gazebo worlds/iris_standoff_demo.world
+gazebo worlds/iris_arducopter_demo.world
 
 Gazebo starts up paused in a black screen. To start simulation,
 setup ArduCopter and run below in a separate terminal:
 
-sim_vehicle.sh -j 4 -f Gazebo
+sim_vehicle.sh -j 4 -f Gazebo -S 100
 
-This will start mavproxy, you can then do the usual mavprox commands with
-Gazebo, e.g.
+Note the speed up (-S) is set to a large number, as long as this number
+is higher than simulation RTF we are ok. This is becuase simulation
+is blocking and waiting for ArduCopter, but ArduCopter is not waiting
+for anyone.
 
-MAV> arm uncheck all
-MAV> mode STABILIZE
+This will start mavproxy, easiest way to start flying is to first skip arming
+checks (e.g. RC calibration, etc.). And increase Failsafe EKF threshold to
+account for simulation errors:
+
+STABILIZE> arm uncheck all
+STABILIZE> param set FS_EKF_THRESH 1
+
+Takeoff:
+
+STABILIZE> mode LOITER
+LOITER> rc 3 1500
+LOITER> arm throttle
+LOITER> takeoff 10
+
+Or you can then do the usual mavprox commands within mavproxy shell:
+
+STABILIZE> mode STABILIZE
 STABILIZE> arm throttle
 
-or
+Option to connect a joystick:
 
 STABILIZE> module load joystick
 
 to fly iris with a ps2 joystick.
 
 -->
-
-<sdf version="1.4">
+<sdf version="1.6">
   <world name="default">
     <gui>
       <camera name="user_camera">
@@ -38,7 +62,6 @@ to fly iris with a ps2 joystick.
       </camera>
     </gui>
     <physics type="ode">
-      <gravity>0.0 0.0 -9.81</gravity>
       <ode>
         <solver>
           <type>quick</type>
@@ -52,17 +75,13 @@ to fly iris with a ps2 joystick.
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <real_time_update_rate>400</real_time_update_rate>
+      <real_time_update_rate>0</real_time_update_rate>
       <max_step_size>0.0025</max_step_size>
     </physics>
+
     <include>
       <uri>model://sun</uri>
     </include>
-<!--
-    <include>
-      <uri>model://drc_terrain</uri>
-    </include>
--->
 
     <model name="ground_plane">
       <static>true</static>
@@ -84,7 +103,7 @@ to fly iris with a ps2 joystick.
           </surface>
         </collision>
         <visual name="runway">
-          <pose>700 0 0.1 0 0 0</pose>
+          <pose>700 0 0.005 0 0 0</pose>
           <cast_shadows>false</cast_shadows>
           <geometry>
             <plane>
@@ -120,14 +139,14 @@ to fly iris with a ps2 joystick.
       </link>
     </model>
 
-    <model name="iris">
+    <model name="iris_demo">
       <include>
-        <uri>model://iris_test</uri>
+        <uri>model://iris_with_standoffs</uri>
       </include>
 
       <include>
         <uri>model://gimbal_small_2d</uri>
-        <pose>0 0 0.040 1.57 0 1.57</pose>
+        <pose>0 -0.01 0.070 1.57 0 1.57</pose>
       </include>
 
       <joint name="iris_gimbal_mount" type="revolute">
@@ -634,7 +653,8 @@ to fly iris with a ps2 joystick.
         <link_name>iris::rotor_3</link_name>
       </plugin>
       <plugin name="arducopter_plugin" filename="libArduCopterPlugin.so">
-        <imuLinkName>iris::iris/imu_link</imuLinkName>
+        <imuName>iris::iris/imu_link::imu_sensor</imuName>
+        <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
         <rotor id="0">
           <vel_p_gain>0.2</vel_p_gain>
           <vel_i_gain>0</vel_i_gain>
@@ -644,9 +664,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_0_joint</jointName>
-          <linkName>iris::rotor_0</linkName>
           <turningDirection>ccw</turningDirection>
-          <motorNumber>0</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="1">
@@ -658,9 +676,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_1_joint</jointName>
-          <linkName>iris::rotor_1</linkName>
           <turningDirection>ccw</turningDirection>
-          <motorNumber>1</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="2">
@@ -672,9 +688,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_2_joint</jointName>
-          <linkName>iris::rotor_2</linkName>
           <turningDirection>cw</turningDirection>
-          <motorNumber>2</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="3">
@@ -686,9 +700,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_3_joint</jointName>
-          <linkName>iris::rotor_3</linkName>
           <turningDirection>cw</turningDirection>
-          <motorNumber>3</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
       </plugin>
