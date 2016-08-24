@@ -30,13 +30,21 @@ namespace gazebo
   /// modeled after SITL/SIM_*
   ///
   /// The plugin requires the following parameters:
-  /// <controller_ip>       controller is on this ip
-  /// <state_port>          This plugin publishes states on this port
-  /// <command_port>        This plugin receives states on this port
-  ///
-  /// The following parameters are optional:
-  /// <param.xml>           use params stored at this absolute file path
-  ///
+  /// <rotor>       rotor description block
+  ///    id         attribute rotor id
+  ///    <vel_p_gain>       velocity pid p gain
+  ///    <vel_i_gain>       velocity pid i gain
+  ///    <vel_d_gain>       velocity pid d gain
+  ///    <vel_i_max>        velocity pid max integral correction
+  ///    <vel_i_min>        velocity pid min integral correction
+  ///    <vel_cmd_max>      velocity pid max command torque
+  ///    <vel_cmd_min>      velocity pid min command torque
+  ///    <jointName>        rotor motor joint, torque applied here
+  ///    <turningDirection> turning direction, 'cw' or 'ccw'
+  ///    <rotorVelocitySlowdownSim> experimental, not needed
+  /// <imuName>     scoped name for the imu sensor
+  /// <connectionTimeoutMaxCount> timeout before giving up on
+  ///                             controller synchronization
   class GAZEBO_VISIBLE ArduCopterPlugin : public ModelPlugin
   {
     /// \brief Constructor.

@@ -124,12 +124,6 @@ class Rotor
   /// \brief Control propeller joint.
   public: physics::JointPtr joint;
 
-  /// \brief Control propeller link.
-  public: std::string linkName;
-
-  /// \brief Control propeller link.
-  public: physics::LinkPtr link;
-
   /// \brief direction multiplier for this rotor
   public: double multiplier = 1;
 
@@ -295,16 +289,9 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       }
       else
       {
-        gzwarn << "id attribute not specified, check motorNumber.\n";
-        if (rotorSDF->HasElement("motorNumber"))
-        {
-          rotor.id = rotorSDF->Get<int>("motorNumber");
-        }
-        else
-        {
-          gzwarn << "motorNumber not specified, use order parsed.\n";
-          rotor.id = this->dataPtr->rotors.size();
-        }
+        rotor.id = this->dataPtr->rotors.size();
+        gzwarn << "id attribute not specified, use order parsed ["
+               << rotor.id << "].\n";
       }
 
       if (rotorSDF->HasElement("jointName"))
@@ -323,22 +310,6 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         gzerr << "Couldn't find specified joint ["
             << rotor.jointName << "]. This plugin will not run.\n";
-        return;
-      }
-
-      if (rotorSDF->HasElement("linkName"))
-        rotor.linkName = rotorSDF->Get<std::string>("linkName");
-      else
-      {
-        gzerr << "Please specify a linkName for the rotor. Aborting plugin.\n";
-        return;
-      }
-
-      rotor.link = _model->GetLink(rotor.linkName);
-      if (rotor.link == nullptr)
-      {
-        gzerr << "Couldn't find specified link ["
-            << rotor.linkName << "]. This plugin will not run\n";
         return;
       }
 

@@ -664,9 +664,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_0_joint</jointName>
-          <linkName>iris::rotor_0</linkName>
           <turningDirection>ccw</turningDirection>
-          <motorNumber>0</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="1">
@@ -678,9 +676,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_1_joint</jointName>
-          <linkName>iris::rotor_1</linkName>
           <turningDirection>ccw</turningDirection>
-          <motorNumber>1</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="2">
@@ -692,9 +688,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_2_joint</jointName>
-          <linkName>iris::rotor_2</linkName>
           <turningDirection>cw</turningDirection>
-          <motorNumber>2</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="3">
@@ -706,9 +700,7 @@ to fly iris with a ps2 joystick.
           <vel_cmd_max>2.0</vel_cmd_max>
           <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_3_joint</jointName>
-          <linkName>iris::rotor_3</linkName>
           <turningDirection>cw</turningDirection>
-          <motorNumber>3</motorNumber>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
       </plugin>
