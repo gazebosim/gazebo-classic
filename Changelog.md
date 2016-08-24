@@ -3,7 +3,7 @@
 ## Gazebo 8.x.x (2017-xx-xx)
 
 1. Add video recording of user camera.
-    * [Pull request #2423](https://bitbucket.org/osrf/gazebo/pull-request/2423)
+    * [Pull request #2432](https://bitbucket.org/osrf/gazebo/pull-request/2432)
 
 1. Include basic support for GNU Precompiled Headers to reduce compile time
     * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
