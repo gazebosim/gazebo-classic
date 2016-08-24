@@ -220,6 +220,8 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  this->dataPtr->videoEncoder.Reset();
+
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
   this->saveFrameBuffer = NULL;
