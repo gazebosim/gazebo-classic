@@ -52,17 +52,6 @@ class gazebo::common::VideoEncoderPrivate
   /// \return Full filename of the temporary video file.
   public: std::string TmpFilename() const;
 
-  /// \brief Helper function that opens the video codec
-  /// \param[in] _codec Pointer to the codec
-  public: bool OpenVideo(AVCodec *_codec);
-
-  /// \brief Helper function that creates a video stream
-  /// \param[in] _codec Pointer to the codec's address
-  /// \param[in] _width Output frame width
-  /// \param[in] _height Output frame height
-  public: bool AddStream(AVCodec **_codec,
-                         unsigned int _width, unsigned int _height);
-
   /// \brief libav audio video stream
   public: AVStream *videoStream = nullptr;
 
@@ -76,7 +65,11 @@ class gazebo::common::VideoEncoderPrivate
   public: AVFrame *avOutFrame = nullptr;
 
   /// \brief libav input image data
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+  public: AVPicture *avInFrame = nullptr;
+#else
   public: AVFrame *avInFrame = nullptr;
+#endif
 
   /// \brief Software scaling context
   public: SwsContext *swsCtx = nullptr;
@@ -155,9 +148,11 @@ bool VideoEncoder::Start(const unsigned int _width,
     this->Reset();
   }
 
+  std::string tmpFileNameFull = this->dataPtr->TmpFilename();
+
   // Remove old temp file, if it exists.
-  if (common::exists(this->dataPtr->TmpFilename()))
-    std::remove(this->dataPtr->TmpFilename().c_str());
+  if (common::exists(tmpFileNameFull))
+    std::remove(tmpFileNameFull.c_str());
 
   // Calculate a good bitrate if the _bitRate argument is zero
   if (_bitRate == 0)
@@ -195,33 +190,147 @@ bool VideoEncoder::Start(const unsigned int _width,
   this->dataPtr->frameCount = 0;
 
 #ifdef HAVE_FFMPEG
-  AVCodec *videoCodec = nullptr;
 
   // The resolution must be divisible by two
   unsigned int outWidth = _width % 2 == 0 ? _width : _width + 1;
   unsigned int outHeight = _height % 2 == 0 ? _height : _height + 1;
 
-  std::string tmpFileNameFull = this->dataPtr->TmpFilename();
+  // Helper function based on the available ffmpeg version
+  return this->StartHelper(outWidth, outHeight, this->dataPtr->TmpFilename());
+#else
+  gzwarn << "Encoding capability not available. "
+      << "Please install libavcodec, libavformat and libswscale dev packages."
+      << std::endl;
+  return false;
+#endif
+}
 
-  avformat_alloc_output_context2(&this->dataPtr->formatCtx, nullptr, nullptr,
-                                 tmpFileNameFull.c_str());
-  if (!this->dataPtr->formatCtx)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+/////////////////////////////////////////////////
+// This function supports ffmpeg2
+bool VideoEncoder::StartHelper(unsigned int _outWidth,
+    unsigned int _outHeight, const std::string &_filename)
+{
+  AVOutputFormat *outputFormat =
+    av_guess_format(NULL, _filename.c_str(), NULL);
+
+  if (!outputFormat)
   {
-    gzerr << "Unable to allocate format context. Video encoding not started\n";
+    gzwarn << "Could not deduce output format from file extension."
+           << "Using MPEG.\n";
+    outputFormat = av_guess_format("mpeg", NULL, NULL);
+  }
+
+  AVCodec *encoder = nullptr;
+
+  // find the video encoder
+  encoder = avcodec_find_encoder(outputFormat->video_codec);
+  if (!encoder)
+  {
+    gzerr << "Codec for[" << outputFormat->name
+          << "] not found. Video encoding is not started.\n";
     this->Reset();
     return false;
   }
 
-  // Create the video stream
-  if (!this->dataPtr->AddStream(&videoCodec, outWidth, outHeight))
+  this->dataPtr->formatCtx = avformat_alloc_context();
+  this->dataPtr->formatCtx->oformat = outputFormat;
+
+#ifdef WIN32
+  _snprintf(this->dataPtr->formatCtx->filename,
+      sizeof(this->dataPtr->formatCtx->filename),
+      "%s", _filename.c_str());
+#else
+  snprintf(this->dataPtr->formatCtx->filename,
+      sizeof(this->dataPtr->formatCtx->filename),
+      "%s", _filename.c_str());
+#endif
+
+  this->dataPtr->videoStream =
+    avformat_new_stream(this->dataPtr->formatCtx, encoder);
+
+  // some formats want stream headers to be separate
+  if (this->dataPtr->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+    this->dataPtr->videoStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
+  // Make sure the codec is valid
+  if (!this->dataPtr->videoStream->codec)
   {
+    gzerr << "Could not allocate video codex context."
+          << "Video encoding is not started\n";
     this->Reset();
     return false;
   }
 
-  // Opene the video stream
-  if (!this->dataPtr->OpenVideo(videoCodec))
+  // frames per second
+  this->dataPtr->videoStream->time_base.den = this->dataPtr->fps;
+  this->dataPtr->videoStream->time_base.num = 1;
+  this->dataPtr->videoStream->codec->time_base.den = this->dataPtr->fps;
+  this->dataPtr->videoStream->codec->time_base.num = 1;
+
+  // Sample parameters
+  this->dataPtr->videoStream->codec->bit_rate = this->dataPtr->bitRate;
+
+  // Resolution
+  this->dataPtr->videoStream->codec->width = _outWidth;
+  this->dataPtr->videoStream->codec->height = _outHeight;
+
+  // Emit one intra frame every ten frames
+  this->dataPtr->videoStream->codec->gop_size = 10;
+  this->dataPtr->videoStream->codec->max_b_frames = 1;
+  this->dataPtr->videoStream->codec->pix_fmt = AV_PIX_FMT_YUV420P;
+  this->dataPtr->videoStream->codec->thread_count = 5;
+
+  if (this->dataPtr->videoStream->codec->codec_id == AV_CODEC_ID_H264)
   {
+    av_opt_set(this->dataPtr->videoStream->codec->priv_data,
+        "preset", "slow", 0);
+  }
+
+  if (this->dataPtr->videoStream->codec->codec_id == AV_CODEC_ID_MPEG1VIDEO)
+  {
+    // Needed to avoid using macroblocks in which some coeffs overflow.
+    // This does not happen with normal video, it just happens here as
+    // the motion of the chroma plane does not match the luma plane.
+    this->dataPtr->videoStream->codec->mb_decision = 2;
+  }
+
+  // Open it
+  if (avcodec_open2(this->dataPtr->videoStream->codec, encoder, nullptr) < 0)
+  {
+    gzerr << "Could not open codec. Video encoding is not started\n";
+    this->Reset();
+    return false;
+  }
+
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 28, 1)
+  this->dataPtr->avOutFrame = avcodec_alloc_frame();
+#else
+  this->dataPtr->avOutFrame = av_frame_alloc();
+#endif
+
+  if (!this->dataPtr->avOutFrame)
+  {
+    gzerr << "Could not allocate video frame. Video encoding is not started\n";
+    this->Reset();
+    return false;
+  }
+
+  this->dataPtr->avOutFrame->format =
+    this->dataPtr->videoStream->codec->pix_fmt;
+  this->dataPtr->avOutFrame->width  = this->dataPtr->videoStream->codec->width;
+  this->dataPtr->avOutFrame->height = this->dataPtr->videoStream->codec->height;
+
+  // the image can be allocated by any means and av_image_alloc() is
+  // just the most convenient way if av_malloc() is to be used
+  if (av_image_alloc(this->dataPtr->avOutFrame->data,
+      this->dataPtr->avOutFrame->linesize,
+      this->dataPtr->videoStream->codec->width,
+      this->dataPtr->videoStream->codec->height,
+      this->dataPtr->videoStream->codec->pix_fmt, 32) < 0)
+  {
+    gzerr << "Could not allocate raw picture buffer."
+          << "Video encoding is not started\n";
     this->Reset();
     return false;
   }
@@ -232,15 +341,171 @@ bool VideoEncoder::Start(const unsigned int _width,
   this->dataPtr->formatCtx->max_delay =
     static_cast<int>(muxMaxDelay * AV_TIME_BASE);
 
+  if (!(outputFormat->flags & AVFMT_NOFILE))
+  {
+    if (avio_open(&this->dataPtr->formatCtx->pb, _filename.c_str(),
+        AVIO_FLAG_WRITE) < 0)
+    {
+      gzerr << "Could not open '" << _filename << "'."
+            << "Video encoding is not started\n";
+      this->Reset();
+      return false;
+    }
+  }
+
+  // Write the stream header, if any.
+  if (avformat_write_header(this->dataPtr->formatCtx, nullptr) < 0)
+  {
+    gzerr << "Error occured when opening output file."
+          << "Video encoding is not started\n";
+    this->Reset();
+    return false;
+  }
+
+  this->dataPtr->encoding = true;
+  return true;
+}
+#else
+/////////////////////////////////////////////////
+// This function support ffmpeg3
+bool VideoEncoder::StartHelper(unsigned int _outWidth,
+    unsigned int _outHeight, const std::string &_filename)
+{
+  AVCodec *videoCodec = nullptr;
+
+  avformat_alloc_output_context2(&this->dataPtr->formatCtx, nullptr, nullptr,
+                                 _filename.c_str());
+  if (!this->dataPtr->formatCtx)
+  {
+    gzerr << "Unable to allocate format context. Video encoding not started\n";
+    this->Reset();
+    return false;
+  }
+
+  // find the video encoder
+  videoCodec = avcodec_find_encoder(
+      this->dataPtr->formatCtx->oformat->video_codec);
+  if (!videoCodec)
+  {
+    gzerr << "Codec for["
+      << avcodec_get_name(this->dataPtr->formatCtx->oformat->video_codec)
+      << "] not found. Video encoding is not started.\n";
+    this->Reset();
+    return false;
+  }
+
+  // Create a new video stream
+  this->dataPtr->videoStream = avformat_new_stream(
+      this->dataPtr->formatCtx, nullptr);
+  if (!this->dataPtr->videoStream)
+  {
+    gzerr << "Could not allocate stream. Video encoding is not started\n";
+    this->Reset();
+    return false;
+  }
+  this->dataPtr->videoStream->id = this->dataPtr->formatCtx->nb_streams-1;
+
+  // Allocate a new video context
+  this->dataPtr->codecCtx = avcodec_alloc_context3(videoCodec);
+  if (!this->dataPtr->codecCtx)
+  {
+    gzerr << "Could not allocate an encoding context."
+          << "Video encoding is not started\n";
+    this->Reset();
+    return false;
+  }
+
+  if (this->dataPtr->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+    this->dataPtr->codecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
+  // Set the context parameters
+  this->dataPtr->codecCtx->codec_id =
+    this->dataPtr->formatCtx->oformat->video_codec;
+  this->dataPtr->codecCtx->bit_rate = this->dataPtr->bitRate;
+  this->dataPtr->codecCtx->width = _outWidth;
+  this->dataPtr->codecCtx->height = _outHeight;
+  this->dataPtr->codecCtx->time_base.den = this->dataPtr->fps;
+  this->dataPtr->codecCtx->time_base.num = 1;
+  this->dataPtr->codecCtx->gop_size = 10;
+  this->dataPtr->codecCtx->max_b_frames = 1;
+  this->dataPtr->codecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+  this->dataPtr->codecCtx->thread_count = 5;
+
+  // The video stream must have the same time base as the context
+  this->dataPtr->videoStream->time_base.den = this->dataPtr->fps;
+  this->dataPtr->videoStream->time_base.num = 1;
+
+  if (this->dataPtr->codecCtx->codec_id == AV_CODEC_ID_MPEG1VIDEO)
+    this->dataPtr->codecCtx->mb_decision = 2;
+
+  if (this->dataPtr->codecCtx->codec_id == AV_CODEC_ID_H264)
+  {
+    av_opt_set(this->dataPtr->videoStream->priv_data, "preset", "slow", 0);
+    av_opt_set(this->dataPtr->codecCtx->priv_data, "preset", "slow", 0);
+  }
+
+  // Open the video context
+  int ret = avcodec_open2(this->dataPtr->codecCtx, videoCodec, 0);
+  if (ret < 0)
+  {
+    char errBuff[AV_ERROR_MAX_STRING_SIZE];
+    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
+
+    gzerr << "Could not open video codec: " << errBuff
+          << "Video encoding is not started\n";
+    this->Reset();
+    return false;
+  }
+
+  this->dataPtr->avOutFrame = av_frame_alloc();
+
+  if (!this->dataPtr->avOutFrame)
+  {
+    gzerr << "Could not allocate video frame. Video encoding is not started\n";
+    this->Reset();
+    return false;
+  }
+
+  this->dataPtr->avOutFrame->format = this->dataPtr->codecCtx->pix_fmt;
+  this->dataPtr->avOutFrame->width = this->dataPtr->codecCtx->width;
+  this->dataPtr->avOutFrame->height = this->dataPtr->codecCtx->height;
+
+  av_image_alloc(this->dataPtr->avOutFrame->data,
+                 this->dataPtr->avOutFrame->linesize,
+                 this->dataPtr->codecCtx->width,
+                 this->dataPtr->codecCtx->height,
+                 this->dataPtr->codecCtx->pix_fmt, 32);
+
+  // Copy parameters from the context to the video stream
+  ret = avcodec_parameters_from_context(
+      this->dataPtr->videoStream->codecpar, this->dataPtr->codecCtx);
+
+  if (ret < 0)
+  {
+    char errBuff[AV_ERROR_MAX_STRING_SIZE];
+    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
+
+    gzerr << "Could not copy the stream parameters:" << errBuff
+          << "Video encoding not started\n";
+    return false;
+  }
+
+  // Open the video stream
+  // setting mux preload and max delay avoids buffer underflow when writing to
+  // mpeg format
+  double muxMaxDelay = 0.7f;
+  this->dataPtr->formatCtx->max_delay =
+    static_cast<int>(muxMaxDelay * AV_TIME_BASE);
+
   if (!(this->dataPtr->formatCtx->oformat->flags & AVFMT_NOFILE))
   {
-    int ret = avio_open(&this->dataPtr->formatCtx->pb, tmpFileNameFull.c_str(),
+    ret = avio_open(&this->dataPtr->formatCtx->pb, _filename.c_str(),
         AVIO_FLAG_WRITE);
     if (ret < 0)
     {
       char errBuff[AV_ERROR_MAX_STRING_SIZE];
       av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-      gzerr << "Could not open '" << tmpFileNameFull << "'. "
+      gzerr << "Could not open '" << _filename << "'. "
             << errBuff
             << "Video encoding is not started\n";
       this->Reset();
@@ -249,29 +514,22 @@ bool VideoEncoder::Start(const unsigned int _width,
   }
 
   // Write the stream header, if any.
-  int ret = avformat_write_header(this->dataPtr->formatCtx, nullptr);
+  ret = avformat_write_header(this->dataPtr->formatCtx, nullptr);
   if (ret < 0)
   {
     char errBuff[AV_ERROR_MAX_STRING_SIZE];
     av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
 
-    gzerr << "Error occured when opening output file. "
-          << errBuff
-          << "Video encoding is not started\n";
+    gzerr << "Error occured when opening output file: " << errBuff
+          << ". Video encoding is not started\n";
     this->Reset();
     return false;
   }
 
   this->dataPtr->encoding = true;
-
   return true;
-#else
-  gzwarn << "Encoding capability not available. "
-      << "Please install libavcodec, libavformat and libswscale dev packages."
-      << std::endl;
-  return false;
-#endif
 }
+#endif
 
 ////////////////////////////////////////////////
 bool VideoEncoder::IsEncoding()
@@ -290,6 +548,138 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
 /////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
+
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+bool VideoEncoder::AddFrame(const unsigned char *_frame,
+    const unsigned int _width,
+    const unsigned int _height,
+    const std::chrono::steady_clock::time_point &_timestamp)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  if (!this->dataPtr->encoding)
+  {
+    gzerr << "Start encoding before adding a frame\n";
+    return false;
+  }
+
+  auto dt = _timestamp - this->dataPtr->timePrev;
+
+  // Skip frames that arrive faster than the video's fps
+  if (dt < std::chrono::duration<double>(1.0/this->dataPtr->fps))
+    return false;
+
+  this->dataPtr->timePrev = _timestamp;
+
+  // Cause the sws to be recreated on image resize
+  if (this->dataPtr->swsCtx &&
+      (this->dataPtr->inWidth != _width || this->dataPtr->inHeight != _height))
+  {
+    sws_freeContext(this->dataPtr->swsCtx);
+    this->dataPtr->swsCtx = nullptr;
+    if (this->dataPtr->avInFrame)
+    {
+      av_free(this->dataPtr->avInFrame);
+      this->dataPtr->avInFrame = nullptr;
+    }
+  }
+
+  if (!this->dataPtr->swsCtx)
+  {
+    this->dataPtr->inWidth = _width;
+    this->dataPtr->inHeight = _height;
+
+    if (!this->dataPtr->avInFrame)
+    {
+      this->dataPtr->avInFrame = new AVPicture;
+      avpicture_alloc(this->dataPtr->avInFrame,
+          AV_PIX_FMT_RGB24, this->dataPtr->inWidth,
+          this->dataPtr->inHeight);
+    }
+
+    this->dataPtr->swsCtx = sws_getContext(
+        this->dataPtr->inWidth,
+        this->dataPtr->inHeight,
+        AV_PIX_FMT_RGB24,
+        this->dataPtr->videoStream->codec->width,
+        this->dataPtr->videoStream->codec->height,
+        this->dataPtr->videoStream->codec->pix_fmt,
+        SWS_BICUBIC, nullptr, nullptr, nullptr);
+
+    if (this->dataPtr->swsCtx == nullptr)
+    {
+      gzerr << "Error while calling sws_getContext\n";
+      return false;
+    }
+  }
+
+  // encode
+  memcpy(this->dataPtr->avInFrame->data[0], _frame,
+      this->dataPtr->inWidth * this->dataPtr->inHeight * 3);
+
+  sws_scale(this->dataPtr->swsCtx,
+      this->dataPtr->avInFrame->data,
+      this->dataPtr->avInFrame->linesize,
+      0, this->dataPtr->inHeight,
+      this->dataPtr->avOutFrame->data,
+      this->dataPtr->avOutFrame->linesize);
+
+  this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
+
+  int gotOutput = 0;
+  AVPacket avPacket;
+  av_init_packet(&avPacket);
+  avPacket.data = nullptr;
+  avPacket.size = 0;
+
+  int ret = avcodec_encode_video2(this->dataPtr->videoStream->codec, &avPacket,
+      this->dataPtr->avOutFrame, &gotOutput);
+
+  if (ret >= 0)
+  {
+    // write the frame
+    if (gotOutput)
+    {
+      avPacket.stream_index = this->dataPtr->videoStream->index;
+
+      // Scale timestamp appropriately.
+      if (avPacket.pts != static_cast<int64_t>(AV_NOPTS_VALUE))
+      {
+        avPacket.pts = av_rescale_q(avPacket.pts,
+            this->dataPtr->videoStream->codec->time_base,
+            this->dataPtr->videoStream->time_base);
+      }
+
+      if (avPacket.dts != static_cast<int64_t>(AV_NOPTS_VALUE))
+      {
+        avPacket.dts = av_rescale_q(
+            avPacket.dts,
+            this->dataPtr->videoStream->codec->time_base,
+            this->dataPtr->videoStream->time_base);
+      }
+
+      // Write frame to disk
+      ret = av_interleaved_write_frame(this->dataPtr->formatCtx, &avPacket);
+
+      if (ret < 0)
+      {
+        gzerr << "Error writing frame" << std::endl;
+        return false;
+      }
+    }
+    // gotOutput == false is not an error. It is an indicator that we do not
+    // need to call av_interleaved_write_frame.
+  }
+  else
+  {
+    gzerr << "Error encoding frame[" << ret << "]\n";
+    return false;
+  }
+
+  av_free_packet(&avPacket);
+  return true;
+}
+#else
 bool VideoEncoder::AddFrame(const unsigned char *_frame,
     const unsigned int _width,
     const unsigned int _height,
@@ -330,11 +720,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
     if (!this->dataPtr->avInFrame)
     {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 28, 1)
-      this->dataPtr->avInFrame = avcodec_alloc_frame();
-#else
       this->dataPtr->avInFrame = av_frame_alloc();
-#endif
 
       av_image_alloc(this->dataPtr->avInFrame->data,
           this->dataPtr->avInFrame->linesize,
@@ -371,8 +757,10 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
 
+  // FFMPEG 3.x.x frame encoding and writing
   AVPacket *avPacket = av_packet_alloc();
   av_init_packet(avPacket);
+
   avPacket->data = nullptr;
   avPacket->size = 0;
 
@@ -413,8 +801,10 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   }
 
   av_packet_free(&avPacket);
+
   return true;
 }
+#endif
 #else
 bool VideoEncoder::AddFrame(const unsigned char */*_frame*/,
     const unsigned int /*_width*/,
@@ -437,7 +827,11 @@ bool VideoEncoder::Stop()
   this->dataPtr->codecCtx = nullptr;
 
   if (this->dataPtr->avInFrame)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+    av_free(this->dataPtr->avInFrame);
+#else
     av_frame_free(&this->dataPtr->avInFrame);
+#endif
   this->dataPtr->avInFrame = nullptr;
 
   if (this->dataPtr->avOutFrame)
@@ -510,118 +904,4 @@ void VideoEncoder::Reset()
 std::string VideoEncoderPrivate::TmpFilename() const
 {
   return common::cwd() + "/TMP_RECORDING." + this->format;
-}
-
-/////////////////////////////////////////////////
-bool VideoEncoderPrivate::AddStream(AVCodec **_codec,
-    unsigned int _width, unsigned int _height)
-{
-  // find the video encoder
-  *_codec = avcodec_find_encoder(this->formatCtx->oformat->video_codec);
-  if (!(*_codec))
-  {
-    gzerr << "Codec for["
-      << avcodec_get_name(this->formatCtx->oformat->video_codec)
-      << "] not found. Video encoding is not started.\n";
-    return false;
-  }
-
-  // Create a new video stream
-  this->videoStream = avformat_new_stream(this->formatCtx, nullptr);
-  if (!this->videoStream)
-  {
-    gzerr << "Could not allocate stream. Video encoding is not started\n";
-    return false;
-  }
-  this->videoStream->id = this->formatCtx->nb_streams-1;
-
-  // Allocate a new video context
-  this->codecCtx = avcodec_alloc_context3(*_codec);
-  if (!this->codecCtx)
-  {
-    gzerr << "Could not allocate an encoding context."
-      << "Video encoding is not started\n";
-    return false;
-  }
-
-  // Set the context parameters
-  this->codecCtx->codec_id = this->formatCtx->oformat->video_codec;
-  this->codecCtx->bit_rate = this->bitRate;
-  this->codecCtx->width = _width;
-  this->codecCtx->height = _height;
-  this->codecCtx->time_base.den = this->fps;
-  this->codecCtx->time_base.num = 1;
-  this->codecCtx->gop_size = 10;
-  this->codecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-
-  // The video stream must have the same time base as the context
-  this->videoStream->time_base.den = this->fps;
-  this->videoStream->time_base.num = 1;
-
-  if (this->codecCtx->codec_id == AV_CODEC_ID_MPEG2VIDEO)
-    this->codecCtx->max_b_frames = 2;
-
-  if (this->codecCtx->codec_id == AV_CODEC_ID_MPEG1VIDEO)
-    this->codecCtx->mb_decision = 2;
-
-  if (this->codecCtx->codec_id == AV_CODEC_ID_H264)
-  {
-    av_opt_set(this->videoStream->priv_data, "preset", "slow", 0);
-    av_opt_set(this->codecCtx->priv_data, "preset", "slow", 0);
-  }
-
-  if (this->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
-    this->codecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool VideoEncoderPrivate::OpenVideo(AVCodec *_codec)
-{
-  int ret = 0;
-
-  // Open the video context
-  ret = avcodec_open2(this->codecCtx, _codec, 0);
-  if (ret < 0)
-  {
-    char errBuff[AV_ERROR_MAX_STRING_SIZE];
-    av_strerror(ret, errBuff, AV_ERROR_MAX_STRING_SIZE);
-
-    gzerr << "Could not open video codec: " << errBuff << std::endl;
-    return false;
-  }
-
-  // Allocate the output frame
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55, 28, 1)
-  this->avOutFrame = avcodec_alloc_frame();
-#else
-  this->avOutFrame = av_frame_alloc();
-#endif
-
-  if (!this->avOutFrame)
-  {
-    gzerr << "Cloud not allocate video frame\n";
-    return false;
-  }
-
-  this->avOutFrame->format = this->codecCtx->pix_fmt;
-  this->avOutFrame->width = this->codecCtx->width;
-  this->avOutFrame->height = this->codecCtx->height;
-
-  av_image_alloc(this->avOutFrame->data, this->avOutFrame->linesize,
-                 this->codecCtx->width, this->codecCtx->height,
-                 this->codecCtx->pix_fmt, 32);
-
-  // Copy parameters from the context to the video stream
-  ret = avcodec_parameters_from_context(
-      this->videoStream->codecpar, this->codecCtx);
-
-  if (ret < 0)
-  {
-    gzerr << "Could not copy the stream parameters\n";
-    return false;
-  }
-
-  return true;
 }

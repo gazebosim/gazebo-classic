@@ -113,6 +113,15 @@ namespace gazebo
       /// memory. This will also delete any temporary files.
       public: void Reset();
 
+      /// \brief Start helper function
+      /// \param[in] _outWidth Output frame width
+      /// \param[in] _outHeight Output frame height
+      /// \param[in] _filename Temporary filename in which to store the
+      /// video.
+      private: bool StartHelper(unsigned int _outWidth,
+                                unsigned int _outHeight,
+                                const std::string &_filename);
+
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<VideoEncoderPrivate> dataPtr;
