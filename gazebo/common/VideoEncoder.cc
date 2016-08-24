@@ -189,22 +189,15 @@ bool VideoEncoder::Start(const unsigned int _width,
   this->dataPtr->fps = _fps;
   this->dataPtr->frameCount = 0;
 
-#ifdef HAVE_FFMPEG
-
   // The resolution must be divisible by two
   unsigned int outWidth = _width % 2 == 0 ? _width : _width + 1;
   unsigned int outHeight = _height % 2 == 0 ? _height : _height + 1;
 
   // Helper function based on the available ffmpeg version
   return this->StartHelper(outWidth, outHeight, this->dataPtr->TmpFilename());
-#else
-  gzwarn << "Encoding capability not available. "
-      << "Please install libavcodec, libavformat and libswscale dev packages."
-      << std::endl;
-  return false;
-#endif
 }
 
+#ifdef HAVE_FFMPEG
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
 /////////////////////////////////////////////////
 // This function supports ffmpeg2
@@ -365,6 +358,7 @@ bool VideoEncoder::StartHelper(unsigned int _outWidth,
   this->dataPtr->encoding = true;
   return true;
 }
+// #else for libavcodec version check
 #else
 /////////////////////////////////////////////////
 // This function support ffmpeg3
@@ -529,6 +523,18 @@ bool VideoEncoder::StartHelper(unsigned int _outWidth,
   this->dataPtr->encoding = true;
   return true;
 }
+// #endif for libavcodec version check
+#endif
+// #else for HAVE_FFMPEG version check
+#else
+bool VideoEncoder::StartHelper(unsigned int /*_outWidth*/,
+    unsigned int /*_outHeight*/, const std::string &/*_filename*/)
+{
+  gzwarn << "Encoding capability not available. "
+      << "Please install libavcodec, libavformat and libswscale dev packages."
+      << std::endl;
+  return false;
+}
 #endif
 
 ////////////////////////////////////////////////
@@ -546,10 +552,10 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
                         std::chrono::steady_clock::now());
 }
 
-/////////////////////////////////////////////////
 #ifdef HAVE_FFMPEG
-
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+/////////////////////////////////////////////////
+// This function supports ffmpeg2
 bool VideoEncoder::AddFrame(const unsigned char *_frame,
     const unsigned int _width,
     const unsigned int _height,
@@ -679,7 +685,10 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
   av_free_packet(&avPacket);
   return true;
 }
+// #else for libavcodec version check
 #else
+/////////////////////////////////////////////////
+// This function supports ffmpeg2
 bool VideoEncoder::AddFrame(const unsigned char *_frame,
     const unsigned int _width,
     const unsigned int _height,
@@ -757,7 +766,6 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   this->dataPtr->avOutFrame->pts = this->dataPtr->frameCount++;
 
-  // FFMPEG 3.x.x frame encoding and writing
   AVPacket *avPacket = av_packet_alloc();
   av_init_packet(avPacket);
 
@@ -804,7 +812,9 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
 
   return true;
 }
+// #endif for libavcodec version check
 #endif
+// #else for HAVE_FFMPEG check
 #else
 bool VideoEncoder::AddFrame(const unsigned char */*_frame*/,
     const unsigned int /*_width*/,
