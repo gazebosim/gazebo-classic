@@ -224,9 +224,6 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief Socket handle
   public: int handle;
 
-  /// \brief Pointer to the link on which the IMU sensor is attached.
-  public: physics::LinkPtr imuLink;
-
   /// \brief Pointer to an IMU sensor
   public: sensors::ImuSensorPtr imuSensor;
 
@@ -424,10 +421,6 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       rotorSDF = rotorSDF->GetNextElement("rotor");
     }
   }
-
-  std::string imuLinkName;
-  getSdfParam<std::string>(_sdf, "imuLinkName", imuLinkName, "iris/imu_link");
-  this->dataPtr->imuLink = this->dataPtr->model->GetLink(imuLinkName);
 
   // Get sensors
   this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
