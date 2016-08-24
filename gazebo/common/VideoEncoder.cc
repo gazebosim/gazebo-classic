@@ -833,7 +833,11 @@ bool VideoEncoder::Stop()
     av_write_trailer(this->dataPtr->formatCtx);
 
   if (this->dataPtr->codecCtx)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+    av_free(this->dataPtr->codecCtx);
+#else
     avcodec_free_context(&this->dataPtr->codecCtx);
+#endif
   this->dataPtr->codecCtx = nullptr;
 
   if (this->dataPtr->avInFrame)
@@ -845,7 +849,11 @@ bool VideoEncoder::Stop()
   this->dataPtr->avInFrame = nullptr;
 
   if (this->dataPtr->avOutFrame)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+    av_free(this->dataPtr->avOutFrame);
+#else
     av_frame_free(&this->dataPtr->avOutFrame);
+#endif
   this->dataPtr->avOutFrame = nullptr;
 
   if (this->dataPtr->swsCtx)

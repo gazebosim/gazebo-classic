@@ -72,7 +72,7 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
   // Get the ffmpeg module.
   if (_ptr)
   {
-    AVClass *avc = *(AVClass**)_ptr;
+    AVClass *avc = *reinterpret_cast<AVClass**>(_ptr);
     const char *module = avc->item_name(_ptr);
     if (module)
       msg += std::string("[") + module + "] ";
