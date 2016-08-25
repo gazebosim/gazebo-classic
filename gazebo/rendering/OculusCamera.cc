@@ -25,7 +25,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/math/Pose3d.hh"
+#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
