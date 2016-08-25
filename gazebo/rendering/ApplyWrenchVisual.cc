@@ -217,12 +217,6 @@ void ApplyWrenchVisual::Load()
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetCoM(const math::Vector3 &_comVector)
-{
-  this->SetCoM(_comVector.Ign());
-}
-
-///////////////////////////////////////////////////
 void ApplyWrenchVisual::SetCoM(const ignition::math::Vector3d &_comVector)
 {
   ApplyWrenchVisualPrivate *dPtr =
@@ -236,12 +230,6 @@ void ApplyWrenchVisual::SetCoM(const ignition::math::Vector3d &_comVector)
 
     this->UpdateTorqueVisual();
   }
-}
-
-///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetForcePos(const math::Vector3 &_forcePosVector)
-{
-  this->SetForcePos(_forcePosVector.Ign());
 }
 
 ///////////////////////////////////////////////////
@@ -259,13 +247,6 @@ void ApplyWrenchVisual::SetForcePos(
 
     this->UpdateForceVisual();
   }
-}
-
-///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
-    const bool _rotatedByMouse)
-{
-  this->SetForce(_forceVector.Ign(), _rotatedByMouse);
 }
 
 ///////////////////////////////////////////////////
@@ -293,13 +274,6 @@ void ApplyWrenchVisual::SetForce(const ignition::math::Vector3d &_forceVector,
   {
     this->SetMode(Mode::FORCE);
   }
-}
-
-///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector,
-    const bool _rotatedByMouse)
-{
-  this->SetTorque(_torqueVector.Ign(), _rotatedByMouse);
 }
 
 ///////////////////////////////////////////////////

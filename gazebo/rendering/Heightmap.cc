@@ -34,7 +34,6 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -150,21 +149,9 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
-{
-  return this->OgreTerrain();
-}
-
-//////////////////////////////////////////////////
 Ogre::TerrainGroup *Heightmap::OgreTerrain() const
 {
   return this->dataPtr->terrainGroup;
-}
-
-//////////////////////////////////////////////////
-common::Image Heightmap::GetImage() const
-{
-  return this->Image();
 }
 
 //////////////////////////////////////////////////
@@ -726,12 +713,6 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 }
 
 /////////////////////////////////////////////////
-double Heightmap::GetHeight(double _x, double _y, double _z)
-{
-  return this->Height(_x, _y, _z);
-}
-
-/////////////////////////////////////////////////
 double Heightmap::Height(const double _x, const double _y, const double _z)
     const
 {
@@ -750,13 +731,6 @@ double Heightmap::Height(const double _x, const double _y, const double _z)
 }
 
 /////////////////////////////////////////////////
-Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
-    math::Vector2i _mousePos)
-{
-  return this->MouseHit(_camera, _mousePos.Ign());
-}
-
-/////////////////////////////////////////////////
 Ogre::TerrainGroup::RayResult Heightmap::MouseHit(CameraPtr _camera,
     const ignition::math::Vector2i &_mousePos) const
 {
@@ -768,15 +742,6 @@ Ogre::TerrainGroup::RayResult Heightmap::MouseHit(CameraPtr _camera,
 
   // The terrain uses a special ray intersection test.
   return this->dataPtr->terrainGroup->rayIntersects(mouseRay);
-}
-
-/////////////////////////////////////////////////
-bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight)
-{
-  return this->Smooth(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
-      _weight);
 }
 
 /////////////////////////////////////////////////
@@ -796,15 +761,6 @@ bool Heightmap::Smooth(CameraPtr _camera,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight)
-{
-  return this->Flatten(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
-      _weight);
-}
-
-/////////////////////////////////////////////////
 bool Heightmap::Flatten(CameraPtr _camera,
                         const ignition::math::Vector2i &_mousePos,
                         const double _outsideRadius, const double _insideRadius,
@@ -818,14 +774,6 @@ bool Heightmap::Flatten(CameraPtr _camera,
         _insideRadius, _weight, "flatten");
 
   return terrainResult.hit;
-}
-
-/////////////////////////////////////////////////
-bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
-    double _outsideRadius, double _insideRadius, double _weight)
-{
-  return this->Raise(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
-      _weight);
 }
 
 /////////////////////////////////////////////////
@@ -846,14 +794,6 @@ bool Heightmap::Raise(CameraPtr _camera,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
-    double _outsideRadius, double _insideRadius, double _weight)
-{
-  return this->Lower(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
-      _weight);
-}
-
-/////////////////////////////////////////////////
 bool Heightmap::Lower(CameraPtr _camera,
     const ignition::math::Vector2i &_mousePos,
     const double _outsideRadius, const double _insideRadius,
@@ -868,12 +808,6 @@ bool Heightmap::Lower(CameraPtr _camera,
         _insideRadius, _weight, "lower");
 
   return terrainResult.hit;
-}
-
-/////////////////////////////////////////////////
-double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
-{
-  return this->AvgHeight(Conversions::ConvertIgn(_pos), _radius);
 }
 
 /////////////////////////////////////////////////
@@ -1035,12 +969,6 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(NULL);
   }
-}
-
-/////////////////////////////////////////////////
-unsigned int Heightmap::GetTerrainSubdivisionCount() const
-{
-  return this->TerrainSubdivisionCount();
 }
 
 /////////////////////////////////////////////////

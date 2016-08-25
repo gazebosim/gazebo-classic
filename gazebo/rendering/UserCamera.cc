@@ -210,7 +210,7 @@ void UserCamera::Init()
 void UserCamera::SetDefaultPose(const math::Pose &_pose)
 {
   this->dataPtr->defaultPose = _pose;
-  this->SetWorldPose(_pose);
+  this->SetWorldPose(_pose.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -223,6 +223,13 @@ math::Pose UserCamera::DefaultPose() const
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose.Ign());
+  this->dataPtr->viewController->Init();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
 }
 
@@ -483,12 +490,6 @@ void UserCamera::ToggleShowVisual()
 void UserCamera::ShowVisual(bool /*_s*/)
 {
   // this->visual->SetVisible(_s);
-}
-
-//////////////////////////////////////////////////
-bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  return Camera::MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////
