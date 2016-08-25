@@ -25,6 +25,7 @@
 
 #include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
+ #include <ignition/msgs/sensor_v.pb.h>
  #include <ignition/msgs/visual_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
@@ -141,6 +142,17 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Surface &_msg,
                                      QtProperty *_parent);
 
+      /// \brief Fill the property tree with sensor info.
+      /// \param[in] _msg The plugin message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const ignition::msgs::Sensor &_msg,
+                                     QtProperty *_parent);
+
+      /// \brief Fill the property tree with visual info.
+      /// \param[in] _msg The plugin message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
       private: void FillPropertyTree(const ignition::msgs::Visual &_msg,
                                      QtProperty *_parent);
 
@@ -242,7 +254,7 @@ namespace gazebo
       /// \brief Callback when sensor info is received.
       /// \param[in] _plugins Vector of sensors.
       /// \param[in] _success True if the info was successfully received.
-      private: void OnSensorInfo(const ignition::msgs::Plugin_V &_plugins,
+      private: void OnSensorInfo(const ignition::msgs::Sensor_V &_sensors,
           const bool _success);
 
       /// \brief Callback when visual info is received.

@@ -1113,11 +1113,14 @@ void MainWindow_TEST::MinimumSize()
   mainWindow->close();
   delete mainWindow;
 }
-/*
+
 //////////////////////////////////////////////////
-TEST_F(MainWindowTest, MainWindowPluginInfo)
+TEST_F(MainWindow_TEST, MainWindowPluginInfo)
 {
   this->Load("worlds/timer_gui.world", true);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
 
   ignition::msgs::Plugin_V plugins;
   bool success;
@@ -1126,8 +1129,8 @@ TEST_F(MainWindowTest, MainWindowPluginInfo)
   gzmsg << "Get an existing plugin" << std::endl;
   {
     pluginUri.Parse(
-        "data://gui/plugin/timer_gui");
-    this->PluginInfo(pluginUri, plugins, success);
+        "data://gui/gzlient/plugin/timer_gui");
+    mainWindow->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
@@ -1136,8 +1139,8 @@ TEST_F(MainWindowTest, MainWindowPluginInfo)
 
   gzmsg << "Get all plugins" << std::endl;
   {
-    pluginUri.Parse("data://gui/plugin/");
-    this->PluginInfo(pluginUri, plugins, success);
+    pluginUri.Parse("data://gui/gzlient/plugin/");
+    mainWindow->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 4);
@@ -1147,7 +1150,7 @@ TEST_F(MainWindowTest, MainWindowPluginInfo)
     EXPECT_EQ(plugins.plugins(3).name(), "timer_countdown");
   }
 }
-
+/*
 //////////////////////////////////////////////////
 TEST_F(MainWindowTest, PluginInfoFailures)
 {

@@ -1671,7 +1671,6 @@ void Model::PluginInfo(const common::URI &_pluginUri,
     return;
   }
 
-printf("%s\n", "model");
   auto parts = common::split(_pluginUri.Path().Str(), "/");
   auto myParts = common::split(this->URI().Path().Str(), "/");
 
@@ -1695,7 +1694,6 @@ printf("%s\n", "model");
     }
   }
 
-printf("%s\n", "model2");
   // Iterate over parts following this model
   for (; i < parts.size(); i = i+2)
   {
@@ -1751,7 +1749,6 @@ printf("%s\n", "model2");
             this->URI().Str() << "]" << std::endl;
         return;
       }
-      printf("%s\n", "model");
       _success = true;
       return;
     }

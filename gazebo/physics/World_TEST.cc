@@ -230,24 +230,23 @@ TEST_F(WorldTest, ModelPluginInfo)
     EXPECT_EQ(plugins.plugins(4).name(), "buoyancy");
   }
 }
-/*
+
 //////////////////////////////////////////////////
 TEST_F(WorldTest, WorldPluginInfo)
 {
   this->Load("worlds/wind_demo.world", true);
 
-// Create the main window.
-  auto mainWindow = new gazebo::gui::MainWindow();
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
 
   ignition::msgs::Plugin_V plugins;
   bool success;
-  common::URI pluginUri;
+  ignition::msgs::StringMsg req;
 
   gzmsg << "Get an existing plugin" << std::endl;
   {
-    pluginUri.Parse(
-        "data://world/default/plugin/wind");
-    mainWindow->PluginInfo(pluginUri, plugins, success);
+    req.set_data("data://world/default/plugin/wind");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
@@ -256,16 +255,15 @@ TEST_F(WorldTest, WorldPluginInfo)
 
   gzmsg << "Get all plugins" << std::endl;
   {
-    pluginUri.Parse(
-        "data://world/default/plugin/");
-    mainWindow->PluginInfo(pluginUri, plugins, success);
+    req.set_data("data://world/default/plugin/");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
     EXPECT_EQ(plugins.plugins(0).name(), "wind");
   }
 }
-
+/*
 //////////////////////////////////////////////////
 TEST_F(ModelTest, PluginInfoFailures)
 {
@@ -310,8 +308,8 @@ TEST_F(ModelTest, PluginInfoFailures)
 
     EXPECT_FALSE(success);
   }
-}
-*/
+}*/
+
 //////////////////////////////////////////////////
 
 int main(int argc, char **argv)

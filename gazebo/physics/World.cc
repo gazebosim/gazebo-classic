@@ -2939,8 +2939,6 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     return;
   }
 
-printf("%s\n", "jo");
-
   auto parts = common::split(pluginUri.Path().Str(), "/");
   auto myParts = common::split(this->URI().Path().Str(), "/");
 
@@ -2978,7 +2976,6 @@ printf("%s\n", "jo");
         return;
       }
 
-printf("%s\n", "balea");
       model->PluginInfo(pluginUri, _plugins, _success);
       return;
     }

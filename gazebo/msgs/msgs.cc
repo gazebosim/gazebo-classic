@@ -1821,6 +1821,19 @@ namespace gazebo
         gzwarn << "Conversion of sensor type[" << type << "] not supported."
           << std::endl;
       }
+
+      if (_sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          auto pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
+      }
+
       return result;
     }
 

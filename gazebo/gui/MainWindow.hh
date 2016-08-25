@@ -20,15 +20,15 @@
 #include <memory>
 #include <string>
 
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
-#include "gazebo/common/URI.hh"
-
-#include <ignition/msgs/plugin_v.pb.h>
-#include <ignition/msgs/stringmsg.pb.h>
 
 #ifdef HAVE_OCULUS
 #include "gazebo/gui/OculusWindow.hh"
@@ -330,7 +330,7 @@ namespace gazebo
       /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
       private: void OnWindowMode(const std::string &_mode);
 
-      /// \brief Callback for "gui/server/info/plugin" service.
+      /// \brief Callback for "/gui/info/plugin" service.
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
       /// \param[out] _success True if the info was successfully obtained.

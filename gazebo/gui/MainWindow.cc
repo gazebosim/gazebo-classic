@@ -2084,7 +2084,6 @@ void MainWindow::OnAddPlugins()
       }
     }
   }
-  this->dataPtr->pluginMsgs.clear();
 
   g_overlayAct->setChecked(true);
   g_overlayAct->setEnabled(true);
@@ -2493,9 +2492,11 @@ printf("%s\n", "bobo2");
     // Look for plugins
     if (parts[i] == "plugin")
     {
+      printf("%s\n", "main");
       // Return empty vector
       if (this->dataPtr->pluginMsgs.size() <= 0)
       {
+        printf("%s\n", "mainlow");
         _success = true;
         return;
       }

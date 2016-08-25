@@ -113,6 +113,9 @@ namespace gazebo
       /// \brief Keep latest visual message.
       public: ignition::msgs::Visual visualMsg;
 
+      /// \brief Keep latest sensor message.
+      public: ignition::msgs::Sensor sensorMsg;
+
       public: msgs::Physics physicsMsg;
       public: msgs::Wind windMsg;
 

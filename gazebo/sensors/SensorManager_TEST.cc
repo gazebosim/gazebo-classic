@@ -159,6 +159,54 @@ TEST_F(SensorManager_TEST, InitRemove)
   printf("Done done\n");
 }
 
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, SensorInfo)
+{
+  this->Load("worlds/depth_camera.world", true);
+
+  auto sensorManager = SensorManager::Instance();
+  ASSERT_TRUE(sensorManager != nullptr);
+
+  ignition::msgs::Sensor_V sensors;
+  bool success;
+  common::URI sensorUri;
+
+  gzmsg << "Get an existing sensor" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/camera_model/link/my_link/sensor/camera");
+    sensorManager->SesnsorInfo(sensorUri, sensors, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(sensors.ensors_size(), 1);
+    EXPECT_EQ(sensors.sensors(0).name(), "wind");
+  }
+}
+/*
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, PluginInfo)
+{
+  this->Load("worlds/depth_camera.world", true);
+
+  auto sensorManager = SensorManager::Instance();
+  ASSERT_TRUE(sensorManager != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get an existing plugin" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/camera_model/link/my_link/sensor/camera"
+        + "/plugin/blo");
+    sensorManager->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "wind");
+  }
+*/
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

@@ -18,17 +18,18 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/msgs/Utility.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include <ignition/msgs/Utility.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -74,7 +75,6 @@
 
 #include "gazebo/rendering/ScenePrivate.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/common/URI.hh"
 #include "gazebo/util/IgnMsgSdf.hh"
 
 #ifdef HAVE_OCULUS
@@ -3661,6 +3661,8 @@ void Scene::VisualInfo(const common::URI _visualUri,
     gzwarn << "URI [" << _visualUri.Str() << "] is not a visual." << std::endl;
     return;
   }
+
+  printf("%s\n", parts[1].c_str());
 
   auto visual = this->GetVisual(parts[1]);
 

@@ -26,13 +26,13 @@
 #include <boost/unordered/unordered_map.hpp>
 
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include <ignition/transport/Node.hh>
 
 namespace SkyX
 {

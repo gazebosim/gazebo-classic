@@ -347,7 +347,55 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
   EXPECT_TRUE(newBoxLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
 }
+/*
+//////////////////////////////////////////////////
+TEST_F(Scene_TEST, VisualInfo)
+{
+  this->Load("worlds/blink_visual.world", true);
 
+  auto scene = rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  ignition::msgs::Visual_V visuals;
+  bool success;
+  common::URI visualUri;
+
+  gzmsg << "Get an existing visual" << std::endl;
+  {
+    visualUri.Parse(
+        "data://world/default/model/box_sim/link/link/visual/visual");
+    scene->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(visual.visuals_size(), 1);
+    //EXPECT_EQ(visual.visuals(0).name(), "wind");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(Scene_TEST, PluginInfo)
+{
+  this->Load("worlds/wind_demo.world", true);
+
+  auto scene = rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get an existing plugin" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/plugin/wind");
+    scene->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "wind");
+  }
+}
+*/
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

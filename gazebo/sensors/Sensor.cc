@@ -295,6 +295,12 @@ std::string Sensor::GetScopedName() const
 }
 
 //////////////////////////////////////////////////
+sdf::ElementPtr Sensor::GetSDF() const
+{
+  return this->sdf;
+}
+
+//////////////////////////////////////////////////
 std::string Sensor::ScopedName() const
 {
   return this->world->GetName() + "::" +

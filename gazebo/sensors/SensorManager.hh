@@ -28,14 +28,14 @@
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/sensor_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
-#include <ignition/transport.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
-#include "gazebo/common/URI.hh"
 
 namespace gazebo
 {
@@ -203,7 +203,7 @@ namespace gazebo
       /// \param[in] _sensor Pointer to a sensor to add.
       private: void AddSensor(SensorPtr _sensor);
 
-      /// \brief Callback for "<this_name>/server/info/plugin" service.
+      /// \brief Callback for "/sensors/info/plugin" service.
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
       /// \param[out] _success True if the info was successfully obtained.
@@ -211,7 +211,7 @@ namespace gazebo
       private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
 
-      /// \brief Callback for "<this_name>/server/info" service.
+      /// \brief Callback for "/sensors/info/sensor" service.
       /// \param[in] _request Request containing sensor URI.
       /// \param[out] _sensors Message containing vector of sensors.
       /// \param[out] _success True if the info was successfully obtained.

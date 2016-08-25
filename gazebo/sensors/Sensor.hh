@@ -86,6 +86,10 @@ namespace gazebo
       /// \return Name of Parent.
       public: std::string ParentName() const;
 
+      /// \brief Get the sensor SDF.
+      /// \return SDF of the sensor.
+      public: sdf::ElementPtr GetSDF() const;
+
       /// \brief Update the sensor.
       /// \param[in] _force True to force update, false otherwise.
       public: void Update(const bool _force);

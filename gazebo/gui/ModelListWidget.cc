@@ -35,6 +35,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/Conversions.hh"
@@ -284,81 +285,81 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 
       this->dataPtr->modelTreeWidget->setCurrentItem(lItem);
     }
-    // World plugin
-    else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
-      && this->dataPtr->selectedEntityName.find("/world/") != std::string::npos
-      && this->dataPtr->selectedEntityName.find("/sensor/") == std::string::npos
-      && this->dataPtr->selectedEntityName.find("/visual/") == std::string::npos)
+
+    auto parts = common::split(this->dataPtr->selectedEntityName, "/");
+
+    // check if second-last element is a plugin
+    if (parts.end()[-2] == "plugin")
     {
-      std::string service("/physics/info/plugin");
+      // World plugin
+      if (parts.end()[-4] == "world") 
+      {
+        std::string service("/physics/info/plugin");
 
-      ignition::msgs::StringMsg req;
-      req.set_data(this->dataPtr->selectedEntityName);
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
 
-      this->dataPtr->ignNode.Request(service, req,
-         &ModelListWidget::OnPluginInfo, this);
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnPluginInfo, this);
+      }
+      // GUI plugin
+      else if (parts.end()[-4] == "gui") 
+      {
+        std::string service("/gui/info/plugin");
+
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnPluginInfo, this);
+      }
+      // Visual plugin
+      else if (parts.end()[-4] == "visual")
+      {
+        std::string service("/rendering/info/plugin");
+
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnPluginInfo, this);
+      }
+      // Sensor plugin
+      else if (parts.end()[-4] == "sensor")
+      {
+        std::string service("/sensors/info/plugin");
+
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnPluginInfo, this);
+      }
     }
-    // GUI plugin
-    else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
-      && this->dataPtr->selectedEntityName.find("/gui/") != std::string::npos)
+    else
     {
-      std::string service("/gui/info/plugin");
+      // Sensor
+      if (parts.end()[-2] == "sensor")
+      {
+        std::string service("/sensors/info/sensor");
 
-      ignition::msgs::StringMsg req;
-      req.set_data(this->dataPtr->selectedEntityName);
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
 
-      this->dataPtr->ignNode.Request(service, req,
-         &ModelListWidget::OnPluginInfo, this);
-    }
-    // Sensor
-    else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
-      && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
-    {
-      std::string service("/sensors/info/sensor");
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnSensorInfo, this);
+      }
+      // Visual
+      if (parts.end()[-2] == "visual")
+      {
+        std::string service("/rendering/info/visual");
 
-      ignition::msgs::StringMsg req;
-      req.set_data(this->dataPtr->selectedEntityName);
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
 
-      printf("%s\n", "balea2");
-
-      this->dataPtr->ignNode.Request(service, req,
-         &ModelListWidget::OnSensorInfo, this);
-    }
-    // Sensor plugin
-    else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
-      && this->dataPtr->selectedEntityName.find("/sensor/") != std::string::npos)
-    {
-      std::string service("/sensors/info/plugin");
-
-      ignition::msgs::StringMsg req;
-      req.set_data(this->dataPtr->selectedEntityName);
-
-      this->dataPtr->ignNode.Request(service, req,
-         &ModelListWidget::OnPluginInfo, this);
-    }
-    // Visual
-    else if (this->dataPtr->selectedEntityName.find("/plugin/") == std::string::npos 
-      && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
-    {
-      std::string service("/rendering/info/visual");
-
-      ignition::msgs::StringMsg req;
-      req.set_data(this->dataPtr->selectedEntityName);
-
-      this->dataPtr->ignNode.Request(service, req,
-         &ModelListWidget::OnVisualInfo, this);
-    }
-    // Visual plugin
-    else if (this->dataPtr->selectedEntityName.find("/plugin/") != std::string::npos 
-      && this->dataPtr->selectedEntityName.find("/visual/") != std::string::npos)
-    {
-      std::string service("/rendering/info/plugin");
-
-      ignition::msgs::StringMsg req;
-      req.set_data(this->dataPtr->selectedEntityName);
-
-      this->dataPtr->ignNode.Request(service, req,
-         &ModelListWidget::OnPluginInfo, this);
+        this->dataPtr->ignNode.Request(service, req,
+           &ModelListWidget::OnVisualInfo, this);
+      }
     }
   }
   else if (this->dataPtr->modelTreeWidget->currentItem())
@@ -378,6 +379,9 @@ void ModelListWidget::Update()
 
     this->dataPtr->ignNode.Request(service, req,
         &ModelListWidget::OnGUIPluginList, this);
+
+
+    printf("%s\n", "im req");
   }
   if (!this->dataPtr->fillTypes.empty())
   {
@@ -394,7 +398,9 @@ void ModelListWidget::Update()
     else if (this->dataPtr->fillTypes[0] == "Plugin")
       this->FillPropertyTree(this->dataPtr->pluginMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Visual")
-    this->FillPropertyTree(this->dataPtr->visualMsg, nullptr);
+      this->FillPropertyTree(this->dataPtr->visualMsg, nullptr);
+    else if (this->dataPtr->fillTypes[0] == "Sensor")
+      this->FillPropertyTree(this->dataPtr->sensorMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Scene")
       this->FillPropertyTree(this->dataPtr->sceneMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Physics")
@@ -2696,6 +2702,86 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.heightmap().origin(), sizeItem);
   }
+} 
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const ignition::msgs::Sensor &_msg,
+                                       QtProperty *_parent)
+{
+  QtProperty *topItem = nullptr;
+  QtVariantProperty *item = nullptr;
+
+  // id, store it but make it hidden
+  QtBrowserItem *browserItem = nullptr;
+  item = this->dataPtr->variantManager->addProperty(QVariant::String, tr("id"));
+  item->setValue(_msg.id());
+  this->AddProperty(item, _parent);
+  browserItem = this->dataPtr->propTreeBrowser->items(item)[0];
+  this->dataPtr->propTreeBrowser->setItemVisible(browserItem, false);
+
+  // name
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+      tr("name"));
+  item->setValue(_msg.name().c_str());
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+
+  // parent
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+      tr("parent"));
+  item->setValue(_msg.parent().c_str());
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+
+  // type
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+      tr("type"));
+  item->setValue(_msg.type().c_str());
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+
+  // always_on
+  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+      tr("always_on"));
+  if (_msg.has_always_on())
+    item->setValue(_msg.always_on());
+  else
+    item->setValue(true);
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+
+  // update-rate
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("update_rate"));
+  if (_msg.update_rate())
+    item->setValue(_msg.update_rate());
+  else
+    item->setValue(0.0);
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+/*
+  // pose
+  topItem = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("pose"));
+  this->AddProperty(item, _parent);
+  this->FillPoseProperty(_msg.pose(), topItem);
+*/
+  // visualize
+  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+      tr("visualize"));
+  if (_msg.has_visualize())
+    item->setValue(_msg.visualize());
+  else
+    item->setValue(true);
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+
+  // topic
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+      tr("topic"));
+  item->setValue(_msg.topic().c_str());
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
 }
 
 /////////////////////////////////////////////////
@@ -3754,29 +3840,25 @@ void ModelListWidget::FillGrid()
 void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
     const bool _success)
 {
-printf("%s\n", "chara");  
   if (!_success)
   {
     gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
     return;
   }
 
-printf("%s\n", "char");
   // We asked for only one plugin
   GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
 
   this->dataPtr->propMutex->lock();
   this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
-  printf("%s\n", "char2");
   this->dataPtr->fillTypes.push_back("Plugin");
-  printf("%s\n", "char5");
   this->dataPtr->propMutex->unlock();
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnSensorInfo(const ignition::msgs::Plugin_V &_plugins,
+void ModelListWidget::OnSensorInfo(const ignition::msgs::Sensor_V &_sensors,
     const bool _success)
-{/*
+{
   if (!_success)
   {
     gzerr << "Failed to receive sensor info. Check server logs." << std::endl;
@@ -3787,9 +3869,9 @@ void ModelListWidget::OnSensorInfo(const ignition::msgs::Plugin_V &_plugins,
   GZ_ASSERT(_sensors.sensors().size() == 1, "Wrong number of sensors");
 
   this->dataPtr->propMutex->lock();
-  this->dataPtr->pluginMsg.CopyFrom(_sensors.sensors(0));
+  this->dataPtr->sensorMsg.CopyFrom(_sensors.sensors(0));
   this->dataPtr->fillTypes.push_back("Sensor");
-  this->dataPtr->propMutex->unlock();*/
+  this->dataPtr->propMutex->unlock();
 }
 
 /////////////////////////////////////////////////
@@ -3827,11 +3909,14 @@ void ModelListWidget::OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
   QFont subheaderFont;
   subheaderFont.setBold(true);
 
+  printf("%s\n", "guipl");
+
   ignition::msgs::Plugin_V plugins;
   plugins.CopyFrom(_plugins);
 
   if (plugins.plugins_size() > 0)
   {
+    printf("%s\n", "guiplsd");
     // Fetch top level GUI item
     QList<QTreeWidgetItem *> topItem =
         this->dataPtr->modelTreeWidget->findItems(tr("GUI"), Qt::MatchExactly);
