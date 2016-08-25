@@ -66,17 +66,7 @@ namespace gazebo
 
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
-      /// \deprecated See Camera() function
-      public: rendering::CameraPtr GetCamera() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns a pointer to the rendering::Camera.
-      /// \return The Pointer to the camera sensor.
       public: rendering::CameraPtr Camera() const;
-
-      /// \brief Gets the width of the image in pixels.
-      /// \return The image width in pixels.
-      /// \deprecated See ImageWidth()
-      public: unsigned int GetImageWidth() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Gets the width of the image in pixels.
       /// \return The image width in pixels.
@@ -85,17 +75,7 @@ namespace gazebo
 
       /// \brief Gets the height of the image in pixels.
       /// \return The image height in pixels.
-      /// \deprecated See ImageHeight()
-      public: unsigned int GetImageHeight() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Gets the height of the image in pixels.
-      /// \return The image height in pixels.
       public: unsigned int ImageHeight() const;
-
-      /// \brief Gets the raw image data from the sensor.
-      /// \return The pointer to the image data array.
-      /// \deprecated See ImageData()
-      public: const unsigned char *GetImageData() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Gets the raw image data from the sensor.
       /// \return The pointer to the image data array.

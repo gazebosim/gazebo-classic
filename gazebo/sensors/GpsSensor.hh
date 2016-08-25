@@ -73,11 +73,6 @@ namespace gazebo
 
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.
-      /// \deprecated See Altitude()
-      public: double GetAltitude() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Accessor for current altitude
-      /// \return Current altitude above sea level.
       public: double Altitude() const;
 
       /// \internal
