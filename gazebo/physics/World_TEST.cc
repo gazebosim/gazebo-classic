@@ -194,6 +194,7 @@ TEST_F(WorldTest, EditName)
   }
 }
 
+/*
 //////////////////////////////////////////////////
 TEST_F(WorldTest, ModelPluginInfo)
 {
