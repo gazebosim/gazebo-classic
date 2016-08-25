@@ -71,12 +71,24 @@ GimbalSmall2dPlugin::GimbalSmall2dPlugin()
 
 /////////////////////////////////////////////////
 void GimbalSmall2dPlugin::Load(physics::ModelPtr _model,
-  sdf::ElementPtr /*_sdf*/)
+  sdf::ElementPtr _sdf)
 {
   this->dataPtr->model = _model;
-  std::string jointName = _model->GetName() + "::gimbal_small_2d::tilt_joint";
-  this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(jointName);
 
+  std::string jointName = "tilt_joint";
+  if (_sdf->HasElement("joint"))
+  {
+    jointName = _sdf->Get<std::string>("joint");
+  }
+  this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(jointName);
+  if (!this->dataPtr->tiltJoint)
+  {
+    std::string scopedJointName = _model->GetScopedName() + "::" + jointName;
+    gzwarn << "joint [" << jointName
+           << "] not found, trying again with scoped joint name ["
+           << scopedJointName << "]\n";
+    this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(scopedJointName);
+  }
   if (!this->dataPtr->tiltJoint)
   {
     gzerr << "GimbalSmall2dPlugin::Load ERROR! Can't get joint '"

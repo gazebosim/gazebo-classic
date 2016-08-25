@@ -53,12 +53,12 @@ namespace gazebo
 
     public: struct irlockPacket
             {
-              double timestamp;
-              double target_num;
-              double angle_x;
-              double angle_y;
-              double size_x;
-              double size_y;
+              uint64_t timestamp;
+              uint16_t num_targets;
+              float pos_x;
+              float pos_y;
+              float size_x;
+              float size_y;
             };
   };
 }
@@ -211,24 +211,25 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
   double vfov = camera->VFOV().Radian();
   double pixelsPerRadianX = imageWidth / hfov;
   double pixelsPerRadianY = imageHeight / vfov;
-  double angleX = (static_cast<double>(_x) - (imageWidth * 0.5)) /
+  float angleX = (static_cast<double>(_x) - (imageWidth * 0.5)) /
       pixelsPerRadianX;
-  double angleY = -((imageHeight * 0.5) - static_cast<double>(_y)) /
+  float angleY = -((imageHeight * 0.5) - static_cast<double>(_y)) /
       pixelsPerRadianY;
 
   // send_packet
   ArduCopterIRLockPluginPrivate::irlockPacket pkt;
 
-  pkt.timestamp = this->dataPtr->parentSensor->LastMeasurementTime().Double();
-  pkt.target_num = 0;
-  pkt.angle_x = angleX;
-  pkt.angle_y = angleY;
+  pkt.timestamp = static_cast<uint64_t>
+    (1.0e3*this->dataPtr->parentSensor->LastMeasurementTime().Double());
+  pkt.num_targets = static_cast<uint16_t>(1);
+  pkt.pos_x = angleX;
+  pkt.pos_y = angleY;
   // 1x1 pixel box for now
-  pkt.size_x = 1;
-  pkt.size_y = 1;
+  pkt.size_x = static_cast<float>(1);
+  pkt.size_y = static_cast<float>(1);
 
   // std::cerr << "fiducial '" << _fiducial << "':" << _x << ", " << _y
-  //     << ", angle: " << angleX << ", " << angleY << std::endl;
+  //     << ", pos: " << pkt.pos_x << ", " << pkt.pos_y << std::endl;
 
   struct sockaddr_in sockaddr;
   memset(&sockaddr, 0, sizeof(sockaddr));

@@ -52,12 +52,12 @@ LOITER> mode LAND
         </solver>
         <constraints>
           <cfm>0.0</cfm>
-          <erp>0.2</erp>
+          <erp>0.9</erp>
           <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <real_time_update_rate>800</real_time_update_rate>
+      <real_time_update_rate>1200</real_time_update_rate>
       <max_step_size>0.0025</max_step_size>
     </physics>
 
@@ -76,17 +76,17 @@ LOITER> mode LAND
 
       <!-- add new camera -->
       <link name='camera'>
-        <pose>0 0 0.11 0 0 0</pose>
-         <inertial>
+        <pose>0 -0.01 0.070 1.57 0 1.57</pose>
+        <inertial>
           <pose>0 0 0 0 0 0</pose>
-          <mass>0.01</mass>
+          <mass>0.1</mass>
           <inertia>
-            <ixx>0.0001</ixx>
+            <ixx>0.001</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0001</iyy>
+            <iyy>0.001</iyy>
             <iyz>0</iyz>
-            <izz>0.0001</izz>
+            <izz>0.001</izz>
           </inertia>
         </inertial>
         <visual name='visual'>
@@ -97,16 +97,15 @@ LOITER> mode LAND
               <length>0.025</length>
             </cylinder>
           </geometry>
-
            <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
               <name>Gazebo/Grey</name>
             </script>
           </material>
-       </visual>
+        </visual>
         <sensor name="camera" type="camera">
-          <pose>0 0 0 0 1.57 0</pose>
+          <pose>0 0 0 -1.57 -1.57 0</pose>
           <camera>
             <horizontal_fov>1.0472</horizontal_fov>
             <image>
@@ -130,10 +129,7 @@ LOITER> mode LAND
 
       <!-- attach camera -->
       <joint type="revolute" name="base_camera_joint">
-        <pose>0 0 0 0 0 0</pose>
-        <!-- attach to body or to the gimbal?
-        <parent>iris_with_standoffs::base_link</parent>
-        -->
+        <pose>0 0 0.0 0 0 0</pose>
         <parent>iris::iris_demo::gimbal_small_2d::tilt_link</parent>
         <child>camera</child>
         <axis>
@@ -150,13 +146,54 @@ LOITER> mode LAND
     <model name="irlock_beacon_01">
       <pose>1.0 -1.0 0.005 0 0 0</pose>
       <link name="link">
+         <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>0.3</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.1 0.1 0.02</size>
+              <size>1.0 1.0 0.02</size>
             </box>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1e+12</kp>
+                <kd>1</kd>
+                <max_vel>10</max_vel>
+                <min_depth>0.003</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
+        <visual name="visual2">
+          <geometry>
+            <box>
+              <size>1.0 1.0 0.018</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
         <visual name="visual">
           <geometry>
             <box>
