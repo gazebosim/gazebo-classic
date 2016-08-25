@@ -75,12 +75,13 @@ namespace gazebo
 
       /// \brief True if the enoder has been started, false otherwise
       /// \return True if Start has been called.
-      public: bool IsEncoding();
+      public: bool IsEncoding() const;
 
       /// \brief Add a single frame to be encoded
       /// \param[in] _frame Image buffer to be encoded
       /// \param[in] _width Input frame width
       /// \param[in] _height Input frame height
+      /// \return True on success
       public: bool AddFrame(const unsigned char *_frame,
                             const unsigned int _width,
                             const unsigned int _height);
@@ -118,6 +119,7 @@ namespace gazebo
       /// \param[in] _outHeight Output frame height
       /// \param[in] _filename Temporary filename in which to store the
       /// video.
+      /// \return True on success
       private: bool StartHelper(unsigned int _outWidth,
                                 unsigned int _outHeight,
                                 const std::string &_filename);

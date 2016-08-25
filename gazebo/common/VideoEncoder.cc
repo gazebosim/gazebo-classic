@@ -538,7 +538,7 @@ bool VideoEncoder::StartHelper(unsigned int /*_outWidth*/,
 #endif
 
 ////////////////////////////////////////////////
-bool VideoEncoder::IsEncoding()
+bool VideoEncoder::IsEncoding() const
 {
   return this->dataPtr->encoding;
 }
