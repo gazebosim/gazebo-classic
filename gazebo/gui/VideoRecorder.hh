@@ -42,15 +42,15 @@ namespace gazebo
       public: ~VideoRecorder();
 
       /// \brief Signal emitted when a recording is started.
-      Q_SIGNALS: void recordingStarted();
+      Q_SIGNALS: void RecordingStarted();
 
       /// \brief Signal emitted when a recording is stopped.
-      Q_SIGNALS: void recordingStopped();
+      Q_SIGNALS: void RecordingStopped();
 
       /// \brief Signal emitted when the recording state changes.
       /// \param[out] _recording True if recording is enabled, false
       /// otherwise.
-      Q_SIGNALS: void recordingChanged(bool _recording);
+      Q_SIGNALS: void RecordingChanged(bool _recording);
 
       /// \brief Qt callback when the record stop button is pressed.
       private slots: void OnRecordStop();

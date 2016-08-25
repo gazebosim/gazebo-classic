@@ -41,6 +41,7 @@ TEST_F(VideoEncoderTest, StartStop)
 
   video.Stop();
   EXPECT_FALSE(video.IsEncoding());
+  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.ogv"));
 
   video.Start(1024, 768, "ogv");
   EXPECT_TRUE(video.IsEncoding());

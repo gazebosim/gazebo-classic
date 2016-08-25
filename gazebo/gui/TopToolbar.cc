@@ -203,13 +203,13 @@ TopToolbar::TopToolbar(QWidget *_parent)
 
     // Disable the fade effect on recording stop. This prevent the button
     // from being partially faded when the animation stops.
-    connect(this->dataPtr->videoRecorder, SIGNAL(recordingChanged(bool)),
+    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingChanged(bool)),
         fade, SLOT(setEnabled(bool)));
 
     // Close the menu when a button is pressed.
-    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStarted()),
+    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStarted()),
             menu, SLOT(close()));
-    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStopped()),
+    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStopped()),
             menu, SLOT(close()));
   }
 

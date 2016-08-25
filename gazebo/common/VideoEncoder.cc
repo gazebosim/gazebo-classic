@@ -205,13 +205,13 @@ bool VideoEncoder::StartHelper(unsigned int _outWidth,
     unsigned int _outHeight, const std::string &_filename)
 {
   AVOutputFormat *outputFormat =
-    av_guess_format(NULL, _filename.c_str(), NULL);
+    av_guess_format(nullptr, _filename.c_str(), nullptr);
 
   if (!outputFormat)
   {
     gzwarn << "Could not deduce output format from file extension."
            << "Using MPEG.\n";
-    outputFormat = av_guess_format("mpeg", NULL, NULL);
+    outputFormat = av_guess_format("mpeg", nullptr, nullptr);
   }
 
   AVCodec *encoder = nullptr;
