@@ -61,6 +61,15 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   EXPECT_NEAR(dt, 1e-3, 1e-6);
 
   {
+    // Wait for joint to load
+    for (int i = 0; i < 1000; ++i)
+    {
+      if (model->GetJoint("joint1"))
+      {
+        break;
+      }
+      common::Time::MSleep(10);
+    }
     auto joint = model->GetJoint("joint1");
     ASSERT_NE(joint, nullptr);
 
@@ -86,7 +95,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
       break;
     }
     common::Time::MSleep(10);
-  };
+  }
   EXPECT_EQ(model->GetJoint("joint1"), nullptr);
 
   // Now step forward and expect it to fall
@@ -154,6 +163,15 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(physics->GetRealTimeUpdateRate(), 0.0);
 
   {
+    // Wait for joint to load
+    for (int i = 0; i < 1000; ++i)
+    {
+      if (model->GetJoint("joint1"))
+      {
+        break;
+      }
+      common::Time::MSleep(10);
+    }
     auto joint = model->GetJoint("joint1");
     ASSERT_NE(joint, nullptr);
 
@@ -213,6 +231,15 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   auto model = world->GetModel("box");
   ASSERT_NE(model, nullptr);
 
+  // Wait for joint to load
+  for (int i = 0; i < 1000; ++i)
+  {
+    if (model->GetJoint("joint1"))
+    {
+      break;
+    }
+    common::Time::MSleep(10);
+  }
   auto joint = model->GetJoint("joint1");
   ASSERT_NE(joint, nullptr);
 
