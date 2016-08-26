@@ -895,6 +895,8 @@
           <p>100</p>
           <i>0</i>
           <d>0</d>
+          <cmd_max>3</cmd_max>
+          <cmd_min>0</cmd_min>
         </control>
       </plugin>
 
