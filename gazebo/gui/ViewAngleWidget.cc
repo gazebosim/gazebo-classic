@@ -229,7 +229,7 @@ void ViewAngleWidget::OnResetView()
   if (!cam)
     return;
 
-  cam->MoveToPosition(cam->DefaultPose(), 1);
+  cam->MoveToPosition(cam->DefaultPose().Ign(), 1);
 }
 
 /////////////////////////////////////////////////

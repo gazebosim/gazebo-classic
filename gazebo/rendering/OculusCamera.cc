@@ -25,6 +25,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/math/Pose.hh"
+
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -360,12 +362,6 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     delete [] this->saveFrameBuffer;
     this->saveFrameBuffer = NULL;
   }
-}
-
-//////////////////////////////////////////////////
-bool OculusCamera::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  return Camera::MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////

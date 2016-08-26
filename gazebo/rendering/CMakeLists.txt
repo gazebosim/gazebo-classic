@@ -184,8 +184,7 @@ link_directories(
   ${ogre_library_dirs}
 )
 
-set (CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB")
+add_definitions(-DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB)
 if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
 endif()
@@ -207,6 +206,10 @@ endif()
 
 if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
+endif()
+
+if (USE_PCH)
+  add_pch(gazebo_rendering rendering_pch.hh)
 endif()
 
 gz_install_library(gazebo_rendering)

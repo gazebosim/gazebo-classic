@@ -25,6 +25,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <algorithm>
+#include <cmath>
+#include <string>
+#include <ignition/math/Helpers.hh>
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_GDAL
@@ -35,9 +39,6 @@
 # pragma GCC diagnostic pop
 #endif
 
-#include <algorithm>
-#include <cmath>
-#include <string>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
@@ -209,7 +210,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
-      !math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
+      !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
@@ -316,10 +317,11 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
-  if (_x < 0 || _y < 0)
+  int index =  _y * this->vertSize + _x;
+  if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
     return 0.0;
 
-  return this->heights[_y * this->vertSize + _x];
+  return this->heights[index];
 }
 
 /////////////////////////////////////////////////
