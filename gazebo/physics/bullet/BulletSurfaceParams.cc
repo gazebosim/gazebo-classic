@@ -89,12 +89,6 @@ void BulletSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-FrictionPyramidPtr BulletSurfaceParams::GetFrictionPyramid() const
-{
-  return this->frictionPyramid;
-}
-
-/////////////////////////////////////////////////
 FrictionPyramidPtr BulletSurfaceParams::FrictionPyramid() const
 {
   return this->frictionPyramid;

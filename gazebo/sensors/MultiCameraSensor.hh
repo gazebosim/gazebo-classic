@@ -60,20 +60,7 @@ namespace gazebo
 
       /// \brief Get the number of cameras.
       /// \return The number of cameras.
-      /// \deprecated See CameraCount()
-      public: unsigned int GetCameraCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the number of cameras.
-      /// \return The number of cameras.
       public: unsigned int CameraCount() const;
-
-      /// \brief Returns a pointer to a rendering::Camera.
-      /// \param[in] _index Index of the camera to get
-      /// \return The Pointer to the camera sensor.
-      /// \sa MultiCameraSensor::CameraCount
-      /// \deprecated See Camera(unsiged int _index)
-      public: rendering::CameraPtr GetCamera(unsigned int _index) const
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns a pointer to a rendering::Camera.
       /// \param[in] _index Index of the camera to get
@@ -86,37 +73,13 @@ namespace gazebo
       /// \param[in] _index Index of the camera
       /// \return The image width in pixels.
       /// \sa MultiCameraSensor::CameraCount
-      /// \deprecated See ImageWidth(unsigned int _index)
-      public: unsigned int GetImageWidth(unsigned int _index) const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Gets the width of the image in pixels.
-      /// \param[in] _index Index of the camera
-      /// \return The image width in pixels.
-      /// \sa MultiCameraSensor::CameraCount
       public: unsigned int ImageWidth(const unsigned int _index) const;
 
       /// \brief Gets the height of the image in pixels.
       /// \param[in] _index Index of the camera
       /// \return The image height in pixels.
       /// \sa MultiCameraSensor::GetCameraCount
-      /// \deprecated See ImageHeight(unsigned int _index)
-      public: unsigned int GetImageHeight(
-                  unsigned int _index) const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Gets the height of the image in pixels.
-      /// \param[in] _index Index of the camera
-      /// \return The image height in pixels.
-      /// \sa MultiCameraSensor::GetCameraCount
       public: unsigned int ImageHeight(const unsigned int _index) const;
-
-      /// \brief Gets the raw image data from the sensor.
-      /// \param[in] _index Index of the camera
-      /// \return The pointer to the image data array.
-      /// \sa MultiCameraSensor::GetCameraCount
-      /// \deprecated See ImageData
-      public: const unsigned char *GetImageData(unsigned int _index)
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Gets the raw image data from the sensor.
       /// \param[in] _index Index of the camera

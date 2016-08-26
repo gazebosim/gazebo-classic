@@ -108,11 +108,6 @@ namespace gazebo
 
       /// \brief Get the number of scenes.
       /// \return The number of scenes created by the RenderEngine.
-      /// \deprecated See SceneCount()
-      public: unsigned int GetSceneCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the number of scenes.
-      /// \return The number of scenes created by the RenderEngine.
       public: unsigned int SceneCount() const;
 
       /// \brief Add a new path for Ogre to search for resources.
@@ -134,13 +129,6 @@ namespace gazebo
       public: Ogre::Root *Root() const;
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
-      /// \internal
-      /// \brief Get a pointer to the Ogre overlay system.
-      /// \return Pointer to the OGRE overlay system.
-      /// \deprecated See OverlaySystem()
-      public: Ogre::OverlaySystem *GetOverlaySystem() const
-          GAZEBO_DEPRECATED(7.0);
-
       /// \internal
       /// \brief Get a pointer to the Ogre overlay system.
       /// \return Pointer to the OGRE overlay system.
