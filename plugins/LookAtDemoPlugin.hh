@@ -17,33 +17,17 @@
 #ifndef GAZEBO_PLUGINS_LOOKATDEMOPLUGIN_HH_
 #define GAZEBO_PLUGINS_LOOKATDEMOPLUGIN_HH_
 
-#include <gazebo/transport/transport.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <gazebo/transport/transport.hh>
 # include <gazebo/gui/gui.hh>
 #endif
 
 namespace gazebo
 {
-  /// \brief A GUI plugin that displays a timer. Control of this timer
-  /// is managed via a topic that is ~/timer_control by default. The
-  /// topic may be specified in the plugin's SDF. The topic receives
-  /// string messages where:
-  ///
-  ///     "start" == start the timer
-  ///     "stop" == stop the timer
-  ///     "reset" == reset the timer
-  ///
-  /// <plugin name="timer_plugin" filename="libLookAtDemoPlugin.so">
-  ///   <topic>~/my_timer_control</topic>
-  ///   <pos>pixel_x_pos pixel_y_pos</pos>
-  ///   <size>pixel_width pixel_height</size>
-  ///   <start_stop_button>visible</start_stop_button>
-  ///   <reset_button>visible</reset_button>
-  /// </plugin>
-  ///
-  /// Note that the size has to be large enough to fit all widgets.
+  /// \brief A GUI plugin that demos the ignition::math::Matrix4<T>::LookAt
+  /// function.
   class GAZEBO_VISIBLE LookAtDemoPlugin : public GUIPlugin
   {
     Q_OBJECT
