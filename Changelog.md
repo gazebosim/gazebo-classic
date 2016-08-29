@@ -5,6 +5,9 @@
 1. Add video recording of user camera.
     * [Pull request #2432](https://bitbucket.org/osrf/gazebo/pull-request/2432)
 
+1. Removed deprecations
+    * [Pull request #2427]((https://bitbucket.org/osrf/gazebo/pull-request/2427)
+
 1. Include basic support for GNU Precompiled Headers to reduce compile time
     * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
 
@@ -73,8 +76,10 @@
 
 1. Deprecate gazebo::math
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
+    * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)

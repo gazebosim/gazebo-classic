@@ -56,13 +56,6 @@ const Ogre::String &DynamicLines::getMovableType() const
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::AddPoint(const math::Vector3 &_pt,
-                            const common::Color &_color)
-{
-  this->AddPoint(_pt.Ign(), _color);
-}
-
-/////////////////////////////////////////////////
 void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
                             const common::Color &_color)
 {
@@ -76,12 +69,6 @@ void DynamicLines::AddPoint(double _x, double _y, double _z,
                             const common::Color &_color)
 {
   this->AddPoint(ignition::math::Vector3d(_x, _y, _z), _color);
-}
-
-/////////////////////////////////////////////////
-void DynamicLines::SetPoint(unsigned int _index, const math::Vector3 &_value)
-{
-  this->SetPoint(_index, _value.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -105,15 +92,6 @@ void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 {
   this->colors[_index] = _color;
   this->dirty = true;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 DynamicLines::GetPoint(unsigned int _index) const
-{
-  if (_index >= this->points.size())
-    gzthrow("Point index is out of bounds");
-
-  return this->points[_index];
 }
 
 /////////////////////////////////////////////////

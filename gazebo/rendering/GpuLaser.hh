@@ -88,11 +88,6 @@ namespace gazebo
 
       /// \brief All things needed to get back z buffer for laser data.
       /// \return Array of laser data.
-      /// \deprecated See LaserData()
-      public: const float *GetLaserData() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief All things needed to get back z buffer for laser data.
-      /// \return Array of laser data.
       public: const float *LaserData() const;
 
       /// \brief Connect to a laser frame signal
@@ -124,17 +119,7 @@ namespace gazebo
 
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
-      /// \deprecated See HorzHalfAngle()
-      public: double GetHorzHalfAngle() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
-      /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
       public: double HorzHalfAngle() const;
-
-      /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
-      /// \return (vertical_max_angle + vertical_min_angle) * 0.5
-      /// \deprecated See VertHalfAngle()
-      public: double GetVertHalfAngle() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5
@@ -158,17 +143,7 @@ namespace gazebo
 
       /// \brief Get the horizontal field of view of the laser sensor.
       /// \return The horizontal field of view of the laser sensor.
-      /// \deprecated See HorzFOV()
-      public: double GetHorzFOV() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the horizontal field of view of the laser sensor.
-      /// \return The horizontal field of view of the laser sensor.
       public: double HorzFOV() const;
-
-      /// \brief Get Cos Horz field-of-view
-      /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
-      /// \deprecated See CosHorzFOV()
-      public: double GetCosHorzFOV() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get Cos Horz field-of-view
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
@@ -180,17 +155,7 @@ namespace gazebo
 
       /// \brief Get the vertical field-of-view.
       /// \return The vertical field of view of the laser sensor.
-      /// \deprecated See VertFOV()
-      public: double GetVertFOV() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the vertical field-of-view.
-      /// \return The vertical field of view of the laser sensor.
       public: double VertFOV() const;
-
-      /// \brief Get Cos Vert field-of-view
-      /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
-      /// \deprecated See CosVertFOV()
-      public: double GetCosVertFOV() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get Cos Vert field-of-view
       /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
@@ -202,17 +167,7 @@ namespace gazebo
 
       /// \brief Get near clip
       /// \return near clip distance
-      /// \deprecated See NearClip()
-      public: double GetNearClip() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get near clip
-      /// \return near clip distance
       public: double NearClip() const;
-
-      /// \brief Get far clip
-      /// \return far clip distance
-      /// \deprecated See FarClip()
-      public: double GetFarClip() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get far clip
       /// \return far clip distance
@@ -236,22 +191,12 @@ namespace gazebo
 
       /// \brief Get the number of cameras required
       /// \return Number of cameras needed to generate the rays
-      /// \deprecated See CameraCount()
-      public: double GetCameraCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the number of cameras required
-      /// \return Number of cameras needed to generate the rays
       public: unsigned int CameraCount() const;
 
       /// \brief Set the number of cameras required
       /// \param[in] _cameraCount The number of cameras required to generate
       /// the rays
       public: void SetCameraCount(const unsigned int _cameraCount);
-
-      /// \brief Get the ray count ratio (equivalent to aspect ratio)
-      /// \return The ray count ratio (equivalent to aspect ratio)
-      /// \deprecated See RayCountRatio()
-      public: double GetRayCountRatio() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the ray count ratio (equivalent to aspect ratio)
       /// \return The ray count ratio (equivalent to aspect ratio)

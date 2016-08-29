@@ -190,7 +190,7 @@ foreach(FIL ${msgs})
     VERBATIM )
 endforeach()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS")
+add_definitions(-DBUILDING_DLL_GZ_MSGS)
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
