@@ -261,12 +261,6 @@ ScenePtr RenderEngine::GetScene(unsigned int index)
 }
 
 //////////////////////////////////////////////////
-unsigned int RenderEngine::GetSceneCount() const
-{
-  return this->SceneCount();
-}
-
-//////////////////////////////////////////////////
 unsigned int RenderEngine::SceneCount() const
 {
   return this->dataPtr->scenes.size();
@@ -812,12 +806,6 @@ Ogre::Root *RenderEngine::Root() const
 }
 
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
-/////////////////////////////////////////////////
-Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
-{
-  return this->OverlaySystem();
-}
-
 /////////////////////////////////////////////////
 Ogre::OverlaySystem *RenderEngine::OverlaySystem() const
 {

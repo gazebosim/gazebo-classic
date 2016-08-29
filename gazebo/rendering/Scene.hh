@@ -33,7 +33,6 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/gazebo_config.h"
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -111,17 +110,7 @@ namespace gazebo
 
       /// \brief Get the OGRE scene manager.
       /// \return Pointer to the Ogre SceneManager.
-      /// \deprecated See OgreSceneManager()
-      public: Ogre::SceneManager *GetManager() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the OGRE scene manager.
-      /// \return Pointer to the Ogre SceneManager.
       public: Ogre::SceneManager *OgreSceneManager() const;
-
-      /// \brief Get the name of the scene.
-      /// \return Name of the scene.
-      /// \deprecated See Name()
-      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the name of the scene.
       /// \return Name of the scene.
@@ -133,21 +122,11 @@ namespace gazebo
 
       /// \brief Get the ambient color.
       /// \return The scene's ambient color.
-      /// \deprecated See AmbientColor()
-      public: common::Color GetAmbientColor() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the ambient color.
-      /// \return The scene's ambient color.
       public: common::Color AmbientColor() const;
 
       /// \brief Set the background color.
       /// \param[in] _color The background color.
       public: void SetBackgroundColor(const common::Color &_color);
-
-      /// \brief Get the background color.
-      /// \return The background color.
-      /// \deprecated See BackgroundColor()
-      public: common::Color GetBackgroundColor() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the background color.
       /// \return The background color.
@@ -166,11 +145,6 @@ namespace gazebo
       /// Scene::GetGridCount.
       /// \param[in] _index Index of the grid.
       public: Grid *GetGrid(uint32_t _index) const;
-
-      /// \brief Get the number of grids.
-      /// \return The number of grids.
-      /// \deprecated See GridCount()
-      public: uint32_t GetGridCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the number of grids.
       /// \return The number of grids.
@@ -200,11 +174,6 @@ namespace gazebo
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of cameras.
-      /// \deprecated See OculusCameraCount()
-      public: uint32_t GetOculusCameraCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the number of cameras in this scene
-      /// \return Number of cameras.
       public: uint32_t OculusCameraCount() const;
 #endif
 
@@ -223,11 +192,6 @@ namespace gazebo
       /// \return Pointer to the new laser.
       public: GpuLaserPtr CreateGpuLaser(const std::string &_name,
                                          const bool _autoRender = true);
-
-      /// \brief Get the number of cameras in this scene
-      /// \return Number of cameras.
-      /// \deprecated See CameraCount()
-      public: uint32_t GetCameraCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the number of cameras in this scene
       /// \return Number of cameras.
@@ -256,11 +220,6 @@ namespace gazebo
 
       /// \brief Get the number of user cameras in this scene
       /// \return The number of user cameras.
-      /// \deprecated See UserCameraCount()
-      public: uint32_t GetUserCameraCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the number of user cameras in this scene
-      /// \return The number of user cameras.
       public: uint32_t UserCameraCount() const;
 
       /// \brief Get a user camera by index. The index value must be between
@@ -278,11 +237,6 @@ namespace gazebo
       /// \param[in] _name Name of the light to get.
       /// \return Pointer to the light, or NULL if the light was not found.
       public: LightPtr GetLight(const std::string &_name) const;
-
-      /// \brief Get the count of the lights.
-      /// \return The number of lights.
-      /// \deprecated See LightCount()
-      public: uint32_t GetLightCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the count of the lights.
       /// \return The number of lights.
@@ -316,17 +270,6 @@ namespace gazebo
       /// \param[in] _mousePos The position of the mouse in screen coordinates
       /// \param[out] _mod Used for object manipulation
       /// \return The selected entity, or NULL
-      /// \deprecated See VisualAt()
-      public: VisualPtr GetVisualAt(CameraPtr _camera,
-                                    const math::Vector2i &_mousePos,
-                                    std::string &_mod) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get an entity at a pixel location using a camera. Used for
-      ///        mouse picking.
-      /// \param[in] _camera The ogre camera, used to do mouse picking
-      /// \param[in] _mousePos The position of the mouse in screen coordinates
-      /// \param[out] _mod Used for object manipulation
-      /// \return The selected entity, or NULL
       public: VisualPtr VisualAt(CameraPtr _camera,
                                  const ignition::math::Vector2i &_mousePos,
                                  std::string &_mod);
@@ -334,15 +277,6 @@ namespace gazebo
       /// \brief Move the visual to be ontop of the nearest visual below it.
       /// \param[in] _visualName Name of the visual to move.
       public: void SnapVisualToNearestBelow(const std::string &_visualName);
-
-      /// \brief Get a visual at a mouse position.
-      /// \param[in] _camera Pointer to the camera used to project the mouse
-      /// position.
-      /// \param[in] _mousePos The 2d position of the mouse in pixels.
-      /// \return Pointer to the visual, NULL if none found.
-      /// \deprecated See VisualAt()
-      public: VisualPtr GetVisualAt(CameraPtr _camera,
-          const math::Vector2i &_mousePos) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a visual at a mouse position.
       /// \param[in] _camera Pointer to the camera used to project the mouse
@@ -357,24 +291,8 @@ namespace gazebo
       /// position.
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
       /// \return Pointer to the visual, NULL if none found.
-      /// \deprecated See ModelVisualAt()
-      public: VisualPtr GetModelVisualAt(CameraPtr _camera,
-          const math::Vector2i &_mousePos) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a model's visual at a mouse position.
-      /// \param[in] _camera Pointer to the camera used to project the mouse
-      /// position.
-      /// \param[in] _mousePos The 2d position of the mouse in pixels.
-      /// \return Pointer to the visual, NULL if none found.
       public: VisualPtr ModelVisualAt(CameraPtr _camera,
           const ignition::math::Vector2i &_mousePos);
-
-      /// \brief Get the closest visual below a given visual.
-      /// \param[in] _visualName Name of the visual to search below.
-      /// \return Pointer to the visual below, or NULL if no visual.
-      /// \deprecated See VisualBelow()
-      public: VisualPtr GetVisualBelow(const std::string &_visualName)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the closest visual below a given visual.
       /// \param[in] _visualName Name of the visual to search below.
@@ -385,41 +303,14 @@ namespace gazebo
       /// \param[in] _pt 3D point to get the visual below.
       /// \param[out] _visuals The visuals below the point order in
       /// proximity.
-      /// \deprecated See VisualsBelowPoint()
-      public: void GetVisualsBelowPoint(const math::Vector3 &_pt,
-          std::vector<VisualPtr> &_visuals) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a visual directly below a point.
-      /// \param[in] _pt 3D point to get the visual below.
-      /// \param[out] _visuals The visuals below the point order in
-      /// proximity.
       public: void VisualsBelowPoint(const ignition::math::Vector3d &_pt,
                                      std::vector<VisualPtr> &_visuals);
-
-
-      /// \brief Get the Z-value of the first object below the given point.
-      /// \param[in] _pt Position to search below for a visual.
-      /// \return The Z-value of the nearest visual below the point. Zero
-      /// is returned if no visual is found.
-      /// \deprecated See HeightBelowPoint()
-      public: double GetHeightBelowPoint(const math::Vector3 &_pt)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the Z-value of the first object below the given point.
       /// \param[in] _pt Position to search below for a visual.
       /// \return The Z-value of the nearest visual below the point. Zero
       /// is returned if no visual is found.
       public: double HeightBelowPoint(const ignition::math::Vector3d &_pt);
-
-      /// \brief Get the world pos of a the first contact at a pixel location.
-      /// \param[in] _camera Pointer to the camera.
-      /// \param[in] _mousePos 2D position of the mouse in pixels.
-      /// \param[out] _position 3D position of the first contact point.
-      /// \return True if a valid object was hit by the raycast.
-      /// \deprecated See FirstContact()
-      public: bool GetFirstContact(CameraPtr _camera,
-          const math::Vector2i &_mousePos,
-          math::Vector3 &_position) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the world pos of a the first contact at a pixel location.
       /// \param[in] _camera Pointer to the camera.
@@ -443,15 +334,6 @@ namespace gazebo
       /// \param[in] _start Start position of the line.
       /// \param[in] _end End position of the line.
       /// \param[in] _name Name of the line.
-      /// \deprecated See function that accepts ignition::math parameters.
-      public: void DrawLine(const math::Vector3 &_start,
-                            const math::Vector3 &_end,
-                            const std::string &_name) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Draw a named line.
-      /// \param[in] _start Start position of the line.
-      /// \param[in] _end End position of the line.
-      /// \param[in] _name Name of the line.
       public: void DrawLine(const ignition::math::Vector3d &_start,
                             const ignition::math::Vector3d &_end,
                             const std::string &_name);
@@ -470,17 +352,7 @@ namespace gazebo
 
       /// \brief Get the scene ID.
       /// \return The ID of the scene.
-      /// \deprecated See Id()
-      public: uint32_t GetId() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the scene ID.
-      /// \return The ID of the scene.
       public: uint32_t Id() const;
-
-      /// \brief Get the scene Id as a string.
-      /// \return The ID as a string.
-      /// \deprecated See IdString()
-      public: std::string GetIdString() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the scene Id as a string.
       /// \return The ID as a string.
@@ -489,11 +361,6 @@ namespace gazebo
       /// \brief Set whether shadows are on or off
       /// \param[in] _value True to enable shadows, False to disable
       public: void SetShadowsEnabled(const bool _value);
-
-      /// \brief Get whether shadows are on or off
-      /// \return True if shadows are enabled.
-      /// \deprecated See ShadowsEnabled()
-      public: bool GetShadowsEnabled() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get whether shadows are on or off
       /// \return True if shadows are enabled.
@@ -536,11 +403,6 @@ namespace gazebo
 
       /// \brief Get the top level world visual.
       /// \return Pointer to the world visual.
-      /// \deprecated See WorldVisual()
-      public: VisualPtr GetWorldVisual() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the top level world visual.
-      /// \return Pointer to the world visual.
       public: VisualPtr WorldVisual() const;
 
       /// \brief Remove the name of scene from a string.
@@ -554,12 +416,6 @@ namespace gazebo
 
       /// \brief Clear rendering::Scene
       public: void Clear();
-
-      /// \brief Get the currently selected visual.
-      /// \return Pointer to the currently selected visual, or NULL if
-      /// nothing is selected.
-      /// \deprecated See SelectedVisual()
-      public: VisualPtr GetSelectedVisual() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the currently selected visual.
       /// \return Pointer to the currently selected visual, or NULL if
@@ -608,11 +464,6 @@ namespace gazebo
 
       /// \brief Get whether or not clouds are displayed.
       /// \return True if clouds are displayed.
-      /// \deprecated See ShowClouds()
-      public: bool GetShowClouds() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get whether or not clouds are displayed.
-      /// \return True if clouds are displayed.
       public: bool ShowClouds() const;
 
       /// \brief Set SkyX mode to enable/disable skyx components such as
@@ -627,11 +478,6 @@ namespace gazebo
 
       /// \brief Return true if the Scene has been initialized.
       /// \return True if the scene has been initialized.
-      /// \deprecated See Initialized()
-      public: bool GetInitialized() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Return true if the Scene has been initialized.
-      /// \return True if the scene has been initialized.
       public: bool Initialized() const;
 
       /// \brief Get the scene simulation time.
@@ -639,20 +485,7 @@ namespace gazebo
       /// there is a lag between the time new poses are sent out by World
       /// and when they are received and applied by the Scene.
       /// \return The current simulation time in Scene
-      /// \deprecated See SimTime()
-      public: common::Time GetSimTime() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the scene simulation time.
-      /// Note this is different from World::GetSimTime() because
-      /// there is a lag between the time new poses are sent out by World
-      /// and when they are received and applied by the Scene.
-      /// \return The current simulation time in Scene
       public: common::Time SimTime() const;
-
-      /// \brief Get the number of visuals.
-      /// \return The number of visuals in the Scene.
-      /// \deprecated See VisualCount()
-      public: uint32_t GetVisualCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the number of visuals.
       /// \return The number of visuals in the Scene.
