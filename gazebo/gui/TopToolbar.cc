@@ -194,11 +194,11 @@ TopToolbar::TopToolbar(QWidget *_parent)
     animation->setLoopCount(-1);
 
     // Start the opacity animation when a recording begins
-    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStarted()),
+    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStarted()),
             animation, SLOT(start()));
 
     // Stop the opacity animation when a recording ends
-    connect(this->dataPtr->videoRecorder, SIGNAL(recordingStopped()),
+    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStopped()),
             animation, SLOT(stop()));
 
     // Disable the fade effect on recording stop. This prevent the button
