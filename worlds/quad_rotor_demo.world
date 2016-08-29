@@ -1082,6 +1082,8 @@
           <inc_key>65</inc_key>
           <dec_key>66</dec_key>
           <inc_val>3</inc_val>
+          <max_val>3</max_val>
+          <min_val>-3</min_val>
         </engine>
         <engine name="engine2">
           <joint_name>rod_2_joint</joint_name>
@@ -1089,6 +1091,8 @@
           <inc_key>65</inc_key>
           <dec_key>66</dec_key>
           <inc_val>3</inc_val>
+          <max_val>3</max_val>
+          <min_val>-3</min_val>
         </engine>
         <engine name="engine3">
           <joint_name>rod_3_joint</joint_name>
@@ -1096,6 +1100,8 @@
           <inc_key>65</inc_key>
           <dec_key>66</dec_key>
           <inc_val>3</inc_val>
+          <max_val>3</max_val>
+          <min_val>-3</min_val>
         </engine>
         <engine name="engine4">
           <joint_name>rod_4_joint</joint_name>
@@ -1103,6 +1109,8 @@
           <inc_key>65</inc_key>
           <dec_key>66</dec_key>
           <inc_val>3</inc_val>
+          <max_val>3</max_val>
+          <min_val>-3</min_val>
         </engine>
         <!--
         <thruster name="thruster1">
@@ -1110,6 +1118,8 @@
           <inc_key>97</inc_key>
           <dec_key>122</dec_key>
           <inc_val>-50 0 0</inc_val>
+          <max_val>3</max_val>
+          <min_val>-3</min_val>
         </thruster>
         -->
       </plugin>
