@@ -343,7 +343,7 @@ void Model::Init()
     {
       // clamp initial position between joint limits
       math::Angle position = math::clamp((*iter)->InitialPosition(i),
-        (*iter)->GetLowerLimit(i), (*iter)->GetUpperLimit(i));
+        (*iter)->GetLowerLimit(i).Ign(), (*iter)->GetUpperLimit(i).Ign());
       // gzdbg << "setting joint[" << i
       //       << "] [" << (*iter)->GetName()
       //       << "] to [" << position.Radian() << "]\n";
