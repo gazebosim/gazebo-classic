@@ -130,16 +130,22 @@ do
     # for each coredump
     for c in $(find . | grep '/core$')
     do
-      CORE_XML=$(strings $c | grep "$BUILD_ROOT/build/gazebo/.*xml$" | head -1)
-      CORE_TEST_NUMBER=$(grep $CORE_XML $logfileRaw | head -1 | sed -e 's@:.*@@')
-      CORE_TEST_NAME=$(basename $CORE_XML .xml)
-      if [[ "${CORE_TEST_NAME}" == "UNIT_Exception_TEST" || \
-            "${CORE_TEST_NAME}" == "UNIT_ModelSnap_TEST" ]]; then
+      CORE_EXECUTABLE_PATH=$(readelf -n $c | grep -A2 '^ *Start *End *Page Offset' | tail -1)
+      CORE_EXECUTABLE_NAME=$(basename ${CORE_EXECUTABLE_PATH})
+      CORE_TEST_NUMBER=$(grep "${CORE_EXECUTABLE_NAME}\.xml" $logfileRaw | head -1 | sed -e 's@:.*@@')
+      if [[ "${CORE_EXECUTABLE_NAME}" == "UNIT_Exception_TEST" || \
+            "${CORE_EXECUTABLE_NAME}" == "UNIT_ModelSnap_TEST" ]]; then
+        rm $c
         continue
+      elif [[ -z "${CORE_TEST_NUMBER}" ]]; then
+        CORE_TEST_NUMBER=${CORE_EXECUTABLE_NAME}
       fi
-      CORE_TEST_PATH=$(find . | grep $CORE_TEST_NAME$)
       CORE_BT_LOG="${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-backtrace.txt"
-      gdb $CORE_TEST_PATH $c -ex bt -ex 'thread apply all bt' -ex q > $CORE_BT_LOG
+      echo '# CORE_TEST_NUMBER='"${CORE_TEST_NUMBER}" >> $CORE_BT_LOG
+      echo '# CORE_EXECUTABLE_NAME='"${CORE_EXECUTABLE_NAME}" >> $CORE_BT_LOG
+      echo '# CORE_EXECUTABLE_PATH='"${CORE_EXECUTABLE_PATH}" >> $CORE_BT_LOG
+      echo '# ls -l: '"$(ls -l ${c})" >> $CORE_BT_LOG
+      gdb $CORE_EXECUTABLE_PATH $c -ex bt -ex 'thread apply all bt' -ex q >> $CORE_BT_LOG
       rm $c
       if grep OnReadHeader $CORE_BT_LOG; then
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-OnReadHeader-backtrace.txt"
@@ -152,7 +158,10 @@ do
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-RemoveModel_BuildSceneMsg-backtrace.txt"
       elif grep World::BuildSceneMsg $CORE_BT_LOG && \
            grep SimTk::StateImpl::getCacheEntry $CORE_BT_LOG; then
-        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-SimTK_BuildSceneMsg-backtrace.txt"
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-SimTk_BuildSceneMsg-backtrace.txt"
+      elif grep Visual::GetBoundsHelper $CORE_BT_LOG && \
+           grep simbody $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-GetBoundsHelper_simbody-backtrace.txt"
       fi
     done
   done
