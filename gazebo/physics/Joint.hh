@@ -574,7 +574,7 @@ namespace gazebo
       /// if the model is re-initialized.
       /// \param[in] _index joint axis index.
       /// \param[in] _position joint's initial position.
-      public: void SetInitialPosition(unsigned int _index,
+      private: void SetInitialPosition(unsigned int _index,
         ignition::math::Angle _position);
 
       /// \brief Returns this joint's cached initial position.
