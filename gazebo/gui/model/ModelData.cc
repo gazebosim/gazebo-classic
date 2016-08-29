@@ -95,25 +95,39 @@ void ModelData::UpdateRenderGroup(rendering::VisualPtr _visual)
 /////////////////////////////////////////////////
 void NestedModelData::SetName(const std::string &_name)
 {
-  this->modelSDF->GetAttribute("name")->Set(_name);
+  if (this->modelSDF)
+    this->modelSDF->GetAttribute("name")->Set(_name);
+  else
+    gzerr << "Model SDF not found." << std::endl;
 }
 
 /////////////////////////////////////////////////
 std::string NestedModelData::Name() const
 {
-  return this->modelSDF->Get<std::string>("name");
+  if (this->modelSDF)
+    return this->modelSDF->Get<std::string>("name");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return "";
 }
 
 /////////////////////////////////////////////////
 void NestedModelData::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->modelSDF->GetElement("pose")->Set(_pose);
+  if (this->modelSDF)
+    this->modelSDF->GetElement("pose")->Set(_pose);
+  else
+    gzerr << "Model SDF not found." << std::endl;
 }
 
 /////////////////////////////////////////////////
 ignition::math::Pose3d NestedModelData::Pose() const
 {
-  return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+  if (this->modelSDF)
+    return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -131,7 +145,6 @@ LinkData::LinkData()
   this->linkSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->linkSDF);
 
-  this->scale = ignition::math::Vector3d::One;
   this->inertiaIxx = 0;
   this->inertiaIyy = 0;
   this->inertiaIzz = 0;
@@ -140,6 +153,7 @@ LinkData::LinkData()
 
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);
+  connect(this->inspector, SIGNAL(Opened()), this, SLOT(OnInspectorOpened()));
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
   connect(this->inspector->GetVisualConfig(),
@@ -168,7 +182,6 @@ LinkData::LinkData()
 /////////////////////////////////////////////////
 LinkData::~LinkData()
 {
-  event::Events::DisconnectPreRender(this->connections[0]);
   this->connections.clear();
   delete this->inspector;
   delete this->updateMutex;
@@ -203,13 +216,13 @@ void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 }
 
 /////////////////////////////////////////////////
-void LinkData::SetScale(const ignition::math::Vector3d &_scale)
+void LinkData::UpdateInspectorScale()
 {
   GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
-  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
-  ignition::math::Vector3d dScale = _scale / this->scale;
-  for (auto const &it : this->visuals)
+  // Update visual config
+  VisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  for (auto &it : this->visuals)
   {
     std::string name = it.first->GetName();
     std::string linkName = this->linkVisual->GetName();
@@ -220,12 +233,17 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     visualConfig->Geometry(leafName,  visOldSize, uri);
     ignition::math::Vector3d visNewSize = it.first->GetGeometrySize();
     visualConfig->SetGeometry(leafName, visNewSize);
+
+    auto visMsg = visualConfig->GetData(leafName);
+    if (visMsg)
+      it.second.CopyFrom(*visMsg);
   }
 
+  // Update collision config
   std::map<std::string, ignition::math::Vector3d> colOldSizes;
   std::map<std::string, ignition::math::Vector3d> colNewSizes;
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
-  for (auto const &it : this->collisions)
+  for (auto &it : this->collisions)
   {
     std::string name = it.first->GetName();
     std::string linkName = this->linkVisual->GetName();
@@ -239,6 +257,10 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     collisionConfig->SetGeometry(leafName, colNewSize);
     colOldSizes[name] = colOldSize;
     colNewSizes[name] = colNewSize;
+
+    auto colMsg = collisionConfig->GetData(leafName);
+    if (colMsg)
+      it.second.CopyFrom(*colMsg);
   }
 
   if (this->collisions.empty())
@@ -399,18 +421,24 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   sdf::ElementPtr inertialPoseElem = inertialElem->GetElement("pose");
   ignition::math::Pose3d newPose =
       inertialPoseElem->Get<ignition::math::Pose3d>();
-  newPose.Pos() *= dScale;
 
-  inertialPoseElem->Set(newPose);
-  linkConfig->SetInertialPose(newPose);
-
-  this->scale = _scale;
+  // FIXME: Not updating the CoM pose. Reimplement this using
+  // ignition::math::Inertial
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d LinkData::Scale() const
+void LinkData::SetScales(
+    const std::map<std::string, ignition::math::Vector3d> &_scales)
 {
-  return this->scale;
+  this->UpdateInspectorScale();
+
+  this->scales = _scales;
+}
+
+/////////////////////////////////////////////////
+const std::map<std::string, ignition::math::Vector3d> &LinkData::Scales() const
+{
+  return this->scales;
 }
 
 /////////////////////////////////////////////////
@@ -574,6 +602,7 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
   this->visuals[_visual] = visualMsg;
+  this->scales[_visual->GetName()] = _visual->GetGeometrySize();
 
   std::string visName = _visual->GetName();
   std::string leafName = visName;
@@ -617,6 +646,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
   }
 
   this->collisions[_collisionVis] = collisionMsg;
+  this->scales[_collisionVis->GetName()] = _collisionVis->GetGeometrySize();
   collisionConfig->AddCollision(leafName, &collisionMsg);
 }
 
@@ -901,6 +931,27 @@ void LinkData::OnApply()
 }
 
 /////////////////////////////////////////////////
+void LinkData::OnInspectorOpened()
+{
+  // Reset backup lists
+  for (auto it = this->deletedVisuals.begin();
+      it != this->deletedVisuals.end(); ++it)
+  {
+    this->linkVisual->DetachVisual(it->first);
+    this->linkVisual->GetScene()->RemoveVisual(it->first);
+  }
+  this->deletedVisuals.clear();
+
+  for (auto it = this->deletedCollisions.begin();
+      it != this->deletedCollisions.end(); ++it)
+  {
+    this->linkVisual->DetachVisual(it->first);
+    this->linkVisual->GetScene()->RemoveVisual(it->first);
+  }
+  this->deletedCollisions.clear();
+}
+
+/////////////////////////////////////////////////
 bool LinkData::Apply()
 {
   GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
@@ -1169,14 +1220,33 @@ void LinkData::OnAddVisual(const std::string &_name)
   visualName << this->linkVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr visVisual;
-  rendering::VisualPtr refVisual;
-  if (!this->visuals.empty())
+  msgs::Visual visualMsg;
+
+  // See if this is in the deleted list
+  for (auto it = this->deletedVisuals.begin();
+      it != this->deletedVisuals.end(); ++it)
+  {
+    if (it->first->GetName() == visualName.str())
+    {
+      visVisual = it->first;
+      visVisual->SetVisible(true);
+      visualMsg = it->second;
+
+      this->deletedVisuals.erase(it);
+      break;
+    }
+  }
+
+  if (!visVisual && !this->visuals.empty())
   {
     // add new visual by cloning last instance
-    refVisual = this->visuals.rbegin()->first;
+    auto refVisual = this->visuals.rbegin()->first;
     visVisual = refVisual->Clone(visualName.str(), this->linkVisual);
+
+    visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+    visualMsg.set_transparency(this->visuals[refVisual].transparency());
   }
-  else
+  else if (!visVisual)
   {
     // create new visual based on sdf template (box)
     sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
@@ -1188,17 +1258,14 @@ void LinkData::OnAddVisual(const std::string &_name)
     sdf::ElementPtr visualElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
+    visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
   }
-
-  msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
-  // store the correct transparency setting
-  if (refVisual)
-    visualMsg.set_transparency(this->visuals[refVisual].transparency());
 
   msgs::VisualPtr visualMsgPtr(new msgs::Visual);
   visualMsgPtr->CopyFrom(visualMsg);
   visualConfig->UpdateVisual(_name, visualMsgPtr);
   this->visuals[visVisual] = visualMsg;
+  this->scales[visVisual->GetName()] = visVisual->GetGeometrySize();
   visVisual->SetTransparency(visualMsg.transparency() *
       (1-ModelData::GetEditTransparency()-0.1)
       + ModelData::GetEditTransparency());
@@ -1217,37 +1284,57 @@ void LinkData::OnAddCollision(const std::string &_name)
   collisionName << this->linkVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr collisionVis;
-  if (!this->collisions.empty())
-  {
-    // add new collision by cloning last instance
-    collisionVis = this->collisions.rbegin()->first->Clone(collisionName.str(),
-        this->linkVisual);
-  }
-  else
-  {
-    // create new collision based on sdf template (box)
-    sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
-    modelTemplateSDF->SetFromString(
-        ModelData::GetTemplateSDFString());
-
-    collisionVis.reset(new rendering::Visual(collisionName.str(),
-        this->linkVisual));
-    sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
-        ->GetElement("model")->GetElement("link")->GetElement("visual");
-    collisionVis->Load(collisionElem);
-    collisionVis->SetMaterial("Gazebo/Orange");
-  }
-
-  msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
   msgs::Collision collisionMsg;
-  collisionMsg.set_name(_name);
-  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
-  geomMsg->CopyFrom(visualMsg.geometry());
+
+  // See if this is in the deleted list
+  for (auto it = this->deletedCollisions.begin();
+      it != this->deletedCollisions.end(); ++it)
+  {
+    if (it->first->GetName() == collisionName.str())
+    {
+      collisionVis = it->first;
+      collisionVis->SetVisible(true);
+      collisionMsg = it->second;
+
+      this->deletedCollisions.erase(it);
+      break;
+    }
+  }
+
+  if (!collisionVis)
+  {
+    if (!this->collisions.empty())
+    {
+      // add new collision by cloning last instance
+      collisionVis = this->collisions.rbegin()->first->Clone(
+          collisionName.str(), this->linkVisual);
+    }
+    else
+    {
+      // create new collision based on sdf template (box)
+      sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
+      modelTemplateSDF->SetFromString(
+          ModelData::GetTemplateSDFString());
+
+      collisionVis.reset(new rendering::Visual(collisionName.str(),
+          this->linkVisual));
+      sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
+          ->GetElement("model")->GetElement("link")->GetElement("visual");
+      collisionVis->Load(collisionElem);
+      collisionVis->SetMaterial("Gazebo/Orange");
+    }
+
+    msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
+    collisionMsg.set_name(_name);
+    msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+    geomMsg->CopyFrom(visualMsg.geometry());
+  }
 
   msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
   collisionMsgPtr->CopyFrom(collisionMsg);
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
   this->collisions[collisionVis] = collisionMsg;
+  this->scales[collisionVis->GetName()] = collisionVis->GetGeometrySize();
 
   collisionVis->SetTransparency(
       ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
@@ -1269,8 +1356,11 @@ void LinkData::OnRemoveVisual(const std::string &_name)
   {
     if (visualName == it->first->GetName())
     {
-      this->linkVisual->DetachVisual(it->first);
-      this->linkVisual->GetScene()->RemoveVisual(it->first);
+      it->first->SetVisible(false);
+
+      this->deletedVisuals[it->first] = it->second;
+      this->scales.erase(visualName);
+
       this->visuals.erase(it);
       break;
     }
@@ -1292,8 +1382,11 @@ void LinkData::OnRemoveCollision(const std::string &_name)
   {
     if (collisionName == it->first->GetName())
     {
-      this->linkVisual->DetachVisual(it->first);
-      this->linkVisual->GetScene()->RemoveVisual(it->first);
+      it->first->SetVisible(false);
+
+      this->deletedCollisions[it->first] = it->second;
+      this->scales.erase(collisionName);
+
       this->collisions.erase(it);
       break;
     }
@@ -1319,6 +1412,9 @@ void LinkData::Update()
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
         it.first->UpdateFromMsg(updateMsgPtr);
+
+        this->scales[it.first->GetName()] = it.first->GetGeometrySize();
+
         it.first->SetTransparency(updateMsgPtr->transparency() *
             (1-ModelData::GetEditTransparency()-0.1)
             + ModelData::GetEditTransparency());
@@ -1346,6 +1442,8 @@ void LinkData::Update()
         updateMsgPtr->CopyFrom(collisionVisMsg);
         std::string origGeomType = it.first->GetGeometryType();
         it.first->UpdateFromMsg(updateMsgPtr);
+
+        this->scales[it.first->GetName()] = it.first->GetGeometrySize();
 
         // fix for transparency alpha compositing
         if (it.first->GetGeometryType() != origGeomType)

@@ -37,7 +37,7 @@ BreakableJointPlugin::BreakableJointPlugin()
 /////////////////////////////////////////////////
 BreakableJointPlugin::~BreakableJointPlugin()
 {
-  this->parentSensor->DisconnectUpdate(this->connection);
+  this->connection.reset();
   this->parentSensor.reset();
 }
 
@@ -86,5 +86,5 @@ void BreakableJointPlugin::OnWorldUpdate()
   this->parentSensor->SetActive(false);
   this->parentJoint->Detach();
   this->parentJoint->SetProvideFeedback(false);
-  event::Events::DisconnectWorldUpdateBegin(this->worldConnection);
+  this->worldConnection.reset();
 }

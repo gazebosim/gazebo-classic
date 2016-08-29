@@ -79,19 +79,19 @@ TEST_F(SensorManager_TEST, Data)
   // Get each sensor, and make sure that it has been updated
   {
     sensor = mgr->GetSensor("default::camera_1::link::camera");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::camera_2::link::camera");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_1::link::laser");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_2::link::laser");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
   }
 }

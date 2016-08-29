@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <world name="default">
+    <gui>
+      <!-- A plugin for controlling the Cessna with the keyboard -->
+      <plugin name="keyboard" filename="libKeyboardGUIPlugin.so"/>
+    </gui>
     <physics type="ode">
       <gravity>0.0 0.0 -10.0</gravity>
       <ode>

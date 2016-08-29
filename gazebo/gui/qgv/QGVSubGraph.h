@@ -19,9 +19,16 @@ License along with this library.
 #ifndef QGVSUBGRAPH_H
 #define QGVSUBGRAPH_H
 
+#ifndef _MSC_VER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
 #include <qgv.h>
 #include <QGraphicsItem>
 #include <QPen>
+#ifndef _MSC_VER
+#pragma GCC diagnostic pop
+#endif
 
 class QGVNode;
 class QGVEdge;

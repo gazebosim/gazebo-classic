@@ -42,6 +42,7 @@ namespace gazebo
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \brief Bullet physics engine wrapper
     /// \{
 
     /// \brief Bullet physics engine

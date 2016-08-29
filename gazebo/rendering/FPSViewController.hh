@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/util/system.hh"
 

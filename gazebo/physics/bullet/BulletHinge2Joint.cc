@@ -31,9 +31,9 @@ using namespace physics;
 BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world, BasePtr _parent)
     : Hinge2Joint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  GZ_ASSERT(_world, "bullet world pointer is null");
   this->bulletWorld = _world;
-  this->bulletHinge2 = NULL;
+  this->bulletHinge2 = nullptr;
   this->angleOffset[0] = 0.0;
   this->angleOffset[1] = 0.0;
 }
@@ -83,7 +83,7 @@ void BulletHinge2Joint::Init()
   this->constraint = this->bulletHinge2;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
   this->bulletWorld->addConstraint(this->constraint, true);
 
   // Allows access to impulse
@@ -127,14 +127,14 @@ math::Angle BulletHinge2Joint::GetAngle(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 double BulletHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented";
+  gzerr << "BulletHinge2Joint::GetVelocity not implemented" << std::endl;
   return 0;
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
-  gzerr << "Not implemented";
+  gzerr << "BulletHinge2Joint::SetVelocity not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -152,7 +152,7 @@ void BulletHinge2Joint::SetAxis(unsigned int /*_index*/,
 void BulletHinge2Joint::SetForceImpl(unsigned int /*_index*/,
     double /*_torque*/)
 {
-  gzerr << "Not implemented";
+  gzerr << "BulletHinge2Joint::SetForceImpl not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////

@@ -22,11 +22,16 @@
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
+  // Forward declare private data
   class UserCameraPrivate;
 
   namespace rendering
@@ -55,6 +60,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetClipDist(float _near, float _far);
+      using Camera::SetClipDist;
 
       /// \brief Generic load function
       public: void Load();

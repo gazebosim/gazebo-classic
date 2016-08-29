@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="inertia_rotations">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+<%
+  boxes = {}
+  boxes["ref"] = {:ixx => 0.97,  :iyy => 0.82,  :izz => 0.17,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 0 0"}
+  boxes["x90"] = {:ixx => 0.97,  :iyy => 0.17,  :izz => 0.82,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "#{Math::PI/2} 0 0"}
+  boxes["y90"] = {:ixx => 0.17,  :iyy => 0.82,  :izz => 0.97,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 #{Math::PI/2} 0"}
+  boxes["z90"] = {:ixx => 0.82,  :iyy => 0.97,  :izz => 0.17,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 0 #{Math::PI/2}"}
+  boxes["x45"] = {:ixx => 0.97,  :iyy => 0.495, :izz => 0.495, :ixy => 0, :ixz => 0, :iyz => 0.325, :rpy => "#{-Math::PI/4} 0 0"}
+  boxes["y45"] = {:ixx => 0.57,  :iyy => 0.82,  :izz => 0.57,  :ixy => 0, :ixz => -0.40, :iyz => 0, :rpy => "0 #{-Math::PI/4} 0"}
+  boxes["z45"] = {:ixx => 0.895, :iyy => 0.895, :izz => 0.17,  :ixy => 0.075, :ixz => 0, :iyz => 0, :rpy => "0 0 #{-Math::PI/4}"}
+  boxes.keys.each_with_index { |k,i|
+    rpy = boxes[k][:rpy]
+    ixx = boxes[k][:ixx]
+    iyy = boxes[k][:iyy]
+    izz = boxes[k][:izz]
+    ixy = boxes[k][:ixy]
+    ixz = boxes[k][:ixz]
+    iyz = boxes[k][:iyz]
+%>
+    <model name="box010409_<%= k %>">
+      <pose>0 <%= i %> 0.45  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>0 0 0  <%= rpy %></pose>
+          <mass>12</mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy><%= ixy %></ixy>
+            <ixz><%= ixz %></ixz>
+            <iyz><%= iyz %></iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.1 0.4 0.9</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <max_vel>0.01</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.4 0.9</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+  }
+%>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>4.2 -0.7 2.0  0 0.3 2.57</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>

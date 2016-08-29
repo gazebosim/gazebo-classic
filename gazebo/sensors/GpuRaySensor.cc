@@ -61,6 +61,7 @@ GpuRaySensor::GpuRaySensor()
 //////////////////////////////////////////////////
 GpuRaySensor::~GpuRaySensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -117,7 +118,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->dataPtr->parentEntity =
     this->world->GetEntity(this->ParentName());
 
-  GZ_ASSERT(this->dataPtr->parentEntity != NULL,
+  GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
 }
 
@@ -317,10 +318,13 @@ void GpuRaySensor::Init()
 //////////////////////////////////////////////////
 void GpuRaySensor::Fini()
 {
-  Sensor::Fini();
-  this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
-  this->dataPtr->laserCam.reset();
+  if (this->scene)
+    this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
   this->scene.reset();
+
+  this->dataPtr->laserCam.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -334,7 +338,14 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 //////////////////////////////////////////////////
 void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
 {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->dataPtr->laserCam->DisconnectNewLaserFrame(_conn);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

@@ -29,7 +29,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// Forward declare private data class

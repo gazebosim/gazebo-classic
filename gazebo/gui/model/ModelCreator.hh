@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
-#define _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+#define GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -27,7 +28,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -163,7 +163,10 @@ namespace gazebo
 
       /// \brief Remove a model plugin from the model.
       /// \param[in] _pluginName Name of the model plugin to remove.
-      public: void RemoveModelPlugin(const std::string &_pluginName);
+      /// \param[in] _newCmd Flag indicating whether a new command should be
+      /// created.
+      public: void RemoveModelPlugin(const std::string &_pluginName,
+          const bool _newCmd = true);
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
@@ -210,8 +213,11 @@ namespace gazebo
       /// \param[in] _name Name of plugin
       /// \param[in] _filename Plugin filename
       /// \param[in] _innerxml Plugin SDF elements in string
+      /// \param[in] _newCmd Flag indicating whether a new command should be
+      /// created.
       public: void OnAddModelPlugin(const std::string &_name,
-          const std::string &_filename, const std::string &_innerxml);
+          const std::string &_filename, const std::string &_innerxml,
+          const bool _newCmd = true);
 
       /// \brief Add a model plugin to the model
       /// \param[in] _pluginElem Pointer to plugin SDF element
@@ -224,6 +230,13 @@ namespace gazebo
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
+
+      /// \brief Convert a given pose from the world frame to the local frame
+      /// of the model being edited.
+      /// \param[in] _world Pose in world frame.
+      /// \return Pose in model local frame.
+      public: ignition::math::Pose3d WorldToLocal(
+          const ignition::math::Pose3d &_world) const;
 
       /// \brief Helper function to generate link sdf from link data.
       /// \param[in] _link Link data used to generate the sdf.
@@ -254,9 +267,6 @@ namespace gazebo
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
-
-      /// \brief Update callback on PreRender.
-      private: void Update();
 
       /// \brief Internal helper function to remove a nestedModel without
       /// removing the joints.
@@ -311,17 +321,17 @@ namespace gazebo
       /// \param[in] _mode New manipulation mode.
       private: void OnManipMode(const std::string &_mode);
 
-      /// \brief Callback when an entity is selected.
+      /// \brief Callback when an entity is selected outside of the editor.
       /// \param[in] _name Name of entity.
       /// \param[in] _mode Select mode
-      private: void OnSetSelectedEntity(const std::string &_name,
+      private: void OnDeselectAll(const std::string &_name,
           const std::string &_mode);
 
       /// \brief Callback when a model editor entity is selected.
       /// \param[in] _name Name of entity.
       /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelectedLink(const std::string &_name,
+      private: void OnSetSelectedEntity(const std::string &_name,
           const bool _selected);
 
       /// \brief Callback when a model plugin is selected.
@@ -410,20 +420,43 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _scale New scale.
       private: void OnEntityScaleChanged(const std::string &_name,
-          const gazebo::math::Vector3 &_scale);
+          const ignition::math::Vector3d &_scale);
+
+      /// \brief Callback when an entity's pose has changed.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _pose New pose.
+      /// \param[in] _isFinal Whether this is the final pose or it is still
+      /// being manipulated.
+      private: void OnEntityMoved(const std::string &_name,
+          const ignition::math::Pose3d &_pose, const bool _isFinal);
 
       /// \brief Deselect anything whose selection is handled here, such as
       /// links and model plugins.
       private: void DeselectAll();
 
-      /// \brief Deselect all currently selected links.
-      private: void DeselectAllLinks();
-
-      /// \brief Deselect all currently selected nested models.
-      private: void DeselectAllNestedModels();
+      /// \brief Deselect all currently selected entities.
+      private: void DeselectAllEntities();
 
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
+
+      /// \brief Callback when receiving a request to scale a link.
+      /// \param[in] _name Link name.
+      /// \param[in] _scales New scale for each child of the link.
+      private: void OnRequestLinkScale(const std::string &_name,
+          const std::map<std::string, ignition::math::Vector3d> &_scales);
+
+      /// \brief Callback when receiving a request to move a link.
+      /// \param[in] _name Link name.
+      /// \param[in] _pose New link pose.
+      private: void OnRequestLinkMove(const std::string &_name,
+          const ignition::math::Pose3d &_pose);
+
+      /// \brief Callback when receiving a request to move a nested model.
+      /// \param[in] _name Nested model name.
+      /// \param[in] _pose New nested model pose.
+      private: void OnRequestNestedModelMove(const std::string &_name,
+          const ignition::math::Pose3d &_pose);
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values

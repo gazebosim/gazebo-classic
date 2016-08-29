@@ -29,6 +29,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \class ODEGearboxJoint ODEGearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint.
     class GZ_PHYSICS_VISIBLE ODEGearboxJoint : public GearboxJoint<ODEJoint>
@@ -86,6 +89,7 @@ namespace gazebo
       /// \param[in] _body an ode body as the reference link for the gears.
       private: void SetReferenceBody(LinkPtr _body);
     };
+    /// \}
   }
 }
 #endif

@@ -52,12 +52,12 @@ LOITER> mode LAND
         </solver>
         <constraints>
           <cfm>0.0</cfm>
-          <erp>0.2</erp>
+          <erp>0.9</erp>
           <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <real_time_update_rate>400</real_time_update_rate>
+      <real_time_update_rate>1200</real_time_update_rate>
       <max_step_size>0.0025</max_step_size>
     </physics>
 
@@ -71,24 +71,24 @@ LOITER> mode LAND
 
     <model name="iris">
       <include>
-        <uri>model://iris_test</uri>
+        <uri>model://iris_with_standoffs_demo</uri>
       </include>
 
+      <!-- add new camera -->
       <link name='camera'>
-        <pose>0 0 0.11 0 0 0</pose>
-         <inertial>
+        <pose>0 -0.01 0.070 1.57 0 1.57</pose>
+        <inertial>
           <pose>0 0 0 0 0 0</pose>
-          <mass>0.01</mass>
+          <mass>0.1</mass>
           <inertia>
-            <ixx>0.0001</ixx>
+            <ixx>0.001</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0001</iyy>
+            <iyy>0.001</iyy>
             <iyz>0</iyz>
-            <izz>0.0001</izz>
+            <izz>0.001</izz>
           </inertia>
         </inertial>
-
         <visual name='visual'>
           <pose>0 0 0 0 0 0</pose>
           <geometry>
@@ -97,17 +97,15 @@ LOITER> mode LAND
               <length>0.025</length>
             </cylinder>
           </geometry>
-
            <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
               <name>Gazebo/Grey</name>
             </script>
           </material>
-       </visual>
-
+        </visual>
         <sensor name="camera" type="camera">
-          <pose>0 0 0 0 1.57 0</pose>
+          <pose>0 0 0 -1.57 -1.57 0</pose>
           <camera>
             <horizontal_fov>1.0472</horizontal_fov>
             <image>
@@ -129,217 +127,73 @@ LOITER> mode LAND
         </sensor>
       </link>
 
-      <joint type="fixed" name="base_camera_joint">
-        <pose>0 0 0 0 0 0</pose>
-        <parent>iris::base_link</parent>
+      <!-- attach camera -->
+      <joint type="revolute" name="base_camera_joint">
+        <pose>0 0 0.0 0 0 0</pose>
+        <parent>iris::iris_demo::gimbal_small_2d::tilt_link</parent>
         <child>camera</child>
+        <axis>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
       </joint>
-
-
-
-      <!-- plugins -->
-      <plugin name="rotor_0_blade_1" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>0.084 0 0</cp>
-        <forward>0 1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_0</link_name>
-      </plugin>
-      <plugin name="rotor_0_blade_2" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>-0.084 0 0</cp>
-        <forward>0 -1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_0</link_name>
-      </plugin>
-
-      <plugin name="rotor_1_blade_1" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>0.084 0 0</cp>
-        <forward>0 1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_1</link_name>
-      </plugin>
-      <plugin name="rotor_1_blade_2" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>-0.084 0 0</cp>
-        <forward>0 -1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_1</link_name>
-      </plugin>
-
-      <plugin name="rotor_2_blade_1" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>0.084 0 0</cp>
-        <forward>0 -1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_2</link_name>
-      </plugin>
-      <plugin name="rotor_2_blade_2" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>-0.084 0 0</cp>
-        <forward>0 1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_2</link_name>
-      </plugin>
-
-      <plugin name="rotor_3_blade_1" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>0.084 0 0</cp>
-        <forward>0 -1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_3</link_name>
-      </plugin>
-      <plugin name="rotor_3_blade_2" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
-        <alpha_stall>1.4</alpha_stall>
-        <cla>0.2500</cla>
-        <cda>0.10</cda>
-        <cma>0.00</cma>
-        <cla_stall>-0.025</cla_stall>
-        <cda_stall>0.0</cda_stall>
-        <cma_stall>0.0</cma_stall>
-        <area>0.2</area>
-        <air_density>1.2041</air_density>
-        <cp>-0.084 0 0</cp>
-        <forward>0 1 0</forward>
-        <upward>0 0 1</upward>
-        <link_name>iris::rotor_3</link_name>
-      </plugin>
-      <plugin name="arducopter_plugin" filename="libArduCopterPlugin.so">
-        <imuLinkName>iris::iris/imu_link</imuLinkName>
-        <rotor id="0">
-          <vel_p_gain>0.2</vel_p_gain>
-          <vel_i_gain>0</vel_i_gain>
-          <vel_d_gain>0</vel_d_gain>
-          <vel_i_max>0</vel_i_max>
-          <vel_i_min>0</vel_i_min>
-          <vel_cmd_max>2.0</vel_cmd_max>
-          <vel_cmd_min>-2.0</vel_cmd_min>
-          <jointName>iris::rotor_0_joint</jointName>
-          <linkName>iris::rotor_0</linkName>
-          <turningDirection>ccw</turningDirection>
-          <motorNumber>0</motorNumber>
-          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
-        </rotor>
-        <rotor id="1">
-          <vel_p_gain>0.2</vel_p_gain>
-          <vel_i_gain>0</vel_i_gain>
-          <vel_d_gain>0</vel_d_gain>
-          <vel_i_max>0</vel_i_max>
-          <vel_i_min>0</vel_i_min>
-          <vel_cmd_max>2.0</vel_cmd_max>
-          <vel_cmd_min>-2.0</vel_cmd_min>
-          <jointName>iris::rotor_1_joint</jointName>
-          <linkName>iris::rotor_1</linkName>
-          <turningDirection>ccw</turningDirection>
-          <motorNumber>1</motorNumber>
-          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
-        </rotor>
-        <rotor id="2">
-          <vel_p_gain>0.2</vel_p_gain>
-          <vel_i_gain>0</vel_i_gain>
-          <vel_d_gain>0</vel_d_gain>
-          <vel_i_max>0</vel_i_max>
-          <vel_i_min>0</vel_i_min>
-          <vel_cmd_max>2.0</vel_cmd_max>
-          <vel_cmd_min>-2.0</vel_cmd_min>
-          <jointName>iris::rotor_2_joint</jointName>
-          <linkName>iris::rotor_2</linkName>
-          <turningDirection>cw</turningDirection>
-          <motorNumber>2</motorNumber>
-          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
-        </rotor>
-        <rotor id="3">
-          <vel_p_gain>0.2</vel_p_gain>
-          <vel_i_gain>0</vel_i_gain>
-          <vel_d_gain>0</vel_d_gain>
-          <vel_i_max>0</vel_i_max>
-          <vel_i_min>0</vel_i_min>
-          <vel_cmd_max>2.0</vel_cmd_max>
-          <vel_cmd_min>-2.0</vel_cmd_min>
-          <jointName>iris::rotor_3_joint</jointName>
-          <linkName>iris::rotor_3</linkName>
-          <turningDirection>cw</turningDirection>
-          <motorNumber>3</motorNumber>
-          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
-        </rotor>
-      </plugin>
     </model>
 
     <model name="irlock_beacon_01">
       <pose>1.0 -1.0 0.005 0 0 0</pose>
       <link name="link">
+         <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>3.0</mass>
+          <inertia>
+            <ixx>0.019</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.1 0.1 0.02</size>
+              <size>1.0 1.0 0.02</size>
             </box>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1e+12</kp>
+                <kd>1</kd>
+                <max_vel>10</max_vel>
+                <min_depth>0.003</min_depth>
+              </ode>
+            </contact>
+          </surface>
         </collision>
+        <visual name="visual2">
+          <geometry>
+            <box>
+              <size>1.0 1.0 0.018</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
         <visual name="visual">
           <geometry>
             <box>

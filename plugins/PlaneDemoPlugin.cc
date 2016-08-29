@@ -15,12 +15,10 @@
  *
 */
 
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/common/PID.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/PlaneDemoPlugin.hh"
 
@@ -28,15 +26,122 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(PlaneDemoPlugin)
 
+/// \brief Joint controller
+struct JointControl
+{
+  /// \brief Pointer to the joint controlled by JointControl
+  public: physics::JointPtr joint;
+
+  /// \brief PID command
+  public: double cmd;
+
+  /// \brief Amount to increment the joint angle by on each update
+  public: double incVal;
+
+  /// \brief Key for increasing the joint angle
+  public: int incKey;
+
+  /// \brief Key for decreasing the joint angle
+  public: int decKey;
+
+  /// \brief PID controller
+  public: common::PID pid;
+};
+
+/// \brief Engine torque controller
+struct EngineControl
+{
+  /// \brief Pointer to the joint controlled by EngineControl
+  public: physics::JointPtr joint;
+
+  /// \brief Max torque that can be applied to joint
+  public: double maxTorque;
+
+  /// \brief Key for increasing the engine torque
+  public: int incKey;
+
+  /// \brief Key for descreasing the engine torque
+  public: int decKey;
+
+  /// \brief Amount to increment the engine torque by on each update
+  public: double incVal;
+
+  /// \brief Torque applied to engine joint
+  public: double torque;
+};
+
+/// \brief Thruster force controller
+struct ThrusterControl
+{
+  /// \brief Link controlled by ThrusterControl
+  public: physics::LinkPtr link;
+
+  /// \brief Key for increasing the thruster force
+  public: int incKey;
+
+  /// \brief Key for decreasing the thruster force
+  public: int decKey;
+
+  /// \brief Amount to increment the engine torque by on each update
+  public: ignition::math::Vector3d incVal;
+
+  /// \brief Force applied to the thruster link
+  public: ignition::math::Vector3d force;
+};
+
+/// \brief Private data class
+class gazebo::PlaneDemoPluginPrivate
+{
+  /// \brief Callback when a keyboard message is received.
+  /// \param[in] _msg Message containing the key press value.
+  public: void OnKeyHit(ConstAnyPtr &_msg);
+
+  /// \brief Connection to World Update events.
+  public: event::ConnectionPtr updateConnection;
+
+  /// \brief Pointer to world.
+  public: physics::WorldPtr world;
+
+  /// \brief Pointer to physics engine.
+  public: physics::PhysicsEnginePtr physics;
+
+  /// \brief Pointer to model containing plugin.
+  public: physics::ModelPtr model;
+
+  /// \brief SDF for this plugin;
+  public: sdf::ElementPtr sdf;
+
+  /// \brief A list of controls for the engine
+  public: std::vector<EngineControl> engineControls;
+
+  /// \brief A list of controls for the thruster
+  public: std::vector<ThrusterControl> thrusterControls;
+
+  /// \brief A list of controls for the joint
+  public: std::vector<JointControl> jointControls;
+
+  /// \brief Last update sim time
+  public: common::Time lastUpdateTime;
+
+  /// \brief Mutex to protect updates
+  public: std::mutex mutex;
+
+  /// \brief Pointer to a node for communication.
+  public: transport::NodePtr gzNode;
+
+  /// \brief State subscriber.
+  public: transport::SubscriberPtr keyboardSub;
+};
+
 /////////////////////////////////////////////////
 PlaneDemoPlugin::PlaneDemoPlugin()
+  : dataPtr(new PlaneDemoPluginPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 PlaneDemoPlugin::~PlaneDemoPlugin()
 {
-  this->stop = true;
 }
 
 /////////////////////////////////////////////////
@@ -44,21 +149,21 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "PlaneDemoPlugin _model pointer is NULL");
-  this->model = _model;
-  this->modelName = _model->GetName();
-  this->sdf = _sdf;
+  this->dataPtr->model = _model;
+  this->dataPtr->sdf = _sdf;
 
-  this->world = this->model->GetWorld();
-  GZ_ASSERT(this->world, "PlaneDemoPlugin world pointer is NULL");
+  this->dataPtr->world = this->dataPtr->model->GetWorld();
+  GZ_ASSERT(this->dataPtr->world, "PlaneDemoPlugin world pointer is NULL");
 
-  this->physics = this->world->GetPhysicsEngine();
-  GZ_ASSERT(this->physics, "PlaneDemoPlugin physics pointer is NULL");
+  this->dataPtr->physics = this->dataPtr->world->GetPhysicsEngine();
+  GZ_ASSERT(this->dataPtr->physics, "PlaneDemoPlugin physics pointer is NULL");
 
   GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
 
-  gzerr << "model: " << this->model->GetName() << "\n";
+  gzdbg << "using model: " << this->dataPtr->model->GetName() << "\n";
 
   // get engine controls
+  gzdbg << "loading engines.\n";
   if (_sdf->HasElement("engine"))
   {
     sdf::ElementPtr enginePtr = _sdf->GetElement("engine");
@@ -67,8 +172,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
       if (enginePtr->HasElement("joint_name"))
       {
         std::string jointName = enginePtr->Get<std::string>("joint_name");
-        gzerr << jointName << "\n";
-        physics::JointPtr joint = this->model->GetJoint(jointName);
+        physics::JointPtr joint = this->dataPtr->model->GetJoint(jointName);
         if (joint.get() != NULL)
         {
           EngineControl ec;
@@ -83,7 +187,13 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           if (enginePtr->HasElement("inc_val"))
             ec.incVal = enginePtr->Get<double>("inc_val");
           ec.torque = 0;
-          this->engineControls.push_back(ec);
+          this->dataPtr->engineControls.push_back(ec);
+          gzdbg << "joint [" << jointName << "] controlled by keyboard"
+                << " t[" << ec.maxTorque
+                << "] +[" << ec.incKey
+                << "] -[" << ec.decKey
+                << "] d[" << ec.incVal
+                << "].\n";
         }
       }
       // get next element
@@ -92,6 +202,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   }
 
   // get thruster controls
+  gzdbg << "loading thrusters.\n";
   if (_sdf->HasElement("thruster"))
   {
     sdf::ElementPtr thrusterPtr = _sdf->GetElement("thruster");
@@ -100,8 +211,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
       if (thrusterPtr->HasElement("link_name"))
       {
         std::string linkName = thrusterPtr->Get<std::string>("link_name");
-        gzerr << linkName << "\n";
-        physics::LinkPtr link = this->model->GetLink(linkName);
+        physics::LinkPtr link = this->dataPtr->model->GetLink(linkName);
         if (link.get() != NULL)
         {
           ThrusterControl tc;
@@ -112,9 +222,9 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           if (thrusterPtr->HasElement("dec_key"))
             tc.decKey = thrusterPtr->Get<int>("dec_key");
           if (thrusterPtr->HasElement("inc_val"))
-            tc.incVal = thrusterPtr->Get<math::Vector3>("inc_val");
-          tc.force = math::Vector3();
-          this->thrusterControls.push_back(tc);
+            tc.incVal = thrusterPtr->Get<ignition::math::Vector3d>("inc_val");
+          tc.force = ignition::math::Vector3d::Zero;
+          this->dataPtr->thrusterControls.push_back(tc);
         }
       }
       // get next element
@@ -123,14 +233,14 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   }
 
   // get controls
+  gzdbg << "loading controls.\n";
   sdf::ElementPtr controlPtr = _sdf->GetElement("control");
   while (controlPtr)
   {
     if (controlPtr->HasElement("joint_name"))
     {
       std::string jointName = controlPtr->Get<std::string>("joint_name");
-      gzerr << jointName << "\n";
-      physics::JointPtr joint = this->model->GetJoint(jointName);
+      physics::JointPtr joint = this->dataPtr->model->GetJoint(jointName);
       if (joint.get() != NULL)
       {
         JointControl jc;
@@ -142,27 +252,34 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           jc.decKey = controlPtr->Get<int>("dec_key");
         if (controlPtr->HasElement("inc_val"))
           jc.incVal = controlPtr->Get<double>("inc_val");
+
         double p, i, d, iMax, iMin, cmdMax, cmdMin;
+
         if (controlPtr->HasElement("p"))
           p = controlPtr->Get<double>("p");
         else
           p = 0.0;
+
         if (controlPtr->HasElement("i"))
           i = controlPtr->Get<double>("i");
         else
           i = 0.0;
+
         if (controlPtr->HasElement("d"))
           d = controlPtr->Get<double>("d");
         else
           d = 0.0;
+
         if (controlPtr->HasElement("i_max"))
           iMax = controlPtr->Get<double>("i_max");
         else
           iMax = 0.0;
+
         if (controlPtr->HasElement("i_min"))
           iMin = controlPtr->Get<double>("i_min");
         else
           iMin = 0.0;
+
         if (controlPtr->HasElement("cmd_max"))
           cmdMax = controlPtr->Get<double>("cmd_max");
         else
@@ -174,146 +291,158 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         jc.pid.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
         jc.cmd = joint->GetAngle(0).Radian();
         jc.pid.SetCmd(jc.cmd);
-        this->jointControls.push_back(jc);
+        this->dataPtr->jointControls.push_back(jc);
       }
     }
     // get next element
     controlPtr = controlPtr->GetNextElement("control");
+    // gzdbg << controlPtr << "\n";
   }
+
+  // Initialize transport.
+  this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
+  this->dataPtr->gzNode->Init();
+  this->dataPtr->keyboardSub = this->dataPtr->gzNode->Subscribe<msgs::Any>(
+    "~/keyboard/keypress", &PlaneDemoPluginPrivate::OnKeyHit,
+    this->dataPtr.get());
+  gzdbg << "Load done.\n";
 }
 
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::Init()
 {
-  this->lastUpdateTime = this->world->GetSimTime();
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->dataPtr->lastUpdateTime = this->dataPtr->world->GetSimTime();
+  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
           std::bind(&PlaneDemoPlugin::OnUpdate, this));
-  this->keyHitThread =
-    new std::thread(std::bind(&PlaneDemoPlugin::OnKeyHit, this));
-  this->stop = false;
-}
-
-/////////////////////////////////////////////////
-void PlaneDemoPlugin::OnKeyHit()
-{
-  char ch='x';
-  ch = getchar();
-  while (!this->stop)
-  {
-    std::lock_guard<std::mutex> lock(this->mutex);
-    printf("you hit");
-    printf(" '%c'(%i)", isprint(ch)?ch:'?', static_cast<int>(ch));
-    // puts("");
-
-    for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
-      ei != this->engineControls.end(); ++ei)
-    {
-      if (static_cast<int>(ch) == ei->incKey)
-      {
-        // spin up motor
-        ei->torque += ei->incVal;
-        gzerr << "torque: " << ei->torque << "\n";
-      }
-      else if (static_cast<int>(ch) == ei->decKey)
-      {
-        ei->torque -= ei->incVal;
-        gzerr << "torque: " << ei->torque << "\n";
-      }
-      else
-      {
-        // ungetc( ch, stdin );
-        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
-      }
-    }
-
-    for (std::vector<ThrusterControl>::iterator
-      ti = this->thrusterControls.begin();
-      ti != this->thrusterControls.end(); ++ti)
-    {
-      if (static_cast<int>(ch) == ti->incKey)
-      {
-        // spin up motor
-        ti->force += ti->incVal;
-        gzerr << "force: " << ti->force << "\n";
-      }
-      else if (static_cast<int>(ch) == ti->decKey)
-      {
-        ti->force -= ti->incVal;
-        gzerr << "force: " << ti->force << "\n";
-      }
-      else
-      {
-        // ungetc( ch, stdin );
-        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
-      }
-    }
-
-    for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
-      ji != this->jointControls.end(); ++ji)
-    {
-      if (static_cast<int>(ch) == ji->incKey)
-      {
-        // spin up motor
-        ji->cmd += ji->incVal;
-        ji->pid.SetCmd(ji->cmd);
-        gzerr << ji->joint->GetName()
-              << " cur: " << ji->joint->GetAngle(0).Radian()
-              << " cmd: " << ji->cmd << "\n";
-      }
-      else if (static_cast<int>(ch) == ji->decKey)
-      {
-        ji->cmd -= ji->incVal;
-        ji->pid.SetCmd(ji->cmd);
-        gzerr << ji->joint->GetName()
-              << " cur: " << ji->joint->GetAngle(0).Radian()
-              << " cmd: " << ji->cmd << "\n";
-      }
-      else if (static_cast<int>(ch) == 99)  // 'c' resets all control surfaces
-      {
-        ji->cmd = 0;
-        ji->pid.SetCmd(ji->cmd);
-        gzerr << ji->joint->GetName()
-              << " cur: " << ji->joint->GetAngle(0).Radian()
-              << " cmd: " << ji->cmd << "\n";
-      }
-      else
-      {
-        // ungetc( ch, stdin );
-        // gzerr << (int)ch << " : " << this->clIncKey << "\n";
-      }
-    }
-  }
+  gzdbg << "Init done.\n";
 }
 
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
+  // gzdbg << "executing OnUpdate.\n";
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    common::Time curTime = this->dataPtr->world->GetSimTime();
+    for (std::vector<EngineControl>::iterator ei =
+        this->dataPtr->engineControls.begin();
+        ei != this->dataPtr->engineControls.end(); ++ei)
+    {
+      // spin up engine
+      ei->joint->SetForce(0, ei->torque);
+    }
+
+    for (std::vector<ThrusterControl>::iterator
+      ti = this->dataPtr->thrusterControls.begin();
+      ti != this->dataPtr->thrusterControls.end(); ++ti)
+    {
+      // fire up thruster
+      math::Pose pose = ti->link->GetWorldPose();
+      ti->link->AddForce(pose.rot.RotateVector(ti->force));
+    }
+
+    for (std::vector<JointControl>::iterator ji =
+        this->dataPtr->jointControls.begin();
+        ji != this->dataPtr->jointControls.end(); ++ji)
+    {
+      // spin up joint control
+      double pos = ji->joint->GetAngle(0).Radian();
+      double error = pos - ji->cmd;
+      double force = ji->pid.Update(error,
+          curTime - this->dataPtr->lastUpdateTime);
+      ji->joint->SetForce(0, force);
+    }
+    this->dataPtr->lastUpdateTime = curTime;
+  }
+}
+
+/////////////////////////////////////////////////
+void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
+{
   std::lock_guard<std::mutex> lock(this->mutex);
-  common::Time curTime = this->world->GetSimTime();
+
+  // gzdbg << "executing OnKeyHit.\n";
+  char ch =_msg->int_value();
+  gzdbg << "keyhit [" << ch
+        << "] num [" << _msg->int_value() << "]\n";
+
   for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
     ei != this->engineControls.end(); ++ei)
   {
-    // spin up engine
-    ei->joint->SetForce(0, ei->torque);
+    if (static_cast<int>(ch) == ei->incKey)
+    {
+      // spin up motor
+      ei->torque += ei->incVal;
+      gzerr << "torque: " << ei->torque << "\n";
+    }
+    else if (static_cast<int>(ch) == ei->decKey)
+    {
+      ei->torque -= ei->incVal;
+      gzerr << "torque: " << ei->torque << "\n";
+    }
+    else
+    {
+      // ungetc( ch, stdin );
+      // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+    }
   }
 
   for (std::vector<ThrusterControl>::iterator
     ti = this->thrusterControls.begin();
     ti != this->thrusterControls.end(); ++ti)
   {
-    // fire up thruster
-    math::Pose pose = ti->link->GetWorldPose();
-    ti->link->AddForce(pose.rot.RotateVector(ti->force));
+    if (static_cast<int>(ch) == ti->incKey)
+    {
+      // spin up motor
+      ti->force += ti->incVal;
+      gzerr << "force: " << ti->force << "\n";
+    }
+    else if (static_cast<int>(ch) == ti->decKey)
+    {
+      ti->force -= ti->incVal;
+      gzerr << "force: " << ti->force << "\n";
+    }
+    else
+    {
+      // ungetc( ch, stdin );
+      // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+    }
   }
 
-  for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
+  for (std::vector<JointControl>::iterator
+    ji = this->jointControls.begin();
     ji != this->jointControls.end(); ++ji)
   {
-    // spin up joint control
-    double pos = ji->joint->GetAngle(0).Radian();
-    double error = pos - ji->cmd;
-    double force = ji->pid.Update(error, curTime - this->lastUpdateTime);
-    ji->joint->SetForce(0, force);
+    if (static_cast<int>(ch) == ji->incKey)
+    {
+      // spin up motor
+      ji->cmd += ji->incVal;
+      ji->pid.SetCmd(ji->cmd);
+      gzerr << ji->joint->GetName()
+            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cmd: " << ji->cmd << "\n";
+    }
+    else if (static_cast<int>(ch) == ji->decKey)
+    {
+      ji->cmd -= ji->incVal;
+      ji->pid.SetCmd(ji->cmd);
+      gzerr << ji->joint->GetName()
+            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cmd: " << ji->cmd << "\n";
+    }
+    else if (static_cast<int>(ch) == 99)  // 'c' resets all control surfaces
+    {
+      ji->cmd = 0;
+      ji->pid.SetCmd(ji->cmd);
+      gzerr << ji->joint->GetName()
+            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cmd: " << ji->cmd << "\n";
+    }
+    else
+    {
+      // ungetc( ch, stdin );
+      // gzerr << (int)ch << " : " << this->clIncKey << "\n";
+    }
   }
-  this->lastUpdateTime = curTime;
+  usleep(500);
 }

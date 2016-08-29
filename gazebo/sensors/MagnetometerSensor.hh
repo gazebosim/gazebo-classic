@@ -23,7 +23,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
 

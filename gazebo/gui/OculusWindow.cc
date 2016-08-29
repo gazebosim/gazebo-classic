@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include <boost/bind.hpp>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/gui/OculusWindow.hh"
 #include "gazebo/rendering/OculusCamera.hh"
@@ -54,7 +54,7 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
   renderLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(renderLayout);
-  this->attachCameraThread = NULL;
+  this->attachCameraThread = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -101,7 +101,7 @@ void OculusWindow::AttachCameraToVisual()
 {
   if (!this->scene)
   {
-    gzerr << "OculusWindow::AttachCameraToVisual(): Scene is NULL" << std::endl;
+    gzerr << "OculusWindow::AttachCameraToVisual(): Scene is null" << std::endl;
     return;
   }
   int tries = 0;
@@ -120,15 +120,16 @@ void OculusWindow::AttachCameraToVisual()
 
   this->oculusCamera->AttachToVisual(this->visualName, true, 0, 0);
 
-  math::Vector3 camPos(0.1, 0, 0);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(0.1, 0, 0);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  auto delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y, delta.x);
+  double yaw = atan2(delta.Y(), delta.X());
 
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
+  double pitch = atan2(-delta.Z(),
+      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
 
-  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(camPos.Ign(),
+  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(camPos,
       ignition::math::Quaterniond(0.0, pitch, yaw)));
 }
 
@@ -138,7 +139,7 @@ bool OculusWindow::CreateCamera()
   this->scene = rendering::get_scene();
 
   if (!this->scene)
-    gzerr << "Unable to create an oculus camera, scene is NULL" << std::endl;
+    gzerr << "Unable to create an oculus camera, scene is null" << std::endl;
 
   this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
   return this->oculusCamera->Ready();
@@ -148,8 +149,8 @@ bool OculusWindow::CreateCamera()
 void OculusWindow::showEvent(QShowEvent *_event)
 {
   if (this->oculusCamera)
-    this->attachCameraThread = new boost::thread(
-        boost::bind(&OculusWindow::AttachCameraToVisual, this));
+    this->attachCameraThread = new std::thread(
+        std::bind(&OculusWindow::AttachCameraToVisual, this));
 
   if (this->windowId == -1)
   {
