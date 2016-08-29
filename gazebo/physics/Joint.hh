@@ -583,7 +583,7 @@ namespace gazebo
       /// time by Joint::SetInitialPosition.
       /// \param[in] _index joint axis index.
       /// \return joint's initial position.
-      public: math::Angle InitialPosition(unsigned int _index);
+      public: ignition::math::Angle InitialPosition(unsigned int _index);
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -678,7 +678,7 @@ namespace gazebo
       protected: math::Angle upperLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint initial position
-      protected: math::Angle initialPosition[MAX_JOINT_AXIS];
+      protected: ignition::math::Angle initialPosition[MAX_JOINT_AXIS];
 
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.

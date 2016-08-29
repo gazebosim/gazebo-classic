@@ -1537,7 +1537,7 @@ void Joint::SetInitialPosition(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-math::Angle Joint::InitialPosition(unsigned int _index)
+ignition::math::Angle Joint::InitialPosition(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
