@@ -58,7 +58,7 @@ namespace gazebo
 
     /// \brief Update the control surfaces controllers.
     /// \param[in] _info Update information provided by the server.
-    private: void OnUpdate(const common::UpdateInfo &_info);
+    private: void OnUpdate();
 
     /// \brief Update PID Joint controllers.
     /// \param[in] _dt time step size since last update.
