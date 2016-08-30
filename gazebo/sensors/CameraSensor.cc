@@ -169,6 +169,10 @@ void CameraSensor::Fini()
 {
   this->imagePub.reset();
 
+  // remove the plugins before the camera as we do not want the plugins
+  // to be using a null camera
+  this->plugins.clear();
+
   if (this->camera)
   {
     this->scene->RemoveCamera(this->camera->Name());
@@ -324,4 +328,3 @@ void CameraSensor::SetRendered(const bool _value)
 {
   this->dataPtr->rendered = _value;
 }
-
