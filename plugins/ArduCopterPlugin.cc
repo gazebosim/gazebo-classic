@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <functional>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -420,13 +421,13 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&ArduCopterPlugin::OnUpdate, this, _1));
+      std::bind(&ArduCopterPlugin::OnUpdate, this));
 
   gzlog << "ArduCopter ready to fly. The force will be with you" << std::endl;
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
+void ArduCopterPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
