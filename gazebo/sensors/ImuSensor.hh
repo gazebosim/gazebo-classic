@@ -62,11 +62,6 @@ namespace gazebo
 
       /// \brief Returns the imu message
       /// \return Imu message.
-      /// \deprecated See ImuMessage()
-      public: msgs::IMU GetImuMessage() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns the imu message
-      /// \return Imu message.
       public: msgs::IMU ImuMessage() const;
 
       /// \brief Returns the angular velocity in the IMU sensor local frame.

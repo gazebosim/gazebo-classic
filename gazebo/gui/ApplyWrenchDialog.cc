@@ -398,9 +398,6 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 ApplyWrenchDialog::~ApplyWrenchDialog()
 {
   this->Fini();
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -440,7 +437,9 @@ void ApplyWrenchDialog::Fini()
     this->dataPtr->mainWindow->removeEventFilter(this);
 
   this->dataPtr->userCmdPub.reset();
-  this->dataPtr->node->Fini();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
   this->dataPtr->connections.clear();
 
   if (this->dataPtr->applyWrenchVisual)
@@ -751,7 +750,7 @@ void ApplyWrenchDialog::ToggleComRadio(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, double _value)
+void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, const double _value)
 {
   _spin->blockSignals(true);
   _spin->setValue(_value);

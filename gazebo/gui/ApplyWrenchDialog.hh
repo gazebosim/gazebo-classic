@@ -18,6 +18,7 @@
 #ifndef GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
 #define GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
 
+#include <memory>
 #include <string>
 #include <ignition/math/Vector3.hh>
 
@@ -147,7 +148,7 @@ namespace gazebo
       /// avoid recursion loops.
       /// \param[in] _spin Spin whose value will be changed.
       /// \param[in] _value New value.
-      private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
+      private: void SetSpinValue(QDoubleSpinBox *_spin, const double _value);
 
       /// \brief Set force position vector, send it to visuals and update spins.
       /// \param[in] _forcePos New force position.
@@ -215,7 +216,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ApplyWrenchDialogPrivate *dataPtr;
+      private: std::unique_ptr<ApplyWrenchDialogPrivate> dataPtr;
     };
     /// \}
   }

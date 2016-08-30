@@ -41,18 +41,6 @@ FrictionPyramid::~FrictionPyramid()
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetMuPrimary()
-{
-  return this->Mu(0);
-}
-
-//////////////////////////////////////////////////
-double FrictionPyramid::GetMuSecondary()
-{
-  return this->Mu(1);
-}
-
-//////////////////////////////////////////////////
 double FrictionPyramid::MuPrimary() const
 {
   return this->Mu(0);
@@ -247,12 +235,6 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->collideWithoutContactBitmask = _msg.collide_without_contact_bitmask();
   if (_msg.has_collide_bitmask())
     this->collideBitmask = _msg.collide_bitmask();
-}
-
-/////////////////////////////////////////////////
-FrictionPyramidPtr SurfaceParams::GetFrictionPyramid() const
-{
-  return FrictionPyramidPtr();
 }
 
 /////////////////////////////////////////////////

@@ -17,10 +17,13 @@
 #ifndef GAZEBO_GUI_APPLYWRENCHDIALOGPRIVATE_HH_
 #define GAZEBO_GUI_APPLYWRENCHDIALOGPRIVATE_HH_
 
-#include <string>
-#include <vector>
 #include <map>
 #include <mutex>
+#include <string>
+#include <vector>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/ApplyWrenchDialog.hh"

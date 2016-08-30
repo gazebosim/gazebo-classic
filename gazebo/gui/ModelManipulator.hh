@@ -14,10 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MODEL_MANIPULATOR_HH_
-#define _GAZEBO_GUI_MODEL_MANIPULATOR_HH_
+#ifndef GAZEBO_GUI_MODELMANIPULATOR_HH_
+#define GAZEBO_GUI_MODELMANIPULATOR_HH_
 
+#include <memory>
 #include <string>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/math/Vector3.hh"
@@ -246,7 +250,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ModelManipulatorPrivate *dataPtr;
+      private: std::unique_ptr<ModelManipulatorPrivate> dataPtr;
     };
   }
 }

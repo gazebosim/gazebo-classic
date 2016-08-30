@@ -46,31 +46,30 @@ using namespace gui;
 ModelManipulator::ModelManipulator()
   : dataPtr(new ModelManipulatorPrivate)
 {
-  this->dataPtr->manipMode = "";
-  this->dataPtr->globalManip = false;
-  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
 ModelManipulator::~ModelManipulator()
 {
   this->Clear();
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void ModelManipulator::Clear()
 {
+  this->dataPtr->userCmdPub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
   if (this->dataPtr->selectionObj)
     this->dataPtr->selectionObj->Fini();
-
-  this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
-  this->dataPtr->userCamera.reset();
-  this->dataPtr->scene.reset();
-  this->dataPtr->node.reset();
   this->dataPtr->mouseMoveVis.reset();
+
+  this->dataPtr->scene.reset();
+  this->dataPtr->userCamera.reset();
+
   this->dataPtr->mouseChildVisualScale.clear();
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
@@ -710,7 +709,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
     // If the root visual's ID can be found, it is a model in the main window
-    // TODO gui::get_entity_id always return 0 in QTestFixture due to NULL
+    // TODO gui::get_entity_id always return 0 in QTestFixture due to nullptr
     // g_main_win
     if (gui::get_entity_id(rootVis->GetName()))
     {
@@ -1062,7 +1061,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   // Rotate the visual using the middle mouse button
   if (this->dataPtr->mouseEvent.buttons == common::MouseEvent::MIDDLE)
   {
-    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().GetAsEuler();
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
     double yaw = (delta.X() * 0.01) + rpy.Z();
@@ -1078,7 +1077,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   }
   else if (this->dataPtr->mouseEvent.buttons == common::MouseEvent::RIGHT)
   {
-    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().GetAsEuler();
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
     double pitch = (delta.Y() * 0.01) + rpy.Y();
@@ -1096,7 +1095,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
   else if (this->dataPtr->mouseEvent.buttons & common::MouseEvent::LEFT &&
            this->dataPtr->mouseEvent.buttons & common::MouseEvent::RIGHT)
   {
-    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().GetAsEuler();
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
     double roll = (delta.X() * 0.01) + rpy.X();
