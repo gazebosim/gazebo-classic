@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Removed deprecations
+    * [Pull request #2427]((https://bitbucket.org/osrf/gazebo/pull-request/2427)
+
 1. Include basic support for GNU Precompiled Headers to reduce compile time
     * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
 

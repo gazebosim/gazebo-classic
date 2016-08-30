@@ -287,12 +287,6 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetScale(const math::Vector3 &_scale)
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set the scale of model.
-      /// \param[in] _scale Scale to set the model to.
       /// \param[in] _publish True to publish a message for the client with the
       /// new scale.
       /// \sa ignition::math::Vector3d Scale() const
