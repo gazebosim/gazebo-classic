@@ -397,14 +397,18 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Get sensors
   std::string imuName;
   getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
-  this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
-    (sensors::SensorManager::Instance()->GetSensor(
-      this->dataPtr->model->GetWorld()->GetName()
+  std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
       + "::" + this->dataPtr->model->GetScopedName()
-      + "::" + imuName));
+      + "::" + imuName;
+  this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
+    (sensors::SensorManager::Instance()->GetSensor(imuScopedName));
 
   if (!this->dataPtr->imuSensor)
-    gzerr << "imu_sensor not found\n" << "\n";
+  {
+    gzerr << "imu_sensor [" << imuScopedName
+          << "] not found, abort ArduCopter plugin.\n" << "\n";
+    return;
+  }
 
   // Controller time control.
   this->dataPtr->lastControllerUpdateTime = 0;
