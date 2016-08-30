@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_SNAP_PRIVATE_HH_
-#define _MODEL_SNAP_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MODELSNAPPRIVATE_HH_
+#define GAZEBO_GUI_MODELSNAPPRIVATE_HH_
 
 #include <string>
-#include <vector>
+#include <ignition/math/Triangle3.hh>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -57,11 +57,11 @@ namespace gazebo
       /// \brief True if the model align tool is initialized.
       public: bool initialized;
 
-      /// \brief Vertices of a mesh triangle used as the basis for alignment.
-      public: std::vector<math::Vector3> selectedTriangle;
+      /// \brief A mesh triangle used as the basis for alignment.
+      public: ignition::math::Triangle3d selectedTriangle;
 
-      /// \brief Vertices of a mesh triangle being hovered.
-      public: std::vector<math::Vector3> hoverTriangle;
+      /// \brief A mesh triangle being hovered.
+      public: ignition::math::Triangle3d hoverTriangle;
 
       /// \brief Currently selected visual.
       public: rendering::VisualPtr selectedVis;

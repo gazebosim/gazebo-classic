@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
-#define _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
+#ifndef GAZEBO_GUI_APPLYWRENCHDIALOGPRIVATE_HH_
+#define GAZEBO_GUI_APPLYWRENCHDIALOGPRIVATE_HH_
 
 #include <string>
 #include <vector>
@@ -24,6 +24,8 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -88,16 +90,16 @@ namespace gazebo
       public: QDoubleSpinBox *torqueZSpin;
 
       /// \brief CoM coordinates in link frame.
-      public: math::Vector3 comVector;
+      public: ignition::math::Vector3d comVector;
 
       /// \brief Force position coordinates in link frame.
-      public: math::Vector3 forcePosVector;
+      public: ignition::math::Vector3d forcePosVector;
 
       /// \brief Force vector.
-      public: math::Vector3 forceVector;
+      public: ignition::math::Vector3d forceVector;
 
       /// \brief Torque vector.
-      public: math::Vector3 torqueVector;
+      public: ignition::math::Vector3d torqueVector;
 
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
@@ -110,7 +112,7 @@ namespace gazebo
       public: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Map link name to link CoM vector.
-      public: std::map<std::string, math::Vector3> linkToCOMMap;
+      public: std::map<std::string, ignition::math::Vector3d> linkToCOMMap;
 
       /// \brief Interactive visual which represents the wrench to be applied.
       public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
@@ -121,7 +123,7 @@ namespace gazebo
 
       /// \brief World pose of the rotation tool the moment dragging
       /// started.
-      public: math::Pose dragStartPose;
+      public: ignition::math::Pose3d dragStartPose;
 
       /// \brief State of the manipulation tool, here only using "rot_y"
       /// and "rot_z".

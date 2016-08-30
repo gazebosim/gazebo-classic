@@ -45,6 +45,25 @@ RayQuery::~RayQuery()
 bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices)
 {
+  ignition::math::Vector3d intersect;
+  ignition::math::Triangle3d triangle;
+
+  auto result = this->SelectMeshTriangle(_x, _y, _visual, intersect, triangle);
+
+  _intersect = intersect;
+  _vertices.clear();
+  _vertices.push_back(triangle[0]);
+  _vertices.push_back(triangle[1]);
+  _vertices.push_back(triangle[2]);
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
+    const VisualPtr _visual, ignition::math::Vector3d &_intersect,
+    ignition::math::Triangle3d &_triangle)
+{
   // create the ray to test
   Ogre::Ray ray =
       this->dataPtr->camera->OgreCamera()->getCameraToViewportRay(
@@ -52,8 +71,7 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
       static_cast<float>(_y) / this->dataPtr->camera->ViewportHeight());
 
   std::vector<rendering::VisualPtr> visuals;
-  this->GetMeshVisuals(_visual, visuals);
-
+  this->MeshVisuals(_visual, visuals);
 
   Ogre::Real closestDistance = -1.0f;
   Ogre::Vector3 closestResult;
@@ -117,11 +135,11 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
   if (closestDistance >= 0.0f && vertices.size() == 3u)
   {
     // raycast success
-    _intersect = Conversions::Convert(closestResult);
-    _vertices.clear();
-    _vertices.push_back(Conversions::Convert(vertices[0]));
-    _vertices.push_back(Conversions::Convert(vertices[1]));
-    _vertices.push_back(Conversions::Convert(vertices[2]));
+    _intersect = Conversions::ConvertIgn(closestResult);
+    _triangle.Set(
+        Conversions::ConvertIgn(vertices[0]),
+        Conversions::ConvertIgn(vertices[1]),
+        Conversions::ConvertIgn(vertices[2]));
     return true;
   }
   // raycast failed
@@ -129,7 +147,7 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 }
 
 /////////////////////////////////////////////////
-void RayQuery::GetMeshVisuals(rendering::VisualPtr _visual,
+void RayQuery::MeshVisuals(const rendering::VisualPtr _visual,
     std::vector<rendering::VisualPtr> &_visuals)
 {
   if (!_visual->GetMeshName().empty() &&
@@ -137,5 +155,5 @@ void RayQuery::GetMeshVisuals(rendering::VisualPtr _visual,
     _visuals.push_back(_visual);
 
   for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
-    this->GetMeshVisuals(_visual->GetChild(i), _visuals);
+    this->MeshVisuals(_visual->GetChild(i), _visuals);
 }

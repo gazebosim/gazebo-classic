@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MANIPULATOR_PRIVATE_HH_
-#define _MODEL_MANIPULATOR_PRIVATE_HH_
+#ifndef GAZEBO_GUI__MODELMANIPULATORPRIVATE_HH_
+#define GAZEBO_GUI__MODELMANIPULATORPRIVATE_HH_
 
 #include <string>
 #include <vector>
@@ -42,10 +42,10 @@ namespace gazebo
       public: std::string manipMode;
 
       /// \brief Keep track of the mouse start pose before a move action.
-      public: math::Pose mouseMoveVisStartPose;
+      public: ignition::math::Pose3d mouseMoveVisStartPose;
 
       /// \brief Keep track of the mouse start screen position.
-      public: math::Vector2i mouseStart;
+      public: ignition::math::Vector2i mouseStart;
 
       /// \brief The current visual attached to the mouse.
       public: rendering::VisualPtr mouseMoveVis;
@@ -73,13 +73,13 @@ namespace gazebo
       public: bool initialized;
 
       /// \brief Scale of the visual attached to the mouse.
-      public: math::Vector3 mouseVisualScale;
+      public: ignition::math::Vector3d mouseVisualScale;
 
       /// \brief Scale of all the child visuals attached to the mouse.
-      public: std::vector<math::Vector3> mouseChildVisualScale;
+      public: std::vector<ignition::math::Vector3d> mouseChildVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      public: math::Box mouseVisualBbox;
+      public: ignition::math::Box mouseVisualBbox;
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip;

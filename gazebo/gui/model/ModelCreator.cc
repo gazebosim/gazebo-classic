@@ -2403,14 +2403,14 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   }
 
   auto pose = this->dataPtr->mouseVisual->GetWorldPose().Ign();
-  pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
-      userCamera, _event).Ign();
+  pose.Pos() = ModelManipulator::MousePositionOnPlane(
+      userCamera, _event);
 
   // there is a problem detecting control key from common::MouseEvent, so
   // check using Qt for now
   if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
-    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
+    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
   pose.Pos().Z(this->dataPtr->mouseVisual->GetWorldPose().Ign().Pos().Z());
 
@@ -2505,9 +2505,8 @@ void ModelCreator::OnPaste()
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (userCamera)
   {
-    ignition::math::Vector3d mousePosition =
-        ModelManipulator::GetMousePositionOnPlane(
-        userCamera, this->dataPtr->lastMouseEvent).Ign();
+    auto mousePosition = ModelManipulator::MousePositionOnPlane(
+        userCamera, this->dataPtr->lastMouseEvent);
     clonePose.Pos().X() = mousePosition.X();
     clonePose.Pos().Y() = mousePosition.Y();
   }

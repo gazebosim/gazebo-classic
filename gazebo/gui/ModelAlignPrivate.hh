@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_ALIGN_PRIVATE_HH_
-#define _MODEL_ALIGN_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MODELALIGNPRIVATE_HH_
+#define GAZEBO_GUI_MODELALIGNPRIVATE_HH_
 
 #include <string>
 #include <vector>
 #include <map>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -60,7 +61,8 @@ namespace gazebo
       public: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Original model pose used when user resets alignment.
-      public: std::map<rendering::VisualPtr, math::Pose> originalVisualPose;
+      public: std::map<rendering::VisualPtr, ignition::math::Pose3d>
+          originalVisualPose;
     };
   }
 }
