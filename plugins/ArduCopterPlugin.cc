@@ -416,7 +416,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ArduCopterPlugin::OnUpdate, this, _1));
+      std::bind(&ArduCopterPlugin::OnUpdate, this, _1));
 
   gzlog << "ArduCopter ready to fly. The force will be with you" << std::endl;
 }

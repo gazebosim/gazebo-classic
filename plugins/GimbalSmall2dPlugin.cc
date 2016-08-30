@@ -99,7 +99,7 @@ void GimbalSmall2dPlugin::Init()
       &GimbalSmall2dPluginPrivate::OnStringMsg, this->dataPtr.get());
 
   this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&GimbalSmall2dPlugin::OnUpdate, this)));
+          std::bind(&GimbalSmall2dPlugin::OnUpdate, this)));
 
   topic = std::string("~/") +
     this->dataPtr->model->GetName() + "/gimbal_tilt_status";
