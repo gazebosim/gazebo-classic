@@ -16,12 +16,11 @@ $ export PATH=/opt/gcc-arm-none-eabi-4_7-2014q2/bin:$PATH
 
 To start simulation, first run gazebo:
 
-gazebo worlds/iris_arducopter_demo.world
+$ gazebo worlds/iris_arducopter_demo.world
 
-Gazebo starts up paused in a black screen. To start simulation,
-setup ArduCopter and run below in a separate terminal:
+Start ArduCopter controller by running script below in a separate terminal:
 
-sim_vehicle.sh -j 4 -f Gazebo -S 100
+$ sim_vehicle.sh -j 4 -f Gazebo -S 100
 
 Note the speed up (-S) is set to a large number, as long as this number
 is higher than simulation RTF we are ok. This is becuase simulation
