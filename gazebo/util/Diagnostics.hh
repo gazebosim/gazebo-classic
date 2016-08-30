@@ -102,18 +102,7 @@ namespace gazebo
 
       /// \brief Get the number of timers
       /// \return The number of timers
-      /// \deprecated See TimerCount() const
-      public: int GetTimerCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the number of timers
-      /// \return The number of timers
       public: int TimerCount() const;
-
-      /// \brief Get the time of a timer instance
-      /// \param[in] _index The index of a timer instance
-      /// \return Time of the specified timer
-      /// \deprecated See Time(const int) const;
-      public: common::Time GetTime(int _index) const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the time of a timer instance
       /// \param[in] _index The index of a timer instance
@@ -123,30 +112,12 @@ namespace gazebo
       /// \brief Get a time based on a label
       /// \param[in] _label Name of the timer instance
       /// \return Time of the specified timer
-      /// \deprecated See Time(const std::string &_label) const
-      public: common::Time GetTime(const std::string &_label) const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a time based on a label
-      /// \param[in] _label Name of the timer instance
-      /// \return Time of the specified timer
       public: common::Time Time(const std::string &_label) const;
 
       /// \brief Get a label for a timer
       /// \param[in] _index Index of a timer instance
       /// \return Label of the specified timer
-      /// \deprecated See Label(const int) const
-      public: std::string GetLabel(int _index) const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a label for a timer
-      /// \param[in] _index Index of a timer instance
-      /// \return Label of the specified timer
       public: std::string Label(const int _index) const;
-
-      /// \brief Get the path in which logs are stored.
-      /// \return The path in which logs are stored.
-      /// \deprecated See LogPath() const
-      public: boost::filesystem::path GetLogPath() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the path in which logs are stored.
       /// \return The path in which logs are stored.
@@ -196,11 +167,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Stop();
-
-      /// \brief Get the name of the timer
-      /// \return The name of timer
-      /// \deprecated See Name() const
-      public: const std::string GetName() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the name of the timer
       /// \return The name of timer

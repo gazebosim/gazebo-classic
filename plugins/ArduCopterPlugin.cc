@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <functional>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -338,7 +340,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "rotorVelocitySlowdownSim",
           rotor.rotorVelocitySlowdownSim, 1);
 
-      if (math::equal(rotor.rotorVelocitySlowdownSim, 0.0))
+      if (ignition::math::equal(rotor.rotorVelocitySlowdownSim, 0.0))
       {
         gzerr << "rotor for joint [" << rotor.jointName
               << "] rotorVelocitySlowdownSim is zero,"
@@ -419,13 +421,13 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ArduCopterPlugin::OnUpdate, this, _1));
+      std::bind(&ArduCopterPlugin::OnUpdate, this));
 
   gzlog << "ArduCopter ready to fly. The force will be with you" << std::endl;
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
+void ArduCopterPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -498,7 +500,7 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     // Otherwise skip quickly and do not set control force.
     waitMs = 1;
   }
-  ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(pkt), waitMs);
+  ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(ServoPacket), waitMs);
   ssize_t expectedPktSize = sizeof(float)*this->dataPtr->rotors.size();
   if ((recvSize == -1) || (recvSize != expectedPktSize))
   {
@@ -507,7 +509,7 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     if (recvSize != -1)
     {
       gzerr << "got something weird: " << recvSize
-            << ", should be: " << sizeof(pkt) << "\n";
+            << ", should be: " << sizeof(ServoPacket) << "\n";
     }
 
     gazebo::common::Time::NSleep(100);

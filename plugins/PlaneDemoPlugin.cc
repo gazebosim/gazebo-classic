@@ -38,6 +38,12 @@ struct JointControl
   /// \brief Amount to increment the joint angle by on each update
   public: double incVal;
 
+  /// \brief Max joint angle command
+  public: double maxVal;
+
+  /// \brief Min joint angle command
+  public: double minVal;
+
   /// \brief Key for increasing the joint angle
   public: int incKey;
 
@@ -66,6 +72,12 @@ struct EngineControl
   /// \brief Amount to increment the engine torque by on each update
   public: double incVal;
 
+  /// \brief Max joint angle command
+  public: double maxVal;
+
+  /// \brief Min joint angle command
+  public: double minVal;
+
   /// \brief Torque applied to engine joint
   public: double torque;
 };
@@ -84,6 +96,12 @@ struct ThrusterControl
 
   /// \brief Amount to increment the engine torque by on each update
   public: ignition::math::Vector3d incVal;
+
+  /// \brief Max joint angle command
+  public: ignition::math::Vector3d maxVal;
+
+  /// \brief Min joint angle command
+  public: ignition::math::Vector3d minVal;
 
   /// \brief Force applied to the thruster link
   public: ignition::math::Vector3d force;
@@ -186,6 +204,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
             ec.decKey = enginePtr->Get<int>("dec_key");
           if (enginePtr->HasElement("inc_val"))
             ec.incVal = enginePtr->Get<double>("inc_val");
+          if (enginePtr->HasElement("max_val"))
+            ec.maxVal = enginePtr->Get<double>("max_val");
+          if (enginePtr->HasElement("min_val"))
+            ec.minVal = enginePtr->Get<double>("min_val");
           ec.torque = 0;
           this->dataPtr->engineControls.push_back(ec);
           gzdbg << "joint [" << jointName << "] controlled by keyboard"
@@ -193,6 +215,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
                 << "] +[" << ec.incKey
                 << "] -[" << ec.decKey
                 << "] d[" << ec.incVal
+                << "] max[" << ec.maxVal
+                << "] min[" << ec.minVal
                 << "].\n";
         }
       }
@@ -223,6 +247,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
             tc.decKey = thrusterPtr->Get<int>("dec_key");
           if (thrusterPtr->HasElement("inc_val"))
             tc.incVal = thrusterPtr->Get<ignition::math::Vector3d>("inc_val");
+          if (thrusterPtr->HasElement("max_val"))
+            tc.maxVal = thrusterPtr->Get<ignition::math::Vector3d>("max_val");
+          if (thrusterPtr->HasElement("min_val"))
+            tc.minVal = thrusterPtr->Get<ignition::math::Vector3d>("min_val");
           tc.force = ignition::math::Vector3d::Zero;
           this->dataPtr->thrusterControls.push_back(tc);
         }
@@ -252,6 +280,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           jc.decKey = controlPtr->Get<int>("dec_key");
         if (controlPtr->HasElement("inc_val"))
           jc.incVal = controlPtr->Get<double>("inc_val");
+        if (controlPtr->HasElement("max_val"))
+          jc.maxVal = controlPtr->Get<double>("max_val");
+        if (controlPtr->HasElement("min_val"))
+          jc.minVal = controlPtr->Get<double>("min_val");
 
         double p, i, d, iMax, iMin, cmdMax, cmdMin;
 
@@ -373,18 +405,18 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     {
       // spin up motor
       ei->torque += ei->incVal;
-      gzerr << "torque: " << ei->torque << "\n";
     }
     else if (static_cast<int>(ch) == ei->decKey)
     {
       ei->torque -= ei->incVal;
-      gzerr << "torque: " << ei->torque << "\n";
     }
     else
     {
       // ungetc( ch, stdin );
       // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
+    ei->torque = math::clamp(ei->torque, ei->minVal, ei->maxVal);
+    gzerr << "torque: " << ei->torque << "\n";
   }
 
   for (std::vector<ThrusterControl>::iterator
@@ -395,18 +427,20 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     {
       // spin up motor
       ti->force += ti->incVal;
-      gzerr << "force: " << ti->force << "\n";
     }
     else if (static_cast<int>(ch) == ti->decKey)
     {
       ti->force -= ti->incVal;
-      gzerr << "force: " << ti->force << "\n";
     }
     else
     {
       // ungetc( ch, stdin );
       // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
+    ti->force.X() = math::clamp(ti->force.X(), ti->minVal.X(), ti->maxVal.X());
+    ti->force.Y() = math::clamp(ti->force.Y(), ti->minVal.Y(), ti->maxVal.Y());
+    ti->force.Z() = math::clamp(ti->force.Z(), ti->minVal.Z(), ti->maxVal.Z());
+    gzerr << "force: " << ti->force << "\n";
   }
 
   for (std::vector<JointControl>::iterator
@@ -417,6 +451,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     {
       // spin up motor
       ji->cmd += ji->incVal;
+      ji->cmd = math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
             << " cur: " << ji->joint->GetAngle(0).Radian()
@@ -425,6 +460,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     else if (static_cast<int>(ch) == ji->decKey)
     {
       ji->cmd -= ji->incVal;
+      ji->cmd = math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
             << " cur: " << ji->joint->GetAngle(0).Radian()

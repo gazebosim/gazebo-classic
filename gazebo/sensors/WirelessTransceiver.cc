@@ -109,21 +109,9 @@ void WirelessTransceiver::Fini()
 }
 
 /////////////////////////////////////////////////
-double WirelessTransceiver::GetPower() const
-{
-  return this->Power();
-}
-
-/////////////////////////////////////////////////
 double WirelessTransceiver::Power() const
 {
   return this->power;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransceiver::GetGain() const
-{
-  return this->Gain();
 }
 
 /////////////////////////////////////////////////

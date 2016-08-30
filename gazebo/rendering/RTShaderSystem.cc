@@ -176,23 +176,6 @@ void RTShaderSystem::RemoveScene(const std::string &_scene)
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::AttachEntity(Visual * /*_vis*/)
-{
-  return;
-}
-
-//////////////////////////////////////////////////
-void RTShaderSystem::DetachEntity(Visual * /*_vis*/)
-{
-  return;
-}
-
-//////////////////////////////////////////////////
-void RTShaderSystem::Clear()
-{
-}
-
-//////////////////////////////////////////////////
 void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
@@ -227,13 +210,6 @@ void RTShaderSystem::UpdateShaders(VisualPtr _vis)
     for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
       this->UpdateShaders(_vis->GetChild(i));
   }
-}
-
-//////////////////////////////////////////////////
-void RTShaderSystem::GenerateShaders(Visual *_vis)
-{
-  VisualPtr vis(_vis);
-  this->GenerateShaders(vis);
 }
 
 //////////////////////////////////////////////////
