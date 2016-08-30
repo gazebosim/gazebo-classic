@@ -369,12 +369,6 @@ void DepthCamera::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-const float* DepthCamera::GetDepthData()
-{
-  return this->DepthData();
-}
-
-//////////////////////////////////////////////////
 const float* DepthCamera::DepthData() const
 {
   return this->dataPtr->depthBuffer;

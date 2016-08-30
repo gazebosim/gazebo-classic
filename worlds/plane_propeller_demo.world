@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.6">
+<sdf version="1.4">
   <world name="default">
     <gui>
       <!-- A plugin for controlling the Cessna with the keyboard -->
@@ -13,7 +13,7 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>2000</iters>
+          <iters>200</iters>
           <sor>1.0</sor>
         </solver>
         <constraints>
@@ -404,7 +404,7 @@
         </physics>
       </joint>
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
+        <a0>0.2</a0>
         <cla>10.000</cla>
         <cda>0.0001</cda>
         <cma>0.00</cma>
@@ -420,7 +420,7 @@
         <link_name>lift_drag_demo_model::blade_1</link_name>
       </plugin>
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
-        <a0>0.1</a0>
+        <a0>0.2</a0>
         <cla>10.000</cla>
         <cda>0.0001</cda>
         <cma>0.00</cma>
@@ -440,6 +440,7 @@
         <child>wheel_1</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
+          <use_parent_frame>1</use_parent_frame>
           <limit>
             <lower>-1e16</lower>
             <upper>1e16</upper>
@@ -458,7 +459,9 @@
       <joint name="wheel_2_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_2</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
+          <use_parent_frame>0</use_parent_frame>
           <limit>
             <lower>-1e16</lower>
             <upper>1e16</upper>
@@ -477,7 +480,9 @@
       <joint name="wheel_3_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_3</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
+          <use_parent_frame>0</use_parent_frame>
           <limit>
             <lower>-1e16</lower>
             <upper>1e16</upper>
@@ -497,6 +502,7 @@
         <parent>body</parent>
         <child>rod_1</child>
         <axis>
+          <use_parent_frame>0</use_parent_frame>
           <limit>
             <lower>-1e16</lower>
             <upper>1e16</upper>
@@ -512,9 +518,6 @@
           </ode>
         </physics>
       </joint>
-
-
-
 
       <link name="wing_right">
         <pose>3 0 1.5 0.2 0 0</pose>
@@ -826,45 +829,63 @@
         <engine name="engine1">
           <joint_name>rod_1_joint</joint_name>
           <max_torque>1000</max_torque>
-          <inc_key>119</inc_key>
-          <dec_key>115</dec_key>
+          <inc_key>119</inc_key> <!-- w -->
+          <dec_key>115</dec_key> <!-- s -->
           <inc_val>50</inc_val>
+          <max_val>650</max_val>
+          <min_val>-650</min_val>
         </engine>
         <control name="wing_left_control">
           <joint_name>wing_left_joint</joint_name>
-          <inc_key>100</inc_key>
+          <inc_key>100</inc_key> <!-- d -->
           <inc_val>-0.02</inc_val>
-          <dec_key>97</dec_key>
+          <dec_key>97</dec_key> <!-- a -->
+          <max_val>0.3</max_val>
+          <min_val>-0.3</min_val>
           <p>1000</p>
           <i>0</i>
           <d>0</d>
+          <cmd_max>1.0</cmd_max>
+          <cmd_min>-1.0</cmd_min>
         </control>
         <control name="wing_right_control">
           <joint_name>wing_right_joint</joint_name>
-          <inc_key>97</inc_key>
+          <inc_key>97</inc_key> <!-- a -->
           <inc_val>0.02</inc_val>
-          <dec_key>100</dec_key>
+          <dec_key>100</dec_key> <!-- d -->
+          <max_val>0.3</max_val>
+          <min_val>-0.3</min_val>
           <p>1000</p>
           <i>0</i>
           <d>0</d>
+          <cmd_max>1.0</cmd_max>
+          <cmd_min>-1.0</cmd_min>
         </control>
         <control name="elevator_control">
           <joint_name>elevator_joint</joint_name>
-          <inc_key>107</inc_key>
+          <inc_key>107</inc_key> <!-- k -->
           <inc_val>0.02</inc_val>
-          <dec_key>106</dec_key>
+          <dec_key>106</dec_key> <!-- j -->
+          <max_val>0.5</max_val>
+          <min_val>-0.5</min_val>
           <p>100</p>
           <i>0</i>
           <d>0</d>
+          <cmd_max>1.0</cmd_max>
+          <cmd_min>-1.0</cmd_min>
         </control>
         <control name="rudder_control">
           <joint_name>rudder_joint</joint_name>
-          <inc_key>101</inc_key>
+          <inc_key>101</inc_key> <!-- e -->
           <inc_val>0.02</inc_val>
-          <dec_key>113</dec_key>
+          <dec_key>113</dec_key> <!-- q -->
+          <max_val>0.3</max_val>
+          <min_val>-0.3</min_val>
           <p>100</p>
           <i>0</i>
           <d>0</d>
+          <cmd_max>1.0</cmd_max>
+          <cmd_min>-1.0</cmd_min>
         </control>
       </plugin>
 

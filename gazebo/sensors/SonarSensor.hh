@@ -58,41 +58,15 @@ namespace gazebo
 
       /// \brief Get the minimum range of the sonar
       /// \return The sonar's minimum range.
-      /// \deprecated See RangeMin()
-      public: double GetRangeMin() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the minimum range of the sonar
-      /// \return The sonar's minimum range.
       public: double RangeMin() const;
-
-      /// \brief Get the minimum range of the sonar.
-      /// \return The sonar's maximum range.
-      /// \deprecated See RangeMax()
-      public: double GetRangeMax() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the minimum range of the sonar.
       /// \return The sonar's maximum range.
       public: double RangeMax() const;
 
       /// \brief Get the radius of the sonar cone at maximum range.
-      /// \return The radisu of the sonar cone at max range.
-      /// \deprecated See Radius()
-      public: double GetRadius() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the radius of the sonar cone at maximum range.
       /// \return The radius of the sonar cone at max range.
       public: double Radius() const;
-
-      /// \brief Get detected range for a sonar.
-      ///         Warning: If you are accessing all the ray data in a loop
-      ///         it's possible that the Ray will update in the middle of
-      ///         your access loop. This means some data will come from one
-      ///         scan, and some from another scan. You can solve this
-      ///         problem by using SetActive(false) <your accessor loop>
-      ///         SetActive(true).
-      /// \return Returns DBL_MAX for no detection.
-      /// \deprecated See Range()
-      public: double GetRange() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get detected range for a sonar.
       ///         Warning: If you are accessing all the ray data in a loop
