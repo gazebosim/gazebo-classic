@@ -72,7 +72,6 @@ namespace gazebo
 
       /// \brief Get the mode, either force, torque or none.
       /// \return Current mode.
-      /// \deprecated See Mode()
       public: Mode GetMode() const;
 
       /// \brief Set model to which wrench will be applied.

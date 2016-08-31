@@ -17,15 +17,13 @@
 #ifndef GAZEBO_GUI_MODELSNAPPRIVATE_HH_
 #define GAZEBO_GUI_MODELSNAPPRIVATE_HH_
 
-#include <string>
 #include <ignition/math/Triangle3.hh>
 
 #include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -73,7 +71,7 @@ namespace gazebo
       public: event::ConnectionPtr renderConnection;
 
       /// \brief Mutex to protect the selected triangle vertices.
-      public: boost::recursive_mutex *updateMutex;
+      public: std::recursive_mutex updateMutex;
 
       /// \brief A visual to represent the snap spot.
       public: rendering::VisualPtr snapVisual;

@@ -17,8 +17,11 @@
 #ifndef GAZEBO_GUI_MODELSNAP_HH_
 #define GAZEBO_GUI_MODELSNAP_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
+
+#include <ignition/math/Triangle3.hh>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -68,7 +71,7 @@ namespace gazebo
       /// \deprecated See function that accepts ignition::math parameters.
       public: void Snap(const std::vector<math::Vector3> &_triangleSrc,
           const std::vector<math::Vector3> &_triangleDest,
-          rendering::VisualPtr _visualSrc) GAZEBO_DEPRECATED(7.0);
+          rendering::VisualPtr _visualSrc) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Calculate the translation and rotation needed to snap the
       /// centroid of a mesh triangle of a visual to another, taking into
@@ -97,7 +100,7 @@ namespace gazebo
           const std::vector<math::Vector3> &_triangleSrc,
           const std::vector<math::Vector3> &_triangleDest,
           const math::Pose &_poseSrc, math::Vector3 &_trans,
-          math::Quaternion &_rot) GAZEBO_DEPRECATED(7.0);
+          math::Quaternion &_rot) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Calculate the translation and rotation needed to snap the
       /// centroid of a mesh triangle of a visual to another, taking into
@@ -140,7 +143,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ModelSnapPrivate *dataPtr;
+      private: std::unique_ptr<ModelSnapPrivate> dataPtr;
     };
   }
 }

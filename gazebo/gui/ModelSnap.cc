@@ -20,8 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
-
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -59,9 +57,7 @@ ModelSnap::ModelSnap()
 /////////////////////////////////////////////////
 ModelSnap::~ModelSnap()
 {
-  this->Clear();
-  delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -89,7 +85,8 @@ void ModelSnap::Clear()
   this->dataPtr->hoverVis.reset();
 
   this->dataPtr->userCmdPub.reset();
-  this->dataPtr->node->Fini();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
 
   this->dataPtr->renderConnection.reset();
@@ -109,9 +106,6 @@ void ModelSnap::Clear()
     this->dataPtr->highlightVisual->Fini();
     this->dataPtr->highlightVisual.reset();
   }
-
-  delete this->dataPtr->updateMutex;
-  this->dataPtr->updateMutex = NULL;
 
   this->dataPtr->scene.reset();
   this->dataPtr->userCamera.reset();
@@ -136,8 +130,6 @@ void ModelSnap::Init()
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene =  cam->GetScene();
 
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
-
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
   this->dataPtr->userCmdPub =
@@ -152,7 +144,7 @@ void ModelSnap::Init()
 /////////////////////////////////////////////////
 void ModelSnap::Reset()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   this->dataPtr->selectedVis.reset();
   this->dataPtr->selectedTriangle.Set(
       ignition::math::Vector3d::Zero,
@@ -207,7 +199,7 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 
     if (hoverTriangle.Valid())
     {
-      boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+      std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
       this->dataPtr->hoverVis = vis;
       this->dataPtr->hoverTriangle = hoverTriangle;
       this->dataPtr->hoverTriangleDirty = true;
@@ -215,13 +207,13 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
       if (!this->dataPtr->renderConnection)
       {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
-            boost::bind(&ModelSnap::Update, this));
+            std::bind(&ModelSnap::Update, this));
       }
     }
   }
   else
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     this->dataPtr->hoverVis.reset();
     this->dataPtr->hoverTriangle.Set(
         ignition::math::Vector3d::Zero,
@@ -281,7 +273,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       if (!this->dataPtr->renderConnection)
       {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
-            boost::bind(&ModelSnap::Update, this));
+            std::bind(&ModelSnap::Update, this));
       }
     }
     else
@@ -436,7 +428,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelSnap::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   if (this->dataPtr->hoverTriangleDirty)
   {
     if (this->dataPtr->hoverTriangle.Valid())

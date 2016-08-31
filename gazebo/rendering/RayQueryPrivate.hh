@@ -15,12 +15,10 @@
  *
 */
 
-#ifndef _RAYQUERY_PRIVATE_HH_
-#define _RAYQUERY_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_RAYQUERYPRIVATE_HH_
+#define GAZEBO_RENDERING_RAYQUERYPRIVATE_HH_
 
-#include <string>
-
-#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

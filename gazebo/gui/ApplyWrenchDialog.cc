@@ -478,7 +478,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
   // Check if model/link hasn't been deleted on PreRender
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
-      boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
+      std::bind(&ApplyWrenchDialog::OnPreRender, this)));
 
   this->dataPtr->modelLabel->setText(("<b>Model:</b> " + _modelName).c_str());
 
@@ -585,7 +585,8 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   {
     MouseEventHandler::Instance()->AddReleaseFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+        std::bind(&ApplyWrenchDialog::OnMouseRelease, this,
+        std::placeholders::_1));
   }
 
   return true;
@@ -1204,11 +1205,13 @@ void ApplyWrenchDialog::SetActive(bool _active)
 
     MouseEventHandler::Instance()->AddPressFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
+        std::bind(&ApplyWrenchDialog::OnMousePress, this,
+        std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddMoveFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
+        std::bind(&ApplyWrenchDialog::OnMouseMove, this,
+        std::placeholders::_1));
   }
   else
   {

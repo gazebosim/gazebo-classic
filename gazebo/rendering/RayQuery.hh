@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_RAYQUERY_HH_
-#define _GAZEBO_RAYQUERY_HH_
+#ifndef GAZEBO_RENDERING_RAYQUERY_HH_
+#define GAZEBO_RENDERING_RAYQUERY_HH_
 
+#include <memory>
 #include <vector>
 #include <ignition/math/Triangle3.hh>
 
@@ -78,7 +79,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: RayQueryPrivate *dataPtr;
+      private: std::unique_ptr<RayQueryPrivate> dataPtr;
     };
     /// \}
   }

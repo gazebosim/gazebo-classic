@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
 #include <sstream>
 
 #include "gazebo/transport/Node.hh"
@@ -84,7 +83,7 @@ TimePanel::TimePanel(QWidget *_parent)
   // Connections
   this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-      boost::bind(&TimePanel::OnFullScreen, this, _1)));
+      std::bind(&TimePanel::OnFullScreen, this, std::placeholders::_1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
 

@@ -172,7 +172,7 @@ TopToolbar::TopToolbar(QWidget *_parent)
   // Connections
   this->dataPtr->connections.push_back(
       gui::Events::ConnectWindowMode(
-      boost::bind(&TopToolbar::OnWindowMode, this, _1)));
+      std::bind(&TopToolbar::OnWindowMode, this, std::placeholders::_1)));
 }
 
 /////////////////////////////////////////////////
