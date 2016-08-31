@@ -170,8 +170,10 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
 
   // Check that link rotated
   QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->GetWorldPose().Ign().Pos().X());
-  QVERIFY(boxLinkPose.Pos().Y() - boxLinkVis->GetWorldPose().Ign().Pos().Y() < 1e-6);
-  QVERIFY(boxLinkPose.Pos().Z() - boxLinkVis->GetWorldPose().Ign().Pos().Z() < 1e-6);
+  QVERIFY(boxLinkPose.Pos().Y() -
+      boxLinkVis->GetWorldPose().Ign().Pos().Y() < 1e-6);
+  QVERIFY(boxLinkPose.Pos().Z() -
+      boxLinkVis->GetWorldPose().Ign().Pos().Z() < 1e-6);
   QVERIFY(boxLinkPose.Rot() != boxLinkVis->GetWorldPose().Ign().Rot());
 
   // Save current pose
