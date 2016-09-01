@@ -568,22 +568,13 @@ namespace gazebo
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 
-      /// \brief Alters this joint's cached initial position per SDF.
-      /// This call will not change joint position dynamically, instead,
-      /// it simply changes the initial_position value, which is used
-      /// if the model is re-initialized.
-      /// \param[in] _index joint axis index.
-      /// \param[in] _position joint's initial position.
-      private: void SetInitialPosition(unsigned int _index,
-        ignition::math::Angle _position);
-
       /// \brief Returns this joint's cached initial position.
       /// The initial position is only used if the model is re-initialized.
       /// This value is specified by SDF (1.6+), and can be altered at run
       /// time by Joint::SetInitialPosition.
       /// \param[in] _index joint axis index.
       /// \return joint's initial position.
-      public: ignition::math::Angle InitialPosition(unsigned int _index);
+      public: ignition::math::Angle InitialPosition(unsigned int _index) const;
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -626,6 +617,15 @@ namespace gazebo
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
+
+      /// \brief Alters this joint's cached initial position per SDF.
+      /// This call will not change joint position dynamically, instead,
+      /// it simply changes the initial_position value, which is used
+      /// if the model is re-initialized.
+      /// \param[in] _index joint axis index.
+      /// \param[in] _position joint's initial position.
+      private: void SetInitialPosition(unsigned int _index,
+        const ignition::math::Angle &_position);
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
