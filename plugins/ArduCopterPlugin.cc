@@ -233,28 +233,33 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief number of times ArduCotper skips update
   /// before marking ArduCopter offline
   public: int connectionTimeoutMaxCount;
+
+  /// \brief constructor
+  public: ArduCopterPluginPrivate()
+  {
+    this->arduCopterOnline = false;
+    this->connectionTimeoutCount = 0;
+  }
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 ArduCopterPlugin::ArduCopterPlugin()
   : dataPtr(new ArduCopterPluginPrivate)
 {
-  // socket
+  // initialize socket
   this->dataPtr->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
   fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
   int one = 1;
   setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
       &one, sizeof(one));
 
+  /// TODO: make port (9002) part of SDF XML parameters
   if (!this->dataPtr->Bind("127.0.0.1", 9002))
   {
     gzerr << "failed to bind with 127.0.0.1:9002, aborting plugin.\n";
     return;
   }
-
-  this->dataPtr->arduCopterOnline = false;
-
-  this->dataPtr->connectionTimeoutCount = 0;
 
   setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
       &one, sizeof(one));
