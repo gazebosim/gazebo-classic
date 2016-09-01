@@ -733,10 +733,10 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/include
   /usr/local/include
   /usr/local/lib/qwt.framework/Headers
-  PATH_SUFFIXES qwt qwt5 qwt6
+  PATH_SUFFIXES qwt qwt5
   )
 
-find_library(QWT_LIBRARY NAMES qwt-qt5 PATHS
+find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
