@@ -1523,7 +1523,7 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
 }
 
 /////////////////////////////////////////////////
-void Joint::SetInitialPosition(unsigned int _index,
+void Joint::SetInitialPosition(const unsigned int _index,
   const ignition::math::Angle &_position)
 {
   if (_index >= this->GetAngleCount())
@@ -1537,7 +1537,7 @@ void Joint::SetInitialPosition(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-ignition::math::Angle Joint::InitialPosition(unsigned int _index) const
+ignition::math::Angle Joint::InitialPosition(const unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())
   {
