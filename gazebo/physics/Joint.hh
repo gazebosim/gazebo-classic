@@ -574,7 +574,8 @@ namespace gazebo
       /// time by Joint::SetInitialPosition.
       /// \param[in] _index joint axis index.
       /// \return joint's initial position.
-      public: ignition::math::Angle InitialPosition(unsigned int _index) const;
+      public: ignition::math::Angle InitialPosition(
+          const unsigned int _index) const;
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
@@ -624,8 +625,8 @@ namespace gazebo
       /// if the model is re-initialized.
       /// \param[in] _index joint axis index.
       /// \param[in] _position joint's initial position.
-      private: void SetInitialPosition(unsigned int _index,
-        const ignition::math::Angle &_position);
+      private: void SetInitialPosition(const unsigned int _index,
+          const ignition::math::Angle &_position);
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
