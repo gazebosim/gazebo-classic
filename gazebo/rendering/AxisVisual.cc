@@ -92,12 +92,6 @@ void AxisVisual::Load()
 }
 
 /////////////////////////////////////////////////
-void AxisVisual::ScaleXAxis(const math::Vector3 &_scale)
-{
-  this->ScaleXAxis(_scale.Ign());
-}
-
-/////////////////////////////////////////////////
 void AxisVisual::ScaleXAxis(const ignition::math::Vector3d &_scale)
 {
   AxisVisualPrivate *dPtr =
@@ -107,24 +101,12 @@ void AxisVisual::ScaleXAxis(const ignition::math::Vector3d &_scale)
 }
 
 /////////////////////////////////////////////////
-void AxisVisual::ScaleYAxis(const math::Vector3 &_scale)
-{
-  this->ScaleYAxis(_scale.Ign());
-}
-
-/////////////////////////////////////////////////
 void AxisVisual::ScaleYAxis(const ignition::math::Vector3d &_scale)
 {
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
 
   dPtr->yAxis->SetScale(_scale);
-}
-
-/////////////////////////////////////////////////
-void AxisVisual::ScaleZAxis(const math::Vector3 &_scale)
-{
-  this->ScaleZAxis(_scale.Ign());
 }
 
 /////////////////////////////////////////////////

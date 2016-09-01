@@ -83,31 +83,12 @@ namespace gazebo
       /// \brief Get the average FPS.
       /// \param[in] _id ID of the window.
       /// \return The frames per second.
-      /// \deprecated See AvgFPS()
-      public: float GetAvgFPS(uint32_t _id) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the average FPS.
-      /// \param[in] _id ID of the window.
-      /// \return The frames per second.
       public: float AvgFPS(const uint32_t _id) const;
 
       /// \brief Get the triangle count.
       /// \param[in] _id ID of the window.
       /// \return The triangle count.
-      /// \deprecated See TriangleCount()
-      public: uint32_t GetTriangleCount(uint32_t _id) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the triangle count.
-      /// \param[in] _id ID of the window.
-      /// \return The triangle count.
       public: uint32_t TriangleCount(const uint32_t _id) const;
-
-      /// \brief Get the render window associated with the given id.
-      /// \param[in] _id ID of the window.
-      /// \return Pointer to the render window, NULL if the id is invalid.
-      /// \deprecated See Window()
-      public: Ogre::RenderWindow *GetWindow(uint32_t _id)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the render window associated with the given id.
       /// \param[in] _id ID of the window.

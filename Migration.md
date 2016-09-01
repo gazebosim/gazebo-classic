@@ -55,7 +55,17 @@ release will remove the deprecated code.
 1. **gazebo/util/system.hh**
     + ***Replacement:*** GAZEBO_FORCEINLINE
 
+1. **gazebo/rendering/OculusCamera.hh**
+    + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
+
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
+
 ### Deprecations
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
+    + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose)
 
 1. **gazebo/gui/ModelManipulator.hh**
     + ***Deprecation:*** public: void RotateEntity(rendering::VisualPtr &_vis,
