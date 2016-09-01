@@ -44,6 +44,7 @@ set (plugins_single_header
   ActuatorPlugin
   ArduCopterPlugin
   ArduCopterIRLockPlugin
+  ArduPilotPlugin
   ArrangePlugin
   BlinkVisualPlugin
   BreakableJointPlugin
