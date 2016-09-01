@@ -695,8 +695,8 @@ endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport1 QUIET)
-if (NOT ignition-transport1_FOUND)
+find_package(ignition-transport2 QUIET)
+if (NOT ignition-transport2_FOUND)
   BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
@@ -733,7 +733,7 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/include
   /usr/local/include
   /usr/local/lib/qwt.framework/Headers
-  PATH_SUFFIXES qwt qwt5
+  PATH_SUFFIXES qwt qwt5 qwt6
   )
 
 find_library(QWT_LIBRARY NAMES qwt-qt5 PATHS
@@ -741,6 +741,9 @@ find_library(QWT_LIBRARY NAMES qwt-qt5 PATHS
   /usr/local/lib
   /usr/local/lib/qwt.framework
   )
+
+message (STATUS "\n\nQWT_INCLUDE_DIR=${QWT_INCLUDE_DIR}\n\n\n")
+message (STATUS "\n\nQWT_LIBRARY=${QWT_LIBRARY}\n\n\n")
 
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)
