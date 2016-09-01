@@ -164,8 +164,9 @@ TEST_F(SensorManager_TEST, SensorInfo)
 {
   this->Load("worlds/depth_camera.world", true);
 
-  auto sensorManager = SensorManager::Instance();
-  ASSERT_TRUE(sensorManager != nullptr);
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+  ASSERT_TRUE(mgr != nullptr);
 
   ignition::msgs::Sensor_V sensors;
   bool success;
@@ -173,23 +174,24 @@ TEST_F(SensorManager_TEST, SensorInfo)
 
   gzmsg << "Get an existing sensor" << std::endl;
   {
-    pluginUri.Parse(
+    sensorUri.Parse(
         "data://world/default/model/camera_model/link/my_link/sensor/camera");
-    sensorManager->SesnsorInfo(sensorUri, sensors, success);
+    mgr->SensorInfo(sensorUri, sensors, success);
 
     EXPECT_TRUE(success);
-    EXPECT_EQ(sensors.ensors_size(), 1);
-    EXPECT_EQ(sensors.sensors(0).name(), "wind");
+    EXPECT_EQ(sensors.sensors_size(), 1);
+    EXPECT_EQ(sensors.sensors(0).name(), "camera");
   }
 }
-/*
+
 //////////////////////////////////////////////////
 TEST_F(SensorManager_TEST, PluginInfo)
 {
   this->Load("worlds/depth_camera.world", true);
 
-  auto sensorManager = SensorManager::Instance();
-  ASSERT_TRUE(sensorManager != nullptr);
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+  ASSERT_TRUE(mgr != nullptr);
 
   ignition::msgs::Plugin_V plugins;
   bool success;
@@ -197,16 +199,110 @@ TEST_F(SensorManager_TEST, PluginInfo)
 
   gzmsg << "Get an existing plugin" << std::endl;
   {
-    pluginUri.Parse(
-        "data://world/default/model/camera_model/link/my_link/sensor/camera"
-        + "/plugin/blo");
-    sensorManager->PluginInfo(pluginUri, plugins, success);
+    pluginUri.Parse("data://world/default/model/camera_model/"
+      "link/my_link/sensor/camera/plugin/depth_camera_plugin");
+    mgr->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
-    EXPECT_EQ(plugins.plugins(0).name(), "wind");
+    EXPECT_EQ(plugins.plugins(0).name(), "depth_camera_plugin");
   }
-*/
+}
+
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, PluginInfoFailures)
+{
+  this->Load("worlds/depth_camera.world", true);
+
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  gazebo::common::URI pluginUri;
+
+  pluginUri.Parse("data://world/default/model/camera_model/"
+      "link/my_link/sensor/camera/plugin/depth_camera_plugin");
+
+  gzmsg << "Get specific plugin" << std::endl;
+  {
+    do 
+    {
+      mgr->PluginInfo(pluginUri, plugins, success);
+    }
+    while (plugins.plugins_size() <= 0);
+
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = gazebo::common::URI("tell me about your plugins");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/camera_model/"
+      "link/my_link/sensor/camera");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, SensorInfoFailures)
+{
+  this->Load("worlds/depth_camera.world", true);
+
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+
+  ignition::msgs::Sensor_V sensors;
+  bool success;
+  gazebo::common::URI sensorUri;
+
+  sensorUri.Parse("data://world/default/model/camera_model/"
+      "link/my_link/sensor/camera");
+
+  gzmsg << "Get specific sensor" << std::endl;
+  {
+    do 
+    {
+      mgr->SensorInfo(sensorUri, sensors, success);
+    }
+    while (sensors.sensors_size() <= 0);
+
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(sensors.sensors_size(), 1);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    sensorUri = gazebo::common::URI("tell me about your plugins");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    sensorUri.Parse("data://world/default/model/camera_model/"
+      "link/my_link");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

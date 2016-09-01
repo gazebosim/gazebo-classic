@@ -28,6 +28,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
+#include "gazebo/common/URI.hh"
 
 #include "test_config.h"
 
@@ -1115,76 +1116,105 @@ void MainWindow_TEST::MinimumSize()
 }
 
 //////////////////////////////////////////////////
-TEST_F(MainWindow_TEST, MainWindowPluginInfo)
+void MainWindow_TEST::PluginInfo()
 {
   this->Load("worlds/timer_gui.world", true);
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
 
+  mainWindow->Load();
+  mainWindow->Init();
+
   ignition::msgs::Plugin_V plugins;
   bool success;
-  common::URI pluginUri;
+  gazebo::common::URI pluginUri;
 
   gzmsg << "Get an existing plugin" << std::endl;
   {
     pluginUri.Parse(
-        "data://gui/gzlient/plugin/timer_gui");
-    mainWindow->PluginInfo(pluginUri, plugins, success);
+    "data://gui/gzclient/plugin/timer_gui");
 
-    EXPECT_TRUE(success);
-    EXPECT_EQ(plugins.plugins_size(), 1);
-    EXPECT_EQ(plugins.plugins(0).name(), "timer_gui");
-  }
+    do 
+    {
+      mainWindow->PluginInfo(pluginUri, plugins, success);
+    } 
+    while (plugins.plugins_size() <= 0);
 
+    //pluginMsgs from MainWindow are filled
+    QVERIFY(success);
+    QVERIFY(plugins.plugins_size() == 1);
+    QVERIFY(plugins.plugins(0).name() == "timer_gui");
+	}
   gzmsg << "Get all plugins" << std::endl;
   {
-    pluginUri.Parse("data://gui/gzlient/plugin/");
-    mainWindow->PluginInfo(pluginUri, plugins, success);
+    pluginUri.Parse("data://gui/gzclient/plugin");
 
-    EXPECT_TRUE(success);
-    EXPECT_EQ(plugins.plugins_size(), 4);
-    EXPECT_EQ(plugins.plugins(0).name(), "timer_gui");
-    EXPECT_EQ(plugins.plugins(1).name(), "timer_start_reset_buttons");
-    EXPECT_EQ(plugins.plugins(2).name(), "timer_start_button");
-    EXPECT_EQ(plugins.plugins(3).name(), "timer_countdown");
+    do 
+    {
+      mainWindow->PluginInfo(pluginUri, plugins, success);
+    }
+    while (plugins.plugins_size() <= 0);
+
+    //pluginMsgs from MainWindow are filled
+    QVERIFY(success);
+    QVERIFY(plugins.plugins_size() == 4);
+    QVERIFY(plugins.plugins(0).name() == "timer_gui");
+    QVERIFY(plugins.plugins(1).name() == "timer_start_reset_buttons");
+    QVERIFY(plugins.plugins(2).name() == "timer_start_button");
+    QVERIFY(plugins.plugins(3).name() == "timer_countdown");
   }
+
+  delete mainWindow;
 }
-/*
+
 //////////////////////////////////////////////////
-TEST_F(MainWindowTest, PluginInfoFailures)
+void MainWindow_TEST::PluginInfoFailures()
 {
   this->Load("worlds/timer_gui.world", true);
 
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+
+  mainWindow->Load();
+  mainWindow->Init();
+
   ignition::msgs::Plugin_V plugins;
   bool success;
-  common::URI pluginUri;
+  gazebo::common::URI pluginUri;
+
+  pluginUri.Parse("data://gui/gzclient/plugin");
 
   gzmsg << "Get all plugins" << std::endl;
   {
-    pluginUri.Parse("data://gui/plugin/");
-    model->PluginInfo(pluginUri, plugins, success);
+    do 
+    {
+      mainWindow->PluginInfo(pluginUri, plugins, success);
+    }
+    while (plugins.plugins_size() <= 0);
 
-    EXPECT_TRUE(success);
-    EXPECT_EQ(plugins.plugins_size(), 4);
+    mainWindow->PluginInfo(pluginUri, plugins, success);
+
+    QVERIFY(success);
+    QVERIFY(plugins.plugins_size() == 4);
   }
 
   gzmsg << "Invalid URI" << std::endl;
   {
-    pluginUri = common::URI("tell me about your plugins");
-    model->PluginInfo(pluginUri, plugins, success);
+    pluginUri = gazebo::common::URI("tell me about your plugins");
+    mainWindow->PluginInfo(pluginUri, plugins, success);
 
-    EXPECT_FALSE(success);
+    QVERIFY(!success);
   }
 
   gzmsg << "Incomplete URI" << std::endl;
   {
     pluginUri.Parse("data://gui/");
-    model->PluginInfo(pluginUri, plugins, success);
+    mainWindow->PluginInfo(pluginUri, plugins, success);
 
-    EXPECT_FALSE(success);
+    QVERIFY(!success);
   }
 }
-*/
+
 // Generate a main function for the test
 QTEST_MAIN(MainWindow_TEST)

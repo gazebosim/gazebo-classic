@@ -67,6 +67,12 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test that the minimum size of the window is reasonable.
   private slots: void MinimumSize();
+
+  /// \brief Test that the the plugin information is received correctly.
+  private slots: void PluginInfo();
+
+  /// \brief Test that the the plugin URIs are processed correctly.
+  private slots: void PluginInfoFailures();
 };
 
 #endif

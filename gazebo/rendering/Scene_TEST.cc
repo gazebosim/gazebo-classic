@@ -347,35 +347,46 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
   EXPECT_TRUE(newBoxLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
 }
-/*
+
 //////////////////////////////////////////////////
 TEST_F(Scene_TEST, VisualInfo)
 {
   this->Load("worlds/blink_visual.world", true);
 
-  auto scene = rendering::get_scene();
+  auto scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
+
+  printf("%d\n", scene->GetVisualCount());
 
   ignition::msgs::Visual_V visuals;
   bool success;
   common::URI visualUri;
 
+  // Wait until all visuals are loaded
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sleep < maxSleep)
+  {
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+
   gzmsg << "Get an existing visual" << std::endl;
   {
     visualUri.Parse(
-        "data://world/default/model/box_sim/link/link/visual/visual");
-    scene->PluginInfo(pluginUri, plugins, success);
+        "data://visual/box_sim::link::visual");
+    scene->VisualInfo(visualUri, visuals, success);
 
     EXPECT_TRUE(success);
-    EXPECT_EQ(visual.visuals_size(), 1);
-    //EXPECT_EQ(visual.visuals(0).name(), "wind");
+    EXPECT_EQ(visuals.visuals_size(), 1);
+    EXPECT_EQ(visuals.visuals(0).name(), "visual");
   }
 }
 
 //////////////////////////////////////////////////
 TEST_F(Scene_TEST, PluginInfo)
 {
-  this->Load("worlds/wind_demo.world", true);
+  this->Load("worlds/blink_visual.world", true);
 
   auto scene = rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
@@ -384,18 +395,26 @@ TEST_F(Scene_TEST, PluginInfo)
   bool success;
   common::URI pluginUri;
 
+  // Wait until all visuals are loaded
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sleep < maxSleep)
+  {
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+
   gzmsg << "Get an existing plugin" << std::endl;
   {
-    pluginUri.Parse(
-        "data://world/default/plugin/wind");
+    pluginUri.Parse("data://data://visual/box_sim::link::visual/plugin/blink");
     scene->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
-    EXPECT_EQ(plugins.plugins(0).name(), "wind");
+    EXPECT_EQ(plugins.plugins(0).name(), "blink");
   }
 }
-*/
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

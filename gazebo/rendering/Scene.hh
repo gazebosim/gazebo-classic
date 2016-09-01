@@ -29,12 +29,14 @@
 
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
+
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/visual_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -42,9 +44,6 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
-#include "gazebo/common/URI.hh"
-
-#include <ignition/msgs/stringmsg.pb.h>
 
 namespace SkyX
 {
@@ -636,7 +635,7 @@ namespace gazebo
       public: void PluginInfo(const common::URI &_pluginUri,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
 
-      /// \brief Get visual properties acording to
+      /// \brief Get properties for a visual of the VT_VISUAL type for
       /// the given _visualUri. Some _visualUri examples:
       ///
       /// * Info about a specific visual:
@@ -861,22 +860,6 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
           VisualPtr _linkVisual);
-
-      /// \brief Callback for "<this_name>/server/info/plugin" service.
-      /// \param[in] _request Request containing plugin URI.
-      /// \param[out] _plugins Message containing vector of plugins.
-      /// \param[out] _success True if the info was successfully obtained.
-      /// \sa PluginInfo
-      private: void PluginInfoService(const ignition::msgs::StringMsg &_req,
-          ignition::msgs::Plugin_V &_plugins, bool &_success);
-
-      /// \brief Callback for "<this_name>/server/info" service.
-      /// \param[in] _request Request containing visual URI.
-      /// \param[out] _visuals Message containing vector of visuals.
-      /// \param[out] _success True if the info was successfully obtained.
-      /// \sa VisualInfo
-      private: void VisualInfoService(const ignition::msgs::StringMsg &_request,
-          ignition::msgs::Visual_V &_visuals, bool &_success);
 
       /// \brief Create a new link frame visual.
       /// \param[in] _msg Message containing the link data.

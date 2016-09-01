@@ -35,7 +35,6 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/Conversions.hh"
@@ -74,8 +73,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 {
   this->setObjectName("modelList");
 
-  this->dataPtr->guiInfoRequested == false;
-
+  this->dataPtr->guiInfoRequested = false;
   this->dataPtr->requestMsg = nullptr;
   this->dataPtr->propMutex = new std::mutex();
   this->dataPtr->receiveMutex = new std::mutex();
@@ -285,80 +283,82 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 
       this->dataPtr->modelTreeWidget->setCurrentItem(lItem);
     }
-
-    auto parts = common::split(this->dataPtr->selectedEntityName, "/");
-
-    // check if second-last element is a plugin
-    if (parts.end()[-2] == "plugin")
-    {
-      // World plugin
-      if (parts.end()[-4] == "world") 
-      {
-        std::string service("/physics/info/plugin");
-
-        ignition::msgs::StringMsg req;
-        req.set_data(this->dataPtr->selectedEntityName);
-
-        this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnPluginInfo, this);
-      }
-      // GUI plugin
-      else if (parts.end()[-4] == "gui") 
-      {
-        std::string service("/gui/info/plugin");
-
-        ignition::msgs::StringMsg req;
-        req.set_data(this->dataPtr->selectedEntityName);
-
-        this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnPluginInfo, this);
-      }
-      // Visual plugin
-      else if (parts.end()[-4] == "visual")
-      {
-        std::string service("/rendering/info/plugin");
-
-        ignition::msgs::StringMsg req;
-        req.set_data(this->dataPtr->selectedEntityName);
-
-        this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnPluginInfo, this);
-      }
-      // Sensor plugin
-      else if (parts.end()[-4] == "sensor")
-      {
-        std::string service("/sensors/info/plugin");
-
-        ignition::msgs::StringMsg req;
-        req.set_data(this->dataPtr->selectedEntityName);
-
-        this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnPluginInfo, this);
-      }
-    }
     else
     {
-      // Sensor
-      if (parts.end()[-2] == "sensor")
+      auto parts = common::split(this->dataPtr->selectedEntityName, "/");
+
+      // check if second-last element is a plugin
+      if (parts.end()[-2] == "plugin")
       {
-        std::string service("/sensors/info/sensor");
+        // World plugin
+        if (parts.end()[-4] == "world") 
+        {
+          std::string service("/physics/info/plugin");
 
-        ignition::msgs::StringMsg req;
-        req.set_data(this->dataPtr->selectedEntityName);
+          ignition::msgs::StringMsg req;
+          req.set_data(this->dataPtr->selectedEntityName);
 
-        this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnSensorInfo, this);
+          this->dataPtr->ignNode.Request(service, req,
+             &ModelListWidget::OnPluginInfo, this);
+        }
+        // GUI plugin
+        else if (parts.end()[-4] == "gui") 
+        {
+          std::string service("/gui/info/plugin");
+
+          ignition::msgs::StringMsg req;
+          req.set_data(this->dataPtr->selectedEntityName);
+
+          this->dataPtr->ignNode.Request(service, req,
+             &ModelListWidget::OnPluginInfo, this);
+        }
+        // Visual plugin
+        else if (parts.end()[-4] == "visual")
+        {
+          std::string service("/rendering/info/plugin");
+
+          ignition::msgs::StringMsg req;
+          req.set_data(this->dataPtr->selectedEntityName);
+
+          this->dataPtr->ignNode.Request(service, req,
+             &ModelListWidget::OnPluginInfo, this);
+        }
+        // Sensor plugin
+        else if (parts.end()[-4] == "sensor")
+        {
+          std::string service("/sensors/info/plugin");
+
+          ignition::msgs::StringMsg req;
+          req.set_data(this->dataPtr->selectedEntityName);
+
+          this->dataPtr->ignNode.Request(service, req,
+             &ModelListWidget::OnPluginInfo, this);
+        }
       }
-      // Visual
-      if (parts.end()[-2] == "visual")
+      else
       {
-        std::string service("/rendering/info/visual");
+        // Sensor
+        if (parts.end()[-2] == "sensor")
+        {
+          std::string service("/sensors/info/sensor");
 
-        ignition::msgs::StringMsg req;
-        req.set_data(this->dataPtr->selectedEntityName);
+          ignition::msgs::StringMsg req;
+          req.set_data(this->dataPtr->selectedEntityName);
 
-        this->dataPtr->ignNode.Request(service, req,
-           &ModelListWidget::OnVisualInfo, this);
+          this->dataPtr->ignNode.Request(service, req,
+             &ModelListWidget::OnSensorInfo, this);
+        }
+        // Visual
+        if (parts.end()[-2] == "visual")
+        {
+          std::string service("/rendering/info/visual");
+
+          ignition::msgs::StringMsg req;
+          req.set_data(this->dataPtr->selectedEntityName);
+
+          this->dataPtr->ignNode.Request(service, req,
+             &ModelListWidget::OnVisualInfo, this);
+        }
       }
     }
   }
@@ -371,18 +371,6 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void ModelListWidget::Update()
 {
-  if (this->dataPtr->guiInfoRequested == false)
-  {
-    std::string service("/gui/info/plugin");
-    ignition::msgs::StringMsg req;
-    req.set_data("data://gui/gzclient/plugin/");
-
-    this->dataPtr->ignNode.Request(service, req,
-        &ModelListWidget::OnGUIPluginList, this);
-
-
-    printf("%s\n", "im req");
-  }
   if (!this->dataPtr->fillTypes.empty())
   {
     std::lock_guard<std::mutex> lock(*this->dataPtr->propMutex);
@@ -397,10 +385,6 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->dataPtr->jointMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Plugin")
       this->FillPropertyTree(this->dataPtr->pluginMsg, nullptr);
-    else if (this->dataPtr->fillTypes[0] == "Visual")
-      this->FillPropertyTree(this->dataPtr->visualMsg, nullptr);
-    else if (this->dataPtr->fillTypes[0] == "Sensor")
-      this->FillPropertyTree(this->dataPtr->sensorMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Scene")
       this->FillPropertyTree(this->dataPtr->sceneMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Physics")
@@ -500,150 +484,6 @@ void ModelListWidget::ProcessModelMsgs()
           linkItem->setData(2, Qt::UserRole, QVariant((*iter).id()));
           linkItem->setData(3, Qt::UserRole, QVariant("Link"));
           this->dataPtr->modelTreeWidget->addTopLevelItem(linkItem);
-
-          if ((*iter).link(i).visual_size() > 1)
-          {
-            // Create subheader for visuals
-            QTreeWidgetItem *visualheaderItem = new QTreeWidgetItem(linkItem,
-            QStringList(QString("%1").arg(QString::fromStdString("VISUALS"))));
-            visualheaderItem->setFont(0, subheaderFont);
-            visualheaderItem->setFlags(Qt::NoItemFlags);
-            this->dataPtr->modelTreeWidget->addTopLevelItem(visualheaderItem);
-          }
-
-          // Create visuals under every parent link
-          // Ignore first visual. It is a dummy visual, 
-          // a copy of the link name.
-          for (int j = 1; j < (*iter).link(i).visual_size(); ++j)
-          {
-            std::string visualName = (*iter).link(i).visual(j).name();
-            int index = visualName.rfind("::") + 2;
-            std::string visualNameShort = visualName.substr(index,
-                                                        visualName.size() - index);
-            common::URI visualUri;
-            visualUri.SetScheme("data");
-            visualUri.Path().PushBack("visual");
-            visualUri.Path().PushBack(visualName);
-
-            QTreeWidgetItem *visualItem = new QTreeWidgetItem(linkItem,
-                QStringList(QString("%1").arg(
-                QString::fromStdString(visualNameShort))));
-
-            visualItem->setData(0, Qt::UserRole, QVariant(visualUri.Str().c_str()));
-            visualItem->setData(3, Qt::UserRole, QVariant("Visual"));
-
-            this->dataPtr->modelTreeWidget->addTopLevelItem(visualItem);
-
-            if ((*iter).link(i).visual(j).plugin_size() > 0)
-            {
-              // Create subheader for plugins
-              QTreeWidgetItem *pluginHeaderItem = new QTreeWidgetItem(visualItem,
-              QStringList(QString("%1").arg("PLUGINS")));
-              pluginHeaderItem->setFont(0, subheaderFont);
-              pluginHeaderItem->setFlags(Qt::NoItemFlags);
-              this->dataPtr->modelTreeWidget->addTopLevelItem(pluginHeaderItem);
-            }
-
-            for (int k = 0; k < (*iter).link(i).visual(j).plugin_size(); ++k)
-            {
-              std::string pluginName = (*iter).link(i).visual(j).plugin(k).name();
-
-              QTreeWidgetItem *pluginItem = new QTreeWidgetItem(visualItem,
-                  QStringList(QString("%1").arg(
-                      QString::fromStdString(pluginName))));
-
-              common::URI pluginUri;
-              pluginUri.SetScheme("data");
-              pluginUri.Path().PushBack("visual");
-              pluginUri.Path().PushBack(visualName);
-              pluginUri.Path().PushBack("plugin");
-              pluginUri.Path().PushBack(pluginName);
-
-              pluginItem->setData(0, Qt::UserRole,
-                  QVariant(pluginUri.Str().c_str()));
-              pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
-
-              this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
-            }
-          }
-
-          if ((*iter).link(i).sensor_size() > 0)
-          {
-            // Create subheader for sensors
-            QTreeWidgetItem *sensorheaderItem = new QTreeWidgetItem(linkItem,
-            QStringList(QString("%1").arg(QString::fromStdString("SENSORS"))));
-            sensorheaderItem->setFont(0, subheaderFont);
-            sensorheaderItem->setFlags(Qt::NoItemFlags);
-            this->dataPtr->modelTreeWidget->addTopLevelItem(sensorheaderItem);
-          }
-
-          // Create sensors under every parent link
-          for (int j = 0; j < (*iter).link(i).sensor_size(); ++j)
-          {
-            std::string sensorName = (*iter).link(i).sensor(j).name();
-
-            common::URI sensorUri;
-
-            sensorUri.SetScheme("data");
-
-            sensorUri.Path().PushBack("world");
-            sensorUri.Path().PushBack(gui::get_world());
-            sensorUri.Path().PushBack("model");
-            sensorUri.Path().PushBack((*iter).name());
-            sensorUri.Path().PushBack("link");
-            sensorUri.Path().PushBack(linkNameShort);
-            sensorUri.Path().PushBack("sensor");
-            sensorUri.Path().PushBack(sensorName);
-
-            QTreeWidgetItem *sensorItem = new QTreeWidgetItem(linkItem,
-                QStringList(QString("%1").arg(
-                QString::fromStdString(sensorName))));
-
-            sensorItem->setData(0, Qt::UserRole, QVariant(sensorUri.Str().
-              c_str()));
-            sensorItem->setData(3, Qt::UserRole, QVariant("Sensor"));
-
-            this->dataPtr->modelTreeWidget->addTopLevelItem(sensorItem);
-
-            if ((*iter).link(i).sensor(j).plugin_size() > 0)
-            {
-              // Create subheader for plugins
-              QTreeWidgetItem *pluginHeaderItem = new QTreeWidgetItem(sensorItem,
-              QStringList(QString("%1").arg("PLUGINS")));
-              pluginHeaderItem->setFont(0, subheaderFont);
-              pluginHeaderItem->setFlags(Qt::NoItemFlags);
-              this->dataPtr->modelTreeWidget->addTopLevelItem(pluginHeaderItem);
-            }
-
-            for (int k = 0; k < (*iter).link(i).sensor(j).plugin_size(); ++k)
-            {
-              std::string pluginName = (*iter).link(i).sensor(j).plugin(k).name();
-
-              QTreeWidgetItem *pluginItem = new QTreeWidgetItem(sensorItem,
-                  QStringList(QString("%1").arg(
-                      QString::fromStdString(pluginName))));
-
-              common::URI pluginUri;
-              pluginUri.SetScheme("data");
-
-              pluginUri.Path().PushBack("world");
-              pluginUri.Path().PushBack(gui::get_world());
-              pluginUri.Path().PushBack("model");
-              pluginUri.Path().PushBack((*iter).name());
-              pluginUri.Path().PushBack("link");
-              pluginUri.Path().PushBack(linkNameShort);
-              pluginUri.Path().PushBack("sensor");
-              pluginUri.Path().PushBack(sensorName);
-              pluginUri.Path().PushBack("plugin");
-              pluginUri.Path().PushBack(pluginName);
-
-              pluginItem->setData(0, Qt::UserRole,
-                  QVariant(pluginUri.Str().c_str()));
-              pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
-
-              this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
-            }
-          }
         }
 
         if ((*iter).joint_size() > 0)
@@ -2334,6 +2174,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     prop->setToolTip(tr(_msg.visual(i).name().c_str()));
     this->AddProperty(prop, _parent);
 
+    this->FillPropertyTree(_msg.visual(i), prop);
+
     // TODO: disable setting visual properties until there are tests
     // in place to verify the functionality
     prop->setEnabled(false);
@@ -2702,104 +2544,28 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.heightmap().origin(), sizeItem);
   }
-} 
-
-/////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const ignition::msgs::Sensor &_msg,
-                                       QtProperty *_parent)
-{
-  QtProperty *topItem = nullptr;
-  QtVariantProperty *item = nullptr;
-
-  // id, store it but make it hidden
-  QtBrowserItem *browserItem = nullptr;
-  item = this->dataPtr->variantManager->addProperty(QVariant::String, tr("id"));
-  item->setValue(_msg.id());
-  this->AddProperty(item, _parent);
-  browserItem = this->dataPtr->propTreeBrowser->items(item)[0];
-  this->dataPtr->propTreeBrowser->setItemVisible(browserItem, false);
-
-  // name
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
-      tr("name"));
-  item->setValue(_msg.name().c_str());
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
-
-  // parent
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
-      tr("parent"));
-  item->setValue(_msg.parent().c_str());
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
-
-  // type
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
-      tr("type"));
-  item->setValue(_msg.type().c_str());
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
-
-  // always_on
-  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
-      tr("always_on"));
-  if (_msg.has_always_on())
-    item->setValue(_msg.always_on());
-  else
-    item->setValue(true);
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
-
-  // update-rate
-  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
-      tr("update_rate"));
-  if (_msg.update_rate())
-    item->setValue(_msg.update_rate());
-  else
-    item->setValue(0.0);
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
-/*
-  // pose
-  topItem = this->dataPtr->variantManager->addProperty(
-      QtVariantPropertyManager::groupTypeId(), tr("pose"));
-  this->AddProperty(item, _parent);
-  this->FillPoseProperty(_msg.pose(), topItem);
-*/
-  // visualize
-  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
-      tr("visualize"));
-  if (_msg.has_visualize())
-    item->setValue(_msg.visualize());
-  else
-    item->setValue(true);
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
-
-  // topic
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
-      tr("topic"));
-  item->setValue(_msg.topic().c_str());
-  this->AddProperty(item, _parent);
-  item->setEnabled(false);
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
+void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
                                        QtProperty *_parent)
 {
+  if (!_parent)
+  {
+    gzwarn << "Null QtProperty parent, not adding visual elements."
+           << " This should never happen." << std::endl;
+    return;
+  }
+
   QtProperty *topItem = nullptr;
   QtVariantProperty *item = nullptr;
 
   // Name value
   item = this->dataPtr->variantManager->addProperty(QVariant::String,
                                            tr("name"));
-
   item->setValue(_msg.name().c_str());
-  item->setEnabled(false);
-  this->AddProperty(item, _parent);
-/* TODO We can not retrieve the laser retro value without a 
-  // GetLaserRetro() function
+  _parent->addSubProperty(item);
+
   // Laser Retro value
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
                                            tr("laser_retro"));
@@ -2807,9 +2573,8 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
     item->setValue(_msg.laser_retro());
   else
     item->setValue(0.0);
-  item->setEnabled(false);
-  this->AddProperty(item, _parent);
-*/
+  _parent->addSubProperty(item);
+
   // cast shadows value
   item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
                                            tr("cast_shadows"));
@@ -2817,8 +2582,7 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
     item->setValue(_msg.cast_shadows());
   else
     item->setValue(true);
-  item->setEnabled(false);
-  this->AddProperty(item, _parent);
+  _parent->addSubProperty(item);
 
   // transparency
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
@@ -2827,9 +2591,9 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
     item->setValue(_msg.transparency());
   else
     item->setValue(0.0);
-  item->setEnabled(false);
-  this->AddProperty(item, _parent);
-/* TODO pose and geometry of pluginMsg are unknown
+  _parent->addSubProperty(item);
+
+
   // Pose value
   topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
@@ -2842,7 +2606,7 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
       QtVariantPropertyManager::groupTypeId(),
       tr("geometry"));
   _parent->addSubProperty(topItem);
-  this->FillPropertyTree(_msg.geometry(), topItem);*/
+  this->FillPropertyTree(_msg.geometry(), topItem);
 }
 
 /////////////////////////////////////////////////
@@ -3103,16 +2867,6 @@ void ModelListWidget::OnCreateScene(const std::string &_name)
   this->dataPtr->propTreeBrowser->clear();
   this->InitTransport(_name);
 
-  std::string service("/physics/info/plugin");
-
-  ignition::msgs::StringMsg req;
-
-  // Before entityName. Fill this with some name?
-
-  req.set_data("data://world/" + gui::get_world() + "/plugin/");
-
-  this->dataPtr->ignNode.Request(service, req,
-      &ModelListWidget::OnWorldPluginList, this);
   // this->requestMsg = msgs::CreateRequest("scene_info");
   // this->requestPub->Publish(*this->requestMsg);
 }
@@ -3228,6 +2982,7 @@ void ModelListWidget::ResetTree()
     this->dataPtr->modelTreeWidget->addTopLevelItem(this->dataPtr->lightsItem);
   }
 
+  this->dataPtr->fillingPropertyTree = false;
   this->dataPtr->selectedProperty = nullptr;
 }
 
@@ -3853,155 +3608,4 @@ void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
   this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
   this->dataPtr->fillTypes.push_back("Plugin");
   this->dataPtr->propMutex->unlock();
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnSensorInfo(const ignition::msgs::Sensor_V &_sensors,
-    const bool _success)
-{
-  if (!_success)
-  {
-    gzerr << "Failed to receive sensor info. Check server logs." << std::endl;
-    return;
-  }
-
-  // We asked for only one sensor
-  GZ_ASSERT(_sensors.sensors().size() == 1, "Wrong number of sensors");
-
-  this->dataPtr->propMutex->lock();
-  this->dataPtr->sensorMsg.CopyFrom(_sensors.sensors(0));
-  this->dataPtr->fillTypes.push_back("Sensor");
-  this->dataPtr->propMutex->unlock();
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnVisualInfo(const ignition::msgs::Visual_V &_visuals,
-    const bool _success)
-{
-  if (!_success)
-  {
-    gzerr << "Failed to receive visual info. Check server logs." << std::endl;
-    return;
-  }
-
-  // We asked for only one plugin
-  GZ_ASSERT(_visuals.visuals().size() == 1, "Wrong number of visuals");
-
-  this->dataPtr->propMutex->lock();
-  this->dataPtr->visualMsg.CopyFrom(_visuals.visuals(0));
-  this->dataPtr->fillTypes.push_back("Visual");
-  this->dataPtr->propMutex->unlock();
-
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
-    const bool _success)
-{
-  if (!_success)
-  {
-    gzerr << "Failed to receive plugin list. Check client logs." << std::endl;
-    return;
-  }
-
-  this->dataPtr->guiInfoRequested = true;
-
-  QFont subheaderFont;
-  subheaderFont.setBold(true);
-
-  printf("%s\n", "guipl");
-
-  ignition::msgs::Plugin_V plugins;
-  plugins.CopyFrom(_plugins);
-
-  if (plugins.plugins_size() > 0)
-  {
-    printf("%s\n", "guiplsd");
-    // Fetch top level GUI item
-    QList<QTreeWidgetItem *> topItem =
-        this->dataPtr->modelTreeWidget->findItems(tr("GUI"), Qt::MatchExactly);
-
-      // Create subheader for plugins
-      // Assume there is only one GUI item
-      QTreeWidgetItem *pluginHeaderItem = new QTreeWidgetItem(
-        topItem.at(0), QStringList(QString("%1").arg("PLUGINS")));
-      pluginHeaderItem->setFont(0, subheaderFont);
-      pluginHeaderItem->setFlags(Qt::NoItemFlags);
-      this->dataPtr->modelTreeWidget->addTopLevelItem(pluginHeaderItem);
-
-    for (int i = 0; i < plugins.plugins_size(); ++i)
-    {
-      std::string pluginName = plugins.plugins(i).name().c_str();
-
-      QTreeWidgetItem *pluginItem = new QTreeWidgetItem(topItem.at(0),
-          QStringList(QString("%1").arg(
-              QString::fromStdString(pluginName))));
-
-      common::URI pluginUri;
-
-      pluginUri.SetScheme("data");
-
-      pluginUri.Path().PushBack("gui");
-      pluginUri.Path().PushBack("gzclient");
-      pluginUri.Path().PushBack("plugin");
-      pluginUri.Path().PushBack(pluginName);
-
-      pluginItem->setData(0, Qt::UserRole,
-          QVariant(pluginUri.Str().c_str()));
-      pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
-
-      this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelListWidget::OnWorldPluginList(const ignition::msgs::Plugin_V &_plugins,
-    const bool _success)
-{
-  if (!_success)
-  {
-    return;
-  }
-
-  QFont subheaderFont;
-  subheaderFont.setBold(true);
-
-  ignition::msgs::Plugin_V plugins;
-  plugins.CopyFrom(_plugins);
-
-  if (plugins.plugins_size() > 0)
-  {
-    // Add an world plugins item to the world tab tree
-    QTreeWidgetItem *topItem = new QTreeWidgetItem(
-        static_cast<QTreeWidgetItem *>(0),
-        QStringList(QString("%1").arg("World Plugins")));
-
-    topItem->setData(0, Qt::UserRole, QVariant("World Plugins"));
-    this->dataPtr->modelTreeWidget->addTopLevelItem(topItem);
-
-    for (int i = 0; i < plugins.plugins_size(); ++i)
-    {
-      std::string pluginName = plugins.plugins(i).name().c_str();
-
-      QTreeWidgetItem *pluginItem = new QTreeWidgetItem(topItem,
-          QStringList(QString("%1").arg(
-              QString::fromStdString(pluginName))));
-
-      common::URI pluginUri;
-
-      pluginUri.SetScheme("data");
-
-      pluginUri.Path().PushBack("world");
-      pluginUri.Path().PushBack(gui::get_world());
-      pluginUri.Path().PushBack("plugin");
-      pluginUri.Path().PushBack(pluginName);
-
-      pluginItem->setData(0, Qt::UserRole,
-          QVariant(pluginUri.Str().c_str()));
-      pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
-
-      this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
-    }
-  }
 }

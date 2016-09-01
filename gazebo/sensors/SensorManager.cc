@@ -24,8 +24,6 @@
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -34,7 +32,6 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/util/IgnMsgSdf.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -55,24 +52,6 @@ SensorManager::SensorManager()
 
   // sensors::OTHER container
   this->sensorContainers.push_back(new SensorContainer());
-
-  printf("%s\n", "bala");
-
-  std::string sensorService("/sensors/info/sensor");
-  if (!this->ignNode.Advertise(sensorService,
-      &SensorManager::SensorInfoService, this))
-  {
-    gzerr << "Error advertising service [" << sensorService << "]"
-    << std::endl;
-  }
-
-  std::string pluginService("/sensors/info/plugin");
-  if (!this->ignNode.Advertise(pluginService,
-      &SensorManager::PluginInfoService, this))
-  {
-    gzerr << "Error advertising service [" << pluginService << "]"
-    << std::endl;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -724,6 +703,9 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   SensorContainer::Update(_force);
 }
 
+
+
+
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()
 {
@@ -802,7 +784,7 @@ void SensorManager::PluginInfo(const common::URI &_pluginUri,
     ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
   _plugins.clear_plugins();
-  _success = true;
+  _success = false;
 
   if (!_pluginUri.Valid())
   {
@@ -844,9 +826,10 @@ void SensorManager::PluginInfo(const common::URI &_pluginUri,
       {
         printf("%d\n", j);
         printf("%s\n", myParts[j].c_str());
-        printf("%s\n", parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - j)].c_str());
+        printf("%s\n", parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - (j-1))].c_str());
 
-        if (parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - j)] != myParts[j])
+        // j - 1 == skip check plugin name from _pluginUri
+        if (parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - (j - 1))] != myParts[j])
         {
           gzwarn << "Sensor [" << _pluginUri.Str() << "] does not match sensor [" <<
               sensorUri.Str() << "]" << std::endl;
@@ -900,7 +883,7 @@ void SensorManager::SensorInfo(const common::URI &_sensorUri,
     ignition::msgs::Sensor_V &_sensors, bool &_success)
 {
   _sensors.clear_sensors();
-  _success = true;
+  _success = false;
 
   if (!_sensorUri.Valid())
   {
