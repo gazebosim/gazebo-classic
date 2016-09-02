@@ -507,16 +507,10 @@ void ArduCopterPlugin::ReceiveMotorCommand()
   }
   ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(ServoPacket), waitMs);
   ssize_t expectedPktSize = sizeof(float)*this->dataPtr->rotors.size();
-  if ((recvSize == -1) || (recvSize != expectedPktSize))
+  if (recvSize == -1)
   {
     // didn't receive a packet
     // gzerr << "no packet\n";
-    if (recvSize != -1)
-    {
-      gzerr << "got something weird: " << recvSize
-            << ", should be: " << sizeof(ServoPacket) << "\n";
-    }
-
     gazebo::common::Time::NSleep(100);
     if (this->dataPtr->arduCopterOnline)
     {
@@ -536,6 +530,12 @@ void ArduCopterPlugin::ReceiveMotorCommand()
   }
   else
   {
+    if (recvSize < expectedPktSize)
+    {
+      gzerr << "got less than model needs. Got: " << recvSize
+            << "commands, expected size: " << expectedPktSize << "\n";
+    }
+
     if (!this->dataPtr->arduCopterOnline)
     {
       gzdbg << "ArduCopter controller online detected.\n";
