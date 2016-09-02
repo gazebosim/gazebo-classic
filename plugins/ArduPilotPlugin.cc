@@ -112,9 +112,6 @@ class Control
   /// \brief control id / channel
   public: int channel = 0;
 
-  /// \brief Max control propeller RPM.
-  public: double maxRpm = 838.0;
-
   /// \brief Next command to be applied to the propeller
   public: double cmd = 0;
 
@@ -135,6 +132,9 @@ class Control
 
   /// \brief direction multiplier for this control
   public: double multiplier = 1;
+
+  /// \brief input command offset
+  public: double offset = 0;
 
   /// \brief unused coefficients
   public: double rotorVelocitySlowdownSim;
@@ -289,7 +289,7 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
     controlSDF = _sdf->GetElement("control");
   }
-  if (_sdf->HasElement("rotor"))
+  else if (_sdf->HasElement("rotor"))
   {
     gzwarn << "please deprecate <rotor> block, use <control> block instead.\n";
     controlSDF = _sdf->GetElement("rotor");
@@ -299,15 +299,16 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
     Control control;
 
-    if (controlSDF->HasAttribute("id"))
-    {
-      gzwarn << "please deprecate attribute id, use channel instead.\n";
-      control.channel = controlSDF->GetAttribute("id")->Get(control.channel);
-    }
-    else if (controlSDF->HasAttribute("channel"))
+    if (controlSDF->HasAttribute("channel"))
     {
       control.channel =
-        controlSDF->GetAttribute("channel")->Get(control.channel);
+        atoi(controlSDF->GetAttribute("channel")->GetAsString().c_str());
+    }
+    else if (controlSDF->HasAttribute("id"))
+    {
+      gzwarn << "please deprecate attribute id, use channel instead.\n";
+      control.channel =
+        atoi(controlSDF->GetAttribute("id")->GetAsString().c_str());
     }
     else
     {
@@ -356,7 +357,12 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       return;
     }
 
-    if (controlSDF->HasElement("turningDirection"))
+    if (controlSDF->HasElement("multiplier"))
+    {
+      // overwrite turningDirection, deprecated.
+      control.multiplier = controlSDF->Get<double>("multiplier");;
+    }
+    else if (controlSDF->HasElement("turningDirection"))
     {
       gzwarn << "<turningDirection> is deprecated. Please use"
              << " <multiplier>. Map 'cw' to '-1' and 'ccw' to '1'.\n";
@@ -379,22 +385,20 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
     else
     {
-      gzdbg << "<turningDirection> not specified,"
-            << " direction multiplier ('cw' or 'ccw')."
-            << " Default 'ccw', or equivalent to <multiplier> of 1.\n";
+      gzdbg << "<multiplier> (or deprecated <turningDirection>) not specified,"
+            << " Default 1 (or deprecated <turningDirection> 'ccw').\n";
+      control.multiplier = 1;
     }
 
-    if (controlSDF->HasElement("multiplier"))
+    if (controlSDF->HasElement("offset"))
     {
-      // overwrite turningDirection, deprecated.
-      control.multiplier = controlSDF->Get<double>("multiplier");;
+      control.offset = controlSDF->Get<double>("offset");;
     }
     else
     {
-      control.multiplier = 1;
-      gzdbg << "Default multiplier is 1.\n";
+      gzdbg << "<offset> not specified, default to 0.\n";
+      control.offset = 0;
     }
-
 
     getSdfParam<double>(controlSDF, "rotorVelocitySlowdownSim",
         control.rotorVelocitySlowdownSim, 1);
@@ -560,8 +564,7 @@ void ArduPilotPlugin::ApplyMotorForces(const double _dt)
   {
     if (this->dataPtr->controls[i].type == "VELOCITY")
     {
-      double velTarget = this->dataPtr->controls[i].multiplier *
-        this->dataPtr->controls[i].cmd /
+      double velTarget = this->dataPtr->controls[i].cmd /
         this->dataPtr->controls[i].rotorVelocitySlowdownSim;
       double vel = this->dataPtr->controls[i].joint->GetVelocity(0);
       double error = vel - velTarget;
@@ -570,8 +573,7 @@ void ArduPilotPlugin::ApplyMotorForces(const double _dt)
     }
     else if (this->dataPtr->controls[i].type == "POSITION")
     {
-      double posTarget = this->dataPtr->controls[i].multiplier *
-        this->dataPtr->controls[i].cmd;
+      double posTarget = this->dataPtr->controls[i].cmd;
       double pos = this->dataPtr->controls[i].joint->GetAngle(0).Radian();
       double error = pos - posTarget;
       double force = this->dataPtr->controls[i].pid.Update(error, _dt);
@@ -579,8 +581,7 @@ void ArduPilotPlugin::ApplyMotorForces(const double _dt)
     }
     else if (this->dataPtr->controls[i].type == "EFFORT")
     {
-      double force = this->dataPtr->controls[i].multiplier *
-        this->dataPtr->controls[i].cmd;
+      double force = this->dataPtr->controls[i].cmd;
       this->dataPtr->controls[i].joint->SetForce(0, force);
     }
     else
@@ -617,16 +618,11 @@ void ArduPilotPlugin::ReceiveMotorCommand()
   }
   ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(ServoPacket), waitMs);
   ssize_t expectedPktSize = sizeof(float)*this->dataPtr->controls.size();
-  if ((recvSize == -1) || (recvSize != expectedPktSize))
+  ssize_t recvChannels = recvSize/sizeof(float);
+  if (recvSize == -1)
   {
     // didn't receive a packet
-    // gzerr << "no packet\n";
-    if (recvSize != -1)
-    {
-      gzerr << "got something weird: " << recvSize
-            << ", should be: " << sizeof(ServoPacket) << "\n";
-    }
-
+    // gzdbg << "no packet\n";
     gazebo::common::Time::NSleep(100);
     if (this->dataPtr->arduPilotOnline)
     {
@@ -646,6 +642,17 @@ void ArduPilotPlugin::ReceiveMotorCommand()
   }
   else
   {
+    if (recvSize < expectedPktSize)
+    {
+      gzerr << "got less than model needs. Got: " << recvSize
+            << "commands, expected size: " << expectedPktSize << "\n";
+    }
+
+    for(unsigned int i = 0; i < recvChannels; ++i)
+    {
+      gzdbg << "servo_command [" << i << "]: " << pkt.motorSpeed[i] << "\n";
+    }
+
     if (!this->dataPtr->arduPilotOnline)
     {
       gzdbg << "ArduPilot controller online detected.\n";
@@ -659,9 +666,26 @@ void ArduPilotPlugin::ReceiveMotorCommand()
     {
       if (i < MAX_MOTORS)
       {
-        // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
-        this->dataPtr->controls[i].cmd = this->dataPtr->controls[i].maxRpm *
-          pkt.motorSpeed[this->dataPtr->controls[i].channel];
+        if (this->dataPtr->controls[i].channel < recvChannels)
+        {
+          this->dataPtr->controls[i].cmd =
+            this->dataPtr->controls[i].multiplier *
+            (this->dataPtr->controls[i].offset +
+            pkt.motorSpeed[this->dataPtr->controls[i].channel]);
+          gzdbg << "apply input chan[" << this->dataPtr->controls[i].channel
+                << "] to control chan[" << i
+                << "] with joint name [" << this->dataPtr->controls[i].jointName
+                << "] servo_command [" << this->dataPtr->controls[i].cmd
+                << "].\n";
+        }
+        else
+        {
+          gzerr << "control[" << i << "] channel ["
+                << this->dataPtr->controls[i].channel
+                << "] is greater than incoming commands size["
+                << recvChannels
+                << "], control not applied.\n";
+        }
       }
       else
       {

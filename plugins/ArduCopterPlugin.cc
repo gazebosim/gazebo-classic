@@ -292,7 +292,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
       if (rotorSDF->HasAttribute("id"))
       {
-        rotor.id = rotorSDF->GetAttribute("id")->Get(rotor.id);
+        rotor.id = atoi(rotorSDF->GetAttribute("id")->GetAsString().c_str());
       }
       else
       {
