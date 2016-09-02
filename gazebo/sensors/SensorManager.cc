@@ -24,6 +24,8 @@
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -32,6 +34,7 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/util/IgnMsgSdf.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -52,6 +55,22 @@ SensorManager::SensorManager()
 
   // sensors::OTHER container
   this->sensorContainers.push_back(new SensorContainer());
+
+  std::string sensorService("/sensors/info/sensor");
+  if (!this->ignNode.Advertise(sensorService,
+      &SensorManager::SensorInfoService, this))
+  {
+    gzerr << "Error advertising service [" << sensorService << "]"
+    << std::endl;
+  }
+
+  std::string pluginService("/sensors/info/plugin");
+  if (!this->ignNode.Advertise(pluginService,
+      &SensorManager::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << pluginService << "]"
+    << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -940,6 +959,8 @@ void SensorManager::SensorInfo(const common::URI &_sensorUri,
 
       // Add properties
       auto sensorMsg = _sensors.add_sensors();
+      sensorMsg->CopyFrom(util::Convert<ignition::msgs::Sensor>(sensor->GetSDF()));
+      /*
       sensorMsg->set_name(sensor->Name());
       sensorMsg->set_parent(sensor->ParentName());
       sensorMsg->set_type(sensor->Type());
@@ -948,7 +969,7 @@ void SensorManager::SensorInfo(const common::URI &_sensorUri,
       sensorMsg->set_visualize(sensor->Visualize());
       sensorMsg->set_topic(sensor->Topic());
       //sensorMsg->set_pose(sensor->Pose());
-
+*/
       _success = true;
       return;
     }

@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/msgs/Utility.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -27,6 +28,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/URI.hh" 
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -72,6 +75,7 @@
 
 #include "gazebo/rendering/ScenePrivate.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/util/IgnMsgSdf.hh"
 
 #ifdef HAVE_OCULUS
 #include "gazebo/rendering/OculusCamera.hh"
@@ -316,6 +320,23 @@ void Scene::Load()
   this->dataPtr->manager->addRenderQueueListener(
       RenderEngine::Instance()->OverlaySystem());
 #endif
+
+  std::string service("/rendering/info/visual");
+  if (!this->dataPtr->ignNode.Advertise(service,
+    &Scene::VisualInfoService, this))
+  {
+  gzerr << "Error advertising service [" << service << "]"
+      << std::endl;
+  }
+
+  std::string pluginService("/rendering/info/plugin");
+  if (!this->dataPtr->ignNode.Advertise(pluginService,
+    &Scene::PluginInfoService, this))
+  {
+
+  gzerr << "Error advertising service [" << pluginService << "]"
+      << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -3642,10 +3663,6 @@ void Scene::VisualInfo(const common::URI _visualUri,
     return;
   }
 
-  printf("%s\n", parts[1].c_str());
-
-  printf("%d\n", this->GetVisualCount());
-
   auto visual = this->GetVisual(parts[1]);
 
   if (!visual)
@@ -3657,7 +3674,7 @@ void Scene::VisualInfo(const common::URI _visualUri,
 
   // Add properties
   auto visualMsg = _visuals.add_visuals();
-  visualMsg->CopyFrom(util::Convert<ignition::msgs::Visual>(visual->GetSDF())):
+  visualMsg->CopyFrom(util::Convert<ignition::msgs::Visual>(visual->GetSDF()));
   /*
   visualMsg->set_name(visual->GetName());
   visualMsg->set_parent_name(visual->GetParent()->GetName());
@@ -3666,8 +3683,7 @@ void Scene::VisualInfo(const common::URI _visualUri,
   // TODO No set_pose/geo function??  
   ignition::msgs::Set(visualMsg->mutable_pose(), visual->GetPose().Ign());
   //visualMsg->set_geometry(visual->GetGeometrySize());
-  */
-
+*/
   _success = true;
   return;
 }
