@@ -648,10 +648,10 @@ void ArduPilotPlugin::ReceiveMotorCommand()
             << "commands, expected size: " << expectedPktSize << "\n";
     }
 
-    for(unsigned int i = 0; i < recvChannels; ++i)
-    {
-      gzdbg << "servo_command [" << i << "]: " << pkt.motorSpeed[i] << "\n";
-    }
+    // for(unsigned int i = 0; i < recvChannels; ++i)
+    // {
+    //   gzdbg << "servo_command [" << i << "]: " << pkt.motorSpeed[i] << "\n";
+    // }
 
     if (!this->dataPtr->arduPilotOnline)
     {
@@ -672,11 +672,12 @@ void ArduPilotPlugin::ReceiveMotorCommand()
             this->dataPtr->controls[i].multiplier *
             (this->dataPtr->controls[i].offset +
             pkt.motorSpeed[this->dataPtr->controls[i].channel]);
-          gzdbg << "apply input chan[" << this->dataPtr->controls[i].channel
-                << "] to control chan[" << i
-                << "] with joint name [" << this->dataPtr->controls[i].jointName
-                << "] servo_command [" << this->dataPtr->controls[i].cmd
-                << "].\n";
+          // gzdbg << "apply input chan[" << this->dataPtr->controls[i].channel
+          //       << "] to control chan[" << i
+          //       << "] with joint name ["
+          //       << this->dataPtr->controls[i].jointName
+          //       << "] servo_command [" << this->dataPtr->controls[i].cmd
+          //       << "].\n";
         }
         else
         {
