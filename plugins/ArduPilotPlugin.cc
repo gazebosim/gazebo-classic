@@ -294,9 +294,9 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // gazeboToNED brings us from gazebo model frame: x-forward, y-right, z-down
   // to the aerospace convention: x-forward, y-left, z-up
   this->gazeboToNED = ignition::math::Pose3d(0, 0, 0, IGN_PI, 0, 0);
-  if (_sdf->HasElement("modelXYZToNED"))
+  if (_sdf->HasElement("gazeboXYZToNED"))
   {
-    this->gazeboToNED = _sdf->Get<ignition::math::Pose3d>("modelXYZToNED");
+    this->gazeboToNED = _sdf->Get<ignition::math::Pose3d>("gazeboXYZToNED");
   }
 
   // per control channel
