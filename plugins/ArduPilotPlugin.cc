@@ -283,6 +283,22 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->dataPtr->model = _model;
 
+  // modelToXForwardZUp brings us from gazebo model frame: x-forward, y-right, z-down
+  // to the aerospace convention: x-forward, y-left, z-up
+  this->modelToXForwardZUp = ignition::math::Pose3d(0, 0, 0, 0, 0, 0);
+  if (_sdf->HasElement("modelToXForwardZUp"))
+  {
+    this->modelToXForwardZUp = _sdf->Get<ignition::math::Pose3d>("modelToXForwardZUp");
+  }
+
+  // gazeboToNED brings us from gazebo model frame: x-forward, y-right, z-down
+  // to the aerospace convention: x-forward, y-left, z-up
+  this->gazeboToNED = ignition::math::Pose3d(0, 0, 0, IGN_PI, 0, 0);
+  if (_sdf->HasElement("modelXYZToNED"))
+  {
+    this->gazeboToNED = _sdf->Get<ignition::math::Pose3d>("modelXYZToNED");
+  }
+
   // per control channel
   sdf::ElementPtr controlSDF;
   if (_sdf->HasElement("control"))
@@ -503,9 +519,18 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (!this->dataPtr->imuSensor)
   {
-    gzerr << "imu_sensor [" << imuScopedName
-          << "] not found, abort ArduPilot plugin.\n" << "\n";
-    return;
+    gzwarn << "imu_sensor scoped name [" << imuScopedName
+          << "] not found, trying unscoped name.\n" << "\n";
+    // TODO: this fails for multi-nested models.
+    // TODO: and transforms fail for rotated nested model, joints point the wrong way.
+    this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
+      (sensors::SensorManager::Instance()->GetSensor(imuName));
+    if (!this->dataPtr->imuSensor)
+    {
+      gzerr << "imu_sensor [" << imuName
+            << "] not found, abort ArduPilot plugin.\n" << "\n";
+      return;
+    }
   }
 
   // Controller time control.
@@ -712,7 +737,8 @@ void ArduPilotPlugin::SendState() const
 
   // get linear acceleration in body frame
   ignition::math::Vector3d linearAccel =
-    this->dataPtr->imuSensor->LinearAcceleration();
+    this->modelToXForwardZUp.Rot().RotateVectorReverse(
+    this->dataPtr->imuSensor->LinearAcceleration());
 
   // copy to pkt
   pkt.imuLinearAccelerationXYZ[0] = linearAccel.X();
@@ -722,7 +748,8 @@ void ArduPilotPlugin::SendState() const
 
   // get angular velocity in body frame
   ignition::math::Vector3d angularVel =
-    this->dataPtr->imuSensor->AngularVelocity();
+    this->modelToXForwardZUp.Rot().RotateVectorReverse(
+    this->dataPtr->imuSensor->AngularVelocity());
 
   // copy to pkt
   pkt.imuAngularVelocityRPY[0] = angularVel.X();
@@ -746,17 +773,13 @@ void ArduPilotPlugin::SendState() const
   // assuming the world NED frame has xyz mapped to NED,
   // imuLink is NED - z down
 
-  // gazeboToNED brings us from gazebo model: x-forward, y-right, z-down
-  // to the aerospace convention: x-forward, y-left, z-up
-  ignition::math::Pose3d gazeboToNED(0, 0, 0, IGN_PI, 0, 0);
-
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down
-  ignition::math::Pose3d worldToModel = gazeboToNED +
+  ignition::math::Pose3d worldToModel = this->gazeboToNED +
     this->dataPtr->model->GetWorldPose().Ign();
 
   // get transform from world NED to Model frame
-  ignition::math::Pose3d NEDToModel = worldToModel - gazeboToNED;
+  ignition::math::Pose3d NEDToModel = worldToModel - this->gazeboToNED;
 
   // gzerr << "ned to model [" << NEDToModel << "]\n";
 
@@ -777,7 +800,7 @@ void ArduPilotPlugin::SendState() const
   pkt.imuOrientationQuat[3] = NEDToModel.Rot().Z();
 
   // gzdbg << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
-  // gzdbg << "ned [" << gazeboToNED.rot.GetAsEuler() << "]\n";
+  // gzdbg << "ned [" << this->gazeboToNED.rot.GetAsEuler() << "]\n";
   // gzdbg << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
 
   // Get NED velocity in body frame *
@@ -786,7 +809,7 @@ void ArduPilotPlugin::SendState() const
   ignition::math::Vector3d velGazeboWorldFrame =
     this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
   ignition::math::Vector3d velNEDFrame =
-    gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
+    this->gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();
   pkt.velocityXYZ[1] = velNEDFrame.Y();
   pkt.velocityXYZ[2] = velNEDFrame.Z();

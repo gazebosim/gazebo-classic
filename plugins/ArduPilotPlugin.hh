@@ -81,6 +81,12 @@ namespace gazebo
 
     /// \brief Private data pointer.
     private: std::unique_ptr<ArduPilotPluginPrivate> dataPtr;
+
+    /// \brief transform from model orientation to x-forward and z-up
+    private: ignition::math::Pose3d modelToXForwardZUp;
+
+    /// \brief transform from world frame to NED frame
+    private: ignition::math::Pose3d gazeboToNED;
   };
 }
 #endif
