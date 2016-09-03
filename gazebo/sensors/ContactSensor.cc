@@ -266,23 +266,10 @@ unsigned int ContactSensor::GetCollisionContactCount(
 }
 
 //////////////////////////////////////////////////
-msgs::Contacts ContactSensor::GetContacts() const
-{
-  return this->Contacts();
-}
-
-//////////////////////////////////////////////////
 msgs::Contacts ContactSensor::Contacts() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->contactsMsg;
-}
-
-//////////////////////////////////////////////////
-std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
-    const std::string &_collisionName)
-{
-  return this->Contacts(_collisionName);
 }
 
 //////////////////////////////////////////////////
