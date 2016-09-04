@@ -194,7 +194,6 @@ TEST_F(WorldTest, EditName)
   }
 }
 
-/*
 //////////////////////////////////////////////////
 TEST_F(WorldTest, ModelPluginInfo)
 {
@@ -264,9 +263,9 @@ TEST_F(WorldTest, WorldPluginInfo)
     EXPECT_EQ(plugins.plugins(0).name(), "wind");
   }
 }
-/*
+
 //////////////////////////////////////////////////
-TEST_F(ModelTest, PluginInfoFailures)
+TEST_F(WorldTest, PluginInfoFailures)
 {
   this->Load("worlds/wind_demo.world", true);
 
@@ -275,12 +274,12 @@ TEST_F(ModelTest, PluginInfoFailures)
 
   ignition::msgs::Plugin_V plugins;
   bool success;
-  common::URI pluginUri;
+  ignition::msgs::StringMsg req;
 
   gzmsg << "Get all plugins" << std::endl;
   {
-    pluginUri.Parse("data://world/default/model/box/plugin/");
-    model->PluginInfo(pluginUri, plugins, success);
+    req.set_data("data://world/default/plugin");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
@@ -288,28 +287,28 @@ TEST_F(ModelTest, PluginInfoFailures)
 
   gzmsg << "Wrong world" << std::endl;
   {
-    pluginUri.Parse("data://world/wrong/plugin/");
-    model->PluginInfo(pluginUri, plugins, success);
+    req.set_data("data://world/wrong/plugin");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_FALSE(success);
   }
 
   gzmsg << "Invalid URI" << std::endl;
   {
-    pluginUri = common::URI("tell me about your plugins");
-    model->PluginInfo(pluginUri, plugins, success);
+    req.set_data("tell me about your plugins");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_FALSE(success);
   }
 
   gzmsg << "Incomplete URI" << std::endl;
   {
-    pluginUri.Parse("data://world/default/");
-    model->PluginInfo(pluginUri, plugins, success);
+    req.set_data("data://world/default");
+    world->PluginInfoService(req, plugins, success);
 
     EXPECT_FALSE(success);
   }
-}*/
+}
 
 //////////////////////////////////////////////////
 

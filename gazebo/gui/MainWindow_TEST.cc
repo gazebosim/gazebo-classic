@@ -1135,28 +1135,41 @@ void MainWindow_TEST::PluginInfo()
     pluginUri.Parse(
     "data://gui/gzclient/plugin/timer_gui");
 
-    do 
-    {
-      mainWindow->PluginInfo(pluginUri, plugins, success);
-    } 
-    while (plugins.plugins_size() <= 0);
+  // Check that plugins is filled
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sleep < maxSleep && plugins.plugins_size() <= 0)
+  {
+    gazebo::common::Time::MSleep(100);
+    mainWindow->PluginInfo(pluginUri, plugins, success);
+    sleep++;
+  }
+  gzmsg << "plugins.plugins_size() [" << plugins.plugins_size() <<
+  "]    sleep [" << sleep << "]" << std::endl;
 
-    //pluginMsgs from MainWindow are filled
-    QVERIFY(success);
-    QVERIFY(plugins.plugins_size() == 1);
-    QVERIFY(plugins.plugins(0).name() == "timer_gui");
+  //plugins is filled
+  QVERIFY(success);
+  QVERIFY(plugins.plugins_size() == 1);
+  QVERIFY(plugins.plugins(0).name() == "timer_gui");
 	}
+
   gzmsg << "Get all plugins" << std::endl;
   {
     pluginUri.Parse("data://gui/gzclient/plugin");
 
-    do 
-    {
-      mainWindow->PluginInfo(pluginUri, plugins, success);
-    }
-    while (plugins.plugins_size() <= 0);
+  // Check that plugins are filled
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sleep < maxSleep && plugins.plugins_size() <= 0)
+  {
+    gazebo::common::Time::MSleep(100);
+    mainWindow->PluginInfo(pluginUri, plugins, success);
+    sleep++;
+  }
+  gzmsg << "plugins.plugins_size() [" << plugins.plugins_size() <<
+  "]    sleep [" << sleep << "]" << std::endl;
 
-    //pluginMsgs from MainWindow are filled
+    //plugins are filled
     QVERIFY(success);
     QVERIFY(plugins.plugins_size() == 4);
     QVERIFY(plugins.plugins(0).name() == "timer_gui");
@@ -1187,16 +1200,28 @@ void MainWindow_TEST::PluginInfoFailures()
 
   gzmsg << "Get all plugins" << std::endl;
   {
-    do 
+    // Check that plugins are filled
+    int sleep = 0;
+    int maxSleep = 10;
+    while (sleep < maxSleep && plugins.plugins_size() <= 0)
     {
+      gazebo::common::Time::MSleep(100);
       mainWindow->PluginInfo(pluginUri, plugins, success);
+      sleep++;
     }
-    while (plugins.plugins_size() <= 0);
-
-    mainWindow->PluginInfo(pluginUri, plugins, success);
+    gzmsg << "plugins.plugins_size() [" << plugins.plugins_size() <<
+    "]    sleep [" << sleep << "]" << std::endl;
 
     QVERIFY(success);
     QVERIFY(plugins.plugins_size() == 4);
+  }
+
+  gzmsg << "URI of different GUI" << std::endl;
+  {
+    pluginUri.Parse("data://gui/gzweb/plugin");
+    mainWindow->PluginInfo(pluginUri, plugins, success);
+
+    QVERIFY(!success);
   }
 
   gzmsg << "Invalid URI" << std::endl;
@@ -1209,11 +1234,46 @@ void MainWindow_TEST::PluginInfoFailures()
 
   gzmsg << "Incomplete URI" << std::endl;
   {
-    pluginUri.Parse("data://gui/");
+    pluginUri.Parse("data://gui");
     mainWindow->PluginInfo(pluginUri, plugins, success);
 
     QVERIFY(!success);
   }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://gui/gzclient");
+    mainWindow->PluginInfo(pluginUri, plugins, success);
+
+    QVERIFY(!success);
+  }
+
+  //Load world without GUI plugins
+  this->Load("worlds/wind_demo.world", true);
+
+  pluginUri.Parse("data://gui/gzclient/plugin");
+
+  gzmsg << "Try to get all plugins (notice: no GUI plugins in this world)"
+  << std::endl;
+  {
+    // Check if plugins are filled
+    int sleep = 0;
+    int maxSleep = 10;
+    while (sleep < maxSleep && plugins.plugins_size() <= 0)
+    {
+      gazebo::common::Time::MSleep(100);
+      mainWindow->PluginInfo(pluginUri, plugins, success);
+      sleep++;
+    }
+    gzmsg << "plugins.plugins_size() [" << plugins.plugins_size() <<
+    "]    sleep [" << sleep << "]" << std::endl;
+
+    // no GUI plugins
+    QVERIFY(success);
+    QVERIFY(plugins.plugins_size() == 0);
+  }
+
+  delete mainWindow;
 }
 
 // Generate a main function for the test

@@ -475,6 +475,15 @@ void ModelListWidget::ProcessModelMsgs()
         topItem->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
         this->dataPtr->modelTreeWidget->addTopLevelItem(topItem);
 
+        if ((*iter).link_size() > 0)
+        {
+          // Create subheader for links
+          QTreeWidgetItem *linkHeaderItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(QString::fromStdString("LINKS"))));
+          linkHeaderItem->setFont(0, subheaderFont);
+          linkHeaderItem->setFlags(Qt::NoItemFlags);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(linkHeaderItem);
+        }
 
         for (int i = 0; i < (*iter).link_size(); ++i)
         {
