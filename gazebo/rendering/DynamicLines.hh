@@ -26,7 +26,6 @@
 #include <string>
 
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicRenderable.hh"
 #include "gazebo/util/system.hh"
@@ -58,14 +57,6 @@ namespace gazebo
       public: virtual const Ogre::String &getMovableType() const;
 
       /// \brief Add a point to the point list
-      /// \param[in] _pt math::Vector3 point
-      /// \param[in] _color common::Color Point color
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void AddPoint(const math::Vector3 &_pt,
-            const common::Color &_color = common::Color::White)
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Add a point to the point list
       /// \param[in] _pt ignition::math::Vector3d point
       /// \param[in] _color common::Color Point color
       public: void AddPoint(const ignition::math::Vector3d &_pt,
@@ -81,13 +72,6 @@ namespace gazebo
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
-      /// \param[in] _value math::Vector3 value to set the point to
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetPoint(unsigned int _index, const math::Vector3 &_value)
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Change the location of an existing point in the point list
-      /// \param[in] _index Index of the point to set
       /// \param[in] _value ignition::math::Vector3d value to set the point to
       public: void SetPoint(const unsigned int _index,
                   const ignition::math::Vector3d &_value);
@@ -96,15 +80,6 @@ namespace gazebo
       /// \param[in] _index Index of the point to set
       /// \param[in] _color common::Color Pixelcolor color to set the point to
       public: void SetColor(unsigned int _index, const common::Color &_color);
-
-      /// \brief Return the location of an existing point in the point list
-      /// \param[in] _index Number of the point to return
-      /// \return math::Vector3 value of the point
-      /// \deprecated See function that returns an ignition::math object
-      /// \throw Throws an gazebo::common::Exception if the _index is out
-      /// of bounds
-      public: math::Vector3 GetPoint(unsigned int _index) const
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return

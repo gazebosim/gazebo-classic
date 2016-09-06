@@ -168,7 +168,6 @@ void CameraSensor::Init()
 void CameraSensor::Fini()
 {
   this->imagePub.reset();
-  Sensor::Fini();
 
   if (this->camera)
   {
@@ -176,7 +175,8 @@ void CameraSensor::Fini()
   }
 
   this->camera.reset();
-  this->scene.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -223,12 +223,6 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-unsigned int CameraSensor::GetImageWidth() const
-{
-  return this->ImageWidth();
-}
-
-//////////////////////////////////////////////////
 unsigned int CameraSensor::ImageWidth() const
 {
   if (this->camera)
@@ -246,12 +240,6 @@ unsigned int CameraSensor::ImageWidth() const
 }
 
 //////////////////////////////////////////////////
-unsigned int CameraSensor::GetImageHeight() const
-{
-  return this->ImageHeight();
-}
-
-//////////////////////////////////////////////////
 unsigned int CameraSensor::ImageHeight() const
 {
   if (this->camera)
@@ -266,12 +254,6 @@ unsigned int CameraSensor::ImageHeight() const
 
   gzwarn << "Can't get image height." << std::endl;
   return 0;
-}
-
-//////////////////////////////////////////////////
-const unsigned char *CameraSensor::GetImageData()
-{
-  return this->ImageData();
 }
 
 //////////////////////////////////////////////////
@@ -299,12 +281,6 @@ bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());
-}
-
-//////////////////////////////////////////////////
-rendering::CameraPtr CameraSensor::GetCamera() const
-{
-  return this->Camera();
 }
 
 //////////////////////////////////////////////////

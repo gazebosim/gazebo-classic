@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _LASERVISUAL_PRIVATE_HH_
-#define _LASERVISUAL_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_LASERVISUAL_PRIVATE_HH_
+#define GAZEBO_RENDERING_LASERVISUAL_PRIVATE_HH_
 
 #include <vector>
 
@@ -39,11 +38,15 @@ namespace gazebo
       /// \brief Subscription to the laser data.
       public: transport::SubscriberPtr laserScanSub;
 
-      /// \brief Renders the laser data as a triangle fan.
-      public: std::vector<DynamicLines *> rayFans;
+      /// \brief Renders the laser data as a triangle strip.
+      public: std::vector<DynamicLines *> rayStrips;
 
       /// \brief Renders laser data for rays that do not hit obstacles.
-      public: std::vector<DynamicLines *> noHitRayFans;
+      public: std::vector<DynamicLines *> noHitRayStrips;
+
+      /// \brief Renders a deadzone that is between the sensor's origin
+      /// and start of the rays.
+      public: std::vector<DynamicLines *> deadzoneRayFans;
 
       /// \brief Renders the laser data as a line list.
       public: std::vector<DynamicLines *> rayLines;

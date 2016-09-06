@@ -45,6 +45,19 @@ JointVisual::~JointVisual()
 }
 
 /////////////////////////////////////////////////
+void JointVisual::Fini()
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  if (dPtr->parentAxisVis)
+    dPtr->parentAxisVis->Fini();
+  dPtr->parentAxisVis.reset();
+
+  Visual::Fini();
+}
+
+/////////////////////////////////////////////////
 void JointVisual::Load(ConstJointPtr &_msg)
 {
   JointVisualPrivate *dPtr =

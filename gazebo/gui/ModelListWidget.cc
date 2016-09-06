@@ -34,6 +34,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -252,8 +253,16 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     {
       if (this->dataPtr->requestPub)
       {
-        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-            this->dataPtr->selectedEntityName);
+        if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
+        {
+          this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
+              this->dataPtr->selectedEntityName);
+        }
+        else
+        {
+          this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+           this->dataPtr->selectedEntityName);
+        }
         this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
@@ -293,6 +302,8 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->dataPtr->linkMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Joint")
       this->FillPropertyTree(this->dataPtr->jointMsg, nullptr);
+    else if (this->dataPtr->fillTypes[0] == "Plugin")
+      this->FillPropertyTree(this->dataPtr->pluginMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Scene")
       this->FillPropertyTree(this->dataPtr->sceneMsg, nullptr);
     else if (this->dataPtr->fillTypes[0] == "Physics")
@@ -343,6 +354,8 @@ void ModelListWidget::OnLightUpdate(const msgs::Light &_msg)
 void ModelListWidget::ProcessModelMsgs()
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+  QFont subheaderFont;
+  subheaderFont.setBold(true);
 
   for (auto iter = this->dataPtr->modelMsgs.begin();
        iter != this->dataPtr->modelMsgs.end(); ++iter)
@@ -364,7 +377,17 @@ void ModelListWidget::ProcessModelMsgs()
         topItem->setData(0, Qt::UserRole, QVariant((*iter).name().c_str()));
         this->dataPtr->modelTreeWidget->addTopLevelItem(topItem);
 
-        for (int i = 0; i < (*iter).link_size(); i++)
+        if ((*iter).link_size() > 0)
+        {
+          // Create subheader for links
+          QTreeWidgetItem *linkHeaderItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(QString::fromStdString("LINKS"))));
+          linkHeaderItem->setFont(0, subheaderFont);
+          linkHeaderItem->setFlags(Qt::NoItemFlags);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(linkHeaderItem);
+        }
+
+        for (int i = 0; i < (*iter).link_size(); ++i)
         {
           std::string linkName = (*iter).link(i).name();
           int index = linkName.rfind("::") + 2;
@@ -382,7 +405,17 @@ void ModelListWidget::ProcessModelMsgs()
           this->dataPtr->modelTreeWidget->addTopLevelItem(linkItem);
         }
 
-        for (int i = 0; i < (*iter).joint_size(); i++)
+        if ((*iter).joint_size() > 0)
+        {
+          // Create subheader for joints
+          QTreeWidgetItem *jointHeaderItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg(QString::fromStdString("JOINTS"))));
+          jointHeaderItem->setFont(0, subheaderFont);
+          jointHeaderItem->setFlags(Qt::NoItemFlags);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(jointHeaderItem);
+        }
+
+        for (int i = 0; i < (*iter).joint_size(); ++i)
         {
           std::string jointName = (*iter).joint(i).name();
 
@@ -397,6 +430,41 @@ void ModelListWidget::ProcessModelMsgs()
           jointItem->setData(0, Qt::UserRole, QVariant(jointName.c_str()));
           jointItem->setData(3, Qt::UserRole, QVariant("Joint"));
           this->dataPtr->modelTreeWidget->addTopLevelItem(jointItem);
+        }
+
+        if ((*iter).plugin_size() > 0)
+        {
+          // Create subheader for plugins
+          QTreeWidgetItem *pluginHeaderItem = new QTreeWidgetItem(topItem,
+          QStringList(QString("%1").arg("PLUGINS")));
+          pluginHeaderItem->setFont(0, subheaderFont);
+          pluginHeaderItem->setFlags(Qt::NoItemFlags);
+          this->dataPtr->modelTreeWidget->addTopLevelItem(pluginHeaderItem);
+        }
+
+        for (int i = 0; i < (*iter).plugin_size(); ++i)
+        {
+          std::string pluginName = (*iter).plugin(i).name();
+
+          QTreeWidgetItem *pluginItem = new QTreeWidgetItem(topItem,
+              QStringList(QString("%1").arg(
+                  QString::fromStdString(pluginName))));
+
+          common::URI pluginUri;
+          pluginUri.SetScheme("data");
+
+          pluginUri.Path().PushBack("world");
+          pluginUri.Path().PushBack(gui::get_world());
+          pluginUri.Path().PushBack("model");
+          pluginUri.Path().PushBack((*iter).name());
+          pluginUri.Path().PushBack("plugin");
+          pluginUri.Path().PushBack(pluginName);
+
+          pluginItem->setData(0, Qt::UserRole,
+              QVariant(pluginUri.Str().c_str()));
+          pluginItem->setData(3, Qt::UserRole, QVariant("Plugin"));
+
+          this->dataPtr->modelTreeWidget->addTopLevelItem(pluginItem);
         }
       }
     }
@@ -445,6 +513,14 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->dataPtr->propMutex->lock();
     this->dataPtr->jointMsg.ParseFromString(_msg->serialized_data());
     this->dataPtr->fillTypes.push_back("Joint");
+    this->dataPtr->propMutex->unlock();
+  }
+  else if (_msg->has_type() && _msg->type() ==
+    this->dataPtr->pluginMsg.GetTypeName())
+  {
+    this->dataPtr->propMutex->lock();
+    this->dataPtr->pluginMsg.ParseFromString(_msg->serialized_data());
+    this->dataPtr->fillTypes.push_back("Plugin");
     this->dataPtr->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() ==
@@ -2514,6 +2590,34 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
     this->FillPropertyTree(_msg.link(i), prop);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Plugin &_msg,
+                                       QtProperty *_parent)
+{
+  QtVariantProperty *item = nullptr;
+
+  // name
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+      tr("name"));
+  item->setValue(_msg.name().c_str());
+  item->setEnabled(false);
+  this->AddProperty(item, _parent);
+
+  // filename
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+    tr("filename"));
+  item->setValue(_msg.filename().c_str());
+  item->setEnabled(false);
+  this->AddProperty(item, _parent);
+
+  // innerxml
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+    tr("innerxml"));
+  item->setValue(_msg.innerxml().c_str());
+  item->setEnabled(false);
+  this->AddProperty(item, _parent);
 }
 
 /////////////////////////////////////////////////

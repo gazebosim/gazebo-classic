@@ -862,7 +862,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
     // Process path
     auto pathParts = common::split(pathStr, "/");
 
-    QStandardItem *previousItem = NULL;
+    QStandardItem *previousItem = nullptr;
     unsigned int i = 0;
     while (i < pathParts.size())
     {
@@ -872,7 +872,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       if (part == "model")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -945,7 +945,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       else if (part == "link")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -1008,7 +1008,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       else if (part == "joint")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -1342,7 +1342,7 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
     subItem0Name = "acceleration";
 
   // Check if it has already been added
-  QStandardItem *subItem0 = NULL;
+  QStandardItem *subItem0 = nullptr;
   for (int k = 0; k < _item->rowCount(); ++k)
   {
     auto childItem = _item->child(k, 0);
@@ -1470,7 +1470,7 @@ void Palette::InsertAxisItem(QStandardItem *_item, const common::URI &_uri,
     axis = 2;
 
   // Check if it has already been added
-  QStandardItem *subItem0 = NULL;
+  QStandardItem *subItem0 = nullptr;
   for (int k = 0; k < _item->rowCount(); ++k)
   {
     auto childItem = _item->child(k, 0);

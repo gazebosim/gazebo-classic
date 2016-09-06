@@ -117,11 +117,6 @@ namespace gazebo
 
       /// \brief Method to check if autorepeats are toggled.
       /// \return Whether or not autorepeats are toggled for key presses.
-      /// \deprecated See bool AutoRepeat() const.
-      public: bool GetAutoRepeat() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Method to check if autorepeats are toggled.
-      /// \return Whether or not autorepeats are toggled for key presses.
       public: bool AutoRepeat() const;
 
       /// \brief Toggle the allowance of autorepeats on key presses.
