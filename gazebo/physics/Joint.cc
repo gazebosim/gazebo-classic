@@ -520,6 +520,12 @@ void Joint::Reset()
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
     this->SetVelocity(i, 0.0);
+    // clamp initial position between joint limits
+    ignition::math::Angle position = ignition::math::clamp(
+      this->InitialPosition(i),
+      this->GetLowerLimit(i).Ign(),
+      this->GetUpperLimit(i).Ign());
+    this->SetPosition(i, position.Radian());
   }
   this->staticAngle.SetFromRadian(0);
 }

@@ -342,7 +342,8 @@ void Model::Init()
     for (unsigned int i = 0; i < (*iter)->GetAngleCount(); ++i)
     {
       // clamp initial position between joint limits
-      math::Angle position = math::clamp((*iter)->InitialPosition(i),
+      ignition::math::Angle position =
+        ignition::math::clamp((*iter)->InitialPosition(i),
         (*iter)->GetLowerLimit(i).Ign(), (*iter)->GetUpperLimit(i).Ign());
       // gzdbg << "setting joint[" << i
       //       << "] [" << (*iter)->GetName()
