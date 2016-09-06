@@ -478,13 +478,13 @@ namespace gazebo
       public: math::Angle GetUpperLimit(unsigned int _index) const;
 
       /// \brief:  set the joint upper limit
-      /// (replaces SetLowStop and SetHighStop)
+      /// (replaces SetLowStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
       public: void SetLowerLimit(unsigned int _index, math::Angle _limit);
 
-      /// \brief:  set the joint lower limit
-      /// (replacee GetLowStop and GetHighStop)
+      /// \brief:  set the joint upper limit
+      /// (replacee SetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Upper limit of the axis.
       public: void SetUpperLimit(unsigned int _index, math::Angle _limit);
