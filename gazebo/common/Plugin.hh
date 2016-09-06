@@ -340,7 +340,7 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
-  /// \brief A plugin loaded within the gzserver on startup.  See
+  /// \brief A plugin with access to rendering::Visual.  See
   /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
   /// &cat=write_plugin">reference</a>.
   class VisualPlugin : public PluginT<VisualPlugin>

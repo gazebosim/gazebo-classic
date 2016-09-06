@@ -91,12 +91,6 @@ void DiagnosticManager::Init(const std::string &_worldName)
 }
 
 //////////////////////////////////////////////////
-boost::filesystem::path DiagnosticManager::GetLogPath() const
-{
-  return this->LogPath();
-}
-
-//////////////////////////////////////////////////
 boost::filesystem::path DiagnosticManager::LogPath() const
 {
   return this->dataPtr->logPath;
@@ -181,21 +175,9 @@ void DiagnosticManager::Lap(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-int DiagnosticManager::GetTimerCount() const
-{
-  return this->TimerCount();
-}
-
-//////////////////////////////////////////////////
 int DiagnosticManager::TimerCount() const
 {
   return this->dataPtr->timers.size();
-}
-
-//////////////////////////////////////////////////
-common::Time DiagnosticManager::GetTime(int _index) const
-{
-  return this->Time(_index);
 }
 
 //////////////////////////////////////////////////
@@ -225,12 +207,6 @@ common::Time DiagnosticManager::Time(const int _index) const
 }
 
 //////////////////////////////////////////////////
-std::string DiagnosticManager::GetLabel(int _index) const
-{
-  return this->Label(_index);
-}
-
-//////////////////////////////////////////////////
 std::string DiagnosticManager::Label(const int _index) const
 {
   if (_index < 0 || static_cast<size_t>(_index) > this->dataPtr->timers.size())
@@ -250,12 +226,6 @@ std::string DiagnosticManager::Label(const int _index) const
     gzerr << "Erorr getting label\n";
 
   return "null";
-}
-
-//////////////////////////////////////////////////
-common::Time DiagnosticManager::GetTime(const std::string &_label) const
-{
-  return this->Time(_label);
 }
 
 //////////////////////////////////////////////////
@@ -353,12 +323,6 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
 
   // Store the prev lap time.
   this->dataPtr->prevLap = elapsed;
-}
-
-//////////////////////////////////////////////////
-const std::string DiagnosticTimer::GetName() const
-{
-  return this->Name();
 }
 
 //////////////////////////////////////////////////
