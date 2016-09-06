@@ -20,7 +20,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
-#define TOL 0.00001
+#define TOL 1e-5
 using namespace gazebo;
 
 class JointKinematicTest : public ServerFixture,
