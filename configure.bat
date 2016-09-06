@@ -33,7 +33,7 @@ set CURL_LIBRARY_NAME=libcurl_a
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
-@set IGNITION-TRANSPORT_PATH=%cd%\..\..\ign-transport\build\install\%build_type%
+@set IGNITION-TRANSPORT_PATH=%cd%\..\..\ign-transport2\build\install\%build_type%
 
 @set TBB_PATH=%cd%\..\..\tbb43_20141023oss
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
