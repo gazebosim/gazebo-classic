@@ -67,7 +67,7 @@ namespace gazebo
       /// \param[out] _intersect Intersection point.
       /// \param[out] _triangle The selected triangle on the mesh.
       public: bool SelectMeshTriangle(const int _x, const int _y,
-          const VisualPtr _visual,
+          const VisualPtr &_visual,
           ignition::math::Vector3d &_intersect,
           ignition::math::Triangle3d &_triangle);
 

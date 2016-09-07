@@ -59,7 +59,7 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 
 /////////////////////////////////////////////////
 bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
-    const VisualPtr _visual, ignition::math::Vector3d &_intersect,
+    const VisualPtr &_visual, ignition::math::Vector3d &_intersect,
     ignition::math::Triangle3d &_triangle)
 {
   // create the ray to test
