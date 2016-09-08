@@ -34,9 +34,10 @@
 #cmakedefine HAVE_GRAPHVIZ 1
 #cmakedefine HAVE_UUID 1
 #cmakedefine USE_EXTERNAL_TINYXML2 1
+#cmakedefine HAVE_OSVR 1
 
 #ifdef BUILD_TYPE_PROFILE
-#include <google/heap-checker.h>
+#include <gperftools/heap-checker.h>
 #endif
 
 // ifndef _GAZEBO_CONFIG_H_

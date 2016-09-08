@@ -169,24 +169,12 @@ ignition::math::Angle RaySensor::AngleMax() const
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRangeMin() const
-{
-  return this->RangeMin();
-}
-
-//////////////////////////////////////////////////
 double RaySensor::RangeMin() const
 {
   if (this->dataPtr->laserShape)
     return this->dataPtr->laserShape->GetMinRange();
   else
     return -1;
-}
-
-//////////////////////////////////////////////////
-double RaySensor::GetRangeMax() const
-{
-  return this->RangeMax();
 }
 
 //////////////////////////////////////////////////
@@ -199,22 +187,10 @@ double RaySensor::RangeMax() const
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetAngleResolution() const
-{
-  return this->AngleResolution();
-}
-
-//////////////////////////////////////////////////
 double RaySensor::AngleResolution() const
 {
   return (this->AngleMax() - this->AngleMin()).Radian() /
     (this->RangeCount()-1);
-}
-
-//////////////////////////////////////////////////
-double RaySensor::GetRangeResolution() const
-{
-  return this->RangeResolution();
 }
 
 //////////////////////////////////////////////////
@@ -227,24 +203,12 @@ double RaySensor::RangeResolution() const
 }
 
 //////////////////////////////////////////////////
-int RaySensor::GetRayCount() const
-{
-  return this->RayCount();
-}
-
-//////////////////////////////////////////////////
 int RaySensor::RayCount() const
 {
   if (this->dataPtr->laserShape)
     return this->dataPtr->laserShape->GetSampleCount();
   else
     return -1;
-}
-
-//////////////////////////////////////////////////
-int RaySensor::GetRangeCount() const
-{
-  return this->RangeCount();
 }
 
 //////////////////////////////////////////////////
@@ -260,24 +224,12 @@ int RaySensor::RangeCount() const
 }
 
 //////////////////////////////////////////////////
-int RaySensor::GetVerticalRayCount() const
-{
-  return this->VerticalRayCount();
-}
-
-//////////////////////////////////////////////////
 int RaySensor::VerticalRayCount() const
 {
   if (this->dataPtr->laserShape)
     return this->dataPtr->laserShape->GetVerticalSampleCount();
   else
     return -1;
-}
-
-//////////////////////////////////////////////////
-int RaySensor::GetVerticalRangeCount() const
-{
-  return this->VerticalRangeCount();
 }
 
 //////////////////////////////////////////////////
@@ -315,22 +267,10 @@ ignition::math::Angle RaySensor::VerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetVerticalAngleResolution() const
-{
-  return this->VerticalAngleResolution();
-}
-
-//////////////////////////////////////////////////
 double RaySensor::VerticalAngleResolution() const
 {
   return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
     (this->VerticalRangeCount()-1);
-}
-
-//////////////////////////////////////////////////
-void RaySensor::GetRanges(std::vector<double> &_ranges)
-{
-  this->Ranges(_ranges);
 }
 
 //////////////////////////////////////////////////
@@ -341,12 +281,6 @@ void RaySensor::Ranges(std::vector<double> &_ranges) const
   _ranges.resize(this->dataPtr->laserMsg.scan().ranges_size());
   memcpy(&_ranges[0], this->dataPtr->laserMsg.scan().ranges().data(),
          sizeof(_ranges[0]) * this->dataPtr->laserMsg.scan().ranges_size());
-}
-
-//////////////////////////////////////////////////
-double RaySensor::GetRange(unsigned int _index)
-{
-  return this->Range(_index);
 }
 
 //////////////////////////////////////////////////
@@ -369,12 +303,6 @@ double RaySensor::Range(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRetro(unsigned int _index)
-{
-  return this->Retro(_index);
-}
-
-//////////////////////////////////////////////////
 double RaySensor::Retro(const unsigned int _index) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -392,12 +320,6 @@ double RaySensor::Retro(const unsigned int _index) const
   }
 
   return this->dataPtr->laserMsg.scan().intensities(_index);
-}
-
-//////////////////////////////////////////////////
-int RaySensor::GetFiducial(unsigned int _index)
-{
-  return this->Fiducial(_index);
 }
 
 //////////////////////////////////////////////////
@@ -592,12 +514,6 @@ bool RaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections());
-}
-
-//////////////////////////////////////////////////
-physics::MultiRayShapePtr RaySensor::GetLaserShape() const
-{
-  return this->LaserShape();
 }
 
 //////////////////////////////////////////////////

@@ -73,7 +73,6 @@
   <file>images/view_angle_left.png</file>
   <file>images/view_angle_right.png</file>
   <file>images/view_angle_home.png</file>
-  <file>hotkeyTable.html</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
@@ -89,6 +88,11 @@
   <file>images/model.svg</file>
   <file>images/link.svg</file>
   <file>images/joint.svg</file>
+  <file>images/file_upload.svg</file>
+  <file>images/select_all.svg</file>
+  <file>images/clear.svg</file>
+  <file>images/check_box_black.svg</file>
+  <file>images/check_box_outline_black.svg</file>
 
   <file>fonts/Roboto-Black.ttf</file>
   <file>fonts/Roboto-BlackItalic.ttf</file>

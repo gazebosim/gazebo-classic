@@ -20,6 +20,10 @@
 #include "gazebo/math/SignalStatsPrivate.hh"
 #include "gazebo/math/SignalStats.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 

@@ -32,17 +32,20 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
-@set IGNITION_MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
-:: TODO: current ignition transport build lacks of debug compilation
-@set IGNITION_TRANSPORT_PATH=%cd%\..\..\ign-TRANSPORT\build\install\%build_type%
-@set IGNITION_TRANSPORT_CMAKE_PREFIX_PATH=%IGNITION_TRANSPORT_PATH%\lib\cmake\ignition-transport1
+@set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
+@set IGNITION-TRANSPORT_PATH=%cd%\..\..\ign-transport\build\install\%build_type%
+@set IGNITION-MSGS_PATH=%cd%\..\..\ign-msgs\build\install\%build_type%
 
 @set TBB_PATH=%cd%\..\..\tbb43_20141023oss
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
 @set TBB_INCLUDEDIR=%TBB_PATH%\include
 
-@set OGRE_VERSION=1.8.1
-@set OGRE_PATH=%cd%\..\..\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\%build_type%
+@set QWT_PATH=%cd%\..\..\qwt_6.1.0~github_zalf_lsa
+@set QWT_LIBRARY_DIR=%QWT_PATH%\%build_type%\qwt-6.1.0-vc12-x64
+@set QWT_INCLUDEDIR=%QWT_PATH%\include
+
+@set OGRE_VERSION=1.9.0
+@set OGRE_PATH=%cd%\..\..\OGRE-SDK-1.9.0-vc120-x64-12.03.2016
 @set OGRE_INCLUDE_DIR=%OGRE_PATH%\include;%OGRE_PATH%\include\OGRE;%OGRE_PATH%\include\OGRE\RTShaderSystem;%OGRE_PATH%\include\OGRE\Terrain;%OGRE_PATH%\include\OGRE\Paging
 @set OGRE_LIBRARY_DIR=%OGRE_PATH%\lib\%build_type%
 @set OGRE_PLUGIN_DIR=%OGRE_LIBRARY_DIR%\opt
@@ -58,16 +61,12 @@ set OGRE_LIB_SUFFIX=.lib
 @set QT4_PATH=C:\Qt\4.8.6\x64\msvc2013
 @set QT4_BIN_DIR=%QT4_PATH%\bin
 
-@set ZEROMQ_PATH=%cd%\..\..\ZeroMQ-3.2.4
-
-@set CPPZMQ_PATH=%cd%\..\..\cppzmq
-
 @set INCLUDE=%FREEIMAGE_INCLUDE_DIR%;%TBB_INCLUDEDIR%;%DLFCN_WIN32_INCLUDE_DIR%;%INCLUDE%
 @set LIB=%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
 @set PATH=%QT4_BIN_DIR%;%PATH%
 
-cmake -G "NMake Makefiles"^
-    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION_MATH_PATH%;%IGNITION_TRANSPORT_CMAKE_PREFIX_PATH%"^
+cmake -Wno-dev -G "NMake Makefiles"^
+    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-TRANSPORT_PATH%;%IGNITION-MSGS_PATH%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DUSE_EXTERNAL_TINYXML2:BOOL=False^
     -DFREEIMAGE_RUNS=1^
@@ -81,6 +80,8 @@ cmake -G "NMake Makefiles"^
     -DOGRE_PLUGINDIR="%OGRE_PLUGIN_DIR%"^
     -DOGRE_INCLUDE_DIRS="%OGRE_INCLUDE_DIR%"^
     -DOGRE_LIBRARIES="%OGRE_LIBS%"^
+    -DQWT_WIN_INCLUDE_DIR="%QWT_INCLUDEDIR%"^
+    -DQWT_WIN_LIBRARY_DIR="%QWT_LIBRARY_DIR%"^
     -DCURL_FOUND=1^
     -DCURL_INCLUDEDIR="%CURL_INCLUDE_DIR%"^
     -DCURL_LIBDIR="%CURL_LIBRARY_DIR%"^
@@ -88,14 +89,6 @@ cmake -G "NMake Makefiles"^
     -DTBB_FOUND=1^
     -DTBB_INCLUDEDIR="%TBB_INCLUDEDIR%"^
     -DTBB_LIBRARY_DIR="%TBB_LIBRARY_DIR%"^
-    -DIGNITION-MATH_INCLUDE_DIRS:STRING="%IGNITION_MATH_PATH%\include\ignition\math2"^
-    -DIGNITION-MATH_LIBRARY_DIRS:STRING="%IGNITION_MATH_PATH%\lib"^
-    -DIGNITION-MATH_LIBRARIES="ignition-math2"^
-    -DIGNITION-TRANSPORT_INCLUDE_DIRS:STRING="%IGNITION_TRANSPORT_PATH%\include\ignition\transport1"^
-    -DIGNITION-TRANSPORT_LIBRARY_DIRS:STRING="%IGNITION_TRANSPORT_PATH%\lib"^
-    -DIGNITION-TRANSPORT_LIBRARIES="ignition-transport1"^
-    -DZeroMQ_ROOT_DIR="@ZEROMQ_PATH@"^
-    -DCPPZMQ_HEADER_PATH="@CPPZMQ_PATH@"^
     -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
     -DENABLE_TESTS_COMPILATION:BOOL=False^

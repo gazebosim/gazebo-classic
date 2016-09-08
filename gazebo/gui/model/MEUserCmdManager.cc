@@ -53,6 +53,14 @@ namespace gazebo
 
       /// \brief Pose after the command (to be used by redo).
       public: ignition::math::Pose3d poseAfter;
+
+      /// \brief Map of scale for each visual and collision before the command
+      /// (to be used by undo), indexed by the visual name.
+      public: std::map<std::string, ignition::math::Vector3d> scalesBefore;
+
+      /// \brief Map of scale for each visual and collision after the command
+      /// (to be used by redo), indexed by the visual name.
+      public: std::map<std::string, ignition::math::Vector3d> scalesAfter;
     };
 
     /// \internal
@@ -150,6 +158,28 @@ void MEUserCmd::Undo()
     model::Events::requestNestedModelMove(this->dataPtr->scopedName,
         this->dataPtr->poseBefore);
   }
+  // Scaling a link
+  else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
+           !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkScale(this->dataPtr->scopedName,
+        this->dataPtr->scalesBefore);
+  }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName, false);
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml(), false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -210,6 +240,28 @@ void MEUserCmd::Redo()
     model::Events::requestNestedModelMove(this->dataPtr->scopedName,
         this->dataPtr->poseAfter);
   }
+  // Scaling a link
+  else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
+           !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkScale(this->dataPtr->scopedName,
+        this->dataPtr->scalesAfter);
+  }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml(), false);
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName, false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -248,6 +300,23 @@ void MEUserCmd::SetPoseChange(const ignition::math::Pose3d &_before,
 {
   this->dataPtr->poseBefore = _before;
   this->dataPtr->poseAfter = _after;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetScaleChange(
+    const std::map<std::string, ignition::math::Vector3d> &_before,
+    const std::map<std::string, ignition::math::Vector3d> &_after)
+{
+  if (_before.size() != _after.size())
+  {
+    gzwarn << "Number of scale operations before [" << _before.size()
+      << "] and after [" << _after.size() << "] command are "
+      << "different, some visuals or collisions might be scaled wrong."
+      << std::endl;
+  }
+
+  this->dataPtr->scalesBefore = _before;
+  this->dataPtr->scalesAfter = _after;
 }
 
 /////////////////////////////////////////////////

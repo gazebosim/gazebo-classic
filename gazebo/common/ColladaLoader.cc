@@ -22,6 +22,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -99,11 +100,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   TiXmlDocument xmlDoc;
 
-  this->dataPtr->path.clear();
-  if (_filename.rfind('/') != std::string::npos)
-  {
-    this->dataPtr->path = _filename.substr(0, _filename.rfind('/'));
-  }
+  boost::filesystem::path p(_filename);
+  this->dataPtr->path = p.parent_path().generic_string();
 
   this->dataPtr->filename = _filename;
   if (!xmlDoc.LoadFile(_filename))
@@ -466,7 +464,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
-    weights.push_back(math::parseFloat(wStrs[i]));
+    weights.push_back(ignition::math::parseFloat(wStrs[i]));
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
@@ -480,10 +478,10 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   std::vector<unsigned int> v;
 
   for (unsigned int i = 0; i < vCountStrs.size(); ++i)
-    vCount.push_back(math::parseInt(vCountStrs[i]));
+    vCount.push_back(ignition::math::parseInt(vCountStrs[i]));
 
   for (unsigned int i = 0; i < vStrs.size(); ++i)
-    v.push_back(math::parseInt(vStrs[i]));
+    v.push_back(ignition::math::parseInt(vStrs[i]));
 
   skeleton->SetNumVertAttached(vCount.size());
 
@@ -602,7 +600,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
       std::vector<double> times;
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
-        times.push_back(math::parseFloat(timeStrs[i]));
+        times.push_back(ignition::math::parseFloat(timeStrs[i]));
 
       TiXmlElement *output = frameTransXml->FirstChildElement("float_array");
       std::string outputStr = output->GetText();
@@ -611,7 +609,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
       std::vector<double> values;
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
-        values.push_back(math::parseFloat(outputStrs[i]));
+        values.push_back(ignition::math::parseFloat(outputStrs[i]));
 
       TiXmlElement *accessor =
         frameTransXml->FirstChildElement("technique_common");
@@ -968,7 +966,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
   {
-    ignition::math::Vector3d vec(math::parseFloat(*iter),
+    ignition::math::Vector3d vec(ignition::math::parseFloat(*iter),
         ignition::math::parseFloat(*(iter+1)),
         ignition::math::parseFloat(*(iter+2)));
 
@@ -1491,7 +1489,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   boost::split(vcountStrs, vcountStr, boost::is_any_of("   "));
   std::vector<int> vcounts;
   for (unsigned int j = 0; j < vcountStrs.size(); ++j)
-    vcounts.push_back(math::parseInt(vcountStrs[j]));
+    vcounts.push_back(ignition::math::parseInt(vcountStrs[j]));
 
   // read p
   TiXmlElement *pXml = _polylistXml->FirstChildElement("p");

@@ -11,10 +11,11 @@ include_directories(${TBB_INCLUDEDIR}
                     ${tinyxml2_INCLUDE_DIRS}
                     ${IGNITION-TRANSPORT_INCLUDE_DIRS})
 
-link_directories(${tinyxml2_LIBRARY_DIRS})
+link_directories(${tinyxml2_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
 
 set (sources
   Diagnostics.cc
+  IgnMsgSdf.cc
   IntrospectionClient.cc
   IntrospectionManager.cc
   LogPlay.cc
@@ -36,6 +37,7 @@ endif()
 
 set (headers
   Diagnostics.hh
+  IgnMsgSdf.hh
   IntrospectionClient.hh
   IntrospectionManager.hh
   LogPlay.hh
@@ -47,6 +49,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  IgnMsgSdf_TEST.cc
   IntrospectionClient_TEST.cc
   IntrospectionManager_TEST.cc
   LogPlay_TEST.cc
@@ -78,6 +81,7 @@ target_link_libraries(gazebo_util
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)
