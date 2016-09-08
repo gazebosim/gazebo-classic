@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Helpers.hh>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/MouseEvent.hh"
 
@@ -34,7 +35,7 @@ static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 //////////////////////////////////////////////////
 OrbitViewController::OrbitViewController(UserCameraPtr _camera,
     const std::string &_name)
-  : ViewController(_camera), distance(5.0f)
+  : ViewController(_camera), yaw(0.0f), pitch(0.0f), distance(5.0f)
 {
   this->typeString = TYPE_STRING;
   this->init = false;
@@ -88,7 +89,7 @@ void OrbitViewController::Init()
   }
 
   // If the plane is too far away.
-  if (dist < 0 || dist > 20 || math::isnan(dist))
+  if (dist < 0 || dist > 20 || ignition::math::isnan(dist))
   {
     // First, see if the camera is looking at the origin.
     ignition::math::Vector3d dir = this->camera->Direction();

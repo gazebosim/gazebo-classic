@@ -24,8 +24,6 @@
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -81,12 +79,6 @@ namespace gazebo
 
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
       /// \return Pointer to GpuLaser
-      /// \deprecate See LaserCamera
-      public: rendering::GpuLaserPtr GetLaserCamera() const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns a pointer to the internally kept rendering::GpuLaser
-      /// \return Pointer to GpuLaser
       public: rendering::GpuLaserPtr LaserCamera() const;
 
       /// \brief Get the minimum angle
@@ -107,26 +99,11 @@ namespace gazebo
 
       /// \brief Get radians between each range
       /// \return Return angle resolution
-      /// \deprecated See AngleResolution()
-      public: double GetAngleResolution() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get radians between each range
-      /// \return Return angle resolution
       public: double AngleResolution() const;
 
       /// \brief Get the minimum range
       /// \return The minimum range
-      /// \deprecated See RangeMin
-      public: double GetRangeMin() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the minimum range
-      /// \return The minimum range
       public: double RangeMin() const;
-
-      /// \brief Get the maximum range
-      /// \return The maximum range
-      /// \deprecated See RangeMax
-      public: double GetRangeMax() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the maximum range
       /// \return The maximum range
@@ -139,22 +116,7 @@ namespace gazebo
       ///      used, the results are interpolated from two nearest neighbors,
       ///      and vice versa.
       /// \return The Range Resolution
-      /// \deprecated See RangeResolution()
-      public: double GetRangeResolution() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the range resolution
-      ///      If RangeResolution is 1, the number of simulated rays is equal
-      ///      to the number of returned range readings. If it's less than 1,
-      ///      fewer simulated rays than actual returned range readings are
-      ///      used, the results are interpolated from two nearest neighbors,
-      ///      and vice versa.
-      /// \return The Range Resolution
       public: double RangeResolution() const;
-
-      /// \brief Get the ray count
-      /// \return The number of rays
-      /// \deprecated See RayCount
-      public: int GetRayCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the ray count
       /// \return The number of rays
@@ -162,26 +124,11 @@ namespace gazebo
 
       /// \brief Get the range count
       /// \return The number of ranges
-      /// \deprecated See RangeCount
-      public: int GetRangeCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the range count
-      /// \return The number of ranges
       public: int RangeCount() const;
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
-      /// \deprecated See VerticalRayCount()
-      public: int GetVerticalRayCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the vertical scan line count
-      /// \return The number of scan lines vertically
       public: int VerticalRayCount() const;
-
-      /// \brief Get the vertical scan line count
-      /// \return The number of scan lines vertically
-      /// \deprecated See VerticalRangeCount()
-      public: int GetVerticalRangeCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
@@ -205,24 +152,7 @@ namespace gazebo
 
       /// \brief Get the vertical angle in radians between each range
       /// \return Resolution of the angle
-      /// \deprecated See VerticalAngleResolution
-      public: double GetVerticalAngleResolution() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the vertical angle in radians between each range
-      /// \return Resolution of the angle
       public: double VerticalAngleResolution() const;
-
-      /// \brief Get detected range for a ray.
-      ///         Warning: If you are accessing all the ray data in a loop
-      ///         it's possible that the Ray will update in the middle of
-      ///         your access loop. This means some data will come from one
-      ///         scan, and some from another scan. You can solve this
-      ///         problem by using SetActive(false) <your accessor loop>
-      ///         SetActive(true).
-      /// \param[in] _index Index of specific ray
-      /// \return Returns RangeMax for no detection.
-      /// \deprecated See Range(int _index)
-      public: double GetRange(int _index) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -237,25 +167,7 @@ namespace gazebo
 
       /// \brief Get all the ranges
       /// \param[out] _range A vector that will contain all the range data
-      /// \deprecated See Ranges(std::vector<double> &_ranges)
-      public: void GetRanges(std::vector<double> &_ranges)
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get all the ranges
-      /// \param[out] _range A vector that will contain all the range data
       public: void Ranges(std::vector<double> &_ranges) const;
-
-      /// \brief Get detected retro (intensity) value for a ray.
-      ///         Warning: If you are accessing all the ray data in a loop
-      ///         it's possible that the Ray will update in the middle of
-      ///         your access loop. This means some data will come from one
-      ///         scan, and some from another scan. You can solve this
-      ///         problem by using SetActive(false) <your accessor loop>
-      ///         SetActive(true).
-      /// \param[in] _index Index of specific ray
-      /// \return Intensity value of ray
-      /// \deprecated See Retro(int _index)
-      public: double GetRetro(int _index) const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -277,24 +189,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Fiducial value of ray
-      /// \deprecated See Fiducial(unsigned int _index)
-      public: int GetFiducial(int _index) const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get detected fiducial value for a ray.
-      ///         Warning: If you are accessing all the ray data in a loop
-      ///         it's possible that the Ray will update in the middle of
-      ///         your access loop. This means some data will come from one
-      ///         scan, and some from another scan. You can solve this
-      ///         problem by using SetActive(false) <your accessor loop>
-      ///         SetActive(true).
-      /// \param[in] _index Index of specific ray
-      /// \return Fiducial value of ray
       public: int Fiducial(const unsigned int _index) const;
-
-      /// \brief Gets the camera count
-      /// \return Number of cameras
-      /// \deprecated See CameraCount()
-      public: unsigned int GetCameraCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Gets the camera count
       /// \return Number of cameras
@@ -310,25 +205,7 @@ namespace gazebo
       /// A ray count is the number of simulated rays. Whereas a range count
       /// is the total number of data points returned. When range count
       /// != ray count, then values are interpolated between rays.
-      /// \deprecated See RayCountRatio
-      public: double GetRayCountRatio() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Return the ratio of horizontal ray count to vertical ray
-      /// count.
-      ///
-      /// A ray count is the number of simulated rays. Whereas a range count
-      /// is the total number of data points returned. When range count
-      /// != ray count, then values are interpolated between rays.
       public: double RayCountRatio() const;
-
-      /// \brief Return the ratio of horizontal range count to vertical
-      /// range count.
-      ///
-      /// A ray count is the number of simulated rays. Whereas a range count
-      /// is the total number of data points returned. When range count
-      /// != ray count, then values are interpolated between rays.
-      /// \deprecated See RangeCountRatio
-      public: double GetRangeCountRatio() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return the ratio of horizontal range count to vertical
       /// range count.
@@ -340,25 +217,11 @@ namespace gazebo
 
       /// \brief Get the horizontal field of view of the laser sensor.
       /// \return The horizontal field of view of the laser sensor.
-      /// \deprecated See HorzFOV
-      public: double GetHorzFOV() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the horizontal field of view of the laser sensor.
-      /// \return The horizontal field of view of the laser sensor.
       public: double HorzFOV() const;
 
       /// \brief Get Cos Horz field-of-view
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
-      /// \deprecated See CosHorzFOV
-      public: double GetCosHorzFOV() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get Cos Horz field-of-view
-      /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
       public: double CosHorzFOV() const;
-
-      /// \brief Get the vertical field-of-view.
-      /// \deprecated See VertFOV
-      public: double GetVertFOV() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the vertical field-of-view.
       /// \return Vertical field of view.
@@ -366,26 +229,11 @@ namespace gazebo
 
       /// \brief Get Cos Vert field-of-view
       /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
-      /// \deprecated See CosVertFOV.
-      public: double GetCosVertFOV() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get Cos Vert field-of-view
-      /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
       public: double CosVertFOV() const;
 
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
-      /// \deprecated See HorzHalfAngle()
-      public: double GetHorzHalfAngle() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
-      /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
       public: double HorzHalfAngle() const;
-
-      /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
-      /// \return (vertical_max_angle + vertical_min_angle) * 0.5
-      /// \deprecated See VertHalfAngle
-      public: double GetVertHalfAngle() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5
@@ -400,7 +248,9 @@ namespace gazebo
 
       /// \brief Disconnect Laser Frame.
       /// \param[in,out] _conn Connection pointer to disconnect.
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
+              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       public: virtual bool IsActive() const;

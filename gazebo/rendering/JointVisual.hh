@@ -48,6 +48,9 @@ namespace gazebo
       public: void Load(ConstJointPtr &_msg);
       using Visual::Load;
 
+      /// Documentation Inherited
+      public: virtual void Fini();
+
       /// \internal
       /// \brief Load the joint visual based on a message and an offset pose
       /// This is currently used internally for creating a second visual for

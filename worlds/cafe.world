@@ -80,7 +80,7 @@
     <actor name="actor1">
       <pose>0 1 1.25 0 0 0</pose>
       <skin>
-        <filename>moonwalk.dae</filename>
+        <filename>walk.dae</filename>
         <scale>1.0</scale>
       </skin>
       <animation name="walking">
@@ -106,7 +106,7 @@
     <actor name="actor2">
       <pose>-2 -2 1.25 0 0 0</pose>
       <skin>
-        <filename>moonwalk.dae</filename>
+        <filename>walk.dae</filename>
         <scale>1.0</scale>
       </skin>
       <animation name="walking">

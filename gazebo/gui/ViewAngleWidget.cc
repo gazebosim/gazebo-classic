@@ -182,8 +182,7 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
       ignition::math::Quaterniond(roll, pitch, yaw);
 
   // Move camera to that pose in 1s
-  cam->MoveToPosition(math::Pose(math::Vector3(newCamPos),
-      math::Quaternion(quat)), 1);
+  cam->MoveToPosition(ignition::math::Pose3d(newCamPos, quat), 1);
 }
 
 /////////////////////////////////////////////////
@@ -213,13 +212,13 @@ void ViewAngleWidget::OnBackView()
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnLeftView()
 {
-  this->LookDirection(-ignition::math::Vector3d::UnitY);
+  this->LookDirection(ignition::math::Vector3d::UnitY);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnRightView()
 {
-  this->LookDirection(ignition::math::Vector3d::UnitY);
+  this->LookDirection(-ignition::math::Vector3d::UnitY);
 }
 
 /////////////////////////////////////////////////
@@ -230,7 +229,7 @@ void ViewAngleWidget::OnResetView()
   if (!cam)
     return;
 
-  cam->MoveToPosition(cam->DefaultPose(), 1);
+  cam->MoveToPosition(cam->DefaultPose().Ign(), 1);
 }
 
 /////////////////////////////////////////////////
@@ -259,4 +258,3 @@ void ViewAngleWidget::OnProjection(int _index)
   else
     gzwarn << "Projection index [" << _index << "] not recognized" << std::endl;
 }
-

@@ -31,6 +31,7 @@ EventT<void (std::string)> Events::addEntity;
 EventT<void (std::string)> Events::deleteEntity;
 
 EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
+EventT<void (const common::UpdateInfo &)> Events::beforePhysicsUpdate;
 
 EventT<void ()> Events::worldUpdateEnd;
 EventT<void ()> Events::worldReset;
@@ -51,5 +52,5 @@ EventT<void (sdf::ElementPtr, const std::string &,
 /////////////////////////////////////////////////
 void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)
 {
-  worldUpdateBegin.Disconnect(_subscriber);
+  worldUpdateBegin.Disconnect(_subscriber->Id());
 }

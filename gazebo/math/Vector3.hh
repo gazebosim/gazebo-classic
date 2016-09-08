@@ -323,8 +323,15 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Vector3 &_pt)
       {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         _out << precision(_pt.x, 6) << " " << precision(_pt.y, 6) << " "
              << precision(_pt.z, 6);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
         return _out;
       }
 

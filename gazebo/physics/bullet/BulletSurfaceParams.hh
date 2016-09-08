@@ -20,7 +20,6 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/util/system.hh"
@@ -29,7 +28,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet
     /// \{
 
     /// \brief Bullet surface parameters.
@@ -50,10 +49,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
-
-      // Documentation inherited.
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
-          GAZEBO_DEPRECATED(7.0);
 
       // Documentation inherited.
       public: virtual FrictionPyramidPtr FrictionPyramid() const;

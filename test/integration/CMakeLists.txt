@@ -45,6 +45,7 @@ set(tests
   gz_physics.cc
   gz_world.cc
   imu.cc
+  introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
@@ -64,6 +65,7 @@ set(tests
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_base.cc
   physics_basic_controller_response.cc
   physics_collision.cc
   physics_friction.cc
@@ -80,7 +82,6 @@ set(tests
   rayshape.cc
   region_events.cc
   rest_web.cc
-  road.cc
   saving_and_loading.cc
   sensor.cc
   server_fixture.cc
@@ -99,6 +100,7 @@ set(tests
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
+  world_remove.cc
   worlds_installed.cc
   )
 
@@ -120,7 +122,14 @@ if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+
+  set_property(
+    SOURCE world_clone.cc
+    PROPERTY COMPILE_DEFINITIONS
+    GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+  )
 
   # Increase timeout for debug-mode
   if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
@@ -130,9 +139,6 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
-
-  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
-    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests
@@ -146,6 +152,7 @@ set(dri_tests
   camera_sensor.cc
   depth_camera.cc
   factory.cc
+  fiducial.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
@@ -154,6 +161,7 @@ set(dri_tests
   pr2.cc
   projector.cc
   rendering_sensor.cc
+  road.cc
   speed_pr2.cc
   world_reset.cc
 )
@@ -164,8 +172,11 @@ set(qt_tests
   model_editor.cc
   model_editor_undo.cc
   model_manipulation.cc
+  mouse_pick.cc
   track_visual.cc
   undo.cc
+  view_angle.cc
+  view_control.cc
   visual_pose.cc
 )
 

@@ -37,6 +37,7 @@ DARTPlaneShape::DARTPlaneShape(CollisionPtr _parent)
 DARTPlaneShape::~DARTPlaneShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

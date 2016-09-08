@@ -39,7 +39,7 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    /// \internal
+    /// \cond
     /// \brief Private data members for MovingWindowFilter class.
     /// This must be in the header due to templatization.
     template< typename T>
@@ -63,6 +63,7 @@ namespace gazebo
       /// \brief keep track of number of elements
       public: unsigned int samples;
     };
+    /// \endcond
 
     //////////////////////////////////////////////////
     template<typename T>
@@ -128,7 +129,7 @@ namespace gazebo
     {
       this->dataPtr->valHistory.clear();
       delete this->dataPtr;
-      this->dataPtr = NULL;
+      this->dataPtr = nullptr;
     }
 
     //////////////////////////////////////////////////

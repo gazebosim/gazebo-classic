@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/util/system.hh"
 
@@ -42,6 +43,7 @@ namespace gazebo
 
       /// \brief Initialize the controller
       public: virtual void Init();
+      using ViewController::Init;
 
       /// \brief Update the camera position
       public: virtual void Update();

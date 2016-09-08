@@ -170,11 +170,7 @@ void SphereAtlasDemoPlugin::Reset()
   gzlog << "SphereAtlasDemoPlugin: \n"
         << "  This is not a typical usage of plugin Reset function,\n"
         << "  we are doing this just for testing purposes.\n";
-  if (this->updateConnection)
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-    this->updateConnection.reset();
-  }
+  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////

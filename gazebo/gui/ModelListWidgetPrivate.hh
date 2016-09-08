@@ -45,6 +45,7 @@ namespace gazebo
       public: transport::PublisherPtr modelPub;
       public: transport::PublisherPtr scenePub;
       public: transport::PublisherPtr physicsPub;
+      public: transport::PublisherPtr windPub;
 
       /// \brief Publisher for atmosphere messages.
       public: transport::PublisherPtr atmospherePub;
@@ -62,6 +63,9 @@ namespace gazebo
 
       /// \brief Physics tree item.
       public: QTreeWidgetItem *physicsItem;
+
+      /// \brief Wind tree item.
+      public: QTreeWidgetItem *windItem;
 
       /// \brief Atmosphere tree item.
       public: QTreeWidgetItem *atmosphereItem;
@@ -100,7 +104,12 @@ namespace gazebo
       public: msgs::Link linkMsg;
       public: msgs::Scene sceneMsg;
       public: msgs::Joint jointMsg;
+
+      /// \brief Keep latest plugin message.
+      public: msgs::Plugin pluginMsg;
+
       public: msgs::Physics physicsMsg;
+      public: msgs::Wind windMsg;
 
       /// \brief Keep latest atmosphere message.
       public: msgs::Atmosphere atmosphereMsg;

@@ -24,16 +24,7 @@
 
 #include <string>
 
-/*
-
-#include "gazebo/common/Param.hh"
-#include "Entity.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/physics/Collision.hh"
-#include "gazebo/util/system.hh"
-*/
-
+#include "gazebo/math/Box.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"

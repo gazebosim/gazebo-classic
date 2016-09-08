@@ -573,7 +573,7 @@ void JointInspector::OnRemove()
 {
   this->close();
 
-  this->dataPtr->jointMaker->RemoveJoint(this->dataPtr->jointId);
+  this->dataPtr->jointMaker->RemoveJointByUser(this->dataPtr->jointId);
 }
 
 /////////////////////////////////////////////////

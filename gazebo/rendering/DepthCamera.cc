@@ -369,12 +369,6 @@ void DepthCamera::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-const float* DepthCamera::GetDepthData()
-{
-  return this->DepthData();
-}
-
-//////////////////////////////////////////////////
 const float* DepthCamera::DepthData() const
 {
   return this->dataPtr->depthBuffer;
@@ -393,7 +387,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     this->depthViewport->setBackgroundColour(
         Conversions::Convert(this->scene->BackgroundColor()));
     this->depthViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     double ratio = static_cast<double>(this->depthViewport->getActualWidth()) /
                    static_cast<double>(this->depthViewport->getActualHeight());
@@ -417,7 +411,7 @@ event::ConnectionPtr DepthCamera::ConnectNewDepthFrame(
 //////////////////////////////////////////////////
 void DepthCamera::DisconnectNewDepthFrame(event::ConnectionPtr &_c)
 {
-  this->dataPtr->newDepthFrame.Disconnect(_c);
+  this->dataPtr->newDepthFrame.Disconnect(_c->Id());
 }
 
 //////////////////////////////////////////////////
@@ -431,5 +425,5 @@ event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
 //////////////////////////////////////////////////
 void DepthCamera::DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
 {
-  this->dataPtr->newRGBPointCloud.Disconnect(_c);
+  this->dataPtr->newRGBPointCloud.Disconnect(_c->Id());
 }

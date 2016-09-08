@@ -61,6 +61,7 @@ CameraSensor::CameraSensor()
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -167,16 +168,15 @@ void CameraSensor::Init()
 void CameraSensor::Fini()
 {
   this->imagePub.reset();
-  Sensor::Fini();
 
   if (this->camera)
   {
-    std::string scopedName = this->parentName + "::" + this->Name();
-    this->scene->RemoveCamera(scopedName);
+    this->scene->RemoveCamera(this->camera->Name());
   }
 
   this->camera.reset();
-  this->scene.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -223,26 +223,20 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-unsigned int CameraSensor::GetImageWidth() const
-{
-  return this->ImageWidth();
-}
-
-//////////////////////////////////////////////////
 unsigned int CameraSensor::ImageWidth() const
 {
   if (this->camera)
     return this->camera->ImageWidth();
 
-  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-  sdf::ElementPtr elem = cameraSdf->GetElement("image");
-  return elem->Get<unsigned int>("width");
-}
+  if (this->sdf && this->sdf->HasElement("camera"))
+  {
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+    sdf::ElementPtr elem = cameraSdf->GetElement("image");
+    return elem->Get<unsigned int>("width");
+  }
 
-//////////////////////////////////////////////////
-unsigned int CameraSensor::GetImageHeight() const
-{
-  return this->ImageHeight();
+  gzwarn << "Can't get image width." << std::endl;
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -251,15 +245,15 @@ unsigned int CameraSensor::ImageHeight() const
   if (this->camera)
     return this->camera->ImageHeight();
 
-  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-  sdf::ElementPtr elem = cameraSdf->GetElement("image");
-  return elem->Get<unsigned int>("height");
-}
+  if (this->sdf && this->sdf->HasElement("camera"))
+  {
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+    sdf::ElementPtr elem = cameraSdf->GetElement("image");
+    return elem->Get<unsigned int>("height");
+  }
 
-//////////////////////////////////////////////////
-const unsigned char *CameraSensor::GetImageData()
-{
-  return this->ImageData();
+  gzwarn << "Can't get image height." << std::endl;
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -268,7 +262,7 @@ const unsigned char *CameraSensor::ImageData() const
   if (this->camera)
     return this->camera->ImageData(0);
   else
-    return NULL;
+    return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -287,12 +281,6 @@ bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());
-}
-
-//////////////////////////////////////////////////
-rendering::CameraPtr CameraSensor::GetCamera() const
-{
-  return this->Camera();
 }
 
 //////////////////////////////////////////////////

@@ -120,6 +120,7 @@ namespace gazebo
 
       /// \brief Reset the joint.
       public: virtual void Reset();
+      using Base::Reset;
 
       /// \brief Set the joint state.
       /// \param[in] _state Joint state
@@ -214,8 +215,10 @@ namespace gazebo
 
       /// \brief Disconnect a boost::slot the the joint update signal.
       /// \param[in] _conn Connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectJointUpdate(event::ConnectionPtr &_conn)
-              {jointUpdate.Disconnect(_conn);}
+              GAZEBO_DEPRECATED(8.0)
+              {jointUpdate.Disconnect(_conn->Id());}
 
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
@@ -591,6 +594,17 @@ namespace gazebo
       /// \return new child link pose at new joint position.
       protected: math::Pose ComputeChildLinkPose(unsigned int _index,
           double _position);
+
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Register position items in the introspection service.
+      /// \param[in] _index Axis index.
+      private: void RegisterIntrospectionPosition(const unsigned int _index);
+
+      /// \brief Register velocity items in the introspection service.
+      /// \param[in] _index Axis index.
+      private: void RegisterIntrospectionVelocity(const unsigned int _index);
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.

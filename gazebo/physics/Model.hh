@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -32,6 +33,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -97,6 +99,7 @@ namespace gazebo
 
       /// \brief Reset the model.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of
       /// all child links.
@@ -282,12 +285,6 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetScale(const math::Vector3 &_scale)
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set the scale of model.
-      /// \param[in] _scale Scale to set the model to.
       /// \param[in] _publish True to publish a message for the client with the
       /// new scale.
       /// \sa ignition::math::Vector3d Scale() const
@@ -393,6 +390,14 @@ namespace gazebo
       /// \return true if successful, false if not.
       public: bool RemoveJoint(const std::string &_name);
 
+      /// \brief Set whether wind affects this body.
+      /// \param[in] _mode True to enable wind.
+      public: virtual void SetWindMode(const bool _mode);
+
+      /// \brief Get the wind mode.
+      /// \return True if wind is enabled.
+      public: virtual bool WindMode() const;
+
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself
       public: boost::shared_ptr<Model> shared_from_this();
@@ -432,6 +437,13 @@ namespace gazebo
       /// \brief Publish the scale.
       private: virtual void PublishScale();
 
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
@@ -466,11 +478,20 @@ namespace gazebo
       /// \brief Callback used when a joint animation completes.
       private: boost::function<void()> onJointAnimationComplete;
 
+      /// \brief Controller for the joints.
+      private: JointControllerPtr jointController;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;
 
-      /// \brief Controller for the joints.
-      private: JointControllerPtr jointController;
+      /// \brief Mutex to protect incoming message buffers.
+      private: std::mutex receiveMutex;
     };
     /// \}
   }

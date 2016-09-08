@@ -26,6 +26,9 @@ namespace gazebo
   {
     class BulletMesh;
 
+    /// \addtogroup gazebo_physics_bullet
+    /// \{
+
     /// \brief Bullet polyline shape
     class GZ_PHYSICS_VISIBLE BulletPolylineShape : public PolylineShape
     {
@@ -45,6 +48,7 @@ namespace gazebo
       /// \brief Bullet collsion mesh helper class.
       private: BulletMesh *bulletMesh;
     };
+    /// \}
   }
 }
 #endif
