@@ -678,10 +678,20 @@ endif()
 
 ########################################
 # Find the Ignition_Transport library
+SET(IGNITION_TRANSPORT_FOUND TRUE)
 find_package(ignition-transport1 QUIET)
 if (NOT ignition-transport1_FOUND)
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
+  find_package(ignition-transport2 QUIET)
+  if (NOT ignition-transport2 QUIET)
+    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
+    SET(IGNITION_TRANSPORT_FOUND FALSE)
+  endif()
 else()
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport2-dev)")
+  SET(IGNITION_TRANSPORT_FOUND FALSE)
+endif()
+
+if (IGNITION_TRANSPORT_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
