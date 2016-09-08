@@ -724,14 +724,17 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/include
   /usr/local/include
   /usr/local/lib/qwt.framework/Headers
+  ${QWT_WIN_INCLUDE_DIR}
+
   PATH_SUFFIXES qwt-qt4 qwt qwt5
-  )
+)
 
 find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
-  )
+  ${QWT_WIN_LIBRARY_DIR}
+)
 
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)

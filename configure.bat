@@ -40,6 +40,10 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
 @set TBB_INCLUDEDIR=%TBB_PATH%\include
 
+@set QWT_PATH=%cd%\..\..\qwt_6.1.0~github_zalf_lsa
+@set QWT_LIBRARY_DIR=%QWT_PATH%\%build_type%\qwt-6.1.0-vc12-x64
+@set QWT_INCLUDEDIR=%QWT_PATH%\include
+
 @set OGRE_VERSION=1.9.0
 @set OGRE_PATH=%cd%\..\..\OGRE-SDK-1.9.0-vc120-x64-12.03.2016
 @set OGRE_INCLUDE_DIR=%OGRE_PATH%\include;%OGRE_PATH%\include\OGRE;%OGRE_PATH%\include\OGRE\RTShaderSystem;%OGRE_PATH%\include\OGRE\Terrain;%OGRE_PATH%\include\OGRE\Paging
@@ -75,6 +79,8 @@ cmake -Wno-dev -G "NMake Makefiles"^
     -DOGRE_PLUGINDIR="%OGRE_PLUGIN_DIR%"^
     -DOGRE_INCLUDE_DIRS="%OGRE_INCLUDE_DIR%"^
     -DOGRE_LIBRARIES="%OGRE_LIBS%"^
+    -DQWT_WIN_INCLUDE_DIR="%QWT_INCLUDEDIR%"^
+    -DQWT_WIN_LIBRARY_DIR="%QWT_LIBRARY_DIR%"^
     -DCURL_FOUND=1^
     -DCURL_INCLUDEDIR="%CURL_INCLUDE_DIR%"^
     -DCURL_LIBDIR="%CURL_LIBRARY_DIR%"^
