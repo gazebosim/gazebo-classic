@@ -152,7 +152,7 @@
           <inc_key>119</inc_key> <!-- w -->
           <dec_key>115</dec_key> <!-- d -->
           <inc_val>0.2</inc_val>
-          <max_val>4.0</max_val>
+          <max_val>2.0</max_val>
           <min_val>-0.2</min_val>
           <p>0.5</p>
           <i>0</i>
@@ -163,6 +163,8 @@
           <inc_key>97</inc_key> <!-- a -->
           <inc_val>-0.02</inc_val>
           <dec_key>113</dec_key> <!-- q -->
+          <max_val>0.08</max_val>
+          <min_val>-0.08</min_val>
           <p>1</p>
           <i>0</i>
           <d>0</d>
@@ -172,6 +174,8 @@
           <inc_key>101</inc_key> <!-- e -->
           <inc_val>0.02</inc_val>
           <dec_key>100</dec_key> <!-- d -->
+          <max_val>0.08</max_val>
+          <min_val>-0.08</min_val>
           <p>1</p>
           <i>0</i>
           <d>0</d>
