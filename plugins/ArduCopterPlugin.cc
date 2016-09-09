@@ -509,8 +509,8 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     // gzerr << "no packet\n";
     if (recvSize != -1)
     {
-      gzerr << "received size: " << recvSize
-            << ", expected size: " << expectedPktSize << "\n";
+      gzerr << "received bit size (" << recvSize << ") to small,"
+            << " controller expected size (" << expectedPktSize << ").\n";
     }
 
     gazebo::common::Time::NSleep(100);
