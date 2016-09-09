@@ -501,15 +501,16 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     waitMs = 1;
   }
   ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(ServoPacket), waitMs);
-  ssize_t expectedPktSize = sizeof(pkt.motorSpeed[0])*this->dataPtr->rotors.size();
-  if ((recvSize == -1) || (recvSize != expectedPktSize))
+  ssize_t expectedPktSize =
+    sizeof(pkt.motorSpeed[0])*this->dataPtr->rotors.size();
+  if ((recvSize == -1) || (recvSize < expectedPktSize))
   {
     // didn't receive a packet
     // gzerr << "no packet\n";
     if (recvSize != -1)
     {
-      gzerr << "got something weird: " << recvSize
-            << ", should be: " << sizeof(ServoPacket) << "\n";
+      gzerr << "received size: " << recvSize
+            << ", expected size: " << expectedPktSize << "\n";
     }
 
     gazebo::common::Time::NSleep(100);
