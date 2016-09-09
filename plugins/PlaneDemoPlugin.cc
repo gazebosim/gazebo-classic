@@ -204,6 +204,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
             ec.decKey = enginePtr->Get<int>("dec_key");
           if (enginePtr->HasElement("inc_val"))
             ec.incVal = enginePtr->Get<double>("inc_val");
+          // initialize to joint limits
+          ec.maxVal = joint->GetEffortLimit(0);
+          ec.minVal = -joint->GetEffortLimit(0);
+          // overwrite if user specified limits
           if (enginePtr->HasElement("max_val"))
             ec.maxVal = enginePtr->Get<double>("max_val");
           if (enginePtr->HasElement("min_val"))
@@ -280,6 +284,10 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
           jc.decKey = controlPtr->Get<int>("dec_key");
         if (controlPtr->HasElement("inc_val"))
           jc.incVal = controlPtr->Get<double>("inc_val");
+        // initialize to joint limits
+        jc.maxVal = joint->GetUpperLimit(0).Radian();
+        jc.minVal = joint->GetLowerLimit(0).Radian();
+        // overwrite if user specified limits
         if (controlPtr->HasElement("max_val"))
           jc.maxVal = controlPtr->Get<double>("max_val");
         if (controlPtr->HasElement("min_val"))

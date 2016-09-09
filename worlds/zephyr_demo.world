@@ -149,27 +149,29 @@
         <engine name="engine1">
           <joint_name>zephyr_delta_wing::propeller_joint</joint_name>
           <max_torque>4</max_torque>
-          <inc_key>119</inc_key>
-          <dec_key>115</dec_key>
+          <inc_key>119</inc_key> <!-- w -->
+          <dec_key>115</dec_key> <!-- d -->
           <inc_val>0.2</inc_val>
+          <max_val>4.0</max_val>
+          <min_val>-0.2</min_val>
           <p>0.5</p>
           <i>0</i>
           <d>0</d>
         </engine>
         <control name="flap_left_control">
           <joint_name>zephyr_delta_wing::flap_left_joint</joint_name>
-          <inc_key>97</inc_key>
+          <inc_key>97</inc_key> <!-- a -->
           <inc_val>-0.02</inc_val>
-          <dec_key>113</dec_key>
+          <dec_key>113</dec_key> <!-- q -->
           <p>1</p>
           <i>0</i>
           <d>0</d>
         </control>
         <control name="flap_right_control">
           <joint_name>zephyr_delta_wing::flap_right_joint</joint_name>
-          <inc_key>101</inc_key>
+          <inc_key>101</inc_key> <!-- e -->
           <inc_val>0.02</inc_val>
-          <dec_key>100</dec_key>
+          <dec_key>100</dec_key> <!-- d -->
           <p>1</p>
           <i>0</i>
           <d>0</d>
