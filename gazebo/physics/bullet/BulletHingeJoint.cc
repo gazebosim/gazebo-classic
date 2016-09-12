@@ -195,11 +195,20 @@ void BulletHingeJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
 {
+  // We want to get position of A frame in the world
+
+  // getAFrame returns the transform from com to A.
   btTransform trans = this->bulletHinge->getAFrame();
-  trans.getOrigin() +=
-    this->bulletHinge->getRigidBodyA().getCenterOfMassTransform().getOrigin();
-  return math::Vector3(trans.getOrigin().getX(),
-      trans.getOrigin().getY(), trans.getOrigin().getZ());
+  ignition::math::Pose3d aPose = BulletTypes::ConvertPose(trans).Ign();
+
+  // comPose is the transform from world frame to com frame
+  ignition::math::Pose3d comPose = BulletTypes::ConvertPose(
+    this->bulletHinge->getRigidBodyA().getCenterOfMassTransform()).Ign();
+
+  // compute A frame pose in world
+  aPose = aPose + comPose;
+
+  return aPose.Pos();
 }
 
 //////////////////////////////////////////////////
