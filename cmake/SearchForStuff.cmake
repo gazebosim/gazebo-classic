@@ -682,20 +682,18 @@ endif()
 ########################################
 # Find the Ignition_Transport library
 # In Windows we expect a call from configure.bat script with the paths
-if (NOT WIN32)
-  find_package(ignition-transport2 QUIET)
-  if (NOT ignition-transport2_FOUND)
-    find_package(ignition-transport1 QUIET)
-    if (NOT ignition-transport1_FOUND)
-      BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev")
-    endif()
+find_package(ignition-transport2 QUIET)
+if (NOT ignition-transport2_FOUND)
+  find_package(ignition-transport1 QUIET)
+  if (NOT ignition-transport1_FOUND)
+    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev")
   endif()
+endif()
 
-  if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
-    include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
-    link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
-  endif()
+if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+  include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
+  link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
 
 ################################################
