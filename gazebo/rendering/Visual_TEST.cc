@@ -1448,7 +1448,7 @@ TEST_F(Visual_TEST, GetAncestors)
   EXPECT_FALSE(vis4->IsDescendantOf(vis3_2));
   EXPECT_FALSE(vis4->IsDescendantOf(vis4));
 
-  // nullptr
+  // null
   EXPECT_FALSE(world->IsAncestorOf(nullptr));
   EXPECT_FALSE(world->IsDescendantOf(nullptr));
   EXPECT_FALSE(vis4->IsAncestorOf(nullptr));
