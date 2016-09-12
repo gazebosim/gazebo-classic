@@ -112,6 +112,7 @@ void common::load()
     first = false;
     avcodec_register_all();
     av_register_all();
+    avdevice_register_all();
 
     // Set the log callback function.
     av_log_set_callback(logCallback);

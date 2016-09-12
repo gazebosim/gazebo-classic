@@ -415,6 +415,16 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
+  # Find AV device
+  pkg_check_modules(libavdevice libavdevice)
+  if (NOT libavdevice_FOUND)
+    BUILD_WARNING ("libavdevice not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libavdevice_INCLUDE_DIRS})
+    link_directories(${libavdevice_LIBRARY_DIRS})
+  endif ()
+
+  ########################################
   # Find AV format
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
@@ -441,8 +451,8 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
   endif ()
 
-
-  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND
+      libswscale_FOUND AND libavdevice_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -678,8 +688,8 @@ endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport1 QUIET)
-if (NOT ignition-transport1_FOUND)
+find_package(ignition-transport2 QUIET)
+if (NOT ignition-transport2_FOUND)
   BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")

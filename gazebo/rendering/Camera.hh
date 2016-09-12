@@ -401,11 +401,20 @@ namespace gazebo
       public: void SetCaptureDataOnce();
 
       /// \brief Turn on video recording.
-      /// \param[in] _format Video format.
+      /// \param[in] _format String that represents the video type.
+      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// "v4l2", you must also specify a _filename.
+      /// \param[in] _filename Name of the file that stores the video while it
+      /// is being created. This is a temporary file when recording to
+      /// disk, or a video4linux loopback device like /dev/video0 when
+      /// the _format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" _format must be accompanied with a video
+      /// loopback device filename.
       /// \return True on success. The return value is set by
       /// common::VideoEncoder::Start().
       /// \sa common::VideoEncoder::Start
-      public: bool StartVideo(const std::string &_format);
+      public: bool StartVideo(const std::string &_format,
+                              const std::string &_filename = "");
 
       /// \brief Turn off video recording
       /// \return True on success. The return value is set by

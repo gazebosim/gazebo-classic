@@ -229,6 +229,7 @@ target_link_libraries(gazebo_common
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
+  ${libavdevice_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}

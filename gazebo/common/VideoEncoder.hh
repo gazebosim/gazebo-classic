@@ -57,14 +57,22 @@ namespace gazebo
       /// \param[in] _width Width in pixels of the output video.
       /// \param[in] _height Height in pixels of the output video.
       /// \param[in] _format String that represents the video type.
-      /// Supported types include: "avi", "ogv", mp4".
+      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// "v4l2", you must also specify a _filename.
       /// \param[in] _bitRate Bit rate to encode the video. A value of zero
       /// will cause this function to automatically compute a bitrate.
+      /// \param[in] _filename Name of the file that stores the video while it
+      /// is being created. This is a temporary file when recording to
+      /// disk, or a video4linux loopback device like /dev/video0 when
+      /// the _format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" _format must be accompanied with a video
+      /// loopback device filename.
       /// \return True on success
       public: bool Start(
+                const std::string &_format = VIDEO_ENCODER_FORMAT_DEFAULT,
+                const std::string &_filename = "",
                 const unsigned int _width = VIDEO_ENCODER_WIDTH_DEFAULT,
                 const unsigned int _height = VIDEO_ENCODER_HEIGHT_DEFAULT,
-                const std::string &_format = VIDEO_ENCODER_FORMAT_DEFAULT,
                 const unsigned int _fps = VIDEO_ENCODER_FPS_DEFAULT,
                 const unsigned int _bitRate = VIDEO_ENCODER_BITRATE_DEFAULT);
 
@@ -113,16 +121,6 @@ namespace gazebo
       /// \brief Reset to default video properties and clean up allocated
       /// memory. This will also delete any temporary files.
       public: void Reset();
-
-      /// \brief Start helper function
-      /// \param[in] _outWidth Output frame width
-      /// \param[in] _outHeight Output frame height
-      /// \param[in] _filename Temporary filename in which to store the
-      /// video.
-      /// \return True on success
-      private: bool StartHelper(unsigned int _outWidth,
-                                unsigned int _outHeight,
-                                const std::string &_filename);
 
       /// \internal
       /// \brief Private data pointer

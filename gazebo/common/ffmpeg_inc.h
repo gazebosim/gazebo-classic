@@ -34,6 +34,7 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
+#include <libavdevice/avdevice.h>
 }
 
 #include "gazebo/util/system.hh"

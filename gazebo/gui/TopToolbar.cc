@@ -167,11 +167,12 @@ TopToolbar::TopToolbar(QWidget *_parent)
     QWidgetAction *recordVideoAct = new QWidgetAction(this);
     this->dataPtr->videoRecorder = new VideoRecorder(this);
     recordVideoAct->setDefaultWidget(this->dataPtr->videoRecorder);
+    recordVideoAct->setObjectName("recordVideoAction");
 
     QToolButton *button = new QToolButton;
     button->setObjectName("recordVideoButton");
     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    button->setIcon(QIcon(":/images/video_camera_white.svg"));
+    button->setIcon(QIcon(":/images/video_camera.svg"));
     button->setToolTip(tr("Record a video"));
 
     QMenu *menu = new QMenu(button);
@@ -180,7 +181,8 @@ TopToolbar::TopToolbar(QWidget *_parent)
     button->setMenu(menu);
     button->setPopupMode(QToolButton::InstantPopup);
 
-    this->dataPtr->toolbar->addWidget(button);
+    QAction *videoToolbarAct = this->dataPtr->toolbar->addWidget(button);
+    videoToolbarAct->setObjectName("recordVideoAction");
 
     QGraphicsOpacityEffect *fade = new QGraphicsOpacityEffect(button);
     button->setGraphicsEffect(fade);
@@ -248,7 +250,8 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
     if (acts[i] == g_screenshotAct ||
         acts[i] == g_viewAngleButtonAct ||
         acts[i] == g_plotAct ||
-        acts[i]->objectName() == "toolbarSpacerAction")
+        acts[i]->objectName() == "toolbarSpacerAction" ||
+        acts[i]->objectName() == "recordVideoAction")
     {
       acts[i]->setVisible(modelEditor || simulation || logPlayback);
       acts[i]->setEnabled(modelEditor || simulation || logPlayback);

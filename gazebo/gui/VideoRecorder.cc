@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/VideoRecorder.hh"
@@ -25,17 +26,25 @@ using namespace gui;
 // Private data class
 class gazebo::gui::VideoRecorderPrivate
 {
-  /// \brief Button to enable mp4 recording
+  /// \brief Button to enable mp4 recording.
   public: QToolButton *mp4Button = nullptr;
 
-  /// \brief Button to enable ogv recording
+  /// \brief Button to enable ogv recording.
   public: QToolButton *ogvButton = nullptr;
 
-  /// \brief Button to enable avi recording
+  /// \brief Button to enable avi recording.
   public: QToolButton *aviButton = nullptr;
 
-  /// \brief Button to stop recording
+  /// \brief Button to stop recording.
   public: QPushButton *stopButton = nullptr;
+
+#ifdef __linux__
+  /// \brief Button to enable v4l recording.
+  public: QToolButton *v4lButton = nullptr;
+#endif
+
+  /// \brief Format of the video.
+  public: std::string format;
 };
 
 /////////////////////////////////////////////////
@@ -80,11 +89,8 @@ VideoRecorder::VideoRecorder(QWidget *_parent)
   mainLayout->addWidget(this->dataPtr->mp4Button, 0, 1);
   mainLayout->addWidget(this->dataPtr->ogvButton, 0, 2);
   mainLayout->addWidget(this->dataPtr->aviButton, 0, 3);
-  mainLayout->addWidget(this->dataPtr->stopButton, 1, 0);
+  mainLayout->addWidget(this->dataPtr->stopButton, 2, 0);
   mainLayout->setContentsMargins(0, 0, 0, 0);
-
-  this->setLayout(mainLayout);
-  this->setContentsMargins(0, 0, 0, 0);
 
   // Map each video record button to the OnRecordStart slot
   QSignalMapper *signalMapper = new QSignalMapper(this);
@@ -95,8 +101,26 @@ VideoRecorder::VideoRecorder(QWidget *_parent)
   signalMapper->setMapping(mp4Action, QString("mp4"));
   signalMapper->setMapping(aviAction, QString("avi"));
   signalMapper->setMapping(ogvAction, QString("ogv"));
+
+  // Only support video4linux on linux
+#ifdef __linux__
+  // V4L recording button
+  this->dataPtr->v4lButton = new QToolButton(this);
+  this->dataPtr->v4lButton->setToolTip(tr("Record to video4linux device."));
+  QAction *v4lAction = new QAction(QIcon(":/images/v4l.svg"),
+      tr("Record v4l video"), this);
+  this->dataPtr->v4lButton->setDefaultAction(v4lAction);
+  this->dataPtr->v4lButton->setIconSize(iconSize);
+  mainLayout->addWidget(this->dataPtr->v4lButton, 0, 4);
+  connect(v4lAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
+  signalMapper->setMapping(v4lAction, QString("v4l2"));
+#endif
+
   connect(signalMapper, SIGNAL(mapped(QString)), this,
           SLOT(OnRecordStart(const QString &)));
+
+  this->setLayout(mainLayout);
+  this->setContentsMargins(0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -127,26 +151,36 @@ void VideoRecorder::OnRecordStop()
   this->dataPtr->mp4Button->show();
   this->dataPtr->aviButton->show();
   this->dataPtr->ogvButton->show();
+#ifdef __linux__
+  this->dataPtr->v4lButton->show();
+#endif
   this->dataPtr->stopButton->hide();
 
-  // Create and open a file dialog box to save the video
-  QFileDialog fileDialog(this, tr("Save Video"), QDir::homePath());
-  fileDialog.setObjectName("material");
-
-  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
-      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
-
-  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-  fileDialog.setFileMode(QFileDialog::AnyFile);
-
   bool saved = false;
-  if (fileDialog.exec() == QDialog::Accepted)
+
+  if (this->dataPtr->format != "v4l2")
   {
-    QStringList selected = fileDialog.selectedFiles();
-    if (!selected.empty())
+    std::string title = "Save Video (" + this->dataPtr->format + ")";
+    // Create and open a file dialog box to save the video
+    QFileDialog fileDialog(this, tr(title.c_str()), QDir::homePath());
+    fileDialog.setObjectName("material");
+
+    fileDialog.setDefaultSuffix(this->dataPtr->format.c_str());
+
+    fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog.setFileMode(QFileDialog::AnyFile);
+
+    if (fileDialog.exec() == QDialog::Accepted)
     {
-      // Save the video
-      saved = cam->SaveVideo(selected[0].toStdString());
+      QStringList selected = fileDialog.selectedFiles();
+      if (!selected.empty())
+      {
+        // Save the video
+        saved = cam->SaveVideo(selected[0].toStdString());
+      }
     }
   }
 
@@ -168,7 +202,62 @@ void VideoRecorder::OnRecordStart(const QString &_format)
     return;
   }
 
-  if (cam->StartVideo(_format.toStdString()))
+  this->dataPtr->format = _format.toStdString();
+
+  std::string filename;
+
+  // Get the video4linux2 loopback device
+  if (this->dataPtr->format == "v4l2")
+  {
+    std::string videoDevice;
+
+    // Attempt to select an available video device.
+    for (int i = 0; i < 4; ++i)
+    {
+      std::string tmp = "/dev/video" + std::to_string(i);
+      if (common::exists(tmp))
+        videoDevice = tmp;
+    }
+
+    // Display error message.
+    if (videoDevice.empty())
+    {
+      QMessageBox msg(QMessageBox::Critical, "Unable to record video",
+          "No video loopback device (/dev/video*) found."
+          "Install v4l2loopback-utils, and 'sudo modprobe v4l2loopback'",
+          QMessageBox::Close);
+      msg.exec();
+      return;
+    }
+
+    // Create and open a file dialog box. Only linux is supported, so
+    // we can safely set the default directory to /dev.
+    QFileDialog fileDialog(this, tr("Video Loopback Device"), "/dev");
+
+    fileDialog.selectFile(videoDevice.c_str());
+    fileDialog.setObjectName("material");
+
+    fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+    fileDialog.setFileMode(QFileDialog::ExistingFile);
+
+    if (fileDialog.exec() == QDialog::Accepted)
+    {
+      QStringList selected = fileDialog.selectedFiles();
+      if (!selected.empty())
+      {
+        filename = selected[0].toStdString();
+      }
+    }
+
+    // Don't record if a device file was not selected.
+    if (filename.empty())
+      return;
+  }
+
+  if (cam->StartVideo(this->dataPtr->format, filename))
   {
     // Tell listeners that we started recording
     emit RecordingStarted();
@@ -178,6 +267,9 @@ void VideoRecorder::OnRecordStart(const QString &_format)
     this->dataPtr->mp4Button->hide();
     this->dataPtr->aviButton->hide();
     this->dataPtr->ogvButton->hide();
+#ifdef __linux__
+    this->dataPtr->v4lButton->hide();
+#endif
     this->dataPtr->stopButton->show();
   }
 }

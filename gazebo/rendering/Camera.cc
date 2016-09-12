@@ -1293,10 +1293,11 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
-bool Camera::StartVideo(const std::string &_format)
+bool Camera::StartVideo(const std::string &_format,
+                        const std::string &_filename)
 {
-  return this->dataPtr->videoEncoder.Start(
-      this->ImageWidth(), this->ImageHeight(), _format);
+  return this->dataPtr->videoEncoder.Start(_format, _filename,
+      this->ImageWidth(), this->ImageHeight());
 }
 
 //////////////////////////////////////////////////
