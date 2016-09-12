@@ -461,7 +461,7 @@
         <child>wheel_2</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <use_parent_model_frame>0</use_parent_model_frame>
+          <use_parent_model_frame>1</use_parent_model_frame>
           <limit>
             <lower>-1e16</lower>
             <upper>1e16</upper>
@@ -482,7 +482,7 @@
         <child>wheel_3</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <use_parent_model_frame>0</use_parent_model_frame>
+          <use_parent_model_frame>1</use_parent_model_frame>
           <limit>
             <lower>-1e16</lower>
             <upper>1e16</upper>
