@@ -100,11 +100,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   TiXmlDocument xmlDoc;
 
-  this->dataPtr->path.clear();
-  if (_filename.rfind('/') != std::string::npos)
-  {
-    this->dataPtr->path = _filename.substr(0, _filename.rfind('/'));
-  }
+  boost::filesystem::path p(_filename);
+  this->dataPtr->path = p.parent_path().generic_string();
 
   this->dataPtr->filename = _filename;
   if (!xmlDoc.LoadFile(_filename))
