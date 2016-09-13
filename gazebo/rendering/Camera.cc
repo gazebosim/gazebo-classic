@@ -33,7 +33,6 @@
   #include "gazebo/common/win_dirent.h"
 #endif
 
-
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "gazebo/common/Assert.hh"

@@ -40,7 +40,10 @@ extern "C"
 #include <libavutil/opt.h>
 #include <libavutil/error.h>
 #include <libavutil/imgutils.h>
+
+#ifdef __linux__
 #include <libavdevice/avdevice.h>
+#endif
 }
 #endif
 

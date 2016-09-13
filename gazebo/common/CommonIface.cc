@@ -112,7 +112,10 @@ void common::load()
     first = false;
     avcodec_register_all();
     av_register_all();
+
+#ifdef __linux__
     avdevice_register_all();
+#endif
 
     // Set the log callback function.
     av_log_set_callback(logCallback);
