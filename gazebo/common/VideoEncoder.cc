@@ -235,8 +235,12 @@ bool VideoEncoder::Start(const std::string &_format,
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
     // Loop through available output devices.
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+    while ((outputFormat = av_oformat_next(outputFormat)) != nullptr)
+#else
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
+#endif
     {
       // Break when the output device name matches 'v4l2'
       if (this->dataPtr->format.compare(outputFormat->name) == 0)
