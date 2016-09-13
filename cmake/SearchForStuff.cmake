@@ -418,13 +418,15 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
-  # Find AV device
-  pkg_check_modules(libavdevice libavdevice)
-  if (NOT libavdevice_FOUND)
-    BUILD_WARNING ("libavdevice not found. Audio-video capabilities will be disabled.")
-  else()
-    include_directories(${libavdevice_INCLUDE_DIRS})
-    link_directories(${libavdevice_LIBRARY_DIRS})
+  # Find AV device. Only check for this on linux.
+  if (UNIX)
+    pkg_check_modules(libavdevice libavdevice)
+    if (NOT libavdevice_FOUND)
+      BUILD_WARNING ("libavdevice not found. Audio-video capabilities will be disabled.")
+    else()
+      include_directories(${libavdevice_INCLUDE_DIRS})
+      link_directories(${libavdevice_LIBRARY_DIRS})
+    endif ()
   endif ()
 
   ########################################
@@ -455,7 +457,7 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND
-      libswscale_FOUND AND libavdevice_FOUND)
+      libswscale_FOUND AND (APPLE OR MSVC OR (UNIX AND libavdevice_FOUND)))
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
