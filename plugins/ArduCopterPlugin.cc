@@ -506,8 +506,9 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     waitMs = 1;
   }
   ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(ServoPacket), waitMs);
-  ssize_t expectedPktSize = sizeof(float)*this->dataPtr->rotors.size();
-  if (recvSize == -1)
+  ssize_t expectedPktSize =
+    sizeof(pkt.motorSpeed[0])*this->dataPtr->rotors.size();
+  if ((recvSize == -1) || (recvSize < expectedPktSize))
   {
     // didn't receive a packet
     // gzerr << "no packet\n";
