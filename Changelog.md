@@ -166,6 +166,10 @@
    `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
     * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
 
+
+1. Fix loading collada files with multiple texture coordinates.
+    * [Pull request 2413](https://bitbucket.org/osrf/gazebo/pull-request/2413)
+
 1. Added visualization of minimum range to laservisual.
     * [Pull request 2412](https://bitbucket.org/osrf/gazebo/pull-request/2412)
     * [Issue 2018](https://bitbucket.org/osrf/gazebo/issues/2018)
