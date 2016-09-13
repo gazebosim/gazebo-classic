@@ -133,7 +133,7 @@ TEST_F(Visual_TEST, BoundingBox)
       cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   int sleep = 0;
   int maxSleep = 50;
@@ -144,7 +144,7 @@ TEST_F(Visual_TEST, BoundingBox)
     common::Time::MSleep(1000);
     sleep++;
   }
-  ASSERT_TRUE(visual != nullptr);
+  ASSERT_NE(visual, nullptr);
 
   // verify initial bounding box
   math::Vector3 bboxMin(-0.5, -0.5, -0.5);
@@ -184,7 +184,7 @@ TEST_F(Visual_TEST, Geometry)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // check geometry with unit scale
   {
@@ -310,7 +310,7 @@ TEST_F(Visual_TEST, CastShadows)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // load a model that casts shadows by default
   sdf::ElementPtr boxSDF(new sdf::Element);
@@ -347,7 +347,7 @@ TEST_F(Visual_TEST, Transparency)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
@@ -396,7 +396,7 @@ TEST_F(Visual_TEST, ChildTransparency)
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
@@ -448,7 +448,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Wait until all models are inserted
   int sleep = 0;
@@ -467,7 +467,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
   // and verify initial transparency
 
   // box
-  ASSERT_TRUE(box != nullptr);
+  ASSERT_NE(box, nullptr);
   rendering::VisualPtr boxLink;
   for (unsigned int i = 0; i < box->GetChildCount(); ++i)
   {
@@ -475,7 +475,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     if (vis->GetType() == rendering::Visual::VT_LINK)
       boxLink = vis;
   }
-  ASSERT_TRUE(boxLink != nullptr);
+  ASSERT_NE(boxLink, nullptr);
 
   rendering::VisualPtr boxVisual;
   for (unsigned int i = 0; i < boxLink->GetChildCount(); ++i)
@@ -484,7 +484,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     if (vis->GetType() == rendering::Visual::VT_VISUAL)
       boxVisual = vis;
   }
-  ASSERT_TRUE(boxVisual != nullptr);
+  ASSERT_NE(boxVisual, nullptr);
 
   EXPECT_FLOAT_EQ(box->GetTransparency(), 0.0f);
   EXPECT_FLOAT_EQ(boxLink->GetTransparency(), 0.0f);
@@ -495,7 +495,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
   EXPECT_FLOAT_EQ(boxVisual->DerivedTransparency(), 0.0f);
 
   // sphere
-  ASSERT_TRUE(sphere != nullptr);
+  ASSERT_NE(sphere, nullptr);
   rendering::VisualPtr sphereLink;
   for (unsigned int i = 0; i < sphere->GetChildCount(); ++i)
   {
@@ -503,7 +503,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     if (vis->GetType() == rendering::Visual::VT_LINK)
       sphereLink = vis;
   }
-  ASSERT_TRUE(sphereLink != nullptr);
+  ASSERT_NE(sphereLink, nullptr);
 
   rendering::VisualPtr sphereVisual;
   for (unsigned int i = 0; i < sphereLink->GetChildCount(); ++i)
@@ -512,7 +512,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     if (vis->GetType() == rendering::Visual::VT_VISUAL)
       sphereVisual = vis;
   }
-  ASSERT_TRUE(sphereVisual != nullptr);
+  ASSERT_NE(sphereVisual, nullptr);
 
   EXPECT_FLOAT_EQ(sphere->GetTransparency(), 0.0f);
   EXPECT_FLOAT_EQ(sphereLink->GetTransparency(), 0.0f);
@@ -523,7 +523,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
   EXPECT_FLOAT_EQ(sphereVisual->DerivedTransparency(), 0.0f);
 
   // cylinder
-  ASSERT_TRUE(cylinder != nullptr);
+  ASSERT_NE(cylinder, nullptr);
   rendering::VisualPtr cylinderLink;
   for (unsigned int i = 0; i < cylinder->GetChildCount(); ++i)
   {
@@ -531,7 +531,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     if (vis->GetType() == rendering::Visual::VT_LINK)
       cylinderLink = vis;
   }
-  ASSERT_TRUE(cylinderLink != nullptr);
+  ASSERT_NE(cylinderLink, nullptr);
 
   rendering::VisualPtr cylinderVisual;
   for (unsigned int i = 0; i < cylinderLink->GetChildCount(); ++i)
@@ -540,7 +540,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     if (vis->GetType() == rendering::Visual::VT_VISUAL)
       cylinderVisual = vis;
   }
-  ASSERT_TRUE(cylinderVisual != nullptr);
+  ASSERT_NE(cylinderVisual, nullptr);
 
   EXPECT_FLOAT_EQ(cylinder->GetTransparency(), 0.0f);
   EXPECT_FLOAT_EQ(cylinderLink->GetTransparency(), 0.0f);
@@ -734,7 +734,7 @@ TEST_F(Visual_TEST, Wireframe)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
@@ -793,7 +793,7 @@ TEST_F(Visual_TEST, Material)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
@@ -833,7 +833,7 @@ TEST_F(Visual_TEST, ChildMaterial)
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
@@ -888,7 +888,7 @@ TEST_F(Visual_TEST, Lighting)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
@@ -923,7 +923,7 @@ TEST_F(Visual_TEST, Color)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
@@ -1006,7 +1006,7 @@ TEST_F(Visual_TEST, ChildColor)
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
@@ -1107,7 +1107,7 @@ TEST_F(Visual_TEST, ColorMaterial)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   std::string materialName = "Test/Grey";
   CreateColorMaterial(materialName, common::Color(0.3, 0.3, 0.3, 1.0),
@@ -1220,7 +1220,7 @@ TEST_F(Visual_TEST, UpdateMeshFromMsg)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   sdf::ElementPtr meshUpdateSDF(new sdf::Element);
   sdf::initFile("visual.sdf", meshUpdateSDF);
@@ -1260,11 +1260,11 @@ TEST_F(Visual_TEST, GetAncestors)
   Load("worlds/blank.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Get world visual
   gazebo::rendering::VisualPtr world = scene->WorldVisual();
-  ASSERT_TRUE(world != nullptr);
+  ASSERT_NE(world, nullptr);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
@@ -1300,7 +1300,7 @@ TEST_F(Visual_TEST, GetAncestors)
   EXPECT_EQ(vis4->GetDepth(), 4u);
 
   // Check parents
-  EXPECT_TRUE(world->GetParent() == nullptr);
+  EXPECT_EQ(world->GetParent(), nullptr);
   EXPECT_EQ(vis1->GetParent(), world);
   EXPECT_EQ(vis2->GetParent(), vis1);
   EXPECT_EQ(vis3_1->GetParent(), vis2);
@@ -1325,7 +1325,7 @@ TEST_F(Visual_TEST, GetAncestors)
   EXPECT_EQ(vis4->GetNthAncestor(0), world);
 
   // Check that the 1st ancestor is the root visual
-  EXPECT_TRUE(world->GetNthAncestor(1) == nullptr);
+  EXPECT_EQ(world->GetNthAncestor(1), nullptr);
   EXPECT_EQ(vis1->GetNthAncestor(1), vis1->GetRootVisual());
   EXPECT_EQ(vis2->GetNthAncestor(1), vis2->GetRootVisual());
   EXPECT_EQ(vis3_1->GetNthAncestor(1), vis3_1->GetRootVisual());
@@ -1333,27 +1333,27 @@ TEST_F(Visual_TEST, GetAncestors)
   EXPECT_EQ(vis4->GetNthAncestor(1), vis4->GetRootVisual());
 
   // Check 2nd ancestor
-  EXPECT_TRUE(world->GetNthAncestor(2) == nullptr);
-  EXPECT_TRUE(vis1->GetNthAncestor(2) == nullptr);
+  EXPECT_EQ(world->GetNthAncestor(2), nullptr);
+  EXPECT_EQ(vis1->GetNthAncestor(2), nullptr);
   EXPECT_EQ(vis2->GetNthAncestor(2), vis2);
   EXPECT_EQ(vis3_1->GetNthAncestor(2), vis2);
   EXPECT_EQ(vis3_2->GetNthAncestor(2), vis2);
   EXPECT_EQ(vis4->GetNthAncestor(2), vis2);
 
   // Check 3rd ancestor
-  EXPECT_TRUE(world->GetNthAncestor(3) == nullptr);
-  EXPECT_TRUE(vis1->GetNthAncestor(3) == nullptr);
-  EXPECT_TRUE(vis2->GetNthAncestor(3) == nullptr);
+  EXPECT_EQ(world->GetNthAncestor(3), nullptr);
+  EXPECT_EQ(vis1->GetNthAncestor(3), nullptr);
+  EXPECT_EQ(vis2->GetNthAncestor(3), nullptr);
   EXPECT_EQ(vis3_1->GetNthAncestor(3), vis3_1);
   EXPECT_EQ(vis3_2->GetNthAncestor(3), vis3_2);
   EXPECT_EQ(vis4->GetNthAncestor(3), vis3_1);
 
   // Check 4th ancestor
-  EXPECT_TRUE(world->GetNthAncestor(4) == nullptr);
-  EXPECT_TRUE(vis1->GetNthAncestor(4) == nullptr);
-  EXPECT_TRUE(vis2->GetNthAncestor(4) == nullptr);
-  EXPECT_TRUE(vis3_1->GetNthAncestor(4) == nullptr);
-  EXPECT_TRUE(vis3_2->GetNthAncestor(4) == nullptr);
+  EXPECT_EQ(world->GetNthAncestor(4), nullptr);
+  EXPECT_EQ(vis1->GetNthAncestor(4), nullptr);
+  EXPECT_EQ(vis2->GetNthAncestor(4), nullptr);
+  EXPECT_EQ(vis3_1->GetNthAncestor(4), nullptr);
+  EXPECT_EQ(vis3_2->GetNthAncestor(4), nullptr);
   EXPECT_EQ(vis4->GetNthAncestor(4), vis4);
 
   // Check if it is ancestor / descendant
@@ -1509,7 +1509,7 @@ TEST_F(Visual_TEST, Scale)
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Wait until all models are inserted
   int sleep = 0;
@@ -1528,7 +1528,7 @@ TEST_F(Visual_TEST, Scale)
   // and verify initial scale
 
   // box
-  ASSERT_TRUE(box != nullptr);
+  ASSERT_NE(box, nullptr);
   rendering::VisualPtr boxLink;
   for (unsigned int i = 0; i < box->GetChildCount(); ++i)
   {
@@ -1536,7 +1536,7 @@ TEST_F(Visual_TEST, Scale)
     if (vis->GetType() == rendering::Visual::VT_LINK)
       boxLink = vis;
   }
-  ASSERT_TRUE(boxLink != nullptr);
+  ASSERT_NE(boxLink, nullptr);
 
   rendering::VisualPtr boxVisual;
   for (unsigned int i = 0; i < boxLink->GetChildCount(); ++i)
@@ -1545,7 +1545,7 @@ TEST_F(Visual_TEST, Scale)
     if (vis->GetType() == rendering::Visual::VT_VISUAL)
       boxVisual = vis;
   }
-  ASSERT_TRUE(boxVisual != nullptr);
+  ASSERT_NE(boxVisual, nullptr);
 
   EXPECT_EQ(box->GetScale().Ign(), ignition::math::Vector3d::One);
   EXPECT_EQ(boxLink->GetScale().Ign(), ignition::math::Vector3d::One);
@@ -1556,7 +1556,7 @@ TEST_F(Visual_TEST, Scale)
   EXPECT_EQ(boxVisual->DerivedScale(), ignition::math::Vector3d::One);
 
   // sphere
-  ASSERT_TRUE(sphere != nullptr);
+  ASSERT_NE(sphere, nullptr);
   rendering::VisualPtr sphereLink;
   for (unsigned int i = 0; i < sphere->GetChildCount(); ++i)
   {
@@ -1564,7 +1564,7 @@ TEST_F(Visual_TEST, Scale)
     if (vis->GetType() == rendering::Visual::VT_LINK)
       sphereLink = vis;
   }
-  ASSERT_TRUE(sphereLink != nullptr);
+  ASSERT_NE(sphereLink, nullptr);
 
   rendering::VisualPtr sphereVisual;
   for (unsigned int i = 0; i < sphereLink->GetChildCount(); ++i)
@@ -1573,7 +1573,7 @@ TEST_F(Visual_TEST, Scale)
     if (vis->GetType() == rendering::Visual::VT_VISUAL)
       sphereVisual = vis;
   }
-  ASSERT_TRUE(sphereVisual != nullptr);
+  ASSERT_NE(sphereVisual, nullptr);
 
   EXPECT_EQ(sphere->GetScale().Ign(), ignition::math::Vector3d::One);
   EXPECT_EQ(sphereLink->GetScale().Ign(), ignition::math::Vector3d::One);
@@ -1584,7 +1584,7 @@ TEST_F(Visual_TEST, Scale)
   EXPECT_EQ(sphereVisual->DerivedScale(), ignition::math::Vector3d::One);
 
   // cylinder
-  ASSERT_TRUE(cylinder != nullptr);
+  ASSERT_NE(cylinder, nullptr);
   rendering::VisualPtr cylinderLink;
   for (unsigned int i = 0; i < cylinder->GetChildCount(); ++i)
   {
@@ -1592,7 +1592,7 @@ TEST_F(Visual_TEST, Scale)
     if (vis->GetType() == rendering::Visual::VT_LINK)
       cylinderLink = vis;
   }
-  ASSERT_TRUE(cylinderLink != nullptr);
+  ASSERT_NE(cylinderLink, nullptr);
 
   rendering::VisualPtr cylinderVisual;
   for (unsigned int i = 0; i < cylinderLink->GetChildCount(); ++i)
@@ -1601,7 +1601,7 @@ TEST_F(Visual_TEST, Scale)
     if (vis->GetType() == rendering::Visual::VT_VISUAL)
       cylinderVisual = vis;
   }
-  ASSERT_TRUE(cylinderVisual != nullptr);
+  ASSERT_NE(cylinderVisual, nullptr);
 
   EXPECT_EQ(cylinder->GetScale().Ign(), ignition::math::Vector3d::One);
   EXPECT_EQ(cylinderLink->GetScale().Ign(), ignition::math::Vector3d::One);
@@ -1750,11 +1750,11 @@ TEST_F(Visual_TEST, Clone)
   Load("worlds/blank.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Get world visual
   gazebo::rendering::VisualPtr world = scene->WorldVisual();
-  ASSERT_TRUE(world != nullptr);
+  ASSERT_NE(world, nullptr);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
@@ -1773,21 +1773,21 @@ TEST_F(Visual_TEST, Clone)
 
   gazebo::rendering::VisualPtr vis1Clone = vis1->Clone("vis1_clone",
       vis1->GetParent());
-  EXPECT_TRUE(vis1Clone != nullptr);
+  ASSERT_NE(vis1Clone, nullptr);
   EXPECT_EQ(vis1Clone->GetName(), "vis1_clone");
 
   EXPECT_EQ(vis1Clone->GetChildCount(), vis1->GetChildCount());
   EXPECT_EQ(vis1Clone->GetChildCount(), 1u);
 
   gazebo::rendering::VisualPtr vis2Clone = vis1Clone->GetChild(0);
-  EXPECT_TRUE(vis2Clone != nullptr);
+  ASSERT_NE(vis2Clone, nullptr);
   EXPECT_EQ(vis2Clone->GetName(), "vis1_clone::vis2");
 
   EXPECT_EQ(vis2Clone->GetChildCount(), vis2->GetChildCount());
   EXPECT_EQ(vis2Clone->GetChildCount(), 1u);
 
   gazebo::rendering::VisualPtr vis3Clone = vis2Clone->GetChild(0);
-  EXPECT_TRUE(vis3Clone != nullptr);
+  ASSERT_NE(vis3Clone, nullptr);
   EXPECT_EQ(vis3Clone->GetName(), "vis1_clone::vis2::vis3");
 
   EXPECT_EQ(vis3Clone->GetChildCount(), vis3->GetChildCount());
@@ -1808,7 +1808,7 @@ TEST_F(Visual_TEST, VisibilityFlags)
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Wait until all models are inserted
   int sleep = 0;
@@ -1824,7 +1824,7 @@ TEST_F(Visual_TEST, VisibilityFlags)
   // Check that the cylinder model, link, and visual were properly added
 
   // cylinder
-  ASSERT_TRUE(cylinder != nullptr);
+  ASSERT_NE(cylinder, nullptr);
   rendering::VisualPtr cylinderLink;
   for (unsigned int i = 0; i < cylinder->GetChildCount(); ++i)
   {
@@ -1832,7 +1832,7 @@ TEST_F(Visual_TEST, VisibilityFlags)
     if (vis->GetType() == rendering::Visual::VT_LINK)
       cylinderLink = vis;
   }
-  ASSERT_TRUE(cylinderLink != nullptr);
+  ASSERT_NE(cylinderLink, nullptr);
 
   rendering::VisualPtr cylinderVisual;
   for (unsigned int i = 0; i < cylinderLink->GetChildCount(); ++i)
@@ -1841,7 +1841,7 @@ TEST_F(Visual_TEST, VisibilityFlags)
     if (vis->GetType() == rendering::Visual::VT_VISUAL)
       cylinderVisual = vis;
   }
-  ASSERT_TRUE(cylinderVisual != nullptr);
+  ASSERT_NE(cylinderVisual, nullptr);
 
   // set visibility flags - by default they cascade
 
@@ -1890,7 +1890,7 @@ TEST_F(Visual_TEST, DestroyWithPlugin)
   this->Load("worlds/empty.world");
 
   auto scene = gazebo::rendering::get_scene();
-  ASSERT_TRUE(scene != nullptr);
+  ASSERT_NE(scene, nullptr);
 
   // Load visual
   std::stringstream visualString;
@@ -1914,7 +1914,7 @@ TEST_F(Visual_TEST, DestroyWithPlugin)
       new gazebo::rendering::Visual("box_visual", scene));
   vis->Load(sdf);
 
-  ASSERT_TRUE(vis != nullptr);
+  ASSERT_NE(vis, nullptr);
 
   // Call Fini multiple times, reset and check there's no crash
   vis->Fini();
@@ -1922,7 +1922,7 @@ TEST_F(Visual_TEST, DestroyWithPlugin)
   vis->Fini();
   vis.reset();
 
-  ASSERT_TRUE(vis == nullptr);
+  ASSERT_EQ(vis, nullptr);
 }
 
 /////////////////////////////////////////////////
