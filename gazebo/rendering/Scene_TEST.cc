@@ -351,35 +351,55 @@ TEST_F(Scene_TEST, VisualType)
 //////////////////////////////////////////////////
 TEST_F(Scene_TEST, VisualInfo)
 {
-  this->Load("worlds/blink_visual.world", true);
+  this->Load("worlds/shapes.world");
+
+  // FIXME need a camera otherwise visuals are never spawned
+  {
+    ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+    std::string cameraName = "test_camera";
+    this->SpawnCamera("test_camera_model", cameraName,
+        cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+  }
 
   auto scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
-
-  printf("%d\n", scene->GetVisualCount());
 
   ignition::msgs::Visual_V visuals;
   bool success;
   common::URI visualUri;
 
-  // Wait until all visuals are loaded
+  // Wait until visuals are loaded
+  std::string visScoped("box::link::visual");
   int sleep = 0;
-  int maxSleep = 10;
-  while (sleep < maxSleep)
+  int maxSleep = 30;
+  while (sleep < maxSleep && !scene->GetVisual(visScoped))
   {
-    common::Time::MSleep(1000);
+    common::Time::MSleep(100);
     sleep++;
   }
+  EXPECT_TRUE(scene->GetVisual(visScoped) != nullptr);
 
   gzmsg << "Get an existing visual" << std::endl;
   {
-    visualUri.Parse(
-        "data://visual/box_sim::link::visual");
+    visualUri.Parse("data://visual/" + visScoped);
     scene->VisualInfo(visualUri, visuals, success);
 
     EXPECT_TRUE(success);
     EXPECT_EQ(visuals.visuals_size(), 1);
-    EXPECT_EQ(visuals.visuals(0).name(), "visual");
+    EXPECT_EQ(visuals.visuals(0).name(), visScoped);
+  }
+
+  gzmsg << "Get all visuals" << std::endl;
+  {
+    visualUri.Parse("data://visual/");
+    scene->VisualInfo(visualUri, visuals, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(visuals.visuals_size(), 4);
+    EXPECT_EQ(visuals.visuals(0).name(), "ground_plane::link::visual");
+    EXPECT_EQ(visuals.visuals(1).name(), "box::link::visual");
+    EXPECT_EQ(visuals.visuals(2).name(), "sphere::link::visual");
+    EXPECT_EQ(visuals.visuals(3).name(), "cylinder::link::visual");
   }
 }
 
@@ -388,25 +408,47 @@ TEST_F(Scene_TEST, PluginInfo)
 {
   this->Load("worlds/blink_visual.world", true);
 
+  // FIXME need a camera otherwise visuals are never spawned
+  {
+    ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+    std::string cameraName = "test_camera";
+    this->SpawnCamera("test_camera_model", cameraName,
+        cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+  }
+
   auto scene = rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
+
+  // Wait until visuals are loaded
+  std::string visScoped("box_sim::link::visual");
+  int sleep = 0;
+  int maxSleep = 30;
+  while (sleep < maxSleep && !scene->GetVisual(visScoped))
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_TRUE(scene->GetVisual(visScoped) != nullptr);
 
   ignition::msgs::Plugin_V plugins;
   bool success;
   common::URI pluginUri;
 
-  // Wait until all visuals are loaded
-  int sleep = 0;
-  int maxSleep = 10;
-  while (sleep < maxSleep)
-  {
-    common::Time::MSleep(1000);
-    sleep++;
-  }
-
   gzmsg << "Get an existing plugin" << std::endl;
   {
-    pluginUri.Parse("data://data://visual/box_sim::link::visual/plugin/blink");
+    std::string pluginStr(visScoped + "/plugin/blink");
+    pluginUri.Parse("data://visual/" + pluginStr);
+    scene->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "blink");
+  }
+
+  gzmsg << "Get all plugins for a visual" << std::endl;
+  {
+    std::string pluginStr(visScoped + "/plugin/");
+    pluginUri.Parse("data://visual/" + pluginStr);
     scene->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);

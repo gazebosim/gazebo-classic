@@ -263,7 +263,7 @@ void World::Load(sdf::ElementPtr _sdf)
     gzerr << "Error advertising service [" << pluginInfoService << "]"
         << std::endl;
   }
-  
+
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 

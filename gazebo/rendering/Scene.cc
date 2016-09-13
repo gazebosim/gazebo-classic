@@ -29,7 +29,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/URI.hh" 
+#include "gazebo/common/URI.hh"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -323,19 +323,16 @@ void Scene::Load()
 
   std::string service("/rendering/info/visual");
   if (!this->dataPtr->ignNode.Advertise(service,
-    &Scene::VisualInfoService, this))
+      &Scene::VisualInfoService, this))
   {
-  gzerr << "Error advertising service [" << service << "]"
-      << std::endl;
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
 
   std::string pluginService("/rendering/info/plugin");
   if (!this->dataPtr->ignNode.Advertise(pluginService,
-    &Scene::PluginInfoService, this))
+      &Scene::PluginInfoService, this))
   {
-
-  gzerr << "Error advertising service [" << pluginService << "]"
-      << std::endl;
+    gzerr << "Error advertising service [" << pluginService << "]" << std::endl;
   }
 }
 
@@ -3656,36 +3653,42 @@ void Scene::VisualInfo(const common::URI _visualUri,
 
   auto parts = common::split(_visualUri.Path().Str(), "/");
 
-  // See if there is a visual
-  if (parts[0] != "visual")
+  for (size_t i = 0; i < parts.size(); i = i+2)
   {
-    gzwarn << "URI [" << _visualUri.Str() << "] is not a visual." << std::endl;
-    return;
+    // See if there is a visual
+    if (parts[i] == "visual")
+    {
+      // Find correct visual
+      for (auto vis : this->dataPtr->visuals)
+      {
+        // Skip visuals not of visual type
+        if (vis.second->GetType() != Visual::VT_VISUAL)
+          continue;
+
+        auto visName = vis.second->GetName();
+
+        // If asking for a specific visual, skip all other visuals
+        // \todo: This is using the visual's scoped name. Change this to URI.
+        if (i+1 < parts.size() && parts[i+1] != visName)
+        {
+          continue;
+        }
+
+        // Add properties
+        auto visualMsg = _visuals.add_visuals();
+        visualMsg->CopyFrom(util::Convert<ignition::msgs::Visual>(
+            vis.second->GetSDF()));
+      }
+    }
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << _visualUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
   }
 
-  auto visual = this->GetVisual(parts[1]);
-
-  if (!visual)
-  {
-    gzwarn << "Visual [" << parts[1] << "] not found"
-    << std::endl;
-    return;
-  }
-
-  // Add properties
-  auto visualMsg = _visuals.add_visuals();
-  visualMsg->CopyFrom(util::Convert<ignition::msgs::Visual>(visual->GetSDF()));
-  /*
-  visualMsg->set_name(visual->GetName());
-  visualMsg->set_parent_name(visual->GetParent()->GetName());
-  visualMsg->set_cast_shadows(visual->GetCastShadows());
-  visualMsg->set_transparency(visual->GetTransparency());
-  // TODO No set_pose/geo function??  
-  ignition::msgs::Set(visualMsg->mutable_pose(), visual->GetPose().Ign());
-  //visualMsg->set_geometry(visual->GetGeometrySize());
-*/
   _success = true;
-  return;
 }
 
 //////////////////////////////////////////////////
@@ -3710,48 +3713,71 @@ void Scene::PluginInfo(const common::URI &_pluginUri,
 
   auto parts = common::split(_pluginUri.Path().Str(), "/");
 
-  // See if this is a visual plugin
-  if (parts[0] != "visual" || parts[2] != "plugin")
+  // \todo Checking specific positions in the URI because we're using
+  // scoped names. Once we support full URI, the logic needs to change
+  // to take nested models into account.
+
+  if (parts.size() < 3 || parts[0] != "visual" || parts[2] != "plugin")
   {
-    gzwarn << "URI [" << _pluginUri.Str() << "] is not a visual plugin." << std::endl;
+    gzwarn << "URI [" << _pluginUri.Str() <<
+        "] doesn't correspond to a visual plugin." << std::endl;
+    _success = false;
     return;
   }
 
-  auto visual = this->GetVisual(parts[1]);
-
-  if (!visual)
+  // Find correct visual
+  for (auto vis : this->dataPtr->visuals)
   {
-    gzwarn << "Visual [" << parts[1] << "] not found"
-    << std::endl;
-    return;
-  }
+    // Skip visuals not of visual type
+    if (vis.second->GetType() != Visual::VT_VISUAL)
+      continue;
 
-  if (visual->GetSDF()->HasElement("plugin"))
-  {
-    sdf::ElementPtr pluginElem = visual->GetSDF()->GetElement("plugin");
-    while (pluginElem)
+    // \todo: This is using the visual's scoped name. Change this to URI.
+    auto visName = vis.second->GetName();
+
+    // Skip if visual is different
+    if (parts[1] != visName)
+      continue;
+
+    if (vis.second->GetSDF()->HasElement("plugin"))
     {
-      auto pluginName = pluginElem->Get<std::string>("name");
-
-      if (pluginName == parts[3])
+      // Insert each plugin
+      auto pluginElem = vis.second->GetSDF()->GetElement("plugin");
+      while (pluginElem)
       {
+        auto pluginName = pluginElem->Get<std::string>("name");
+
+        // If asking for a specific plugin, skip all other plugins
+        if (parts.size() > 3 && parts[3] != pluginName)
+        {
+          pluginElem = pluginElem->GetNextElement("plugin");
+          continue;
+        }
+
         // Get plugin info from SDF
         auto pluginMsg = _plugins.add_plugins();
-        pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
+        pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(
+            pluginElem));
 
-        _success = true;
-        return;
+        pluginElem = pluginElem->GetNextElement("plugin");
       }
-      pluginElem = pluginElem->GetNextElement("plugin");
     }
-      gzwarn << "Visual plugin [" << parts[3] << "] not found in visual"
-      << parts[1] << std::endl;
+
+    // If asking for a specific plugin and it wasn't found
+    if (parts.size() > 3 && _plugins.plugins_size() == 0)
+    {
+      gzwarn << "Plugin [" << parts[3] << "] not found in visual [" <<
+          parts[1] << "]" << std::endl;
+      _success = false;
+      return;
+    }
+
+    // No need to keep checking other visuals
+    _success = true;
+    return;
   }
-  else
-  {
-    gzwarn << "There is no plugin element in visual [" << parts[1] << "]"
-    << std::endl;
-  }
+
+  gzwarn << "Could not find visual [" << parts[1] << "]" << std::endl;
 
   _success = false;
   return;
