@@ -693,10 +693,13 @@ void ArduPilotPlugin::ReceiveMotorCommand()
       {
         if (this->dataPtr->controls[i].channel < recvChannels)
         {
+          // bound incoming cmd between 0 and 1
+          double cmd =
+            ignition::math::clamp(pkt.motorSpeed[this->dataPtr->controls[i].channel],
+            0.0f, 1.0f);
           this->dataPtr->controls[i].cmd =
             this->dataPtr->controls[i].multiplier *
-            (this->dataPtr->controls[i].offset +
-            pkt.motorSpeed[this->dataPtr->controls[i].channel]);
+            (this->dataPtr->controls[i].offset + cmd);
           // gzdbg << "apply input chan[" << this->dataPtr->controls[i].channel
           //       << "] to control chan[" << i
           //       << "] with joint name ["
