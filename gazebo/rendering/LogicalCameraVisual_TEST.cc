@@ -16,18 +16,18 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/rendering/LaserVisual.hh"
+#include "gazebo/rendering/LogicalCameraVisual.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class LaserVisual_TEST : public RenderingFixture
+class LogicalCameraVisual_TEST : public RenderingFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(LaserVisual_TEST, LoadDestroy)
+TEST_F(LogicalCameraVisual_TEST, LoadDestroy)
 {
   this->Load("worlds/empty.world");
 
@@ -45,8 +45,8 @@ TEST_F(LaserVisual_TEST, LoadDestroy)
   // test calling constructor and Load functions and make sure
   // there are no segfaults
   gazebo::rendering::VisualPtr vis(
-      new gazebo::rendering::LaserVisual("test_vis",
-      scene->WorldVisual(), ""));
+      new gazebo::rendering::LogicalCameraVisual("test_vis",
+      scene->WorldVisual()));
   vis->Load();
 
   // Check visual was created

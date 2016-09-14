@@ -163,6 +163,7 @@ set (gtest_sources_dri
   InertiaVisual_TEST.cc
   JointVisual_TEST.cc
   LaserVisual_TEST.cc
+  LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   RenderingLight_TEST.cc
