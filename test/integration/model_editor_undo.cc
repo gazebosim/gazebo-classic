@@ -716,14 +716,14 @@ void ModelEditorUndoTest::ModelPluginDeletionByContextMenu()
   QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
   // Check the model plugin is listed in the editor
-  // 2 children: Add button and plugin
   auto modelTree = mainWindow->findChild<QTreeWidget *>(
       "modelEditorTreeWidget");
   QVERIFY(modelTree != nullptr);
 
+  // 4 children: Add button, body, propeller and buoyancy plugins
   auto pluginsItem = modelTree->topLevelItem(0);
   QVERIFY(pluginsItem != nullptr);
-  QCOMPARE(pluginsItem->childCount(), 2);
+  QCOMPARE(pluginsItem->childCount(), 4);
 
   // Open the context menu and trigger the delete action
   QTimer::singleShot(500, this, SLOT(TriggerDelete()));
@@ -741,7 +741,7 @@ void ModelEditorUndoTest::ModelPluginDeletionByContextMenu()
     QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check the plugin has been removed
-    QCOMPARE(pluginsItem->childCount(), 1);
+    QCOMPARE(pluginsItem->childCount(), 3);
 
     // Undo
     gzmsg << "Undo deleting plugin [buoyancy]" << std::endl;
@@ -756,7 +756,7 @@ void ModelEditorUndoTest::ModelPluginDeletionByContextMenu()
     QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
 
     // Check the plugin has been inserted
-    QCOMPARE(pluginsItem->childCount(), 2);
+    QCOMPARE(pluginsItem->childCount(), 4);
 
     // Redo
     gzmsg << "Redo deleting plugin [buoyancy]" << std::endl;
@@ -1116,4 +1116,3 @@ void ModelEditorUndoTest::NestedModelAlign()
 
 // Generate a main function for the test
 QTEST_MAIN(ModelEditorUndoTest)
-
