@@ -1286,6 +1286,18 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   int fsaa = 4;
 
+  Ogre::RenderSystem *renderSys = Ogre::Root::getSingleton().getRenderSystem();
+  Ogre::ConfigOptionMap configMap = renderSys->getConfigOptions();
+  auto fsaaOoption = configMap.find("FSAA");
+  if (fsaaOoption != configMap.end())
+  {
+    for (const auto &v : (*fsaaOoption).second.possibleValues)
+    {
+      std::cerr << " FSAA: " << v << std::endl;
+    }
+    std::cerr << "---" << std::endl;
+  }
+
   // Full-screen anti-aliasing only works correctly in 1.8 and above
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
   fsaa = 0;
