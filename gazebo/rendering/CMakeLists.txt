@@ -154,6 +154,7 @@ set (gtest_sources_dri
   ApplyWrenchVisual_TEST.cc
   ArrowVisual_TEST.cc
   AxisVisual_TEST.cc
+  CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
   GpuLaser_TEST.cc
