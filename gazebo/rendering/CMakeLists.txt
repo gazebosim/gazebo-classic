@@ -151,6 +151,8 @@ set (gtest_sources
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_rendering)
 
 set (gtest_sources_dri
+  ApplyWrenchVisual_TEST.cc
+  ArrowVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
   GpuLaser_TEST.cc
