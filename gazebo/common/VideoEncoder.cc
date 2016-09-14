@@ -55,6 +55,10 @@ extern "C"
 using namespace gazebo;
 using namespace common;
 
+#ifndef AV_ERROR_MAX_STRING_SIZE
+#define AV_ERROR_MAX_STRING_SIZE 64
+#endif
+
 // Private data class
 class gazebo::common::VideoEncoderPrivate
 {
@@ -235,7 +239,7 @@ bool VideoEncoder::Start(const std::string &_format,
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
     // Loop through available output devices.
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(56, 40, 1)
     while ((outputFormat = av_oformat_next(outputFormat)) != nullptr)
 #else
     while ((outputFormat = av_output_video_device_next(outputFormat))
@@ -245,9 +249,24 @@ bool VideoEncoder::Start(const std::string &_format,
       // Break when the output device name matches 'v4l2'
       if (this->dataPtr->format.compare(outputFormat->name) == 0)
       {
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(56, 40, 1)
+        this->dataPtr->formatCtx = avformat_alloc_context();
+        this->dataPtr->formatCtx->oformat = outputFormat;
+#ifdef WIN32
+        _sprintf(this->dataPtr->formatCtx->filename,
+                 sizeof(this->dataPtr->formatCtx->filename),
+                 "%s", _filename.c_str());
+#else
+        snprintf(this->dataPtr->formatCtx->filename,
+                sizeof(this->dataPtr->formatCtx->filename),
+                "%s", _filename.c_str());
+#endif
+
+#else
         // Allocate the context using the correct outputFormat
         avformat_alloc_output_context2(&this->dataPtr->formatCtx,
             outputFormat, nullptr, this->dataPtr->filename.c_str());
+#endif
         break;
       }
     }
@@ -264,8 +283,23 @@ bool VideoEncoder::Start(const std::string &_format,
       outputFormat = av_guess_format("mpeg", nullptr, nullptr);
     }
 
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(56, 40, 1)
+        this->dataPtr->formatCtx = avformat_alloc_context();
+        this->dataPtr->formatCtx->oformat = outputFormat;
+#ifdef WIN32
+        _sprintf(this->dataPtr->formatCtx->filename,
+                 sizeof(this->dataPtr->formatCtx->filename),
+                 "%s", _filename.c_str());
+#else
+        snprintf(this->dataPtr->formatCtx->filename,
+                sizeof(this->dataPtr->formatCtx->filename),
+                "%s", _filename.c_str());
+#endif
+
+#else
     avformat_alloc_output_context2(&this->dataPtr->formatCtx, nullptr, nullptr,
         this->dataPtr->filename.c_str());
+#endif
   }
 
   // Make sure allocation occurred.
@@ -282,7 +316,11 @@ bool VideoEncoder::Start(const std::string &_format,
   if (!encoder)
   {
     gzerr << "Codec for["
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+          << this->dataPtr->formatCtx->oformat->name
+#else
           << avcodec_get_name(this->dataPtr->formatCtx->oformat->video_codec)
+#endif
           << "] not found. Video encoding is not started.\n";
     this->Reset();
     return false;
@@ -312,7 +350,13 @@ bool VideoEncoder::Start(const std::string &_format,
 
   // some formats want stream headers to be separate
   if (this->dataPtr->formatCtx->oformat->flags & AVFMT_GLOBALHEADER)
+  {
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+    this->dataPtr->codecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+#else
     this->dataPtr->codecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+#endif
+  }
 
   // Frames per second
   this->dataPtr->codecCtx->time_base.den = this->dataPtr->fps;
