@@ -694,9 +694,9 @@ void ArduPilotPlugin::ReceiveMotorCommand()
         if (this->dataPtr->controls[i].channel < recvChannels)
         {
           // bound incoming cmd between 0 and 1
-          double cmd =
-            ignition::math::clamp(pkt.motorSpeed[this->dataPtr->controls[i].channel],
-            0.0f, 1.0f);
+          double cmd = ignition::math::clamp(
+            pkt.motorSpeed[this->dataPtr->controls[i].channel],
+            -1.0f, 1.0f);
           this->dataPtr->controls[i].cmd =
             this->dataPtr->controls[i].multiplier *
             (this->dataPtr->controls[i].offset + cmd);
@@ -704,7 +704,9 @@ void ArduPilotPlugin::ReceiveMotorCommand()
           //       << "] to control chan[" << i
           //       << "] with joint name ["
           //       << this->dataPtr->controls[i].jointName
-          //       << "] servo_command [" << this->dataPtr->controls[i].cmd
+          //       << "] raw cmd ["
+          //       << pkt.motorSpeed[this->dataPtr->controls[i].channel]
+          //       << "] adjusted cmd [" << this->dataPtr->controls[i].cmd
           //       << "].\n";
         }
         else
