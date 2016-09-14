@@ -167,6 +167,7 @@ set (gtest_sources_dri
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   RenderingLight_TEST.cc
+  RFIDVisual_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
