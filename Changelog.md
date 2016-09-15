@@ -3,7 +3,7 @@
 ## Gazebo 8.x.x (2017-xx-xx)
 
 1. Add video recording of user camera.
-    * [Pull request #2432](https://bitbucket.org/osrf/gazebo/pull-request/2432)
+    * [Pull request #2443](https://bitbucket.org/osrf/gazebo/pull-request/2443)
 
 1. Removed deprecations
     * [Pull request #2427]((https://bitbucket.org/osrf/gazebo/pull-request/2427)
