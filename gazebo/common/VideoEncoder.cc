@@ -724,19 +724,16 @@ bool VideoEncoder::AddFrame(const unsigned char */*_frame*/,
 /////////////////////////////////////////////////
 bool VideoEncoder::Stop()
 {
-std::cout << "STOP\n";
 #ifdef HAVE_FFMPEG
   if (this->dataPtr->encoding && this->dataPtr->formatCtx)
     av_write_trailer(this->dataPtr->formatCtx);
 
-std::cout << "1\n";
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 24, 1)
   if (this->dataPtr->codecCtx)
     avcodec_free_context(&this->dataPtr->codecCtx);
 #endif
   this->dataPtr->codecCtx = nullptr;
 
-std::cout << "2\n";
   if (this->dataPtr->avInFrame)
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
     av_free(this->dataPtr->avInFrame);
@@ -745,7 +742,6 @@ std::cout << "2\n";
 #endif
   this->dataPtr->avInFrame = nullptr;
 
-std::cout << "3\n";
   if (this->dataPtr->avOutFrame)
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
     av_free(this->dataPtr->avOutFrame);
@@ -754,19 +750,16 @@ std::cout << "3\n";
 #endif
   this->dataPtr->avOutFrame = nullptr;
 
-std::cout << "4\n";
   if (this->dataPtr->swsCtx)
     sws_freeContext(this->dataPtr->swsCtx);
   this->dataPtr->swsCtx = nullptr;
 
-std::cout << "5\n";
   // This frees the context and all the streams
   if (this->dataPtr->formatCtx)
     avformat_free_context(this->dataPtr->formatCtx);
   this->dataPtr->formatCtx = nullptr;
   this->dataPtr->videoStream = nullptr;
 
-std::cout << "6\n";
   this->dataPtr->encoding = false;
   return true;
 #endif
