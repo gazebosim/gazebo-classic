@@ -1240,18 +1240,16 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
     auto values = (*fsaaOoption).second.possibleValues;
     for (auto const &str : values)
     {
-      int value = 0;
       try
       {
-        value = std::stoi(str);
+        if (std::stoi(str) == targetFSAA)
+        {
+          fsaa = targetFSAA;
+          break;
+        }
       }
       catch(...)
       {
-      }
-      if (value == targetFSAA)
-      {
-        fsaa == targetFSAA;
-        break;
       }
     }
   }
