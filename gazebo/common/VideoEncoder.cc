@@ -238,38 +238,25 @@ bool VideoEncoder::Start(const std::string &_format,
   // Special case for video4linux2. Here we attempt to find the v4l2 device
   if (this->dataPtr->format.compare("v4l2") == 0)
   {
-    // Loop through available output devices.
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(56, 40, 1)
-    while ((outputFormat = av_oformat_next(outputFormat)) != nullptr)
-#else
+#if LIBAVDEVICE_VERSION_INT >= AV_VERSION_INT(56, 4, 100)
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
-#endif
     {
+      std::cout << "Outputformat[" << outputFormat->name << "]\n";
       // Break when the output device name matches 'v4l2'
       if (this->dataPtr->format.compare(outputFormat->name) == 0)
       {
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(56, 40, 1)
-        this->dataPtr->formatCtx = avformat_alloc_context();
-        this->dataPtr->formatCtx->oformat = outputFormat;
-#ifdef WIN32
-        _sprintf(this->dataPtr->formatCtx->filename,
-                 sizeof(this->dataPtr->formatCtx->filename),
-                 "%s", _filename.c_str());
-#else
-        snprintf(this->dataPtr->formatCtx->filename,
-                sizeof(this->dataPtr->formatCtx->filename),
-                "%s", _filename.c_str());
-#endif
-
-#else
         // Allocate the context using the correct outputFormat
         avformat_alloc_output_context2(&this->dataPtr->formatCtx,
             outputFormat, nullptr, this->dataPtr->filename.c_str());
-#endif
         break;
       }
     }
+#else
+    gzerr << "libavdevice version >= 56.4.100 is required for v4l2 recording. "
+          << "This version is available on Ubuntu Xenial or greater.\n";
+    return false;
+#endif
   }
   else
   {
@@ -327,8 +314,13 @@ bool VideoEncoder::Start(const std::string &_format,
   }
 
   // Create a new video stream
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+  this->dataPtr->videoStream = avformat_new_stream(this->dataPtr->formatCtx,
+    encoder);
+#else
   this->dataPtr->videoStream = avformat_new_stream(this->dataPtr->formatCtx,
       nullptr);
+#endif
 
   if (!this->dataPtr->videoStream)
   {
@@ -339,7 +331,12 @@ bool VideoEncoder::Start(const std::string &_format,
   this->dataPtr->videoStream->id = this->dataPtr->formatCtx->nb_streams-1;
 
   // Allocate a new video context
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
+  this->dataPtr->codecCtx = this->dataPtr->videoStream->codec;
+#else
   this->dataPtr->codecCtx = avcodec_alloc_context3(encoder);
+#endif
+
   if (!this->dataPtr->codecCtx)
   {
     gzerr << "Could not allocate an encoding context."
@@ -393,12 +390,13 @@ bool VideoEncoder::Start(const std::string &_format,
 
   if (this->dataPtr->codecCtx->codec_id == AV_CODEC_ID_H264)
   {
-    av_opt_set(this->dataPtr->videoStream->priv_data, "preset", "slow", 0);
     av_opt_set(this->dataPtr->codecCtx->priv_data, "preset", "slow", 0);
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
     av_opt_set(this->dataPtr->videoStream->codec->priv_data,
         "preset", "slow", 0);
+#else
+    av_opt_set(this->dataPtr->videoStream->priv_data, "preset", "slow", 0);
 #endif
   }
 
@@ -448,8 +446,8 @@ bool VideoEncoder::Start(const std::string &_format,
 
   // Copy parameters from the context to the video stream
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-  ret = avcodec_copy_context(this->dataPtr->videoStream->codec,
-                       this->dataPtr->codecCtx);
+//  ret = avcodec_copy_context(this->dataPtr->videoStream->codec,
+//                       this->dataPtr->codecCtx);
 #else
   ret = avcodec_parameters_from_context(
       this->dataPtr->videoStream->codecpar, this->dataPtr->codecCtx);
@@ -726,18 +724,19 @@ bool VideoEncoder::AddFrame(const unsigned char */*_frame*/,
 /////////////////////////////////////////////////
 bool VideoEncoder::Stop()
 {
+std::cout << "STOP\n";
 #ifdef HAVE_FFMPEG
   if (this->dataPtr->encoding && this->dataPtr->formatCtx)
     av_write_trailer(this->dataPtr->formatCtx);
 
+std::cout << "1\n";
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 24, 1)
   if (this->dataPtr->codecCtx)
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
-    av_free(this->dataPtr->codecCtx);
-#else
     avcodec_free_context(&this->dataPtr->codecCtx);
 #endif
   this->dataPtr->codecCtx = nullptr;
 
+std::cout << "2\n";
   if (this->dataPtr->avInFrame)
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
     av_free(this->dataPtr->avInFrame);
@@ -746,6 +745,7 @@ bool VideoEncoder::Stop()
 #endif
   this->dataPtr->avInFrame = nullptr;
 
+std::cout << "3\n";
   if (this->dataPtr->avOutFrame)
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 24, 1)
     av_free(this->dataPtr->avOutFrame);
@@ -754,16 +754,19 @@ bool VideoEncoder::Stop()
 #endif
   this->dataPtr->avOutFrame = nullptr;
 
+std::cout << "4\n";
   if (this->dataPtr->swsCtx)
     sws_freeContext(this->dataPtr->swsCtx);
   this->dataPtr->swsCtx = nullptr;
 
+std::cout << "5\n";
   // This frees the context and all the streams
   if (this->dataPtr->formatCtx)
     avformat_free_context(this->dataPtr->formatCtx);
   this->dataPtr->formatCtx = nullptr;
   this->dataPtr->videoStream = nullptr;
 
+std::cout << "6\n";
   this->dataPtr->encoding = false;
   return true;
 #endif

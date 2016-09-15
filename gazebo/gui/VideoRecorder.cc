@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -38,7 +39,7 @@ class gazebo::gui::VideoRecorderPrivate
   /// \brief Button to stop recording.
   public: QPushButton *stopButton = nullptr;
 
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
   /// \brief Button to enable v4l recording.
   public: QToolButton *v4lButton = nullptr;
 #endif
@@ -103,7 +104,7 @@ VideoRecorder::VideoRecorder(QWidget *_parent)
   signalMapper->setMapping(ogvAction, QString("ogv"));
 
   // Only support video4linux on linux
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
   // V4L recording button
   this->dataPtr->v4lButton = new QToolButton(this);
   this->dataPtr->v4lButton->setToolTip(tr("Record to video4linux device."));
@@ -151,7 +152,7 @@ void VideoRecorder::OnRecordStop()
   this->dataPtr->mp4Button->show();
   this->dataPtr->aviButton->show();
   this->dataPtr->ogvButton->show();
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
   this->dataPtr->v4lButton->show();
 #endif
   this->dataPtr->stopButton->hide();
@@ -267,7 +268,7 @@ void VideoRecorder::OnRecordStart(const QString &_format)
     this->dataPtr->mp4Button->hide();
     this->dataPtr->aviButton->hide();
     this->dataPtr->ogvButton->hide();
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
     this->dataPtr->v4lButton->hide();
 #endif
     this->dataPtr->stopButton->show();

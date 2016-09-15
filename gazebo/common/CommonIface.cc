@@ -113,7 +113,7 @@ void common::load()
     avcodec_register_all();
     av_register_all();
 
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
     avdevice_register_all();
 #endif
 
