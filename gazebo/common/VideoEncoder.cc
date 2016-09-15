@@ -242,7 +242,6 @@ bool VideoEncoder::Start(const std::string &_format,
     while ((outputFormat = av_output_video_device_next(outputFormat))
            != nullptr)
     {
-      std::cout << "Outputformat[" << outputFormat->name << "]\n";
       // Break when the output device name matches 'v4l2'
       if (this->dataPtr->format.compare(outputFormat->name) == 0)
       {
