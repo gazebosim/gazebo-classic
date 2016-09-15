@@ -1230,6 +1230,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   int fsaa = 0;
 
+  // check if target FSAA is supported
   int targetFSAA = 4;
   Ogre::RenderSystem *renderSys = Ogre::Root::getSingleton().getRenderSystem();
   Ogre::ConfigOptionMap configMap = renderSys->getConfigOptions();
