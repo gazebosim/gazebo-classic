@@ -35,7 +35,7 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 
-#ifdef __linux__
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
 #include <libavdevice/avdevice.h>
 #endif
 }
