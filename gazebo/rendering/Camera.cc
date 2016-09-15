@@ -1231,23 +1231,25 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
   int fsaa = 0;
 
   // check if target FSAA is supported
-  int targetFSAA = 4;
   Ogre::RenderSystem *renderSys = Ogre::Root::getSingleton().getRenderSystem();
   Ogre::ConfigOptionMap configMap = renderSys->getConfigOptions();
   auto fsaaOoption = configMap.find("FSAA");
   if (fsaaOoption != configMap.end())
   {
-    for (const auto &str : (*fsaaOoption).second.possibleValues)
+    int targetFSAA = 4;
+    auto values = (*fsaaOoption).second.possibleValues;
+    for (auto const &str : values)
     {
       int value = 0;
       try
       {
         value = std::stoi(str);
       }
-      catch (...)
+      catch(...)
       {
       }
-      if (value == targetFSAA) {
+      if (value == targetFSAA)
+      {
         fsaa == targetFSAA;
         break;
       }
