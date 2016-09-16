@@ -484,7 +484,7 @@ namespace gazebo
       public: void SetLowerLimit(unsigned int _index, math::Angle _limit);
 
       /// \brief:  set the joint upper limit
-      /// (replacee SetHighStop)
+      /// (replaces SetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Upper limit of the axis.
       public: void SetUpperLimit(unsigned int _index, math::Angle _limit);
