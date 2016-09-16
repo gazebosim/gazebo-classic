@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_LASERVISUALIZATION_TEST_HH_
-#define GAZEBO_GUI_LASERVISUALIZATION_TEST_HH_
+
+#ifndef GAZEBO_TEST_INTEGRATION_COLLADAVISUALIZATION_HH_
+#define GAZEBO_TEST_INTEGRATION_COLLADAVISUALIZATION_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for laser visualization.
-class LaserVisualization_TEST : public QTestFixture
+/// \brief A test class for collada visualization.
+class ColladaVisualization : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test that laser visualization draws lines correctly.
-  private slots: void Lines();
-
-  /// \brief Laser hit visualization.
-  private slots: void Hit();
-
-  /// \brief Laser no-hit visualization.
-  private slots: void Nohit();
-
-  /// \brief Test laser deadzone visualization.
-  private slots: void Deadzone();
+  /// \brief Test loading a collada mesh that has multiple texture
+  /// coordinates
+  private slots: void MultipleTextureCoordinates();
 };
 
 #endif

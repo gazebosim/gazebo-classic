@@ -83,6 +83,66 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
+    /// \brief Convert a double to a msgs::Any
+    /// \param[in] _v The double to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const double _v);
+
+    /// \brief Convert an int to a msgs::Any
+    /// \param[in] _i The int to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const int _i);
+
+    /// \brief Convert a std::string to a msgs::Any
+    /// \param[in] _s The string to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const std::string &_s);
+
+    /// \brief Convert a string literal to a msgs::Any
+    /// \param[in] _s The string to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const char *_s);
+
+    /// \brief Convert a bool to a msgs::Any
+    /// \param[in] _b The bool to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const bool _b);
+
+    /// \brief Convert an ignition::math::Vector3d to a msgs::Any
+    /// \param[in] _v The vector to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const ignition::math::Vector3d &_v);
+
+    /// \brief Convert a common::Color to a msgs::Any
+    /// \param[in] _c The color to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const common::Color &_c);
+
+    /// \brief Convert an ignition::math::Pose3d to a msgs::Any
+    /// \param[in] _p The pose to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const ignition::math::Pose3d &_p);
+
+    /// \brief Convert an ignition::math::Quaternion to a msgs::Any
+    /// \param[in] _q The quaternion to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const ignition::math::Quaterniond &_q);
+
+    /// \brief Convert a common::Time to a msgs::Any
+    /// \param[in] _t The time to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const common::Time &_t);
+
     /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object

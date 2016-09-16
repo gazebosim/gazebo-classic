@@ -376,6 +376,13 @@ void Visual::Load()
   if (obj)
     meshSize = obj->getBoundingBox().getSize();
 
+  // Keep transparency to set after setting material
+  double sdfTransparency = -1;
+  if (this->dataPtr->sdf->HasElement("transparency"))
+  {
+    sdfTransparency = this->dataPtr->sdf->Get<float>("transparency");
+  }
+
   if (this->dataPtr->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
@@ -474,9 +481,9 @@ void Visual::Load()
     }
   }
 
-  if (this->dataPtr->sdf->HasElement("transparency"))
+  if (sdfTransparency > -1)
   {
-    this->SetTransparency(this->dataPtr->sdf->Get<float>("transparency"));
+    this->SetTransparency(sdfTransparency);
   }
 
   // Allow the mesh to cast shadows
@@ -1227,6 +1234,7 @@ void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
   }
 
   this->dataPtr->diffuse = _color;
+  this->UpdateTransparency();
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("diffuse")->Set(_color);
