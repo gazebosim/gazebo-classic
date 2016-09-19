@@ -39,7 +39,6 @@ Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
-  this->typeStr = "base";
   this->id = physics::getUniqueId();
   this->typeStr = "base";
   this->saveable = true;
@@ -58,22 +57,7 @@ Base::Base(BasePtr _parent)
 //////////////////////////////////////////////////
 Base::~Base()
 {
-  // remove self as a child of the parent
-  if (this->parent)
-    this->parent->RemoveChild(this->id);
-
-  this->SetParent(BasePtr());
-
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    if (*iter)
-      (*iter)->SetParent(BasePtr());
-  }
-  this->children.clear();
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -113,16 +97,26 @@ void Base::Fini()
 {
   this->UnregisterIntrospectionItems();
 
-  Base_V::iterator iter;
+  // Remove self as a child of the parent
+  if (this->parent)
+  {
+    auto temp = this->parent;
+    this->parent.reset();
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter)
-      (*iter)->Fini();
+    temp->RemoveChild(this->id);
+  }
 
+  // Also destroy all children.
+  while (!this->children.empty())
+  {
+    auto child = this->children.front();
+    this->RemoveChild(child);
+  }
   this->children.clear();
 
+  this->sdf.reset();
+
   this->world.reset();
-  this->parent.reset();
 }
 
 //////////////////////////////////////////////////
@@ -202,22 +196,17 @@ void Base::AddChild(BasePtr _child)
     gzthrow("Cannot add a null _child to an entity");
 
   // Add this _child to our list
-  this->children.push_back(_child);
+  if (std::find(this->children.begin(), this->children.end(), _child)
+      == this->children.end())
+  {
+    this->children.push_back(_child);
+  }
 }
 
 //////////////////////////////////////////////////
 void Base::RemoveChild(unsigned int _id)
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->GetId() == _id)
-    {
-      (*iter)->Fini();
-      this->children.erase(iter);
-      break;
-    }
-  }
+  this->RemoveChild(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -268,19 +257,23 @@ BasePtr Base::GetChild(const std::string &_name)
 //////////////////////////////////////////////////
 void Base::RemoveChild(const std::string &_name)
 {
-  Base_V::iterator iter;
+  this->RemoveChild(this->GetByName(_name));
+}
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->GetScopedName() == _name)
-      break;
-  }
+//////////////////////////////////////////////////
+void Base::RemoveChild(physics::BasePtr _child)
+{
+  if (!_child)
+    return;
 
-  if (iter != this->children.end())
-  {
-    (*iter)->Fini();
-    this->children.erase(iter);
-  }
+  // Fini
+  _child->SetParent(nullptr);
+  _child->Fini();
+
+  // Remove from vector if still there
+  this->children.erase(std::remove(this->children.begin(),
+                                   this->children.end(), _child),
+                                   this->children.end());
 }
 
 //////////////////////////////////////////////////

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
-#define _GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
+#ifndef GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
+#define GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
 
 #include <memory>
 #include <string>
@@ -41,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
-      public: VariablePillContainer(QWidget *_parent = NULL);
+      public: VariablePillContainer(QWidget *_parent = nullptr);
 
       /// \brief Destructor
       public: virtual ~VariablePillContainer();

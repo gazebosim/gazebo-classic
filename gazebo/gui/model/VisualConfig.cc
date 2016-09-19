@@ -350,7 +350,7 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
 
 /////////////////////////////////////////////////
 void VisualConfig::SetGeometry(const std::string &_name,
-    const math::Vector3 &_size, const std::string &_uri)
+    const ignition::math::Vector3d &_size, const std::string &_uri)
 {
   for (auto &it : this->configs)
   {
@@ -361,7 +361,7 @@ void VisualConfig::SetGeometry(const std::string &_name,
       std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size.Ign(), _uri);
+          _size, _uri);
       break;
     }
   }

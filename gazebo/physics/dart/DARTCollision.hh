@@ -18,7 +18,8 @@
 #ifndef _GAZEBO_DARTCOLLISION_HH_
 #define _GAZEBO_DARTCOLLISION_HH_
 
-#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/math/Box.hh"
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/dart/dart_inc.h"

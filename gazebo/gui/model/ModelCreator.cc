@@ -49,7 +49,7 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelAlign.hh"
-#include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/SaveEntityDialog.hh"
 #include "gazebo/gui/MainWindow.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
@@ -171,7 +171,7 @@ namespace gazebo
       public: std::string manipMode;
 
       /// \brief A dialog with options to save the model.
-      public: SaveDialog *saveDialog;
+      public: SaveEntityDialog *saveDialog;
 
       /// \brief Store the current save state of the model.
       public: ModelCreator::SaveState currentSaveState;
@@ -179,9 +179,11 @@ namespace gazebo
       /// \brief Mutex to protect updates
       public: std::recursive_mutex updateMutex;
 
-      /// \todo add this back when undo scaling is implemented
-      /// \brief A list of link names whose scale has changed externally.
-      // public: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
+      /// \brief A list of link names whose scale has changed externally,
+      /// and for each link, the list of scale factors for each of its
+      /// visuals and collisions.
+      public: std::map<LinkData *,
+          std::map<std::string, ignition::math::Vector3d>> linkScaleUpdate;
 
       /// \brief A list of link data whose pose has changed externally.
       /// This is the link's local pose.
@@ -362,7 +364,7 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginRemoval(
       std::bind(&ModelCreator::RemoveModelPlugin, this,
-      std::placeholders::_1)));
+      std::placeholders::_1, std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
@@ -372,7 +374,13 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginInsertion(
       std::bind(&ModelCreator::OnAddModelPlugin, this,
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestLinkScale(
+      std::bind(&ModelCreator::OnRequestLinkScale, this, std::placeholders::_1,
+      std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestLinkMove(
@@ -395,7 +403,7 @@ ModelCreator::ModelCreator(QObject *_parent)
     connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
   }
 
-  this->dataPtr->saveDialog = new SaveDialog(SaveDialog::MODEL);
+  this->dataPtr->saveDialog = new SaveEntityDialog(SaveEntityDialog::MODEL);
 
   this->Reset();
 }
@@ -486,7 +494,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   if (!gui::get_active_camera() ||
       !gui::get_active_camera()->GetScene())
   {
-    gzerr << "Unable to edit model. GUI camera or scene is NULL"
+    gzerr << "Unable to edit model. GUI camera or scene is nullptr"
         << std::endl;
     return;
   }
@@ -1032,7 +1040,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
     if (!info.isFile() || info.completeSuffix().toLower() != "svg")
     {
       gzerr << "File [" << _uri << "] not found or invalid!" << std::endl;
-      return NULL;
+      return nullptr;
     }
 
     common::SVGLoader svgLoader(_samples);
@@ -1042,7 +1050,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
     if (paths.empty())
     {
       gzerr << "No paths found on file [" << _uri << "]" << std::endl;
-      return NULL;
+      return nullptr;
     }
 
     // SVG paths do not map to sdf polylines, because we now allow a contour
@@ -1056,7 +1064,7 @@ LinkData *ModelCreator::AddShape(const EntityType _type,
     {
       gzerr << "No closed polylines found on file [" << _uri << "]"
         << std::endl;
-      return NULL;
+      return nullptr;
     }
     if (!openPolys.empty())
     {
@@ -1231,7 +1239,7 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
   if (it == this->dataPtr->allLinks.end())
   {
     gzerr << "No link with name: " << _linkName << " found."  << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   // generate unique name.
@@ -1270,7 +1278,7 @@ NestedModelData *ModelCreator::CloneNestedModel(
   {
     gzerr << "No nested model with name: " << _nestedModelName <<
         " found."  << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   std::string newName = _nestedModelName + "_clone";
@@ -1293,10 +1301,10 @@ NestedModelData *ModelCreator::CloneNestedModel(
 LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     const rendering::VisualPtr &_parentVis)
 {
-  if (_linkElem == NULL)
+  if (_linkElem == nullptr)
   {
-    gzwarn << "NULL SDF pointer, not creating link." << std::endl;
-    return NULL;
+    gzwarn << "Null SDF pointer, not creating link." << std::endl;
+    return nullptr;
   }
 
   LinkData *link = new LinkData();
@@ -1463,7 +1471,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
     return;
   }
 
-  NestedModelData *modelData = NULL;
+  NestedModelData *modelData = nullptr;
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     if (this->dataPtr->allNestedModels.find(_nestedModelName) ==
@@ -1525,7 +1533,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
     return;
   }
 
-  LinkData *link = NULL;
+  LinkData *link = nullptr;
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     auto linkIt = this->dataPtr->allLinks.find(_linkName);
@@ -1573,7 +1581,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 void ModelCreator::Reset()
 {
   delete this->dataPtr->saveDialog;
-  this->dataPtr->saveDialog = new SaveDialog(SaveDialog::MODEL);
+  this->dataPtr->saveDialog = new SaveEntityDialog(SaveEntityDialog::MODEL);
 
   this->dataPtr->jointMaker->Reset();
   this->dataPtr->selectedEntities.clear();
@@ -1907,11 +1915,13 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
 /////////////////////////////////////////////////
 void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 {
+  // User request from right-click menu
   this->RemoveModelPlugin(_name.toStdString());
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveModelPlugin(const std::string &_name)
+void ModelCreator::RemoveModelPlugin(const std::string &_name,
+    const bool _newCmd)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
@@ -1919,6 +1929,15 @@ void ModelCreator::RemoveModelPlugin(const std::string &_name)
   if (it == this->dataPtr->allModelPlugins.end())
   {
     return;
+  }
+
+  if (_newCmd)
+  {
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Delete plugin [" + _name + "]",
+        MEUserCmd::DELETING_MODEL_PLUGIN);
+    cmd->SetSDF(it->second->modelPluginSDF);
+    cmd->SetScopedName(_name);
   }
 
   ModelPluginData *data = it->second;
@@ -1944,12 +1963,13 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
     {
       this->OnDelete(vis->GetName());
     }
+    this->dataPtr->selectedEntities.clear();
 
     for (const auto &plugin : this->dataPtr->selectedModelPlugins)
     {
       this->RemoveModelPlugin(plugin);
     }
-    this->DeselectAll();
+    this->dataPtr->selectedModelPlugins.clear();
   }
   else if (_event.control)
   {
@@ -2056,7 +2076,21 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  /// \todo End scaling links
+  // End scaling links
+  for (auto link : this->dataPtr->linkScaleUpdate)
+  {
+    // Register command
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Scale [" + link.first->Name() + "]", MEUserCmd::SCALING_LINK);
+    cmd->SetScopedName(link.first->linkVisual->GetName());
+    cmd->SetScaleChange(link.first->Scales(), link.second);
+
+    // Update data and inspector
+    link.first->SetScales(link.second);
+  }
+  if (!this->dataPtr->linkScaleUpdate.empty())
+    this->ModelChanged();
+  this->dataPtr->linkScaleUpdate.clear();
 
   // End moving links
   for (auto link : this->dataPtr->linkPoseUpdate)
@@ -2090,6 +2124,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (!this->dataPtr->nestedModelPoseUpdate.empty())
     this->ModelChanged();
   this->dataPtr->nestedModelPoseUpdate.clear();
+
+  // camera movement mouse release
+  if (_event.Dragging())
+    return false;
 
   // mouse selection and context menu events
   rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
@@ -2314,6 +2352,7 @@ void ModelCreator::ShowModelPluginContextMenu(const std::string &_name)
 
   // Menu
   QMenu menu;
+  menu.setObjectName("ModelEditorContextMenu");
   menu.addAction(inspectorAct);
   menu.addAction(deleteAct);
 
@@ -2364,14 +2403,14 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   }
 
   auto pose = this->dataPtr->mouseVisual->GetWorldPose().Ign();
-  pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
-      userCamera, _event).Ign();
+  pose.Pos() = ModelManipulator::MousePositionOnPlane(
+      userCamera, _event);
 
   // there is a problem detecting control key from common::MouseEvent, so
   // check using Qt for now
   if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
-    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
+    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
   pose.Pos().Z(this->dataPtr->mouseVisual->GetWorldPose().Ign().Pos().Z());
 
@@ -2467,8 +2506,8 @@ void ModelCreator::OnPaste()
   if (userCamera)
   {
     ignition::math::Vector3d mousePosition =
-        ModelManipulator::GetMousePositionOnPlane(
-        userCamera, this->dataPtr->lastMouseEvent).Ign();
+        ModelManipulator::MousePositionOnPlane(
+        userCamera, this->dataPtr->lastMouseEvent);
     clonePose.Pos().X() = mousePosition.X();
     clonePose.Pos().Y() = mousePosition.Y();
   }
@@ -2708,7 +2747,19 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   sdf::ElementPtr newLinkElem = _link->linkSDF->Clone();
   newLinkElem->GetElement("pose")->Set(_link->Pose());
 
-  // visuals
+  // Remove old visuals and collisions
+  while (newLinkElem->HasElement("visual"))
+  {
+    auto oldVis = newLinkElem->GetElement("visual");
+    newLinkElem->RemoveChild(oldVis);
+  }
+  while (newLinkElem->HasElement("collision"))
+  {
+    auto oldCol = newLinkElem->GetElement("collision");
+    newLinkElem->RemoveChild(oldCol);
+  }
+
+  // Add visuals
   for (auto const &it : _link->visuals)
   {
     rendering::VisualPtr visual = it.first;
@@ -2720,7 +2771,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
     newLinkElem->InsertElement(visualElem);
   }
 
-  // collisions
+  // Add collisions
   for (auto const &colIt : _link->collisions)
   {
     sdf::ElementPtr collisionElem = msgs::CollisionToSDF(colIt.second);
@@ -2920,7 +2971,7 @@ void ModelCreator::ModelChanged()
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
-  const gazebo::math::Vector3 &_scale)
+  const ignition::math::Vector3d &/*_scale*/)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   for (auto linksIt : this->dataPtr->allLinks)
@@ -2931,8 +2982,24 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
-      // Update data
-      linksIt.second->SetScale(_scale.Ign());
+      // Update inspector according to visual size
+      linksIt.second->UpdateInspectorScale();
+
+      // Queue to only register command once it is finalized
+      auto linkVis = linksIt.second->linkVisual;
+      std::map<std::string, ignition::math::Vector3d> scales;
+      for (unsigned int i = 0; i < linkVis->GetChildCount(); ++i)
+      {
+        auto child = linkVis->GetChild(i);
+        if (child->GetType() == rendering::Visual::VT_GUI ||
+            child->GetType() == rendering::Visual::VT_PHYSICS)
+          continue;
+
+        // Add to map of scales to update
+        scales[child->GetName()] = linkVis->GetChild(i)->GetGeometrySize();
+      }
+      this->dataPtr->linkScaleUpdate[linksIt.second] = scales;
+
       break;
     }
   }
@@ -3065,7 +3132,8 @@ ModelCreator::SaveState ModelCreator::CurrentSaveState() const
 
 /////////////////////////////////////////////////
 void ModelCreator::OnAddModelPlugin(const std::string &_name,
-    const std::string &_filename, const std::string &_innerxml)
+    const std::string &_filename, const std::string &_innerxml,
+    const bool _newCmd)
 {
   if (_name.empty() || _filename.empty())
   {
@@ -3085,6 +3153,16 @@ void ModelCreator::OnAddModelPlugin(const std::string &_name,
   if (sdf::readString(tmp.str(), modelPluginSDF))
   {
     this->AddModelPlugin(modelPluginSDF);
+
+    if (_newCmd)
+    {
+      auto cmd = this->dataPtr->userCmdManager->NewCmd(
+          "Inserted plugin [" + _name + "]",
+          MEUserCmd::INSERTING_MODEL_PLUGIN);
+      cmd->SetSDF(modelPluginSDF);
+      cmd->SetScopedName(_name);
+    }
+
     this->ModelChanged();
   }
   else
@@ -3122,7 +3200,7 @@ ModelPluginData *ModelCreator::ModelPlugin(const std::string &_name)
   auto it = this->dataPtr->allModelPlugins.find(_name);
   if (it != this->dataPtr->allModelPlugins.end())
     return it->second;
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -3146,6 +3224,38 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   ModelPluginData *modelPlugin = it->second;
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnRequestLinkScale(const std::string &_name,
+    const std::map<std::string, ignition::math::Vector3d> &_scales)
+{
+  auto link = this->dataPtr->allLinks.find(_name);
+  if (link == this->dataPtr->allLinks.end())
+  {
+    gzerr << "Link [" << _name << "] not found." << std::endl;
+    return;
+  }
+
+  auto linkVis = link->second->linkVisual;
+
+  // Go through all child visuals (visuals and collisions)
+  for (unsigned int i = 0; i < linkVis->GetChildCount(); ++i)
+  {
+    auto childVis = linkVis->GetChild(i);
+
+    // Check if there is a new scale for this child
+    auto scaleIter = _scales.find(childVis->GetName());
+    if (scaleIter == _scales.end())
+    {
+      continue;
+    }
+
+    childVis->SetScale(scaleIter->second);
+  }
+
+  // Update link data and inspector
+  link->second->SetScales(_scales);
 }
 
 /////////////////////////////////////////////////
@@ -3186,3 +3296,4 @@ ignition::math::Pose3d ModelCreator::WorldToLocal(
   // p_T_t = w_T_p^-1 * w_T_t
   return (parentModelWorld.Inverse() * targetWorld).Pose();
 }
+

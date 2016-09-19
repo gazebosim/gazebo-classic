@@ -251,12 +251,6 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-FrictionPyramidPtr ODESurfaceParams::GetFrictionPyramid() const
-{
-  return this->frictionPyramid;
-}
-
-/////////////////////////////////////////////////
 FrictionPyramidPtr ODESurfaceParams::FrictionPyramid() const
 {
   return this->frictionPyramid;

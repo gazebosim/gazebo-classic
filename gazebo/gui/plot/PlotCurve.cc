@@ -153,7 +153,7 @@ namespace gazebo
       public: unsigned int age = 0;
 
       /// \brief Qwt Curve object.
-      public: QwtPlotCurve *curve = NULL;
+      public: QwtPlotCurve *curve = nullptr;
 
       /// \brief Curve data in the form of QwtArraySeriesData
       public: CurveData *curveData;
@@ -243,7 +243,7 @@ PlotCurve::PlotCurve(const std::string &_label)
 
   this->dataPtr->curveData =
       static_cast<CurveData *>(this->dataPtr->curve->data());
-  GZ_ASSERT(this->dataPtr->curveData != NULL, "Curve data is NULL");
+  GZ_ASSERT(this->dataPtr->curveData != nullptr, "Curve data is nullptr");
 
   this->dataPtr->id = PlotCurvePrivate::globalCurveId++;
 

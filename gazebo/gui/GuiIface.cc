@@ -21,23 +21,22 @@
   #define snprintf _snprintf
 #endif
 
-#include <set>
-#include <string>
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/gazebo_client.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gazebo_client.hh"
+
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/ModelDatabase.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/gui/SplashScreen.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
-#include "gazebo/gui/SplashScreen.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #ifdef WIN32
 # define HOMEDIR "HOMEPATH"
@@ -79,6 +78,44 @@ Q_DECLARE_METATYPE(std::string)
 // This makes it possible to use std::set<std::string> in QT signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::set<std::string>)
+
+//////////////////////////////////////////////////
+// QT message handler that pipes qt messages into gazebo's console system.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
+    const QString &_msg)
+{
+  std::string msg = _msg.toStdString();
+  msg += "(" + _context.function + ")";
+#else
+void messageHandler(QtMsgType _type, const char *_msg)
+{
+  const char *msg = _msg;
+#endif
+
+  switch (_type)
+  {
+    case QtDebugMsg:
+      gzdbg << msg << std::endl;
+      break;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+    case QtInfoMsg:
+      gzmsg << msg << std::endl;
+      break;
+#endif
+    case QtWarningMsg:
+      gzwarn << msg << std::endl;
+      break;
+    case QtFatalMsg:
+    case QtCriticalMsg:
+      gzerr << msg << std::endl;
+      break;
+    default:
+      gzwarn << "Unknown QT Message type[" << _type << "]: "
+        << msg << std::endl;
+      break;
+  }
+}
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -261,10 +298,18 @@ bool gui::load()
     snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
 
+  // Register custom message handler
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  qInstallMessageHandler(messageHandler);
+#else
+  qInstallMsgHandler(messageHandler);
+#endif
+
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
-  gui::register_metatypes();
+  if (!gui::register_metatypes())
+    std::cerr << "Unable to register Qt metatypes" << std::endl;
 
   g_splashScreen = new gui::SplashScreen();
 

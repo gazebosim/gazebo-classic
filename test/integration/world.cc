@@ -566,9 +566,9 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   }
 
   // disconnect from world events
-  event::Events::DisconnectWorldUpdateBegin(worldUpdateBeginEventConnection);
-  event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
-  event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
+  worldUpdateBeginEventConnection.reset();
+  beforePhysicsUpdateConnection.reset();
+  worldUpdateEndEventConnection.reset();
 }
 
 /////////////////////////////////////////////////
@@ -616,50 +616,6 @@ TEST_F(WorldTest, URI)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
-
-/////////////////////////////////////////////////
-TEST_F(WorldTest, URI)
-{
-  Load("worlds/nested_model.world");
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-  EXPECT_EQ(world->URI().Str(), "data://world/default");
-
-  // Check a light.
-  auto light = world->Light("sun");
-  ASSERT_TRUE(light != NULL);
-  EXPECT_EQ(light->URI().Str(), "data://world/default/light/sun");
-
-  // Check a model.
-  auto model = world->GetModel("ground_plane");
-  ASSERT_TRUE(model != NULL);
-  EXPECT_EQ(model->URI().Str(), "data://world/default/model/ground_plane");
-
-  auto link = model->GetLink("link");
-  ASSERT_TRUE(link != NULL);
-  EXPECT_EQ(link->URI().Str(),
-      "data://world/default/model/ground_plane/link/link");
-
-  // Check a nested model.
-  model = world->GetModel("model_00");
-  ASSERT_TRUE(model != NULL);
-  EXPECT_EQ(model->URI().Str(), "data://world/default/model/model_00");
-
-  link = model->GetLink("link_00");
-  ASSERT_TRUE(link != NULL);
-  EXPECT_EQ(link->URI().Str(),
-      "data://world/default/model/model_00/link/link_00");
-
-  auto nestedModel = model->NestedModel("model_01");
-  ASSERT_TRUE(nestedModel != NULL);
-  EXPECT_EQ(nestedModel->URI().Str(),
-      "data://world/default/model/model_00/model/model_01");
-
-  link = nestedModel->GetLink("link_01");
-  ASSERT_TRUE(link != NULL);
-  EXPECT_EQ(link->URI().Str(),
-      "data://world/default/model/model_00/model/model_01/link/link_01");
-}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

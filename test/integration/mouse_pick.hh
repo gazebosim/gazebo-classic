@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,24 @@
  *
 */
 
-#ifndef _GAZEBO_HOTKEY_DIALOG_TEST_HH_
-#define _GAZEBO_HOTKEY_DIALOG_TEST_HH_
+#ifndef GAZEBO_TEST_MOUSEPICKINGTEST_HH_
+#define GAZEBO_TEST_MOUSEPICKINGTEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the hotkey dialog class.
-class HotkeyDialog_TEST : public QTestFixture
+/// \brief A test class for GUI mouse picking.
+class MousePickingTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test opening and closing the hotkey chart
-  private slots: void HotkeyChart();
+  /// \brief Verify camera movement does not affect entity selection
+  private slots: void ModelEditorSelection();
+
+  /// \brief Verify simple shapes can be picked.
+  private slots: void Shapes();
+
+  /// \brief Verify models can be picked.
+  private slots: void Transparency();
 };
 
 #endif

@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-
 #include <mutex>
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
+#include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/Palette.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
@@ -77,7 +77,7 @@ class DragableListWidget : public QListWidget
 
 /////////////////////////////////////////////////
 PlotWindow::PlotWindow(QWidget *_parent)
-  : QDialog(_parent),
+  : QWidget(_parent),
     dataPtr(new PlotWindowPrivate())
 {
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
@@ -102,7 +102,23 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addCanvasShadow->setOffset(0, 0);
   addCanvasButton->setGraphicsEffect(addCanvasShadow);
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
-  QVBoxLayout *addButtonLayout = new QVBoxLayout;
+
+  // export button
+  QPushButton *exportPlotButton = new QPushButton("Export");
+  exportPlotButton->setIcon(QIcon(":/images/file_upload.svg"));
+  exportPlotButton->setObjectName("plotExport");
+  exportPlotButton->setDefault(false);
+  exportPlotButton->setAutoDefault(false);
+  exportPlotButton->setToolTip("Export plot data");
+  QGraphicsDropShadowEffect *exportPlotShadow = new QGraphicsDropShadowEffect();
+  exportPlotShadow->setBlurRadius(8);
+  exportPlotShadow->setOffset(0, 0);
+  exportPlotButton->setGraphicsEffect(exportPlotShadow);
+  connect(exportPlotButton, SIGNAL(clicked()), this, SLOT(OnExport()));
+
+  QHBoxLayout *addButtonLayout = new QHBoxLayout;
+  addButtonLayout->addWidget(exportPlotButton);
+  addButtonLayout->addStretch();
   addButtonLayout->addWidget(addCanvasButton);
   addButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
   addButtonLayout->setContentsMargins(0, 0, 0, 0);
@@ -136,7 +152,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
-  this->setSizeGripEnabled(true);
 
   QShortcut *space = new QShortcut(Qt::Key_Space, this);
   QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));
@@ -178,7 +193,7 @@ void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
     return;
 
   _canvas->hide();
-  _canvas->setParent(NULL);
+  _canvas->setParent(nullptr);
   _canvas->deleteLater();
 }
 
@@ -285,13 +300,16 @@ void PlotWindow::TogglePause()
 }
 
 /////////////////////////////////////////////////
-void PlotWindow::Export()
+void PlotWindow::OnExport()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  // Get the plots that have data.
+  std::list<PlotCanvas*> plots;
   for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
   {
+    bool hasData = false;
     PlotCanvas *canvas =
         qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
+
     if (!canvas)
       continue;
 
@@ -303,12 +321,50 @@ void PlotWindow::Export()
         if (!c)
           continue;
 
-        for (unsigned int j = 0; j < c->Size(); ++j)
-        {
-          ignition::math::Vector2d pt = c->Point(j);
-          std::cerr << pt.X() << ", " << pt.Y() << std::endl;
-        }
+        hasData = hasData || c->Size() > 0;
       }
     }
+
+    if (hasData)
+      plots.push_back(canvas);
   }
+
+  // Display an error message if no plots have data.
+  if (plots.empty())
+  {
+    QMessageBox msgBox(
+        QMessageBox::Information,
+        QString("Unable to export"),
+        QString(
+          "No data to export.\nAdd variables with data to a graph first."),
+        QMessageBox::Close,
+        this,
+        Qt::Window | Qt::WindowTitleHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+    msgBox.exec();
+  }
+  else
+  {
+    ExportDialog *dialog = new ExportDialog(this, plots);
+    dialog->setModal(true);
+    dialog->show();
+  }
+}
+
+/////////////////////////////////////////////////
+std::list<PlotCanvas *> PlotWindow::Plots()
+{
+  std::list<PlotCanvas *> plots;
+
+  for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
+  {
+    PlotCanvas *canvas =
+        qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
+
+    if (!canvas)
+      continue;
+    plots.push_back(canvas);
+  }
+
+  return plots;
 }

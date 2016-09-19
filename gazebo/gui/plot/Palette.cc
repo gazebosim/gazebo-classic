@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include <mutex>
 #include <set>
 #include <string>
@@ -25,6 +24,8 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/URI.hh"
+
+// #include "gazebo/gui/Futures.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -758,15 +759,21 @@ void Palette::FillTopics()
 /////////////////////////////////////////////////
 void Palette::FillModels()
 {
-  gazebo::util::IntrospectionClient client;
+  // TODO re-enable once Futures is integrated
+  // Make sure that the managers have been retreived.
+  // if (Futures::introspectionClientFuture.valid())
+  //   Futures::introspectionClientFuture.get();
 
-  // Wait for the managers to come online
-  auto managerIds = client.WaitForManagers(std::chrono::seconds(2));
+  gazebo::util::IntrospectionClient client;
+  client.WaitForManagers(std::chrono::seconds(2));
+
+  // Get the managers
+  auto managerIds = client.Managers();
 
   if (managerIds.empty())
   {
-    std::cerr << "No introspection managers detected." << std::endl;
-    std::cerr << "Is a gzserver running?" << std::endl;
+    gzerr << "No introspection managers detected." << std::endl;
+    gzerr << "Is a gzserver running?" << std::endl;
     return;
   }
 
@@ -856,7 +863,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
     // Process path
     auto pathParts = common::split(pathStr, "/");
 
-    QStandardItem *previousItem = NULL;
+    QStandardItem *previousItem = nullptr;
     unsigned int i = 0;
     while (i < pathParts.size())
     {
@@ -866,7 +873,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       if (part == "model")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -939,7 +946,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       else if (part == "link")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -1002,7 +1009,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       else if (part == "joint")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -1341,7 +1348,7 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
     subItem0Name = "acceleration";
 
   // Check if it has already been added
-  QStandardItem *subItem0 = NULL;
+  QStandardItem *subItem0 = nullptr;
   for (int k = 0; k < _item->rowCount(); ++k)
   {
     auto childItem = _item->child(k, 0);
@@ -1469,7 +1476,7 @@ void Palette::InsertAxisItem(QStandardItem *_item, const common::URI &_uri,
     axis = 2;
 
   // Check if it has already been added
-  QStandardItem *subItem0 = NULL;
+  QStandardItem *subItem0 = nullptr;
   for (int k = 0; k < _item->rowCount(); ++k)
   {
     auto childItem = _item->child(k, 0);

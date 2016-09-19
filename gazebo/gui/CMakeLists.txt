@@ -33,7 +33,6 @@ set (sources
   GLWidget.cc
   GuiEvents.cc
   GuiIface.cc
-  HotkeyDialog.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -49,7 +48,7 @@ set (sources
   ModelSnap.cc
   MouseEventHandler.cc
   RenderWidget.cc
-  SaveDialog.cc
+  SaveEntityDialog.cc
   SpaceNav.cc
   SplashScreen.cc
   TimePanel.cc
@@ -79,7 +78,6 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
-  HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
@@ -88,7 +86,7 @@ set (qt_headers
   ModelListWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
-  SaveDialog.hh
+  SaveEntityDialog.hh
   SplashScreen.hh
   TimePanel.hh
   TimeWidget.hh
@@ -134,15 +132,13 @@ set (qt_tests
   GLWidget_TEST.cc
   GLWidget_TEST2.cc
   GuiIface_TEST.cc
-  HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelListWidget_TEST.cc
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
-  ModelSnap_TEST.cc
   RenderWidget_TEST.cc
-  SaveDialog_TEST.cc
+  SaveEntityDialog_TEST.cc
   SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
@@ -176,6 +172,7 @@ if (ENABLE_SCREEN_TESTS)
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
+      ModelSnap_TEST.cc
       Projection_TEST.cc)
 endif()
 
@@ -193,7 +190,7 @@ gz_add_executable(gzclient main.cc ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
+add_definitions(-DBUILDING_DLL_GZ_GUI)
 
 target_link_libraries(gazebo_gui
   libgazebo_client
@@ -226,6 +223,10 @@ endif()
 if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
+endif()
+
+if (USE_PCH)
+  add_pch(gazebo_gui gui_pch.hh)
 endif()
 
 set (gtest_sources

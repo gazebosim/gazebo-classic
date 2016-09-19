@@ -22,7 +22,7 @@
 #ifndef _PLANESHAPE_HH_
 #define _PLANESHAPE_HH_
 
-#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/math/Vector2d.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 

@@ -21,6 +21,7 @@
 #endif
 
 #include <sstream>
+#include <gazebo/math/Vector2d.hh>
 #include <gazebo/msgs/msgs.hh>
 #include "TimerGUIPlugin.hh"
 

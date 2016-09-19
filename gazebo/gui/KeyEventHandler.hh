@@ -22,7 +22,6 @@
 #include <string>
 #include <boost/function.hpp>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
 
@@ -115,11 +114,6 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return Whether or not the event was handled.
       public: bool HandleRelease(const common::KeyEvent &_event);
-
-      /// \brief Method to check if autorepeats are toggled.
-      /// \return Whether or not autorepeats are toggled for key presses.
-      /// \deprecated See bool AutoRepeat() const.
-      public: bool GetAutoRepeat() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Method to check if autorepeats are toggled.
       /// \return Whether or not autorepeats are toggled for key presses.

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOT_PLOTMANAGER_HH_
-#define _GAZEBO_GUI_PLOT_PLOTMANAGER_HH_
+#ifndef GAZEBO_GUI_PLOT_PLOTMANAGER_HH_
+#define GAZEBO_GUI_PLOT_PLOTMANAGER_HH_
 
 #include <memory>
 #include <string>
@@ -24,7 +23,6 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
-#include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_QWT_GAZEBO_H_
-#define _GAZEBO_GUI_PLOT_QWT_GAZEBO_H_
+#ifndef GAZEBO_GUI_PLOT_QWT_GAZEBO_H_
+#define GAZEBO_GUI_PLOT_QWT_GAZEBO_H_
 
 #pragma GCC system_header
 
@@ -40,6 +40,7 @@
 #include <qwt/qwt_scale_engine.h>
 #include <qwt/qwt_scale_widget.h>
 #include <qwt/qwt_symbol.h>
+#include <qwt/qwt_plot_renderer.h>
 
 #pragma clang diagnostic pop
 

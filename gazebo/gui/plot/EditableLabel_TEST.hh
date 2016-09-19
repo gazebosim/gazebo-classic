@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOT_EDITABLELABEL_TEST_HH_
-#define _GAZEBO_GUI_PLOT_EDITABLELABEL_TEST_HH_
+#ifndef GAZEBO_GUI_PLOT_EDITABLELABEL_TEST_HH_
+#define GAZEBO_GUI_PLOT_EDITABLELABEL_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
@@ -28,7 +27,7 @@ class EditableLabel_TEST : public QTestFixture
   /// \brief Test retrieving label text.
   private slots: void Text();
 
-  /// \brief Test editing lable.
+  /// \brief Test editing label.
   private slots: void Edit();
 };
 #endif

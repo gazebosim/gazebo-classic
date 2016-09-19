@@ -23,9 +23,9 @@ void EditableLabel_TEST::Text()
 {
   // Create a new EditableLabel widget
   gazebo::gui::EditableLabel *editableLabel =
-      new gazebo::gui::EditableLabel("test_label", NULL);
+      new gazebo::gui::EditableLabel("test_label", nullptr);
 
-  QVERIFY(editableLabel != NULL);
+  QVERIFY(editableLabel != nullptr);
 
   QCOMPARE(editableLabel->Text(), std::string("test_label"));
 
@@ -37,12 +37,12 @@ void EditableLabel_TEST::Edit()
 {
   // Create a new EditableLabel widget
   gazebo::gui::EditableLabel *editableLabel =
-      new gazebo::gui::EditableLabel("test_label", NULL);
+      new gazebo::gui::EditableLabel("test_label", nullptr);
 
-  QVERIFY(editableLabel != NULL);
+  QVERIFY(editableLabel != nullptr);
 
   QLineEdit *lineEdit = editableLabel->findChild<QLineEdit *>();
-  QVERIFY(lineEdit != NULL);
+  QVERIFY(lineEdit != nullptr);
 
   QCOMPARE(editableLabel->Text(), std::string("test_label"));
   editableLabel->show();
@@ -50,27 +50,27 @@ void EditableLabel_TEST::Edit()
   // test editing value and hitting enter to save
   QPoint center(editableLabel->width()*0.5, editableLabel->height()*0.5);
   QTest::mouseMove(editableLabel, center);
-  this->ProcessEventsAndDraw(NULL);
+  this->ProcessEventsAndDraw(nullptr);
   QTest::mouseDClick(editableLabel, Qt::LeftButton, Qt::NoModifier,
       center, 100);
-  this->ProcessEventsAndDraw(NULL);
+  this->ProcessEventsAndDraw(nullptr);
   for (unsigned int i = 0; i < 3; ++i)
   {
     QTest::keyClick(lineEdit, Qt::Key_A);
-    this->ProcessEventsAndDraw(NULL);
+    this->ProcessEventsAndDraw(nullptr);
   }
   QTest::keyClick(lineEdit, Qt::Key_Enter);
-  this->ProcessEventsAndDraw(NULL);
+  this->ProcessEventsAndDraw(nullptr);
   QCOMPARE(editableLabel->Text(), std::string("aaa"));
 
   // test editing value and hitting escape to forget changes
   QTest::mouseDClick(editableLabel, Qt::LeftButton, Qt::NoModifier,
       center, 100);
-  this->ProcessEventsAndDraw(NULL);
+  this->ProcessEventsAndDraw(nullptr);
   for (unsigned int i = 0; i < 3; ++i)
   {
     QTest::keyClick(lineEdit, Qt::Key_B);
-    this->ProcessEventsAndDraw(NULL);
+    this->ProcessEventsAndDraw(nullptr);
   }
   QTest::keyClick(lineEdit, Qt::Key_Escape);
   QCOMPARE(editableLabel->Text(), std::string("aaa"));

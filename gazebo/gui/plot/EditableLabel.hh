@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOT_EDITABLELABEL_HH_
-#define _GAZEBO_GUI_PLOT_EDITABLELABEL_HH_
+#ifndef GAZEBO_GUI_PLOT_EDITABLELABEL_HH_
+#define GAZEBO_GUI_PLOT_EDITABLELABEL_HH_
 
 #include <memory>
 #include <string>
@@ -40,7 +39,8 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _label Label text.
       /// \param[in] _parent Parent widget.
-      public: EditableLabel(const std::string &_label, QWidget *_parent = NULL);
+      public: EditableLabel(const std::string &_label,
+          QWidget *_parent = nullptr);
 
       /// \brief Destructor.
       public: ~EditableLabel();

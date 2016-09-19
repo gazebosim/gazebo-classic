@@ -82,11 +82,6 @@ namespace gazebo
 
       /// \brief All things needed to get back z buffer for depth data
       /// \return The z-buffer as a float array
-      /// \deprecated See DepthData()
-      public: virtual const float *GetDepthData() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief All things needed to get back z buffer for depth data
-      /// \return The z-buffer as a float array
       public: virtual const float *DepthData() const;
 
       /// \brief Set the render target, which renders the depth data
@@ -102,7 +97,9 @@ namespace gazebo
 
       /// \brief Disconnect from an depth image singal
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewDepthFrame(event::ConnectionPtr &_c);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectNewDepthFrame(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Connect a to the new rgb point cloud signal
       /// \param[in] _subscriber Subscriber callback function
@@ -113,7 +110,9 @@ namespace gazebo
 
       /// \brief Disconnect from an rgb point cloud singal
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &_c);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Implementation of the render call
       private: virtual void RenderImpl();

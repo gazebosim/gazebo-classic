@@ -30,7 +30,7 @@ void PlotCurve_TEST::Curve()
   // Create a new plot curve
   gazebo::gui::PlotCurve *plotCurve = new gazebo::gui::PlotCurve("curve01");
 
-  QVERIFY(plotCurve != NULL);
+  QVERIFY(plotCurve != nullptr);
 
   // age
   QCOMPARE(plotCurve->Age(), 0u);
@@ -63,19 +63,19 @@ void PlotCurve_TEST::CurveId()
 
   // Create new variable pills and verify they all have unique ids
   gazebo::gui::PlotCurve *curve01 = new gazebo::gui::PlotCurve("curve01");
-  QVERIFY(curve01 != NULL);
+  QVERIFY(curve01 != nullptr);
   unsigned int id = curve01->Id();
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
 
   gazebo::gui::PlotCurve *curve02 = new gazebo::gui::PlotCurve("curve02");
-  QVERIFY(curve02 != NULL);
+  QVERIFY(curve02 != nullptr);
   id = curve02->Id();
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
 
   gazebo::gui::PlotCurve *curve03 = new gazebo::gui::PlotCurve("curve03");
-  QVERIFY(curve03 != NULL);
+  QVERIFY(curve03 != nullptr);
   id = curve03->Id();
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
@@ -96,7 +96,7 @@ void PlotCurve_TEST::AddPoint()
   // Create a new plot curve
   gazebo::gui::PlotCurve *plotCurve = new gazebo::gui::PlotCurve("curve01");
 
-  QVERIFY(plotCurve != NULL);
+  QVERIFY(plotCurve != nullptr);
 
   // verify the curve has no data
   QCOMPARE(plotCurve->Size(), 0u);

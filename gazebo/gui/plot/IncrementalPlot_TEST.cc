@@ -29,14 +29,15 @@ void IncrementalPlot_TEST::AddRemoveCurve()
   this->Load("worlds/empty.world");
 
   // Create a new plot
-  gazebo::gui::IncrementalPlot *plot = new gazebo::gui::IncrementalPlot(NULL);
-  QVERIFY(plot != NULL);
+  gazebo::gui::IncrementalPlot *plot =
+      new gazebo::gui::IncrementalPlot(nullptr);
+  QVERIFY(plot != nullptr);
 
   // add a curve and verify that it is in the plot
   gazebo::gui::PlotCurveWeakPtr curve01 = plot->AddCurve("curve01");
   QVERIFY(!curve01.expired());
   auto c01 = curve01.lock();
-  QVERIFY(c01 != NULL);
+  QVERIFY(c01 != nullptr);
   QVERIFY(plot->Curve(c01->Id()).lock() == c01);
   QVERIFY(plot->Curve(c01->Label()).lock() == c01);
 
@@ -44,7 +45,7 @@ void IncrementalPlot_TEST::AddRemoveCurve()
   gazebo::gui::PlotCurveWeakPtr curve02 = plot->AddCurve("curve02");
   QVERIFY(!curve02.expired());
   auto c02 = curve02.lock();
-  QVERIFY(c02 != NULL);
+  QVERIFY(c02 != nullptr);
   QVERIFY(plot->Curve(c02->Id()).lock() == c02);
   QVERIFY(plot->Curve(c02->Label()).lock() == c02);
 
@@ -67,7 +68,7 @@ void IncrementalPlot_TEST::AddRemoveCurve()
   gazebo::gui::PlotCurveWeakPtr curve03 = plot->AddCurve("curve03");
   auto c03 = curve03.lock();
 
-  QVERIFY(c03 != NULL);
+  QVERIFY(c03 != nullptr);
   QVERIFY(plot->Curve(c03->Id()).lock() == c03);
   QVERIFY(plot->Curve(c03->Label()).lock() == c03);
 
@@ -88,17 +89,19 @@ void IncrementalPlot_TEST::AttachDetachCurve()
   this->Load("worlds/empty.world");
 
   // Create new plots
-  gazebo::gui::IncrementalPlot *plot01 = new gazebo::gui::IncrementalPlot(NULL);
-  QVERIFY(plot01 != NULL);
+  gazebo::gui::IncrementalPlot *plot01 =
+      new gazebo::gui::IncrementalPlot(nullptr);
+  QVERIFY(plot01 != nullptr);
 
-  gazebo::gui::IncrementalPlot *plot02 = new gazebo::gui::IncrementalPlot(NULL);
-  QVERIFY(plot02 != NULL);
+  gazebo::gui::IncrementalPlot *plot02 =
+      new gazebo::gui::IncrementalPlot(nullptr);
+  QVERIFY(plot02 != nullptr);
 
   // add a curve to plot01 and verify that it is in the right plot
   gazebo::gui::PlotCurveWeakPtr curve01 = plot01->AddCurve("curve01");
   QVERIFY(!curve01.expired());
   auto c01 = curve01.lock();
-  QVERIFY(c01 != NULL);
+  QVERIFY(c01 != nullptr);
   QVERIFY(plot01->Curve(c01->Id()).lock() == c01);
   QVERIFY(plot02->Curve(c01->Id()).expired());
 
@@ -106,7 +109,7 @@ void IncrementalPlot_TEST::AttachDetachCurve()
   gazebo::gui::PlotCurveWeakPtr curve02 = plot01->AddCurve("curve02");
   QVERIFY(!curve02.expired());
   auto c02 = curve02.lock();
-  QVERIFY(c02 != NULL);
+  QVERIFY(c02 != nullptr);
   QVERIFY(plot01->Curve(c02->Id()).lock() == c02);
   QVERIFY(plot02->Curve(c02->Id()).expired());
 
@@ -128,8 +131,8 @@ void IncrementalPlot_TEST::AttachDetachCurve()
   QVERIFY(plot02->Curve(c02->Label()).expired());
 
   // detach already datched curve02 from plot01
-  gazebo::gui::PlotCurvePtr nullPc02 = plot01->DetachCurve(c02->Id());
-  QVERIFY(nullPc02 == NULL);
+  gazebo::gui::PlotCurvePtr nullptrPc02 = plot01->DetachCurve(c02->Id());
+  QVERIFY(nullptrPc02 == nullptr);
 
   // attach curve02 to plot02 and verify
   plot02->AttachCurve(pc02);
@@ -140,13 +143,13 @@ void IncrementalPlot_TEST::AttachDetachCurve()
   gazebo::gui::PlotCurveWeakPtr curve03 = plot01->AddCurve("curve03");
   QVERIFY(!curve03.expired());
   auto c03 = curve03.lock();
-  QVERIFY(c03 != NULL);
+  QVERIFY(c03 != nullptr);
   QVERIFY(plot01->Curve(c03->Id()).lock() == c03);
 
   gazebo::gui::PlotCurveWeakPtr curve04 = plot02->AddCurve("curve04");
   QVERIFY(!curve04.expired());
   auto c04 = curve04.lock();
-  QVERIFY(c04 != NULL);
+  QVERIFY(c04 != nullptr);
   QVERIFY(plot02->Curve(c04->Id()).lock() == c04);
 
   delete plot01;
@@ -162,20 +165,21 @@ void IncrementalPlot_TEST::AddPoint()
   this->Load("worlds/empty.world");
 
   // Create new plots
-  gazebo::gui::IncrementalPlot *plot = new gazebo::gui::IncrementalPlot(NULL);
-  QVERIFY(plot != NULL);
+  gazebo::gui::IncrementalPlot *plot =
+      new gazebo::gui::IncrementalPlot(nullptr);
+  QVERIFY(plot != nullptr);
 
   // add two curves
   gazebo::gui::PlotCurveWeakPtr curve01 = plot->AddCurve("curve01");
   QVERIFY(!curve01.expired());
   auto c01 = curve01.lock();
-  QVERIFY(c01 != NULL);
+  QVERIFY(c01 != nullptr);
   QVERIFY(plot->Curve(c01->Id()).lock() == c01);
 
   gazebo::gui::PlotCurveWeakPtr curve02 = plot->AddCurve("curve02");
   QVERIFY(!curve02.expired());
   auto c02 = curve02.lock();
-  QVERIFY(c02 != NULL);
+  QVERIFY(c02 != nullptr);
   QVERIFY(plot->Curve(c02->Id()).lock() == c02);
 
   // add point to curve01 and verify
@@ -213,14 +217,15 @@ void IncrementalPlot_TEST::SetCurveLabel()
   this->Load("worlds/empty.world");
 
   // Create a new plot
-  gazebo::gui::IncrementalPlot *plot = new gazebo::gui::IncrementalPlot(NULL);
-  QVERIFY(plot != NULL);
+  gazebo::gui::IncrementalPlot *plot =
+      new gazebo::gui::IncrementalPlot(nullptr);
+  QVERIFY(plot != nullptr);
 
   // add a curve and verify that it is in the plot
   gazebo::gui::PlotCurveWeakPtr curve01 = plot->AddCurve("curve01");
   QVERIFY(!curve01.expired());
   auto c01 = curve01.lock();
-  QVERIFY(c01 != NULL);
+  QVERIFY(c01 != nullptr);
   QCOMPARE(c01->Label(), std::string("curve01"));
   QVERIFY(plot->Curve(c01->Label()).lock() == c01);
 

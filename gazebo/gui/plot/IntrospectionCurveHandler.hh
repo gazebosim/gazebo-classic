@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOT_INTROSPECTIONCURVEHANDLER_HH_
-#define _GAZEBO_GUI_PLOT_INTROSPECTIONCURVEHANDLER_HH_
+#ifndef GAZEBO_GUI_PLOT_INTROSPECTIONCURVEHANDLER_HH_
+#define GAZEBO_GUI_PLOT_INTROSPECTIONCURVEHANDLER_HH_
 
 #include <memory>
 #include <string>
@@ -50,7 +49,7 @@ namespace gazebo
       /// \param[in] _curve Pointer to the plot curve to add.
       public: void AddCurve(const std::string &_query, PlotCurveWeakPtr _curve);
 
-      /// \brief Remove a curve from the topic data handler
+      /// \brief Remove a curve from the topic data hander
       /// \param[in] _curve Pointer to the plot curve to remove.
       public: void RemoveCurve(PlotCurveWeakPtr _curve);
 

@@ -28,9 +28,9 @@ void PlotWindow_TEST::AddRemoveCanvas()
   this->Load("worlds/empty.world");
 
   // Create a new plot window widget
-  gazebo::gui::PlotWindow *plotWindow = new gazebo::gui::PlotWindow(NULL);
+  gazebo::gui::PlotWindow *plotWindow = new gazebo::gui::PlotWindow(nullptr);
 
-  QVERIFY(plotWindow != NULL);
+  QVERIFY(plotWindow != nullptr);
 
   plotWindow->show();
 
@@ -39,15 +39,15 @@ void PlotWindow_TEST::AddRemoveCanvas()
 
   // add canvas
   gazebo::gui::PlotCanvas *canvas01 = plotWindow->AddCanvas();
-  QVERIFY(canvas01 != NULL);
+  QVERIFY(canvas01 != nullptr);
   QCOMPARE(plotWindow->CanvasCount(), 2u);
 
   gazebo::gui::PlotCanvas *canvas02 = plotWindow->AddCanvas();
-  QVERIFY(canvas02 != NULL);
+  QVERIFY(canvas02 != nullptr);
   QCOMPARE(plotWindow->CanvasCount(), 3u);
 
   gazebo::gui::PlotCanvas *canvas03 = plotWindow->AddCanvas();
-  QVERIFY(canvas03 != NULL);
+  QVERIFY(canvas03 != nullptr);
   QCOMPARE(plotWindow->CanvasCount(), 4u);
 
   // remove canvas
@@ -67,7 +67,7 @@ void PlotWindow_TEST::AddRemoveCanvas()
 
   // check we can add more canvases
   gazebo::gui::PlotCanvas *canvas04 = plotWindow->AddCanvas();
-  QVERIFY(canvas04 != NULL);
+  QVERIFY(canvas04 != nullptr);
   QCOMPARE(plotWindow->CanvasCount(), 2u);
 
   // clear canvases

@@ -215,8 +215,10 @@ namespace gazebo
 
       /// \brief Disconnect a boost::slot the the joint update signal.
       /// \param[in] _conn Connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectJointUpdate(event::ConnectionPtr &_conn)
-              {jointUpdate.Disconnect(_conn);}
+              GAZEBO_DEPRECATED(8.0)
+              {jointUpdate.Disconnect(_conn->Id());}
 
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
@@ -688,9 +690,6 @@ namespace gazebo
 
       /// \brief Joint stop dissipation
       private: double stopDissipation[MAX_JOINT_AXIS];
-
-      /// \brief All the introspection items regsitered for this.
-      private: std::vector<common::URI> introspectionItems;
     };
     /// \}
   }

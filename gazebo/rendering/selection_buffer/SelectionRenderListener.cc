@@ -29,7 +29,6 @@ SelectionRenderListener::SelectionRenderListener(MaterialSwitcher *_switcher)
 /////////////////////////////////////////////////
 SelectionRenderListener::~SelectionRenderListener()
 {
-  delete this->materialListener;
 }
 
 /////////////////////////////////////////////////

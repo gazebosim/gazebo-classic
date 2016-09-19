@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_PLOT_PLOTCANVAS_HH_
-#define _GAZEBO_GUI_PLOT_PLOTCANVAS_HH_
+#ifndef GAZEBO_GUI_PLOT_PLOTCANVAS_HH_
+#define GAZEBO_GUI_PLOT_PLOTCANVAS_HH_
 
 #include <memory>
 #include <string>
@@ -24,6 +24,7 @@
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -99,7 +100,7 @@ namespace gazebo
 
       /// \brief Get all the plots in this canvas.
       /// \return A list of plots in this canvas.
-      public: std::vector<IncrementalPlot *> Plots();
+      public: std::vector<IncrementalPlot *> Plots() const;
 
       /// \brief Get the curve associated with the variable
       /// \param[in] _id Unique id of the variable
@@ -119,6 +120,26 @@ namespace gazebo
       /// \param[in] _event Pointer to the event.
       /// \return True if event was handled.
       public: virtual bool eventFilter(QObject *_o, QEvent *_event);
+
+      /// \brief Get the title of the plot
+      /// \return Title of the plot
+      public: std::string Title() const;
+
+      /// \brief Export to PDF files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the files into.
+      /// \param[in] _type File type, such as PDFFile or CSVFile.
+      public: void Export(const std::string &_dirName,
+          const FileType _type) const;
+
+      /// \brief Export to PDF files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the PDF files
+      /// into.
+      private: void ExportPDF(const std::string &_dirName) const;
+
+      /// \brief Export to CSV files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the CSV files
+      /// into.
+      private: void ExportCSV(const std::string &_dirName) const;
 
       /// \brief Add a variable to a plot. Note this function
       /// only updates the plot but not the variable pill container.

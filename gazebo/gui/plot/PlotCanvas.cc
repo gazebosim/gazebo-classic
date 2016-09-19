@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/URI.hh"
 
@@ -46,7 +47,7 @@ namespace gazebo
       public: unsigned int id;
 
       /// brief Pointer to the plot
-      public: IncrementalPlot *plot = NULL;
+      public: IncrementalPlot *plot = nullptr;
 
       /// \brief A map of container variable ids to their plot curve ids.
       public: std::map<unsigned int, unsigned int> variableCurves;
@@ -66,13 +67,13 @@ namespace gazebo
       public: std::map<unsigned int, PlotData *> plotData;
 
       /// \brief Pointer to an empty plot.
-      public: IncrementalPlot *emptyPlot = NULL;
+      public: IncrementalPlot *emptyPlot = nullptr;
 
       /// \brief Container for all the variableCurves on the Y axis.
-      public: VariablePillContainer *yVariableContainer = NULL;
+      public: VariablePillContainer *yVariableContainer = nullptr;
 
       /// \brief Delete canvas Qt action
-      public: QAction *deleteCanvasAct = NULL;
+      public: QAction *deleteCanvasAct = nullptr;
 
       /// \brief Global plot counter.
       public: static unsigned int globalPlotId;
@@ -102,6 +103,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
 
   // Settings
   QMenu *settingsMenu = new QMenu;
+  settingsMenu->setObjectName("material");
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
   clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));
@@ -154,7 +156,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   xVariableContainer->SetMaxSize(1);
   xVariableContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   xVariableContainer->setContentsMargins(0, 0, 0, 0);
-  // hardcode x axis for now
+  // \todo: fix hardcoded x axis
   xVariableContainer->AddVariablePill("sim_time");
   xVariableContainer->setEnabled(false);
 
@@ -230,11 +232,6 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   mainLayout->addWidget(mainFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
-
-/*  QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
-  shadow->setBlurRadius(8);
-  shadow->setOffset(0, 0);
-  this->setGraphicsEffect(shadow);*/
 }
 
 /////////////////////////////////////////////////
@@ -313,6 +310,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     this->dataPtr->plotSplitter->setVisible(true);
   }
 
+
   if (common::URI::Valid(_variable))
   {
     common::URI uri(_variable);
@@ -320,8 +318,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     if (schemeStr == "data")
     {
       PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
-
-      // give it a more compact, friendly name
+       // give it a more compact, friendly name
       // do this after PlotManager AddIntrospectionCurve call!
       std::string label = PlotManager::Instance()->HumanReadableName(_variable);
       this->SetVariableLabel(_id, label);
@@ -799,7 +796,7 @@ PlotCurveWeakPtr PlotCanvas::PlotCurve(const unsigned int _variableId)
 }
 
 /////////////////////////////////////////////////
-std::vector<IncrementalPlot *> PlotCanvas::Plots()
+std::vector<IncrementalPlot *> PlotCanvas::Plots() const
 {
   std::vector<IncrementalPlot *> plots;
   for (const auto it : this->dataPtr->plotData)
@@ -902,4 +899,90 @@ void PlotCanvas::SetDeleteCanvasEnabled(const bool _enable)
 {
   if (this->dataPtr->deleteCanvasAct)
     this->dataPtr->deleteCanvasAct->setEnabled(_enable);
+}
+
+/////////////////////////////////////////////////
+std::string PlotCanvas::Title() const
+{
+  return this->dataPtr->title->Text();
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::Export(const std::string &_dirName,
+    const FileType _type) const
+{
+  std::string title = this->Title();
+
+  // Cleanup the title
+  std::replace(title.begin(), title.end(), '/', '_');
+  std::replace(title.begin(), title.end(), '?', ':');
+
+  std::string filePrefix = _dirName + "/" + title;
+
+  if (_type == FileType::PDFFile)
+    this->ExportPDF(filePrefix);
+  else if (_type == FileType::CSVFile)
+    this->ExportCSV(filePrefix);
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::ExportPDF(const std::string &_filePrefix) const
+{
+  // Render the plot to a PDF
+  int index = 0;
+  for (const auto it : this->dataPtr->plotData)
+  {
+    std::string suffix =
+        this->dataPtr->plotData.size() > 1 ? std::to_string(index) : "";
+
+    std::string filename =
+      common::unique_file_path(_filePrefix + suffix, "pdf");
+
+    IncrementalPlot *plot = it.second->plot;
+
+    QSizeF docSize(plot->canvas()->width() + plot->legend()->width(),
+                   plot->canvas()->height());
+
+    QwtPlotRenderer renderer;
+    renderer.renderDocument(plot, QString(filename.c_str()), docSize, 20);
+
+    gzmsg << "Plot exported to file [" << filename << "]" << std::endl;
+
+    index++;
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::ExportCSV(const std::string &_filePrefix) const
+{
+  // Save data from each curve into a separate file.
+  for (const auto it : this->dataPtr->plotData)
+  {
+    for (const auto &curve : it.second->plot->Curves())
+    {
+      auto c = curve.lock();
+      if (!c)
+        continue;
+
+      // Cleanup the label
+      std::string label = c->Label();
+      std::replace(label.begin(), label.end(), '/', '_');
+      std::replace(label.begin(), label.end(), '?', ':');
+
+      std::string filename =
+          common::unique_file_path(_filePrefix + "-" + label, "csv");
+
+      std::ofstream out(filename);
+      // \todo: fix hardcoded sim_time
+      out << "sim_time, " << c->Label() << std::endl;
+      for (unsigned int j = 0; j < c->Size(); ++j)
+      {
+        ignition::math::Vector2d pt = c->Point(j);
+        out << pt.X() << ", " << pt.Y() << std::endl;
+      }
+      out.close();
+
+      gzmsg << "Plot exported to file [" << filename << "]" << std::endl;
+    }
+  }
 }

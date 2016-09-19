@@ -29,9 +29,9 @@ void PlotCanvas_TEST::AddRemovePlot()
   this->Load("worlds/empty.world");
 
   // Create a new plot canvas widget
-  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(nullptr);
 
-  QVERIFY(plotCanvas != NULL);
+  QVERIFY(plotCanvas != nullptr);
 
   plotCanvas->show();
 
@@ -80,8 +80,8 @@ void PlotCanvas_TEST::AddRemoveVariable()
   this->Load("worlds/empty.world");
 
   // Create a new plot canvas widget
-  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
-  QVERIFY(plotCanvas != NULL);
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(nullptr);
+  QVERIFY(plotCanvas != nullptr);
 
   plotCanvas->show();
 
@@ -148,8 +148,8 @@ void PlotCanvas_TEST::VariableLabel()
   this->Load("worlds/empty.world");
 
   // Create a new plot canvas widget
-  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
-  QVERIFY(plotCanvas != NULL);
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(nullptr);
+  QVERIFY(plotCanvas != nullptr);
 
   plotCanvas->show();
 

@@ -95,12 +95,6 @@ void DARTSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 }
 
 /////////////////////////////////////////////////
-FrictionPyramidPtr DARTSurfaceParams::GetFrictionPyramid() const
-{
-  return this->dataPtr->frictionPyramid;
-}
-
-/////////////////////////////////////////////////
 FrictionPyramidPtr DARTSurfaceParams::FrictionPyramid() const
 {
   return this->dataPtr->frictionPyramid;
