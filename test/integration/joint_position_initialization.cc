@@ -38,12 +38,6 @@ void JointKinematicTest::JointInitialPositionTest(
   // init random seed
   srand(time(NULL));
 
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Bullet Joint::SetPosition affected by issue #1194.\n";
-    return;
-  }
-
   if (_physicsEngine == "dart")
   {
     gzerr << "DART Joint::SetPosition not yet working.\n";
