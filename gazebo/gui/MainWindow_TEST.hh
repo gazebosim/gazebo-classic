@@ -71,8 +71,12 @@ class MainWindow_TEST : public QTestFixture
   /// \brief Test that the the plugin information is received correctly.
   private slots: void PluginInfo();
 
-  /// \brief Test that the the plugin URIs are processed correctly.
+  /// \brief Test that the incorrect plugin URIs fail.
   private slots: void PluginInfoFailures();
+
+  /// \brief Test that a plugin URI fails procesed in a world without GUI plugins.
+  private slots: void PluginInfoFailureWithFalseWorld();
+
 };
 
 #endif

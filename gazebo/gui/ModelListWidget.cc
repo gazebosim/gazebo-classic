@@ -180,6 +180,8 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   if (_item)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
+    qDebug() << name.c_str() << "name";
+
     this->dataPtr->propTreeBrowser->clear();
     if (name == "Scene")
     {
@@ -227,6 +229,47 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       this->FillUserCamera();
       this->FillGrid();
     }
+    // Expand the item with one click 
+    else if (name == "World Plugins")
+    {
+      QList<QTreeWidgetItem *> treeModelItems =
+          this->dataPtr->modelTreeWidget->
+          findItems(tr("World Plugins"), Qt::MatchExactly);
+
+      // Assume there is only one World Plugins item
+      treeModelItems.at(0)->setExpanded(
+            !treeModelItems.at(0)->isExpanded());
+    }/*
+    else if ()
+    {
+      for (int i = 0; i < this->dataPtr->modelsItem->childCount(); ++i)
+      {
+        for (int j = 0; j < this->dataPtr->modelsItem->
+          child(i)->childCount(); ++j)
+        {
+          if (this->dataPtr->modelsItem->child(i)->child(j)->
+            data(3, Qt::UserRole).toString().toStdString() == "Link")
+          {
+            for (int k = 0; k < this->dataPtr->modelsItem->
+              child(i)->child(j)->childCount(); ++k)
+            {
+              if (this->dataPtr->modelsItem->child(i)->
+                child(j)->child(k)->data(0, Qt::UserRole).
+                toString().toStdString() == this->dataPtr->selectedEntityName)
+              {
+                if (this->dataPtr->requestPub)
+                {
+                  this->dataPtr->requestMsg = msgs::CreateRequest("sensor_info",
+                  this->dataPtr->selectedEntityName);
+
+                  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+                }
+              }
+            }
+          }
+        }
+      }
+    }*/
     else
     {
       this->dataPtr->propTreeBrowser->clear();
@@ -2931,21 +2974,21 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Plugin &_msg,
   item = this->dataPtr->variantManager->addProperty(QVariant::String,
       tr("name"));
   item->setValue(_msg.name().c_str());
-  item->setEnabled(false);
+  item->setEnabled(true);
   this->AddProperty(item, _parent);
 
   // filename
-  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+  item = this->dataPtr->variantManager->addProperty(QVariant::String, 
     tr("filename"));
   item->setValue(_msg.filename().c_str());
-  item->setEnabled(false);
+  item->setEnabled(true);
   this->AddProperty(item, _parent);
 
   // innerxml
   item = this->dataPtr->variantManager->addProperty(QVariant::String,
     tr("innerxml"));
   item->setValue(_msg.innerxml().c_str());
-  item->setEnabled(false);
+  item->setEnabled(true);
   this->AddProperty(item, _parent);
 }
 
