@@ -35,7 +35,7 @@ using namespace physics;
 ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
     : HingeJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateHinge(_worldId, NULL);
+  this->jointId = dJointCreateHinge(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -59,7 +59,10 @@ math::Vector3 ODEHingeJoint::GetAnchor(unsigned int /*index*/) const
   if (this->jointId)
     dJointGetHingeAnchor(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -87,7 +90,10 @@ math::Vector3 ODEHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
   if (this->jointId)
     dJointGetHingeAxis(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }

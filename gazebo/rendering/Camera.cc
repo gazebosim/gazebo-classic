@@ -125,15 +125,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 //////////////////////////////////////////////////
 Camera::~Camera()
 {
-  delete [] this->saveFrameBuffer;
-  this->saveFrameBuffer = NULL;
-  delete [] this->bayerFrameBuffer;
-  this->bayerFrameBuffer = NULL;
-
   this->Fini();
-
-  this->sdf->Reset();
-  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
@@ -227,8 +219,23 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  if (this->saveFrameBuffer)
+    delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
+
+  if (this->bayerFrameBuffer)
+    delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
+
   this->initialized = false;
+
+  this->dataPtr->cmdSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+
+  this->dataPtr->distortion.reset();
+  this->dataPtr->trackedVisual.reset();
 
   if (this->viewport && this->scene)
     RTShaderSystem::DetachViewport(this->viewport, this->scene);
@@ -252,6 +259,10 @@ void Camera::Fini()
 
   this->scene.reset();
   this->connections.clear();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
@@ -1703,16 +1714,13 @@ void Camera::AttachToVisual(uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
-  this->SetTrackMinDistance(_minDist);
-  this->SetTrackMaxDistance(_maxDist);
-
   msgs::Request request;
   msgs::TrackVisual track;
 
   track.set_name(this->Name() + "_attach_to_visual_track");
   track.set_id(_visualId);
-  track.set_min_dist(this->TrackMinDistance());
-  track.set_max_dist(this->TrackMaxDistance());
+  track.set_min_dist(_minDist);
+  track.set_max_dist(_maxDist);
   track.set_inherit_orientation(_inheritOrientation);
 
   std::string *serializedData = request.mutable_data();
@@ -1728,9 +1736,6 @@ void Camera::AttachToVisual(const std::string &_visualName,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
-  this->SetTrackMinDistance(_minDist);
-  this->SetTrackMaxDistance(_maxDist);
-
   msgs::Request request;
   msgs::TrackVisual track;
 
@@ -1745,8 +1750,8 @@ void Camera::AttachToVisual(const std::string &_visualName,
   }
 
   track.set_name(_visualName);
-  track.set_min_dist(this->TrackMinDistance());
-  track.set_max_dist(this->TrackMaxDistance());
+  track.set_min_dist(_minDist);
+  track.set_max_dist(_maxDist);
   track.set_inherit_orientation(_inheritOrientation);
 
   std::string *serializedData = request.mutable_data();

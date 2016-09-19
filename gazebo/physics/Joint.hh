@@ -120,6 +120,7 @@ namespace gazebo
 
       /// \brief Reset the joint.
       public: virtual void Reset();
+      using Base::Reset;
 
       /// \brief Set the joint state.
       /// \param[in] _state Joint state
@@ -592,12 +593,8 @@ namespace gazebo
       protected: math::Pose ComputeChildLinkPose(unsigned int _index,
           double _position);
 
-      /// \brief Helper function to load a joint.
-      /// \param[in] _pose Pose of the anchor.
-      private: void LoadImpl(const math::Pose &_pose);
-
       /// \brief Register items in the introspection service.
-      private: void RegisterIntrospectionItems();
+      protected: virtual void RegisterIntrospectionItems();
 
       /// \brief Register position items in the introspection service.
       /// \param[in] _index Axis index.
@@ -607,8 +604,9 @@ namespace gazebo
       /// \param[in] _index Axis index.
       private: void RegisterIntrospectionVelocity(const unsigned int _index);
 
-      /// \brief Unregister items in the introspection service.
-      private: void UnregisterIntrospectionItems();
+      /// \brief Helper function to load a joint.
+      /// \param[in] _pose Pose of the anchor.
+      private: void LoadImpl(const math::Pose &_pose);
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;

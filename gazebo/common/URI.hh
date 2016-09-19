@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_COMMON_URI_HH_
-#define _GAZEBO_COMMON_URI_HH_
+#ifndef GAZEBO_COMMON_URI_HH_
+#define GAZEBO_COMMON_URI_HH_
 
 #include <memory>
 #include <string>
@@ -82,8 +82,8 @@ namespace gazebo
       public: std::string Str(const std::string &_delim = "/") const;
 
       /// \brief Equal operator.
-      /// \param[in] _p another URIPath.
-      /// \return itself.
+      /// \param[in] _path Another URIPath.
+      /// \return Itself.
       public: URIPath &operator=(const URIPath &_path);
 
       /// \brief Return true if the string is a valid path.
@@ -97,8 +97,7 @@ namespace gazebo
 
       /// \brief Parse a string as URIPath.
       /// \param[in] _str A string.
-      /// \param[out] _path URIPath parsed from the string.
-      /// \return true if the string can be parsed as a URIPath.
+      /// \return True if the string could be parsed as a URIPath.
       public: bool Parse(const std::string &_str);
 
       /// \internal
@@ -133,13 +132,13 @@ namespace gazebo
                           const std::string &_value);
 
       /// \brief Equal operator.
-      /// \param[in] _p another URIQuery.
-      /// \return itself.
+      /// \param[in] _query another URIQuery.
+      /// \return Itself.
       public: URIQuery &operator=(const URIQuery &_query);
 
       /// \brief Return true if the two queries contain the same values.
       /// \param[in] _query A URI query to compare.
-      /// return True of the queries match.
+      /// return True if the queries match.
       public: bool operator==(const URIQuery &_query) const;
 
       /// \brief Get the query as a string.
@@ -150,16 +149,16 @@ namespace gazebo
 
       /// \brief Check if a string is a valid URI query.
       /// \param[in] _str The string to check.
-      /// \return true if the string can be parsed as a URI query.
+      /// \return True if the string can be parsed as a URI query.
       public: static bool Valid(const std::string &_str);
 
       /// \brief Check if this is a valid URI query.
-      /// \return true if this can be parsed as a URI query.
+      /// \return True if this can be parsed as a URI query.
       public: bool Valid() const;
 
       /// \brief Parse a string as URIQuery.
       /// \param[in] _str A string.
-      /// \return true if the string can be parsed as a URIQuery.
+      /// \return True if the string can be parsed as a URIQuery.
       public: bool Parse(const std::string &_string);
 
       /// \internal
@@ -211,13 +210,13 @@ namespace gazebo
       public: URIQuery &Query();
 
       /// \brief Equal operator.
-      /// \param[in] _uri another URI.
-      /// \return itself.
+      /// \param[in] _uri Another URI.
+      /// \return Itself.
       public: URI &operator=(const URI &_uri);
 
       /// \brief Return true if the two URIs match.
-      /// \param[in] _uri another URI to compare.
-      /// \return true if the two URIs match.
+      /// \param[in] _uri Another URI to compare.
+      /// \return True if the two URIs match.
       public: bool operator==(const URI &_uri) const;
 
       /// \brief Validate this URI.
@@ -231,7 +230,7 @@ namespace gazebo
 
       /// \brief Parse a string as URI.
       /// \param[in] _str A string.
-      /// \return true if the string can be parsed as a URI.
+      /// \return True if the string can be parsed as a URI.
       public: bool Parse(const std::string &_str);
 
       /// \internal

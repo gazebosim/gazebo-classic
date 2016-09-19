@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_PHYSICS_BASE_HH_
-#define _GAZEBO_PHYSICS_BASE_HH_
+#ifndef GAZEBO_PHYSICS_BASE_HH_
+#define GAZEBO_PHYSICS_BASE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -26,6 +26,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
+#include <vector>
 
 #include <sdf/sdf.hh>
 
@@ -39,7 +40,8 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
@@ -277,7 +279,7 @@ namespace gazebo
       /// \return The scoped name.
       public: std::string GetScopedName(bool _prependWorldName = false) const;
 
-      /// \brief Return the common::Uri of this entity.
+      /// \brief Return the common::URI of this entity.
       /// The URI includes the world where the entity is contained and all the
       /// hierarchy of sub-entities that can compose this entity.
       /// E.g.: A link entity contains the name of the link and the model where
@@ -317,6 +319,12 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      protected: virtual void UnregisterIntrospectionItems();
+
       /// \brief Compute the scoped name of this object based on its
       /// parents.
       /// \sa Base::GetScopedName
@@ -333,6 +341,9 @@ namespace gazebo
 
       /// \brief Pointer to the world.
       protected: WorldPtr world;
+
+      /// \brief All the introspection items regsitered for this.
+      protected: std::vector<common::URI> introspectionItems;
 
       /// \brief Set to true if the object should be saved.
       private: bool saveable;

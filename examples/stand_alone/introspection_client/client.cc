@@ -17,7 +17,6 @@
 
 #include <chrono>
 #include <iostream>
-#include <thread>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/util/IntrospectionClient.hh>
 #include <ignition/transport.hh>
@@ -57,7 +56,7 @@ int main(int _argc, char **_argv)
 
   // Pick up the first manager.
   std::string id = *managerIds.begin();
-  std::string item = "data://world/default?p=sim_time";
+  std::string item = "data://world/default?p=time/sim_time";
 
   if (!client.IsRegistered(id, item))
   {
@@ -77,7 +76,7 @@ int main(int _argc, char **_argv)
   node.Subscribe(topic, cb);
 
   /// zZZZ.
-  getchar();
+  ignition::transport::waitForShutdown();
 
   return 0;
 }

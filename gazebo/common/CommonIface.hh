@@ -72,9 +72,17 @@ namespace gazebo
 
     /// \brief Cross platform retrieval of an environment variable.
     /// \param[in] _name Name of the environment variable to get.
-    /// \return Environment variable contents, or NULL on error.
+    /// \return Environment variable contents, or nullptr on error.
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
+
+    /// \brief Splits a string into tokens.
+    /// \param[in] _str Input string.
+    /// \param[in] _delim Token delimiter.
+    /// \return Vector of tokens.
+    GZ_COMMON_VISIBLE
+    std::vector<std::string> split(const std::string &_str,
+                                   const std::string &_delim);
     /// \}
 
     /// \brief Splits a string into tokens.
@@ -97,7 +105,7 @@ namespace gazebo
 
     if (_buffer.size() == 0)
     {
-      sha1.process_bytes(NULL, 0);
+      sha1.process_bytes(nullptr, 0);
     }
     else
     {

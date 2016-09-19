@@ -26,6 +26,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -40,6 +41,7 @@ Base::Base(BasePtr _parent)
   this->type = BASE;
   this->typeStr = "base";
   this->id = physics::getUniqueId();
+  this->typeStr = "base";
   this->saveable = true;
   this->selected = false;
 
@@ -94,6 +96,8 @@ void Base::Load(sdf::ElementPtr _sdf)
   }
 
   this->ComputeScopedName();
+
+  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -107,6 +111,8 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
+  this->UnregisterIntrospectionItems();
+
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
@@ -326,7 +332,6 @@ std::string Base::GetScopedName(bool _prependWorldName) const
     return this->scopedName;
 }
 
-
 //////////////////////////////////////////////////
 common::URI Base::URI() const
 {
@@ -352,6 +357,21 @@ common::URI Base::URI() const
   uri.Path().PushFront("world");
 
   return uri;
+}
+
+/////////////////////////////////////////////////
+void Base::RegisterIntrospectionItems()
+{
+  // nothing for now
+}
+
+/////////////////////////////////////////////////
+void Base::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
 }
 
 //////////////////////////////////////////////////

@@ -81,13 +81,7 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
-  // Remove all the sensors attached to the joint
-  for (auto const &sensor : this->sensors)
-  {
-    event::Events::removeSensor(sensor);
-  }
-
-  this->sensors.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -341,7 +335,6 @@ void Joint::LoadImpl(const math::Pose &_pose)
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
-  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -409,7 +402,12 @@ void Joint::Fini()
   }
   this->sensors.clear();
 
-  this->UnregisterIntrospectionItems();
+  this->anchorLink.reset();
+  this->applyDamping.reset();
+  this->childLink.reset();
+  this->model.reset();
+  this->parentLink.reset();
+  this->sdfJoint.reset();
 
   Base::Fini();
 }
@@ -1493,13 +1491,4 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
   this->introspectionItems.push_back(uri);
   gazebo::util::IntrospectionManager::Instance()->Register
       <double>(uri.Str(), f);
-}
-
-/////////////////////////////////////////////////
-void Joint::UnregisterIntrospectionItems()
-{
-  for (auto &item : this->introspectionItems)
-    util::IntrospectionManager::Instance()->Unregister(item.Str());
-
-  this->introspectionItems.clear();
 }

@@ -32,28 +32,57 @@ event::EventT<void (bool, bool)> model::Events::modelPropertiesChanged;
 event::EventT<void (std::string)> model::Events::saveModel;
 event::EventT<void ()> model::Events::newModel;
 
+event::EventT<void (std::string, bool)> model::Events::setSelectedEntity;
+
+// Nested Models
 event::EventT<void (std::string)> model::Events::nestedModelInserted;
-event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::nestedModelRemoved;
+
+event::EventT<void (sdf::ElementPtr)>
+    model::Events::requestNestedModelInsertion;
+event::EventT<void (std::string)> model::Events::requestNestedModelRemoval;
+
+event::EventT<void (std::string, ignition::math::Pose3d)>
+    model::Events::requestNestedModelMove;
+
+// Links
+event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::linkRemoved;
+
+event::EventT<void (sdf::ElementPtr)> model::Events::requestLinkInsertion;
 event::EventT<void (std::string)> model::Events::requestLinkRemoval;
+
+event::EventT<void (std::string)> model::Events::openLinkInspector;
+event::EventT<void (std::string)> model::Events::showLinkContextMenu;
+
+event::EventT<void (std::string, ignition::math::Pose3d)>
+    model::Events::requestLinkMove;
+
+// Joints
 event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointInserted;
 event::EventT<void (std::string)> model::Events::jointRemoved;
+
+event::EventT<void (sdf::ElementPtr, std::string)>
+    model::Events::requestJointInsertion;
+event::EventT<void (std::string)> model::Events::requestJointRemoval;
+
+event::EventT<void (std::string)> model::Events::openJointInspector;
+event::EventT<void (std::string)> model::Events::showJointContextMenu;
+event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
+
 event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointChanged;
-event::EventT<void (std::string)> model::Events::openLinkInspector;
-event::EventT<void (std::string)> model::Events::openJointInspector;
-event::EventT<void (std::string)> model::Events::openModelPluginInspector;
 event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
-event::EventT<void (std::string)> model::Events::showLinkContextMenu;
-event::EventT<void (std::string)> model::Events::showJointContextMenu;
-event::EventT<void (std::string)> model::Events::showModelPluginContextMenu;
-event::EventT<void (std::string, bool)> model::Events::setSelectedLink;
-event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
-event::EventT<void (std::string, bool)> model::Events::setSelectedModelPlugin;
+
+// Model plugins
 event::EventT<void (std::string)> model::Events::modelPluginInserted;
 event::EventT<void (std::string)> model::Events::modelPluginRemoved;
-event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;
+
 event::EventT<void (std::string, std::string, std::string)>
     model::Events::requestModelPluginInsertion;
+event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;
+
+event::EventT<void (std::string)> model::Events::openModelPluginInspector;
+event::EventT<void (std::string)> model::Events::showModelPluginContextMenu;
+event::EventT<void (std::string, bool)> model::Events::setSelectedModelPlugin;

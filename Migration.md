@@ -7,10 +7,73 @@ release will remove the deprecated code.
 
 ## Gazebo 7.X to 8.X
 
+### Additions
+
+1. **gazebo/common/Event.hh**
+    + public: bool Connection::Id() const;
+    + public: bool Event::Signaled() const;
+    + public: void Event::SetSignaled(const bool);
+
 ### Modifications
+
+1. **gazebo/common/Event.hh**
+    + Connection(Event*, int) constructor changed to
+      Connection(Event*, const int)
+    + EventTPrivate no longer inherits from EventPrivate
+    + EventT::Connect(const boost::function<T> &) changed to
+      EventT::Connect(const std::function<T> &)
 
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** ConnectSetSelectedLink
+    + ***Replacement:*** ConnectSetSelectedEntity
+    + ***Removed:*** DisconnectSetSelectedLink
+    + ***Replacement:*** DisconnectSetSelectedEntity
+    + ***Removed:*** setSelectedLink
+    + ***Replacement:*** setSelectedEntity
+
+### Deprecations
+
+1. **gazebo/common/Event.hh**
+    + ***Deprecation:*** public: bool Event::GetSignaled() const;
+    + ***Replacement:*** public: bool Event::Signaled() const;
+    + ***Deprecation:*** public: bool Connection::GetId() const;
+    + ***Replacement:*** public: bool Connection::Id() const;
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: math::Vector3 GetGravity const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
+### Deletions
+
+1. **gazebo/common/Event.hh**
+    + ConnectionPrivate class
+    + Connection() constructor
+    + EventPrivate class
+    + Event(EventPrivate&) constructor
+
+1. **gazebo/gui/EntityMaker.hh**
+    + EntityMakerPrivate class
+    + Entity(EntityMakerPrivate&) constructor
+    + EntityMakerPrivate *dataPtr
+
+## Gazebo 7.1.0 to 7.X
+
+### Additions
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + public: virtual void Fini();
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + public: virtual void Fini();
 
 ## Gazebo 6.X to 7.X
 

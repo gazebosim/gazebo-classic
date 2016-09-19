@@ -18,6 +18,7 @@
 #define _SAVE_DIALOG_PRIVATE_HH_
 
 #include <sdf/sdf.hh>
+#include <tinyxml.h>
 
 #include "gazebo/gui/qt.h"
 
