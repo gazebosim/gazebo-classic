@@ -690,9 +690,6 @@ namespace gazebo
 
       /// \brief Joint stop dissipation
       private: double stopDissipation[MAX_JOINT_AXIS];
-
-      /// \brief All the introspection items regsitered for this.
-      private: std::vector<common::URI> introspectionItems;
     };
     /// \}
   }

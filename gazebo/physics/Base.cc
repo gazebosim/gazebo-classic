@@ -39,7 +39,6 @@ Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
-  this->typeStr = "base";
   this->id = physics::getUniqueId();
   this->typeStr = "base";
   this->saveable = true;

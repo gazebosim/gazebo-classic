@@ -492,9 +492,6 @@ namespace gazebo
 
       /// \brief Mutex to protect incoming message buffers.
       private: std::mutex receiveMutex;
-
-      /// \brief All the introspection items regsitered for this.
-      private: std::vector<common::URI> introspectionItems;
     };
     /// \}
   }

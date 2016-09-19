@@ -167,14 +167,6 @@ namespace gazebo
     std::string unique_file_path(const std::string &_pathAndName,
                                  const std::string &_extension);
     /// \}
-
-    /// \brief Splits a string into tokens.
-    /// \param[in] _str Input string.
-    /// \param[in] _delim Token delimiter.
-    /// \return Vector of tokens.
-    GZ_COMMON_VISIBLE
-    std::vector<std::string> split(const std::string &_str,
-                                   const std::string &_delim);
   }
 
   ///////////////////////////////////////////////

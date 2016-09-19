@@ -21,23 +21,22 @@
   #define snprintf _snprintf
 #endif
 
-#include <set>
-#include <string>
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/gazebo_client.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gazebo_client.hh"
+
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/ModelDatabase.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/gui/SplashScreen.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
-#include "gazebo/gui/SplashScreen.hh"
+#include "gazebo/gui/GuiIface.hh"
 
 #ifdef WIN32
 # define HOMEDIR "HOMEPATH"

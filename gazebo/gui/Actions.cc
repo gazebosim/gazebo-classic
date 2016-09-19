@@ -126,7 +126,7 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_topicVisAct = 0;
 
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_plotAct = 0;
+QAction *gazebo::gui::g_diagnosticsAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_plotAct = 0;
