@@ -32,7 +32,7 @@ void ModelMaker_TEST::SimpleShape()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -44,7 +44,7 @@ void ModelMaker_TEST::SimpleShape()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's no box in the left panel yet
-  bool hasBox = mainWindow->HasEntityName("unit_box_0");
+  bool hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(!hasBox);
 
   // Get scene
@@ -52,7 +52,7 @@ void ModelMaker_TEST::SimpleShape()
   QVERIFY(scene != NULL);
 
   // Check there's no box in the scene yet
-  gazebo::rendering::VisualPtr vis = scene->GetVisual("unit_box_0");
+  gazebo::rendering::VisualPtr vis = scene->GetVisual("unit_box");
   QVERIFY(vis == NULL);
 
   // Create a model maker
@@ -64,11 +64,11 @@ void ModelMaker_TEST::SimpleShape()
   modelMaker->Start();
 
   // Check there's still no box in the left panel
-  hasBox = mainWindow->HasEntityName("unit_box_0");
+  hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(!hasBox);
 
   // Check there's a box in the scene -- this is the preview
-  vis = scene->GetVisual("unit_box_0");
+  vis = scene->GetVisual("unit_box");
   QVERIFY(vis != NULL);
 
   // Check that the box appeared in the center of the screen
@@ -95,17 +95,17 @@ void ModelMaker_TEST::SimpleShape()
   modelMaker->OnMouseRelease(mouseEvent);
 
   // Check there's no box in the scene -- the preview is gone
-  vis = scene->GetVisual("unit_box_0");
+  vis = scene->GetVisual("unit_box");
   QVERIFY(vis == NULL);
 
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a box in the scene -- this is the final model
-  vis = scene->GetVisual("unit_box_0");
+  vis = scene->GetVisual("unit_box");
   QVERIFY(vis != NULL);
 
   // Check the box is in the left panel
-  hasBox = mainWindow->HasEntityName("unit_box_0");
+  hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(hasBox);
 
   // Terminate
@@ -119,7 +119,7 @@ void ModelMaker_TEST::FromFile()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -210,7 +210,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -323,7 +323,7 @@ void ModelMaker_TEST::FromModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/box.world");
+  this->Load("worlds/box.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -420,7 +420,7 @@ void ModelMaker_TEST::FromNestedModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("test/worlds/deeply_nested_models.world");
+  this->Load("test/worlds/deeply_nested_models.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -509,15 +509,14 @@ void ModelMaker_TEST::FromNestedModel()
   modelMaker->OnMouseRelease(mouseEvent);
 
   // Check there's no clone in the scene -- the preview is gone
-  // FIXME visuals don't get removed
-  // vis = scene->GetVisual("model_00_clone_tmp");
-  // QVERIFY(vis == NULL);
-  // vis = scene->GetVisual("model_00_clone_tmp::model_01");
-  // QVERIFY(vis == NULL);
-  // vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02");
-  // QVERIFY(vis == NULL);
-  // vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
-  // QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00_clone_tmp");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02");
+  QVERIFY(vis == nullptr);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
+  QVERIFY(vis == nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 

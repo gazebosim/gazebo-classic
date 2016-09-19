@@ -42,6 +42,11 @@ BulletLink::BulletLink(EntityPtr _parent)
 {
   this->rigidLink = nullptr;
   this->compoundShape = nullptr;
+
+  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
+      this->GetWorld()->GetPhysicsEngine());
+  if (this->bulletPhysics == nullptr)
+    gzerr << "Not using the bullet physics engine\n";
 }
 
 //////////////////////////////////////////////////
@@ -53,18 +58,16 @@ BulletLink::~BulletLink()
 //////////////////////////////////////////////////
 void BulletLink::Load(sdf::ElementPtr _sdf)
 {
-  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
-
-  if (this->bulletPhysics == nullptr)
-    gzthrow("Not using the bullet physics engine");
-
-  Link::Load(_sdf);
+  if (this->bulletPhysics)
+    Link::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
+  if (!this->bulletPhysics)
+    return;
+
   // Set the initial pose of the body
   this->motionState.reset(new BulletMotionState(
     boost::dynamic_pointer_cast<Link>(shared_from_this())));
@@ -219,6 +222,8 @@ void BulletLink::Fini()
   }
   this->bulletPhysics.reset();
   this->rigidLink = nullptr;
+
+  this->motionState.reset();
 
   if (this->compoundShape)
     delete this->compoundShape;

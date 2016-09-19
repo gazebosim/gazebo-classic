@@ -245,8 +245,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
     }
     if (!this->parentLink)
     {
-      std::string parentNameThisModel =
-          parentName.substr(parentName.find("::"));
+      std::string parentNameThisModel;
+      auto doubleColon = parentName.find("::");
+      if (doubleColon != std::string::npos)
+      {
+        parentNameThisModel = parentName.substr(doubleColon);
+      }
+      else
+      {
+        parentNameThisModel = "::" + parentName;
+      }
       parentNameThisModel = parentModel->GetName() + parentNameThisModel;
 
       this->parentLink = boost::dynamic_pointer_cast<Link>(
@@ -267,11 +275,20 @@ void Joint::Load(sdf::ElementPtr _sdf)
       this->childLink = boost::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(scopedChildName));
 
-        parentModel = parentModel->GetParent();
+      parentModel = parentModel->GetParent();
     }
     if (!this->childLink)
     {
-      std::string childNameThisModel = childName.substr(childName.find("::"));
+      std::string childNameThisModel;
+      auto doubleColon = childName.find("::");
+      if (doubleColon != std::string::npos)
+      {
+        childNameThisModel = childName.substr(doubleColon);
+      }
+      else
+      {
+        childNameThisModel = "::" + childName;
+      }
       childNameThisModel = parentModel->GetName() + childNameThisModel;
 
       this->childLink = boost::dynamic_pointer_cast<Link>(
@@ -395,6 +412,8 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
+  this->applyDamping.reset();
+
   // Remove all the sensors attached to the joint
   for (auto const &sensor : this->sensors)
   {
@@ -403,10 +422,9 @@ void Joint::Fini()
   this->sensors.clear();
 
   this->anchorLink.reset();
-  this->applyDamping.reset();
   this->childLink.reset();
-  this->model.reset();
   this->parentLink.reset();
+  this->model.reset();
   this->sdfJoint.reset();
 
   Base::Fini();
@@ -483,6 +501,7 @@ void Joint::Update()
 void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
+  /// \todo Update joint specific parameters. Issue #1954
 }
 
 //////////////////////////////////////////////////

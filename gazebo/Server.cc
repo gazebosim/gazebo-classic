@@ -165,6 +165,13 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
+    // This is a bit of a hack. The server assumes the last item on the
+    // command (if present) is a world file. A problem arises with:
+    //     gazebo -g <some_gui_plugin.so>
+    // Without this hidden option, the server would try to load
+    // <some_gui_plugin.so> as a world file.
+    ("gui-plugin,g", po::value<std::vector<std::string> >(),
+     "Gui plugin ignored.")
     ("world_file", po::value<std::string>(), "SDF world to load.")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
@@ -324,7 +331,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
     // Load the server
     if (!this->LoadFile(configFilename, physics))
-      return false;
+    {
+      gzwarn << "Falling back on worlds/empty.world\n";
+      if (!this->LoadFile("worlds/empty.world", physics))
+        return false;
+    }
 
     if (this->dataPtr->vm.count("profile"))
     {

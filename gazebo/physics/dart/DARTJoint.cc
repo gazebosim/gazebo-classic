@@ -53,6 +53,12 @@ DARTJoint::~DARTJoint()
 //////////////////////////////////////////////////
 void DARTJoint::Load(sdf::ElementPtr _sdf)
 {
+  if (!this->dataPtr->dtJoint)
+  {
+    gzerr << "dtJoint should be created in each subclass constructor" <<
+        std::endl;
+  }
+
   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
   // parent link and child link.
   Joint::Load(_sdf);

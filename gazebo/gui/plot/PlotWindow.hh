@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
-#define _GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
+#ifndef GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
+#define GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
 
+#include <list>
 #include <memory>
 
 #include "gazebo/gui/qt.h"
@@ -32,19 +33,23 @@ namespace gazebo
     class PlotCanvas;
 
     /// \brief Plot window
-    class GZ_GUI_VISIBLE PlotWindow : public QDialog
+    class GZ_GUI_VISIBLE PlotWindow : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent widget.
-      public: PlotWindow(QWidget *_parent = NULL);
+      public: PlotWindow(QWidget *_parent = nullptr);
 
       /// \brief Destructor.
       public: virtual ~PlotWindow();
 
       /// \brief Add a new canvas.
       public: PlotCanvas *AddCanvas();
+
+      /// \brief Get a list of all the plots
+      /// \return A list of all the plots.
+      public: std::list<PlotCanvas *> Plots();
 
       /// \brief Remove a plot canvas
       /// \param[in] _canvas Canvas to remove
@@ -61,9 +66,6 @@ namespace gazebo
       /// variable in the plot. Existing plot curves will no longer be updated.
       public: void Restart();
 
-      /// \brief Export all canvas plots.
-      public: void Export();
-
       /// \brief Update a canvas. This currently just enables/disables the
       /// delete canvas setting option based on the number of canvases in the
       /// window.
@@ -71,6 +73,9 @@ namespace gazebo
 
       /// \brief Update all canvases
       private slots: void Update();
+
+      /// \brief QT callback for when a plot is to be exported.
+      private slots: void OnExport();
 
       /// \brief Qt Callback when a new plot canvas should be added.
       private slots: void OnAddCanvas();

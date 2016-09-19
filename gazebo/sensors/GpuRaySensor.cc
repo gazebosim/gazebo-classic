@@ -61,6 +61,7 @@ GpuRaySensor::GpuRaySensor()
 //////////////////////////////////////////////////
 GpuRaySensor::~GpuRaySensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -317,10 +318,13 @@ void GpuRaySensor::Init()
 //////////////////////////////////////////////////
 void GpuRaySensor::Fini()
 {
-  Sensor::Fini();
-  this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
-  this->dataPtr->laserCam.reset();
+  if (this->scene)
+    this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
   this->scene.reset();
+
+  this->dataPtr->laserCam.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -334,13 +338,14 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 //////////////////////////////////////////////////
 void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
 {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->dataPtr->laserCam->DisconnectNewLaserFrame(_conn);
-}
-
-//////////////////////////////////////////////////
-unsigned int GpuRaySensor::GetCameraCount() const
-{
-  return this->CameraCount();
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -356,33 +361,9 @@ bool GpuRaySensor::IsHorizontal() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetHorzHalfAngle() const
-{
-  return this->dataPtr->laserCam->HorzHalfAngle();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetVertHalfAngle() const
-{
-  return this->dataPtr->laserCam->VertHalfAngle();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetHorzFOV() const
-{
-  return this->HorzFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::HorzFOV() const
 {
   return this->dataPtr->laserCam->HorzFOV();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetCosHorzFOV() const
-{
-  return this->CosHorzFOV();
 }
 
 //////////////////////////////////////////////////
@@ -392,33 +373,15 @@ double GpuRaySensor::CosHorzFOV() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetVertFOV() const
-{
-  return this->VertFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::VertFOV() const
 {
   return this->dataPtr->laserCam->VertFOV();
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetCosVertFOV() const
-{
-  return this->CosVertFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::CosVertFOV() const
 {
   return this->dataPtr->laserCam->CosVertFOV();
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetRayCountRatio() const
-{
-  return this->RayCountRatio();
 }
 
 //////////////////////////////////////////////////
@@ -458,33 +421,15 @@ void GpuRaySensor::SetAngleMax(double _angle)
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRangeMin() const
-{
-  return this->RangeMin();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::RangeMin() const
 {
   return this->dataPtr->rangeElem->Get<double>("min");
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRangeMax() const
-{
-  return this->RangeMax();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::RangeMax() const
 {
   return this->dataPtr->rangeElem->Get<double>("max");
-}
-
-/////////////////////////////////////////////////
-double GpuRaySensor::GetAngleResolution() const
-{
-  return this->AngleResolution();
 }
 
 /////////////////////////////////////////////////
@@ -495,21 +440,9 @@ double GpuRaySensor::AngleResolution() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRangeResolution() const
-{
-  return this->RangeResolution();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::RangeResolution() const
 {
   return this->dataPtr->rangeElem->Get<double>("resolution");
-}
-
-//////////////////////////////////////////////////
-int GpuRaySensor::GetRayCount() const
-{
-  return this->RayCount();
 }
 
 //////////////////////////////////////////////////
@@ -519,21 +452,9 @@ int GpuRaySensor::RayCount() const
 }
 
 //////////////////////////////////////////////////
-int GpuRaySensor::GetRangeCount() const
-{
-  return this->RangeCount();
-}
-
-//////////////////////////////////////////////////
 int GpuRaySensor::RangeCount() const
 {
   return this->RayCount() * this->dataPtr->horzElem->Get<double>("resolution");
-}
-
-//////////////////////////////////////////////////
-int GpuRaySensor::GetVerticalRayCount() const
-{
-  return this->VerticalRayCount();
 }
 
 //////////////////////////////////////////////////
@@ -543,12 +464,6 @@ int GpuRaySensor::VerticalRayCount() const
     return this->dataPtr->vertElem->Get<unsigned int>("samples");
   else
     return 1;
-}
-
-//////////////////////////////////////////////////
-int GpuRaySensor::GetVerticalRangeCount() const
-{
-  return this->VerticalRangeCount();
 }
 
 //////////////////////////////////////////////////
@@ -593,12 +508,6 @@ ignition::math::Angle GpuRaySensor::VerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetVerticalAngleResolution() const
-{
-  return this->VerticalAngleResolution();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::VerticalAngleResolution() const
 {
   return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
@@ -613,12 +522,6 @@ void GpuRaySensor::SetVerticalAngleMax(const double _angle)
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::GetRanges(std::vector<double> &_ranges)
-{
-  this->Ranges(_ranges);
-}
-
-//////////////////////////////////////////////////
 void GpuRaySensor::Ranges(std::vector<double> &_ranges) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -626,12 +529,6 @@ void GpuRaySensor::Ranges(std::vector<double> &_ranges) const
   _ranges.resize(this->dataPtr->laserMsg.scan().ranges_size());
   memcpy(&_ranges[0], this->dataPtr->laserMsg.scan().ranges().data(),
          sizeof(_ranges[0]) * this->dataPtr->laserMsg.scan().ranges_size());
-}
-
-//////////////////////////////////////////////////
-double GpuRaySensor::GetRange(int _index)
-{
-  return this->Range(_index);
 }
 
 //////////////////////////////////////////////////
@@ -653,21 +550,9 @@ double GpuRaySensor::Range(const int _index) const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRetro(int _index) const
-{
-  return this->Retro(_index);
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::Retro(const int /*_index*/) const
 {
   return 0.0;
-}
-
-//////////////////////////////////////////////////
-int GpuRaySensor::GetFiducial(int /*_index*/) const
-{
-  return -1;
 }
 
 //////////////////////////////////////////////////
@@ -776,12 +661,6 @@ bool GpuRaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections());
-}
-
-//////////////////////////////////////////////////
-rendering::GpuLaserPtr GpuRaySensor::GetLaserCamera() const
-{
-  return this->LaserCamera();
 }
 
 //////////////////////////////////////////////////

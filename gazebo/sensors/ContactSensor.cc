@@ -197,13 +197,13 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
   this->dataPtr->incomingContacts.clear();
 
   this->lastMeasurementTime = this->world->GetSimTime();
+  msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
+            this->lastMeasurementTime);
 
   // Generate a outgoing message only if someone is listening.
   if (this->dataPtr->contactsPub &&
       this->dataPtr->contactsPub->HasConnections())
   {
-    msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
-              this->lastMeasurementTime);
     this->dataPtr->contactsPub->Publish(this->dataPtr->contactsMsg);
   }
 
@@ -266,23 +266,10 @@ unsigned int ContactSensor::GetCollisionContactCount(
 }
 
 //////////////////////////////////////////////////
-msgs::Contacts ContactSensor::GetContacts() const
-{
-  return this->Contacts();
-}
-
-//////////////////////////////////////////////////
 msgs::Contacts ContactSensor::Contacts() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->contactsMsg;
-}
-
-//////////////////////////////////////////////////
-std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
-    const std::string &_collisionName)
-{
-  return this->Contacts(_collisionName);
 }
 
 //////////////////////////////////////////////////

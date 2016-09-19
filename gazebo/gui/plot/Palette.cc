@@ -758,10 +758,16 @@ void Palette::FillTopics()
 /////////////////////////////////////////////////
 void Palette::FillModels()
 {
-  gazebo::util::IntrospectionClient client;
+  // TODO re-enable once Futures is integrated
+  // Make sure that the managers have been retreived.
+  // if (Futures::introspectionClientFuture.valid())
+  //   Futures::introspectionClientFuture.get();
 
-  // Wait for the managers to come online
-  auto managerIds = client.WaitForManagers(std::chrono::seconds(2));
+  gazebo::util::IntrospectionClient client;
+  client.WaitForManagers(std::chrono::seconds(2));
+
+  // Get the managers
+  auto managerIds = client.Managers();
 
   if (managerIds.empty())
   {

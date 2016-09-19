@@ -566,9 +566,9 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   }
 
   // disconnect from world events
-  event::Events::DisconnectWorldUpdateBegin(worldUpdateBeginEventConnection);
-  event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
-  event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
+  worldUpdateBeginEventConnection.reset();
+  beforePhysicsUpdateConnection.reset();
+  worldUpdateEndEventConnection.reset();
 }
 
 /////////////////////////////////////////////////

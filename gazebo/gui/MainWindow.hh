@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MAINWINDOW_HH_
-#define _GAZEBO_GUI_MAINWINDOW_HH_
+#ifndef GAZEBO_GUI_MAINWINDOW_HH_
+#define GAZEBO_GUI_MAINWINDOW_HH_
 
 #include <memory>
 #include <string>
@@ -78,12 +78,6 @@ namespace gazebo
       /// the main tab.
       public: void ShowLeftColumnWidget(const std::string &_name = "default");
 
-
-      /// \brief Get a pointer to the render widget.
-      /// \return A pointer to the render widget.
-      /// \deprecated See RenderWidget() const.
-      public: gui::RenderWidget *GetRenderWidget() const GAZEBO_DEPRECATED(7.0);
-
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.
       public: gui::RenderWidget *RenderWidget() const;
@@ -121,13 +115,6 @@ namespace gazebo
       /// \param[in] _parent Parent for the new action.
       /// \return The new action.
       public: QAction *CloneAction(QAction *_action, QObject *_parent);
-
-      /// \brief Get an editor by name
-      /// \param[in] _name Name of the editor.
-      /// \return Pointer to the editor.
-      /// \deprecated See Editor(const std::string &_name) const.
-      public: gui::Editor *GetEditor(
-          const std::string &_name) const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.

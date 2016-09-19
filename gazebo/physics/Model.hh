@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -32,6 +33,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -211,7 +213,7 @@ namespace gazebo
       public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
@@ -280,12 +282,6 @@ namespace gazebo
       /// \brief Set the current model state.
       /// \param[in] _state State to set the model to.
       public: void SetState(const ModelState &_state);
-
-      /// \brief Set the scale of model.
-      /// \param[in] _scale Scale to set the model to.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetScale(const math::Vector3 &_scale)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
@@ -444,6 +440,10 @@ namespace gazebo
       /// \brief Publish the scale.
       private: virtual void PublishScale();
 
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
@@ -478,11 +478,20 @@ namespace gazebo
       /// \brief Callback used when a joint animation completes.
       private: boost::function<void()> onJointAnimationComplete;
 
+      /// \brief Controller for the joints.
+      private: JointControllerPtr jointController;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;
 
-      /// \brief Controller for the joints.
-      private: JointControllerPtr jointController;
+      /// \brief Mutex to protect incoming message buffers.
+      private: std::mutex receiveMutex;
 
       /// \brief All the introspection items regsitered for this.
       private: std::vector<common::URI> introspectionItems;

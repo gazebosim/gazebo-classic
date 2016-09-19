@@ -76,6 +76,78 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
 
+    /// \brief Get the current working directory
+    /// \return Name of the current directory
+    GZ_COMMON_VISIBLE
+    std::string cwd();
+
+    /// \brief Returns true if _path is a file or directory
+    /// \param[in] _path Path to check.
+    /// \return True if _path is a file or directory
+    GZ_COMMON_VISIBLE
+    bool exists(const std::string &_path);
+
+    /// \brief Check if the given path is a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory.
+    GZ_COMMON_VISIBLE
+    bool isDirectory(const std::string &_path);
+
+    /// \brief Check if the given path is a file.
+    /// \param[in] _path Path to a file.
+    /// \return True if _path is a file.
+    GZ_COMMON_VISIBLE
+    bool isFile(const std::string &_path);
+
+    /// \brief Get the absolute path of a provided path.
+    /// \param[in] _path Relative or absolute path.
+    /// \return Absolute path
+    GZ_COMMON_VISIBLE
+    std::string absPath(const std::string &_path);
+
+    /// \brief Copy a file.
+    /// \param[in] _existingFilename Path to an existing file.
+    /// \param[in] _newFilename Path of the new file.
+    /// \return True on success.
+    GZ_COMMON_VISIBLE
+    bool copyFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Move a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _newFilename Full path of the new file.
+    /// \return True on success.
+    GZ_COMMON_VISIBLE
+    bool moveFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[out] _result The new string that has had _key replaced
+    /// with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \sa  std::string replaceAll(const std::string &_orig,
+    /// const std::string &_key, const std::string &_replacement)
+    GZ_COMMON_VISIBLE
+    void replaceAll(std::string &_result,
+                    const std::string &_orig,
+                    const std::string &_key,
+                    const std::string &_replacement);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \return The new string that has had _key replaced with _replacement.
+    /// \sa void common::replaceAll(std::string &_result,
+    /// const std::string &_orig, const std::string &_key,
+    /// const std::string &_replacement)
+    GZ_COMMON_VISIBLE
+    std::string replaceAll(const std::string &_orig,
+                           const std::string &_key,
+                           const std::string &_replacement);
+
     /// \brief Splits a string into tokens.
     /// \param[in] _str Input string.
     /// \param[in] _delim Token delimiter.
@@ -83,6 +155,17 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     std::vector<std::string> split(const std::string &_str,
                                    const std::string &_delim);
+
+    /// \brief Generates a path for a file which doesn't collide with existing
+    /// files, by appending numbers to it (i.e. (0), (1), ...)
+    /// \param[in] _pathAndName Full absolute path and file name up to the
+    /// file extension.
+    /// \param[in] _extension File extension, such as "pdf".
+    /// \return Full path with name and extension, which doesn't collide with
+    /// existing files
+    GZ_COMMON_VISIBLE
+    std::string unique_file_path(const std::string &_pathAndName,
+                                 const std::string &_extension);
     /// \}
 
     /// \brief Splits a string into tokens.

@@ -109,23 +109,12 @@ namespace gazebo
       /// \brief Get whether logging is paused.
       /// \return True if logging is paused.
       /// \sa LogRecord::SetPaused
-      /// \deprecated See Paused() const
-      public: bool GetPaused() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get whether logging is paused.
-      /// \return True if logging is paused.
-      /// \sa LogRecord::SetPaused
       public: bool Paused() const;
 
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.
       // \return True if logger is ready to start.
       public: bool IsReadyToStart() const;
-
-      /// \brief Get whether logging is running.
-      /// \return True if logging has been started.
-      /// \deprecated See Running() const
-      public: bool GetRunning() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
@@ -140,32 +129,12 @@ namespace gazebo
       /// \brief Get the encoding used.
       /// \return Either [txt, zlib, or bz2], where txt is plain txt and bz2
       /// and zlib are compressed data with Base64 encoding.
-      /// \deprecated See Encoding() const
-      public: const std::string &GetEncoding() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the encoding used.
-      /// \return Either [txt, zlib, or bz2], where txt is plain txt and bz2
-      /// and zlib are compressed data with Base64 encoding.
       public: const std::string &Encoding() const;
 
       /// \brief Get the filename for a log object.
       /// \param[in] _name Name of the log object.
       /// \return Filename, empty string if not found.
-      /// \deprecated See Filename(const std::string &) const
-      public: std::string GetFilename(const std::string &_name = "") const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the filename for a log object.
-      /// \param[in] _name Name of the log object.
-      /// \return Filename, empty string if not found.
       public: std::string Filename(const std::string &_name = "") const;
-
-      /// \brief Get the file size for a log object.
-      /// \param[in] _name Name of the log object.
-      /// \return Size in bytes.
-      /// \deprecated See FileSize(const std::string) const
-      public: unsigned int GetFileSize(const std::string &_name = "") const
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the file size for a log object.
       /// \param[in] _name Name of the log object.
@@ -178,17 +147,7 @@ namespace gazebo
 
       /// \brief Get the base path for a log recording.
       /// \return Path for log recording.
-      /// \deprecated See BasePath() const
-      public: std::string GetBasePath() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the base path for a log recording.
-      /// \return Path for log recording.
       public: std::string BasePath() const;
-
-      /// \brief Get the run time in sim time.
-      /// \return Run sim time.
-      /// \deprecated See RunTime() const
-      public: common::Time GetRunTime() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the run time in sim time.
       /// \return Run sim time.
@@ -199,21 +158,11 @@ namespace gazebo
 
       /// \brief Return true if an Update has not yet been completed.
       /// \return True if an Update has not yet been completed.
-      /// \deprecated See FirstUpdate()
-      public: bool GetFirstUpdate() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Return true if an Update has not yet been completed.
-      /// \return True if an Update has not yet been completed.
       public: bool FirstUpdate() const;
 
       /// \brief Write all logs.
       /// \param[in] _force True to skip waiting on dataAvailableCondition.
       public: void Write(const bool _force = false);
-
-      /// \brief Get the size of the buffer.
-      /// \return Size of the buffer, in bytes.
-      /// \deprecated See BufferSize() const
-      public: unsigned int GetBufferSize() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the size of the buffer.
       /// \return Size of the buffer, in bytes.

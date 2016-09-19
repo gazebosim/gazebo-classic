@@ -430,6 +430,13 @@ namespace gazebo
       /// \return URI of this world.
       public: common::URI URI() const;
 
+      /// \brief Get a model name which doesn't equal any existing
+      /// model's name, by appending numbers to the given name. If _name is
+      /// already unique, the returned value is the same.
+      /// \param[in] _name Desired model name.
+      /// \return Unique model name.
+      public: std::string UniqueModelName(const std::string &_name);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.

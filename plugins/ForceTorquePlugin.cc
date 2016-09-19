@@ -37,7 +37,7 @@ ForceTorquePlugin::ForceTorquePlugin()
 /////////////////////////////////////////////////
 ForceTorquePlugin::~ForceTorquePlugin()
 {
-  this->parentSensor->DisconnectUpdate(this->connection);
+  this->connection.reset();
   this->parentSensor.reset();
 }
 

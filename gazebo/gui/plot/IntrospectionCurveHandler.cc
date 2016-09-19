@@ -27,6 +27,7 @@
 
 #include "gazebo/util/IntrospectionClient.hh"
 
+// #include "gazebo/gui/Futures.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
@@ -208,9 +209,16 @@ void IntrospectionCurveHandler::SetupIntrospection()
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
-  // Wait for the managers to come online
-  std::set<std::string> managerIds =
-      this->dataPtr->introspectClient.WaitForManagers(std::chrono::seconds(2));
+  // TODO re-enable once Futures is integrated
+  // Make sure that the managers have been retreived.
+  // if (Futures::introspectionClientFuture.valid())
+  //   Futures::introspectionClientFuture.get();
+
+  gazebo::util::IntrospectionClient client;
+  client.WaitForManagers(std::chrono::seconds(2));
+
+  // Get the managers
+  std::set<std::string> managerIds = this->dataPtr->introspectClient.Managers();
   if (managerIds.empty())
   {
     gzerr << "No introspection managers detected." << std::endl;

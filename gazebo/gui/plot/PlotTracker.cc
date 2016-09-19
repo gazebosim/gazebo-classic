@@ -84,7 +84,7 @@ namespace gazebo
     {
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
       /// \brief The hover line widget drawn over the canvas.
-      public: HoverLineWidget *hoverLineWidget = NULL;
+      public: HoverLineWidget *hoverLineWidget = nullptr;
 #endif
     };
   }

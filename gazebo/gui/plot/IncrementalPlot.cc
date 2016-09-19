@@ -71,7 +71,7 @@ namespace gazebo
       protected: virtual void rescale(double _factor)
               {
                 QwtPlot *plt = plot();
-                if ( plt == NULL )
+                if (plt == nullptr)
                     return;
 
                 double factor = qAbs(_factor);

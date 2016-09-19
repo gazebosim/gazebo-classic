@@ -16,7 +16,10 @@
 */
 #include <boost/filesystem.hpp>
 
-#include "gazebo/math/Helpers.hh"
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"
@@ -33,6 +36,38 @@ void OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "set_wireframe")
     g_gotSetWireframe = true;
+}
+
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::MinimizeMaximize()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // repeat minimize and maximize a couple of times
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMinimized();
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMaximized();
+  this->ProcessEventsAndDraw(mainWindow);
+
+  mainWindow->showMinimized();
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMaximized();
+  this->ProcessEventsAndDraw(mainWindow);
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -109,7 +144,7 @@ void MainWindow_TEST::Selection()
     mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
-  gazebo::math::Vector2i glWidgetCenter(
+  ignition::math::Vector2i glWidgetCenter(
       glWidget->width()*0.5, glWidget->height()*0.5);
 
   // get model at center of window - should get the box
@@ -126,7 +161,7 @@ void MainWindow_TEST::Selection()
 
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->GetVisual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis2 != NULL);
   QVERIFY(vis2->GetRootVisual()->GetName() == "box");
 
@@ -146,7 +181,7 @@ void MainWindow_TEST::Selection()
 
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->GetVisual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis4 != NULL);
   QVERIFY(vis4->GetRootVisual()->GetName() == "box");
 
@@ -442,7 +477,7 @@ void MainWindow_TEST::Wireframe()
 
   // Redraw the screen
   for (unsigned int i = 0; i < 100 &&
-      gazebo::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
+      ignition::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -469,7 +504,7 @@ void MainWindow_TEST::Wireframe()
         << "] AvgPostWireframe[" << avgPostWireframe << "]\n";
 
   // Removing the grey ground plane should change the image.
-  QVERIFY(!gazebo::math::equal(avgPreWireframe, avgPostWireframe));
+  QVERIFY(!ignition::math::equal(avgPreWireframe, avgPostWireframe));
 
   cam->Fini();
   mainWindow->close();
@@ -750,6 +785,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_undoHistoryAct);
 
   QVERIFY(gazebo::gui::g_redoAct);
+
+  QVERIFY(gazebo::gui::g_plotAct);
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
 
