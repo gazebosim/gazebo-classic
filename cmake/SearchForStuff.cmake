@@ -685,7 +685,7 @@ find_package(ignition-transport2 QUIET)
 if (NOT ignition-transport2_FOUND)
   find_package(ignition-transport1 QUIET)
   if (NOT ignition-transport1_FOUND)
-    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
+    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
   endif()
 endif()
 
