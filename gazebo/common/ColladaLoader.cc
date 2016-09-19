@@ -1443,25 +1443,21 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
       if (norms.size() > count)
         combinedVertNorms = true;
       inputs[VERTEX].insert(ignition::math::parseInt(offset));
-      //inputSize++;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
       inputs[NORMAL].insert(ignition::math::parseInt(offset));
-      //inputSize++;
     }
     else if (semantic == "TEXCOORD")
     {
       this->LoadTexCoords(source, texcoords, texDupMap);
       inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
-      //inputSize++;
     }
     else
     {
       inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
-      //inputSize++;
       gzwarn << "Polylist input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
