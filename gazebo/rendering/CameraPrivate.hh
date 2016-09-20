@@ -70,15 +70,6 @@ namespace gazebo
       /// \brief Render period.
       public: common::Time renderPeriod;
 
-      /// \brief Position PID used to track a visual smoothly.
-      public: common::PID trackVisualPID;
-
-      /// \brief Pitch PID used to track a visual smoothly.
-      public: common::PID trackVisualPitchPID;
-
-      /// \brief Yaw PID used to track a visual smoothly.
-      public: common::PID trackVisualYawPID;
-
       /// \brief Communication Node
       public: transport::NodePtr node;
 
