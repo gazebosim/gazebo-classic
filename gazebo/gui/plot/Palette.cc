@@ -865,7 +865,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
 
     QStandardItem *previousItem = nullptr;
     unsigned int i = 0;
-    while (i < pathParts.size())
+    while (i < pathParts.size() - 1)
     {
       // Create model item based on part
       auto part = pathParts[i];
