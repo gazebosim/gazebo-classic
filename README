@@ -44,6 +44,3 @@ Read the uninstallation instructions (http://gazebosim.org/uninstall)
 in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
   $ make uninstall (inside the gazebo-trunk/build directory)
-
-
-- Nate Koenig
