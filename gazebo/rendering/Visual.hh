@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_VISUAL_HH_
-#define _GAZEBO_VISUAL_HH_
+#ifndef GAZEBO_RENDERING_VISUAL_HH_
+#define GAZEBO_RENDERING_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>

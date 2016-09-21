@@ -267,21 +267,12 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 
   if (joint->visual)
   {
-    scene->RemoveVisual(joint->visual);
     joint->visual->Fini();
   }
 
   if (joint->jointVisual)
   {
-    auto parentAxisVis = joint->jointVisual->GetParentAxisVisual();
-    if (parentAxisVis)
-    {
-      parentAxisVis->GetParent()->DetachVisual(parentAxisVis->GetName());
-      scene->RemoveVisual(parentAxisVis);
-    }
-    joint->jointVisual->GetParent()->DetachVisual(
-        joint->jointVisual->GetName());
-    scene->RemoveVisual(joint->jointVisual);
+    joint->jointVisual->Fini();
   }
 
   if (joint->inspector)
