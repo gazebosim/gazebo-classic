@@ -107,9 +107,10 @@ namespace gazebo
       /// \brief Update the plot curve based on message
       /// \param[in] _msg Message containing data to be added to the curve
       /// \param[in] _index Index of token in the param path string
+      /// \param[in] _x X value. Only used if the topic data is not timestamped
       /// \param[in] _curvesUpdates A list of curves and values to update
       public: void UpdateCurve(google::protobuf::Message *_msg,
-                  const int _index,
+                  const int _index, const double _x,
                   std::vector<std::pair<TopicCurve::CurveVariableMapIt,
                       ignition::math::Vector2d> > &_curvesUpdates);
 
@@ -298,11 +299,11 @@ void TopicCurve::OnTopicData(const std::string &_msg)
   std::vector<std::pair<TopicCurve::CurveVariableMapIt,
       ignition::math::Vector2d> > curvesUpdates;
 
-  // collect updates
-  this->UpdateCurve(msg.get(), 0, curvesUpdates);
+  // nearest sim time - use this x value if the message is not timestamped
+  double x = TopicTime::Instance()->LastSimTime();
 
-  // nearest sim_time
-//  double x = TopicTime::Instance()->LastSimTime();
+  // collect updates
+  this->UpdateCurve(msg.get(), 0, x, curvesUpdates);
 
   // update curves!
   for (auto &curveUpdate : curvesUpdates)
@@ -313,14 +314,14 @@ void TopicCurve::OnTopicData(const std::string &_msg)
       if (!curve)
         continue;
 
-      // std::cerr << " data " << x << ", " << curveUpdate.second << std::endl;
       curve->AddPoint(curveUpdate.second);
     }
   }
 }
 
 /////////////////////////////////////////////////
-void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
+void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
+    const int _index, const double x,
     std::vector<std::pair<TopicCurve::CurveVariableMapIt,
     ignition::math::Vector2d> > &_curvesUpdates)
 {
@@ -332,7 +333,9 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
   if (!descriptor)
     return;
 
-  double xData = TopicTime::Instance()->LastSimTime();
+  // x axis data
+  double xData = x;
+
   for (int i = 0; i < descriptor->field_count(); ++i)
   {
     auto field = descriptor->field(i);
@@ -484,7 +487,7 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
           }
           else
           {
-            this->UpdateCurve(valueMsg, _index + 1, _curvesUpdates);
+            this->UpdateCurve(valueMsg, _index + 1, xData, _curvesUpdates);
             addData = false;
           }
           break;
