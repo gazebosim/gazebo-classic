@@ -28,6 +28,7 @@
 // #include "gazebo/gui/Futures.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
 #include "gazebo/transport/TransportIface.hh"
@@ -522,7 +523,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
-
   this->FillModels();
 
   // A proxy model to filter models model
@@ -731,7 +731,8 @@ void Palette::FillTopics()
   for (auto topic : topics)
   {
     // Shorten topic name
-    std::string prefix = "/gazebo/default";
+    std::string worldName = gui::get_world();
+    std::string prefix = "/gazebo/" + worldName;
     auto shortName = topic;
     auto idX = shortName.find(prefix);
     if (idX != std::string::npos)
@@ -751,7 +752,7 @@ void Palette::FillTopics()
     }
 
     auto msg = msgs::MsgFactory::NewMsg(msgType);
-    this->FillFromMsg(msg.get(), topicItem, topic+"?p=");
+    this->FillFromMsg(msg.get(), topicItem, topic + "?p=");
   }
 }
 
@@ -864,7 +865,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
 
     QStandardItem *previousItem = nullptr;
     unsigned int i = 0;
-    while (i < pathParts.size())
+    while (i < pathParts.size() - 1)
     {
       // Create model item based on part
       auto part = pathParts[i];
@@ -1103,10 +1104,15 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
 void Palette::FillSim()
 {
   // Hard-coded values for the sim tab
+
+  std::string worldName = gui::get_world();
+  std::string prefix = "/gazebo/" + worldName;
+  std::string worldStatsTopicStr = prefix + "/world_stats";
+
   std::multimap<std::string, std::string> simFields = {
-      {"~/world_stats", "sim_time"},
-      {"~/world_stats", "real_time"},
-      {"~/world_stats", "iterations"}};
+      {worldStatsTopicStr, "sim_time"},
+      {worldStatsTopicStr, "real_time"},
+      {worldStatsTopicStr, "iterations"}};
 
   for (auto field : simFields)
   {
