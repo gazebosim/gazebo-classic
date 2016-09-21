@@ -116,7 +116,7 @@ void UserCamera::Init()
   Camera::Init();
 
   // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  this->SetFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
   this->camera->setAutoAspectRatio(false);
 

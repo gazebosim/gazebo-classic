@@ -107,6 +107,12 @@ namespace gazebo
 
       /// \brief Maximum distance between the camera and tracked model.
       public: double trackMaxDistance;
+
+      /// \brief If set to true, the camera yaws around a fixed axis.
+      public: bool yawFixed;
+
+      /// \brief Fixed axis to yaw around.
+      public: Ogre::Vector3 yawFixedAxis;
     };
   }
 }

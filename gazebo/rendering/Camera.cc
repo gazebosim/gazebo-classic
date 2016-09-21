@@ -677,6 +677,15 @@ void Camera::SetClipDist(const float _near, const float _far)
 }
 
 //////////////////////////////////////////////////
+void Camera::SetFixedYawAxis(const bool _useFixed,
+    const Ogre::Vector3 &_fixedAxis)
+{
+  this->camera->setFixedYawAxis(_useFixed, _fixedAxis);
+  this->dataPtr->yawFixed = _useFixed;
+  this->dataPtr->yawFixedAxis = _fixedAxis;
+}
+
+//////////////////////////////////////////////////
 void Camera::SetHFOV(const ignition::math::Angle &_angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
@@ -1298,7 +1307,7 @@ void Camera::CreateCamera()
   if (this->sdf->HasElement("projection_type"))
     this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
 
-  this->camera->setFixedYawAxis(false);
+  this->SetFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
 }
@@ -1514,7 +1523,8 @@ bool Camera::TrackVisualImpl(const std::string &_name)
   {
     this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
-    this->camera->setFixedYawAxis(false);
+    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
+                                  this->dataPtr->yawFixedAxis);
   }
 
   if (_name.empty())
@@ -1539,7 +1549,8 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   {
     this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
-    this->camera->setFixedYawAxis(false);
+    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
+                                  this->dataPtr->yawFixedAxis);
   }
 
   return result;
