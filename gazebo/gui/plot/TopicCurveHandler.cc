@@ -110,9 +110,8 @@ namespace gazebo
       /// \param[in] _curvesUpdates A list of curves and values to update
       public: void UpdateCurve(google::protobuf::Message *_msg,
                   const int _index,
-                  std::vector<
-                  std::pair<TopicCurve::CurveVariableMapIt, double> >
-                  &_curvesUpdates);
+                  std::vector<std::pair<TopicCurve::CurveVariableMapIt,
+                      ignition::math::Vector2d> > &_curvesUpdates);
 
       /// \brief Topic name
       private: std::string topic;
@@ -296,13 +295,14 @@ void TopicCurve::OnTopicData(const std::string &_msg)
   msg->ParseFromString(_msg);
 
   // stores a list of curve iterators and their new values
-  std::vector<std::pair<TopicCurve::CurveVariableMapIt, double> > curvesUpdates;
+  std::vector<std::pair<TopicCurve::CurveVariableMapIt,
+      ignition::math::Vector2d> > curvesUpdates;
 
   // collect updates
   this->UpdateCurve(msg.get(), 0, curvesUpdates);
 
   // nearest sim_time
-  double x = TopicTime::Instance()->LastSimTime();
+//  double x = TopicTime::Instance()->LastSimTime();
 
   // update curves!
   for (auto &curveUpdate : curvesUpdates)
@@ -313,15 +313,16 @@ void TopicCurve::OnTopicData(const std::string &_msg)
       if (!curve)
         continue;
 
-      curve->AddPoint(ignition::math::Vector2d(x, curveUpdate.second));
+      // std::cerr << " data " << x << ", " << curveUpdate.second << std::endl;
+      curve->AddPoint(curveUpdate.second);
     }
   }
 }
 
 /////////////////////////////////////////////////
 void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
-    std::vector<std::pair<TopicCurve::CurveVariableMapIt, double> >
-    &_curvesUpdates)
+    std::vector<std::pair<TopicCurve::CurveVariableMapIt,
+    ignition::math::Vector2d> > &_curvesUpdates)
 {
   auto ref = _msg->GetReflection();
   if (!ref)
@@ -331,6 +332,7 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
   if (!descriptor)
     return;
 
+  double xData = TopicTime::Instance()->LastSimTime();
   for (int i = 0; i < descriptor->field_count(); ++i)
   {
     auto field = descriptor->field(i);
@@ -338,6 +340,25 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
       continue;
 
     std::string fieldName = field->name();
+
+    // Check if message has timestamp and use it if it exists and is
+    // a top level msg field.
+    // TODO x axis is hardcoded to be the sim time for now. Once it is
+    // configurable, remove this logic for setting the x value
+    if (_index == 0 && (fieldName == "stamp" || fieldName == "time") &&
+        field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+    {
+      auto valueMsg = ref->MutableMessage(_msg, field);
+      if (field->message_type()->name() == "Time")
+      {
+        msgs::Time *msg = dynamic_cast<msgs::Time *>(valueMsg);
+        if (msg)
+        {
+          common::Time time = msgs::Convert(*msg);
+          xData = time.Double();
+        }
+      }
+    }
 
     // loop through all the topic param name + curve pairs
     for (auto cIt = this->curves.begin(); cIt != this->curves.end(); ++cIt)
@@ -359,6 +380,7 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
       topicField = queryTokens[queryIndex];
 
       double data = 0;
+      bool addData = true;
       if (topicField != fieldName)
         continue;
 
@@ -463,6 +485,7 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
           else
           {
             this->UpdateCurve(valueMsg, _index + 1, _curvesUpdates);
+            addData = false;
           }
           break;
         }
@@ -474,7 +497,11 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
       }
 
       // push to tmp list and update later
-      _curvesUpdates.push_back(std::make_pair(cIt, data));
+      if (addData)
+      {
+        _curvesUpdates.push_back(
+            std::make_pair(cIt, ignition::math::Vector2d(xData, data)));
+      }
     }
   }
 }
