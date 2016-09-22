@@ -112,7 +112,7 @@ namespace gazebo
       public: bool yawFixed;
 
       /// \brief Fixed axis to yaw around.
-      public: Ogre::Vector3 yawFixedAxis;
+      public: ignition::math::Vector3d yawFixedAxis;
     };
   }
 }

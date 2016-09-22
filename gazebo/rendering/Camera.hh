@@ -704,7 +704,8 @@ namespace gazebo
       /// If false, the camera yaws around the local Y.
       /// \param[in] _fixedAxis The axis to use if the first parameter is true.
       protected: virtual void SetFixedYawAxis(const bool _useFixed,
-                     const Ogre::Vector3 &_fixedAxis = Ogre::Vector3::UNIT_Y);
+          const ignition::math::Vector3d &_fixedAxis =
+            ignition::math::Vector3d::UnitY);
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats

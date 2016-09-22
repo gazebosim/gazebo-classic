@@ -678,9 +678,9 @@ void Camera::SetClipDist(const float _near, const float _far)
 
 //////////////////////////////////////////////////
 void Camera::SetFixedYawAxis(const bool _useFixed,
-    const Ogre::Vector3 &_fixedAxis)
+    const ignition::math::Vector3d &_fixedAxis)
 {
-  this->camera->setFixedYawAxis(_useFixed, _fixedAxis);
+  this->camera->setFixedYawAxis(_useFixed, Conversions::Convert(_fixedAxis));
   this->dataPtr->yawFixed = _useFixed;
   this->dataPtr->yawFixedAxis = _fixedAxis;
 }
@@ -1524,7 +1524,7 @@ bool Camera::TrackVisualImpl(const std::string &_name)
     this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
     this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
-                                  this->dataPtr->yawFixedAxis);
+        Conversions::Convert(this->dataPtr->yawFixedAxis));
   }
 
   if (_name.empty())
@@ -1550,7 +1550,7 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
     this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
     this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
-                                  this->dataPtr->yawFixedAxis);
+        Conversions::Convert(this->dataPtr->yawFixedAxis));
   }
 
   return result;
