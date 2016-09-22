@@ -1665,31 +1665,18 @@ void Model::PluginInfo(const common::URI &_pluginUri,
     return;
   }
 
-  auto parts = common::split(_pluginUri.Path().Str(), "/");
-  auto myParts = common::split(this->URI().Path().Str(), "/");
-
-  // Plugin URI should be longer than model URI
-  if (myParts.size() >= parts.size())
+  if (!_pluginUri.Path().Contains(this->URI().Path()))
   {
-    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
+    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
         this->URI().Str() << "]" << std::endl;
     return;
   }
 
-  // Check if all segments match up to this model
-  size_t i = 0;
-  for (; i < myParts.size(); ++i)
-  {
-    if (parts[i] != myParts[i])
-    {
-      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
-          this->URI().Str() << "]" << std::endl;
-      return;
-    }
-  }
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
+  auto myParts = common::split(this->URI().Path().Str(), "/");
 
   // Iterate over parts following this model
-  for (; i < parts.size(); i = i+2)
+  for (size_t i = myParts.size(); i < parts.size(); i = i+2)
   {
     if (parts[i] == "model")
     {

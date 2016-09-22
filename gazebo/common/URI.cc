@@ -189,6 +189,27 @@ bool URIPath::Parse(const std::string &_str)
 }
 
 /////////////////////////////////////////////////
+bool URIPath::Contains(const URIPath &_other) const
+{
+  if (this->Str() == _other.Str())
+    return true;
+
+  auto parts = common::split(this->Str(), "/");
+  auto otherParts = common::split(_other.Str(), "/");
+
+  if (otherParts.size() > parts.size())
+    return false;
+
+  for (size_t i = 0; i < otherParts.size(); ++i)
+  {
+    if (parts[i] != otherParts[i])
+      return false;
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 URIQuery::URIQuery()
   : dataPtr(new URIQueryPrivate())
 {
