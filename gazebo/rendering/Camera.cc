@@ -562,8 +562,7 @@ void Camera::PostRender()
     }
     else if (this->dataPtr->videoEncoder.IsEncoding())
     {
-      this->dataPtr->videoEncoder.AddFrame(buffer,
-          this->ImageWidth(), this->ImageHeight());
+      this->dataPtr->videoEncoder.AddFrame(buffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&
