@@ -54,11 +54,6 @@ TEST_F(VideoEncoderTest, StartStop)
 
   video.Stop();
   EXPECT_FALSE(video.IsEncoding());
-
-  video.Start(1024, 768, "avi");
-  EXPECT_TRUE(video.IsEncoding());
-  EXPECT_STREQ(video.Format().c_str(), "avi");
-  EXPECT_TRUE(common::exists(common::cwd() + "/TMP_RECORDING.avi"));
 #endif
 }
 
@@ -71,7 +66,6 @@ TEST_F(VideoEncoderTest, Exists)
 
   EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.ogv"));
   EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.mp4"));
-  EXPECT_FALSE(common::exists(common::cwd() + "/TMP_RECORDING.avi"));
 
 #ifdef HAVE_FFMPEG
   video.Start();
