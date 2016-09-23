@@ -2,6 +2,10 @@
 
 ### Gazebo 5.x.x
 
+1. Check FSAA support when creating camera render textures
+    * [Pull request 2442](https://bitbucket.org/osrf/gazebo/pull-request/2442)
+    * [Issue #1837](https://bitbucket.org/osrf/gazebo/issue/1837)
+
 1. Fix mouse picking with transparent visuals
     * [Pull request 2305](https://bitbucket.org/osrf/gazebo/pull-request/2305)
     * [Issue #1956](https://bitbucket.org/osrf/gazebo/issue/1956)
