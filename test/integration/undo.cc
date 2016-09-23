@@ -548,17 +548,17 @@ void UndoTest::UndoSnap()
   QVERIFY(boxVis->GetWorldPose() == boxInitialPose);
 
   // Trigger user command
-  std::vector<gazebo::math::Vector3> verticesSrc;
-  verticesSrc.push_back(gazebo::math::Vector3(0.5, 0.5, 0));
-  verticesSrc.push_back(gazebo::math::Vector3(-0.5, 0.5, 0));
-  verticesSrc.push_back(gazebo::math::Vector3(0.5, -0.5, 0));
+  ignition::math::Vector3d triangleSrc(
+      ignition::math::Vector3d(0.5, 0.5, 0),
+      ignition::math::Vector3d(-0.5, 0.5, 0),
+      ignition::math::Vector3d(0.5, -0.5, 0));
 
-  std::vector<gazebo::math::Vector3> verticesDest;
-  verticesDest.push_back(gazebo::math::Vector3::Zero);
-  verticesDest.push_back(gazebo::math::Vector3(0, 0, 10));
-  verticesDest.push_back(gazebo::math::Vector3(10, 0, 0));
+  ignition::math::Vector3d triangleDest(
+      ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d(0, 0, 10),
+      ignition::math::Vector3d(10, 0, 0));
 
-  gazebo::gui::ModelSnap::Instance()->Snap(verticesSrc, verticesDest,
+  gazebo::gui::ModelSnap::Instance()->Snap(triangleSrc, triangleDest,
       boxVis);
 
   // Check that visual moved but model didn't

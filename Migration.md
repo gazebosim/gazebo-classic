@@ -107,6 +107,7 @@ release will remove the deprecated code.
                                                                                    const ignition::math::Vector2i &_end,
                                                                                    const ignition::math::Pose3d &_pose,
                                                                                    const ignition::math::Vector3d &_axis,
+                                                                                   const bool _local)
 
 1. **gazebo/gui/ModelSnap.hh**
     + ***Deprecation:*** public: void Snap(const std::vector<math::Vector3> &_triangleSrc,
