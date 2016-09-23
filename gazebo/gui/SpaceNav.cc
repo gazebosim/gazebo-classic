@@ -25,6 +25,10 @@
 #include <gazebo/gazebo_config.h>
 #ifdef HAVE_SPNAV
 #include <spnav.h>
+// Status is defined in X11/Xlib.h which is included by spnav.h
+// protobuf define a class named Status. To avoid conflicts, remove here
+// the definition of Status.
+#undef Status
 #endif
 
 #include "gazebo/gui/GuiIface.hh"
