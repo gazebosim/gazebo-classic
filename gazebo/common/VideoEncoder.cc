@@ -22,7 +22,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <linux/videodev2.h>
 
 #ifdef HAVE_FFMPEG
 

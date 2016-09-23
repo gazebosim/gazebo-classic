@@ -33,9 +33,6 @@ class gazebo::gui::VideoRecorderPrivate
   /// \brief Button to enable ogv recording.
   public: QToolButton *ogvButton = nullptr;
 
-  /// \brief Button to enable avi recording.
-  public: QToolButton *aviButton = nullptr;
-
   /// \brief Button to stop recording.
   public: QPushButton *stopButton = nullptr;
 
@@ -66,18 +63,10 @@ VideoRecorder::VideoRecorder(QWidget *_parent)
       tr("Record ogv video"), this);
   this->dataPtr->ogvButton->setDefaultAction(ogvAction);
 
-  // AVI recording button
-  this->dataPtr->aviButton = new QToolButton(this);
-  this->dataPtr->aviButton->setToolTip(tr("Record an AVI video"));
-  QAction *aviAction = new QAction(QIcon(":/images/avi.svg"),
-      tr("Record avi video"), this);
-  this->dataPtr->aviButton->setDefaultAction(aviAction);
-
   // Set icon size
   QSize iconSize(32, 32);
   this->dataPtr->mp4Button->setIconSize(iconSize);
   this->dataPtr->ogvButton->setIconSize(iconSize);
-  this->dataPtr->aviButton->setIconSize(iconSize);
 
   // Stop button
   this->dataPtr->stopButton = new QPushButton("Stop");
@@ -89,18 +78,15 @@ VideoRecorder::VideoRecorder(QWidget *_parent)
   QGridLayout *mainLayout = new QGridLayout();
   mainLayout->addWidget(this->dataPtr->mp4Button, 0, 1);
   mainLayout->addWidget(this->dataPtr->ogvButton, 0, 2);
-  mainLayout->addWidget(this->dataPtr->aviButton, 0, 3);
   mainLayout->addWidget(this->dataPtr->stopButton, 2, 0);
-  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setContentsMargins(2, 2, 2, 2);
 
   // Map each video record button to the OnRecordStart slot
   QSignalMapper *signalMapper = new QSignalMapper(this);
   connect(mp4Action, SIGNAL(triggered()), signalMapper, SLOT(map()));
-  connect(aviAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
   connect(ogvAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
 
   signalMapper->setMapping(mp4Action, QString("mp4"));
-  signalMapper->setMapping(aviAction, QString("avi"));
   signalMapper->setMapping(ogvAction, QString("ogv"));
 
   // Only support video4linux on linux
@@ -150,7 +136,6 @@ void VideoRecorder::OnRecordStop()
 
   // Show the correct buttons
   this->dataPtr->mp4Button->show();
-  this->dataPtr->aviButton->show();
   this->dataPtr->ogvButton->show();
 #if defined(__linux__) && defined(HAVE_AVDEVICE)
   this->dataPtr->v4lButton->show();
@@ -266,7 +251,6 @@ void VideoRecorder::OnRecordStart(const QString &_format)
 
     // Show the Stop button, and hide the record options
     this->dataPtr->mp4Button->hide();
-    this->dataPtr->aviButton->hide();
     this->dataPtr->ogvButton->hide();
 #if defined(__linux__) && defined(HAVE_AVDEVICE)
     this->dataPtr->v4lButton->hide();

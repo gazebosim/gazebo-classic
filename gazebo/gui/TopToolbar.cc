@@ -165,8 +165,8 @@ TopToolbar::TopToolbar(QWidget *_parent)
   // Record video
   {
     QWidgetAction *recordVideoAct = new QWidgetAction(this);
-    this->dataPtr->videoRecorder = new VideoRecorder(this);
-    recordVideoAct->setDefaultWidget(this->dataPtr->videoRecorder);
+    VideoRecorder *videoRecorder = new VideoRecorder(this);
+    recordVideoAct->setDefaultWidget(videoRecorder);
     recordVideoAct->setObjectName("recordVideoAction");
 
     QToolButton *button = new QToolButton;
@@ -196,22 +196,22 @@ TopToolbar::TopToolbar(QWidget *_parent)
     animation->setLoopCount(-1);
 
     // Start the opacity animation when a recording begins
-    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStarted()),
+    connect(videoRecorder, SIGNAL(RecordingStarted()),
             animation, SLOT(start()));
 
     // Stop the opacity animation when a recording ends
-    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStopped()),
+    connect(videoRecorder, SIGNAL(RecordingStopped()),
             animation, SLOT(stop()));
 
     // Disable the fade effect on recording stop. This prevent the button
     // from being partially faded when the animation stops.
-    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingChanged(bool)),
+    connect(videoRecorder, SIGNAL(RecordingChanged(bool)),
         fade, SLOT(setEnabled(bool)));
 
     // Close the menu when a button is pressed.
-    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStarted()),
+    connect(videoRecorder, SIGNAL(RecordingStarted()),
             menu, SLOT(close()));
-    connect(this->dataPtr->videoRecorder, SIGNAL(RecordingStopped()),
+    connect(videoRecorder, SIGNAL(RecordingStopped()),
             menu, SLOT(close()));
   }
 
