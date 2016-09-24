@@ -984,6 +984,8 @@ namespace gazebo
         bool useTerrainPaging =
             geomElem->Get<bool>("use_terrain_paging");
         result.mutable_heightmap()->set_use_terrain_paging(useTerrainPaging);
+        result.mutable_heightmap()->set_filename(
+            geomElem->Get<std::string>("uri"));
       }
       else if (geomElem->GetName() == "mesh")
       {
