@@ -172,7 +172,7 @@ class gazebo::ArduPilotSocketPrivate
   /// \param[in] _address Address to bind to.
   /// \param[in] _port Port to bind to.
   /// \return True on success.
-  public: bool Bind(const char *_address, uint16_t _port)
+  public: bool Bind(const char *_address, const uint16_t _port)
   {
     struct sockaddr_in sockaddr;
     this->MakeSockAddr(_address, _port, sockaddr);
@@ -196,7 +196,7 @@ class gazebo::ArduPilotSocketPrivate
   /// \param[in] _address Address to connect to.
   /// \param[in] _port Port to connect to.
   /// \return True on success.
-  public : bool Connect(const char *_address, uint16_t _port)
+  public : bool Connect(const char *_address, const uint16_t _port)
   {
     struct sockaddr_in sockaddr;
     this->MakeSockAddr(_address, _port, sockaddr);
