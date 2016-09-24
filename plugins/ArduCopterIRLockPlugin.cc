@@ -233,9 +233,9 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
 
   struct sockaddr_in sockaddr;
   memset(&sockaddr, 0, sizeof(sockaddr));
-  sockaddr.sin_port = htons(9005);
+  sockaddr.sin_port = htons(9005);  // TODO: make it variable
   sockaddr.sin_family = AF_INET;
-  sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+  sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");  // TODO: make it variable
   ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
     (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }

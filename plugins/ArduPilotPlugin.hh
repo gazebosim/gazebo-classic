@@ -24,6 +24,7 @@
 namespace gazebo
 {
   // Forward declare private data class
+  class ArduPilotSocketPrivate;
   class ArduPilotPluginPrivate;
 
   /// \brief Interface ArduPilot from ardupilot stack
@@ -78,6 +79,9 @@ namespace gazebo
 
     /// \brief Send state to ArduPilot
     private: void SendState() const;
+
+    /// \brief Init ardupilot socket
+    private: bool InitArduPilotSockets(sdf::ElementPtr _sdf) const;
 
     /// \brief Private data pointer.
     private: std::unique_ptr<ArduPilotPluginPrivate> dataPtr;

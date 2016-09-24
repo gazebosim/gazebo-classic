@@ -141,23 +141,71 @@ class Rotor
 };
 
 // Private data class
-class gazebo::ArduCopterPluginPrivate
+class gazebo::ArducopterSocketPrivate
 {
+  /// \brief constructor
+  public: ArducopterSocketPrivate()
+  {
+    // initialize socket udp socket
+    fd = socket(AF_INET, SOCK_DGRAM, 0);
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+  }
+
+  /// \brief destructor
+  public: ~ArducopterSocketPrivate()
+  {
+    if (fd != -1)
+    {
+      ::close(fd);
+      fd = -1;
+    }
+  }
+
   /// \brief Bind to an adress and port
   /// \param[in] _address Address to bind to.
   /// \param[in] _port Port to bind to.
   /// \return True on success.
-  public: bool Bind(const char *_address, const uint16_t _port)
+  public: bool Bind(const char *_address, uint16_t _port)
   {
     struct sockaddr_in sockaddr;
     this->MakeSockAddr(_address, _port, sockaddr);
 
-    if (bind(this->handle, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
+    if (bind(this->fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
-      shutdown(this->handle, 0);
-      close(this->handle);
+      shutdown(this->fd, 0);
+      close(this->fd);
       return false;
     }
+    int one = 1;
+    setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR,
+          &one, sizeof(one));
+
+    fcntl(this->fd, F_SETFL,
+    fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+    return true;
+  }
+
+  /// \brief Connect to an adress and port
+  /// \param[in] _address Address to connect to.
+  /// \param[in] _port Port to connect to.
+  /// \return True on success.
+  public : bool Connect(const char *_address, uint16_t _port)
+  {
+    struct sockaddr_in sockaddr;
+    this->MakeSockAddr(_address, _port, sockaddr);
+
+    if (connect(this->fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
+    {
+      shutdown(this->fd, 0);
+      close(this->fd);
+      return false;
+    }
+    int one = 1;
+    setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR,
+          &one, sizeof(one));
+
+    fcntl(this->fd, F_SETFL,
+    fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
     return true;
   }
 
@@ -179,6 +227,11 @@ class gazebo::ArduCopterPluginPrivate
     _sockaddr.sin_addr.s_addr = inet_addr(_address);
   }
 
+  public: ssize_t Send(const void *_buf, size_t _size)
+  {
+    return send(this->fd, _buf, _size, 0);
+  }
+
   /// \brief Receive data
   /// \param[out] _buf Buffer that receives the data.
   /// \param[in] _size Size of the buffer.
@@ -189,19 +242,26 @@ class gazebo::ArduCopterPluginPrivate
     struct timeval tv;
 
     FD_ZERO(&fds);
-    FD_SET(this->handle, &fds);
+    FD_SET(this->fd, &fds);
 
     tv.tv_sec = _timeoutMs / 1000;
     tv.tv_usec = (_timeoutMs % 1000) * 1000UL;
 
-    if (select(this->handle+1, &fds, NULL, NULL, &tv) != 1)
+    if (select(this->fd+1, &fds, NULL, NULL, &tv) != 1)
     {
         return -1;
     }
 
-    return recv(this->handle, _buf, _size, 0);
+    return recv(this->fd, _buf, _size, 0);
   }
 
+  /// \brief Socket handle
+  private: int fd;
+};
+
+// Private data class
+class gazebo::ArduCopterPluginPrivate
+{
   /// \brief Pointer to the update event connection.
   public: event::ConnectionPtr updateConnection;
 
@@ -217,8 +277,20 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief Controller update mutex.
   public: std::mutex mutex;
 
-  /// \brief Socket handle
-  public: int handle;
+  /// \brief Ardupilot Socket for receive motor command on gazebo
+  public: ArducopterSocketPrivate socket_in;
+
+  /// \brief Ardupilot Socket to send state to Ardupilot
+  public: ArducopterSocketPrivate socket_out;
+
+  /// \brief Ardupilot address  
+  public: std::string fdm_addr;
+
+  /// \brief Ardupilot port for receiver socket
+  public: uint16_t fdm_port_in;
+
+  /// \brief Ardupilot port for sender socket  
+  public: uint16_t fdm_port_out;
 
   /// \brief Pointer to an IMU sensor
   public: sensors::ImuSensorPtr imuSensor;
@@ -233,41 +305,15 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief number of times ArduCotper skips update
   /// before marking ArduCopter offline
   public: int connectionTimeoutMaxCount;
-
-  /// \brief constructor
-  public: ArduCopterPluginPrivate()
-  {
-    this->arduCopterOnline = false;
-    this->connectionTimeoutCount = 0;
-  }
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 ArduCopterPlugin::ArduCopterPlugin()
   : dataPtr(new ArduCopterPluginPrivate)
 {
-  // initialize socket
-  this->dataPtr->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
-  fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
-  int one = 1;
-  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
-      &one, sizeof(one));
-
-  /// TODO: make port (9002) part of SDF XML parameters
-  if (!this->dataPtr->Bind("127.0.0.1", 9002))
-  {
-    gzerr << "failed to bind with 127.0.0.1:9002, aborting plugin.\n";
-    return;
-  }
-
-  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
-      &one, sizeof(one));
-
-  fcntl(this->dataPtr->handle, F_SETFL,
-      fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
+  this->dataPtr->arduCopterOnline = false;
+  this->dataPtr->connectionTimeoutCount = 0;
 }
-
 /////////////////////////////////////////////////
 ArduCopterPlugin::~ArduCopterPlugin()
 {
@@ -419,6 +465,12 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Controller time control.
   this->dataPtr->lastControllerUpdateTime = 0;
 
+  // Initialise ardupilot sockets
+  if (!InitArducopterSockets(_sdf))
+  {
+    return;
+  }
+
   // Missed update count before we declare arduCopterOnline status false
   getSdfParam<int>(_sdf, "connectionTimeoutMaxCount",
     this->dataPtr->connectionTimeoutMaxCount, 10);
@@ -451,6 +503,35 @@ void ArduCopterPlugin::OnUpdate()
   }
 
   this->dataPtr->lastControllerUpdateTime = curTime;
+}
+
+/////////////////////////////////////////////////
+bool ArduCopterPlugin::InitArducopterSockets(sdf::ElementPtr _sdf) const
+{
+    getSdfParam<std::string>(_sdf, "fdm_addr",
+            this->dataPtr->fdm_addr, "INADDR_ANY");
+    getSdfParam<uint16_t>(_sdf, "fdm_port_in",
+            this->dataPtr->fdm_port_in, 9002);
+    getSdfParam<uint16_t>(_sdf, "fdm_port_out",
+            this->dataPtr->fdm_port_out, 9003);
+
+    if (!this->dataPtr->socket_in.Bind(this->dataPtr->fdm_addr.c_str(),
+            this->dataPtr->fdm_port_in))
+    {
+        gzerr << "failed to bind with " << this->dataPtr->fdm_addr
+              << ":" << this->dataPtr->fdm_port_in << " aborting plugin.\n";
+        return false;
+    }
+
+    if (!this->dataPtr->socket_out.Connect(this->dataPtr->fdm_addr.c_str(),
+            this->dataPtr->fdm_port_out))
+    {
+        gzerr << "failed to bind with " << this->dataPtr->fdm_addr
+              << ":" << this->dataPtr->fdm_port_out << " aborting plugin.\n";
+        return false;
+    }
+
+    return true;
 }
 
 /////////////////////////////////////////////////
@@ -505,7 +586,8 @@ void ArduCopterPlugin::ReceiveMotorCommand()
     // Otherwise skip quickly and do not set control force.
     waitMs = 1;
   }
-  ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(ServoPacket), waitMs);
+  ssize_t recvSize =
+      this->dataPtr->socket_in.Recv(&pkt, sizeof(ServoPacket), waitMs);
   ssize_t expectedPktSize =
     sizeof(pkt.motorSpeed[0])*this->dataPtr->rotors.size();
   if ((recvSize == -1) || (recvSize < expectedPktSize))
@@ -657,9 +739,5 @@ void ArduCopterPlugin::SendState() const
   pkt.velocityXYZ[1] = velNEDFrame.Y();
   pkt.velocityXYZ[2] = velNEDFrame.Z();
 
-  struct sockaddr_in sockaddr;
-  this->dataPtr->MakeSockAddr("127.0.0.1", 9003, sockaddr);
-
-  ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
-    (struct sockaddr *)&sockaddr, sizeof(sockaddr));
+  this->dataPtr->socket_out.Send(&pkt, sizeof(pkt));
 }
