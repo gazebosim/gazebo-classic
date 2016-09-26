@@ -421,8 +421,6 @@ void Heightmap::Load()
     }
   }
 
-  this->dataPtr->heights.clear();
-
   // if heightmap fails to load locally, get the data from the server side
   if (this->dataPtr->heights.empty())
   {
