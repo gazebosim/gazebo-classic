@@ -92,7 +92,8 @@ namespace gazebo
       /// \param[in] _curve Pointer to the plot curve to remove.
       public: bool RemoveCurve(PlotCurveWeakPtr _curve);
 
-      /// \brief Get whether the topic curve class has the specified curve.
+      /// \brief Get whether the topic curve has the specified plot curve.
+      /// \param[in] _curve Pointer to the plot curve
       /// \return True if curve exists
       public: bool HasCurve(PlotCurveWeakPtr _curve) const;
 
