@@ -526,6 +526,10 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
+      // Documentation inherited
+      public: virtual void SetStatic(const bool &_static);
+      using Entity::SetStatic;
+
       /// \brief Move Link given source and target frames specified in
       /// world coordinates. Assuming link's relative pose to
       /// source frame (_worldReferenceFrameSrc) remains unchanged relative
