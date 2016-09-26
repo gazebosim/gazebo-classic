@@ -91,6 +91,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
     return -1;
   }
 
+#ifdef HAVE_GDAL
   // DEM
   auto demData = dynamic_cast<common::Dem *>(this->heightmapData);
   if (demData)
@@ -133,6 +134,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
   }
   // Image
   else
+#endif
   {
     auto imageData =
         dynamic_cast<common::ImageHeightmap *>(this->heightmapData);
