@@ -2454,7 +2454,6 @@ void MainWindow::PluginInfoService(const ignition::msgs::StringMsg &_req,
 void MainWindow::PluginInfo(const common::URI &_pluginUri,
   ignition::msgs::Plugin_V &_plugins, bool &_success)
 {
-  printf("%s\n", "bobo");
   _plugins.clear_plugins();
   _success = false;
 
@@ -2486,17 +2485,14 @@ void MainWindow::PluginInfo(const common::URI &_pluginUri,
       return;
     }
   }
-printf("%s\n", "bobo2");
   for (; i < parts.size(); i = i+2)
   {
     // Look for plugins
     if (parts[i] == "plugin")
     {
-      printf("%s\n", "main");
       // Return empty vector
       if (this->dataPtr->pluginMsgs.size() <= 0)
       {
-        printf("%s\n", "mainlow");
         _success = true;
         return;
       }
@@ -2506,12 +2502,10 @@ printf("%s\n", "bobo2");
         iter != this->dataPtr->pluginMsgs.end(); ++iter)
         {
           auto pluginName = (*iter)->name();
-           printf("%s\n", pluginName.c_str()); 
 
         // If asking for a specific plugin, skip all other plugins
         if (i+1 < parts.size() && parts[i+1] != pluginName)
         {
-          printf("%s\n", pluginName.c_str());
           continue;
         }
 
@@ -2532,7 +2526,6 @@ printf("%s\n", "bobo2");
         _success = false;
         return;
       }
-      printf("%s\n", "bobo3");
       _success = true;
       return;
     }

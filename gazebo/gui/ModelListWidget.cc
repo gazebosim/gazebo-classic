@@ -180,7 +180,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   if (_item)
   {
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
-    qDebug() << name.c_str() << "name";
+    auto parts = common::split(name, "/");
 
     this->dataPtr->propTreeBrowser->clear();
     if (name == "Scene")
@@ -239,39 +239,44 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       // Assume there is only one World Plugins item
       treeModelItems.at(0)->setExpanded(
             !treeModelItems.at(0)->isExpanded());
-    }/*
-    else if ()
+    }
+    else
     {
-      for (int i = 0; i < this->dataPtr->modelsItem->childCount(); ++i)
+      // Expand a sensor or visual item with one click 
+      // Search for the item inside the link items of models
+      // We need to have more than 2 parts to check for the items
+      if (parts.size() >= 2)
       {
-        for (int j = 0; j < this->dataPtr->modelsItem->
-          child(i)->childCount(); ++j)
+        // Check if second-last element is a sensor or visual
+        if (parts.end()[-2] == "sensor" || parts.end()[-2] == "visual")
         {
-          if (this->dataPtr->modelsItem->child(i)->child(j)->
-            data(3, Qt::UserRole).toString().toStdString() == "Link")
+          // Search model items
           {
-            for (int k = 0; k < this->dataPtr->modelsItem->
-              child(i)->child(j)->childCount(); ++k)
+            for (int i = 0; i < this->dataPtr->modelsItem->childCount(); ++i)
             {
-              if (this->dataPtr->modelsItem->child(i)->
-                child(j)->child(k)->data(0, Qt::UserRole).
-                toString().toStdString() == this->dataPtr->selectedEntityName)
+              for (int j = 0; j < this->dataPtr->modelsItem->
+                child(i)->childCount(); ++j)
               {
-                if (this->dataPtr->requestPub)
+                if (this->dataPtr->modelsItem->child(i)->child(j)->
+                  data(3, Qt::UserRole).toString().toStdString() == "Link")
                 {
-                  this->dataPtr->requestMsg = msgs::CreateRequest("sensor_info",
-                  this->dataPtr->selectedEntityName);
-
-                  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+                  for (int k = 0; k < this->dataPtr->modelsItem->
+                    child(i)->child(j)->childCount(); ++k)
+                  {
+                    if (this->dataPtr->modelsItem->child(i)->
+                      child(j)->child(k)->text(0).toStdString() == parts.back())
+                    {
+                      this->dataPtr->modelsItem->child(i)->child(j)->child(k)->setExpanded(
+                        !this->dataPtr->modelsItem->child(i)->child(j)->child(k)->
+                          isExpanded());
+                    }
+                  }
                 }
               }
             }
           }
         }
       }
-    }*/
-    else
-    {
       this->dataPtr->propTreeBrowser->clear();
       event::Events::setSelectedEntity(name, "normal");
     }
@@ -423,8 +428,6 @@ void ModelListWidget::Update()
 
     this->dataPtr->ignNode.Request(service, req,
         &ModelListWidget::OnGUIPluginList, this);
-
-    printf("%s\n", "im req");
   }
 
   if (!this->dataPtr->fillTypes.empty())
@@ -2750,11 +2753,9 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
 
 
 /////////////////////////////////////////////////
-
 void ModelListWidget::FillPropertyTree(const ignition::msgs::Sensor &_msg,
                                        QtProperty *_parent)
 {
-  QtProperty *topItem = nullptr;
   QtVariantProperty *item = nullptr;
 
   // id, store it but make it hidden
@@ -2806,19 +2807,12 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Sensor &_msg,
   this->AddProperty(item, _parent);
   item->setEnabled(false);
 /*
-
   // pose
-
   topItem = this->dataPtr->variantManager->addProperty(
-
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
-
   this->AddProperty(item, _parent);
-
   this->FillPoseProperty(_msg.pose(), topItem);
-
 */
-
   // visualize
   item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
       tr("visualize"));
@@ -2839,11 +2833,9 @@ void ModelListWidget::FillPropertyTree(const ignition::msgs::Sensor &_msg,
 
 
 /////////////////////////////////////////////////
-
 void ModelListWidget::FillPropertyTree(const ignition::msgs::Visual &_msg,
                                        QtProperty *_parent)
 {
-  QtProperty *topItem = nullptr;
   QtVariantProperty *item = nullptr;
 
   // Name value
@@ -3968,14 +3960,11 @@ void ModelListWidget::OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
   QFont subheaderFont;
   subheaderFont.setBold(true);
 
-  printf("%s\n", "guipl");
-
   ignition::msgs::Plugin_V plugins;
   plugins.CopyFrom(_plugins);
 
   if (plugins.plugins_size() > 0)
   {
-    printf("%s\n", "guiplsd");
     // Fetch top level GUI item
     QList<QTreeWidgetItem *> topItem =
         this->dataPtr->modelTreeWidget->findItems(tr("GUI"), Qt::MatchExactly);

@@ -832,9 +832,6 @@ void SensorManager::PluginInfo(const common::URI &_pluginUri,
       sensorUri.SetScheme("data");
       sensorUri.Path().PushBack(sensor->ScopedName());
 
-      printf("%s\n", sensorUri.Str().c_str());
-      printf("%s\n", _pluginUri.Str().c_str());
-
       auto myParts = common::split(sensorUri.Path().Str(), "::");
 
       // Check if all segments match up to this sensors scopedName,
@@ -843,10 +840,6 @@ void SensorManager::PluginInfo(const common::URI &_pluginUri,
       // /model/<model_name>/link/<link_name>
       for (int j = myParts.size() - 1; j >= 0; --j)
       {
-        printf("%d\n", j);
-        printf("%s\n", myParts[j].c_str());
-        printf("%s\n", parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - (j-1))].c_str());
-
         // j - 1 == skip check plugin name from _pluginUri
         if (parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - (j - 1))] != myParts[j])
         {
@@ -893,7 +886,6 @@ void SensorManager::PluginInfo(const common::URI &_pluginUri,
 void SensorManager::SensorInfoService(const ignition::msgs::StringMsg &_req,
           ignition::msgs::Sensor_V &_sensors, bool &_success)
 {
-  printf("%s\n", "bolek");
   this->SensorInfo(_req.data(), _sensors, _success);
 }
 
@@ -919,7 +911,6 @@ void SensorManager::SensorInfo(const common::URI &_sensorUri,
     // See if there is a sensor
     if (parts[i] == "sensor")
     {
-      printf("%s\n", "yes");
       auto sensor = this->GetSensor(parts[i+1]);
 
       if (!sensor)
@@ -935,9 +926,6 @@ void SensorManager::SensorInfo(const common::URI &_sensorUri,
       sensorUri.SetScheme("data");
       sensorUri.Path().PushBack(sensor->ScopedName());
 
-      printf("%s\n", sensorUri.Str().c_str());
-      printf("%s\n", _sensorUri.Str().c_str());
-
       auto myParts = common::split(sensorUri.Path().Str(), "::");
 
       // Check if all segments match up to this sensors scopedName,
@@ -946,9 +934,6 @@ void SensorManager::SensorInfo(const common::URI &_sensorUri,
       // /model/<model_name>/link/<link_name>
       for (int j = myParts.size() - 1; j >= 0; --j)
       {
-        printf("%d\n", j);
-        printf("%s\n", myParts[j].c_str());
-        printf("%s\n", parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - j)].c_str());
         if (parts[(parts.size() - 1) - 2 * ((myParts.size() - 1) - j)] != myParts[j])
         {
           gzwarn << "Sensor [" << _sensorUri.Str() << "] does not match sensor [" <<
