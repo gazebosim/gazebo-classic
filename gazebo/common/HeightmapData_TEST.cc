@@ -32,7 +32,6 @@ using namespace gazebo;
 
 class HeightmapDataLoaderTest : public gazebo::testing::AutoLogFixture { };
 
-
 /////////////////////////////////////////////////
 TEST_F(HeightmapDataLoaderTest, ImageHeightmap)
 {
@@ -56,6 +55,7 @@ TEST_F(HeightmapDataLoaderTest, ImageHeightmap)
   EXPECT_NEAR(0.99607843, img->GetMaxElevation(), ELEVATION_TOL);
 }
 
+#ifdef HAVE_GDAL
 /////////////////////////////////////////////////
 TEST_F(HeightmapDataLoaderTest, DemHeightmap)
 {
@@ -87,6 +87,7 @@ TEST_F(HeightmapDataLoaderTest, DemHeightmap)
   EXPECT_FLOAT_EQ(142.2274, dem->GetElevation(0, height - 1));
   EXPECT_FLOAT_EQ(209.14784, dem->GetElevation(width - 1, height - 1));
 }
+#endif
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
