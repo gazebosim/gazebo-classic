@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _VISUAL_PRIVATE_HH_
-#define _VISUAL_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_VISUALPRIVATE_HH_
+#define GAZEBO_RENDERING_VISUALPRIVATE_HH_
 
 #include <string>
 #include <utility>
