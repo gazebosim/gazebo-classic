@@ -212,7 +212,7 @@ TEST_F(SensorManager_TEST, PluginInfo)
 //////////////////////////////////////////////////
 TEST_F(SensorManager_TEST, PluginInfoFailures)
 {
-  this->Load("worlds/depth_camera.world", true);
+  this->Load("worlds/magnetometer.world", true);
 
   // Get the SensorManager instance
   auto mgr = sensors::SensorManager::Instance();
@@ -221,21 +221,25 @@ TEST_F(SensorManager_TEST, PluginInfoFailures)
   bool success;
   gazebo::common::URI pluginUri;
 
-  pluginUri.Parse("data://world/default/model/camera_model/"
-      "link/my_link/sensor/camera/plugin/depth_camera_plugin");
-
-  gzmsg << "Get specific plugin" << std::endl;
+  gzmsg << "Sensor has no plugins" << std::endl;
   {
-    do 
-    {
-      mgr->PluginInfo(pluginUri, plugins, success);
-    }
-    while (plugins.plugins_size() <= 0);
-
+    pluginUri.Parse(
+        "data://world/default/model/magnetometerModel/link/link/sensor/"
+        "magnetometer/plugin");
     mgr->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
-    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins_size(), 0);
+  }
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/wrong/model/magnetometerModel/link/link/sensor/"
+        "magnetometer/plugin");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
   }
 
   gzmsg << "Invalid URI" << std::endl;
@@ -246,10 +250,19 @@ TEST_F(SensorManager_TEST, PluginInfoFailures)
     EXPECT_FALSE(success);
   }
 
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
   gzmsg << "Incomplete URI" << std::endl;
   {
-    pluginUri.Parse("data://world/default/model/camera_model/"
-      "link/my_link/sensor/camera");
+    pluginUri.Parse(
+        "data://world/wrong/model/magnetometerModel/link/link/sensor/"
+        "magnetometer");
     mgr->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_FALSE(success);
@@ -259,7 +272,7 @@ TEST_F(SensorManager_TEST, PluginInfoFailures)
 //////////////////////////////////////////////////
 TEST_F(SensorManager_TEST, SensorInfoFailures)
 {
-  this->Load("worlds/depth_camera.world", true);
+  this->Load("worlds/shapes.world", true);
 
   // Get the SensorManager instance
   auto mgr = sensors::SensorManager::Instance();
@@ -268,26 +281,45 @@ TEST_F(SensorManager_TEST, SensorInfoFailures)
   bool success;
   gazebo::common::URI sensorUri;
 
-  sensorUri.Parse("data://world/default/model/camera_model/"
-      "link/my_link/sensor/camera");
-
-  gzmsg << "Get specific sensor" << std::endl;
+  gzmsg << "Link has no sensors" << std::endl;
   {
-    do 
-    {
-      mgr->SensorInfo(sensorUri, sensors, success);
-    }
-    while (sensors.sensors_size() <= 0);
-
+    sensorUri.Parse(
+        "data://world/default/model/box/link/link/sensor/");
     mgr->SensorInfo(sensorUri, sensors, success);
 
     EXPECT_TRUE(success);
-    EXPECT_EQ(sensors.sensors_size(), 1);
+    EXPECT_EQ(sensors.sensors_size(), 0);
+  }
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    sensorUri.Parse(
+        "data://world/wrong/model/box/link/link/sensor/");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong model" << std::endl;
+  {
+    sensorUri.Parse(
+        "data://world/default/model/wrong/link/link/sensor/");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
   }
 
   gzmsg << "Invalid URI" << std::endl;
   {
-    sensorUri = gazebo::common::URI("tell me about your plugins");
+    sensorUri = gazebo::common::URI("tell me about your sensors");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    sensorUri.Parse("data://world/default/model/box/link/link/visual/visual/");
     mgr->SensorInfo(sensorUri, sensors, success);
 
     EXPECT_FALSE(success);
@@ -295,8 +327,7 @@ TEST_F(SensorManager_TEST, SensorInfoFailures)
 
   gzmsg << "Incomplete URI" << std::endl;
   {
-    sensorUri.Parse("data://world/default/model/camera_model/"
-      "link/my_link");
+    sensorUri.Parse("data://world/default/model/box/link/link");
     mgr->SensorInfo(sensorUri, sensors, success);
 
     EXPECT_FALSE(success);

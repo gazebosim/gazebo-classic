@@ -371,8 +371,7 @@ void MainWindow::Init()
   if (!this->dataPtr->ignNode.Advertise(service,
     &MainWindow::PluginInfoService, this))
   {
-    gzerr << "Error advertising service [" << service << "]"
-    << std::endl;
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
 
   gui::Events::mainWindowReady();
@@ -2481,7 +2480,7 @@ void MainWindow::PluginInfo(const common::URI &_pluginUri,
     if (parts[i] != myParts[i])
     {
       gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match GUI"
-      << "[/gui/gzclient/]" << std::endl;
+          << "[/gui/gzclient/]" << std::endl;
       return;
     }
   }
@@ -2511,7 +2510,7 @@ void MainWindow::PluginInfo(const common::URI &_pluginUri,
 
         // Get plugin info from pluginMsgs
         auto pluginMsg = _plugins.add_plugins();
- 
+
         // Get plugin info from pluginMsgs
         pluginMsg->set_name((*iter)->name());
         pluginMsg->set_filename((*iter)->filename());
@@ -2522,7 +2521,7 @@ void MainWindow::PluginInfo(const common::URI &_pluginUri,
       if (i+1 < parts.size() && _plugins.plugins_size() == 0)
       {
         gzwarn << "Plugin [" << parts[i+1] << "] not found in GUI"
-        << "[/gui/gzclient/]" << std::endl;
+            << "[/gui/gzclient/]" << std::endl;
         _success = false;
         return;
       }

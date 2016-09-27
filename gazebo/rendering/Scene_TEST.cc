@@ -404,6 +404,79 @@ TEST_F(Scene_TEST, VisualInfo)
 }
 
 //////////////////////////////////////////////////
+TEST_F(Scene_TEST, VisualInfoFailures)
+{
+  this->Load("worlds/shapes.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("box");
+  ASSERT_TRUE(model != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse("data://world/wrong/model/box/link/link/visual/visual/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong model" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/wrong/link/link/visual/visual/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong visual" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual/wrong");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = common::URI("tell me about your plugins");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Inexistent nested model" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/box/model/box_in_a_box/link/link/visual/visual");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
+//////////////////////////////////////////////////
 TEST_F(Scene_TEST, PluginInfo)
 {
   this->Load("worlds/blink_visual.world", true);
@@ -454,6 +527,80 @@ TEST_F(Scene_TEST, PluginInfo)
     EXPECT_TRUE(success);
     EXPECT_EQ(plugins.plugins_size(), 1);
     EXPECT_EQ(plugins.plugins(0).name(), "blink");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(Scene_TEST, PluginInfoFailures)
+{
+  this->Load("worlds/shapes.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("box");
+  ASSERT_TRUE(model != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Visual has no plugins" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual/visual/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 0);
+  }
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse("data://world/wrong/model/box/link/link/visual/visual/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong model" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/cone/link/link/visual/visual/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = common::URI("tell me about your plugins");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Inexistent nested model" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/box/model/box_in_a_box/link/link/visual/visual/plugin");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual/visual");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
   }
 }
 
