@@ -36,7 +36,8 @@ namespace gazebo
     /// \brief OBJLoader private data
     class OBJLoaderPrivate
     {
-      // empty for now
+      /// \brief Map of material names to material pointers;
+      public: std::map<std::string, Material *> materialIds;
     };
   }
 }
@@ -184,16 +185,27 @@ Mesh *OBJLoader::Load(const std::string &_filename)
     // materials
     if (!materials.empty() && !s.mesh.material_ids.empty())
     {
+      Material *mat = nullptr;
       auto m = materials[s.mesh.material_ids[0]];
-      Material *mat = new Material();
-      mat->SetAmbient(Color(m.ambient[0], m.ambient[1], m.ambient[2]));
-      mat->SetDiffuse(Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
-      mat->SetSpecular(Color(m.specular[0], m.specular[1], m.specular[2]));
-      mat->SetEmissive(Color(m.emission[0], m.emission[1], m.emission[2]));
-      mat->SetShininess(m.shininess);
-      mat->SetTransparency(1.0 - m.dissolve);
-      mat->SetTextureImage(m.diffuse_texname, path.c_str());
-
+      if (this->dataPtr->materialIds.find(m.name)
+          != this->dataPtr->materialIds.end())
+      {
+        mat = this->dataPtr->materialIds[m.name];
+      }
+      else
+      {
+        // Create new material and pass it to mesh who will take ownership of
+        // the object
+        mat = new Material();
+        mat->SetAmbient(Color(m.ambient[0], m.ambient[1], m.ambient[2]));
+        mat->SetDiffuse(Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]));
+        mat->SetSpecular(Color(m.specular[0], m.specular[1], m.specular[2]));
+        mat->SetEmissive(Color(m.emission[0], m.emission[1], m.emission[2]));
+        mat->SetShininess(m.shininess);
+        mat->SetTransparency(1.0 - m.dissolve);
+        mat->SetTextureImage(m.diffuse_texname, path.c_str());
+        this->dataPtr->materialIds[m.name] = mat;
+      }
       int matIndex = mesh->GetMaterialIndex(mat);
       if (matIndex < 0)
         matIndex = mesh->AddMaterial(mat);
