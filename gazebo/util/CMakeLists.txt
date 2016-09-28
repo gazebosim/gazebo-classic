@@ -68,6 +68,11 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/util.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/util.hh )
 
+
+if (WIN32)
+  add_definitions(-DBUILDING_DLL)
+endif()
+
 gz_add_library(gazebo_util ${sources})
 
 add_dependencies(gazebo_util
@@ -83,6 +88,12 @@ target_link_libraries(gazebo_util
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
 )
+
+if (WIN32)
+  include_directories(IGNITION-MSGS_INCLUDE_DIR)
+  set_target_properties(gazebo_util PROPERTIES COMPILE_FLAGS "/FIignition/msgs/System.hh")
+endif()
+
 
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)
