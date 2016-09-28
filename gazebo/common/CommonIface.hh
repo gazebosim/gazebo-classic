@@ -18,6 +18,7 @@
 #ifndef _COMMONIFACE_HH_
 #define _COMMONIFACE_HH_
 
+#include <linux/limits.h>
 #include <string>
 #include <vector>
 #include <boost/uuid/sha1.hpp>
