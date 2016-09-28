@@ -540,8 +540,8 @@ void Actor::Update()
   common::Time currentTime = this->world->GetSimTime();
 
   // do not refresh animation faster than 30 Hz sim time
-  if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
-    return;
+//  if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
+  //  return;
 
   // Get trajectory
   TrajectoryInfo *tinfo = nullptr;
