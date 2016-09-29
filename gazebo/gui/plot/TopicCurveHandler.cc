@@ -158,7 +158,7 @@ void TopicTime::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   if (!_msg)
   {
-    GZ_ASSERT(msg, "_msg pointer in OnStats method should not be null");
+    GZ_ASSERT(_msg, "_msg pointer in OnStats method should not be null");
     return;
   }
 
@@ -214,7 +214,8 @@ bool TopicCurve::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
   common::URI topicURI(_name);
   if (!topicURI.Valid())
   {
-    gzwarn << "topicURI '" + topicURI.Str() + "' is invalid" << std::end;
+    gzwarn << "topicURI '" << topicURI.Str() <<
+              "' is invalid" << std::endl;
     return false;
   }
 
@@ -331,7 +332,7 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
     ignition::math::Vector2d> > &_curvesUpdates)
 {
   if (!_msg)
-    GZ_ASSERT(_msg, "_msg pointer in TopicCurve::UpdateCurve should not be null")
+    GZ_ASSERT(_msg, "_msg pointer in TopicCurve::UpdateCurve should not be null");
 
   auto ref = _msg->GetReflection();
   if (!ref)
@@ -547,7 +548,8 @@ void TopicCurveHandler::AddCurve(const std::string &_name,
   common::URI topicURI(uriName);
   if (!topicURI.Valid())
   {
-    gzwarn << "topicURI '" + topicURI.Str() + "' is invalid" << std::end;
+    gzwarn << "topicURI '" << topicURI.Str().c_str() <<
+              "' is invalid" << std::endl;
     return;
   }
 
