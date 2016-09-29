@@ -2386,22 +2386,6 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
   }
 
-  std::string linkName = linkVis->GetName();
-  if (!this->GetVisual(linkName + "_COM_VISUAL__"))
-  {
-    this->CreateCOMVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_INERTIA_VISUAL__"))
-  {
-    this->CreateInertiaVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_LINK_FRAME_VISUAL__"))
-  {
-    this->CreateLinkFrameVisual(_msg, linkVis);
-  }
-
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2416,6 +2400,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     }
   }
 
+  linkVis->SetTypeMsg(&*_msg);
   return true;
 }
 

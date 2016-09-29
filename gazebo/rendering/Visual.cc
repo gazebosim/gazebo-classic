@@ -16,10 +16,11 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Vector2d.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
@@ -30,18 +31,23 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Skeleton.hh"
-#include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/WireBox.hh"
+
+#include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/RTShaderSystem.hh"
-#include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/InertiaVisual.hh"
+#include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
-#include "gazebo/rendering/VisualPrivate.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/VisualPrivate.hh"
+#include "gazebo/rendering/WireBox.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -2979,10 +2985,32 @@ void Visual::ShowJoints(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowCOM(bool _show)
 {
+  // If this is a COM visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("COM_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link without COM visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + "_COM_VISUAL__"))
+  {
+    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    if (!msg)
+    {
+      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+          "]" << std::endl;
+      return;
+    }
+    auto msgPtr = new ConstLinkPtr(msg);
 
+    COMVisualPtr vis(new COMVisual(this->GetName() + "_COM_VISUAL__",
+        shared_from_this()));
+    vis->Load(*msgPtr);
+    vis->SetVisible(_show);
+  }
+
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowCOM(_show);
@@ -2992,10 +3020,32 @@ void Visual::ShowCOM(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowInertia(bool _show)
 {
+  // If this is an inertia visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-     this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
+      this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link without inertia visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + "_INERTIA_VISUAL__"))
+  {
+    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    if (!msg)
+    {
+      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+          "]" << std::endl;
+      return;
+    }
+    auto msgPtr = new ConstLinkPtr(msg);
 
+    InertiaVisualPtr vis(new InertiaVisual(this->GetName() +
+        "_INERTIA_VISUAL__", shared_from_this()));
+    vis->Load(*msgPtr);
+    vis->SetVisible(_show);
+  }
+
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowInertia(_show);
@@ -3005,10 +3055,23 @@ void Visual::ShowInertia(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowLinkFrame(bool _show)
 {
+  // If this is a link frame visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link without link frame visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + "_LINK_FRAME_VISUAL__"))
+  {
+    LinkFrameVisualPtr vis(new LinkFrameVisual(this->GetName() +
+        "_LINK_FRAME_VISUAL__", shared_from_this()));
+    vis->Load();
+    vis->SetVisible(_show);
+  }
 
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowLinkFrame(_show);
@@ -3246,3 +3309,16 @@ bool Visual::UseRTShader() const
 {
   return this->dataPtr->useRTShader;
 }
+
+//////////////////////////////////////////////////
+void Visual::SetTypeMsg(const google::protobuf::Message *_msg)
+{
+  if (!_msg)
+  {
+    gzerr << "Null type message." << std::endl;
+    return;
+  }
+  this->dataPtr->typeMsg = _msg->New();
+  this->dataPtr->typeMsg->CopyFrom(*_msg);
+}
+

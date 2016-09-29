@@ -209,6 +209,10 @@ namespace gazebo
 
       /// \brief True if wireframe mode is enabled
       public: bool wireframe;
+
+      /// \brief Stores the message for this visual according to the visual
+      /// type. For example, VT_LINK will have gazebo::msgs::Link.
+      public: google::protobuf::Message *typeMsg;
     };
     /// \}
   }
