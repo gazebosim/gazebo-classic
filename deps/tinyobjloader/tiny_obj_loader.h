@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 //
 // Use this in *one* .cc
-//   #define TINYOBJLOADER_IMPLEMENTATION
+//   #define GAZEBO_TINYOBJLOADER_IMPLEMENTATION
 //   #include "tiny_obj_loader.h"
 //
 

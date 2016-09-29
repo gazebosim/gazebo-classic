@@ -15,6 +15,7 @@
  *
  */
 
+#include <memory>
 #include <boost/filesystem/path.hpp>
 
 #include "gazebo/common/Console.hh"
@@ -24,9 +25,6 @@
 
 #define GAZEBO_TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
-
-using namespace gazebo;
-using namespace common;
 
 namespace gazebo
 {
@@ -41,6 +39,9 @@ namespace gazebo
     };
   }
 }
+
+using namespace gazebo;
+using namespace common;
 
 //////////////////////////////////////////////////
 OBJLoader::OBJLoader()
@@ -77,17 +78,16 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
   if (!ret)
   {
-    gzerr << "Failed to load/parse .obj." << std::endl;
+    gzerr << "Failed to load/parse " << _filename << std::endl;
     return nullptr;
   }
 
   Mesh *mesh = new Mesh();
   mesh->SetPath(path);
 
-  for (unsigned int i = 0; i < shapes.size(); ++i)
+  for (auto s: shapes)
   {
-    auto s = shapes[i];
-    SubMesh *subMesh = new SubMesh();
+    std::unique_ptr<SubMesh> subMesh(new SubMesh());
     subMesh->SetName(s.name);
     subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
 
@@ -211,7 +211,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         matIndex = mesh->AddMaterial(mat);
       subMesh->SetMaterialIndex(matIndex);
     }
-    mesh->AddSubMesh(subMesh);
+    mesh->AddSubMesh(subMesh.release());
   }
 
   return mesh;
