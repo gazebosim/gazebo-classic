@@ -214,7 +214,8 @@ bool TopicCurve::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
   common::URI topicURI(_name);
   if (!topicURI.Valid())
   {
-    gzwarn << "topicURI '" + topicURI.Str() + "' is invalid" << std::end;
+    gzwarn << "topicURI '" + topicURI.Str().c_str() +
+              "' is invalid" << std::end;
     return false;
   }
 
@@ -547,7 +548,8 @@ void TopicCurveHandler::AddCurve(const std::string &_name,
   common::URI topicURI(uriName);
   if (!topicURI.Valid())
   {
-    gzwarn << "topicURI '" + topicURI.Str() + "' is invalid" << std::end;
+    gzwarn << "topicURI '" + topicURI.Str().c_str() +
+              "' is invalid" << std::end;
     return;
   }
 
