@@ -33,8 +33,6 @@ namespace gazebo
     /// \brief OBJLoader private data
     class OBJLoaderPrivate
     {
-      /// \brief Map of material names to material pointers;
-      public: std::map<std::string, Material *> materialIds;
     };
   }
 }
@@ -56,7 +54,7 @@ OBJLoader::~OBJLoader()
 //////////////////////////////////////////////////
 Mesh *OBJLoader::Load(const std::string &_filename)
 {
-  this->dataPtr->materialIds.clear();
+  std::map<std::string, Material *> materialIds;
 
   std::string path;
   size_t idx = _filename.rfind('/');
@@ -190,10 +188,9 @@ Mesh *OBJLoader::Load(const std::string &_filename)
     {
       Material *mat = nullptr;
       auto m = materials[s.mesh.material_ids[0]];
-      if (this->dataPtr->materialIds.find(m.name)
-          != this->dataPtr->materialIds.end())
+      if (materialIds.find(m.name) != materialIds.end())
       {
-        mat = this->dataPtr->materialIds[m.name];
+        mat = materialIds[m.name];
       }
       else
       {
@@ -207,7 +204,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         mat->SetShininess(m.shininess);
         mat->SetTransparency(1.0 - m.dissolve);
         mat->SetTextureImage(m.diffuse_texname, path.c_str());
-        this->dataPtr->materialIds[m.name] = mat;
+        materialIds[m.name] = mat;
       }
       int matIndex = mesh->GetMaterialIndex(mat);
       if (matIndex < 0)
