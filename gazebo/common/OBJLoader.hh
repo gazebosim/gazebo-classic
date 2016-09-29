@@ -24,8 +24,6 @@
 #include "gazebo/common/MeshLoader.hh"
 #include "gazebo/util/system.hh"
 
-class TiXmlElement;
-
 namespace gazebo
 {
   namespace common
