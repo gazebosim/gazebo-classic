@@ -45,7 +45,7 @@ namespace gazebo
       public: virtual ~OBJLoader();
 
       /// \brief Load a mesh
-      /// \param[in] _filename Collada file to load
+      /// \param[in] _filename OBJ file to load
       /// \return Pointer to a new Mesh
       public: virtual Mesh *Load(const std::string &_filename);
 
