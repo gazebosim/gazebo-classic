@@ -5,6 +5,303 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.X to 8.X
+
+### Additions
+
+1. **gazebo/common/Event.hh**
+    + public: bool Connection::Id() const;
+    + public: bool Event::Signaled() const;
+    + public: void Event::SetSignaled(const bool);
+
+### Modifications
+
+1. **gazebo/rendering/Road2d.hh**
+    + Modified to inherit from Visual class.
+
+1. **gazebo/common/Event.hh**
+    + Connection(Event*, int) constructor changed to
+      Connection(Event*, const int)
+    + EventTPrivate no longer inherits from EventPrivate
+    + EventT::Connect(const boost::function<T> &) changed to
+      EventT::Connect(const std::function<T> &)
+
+1. **gazebo/sensors/DepthCameraSensor.hh**
+    + Modified to inherit from CameraSensor class.
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** ConnectSetSelectedLink
+    + ***Replacement:*** ConnectSetSelectedEntity
+    + ***Removed:*** DisconnectSetSelectedLink
+    + ***Replacement:*** DisconnectSetSelectedEntity
+    + ***Removed:*** setSelectedLink
+    + ***Replacement:*** setSelectedEntity
+    + ***Removed:*** event::EventT<void (std::string)> requestModelPluginRemoval;
+    + ***Replacement:*** event::EventT<void (std::string, bool)> requestModelPluginRemoval;
+    + ***Removed:*** event::EventT<void (std::string, std::string, std::string)> requestModelPluginInsertion;
+    + ***Replacement:*** event::EventT<void (std::string, std::string, std::string, bool)> requestModelPluginInsertion;
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Removed:*** event::EventT<void (const std::string &, const gazebo::math::Vector3 &)> Events::scaleEntity
+    + ***Replacement:*** event::EventT<void (const std::string &, const ignition::math::Vector3d &)> Events::scaleEntity
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_DEPRECATED
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_DEPRECATED
+
+1. **gazebo/common/CommonTypes.hh**
+    + ***Removed:*** GAZEBO_FORCEINLINE
+1. **gazebo/util/system.hh**
+    + ***Replacement:*** GAZEBO_FORCEINLINE
+
+1. **gazebo/rendering/OculusCamera.hh**
+    + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
+
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
+
+### Deprecations
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
+    + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose)
+
+1. **gazebo/gui/ModelManipulator.hh**
+    + ***Deprecation:*** public: void RotateEntity(rendering::VisualPtr &_vis,
+                                                   const math::Vector3 &_axis,
+                                                   bool _local = false);
+    + ***Replacement:*** public: void RotateEntity(rendering::VisualPtr &_vis,
+                                                   const ignition::math::Vector3d &_axis,
+                                                   const bool _local = false)
+    + ***Deprecation:*** public: void TranslateEntity(rendering::VisualPtr &_vis,
+                                                      const math::Vector3 &_axis,
+                                                      bool _local = false)
+    + ***Replacement:*** public: void TranslateEntity(rendering::VisualPtr &_vis,
+                                                      const ignition::math::Vector3d &_axis,
+                                                      const bool _local = false);
+    + ***Deprecation:*** public: void ScaleEntity(rendering::VisualPtr &_vis,
+                                                  const math::Vector3 &_axis,
+                                                  bool _local = false)
+    + ***Replacement:*** public: void ScaleEntity(rendering::VisualPtr &_vis,
+                                                  const ignition::math::Vector3d &_axis,
+                                                  const bool _local = false)
+    + ***Deprecation:*** public: static math::Vector3 SnapPoint(const math::Vector3 &_point,
+                                                                double _interval = 1.0,
+                                                                double _sensitivity = 0.4);
+    + ***Replacement:*** public: static ignition::math::Vector3d SnapPoinit(const ignition::math::Vector3d &_point,
+                                                                            const double _interval = 1.0,
+                                                                            const double _sensitivity = 0.4)
+    + ***Deprecation:*** public: static math::Vector3 GetMousePositionOnPlane(rendering::CameraPtr _camera,
+                                                                              const common::MouseEvent &_event)
+    + ***Replacement:*** public: static ignition::math::Vector3d MousePositionOnPlane(rendering::CameraPtr _camera,
+                                                                                      const common::MouseEvent &_event)
+    + ***Deprecation:*** public: static math::Vector3 GetMouseMoveDistance(rendering::CameraPtr _camera,
+                                                                           const math::Vector2i &_start,
+                                                                           const math::Vector2i &_end,
+                                                                           const math::Pose &_pose,
+                                                                           const math::Vector3 &_axis,
+                                                                           bool _local)
+    + ***Replacement:*** public: static ignition::math::Vector3d MouseMoveDistance(rendering::CameraPtr _camera,
+                                                                                   const ignition::math::Vector2i &_start,
+                                                                                   const ignition::math::Vector2i &_end,
+                                                                                   const ignition::math::Pose3d &_pose,
+                                                                                   const ignition::math::Vector3d &_axis,
+                                                                                   const bool _local)
+
+1. **gazebo/rendering/Road2d.hh**
+    + ***Deprecation:*** public: void Load(VisualPtr);
+    + ***Replacement:*** public: void Load(msgs::Road);
+
+1. **gazebo/common/Event.hh**
+    + ***Deprecation:*** public: void Event::Disconnect(ConnectionPtr);
+    + ***Deprecation:*** public: void EventT::Disconnect(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+    + ***Deprecation:*** public: bool Event::GetSignaled() const;
+    + ***Replacement:*** public: bool Event::Signaled() const;
+    + ***Deprecation:*** public: bool Connection::GetId() const;
+    + ***Replacement:*** public: bool Connection::Id() const;
+
+1. **gazebo/common/Events.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/building/BuildingEditorEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Deprecation:*** public: void Events::Disconnect.*(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation:*** public: void Joint::DisconnectJointUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/Link.hh**
+    + ***Deprecation:*** public: void Link::DisconnectEnabled(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/MultiRayShape.hh**
+    + ***Deprecation:*** public: void MultiRayShape::DisconnectNewLaserScans(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: math::Vector3 GetGravity const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
+1. **gazebo/rendering/Grid.hh**
+    + ***Deprecation:*** public: public: Ogre::SceneNode *GetSceneNode()
+    + ***Replacement:*** public: public: Ogre::SceneNode *SceneNode() const
+    + ***Deprecation:*** public: common::Color GetColor() const
+    + ***Replacement:*** public: common::Color Color() const
+    + ***Deprecation:*** public: uint32_t GetCellCount() const
+    + ***Replacement:*** public: uint32_t CellCount() const
+    + ***Deprecation:*** public: float GetCellLength() const
+    + ***Replacement:*** public: float CellLength() const
+    + ***Deprecation:*** public: float GetLineWidth() const
+    + ***Replacement:*** public: float LineWidth() const
+    + ***Deprecation:*** public: uint32_t GetHeight() const
+    + ***Replacement:*** public: uint32_t Height() const
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: void Camera::DisconnectNewImageFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Deprecation:*** public: void DepthCamera::DisconnectNewDepthFrame(ConnectionPtr);
+    + ***Deprecation:*** public: void DepthCamera::DisconnectNewRGBPointCloud(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Deprecation:*** public: void GpuLaser::DisconnectNewLaserFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + ***Deprecation:*** public: void ForceTorqueSensor::DisconnectUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + ***Deprecation:*** public: void GpuRaySensor::DisconnectNewLaserFrame(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/Sensor.hh**
+    + ***Deprecation:*** public: void Sensor::DisconnectUpdated(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/sensors/SonarSensor.hh**
+    + ***Deprecation:*** public: void SonarSensor::DisconnectUpdate(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/transport/Connection.hh**
+    + ***Deprecation:*** public: void Connection::DisconnectShutdown(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **plugins/events/EventSource.hh**
+    + ***Deprecation:*** public: void SimEventConnector::DisconnectSpawnModel(ConnectionPtr);
+    + ***Replacement:*** Delete the Connection object, perhaps by calling
+    reset() on its smart pointer.
+
+1. **gazebo/math/Filter.hh**
+    + ***Deprecation:*** public:   gazebo::math::BiQuad
+    + ***Replacement:*** public: ignition::math::BiQuad
+    + ***Deprecation:*** public:   gazebo::math::Filter
+    + ***Replacement:*** public: ignition::math::Filter
+    + ***Deprecation:*** public:   gazebo::math::OnePole
+    + ***Replacement:*** public: ignition::math::OnePole
+
+1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
+    + ***Replacement:*** public: double ignition::math::fixnan(double)
+    + ***Deprecation:*** public: float   gazebo::math::fixnan(float)
+    + ***Replacement:*** public: float ignition::math::fixnan(float)
+    + ***Deprecation:*** public: bool   gazebo::math::isnan(double)
+    + ***Replacement:*** public: bool ignition::math::isnan(double)
+    + ***Deprecation:*** public: bool   gazebo::math::isnan(float)
+    + ***Replacement:*** public: bool ignition::math::isnan(float)
+    + ***Deprecation:*** public: bool   gazebo::math::isPowerOfTwo(unsigned int)
+    + ***Replacement:*** public: bool ignition::math::isPowerOfTwo(unsigned int)
+    + ***Deprecation:*** public: T   gazebo::math::max(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::max(const std::vector<T> &)
+    + ***Deprecation:*** public: T   gazebo::math::mean(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::mean(const std::vector<T> &)
+    + ***Deprecation:*** public: T   gazebo::math::min(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::min(const std::vector<T> &)
+    + ***Deprecation:*** public: double   gazebo::math::parseFloat(const std::string &)
+    + ***Replacement:*** public: double ignition::math::parseFloat(const std::string &)
+    + ***Deprecation:*** public: int   gazebo::math::parseInt(const std::string &)
+    + ***Replacement:*** public: int ignition::math::parseInt(const std::string &)
+    + ***Deprecation:*** public: T   gazebo::math::precision(const T &, const unsigned int &)
+    + ***Replacement:*** public: T ignition::math::precision(const T &, const unsigned int &)
+    + ***Deprecation:*** public: unsigned int   gazebo::math::roundUpPowerOfTwo(unsigned int)
+    + ***Replacement:*** public: unsigned int ignition::math::roundUpPowerOfTwo(unsigned int)
+    + ***Deprecation:*** public: T   gazebo::math::variance(const std::vector<T> &)
+    + ***Replacement:*** public: T ignition::math::variance(const std::vector<T> &)
+
+1. **gazebo/math/Kmeans.hh**
+    + ***Deprecation:*** public:   gazebo::math::Kmeans
+    + ***Replacement:*** public: ignition::math::Kmeans
+
+1. **gazebo/math/RotationSpline.hh**
+    + ***Deprecation:*** public:   gazebo::math::RotationSpline
+    + ***Replacement:*** public: ignition::math::RotationSpline
+
+1. **gazebo/math/SignalStats.hh**
+    + ***Deprecation:*** public:   gazebo::math::SignalStatistic
+    + ***Replacement:*** public: ignition::math::SignalStatistic
+    + ***Deprecation:*** public:   gazebo::math::SignalStats
+    + ***Replacement:*** public: ignition::math::SignalStats
+
+1. **gazebo/math/Spline.hh**
+    + ***Deprecation:*** public:   gazebo::math::Spline
+    + ***Replacement:*** public: ignition::math::Spline
+
+1. **gazebo/math/Vector3Stats.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector3Stats
+    + ***Replacement:*** public: ignition::math::Vector3Stats
+
+### Deletions
+
+1. **gazebo/common/Event.hh**
+    + ConnectionPrivate class
+    + Connection() constructor
+    + EventPrivate class
+    + Event(EventPrivate&) constructor
+
+1. **gazebo/gui/EntityMaker.hh**
+    + EntityMakerPrivate class
+    + Entity(EntityMakerPrivate&) constructor
+    + EntityMakerPrivate *dataPtr
+
+1. **gazebo/physics/Link.hh**
+    + std::vector<std::string> cgVisuals
+
 ## Gazebo 7.1.0 to 7.X
 
 ### Additions
@@ -106,7 +403,6 @@ release will remove the deprecated code.
     + ***Replacement:*** public: virtual void SetClipDist();
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewImageFrame(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewImageFrame(std::function<void (const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> _subscriber);
-
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`

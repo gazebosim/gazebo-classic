@@ -22,7 +22,7 @@
 
 #include <functional>
 
-#include "ForceTorquePlugin.hh"
+#include "plugins/ForceTorquePlugin.hh"
 
 using namespace gazebo;
 
@@ -37,7 +37,7 @@ ForceTorquePlugin::ForceTorquePlugin()
 /////////////////////////////////////////////////
 ForceTorquePlugin::~ForceTorquePlugin()
 {
-  this->parentSensor->DisconnectUpdate(this->connection);
+  this->connection.reset();
   this->parentSensor.reset();
 }
 
@@ -49,7 +49,11 @@ void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
     std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
 
   if (!this->parentSensor)
-    gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
+  {
+    gzerr << "ForceTorquePlugin requires a force_torque "
+          << "sensor as its parent.\n";
+    return;
+  }
 
   this->connection = this->parentSensor->ConnectUpdate(
         std::bind(&ForceTorquePlugin::OnUpdate, this, std::placeholders::_1));

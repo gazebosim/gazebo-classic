@@ -1,3 +1,160 @@
+## Gazebo 8
+
+## Gazebo 8.x.x (2017-xx-xx)
+
+1. Removed deprecations
+    * [Pull request #2427]((https://bitbucket.org/osrf/gazebo/pull-request/2427)
+
+1. Include basic support for GNU Precompiled Headers to reduce compile time
+    * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
+
+1. Plotting utility
+    * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
+    * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
+    * [Pull request #2382](https://bitbucket.org/osrf/gazebo/pull-request/2382)
+
+1. Renamed `gazebo/gui/SaveDialog` to `gazebo/gui/SaveEntityDialog`. A new
+   `SaveDialog` class will be added in a future pull request. The migration
+   guide will be updated with that pull request.
+    * [Pull request #2384](https://bitbucket.org/osrf/gazebo/pull-request/2384)
+
+1. Add FiducialCameraPlugin for Camera Sensors
+    * [Pull request #2350](https://bitbucket.org/osrf/gazebo/pull-request/2350)
+
+1. Fix Road2d vertices and shadows
+    * [Pull request #2362](https://bitbucket.org/osrf/gazebo/pull-request/2362)
+
+1. Rearrange GLWidget::OnMouseMove so that the more common use cases it
+   fewer if statements. Use std::thread in place of boost in OculusWindow.
+   Pragma statements to prevent warnings. Prevent variable hiding in
+   WallSegmentItem.
+    * [Pull request #2376](https://bitbucket.org/osrf/gazebo/pull-request/2376)
+
+1. Use single pixel selection buffer for mouse picking
+    * [Pull request #2335](https://bitbucket.org/osrf/gazebo/pull-request/2335)
+
+1. Refactor Visual classes
+  * [Pull request #2331](https://bitbucket.org/osrf/gazebo/pull-requests/2331)
+
+1. Windows plugins (with .dll extension) now accepted
+    * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311)
+    * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
+
+1. Add Introspection Manager and Client util
+    * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
+
+1. Refactor Event classes and improve memory management.
+    * [Pull request #2277](https://bitbucket.org/osrf/gazebo/pull-request/2277)
+    * [Pull request #2317](https://bitbucket.org/osrf/gazebo/pull-request/2317)
+    * [Pull request #2329](https://bitbucket.org/osrf/gazebo/pull-request/2329)
+    * [gazebo_design Pull request #33](https://bitbucket.org/osrf/gazebo_design/pull-requests/33)
+
+1. Remove EntityMakerPrivate and move its members to derived classes
+    * [Pull request #2310](https://bitbucket.org/osrf/gazebo/pull-request/2310)
+
+1. Conversion between ign-msgs and sdf, for plugin
+    * [Pull request #2403](https://bitbucket.org/osrf/gazebo/pull-request/2403)
+
+1. Change NULL to nullptr.
+    * [Pull request #2294](https://bitbucket.org/osrf/gazebo/pull-request/2294)
+    * [Pull request #2297](https://bitbucket.org/osrf/gazebo/pull-request/2297)
+    * [Pull request #2298](https://bitbucket.org/osrf/gazebo/pull-request/2298)
+    * [Pull request #2302](https://bitbucket.org/osrf/gazebo/pull-request/2302)
+    * [Pull request #2295](https://bitbucket.org/osrf/gazebo/pull-request/2295)
+    * [Pull request #2300](https://bitbucket.org/osrf/gazebo/pull-request/2300)
+
+1. Fix memory and other issues found from running Coverity.
+    * A contribution from Olivier Crave
+    * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)
+    * [Pull request #2242](https://bitbucket.org/osrf/gazebo/pull-request/2242)
+    * [Pull request #2243](https://bitbucket.org/osrf/gazebo/pull-request/2243)
+    * [Pull request #2244](https://bitbucket.org/osrf/gazebo/pull-request/2244)
+    * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
+
+1. Deprecate gazebo::math
+    * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
+    * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
+    * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
+    * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
+
+1. Add Wind support
+    * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
+    * A contribution from Olivier Crave
+
+1. Add const accessors to uri path and query
+    * [Pull request #2400](https://bitbucket.org/osrf/gazebo/pull-request/2400)
+
+1. Server generates unique model names in case of overlap, and added allow_renaming field to factory message.
+    * [Pull request 2301](https://bitbucket.org/osrf/gazebo/pull-request/2301)
+    * [Issue 510](https://bitbucket.org/osrf/gazebo/issues/510)
+
+1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
+    * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
+
+1. Add common::URI class
+    * [Pull request #2275](https://bitbucket.org/osrf/gazebo/pull-request/2275)
+
+1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
+    * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
+
+1. Generalize actors to work even if not all elements are specified
+    * [Pull request #2360](https://bitbucket.org/osrf/gazebo/pull-request/2360)
+
+1. PIMPLize rendering/Grid
+    * [Pull request 2330](https://bitbucket.org/osrf/gazebo/pull-request/2330)
+
+1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
+    * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
+
+1. Moved gazebo ODE includes to have correct include path
+    * [Pull request #2186](https://bitbucket.org/osrf/gazebo/pull-request/2186)
+
+1. Atmosphere model
+    * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
+
+1. Added static camera when following a model.
+    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+    * A contribution from Oliver Crave
+
+1. Support conversions between SDF and protobuf for more sensors.
+    * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
+
+1. Fix ODE Ray-Cylinder collision, and added ability to instantiate stand alone MultiRayShapes.
+    * [Pull request #2122](https://bitbucket.org/osrf/gazebo/pull-request/2122)
+
+1. Update depth camera sensor to publish depth data over a topic.
+    * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
+
+1. Add color picker to config widget and fix visual and collision duplication.
+    * [Pull request #2381](https://bitbucket.org/osrf/gazebo/pull-request/2381)
+
+1. Model editor updates
+
+    1. Undo / redo inserting and deleting links
+        * [Pull request #2151](https://bitbucket.org/osrf/gazebo/pull-request/2151)
+
+    1. Undo / redo inserting and deleting nested models
+        * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
+
+    1. Undo insert / delete joints
+        * [Pull request #2266](https://bitbucket.org/osrf/gazebo/pull-request/2266)
+
+    1. Undo insert / delete model plugins
+        * [Pull request #2334](https://bitbucket.org/osrf/gazebo/pull-request/2334)
+
+    1. Undo translate, rotate, snap and align links and nested models
+        * [Pull request #2314](https://bitbucket.org/osrf/gazebo/pull-request/2314)
+
+    1. Undo scale links
+        * [Pull request #2368](https://bitbucket.org/osrf/gazebo/pull-request/2368)
+
+1. Google Summer of Code Graphical interface for inserting plugins during simulation.
+
+    1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
+        * [Pull request #2323](https://bitbucket.org/osrf/gazebo/pull-request/2323)
+        * [Issue #1698](https://bitbucket.org/osrf/gazebo/pull-request/1698)
+
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
@@ -551,6 +708,9 @@ using the same arguments used in the command line.
 
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
+
+    1. Add density widget to config widget and link inspector
+        * [Pull request #1978](https://bitbucket.org/osrf/gazebo/pull-request/1978)
 
     1. Added icons for child and parent link in joint inspector
         * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
@@ -2331,4 +2491,3 @@ compilation on Windows.
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-

@@ -45,6 +45,7 @@ set(tests
   gz_physics.cc
   gz_world.cc
   imu.cc
+  introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
@@ -60,10 +61,12 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_base.cc
   physics_basic_controller_response.cc
   physics_collision.cc
   physics_friction.cc
@@ -80,7 +83,6 @@ set(tests
   rayshape.cc
   region_events.cc
   rest_web.cc
-  road.cc
   saving_and_loading.cc
   sensor.cc
   server_fixture.cc
@@ -138,9 +140,6 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
-
-  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
-    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests
@@ -152,7 +151,9 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  depth_camera.cc
   factory.cc
+  fiducial.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
@@ -161,6 +162,7 @@ set(dri_tests
   pr2.cc
   projector.cc
   rendering_sensor.cc
+  road.cc
   speed_pr2.cc
   world_reset.cc
 )
@@ -170,8 +172,10 @@ set(qt_tests
   collada_visualization.cc
   insert_model.cc
   model_editor.cc
+  model_editor_undo.cc
   model_manipulation.cc
   mouse_pick.cc
+  track_visual.cc
   undo.cc
   view_angle.cc
   view_control.cc

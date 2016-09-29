@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+
+<!--
+
+To run this demo, you must have following arducopter repo checked out:
+
+$ git clone https://github.com/hsu/ardupilot.git -b gazebo_sitl
+
+Add correct path
+
+$ export PATH=$PATH:[path to ardupilot]/ArduCopter
+$ export PATH=$PATH:[path to ardupilot]/Tools/autotest
+
+Make sure you have the right compiler if you are compiling for ARM based platforms
+$ export PATH=/opt/gcc-arm-none-eabi-4_7-2014q2/bin:$PATH
+
+To start simulation, first run gazebo:
+
+$ gazebo worlds/iris_arducopter_demo.world
+
+Start ArduCopter controller by running script below in a separate terminal:
+
+$ sim_vehicle.sh -j 4 -f Gazebo -S 100
+
+Note the speed up (-S) is set to a large number, as long as this number
+is higher than simulation RTF we are ok. This is becuase simulation
+is blocking and waiting for ArduCopter, but ArduCopter is not waiting
+for anyone.
+
+This will start mavproxy, easiest way to start flying is to first skip arming
+checks (e.g. RC calibration, etc.). And increase Failsafe EKF threshold to
+account for simulation errors:
+
+STABILIZE> arm uncheck all
+STABILIZE> param set FS_EKF_THRESH 1
+
+Takeoff:
+
+STABILIZE> mode LOITER
+LOITER> rc 3 1500
+LOITER> arm throttle
+LOITER> takeoff 10
+
+Or you can then do the usual mavprox commands within mavproxy shell:
+
+STABILIZE> mode STABILIZE
+STABILIZE> arm throttle
+
+Option to connect a joystick:
+
+STABILIZE> module load joystick
+
+to fly iris with a ps2 joystick.
+
+-->
+<sdf version="1.6">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>-5 0 1 0 0.2 0</pose>
+      </camera>
+    </gui>
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>100</iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0.0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>0</real_time_update_rate>
+      <max_step_size>0.0025</max_step_size>
+    </physics>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="runway">
+          <pose>700 0 0.005 0 0 0</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1829 45</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Runway</name>
+            </script>
+          </material>
+        </visual>
+
+        <visual name="grass">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grass</name>
+            </script>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <model name="iris_demo">
+      <include>
+        <uri>model://iris_with_standoffs_demo</uri>
+      </include>
+    </model>
+  </world>
+</sdf>

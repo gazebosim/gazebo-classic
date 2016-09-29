@@ -72,7 +72,7 @@ namespace gazebo
 
     /// \brief Cross platform retrieval of an environment variable.
     /// \param[in] _name Name of the environment variable to get.
-    /// \return Environment variable contents, or NULL on error.
+    /// \return Environment variable contents, or nullptr on error.
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
 
@@ -147,6 +147,25 @@ namespace gazebo
     std::string replaceAll(const std::string &_orig,
                            const std::string &_key,
                            const std::string &_replacement);
+
+    /// \brief Splits a string into tokens.
+    /// \param[in] _str Input string.
+    /// \param[in] _delim Token delimiter.
+    /// \return Vector of tokens.
+    GZ_COMMON_VISIBLE
+    std::vector<std::string> split(const std::string &_str,
+                                   const std::string &_delim);
+
+    /// \brief Generates a path for a file which doesn't collide with existing
+    /// files, by appending numbers to it (i.e. (0), (1), ...)
+    /// \param[in] _pathAndName Full absolute path and file name up to the
+    /// file extension.
+    /// \param[in] _extension File extension, such as "pdf".
+    /// \return Full path with name and extension, which doesn't collide with
+    /// existing files
+    GZ_COMMON_VISIBLE
+    std::string unique_file_path(const std::string &_pathAndName,
+                                 const std::string &_extension);
     /// \}
   }
 
@@ -161,7 +180,7 @@ namespace gazebo
 
     if (_buffer.size() == 0)
     {
-      sha1.process_bytes(NULL, 0);
+      sha1.process_bytes(nullptr, 0);
     }
     else
     {

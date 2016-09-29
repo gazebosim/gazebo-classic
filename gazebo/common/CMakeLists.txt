@@ -1,8 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-if (WIN32)
- add_definitions(-DBUILDING_DLL_GZ_COMMON)
-endif()
+add_definitions(-DBUILDING_DLL_GZ_COMMON)
 
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
@@ -50,6 +48,7 @@ set (sources
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
+  MaterialDensity.cc
   Mesh.cc
   MeshExporter.cc
   MeshLoader.cc
@@ -66,6 +65,7 @@ set (sources
   SVGLoader.cc
   Time.cc
   Timer.cc
+  URI.cc
   Video.cc
   ffmpeg_inc.cc
 )
@@ -103,6 +103,7 @@ set (headers
   KeyEvent.hh
   KeyFrame.hh
   Material.hh
+  MaterialDensity.hh
   Mesh.hh
   MeshLoader.hh
   MeshManager.hh
@@ -121,6 +122,7 @@ set (headers
   Time.hh
   Timer.hh
   UpdateInfo.hh
+  URI.hh
   Video.hh
   ffmpeg_inc.h
  )
@@ -140,6 +142,7 @@ set (gtest_sources
   Image_TEST.cc
   ImageHeightmap_TEST.cc
   Material_TEST.cc
+  MaterialDensity_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
@@ -149,6 +152,7 @@ set (gtest_sources
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
+  URI_TEST.cc
 )
 
 # Timer test fails on OSX
@@ -249,6 +253,12 @@ endif()
 if (HAVE_GDAL)
   target_link_libraries(gazebo_common ${GDAL_LIBRARY})
 endif()
+
+if (USE_PCH)
+  set(MORE_FLAGS "-pthread")
+  add_pch(gazebo_common common_pch.hh ${MORE_FLAGS})
+endif()
+
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)

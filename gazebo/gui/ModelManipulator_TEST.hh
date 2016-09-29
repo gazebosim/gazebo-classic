@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_MANIPULATOR_TEST_HH_
-#define _GAZEBO_MODEL_MANIPULATOR_TEST_HH_
+#ifndef GAZEBO_GUI_MODELMANIPULATOR_TEST_HH_
+#define GAZEBO_GUI_MODELMANIPULATOR_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
@@ -27,6 +27,9 @@ class ModelManipulator_TEST : public QTestFixture
 
   /// \brief Test attaching to visual
   private slots: void Attach();
+
+  /// \brief Test Transparency of a visual after translating.
+  private slots: void Transparency();
 };
 
 #endif

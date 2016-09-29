@@ -78,4 +78,3 @@ message Any
   /// \brief A Time value
   optional Time time_value             = 10;
 }
-

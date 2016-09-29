@@ -21,6 +21,7 @@
 #include <deque>
 #include <vector>
 #include <list>
+#include <memory>
 #include <set>
 #include <boost/thread.hpp>
 #include <sdf/sdf.hh>
@@ -28,6 +29,7 @@
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -48,6 +50,13 @@ namespace gazebo
 
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
+
+      /// \brief Unique pointer the wind. The world owns this pointer.
+      public: std::unique_ptr<Wind> wind;
+
+      /// \brief Unique pointer the atmosphere model.
+      /// The world owns this pointer.
+      public: std::unique_ptr<Atmosphere> atmosphere;
 
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;
@@ -219,6 +228,12 @@ namespace gazebo
       /// \brief True to enable the physics engine.
       public: bool enablePhysicsEngine;
 
+      /// \brief True to enable the wind.
+      public: bool enableWind;
+
+      /// \brief True to enable the atmosphere model.
+      public: bool enableAtmosphere;
+
       /// \brief Ray used to test for collisions when placing entities.
       public: RayShapePtr testRay;
 
@@ -323,6 +338,12 @@ namespace gazebo
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
+
+      /// \brief URI of this world.
+      public: common::URI uri;
+
+      /// \brief All the introspection items regsitered for this.
+      public: std::vector<common::URI> introspectionItems;
     };
   }
 }

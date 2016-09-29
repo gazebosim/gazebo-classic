@@ -56,6 +56,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/math/Vector3.hh"
 
@@ -63,6 +64,7 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
@@ -70,11 +72,14 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Atmosphere.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Wind.hh"
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
@@ -143,6 +148,8 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableWind = true;
+  this->dataPtr->enableAtmosphere = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -257,6 +264,28 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->physicsEngine->Load(physicsElem);
 
+  // This should come before loading of entities
+  sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
+
+  this->dataPtr->wind.reset(new physics::Wind(*this,
+                            this->dataPtr->sdf->GetElement("wind")));
+
+  if (this->dataPtr->wind == NULL)
+    gzthrow("Unable to create wind\n");
+
+  this->dataPtr->wind->Load(windElem);
+
+  // This should come after loading physics engine
+  sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
+
+  type = atmosphereElem->Get<std::string>("type");
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type, *this);
+
+  if (this->dataPtr->atmosphere == NULL)
+    gzerr << "Unable to create atmosphere model\n";
+
+  this->dataPtr->atmosphere->Load(atmosphereElem);
+
   // This should also come before loading of entities
   {
     sdf::ElementPtr spherical = this->dataPtr->sdf->GetElement(
@@ -304,6 +333,14 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->userCmdManager = UserCmdManagerPtr(
       new UserCmdManager(shared_from_this()));
+
+  // Initialize the world URI.
+  this->dataPtr->uri.Clear();
+  this->dataPtr->uri.SetScheme("data");
+  this->dataPtr->uri.Path().PushFront(this->GetName());
+  this->dataPtr->uri.Path().PushFront("world");
+
+  this->RegisterIntrospectionItems();
 
   this->dataPtr->loaded = true;
 }
@@ -669,6 +706,8 @@ void World::Step()
     }
   }
 
+  gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
+
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
@@ -797,6 +836,8 @@ void World::Update()
 
   event::Events::worldUpdateEnd();
 
+  gazebo::util::IntrospectionManager::Instance()->Update();
+
   DIAG_TIMER_STOP("World::Update");
 }
 
@@ -909,6 +950,8 @@ void World::Fini()
     delete this->dataPtr->thread;
     this->dataPtr->thread = nullptr;
   }
+
+  this->UnregisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -944,6 +987,18 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->dataPtr->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+Wind &World::Wind() const
+{
+  return *this->dataPtr->wind;
+}
+
+//////////////////////////////////////////////////
+Atmosphere &World::Atmosphere() const
+{
+  return *this->dataPtr->atmosphere;
 }
 
 //////////////////////////////////////////////////
@@ -1073,6 +1128,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
+  light->SetStatic(true);
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);
@@ -2003,8 +2059,27 @@ void World::ProcessFactoryMsgs()
         {
           // Make sure model name is unique
           auto entityName = elem->Get<std::string>("name");
-          entityName = this->UniqueModelName(entityName);
-          elem->GetAttribute("name")->Set(entityName);
+          if (entityName.empty())
+          {
+            gzerr << "Can't load model with empty name" << std::endl;
+            continue;
+          }
+
+          // Model with the given name already exists
+          if (this->GetModel(entityName))
+          {
+            // If allow renaming is disabled
+            if (!factoryMsg.allow_renaming())
+            {
+              gzwarn << "A model named [" << entityName << "] already exists "
+                    << "and allow_renaming is false. Model won't be inserted."
+                    << std::endl;
+              continue;
+            }
+
+            entityName = this->UniqueModelName(entityName);
+            elem->GetAttribute("name")->Set(entityName);
+          }
 
           modelsToLoad.push_back(elem);
         }
@@ -2059,8 +2134,6 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 
   if (entity)
     model = entity->GetParentModel();
-  else
-    gzerr << "Unable to find entity below point[" << _pt << "]\n";
 
   return model;
 }
@@ -2750,6 +2823,43 @@ void World::EnablePhysicsEngine(bool _enable)
 }
 
 /////////////////////////////////////////////////
+bool World::WindEnabled() const
+{
+  return this->dataPtr->enableWind;
+}
+
+/////////////////////////////////////////////////
+void World::SetWindEnabled(const bool _enable)
+{
+  if (this->dataPtr->enableWind == _enable)
+    return;
+
+  this->dataPtr->enableWind = _enable;
+
+  for (auto const &model : this->dataPtr->models)
+  {
+    Link_V links = model->GetLinks();
+    for (auto const &link : links)
+    {
+      if (link->WindMode())
+        link->SetWindEnabled(this->dataPtr->enableWind);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+bool World::AtmosphereEnabled() const
+{
+  return this->dataPtr->enableAtmosphere;
+}
+
+/////////////////////////////////////////////////
+void World::SetAtmosphereEnabled(const bool _enable)
+{
+  this->dataPtr->enableAtmosphere = _enable;
+}
+
+/////////////////////////////////////////////////
 void World::_AddDirty(Entity *_entity)
 {
   GZ_ASSERT(_entity != nullptr, "_entity is nullptr");
@@ -2761,6 +2871,34 @@ void World::ResetPhysicsStates()
 {
   for (auto &model : this->dataPtr->models)
     model->ResetPhysicsStates();
+}
+
+/////////////////////////////////////////////////
+common::URI World::URI() const
+{
+  return this->dataPtr->uri;
+}
+
+/////////////////////////////////////////////////
+void World::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  common::URI timeURI(uri);
+  timeURI.Query().Insert("p", "time/sim_time");
+  this->dataPtr->introspectionItems.push_back(timeURI);
+  // Add here all the items that might be introspected.
+  gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
+      timeURI.Str(), std::bind(&World::GetSimTime, this));
+}
+
+/////////////////////////////////////////////////
+void World::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->dataPtr->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->dataPtr->introspectionItems.clear();
 }
 
 //////////////////////////////////////////////////

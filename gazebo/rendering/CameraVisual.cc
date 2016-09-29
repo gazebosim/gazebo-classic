@@ -118,7 +118,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->AttachObject(planeEnt);
-  dPtr->camera->AttachToVisual(this->GetId(), true);
+  dPtr->camera->AttachToVisual(this->GetId(), true, 0, 0);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
@@ -161,4 +161,6 @@ void CameraVisual::Fini()
     this->dataPtr->scene->OgreSceneManager()->destroyEntity(
         this->GetName() + "__plane");
   }
+
+  Visual::Fini();
 }

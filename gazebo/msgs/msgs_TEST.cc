@@ -230,7 +230,7 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
   EXPECT_DOUBLE_EQ(msg.w(), 0.27059805007309851);
 }
 
-TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
+TEST_F(MsgsTest, ConvertMsgsQuaternionToMath)
 {
   msgs::Quaternion msg =
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
@@ -599,6 +599,323 @@ TEST_F(MsgsTest, Initialization)
     EXPECT_DOUBLE_EQ(0, msg.torque().y());
     EXPECT_DOUBLE_EQ(0, msg.torque().z());
   }
+}
+
+/////////////////////////////////////////////////
+/// Helper function for GPSSensorFromSDF
+void CheckGPSSensorMsg(const msgs::GPSSensor &_msg)
+{
+  EXPECT_EQ(_msg.position().horizontal_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.position().horizontal_noise().mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().stddev(), 0.2, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().bias_mean(), 0.3, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().bias_stddev(), 0.4, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().precision(), 0.5, 1e-4);
+
+  EXPECT_EQ(_msg.position().vertical_noise().type(),
+      msgs::SensorNoise::GAUSSIAN_QUANTIZED);
+  EXPECT_NEAR(_msg.position().vertical_noise().mean(), 0.6, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().stddev(), 0.7, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_mean(), 0.8, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_stddev(), 0.9, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().precision(), 1.0, 1e-4);
+
+  EXPECT_EQ(_msg.velocity().horizontal_noise().type(), msgs::SensorNoise::NONE);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().mean(), 1.1, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().stddev(), 1.2, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_mean(), 1.3, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_stddev(), 1.4, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().precision(), 1.5, 1e-4);
+
+  EXPECT_EQ(_msg.velocity().vertical_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().mean(), 1.6, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().stddev(), 1.7, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_mean(), 1.8, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_stddev(), 1.9, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().precision(), 2.0, 1e-4);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, GPSSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='gps' type='gps'>\
+           <always_on>true</always_on>\
+           <update_rate>15</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>true</visualize>\
+           <topic>/gazebo/test</topic>\
+           <gps>\
+             <position_sensing>\
+               <horizontal>\
+                 <noise type='gaussian'>\
+                   <mean>0.1</mean>\
+                   <stddev>0.2</stddev>\
+                   <bias_mean>0.3</bias_mean>\
+                   <bias_stddev>0.4</bias_stddev>\
+                   <precision>0.5</precision>\
+                 </noise>\
+               </horizontal>\
+               <vertical>\
+                 <noise type='gaussian_quantized'>\
+                   <mean>0.6</mean>\
+                   <stddev>0.7</stddev>\
+                   <bias_mean>0.8</bias_mean>\
+                   <bias_stddev>0.9</bias_stddev>\
+                   <precision>1.0</precision>\
+                 </noise>\
+               </vertical>\
+             </position_sensing>\
+             <velocity_sensing>\
+               <horizontal>\
+                 <noise type='none'>\
+                   <mean>1.1</mean>\
+                   <stddev>1.2</stddev>\
+                   <bias_mean>1.3</bias_mean>\
+                   <bias_stddev>1.4</bias_stddev>\
+                   <precision>1.5</precision>\
+                 </noise>\
+               </horizontal>\
+               <vertical>\
+                 <noise type='gaussian'>\
+                   <mean>1.6</mean>\
+                   <stddev>1.7</stddev>\
+                   <bias_mean>1.8</bias_mean>\
+                   <bias_stddev>1.9</bias_stddev>\
+                   <precision>2.0</precision>\
+                 </noise>\
+               </vertical>\
+             </velocity_sensing>\
+           </gps>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "gps");
+  EXPECT_EQ(msg.type(), "gps");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_gps());
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+
+  CheckGPSSensorMsg(msg.gps());
+
+  sdf::ElementPtr elem = msgs::GPSSensorToSDF(msg.gps());
+  msgs::GPSSensor sensorMsg = msgs::GPSSensorFromSDF(elem);
+  CheckGPSSensorMsg(sensorMsg);
+}
+
+/////////////////////////////////////////////////
+/// Helper function for IMUSensorFromSDF
+void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
+{
+  EXPECT_EQ(_msg.angular_velocity().x_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.angular_velocity().y_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.angular_velocity().z_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().x_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().y_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().z_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().precision(), 0.0, 1e-4);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, IMUSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+        <sensor name='imu_sensor' type='imu'>\
+          <update_rate>1000</update_rate>\
+          <always_on>true</always_on>\
+          <pose>1 2 3 0.1 0.2 0.3</pose>\
+          <visualize>true</visualize>\
+          <topic>/gazebo/test</topic>\
+          <imu>\
+            <angular_velocity>\
+              <x>\
+                <noise type='gaussian'>\
+                 <mean>0</mean>\
+                 <stddev>0.0002</stddev>\
+                 <bias_mean>7.5e-06</bias_mean>\
+                 <bias_stddev>8e-07</bias_stddev>\
+                </noise>\
+              </x>\
+              <y>\
+                <noise type='gaussian'>\
+                 <mean>0</mean>\
+                 <stddev>0.0002</stddev>\
+                 <bias_mean>7.5e-06</bias_mean>\
+                 <bias_stddev>8e-07</bias_stddev>\
+                </noise>\
+              </y>\
+              <z>\
+                <noise type='gaussian'>\
+                 <mean>0</mean>\
+                 <stddev>0.0002</stddev>\
+                 <bias_mean>7.5e-06</bias_mean>\
+                 <bias_stddev>8e-07</bias_stddev>\
+                </noise>\
+              </z>\
+            </angular_velocity>\
+            <linear_acceleration>\
+              <x>\
+                <noise type='gaussian'>\
+                  <mean>0</mean>\
+                  <stddev>0.017</stddev>\
+                  <bias_mean>0.1</bias_mean>\
+                  <bias_stddev>0.001</bias_stddev>\
+                </noise>\
+              </x>\
+              <y>\
+                <noise type='gaussian'>\
+                  <mean>0</mean>\
+                  <stddev>0.017</stddev>\
+                  <bias_mean>0.1</bias_mean>\
+                  <bias_stddev>0.001</bias_stddev>\
+                </noise>\
+              </y>\
+              <z>\
+                <noise type='gaussian'>\
+                  <mean>0</mean>\
+                  <stddev>0.017</stddev>\
+                  <bias_mean>0.1</bias_mean>\
+                  <bias_stddev>0.001</bias_stddev>\
+                </noise>\
+              </z>\
+            </linear_acceleration>\
+          </imu>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "imu_sensor");
+  EXPECT_EQ(msg.type(), "imu");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 1000.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_imu());
+  EXPECT_FALSE(msg.has_gps());
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+
+  CheckIMUSensorMsg(msg.imu());
+
+  sdf::ElementPtr elem = msgs::IMUSensorToSDF(msg.imu());
+  msgs::IMUSensor sensorMsg = msgs::IMUSensorFromSDF(elem);
+  CheckIMUSensorMsg(sensorMsg);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, LogicalCameraSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='camera' type='logical_camera'>\
+           <always_on>true</always_on>\
+           <update_rate>15</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>true</visualize>\
+           <topic>/gazebo/test</topic>\
+           <logical_camera>\
+             <near>0.1</near>\
+             <far>100.2</far>\
+             <aspect_ratio>1.43</aspect_ratio>\
+             <horizontal_fov>1.23</horizontal_fov>\
+           </logical_camera>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "camera");
+  EXPECT_EQ(msg.type(), "logical_camera");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_logical_camera());
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+  EXPECT_FALSE(msg.has_contact());
+
+  EXPECT_NEAR(msg.logical_camera().near_clip(), 0.1, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().far_clip(), 100.2, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().aspect_ratio(), 1.43, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().horizontal_fov(), 1.23, 1e-4);
+
+  sdf::ElementPtr elem = msgs::LogicalCameraSensorToSDF(msg.logical_camera());
+  msgs::LogicalCameraSensor sensorMsg = msgs::LogicalCameraSensorFromSDF(elem);
+
+  EXPECT_NEAR(sensorMsg.near_clip(), 0.1, 1e-4);
+  EXPECT_NEAR(sensorMsg.far_clip(), 100.2, 1e-4);
+  EXPECT_NEAR(sensorMsg.aspect_ratio(), 1.43, 1e-4);
+  EXPECT_NEAR(sensorMsg.horizontal_fov(), 1.23, 1e-4);
 }
 
 /////////////////////////////////////////////////
@@ -2054,6 +2371,7 @@ TEST_F(MsgsTest, LinkToSDF)
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
+  linkMsg.set_enable_wind(false);
   msgs::Set(linkMsg.mutable_pose(), pose);
 
   const double laserRetro1 = 0.4;
@@ -2084,6 +2402,7 @@ TEST_F(MsgsTest, LinkToSDF)
   EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
+  EXPECT_FALSE(linkSDF->Get<bool>("enable_wind"));
   EXPECT_EQ(pose, linkSDF->Get<ignition::math::Pose3d>("pose"));
 
   sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");
@@ -3369,6 +3688,14 @@ TEST_F(MsgsTest, ModelToSDF)
   const ignition::math::Vector3d rearAxis(0, 0, 1);
   msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
 
+  // Add plugin
+  model.add_plugin();
+  ASSERT_EQ(model.plugin_size(), 1);
+  auto plugin = model.mutable_plugin(0);
+  plugin->set_name("plugin_name");
+  plugin->set_filename("plugin_filename");
+  plugin->set_innerxml("<plugin_param>param</plugin_param>");
+
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
   EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(modelSDF->Get<bool>("static"));
@@ -3398,6 +3725,12 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
       ignition::math::Pose3d());
+
+  sdf::ElementPtr pluginElem = modelSDF->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), "plugin_name");
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), "plugin_filename");
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }
 
 /////////////////////////////////////////////////

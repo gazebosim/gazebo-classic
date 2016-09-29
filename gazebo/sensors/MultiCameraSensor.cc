@@ -154,7 +154,7 @@ void MultiCameraSensor::Init()
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
-    camera->AttachToVisual(this->parentId, true);
+    camera->AttachToVisual(this->parentId, true, 0, 0);
 
     if (cameraSdf->HasElement("noise"))
     {
@@ -212,12 +212,6 @@ void MultiCameraSensor::Fini()
   }
   this->dataPtr->cameras.clear();
   this->scene.reset();
-}
-
-//////////////////////////////////////////////////
-rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
-{
-  return this->Camera(_index);
 }
 
 //////////////////////////////////////////////////
@@ -290,22 +284,10 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-unsigned int MultiCameraSensor::GetCameraCount() const
-{
-  return this->CameraCount();
-}
-
-//////////////////////////////////////////////////
 unsigned int MultiCameraSensor::CameraCount() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
   return this->dataPtr->cameras.size();
-}
-
-//////////////////////////////////////////////////
-unsigned int MultiCameraSensor::GetImageWidth(unsigned int _index) const
-{
-  return this->ImageWidth(_index);
 }
 
 //////////////////////////////////////////////////
@@ -315,21 +297,9 @@ unsigned int MultiCameraSensor::ImageWidth(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-unsigned int MultiCameraSensor::GetImageHeight(unsigned int _index) const
-{
-  return this->ImageHeight(_index);
-}
-
-//////////////////////////////////////////////////
 unsigned int MultiCameraSensor::ImageHeight(const unsigned int _index) const
 {
   return this->Camera(_index)->ImageHeight();
-}
-
-//////////////////////////////////////////////////
-const unsigned char *MultiCameraSensor::GetImageData(unsigned int _index)
-{
-  return this->ImageData(_index);
 }
 
 //////////////////////////////////////////////////

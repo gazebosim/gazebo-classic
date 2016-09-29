@@ -111,19 +111,19 @@ void SonarSensor::Load(const std::string &_worldName)
   }
 
   Sensor::Load(_worldName);
-  GZ_ASSERT(this->world != NULL,
+  GZ_ASSERT(this->world != nullptr,
       "SonarSensor did not get a valid World pointer");
 
   this->dataPtr->parentEntity =
     this->world->GetEntity(this->ParentName());
 
-  GZ_ASSERT(this->dataPtr->parentEntity != NULL,
+  GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
 
   physics::PhysicsEnginePtr physicsEngine =
     this->world->GetPhysicsEngine();
 
-  GZ_ASSERT(physicsEngine != NULL,
+  GZ_ASSERT(physicsEngine != nullptr,
       "Unable to get a pointer to the physics engine");
 
   /// \todo: Change the collision shape to a cone. Needs a collision shape
@@ -131,7 +131,7 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->sonarCollision = physicsEngine->CreateCollision("mesh",
       this->ParentName());
 
-  GZ_ASSERT(this->dataPtr->sonarCollision != NULL,
+  GZ_ASSERT(this->dataPtr->sonarCollision != nullptr,
       "Unable to create a cylinder collision using the physics engine.");
 
   this->dataPtr->sonarCollision->SetName(this->ScopedName() +
@@ -146,7 +146,7 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->sonarShape = boost::dynamic_pointer_cast<physics::MeshShape>(
       this->dataPtr->sonarCollision->GetShape());
 
-  GZ_ASSERT(this->dataPtr->sonarShape != NULL,
+  GZ_ASSERT(this->dataPtr->sonarShape != nullptr,
       "Unable to get the sonar shape from the sonar collision.");
 
   // Use a scaled cone mesh for the sonar collision shape.
@@ -234,21 +234,9 @@ void SonarSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-double SonarSensor::GetRangeMin() const
-{
-  return this->RangeMin();
-}
-
-//////////////////////////////////////////////////
 double SonarSensor::RangeMin() const
 {
   return this->dataPtr->rangeMin;
-}
-
-//////////////////////////////////////////////////
-double SonarSensor::GetRangeMax() const
-{
-  return this->RangeMax();
 }
 
 //////////////////////////////////////////////////
@@ -258,21 +246,9 @@ double SonarSensor::RangeMax() const
 }
 
 //////////////////////////////////////////////////
-double SonarSensor::GetRadius() const
-{
-  return this->Radius();
-}
-
-//////////////////////////////////////////////////
 double SonarSensor::Radius() const
 {
   return this->dataPtr->radius;
-}
-
-//////////////////////////////////////////////////
-double SonarSensor::GetRange()
-{
-  return this->Range();
 }
 
 //////////////////////////////////////////////////
@@ -388,6 +364,6 @@ event::ConnectionPtr SonarSensor::ConnectUpdate(
 //////////////////////////////////////////////////
 void SonarSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
 {
-  this->dataPtr->update.Disconnect(_conn);
+  this->dataPtr->update.Disconnect(_conn->Id());
 }
 

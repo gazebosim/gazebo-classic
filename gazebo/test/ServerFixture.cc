@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo.hh"
 #include "ServerFixture.hh"
@@ -254,22 +255,18 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
 
   ASSERT_NO_THROW(this->server = new Server());
 
-  if (!this->server->ParseArgs(argc, argv))
+  if (this->server->ParseArgs(argc, argv))
   {
-    ASSERT_NO_THROW(delete this->server);
-    this->server = NULL;
-    return;
+    if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+    {
+      ASSERT_NO_THROW(rendering::create_scene(
+            gazebo::physics::get_world()->GetName(), false, true));
+    }
+
+    ASSERT_NO_THROW(this->server->Run());
+
+    ASSERT_NO_THROW(this->server->Fini());
   }
-
-  if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
-  {
-    ASSERT_NO_THROW(rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true));
-  }
-
-  ASSERT_NO_THROW(this->server->Run());
-
-  ASSERT_NO_THROW(this->server->Fini());
 
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
@@ -397,12 +394,12 @@ void ServerFixture::PrintScan(const std::string &_name, double *_scan,
   for (unsigned int i = 0; i < _sampleCount-1; ++i)
   {
     if ((i+1) % 5 == 0)
-      printf("%13.10f,\n", math::precision(_scan[i], 10));
+      printf("%13.10f,\n", ignition::math::precision(_scan[i], 10));
     else
-      printf("%13.10f, ", math::precision(_scan[i], 10));
+      printf("%13.10f, ", ignition::math::precision(_scan[i], 10));
   }
   printf("%13.10f};\n",
-      math::precision(_scan[_sampleCount-1], 10));
+      ignition::math::precision(_scan[_sampleCount-1], 10));
   printf("static double *%s = __%s;\n", _name.c_str(),
       _name.c_str());
 }
@@ -417,8 +414,8 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+    double diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                       ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -448,8 +445,8 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
     }
     else
     {
-      diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+      diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                  ignition::math::precision(_scanB[i], 10));
     }
 
     _diffSum += diff;
@@ -529,7 +526,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   while (this->gotImage < 20)
     common::Time::MSleep(100);
 
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  // c will disconnect automatically when it goes out of scope
 }
 
 /////////////////////////////////////////////////
@@ -798,6 +795,47 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_raySensorName, 100, 100);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnDepthCameraSensor(const std::string &_modelName,
+    const std::string &_cameraName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    unsigned int _width, unsigned int _height, double _rate, double _near,
+    double _far)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _cameraName << "' type ='depth'>"
+    << "    <always_on>1</always_on>"
+    << "    <update_rate>" << _rate << "</update_rate>"
+    << "    <visualize>true</visualize>"
+    << "    <camera>"
+    << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+    << "      <image>"
+    << "        <width>" << _width << "</width>"
+    << "        <height>" << _height << "</height>"
+    << "      </image>"
+    << "      <clip>"
+    << "        <near>" << _near << "</near><far>" << _far << "</far>"
+    << "      </clip>"
+    << "    </camera>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 50);
+  WaitUntilSensorSpawn(_cameraName, 100, 100);
 }
 
 /////////////////////////////////////////////////

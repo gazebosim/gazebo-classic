@@ -10,6 +10,7 @@ set (sources_local
   model/JointMaker.cc
   model/LinkConfig.cc
   model/LinkInspector.cc
+  model/MEUserCmdManager.cc
   model/ModelCreator.cc
   model/ModelData.cc
   model/ModelEditor.cc
@@ -29,6 +30,7 @@ set (qt_headers_local
   model/JointMaker.hh
   model/LinkConfig.hh
   model/LinkInspector.hh
+  model/MEUserCmdManager.hh
   model/ModelCreator.hh
   model/ModelData.hh
   model/ModelEditor.hh

@@ -38,13 +38,16 @@ include_directories(${TBB_INCLUDEDIR})
 
 # Be sure to locate this definition *after* add_subdirectories
 # in order to get the proper visibility when building libs
+add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
 if (WIN32)
-  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
   include_directories(${libdl_include_dir})
 endif()
 
 set (sources ${sources}
   Actor.cc
+  AdiabaticAtmosphere.cc
+  Atmosphere.cc
+  AtmosphereFactory.cc
   Base.cc
   BoxShape.cc
   Collision.cc
@@ -82,12 +85,16 @@ set (sources ${sources}
   State.cc
   SurfaceParams.cc
   UserCmdManager.cc
+  Wind.cc
   World.cc
   WorldState.cc
 )
 
 set (headers
   Actor.hh
+  AdiabaticAtmosphere.hh
+  Atmosphere.hh
+  AtmosphereFactory.hh
   BallJoint.hh
   Base.hh
   BoxShape.hh
@@ -135,6 +142,7 @@ set (headers
   SurfaceParams.hh
   UniversalJoint.hh
   UserCmdManager.hh
+  Wind.hh
   World.hh
   WorldState.hh)
 
@@ -176,6 +184,10 @@ if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
+if (USE_PCH)
+  add_pch(gazebo_physics physics_pch.hh)
+endif()
+
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
@@ -194,6 +206,8 @@ gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics)
 
 # unit tests with gazebo_test_fixture
 set (gtest_fixture_sources
+  Actor_TEST.cc
+  Atmosphere_TEST.cc
   ContactManager_TEST.cc
   Light_TEST.cc
   LightState_TEST.cc
@@ -201,6 +215,7 @@ set (gtest_fixture_sources
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
+  Wind_TEST.cc
   World_TEST.cc
   WorldState_TEST.cc
 )

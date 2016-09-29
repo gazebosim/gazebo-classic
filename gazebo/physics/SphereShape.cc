@@ -87,5 +87,5 @@ void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 double SphereShape::ComputeVolume() const
 {
-  return 4*M_PI*pow(this->GetRadius(), 3)/3;
+  return IGN_SPHERE_VOLUME(this->GetRadius());
 }

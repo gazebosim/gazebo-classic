@@ -247,12 +247,6 @@ void ImuSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-msgs::IMU ImuSensor::GetImuMessage() const
-{
-  return this->ImuMessage();
-}
-
-//////////////////////////////////////////////////
 msgs::IMU ImuSensor::ImuMessage() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -352,8 +346,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
 
     this->dataPtr->imuMsg.set_entity_name(this->ParentName());
 
-    this->dataPtr->gravity =
-      this->world->GetPhysicsEngine()->GetGravity().Ign();
+    this->dataPtr->gravity = this->world->Gravity();
 
     msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 

@@ -30,7 +30,6 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -38,6 +37,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
@@ -49,6 +49,9 @@
 #include "gazebo/physics/Contact.hh"
 
 #include "gazebo/transport/Node.hh"
+
+#include "gazebo/util/IntrospectionManager.hh"
+#include "gazebo/util/OpenAL.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -73,6 +76,11 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
+  this->requestSub = this->node->Subscribe("~/request",
+                                           &Model::OnRequest, this, true);
+  this->responsePub = this->node->Advertise<msgs::Response>(
+      "~/response");
+
   this->SetStatic(this->sdf->Get<bool>("static"));
   if (this->sdf->HasElement("static"))
   {
@@ -83,6 +91,11 @@ void Model::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("self_collide"))
   {
     this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+
+  if (this->sdf->HasElement("enable_wind"))
+  {
+    this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
   }
 
   if (this->sdf->HasElement("allow_auto_disable"))
@@ -97,6 +110,49 @@ void Model::Load(sdf::ElementPtr _sdf)
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
+}
+
+//////////////////////////////////////////////////
+void Model::OnRequest(ConstRequestPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
+
+  // Only handle requests for model plugins in this model
+  if (_msg->request() == "model_plugin_info" && this->sdf->HasElement("plugin")
+      && _msg->data().find(this->URI().Str()) != std::string::npos)
+  {
+    // Find correct plugin
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      std::string pluginName = pluginElem->Get<std::string>("name");
+
+      if (_msg->data().find(pluginName) != std::string::npos)
+      {
+        // Get plugin info from SDF
+        msgs::Plugin pluginMsg;
+        pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+        // Publish response with plugin info
+        msgs::Response response;
+        response.set_id(_msg->id());
+        response.set_request(_msg->request());
+        response.set_response("success");
+        response.set_type(pluginMsg.GetTypeName());
+
+        std::string *serializedData = response.mutable_serialized_data();
+        pluginMsg.SerializeToString(serializedData);
+
+        this->responsePub->Publish(response);
+
+        return;
+      }
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+
+    gzwarn << "Plugin [" << _msg->data() << "] not found in model [" <<
+        this->URI().Str() << "]" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1151,6 +1207,7 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
+  _msg.set_enable_wind(this->WindMode());
   msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale);
@@ -1170,6 +1227,18 @@ void Model::FillMsg(msgs::Model &_msg)
   for (const auto &model : this->models)
   {
     model->FillMsg(*_msg.add_model());
+  }
+
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      auto pluginMsg = _msg.add_plugin();
+      pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
   }
 }
 
@@ -1204,6 +1273,9 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   if (_msg.has_scale())
     this->SetScale(msgs::ConvertIgn(_msg.scale()));
+
+  if (_msg.has_enable_wind())
+    this->SetWindMode(_msg.enable_wind());
 }
 
 //////////////////////////////////////////////////
@@ -1303,12 +1375,6 @@ void Model::SetState(const ModelState &_state)
   //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
   //                          jointState.GetAngle(0).Radian());
   // }
-}
-
-/////////////////////////////////////////////////
-void Model::SetScale(const math::Vector3 &_scale)
-{
-  this->SetScale(_scale.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -1533,6 +1599,83 @@ bool Model::RemoveJoint(const std::string &_name)
            << "], not removed.\n";
     return false;
   }
+}
+
+/////////////////////////////////////////////////
+void Model::SetWindMode(const bool _enable)
+{
+  this->sdf->GetElement("enable_wind")->Set(_enable);
+  for (auto &link : this->links)
+    link->SetWindMode(_enable);
+}
+
+/////////////////////////////////////////////////
+bool Model::WindMode() const
+{
+  return this->sdf->Get<bool>("enable_wind");
+}
+
+/////////////////////////////////////////////////
+void Model::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  // Callbacks.
+  auto fModelPose = [this]()
+  {
+    return this->GetWorldPose().Ign();
+  };
+
+  auto fModelLinVel = [this]()
+  {
+    return this->GetWorldLinearVel().Ign();
+  };
+
+  auto fModelAngVel = [this]()
+  {
+    return this->GetWorldAngularVel().Ign();
+  };
+
+  auto fModelLinAcc = [this]()
+  {
+    return this->GetWorldLinearAccel().Ign();
+  };
+
+  auto fModelAngAcc = [this]()
+  {
+    return this->GetWorldAngularAccel().Ign();
+  };
+
+  // Register items.
+  common::URI poseURI(uri);
+  poseURI.Query().Insert("p", "pose3d/world_pose");
+  this->introspectionItems.push_back(poseURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
+
+  common::URI linVelURI(uri);
+  linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  this->introspectionItems.push_back(linVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
+
+  common::URI angVelURI(uri);
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  this->introspectionItems.push_back(angVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angVelURI.Str(), fModelAngVel);
+
+  common::URI linAccURI(uri);
+  linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  this->introspectionItems.push_back(linAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linAccURI.Str(), fModelLinAcc);
+
+  common::URI angAccURI(uri);
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  this->introspectionItems.push_back(angAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angAccURI.Str(), fModelAngAcc);
 }
 
 /////////////////////////////////////////////////

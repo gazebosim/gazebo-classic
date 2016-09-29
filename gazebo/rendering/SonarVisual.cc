@@ -62,11 +62,6 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
 /////////////////////////////////////////////////
 SonarVisual::~SonarVisual()
 {
-  SonarVisualPrivate *dPtr =
-      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
-
-  delete dPtr->sonarRay;
-  dPtr->sonarRay = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -82,20 +77,15 @@ void SonarVisual::Load()
   dPtr->sonarRay->AddPoint(0, 0, 0);
   dPtr->sonarRay->AddPoint(0, 0, 0);
 
-  // Make sure the meshes are in Ogre
-  this->InsertMesh("unit_cone");
-  Ogre::MovableObject *coneObj =
-    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
-          this->GetName()+"__SONAR_CONE__", "unit_cone"));
-  ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
-
-  dPtr->coneNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
-  dPtr->coneNode->attachObject(coneObj);
-  dPtr->coneNode->setPosition(0, 0, 0);
+  dPtr->coneVis.reset(
+      new Visual(this->GetName() + "_SONAR_CONE_", shared_from_this(), false));
+  dPtr->coneVis->Load();
+  dPtr->coneVis->InsertMesh("unit_cone");
+  dPtr->coneVis->AttachMesh("unit_cone");
+  dPtr->coneVis->SetMaterial("Gazebo/BlueLaser");
+  dPtr->coneVis->SetCastShadows(false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->SetCastShadows(false);
 }
 
 /////////////////////////////////////////////////
@@ -128,14 +118,15 @@ void SonarVisual::Update()
     return;
   }
 
-  float rangeDelta = dPtr->sonarMsg->sonar().range_max()
+  double rangeDelta = dPtr->sonarMsg->sonar().range_max()
       - dPtr->sonarMsg->sonar().range_min();
-  float radiusScale = dPtr->sonarMsg->sonar().radius()*2.0;
+  double radiusScale = dPtr->sonarMsg->sonar().radius()*2.0;
 
-  if (!math::equal(dPtr->coneNode->getScale().z, rangeDelta) ||
-      !math::equal(dPtr->coneNode->getScale().x, radiusScale))
+  if (!ignition::math::equal(dPtr->coneVis->GetScale().z, rangeDelta) ||
+      !ignition::math::equal(dPtr->coneVis->GetScale().x, radiusScale))
   {
-    dPtr->coneNode->setScale(radiusScale, radiusScale, rangeDelta);
+    dPtr->coneVis->SetScale(
+        ignition::math::Vector3d(radiusScale, radiusScale, rangeDelta));
     dPtr->sonarRay->SetPoint(0,
         ignition::math::Vector3d(0, 0, rangeDelta * 0.5));
   }

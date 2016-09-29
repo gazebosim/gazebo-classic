@@ -25,18 +25,11 @@
 #include <ignition/math/MassMatrix3.hh>
 #include <ignition/math/Plane.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/math/Quaternion.hh"
-
 #include "gazebo/msgs/MessageTypes.hh"
-
-// Remove gazebo/math includes in Gazebo8
-// Adding the word deprecation so that a grep will find this.
-#include "gazebo/math/MathTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Plane.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Color.hh"
@@ -155,7 +148,7 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Vector2d Convert(const ignition::math::Vector2d &_v);
 
-    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaternion
+    /// \brief Convert a ignition::math::Quaterniond to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
     GAZEBO_VISIBLE
@@ -469,6 +462,9 @@ namespace gazebo
     /// \sa CameraSensorFromSDF
     /// \sa RaySensorFromSDF
     /// \sa ContactSensorFromSDF
+    /// \sa LogicalCameraSensorFromSDF
+    /// \sa GPSSensorFromSDF
+    /// \sa ImuSensorFromSDF
     GAZEBO_VISIBLE
     msgs::Sensor SensorFromSDF(sdf::ElementPtr _sdf);
 
@@ -654,6 +650,71 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Header *GetHeader(google::protobuf::Message &_message);
 
+    /// \brief Create a msgs::GPSSensor from a gps sensor SDF element
+    /// \param[in] _sdf The GPS sensor sdf element
+    /// \return The new msgs::GPSSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::GPSSensor GPSSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::SensorNoise from a sensor noise SDF element
+    /// \param[in] _sdf The sensor noise sdf element
+    /// \return The new msgs::SensorNoise object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::SensorNoise SensorNoiseFromSDF(sdf::ElementPtr _elem);
+
+    /// \brief Create a msgs::IMUSensor from an imu sensor SDF element
+    /// \param[in] _sdf The IMU sensor sdf element
+    /// \return The new msgs::IMUSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::IMUSensor IMUSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::LogicalCameraSensor from a logical camera sensor
+    //// SDF element
+    /// \param[in] _sdf The logical camera sensor sdf element
+    /// \return The new msgs::LogicalCameraSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::LogicalCameraSensor LogicalCameraSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create or update an SDF element from a msgs::LogicalCameraSensor
+    /// \param[in] _msg LogicalCameraSensor messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr LogicalCameraSensorToSDF(
+        const msgs::LogicalCameraSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create or update an SDF element from a msgs::IMUSensor
+    /// \param[in] _msg IMUSensor messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr IMUSensorToSDF(const msgs::IMUSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create or update an SDF element from a msgs::SensorNoise
+    /// \param[in] _msg SensorNoise messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr SensorNoiseToSDF(const msgs::SensorNoise &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create or update an SDF element from a msgs::GPSSensor
+    /// \param[in] _msg GPSSensor messsage
+    /// \param[in] _sdf If supplied, performs an update from _msg instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr GPSSensorToSDF(const msgs::GPSSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
     /// \}
   }
 }

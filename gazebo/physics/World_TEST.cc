@@ -25,7 +25,8 @@ using namespace gazebo;
 class WorldTest : public ServerFixture {};
 
 //////////////////////////////////////////////////
-/// \brief Test generating unique model name for models on insertion.
+/// \brief Test the factory message's allow_renaming flag and unique model name
+/// generation.
 TEST_F(WorldTest, UniqueModelName)
 {
   // Load a blank world
@@ -66,8 +67,24 @@ TEST_F(WorldTest, UniqueModelName)
   EXPECT_EQ(world->GetModelCount(), 1u);
   EXPECT_EQ(world->UniqueModelName(modelName), modelName + "_0");
 
-  // Spawn a new model with the same name
+  // Try to spawn with same name without allowing renaming
   facMsg.set_sdf(modelSDFStr);
+  facMsg.set_allow_renaming(false);
+  this->factoryPub->Publish(facMsg);
+
+  // Wait and check no models are inserted
+  sleep = 0;
+  while (sleep < maxSleep && world->GetModelCount() == 1u)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(world->GetModelCount(), 1u);
+  EXPECT_EQ(world->UniqueModelName(modelName), modelName + "_0");
+
+  // Now try again, but allow renaming
+  facMsg.set_sdf(modelSDFStr);
+  facMsg.set_allow_renaming(true);
   this->factoryPub->Publish(facMsg);
 
   // Check a new entity is spawned with a different name

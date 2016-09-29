@@ -1,5 +1,24 @@
 #!/bin/sh
 
+# Check command line operator, currently there is just an optional "-d" which
+# indicates that development documentation should be uploaded. 
+if [ "$#" -ne "0" ]
+then
+  if [ "$@" = "-d" ]
+  then
+    target="dev"
+  else
+    echo "Usage: sh upload_doc.sh [options]\n"
+    echo "\n"
+    echo "Options:"
+    echo "  -d\t Upload development documentation\n"
+    exit
+  fi
+else
+  target="@GAZEBO_VERSION_FULL@"
+fi
+
+
 # Check if the node was configured to use s3cmd
 # This is done by running s3cmd --configure
 if [ ! -f "${HOME}/.s3cfg" ]; then
@@ -15,22 +34,24 @@ if [ ! -f "@CMAKE_BINARY_DIR@/doxygen/html/index.html" ]; then
 fi
 
 # The code API
-s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api/@GAZEBO_VERSION_FULL@/ --dry-run -v
+s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api/$target/ --dry-run -v
 
+echo "\nUpload target: $target"
 echo -n "Upload code API(Y/n)? "
 read ans
 
 if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
-  s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api/@GAZEBO_VERSION_FULL@/ -v
+  s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api/$target/ -v
 fi
 
 
 # The msgs API
-s3cmd sync @CMAKE_BINARY_DIR@/doxygen_msgs/html/* s3://osrf-distributions/gazebo/api/@GAZEBO_VERSION_FULL@/ --dry-run -v
+s3cmd sync @CMAKE_BINARY_DIR@/doxygen_msgs/html/* s3://osrf-distributions/gazebo/api/$target/ --dry-run -v
 
+echo "\nUpload target: $target"
 echo -n "Upload msg API (Y/n)? "
 read ans
 
 if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
-  s3cmd sync @CMAKE_BINARY_DIR@/doxygen_msgs/html/* s3://osrf-distributions/gazebo/msg-api/@GAZEBO_VERSION_FULL@/ -v
+  s3cmd sync @CMAKE_BINARY_DIR@/doxygen_msgs/html/* s3://osrf-distributions/gazebo/msg-api/$target/ -v
 fi
