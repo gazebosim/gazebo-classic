@@ -16,7 +16,6 @@
  */
 
 #include <memory>
-#include <boost/filesystem/path.hpp>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Material.hh"
@@ -57,8 +56,12 @@ OBJLoader::~OBJLoader()
 //////////////////////////////////////////////////
 Mesh *OBJLoader::Load(const std::string &_filename)
 {
-  boost::filesystem::path p(_filename);
-  std::string path = p.parent_path().generic_string() + "/";
+  this->dataPtr->materialIds.clear();
+
+  std::string path;
+  size_t idx = _filename.rfind('/');
+  if (idx != std::string::npos)
+    path = _filename.substr(0, idx+1);
 
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
