@@ -1428,7 +1428,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 
   // read input elements. A vector of int is used because there can be
   // multiple TEXCOORD inputs.
-  std::map<const unsigned int, std::vector<int>> inputs;
+  std::map<const unsigned int, std::set<int>> inputs;
   unsigned int inputSize = 0;
   while (polylistInputXml)
   {
@@ -1442,32 +1442,31 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[VERTEX].insert(ignition::math::parseInt(offset));
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[NORMAL].insert(ignition::math::parseInt(offset));
     }
     else if (semantic == "TEXCOORD")
     {
       this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
     }
     else
     {
-      inputs[otherSemantics++].push_back(ignition::math::parseInt(offset));
-      inputSize++;
+      inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
       gzwarn << "Polylist input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
 
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
   }
+
+  for (const auto &input : inputs)
+    inputSize += input.second.size();
 
   // read vcount
   // break poly into triangles
@@ -1540,7 +1539,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         {
           // Get the vertex position index value. If it is a duplicate then use
           // the existing index instead
-          daeVertIndex = values[inputs[VERTEX][0]];
+          daeVertIndex = values[*inputs[VERTEX].begin()];
           if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
             daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -1569,7 +1568,8 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                 // Get the vertex normal index value. If the normal is a
                 // duplicate then reset the index to the first instance of the
                 // duplicated position
-                unsigned int remappedNormalIndex = values[inputs[NORMAL][0]];
+                unsigned int remappedNormalIndex =
+                  values[*inputs[NORMAL].begin()];
                 if (normalDupMap.find(remappedNormalIndex)
                     != normalDupMap.end())
                  {
@@ -1590,7 +1590,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                 // duplicate then reset the index to the first instance of the
                 // duplicated texcoord
                 unsigned int remappedTexcoordIndex =
-                  values[inputs[TEXCOORD][0]];
+                  values[*inputs[TEXCOORD].begin()];
 
                 if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
                   remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
@@ -1646,7 +1646,8 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
           }
           if (!inputs[NORMAL].empty())
           {
-            unsigned int inputRemappedNormalIndex = values[inputs[NORMAL][0]];
+            unsigned int inputRemappedNormalIndex =
+              values[*inputs[NORMAL].begin()];
             if (normalDupMap.find(inputRemappedNormalIndex)
                 != normalDupMap.end())
               inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
@@ -1660,7 +1661,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             // Here we are only using the first texture coordinates, when
             // multiple could have been specified.
             unsigned int inputRemappedTexcoordIndex =
-              values[inputs[TEXCOORD][0]];
+              values[*inputs[TEXCOORD].begin()];
 
             if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
             {
