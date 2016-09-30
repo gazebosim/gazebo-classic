@@ -2911,14 +2911,19 @@ ScenePtr Visual::GetScene() const
 //////////////////////////////////////////////////
 void Visual::ShowCollision(bool _show)
 {
-  if (this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
-    this->SetVisible(_show);
-
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  // If this is a collision visual, set it visible
+  if (this->dataPtr->type == VT_COLLISION &&
+      this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
   {
-    (*iter)->ShowCollision(_show);
+    this->SetVisible(_show);
+  }
+  // If this is a link without collision visuals, create them if we must
+
+
+  // Show for children
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowCollision(_show);
   }
 }
 
