@@ -49,7 +49,7 @@ namespace gazebo
 
       /// \brief Get last sim time.
       /// \return last sim time received.
-      public: double LastSimTime();
+      public: common::Time LastSimTime();
 
       /// \brief Callback when world stats message is receieved.
       /// \param[in] _msg WorldStats msg.
@@ -169,10 +169,10 @@ void TopicTime::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-double TopicTime::LastSimTime()
+common::Time TopicTime::LastSimTime()
 {
   std::lock_guard<std::mutex> lock(this->mutex);
-  return this->lastSimTime.Double();
+  return this->lastSimTime;
 }
 
 /////////////////////////////////////////////////
@@ -306,7 +306,7 @@ void TopicCurve::OnTopicData(const std::string &_msg)
       ignition::math::Vector2d> > curvesUpdates;
 
   // nearest sim time - use this x value if the message is not timestamped
-  double x = TopicTime::Instance()->LastSimTime();
+  double x = TopicTime::Instance()->LastSimTime().Double();
 
   // collect updates
   this->UpdateCurve(msg.get(), 0, x, curvesUpdates);
