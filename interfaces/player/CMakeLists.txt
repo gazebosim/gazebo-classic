@@ -33,7 +33,7 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})

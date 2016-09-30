@@ -21,8 +21,8 @@ endif()
 if (HAVE_DART)
   add_subdirectory(dart)
 
-  include_directories(${DARTCore_INCLUDE_DIRS})
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 # Add Simbody support if present
@@ -171,7 +171,7 @@ endif()
 
 # Link in DART support if present
 if (HAVE_DART)
-  target_link_libraries(gazebo_physics ${DARTCore_LIBRARIES})
+  target_link_libraries(gazebo_physics ${DART_LIBRARIES})
 endif()
 
 # Link in Simbody support if present
