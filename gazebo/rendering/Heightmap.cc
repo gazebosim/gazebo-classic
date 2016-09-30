@@ -424,7 +424,7 @@ void Heightmap::Load()
   // if heightmap fails to load locally, get the data from the server side
   if (this->dataPtr->heights.empty())
   {
-    gzmsg << "Heightmap file not found locally "
+    gzmsg << "Heightmap could not be loaded locally "
           << "(is it in the GAZEBO_RESOURCE_PATH?)- requesting data from "
           << "the server" << std::endl;
 
