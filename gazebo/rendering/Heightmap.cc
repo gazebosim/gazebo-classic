@@ -381,7 +381,7 @@ void Heightmap::Load()
 
     if (this->dataPtr->heightmapData)
     {
-      // these params need ot be the same as physics/HeightmapShape.cc
+      // these params need to be the same as physics/HeightmapShape.cc
       // in order to generate consistent height data
       double subSampling = 2;
       bool flipY = false;
