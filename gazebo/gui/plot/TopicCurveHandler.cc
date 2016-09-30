@@ -358,7 +358,8 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
     // TODO x axis is hardcoded to be the sim time for now. Once it is
     // configurable, remove this logic for setting the x value
     if (_index == 0 && (fieldName == "stamp" || fieldName == "time") &&
-        field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+        field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE &&
+        !field->is_repeated())
     {
       auto valueMsg = ref->MutableMessage(_msg, field);
       if (field->message_type()->name() == "Time")
