@@ -2772,20 +2772,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       return false;
     }
 
-    VisualPtr visual;
-    visual.reset(new Visual(_msg->name(), parent->second));
-
-    if (_msg->has_id())
-      visual->SetId(_msg->id());
-
-    visual->LoadFromMsg(_msg);
-    visual->SetType(_type);
-
-    this->dataPtr->visuals[visual->GetId()] = visual;
-    visual->SetVisible(false);
-    visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-
-    visual->SetWireframe(this->dataPtr->wireframe);
+    parent->second->PushPendingChild(std::make_pair(_type, _msg));
 
     return true;
   }
@@ -3391,6 +3378,12 @@ void Scene::SetWireframe(const bool _show)
 
   if (this->dataPtr->terrain)
     this->dataPtr->terrain->SetWireframe(_show);
+}
+
+/////////////////////////////////////////////////
+bool Scene::Wireframe() const
+{
+  return this->dataPtr->wireframe;
 }
 
 /////////////////////////////////////////////////

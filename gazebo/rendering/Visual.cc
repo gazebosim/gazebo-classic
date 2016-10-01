@@ -2912,12 +2912,41 @@ ScenePtr Visual::GetScene() const
 void Visual::ShowCollision(bool _show)
 {
   // If this is a collision visual, set it visible
-  if (this->dataPtr->type == VT_COLLISION &&
-      this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_COLLISION)
   {
     this->SetVisible(_show);
   }
-  // If this is a link without collision visuals, create them if we must
+  // If this is a link, check if there are pending collision visuals
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->pendingChildren.empty())
+  {
+    auto it = std::begin(this->dataPtr->pendingChildren);
+    while (it != std::end(this->dataPtr->pendingChildren))
+    {
+      if (it->first != VT_COLLISION)
+      {
+        ++it;
+        continue;
+      }
+
+      auto msg = it->second;
+
+      VisualPtr visual;
+      visual.reset(new Visual(msg->name(), shared_from_this()));
+
+      if (msg->has_id())
+        visual->SetId(msg->id());
+
+      visual->LoadFromMsg(msg);
+      visual->SetType(it->first);
+
+      visual->SetVisible(_show);
+      visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+      visual->SetWireframe(this->dataPtr->scene->Wireframe());
+
+      this->dataPtr->pendingChildren.erase(it);
+    }
+  }
 
 
   // Show for children
@@ -3325,5 +3354,11 @@ void Visual::SetTypeMsg(const google::protobuf::Message *_msg)
   }
   this->dataPtr->typeMsg = _msg->New();
   this->dataPtr->typeMsg->CopyFrom(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Visual::PushPendingChild(std::pair<VisualType, ConstVisualPtr> _pair)
+{
+  this->dataPtr->pendingChildren.push_back(_pair);
 }
 
