@@ -23,30 +23,64 @@
 
 namespace gazebo
 {
+  /// \brief Store information from SDF for each key
   struct KeyInfo
   {
+    /// \brief Key ASCII value (reference: http://ascii.cl/)
     int key;
+
+    /// \brief Pointer to the joint controlled by this key.
     physics::JointPtr joint;
-    double scale;
+
+    /// \brief Possible target types: position, velocity, force.
     std::string type;
+
+    /// \brief Increments for position, absolute values for velocity and
+    /// force.
+    double scale;
   };
 
-  /// \brief A plugin that simulates buoyancy of an object immersed in fluid.
+  /// \brief Control a joint based on keypress messages received.
+  ///
+  /// The plugin accepts several <map> elements:
+  ///
+  /// <map key='' joint='' type='' scale='' kp='' ki='' kd=''/>
+  ///
+  /// Where:
+  ///
+  /// * key: Key ASCII value (reference: http://ascii.cl/)
+  /// * joint: Joint name
+  /// * type: Available types: position, velocity, force.
+  /// * scale: Slightly different according to type:
+  ///     * position: scale is by how much the target position will increase or
+  ///       decrease for each key press.
+  ///     * velocity: The velocity target. This is not increased at each
+  ///       keypress.
+  ///     * force: The force to apply to the joint each time the key is pressed.
   class GAZEBO_VISIBLE KeysToJointsPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: KeysToJointsPlugin();
+
+    /// \brief Destructor
     public: ~KeysToJointsPlugin();
 
-    /// \brief Read the model SDF to compute volume and center of volume for
-    /// each link, and store those properties in volPropsMap.
+    // Documentation inherited
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    /// \brief Callback each time a key message is received.
     private: void OnKeyPress(ConstAnyPtr &_msg);
 
+    /// \brief Stores information about each tracked key
     private: std::vector<KeyInfo> keys;
+
+    /// \brief Pointer to model
     private: physics::ModelPtr model;
+
+    /// \brief Node for communication.
     private: transport::NodePtr node;
+
+    /// \brief Subscribe to keyboard messages.
     private: transport::SubscriberPtr keyboardSub;
   };
 }
