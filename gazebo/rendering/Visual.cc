@@ -2929,20 +2929,27 @@ void Visual::ShowCollision(bool _show)
         continue;
       }
 
-      auto msg = it->second;
+      auto msg = dynamic_cast<const msgs::Visual *>(it->second);
+      if (!msg)
+      {
+        gzerr << "Wrong message to generate collision visual." << std::endl;
+      }
+      else
+      {
+        VisualPtr visual;
+        visual.reset(new Visual(msg->name(), shared_from_this()));
 
-      VisualPtr visual;
-      visual.reset(new Visual(msg->name(), shared_from_this()));
+        if (msg->has_id())
+          visual->SetId(msg->id());
 
-      if (msg->has_id())
-        visual->SetId(msg->id());
+        auto msgPtr = new ConstVisualPtr(msg);
+        visual->LoadFromMsg(*msgPtr);
 
-      visual->LoadFromMsg(msg);
-      visual->SetType(it->first);
-
-      visual->SetVisible(_show);
-      visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-      visual->SetWireframe(this->dataPtr->scene->Wireframe());
+        visual->SetType(it->first);
+        visual->SetVisible(_show);
+        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+        visual->SetWireframe(this->dataPtr->scene->Wireframe());
+      }
 
       this->dataPtr->pendingChildren.erase(it);
     }
@@ -3357,8 +3364,13 @@ void Visual::SetTypeMsg(const google::protobuf::Message *_msg)
 }
 
 //////////////////////////////////////////////////
-void Visual::PushPendingChild(std::pair<VisualType, ConstVisualPtr> _pair)
+void Visual::PushPendingChild(std::pair<VisualType,
+    const google::protobuf::Message *> _pair)
 {
-  this->dataPtr->pendingChildren.push_back(_pair);
+  // Copy msg
+  auto msg = _pair.second->New();
+  msg->CopyFrom(*_pair.second);
+
+  this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
 }
 

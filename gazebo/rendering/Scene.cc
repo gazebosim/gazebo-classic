@@ -2772,7 +2772,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       return false;
     }
 
-    parent->second->PushPendingChild(std::make_pair(_type, _msg));
+    parent->second->PushPendingChild(std::make_pair(_type, &*_msg));
 
     return true;
   }

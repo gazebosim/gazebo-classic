@@ -613,7 +613,8 @@ namespace gazebo
       /// \brief
       /// \param[in] _
       public: void SetTypeMsg(const google::protobuf::Message *_msg);
-      public: void PushPendingChild(std::pair<VisualType, ConstVisualPtr> _msg);
+      public: void PushPendingChild(std::pair<VisualType,
+          const google::protobuf::Message *> _msg);
 
       /// \brief Convert from msgs::Visual::Type to VisualType.
       /// \param[in] _type A msgs::Visual::Type enum.

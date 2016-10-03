@@ -216,8 +216,7 @@ namespace gazebo
 
       /// \brief Vector of visuals which will be generated on demand.
       public: std::vector<std::pair<Visual::VisualType,
-                                    boost::shared_ptr<msgs::Visual const>>>
-                                    pendingChildren;
+          const google::protobuf::Message *>> pendingChildren;
     };
     /// \}
   }
