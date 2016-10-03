@@ -67,6 +67,7 @@ set (sources
   Timer.cc
   URI.cc
   Video.cc
+  VideoEncoder.cc
   ffmpeg_inc.cc
 )
 
@@ -124,6 +125,7 @@ set (headers
   UpdateInfo.hh
   URI.hh
   Video.hh
+  VideoEncoder.hh
   ffmpeg_inc.h
  )
 
@@ -153,6 +155,7 @@ set (gtest_sources
   SVGLoader_TEST.cc
   Time_TEST.cc
   URI_TEST.cc
+  VideoEncoder_TEST.cc
 )
 
 # Timer test fails on OSX
@@ -226,6 +229,7 @@ target_link_libraries(gazebo_common
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
+  ${libavdevice_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
