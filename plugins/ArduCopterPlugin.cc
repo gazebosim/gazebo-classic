@@ -509,7 +509,7 @@ void ArduCopterPlugin::OnUpdate()
 bool ArduCopterPlugin::InitArduCopterSockets(sdf::ElementPtr _sdf) const
 {
     getSdfParam<std::string>(_sdf, "fdm_addr",
-            this->dataPtr->fdm_addr, "INADDR_ANY");
+            this->dataPtr->fdm_addr, "127.0.0.1");
     getSdfParam<uint16_t>(_sdf, "fdm_port_in",
             this->dataPtr->fdm_port_in, 9002);
     getSdfParam<uint16_t>(_sdf, "fdm_port_out",
