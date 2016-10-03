@@ -317,7 +317,7 @@ class gazebo::ArduPilotPluginPrivate
   public: int connectionTimeoutMaxCount;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 ArduPilotPlugin::ArduPilotPlugin()
   : dataPtr(new ArduPilotPluginPrivate)
 {
@@ -578,8 +578,9 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
     gzwarn << "imu_sensor scoped name [" << imuScopedName
           << "] not found, trying unscoped name.\n" << "\n";
-    // TODO: this fails for multi-nested models.
-    // TODO: and transforms fail for rotated nested model, joints point the wrong way.
+    /// TODO: this fails for multi-nested models.
+    /// TODO: and transforms fail for rotated nested model,
+    ///       joints point the wrong way.
     this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
       (sensors::SensorManager::Instance()->GetSensor(imuName));
     if (!this->dataPtr->imuSensor)

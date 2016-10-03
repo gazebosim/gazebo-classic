@@ -307,7 +307,7 @@ class gazebo::ArduCopterPluginPrivate
   public: int connectionTimeoutMaxCount;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 ArduCopterPlugin::ArduCopterPlugin()
   : dataPtr(new ArduCopterPluginPrivate)
 {
