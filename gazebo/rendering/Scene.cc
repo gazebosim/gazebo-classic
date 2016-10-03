@@ -2415,16 +2415,14 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     childVis = this->GetVisual(_msg->child_id());
 
   if (!childVis)
+  {
+    gzerr << "Could not find visual with child id [" << _msg->child_id() <<
+        "] to be the parent of joint visual [" << _msg->name() << "]" <<
+        std::endl;
     return false;
+  }
 
-  JointVisualPtr jointVis(new JointVisual(
-      _msg->name() + "_JOINT_VISUAL__", childVis));
-  jointVis->Load(_msg);
-  jointVis->SetVisible(this->dataPtr->showJoints);
-  if (_msg->has_id())
-    jointVis->SetId(_msg->id());
-
-  this->dataPtr->visuals[jointVis->GetId()] = jointVis;
+  childVis->PushPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
 
   return true;
 }

@@ -36,6 +36,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
+#include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
@@ -3013,9 +3014,47 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
 //////////////////////////////////////////////////
 void Visual::ShowJoints(bool _show)
 {
+  // If this is a joint visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link, check if there are pending joint visuals
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->pendingChildren.empty())
+  {
+    auto it = std::begin(this->dataPtr->pendingChildren);
+    while (it != std::end(this->dataPtr->pendingChildren))
+    {
+      if (it->first != VT_PHYSICS)
+      {
+        ++it;
+        continue;
+      }
+
+      auto msg = dynamic_cast<const msgs::Joint *>(it->second);
+      if (!msg)
+      {
+        ++it;
+        continue;
+      }
+      else
+      {
+        JointVisualPtr jointVis(new JointVisual(
+            msg->name() + "_JOINT_VISUAL__", shared_from_this()));
+
+        auto msgPtr = new ConstJointPtr(msg);
+        jointVis->Load(*msgPtr);
+
+        jointVis->SetVisible(_show);
+        if (msg->has_id())
+          jointVis->SetId(msg->id());
+      }
+
+      this->dataPtr->pendingChildren.erase(it);
+    }
+  }
 
   for (auto &child : this->dataPtr->children)
   {
