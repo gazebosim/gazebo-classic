@@ -152,6 +152,12 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
     {
       this->dataPtr->filename = common::find_file(
           _msg->geometry().heightmap().filename());
+      if (this->dataPtr->filename.empty())
+      {
+        gzerr << "Unable to find file "
+              << _msg->geometry().heightmap().filename()
+              << std::endl;
+      }
     }
   }
 
@@ -446,12 +452,6 @@ void Heightmap::Load()
           geomMsg.heightmap().heights().size());
 
       this->dataPtr->dataSize = geomMsg.heightmap().width();
-
-      if (geomMsg.heightmap().has_filename())
-      {
-        this->dataPtr->filename =
-            common::find_file(geomMsg.heightmap().filename());
-      }
     }
   }
 
