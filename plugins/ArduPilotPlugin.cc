@@ -875,7 +875,7 @@ void ArduPilotPlugin::SendState() const
 
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down
-  ignition::math::Pose3d worldToModel = this->gazeboToNED +
+  ignition::math::Pose3d worldToModel = this->modelToXForwardZUp +
     this->dataPtr->model->GetWorldPose().Ign();
 
   // get transform from world NED to Model frame
