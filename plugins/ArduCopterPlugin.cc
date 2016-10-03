@@ -141,10 +141,10 @@ class Rotor
 };
 
 // Private data class
-class gazebo::ArducopterSocketPrivate
+class gazebo::ArduCopterSocketPrivate
 {
   /// \brief constructor
-  public: ArducopterSocketPrivate()
+  public: ArduCopterSocketPrivate()
   {
     // initialize socket udp socket
     fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -152,7 +152,7 @@ class gazebo::ArducopterSocketPrivate
   }
 
   /// \brief destructor
-  public: ~ArducopterSocketPrivate()
+  public: ~ArduCopterSocketPrivate()
   {
     if (fd != -1)
     {
@@ -278,10 +278,10 @@ class gazebo::ArduCopterPluginPrivate
   public: std::mutex mutex;
 
   /// \brief Ardupilot Socket for receive motor command on gazebo
-  public: ArducopterSocketPrivate socket_in;
+  public: ArduCopterSocketPrivate socket_in;
 
   /// \brief Ardupilot Socket to send state to Ardupilot
-  public: ArducopterSocketPrivate socket_out;
+  public: ArduCopterSocketPrivate socket_out;
 
   /// \brief Ardupilot address  
   public: std::string fdm_addr;
@@ -466,7 +466,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->dataPtr->lastControllerUpdateTime = 0;
 
   // Initialise ardupilot sockets
-  if (!InitArducopterSockets(_sdf))
+  if (!InitArduCopterSockets(_sdf))
   {
     return;
   }
@@ -506,7 +506,7 @@ void ArduCopterPlugin::OnUpdate()
 }
 
 /////////////////////////////////////////////////
-bool ArduCopterPlugin::InitArducopterSockets(sdf::ElementPtr _sdf) const
+bool ArduCopterPlugin::InitArduCopterSockets(sdf::ElementPtr _sdf) const
 {
     getSdfParam<std::string>(_sdf, "fdm_addr",
             this->dataPtr->fdm_addr, "INADDR_ANY");
