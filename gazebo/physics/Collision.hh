@@ -192,10 +192,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual const math::Pose &GetWorldPose() const;
 
-      /// \brief Helper function used to create a collision visual message.
-      /// \return Visual message for a collision.
-      private: msgs::Visual CreateCollisionVisual();
-
       /// \brief The link this collision belongs to
       protected: LinkPtr link;
 

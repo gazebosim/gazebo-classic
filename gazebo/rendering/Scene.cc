@@ -2777,6 +2777,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     }
 
     parent->second->PushPendingChild(std::make_pair(_type, &*_msg));
+    parent->second->ShowCollision(this->dataPtr->showCollisions);
 
     return true;
   }

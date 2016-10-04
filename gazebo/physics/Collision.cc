@@ -328,30 +328,6 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
 }
 
 /////////////////////////////////////////////////
-msgs::Visual Collision::CreateCollisionVisual()
-{
-  msgs::Visual msg;
-  msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
-
-  // Put in a unique ID because this is a special visual.
-  msg.set_id(this->collisionVisualId);
-  msg.set_parent_name(this->parent->GetScopedName());
-  msg.set_parent_id(this->parent->GetId());
-  msg.set_is_static(this->IsStatic());
-  msg.set_cast_shadows(false);
-  msg.set_type(msgs::Visual::COLLISION);
-  msgs::Set(msg.mutable_pose(), this->GetRelativePose().Ign());
-  msg.mutable_material()->mutable_script()->add_uri(
-      "file://media/materials/scripts/gazebo.material");
-  msg.mutable_material()->mutable_script()->set_name(
-      "Gazebo/OrangeTransparent");
-  msgs::Geometry *geom = msg.mutable_geometry();
-  geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
-
-  return msg;
-}
-
-/////////////////////////////////////////////////
 CollisionState Collision::GetState()
 {
   return this->state;
