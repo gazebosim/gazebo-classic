@@ -2,6 +2,12 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Add video recording of user camera. This change added an optional
+   dependency on libavdevice>=56.4.100 for linux systems. When installed,
+   libavdevice will allow a user to stream a simulated camera to a video4linux2 
+   loopback device.
+    * [Pull request #2443](https://bitbucket.org/osrf/gazebo/pull-request/2443)
+
 1. Removed deprecations
     * [Pull request #2427]((https://bitbucket.org/osrf/gazebo/pull-request/2427)
 
