@@ -3100,15 +3100,17 @@ void Visual::ShowCOM(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowInertia(bool _show)
 {
+  std::string suffix("_INERTIA_VISUAL__");
+
   // If this is an inertia visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
+      this->GetName().find(suffix) != std::string::npos)
   {
     this->SetVisible(_show);
   }
   // If this is a link without inertia visuals, create them
-  else if (_show && this->dataPtr->type == VT_LINK &&
-      !this->dataPtr->scene->GetVisual(this->GetName() + "_INERTIA_VISUAL__"))
+  else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + suffix))
   {
     auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
     if (!msg)
@@ -3120,7 +3122,7 @@ void Visual::ShowInertia(bool _show)
     auto msgPtr = new ConstLinkPtr(msg);
 
     InertiaVisualPtr vis(new InertiaVisual(this->GetName() +
-        "_INERTIA_VISUAL__", shared_from_this()));
+        suffix, shared_from_this()));
     vis->Load(*msgPtr);
     vis->SetVisible(_show);
   }

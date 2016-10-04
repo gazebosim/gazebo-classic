@@ -2401,6 +2401,12 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
   }
 
   linkVis->SetTypeMsg(&*_msg);
+
+  // Trigger visualizations that depend on type msg
+  linkVis->ShowInertia(this->dataPtr->showInertias);
+  linkVis->ShowCOM(this->dataPtr->showCOMs);
+  linkVis->ShowLinkFrame(this->dataPtr->showLinkFrames);
+
   return true;
 }
 
