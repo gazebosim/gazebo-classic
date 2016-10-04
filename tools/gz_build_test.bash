@@ -162,6 +162,10 @@ do
       elif grep Visual::GetBoundsHelper $CORE_BT_LOG && \
            grep simbody $CORE_BT_LOG; then
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-GetBoundsHelper_simbody-backtrace.txt"
+      elif grep World::LogWorker $CORE_BT_LOG && \
+           grep std::_Rb_tree_increment $CORE_BT_LOG && \
+           grep 'WorldState::operator-' $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-LogWorker_WorldState-backtrace.txt"
       fi
     done
   done
