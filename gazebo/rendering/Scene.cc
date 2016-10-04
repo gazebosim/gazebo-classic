@@ -2429,6 +2429,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   }
 
   childVis->PushPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
+  childVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
