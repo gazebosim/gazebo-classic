@@ -219,10 +219,6 @@ bool VideoEncoder::Start(const std::string &_format,
     }
   }
 
-  // The resolution must be divisible by two
-  unsigned int outWidth = _width % 2 == 0 ? _width : _width + 1;
-  unsigned int outHeight = _height % 2 == 0 ? _height : _height + 1;
-
   // The remainder of this function handles FFMPEG initialization of a video
   // stream
 #ifdef HAVE_FFMPEG
@@ -364,9 +360,9 @@ bool VideoEncoder::Start(const std::string &_format,
   // Bitrate
   this->dataPtr->codecCtx->bit_rate = this->dataPtr->bitRate;
 
-  // Resolution
-  this->dataPtr->codecCtx->width = outWidth;
-  this->dataPtr->codecCtx->height = outHeight;
+  // The resolution must be divisible by two
+  this->dataPtr->codecCtx->width = _width % 2 == 0 ? _width : _width + 1;
+  this->dataPtr->codecCtx->height = _height % 2 == 0 ? _height : _height + 1;
 
   // Emit one intra-frame every 10 frames
   this->dataPtr->codecCtx->gop_size = 10;
