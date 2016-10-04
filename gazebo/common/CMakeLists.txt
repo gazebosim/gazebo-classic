@@ -4,6 +4,9 @@ if (WIN32)
  add_definitions(-DBUILDING_DLL_GZ_COMMON)
 endif()
 
+# tiny obj loader
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/tinyobjloader)
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
@@ -56,6 +59,7 @@ set (sources
   MeshManager.cc
   ModelDatabase.cc
   MouseEvent.cc
+  OBJLoader.cc
   PID.cc
   SemanticVersion.cc
   SkeletonAnimation.cc
@@ -108,6 +112,7 @@ set (headers
   MeshManager.hh
   ModelDatabase.hh
   MouseEvent.hh
+  OBJLoader.hh
   PID.hh
   Plugin.hh
   SemanticVersion.hh
@@ -144,6 +149,7 @@ set (gtest_sources
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  OBJLoader_TEST.cc
   SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
