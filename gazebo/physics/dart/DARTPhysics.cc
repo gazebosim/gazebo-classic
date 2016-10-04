@@ -111,7 +111,7 @@ void DARTPhysics::Reset()
   {
     dartModelIt =
       boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
-    GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is NULL");
+    GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is null");
 
     dartModelIt->RestoreState();
   }
@@ -143,8 +143,8 @@ void DARTPhysics::UpdateCollision()
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
 
-    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pair is NULL");
-    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pair is NULL");
+    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pair is null");
+    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pair is null");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
