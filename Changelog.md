@@ -18,6 +18,7 @@
     * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
     * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
     * [Pull request #2382](https://bitbucket.org/osrf/gazebo/pull-request/2382)
+    * [Pull request #2448](https://bitbucket.org/osrf/gazebo/pull-request/2448)
 
 1. Renamed `gazebo/gui/SaveDialog` to `gazebo/gui/SaveEntityDialog`. A new
    `SaveDialog` class will be added in a future pull request. The migration
