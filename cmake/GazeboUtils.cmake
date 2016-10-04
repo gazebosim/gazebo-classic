@@ -132,11 +132,9 @@ endmacro()
 
 #################################################
 macro (gz_setup_windows)
-    set(BUILD_SHARED_LIBS TRUE)
-    add_definitions(-DWIN32_LEAN_AND_MEAN)
-
-    set (CMAKE_FIND_LIBRARY_PREFIXES "")
-    set (CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")
+    # Using static linking in Windows by default
+    set(BUILD_SHARED_LIBS FALSE)
+    add_definitions(-DBUILDING_STATIC_LIBS -DWIN32_LEAN_AND_MEAN)
 
     # Need for M_PI constant
     add_definitions(-D_USE_MATH_DEFINES)

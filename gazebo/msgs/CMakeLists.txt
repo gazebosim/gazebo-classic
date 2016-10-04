@@ -140,8 +140,6 @@ gz_build_tests(${msgs_tests_sources} EXTRA_LIBS gazebo_msgs)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_definitions(-DBUILDING_DLL_GZ_MSGS -DPROTOBUF_USE_DLLS)
-
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC_LIBRARY})
 if (UNIX)
@@ -185,13 +183,14 @@ foreach(FIL ${msgs})
     OUTPUT
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
-    COMMAND set "PATH=;${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/${CMAKE_BUILD_TYPE};%PATH%"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
     ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/${gazebomsgs_out_binary} --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
 endforeach()
+
+add_definitions(-DBUILDING_DLL_GZ_MSGS)
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})

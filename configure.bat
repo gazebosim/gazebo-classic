@@ -19,7 +19,7 @@
 @set BOOST_PATH=%cd%\..\..\boost_1_56_0
 @set BOOST_LIBRARY_DIR=%BOOST_PATH%\lib64-msvc-12.0
 
-@set PROTOBUF_PATH=%cd%\..\..\protobuf-2.6.1
+@set PROTOBUF_PATH=%cd%\..\..\protobuf-2.6.0-win64-vc12
 
 @set CURL_PATH=%cd%\..\..\libcurl-vc12-x64-release-debug-static-ipv6-sspi-winssl\%build_type%
 @set CURL_INCLUDE_DIR=%CURL_PATH%\include
@@ -27,9 +27,9 @@
 set CURL_LIBRARY_NAME=libcurl_a
 @if "%build_type%"=="Debug" set CURL_LIBRARY_NAME=libcurl_a_debug
 
-@set FREEIMAGE_PATH=%cd%\..\..\FreeImage\Dist
-@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64
-@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\x64
+@set FREEIMAGE_PATH=%cd%\..\..\FreeImage-vc12-x64-release-debug
+@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64\%build_type%\DLL
+@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
