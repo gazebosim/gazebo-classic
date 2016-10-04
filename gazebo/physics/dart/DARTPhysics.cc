@@ -99,7 +99,6 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
-  // this->dartWorld->initialize();
 }
 
 //////////////////////////////////////////////////
@@ -137,18 +136,42 @@ void DARTPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
 
-  dart::constraint::ConstraintSolver *dtConstraintSolver =
-      this->dataPtr->dtWorld->getConstraintSolver();
-  dart::collision::CollisionDetector *dtCollisionDetector =
-      dtConstraintSolver->getCollisionDetector();
-  int numContacts = dtCollisionDetector->getNumContacts();
+  //dart::constraint::ConstraintSolver *dtConstraintSolver =
+  //    this->dataPtr->dtWorld->getConstraintSolver();
+
+  const dart::collision::CollisionResult& dtLastResult = this->dataPtr->dtWorld->getLastCollisionResult();
+  int numContacts = dtLastResult.getNumContacts();
 
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
-        dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1;
-    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2;
+        dtLastResult.getContact(i);
+
+    dart::collision::CollisionObject *dtCollObj1 = dtContact.collisionObject1;
+    dart::collision::CollisionObject *dtCollObj2 = dtContact.collisionObject2;
+
+    GZ_ASSERT(dtCollObj1 != nullptr, "collision object 1 is null!");
+    GZ_ASSERT(dtCollObj2 != nullptr, "collision object 2 is null!");
+
+    dart::dynamics::ConstBodyNodePtr dtBodyNode1;
+    dart::dynamics::ConstBodyNodePtr dtBodyNode2;
+    /// old:
+    // dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1.lock().get();
+    // dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2.lock().get();
+
+    const dart::dynamics::ShapeFrame *dtShapeFrame1 = dtCollObj1->getShapeFrame();
+    const dart::dynamics::ShapeFrame *dtShapeFrame2 = dtCollObj2->getShapeFrame();
+    
+    GZ_ASSERT(dtShapeFrame1 != nullptr, "shape frame 1 is null!");
+    GZ_ASSERT(dtShapeFrame2 != nullptr, "shape frame 2 is null!");
+    
+    if (dtShapeFrame1->isShapeNode())
+      dtBodyNode1 = dtShapeFrame1->asShapeNode()->getBodyNodePtr();
+    if (dtShapeFrame2->isShapeNode())
+      dtBodyNode2 = dtShapeFrame2->asShapeNode()->getBodyNodePtr();
+    
+    GZ_ASSERT(dtBodyNode1 != nullptr, "body node 1 is null!");
+    GZ_ASSERT(dtBodyNode2 != nullptr, "body node 2 is null!");
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
@@ -450,8 +473,15 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 dart::simulation::World *DARTPhysics::GetDARTWorld()
 {
+  return this->dataPtr->dtWorld.get();
+}
+
+//////////////////////////////////////////////////
+dart::simulation::WorldPtr DARTPhysics::GetDARTWorldPtr()
+{
   return this->dataPtr->dtWorld;
 }
+
 
 //////////////////////////////////////////////////
 void DARTPhysics::OnRequest(ConstRequestPtr &_msg)

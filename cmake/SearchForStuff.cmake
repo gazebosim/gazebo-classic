@@ -149,7 +149,7 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find DART
   #find_package(DART 4.3.3 QUIET)
-  find_package(DART 6.1)
+  find_package(DART 6)
   if (DART_FOUND)
     message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)

@@ -125,7 +125,7 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const;
+      // public: virtual unsigned int GetAngleCount() const;
 
       // Documentation inherited.
       public: virtual void ApplyDamping();
@@ -149,6 +149,13 @@ namespace gazebo
       /// \brief Get DART model pointer.
       /// \return A pointer to the DART model.
       public: DARTModelPtr GetDARTModel() const;
+
+      /// \brief Get DART Joint properties
+      public: DARTJointPropPtr GetDARTProperties() const;
+
+      /// \brief Set DART joint pointer.
+      /// \param[in] A pointer to the DART joint.
+      public: void SetDARTJoint(dart::dynamics::Joint *_dtJoint);
 
       /// \brief Get DART joint pointer.
       /// \return A pointer to the DART joint.

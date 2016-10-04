@@ -30,10 +30,24 @@ namespace gazebo
     class DARTPlaneShapePrivate
     {
       /// \brief Constructor
-      public: DARTPlaneShapePrivate() = default;
+      public: DARTPlaneShapePrivate()
+        : dtBoxShape(new dart::dynamics::BoxShape(
+                       Eigen::Vector3d(2100, 2100, 2100)))
+      {
+        gzerr<<"Need to change DARTPlaneShapePrivate to have access to ShapeNode instead of Shape! "<<__FILE__<<", "<<__LINE__<<"\n";
+        // GZ_ASSERT(false, "Need to change DARTPlaneShapePrivate to have access to ShapeNode instead of Shape!");
+        // TODO Access to the transform is now on the ShapeNode level, need to find a solution how to access it here
+        // without breaking the interface. For now, PlaneShape is not supported any more.
+        // this->dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
+      }
 
       /// \brief Default destructor
       public: ~DARTPlaneShapePrivate() = default;
+
+      /// \brief DART box shape
+      public: std::shared_ptr<dart::dynamics::BoxShape> dtBoxShape;
+      // We use BoxShape untile PlaneShape is completely supported in DART.
+      // Please see: https://github.com/dartsim/dart/issues/114
     };
   }
 }
