@@ -48,6 +48,7 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
+  HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
   KeyEvent.cc
@@ -142,6 +143,7 @@ set (gtest_sources
   EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
+  HeightmapData_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
   Material_TEST.cc
