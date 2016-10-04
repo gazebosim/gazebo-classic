@@ -296,7 +296,7 @@ void Collision::FillMsg(msgs::Collision &_msg)
 
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
-    //_msg.add_visual()->CopyFrom(*this->visualMsg);
+    // _msg.add_visual()->CopyFrom(*this->visualMsg);
     // TODO remove the need to create the special collision visual msg and
     // let the gui handle this.
     _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
