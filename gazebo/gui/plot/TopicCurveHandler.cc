@@ -332,7 +332,10 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
     ignition::math::Vector2d> > &_curvesUpdates)
 {
   if (!_msg)
-    GZ_ASSERT(_msg, "_msg pointer in TopicCurve::UpdateCurve should not be null");
+  {
+    GZ_ASSERT(_msg,
+        "_msg pointer in TopicCurve::UpdateCurve should not be null");
+  }
 
   auto ref = _msg->GetReflection();
   if (!ref)
