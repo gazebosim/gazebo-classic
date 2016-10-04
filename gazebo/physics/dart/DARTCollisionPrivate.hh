@@ -30,7 +30,7 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTCollisionPrivate()
-        : dtCollisionShape(NULL),
+        : dtCollisionShape(nullptr),
           categoryBits(0),
           collideBits(0)
       {

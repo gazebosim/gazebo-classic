@@ -65,7 +65,7 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     // TODO: Remove type check once DART completely supports plane shape.
     // Please see: https://github.com/dartsim/dart/issues/114
     const bool isPlaneShape =
-        (boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape) != NULL);
+        (boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape) != nullptr);
 
     if (!isPlaneShape)
     {

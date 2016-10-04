@@ -42,14 +42,14 @@ namespace gazebo
 
       /// \brief Constructor
       public: DARTLinkPrivate()
-        : dartPhysics(NULL),
-          dtProperties(NULL),
-          dtBodyNode(NULL),
-          dartParentJoint(NULL),
+        : dartPhysics(nullptr),
+          dtProperties(nullptr),
+          dtBodyNode(nullptr),
+          dartParentJoint(nullptr),
           dartChildJoints {},
           isSoftBody(false),
           staticLink(false),
-          dtWeldJointConst(NULL)
+          dtWeldJointConst(nullptr)
       {
       }
 
@@ -65,7 +65,7 @@ namespace gazebo
       /// \brief Call all the cached setter functions and clear them
       public: void Initialize()
       {
-        GZ_ASSERT(dtBodyNode != NULL, "dtBodyNode is null pointer.\n");
+        GZ_ASSERT(dtBodyNode != nullptr, "dtBodyNode is null pointer.\n");
 
         for (auto func : mCachedFuncs)
           func();
@@ -74,7 +74,7 @@ namespace gazebo
       /// \brief Return true if DART BodyNode is initialized
       public: bool IsInitialized() const
       {
-        return dtBodyNode != NULL;
+        return dtBodyNode != nullptr;
       }
 
       /// \brief Cache a setter function. The cached functions will be called in

@@ -117,7 +117,7 @@ void DARTModel::Init()
   DARTModelPrivate::BodyNodeMap::const_iterator bodyNodeItr =
       bodyNodeMap.begin();
   DARTModelPrivate::JointMap::const_iterator parentJointItr;
-  dart::dynamics::BodyNode* dtParentBodyNode = NULL;
+  dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
 
   while (bodyNodeItr != bodyNodeMap.end())
   {
@@ -147,7 +147,7 @@ void DARTModel::Init()
       rootJoint.type = "free";
 
       if (!DARTModelPrivate::createJointAndNodePair(
-            this->dataPtr->dtSkeleton, NULL, rootJoint, bodyNodeItr->second))
+            this->dataPtr->dtSkeleton, nullptr, rootJoint, bodyNodeItr->second))
       {
         break;
       }

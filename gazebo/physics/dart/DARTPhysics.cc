@@ -143,14 +143,14 @@ void DARTPhysics::UpdateCollision()
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
 
-    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pair is null");
-    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pair is null");
+    GZ_ASSERT(dartLink1.get() != nullptr, "dartLink1 in collision pair is null");
+    GZ_ASSERT(dartLink2.get() != nullptr, "dartLink2 in collision pair is null");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
     CollisionPtr collisionPtr2 = dartLink2->GetCollision(colIndex);
 
-    // Add a new contact to the manager. This will return NULL if no one is
+    // Add a new contact to the manager. This will return null if no one is
     // listening for contact information.
     Contact *contactFeedback = this->GetContactManager()->NewContact(
                                  collisionPtr1.get(), collisionPtr2.get(),
@@ -263,7 +263,7 @@ ModelPtr DARTPhysics::CreateModel(BasePtr _parent)
 //////////////////////////////////////////////////
 LinkPtr DARTPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
   {
     gzerr << "Link must have a parent in DART.\n";
     return LinkPtr();
@@ -379,7 +379,7 @@ bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
   }
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
   // physics dart element not yet added to sdformat
-  // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  // GZ_ASSERT(dartElem != nullptr, "DART SDF element does not exist");
 
   if (_key == "max_contacts")
   {

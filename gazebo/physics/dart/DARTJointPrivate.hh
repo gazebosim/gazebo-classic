@@ -42,9 +42,9 @@ namespace gazebo
         : forceApplied {0.0, 0.0},
           forceAppliedTime(),
           dartPhysicsEngine(_dartPhysicsEngine),
-          dtProperties(NULL),
-          dtJoint(NULL),
-          dtChildBodyNode(NULL)
+          dtProperties(nullptr),
+          dtJoint(nullptr),
+          dtChildBodyNode(nullptr)
       {
         mDefaultValues["Axis0"] = math::Vector3::UnitX;
         mDefaultValues["Axis1"] = math::Vector3::UnitY;
@@ -56,7 +56,7 @@ namespace gazebo
       /// \brief Call all the cached setter functions and clear them
       public: void Initialize()
       {
-        GZ_ASSERT(dtJoint != NULL, "dtJoint is null pointer.\n");
+        GZ_ASSERT(dtJoint != nullptr, "dtJoint is null pointer.\n");
 
         for (auto func : mFuncs)
           func();
@@ -67,7 +67,7 @@ namespace gazebo
       /// \brief Return true if DART Joint is initialized
       public: bool IsInitialized() const
       {
-        return dtJoint != NULL;
+        return dtJoint != nullptr;
       }
 
       /// \brief Cache a setter function. The cached functions will be called in

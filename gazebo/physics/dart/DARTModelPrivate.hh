@@ -103,7 +103,7 @@ namespace gazebo
 
         // Check if the parent Body is created yet
         parentBody = skeleton->getBodyNode(parentBodyName);
-        if (NULL == parentBody
+        if (nullptr == parentBody
             && parentBodyName != "world"
             && !parentBodyName.empty())
         {
@@ -219,7 +219,7 @@ namespace gazebo
                 << jointBuildData.properties->mName
                 << "]! It will be discarded.\n";
           return std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>(
-            NULL, NULL);
+            nullptr, nullptr);
         }
       }
 
@@ -252,7 +252,7 @@ namespace gazebo
           return false;
         }
 
-        if (pair.first == NULL || pair.second == NULL)
+        if (pair.first == nullptr || pair.second == nullptr)
           return false;
 
         dart::dynamics::BodyNode* newBodyNode = pair.second;
