@@ -610,11 +610,17 @@ namespace gazebo
       /// \return True if RT shader is used.
       public: bool UseRTShader() const;
 
-      /// \brief
-      /// \param[in] _
+      /// \brief Set a message specific for this visual type. For example, a i
+      /// link visual will have a link message.
+      /// \param[in] _msg Message for this visual.
       public: void SetTypeMsg(const google::protobuf::Message *_msg);
+
+      /// \brief Push a message for a child of this visual which hasn't been
+      /// loaded yet.
+      /// \param[in] _pair Pair with the child visual type and the message for
+      /// the child.
       public: void PushPendingChild(std::pair<VisualType,
-          const google::protobuf::Message *> _msg);
+          const google::protobuf::Message *> _pair);
 
       /// \brief Convert from msgs::Visual::Type to VisualType.
       /// \param[in] _type A msgs::Visual::Type enum.

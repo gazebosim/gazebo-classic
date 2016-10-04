@@ -569,6 +569,9 @@ namespace gazebo
       /// \brief Enable or disable wireframe for all visuals.
       /// \param[in] _show True to enable wireframe for all visuals.
       public: void SetWireframe(const bool _show);
+
+      /// \brief Get whether wireframe is enabled for all visuals.
+      /// \return True if wireframe is enabled for all visuals.
       public: bool Wireframe() const;
 
       /// \brief Enable or disable transparency for all visuals.

@@ -2930,13 +2930,25 @@ void Visual::ShowCollision(bool _show)
         continue;
       }
 
-      auto msg = dynamic_cast<const msgs::Visual *>(it->second);
-      if (!msg)
+      auto constMsg = dynamic_cast<const msgs::Visual *>(it->second);
+      if (!constMsg)
       {
         gzerr << "Wrong message to generate collision visual." << std::endl;
       }
       else
       {
+        // Copy to non const message
+        msgs::Visual *msg = new msgs::Visual();
+        msg->CopyFrom(*constMsg);
+
+        // Set orange transparent material
+        msg->mutable_material()->mutable_script()->add_uri(
+            "file://media/materials/scripts/gazebo.material");
+        msg->mutable_material()->mutable_script()->set_name(
+            "Gazebo/OrangeTransparent");
+        msg->set_cast_shadows(false);
+
+        // Create visual
         VisualPtr visual;
         visual.reset(new Visual(msg->name(), shared_from_this()));
 
@@ -2950,6 +2962,8 @@ void Visual::ShowCollision(bool _show)
         visual->SetVisible(_show);
         visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
         visual->SetWireframe(this->dataPtr->scene->Wireframe());
+
+        delete msg;
       }
 
       this->dataPtr->pendingChildren.erase(it);
