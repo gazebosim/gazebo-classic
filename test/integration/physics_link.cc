@@ -329,7 +329,7 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // Get gravity magnitude
-  double g = physics->GetGravity().GetLength();
+  double g = world->Gravity().Length();
 
   // Spawn a box
   double z0 = 10.0;

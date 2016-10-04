@@ -54,7 +54,7 @@ namespace gazebo
         oParent = boost::dynamic_pointer_cast<ODECollision>(
             this->collisionParent);
 
-        if (oParent->GetCollisionId() == NULL)
+        if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
         else
           dGeomBoxSetLengths(oParent->GetCollisionId(),
