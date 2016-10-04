@@ -3158,7 +3158,7 @@ void Visual::ShowLinkFrame(bool _show)
     this->SetVisible(_show);
   }
   // If this is a link without link frame visuals, create them
-  else if (_show && this->dataPtr->type == VT_LINK &&
+  else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
     !this->dataPtr->scene->GetVisual(this->GetName() + "_LINK_FRAME_VISUAL__"))
   {
     LinkFrameVisualPtr vis(new LinkFrameVisual(this->GetName() +
