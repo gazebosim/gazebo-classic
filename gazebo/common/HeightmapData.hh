@@ -83,13 +83,11 @@ namespace gazebo
       public: static HeightmapData *LoadTerrainFile(
           const std::string &_filename);
 
-      #ifdef HAVE_GDAL
       /// \brief Load a DEM specified by _filename as a terrain file.
       /// \param[in] _filename The path to the terrain file.
       /// \return 0 when the operation succeeds to load a file or -1 when fails.
       private: static HeightmapData *LoadDEMAsTerrain(
           const std::string &_filename);
-      #endif
 
       /// \brief Load an image specified by _filename as a terrain file.
       /// \param[in] _filename The path to the terrain file.
