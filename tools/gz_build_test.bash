@@ -10,7 +10,7 @@ fi
 
 # Create a logfile based on the current time
 PREFIX=/data_fast/scpeters/ws/tmp
-timestamp=`eval date +%Y_%m_%d_%R:%S`
+timestamp=`eval date +%Y_%m_%d_%H_%M_%S`
 logfile="${PREFIX}/gazebo_test-$timestamp.txt"
 logfileSummary="${PREFIX}/gazebo_test-$timestamp-summary.txt"
 junit_prefix="${PREFIX}/gazebo_test-$timestamp"
