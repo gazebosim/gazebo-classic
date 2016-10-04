@@ -47,6 +47,7 @@ DARTCylinderShape::DARTCylinderShape(DARTCollisionPtr _parent)
 DARTCylinderShape::~DARTCylinderShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

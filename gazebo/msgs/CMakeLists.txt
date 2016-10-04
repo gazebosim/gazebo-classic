@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
+  any.proto
   atmosphere.proto
   axis.proto
   battery.proto
@@ -20,6 +21,7 @@ set (msgs
   density.proto
   diagnostics.proto
   distortion.proto
+  empty.proto
   factory.proto
   fluid.proto
   fog.proto
@@ -67,6 +69,8 @@ set (msgs
   model_v.proto
   packet.proto
   physics.proto
+  param.proto
+  param_v.proto
   planegeom.proto
   pid.proto
   plugin.proto
@@ -136,15 +140,13 @@ gz_build_tests(${msgs_tests_sources} EXTRA_LIBS gazebo_msgs)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS -DPROTOBUF_USE_DLLS")
+add_definitions(-DBUILDING_DLL_GZ_MSGS -DPROTOBUF_USE_DLLS)
 
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC_LIBRARY})
 if (UNIX)
   target_link_libraries(gazebomsgs_out pthread)
 endif()
-
-set_target_properties(gazebomsgs_out PROPERTIES COMPILE_DEFINITIONS "PROTOBUF_USE_DLLS")
 
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)
@@ -191,7 +193,6 @@ foreach(FIL ${msgs})
     VERBATIM )
 endforeach()
 
-
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
 if (UNIX)
@@ -206,7 +207,6 @@ endif()
 
 target_link_libraries(gazebo_msgs
   gazebo_common
-  gazebo_math
   ${GZ_PROTOBUF_LIBRARY}
 )
 

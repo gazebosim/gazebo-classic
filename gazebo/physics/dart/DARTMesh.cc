@@ -60,6 +60,7 @@ DARTMesh::DARTMesh() : dataPtr(new DARTMeshPrivate())
 DARTMesh::~DARTMesh()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

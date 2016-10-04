@@ -35,6 +35,8 @@ Gazebo cmake parameters available at configuring time:
    Enable or disable tests that need screen rendering to run properly.
    Headless machines or machines with the screen turned off should set this to
    False 
+ - USE_PCH (bool) [default False]
+   Use GNU Precompiled Headers. Only works with the gnu compiler
 
 Uninstallation
 --------------
@@ -42,6 +44,3 @@ Read the uninstallation instructions (http://gazebosim.org/uninstall)
 in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
   $ make uninstall (inside the gazebo-trunk/build directory)
-
-
-- Nate Koenig

@@ -18,6 +18,7 @@
 #cmakedefine BUILD_TYPE_COVERAGE 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1
+#cmakedefine HAVE_AVDEVICE 1
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine HAVE_BULLET 1
 #cmakedefine HAVE_SIMBODY 1
@@ -34,9 +35,10 @@
 #cmakedefine HAVE_GRAPHVIZ 1
 #cmakedefine HAVE_UUID 1
 #cmakedefine USE_EXTERNAL_TINYXML2 1
+#cmakedefine HAVE_OSVR 1
 
 #ifdef BUILD_TYPE_PROFILE
-#include <google/heap-checker.h>
+#include <gperftools/heap-checker.h>
 #endif
 
 // ifndef _GAZEBO_CONFIG_H_

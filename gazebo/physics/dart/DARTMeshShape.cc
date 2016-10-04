@@ -48,6 +48,7 @@ DARTMeshShape::DARTMeshShape(DARTCollisionPtr _parent)
 DARTMeshShape::~DARTMeshShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

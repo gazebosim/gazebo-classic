@@ -38,6 +38,7 @@ DARTBoxShape::DARTBoxShape(DARTCollisionPtr _parent)
 DARTBoxShape::~DARTBoxShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

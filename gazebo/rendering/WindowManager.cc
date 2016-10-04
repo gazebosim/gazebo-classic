@@ -171,12 +171,6 @@ void WindowManager::Moved(uint32_t _id)
 }
 
 //////////////////////////////////////////////////
-float WindowManager::GetAvgFPS(uint32_t _windowId)
-{
-  return this->AvgFPS(_windowId);
-}
-
-//////////////////////////////////////////////////
 float WindowManager::AvgFPS(const uint32_t _windowId) const
 {
   float avgFPS = 0;
@@ -192,24 +186,12 @@ float WindowManager::AvgFPS(const uint32_t _windowId) const
 }
 
 //////////////////////////////////////////////////
-uint32_t WindowManager::GetTriangleCount(uint32_t _windowId)
-{
-  return this->TriangleCount(_windowId);
-}
-
-//////////////////////////////////////////////////
 uint32_t WindowManager::TriangleCount(const uint32_t _windowId) const
 {
   if (_windowId < this->dataPtr->windows.size())
     return this->dataPtr->windows[_windowId]->getTriangleCount();
   else
     return 0;
-}
-
-//////////////////////////////////////////////////
-Ogre::RenderWindow *WindowManager::GetWindow(uint32_t _id)
-{
-  return this->Window(_id);
 }
 
 //////////////////////////////////////////////////

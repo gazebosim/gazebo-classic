@@ -369,12 +369,6 @@ void DepthCamera::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-const float* DepthCamera::GetDepthData()
-{
-  return this->DepthData();
-}
-
-//////////////////////////////////////////////////
 const float* DepthCamera::DepthData() const
 {
   return this->dataPtr->depthBuffer;
@@ -417,7 +411,7 @@ event::ConnectionPtr DepthCamera::ConnectNewDepthFrame(
 //////////////////////////////////////////////////
 void DepthCamera::DisconnectNewDepthFrame(event::ConnectionPtr &_c)
 {
-  this->dataPtr->newDepthFrame.Disconnect(_c);
+  this->dataPtr->newDepthFrame.Disconnect(_c->Id());
 }
 
 //////////////////////////////////////////////////
@@ -431,5 +425,5 @@ event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
 //////////////////////////////////////////////////
 void DepthCamera::DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
 {
-  this->dataPtr->newRGBPointCloud.Disconnect(_c);
+  this->dataPtr->newRGBPointCloud.Disconnect(_c->Id());
 }

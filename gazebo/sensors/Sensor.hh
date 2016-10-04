@@ -77,23 +77,11 @@ namespace gazebo
       /// \brief Returns the name of the sensor parent.  The parent name is
       ///        set by Sensor::SetParent.
       /// \return Name of Parent.
-      /// \deprecated See ParentName() function.
-      public: std::string GetParentName() const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns the name of the sensor parent.  The parent name is
-      ///        set by Sensor::SetParent.
-      /// \return Name of Parent.
       public: std::string ParentName() const;
 
       /// \brief Update the sensor.
       /// \param[in] _force True to force update, false otherwise.
       public: void Update(const bool _force);
-
-      /// \brief Get the update rate of the sensor.
-      /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
-      /// \deprecated See UpdateRate() function
-      public: double GetUpdateRate() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -108,17 +96,7 @@ namespace gazebo
 
       /// \brief Get name.
       /// \return Name of sensor.
-      /// \deprecated See Name() function.
-      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get name.
-      /// \return Name of sensor.
       public: std::string Name() const;
-
-      /// \brief Get fully scoped name of the sensor.
-      /// \return world_name::model_name::link_name::sensor_name.
-      /// \deprecated See ScopedName() function
-      public: std::string GetScopedName() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get fully scoped name of the sensor.
       /// \return world_name::model_name::link_name::sensor_name.
@@ -144,26 +122,11 @@ namespace gazebo
 
       /// \brief Get sensor type.
       /// \return Type of sensor.
-      /// \deprecated See Type() function.
-      public: std::string GetType() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get sensor type.
-      /// \return Type of sensor.
       public: std::string Type() const;
 
       /// \brief Return last update time.
       /// \return Time of last update.
-      /// \deprecated See LastUpdateTime() function
-      public: common::Time GetLastUpdateTime() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Return last update time.
-      /// \return Time of last update.
       public: common::Time LastUpdateTime() const;
-
-      /// \brief Return last measurement time.
-      /// \return Time of last measurement.
-      /// \deprecated See LastMeasurementTime() function.
-      public: common::Time GetLastMeasurementTime() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return last measurement time.
       /// \return Time of last measurement.
@@ -173,18 +136,7 @@ namespace gazebo
       /// \brief Return true if user requests the sensor to be visualized
       ///        via tag:  <visualize>true</visualize> in SDF.
       /// \return True if visualized, false if not.
-      /// \deprecated See Visualize() function
-      public: bool GetVisualize() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Return true if user requests the sensor to be visualized
-      ///        via tag:  <visualize>true</visualize> in SDF.
-      /// \return True if visualized, false if not.
       public: bool Visualize() const;
-
-      /// \brief Returns the topic name as set in SDF.
-      /// \return Topic name.
-      /// \deprecated See Topic() function.
-      public: virtual std::string GetTopic() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns the topic name as set in SDF.
       /// \return Topic name.
@@ -193,11 +145,6 @@ namespace gazebo
       /// \brief fills a msgs::Sensor message.
       /// \param[out] _msg Message to fill.
       public: void FillMsg(msgs::Sensor &_msg);
-
-      /// \brief Returns the name of the world the sensor is in.
-      /// \return Name of the world.
-      /// \deprecated See WorldName() function.
-      public: std::string GetWorldName() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns the name of the world the sensor is in.
       /// \return Name of the world.
@@ -214,13 +161,9 @@ namespace gazebo
       /// \brief Disconnect from a the updated signal.
       /// \param[in] _c The connection to disconnect
       /// \sa Sensor::ConnectUpdated
-      public: void DisconnectUpdated(event::ConnectionPtr &_c);
-
-      /// \brief Get the category of the sensor.
-      /// \return The category of the sensor.
-      /// \sa SensorCategory
-      /// \deprecated See Category() function.
-      public: SensorCategory GetCategory() const GAZEBO_DEPRECATED(7.0);
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectUpdated(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the category of the sensor.
       /// \return The category of the sensor.
@@ -232,29 +175,11 @@ namespace gazebo
 
       /// \brief Get the sensor's ID.
       /// \return The sensor's ID.
-      /// \deprecated See Id() function
-      public: uint32_t GetId() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the sensor's ID.
-      /// \return The sensor's ID.
       public: uint32_t Id() const;
 
       /// \brief Get the sensor's parent's ID.
       /// \return The sensor's parent's ID.
-      /// \deprecated See ParentId() function
-      public: uint32_t GetParentId() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the sensor's parent's ID.
-      /// \return The sensor's parent's ID.
       public: uint32_t ParentId() const;
-
-      /// \brief Get the sensor's noise model for a specified noise type.
-      /// \param[in] _type Index of the noise type. Refer to
-      /// SensorNoiseType enumeration for possible indices
-      /// \return The sensor's noise model for the given noise type
-      /// \deprecated See Noise(const SensorNoiseType _type) function
-      public: NoisePtr GetNoise(const SensorNoiseType _type) const
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the sensor's noise model for a specified noise type.
       /// \param[in] _type Index of the noise type. Refer to

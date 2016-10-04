@@ -19,6 +19,8 @@
 #define _GAZEBO_RENDERING_DISTORTION_HH_
 
 #include <sdf/sdf.hh>
+
+#include "gazebo/math/Vector2d.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 

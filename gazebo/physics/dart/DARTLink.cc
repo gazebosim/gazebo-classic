@@ -45,6 +45,7 @@ DARTLink::DARTLink(EntityPtr _parent)
 DARTLink::~DARTLink()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

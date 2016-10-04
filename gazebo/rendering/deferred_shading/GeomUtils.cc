@@ -234,7 +234,7 @@ void GeomUtils::CreateCone(Ogre::VertexData *&_vertexData,
 {
   if (!_vertexData || !_indexData)
   {
-    gzerr << "Inavlid vertex or index data\n";
+    gzerr << "Invalid vertex or index data\n";
     return;
   }
 

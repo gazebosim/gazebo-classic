@@ -38,6 +38,7 @@ DARTSphereShape::DARTSphereShape(DARTCollisionPtr _parent)
 DARTSphereShape::~DARTSphereShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

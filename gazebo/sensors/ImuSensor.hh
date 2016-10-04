@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_IMUSENSOR_HH_
-#define _GAZEBO_SENSORS_IMUSENSOR_HH_
+#ifndef GAZEBO_SENSORS_IMUSENSOR_HH_
+#define GAZEBO_SENSORS_IMUSENSOR_HH_
 
 #include <memory>
 #include <string>
@@ -62,37 +62,64 @@ namespace gazebo
 
       /// \brief Returns the imu message
       /// \return Imu message.
-      /// \deprecated See ImuMessage()
-      public: msgs::IMU GetImuMessage() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns the imu message
-      /// \return Imu message.
       public: msgs::IMU ImuMessage() const;
 
-      /// \brief Returns the angular velocity.
+      /// \brief Returns the angular velocity in the IMU sensor local frame.
       /// \param[in] _noiseFree True if the returned measurement should
       /// not use noise.
       /// \return Angular velocity.
       public: ignition::math::Vector3d AngularVelocity(
                   const bool _noiseFree = false) const;
 
-      /// \brief Returns the imu linear acceleration
+      /// \brief Returns the imu linear acceleration in the IMU sensor
+      /// local frame
       /// \param[in] _noiseFree True if the returned measurement should
       /// not use noise.
       /// \return Linear acceleration.
       public: ignition::math::Vector3d LinearAcceleration(
                   const bool _noiseFree = false) const;
 
-      /// \brief get orientation of the IMU relative to the reference pose
+      /// \brief get orientation of the IMU relative to a reference pose
+      /// Initially, the reference pose is the boot up pose of the IMU,
+      /// but user can call either SetReferencePose to define current
+      /// pose as the reference frame, or call SetWorldToReferencePose
+      /// to define transform from world frame to reference frame.
       /// \return returns the orientation quaternion of the IMU relative to
       /// the imu reference pose.
       public: ignition::math::Quaterniond Orientation() const;
 
-      /// \brief Sets the current pose as the IMU reference pose
+      /// \brief Sets the current IMU pose as the reference NED pose,
+      /// i.e. X axis of the IMU is aligned with North,
+      ///      Y axis of the IMU is aligned with East,
+      ///      Z axis of the IMU is aligned with Downward (gravity) direction.
       public: void SetReferencePose();
 
       // Documentation inherited.
       public: virtual bool IsActive() const;
+
+      /// \brief Sets the transform from world frame to IMU's reference frame.
+      /// For example, if this IMU works with respect to NED frame, then
+      /// call this function with the transform that transforms world frame
+      /// to NED frame. Subsequently, ImuSensor::Orientation will return
+      /// identity transform if the IMU is aligned with the NED frame.
+      /// This call replaces SetReferencePose.
+      /// \param _pose rotation from world frame to imu reference frame,
+      /// tranlation part of _pose param is ignored.
+      /// \deprecated See SetWorldToReferenceOrientation(Quaterniond)
+      public: void SetWorldToReferencePose(
+        const ignition::math::Pose3d &_pose = ignition::math::Pose3d())
+        GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Sets the rotation transform from world frame to IMU's
+      /// reference frame.
+      /// For example, if this IMU works with respect to NED frame, then
+      /// call this function with the transform that transforms world frame
+      /// to NED frame. Subsequently, ImuSensor::Orientation will return
+      /// identity transform if the IMU is aligned with the NED frame.
+      /// This call replaces SetWorldToReferencePose.
+      /// \param _orientation rotation from world frame to imu reference frame.
+      public: void SetWorldToReferenceOrientation(
+        const ignition::math::Quaterniond &_orientation);
 
       /// \brief Callback when link data is received
       /// \param[in] _msg Message containing link data

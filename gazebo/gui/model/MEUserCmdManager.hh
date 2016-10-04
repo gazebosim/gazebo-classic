@@ -18,6 +18,7 @@
 #ifndef GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
 #define GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
 
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -64,7 +65,22 @@ namespace gazebo
         INSERTING_JOINT = 4,
 
         /// \brief Delete a joint.
-        DELETING_JOINT = 5
+        DELETING_JOINT = 5,
+
+        /// \brief Move a link.
+        MOVING_LINK = 6,
+
+        /// \brief Move a nested model.
+        MOVING_NESTED_MODEL = 7,
+
+        /// \brief Scale a link.
+        SCALING_LINK = 8,
+
+        /// \brief Insert a model plugin.
+        INSERTING_MODEL_PLUGIN = 9,
+
+        /// \brief Delete a model plugin.
+        DELETING_MODEL_PLUGIN = 10
       };
 
       /// \brief Constructor
@@ -103,6 +119,20 @@ namespace gazebo
       /// \brief Set the unique id of the joint related to this command.
       /// \param[in] _id Unique id of joint.
       public: void SetJointId(const std::string &_id);
+
+      /// \brief Set the pose before and after the command. These are local
+      /// poses with respect to the parent model.
+      /// \param[in] _before Pose before the command, to be used by undo.
+      /// \param[in] _after Pose after the command, to be used by redo.
+      public: void SetPoseChange(const ignition::math::Pose3d &_before,
+          const ignition::math::Pose3d &_after);
+
+      /// \brief Set the scale factors before and after the command.
+      /// \param[in] _before Scales before the command, to be used by undo.
+      /// \param[in] _after Scales after the command, to be used by redo.
+      public: void SetScaleChange(
+          const std::map<std::string, ignition::math::Vector3d> &_before,
+          const std::map<std::string, ignition::math::Vector3d> &_after);
 
       /// \internal
       /// \brief Pointer to private data.

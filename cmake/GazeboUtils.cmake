@@ -139,10 +139,10 @@ macro (gz_setup_windows)
     set (CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")
 
     # Need for M_PI constant
-    add_definitions(-D_USE_MATH_DEFINES) 
+    add_definitions(-D_USE_MATH_DEFINES)
 
     # Don't pull in the Windows min/max macros
-    add_definitions(-DNOMINMAX) 
+    add_definitions(-DNOMINMAX)
 
     #use static libraries for FREEIMAGE
     add_definitions(-DFREEIMAGE_LIB)
@@ -163,7 +163,7 @@ macro (gz_setup_windows)
     if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
       # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
       # Enable as a second measure to workaround over bug
-      # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240 
+      # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240
       set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
     endif()
 endmacro()
@@ -210,7 +210,7 @@ if (NOT DEFINED ENABLE_TESTS_COMPILATION)
   set (ENABLE_TESTS_COMPILATION True)
 endif()
 
-# Define testing macros as empty and redefine them if support is found and 
+# Define testing macros as empty and redefine them if support is found and
 # ENABLE_TESTS_COMPILATION is set to true
 macro (gz_build_tests)
 endmacro()
@@ -227,14 +227,43 @@ endif()
 
 #################################################
 # Macro to setup supported compiler flags
-# Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST. 
+# Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST.
 include(CheckCXXCompilerFlag)
 
-macro(filter_valid_compiler_flags) 
+macro(filter_valid_compiler_flags)
   foreach(flag ${ARGN})
     CHECK_CXX_COMPILER_FLAG(${flag} R${flag})
     if(${R${flag}})
       set(VALID_CXX_FLAGS "${VALID_CXX_FLAGS} ${flag}")
     endif()
   endforeach()
+endmacro()
+
+#####################################
+# Gnu Precompiled Headers
+if (CMAKE_COMPILER_IS_GNUCXX)
+  option(USE_PCH "compiles using gnu precompiled headers" OFF)
+endif()
+
+# target_name a target name for generating the PCH file
+# filename the name of the PCH file, relative to the dir of the CMakeLists calling the macro
+macro(add_pch target_name filename)
+
+  set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.out.gch)
+  set(pch_in ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
+  set(FLAGS -g -O2 -fPIC -x c++-header)
+
+  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS_ALL} ${CMAKE_CXX_FLAGS} ${ARGN}")
+
+  add_custom_command(OUTPUT ${pch_out}
+    COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${FLAGS} ${pch_in} -o ${pch_out}
+    DEPENDS ${pch_in}
+    COMMENT "Generating precompiled header: ${pch_out}"
+    VERBATIM)
+
+  add_custom_target(${target_name}_pch DEPENDS ${pch_out})
+
+  target_compile_options(${target_name} PRIVATE -Winvalid-pch -include ${filename}.out)
+  add_dependencies(${target_name} ${target_name}_pch)
+
 endmacro()

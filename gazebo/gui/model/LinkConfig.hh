@@ -20,7 +20,8 @@
 
 #include <string>
 
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/qt.h"
 

@@ -361,7 +361,19 @@ URIPath &URI::Path()
 }
 
 /////////////////////////////////////////////////
+const URIPath &URI::Path() const
+{
+  return this->dataPtr->path;
+}
+
+/////////////////////////////////////////////////
 URIQuery &URI::Query()
+{
+  return this->dataPtr->query;
+}
+
+/////////////////////////////////////////////////
+const URIQuery &URI::Query() const
 {
   return this->dataPtr->query;
 }
@@ -455,4 +467,3 @@ bool URI::Parse(const std::string &_str)
   return this->dataPtr->path.Parse(localPath) &&
          this->dataPtr->query.Parse(localQuery);
 }
-

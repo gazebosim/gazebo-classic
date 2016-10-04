@@ -15,12 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_TEST_HH_
-#define _GAZEBO_APPLY_WRENCH_DIALOG_TEST_HH_
+#ifndef GAZEBO_GUI_APPLYWRENCHDIALOG_TEST_HH_
+#define GAZEBO_GUI_APPLYWRENCHDIALOG_TEST_HH_
 
-#include <string>
 #include "gazebo/gui/QTestFixture.hh"
-
 
 /// \brief A test class for the ApplyWrenchDialog.
 class ApplyWrenchDialog_TEST : public QTestFixture

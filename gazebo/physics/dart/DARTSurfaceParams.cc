@@ -34,6 +34,7 @@ DARTSurfaceParams::DARTSurfaceParams()
 DARTSurfaceParams::~DARTSurfaceParams()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -91,12 +92,6 @@ void DARTSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     if (_msg.friction().has_mu2())
       this->dataPtr->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
   }
-}
-
-/////////////////////////////////////////////////
-FrictionPyramidPtr DARTSurfaceParams::GetFrictionPyramid() const
-{
-  return this->dataPtr->frictionPyramid;
 }
 
 /////////////////////////////////////////////////

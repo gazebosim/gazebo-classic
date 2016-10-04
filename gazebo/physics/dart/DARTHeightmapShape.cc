@@ -42,7 +42,8 @@ DARTHeightmapShape::DARTHeightmapShape(DARTCollisionPtr _parent)
 //////////////////////////////////////////////////
 DARTHeightmapShape::~DARTHeightmapShape()
 {
-  delete dataPtr;
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

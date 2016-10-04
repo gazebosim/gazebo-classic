@@ -99,8 +99,8 @@ void Light::Load()
 
   this->dataPtr->visual.reset(new Visual(this->Name(),
                      this->dataPtr->scene->WorldVisual()));
+  this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
-  this->dataPtr->scene->AddVisual(this->dataPtr->visual);
 
   this->CreateVisual();
 }
@@ -184,21 +184,9 @@ void Light::SetName(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-std::string Light::GetName() const
-{
-  return this->Name();
-}
-
-//////////////////////////////////////////////////
 std::string Light::Name() const
 {
   return this->dataPtr->sdf->Get<std::string>("name");
-}
-
-//////////////////////////////////////////////////
-std::string Light::GetType() const
-{
-  return this->Type();
 }
 
 //////////////////////////////////////////////////
@@ -227,34 +215,23 @@ void Light::CreateVisual()
 
     this->dataPtr->visual->SetVisible(true);
 
-    // Create a scene node to hold the light selection object.
-    Ogre::SceneNode *visSceneNode;
-    visSceneNode =
-        this->dataPtr->visual->GetSceneNode()->createChildSceneNode();
+    // Create a visual to hold the light selection object.
+    VisualPtr lightSelectionVis(new Visual(this->Name() + "_seletion",
+        this->dataPtr->visual));
+    lightSelectionVis->SetType(Visual::VT_GUI);
 
     // Make sure the unit_sphere has been inserted.
-    this->dataPtr->visual->InsertMesh("unit_sphere");
-
-    Ogre::Entity *ent =
-        visSceneNode->getCreator()->createEntity(this->Name() +
-        "_selection_sphere", "unit_sphere");
-
-    ent->setMaterialName("Gazebo/White");
-
-    // Create the selection object.
-    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
-
-    // Attach the selection object to the light visual
-    visSceneNode->attachObject(obj);
+    lightSelectionVis->InsertMesh("unit_sphere");
+    lightSelectionVis->AttachMesh("unit_sphere");
+    lightSelectionVis->SetMaterial("Gazebo/White");
 
     // Make sure the selection object is rendered only in the selection
     // buffer.
-    obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
-    obj->getUserObjectBindings().setUserAny(Ogre::Any(this->Name()));
-    obj->setCastShadows(false);
+    lightSelectionVis->SetVisibilityFlags(GZ_VISIBILITY_SELECTION);
+    lightSelectionVis->SetCastShadows(false);
 
     // Scale the selection object to roughly match the light visual size.
-    visSceneNode->setScale(0.25, 0.25, 0.25);
+    lightSelectionVis->SetScale(ignition::math::Vector3d(0.25, 0.25, 0.25));
   }
 
   std::string lightType = this->dataPtr->sdf->Get<std::string>("type");
@@ -378,21 +355,9 @@ void Light::CreateVisual()
 }
 
 //////////////////////////////////////////////////
-void Light::SetPosition(const math::Vector3 &_p)
-{
-  this->SetPosition(_p.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetPosition(const ignition::math::Vector3d &_p)
 {
   this->dataPtr->visual->SetPosition(_p);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Light::GetPosition() const
-{
-  return this->Position();
 }
 
 //////////////////////////////////////////////////
@@ -402,21 +367,9 @@ ignition::math::Vector3d Light::Position() const
 }
 
 //////////////////////////////////////////////////
-void Light::SetRotation(const math::Quaternion &_q)
-{
-  this->SetRotation(_q.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetRotation(const ignition::math::Quaterniond &_q)
 {
   this->dataPtr->visual->SetRotation(_q);
-}
-
-//////////////////////////////////////////////////
-math::Quaternion Light::GetRotation() const
-{
-  return this->Rotation();
 }
 
 //////////////////////////////////////////////////
@@ -449,12 +402,6 @@ void Light::ToggleShowVisual()
 void Light::ShowVisual(const bool _s)
 {
   this->dataPtr->visual->SetVisible(_s);
-}
-
-//////////////////////////////////////////////////
-bool Light::GetVisible() const
-{
-  return this->Visible();
 }
 
 //////////////////////////////////////////////////
@@ -496,21 +443,9 @@ void Light::SetDiffuseColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Light::GetDiffuseColor() const
-{
-  return this->DiffuseColor();
-}
-
-//////////////////////////////////////////////////
 common::Color Light::DiffuseColor() const
 {
   return this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>();
-}
-
-//////////////////////////////////////////////////
-common::Color Light::GetSpecularColor() const
-{
-  return this->SpecularColor();
 }
 
 //////////////////////////////////////////////////
@@ -531,12 +466,6 @@ void Light::SetSpecularColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-void Light::SetDirection(const math::Vector3 &_dir)
-{
-  this->SetDirection(_dir.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetDirection(const ignition::math::Vector3d &_dir)
 {
   // Set the direction which the light points
@@ -547,12 +476,6 @@ void Light::SetDirection(const ignition::math::Vector3d &_dir)
     this->dataPtr->sdf->GetElement("direction")->Set(vec);
 
   this->dataPtr->light->setDirection(vec.x, vec.y, vec.z);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Light::GetDirection() const
-{
-  return this->Direction();
 }
 
 //////////////////////////////////////////////////
