@@ -104,6 +104,14 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
 void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
                                  bool _paused)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support sonar sensor, "
+          << "see issue #2062."
+          << std::endl;
+    return;
+  }
+
   Load("worlds/sonar_demo.world", _paused, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
