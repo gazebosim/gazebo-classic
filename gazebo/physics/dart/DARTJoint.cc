@@ -70,7 +70,7 @@ void DARTJoint::Init()
   this->dataPtr->Initialize();
 
   // DARTModel::Load() should be called first
-  GZ_ASSERT(this->dataPtr->dtJoint != nullptr, "DART Joint is not initialized.");
+  GZ_ASSERT(this->dataPtr->dtJoint != nullptr, "DARTJoint is not initialized.");
 
   // Parent and child link information
   DARTLinkPtr dartParentLink =
