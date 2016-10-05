@@ -31,6 +31,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -142,6 +143,22 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
   {
     this->dataPtr->useTerrainPaging =
         _msg->geometry().heightmap().use_terrain_paging();
+  }
+
+  if (_msg->geometry().heightmap().has_filename())
+  {
+    std::string uri = _msg->geometry().heightmap().filename();
+    if (!uri.empty())
+    {
+      this->dataPtr->filename = common::find_file(
+          _msg->geometry().heightmap().filename());
+      if (this->dataPtr->filename.empty())
+      {
+        gzerr << "Unable to find file "
+              << _msg->geometry().heightmap().filename()
+              << std::endl;
+      }
+    }
   }
 
   this->Load();
@@ -362,44 +379,108 @@ void Heightmap::Load()
   this->dataPtr->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
 #endif
 
-  msgs::Geometry geomMsg;
+  // try loading heightmap data locally
+  if (!this->dataPtr->filename.empty())
+  {
+    this->dataPtr->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(
+        this->dataPtr->filename);
+
+    if (this->dataPtr->heightmapData)
+    {
+      // these params need to be the same as physics/HeightmapShape.cc
+      // in order to generate consistent height data
+      double subSampling = 2;
+      bool flipY = false;
+      // sampling size along image width and height
+      unsigned int vertSize =
+          (this->dataPtr->heightmapData->GetWidth() * subSampling)-1;
+      ignition::math::Vector3d scale;
+      scale.X(this->dataPtr->terrainSize.X() / vertSize);
+      scale.Y(this->dataPtr->terrainSize.Y() / vertSize);
+
+      if (ignition::math::equal(
+          this->dataPtr->heightmapData->GetMaxElevation(), 0.0f))
+      {
+        scale.Z(fabs(this->dataPtr->terrainSize.Z()));
+      }
+      else
+      {
+        scale.Z(fabs(this->dataPtr->terrainSize.Z()) /
+            this->dataPtr->heightmapData->GetMaxElevation());
+      }
+
+      // Construct the heightmap lookup table
+      std::vector<float> lookup;
+      this->dataPtr->heightmapData->FillHeightMap(subSampling, vertSize,
+          this->dataPtr->terrainSize, scale, flipY, lookup);
+
+      for (unsigned int y = 0; y < vertSize; ++y)
+      {
+        for (unsigned int x = 0; x < vertSize; ++x)
+        {
+          int index = (vertSize - y - 1) * vertSize + x;
+          this->dataPtr->heights.push_back(lookup[index]);
+        }
+      }
+
+      this->dataPtr->dataSize = vertSize;
+    }
+  }
+
+  // if heightmap fails to load locally, get the data from the server side
+  if (this->dataPtr->heights.empty())
+  {
+    gzmsg << "Heightmap could not be loaded locally "
+          << "(is it in the GAZEBO_RESOURCE_PATH?)- requesting data from "
+          << "the server" << std::endl;
+
+    msgs::Geometry geomMsg;
+
+    boost::shared_ptr<msgs::Response> response = transport::request(
+       this->dataPtr->scene->Name(), "heightmap_data");
+
+    if (response->response() != "error" &&
+        response->type() == geomMsg.GetTypeName())
+    {
+      geomMsg.ParseFromString(response->serialized_data());
+
+      // Copy the height data.
+      this->dataPtr->terrainSize = msgs::ConvertIgn(geomMsg.heightmap().size());
+      this->dataPtr->heights.resize(geomMsg.heightmap().heights().size());
+      memcpy(&this->dataPtr->heights[0], geomMsg.heightmap().heights().data(),
+          sizeof(this->dataPtr->heights[0]) *
+          geomMsg.heightmap().heights().size());
+
+      this->dataPtr->dataSize = geomMsg.heightmap().width();
+    }
+  }
+
+  if (this->dataPtr->heights.empty())
+  {
+    gzerr << "Failed to load terrain. Heightmap data is empty" << std::endl;
+    return;
+  }
+
   boost::filesystem::path imgPath;
   boost::filesystem::path terrainName;
   boost::filesystem::path terrainDirPath;
   boost::filesystem::path prefix;
-  boost::shared_ptr<msgs::Response> response = transport::request(
-     this->dataPtr->scene->Name(), "heightmap_data");
-
-  if (response->response() != "error" &&
-      response->type() == geomMsg.GetTypeName())
+  if (!this->dataPtr->filename.empty())
   {
-    geomMsg.ParseFromString(response->serialized_data());
+    // Get the full path of the image heightmap
+    imgPath = this->dataPtr->filename;
+    terrainName = imgPath.filename().stem();
+    terrainDirPath = this->dataPtr->gzPagingDir / terrainName;
 
-    // Copy the height data.
-    this->dataPtr->terrainSize = msgs::ConvertIgn(geomMsg.heightmap().size());
-    this->dataPtr->heights.resize(geomMsg.heightmap().heights().size());
-    memcpy(&this->dataPtr->heights[0], geomMsg.heightmap().heights().data(),
-        sizeof(this->dataPtr->heights[0])*geomMsg.heightmap().heights().size());
-
-    this->dataPtr->dataSize = geomMsg.heightmap().width();
-
-    if (geomMsg.heightmap().has_filename())
+    // Add the top level terrain paging directory to the OGRE
+    // ResourceGroupManager
+    if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
+          this->dataPtr->gzPagingDir.string(), "General"))
     {
-      // Get the full path of the image heightmap
-      imgPath = geomMsg.heightmap().filename();
-      terrainName = imgPath.filename().stem();
-      terrainDirPath = this->dataPtr->gzPagingDir / terrainName;
-
-      // Add the top level terrain paging directory to the OGRE
-      // ResourceGroupManager
-      if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
-            this->dataPtr->gzPagingDir.string(), "General"))
-      {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            this->dataPtr->gzPagingDir.string(), "FileSystem", "General", true);
-        Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
-            "General");
-      }
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+          this->dataPtr->gzPagingDir.string(), "FileSystem", "General", true);
+      Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
+          "General");
     }
   }
 
