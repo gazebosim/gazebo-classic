@@ -43,6 +43,14 @@ if (ENABLE_TESTS_COMPILATION)
 endif()
 
 add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+
+if (WIN32)
+  # Force multiple definitions since there is a collision with sdformat GetAsEuler() function
+  # https://bitbucket.org/osrf/sdformat/src/a3fa3d1163cc2fe991ac106e51695b99f8b119ca/include/sdf/Types.hh?at=default&fileviewer=file-view-default#Types.hh-437
+  # it is defined inside an .hh file and bring to gz linking via sdformat and gazebo_gui/gazebo_common
+  set_target_properties(gz PROPERTIES COMPILE_DEFINITIONS "FORCE:MULTIPLE")
+endif()
+
 target_link_libraries(gz
  gazebo_gui
  gazebo_physics
