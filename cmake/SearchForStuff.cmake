@@ -758,6 +758,11 @@ if ( _VERSION_LINE )
     ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
 endif ()
 
+# in Windows, the path need to point to the parent to get correct qwt/foo headers
+if (WIN32)
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")	
+endif()
+
 if (HAVE_QWT)
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
 else()
