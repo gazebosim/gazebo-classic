@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Support version 5 of the DART Physics Engine.
+    * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
+
 1. Add video recording of user camera. This change added an optional
    dependency on libavdevice>=56.4.100 for linux systems. When installed,
    libavdevice will allow a user to stream a simulated camera to a video4linux2 

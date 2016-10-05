@@ -16,6 +16,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/physics/dart/**
+    + Updated to support version 5 of DART physics engine.
+
 1. **gazebo/rendering/Road2d.hh**
     + Modified to inherit from Visual class.
 
