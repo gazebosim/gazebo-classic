@@ -312,6 +312,9 @@ namespace gazebo
 
       /// \brief Generalized velocities
       public: Eigen::VectorXd genVelocities;
+
+      // To get byte-aligned Eigen vectors
+      public: EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
   }
 }

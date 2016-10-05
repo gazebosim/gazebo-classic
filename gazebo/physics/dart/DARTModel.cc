@@ -142,10 +142,12 @@ void DARTModel::Init()
       // If a root FreeJoint is needed for the parent of the current joint, then
       // create it
       DARTModelPrivate::JointBuildData rootJoint;
+      gzlog << "Create rootJoint\n";
       rootJoint.properties =
           Eigen::make_aligned_shared<dart::dynamics::FreeJoint::Properties>(
             dart::dynamics::Joint::Properties(
               "root", bodyNodeItr->second.initTransform));
+      gzlog << __LINE__<<"\n";
       rootJoint.type = "free";
 
       if (!DARTModelPrivate::createJointAndNodePair(
