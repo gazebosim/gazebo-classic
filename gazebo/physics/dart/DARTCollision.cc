@@ -89,32 +89,6 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
 void DARTCollision::Init()
 {
   Collision::Init();
-
-  // Offset
-/*  if (this->dataPtr->dtCollisionShape)
-  {
-    boost::shared_ptr<DARTPlaneShape> planeShape =
-        boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
-
-    if (!planeShape)
-    {
-      math::Pose relativePose = this->GetRelativePose();
-      this->dataPtr->dtCollisionShape->setLocalTransform(
-            DARTTypes::ConvPose(relativePose));
-    }
-    else
-    {
-      // change ground plane to be near semi-infinite.
-      dart::dynamics::BoxShape *dtBoxShape =
-          dynamic_cast<dart::dynamics::BoxShape *>(
-            this->dataPtr->dtCollisionShape);
-      dtBoxShape->setSize(Eigen::Vector3d(2100, 2100, 2100.0));
-      dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100.0/2.0));
-    }
-    // TODO: Remove this specialized code for plane shape once
-    // https://github.com/dartsim/dart/issues/114 is resolved.
-  }
-*/
 }
 
 //////////////////////////////////////////////////
@@ -174,6 +148,7 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape * /* *_shape*/,
                                           bool _placeable)
 {
   gzerr << "Deprecated. Use SetDARTCollisionShape(ShapePtr, bool) instead.\n";
+
   Collision::SetCollision(_placeable);
 }
 
@@ -184,6 +159,7 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
   Collision::SetCollision(_placeable);
   this->dataPtr->dtCollisionShape = _shape;
 }
+
 
 //////////////////////////////////////////////////
 dart::dynamics::ShapePtr DARTCollision::GetDARTCollisionShapePtr() const

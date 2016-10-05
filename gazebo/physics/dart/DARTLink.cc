@@ -32,9 +32,6 @@
 
 #include "gazebo/physics/dart/DARTLinkPrivate.hh"
 
-// need to include this for the constants
-//#include <dart/dynamics/detail/SoftBodyNodeAspect.hpp>
-
 using namespace gazebo;
 using namespace physics;
 
@@ -200,7 +197,7 @@ void DARTLink::Init()
   this->dataPtr->Initialize();
 
   // DARTModel::Load() should be called first
-  GZ_ASSERT(this->dataPtr->dtBodyNode != NULL,
+  GZ_ASSERT(this->dataPtr->dtBodyNode != nullptr,
             "DART BodyNode is not initialized.");
 
   // Name
@@ -656,7 +653,6 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
-
   if (!this->dataPtr->IsInitialized())
     return this->dataPtr->GetCached<math::Vector3>("WorldCoGLinearVel");
 
@@ -788,7 +784,6 @@ void DARTLink::SetSelfCollide(bool _collide)
         }
       }*/
     }
-
     // If the skeleton is not self collidable, we first set the skeleton as
     // self collidable. If the skeleton is self collidable, then DART regards
     // that all the links in the skeleton is self collidable. So, we disable all
@@ -966,7 +961,6 @@ dart::simulation::WorldPtr DARTLink::GetDARTWorldPtr(void) const
   return GetDARTPhysics()->GetDARTWorldPtr();
 }
 
-
 //////////////////////////////////////////////////
 DARTModelPtr DARTLink::GetDARTModel() const
 {
@@ -984,7 +978,6 @@ void DARTLink::SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
 {
   this->dataPtr->dtBodyNode = _dtBodyNode;
 }
-
 
 //////////////////////////////////////////////////
 dart::dynamics::BodyNode *DARTLink::GetDARTBodyNode() const

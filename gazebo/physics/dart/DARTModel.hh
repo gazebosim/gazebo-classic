@@ -64,7 +64,8 @@ namespace gazebo
       /// \brief
       public: void RestoreState();
 
-      /// \brief
+      /// \brief Get pointer to DART Skeleton.
+      /// \return The pointer to DART Skeleton.
       public: dart::dynamics::Skeleton *GetDARTSkeleton()
               GAZEBO_DEPRECATED(8.0);
 
@@ -73,13 +74,10 @@ namespace gazebo
       public: dart::dynamics::SkeletonPtr GetDARTSkeletonPtr();
       // TODO: Rename to GetDARTSkeleton()
 
-
-      /// \brief
+      /// \brief Get pointer to DART Physics.
+      /// \return The pointer to DART Physics.
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
-      /// \brief
-      //public: dart::simulation::World *GetDARTWorld(void) const
-      //        GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get pointer to DART World
       /// \return The pointer to DART World.

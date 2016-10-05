@@ -43,7 +43,6 @@ DARTPlaneShape::DARTPlaneShape(DARTCollisionPtr _parent)
   _parent->SetDARTCollisionShape(this->dataPtr->dtBoxShape, false);
 }
 
-
 //////////////////////////////////////////////////
 DARTPlaneShape::~DARTPlaneShape()
 {

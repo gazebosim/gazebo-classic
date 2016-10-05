@@ -46,7 +46,6 @@ DARTMultiRayShape::DARTMultiRayShape(DARTCollisionPtr _parent)
   this->SetName("DART_multiray_shape");
 }
 
-
 //////////////////////////////////////////////////
 DARTMultiRayShape::~DARTMultiRayShape()
 {

@@ -23,7 +23,6 @@
 #include "gazebo/physics/dart/DARTJoint.hh"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTModel.hh"
-
 #include "gazebo/physics/dart/DARTModelPrivate.hh"
 
 using namespace gazebo;
@@ -119,7 +118,7 @@ void DARTModel::Init()
   DARTModelPrivate::BodyNodeMap::const_iterator bodyNodeItr =
       bodyNodeMap.begin();
   DARTModelPrivate::JointMap::const_iterator parentJointItr;
-  dart::dynamics::BodyNode* dtParentBodyNode = NULL;
+  dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
 
   while (bodyNodeItr != bodyNodeMap.end())
   {
@@ -142,16 +141,14 @@ void DARTModel::Init()
       // If a root FreeJoint is needed for the parent of the current joint, then
       // create it
       DARTModelPrivate::JointBuildData rootJoint;
-      gzlog << "Create rootJoint\n";
       rootJoint.properties =
           Eigen::make_aligned_shared<dart::dynamics::FreeJoint::Properties>(
             dart::dynamics::Joint::Properties(
               "root", bodyNodeItr->second.initTransform));
-      gzlog << __LINE__<<"\n";
       rootJoint.type = "free";
 
       if (!DARTModelPrivate::createJointAndNodePair(
-            this->dataPtr->dtSkeleton, NULL, rootJoint, bodyNodeItr->second))
+            this->dataPtr->dtSkeleton, nullptr, rootJoint, bodyNodeItr->second))
       {
         break;
       }
@@ -302,7 +299,6 @@ dart::dynamics::SkeletonPtr DARTModel::GetDARTSkeletonPtr()
   return this->dataPtr->dtSkeleton;
 }
 
-
 //////////////////////////////////////////////////
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 {
@@ -316,8 +312,3 @@ dart::simulation::WorldPtr DARTModel::GetDARTWorldPtr(void) const
   return GetDARTPhysics()->GetDARTWorldPtr();
 }
 
-//////////////////////////////////////////////////
-/*dart::simulation::World *DARTModel::GetDARTWorld(void) const
-{
-  return GetDARTPhysics()->GetDARTWorld();
-}*/

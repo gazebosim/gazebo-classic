@@ -33,13 +33,13 @@ DARTBallJoint::DARTBallJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
 void DARTBallJoint::Load(sdf::ElementPtr _sdf)
 {
   BallJoint<DARTJoint>::Load(_sdf);
+
   this->dataPtr->dtProperties.reset(
         new dart::dynamics::BallJoint::Properties(
           *this->dataPtr->dtProperties.get()));

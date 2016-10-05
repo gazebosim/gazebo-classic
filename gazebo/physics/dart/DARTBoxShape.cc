@@ -76,24 +76,5 @@ void DARTBoxShape::SetSize(const math::Vector3 &_size)
 
   BoxShape::SetSize(size);
 
-  /*DARTCollisionPtr dartCollisionParent =
-      boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-  if (dartCollisionParent->GetDARTCollisionShape() == nullptr)
-  {
-    dart::dynamics::BodyNode *dtBodyNode =
-        dartCollisionParent->GetDARTBodyNode();
-    dart::dynamics::BoxShape *dtBoxShape =
-        new dart::dynamics::BoxShape(DARTTypes::ConvVec3(size));
-    dtBodyNode->addCollisionShape(dtBoxShape);
-    dartCollisionParent->SetDARTCollisionShape(dtBoxShape);
-  }
-  else
-  {
-    dart::dynamics::BoxShape *dtBoxShape =
-        dynamic_cast<dart::dynamics::BoxShape*>(
-          dartCollisionParent->GetDARTCollisionShape());
-    dtBoxShape->setSize(DARTTypes::ConvVec3(size));
-  }*/
   this->dataPtr->dtBoxShape->setSize(DARTTypes::ConvVec3(size));
 }

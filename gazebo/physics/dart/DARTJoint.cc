@@ -53,13 +53,6 @@ DARTJoint::~DARTJoint()
 //////////////////////////////////////////////////
 void DARTJoint::Load(sdf::ElementPtr _sdf)
 {
-/*  if (!this->dataPtr->dtJoint)
-  {
-    gzerr << "dtJoint should be created in each subclass constructor" <<
-        std::endl;
-  }
-*/
-
   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
   // parent link and child link.
   Joint::Load(_sdf);
@@ -76,6 +69,9 @@ void DARTJoint::Init()
 
   // Name
   this->dataPtr->Initialize();
+
+  // DARTModel::Load() should be called first
+  GZ_ASSERT(this->dataPtr->dtJoint != nullptr, "DARTJoint is not initialized.");
 
   // Parent and child link information
   DARTLinkPtr dartParentLink =
@@ -613,30 +609,6 @@ double DARTJoint::GetForce(unsigned int _index)
 }
 
 /////////////////////////////////////////////////
-/*unsigned int DARTJoint::GetAngleCount() const
-{
-  unsigned int angleCount = 0;
-
-  angleCount = this->dataPtr->dtJoint->getNumDofs();
-
-  return angleCount;
-}*/
-
-
-/////////////////////////////////////////////////
-DARTJointPropPtr DARTJoint::GetDARTProperties() const
-{
-  return this->dataPtr->dtProperties;
-}
-
-/////////////////////////////////////////////////
-void DARTJoint::SetDARTJoint(dart::dynamics::Joint *_dtJoint)
-{
-  this->dataPtr->dtJoint = _dtJoint;
-}
-
-
-/////////////////////////////////////////////////
 void DARTJoint::ApplyDamping()
 {
   // rename ApplyDamping to ApplyStiffnessDamping (below) in gazebo 4.0.
@@ -653,6 +625,18 @@ void DARTJoint::ApplyDamping()
 DARTModelPtr DARTJoint::GetDARTModel() const
 {
   return boost::dynamic_pointer_cast<DARTModel>(this->model);
+}
+
+/////////////////////////////////////////////////
+DARTJointPropPtr DARTJoint::GetDARTProperties() const
+{
+  return this->dataPtr->dtProperties;
+}
+
+/////////////////////////////////////////////////
+void DARTJoint::SetDARTJoint(dart::dynamics::Joint *_dtJoint)
+{
+  this->dataPtr->dtJoint = _dtJoint;
 }
 
 /////////////////////////////////////////////////

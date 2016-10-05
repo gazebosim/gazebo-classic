@@ -56,7 +56,6 @@ void DARTFixedJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTFixedJoint::GetAnchor(unsigned int _index) const
 {
-
   if (!this->dataPtr->IsInitialized())
   {
     return this->dataPtr->GetCached<math::Vector3>(

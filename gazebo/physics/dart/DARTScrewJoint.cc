@@ -339,7 +339,6 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
   return DARTJoint::SetParam(_key, _index, _value);
 }
 
-
 //////////////////////////////////////////////////
 math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {

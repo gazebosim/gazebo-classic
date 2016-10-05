@@ -43,7 +43,6 @@ namespace gazebo
       /// \param[in] _parent Parent Collision.
       public: explicit DARTPlaneShape(DARTCollisionPtr _parent);
 
-
       /// \brief Destructor.
       public: virtual ~DARTPlaneShape();
 

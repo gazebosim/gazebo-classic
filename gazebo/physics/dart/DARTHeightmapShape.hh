@@ -46,7 +46,6 @@ namespace gazebo
       /// \param[in] _parent Collision parent.
       public: DARTHeightmapShape(DARTCollisionPtr _parent);
 
-
       /// \brief Destructor
       public: virtual ~DARTHeightmapShape();
 

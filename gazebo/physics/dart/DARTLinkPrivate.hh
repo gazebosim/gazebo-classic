@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_DARTLINK_PRIVATE_HH_
 #define _GAZEBO_DARTLINK_PRIVATE_HH_
 
-
 #include <map>
 #include <vector>
 #include <string>
@@ -59,12 +58,11 @@ namespace gazebo
       {
         // We don't need to delete dtBodyNode because skeleton will delete
         // dtBodyNode if it is registered to the skeleton.
-      }
 
       /// \brief Call all the cached setter functions and clear them
       public: void Initialize()
       {
-        GZ_ASSERT(dtBodyNode != NULL, "dtBodyNode is null pointer.\n");
+        GZ_ASSERT(dtBodyNode != nullptr, "dtBodyNode is null pointer.\n");
 
         for (auto func : mCachedFuncs)
           func();
@@ -73,7 +71,7 @@ namespace gazebo
       /// \brief Return true if DART BodyNode is initialized
       public: bool IsInitialized() const
       {
-        return dtBodyNode != NULL;
+        return dtBodyNode != nullptr;
       }
 
       /// \brief Cache a setter function. The cached functions will be called in

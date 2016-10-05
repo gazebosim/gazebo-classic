@@ -79,7 +79,6 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     return;
   }
 
-
   Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
 
   if (_index == 0)

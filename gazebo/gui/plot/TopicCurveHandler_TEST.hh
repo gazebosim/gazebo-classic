@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_TOPTOOLBARPRIVATE_HH_
-#define GAZEBO_GUI_TOPTOOLBARPRIVATE_HH_
 
-#include <vector>
+#ifndef GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_TEST_HH_
+#define GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_TEST_HH_
 
-#include "gazebo/gui/qt.h"
+#include "gazebo/gui/QTestFixture.hh"
 
-namespace gazebo
+/// \brief A test class for the TopicCurveHandler.
+class TopicCurveHandler_TEST : public QTestFixture
 {
-  namespace gui
-  {
-    /// \internal
-    /// \brief Private data for the TopToolbar class
-    class TopToolbarPrivate
-    {
-      /// \brief Widget for the top toolbar
-      public: QToolBar *toolbar;
+  Q_OBJECT
 
-      /// \brief Event based connections.
-      public: std::vector<event::ConnectionPtr> connections;
-    };
-  }
-}
+  /// \brief Test adding and removing curves
+  private slots: void AddRemoveCurve();
+};
 #endif
