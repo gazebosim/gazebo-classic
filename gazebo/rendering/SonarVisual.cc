@@ -62,11 +62,6 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
 /////////////////////////////////////////////////
 SonarVisual::~SonarVisual()
 {
-  SonarVisualPrivate *dPtr =
-      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
-
-  delete dPtr->sonarRay;
-  dPtr->sonarRay = NULL;
 }
 
 /////////////////////////////////////////////////

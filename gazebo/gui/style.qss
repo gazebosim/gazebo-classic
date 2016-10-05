@@ -1028,10 +1028,10 @@ QMenu#material::item:disabled
 }
 
 /* --------------------------------------------- */
-/* QFileDialog */
+/* QFileDialog  - material design*/
 /* --------------------------------------------- */
 
-QFileDialog#material
+QFileDialog
 {
   color: #303030;
   background-color: #ffffff;

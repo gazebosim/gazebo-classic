@@ -24,6 +24,7 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/VideoRecorder.hh"
 #include "gazebo/gui/TopToolbarPrivate.hh"
 #include "gazebo/gui/TopToolbar.hh"
 
@@ -153,13 +154,66 @@ TopToolbar::TopToolbar(QWidget *_parent)
   QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
   spacerAction->setObjectName("toolbarSpacerAction");
 
-  // Screenshot / logging
+  // Screenshot / logging / plotting
   if (g_screenshotAct)
     this->dataPtr->toolbar->addAction(g_screenshotAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
   if (g_plotAct)
     this->dataPtr->toolbar->addAction(g_plotAct);
+
+  // Record video
+  {
+    QWidgetAction *recordVideoAct = new QWidgetAction(this);
+    VideoRecorder *videoRecorder = new VideoRecorder(this);
+    recordVideoAct->setDefaultWidget(videoRecorder);
+    recordVideoAct->setObjectName("recordVideoAction");
+
+    QToolButton *button = new QToolButton;
+    button->setObjectName("recordVideoButton");
+    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    button->setIcon(QIcon(":/images/video_camera.svg"));
+    button->setToolTip(tr("Record a video"));
+
+    QMenu *menu = new QMenu(button);
+    menu->addAction(recordVideoAct);
+
+    button->setMenu(menu);
+    button->setPopupMode(QToolButton::InstantPopup);
+
+    QAction *videoToolbarAct = this->dataPtr->toolbar->addWidget(button);
+    videoToolbarAct->setObjectName("recordVideoAction");
+
+    QGraphicsOpacityEffect *fade = new QGraphicsOpacityEffect(button);
+    button->setGraphicsEffect(fade);
+    fade->setEnabled(false);
+
+    QPropertyAnimation *animation = new QPropertyAnimation(fade, "opacity");
+    animation->setDuration(1000);
+    animation->setKeyValueAt(0, 0.1);
+    animation->setKeyValueAt(0.5, 1.0);
+    animation->setKeyValueAt(1.0, 0.1);
+    animation->setLoopCount(-1);
+
+    // Start the opacity animation when a recording begins
+    connect(videoRecorder, SIGNAL(RecordingStarted()),
+            animation, SLOT(start()));
+
+    // Stop the opacity animation when a recording ends
+    connect(videoRecorder, SIGNAL(RecordingStopped()),
+            animation, SLOT(stop()));
+
+    // Disable the fade effect on recording stop. This prevent the button
+    // from being partially faded when the animation stops.
+    connect(videoRecorder, SIGNAL(RecordingChanged(bool)),
+        fade, SLOT(setEnabled(bool)));
+
+    // Close the menu when a button is pressed.
+    connect(videoRecorder, SIGNAL(RecordingStarted()),
+            menu, SLOT(close()));
+    connect(videoRecorder, SIGNAL(RecordingStopped()),
+            menu, SLOT(close()));
+  }
 
   // Layout
   QHBoxLayout *toolLayout = new QHBoxLayout;
@@ -196,7 +250,8 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
     if (acts[i] == g_screenshotAct ||
         acts[i] == g_viewAngleButtonAct ||
         acts[i] == g_plotAct ||
-        acts[i]->objectName() == "toolbarSpacerAction")
+        acts[i]->objectName() == "toolbarSpacerAction" ||
+        acts[i]->objectName() == "recordVideoAction")
     {
       acts[i]->setVisible(modelEditor || simulation || logPlayback);
       acts[i]->setEnabled(modelEditor || simulation || logPlayback);
