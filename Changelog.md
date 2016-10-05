@@ -2,6 +2,10 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Generate visualization on demand, instead of on load. This helps to
+   reduce load time.
+    * [Pull request 2457](https://bitbucket.org/osrf/gazebo/pull-request/2457)
+
 1. Add support for loading wavefront obj mesh files
     * [Pull request 2454](https://bitbucket.org/osrf/gazebo/pull-request/2454)
 
