@@ -64,6 +64,7 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 // avcodec log callback. We use this to redirect message to gazebo's console
 // messages.
+#ifdef HAVE_FFMPEG
 void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
 {
   static char message[8192];
@@ -102,6 +103,7 @@ void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
       break;
   }
 }
+#endif
 
 /////////////////////////////////////////////////
 void common::load()

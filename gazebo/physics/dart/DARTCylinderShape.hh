@@ -46,6 +46,9 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~DARTCylinderShape();
+      
+      // Documentation inerited.
+      public: void Init();
 
       // Documentation inerited.
       public: void SetSize(double _radius, double _length);

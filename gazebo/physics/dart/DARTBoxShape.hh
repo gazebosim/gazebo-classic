@@ -41,6 +41,9 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~DARTBoxShape();
+      
+      // Documentation inherited.
+      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual void SetSize(const math::Vector3 &_size);

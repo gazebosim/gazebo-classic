@@ -133,7 +133,7 @@ namespace gazebo
         return VALID;
       }
 
-      public: template <typename BodyTypeT>
+      private: template <typename BodyTypeT>
       static std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>
       createJointAndNodePair(
           dart::dynamics::SkeletonPtr skeleton,

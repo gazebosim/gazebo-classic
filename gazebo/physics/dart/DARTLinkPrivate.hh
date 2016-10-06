@@ -58,14 +58,18 @@ namespace gazebo
       {
         // We don't need to delete dtBodyNode because skeleton will delete
         // dtBodyNode if it is registered to the skeleton.
+      }
 
       /// \brief Call all the cached setter functions and clear them
       public: void Initialize()
       {
         GZ_ASSERT(dtBodyNode != nullptr, "dtBodyNode is null pointer.\n");
-
+        gzdbg << "Calling Link functions which were cached \n";
+        
         for (auto func : mCachedFuncs)
           func();
+
+        gzdbg << "Finished calling cached Link functions.\n";
       }
 
       /// \brief Return true if DART BodyNode is initialized

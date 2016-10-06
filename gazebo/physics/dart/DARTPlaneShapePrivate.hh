@@ -31,21 +31,38 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTPlaneShapePrivate()
-        : dtBoxShape(new dart::dynamics::BoxShape(
-                       Eigen::Vector3d(2100, 2100, 2100)))
       {
-        gzerr<<"Need to change DARTPlaneShapePrivate to have access to ShapeNode instead of Shape! "<<__FILE__<<", "<<__LINE__<<"\n";
-        // GZ_ASSERT(false, "Need to change DARTPlaneShapePrivate to have access to ShapeNode instead of Shape!");
-        // TODO Access to the transform is now on the ShapeNode level, need to find a solution how to access it here
-        // without breaking the interface. For now, PlaneShape is not supported any more.
-        // this->dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
       }
 
       /// \brief Default destructor
       public: ~DARTPlaneShapePrivate() = default;
 
+      public: dart::dynamics::BoxShape* GetShape()
+      { 
+        GZ_ASSERT(dtBoxShape.get() != nullptr, "BodyNode is NULL");
+        return static_cast<dart::dynamics::BoxShape*> (dtBoxShape->getShape().get()); 
+      }
+
+      public: dart::dynamics::ShapeNodePtr GetShapeNode()
+      {
+        return dtBoxShape; 
+      }
+      
+      public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode) 
+      {
+          GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
+          dart::dynamics::ShapePtr shape (new dart::dynamics::BoxShape(Eigen::Vector3d(2100, 2100, 2100)));
+          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<dart::dynamics::VisualAspect,
+                                        dart::dynamics::CollisionAspect,
+                                        dart::dynamics::DynamicsAspect>(shape);
+          Eigen::Isometry3d trans = Eigen::Isometry3d::Identity();
+          trans.translate(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
+          node->setRelativeTransform(trans);
+          dtBoxShape.set(node);
+      }
+
       /// \brief DART box shape
-      public: std::shared_ptr<dart::dynamics::BoxShape> dtBoxShape;
+      private: dart::dynamics::ShapeNodePtr dtBoxShape;
       // We use BoxShape untile PlaneShape is completely supported in DART.
       // Please see: https://github.com/dartsim/dart/issues/114
     };

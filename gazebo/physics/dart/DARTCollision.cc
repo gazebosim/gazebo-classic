@@ -37,7 +37,6 @@ using namespace physics;
 DARTCollision::DARTCollision(LinkPtr _link)
   : Collision(_link),
     dataPtr(new DARTCollisionPrivate())
-
 {
   this->SetName("DART_Collision");
   this->surface.reset(new DARTSurfaceParams());
@@ -61,7 +60,18 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
 
-  // Pose offset
+}
+
+//////////////////////////////////////////////////
+void DARTCollision::Init()
+{
+  Collision::Init();
+
+  // Create the collision shapes. Since DART6, this has to be done in
+  // Init(), because the BodyNode will only have been created in Load()
+  // and is not guaranteed to exist before.
+  
+  // Set the pose offset.
   if (this->dataPtr->dtCollisionShape)
   {
     // TODO: Remove type check once DART completely supports plane shape.
@@ -71,24 +81,19 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
 
     if (!isPlaneShape)
     {
-      dart::dynamics::BodyNode *bn = GetDARTBodyNode();
+      /*dart::dynamics::BodyNode *bn = GetDARTBodyNode();
       if (!bn)
       {
         gzerr << "Body node should have been initialized! \n";
         return;
-      }
+      }*/
       Eigen::Isometry3d tf = DARTTypes::ConvPose(this->GetRelativePose());
-      bn->getParentJoint()->setTransformFromParentBodyNode(tf);
+      //bn->getParentJoint()->setTransformFromParentBodyNode(tf);
+      this->dataPtr->dtCollisionShape->setRelativeTransform(tf);
       //this->dataPtr->dtCollisionShape->setLocalTransform(
       //      DARTTypes::ConvPose(this->GetRelativePose()));
     }
   }
-}
-
-//////////////////////////////////////////////////
-void DARTCollision::Init()
-{
-  Collision::Init();
 }
 
 //////////////////////////////////////////////////
@@ -131,9 +136,7 @@ unsigned int DARTCollision::GetCollideBits() const
 gazebo::math::Box DARTCollision::GetBoundingBox() const
 {
   math::Box result;
-
   gzerr << "DART does not provide bounding box info.\n";
-
   return result;
 }
 
@@ -147,31 +150,46 @@ dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
 void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape * /* *_shape*/,
                                           bool _placeable)
 {
-  gzerr << "Deprecated. Use SetDARTCollisionShape(ShapePtr, bool) instead.\n";
-
+  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool) instead.\n";
   Collision::SetCollision(_placeable);
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
+void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr /* _shape*/,
+                                          bool _placeable)
+{
+  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool) instead.\n";
+  Collision::SetCollision(_placeable);
+}
+      
+//////////////////////////////////////////////////
+void DARTCollision::SetDARTCollisionShapeNode(dart::dynamics::ShapeNodePtr _shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
   this->dataPtr->dtCollisionShape = _shape;
 }
 
-
 //////////////////////////////////////////////////
 dart::dynamics::ShapePtr DARTCollision::GetDARTCollisionShapePtr() const
 {
-  return this->dataPtr->dtCollisionShape;
+  gzerr << "Deprecated. Use GetDARTCollisionShapeNode() instead.\n";
+  GZ_ASSERT(this->dataPtr->dtCollisionShape != nullptr, "Shape node is NULL");
+  return this->dataPtr->dtCollisionShape->getShape();
 }
-
 
 //////////////////////////////////////////////////
 dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
 {
-  return this->dataPtr->dtCollisionShape.get();
+  gzerr << "Deprecated. Use GetDARTCollisionShapeNode() instead.\n";
+  GZ_ASSERT(this->dataPtr->dtCollisionShape != nullptr, "Shape node is NULL");
+  return this->dataPtr->dtCollisionShape->getShape().get();
+}
+
+//////////////////////////////////////////////////
+dart::dynamics::ShapeNodePtr DARTCollision::GetDARTCollisionShapeNode() const
+{
+  return this->dataPtr->dtCollisionShape;
 }
 
 /////////////////////////////////////////////////

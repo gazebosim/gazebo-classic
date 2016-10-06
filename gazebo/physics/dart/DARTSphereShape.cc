@@ -31,7 +31,6 @@ DARTSphereShape::DARTSphereShape(DARTCollisionPtr _parent)
   : SphereShape(_parent),
     dataPtr(new DARTSphereShapePrivate())
 {
-  _parent->SetDARTCollisionShape(this->dataPtr->dtEllipsoidShape, false);
 }
 
 //////////////////////////////////////////////////
@@ -40,6 +39,25 @@ DARTSphereShape::~DARTSphereShape()
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }
+
+//////////////////////////////////////////////////
+void DARTSphereShape::Init()
+{
+  BasePtr _parent = GetParent();
+  DARTCollisionPtr _collisionParent = boost::dynamic_pointer_cast<DARTCollision>(_parent);
+  GZ_ASSERT(_collisionParent.get(), "Parent must be a DARTCollisionPtr");
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->GetDARTBodyNode();
+  
+  if (!bodyNode.get()) gzerr << "BodyNode is NULL in init!\n";
+  GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL in init!");
+  
+  this->dataPtr->CreateShape(bodyNode);
+  _collisionParent->SetDARTCollisionShapeNode(this->dataPtr->GetShapeNode(), false);
+
+  SphereShape::Init();
+}
+
 
 //////////////////////////////////////////////////
 void DARTSphereShape::SetRadius(double _radius)
@@ -61,7 +79,7 @@ void DARTSphereShape::SetRadius(double _radius)
 
   SphereShape::SetRadius(_radius);
 
-  this->dataPtr->dtEllipsoidShape->setSize(
+  this->dataPtr->GetShape()->setSize(
         Eigen::Vector3d(_radius*2.0, _radius*2.0, _radius*2.0));
 }
 

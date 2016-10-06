@@ -31,7 +31,6 @@ DARTBoxShape::DARTBoxShape(DARTCollisionPtr _parent)
   : BoxShape(_parent),
     dataPtr(new DARTBoxShapePrivate())
 {
-  _parent->SetDARTCollisionShape(this->dataPtr->dtBoxShape);
 }
 
 //////////////////////////////////////////////////
@@ -40,6 +39,25 @@ DARTBoxShape::~DARTBoxShape()
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }
+
+//////////////////////////////////////////////////
+void DARTBoxShape::Init()
+{
+  BasePtr _parent = GetParent();
+  DARTCollisionPtr _collisionParent = boost::dynamic_pointer_cast<DARTCollision>(_parent);
+  GZ_ASSERT(_collisionParent.get(), "Parent must be a DARTCollisionPtr");
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->GetDARTBodyNode();
+  
+  if (!bodyNode.get()) gzerr << "BodyNode is NULL in Init!\n";
+  GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL Init!");
+  
+  this->dataPtr->CreateShape(bodyNode);
+  _collisionParent->SetDARTCollisionShapeNode(this->dataPtr->GetShapeNode(), false);
+
+  BoxShape::Init();
+}
+
 
 //////////////////////////////////////////////////
 void DARTBoxShape::SetSize(const math::Vector3 &_size)
@@ -76,5 +94,6 @@ void DARTBoxShape::SetSize(const math::Vector3 &_size)
 
   BoxShape::SetSize(size);
 
-  this->dataPtr->dtBoxShape->setSize(DARTTypes::ConvVec3(size));
+  GZ_ASSERT(this->dataPtr->GetShape(), "Box shape node or shape itself is NULL");
+  this->dataPtr->GetShape()->setSize(DARTTypes::ConvVec3(size));
 }

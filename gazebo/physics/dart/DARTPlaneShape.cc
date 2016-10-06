@@ -31,8 +31,7 @@ DARTPlaneShape::DARTPlaneShape(CollisionPtr _parent)
   : PlaneShape(_parent),
     dataPtr(new DARTPlaneShapePrivate())
 {
-  boost::dynamic_pointer_cast<DARTCollision>(_parent)->SetDARTCollisionShape(
-        this->dataPtr->dtBoxShape, false);
+  gzerr << "Deprecated. Cannot create plane shape with the deprecated DARTPlaneShapeConstructor. \n";
 }
 
 //////////////////////////////////////////////////
@@ -40,7 +39,6 @@ DARTPlaneShape::DARTPlaneShape(DARTCollisionPtr _parent)
   : PlaneShape(_parent),
     dataPtr(new DARTPlaneShapePrivate())
 {
-  _parent->SetDARTCollisionShape(this->dataPtr->dtBoxShape, false);
 }
 
 //////////////////////////////////////////////////
@@ -48,6 +46,24 @@ DARTPlaneShape::~DARTPlaneShape()
 {
   delete this->dataPtr;
   this->dataPtr = nullptr;
+}
+
+//////////////////////////////////////////////////
+void DARTPlaneShape::Init()
+{
+  BasePtr _parent = GetParent();
+  DARTCollisionPtr _collisionParent = boost::dynamic_pointer_cast<DARTCollision>(_parent);
+  GZ_ASSERT(_collisionParent.get(), "Parent must be a DARTCollisionPtr");
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->GetDARTBodyNode();
+  if (!bodyNode.get()) gzerr << "BodyNode is NULL in init!\n";
+  GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL in init!");
+      
+  this->dataPtr->CreateShape(bodyNode);
+
+  _collisionParent->SetDARTCollisionShapeNode(this->dataPtr->GetShapeNode(), false);
+
+  PlaneShape::Init();
 }
 
 //////////////////////////////////////////////////

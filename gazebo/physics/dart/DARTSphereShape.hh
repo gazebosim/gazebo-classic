@@ -42,6 +42,9 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~DARTSphereShape();
+      
+      // Documentation inherited.
+      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual void SetRadius(double _radius);
