@@ -166,10 +166,12 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Add support for loading wavefront obj mesh files
+    * [Pull request 2454](https://bitbucket.org/osrf/gazebo/pull-request/2454)
+
 1. Added filesystem operations to the common library. Additions include
    `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
     * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
-
 
 1. Fix loading collada files with multiple texture coordinates.
     * [Pull request 2413](https://bitbucket.org/osrf/gazebo/pull-request/2413)
