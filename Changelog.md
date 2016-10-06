@@ -6,6 +6,9 @@
     * [Pull request 2431](https://bitbucket.org/osrf/gazebo/pull-request/2431)
     * [Issue 2034](https://bitbucket.org/osrf/gazebo/issues/2034)
 
+1. Add support for loading wavefront obj mesh files
+    * [Pull request 2454](https://bitbucket.org/osrf/gazebo/pull-request/2454)
+
 1. Added filesystem operations to the common library. Additions include
    `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
     * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
@@ -2334,4 +2337,3 @@ compilation on Windows.
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-
