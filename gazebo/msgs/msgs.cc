@@ -999,6 +999,8 @@ namespace gazebo
         bool useTerrainPaging =
             geomElem->Get<bool>("use_terrain_paging");
         result.mutable_heightmap()->set_use_terrain_paging(useTerrainPaging);
+        result.mutable_heightmap()->set_filename(
+            geomElem->Get<std::string>("uri"));
       }
       else if (geomElem->GetName() == "mesh")
       {
@@ -1119,21 +1121,20 @@ namespace gazebo
       // Set plugins of the visual
       if (_sdf->HasElement("plugin"))
       {
-        sdf::ElementPtr elem = _sdf->GetElement("plugin");
-        msgs::Plugin *plgnMsg = result.mutable_plugin();
-        // if (elem->HasElement("name"))
-          plgnMsg->set_name(elem->Get<std::string>("name"));
-        // if (elem->HasElement("filename"))
-          plgnMsg->set_filename(elem->Get<std::string>("filename"));
-
-        std::stringstream ss;
-        for (sdf::ElementPtr innerElem = elem->GetFirstElement();
-            innerElem;
-            innerElem = innerElem->GetNextElement(""))
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
         {
-          ss << innerElem->ToString("");
+          msgs::Plugin *pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(PluginFromSDF(pluginElem));
+
+          // DEPRECATED in Gazebo7, remove in Gazebo8
+          // duplicate innerxml contents into an <sdf> tag to keep backwards
+          // compatibility
+          pluginMsg->set_innerxml(pluginMsg->innerxml() +
+              "\n<sdf>" + pluginMsg->innerxml() + "</sdf>");
+
+          pluginElem = pluginElem->GetNextElement("plugin");
         }
-        plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
       }
 
       return result;
@@ -1541,10 +1542,10 @@ namespace gazebo
       }
 
       // Set plugins of the visual
-      if (_msg.has_plugin())
+      for (int i = 0; i < _msg.plugin_size(); ++i)
       {
-        sdf::ElementPtr pluginElem = visualSDF->GetElement("plugin");
-        pluginElem = PluginToSDF(_msg.plugin(), pluginElem);
+        sdf::ElementPtr pluginElem = visualSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
       }
 
       return visualSDF;

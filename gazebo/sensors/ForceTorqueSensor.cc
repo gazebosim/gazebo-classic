@@ -186,12 +186,6 @@ void ForceTorqueSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-physics::JointPtr ForceTorqueSensor::GetJoint() const
-{
-  return this->Joint();
-}
-
-//////////////////////////////////////////////////
 physics::JointPtr ForceTorqueSensor::Joint() const
 {
   return this->dataPtr->parentJoint;

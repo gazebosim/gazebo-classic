@@ -247,12 +247,6 @@ void ImuSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-msgs::IMU ImuSensor::GetImuMessage() const
-{
-  return this->ImuMessage();
-}
-
-//////////////////////////////////////////////////
 msgs::IMU ImuSensor::ImuMessage() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);

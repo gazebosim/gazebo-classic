@@ -14,14 +14,19 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
-#define _GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
+#define GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
 
 #include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/common/ImageHeightmap.hh"
+#include "gazebo/common/HeightmapData.hh"
+#include "gazebo/common/Dem.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
@@ -116,9 +121,15 @@ namespace gazebo
       /// \return The height at a the specified location.
       public: float Height(const int _x, const int _y) const;
 
-      /// \brief Fill a geometry message with this shape's data.
+      /// \brief Fill a geometry message with this shape's data. Raw height
+      /// data are not packed in this message to minimize packet size.
       /// \param[out] _msg Message to fill.
+      /// \sa FillHeights
       public: void FillMsg(msgs::Geometry &_msg);
+
+      /// \brief Fill a geometry message with this shape's height data.
+      /// \param[in] _msg Message to fill.
+      public: void FillHeights(msgs::Geometry &_msg) const;
 
       /// \brief Update the heightmap from a message.
       /// \param[in] _msg Message to update from.
@@ -173,18 +184,6 @@ namespace gazebo
       /// \param[in] _filename The path to the terrain file.
       /// \return 0 when the operation succeeds to load a file or -1 when fails.
       private: int LoadTerrainFile(const std::string &_filename);
-
-      #ifdef HAVE_GDAL
-      /// \brief Load a DEM specified by _filename as a terrain file.
-      /// \param[in] _filename The path to the terrain file.
-      /// \return 0 when the operation succeeds to load a file or -1 when fails.
-      private: int LoadDEMAsTerrain(const std::string &_filename);
-      #endif
-
-      /// \brief Load an image specified by _filename as a terrain file.
-      /// \param[in] _filename The path to the terrain file.
-      /// \return 0 when the operation succeeds to load a file or -1 when fails.
-      private: int LoadImageAsTerrain(const std::string &_filename);
 
       /// \brief Handle request messages.
       /// \param[in] _msg The request message.

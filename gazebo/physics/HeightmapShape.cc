@@ -26,14 +26,6 @@
 #include <ignition/math/Helpers.hh>
 #include <gazebo/gazebo_config.h>
 
-#ifdef HAVE_GDAL
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wfloat-equal"
-# include <gdalwarper.h>
-# include <gdal_priv.h>
-# pragma GCC diagnostic pop
-#endif
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
@@ -76,6 +68,7 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
     response.set_response("success");
 
     this->FillMsg(msg);
+    this->FillHeights(msg);
 
     response.set_type(msg.GetTypeName());
     std::string *serializedData = response.mutable_serialized_data();
@@ -86,117 +79,72 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
+int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
-  if (this->heightmapShapeDPtr->img.Load(_filename) != 0)
+  this->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(_filename);
+  if (!this->heightmapShapeDPtr->heightmapData)
   {
-    gzerr << "Unable to load an image as a terrain [" << _filename << "]\n";
+    gzerr << "Unable to load heightmap data" << std::endl;
     return -1;
   }
-
-  this->heightmapShapeDPtr->heightmapData = static_cast<common::HeightmapData*>(
-      &this->heightmapShapeDPtr->img);
-  this->heightmapShapeDPtr->heightmapSize = this->heightmapShapeDPtr->sdf->Get<
-    ignition::math::Vector3d>("size");
-
-  return 0;
-}
 
 #ifdef HAVE_GDAL
-//////////////////////////////////////////////////
-int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
-{
-  if (this->heightmapShapeDPtr->dem.Load(_filename) != 0)
+  // DEM
+  auto demData = dynamic_cast<common::Dem *>(this->heightmapData);
+  if (demData)
   {
-    gzerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
-    return -1;
-  }
+    this->dem = *demData;
+    if (this->sdf->HasElement("size"))
+    {
+      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+    }
+    else
+    {
+      this->heightmapSize.x = this->dem.GetWorldWidth();
+      this->heightmapSize.y = this->dem.GetWorldHeight();
+      this->heightmapSize.z = this->dem.GetMaxElevation() -
+          std::max(0.0f, this->dem.GetMinElevation());
+    }
 
-  if (this->heightmapShapeDPtr->sdf->HasElement("size"))
-  {
-    this->heightmapShapeDPtr->heightmapSize =
-      this->heightmapShapeDPtr->sdf->Get<ignition::math::Vector3d>("size");
+    // Modify the reference geotedic latitude/longitude.
+    // A GPS sensor will use the real georeferenced coordinates of the terrain.
+    common::SphericalCoordinatesPtr sphericalCoordinates;
+    sphericalCoordinates = this->world->GetSphericalCoordinates();
+
+    if (sphericalCoordinates)
+    {
+      ignition::math::Angle latitude, longitude;
+      double elevation;
+
+      this->dem.GetGeoReferenceOrigin(latitude, longitude);
+      elevation = this->dem.GetElevation(0.0, 0.0);
+
+      sphericalCoordinates->SetLatitudeReference(latitude);
+      sphericalCoordinates->SetLongitudeReference(longitude);
+      sphericalCoordinates->SetElevationReference(elevation);
+      sphericalCoordinates.reset();
+    }
+    else
+      gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
+
+    return 0;
   }
+  // Image
   else
-  {
-    this->heightmapShapeDPtr->heightmapSize.X(
-        this->heightmapShapeDPtr->dem.GetWorldWidth());
-    this->heightmapShapeDPtr->heightmapSize.Y(
-        this->heightmapShapeDPtr->dem.GetWorldHeight());
-    this->heightmapShapeDPtr->heightmapSize.Z(
-        this->heightmapShapeDPtr->dem.GetMaxElevation() -
-        std::max(0.0f, this->heightmapShapeDPtr->dem.GetMinElevation()));
-  }
-
-  this->heightmapShapeDPtr->heightmapData =
-    static_cast<common::HeightmapData*>(&this->heightmapShapeDPtr->dem);
-
-  // Modify the reference geotedic latitude/longitude.
-  // A GPS sensor will use the real georeferenced coordinates of the terrain.
-  common::SphericalCoordinatesPtr sphericalCoordinates;
-  sphericalCoordinates =
-    this->heightmapShapeDPtr->world->SphericalCoords();
-
-  if (sphericalCoordinates)
-  {
-    ignition::math::Angle latitude, longitude;
-    double elevation;
-
-    this->heightmapShapeDPtr->dem.GetGeoReferenceOrigin(latitude, longitude);
-    elevation = this->heightmapShapeDPtr->dem.GetElevation(0.0, 0.0);
-
-    sphericalCoordinates->SetLatitudeReference(latitude);
-    sphericalCoordinates->SetLongitudeReference(longitude);
-    sphericalCoordinates->SetElevationReference(elevation);
-    sphericalCoordinates.reset();
-  }
-  else
-  {
-    gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
-  }
-
-  return 0;
-}
-
-//////////////////////////////////////////////////
-int HeightmapShape::LoadTerrainFile(const std::string &_filename)
-{
-  // Register the GDAL drivers
-  GDALAllRegister();
-
-  GDALDataset *poDataset = reinterpret_cast<GDALDataset *>
-      (GDALOpen(_filename.c_str(), GA_ReadOnly));
-
-  if (!poDataset)
-  {
-    gzerr << "Unrecognized terrain format in file [" << _filename << "]\n";
-    return -1;
-  }
-
-  this->heightmapShapeDPtr->fileFormat =
-    poDataset->GetDriver()->GetDescription();
-  GDALClose(reinterpret_cast<GDALDataset *>(poDataset));
-
-  // Check if the heightmap file is an image
-  if (this->heightmapShapeDPtr->fileFormat == "JPEG" ||
-      this->heightmapShapeDPtr->fileFormat == "PNG")
-  {
-    // Load the terrain file as an image
-    return this->LoadImageAsTerrain(_filename);
-  }
-  else
-  {
-    // Load the terrain file as a DEM
-    return this->LoadDEMAsTerrain(_filename);
-  }
-}
-#else
-int HeightmapShape::LoadTerrainFile(const std::string &_filename)
-{
-  // Load the terrain file as an image
-  return this->LoadImageAsTerrain(_filename);
-}
 #endif
+  {
+    auto imageData =
+        dynamic_cast<common::ImageHeightmap *>(this->heightmapData);
+    if (imageData)
+    {
+      this->img = *imageData;
+      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      return 0;
+    }
+  }
+
+  return -1;
+}
 
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
@@ -212,7 +160,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     return;
   }
 
-  if (LoadTerrainFile(filename) != 0)
+  if (this->LoadTerrainFile(filename) != 0)
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
@@ -346,6 +294,14 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
   _msg.mutable_heightmap()->set_width(this->heightmapShapeDPtr->vertSize);
   _msg.mutable_heightmap()->set_height(this->heightmapShapeDPtr->vertSize);
 
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
+  _msg.mutable_heightmap()->set_filename(this->URI());
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::FillHeights(msgs::Geometry &_msg) const
+{
   for (unsigned int y = 0; y < this->heightmapShapeDPtr->vertSize; ++y)
   {
     for (unsigned int x = 0; x < this->heightmapShapeDPtr->vertSize; ++x)
@@ -356,11 +312,6 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
           this->heightmapShapeDPtr->heights[index]);
     }
   }
-
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
-  _msg.mutable_heightmap()->set_filename(
-      this->heightmapShapeDPtr->img.GetFilename());
 }
 
 //////////////////////////////////////////////////
@@ -391,11 +342,12 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 /////////////////////////////////////////////////
 float HeightmapShape::Height(const int _x, const int _y) const
 {
-  if (_x < 0 || _y < 0)
+  int index = _y * this->heightmapShapeDPtr->vertSize + _x;
+  if (_x < 0 || _y < 0 || 
+      index >= static_cast<int>(this->heightmapShapeDPtr->heights.size()))
     return 0.0;
 
-  return this->heightmapShapeDPtr->heights[_y *
-    this->heightmapShapeDPtr->vertSize + _x];
+  return this->heightmapShapeDPtr->heights[index];
 }
 
 /////////////////////////////////////////////////

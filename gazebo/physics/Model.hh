@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_MODEL_HH_
-#define _GAZEBO_PHYSICS_MODEL_HH_
+#ifndef GAZEBO_PHYSICS_MODEL_HH_
+#define GAZEBO_PHYSICS_MODEL_HH_
 
 #include <string>
 #include <map>
@@ -332,7 +332,7 @@ namespace gazebo
       public: virtual void SetSelfCollide(const bool _selfCollide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool _value);
 
       /// \TODO This is not implemented in Link, which means this function

@@ -46,31 +46,30 @@ using namespace gui;
 ModelManipulator::ModelManipulator()
   : dataPtr(new ModelManipulatorPrivate)
 {
-  this->dataPtr->manipMode = "";
-  this->dataPtr->globalManip = false;
-  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
 ModelManipulator::~ModelManipulator()
 {
   this->Clear();
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void ModelManipulator::Clear()
 {
+  this->dataPtr->userCmdPub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
   if (this->dataPtr->selectionObj)
     this->dataPtr->selectionObj->Fini();
-
-  this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
-  this->dataPtr->userCamera.reset();
-  this->dataPtr->scene.reset();
-  this->dataPtr->node.reset();
   this->dataPtr->mouseMoveVis.reset();
+
+  this->dataPtr->scene.reset();
+  this->dataPtr->userCamera.reset();
+
   this->dataPtr->mouseChildVisualScale.clear();
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
@@ -124,7 +123,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 
 /////////////////////////////////////////////////
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
-    const ignition::math::Vector3d &_axis, bool _local)
+    const ignition::math::Vector3d &_axis, const bool _local)
 {
   ignition::math::Vector3d normal;
 
@@ -187,6 +186,13 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
     rendering::CameraPtr _camera,
     const common::MouseEvent &_event)
 {
+  return MousePositionOnPlane(_camera, _event);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d ModelManipulator::MousePositionOnPlane(
+    rendering::CameraPtr _camera, const common::MouseEvent &_event)
+{
   ignition::math::Vector3d origin1, dir1, p1;
 
   // Cast ray from the camera into the world
@@ -212,7 +218,7 @@ math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
 /////////////////////////////////////////////////
 ignition::math::Vector3d ModelManipulator::SnapPoint(
     const ignition::math::Vector3d &_point,
-    double _interval, double _sensitivity)
+    const double _interval, const double _sensitivity)
 {
   if (_interval < 0)
   {
@@ -260,8 +266,8 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
     const math::Vector2i &_start, const math::Vector2i &_end,
     const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
 {
-  return MouseMoveDistance(_camera, _start.Ign(), _end.Ign(),
-      _pose.Ign(), _axis.Ign(), _local);
+  return MouseMoveDistance(_camera, _start.Ign(), _end.Ign(), _pose.Ign(),
+      _axis.Ign(), _local);
 }
 
 /////////////////////////////////////////////////
@@ -270,7 +276,7 @@ ignition::math::Vector3d ModelManipulator::MouseMoveDistance(
     const ignition::math::Vector2i &_start,
     const ignition::math::Vector2i &_end,
     const ignition::math::Pose3d &_pose,
-    const ignition::math::Vector3d &_axis, bool _local)
+    const ignition::math::Vector3d &_axis, const bool _local)
 {
   ignition::math::Pose3d pose = _pose;
 
@@ -319,10 +325,8 @@ ignition::math::Vector3d ModelManipulator::MouseMoveDistance(
   // Fine tune ray casting: cast a second ray and compare the two rays' angle
   // to plane. Use the one that is less parallel to plane for better results.
   double angle = dir1.Dot(planeNorm);
-
   if (_local)
     planeNormOther = pose.Rot().RotateVector(planeNormOther);
-
   double angleOther = dir1.Dot(planeNormOther);
   if (fabs(angleOther) > fabs(angle))
   {
@@ -355,7 +359,7 @@ ignition::math::Vector3d ModelManipulator::MouseMoveDistance(
 /////////////////////////////////////////////////
 ignition::math::Vector3d ModelManipulator::MouseMoveDistance(
     const ignition::math::Pose3d &_pose,
-    const ignition::math::Vector3d &_axis, bool _local) const
+    const ignition::math::Vector3d &_axis, const bool _local) const
 {
   return MouseMoveDistance(this->dataPtr->userCamera,
       this->dataPtr->mouseStart,
@@ -372,16 +376,14 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
 /////////////////////////////////////////////////
 void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
-    const ignition::math::Vector3d &_axis, bool _local)
+    const ignition::math::Vector3d &_axis, const bool _local)
 {
-  ignition::math::Box bbox = this->dataPtr->mouseVisualBbox;
-  ignition::math::Pose3d pose = _vis->GetWorldPose().Ign();
-  ignition::math::Vector3d distance =
-    this->MouseMoveDistance(pose, _axis, _local);
+  auto bbox = this->dataPtr->mouseVisualBbox;
+  auto pose = _vis->GetWorldPose().Ign();
+  auto distance =  this->MouseMoveDistance(pose, _axis, _local);
 
-  ignition::math::Vector3d bboxSize = bbox.Size();
-  ignition::math::Vector3d scale =
-    (bboxSize + pose.Rot().RotateVectorReverse(distance)) / bboxSize;
+  auto bboxSize = bbox.Size();
+  auto scale = (bboxSize + pose.Rot().RotateVectorReverse(distance)) / bboxSize;
 
   // extended scaling to work in model editor mode by checking geometry
   // type of first visual child.
@@ -393,7 +395,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);
 
-      if (childVis->GetPose().pos != math::Vector3::Zero)
+      if (childVis->GetPose().pos != ignition::math::Vector3d::Zero)
       {
         gzwarn << "Scaling is currently limited to simple shapes with their "
             << "origin in the centroid." << std::endl;
@@ -405,7 +407,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
         rendering::VisualPtr grandChildVis = childVis->GetChild(j);
         std::string thisGeomType = grandChildVis->GetGeometryType();
 
-        if (grandChildVis->GetPose().pos != math::Vector3::Zero)
+        if (grandChildVis->GetPose().pos != ignition::math::Vector3d::Zero)
         {
           gzwarn << "Scaling is currently limited to simple shapes with their "
               << "origin in the centroid." << std::endl;
@@ -449,8 +451,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       return;
     }
 
-    ignition::math::Vector3d newScale =
-      this->dataPtr->mouseVisualScale * scale.Abs();
+    auto newScale = this->dataPtr->mouseVisualScale * scale.Abs();
 
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
@@ -490,8 +491,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           geomScale = this->UpdateScale(_axis, scale, geomType);
         }
 
-        ignition::math::Vector3d newScale =
-          this->dataPtr->mouseChildVisualScale[i] * geomScale.Abs();
+        auto newScale = this->dataPtr->mouseChildVisualScale[i]
+            * geomScale.Abs();
 
         if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         {
@@ -519,18 +520,18 @@ ignition::math::Vector3d ModelManipulator::UpdateScale(
   {
     if (_axis.X() > 0)
     {
-      scale.Y() = scale.X();
-      scale.Z() = scale.X();
+      scale.Y(scale.X());
+      scale.Z(scale.X());
     }
     else if (_axis.Y() > 0)
     {
-      scale.X() = scale.Y();
-      scale.Z() = scale.Y();
+      scale.X(scale.Y());
+      scale.Z(scale.Y());
     }
     else if (_axis.Z() > 0)
     {
-      scale.X() = scale.Z();
-      scale.Y() = scale.Z();
+      scale.X(scale.Z());
+      scale.Y(scale.Z());
     }
   }
   else if (_geom == "cylinder")
@@ -557,21 +558,20 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 
 /////////////////////////////////////////////////
 void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
-    const ignition::math::Vector3d &_axis, bool _local)
+    const ignition::math::Vector3d &_axis, const bool _local)
 {
-  ignition::math::Pose3d pose = _vis->GetWorldPose().Ign();
-  ignition::math::Vector3d distance =
-    this->MouseMoveDistance(pose, _axis, _local);
+  auto pose = _vis->GetWorldPose().Ign();
+  auto distance =  this->MouseMoveDistance(pose, _axis, _local);
 
   pose.Pos() = this->dataPtr->mouseMoveVisStartPose.Pos() + distance;
 
   if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
-    pose.Pos() = this->SnapPoint(pose.Pos());
+    pose.Pos() = SnapPoint(pose.Pos());
   }
 
   if (!(_axis.Z() > 0) && !_local)
-    pose.Pos().Z(_vis->GetWorldPose().pos.z);
+    pose.Pos().Z() = _vis->GetWorldPose().Ign().Pos().Z();
 
   _vis->SetWorldPose(pose);
   Events::moveEntity(_vis->GetName(), pose, false);
@@ -683,9 +683,12 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 
   this->dataPtr->selectionObj->SetState(manipState);
 
+  // See issue #1510
+  bool keyIsPressed = (QApplication::keyboardModifiers() != Qt::NoModifier);
+
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
-  if (!this->dataPtr->keyEvent.key && (this->dataPtr->selectionObj->GetMode() ==
+  if (!keyIsPressed && (this->dataPtr->selectionObj->GetMode() ==
        rendering::SelectionObj::SELECTION_NONE
       || (mouseVis && mouseVis != this->dataPtr->selectionObj->GetParent())))
   {
@@ -706,7 +709,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
     // If the root visual's ID can be found, it is a model in the main window
-    // TODO gui::get_entity_id always return 0 in QTestFixture due to NULL
+    // TODO gui::get_entity_id always return 0 in QTestFixture due to nullptr
     // g_main_win
     if (gui::get_entity_id(rootVis->GetName()))
     {
@@ -818,21 +821,24 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
             || this->dataPtr->keyEvent.key == Qt::Key_X)
         {
           this->RotateEntity(this->dataPtr->mouseMoveVis,
-              ignition::math::Vector3d::UnitX, !this->dataPtr->globalManip);
+              ignition::math::Vector3d::UnitX,
+              !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Y
             || this->dataPtr->keyEvent.key == Qt::Key_Y)
         {
           this->RotateEntity(this->dataPtr->mouseMoveVis,
-              ignition::math::Vector3d::UnitY, !this->dataPtr->globalManip);
+              ignition::math::Vector3d::UnitY,
+              !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Z
             || this->dataPtr->keyEvent.key == Qt::Key_Z)
         {
           this->RotateEntity(this->dataPtr->mouseMoveVis,
-              ignition::math::Vector3d::UnitZ, !this->dataPtr->globalManip);
+              ignition::math::Vector3d::UnitZ,
+              !this->dataPtr->globalManip);
         }
       }
       else if (this->dataPtr->selectionObj->GetMode()
@@ -1032,7 +1038,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose().Ign();
       }
     }
-    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -1050,15 +1056,15 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     return;
 
   // Get the point on the plane which correspoinds to the mouse
-  math::Vector3 pp;
+  ignition::math::Vector3d pp;
 
   // Rotate the visual using the middle mouse button
   if (this->dataPtr->mouseEvent.buttons == common::MouseEvent::MIDDLE)
   {
-    math::Vector3 rpy = this->dataPtr->mouseMoveVisStartPose.rot.GetAsEuler();
-    math::Vector2i delta = this->dataPtr->mouseEvent.pos -
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
+    auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
-    double yaw = (delta.x * 0.01) + rpy.z;
+    double yaw = (delta.X() * 0.01) + rpy.Z();
     if (!this->dataPtr->mouseEvent.shift)
     {
       double snap = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
@@ -1067,14 +1073,14 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
         yaw = snap;
     }
 
-    _vis->SetWorldRotation(math::Quaternion(rpy.x, rpy.y, yaw));
+    _vis->SetWorldRotation(ignition::math::Quaterniond(rpy.X(), rpy.Y(), yaw));
   }
   else if (this->dataPtr->mouseEvent.buttons == common::MouseEvent::RIGHT)
   {
-    math::Vector3 rpy = this->dataPtr->mouseMoveVisStartPose.rot.GetAsEuler();
-    math::Vector2i delta = this->dataPtr->mouseEvent.pos -
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
+    auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
-    double pitch = (delta.y * 0.01) + rpy.y;
+    double pitch = (delta.Y() * 0.01) + rpy.Y();
     if (!this->dataPtr->mouseEvent.shift)
     {
       double snap = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
@@ -1083,15 +1089,16 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
         pitch = snap;
     }
 
-    _vis->SetWorldRotation(math::Quaternion(rpy.x, pitch, rpy.z));
+    _vis->SetWorldRotation(
+        ignition::math::Quaterniond(rpy.X(), pitch, rpy.Z()));
   }
   else if (this->dataPtr->mouseEvent.buttons & common::MouseEvent::LEFT &&
            this->dataPtr->mouseEvent.buttons & common::MouseEvent::RIGHT)
   {
-    math::Vector3 rpy = this->dataPtr->mouseMoveVisStartPose.rot.GetAsEuler();
-    math::Vector2i delta = this->dataPtr->mouseEvent.pos -
+    auto rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
+    auto delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
-    double roll = (delta.x * 0.01) + rpy.x;
+    double roll = (delta.X() * 0.01) + rpy.X();
     if (!this->dataPtr->mouseEvent.shift)
     {
       double snap = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
@@ -1100,7 +1107,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
         roll = snap;
     }
 
-    _vis->SetWorldRotation(math::Quaternion(roll, rpy.y, rpy.z));
+    _vis->SetWorldRotation(ignition::math::Quaterniond(roll, rpy.Y(), rpy.Z()));
   }
   else
   {

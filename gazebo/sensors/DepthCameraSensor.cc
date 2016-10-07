@@ -190,12 +190,6 @@ const float *DepthCameraSensor::DepthData() const
 }
 
 //////////////////////////////////////////////////
-rendering::DepthCameraPtr DepthCameraSensor::GetDepthCamera() const
-{
-  return this->DepthCamera();
-}
-
-//////////////////////////////////////////////////
 rendering::DepthCameraPtr DepthCameraSensor::DepthCamera() const
 {
   return this->dataPtr->depthCamera;

@@ -258,7 +258,8 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
+include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS}
+                           ${IGNITION-MSGS_INCLUDE_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -370,10 +371,6 @@ else (build_errors)
     gazebo_sensors
     gazebo_rendering
   )
-
-  if (INCLUDE_PLAYER)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
-  endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_physics

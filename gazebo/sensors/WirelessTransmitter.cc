@@ -140,21 +140,9 @@ bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
 }
 
 /////////////////////////////////////////////////
-std::string WirelessTransmitter::GetESSID() const
-{
-  return this->ESSID();
-}
-
-/////////////////////////////////////////////////
 std::string WirelessTransmitter::ESSID() const
 {
   return this->dataPtr->essid;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransmitter::GetFreq() const
-{
-  return this->Freq();
 }
 
 /////////////////////////////////////////////////

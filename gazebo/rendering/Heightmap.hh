@@ -85,31 +85,8 @@ namespace gazebo
       /// \param[in] _y Y location
       /// \param[in] _z Z location
       /// \return The height at the specified location
-      /// \deprecated See Height()
-      public: double GetHeight(double _x, double _y, double _z = 1000)
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the height at a location
-      /// \param[in] _x X location
-      /// \param[in] _y Y location
-      /// \param[in] _z Z location
-      /// \return The height at the specified location
       public: double Height(const double _x, const double _y,
           const double _z = 1000) const;
-
-      /// \brief Flatten the terrain based on a mouse press.
-      /// \param[in] _camera Camera associated with the mouse press.
-      /// \param[in] _mousePos Position of the mouse in viewport
-      /// coordinates.
-      /// \param[in] _outsideRadius Controls the radius of effect.
-      /// \param[in] _insideRadius Controls the size of the radius with the
-      /// maximum effect (value between 0 and 1).
-      /// \param[in] _weight Controls modification magnitude.
-      /// \return True if the terrain was modified
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Flatten the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -135,39 +112,11 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Smooth the terrain based on a mouse press.
-      /// \param[in] _camera Camera associated with the mouse press.
-      /// \param[in] _mousePos Position of the mouse in viewport
-      /// coordinates.
-      /// \param[in] _outsideRadius Controls the radius of effect.
-      /// \param[in] _insideRadius Controls the size of the radius with the
-      /// maximum effect (value between 0 and 1).
-      /// \param[in] _weight Controls modification magnitude.
-      /// \return True if the terrain was modified
       public: bool Smooth(CameraPtr _camera,
                           const ignition::math::Vector2i &_mousePos,
                           const double _outsideRadius,
                           const double _insideRadius,
                           const double _weight = 0.1);
-
-      /// \brief Raise the terrain based on a mouse press.
-      /// \param[in] _camera Camera associated with the mouse press.
-      /// \param[in] _mousePos Position of the mouse in viewport
-      /// coordinates.
-      /// \param[in] _outsideRadius Controls the radius of effect.
-      /// \param[in] _insideRadius Controls the size of the radius with the
-      /// maximum effect (value between 0 and 1).
-      /// \param[in] _weight Controls modification magnitude.
-      /// \return True if the terrain was modified
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Raise the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -193,32 +142,11 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Lower the terrain based on a mouse press.
-      /// \param[in] _camera Camera associated with the mouse press.
-      /// \param[in] _mousePos Position of the mouse in viewport
-      /// coordinates.
-      /// \param[in] _outsideRadius Controls the radius of effect.
-      /// \param[in] _insideRadius Controls the size of the radius with the
-      /// maximum effect (value between 0 and 1).
-      /// \param[in] _weight Controls modification magnitude.
-      /// \return True if the terrain was modified
       public: bool Lower(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
                          const double _outsideRadius,
                          const double _insideRadius,
                          const double _weight = 0.1);
-
-      /// \brief Get the average height around a point.
-      /// \param[in] _pos Position in world coordinates.
-      /// \param[in] _brushSize Controls the radius of effect.
-      /// \deprecated See AvgHeight()
-      public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the average height around a point.
       /// \param[in] _pos Position in world coordinates.
@@ -232,30 +160,11 @@ namespace gazebo
 
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
-      /// \deprecated See OgreTerrain()
-      public: Ogre::TerrainGroup *GetOgreTerrain() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a pointer to the OGRE terrain group object.
-      /// \return Pointer to the OGRE terrain.
       public: Ogre::TerrainGroup *OgreTerrain() const;
 
       /// \brief Get the heightmap as an image
       /// \return An image that contains the terrain data.
-      /// \deprecated See Image()
-      public: common::Image GetImage() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the heightmap as an image
-      /// \return An image that contains the terrain data.
       public: common::Image Image() const;
-
-      /// \brief Calculate a mouse ray hit on the terrain.
-      /// \param[in] _camera Camera associated with the mouse press.
-      /// \param[in] _mousePos Position of the mouse in viewport
-      /// coordinates.
-      /// \return The result of the mouse ray hit.
-      /// \deprecated See MouseHit()
-      public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
-                  math::Vector2i _mousePos) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Calculate a mouse ray hit on the terrain.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -271,13 +180,6 @@ namespace gazebo
       /// \param[out] _v Destination vector with the subterrains.
       public: void SplitHeights(const std::vector<float> &_heightmap,
                   const int _n, std::vector<std::vector<float> > &_v);
-
-      /// \brief Get the number of subdivision the terrain will be split
-      /// into.
-      /// \return Number of terrain subdivisions
-      /// \deprecated See TerrainSubdivisionCount()
-      public: unsigned int GetTerrainSubdivisionCount() const
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the number of subdivision the terrain will be split
       /// into.
