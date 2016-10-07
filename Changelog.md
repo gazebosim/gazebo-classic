@@ -4,7 +4,7 @@
 
 1. Add Gazebo math helper functions to convert to and from Ignition Math
    objects.
-    * [Pull request #xxxx](https://bitbucket.org/osrf/gazebo/pull-request/xxxx)
+    * [Pull request #2461](https://bitbucket.org/osrf/gazebo/pull-request/2461)
 
 1. Add video recording of user camera. This change added an optional
    dependency on libavdevice>=56.4.100 for linux systems. When installed,
