@@ -56,7 +56,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Qt widget.
-      public: explicit AlignWidget(QWidget *_parent = 0);
+      public: AlignWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~AlignWidget();

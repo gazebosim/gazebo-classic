@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_SCHEMATIC_VIEW_WIDGET_HH_
-#define _GAZEBO_SCHEMATIC_VIEW_WIDGET_HH_
+#ifndef GAZEBO_GUI_MODEL_SCHEMATIC_VIEW_WIDGET_HH_
+#define GAZEBO_GUI_MODEL_SCHEMATIC_VIEW_WIDGET_HH_
 
 #include <utility>
 #include <map>
@@ -44,7 +43,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: explicit SchematicViewWidget(QWidget *_parent = 0);
+      public: SchematicViewWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~SchematicViewWidget() = default;

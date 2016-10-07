@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MODEL_PLUGIN_INSPECTOR_HH_
-#define _GAZEBO_MODEL_PLUGIN_INSPECTOR_HH_
+#ifndef GAZEBO_MODEL_MODELPLUGININSPECTOR_HH_
+#define GAZEBO_MODEL_MODELPLUGININSPECTOR_HH_
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -38,7 +37,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: explicit ModelPluginInspector(QWidget *_parent = 0);
+      public: ModelPluginInspector(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ModelPluginInspector();

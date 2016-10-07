@@ -49,7 +49,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: explicit ModelEditorPalette(QWidget *_parent = 0);
+      public: ModelEditorPalette(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ModelEditorPalette();

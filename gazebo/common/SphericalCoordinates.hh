@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SPHERICALCOORDINATES_HH_
-#define _GAZEBO_SPHERICALCOORDINATES_HH_
+#ifndef GAZEBO_COMMON_SPHERICALCOORDINATES_HH_
+#define GAZEBO_COMMON_SPHERICALCOORDINATES_HH_
 
 #include <string>
 
@@ -72,7 +72,7 @@ namespace gazebo
 
       /// \brief Constructor with surface type input.
       /// \param[in] _type SurfaceType specification.
-      public: explicit SphericalCoordinates(const SurfaceType _type);
+      public: SphericalCoordinates(const SurfaceType _type);
 
       /// \brief Constructor with surface type, angle, and elevation inputs.
       /// \param[in] _type SurfaceType specification.

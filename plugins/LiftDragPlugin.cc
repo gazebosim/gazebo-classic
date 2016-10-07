@@ -362,12 +362,12 @@ void LiftDragPlugin::OnUpdate()
   {
     gzdbg << "=============================\n";
     gzdbg << "sensor: [" << this->GetHandle() << "]\n";
-    gzdbg << "Link: [" << this->link->GetName()
+    gzdbg << "Link: [" << this->link->Name()
           << "] pose: [" << pose
           << "] dynamic pressure: [" << q << "]\n";
-    gzdbg << "spd: [" << vel.GetLength()
+    gzdbg << "spd: [" << vel.Length()
           << "] vel: [" << vel << "]\n";
-    gzdbg << "LD plane spd: [" << velInLDPlane.GetLength()
+    gzdbg << "LD plane spd: [" << velInLDPlane.Length()
           << "] vel : [" << velInLDPlane << "]\n";
     gzdbg << "forward (inertial): " << forwardI << "\n";
     gzdbg << "upward (inertial): " << upwardI << "\n";

@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget pointer.
-      public: explicit LayersWidget(QWidget *_parent = 0);
+      public: LayersWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~LayersWidget();

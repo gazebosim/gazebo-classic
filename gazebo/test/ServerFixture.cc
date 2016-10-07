@@ -258,10 +258,10 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
 
   if (this->server->ParseArgs(argc, argv))
   {
-    if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+    if (!rendering::get_scene(gazebo::physics::get_world()->Name()))
     {
       ASSERT_NO_THROW(rendering::create_scene(
-            gazebo::physics::get_world()->GetName(), false, true));
+            gazebo::physics::get_world()->Name(), false, true));
     }
 
     ASSERT_NO_THROW(this->server->Run());

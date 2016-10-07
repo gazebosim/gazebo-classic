@@ -34,7 +34,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget, commonly a TimePanel.
-      public: explicit TimeWidget(QWidget *_parent = 0);
+      public: TimeWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~TimeWidget();

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_PID_HH_
-#define _GAZEBO_PID_HH_
+#ifndef GAZEBO_COMMON_PID_HH_
+#define GAZEBO_COMMON_PID_HH_
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/system.hh"
@@ -144,7 +143,7 @@ namespace gazebo
       /// The return value is an updated command to be passed
       /// to the object being controlled.
       /// \return the command value
-      public: double Update(double _error, double _dt);
+      public: double Update(const double _error, const double _dt);
 
       /// \brief Set current target command for this PID controller.
       /// \param[in] _cmd New command

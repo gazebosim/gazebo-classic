@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
-#define _GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
+#define GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
 
 #include <mutex>
 #include <string>
@@ -44,7 +44,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: explicit ModelTreeWidget(QWidget *_parent = 0);
+      public: ModelTreeWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ModelTreeWidget() = default;

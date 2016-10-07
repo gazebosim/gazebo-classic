@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOG_HH_
-#define _GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOG_HH_
+#ifndef GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOG_HH_
+#define GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOG_HH_
 
 #include <memory>
 #include <string>
@@ -45,7 +45,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: explicit WallInspectorDialog(QWidget *_parent = 0);
+      public: WallInspectorDialog(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~WallInspectorDialog();

@@ -42,7 +42,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget pointer.
-      public: explicit ToolsWidget(QWidget *_parent = 0);
+      public: ToolsWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~ToolsWidget();

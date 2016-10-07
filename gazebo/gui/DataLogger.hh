@@ -40,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent widget pointer.
-      public: explicit DataLogger(QWidget *_parent = 0);
+      public: DataLogger(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: virtual ~DataLogger();

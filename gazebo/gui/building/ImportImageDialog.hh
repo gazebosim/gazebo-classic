@@ -42,7 +42,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: explicit ImportImageDialog(QWidget *_parent = 0);
+      public: ImportImageDialog(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~ImportImageDialog();

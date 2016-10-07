@@ -67,6 +67,7 @@ TEST_F(EnumIfaceTest, Iterator)
   EXPECT_EQ(common::EnumIterator<MyType>::Begin(), MY_TYPE_BEGIN);
 
   int i = 0;
+
   // Prefix ++ operator
   for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
        typeIter != end; ++typeIter, ++i)

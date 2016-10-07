@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_MODEL_MODEL_EDITOR_HH_
-#define GAZEBO_GUI_MODEL_MODEL_EDITOR_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITOR_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITOR_HH_
 
 #include <memory>
 #include <string>
@@ -41,7 +41,7 @@ namespace gazebo
 
       /// \brief Constuctor.
       /// \param[in] _mainWindow Pointer to the mainwindow.
-      public: explicit ModelEditor(MainWindow *_mainWindow);
+      public: ModelEditor(MainWindow *_mainWindow);
 
       /// \brief Destuctor.
       public: virtual ~ModelEditor();

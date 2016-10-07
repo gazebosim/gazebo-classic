@@ -46,7 +46,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget
-      public: explicit BaseInspectorDialog(QWidget *_parent);
+      public: BaseInspectorDialog(QWidget *_parent);
 
       /// \brief Destructor
       public: ~BaseInspectorDialog();

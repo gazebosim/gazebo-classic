@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_CONSOLE_HH_
-#define _GAZEBO_CONSOLE_HH_
+#ifndef GAZEBO_COMMON_CONSOLE_HH_
+#define GAZEBO_COMMON_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
@@ -112,7 +111,7 @@ namespace gazebo
                  {
                    /// \brief Constructor.
                    /// \param[in] _filename Filename to write into.
-                   public: explicit Buffer(const std::string &_filename);
+                   public: Buffer(const std::string &_filename);
 
                    /// \brief Destructor.
                    public: virtual ~Buffer();

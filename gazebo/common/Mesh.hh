@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MESH_HH_
-#define _GAZEBO_MESH_HH_
+#ifndef GAZEBO_COMMON_MESH_HH_
+#define GAZEBO_COMMON_MESH_HH_
 
 #include <vector>
 #include <string>
@@ -223,7 +223,7 @@ namespace gazebo
       public: SubMesh();
 
       /// \brief Copy Constructor
-      public: explicit SubMesh(const SubMesh *_mesh);
+      public: SubMesh(const SubMesh *_mesh);
 
       /// \brief Destructor
       public: virtual ~SubMesh();

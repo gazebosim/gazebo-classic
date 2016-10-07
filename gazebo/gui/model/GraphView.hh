@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GRAPH_VIEW_HH_
-#define _GAZEBO_GRAPH_VIEW_HH_
+#ifndef GAZEBO_GUI_MODEL_GRAPHVIEW_HH_
+#define GAZEBO_GUI_MODEL_GRAPHVIEW_HH_
 
 #include "gazebo/gui/qt.h"
 
@@ -32,7 +31,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
-      public: explicit GraphView(QWidget *_parent = 0);
+      public: GraphView(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~GraphView() = default;

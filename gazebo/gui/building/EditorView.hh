@@ -100,7 +100,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
-      public: explicit EditorView(QWidget *_parent = 0);
+      public: EditorView(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~EditorView();

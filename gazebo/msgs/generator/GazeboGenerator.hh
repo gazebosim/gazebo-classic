@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBOGENERATOR_H
-#define GAZEBOGENERATOR_H
+#ifndef GAZEBO_MSGS_GENERATOR_GAZEBOGENERATOR_H
+#define GAZEBO_MSGS_GENERATOR_GAZEBOGENERATOR_H
 
 #include <google/protobuf/compiler/code_generator.h>
 #include <string>
@@ -32,7 +32,7 @@ class GeneratorContext;
 /// \brief Google protobuf message generator for gazebo::msgs
 class GazeboGenerator : public CodeGenerator
 {
-  public: explicit GazeboGenerator(const std::string &_name);
+  public: GazeboGenerator(const std::string &_name);
 
   public: virtual ~GazeboGenerator();
 

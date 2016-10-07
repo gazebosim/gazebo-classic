@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _LASERVIEW_HH_
-#define _LASERVIEW_HH_
+#ifndef GAZEBO_GUI_VIEWERS_LASERVIEW_HH_
+#define GAZEBO_GUI_VIEWERS_LASERVIEW_HH_
 
 #include <string>
 #include <vector>
@@ -40,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: explicit LaserView(QWidget *_parent = NULL);
+      public: LaserView(QWidget *_parent = NULL);
 
       /// \brief Destructor
       public: virtual ~LaserView();
@@ -186,7 +186,7 @@ namespace gazebo
                {
                  /// \brief Constructor
                  /// \param[in] _parent Pointer to the parent widget.
-                 public: explicit CustomView(QWidget *_parent)
+                 public: CustomView(QWidget *_parent)
                          : QGraphicsView(_parent), viewZoomed(false) {}
 
                  /// \brief QT callback. Used when a wheel event occurs.

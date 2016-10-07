@@ -42,7 +42,7 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
-      public: explicit NodeAnimation(const std::string &_name);
+      public: NodeAnimation(const std::string &_name);
 
       /// \brief Destructor. It empties the key frames list
       public: ~NodeAnimation();
@@ -129,7 +129,7 @@ namespace gazebo
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation
-      public: explicit SkeletonAnimation(const std::string &_name);
+      public: SkeletonAnimation(const std::string &_name);
 
       /// \brief The destructor. Clears the list without destroying
       /// the animations

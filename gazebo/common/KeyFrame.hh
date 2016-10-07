@@ -38,7 +38,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
-      public: explicit KeyFrame(double _time);
+      public: KeyFrame(double _time);
 
       /// \brief Destructor
       public: virtual ~KeyFrame();
@@ -56,7 +56,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
-      public: explicit PoseKeyFrame(double _time);
+      public: PoseKeyFrame(double _time);
 
       /// \brief Destructor
       public: virtual ~PoseKeyFrame();
@@ -89,7 +89,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe
-      public: explicit NumericKeyFrame(double _time);
+      public: NumericKeyFrame(double _time);
 
       /// \brief Destructor
       public: virtual ~NumericKeyFrame();

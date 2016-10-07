@@ -37,7 +37,7 @@ namespace gazebo
     class GZ_GUI_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
-      public: explicit RenderWidget(QWidget *_parent = 0);
+      public: RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
       public: void RemoveScene(const std::string &_name);
