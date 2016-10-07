@@ -141,7 +141,7 @@ namespace gazebo
       /// \deprecated See ignition::math::SignalStats
       public: SignalStats() GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Ignition math constructor
+      /// \brief Ignition math copy constructor
       /// \param[in] _s SignalStats to copy
       public: SignalStats(const ignition::math::SignalStats &_s);
 
