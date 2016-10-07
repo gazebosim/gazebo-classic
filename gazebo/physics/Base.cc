@@ -550,6 +550,14 @@ const WorldPtr &Base::World() const
 }
 
 //////////////////////////////////////////////////
+const sdf::ElementPtr Base::GetSDF()
+{
+  GZ_ASSERT(this->baseDPtr->sdf != NULL, "Base sdf member is NULL");
+  this->baseDPtr->sdf->Update();
+  return this->baseDPtr->sdf;
+}
+
+//////////////////////////////////////////////////
 const sdf::ElementPtr Base::SDF() const
 {
   GZ_ASSERT(this->baseDPtr->sdf != NULL, "Base sdf member is NULL");

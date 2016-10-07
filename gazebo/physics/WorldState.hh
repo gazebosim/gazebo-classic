@@ -241,7 +241,7 @@ namespace gazebo
       /// \brief Subtraction operator.
       /// \param[in] _pt A state to substract.
       /// \return The resulting state.
-      public: WorldState operator-(const WorldState &_state) const;
+      public: WorldState operator-(const WorldState &_state);
 
       /// \brief Addition operator.
       /// \param[in] _pt A state to add.

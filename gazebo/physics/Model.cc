@@ -33,6 +33,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonTypes.hh"
 
+#include "gazebo/util/IntrospectionManager.hh"
+
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/JointController.hh"
@@ -1712,6 +1714,69 @@ void Model::SetWindMode(const bool _enable)
 bool Model::WindMode() const
 {
   return this->modelDPtr->sdf->Get<bool>("enable_wind");
+}
+
+/////////////////////////////////////////////////
+void Model::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  // Callbacks.
+  auto fModelPose = [this]()
+  {
+    return this->WorldPose();
+  };
+
+  auto fModelLinVel = [this]()
+  {
+    return this->WorldLinearVel();
+  };
+
+  auto fModelAngVel = [this]()
+  {
+    return this->WorldAngularVel();
+  };
+
+  auto fModelLinAcc = [this]()
+  {
+    return this->WorldLinearAccel();
+  };
+
+  auto fModelAngAcc = [this]()
+  {
+    return this->WorldAngularAccel();
+  };
+
+  // Register items.
+  common::URI poseURI(uri);
+  poseURI.Query().Insert("p", "pose3d/world_pose");
+  this->modelDPtr->introspectionItems.push_back(poseURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
+
+  common::URI linVelURI(uri);
+  linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  this->modelDPtr->introspectionItems.push_back(linVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
+
+  common::URI angVelURI(uri);
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  this->modelDPtr->introspectionItems.push_back(angVelURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angVelURI.Str(), fModelAngVel);
+
+  common::URI linAccURI(uri);
+  linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  this->modelDPtr->introspectionItems.push_back(linAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linAccURI.Str(), fModelLinAcc);
+
+  common::URI angAccURI(uri);
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  this->modelDPtr->introspectionItems.push_back(angAccURI);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angAccURI.Str(), fModelAngAcc);
 }
 
 /////////////////////////////////////////////////

@@ -68,7 +68,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
   // initialize worldToReference transform as local frame
   this->dataPtr->worldToReference = (this->pose +
-    this->dataPtr->parentEntity->GetWorldPose().Ign()).Rot();
+    this->dataPtr->parentEntity->WorldPose()).Rot();
 
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
@@ -218,7 +218,7 @@ void ImuSensor::Load(const std::string &_worldName)
   // next, account for vel in world frame of the imu
   // given the imu frame is offset from link frame, and link is rotating
   this->dataPtr->lastImuWorldLinearVel =
-      this->dataPtr->parentEntity->GetWorldLinearVel(this->pose.Pos()).Ign();
+      this->dataPtr->parentEntity->WorldLinearVel(this->pose.Pos());
 }
 
 //////////////////////////////////////////////////
@@ -293,7 +293,7 @@ void ImuSensor::SetReferencePose()
 {
   // this call sets the current imu pose as the imu's reference pose
   this->SetWorldToReferenceOrientation(
-      (this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign()).Rot());
+      (this->pose + this->dataPtr->parentEntity->WorldPose()).Rot());
 }
 
 //////////////////////////////////////////////////
@@ -346,8 +346,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
 
     this->dataPtr->imuMsg.set_entity_name(this->ParentName());
 
-    this->dataPtr->gravity =
-      this->world->Physics()->Gravity();
+    this->dataPtr->gravity = this->world->Gravity();
 
     msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 

@@ -19,6 +19,7 @@
 #include <string>
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
@@ -45,6 +46,9 @@ namespace gazebo
 
       /// \brief Pointer to the world.
       public: WorldPtr world;
+
+      /// \brief All the introspection items regsitered for this.
+      public: std::vector<common::URI> introspectionItems;
 
       /// \brief Set to true if the object should be saved.
       public: bool saveable;

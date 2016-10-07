@@ -81,7 +81,9 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
-  this->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(_filename);
+  this->heightmapShapeDPtr->heightmapData =
+    common::HeightmapDataLoader::LoadTerrainFile(_filename);
+
   if (!this->heightmapShapeDPtr->heightmapData)
   {
     gzerr << "Unable to load heightmap data" << std::endl;
@@ -90,34 +92,40 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 
 #ifdef HAVE_GDAL
   // DEM
-  auto demData = dynamic_cast<common::Dem *>(this->heightmapData);
+  auto demData = dynamic_cast<common::Dem *>(
+      this->heightmapShapeDPtr->heightmapData);
+
   if (demData)
   {
-    this->dem = *demData;
-    if (this->sdf->HasElement("size"))
+    this->heightmapShapeDPtr->dem = *demData;
+    if (this->heightmapShapeDPtr->sdf->HasElement("size"))
     {
-      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      this->heightmapShapeDPtr->heightmapSize =
+        this->heightmapShapeDPtr->sdf->Get<ignition::math::Vector3d>("size");
     }
     else
     {
-      this->heightmapSize.x = this->dem.GetWorldWidth();
-      this->heightmapSize.y = this->dem.GetWorldHeight();
-      this->heightmapSize.z = this->dem.GetMaxElevation() -
-          std::max(0.0f, this->dem.GetMinElevation());
+      this->heightmapShapeDPtr->heightmapSize.X(
+        this->heightmapShapeDPtr->dem.GetWorldWidth());
+      this->heightmapShapeDPtr->heightmapSize.Y(
+        this->heightmapShapeDPtr->dem.GetWorldHeight());
+      this->heightmapShapeDPtr->heightmapSize.Z(
+        this->heightmapShapeDPtr->dem.GetMaxElevation() -
+          std::max(0.0f, this->heightmapShapeDPtr->dem.GetMinElevation()));
     }
 
     // Modify the reference geotedic latitude/longitude.
     // A GPS sensor will use the real georeferenced coordinates of the terrain.
-    common::SphericalCoordinatesPtr sphericalCoordinates;
-    sphericalCoordinates = this->world->GetSphericalCoordinates();
+    common::SphericalCoordinatesPtr sphericalCoordinates =
+      this->heightmapShapeDPtr->world->SphericalCoords();
 
     if (sphericalCoordinates)
     {
       ignition::math::Angle latitude, longitude;
       double elevation;
 
-      this->dem.GetGeoReferenceOrigin(latitude, longitude);
-      elevation = this->dem.GetElevation(0.0, 0.0);
+      this->heightmapShapeDPtr->dem.GetGeoReferenceOrigin(latitude, longitude);
+      elevation = this->heightmapShapeDPtr->dem.GetElevation(0.0, 0.0);
 
       sphericalCoordinates->SetLatitudeReference(latitude);
       sphericalCoordinates->SetLongitudeReference(longitude);
@@ -134,11 +142,13 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 #endif
   {
     auto imageData =
-        dynamic_cast<common::ImageHeightmap *>(this->heightmapData);
+        dynamic_cast<common::ImageHeightmap *>(
+            this->heightmapShapeDPtr->heightmapData);
     if (imageData)
     {
-      this->img = *imageData;
-      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      this->heightmapShapeDPtr->img = *imageData;
+      this->heightmapShapeDPtr->heightmapSize =
+        this->heightmapShapeDPtr->sdf->Get<ignition::math::Vector3d>("size");
       return 0;
     }
   }
@@ -343,7 +353,7 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 float HeightmapShape::Height(const int _x, const int _y) const
 {
   int index = _y * this->heightmapShapeDPtr->vertSize + _x;
-  if (_x < 0 || _y < 0 || 
+  if (_x < 0 || _y < 0 ||
       index >= static_cast<int>(this->heightmapShapeDPtr->heights.size()))
     return 0.0;
 

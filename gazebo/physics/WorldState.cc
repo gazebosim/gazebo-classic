@@ -110,12 +110,12 @@ void WorldState::Load(const World &_world)
   this->world = &_world;
   this->name = _world.Name();
   this->wallTime = common::Time::GetWallTime();
-  this->simTime = _world->SimTime();
-  this->realTime = _world->RealTime();
-  this->iterations = _world->Iterations();
+  this->simTime = _world.SimTime();
+  this->realTime = _world.RealTime();
+  this->iterations = _world.Iterations();
 
   // Add a state for all the models
-  Model_V models = _world->Models();
+  Model_V models = _world.Models();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
@@ -136,7 +136,7 @@ void WorldState::Load(const World &_world)
 
   // Add states for all the lights
   this->lightStates.clear();
-  Light_V lights = _world->Lights();
+  Light_V lights = _world.Lights();
   for (const auto &light : lights)
   {
     this->lightStates[light->Name()].Load(light, this->realTime,
@@ -400,7 +400,7 @@ WorldState &WorldState::operator=(const WorldState &_state)
 }
 
 /////////////////////////////////////////////////
-WorldState WorldState::operator-(const WorldState &_state) const
+WorldState WorldState::operator-(const WorldState &_state)
 {
   WorldState result;
 

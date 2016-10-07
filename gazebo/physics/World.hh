@@ -323,14 +323,14 @@ namespace gazebo
       /// only models.
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
-      public: ModelPtr ModelByName(const std::string &_name);
+      public: ModelPtr ModelByName(const std::string &_name) const;
 
       /// \brief Get a light by name.
       /// This function is the same as baseByName, but limits the search to
       /// only lights.
       /// \param[in] _name The name of the Light to find.
       /// \return A pointer to the Light, or NULL if no light was found.
-      public: LightPtr LightByName(const std::string &_name);
+      public: LightPtr LightByName(const std::string &_name) const;
 
       /// \brief Get a pointer to an Entity based on a name.
       /// This function is the same as BaseByName, but limits the search to

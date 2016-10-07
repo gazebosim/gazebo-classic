@@ -1066,14 +1066,14 @@ ModelPtr World::GetModel(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::ModelByName(const std::string &_name)
+ModelPtr World::ModelByName(const std::string &_name) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->loadModelMutex);
   return std::dynamic_pointer_cast<Model>(this->BaseByName(_name));
 }
 
 //////////////////////////////////////////////////
-LightPtr World::LightByName(const std::string &_name)
+LightPtr World::LightByName(const std::string &_name) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
   return std::dynamic_pointer_cast<Light>(this->BaseByName(_name));
