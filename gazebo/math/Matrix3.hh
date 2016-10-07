@@ -62,7 +62,7 @@ namespace gazebo
       /// \brief Desctructor
       public: virtual ~Matrix3();
 
-      /// \brief Convert this matrix to an ignition::math::Matrix3.
+      /// \brief Convert this matrix to an ignition::math::Matrix3d.
       /// \return This matrix as an ignition::math::Matrix3d.
       public: ignition::math::Matrix3d Ign() const;
 

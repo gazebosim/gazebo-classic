@@ -47,7 +47,7 @@ namespace gazebo
       public: Vector3Stats() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Ignition math copy constructor
-      /// \param[in] _v a vector3stats
+      /// \param[in] _stats An ignition math vector3stats to copy
       public: Vector3Stats(const ignition::math::Vector3Stats &_stats);
 
       /// \brief Destructor
@@ -118,7 +118,7 @@ namespace gazebo
       public: ignition::math::Vector3Stats Ign() const;
 
       /// \brief Assignment operator for ignition math
-      /// \param[in] _v a new value
+      /// \param[in] _v An ignition math vector3stats to copy
       /// \return this
       public: Vector3Stats &operator=(const ignition::math::Vector3Stats &_v);
 
