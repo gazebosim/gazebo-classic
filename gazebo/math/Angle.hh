@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_ANGLE_HH_
-#define _GAZEBO_ANGLE_HH_
+#ifndef GAZEBO_MATH_ANGLE_HH_
+#define GAZEBO_MATH_ANGLE_HH_
 
 #include <math.h>
 #include <ignition/math/Angle.hh>

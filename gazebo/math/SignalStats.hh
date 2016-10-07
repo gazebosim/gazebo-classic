@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <ignition/math/SignalStats.hh>
 #include "gazebo/util/system.hh"
 
 #ifndef _WIN32
@@ -140,6 +141,9 @@ namespace gazebo
       /// \deprecated See ignition::math::SignalStats
       public: SignalStats() GAZEBO_DEPRECATED(8.0);
 
+      /// \brief Ignition math constructor
+      public: SignalStats(const ignition::math::SignalStats &_s);
+
       /// \brief Destructor
       public: ~SignalStats();
 
@@ -188,6 +192,15 @@ namespace gazebo
 
       /// \brief Forget all previous data.
       public: void Reset();
+
+      /// \brief Get this object as an ignition::math::SignalStats.
+      /// \return This as an ignition math object.
+      public: ignition::math::SignalStats Ign() const;
+
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _v a new value
+      /// \return this
+      public: SignalStats &operator=(const ignition::math::SignalStats &_s);
 
       /// \brief Pointer to private data.
       protected: std::unique_ptr<SignalStatsPrivate> dataPtr;

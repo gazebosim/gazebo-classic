@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_VECTOR3_HH_
-#define _GAZEBO_VECTOR3_HH_
+#ifndef GAZEBO_MATH_VECTOR3_HH_
+#define GAZEBO_MATH_VECTOR3_HH_
 
 #include <math.h>
 #include <iostream>
