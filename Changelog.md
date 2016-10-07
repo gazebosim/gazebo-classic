@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Add `syntax = proto2` in proto files to fix some protobuf3 warnings
+    * [Pull request 2456](https://bitbucket.org/osrf/gazebo/pull-request/2456)
+
 1. Add support for loading wavefront obj mesh files
     * [Pull request 2454](https://bitbucket.org/osrf/gazebo/pull-request/2454)
 
