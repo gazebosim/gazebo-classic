@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Remove a joint from control.
       /// \param[in] _joint Joint to remove.
-      public: void RemoveJoint(JointPtr _joint);
+      public: void RemoveJoint(Joint *_joint);
 
       /// \brief Update the joint control.
       public: void Update();

@@ -1552,7 +1552,7 @@ bool Model::RemoveJoint(const std::string &_name)
     this->world->SetPaused(true);
     if (this->jointController)
     {
-      this->jointController->RemoveJoint(joint);
+      this->jointController->RemoveJoint(joint.get());
     }
     joint->Detach();
     joint->Fini();
