@@ -1530,7 +1530,15 @@ gazebo::physics::JointPtr Model::CreateJoint(sdf::ElementPtr _sdf)
     return physics::JointPtr();
   }
 
-  this->LoadJoint(_sdf);
+  try
+  {
+    // LoadJoint can throw if the scoped name of the joint already exists.
+    this->LoadJoint(_sdf);
+  }
+  catch(...)
+  {
+    gzerr << "LoadJoint Failed" << std::endl;
+  }
   return this->GetJoint(jointName);
 }
 
