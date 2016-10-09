@@ -21,6 +21,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
 
+#include <gazebo/gazebo_client.hh>
 #include <gazebo/common/CommonIface.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
@@ -105,7 +106,7 @@ void init()
     return;
   }
 
-  EXPECT_TRUE(gazebo::transport::init());
+  EXPECT_TRUE(gazebo::client::setup());
 }
 
 /////////////////////////////////////////////////
@@ -209,9 +210,6 @@ TEST_F(gzTest, Joint)
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/simple_arm/joint_cmd", &JointCmdCB);
 
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
-
   // Test joint force
   {
     waitForMsg("gz joint -w default -m simple_arm "
@@ -277,9 +275,6 @@ TEST_F(gzTest, Model)
 
   gazebo::transport::SubscriberPtr subFactory =
     node->Subscribe("~/factory", &FactoryCB);
-
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
 
   // Test model info on existing model
   {
@@ -478,9 +473,6 @@ TEST_F(gzTest, World)
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/world_control", &WorldControlCB);
 
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
-
   // Test world pause
   {
     waitForMsg("gz world -w default -p 1");
@@ -551,9 +543,6 @@ TEST_F(gzTest, Physics)
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/physics", &PhysicsCB);
 
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
-
   // Test gravity
   {
     waitForMsg("gz physics -w default -g 1,2,3 ");
@@ -611,9 +600,6 @@ TEST_F(gzTest, Camera)
   node->Init();
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/user/cmd", &CameraCB);
-
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
 
   // Test follow
   {
