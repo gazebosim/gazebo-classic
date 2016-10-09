@@ -23,6 +23,7 @@
 
 #include <gazebo/gazebo_client.hh>
 #include <gazebo/common/CommonIface.hh>
+#include <gazebo/common/Time.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
@@ -107,6 +108,19 @@ void init()
   }
 
   EXPECT_TRUE(gazebo::client::setup());
+
+  // Wait for world_stats topic to be available
+  {
+    int topicWaitCount = 0;
+    const std::string topicName = "/gazebo/default/world_stats";
+    while (topicWaitCount < 20 &&
+           custom_exec_str("gz topic -l").find(topicName) == std::string::npos)
+    {
+      gzdbg << "Waiting for topics to be listed" << std::endl;
+      gazebo::common::Time::MSleep(200);
+    }
+    ASSERT_LT(topicWaitCount, 20);
+  }
 }
 
 /////////////////////////////////////////////////
