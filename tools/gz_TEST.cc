@@ -687,7 +687,6 @@ TEST_F(gzTest, SDF)
 {
   boost::filesystem::path path;
 
-  init();
   std::string helpOutput = custom_exec_str("gz help sdf");
   EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
 
@@ -771,8 +770,6 @@ TEST_F(gzTest, SDF)
       custom_exec_str(std::string("gz sdf -c ") + path.string());
     EXPECT_EQ(output, "Success\n");
   }
-
-  fini();
 }
 
 /////////////////////////////////////////////////
