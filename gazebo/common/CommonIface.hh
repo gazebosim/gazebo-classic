@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COMMONIFACE_HH_
-#define _COMMONIFACE_HH_
+#ifndef GAZEBO_COMMON_COMMONIFACE_HH_
+#define GAZEBO_COMMON_COMMONIFACE_HH_
 
 #include <string>
 #include <vector>

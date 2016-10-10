@@ -24,6 +24,7 @@
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/PID.hh"
+#include "gazebo/common/VideoEncoder.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
@@ -107,6 +108,9 @@ namespace gazebo
 
       /// \brief Maximum distance between the camera and tracked model.
       public: double trackMaxDistance;
+
+      /// \brief Video encoder.
+      public: common::VideoEncoder videoEncoder;
 
       /// \brief If set to true, the camera yaws around a fixed axis.
       public: bool yawFixed;

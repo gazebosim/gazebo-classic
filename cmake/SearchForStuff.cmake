@@ -418,6 +418,24 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
+  # Find AV device. Only check for this on linux.
+  if (UNIX)
+    pkg_check_modules(libavdevice libavdevice>="56.4.100")
+    if (NOT libavdevice_FOUND)
+      BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
+    else()
+      include_directories(${libavdevice_INCLUDE_DIRS})
+      link_directories(${libavdevice_LIBRARY_DIRS})
+    endif ()
+  endif ()
+
+  if (NOT libavdevice_FOUND)
+    set (HAVE_AVDEVICE False)
+  else()
+    set (HAVE_AVDEVICE True)
+  endif()
+
+  ########################################
   # Find AV format
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
@@ -444,8 +462,8 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
   endif ()
 
-
-  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND
+      libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -681,7 +699,6 @@ endif()
 
 ########################################
 # Find the Ignition_Transport library
-# In Windows we expect a call from configure.bat script with the paths
 find_package(ignition-transport2 QUIET)
 if (NOT ignition-transport2_FOUND)
   find_package(ignition-transport1 QUIET)

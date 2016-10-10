@@ -1405,7 +1405,7 @@ void MainWindow::CreateActions()
       tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
-  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setToolTip(tr("Log data (Ctrl+D)"));
   g_dataLoggerAct->setCheckable(true);
   g_dataLoggerAct->setChecked(false);
   this->connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
@@ -1886,7 +1886,6 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
-
   windowMenu->addAction(g_plotAct);
 
   bar->addSeparator();
