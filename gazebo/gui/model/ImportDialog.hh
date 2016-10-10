@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MODEL_IMPORT_DIALOG_HH_
-#define _MODEL_IMPORT_DIALOG_HH_
+#ifndef GAZEBO_GUI_MODEL_IMPORT_DIALOG_HH_
+#define GAZEBO_GUI_MODEL_IMPORT_DIALOG_HH_
 
 #include <string>
 #include "gazebo/gui/qt.h"

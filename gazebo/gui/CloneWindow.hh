@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
-
-#ifndef _GAZEBO_GUI_CLONEWINDOW_HH_
-#define _GAZEBO_GUI_CLONEWINDOW_HH_
+#ifndef GAZEBO_GUI_CLONEWINDOW_HH_
+#define GAZEBO_GUI_CLONEWINDOW_HH_
 
 #include <memory>
 
@@ -42,7 +41,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent widget pointer.
-      public: CloneWindow(QWidget *_parent = 0);
+      public: explicit CloneWindow(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~CloneWindow();
