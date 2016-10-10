@@ -141,7 +141,8 @@ namespace gazebo
       /// \deprecated See ignition::math::SignalStats
       public: SignalStats() GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Ignition math constructor
+      /// \brief Ignition math copy constructor
+      /// \param[in] _s SignalStats to copy
       public: SignalStats(const ignition::math::SignalStats &_s);
 
       /// \brief Destructor
@@ -198,8 +199,8 @@ namespace gazebo
       public: ignition::math::SignalStats Ign() const;
 
       /// \brief Assignment operator for ignition math
-      /// \param[in] _v a new value
-      /// \return this
+      /// \param[in] _s New signal stats
+      /// \return Reference to this
       public: SignalStats &operator=(const ignition::math::SignalStats &_s);
 
       /// \brief Pointer to private data.
