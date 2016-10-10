@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_TERRAINEDITORPALETTE_HH_
-#define GAZEBO_GUI_TERRAINEDITORPALETTE_HH_
+#ifndef GAZEBO_GUI_TERRAIN_TERRAINEDITORPALETTE_HH_
+#define GAZEBO_GUI_TERRAIN_TERRAINEDITORPALETTE_HH_
 
 #include <memory>
 #include <string>

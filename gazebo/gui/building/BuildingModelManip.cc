@@ -299,16 +299,14 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 {
   this->dataPtr->size = BuildingMaker::ConvertSize(_width, _depth, _height);
 
-  ignition::math::Vector3d dScale =
-    this->dataPtr->visual->GetScale().Ign() - this->dataPtr->size;
+  auto dScale = this->dataPtr->visual->GetScale().Ign() - this->dataPtr->size;
 
-  ignition::math::Vector3d originalPos =
-    this->dataPtr->visual->GetPosition().Ign();
+  auto originalPos = this->dataPtr->visual->GetPosition().Ign();
   this->dataPtr->visual->SetPosition(ignition::math::Vector3d(0, 0, 0));
   this->dataPtr->visual->SetScale(this->dataPtr->size);
 
   // adjust position due to difference in pivot points
-  ignition::math::Vector3d newPos = originalPos - dScale/2.0;
+  auto newPos = originalPos - dScale/2.0;
 
   this->dataPtr->visual->SetPosition(newPos);
 }

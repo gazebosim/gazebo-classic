@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_MODEL_LINK_INSPECTOR_HH_
-#define GAZEBO_GUI_MODEL_LINK_INSPECTOR_HH_
+#ifndef GAZEBO_GUI_MODEL_LINKINSPECTOR_HH_
+#define GAZEBO_GUI_MODEL_LINKINSPECTOR_HH_
 
 #include <memory>
 #include <string>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_BUILDING_LEVEL_WIDGET_HH_
-#define GAZEBO_GUI_BUILDING_LEVEL_WIDGET_HH_
+#ifndef GAZEBO_GUI_BUILDING_BUILDINGLEVELWIDGET_HH_
+#define GAZEBO_GUI_BUILDING_BUILDINGLEVELWIDGET_HH_
 
 #include <memory>
 #include <string>

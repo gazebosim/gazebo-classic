@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_BUILDING_BUILDING_EDITOR_HH_
-#define GAZEBO_GUI_BUILDING_BUILDING_EDITOR_HH_
+#ifndef GAZEBO_GUI_BUILDING_BUILDINGEDITOR_HH_
+#define GAZEBO_GUI_BUILDING_BUILDINGEDITOR_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"

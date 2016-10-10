@@ -44,8 +44,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _camera Pointer to the camera whose viewport will be
       /// updated to see the effect of the material switch.
-      public: EditorMaterialSwitcher(
-                  const rendering::CameraPtr &_camera);
+      public: EditorMaterialSwitcher(const rendering::CameraPtr &_camera);
 
       /// \brief Destructor
       public: ~EditorMaterialSwitcher() = default;

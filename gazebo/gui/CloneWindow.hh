@@ -41,7 +41,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent widget pointer.
-      public: explicit CloneWindow(QWidget *_parent = 0);
+      public: CloneWindow(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~CloneWindow();
