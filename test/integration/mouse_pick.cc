@@ -144,7 +144,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick the third model - box
-  pickPt =cam->Project(model03Vis->GetWorldPose().pos.Ign());
+  pickPt = cam->Project(model03Vis->GetWorldPose().pos.Ign());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -330,9 +330,7 @@ void MousePickingTest::Transparency()
   // mouse picking in arrow mode
   gazebo::gui::g_arrowAct->trigger();
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0, 3.0, 0.5),
-      gazebo::math::Vector3(0, 0, -1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0, 3.0, 0.5, 0, 0, -1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -353,9 +351,7 @@ void MousePickingTest::Transparency()
   QVERIFY(!model02Vis->GetHighlighted());
   QVERIFY(model03Vis->GetHighlighted());
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0, -3.0, 0.5),
-      gazebo::math::Vector3(0, 0, 1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0, -3.0, 0.5, 0, 0, 1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -373,9 +369,7 @@ void MousePickingTest::Transparency()
   // try mouse picking in translate mode
   gazebo::gui::g_translateAct->trigger();
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0.1, 3.0, 0.6),
-      gazebo::math::Vector3(0, 0, -1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0.1, 3.0, 0.6, 0, 0, -1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -393,9 +387,7 @@ void MousePickingTest::Transparency()
   QVERIFY(!model02Vis->GetHighlighted() && !model02LinkVis->GetHighlighted());
   QVERIFY(model03Vis->GetHighlighted() || model03LinkVis->GetHighlighted());
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0.1, -3.0, 0.6),
-      gazebo::math::Vector3(0, 0, 1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0.1, -3.0, 0.6, 0, 0, 1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 

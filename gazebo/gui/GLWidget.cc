@@ -233,17 +233,20 @@ void GLWidget::showEvent(QShowEvent *_event)
   QApplication::flush();
   QApplication::syncX();
 
-  // Get the window handle in a form that OGRE can use.
-  std::string winHandle = this->OgreHandle();
+  if (this->dataPtr->windowId <=0)
+  {
+    // Get the window handle in a form that OGRE can use.
+    std::string winHandle = this->OgreHandle();
 
-  // Create the OGRE render window
-  this->dataPtr->windowId =
-    rendering::RenderEngine::Instance()->GetWindowManager()->
-      CreateWindow(winHandle, this->width(), this->height());
+    // Create the OGRE render window
+    this->dataPtr->windowId =
+      rendering::RenderEngine::Instance()->GetWindowManager()->
+        CreateWindow(winHandle, this->width(), this->height());
 
-  // Attach the user camera to the window
-  rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->dataPtr->windowId, this->dataPtr->userCamera);
+    // Attach the user camera to the window
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->dataPtr->windowId, this->dataPtr->userCamera);
+  }
 
   // Let QT continue processing the show event.
   QWidget::showEvent(_event);
@@ -335,6 +338,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (_event->key() == Qt::Key_Delete &&
       this->dataPtr->selectionLevel == SelectionLevels::MODEL)
   {
+    ModelManipulator::Instance()->Detach();
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     while (!this->dataPtr->selectedVisuals.empty())
     {
@@ -1153,8 +1157,8 @@ void GLWidget::OnManipMode(const std::string &_mode)
               = this->dataPtr->selectedVisuals.begin();
               it != --this->dataPtr->selectedVisuals.end();)
       {
-         (*it)->SetHighlighted(false);
-         it = this->dataPtr->selectedVisuals.erase(it);
+        (*it)->SetHighlighted(false);
+        it = this->dataPtr->selectedVisuals.erase(it);
       }
     }
   }

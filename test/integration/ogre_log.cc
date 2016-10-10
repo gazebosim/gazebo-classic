@@ -53,6 +53,15 @@ TEST_F(OgreLog, LogError)
   {
     std::string line;
     std::getline(ogreLog, line);
+
+    // A GL extension may have the word "error" in its name. For example:
+    // GL_KHR_no_error.
+    // We will skip the line that lists all the extensions. This line starts
+    // with a date, so we just check that "GL_EXTENSIONS" is toward the
+    // beginning.
+    if (line.find(" GL_EXTENSIONS =") < 12)
+      continue;
+
     EXPECT_EQ(line.find("Error"), std::string::npos);
     EXPECT_EQ(line.find("error"), std::string::npos);
     EXPECT_EQ(line.find("ERROR"), std::string::npos);

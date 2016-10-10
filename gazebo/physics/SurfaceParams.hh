@@ -43,16 +43,6 @@ namespace gazebo
 
       /// \brief Get the friction coefficient in the primary direction.
       /// \return Friction coefficient in primary direction.
-      /// \deprecated See const function MuPrimary
-      public: double GetMuPrimary() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the friction coefficient in the secondary direction.
-      /// \return Friction coefficient in secondary direction.
-      /// \deprecated See const function MuSecondary
-      public: double GetMuSecondary() GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the friction coefficient in the primary direction.
-      /// \return Friction coefficient in primary direction.
       public: double MuPrimary() const;
 
       /// \brief Get the friction coefficient in the secondary direction.
@@ -193,13 +183,6 @@ namespace gazebo
       /// \brief Process a surface message.
       /// \param[in] _msg Message to read values from.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
-
-      /// \brief Get access to FrictionPyramid data, if available.
-      /// \return Pointer to FrictionPyramid data or NULL if class does
-      /// not use FrictionPyramid data.
-      /// \deprecated See function FrictionPyramid
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get access to FrictionPyramid data, if available.
       /// \return Pointer to FrictionPyramid data or NULL if class does

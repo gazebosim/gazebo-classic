@@ -9,6 +9,7 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
+  ${QWT_INCLUDE_DIR}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -17,7 +18,8 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
-set (internal_qt_headers)
+set (internal_qt_headers
+  VideoRecorder.hh)
 
 set (sources
   Actions.cc
@@ -47,7 +49,7 @@ set (sources
   ModelSnap.cc
   MouseEventHandler.cc
   RenderWidget.cc
-  SaveDialog.cc
+  SaveEntityDialog.cc
   SpaceNav.cc
   SplashScreen.cc
   TimePanel.cc
@@ -56,6 +58,7 @@ set (sources
   TopicSelector.cc
   TopToolbar.cc
   UserCmdHistory.cc
+  VideoRecorder.cc
   ViewAngleWidget.cc
 )
 
@@ -85,7 +88,7 @@ set (qt_headers
   ModelListWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
-  SaveDialog.hh
+  SaveEntityDialog.hh
   SplashScreen.hh
   TimePanel.hh
   TimeWidget.hh
@@ -137,7 +140,7 @@ set (qt_tests
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
-  SaveDialog_TEST.cc
+  SaveEntityDialog_TEST.cc
   SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
@@ -189,7 +192,7 @@ gz_add_executable(gzclient main.cc ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
+add_definitions(-DBUILDING_DLL_GZ_GUI)
 
 target_link_libraries(gazebo_gui
   libgazebo_client
@@ -202,6 +205,7 @@ target_link_libraries(gazebo_gui
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${QWT_LIBRARY}
 )
 
 if (UNIX)
@@ -221,6 +225,10 @@ endif()
 if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
+endif()
+
+if (USE_PCH)
+  add_pch(gazebo_gui gui_pch.hh)
 endif()
 
 set (gtest_sources

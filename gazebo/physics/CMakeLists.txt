@@ -38,8 +38,8 @@ include_directories(${TBB_INCLUDEDIR})
 
 # Be sure to locate this definition *after* add_subdirectories
 # in order to get the proper visibility when building libs
+add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
 if (WIN32)
-  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
   include_directories(${libdl_include_dir})
 endif()
 
@@ -161,6 +161,7 @@ target_link_libraries(gazebo_physics
   gazebo_util
   gazebo_ode
   gazebo_opcode
+  ${Boost_LIBRARIES}
 )
 
 # Link in Bullet support if present
@@ -183,6 +184,10 @@ if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
+if (USE_PCH)
+  add_pch(gazebo_physics physics_pch.hh)
+endif()
+
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
@@ -201,6 +206,7 @@ gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics)
 
 # unit tests with gazebo_test_fixture
 set (gtest_fixture_sources
+  Actor_TEST.cc
   Atmosphere_TEST.cc
   ContactManager_TEST.cc
   Light_TEST.cc

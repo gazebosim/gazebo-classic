@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MAINWINDOW_HH_
-#define _GAZEBO_GUI_MAINWINDOW_HH_
+#ifndef GAZEBO_GUI_MAINWINDOW_HH_
+#define GAZEBO_GUI_MAINWINDOW_HH_
 
 #include <memory>
 #include <string>
@@ -240,8 +240,8 @@ namespace gazebo
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
-      /// \brief Callback for diagnostics action.
-      private slots: void Diagnostics();
+      /// \brief Callback for plot action.
+      private slots: void Plot();
 
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();

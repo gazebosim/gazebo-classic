@@ -213,7 +213,7 @@ namespace gazebo
       public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
@@ -282,12 +282,6 @@ namespace gazebo
       /// \brief Set the current model state.
       /// \param[in] _state State to set the model to.
       public: void SetState(const ModelState &_state);
-
-      /// \brief Set the scale of model.
-      /// \param[in] _scale Scale to set the model to.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetScale(const math::Vector3 &_scale)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
@@ -417,6 +411,9 @@ namespace gazebo
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
       /// \brief Load all the links.
       private: void LoadLinks();
 
@@ -446,9 +443,6 @@ namespace gazebo
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      /// \brief Register items in the introspection service.
-      protected: virtual void RegisterIntrospectionItems();
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;

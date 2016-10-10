@@ -22,6 +22,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -99,11 +100,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   TiXmlDocument xmlDoc;
 
-  this->dataPtr->path.clear();
-  if (_filename.rfind('/') != std::string::npos)
-  {
-    this->dataPtr->path = _filename.substr(0, _filename.rfind('/'));
-  }
+  boost::filesystem::path p(_filename);
+  this->dataPtr->path = p.parent_path().generic_string();
 
   this->dataPtr->filename = _filename;
   if (!xmlDoc.LoadFile(_filename))
@@ -466,7 +464,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
-    weights.push_back(math::parseFloat(wStrs[i]));
+    weights.push_back(ignition::math::parseFloat(wStrs[i]));
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
@@ -480,10 +478,10 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   std::vector<unsigned int> v;
 
   for (unsigned int i = 0; i < vCountStrs.size(); ++i)
-    vCount.push_back(math::parseInt(vCountStrs[i]));
+    vCount.push_back(ignition::math::parseInt(vCountStrs[i]));
 
   for (unsigned int i = 0; i < vStrs.size(); ++i)
-    v.push_back(math::parseInt(vStrs[i]));
+    v.push_back(ignition::math::parseInt(vStrs[i]));
 
   skeleton->SetNumVertAttached(vCount.size());
 
@@ -602,7 +600,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
       std::vector<double> times;
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
-        times.push_back(math::parseFloat(timeStrs[i]));
+        times.push_back(ignition::math::parseFloat(timeStrs[i]));
 
       TiXmlElement *output = frameTransXml->FirstChildElement("float_array");
       std::string outputStr = output->GetText();
@@ -611,7 +609,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
       std::vector<double> values;
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
-        values.push_back(math::parseFloat(outputStrs[i]));
+        values.push_back(ignition::math::parseFloat(outputStrs[i]));
 
       TiXmlElement *accessor =
         frameTransXml->FirstChildElement("technique_common");
@@ -968,7 +966,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
   {
-    ignition::math::Vector3d vec(math::parseFloat(*iter),
+    ignition::math::Vector3d vec(ignition::math::parseFloat(*iter),
         ignition::math::parseFloat(*(iter+1)),
         ignition::math::parseFloat(*(iter+2)));
 
@@ -1428,9 +1426,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   const unsigned int NORMAL = 1;
   const unsigned int TEXCOORD = 2;
   unsigned int otherSemantics = TEXCOORD + 1;
-  bool hasVertices = false;
-  bool hasNormals = false;
-  bool hasTexcoords = false;
 
   // look up table of position/normal/texcoord duplicate indices
   std::map<unsigned int, unsigned int> texDupMap;
@@ -1441,8 +1436,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   if (_mesh->HasSkeleton())
     bindShapeMat = _mesh->GetSkeleton()->BindShapeTransform();
 
-  // read input elements
-  std::map<const unsigned int, int> inputs;
+  // read input elements. A vector of int is used because there can be
+  // multiple TEXCOORD inputs.
+  std::map<const unsigned int, std::set<int>> inputs;
+  unsigned int inputSize = 0;
   while (polylistInputXml)
   {
     std::string semantic = polylistInputXml->Attribute("semantic");
@@ -1455,31 +1452,31 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX] = ignition::math::parseInt(offset);
-      hasVertices = true;
+      inputs[VERTEX].insert(ignition::math::parseInt(offset));
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL] = ignition::math::parseInt(offset);
-      hasNormals = true;
+      inputs[NORMAL].insert(ignition::math::parseInt(offset));
     }
     else if (semantic == "TEXCOORD")
     {
       this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD] = ignition::math::parseInt(offset);
-      hasTexcoords = true;
+      inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
     }
     else
     {
-      inputs[otherSemantics++] = ignition::math::parseInt(offset);
+      inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
       gzwarn << "Polylist input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
 
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
   }
+
+  for (const auto &input : inputs)
+    inputSize += input.second.size();
 
   // read vcount
   // break poly into triangles
@@ -1491,7 +1488,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   boost::split(vcountStrs, vcountStr, boost::is_any_of("   "));
   std::vector<int> vcounts;
   for (unsigned int j = 0; j < vcountStrs.size(); ++j)
-    vcounts.push_back(math::parseInt(vcountStrs[j]));
+    vcounts.push_back(ignition::math::parseInt(vcountStrs[j]));
 
   // read p
   TiXmlElement *pXml = _polylistXml->FirstChildElement("p");
@@ -1500,16 +1497,17 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
-  unsigned int *values = new unsigned int[inputs.size()];
-  memset(values, 0, inputs.size());
+  unsigned int *values = new unsigned int[inputSize];
+  memset(values, 0, inputSize);
 
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
-  std::vector<std::string>::iterator strs_iter = strs.begin();
+  std::vector<std::string>::iterator strsIter = strs.begin();
   for (unsigned int l = 0; l < vcounts.size(); ++l)
   {
     // put us at the beginning of the polygon list
-    if (l > 0) strs_iter += inputs.size()*vcounts[l-1];
+    if (l > 0)
+      strsIter += inputSize*vcounts[l-1];
 
     for (unsigned int k = 2; k < (unsigned int)vcounts[l]; ++k)
     {
@@ -1524,13 +1522,13 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         if (j == 0)
           triangle_index = 0;
         if (j == 1)
-          triangle_index = (k-1)*inputs.size();
+          triangle_index = (k-1)*inputSize;
         if (j == 2)
-          triangle_index = (k)*inputs.size();
+          triangle_index = (k)*inputSize;
 
-        for (unsigned int i = 0; i < inputs.size(); ++i)
+        for (unsigned int i = 0; i < inputSize; ++i)
         {
-          values[i] = ignition::math::parseInt(strs_iter[triangle_index+i]);
+          values[i] = ignition::math::parseInt(strsIter[triangle_index+i]);
           /*gzerr << "debug parsing "
                 << " poly-i[" << l
                 << "] tri-end-index[" << k
@@ -1543,15 +1541,15 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 
 
         unsigned int daeVertIndex = 0;
-        bool addIndex = !hasVertices;
+        bool addIndex = inputs[VERTEX].empty();
 
         // find a set of vertex/normal/texcoord that can be reused
         // only do this if the mesh has vertices
-        if (hasVertices)
+        if (!inputs[VERTEX].empty())
         {
           // Get the vertex position index value. If it is a duplicate then use
           // the existing index instead
-          daeVertIndex = values[inputs[VERTEX]];
+          daeVertIndex = values[*inputs[VERTEX].begin()];
           if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
             daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -1575,12 +1573,13 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
               bool normEqual = false;
               bool texEqual = false;
 
-              if (hasNormals)
+              if (!inputs[NORMAL].empty())
               {
                 // Get the vertex normal index value. If the normal is a
                 // duplicate then reset the index to the first instance of the
                 // duplicated position
-                unsigned int remappedNormalIndex = values[inputs[NORMAL]];
+                unsigned int remappedNormalIndex =
+                  values[*inputs[NORMAL].begin()];
                 if (normalDupMap.find(remappedNormalIndex)
                     != normalDupMap.end())
                  {
@@ -1590,22 +1589,29 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                 if (iv.normalIndex == remappedNormalIndex)
                   normEqual = true;
               }
-              if (hasTexcoords)
+
+              if (!inputs[TEXCOORD].empty())
               {
+                // \todo: Add support for multiple texture maps to SubMesh.
+                // Here we are only using the first texture coordinates, when
+                // multiple could have been specified. See Gazebo issue #532.
+
                 // Get the vertex texcoord index value. If the texcoord is a
                 // duplicate then reset the index to the first instance of the
                 // duplicated texcoord
-                unsigned int remappedTexcoordIndex = values[inputs[TEXCOORD]];
+                unsigned int remappedTexcoordIndex =
+                  values[*inputs[TEXCOORD].begin()];
+
                 if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
                   remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
-                if (iv.texcoordIndex == remappedTexcoordIndex)
-                  texEqual = true;
+                texEqual = iv.texcoordIndex == remappedTexcoordIndex;
               }
 
               // if the vertex has matching normal and texcoord index values
               // then the vertex can be reused.
-              if ((!hasNormals || normEqual) && (!hasTexcoords || texEqual))
+              if ((inputs[NORMAL].empty() || normEqual) &&
+                  (inputs[TEXCOORD].empty() || texEqual))
               {
                 // found a vertex that can be shared.
                 toDuplicate = false;
@@ -1622,7 +1628,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         if (addIndex)
         {
           GeometryIndices input;
-          if (hasVertices)
+          if (!inputs[VERTEX].empty())
           {
             subMesh->AddVertex(verts[daeVertIndex]);
             unsigned int newVertIndex = subMesh->GetVertexCount()-1;
@@ -1648,18 +1654,25 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             input.vertexIndex = daeVertIndex;
             input.mappedIndex = newVertIndex;
           }
-          if (hasNormals)
+          if (!inputs[NORMAL].empty())
           {
-            unsigned int inputRemappedNormalIndex = values[inputs[NORMAL]];
+            unsigned int inputRemappedNormalIndex =
+              values[*inputs[NORMAL].begin()];
             if (normalDupMap.find(inputRemappedNormalIndex)
                 != normalDupMap.end())
               inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
             subMesh->AddNormal(norms[inputRemappedNormalIndex]);
             input.normalIndex = inputRemappedNormalIndex;
           }
-          if (hasTexcoords)
+
+          if (!inputs[TEXCOORD].empty())
           {
-            unsigned int inputRemappedTexcoordIndex = values[inputs[TEXCOORD]];
+            // \todo: Add support for multiple texture maps to SubMesh.
+            // Here we are only using the first texture coordinates, when
+            // multiple could have been specified.
+            unsigned int inputRemappedTexcoordIndex =
+              values[*inputs[TEXCOORD].begin()];
+
             if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
             {
               inputRemappedTexcoordIndex =
@@ -1671,7 +1684,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
           }
 
           // add the new gazebo submesh vertex index to the map
-          if (hasVertices)
+          if (!inputs[VERTEX].empty())
           {
             std::vector<GeometryIndices> inputValues;
             inputValues.push_back(input);

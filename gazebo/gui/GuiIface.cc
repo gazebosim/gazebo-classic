@@ -80,6 +80,44 @@ Q_DECLARE_METATYPE(std::string)
 Q_DECLARE_METATYPE(std::set<std::string>)
 
 //////////////////////////////////////////////////
+// QT message handler that pipes qt messages into gazebo's console system.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
+    const QString &_msg)
+{
+  std::string msg = _msg.toStdString();
+  msg += "(" + _context.function + ")";
+#else
+void messageHandler(QtMsgType _type, const char *_msg)
+{
+  const char *msg = _msg;
+#endif
+
+  switch (_type)
+  {
+    case QtDebugMsg:
+      gzdbg << msg << std::endl;
+      break;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+    case QtInfoMsg:
+      gzmsg << msg << std::endl;
+      break;
+#endif
+    case QtWarningMsg:
+      gzwarn << msg << std::endl;
+      break;
+    case QtFatalMsg:
+    case QtCriticalMsg:
+      gzerr << msg << std::endl;
+      break;
+    default:
+      gzwarn << "Unknown QT Message type[" << _type << "]: "
+        << msg << std::endl;
+      break;
+  }
+}
+
+//////////////////////////////////////////////////
 void print_usage()
 {
   std::cerr << "gzclient -- Gazebo GUI Client\n\n";
@@ -259,6 +297,13 @@ bool gui::load()
     g_argv[i] = new char[strlen("gazebo")];
     snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
+
+  // Register custom message handler
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  qInstallMessageHandler(messageHandler);
+#else
+  qInstallMsgHandler(messageHandler);
+#endif
 
   g_app = new QApplication(g_argc, g_argv);
   set_style();

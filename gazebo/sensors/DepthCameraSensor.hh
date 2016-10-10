@@ -57,12 +57,6 @@ namespace gazebo
 
       /// \brief Returns a pointer to the rendering::DepthCamera
       /// \return Depth Camera pointer
-      /// \deprecated See DepthCamera()
-      public: rendering::DepthCameraPtr GetDepthCamera() const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns a pointer to the rendering::DepthCamera
-      /// \return Depth Camera pointer
       public: virtual rendering::DepthCameraPtr DepthCamera() const;
 
       /// \brief Load the sensor with default parameters

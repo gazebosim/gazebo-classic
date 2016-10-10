@@ -1,8 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-if (WIN32)
- add_definitions(-DBUILDING_DLL_GZ_COMMON)
-endif()
+add_definitions(-DBUILDING_DLL_GZ_COMMON)
+
+# tiny obj loader
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/tinyobjloader)
 
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
@@ -45,6 +46,7 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
+  HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
   KeyEvent.cc
@@ -57,6 +59,7 @@ set (sources
   MeshManager.cc
   ModelDatabase.cc
   MouseEvent.cc
+  OBJLoader.cc
   PID.cc
   SemanticVersion.cc
   SkeletonAnimation.cc
@@ -69,6 +72,7 @@ set (sources
   Timer.cc
   URI.cc
   Video.cc
+  VideoEncoder.cc
   ffmpeg_inc.cc
 )
 
@@ -111,6 +115,7 @@ set (headers
   MeshManager.hh
   ModelDatabase.hh
   MouseEvent.hh
+  OBJLoader.hh
   PID.hh
   Plugin.hh
   SemanticVersion.hh
@@ -126,6 +131,7 @@ set (headers
   UpdateInfo.hh
   URI.hh
   Video.hh
+  VideoEncoder.hh
   ffmpeg_inc.h
  )
 
@@ -141,6 +147,7 @@ set (gtest_sources
   EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
+  HeightmapData_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
   Material_TEST.cc
@@ -149,12 +156,14 @@ set (gtest_sources
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  OBJLoader_TEST.cc
   SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
   URI_TEST.cc
+  VideoEncoder_TEST.cc
 )
 
 # Timer test fails on OSX
@@ -228,6 +237,7 @@ target_link_libraries(gazebo_common
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${libavutil_LIBRARIES}
+  ${libavdevice_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
@@ -255,6 +265,12 @@ endif()
 if (HAVE_GDAL)
   target_link_libraries(gazebo_common ${GDAL_LIBRARY})
 endif()
+
+if (USE_PCH)
+  set(MORE_FLAGS "-pthread")
+  add_pch(gazebo_common common_pch.hh ${MORE_FLAGS})
+endif()
+
 
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)

@@ -28,6 +28,7 @@
 // #include "gazebo/gui/Futures.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
 #include "gazebo/transport/TransportIface.hh"
@@ -522,7 +523,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
-
   this->FillModels();
 
   // A proxy model to filter models model
@@ -727,11 +727,13 @@ void Palette::FillTopics()
     }
   }
 
+  std::string worldName = gui::get_world();
+  std::string prefix = "/gazebo/" + worldName;
+
   // Populate widget
   for (auto topic : topics)
   {
     // Shorten topic name
-    std::string prefix = "/gazebo/default";
     auto shortName = topic;
     auto idX = shortName.find(prefix);
     if (idX != std::string::npos)
@@ -751,7 +753,7 @@ void Palette::FillTopics()
     }
 
     auto msg = msgs::MsgFactory::NewMsg(msgType);
-    this->FillFromMsg(msg.get(), topicItem, topic+"?p=");
+    this->FillFromMsg(msg.get(), topicItem, topic + "?p=");
   }
 }
 
@@ -862,9 +864,9 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
     // Process path
     auto pathParts = common::split(pathStr, "/");
 
-    QStandardItem *previousItem = NULL;
+    QStandardItem *previousItem = nullptr;
     unsigned int i = 0;
-    while (i < pathParts.size())
+    while (i < pathParts.size() - 1)
     {
       // Create model item based on part
       auto part = pathParts[i];
@@ -872,7 +874,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       if (part == "model")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -945,7 +947,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       else if (part == "link")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -1008,7 +1010,7 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
       else if (part == "joint")
       {
         // Check if it has already been added
-        QStandardItem *existingItem = NULL;
+        QStandardItem *existingItem = nullptr;
 
         // Check top level (model)
         if (!previousItem)
@@ -1103,10 +1105,15 @@ void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
 void Palette::FillSim()
 {
   // Hard-coded values for the sim tab
+
+  std::string worldName = gui::get_world();
+  std::string prefix = "/gazebo/" + worldName;
+  std::string worldStatsTopicStr = prefix + "/world_stats";
+
   std::multimap<std::string, std::string> simFields = {
-      {"~/world_stats", "sim_time"},
-      {"~/world_stats", "real_time"},
-      {"~/world_stats", "iterations"}};
+      {worldStatsTopicStr, "sim_time"},
+      {worldStatsTopicStr, "real_time"},
+      {worldStatsTopicStr, "iterations"}};
 
   for (auto field : simFields)
   {
@@ -1161,6 +1168,9 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       return;
 
     auto name = field->name();
+
+    if (field->is_repeated())
+      continue;
 
     switch (field->type())
     {
@@ -1219,9 +1229,6 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       // Message within a message
       case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
       {
-        if (field->is_repeated())
-          continue;
-
         // Treat time as double
         if (field->message_type()->name() == "Time")
         {
@@ -1342,7 +1349,7 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
     subItem0Name = "acceleration";
 
   // Check if it has already been added
-  QStandardItem *subItem0 = NULL;
+  QStandardItem *subItem0 = nullptr;
   for (int k = 0; k < _item->rowCount(); ++k)
   {
     auto childItem = _item->child(k, 0);
@@ -1470,7 +1477,7 @@ void Palette::InsertAxisItem(QStandardItem *_item, const common::URI &_uri,
     axis = 2;
 
   // Check if it has already been added
-  QStandardItem *subItem0 = NULL;
+  QStandardItem *subItem0 = nullptr;
   for (int k = 0; k < _item->rowCount(); ++k)
   {
     auto childItem = _item->child(k, 0);

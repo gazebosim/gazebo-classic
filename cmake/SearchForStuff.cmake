@@ -244,6 +244,9 @@ if (PKG_CONFIG_FOUND)
     if (tinyxml2_FAIL)
       message (STATUS "Looking for tinyxml2.h - not found")
       BUILD_ERROR("Missing: tinyxml2")
+    else()
+      include_directories(${tinyxml2_INCLUDE_DIRS})
+      link_directories(${tinyxml2_LIBRARY_DIRS})
     endif()
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
@@ -415,6 +418,24 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
+  # Find AV device. Only check for this on linux.
+  if (UNIX)
+    pkg_check_modules(libavdevice libavdevice>="56.4.100")
+    if (NOT libavdevice_FOUND)
+      BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
+    else()
+      include_directories(${libavdevice_INCLUDE_DIRS})
+      link_directories(${libavdevice_LIBRARY_DIRS})
+    endif ()
+  endif ()
+
+  if (NOT libavdevice_FOUND)
+    set (HAVE_AVDEVICE False)
+  else()
+    set (HAVE_AVDEVICE True)
+  endif()
+
+  ########################################
   # Find AV format
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
@@ -441,8 +462,8 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
   endif ()
 
-
-  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND
+      libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -657,30 +678,39 @@ else ()
 endif ()
 
 ########################################
-# Find ignition math in unix platforms
-# In Windows we expect a call from configure.bat script with the paths
-if (NOT WIN32)
-  find_package(ignition-math2 2.4 QUIET)
-  if (NOT ignition-math2_FOUND)
-    message(STATUS "Looking for ignition-math2-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math2 library.")
-  else()
-    message(STATUS "Looking for ignition-math2-config.cmake - found")
-  endif()
+# Find ignition msgs
+find_package(ignition-msgs0 0.4 QUIET)
+if (NOT ignition-msgs0_FOUND)
+  message(STATUS "Looking for ignition-msgs0-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs0 library.")
+else()
+  message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+endif()
+
+########################################
+# Find ignition math library
+find_package(ignition-math2 2.4 QUIET)
+if (NOT ignition-math2_FOUND)
+  message(STATUS "Looking for ignition-math2-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math2 library.")
+else()
+  message(STATUS "Looking for ignition-math2-config.cmake - found")
 endif()
 
 ########################################
 # Find the Ignition_Transport library
-# In Windows we expect a call from configure.bat script with the paths
-if (NOT WIN32)
+find_package(ignition-transport2 QUIET)
+if (NOT ignition-transport2_FOUND)
   find_package(ignition-transport1 QUIET)
   if (NOT ignition-transport1_FOUND)
-    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
-  else()
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
-    include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
-    link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
+    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev")
   endif()
+endif()
+
+if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+  include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
+  link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
 
 ################################################
@@ -693,34 +723,59 @@ if (GAZEBO_RUN_VALGRIND_TESTS AND NOT VALGRIND_PROGRAM)
   BUILD_WARNING("valgrind not found. Memory check tests will be skipped.")
 endif()
 
+########################################
+# Find OSVR SDK
+find_library(OSVR_CLIENTKIT_LIBRARY NAMES osvrClientKit)
+find_file(OSVR_CLIENTKIT_HEADER NAMES osvr/ClientKit/ClientKit.h)
+if (OSVR_CLIENTKIT_LIBRARY AND OSVR_CLIENTKIT_HEADER)
+  message(STATUS "Looking for libosvrClientKit and ClientKit.h - found")
+  set(HAVE_OSVR TRUE)
+else()
+  message(STATUS "Looking for libosvrClientKit and ClientKit.h - not found")
+  BUILD_WARNING("OpenSource Virtual Reality (OSVR) support will be disabled.")
+  set(HAVE_OSVR FALSE)
+endif()
 
 ########################################
 # Find QWT (QT graphing library)
-#find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
-#  /usr/include
-#  /usr/local/include
-#  "$ENV{LIB_DIR}/include"
-#  "$ENV{INCLUDE}"
-#  PATH_SUFFIXES qwt-qt4 qwt qwt5
-#  )
-#
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
-#  /usr/lib
-#  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib"
-#  "$ENV{LIB}/lib"
-#  )
-#
-#if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-#  set(HAVE_QWT TRUE)
-#endif (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-#
-#if (HAVE_QWT)
-#  if (NOT QWT_FIND_QUIETLY)
-#    message(STATUS "Found Qwt: ${QWT_LIBRARY}")
-#  endif (NOT QWT_FIND_QUIETLY)
-#else ()
-#  if (QWT_FIND_REQUIRED)
-#    BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
-#  endif (QWT_FIND_REQUIRED)
-#endif ()
+find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
+  /usr/include
+  /usr/local/include
+  /usr/local/lib/qwt.framework/Headers
+  PATH_SUFFIXES qwt-qt4 qwt qwt5
+  )
+
+find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
+  /usr/lib
+  /usr/local/lib
+  /usr/local/lib/qwt.framework
+  )
+
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
+  set(HAVE_QWT TRUE)
+else()
+  set(HAVE_QWT FALSE)
+endif ()
+
+# version
+set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
+file ( STRINGS ${_VERSION_FILE} _VERSION_LINE REGEX "define[ ]+QWT_VERSION_STR" )
+if ( _VERSION_LINE )
+  string ( REGEX REPLACE ".*define[ ]+QWT_VERSION_STR[ ]+\"(.*)\".*" "\\1"
+      QWT_VERSION_STRING "${_VERSION_LINE}" )
+  string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1"
+      QWT_MAJOR_VERSION "${QWT_VERSION_STRING}" )
+  string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\2"
+      QWT_MINOR_VERSION "${QWT_VERSION_STRING}" )
+  string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\3"
+      QWT_PATCH_VERSION "${QWT_VERSION_STRING}" )
+  set(QWT_VERSION
+    ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
+endif ()
+
+if (HAVE_QWT)
+  message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
+else()
+  message (STATUS "Looking for qwt - not found")
+  BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
+endif ()

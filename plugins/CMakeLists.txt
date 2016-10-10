@@ -42,7 +42,9 @@ endif()
 set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
+  ArduCopterPlugin
   ArrangePlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
@@ -54,7 +56,9 @@ set (plugins_single_header
   FiducialCameraPlugin
   FollowerPlugin
   ForceTorquePlugin
+  GimbalSmall2dPlugin
   GpuRayPlugin
+  HarnessPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
@@ -63,6 +67,7 @@ set (plugins_single_header
   LinearBatteryPlugin
   ModelPropShop
   MudPlugin
+  PlaneDemoPlugin
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
@@ -81,7 +86,7 @@ set (plugins_private_header
 )
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
-  set (plugins ${plugins}
+  set (plugins_single_header ${plugins_single_header}
     HydraPlugin
     HydraDemoPlugin
   )
@@ -89,6 +94,7 @@ endif()
 
 set (GUIplugins
   CessnaGUIPlugin
+  KeyboardGUIPlugin
   TimerGUIPlugin
 )
 
