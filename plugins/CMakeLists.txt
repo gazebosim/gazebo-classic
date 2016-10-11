@@ -43,6 +43,7 @@ endif()
 set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
+  ArduCopterPlugin
   ArrangePlugin
   BlinkVisualPlugin
   BreakableJointPlugin
@@ -56,6 +57,7 @@ set (plugins_single_header
   FiducialCameraPlugin
   FollowerPlugin
   ForceTorquePlugin
+  GimbalSmall2dPlugin
   GpuRayPlugin
   HarnessPlugin
   ImuSensorPlugin
@@ -66,6 +68,7 @@ set (plugins_single_header
   LinearBatteryPlugin
   ModelPropShop
   MudPlugin
+  PlaneDemoPlugin
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin

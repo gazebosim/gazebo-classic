@@ -244,6 +244,9 @@ if (PKG_CONFIG_FOUND)
     if (tinyxml2_FAIL)
       message (STATUS "Looking for tinyxml2.h - not found")
       BUILD_ERROR("Missing: tinyxml2")
+    else()
+      include_directories(${tinyxml2_INCLUDE_DIRS})
+      link_directories(${tinyxml2_LIBRARY_DIRS})
     endif()
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
@@ -415,6 +418,24 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
+  # Find AV device. Only check for this on linux.
+  if (UNIX)
+    pkg_check_modules(libavdevice libavdevice>="56.4.100")
+    if (NOT libavdevice_FOUND)
+      BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
+    else()
+      include_directories(${libavdevice_INCLUDE_DIRS})
+      link_directories(${libavdevice_LIBRARY_DIRS})
+    endif ()
+  endif ()
+
+  if (NOT libavdevice_FOUND)
+    set (HAVE_AVDEVICE False)
+  else()
+    set (HAVE_AVDEVICE True)
+  endif()
+
+  ########################################
   # Find AV format
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
@@ -441,8 +462,8 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
   endif ()
 
-
-  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND
+      libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -689,8 +710,6 @@ if (NOT ignition-math2_FOUND)
   BUILD_ERROR ("Missing: Ignition math2 library.")
 else()
   message(STATUS "Looking for ignition-math2-config.cmake - found")
-  include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
-  link_directories(${IGNITION-MATH_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -699,7 +718,7 @@ find_package(ignition-transport2 QUIET)
 if (NOT ignition-transport2_FOUND)
   find_package(ignition-transport1 QUIET)
   if (NOT ignition-transport1_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev)")
+    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev")
   endif()
 endif()
 
