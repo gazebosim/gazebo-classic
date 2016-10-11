@@ -5,6 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.3.1 to 7.X
+
+### Deprecations
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
+    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
+
 ## Gazebo 7.1.0 to 7.X
 
 ### Additions
@@ -457,8 +465,6 @@ release will remove the deprecated code.
 1. **gazebo/sensors/ImuSensor.hh**
     + ***Deprecation:** public: msgs::IMU GetImuMessage() const
     + ***Replacement:** public: msgs::IMU ImuMessage() const;
-    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
-    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
 
 1. **gazebo/sensors/MultiCameraSensor.hh**
     + ***Deprecation:** public: virtual std::string GetTopic() const;
