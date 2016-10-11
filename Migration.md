@@ -124,6 +124,7 @@ release will remove the deprecated code.
                                                     const ignition::math::Triangle3d &_triangleDest,
                                                     const ignition::math::Pose3d &_poseSrc,
                                                     ignition::math::Vector3d &_trans,
+                                                    ignition::math::Quaterniond &_rot)
 
 1. **gazebo/rendering/RayQuery.hh**
     + ***Deprecation:*** public: bool SelectMeshTriangle(int _x, int _y,
