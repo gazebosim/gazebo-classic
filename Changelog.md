@@ -1,6 +1,6 @@
 ## Gazebo 7
 
-## Gazebo 7.x.x (2016-xx-xx)
+## Gazebo 7.4.0 (2016-10-11)
 
 1. Add test for HarnessPlugin, reduce likelihood of race condition
     * [Pull request 2431](https://bitbucket.org/osrf/gazebo/pull-request/2431)
