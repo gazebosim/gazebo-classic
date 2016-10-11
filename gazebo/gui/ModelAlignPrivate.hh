@@ -17,17 +17,15 @@
 #ifndef GAZEBO_GUI_MODELALIGNPRIVATE_HH_
 #define GAZEBO_GUI_MODELALIGNPRIVATE_HH_
 
-#include <string>
-#include <vector>
 #include <map>
+#include <vector>
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {

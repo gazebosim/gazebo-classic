@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include <functional>
 #include <sstream>
 
 #include "gazebo/rendering/RenderEvents.hh"

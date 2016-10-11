@@ -18,22 +18,28 @@
 #define GAZEBO_GUI_MODELSNAP_HH_
 
 #include <memory>
-#include <string>
 #include <vector>
-
+#include <ignition/math/Quaternion.hh>
 #include <ignition/math/Triangle3.hh>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
-
-#include "gazebo/math/Pose.hh"
-#include "gazebo/rendering/RenderTypes.hh"
-
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
+  namespace math
+  {
+    class Pose;
+    class Quaternion;
+    class Vector3;
+  }
+
   namespace gui
   {
     class ModelSnapPrivate;

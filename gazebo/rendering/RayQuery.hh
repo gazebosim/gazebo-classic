@@ -21,14 +21,18 @@
 #include <memory>
 #include <vector>
 #include <ignition/math/Triangle3.hh>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace math
+  {
+    class Vector3;
+  }
+
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
