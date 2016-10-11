@@ -74,11 +74,11 @@ void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
   ignition::math::Vector3d pos =
-      (ModelManipulator::GetMousePositionOnPlane(camera, _event)).Ign();
+      (ModelManipulator::MousePositionOnPlane(camera, _event));
 
   if (_event.Control())
   {
-    pos = ModelManipulator::SnapPoint(pos).Ign();
+    pos = ModelManipulator::SnapPoint(pos);
   }
   pos.Z(this->EntityPosition().Z());
 

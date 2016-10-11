@@ -375,10 +375,6 @@ else (build_errors)
     gazebo_rendering
   )
 
-  if (INCLUDE_PLAYER)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
-  endif()
-
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_physics
     gazebo_ode

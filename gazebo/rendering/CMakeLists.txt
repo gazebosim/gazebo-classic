@@ -158,6 +158,10 @@ set (gtest_sources
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_rendering)
 
 set (gtest_sources_dri
+  ApplyWrenchVisual_TEST.cc
+  ArrowVisual_TEST.cc
+  AxisVisual_TEST.cc
+  CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
   GpuLaser_TEST.cc
@@ -165,9 +169,12 @@ set (gtest_sources_dri
   Heightmap_TEST.cc
   InertiaVisual_TEST.cc
   JointVisual_TEST.cc
+  LaserVisual_TEST.cc
+  LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   RenderingLight_TEST.cc
+  RFIDVisual_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
@@ -191,8 +198,7 @@ link_directories(
   ${ogre_library_dirs}
 )
 
-set (CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB")
+add_definitions(-DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB)
 if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
 endif()
