@@ -225,6 +225,23 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       topItem->addSubProperty(item);
       item->setEnabled(false);
 
+      // Create and set the gui camera clip distances
+      auto clipItem = this->dataPtr->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("clip"));
+      topItem->addSubProperty(clipItem);
+
+      item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+          tr("near"));
+      item->setValue(cam->NearClip());
+      clipItem->addSubProperty(item);
+      item->setEnabled(true);
+
+      item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+          tr("far"));
+      item->setValue(cam->FarClip());
+      clipItem->addSubProperty(item);
+      item->setEnabled(true);
+
       // Create and set the gui camera pose
       item = this->dataPtr->variantManager->addProperty(
           QtVariantPropertyManager::groupTypeId(), tr("pose"));
@@ -707,9 +724,6 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
     return;
 
   QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
-  if (!cameraPoseProperty)
-    return;
-
   if (cameraPoseProperty)
   {
     std::string changedProperty = _item->propertyName().toStdString();
@@ -725,6 +739,38 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+
+  QtProperty *cameraClipProperty = this->ChildItem(cameraProperty, "clip");
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+
+    if (cam)
+    {
+      if (changedProperty == "near")
+      {
+        cam->SetClipDist(this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "near")).toDouble(),
+            cam->FarClip());
+      }
+      else if (changedProperty == "far")
+      {
+        cam->SetFarClip(cam->NearClip(), this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "far")).toDouble());
+      }
+      else
+      {
+        gzerr << "Unable to process user camera clip property["
+          << changedProperty << "]\n";
+      }
+    }
+    else
+    {
+      gzerr << "Unable to get pointer to active user camera when setting clip "
+        << "plane values. This should not happen.\n";
     }
   }
 }
