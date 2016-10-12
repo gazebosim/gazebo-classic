@@ -375,12 +375,9 @@ TEST_F(gzTest, Model)
     EXPECT_NE(g_msgDebugOut.find("entity_delete"), std::string::npos);
     // The following expectation can fail, since Link::Fini publishes
     // an entity_delete request with the integer id of its visuals.
-    // EXPECT_NE(g_msgDebugOut.find("my_box"), std::string::npos);
-    // The expectation is relaxed to accept numeric strings as well
-    // until model deletion is improved, see:
+    // The expectation is disabled until model deletion is improved, see:
     // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
-    EXPECT_TRUE(g_msgDebugOut.find("my_box") != std::string::npos ||
-        std::all_of(g_msgDebugOut.begin(), g_msgDebugOut.end(), ::isdigit));
+    // EXPECT_NE(g_msgDebugOut.find("my_box"), std::string::npos);
   }
 
   // Test model info of deleted model to verify deletion
@@ -484,12 +481,9 @@ TEST_F(gzTest, Model)
     EXPECT_NE(g_msgDebugOut.find("entity_delete"), std::string::npos);
     // The following expectation can fail, since Link::Fini publishes
     // an entity_delete request with the integer id of its visuals.
-    // EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
-    // The expectation is relaxed to accept numeric strings as well
-    // until model deletion is improved, see:
+    // The expectation is disabled until model deletion is improved, see:
     // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
-    EXPECT_TRUE(g_msgDebugOut.find("simple_arm") != std::string::npos ||
-        std::all_of(g_msgDebugOut.begin(), g_msgDebugOut.end(), ::isdigit));
+    // EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
   }
 
   fini();
