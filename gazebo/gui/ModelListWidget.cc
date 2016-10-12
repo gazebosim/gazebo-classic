@@ -225,7 +225,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       topItem->addSubProperty(item);
       item->setEnabled(false);
 
-      // Create and set the gui camera clip distances
+      // Create and set the gui camera clip distance items
       auto clipItem = this->dataPtr->variantManager->addProperty(
           QtVariantPropertyManager::groupTypeId(), tr("clip"));
       topItem->addSubProperty(clipItem);
