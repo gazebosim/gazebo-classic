@@ -12,7 +12,7 @@ if (WIN32)
 endif()
 
 include_directories(${tinyxml_INCLUDE_DIRS})
-link_directories(${tinyxml_LIBRARY_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
 
 set (sources
   ApplyWrenchVisual.cc

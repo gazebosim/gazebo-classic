@@ -4,9 +4,7 @@ find_package(gazebo REQUIRED)
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
-set (CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} ${IGNITION-MSGS_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 add_executable(marker marker.cc)
-target_link_libraries(marker ${GAZEBO_LIBRARIES} ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES} pthread)
+target_link_libraries(marker ${GAZEBO_LIBRARIES})
