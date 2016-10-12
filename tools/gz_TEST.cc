@@ -170,7 +170,6 @@ void RequestCB(ConstRequestPtr &_msg)
   boost::mutex::scoped_lock lock(g_mutex);
   g_msgDebugOut = _msg->DebugString();
   g_msgCondition.notify_all();
-  std::cerr << "Request: " << g_msgDebugOut << std::endl;
 }
 
 /////////////////////////////////////////////////
