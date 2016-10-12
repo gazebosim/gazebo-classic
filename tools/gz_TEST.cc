@@ -380,7 +380,6 @@ TEST_F(gzTest, Model)
     // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
     EXPECT_TRUE(g_msgDebugOut.find("my_box") != std::string::npos ||
         std::all_of(g_msgDebugOut.begin(), g_msgDebugOut.end(), ::isdigit));
-
   }
 
   // Test model info of deleted model to verify deletion
