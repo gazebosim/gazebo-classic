@@ -758,7 +758,7 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       }
       else if (changedProperty == "far")
       {
-        cam->SetFarClip(cam->NearClip(), this->dataPtr->variantManager->value(
+        cam->SetClipDist(cam->NearClip(), this->dataPtr->variantManager->value(
               this->ChildItem(cameraClipProperty, "far")).toDouble());
       }
       else
