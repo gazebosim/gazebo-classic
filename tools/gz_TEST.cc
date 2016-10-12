@@ -112,14 +112,18 @@ void init()
   // Wait for world_stats topic to be available
   {
     int topicWaitCount = 0;
+    const std::string messageName = "gazebo.msgs.WorldStatistics";
     const std::string topicName = "/gazebo/default/world_stats";
     while (topicWaitCount < 20 &&
-           custom_exec_str("gz topic -l").find(topicName) == std::string::npos)
+           gazebo::transport::getAdvertisedTopics(messageName).size() == 0)
     {
       gzdbg << "Waiting for topics to be listed" << std::endl;
       gazebo::common::Time::MSleep(200);
     }
     ASSERT_LT(topicWaitCount, 20);
+    auto topics = gazebo::transport::getAdvertisedTopics(messageName);
+    ASSERT_EQ(topics.size(), 1u);
+    EXPECT_EQ(topics.front(), topicName);
   }
 }
 
