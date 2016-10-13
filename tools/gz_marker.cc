@@ -320,6 +320,11 @@ void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
   {
     msg.set_type(ignition::msgs::Marker::TRIANGLE_STRIP);
   }
+  else
+  {
+    std::cerr << "Invalid type[" << _type << "]\n";
+    return;
+  }
 
   bool result;
   ignition::msgs::StringMsg rep;
@@ -332,10 +337,22 @@ void MarkerCommand::Msg(const std::string &_msg)
   if (!_msg.empty())
   {
     ignition::msgs::Marker msg;
-    google::protobuf::TextFormat::ParseFromString(_msg, &msg);
-    bool result;
-    ignition::msgs::StringMsg rep;
-    this->node.Request("/marker", msg, 5000u, rep, result);
+    if (google::protobuf::TextFormat::ParseFromString(_msg, &msg))
+    {
+      bool result;
+      ignition::msgs::StringMsg rep;
+      this->node.Request("/marker", msg, 5000u, rep, result);
+
+      if (!result)
+      {
+        std::cerr << "Unable to send marker request: "
+                  << rep.data() << std::endl;
+      }
+    }
+    else
+    {
+      std::cerr << "Invalid string message: " << _msg << std::endl;
+    }
   }
 }
 
@@ -351,6 +368,8 @@ void MarkerCommand::Delete(const std::string &_ns, const unsigned int _id)
   ignition::msgs::StringMsg rep;
 
   this->node.Request("/marker", msg, 5000u, rep, result);
+  if (!result)
+    std::cerr << "Failed to delete the marker: " << rep.data() << std::endl;
 }
 
 /////////////////////////////////////////////////
