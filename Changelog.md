@@ -1,5 +1,11 @@
 ## Gazebo 7
 
+## Gazebo 7.x.x (2016-xx-xx)
+
+1. Add GUI items to change the user camera clip distance
+    * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
+    * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
+
 ## Gazebo 7.4.0 (2016-10-11)
 
 1. Add test for HarnessPlugin, reduce likelihood of race condition
