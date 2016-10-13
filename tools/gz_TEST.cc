@@ -114,13 +114,13 @@ void init()
     int topicWaitCount = 0;
     const std::string messageName = "gazebo.msgs.WorldStatistics";
     const std::string topicName = "/gazebo/default/world_stats";
-    while (topicWaitCount < 20 &&
+    while (++topicWaitCount <= 20 &&
            gazebo::transport::getAdvertisedTopics(messageName).size() == 0)
     {
       gzdbg << "Waiting for topics to be listed" << std::endl;
       gazebo::common::Time::MSleep(200);
     }
-    ASSERT_LT(topicWaitCount, 20);
+    ASSERT_LE(topicWaitCount, 20);
     auto topics = gazebo::transport::getAdvertisedTopics(messageName);
     ASSERT_EQ(topics.size(), 1u);
     EXPECT_EQ(topics.front(), topicName);
