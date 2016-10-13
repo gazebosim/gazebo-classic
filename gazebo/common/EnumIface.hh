@@ -140,7 +140,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _c Enum value
-      public: EnumIterator(const Enum &_c) : c(_c)
+      public: EnumIterator(const Enum _c) : c(_c)
       {
         GZ_ASSERT(this->c >= this->Begin() && this->c <= this->End(),
             "Invalid enum value in EnumIterator constructor");
@@ -148,7 +148,7 @@ namespace gazebo
 
       /// \brief Equal operator
       /// \param[in] _c Enum value to copy
-      public: EnumIterator &operator=(const Enum &_c)
+      public: EnumIterator &operator=(const Enum _c)
       {
         GZ_ASSERT(_c >= this->Begin() && _c <= this->End(),
             "Invalid operator= value in EnumIterator");

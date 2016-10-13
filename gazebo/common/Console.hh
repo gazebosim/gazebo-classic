@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_CONSOLE_HH_
-#define GAZEBO_COMMON_CONSOLE_HH_
+#ifndef _GAZEBO_CONSOLE_HH_
+#define _GAZEBO_CONSOLE_HH_
 
 #include <iostream>
 #include <fstream>
