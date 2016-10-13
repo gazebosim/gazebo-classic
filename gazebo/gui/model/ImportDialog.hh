@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef GAZEBO_GUI_MODEL_IMPORT_DIALOG_HH_
-#define GAZEBO_GUI_MODEL_IMPORT_DIALOG_HH_
+#ifndef GAZEBO_GUI_MODEL_IMPORTDIALOG_HH_
+#define GAZEBO_GUI_MODEL_IMPORTDIALOG_HH_
 
 #include <string>
 #include "gazebo/gui/qt.h"

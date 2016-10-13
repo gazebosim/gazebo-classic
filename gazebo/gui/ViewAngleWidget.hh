@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_VIEW_ANGLE_WIDGET_HH_
-#define GAZEBO_GUI_VIEW_ANGLE_WIDGET_HH_
+#ifndef GAZEBO_GUI_VIEWANGLEWIDGET_HH_
+#define GAZEBO_GUI_VIEWANGLEWIDGET_HH_
 
 #include <string>
 
