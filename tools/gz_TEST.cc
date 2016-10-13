@@ -130,7 +130,7 @@ void init()
 /////////////////////////////////////////////////
 void fini()
 {
-  gazebo::transport::fini();
+  EXPECT_TRUE(gazebo::client::shutdown());
   if (kill(g_pid, SIGINT) < 0)
     gzerr << "Failed to kill the gazebo server.\n";
 
