@@ -289,6 +289,12 @@ namespace gazebo
       /// \param[in] _materialName Name of the material
       public: void SetMaterial(const std::string &_materialName);
 
+      /// \brief Create terrain material generator. There are two types:
+      /// custom material generator that support user material scripts,
+      /// and a default material generator that uses our own glsl shader
+      /// and supports PSSM shadows.
+      private: void CreateMaterial();
+
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _outsideRadius Controls the radius of effect.

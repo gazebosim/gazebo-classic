@@ -400,6 +400,10 @@ namespace gazebo
 
       /// \brief True if the terrain's hash does not match the image's hash
       public: bool terrainHashChanged;
+
+      /// \brief Name of custom material to use for the terrain. If empty,
+      /// default material with glsl shader will be used.
+      public: std::string materialName;
     };
   }
 }

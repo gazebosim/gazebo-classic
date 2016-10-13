@@ -2755,7 +2755,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           if (!this->dataPtr->terrain)
           {
             this->dataPtr->terrain = new Heightmap(shared_from_this());
-            this->dataPtr->terrain->LoadFromMsg(_msg);
+            // check the material fields and set material if it is specified
             if (_msg->has_material())
             {
               auto matMsg = _msg->material();
@@ -2771,8 +2771,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
                 this->dataPtr->terrain->SetMaterial(matName);
               }
             }
-            // check the material fields and set material if it is specified
-            // this->dataPtr->terrain->SetMaterial();
+            this->dataPtr->terrain->LoadFromMsg(_msg);
           }
           else
             gzerr << "Only one Heightmap can be created per Scene\n";

@@ -444,12 +444,8 @@ void Heightmap::Load()
   this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
 
-
   // use gazebo shaders
-//  this->SetupShadows(true);
-
-  // use custom shaders
-  this->SetMaterial("Gazebo/Red");
+  this->CreateMaterial();
 
   if (!this->dataPtr->heights.empty())
   {
@@ -1012,22 +1008,19 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, const double _outsideRadius,
 /////////////////////////////////////////////////
 void Heightmap::SetupShadows(bool _enableShadows)
 {
-  this->dataPtr->gzMatGen = new GzTerrainMatGen();
-
   // Assume we get a shader model 2 material profile
   Ogre::TerrainMaterialGeneratorA::SM2Profile *matProfile;
 
-  // RTSS PSSM shadows compatible terrain material
-  Ogre::TerrainMaterialGenerator *matGen = this->dataPtr->gzMatGen;
+  Ogre::TerrainMaterialGeneratorPtr matGen =
+      this->dataPtr->terrainGlobals->getDefaultMaterialGenerator();
 
-  Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
-  ptr.bind(matGen);
-
-  this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(ptr);
   matProfile = static_cast<GzTerrainMatGen::SM2Profile*>(
       matGen->getActiveProfile());
   if (!matProfile)
-    gzerr << "Invalid mat profile\n";
+  {
+    // using custom material script so ignore setting shadows
+    return;
+  }
 
   matProfile->setLayerParallaxMappingEnabled(false);
 
@@ -1049,12 +1042,38 @@ void Heightmap::SetupShadows(bool _enableShadows)
 /////////////////////////////////////////////////
 void Heightmap::SetMaterial(const std::string &_materialName)
 {
-  // init custom material generator
-  Ogre::TerrainMaterialGeneratorPtr terrainMaterialGenerator;
-  TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial(_materialName);
-  terrainMaterialGenerator.bind(terrainMaterial);
-  this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(terrainMaterialGenerator);
-  // TODO support shadows?
+  this->dataPtr->materialName = _materialName;
+  if (!this->dataPtr->materialName.empty() && this->dataPtr->terrainGlobals)
+    this->CreateMaterial();
+}
+
+/////////////////////////////////////////////////
+void Heightmap::CreateMaterial()
+{
+  if (!this->dataPtr->materialName.empty())
+  {
+    // init custom material generator
+    Ogre::TerrainMaterialGeneratorPtr terrainMaterialGenerator;
+    TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial(
+        this->dataPtr->materialName);
+    terrainMaterialGenerator.bind(terrainMaterial);
+    this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(
+        terrainMaterialGenerator);
+  }
+  else
+  {
+    // use default material
+    // RTSS PSSM shadows compatible terrain material
+    if (!dataPtr->gzMatGen)
+      this->dataPtr->gzMatGen = new GzTerrainMatGen();
+
+    Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
+    ptr.bind(this->dataPtr->gzMatGen);
+
+    this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(ptr);
+
+    this->SetupShadows(true);
+  }
 }
 
 /////////////////////////////////////////////////
