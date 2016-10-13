@@ -285,6 +285,10 @@ namespace gazebo
       /// \return Number of terrain subdivisions
       public: unsigned int TerrainSubdivisionCount() const;
 
+      /// \brief Set custom material for the terrain
+      /// \param[in] _materialName Name of the material
+      public: void SetMaterial(const std::string &_materialName);
+
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _outsideRadius Controls the radius of effect.

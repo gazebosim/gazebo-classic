@@ -443,7 +443,13 @@ void Heightmap::Load()
 
   this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
-  this->SetupShadows(true);
+
+
+  // use gazebo shaders
+//  this->SetupShadows(true);
+
+  // use custom shaders
+  this->SetMaterial("Gazebo/Red");
 
   if (!this->dataPtr->heights.empty())
   {
@@ -1038,6 +1044,17 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(NULL);
   }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetMaterial(const std::string &_materialName)
+{
+  // init custom material generator
+  Ogre::TerrainMaterialGeneratorPtr terrainMaterialGenerator;
+  TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial(_materialName);
+  terrainMaterialGenerator.bind(terrainMaterial);
+  this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(terrainMaterialGenerator);
+  // TODO support shadows?
 }
 
 /////////////////////////////////////////////////
@@ -2982,3 +2999,99 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// TerrainMaterial
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+TerrainMaterial::TerrainMaterial(Ogre::String _materialname)
+{
+  mMaterialName = _materialname;
+  mProfiles.push_back(OGRE_NEW Profile(this, "OgreMaterial",
+      "Profile for rendering Ogre standard material"));
+  setActiveProfile("OgreMaterial");
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::setMaterialByName(const Ogre::String _materialname) {
+  mMaterialName = _materialname;
+}
+
+//////////////////////////////////////////////////
+TerrainMaterial::Profile::Profile(Ogre::TerrainMaterialGenerator *_parent,
+    const Ogre::String &_name, const Ogre::String &_desc)
+    : Ogre::TerrainMaterialGenerator::Profile(_parent, _name, _desc)
+{
+}
+
+//////////////////////////////////////////////////
+TerrainMaterial::Profile::~Profile()
+{
+}
+
+//////////////////////////////////////////////////
+Ogre::MaterialPtr TerrainMaterial::Profile::generate(
+    const Ogre::Terrain *_terrain)
+{
+  const Ogre::String& matName = _terrain->getMaterialName();
+
+  Ogre::MaterialPtr mat =
+      Ogre::MaterialManager::getSingleton().getByName(matName);
+  if (!mat.isNull())
+      Ogre::MaterialManager::getSingleton().remove(matName);
+
+  // Set Ogre material
+  mat = Ogre::MaterialManager::getSingleton().getByName(
+      ((TerrainMaterial*)getParent())->mMaterialName);
+
+  // Get default pass
+  Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
+
+  // Add terrain's global normalmap to renderpass so the
+  // fragment program can find it.
+  Ogre::TextureUnitState *tu = p->createTextureUnitState(matName+"/nm");
+
+  Ogre::TexturePtr nmtx = _terrain->getTerrainNormalMap();
+      tu->_setTexturePtr(nmtx);
+
+  return mat;
+}
+
+//////////////////////////////////////////////////
+Ogre::MaterialPtr TerrainMaterial::Profile::generateForCompositeMap(
+    const Ogre::Terrain *_terrain)
+{
+  return _terrain->_getCompositeMapMaterial();
+}
+
+//////////////////////////////////////////////////
+Ogre::uint8 TerrainMaterial::Profile::getMaxLayers(
+    const Ogre::Terrain */*_terrain*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::updateParams(const Ogre::MaterialPtr &/*_mat*/,
+    const Ogre::Terrain */*_terrain*/)
+{
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::updateParamsForCompositeMap(
+    const Ogre::MaterialPtr &/*_mat*/, const Ogre::Terrain */*_terrain*/)
+{
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::requestOptions(Ogre::Terrain *_terrain)
+{
+  _terrain->_setMorphRequired(true);
+  _terrain->_setNormalMapRequired(true); // enable global normal map
+  _terrain->_setLightMapRequired(false);
+  _terrain->_setCompositeMapRequired(false);
+}
+

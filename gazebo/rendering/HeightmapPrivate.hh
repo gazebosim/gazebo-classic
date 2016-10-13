@@ -229,6 +229,45 @@ namespace gazebo
     };
 
     /// \internal
+    /// \brief Custom terrain material generator.
+    /// A custom material generator that lets user specify their own material script
+    /// for rendering the heightmap.
+    class TerrainMaterial : public Ogre::TerrainMaterialGenerator
+    {
+      public: TerrainMaterial(Ogre::String _materialName);
+
+      public: void setMaterialByName(const Ogre::String _materialname);
+
+      class Profile : public Ogre::TerrainMaterialGenerator::Profile
+      {
+        public: Profile(Ogre::TerrainMaterialGenerator *_parent,
+            const Ogre::String &_name, const Ogre::String &_desc);
+
+        public: ~Profile();
+
+        public: bool isVertexCompressionSupported() const { return false; }
+
+        public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
+
+        public: Ogre::MaterialPtr generateForCompositeMap(
+            const Ogre::Terrain *_terrain);
+
+        public: Ogre::uint8 getMaxLayers(const Ogre::Terrain *_terrain) const;
+
+        public: void updateParams(const Ogre::MaterialPtr& mat,
+            const Ogre::Terrain *_terrain);
+
+        public: void updateParamsForCompositeMap(const Ogre::MaterialPtr& mat,
+            const Ogre::Terrain *_terrain);
+
+        public: void requestOptions(Ogre::Terrain *_terrain);
+
+      };
+      protected:  Ogre::String mMaterialName;
+    };
+
+
+    /// \internal
     /// \brief Pretends to provide procedural page content to avoid page loading
     class DummyPageProvider : public Ogre::PageProvider
     {
