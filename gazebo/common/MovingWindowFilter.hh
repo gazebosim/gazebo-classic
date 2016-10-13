@@ -110,8 +110,7 @@ namespace gazebo
 
       /// \brief Allow subclasses to initialize their own data pointer.
       /// \param[in] _d Reference to data pointer.
-      protected: explicit MovingWindowFilter<T>(
-                     MovingWindowFilterPrivate<T> &_d);
+      protected: MovingWindowFilter<T>(MovingWindowFilterPrivate<T> &_d);
 
       /// \brief Data pointer.
       protected: MovingWindowFilterPrivate<T> *dataPtr;

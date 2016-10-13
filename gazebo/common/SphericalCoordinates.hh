@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_SPHERICALCOORDINATES_HH_
-#define GAZEBO_COMMON_SPHERICALCOORDINATES_HH_
+#ifndef _GAZEBO_SPHERICALCOORDINATES_HH_
+#define _GAZEBO_SPHERICALCOORDINATES_HH_
 
 #include <string>
 

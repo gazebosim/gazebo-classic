@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_MSGS_GENERATOR_GAZEBOGENERATOR_H
-#define GAZEBO_MSGS_GENERATOR_GAZEBOGENERATOR_H
+#ifndef GAZEBOGENERATOR_H
+#define GAZEBOGENERATOR_H
 
 #include <google/protobuf/compiler/code_generator.h>
 #include <string>

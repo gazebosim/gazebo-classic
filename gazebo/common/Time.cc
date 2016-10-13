@@ -480,13 +480,6 @@ Time &Time::operator =(const Time &_time)
 }
 
 /////////////////////////////////////////////////
-Time &Time::operator =(const double _seconds)
-{
-  this->Set(_seconds);
-  return *this;
-}
-
-/////////////////////////////////////////////////
 Time Time::operator +(const struct timeval &_tv) const
 {
   Time t(this->sec + _tv.tv_sec, this->nsec + _tv.tv_usec*1000);
@@ -530,25 +523,10 @@ Time Time::operator +(const Time &_time) const
 }
 
 /////////////////////////////////////////////////
-Time Time::operator +(const double _seconds) const
-{
-  return Time(this->Double() + _seconds);
-}
-
-/////////////////////////////////////////////////
 const Time &Time::operator +=(const Time &_time)
 {
   this->sec += _time.sec;
   this->nsec += _time.nsec;
-  this->Correct();
-  return *this;
-}
-
-/////////////////////////////////////////////////
-const Time &Time::operator +=(const double _seconds)
-{
-  this->sec += (int32_t)(floor(_seconds));
-  this->nsec += (int32_t)(round((_seconds - this->sec) * nsInSec));
   this->Correct();
   return *this;
 }
@@ -560,12 +538,6 @@ Time Time::operator -(const struct timeval &_tv) const
   t.Correct();
 
   return t;
-}
-
-/////////////////////////////////////////////////
-Time Time::operator -(double _seconds) const
-{
-  return *this - Time(_seconds);
 }
 
 /////////////////////////////////////////////////
@@ -657,14 +629,6 @@ Time Time::operator *(const Time &_time) const
 }
 
 /////////////////////////////////////////////////
-Time Time::operator *(const double _seconds) const
-{
-  Time t(this->Double() * _seconds);
-  t.Correct();
-  return t;
-}
-
-/////////////////////////////////////////////////
 const Time &Time::operator *=(const Time &_time)
 {
   this->Set(this->Double() * _time.Double());
@@ -676,18 +640,6 @@ const Time &Time::operator *=(const Time &_time)
 Time Time::operator /(const struct timeval &_tv) const
 {
   return (*this) / Time(_tv);
-}
-
-/////////////////////////////////////////////////
-Time Time::operator /(int _seconds) const
-{
-  return (*this) / Time(_seconds, 0);
-}
-
-/////////////////////////////////////////////////
-Time Time::operator /(double _seconds) const
-{
-  return (*this) / Time(_seconds);
 }
 
 /////////////////////////////////////////////////

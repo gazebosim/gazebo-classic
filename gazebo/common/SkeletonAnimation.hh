@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_SKELETONANIMATION_HH_
-#define GAZEBO_COMMON_SKELETONANIMATION_HH_
+#ifndef _GAZEBO_SKELETONANIMATION_HH_
+#define _GAZEBO_SKELETONANIMATION_HH_
 
 #include <map>
 #include <utility>

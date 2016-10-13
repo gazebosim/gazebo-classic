@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_MATERIAL_HH_
-#define GAZEBO_COMMON_MATERIAL_HH_
+#ifndef _MATERIAL_HH_
+#define _MATERIAL_HH_
 
 #include <string>
 #include <iostream>

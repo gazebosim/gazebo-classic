@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_TIME_HH_
-#define GAZEBO_COMMON_TIME_HH_
+
+#ifndef _GAZEBO_COMMON_TIME_HH_
+#define _GAZEBO_COMMON_TIME_HH_
 
 #include <string>
 #include <stdlib.h>
@@ -76,11 +77,11 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
-      public: explicit Time(const struct timeval &_tv);
+      public: Time(const struct timeval &_tv);
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
-      public: explicit Time(const struct timespec &_tv);
+      public: Time(const struct timespec &_tv);
 
       /// \brief Constructor
       /// \param[in] _sec Seconds
@@ -89,7 +90,7 @@ namespace gazebo
 
       /// \brief Constuctor
       /// \param[in] _time Time in double format sec.nsec
-      public: explicit Time(double _time);
+      public: Time(double _time);
 
       /// \brief Destructor
       public: virtual ~Time();
@@ -160,11 +161,6 @@ namespace gazebo
       /// \return a reference to this instance
       public: Time &operator =(const Time &_time);
 
-      /// \brief Assignment operator
-      /// \param[in] _seconds the new time
-      /// \return a reference to this instance
-      public: Time &operator =(const double _seconds);
-
       /// \brief Addition operators
       /// \param[in] _tv the time to add
       /// \return a Time instance
@@ -174,11 +170,6 @@ namespace gazebo
       /// \param[in] _tv the time to add
       /// \return a Time instance
       public: Time operator +(const struct timespec &_tv) const;
-
-      /// \brief Addition operators
-      /// \param[in] _seconds The time to add
-      /// \return a Time instance
-      public: Time operator +(const double _seconds) const;
 
       /// \brief Addition assignment operator
       /// \param[in] _tv the time to add
@@ -200,11 +191,6 @@ namespace gazebo
       /// \return a Time instance
       public: const Time &operator +=(const Time &_time);
 
-      /// \brief Addition assignemtn operator
-      /// \param[in] _seconds The number of seconds to add
-      /// \return a Time instance
-      public: const Time &operator +=(const double _seconds);
-
       /// \brief Subtraction operator
       /// \param[in] _tv The time to subtract
       /// \return a Time instance
@@ -219,11 +205,6 @@ namespace gazebo
       /// \param[in] _tv The time to subtract
       /// \return a Time instance
       public: Time operator -(const struct timespec &_tv) const;
-
-      /// \brief Subtraction operator
-      /// \param[in] _seconds The time to subtract
-      /// \return a Time instance
-      public: Time operator -(double _seconds) const;
 
       /// \brief Subtraction assignment operator
       /// \param[in] _tv The time to subtract
@@ -266,11 +247,6 @@ namespace gazebo
       public: Time operator *(const Time &_time) const;
 
       /// \brief Multiplication operators
-      /// \param[in] _seconds the scaling factor
-      /// \return a scaled Time instance
-      public: Time operator *(const double _second) const;
-
-      /// \brief Multiplication operators
       /// \param[in] _time scale factor
       /// \return a scaled Time instance
       public: const Time &operator *=(const Time &_time);
@@ -289,16 +265,6 @@ namespace gazebo
       /// \param[in] _tv a timespec divisor
       /// \return a Time instance
       public: Time operator /(const struct timespec &_tv) const;
-
-      /// \brief Division operator
-      /// \param[in] _sec Seconds divisor
-      /// \return a Time instance
-      public: Time operator /(int _seconds) const;
-
-      /// \brief Division operator
-      /// \param[in] _sec Seconds divisor
-      /// \return a Time instance
-      public: Time operator /(double _seconds) const;
 
       /// \brief Division assignment operator
       /// \param[in] _tv a divisor

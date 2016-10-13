@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GAZEBO_COMMON_SVGLOADER_HH_
-#define GAZEBO_COMMON_SVGLOADER_HH_
+#ifndef _GAZEBO_SVGLOADER_HH_
+#define _GAZEBO_SVGLOADER_HH_
 
 #include <stdexcept>
 #include <string>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_MESH_HH_
-#define GAZEBO_COMMON_MESH_HH_
+#ifndef _MESH_HH_
+#define _MESH_HH_
 
 #include <vector>
 #include <string>

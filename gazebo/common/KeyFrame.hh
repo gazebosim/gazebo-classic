@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_COMMON_KEYFRAME_HH_
-#define GAZEBO_COMMON_KEYFRAME_HH_
+#ifndef _KEYFRAME_HH_
+#define _KEYFRAME_HH_
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
