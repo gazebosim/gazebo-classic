@@ -47,7 +47,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Name of the parent visual.
-      public: Projector(VisualPtr _parent);
+      public: explicit Projector(VisualPtr _parent);
 
       /// \brief Destructor.
       public: virtual ~Projector();

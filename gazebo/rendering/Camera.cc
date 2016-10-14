@@ -389,9 +389,9 @@ void Camera::Update()
       yawError += M_PI*2;
 
     double pitchAdj = this->dataPtr->trackVisualPitchPID.Update(
-        pitchError, 0.01);
+        pitchError, common::Time(0.01));
     double yawAdj = this->dataPtr->trackVisualYawPID.Update(
-        yawError, 0.01);
+        yawError, common::Time(0.01));
 
     this->SetWorldRotation(ignition::math::Quaterniond(0, currPitch + pitchAdj,
           currYaw + yawAdj));
@@ -1323,7 +1323,16 @@ bool Camera::ResetVideo()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
+  unsigned int fsaa = 0;
+
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   // Full-screen anti-aliasing only works correctly in 1.8 and above
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
