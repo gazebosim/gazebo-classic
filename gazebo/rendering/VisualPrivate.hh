@@ -216,7 +216,7 @@ namespace gazebo
 
       /// \brief Vector of visuals which will be generated on demand.
       public: std::vector<std::pair<Visual::VisualType,
-          const google::protobuf::Message *>> pendingChildren;
+          google::protobuf::Message *>> pendingChildren;
     };
     /// \}
   }

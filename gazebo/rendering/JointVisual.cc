@@ -172,10 +172,14 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     // if set to use parent model frame
     // rotate the arrow visual relative to the model
     VisualPtr model = this->GetRootVisual();
-    math::Quaternion quatFromModel =
-        model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
-    _arrowVisual->SetRotation(quatFromModel.GetInverse() *
-        _arrowVisual->GetRotation());
+    sdf::ElementPtr modelSDF = model->GetSDF();
+    ignition::math::Pose3d initPose =
+        modelSDF->Get<ignition::math::Pose3d>("pose");
+
+    ignition::math::Quaterniond quatFromModel =
+        initPose.Rot().Inverse()*this->GetWorldPose().rot.Ign();
+     _arrowVisual->SetRotation(quatFromModel.Inverse() *
+        _arrowVisual->GetRotation().Ign());
   }
   _arrowVisual->ShowRotation(_type == msgs::Joint::REVOLUTE ||
                              _type == msgs::Joint::REVOLUTE2 ||

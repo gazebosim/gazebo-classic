@@ -208,6 +208,8 @@ Visual::~Visual()
   this->dataPtr->parent.reset();
   this->dataPtr->children.clear();
 
+  delete this->dataPtr->typeMsg;
+
   delete this->dataPtr;
   this->dataPtr = 0;
 }
@@ -2930,17 +2932,13 @@ void Visual::ShowCollision(bool _show)
         continue;
       }
 
-      auto constMsg = dynamic_cast<const msgs::Visual *>(it->second);
-      if (!constMsg)
+      auto msg = dynamic_cast<msgs::Visual *>(it->second);
+      if (!msg)
       {
         gzerr << "Wrong message to generate collision visual." << std::endl;
       }
       else
       {
-        // Copy to non const message
-        msgs::Visual *msg = new msgs::Visual();
-        msg->CopyFrom(*constMsg);
-
         // Set orange transparent material
         msg->mutable_material()->mutable_script()->add_uri(
             "file://media/materials/scripts/gazebo.material");
@@ -2962,10 +2960,9 @@ void Visual::ShowCollision(bool _show)
         visual->SetVisible(_show);
         visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
         visual->SetWireframe(this->dataPtr->scene->Wireframe());
-
-        delete msg;
       }
 
+      delete msg;
       this->dataPtr->pendingChildren.erase(it);
     }
   }
@@ -3066,6 +3063,7 @@ void Visual::ShowJoints(bool _show)
           jointVis->SetId(msg->id());
       }
 
+      delete msg;
       this->dataPtr->pendingChildren.erase(it);
     }
   }
