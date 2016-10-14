@@ -241,11 +241,11 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _materialName Name of material
-      public: TerrainMaterial(Ogre::String _materialName);
+      public: TerrainMaterial(const std::string &_materialName);
 
       /// \brief Set terrain material
       /// \param[in] _materialName Name of material
-      public: void setMaterialByName(const Ogre::String _materialname);
+      public: void setMaterialByName(const std::string &_materialname);
 
       /// \brief Subclassed to provide profile-specific material generation
       class Profile : public Ogre::TerrainMaterialGenerator::Profile
@@ -271,6 +271,9 @@ namespace gazebo
             const Ogre::Terrain *_terrain);
 
         // Documentation Inherited
+        public: void setLightmapEnabled(bool _enabled);
+
+        // Documentation Inherited
         public: Ogre::uint8 getMaxLayers(const Ogre::Terrain *_terrain) const;
 
         // Documentation Inherited
@@ -286,7 +289,7 @@ namespace gazebo
       };
 
       /// \brief Name of material
-      protected:  Ogre::String mMaterialName;
+      protected: std::string materialName;
     };
 
 

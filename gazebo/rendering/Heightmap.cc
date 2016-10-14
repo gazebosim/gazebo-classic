@@ -3107,18 +3107,18 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 /////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
-TerrainMaterial::TerrainMaterial(Ogre::String _materialname)
+TerrainMaterial::TerrainMaterial(const std::string &_materialname)
 {
-  mMaterialName = _materialname;
-  mProfiles.push_back(OGRE_NEW Profile(this, "OgreMaterial",
+  this->materialName = _materialname;
+  this->mProfiles.push_back(OGRE_NEW Profile(this, "OgreMaterial",
       "Profile for rendering Ogre standard material"));
-  setActiveProfile("OgreMaterial");
+  this->setActiveProfile("OgreMaterial");
 }
 
 //////////////////////////////////////////////////
-void TerrainMaterial::setMaterialByName(const Ogre::String _materialname)
+void TerrainMaterial::setMaterialByName(const std::string &_materialname)
 {
-  mMaterialName = _materialname;
+  this->materialName = _materialname;
 }
 
 //////////////////////////////////////////////////
@@ -3152,7 +3152,7 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
 
   // Set Ogre material
   mat = Ogre::MaterialManager::getSingleton().getByName(
-      (dynamic_cast<TerrainMaterial *>(getParent()))->mMaterialName);
+      (dynamic_cast<TerrainMaterial *>(getParent()))->materialName);
 
   // Get default pass
   Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
@@ -3172,6 +3172,11 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generateForCompositeMap(
     const Ogre::Terrain *_terrain)
 {
   return _terrain->_getCompositeMapMaterial();
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::setLightmapEnabled(bool /*_enabled*/)
+{
 }
 
 //////////////////////////////////////////////////
