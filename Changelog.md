@@ -88,7 +88,7 @@
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
     * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
-    * [Pull request #xxxx](https://bitbucket.org/osrf/gazebo/pull-request/xxxx)
+    * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
