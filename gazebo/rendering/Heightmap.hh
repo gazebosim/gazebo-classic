@@ -289,6 +289,10 @@ namespace gazebo
       /// \param[in] _materialName Name of the material
       public: void SetMaterial(const std::string &_materialName);
 
+      /// \brief Get the custom material name used for the terrain.
+      /// \return Custom material name.
+      public: std::string MaterialName() const;
+
       /// \brief Create terrain material generator. There are two types:
       /// custom material generator that support user material scripts,
       /// and a default material generator that uses our own glsl shader

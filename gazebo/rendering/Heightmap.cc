@@ -1048,6 +1048,12 @@ void Heightmap::SetMaterial(const std::string &_materialName)
 }
 
 /////////////////////////////////////////////////
+std::string Heightmap::MaterialName() const
+{
+  return this->dataPtr->materialName;
+}
+
+/////////////////////////////////////////////////
 void Heightmap::CreateMaterial()
 {
   if (!this->dataPtr->materialName.empty())
@@ -3035,7 +3041,8 @@ TerrainMaterial::TerrainMaterial(Ogre::String _materialname)
 }
 
 //////////////////////////////////////////////////
-void TerrainMaterial::setMaterialByName(const Ogre::String _materialname) {
+void TerrainMaterial::setMaterialByName(const Ogre::String _materialname)
+{
   mMaterialName = _materialname;
 }
 
@@ -3064,7 +3071,7 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
 
   // Set Ogre material
   mat = Ogre::MaterialManager::getSingleton().getByName(
-      ((TerrainMaterial*)getParent())->mMaterialName);
+      (dynamic_cast<TerrainMaterial *>(getParent()))->mMaterialName);
 
   // Get default pass
   Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
@@ -3109,7 +3116,8 @@ void TerrainMaterial::Profile::updateParamsForCompositeMap(
 void TerrainMaterial::Profile::requestOptions(Ogre::Terrain *_terrain)
 {
   _terrain->_setMorphRequired(true);
-  _terrain->_setNormalMapRequired(true); // enable global normal map
+  // enable global normal map
+  _terrain->_setNormalMapRequired(true);
   _terrain->_setLightMapRequired(false);
   _terrain->_setCompositeMapRequired(false);
 }

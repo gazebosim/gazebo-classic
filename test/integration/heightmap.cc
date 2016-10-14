@@ -28,6 +28,21 @@
 
 using namespace gazebo;
 
+std::mutex mutex;
+unsigned char* img = NULL;
+
+/////////////////////////////////////////////////
+void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
+                  const unsigned char *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &/*_format*/)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  memcpy(_imageDest, _image, _width * _height * _depth);
+  *_imageCounter += 1;
+}
+
 class HeightmapTest : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
@@ -35,6 +50,7 @@ class HeightmapTest : public ServerFixture,
   public: void WhiteAlpha(const std::string &_physicsEngine);
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
   public: void Volume(const std::string &_physicsEngine);
+  public: void Material(const std::string &_physicsEngine);
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -357,6 +373,81 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 */
 
 /////////////////////////////////////////////////
+void HeightmapTest::Material(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    return;
+  }
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // load a heightmap with red material
+  Load("worlds/heightmap_material.world", false, _physicsEngine);
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model != NULL);
+
+  // spawn camera sensor to capture an image of heightmap
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d testPose(
+      ignition::math::Vector3d(0, 0, 10),
+      ignition::math::Quaterniond(0, 1.57, 0));
+  SpawnCamera(modelName, cameraName, testPose.Pos(),
+      testPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  int imageCount = 0;
+  img = new unsigned char[width*height*3];
+  event::ConnectionPtr c =
+      camSensor->Camera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+
+  // grab some images
+  int sleep = 0;
+  int maxSleep = 500;
+  int total_images = 10;
+  while (imageCount < total_images && sleep++ < maxSleep )
+    common::Time::MSleep(10);
+  EXPECT_GE(imageCount, total_images);
+
+  camSensor->Camera()->DisconnectNewImageFrame(c);
+
+  unsigned int rSum = 0;
+  unsigned int gSum = 0;
+  unsigned int bSum = 0;
+  for (unsigned int i = 0; i < height*width*3; i+=3)
+  {
+    unsigned int r = img[i];
+    unsigned int g = img[i+1];
+    unsigned int b = img[i+2];
+    rSum += r;
+    gSum += g;
+    bSum += b;
+  }
+
+  // verify that red is the dominant color in the image
+  EXPECT(rSum > gSum);
+  EXPECT(rSum > bSum);
+  delete [] img;
+
+  std::cerr << rSum << " " << gSum << " " << bSum << std::endl;
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -403,6 +494,12 @@ TEST_P(HeightmapTest, Heights)
   Heights(GetParam());
 }
 */
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, Material)
+{
+  Material(GetParam());
+}
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, HeightmapTest, PHYSICS_ENGINE_VALUES);
 

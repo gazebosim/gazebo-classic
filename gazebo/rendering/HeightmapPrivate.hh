@@ -230,39 +230,57 @@ namespace gazebo
 
     /// \internal
     /// \brief Custom terrain material generator.
-    /// A custom material generator that lets user specify their own material script
-    /// for rendering the heightmap.
+    /// A custom material generator that lets user specify their own material
+    /// script for rendering the heightmap.
     class TerrainMaterial : public Ogre::TerrainMaterialGenerator
     {
+      /// \brief Constructor
+      /// \param[in] _materialName Name of material
       public: TerrainMaterial(Ogre::String _materialName);
 
+      /// \brief Set terrain material
+      /// \param[in] _materialName Name of material
       public: void setMaterialByName(const Ogre::String _materialname);
 
+      /// \brief Subclassed to provide profile-specific material generation
       class Profile : public Ogre::TerrainMaterialGenerator::Profile
       {
+        /// \brief Constructor
+        /// \param[in] _parent Ogre terrain material generator object
+        /// \param[in] _name Name of the profile
+        /// \param[on] _desc Profile description
         public: Profile(Ogre::TerrainMaterialGenerator *_parent,
             const Ogre::String &_name, const Ogre::String &_desc);
 
+        /// \brief Destructor.
         public: ~Profile();
 
+        // Documentation Inherited
         public: bool isVertexCompressionSupported() const { return false; }
 
+        // Documentation Inherited
         public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
 
+        // Documentation Inherited
         public: Ogre::MaterialPtr generateForCompositeMap(
             const Ogre::Terrain *_terrain);
 
+        // Documentation Inherited
         public: Ogre::uint8 getMaxLayers(const Ogre::Terrain *_terrain) const;
 
+        // Documentation Inherited
         public: void updateParams(const Ogre::MaterialPtr& mat,
             const Ogre::Terrain *_terrain);
 
+        // Documentation Inherited
         public: void updateParamsForCompositeMap(const Ogre::MaterialPtr& mat,
             const Ogre::Terrain *_terrain);
 
+        // Documentation Inherited
         public: void requestOptions(Ogre::Terrain *_terrain);
-
       };
+
+      /// \brief Name of material
       protected:  Ogre::String mMaterialName;
     };
 
