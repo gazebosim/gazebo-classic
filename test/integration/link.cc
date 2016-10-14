@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <string.h>
+
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
