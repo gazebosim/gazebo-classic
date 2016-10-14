@@ -256,7 +256,7 @@ namespace gazebo
         public: ~Profile();
 
         // Documentation Inherited
-        public: bool isVertexCompressionSupported() const { return false; }
+        public: bool isVertexCompressionSupported() const;
 
         // Documentation Inherited
         public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
@@ -365,7 +365,7 @@ namespace gazebo
       public: ignition::math::Vector3d terrainOrigin;
 
       /// \brief Global options.
-      public: Ogre::TerrainGlobalOptions *terrainGlobals;
+      public: Ogre::TerrainGlobalOptions *terrainGlobals = nullptr;
 
       /// \brief Group of terrains.
       public: Ogre::TerrainGroup *terrainGroup;
@@ -392,17 +392,17 @@ namespace gazebo
       public: std::vector<float> heights;
 
       /// \brief Pointer to the terrain material generator.
-      public: GzTerrainMatGen *gzMatGen;
+      public: GzTerrainMatGen *gzMatGen = nullptr;
 
       /// \brief A page provider is needed to use the paging system.
       public: DummyPageProvider dummyPageProvider;
 
       /// \brief Central registration point for extension classes,
       /// such as the PageStrategy, PageContentFactory.
-      public: Ogre::PageManager *pageManager;
+      public: Ogre::PageManager *pageManager = nullptr;
 
       /// \brief Type of paging applied
-      public: Ogre::TerrainPaging *terrainPaging;
+      public: Ogre::TerrainPaging *terrainPaging = nullptr;
 
       /// \brief Collection of world content
       public: Ogre::PagedWorld *world;

@@ -381,18 +381,10 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
     return;
   }
 
-  // Make sure the render engine is available.
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-  {
-    gzerr << "No rendering engine, unable to run camera test\n";
-    return;
-  }
-
   // load a heightmap with red material
   Load("worlds/heightmap_material.world", false, _physicsEngine);
-  physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model != NULL);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  EXPECT_TRUE(heightmap != NULL);
 
   // spawn camera sensor to capture an image of heightmap
   std::string modelName = "camera_model";
@@ -440,11 +432,10 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
   }
 
   // verify that red is the dominant color in the image
-  EXPECT(rSum > gSum);
-  EXPECT(rSum > bSum);
-  delete [] img;
+  EXPECT_GT(rSum, gSum);
+  EXPECT_GT(rSum, bSum);
 
-  std::cerr << rSum << " " << gSum << " " << bSum << std::endl;
+  delete [] img;
 }
 
 /////////////////////////////////////////////////
