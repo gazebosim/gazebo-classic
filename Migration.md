@@ -63,6 +63,12 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/Visual.hh**
+    + ***Deprecation:*** public: void SetScale(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** public: void SetPosition(const math::Vector3 &_pos)
+    + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_pos)
+
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose)

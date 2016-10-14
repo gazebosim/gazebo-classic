@@ -389,9 +389,9 @@ void Camera::Update()
       yawError += M_PI*2;
 
     double pitchAdj = this->dataPtr->trackVisualPitchPID.Update(
-        pitchError, common::Time(0.01));
+        pitchError, 0.01);
     double yawAdj = this->dataPtr->trackVisualYawPID.Update(
-        yawError, common::Time(0.01));
+        yawError, 0.01);
 
     this->SetWorldRotation(ignition::math::Quaterniond(0, currPitch + pitchAdj,
           currYaw + yawAdj));

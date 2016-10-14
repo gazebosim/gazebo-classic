@@ -2402,9 +2402,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
-      geomScale.X() = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.Y() = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.Z() = _msg->geometry().cylinder().length();
+      geomScale.X(_msg->geometry().cylinder().radius() * 2.0);
+      geomScale.Y(_msg->geometry().cylinder().radius() * 2.0);
+      geomScale.Z(_msg->geometry().cylinder().length());
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
     {
@@ -2415,8 +2415,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
       if (_msg->geometry().plane().has_size())
       {
-        geomScale.X() = _msg->geometry().plane().size().x();
-        geomScale.Y() = _msg->geometry().plane().size().y();
+        geomScale.X(_msg->geometry().plane().size().x());
+        geomScale.Y(_msg->geometry().plane().size().y());
       }
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
