@@ -147,8 +147,11 @@ void DARTMesh::CreateMesh(float *_vertices, int *_indices,
 
   dart::dynamics::ShapePtr dtMeshShape(new dart::dynamics::MeshShape(
       DARTTypes::ConvVec3(_scale), assimpScene));
-  GZ_ASSERT(_collision->GetDARTBodyNode(), "DART _collision->GetDARTBodyNode() is null");
+  GZ_ASSERT(_collision->GetDARTBodyNode(),
+            "DART _collision->GetDARTBodyNode() is null");
 
-  _collision->GetDARTBodyNode()->createShapeNodeWith<dart::dynamics::VisualAspect,
-      dart::dynamics::CollisionAspect, dart::dynamics::DynamicsAspect>(dtMeshShape);
+  _collision->GetDARTBodyNode()->createShapeNodeWith<
+      dart::dynamics::VisualAspect,
+      dart::dynamics::CollisionAspect,
+      dart::dynamics::DynamicsAspect>(dtMeshShape);
 }

@@ -45,7 +45,7 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~DARTPlaneShape();
-      
+
       // Documentation inherited
       public: virtual void Init();
 

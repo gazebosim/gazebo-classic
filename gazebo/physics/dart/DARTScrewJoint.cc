@@ -195,7 +195,8 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 {
-  this->threadPitch = _threadPitch;  // TODO Do we really need to set thread pitch twice here?
+  // TODO Do we really need to set thread pitch twice here?
+  this->threadPitch = _threadPitch;
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(

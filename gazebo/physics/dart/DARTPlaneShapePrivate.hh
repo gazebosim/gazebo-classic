@@ -38,21 +38,25 @@ namespace gazebo
       public: ~DARTPlaneShapePrivate() = default;
 
       public: dart::dynamics::BoxShape* GetShape()
-      { 
+      {
         GZ_ASSERT(dtBoxShape.get() != nullptr, "BodyNode is NULL");
-        return static_cast<dart::dynamics::BoxShape*> (dtBoxShape->getShape().get()); 
+        return static_cast<dart::dynamics::BoxShape*>
+          (dtBoxShape->getShape().get());
       }
 
       public: dart::dynamics::ShapeNodePtr GetShapeNode()
       {
-        return dtBoxShape; 
+        return dtBoxShape;
       }
-      
-      public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode) 
+
+      public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode)
       {
-          GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
-          dart::dynamics::ShapePtr shape (new dart::dynamics::BoxShape(Eigen::Vector3d(2100, 2100, 2100)));
-          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<dart::dynamics::VisualAspect,
+          GZ_ASSERT(bodyNode.get() != nullptr,
+                    "BodyNode is NULL");
+          dart::dynamics::ShapePtr shape(new dart::dynamics::BoxShape(
+                                           Eigen::Vector3d(2100, 2100, 2100)));
+          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<
+                                        dart::dynamics::VisualAspect,
                                         dart::dynamics::CollisionAspect,
                                         dart::dynamics::DynamicsAspect>(shape);
           Eigen::Isometry3d trans = Eigen::Isometry3d::Identity();

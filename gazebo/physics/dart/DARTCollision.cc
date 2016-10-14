@@ -59,7 +59,6 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -70,7 +69,7 @@ void DARTCollision::Init()
   // Create the collision shapes. Since DART6, this has to be done in
   // Init(), because the BodyNode will only have been created in Load()
   // and is not guaranteed to exist before.
-  
+
   // Set the pose offset.
   if (this->dataPtr->dtCollisionShape)
   {
@@ -88,9 +87,9 @@ void DARTCollision::Init()
         return;
       }*/
       Eigen::Isometry3d tf = DARTTypes::ConvPose(this->GetRelativePose());
-      //bn->getParentJoint()->setTransformFromParentBodyNode(tf);
+      // bn->getParentJoint()->setTransformFromParentBodyNode(tf);
       this->dataPtr->dtCollisionShape->setRelativeTransform(tf);
-      //this->dataPtr->dtCollisionShape->setLocalTransform(
+      // this->dataPtr->dtCollisionShape->setLocalTransform(
       //      DARTTypes::ConvPose(this->GetRelativePose()));
     }
   }
@@ -150,7 +149,7 @@ dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
 void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape * /* *_shape*/,
                                           bool _placeable)
 {
-  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool) instead.\n";
+  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool)\n";
   Collision::SetCollision(_placeable);
 }
 
@@ -158,12 +157,13 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape * /* *_shape*/,
 void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr /* _shape*/,
                                           bool _placeable)
 {
-  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool) instead.\n";
+  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool)\n";
   Collision::SetCollision(_placeable);
 }
-      
+
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShapeNode(dart::dynamics::ShapeNodePtr _shape,
+void DARTCollision::SetDARTCollisionShapeNode(
+                                          dart::dynamics::ShapeNodePtr _shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);

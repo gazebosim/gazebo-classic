@@ -41,7 +41,7 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~DARTBoxShape();
-      
+
       // Documentation inherited.
       public: virtual void Init();
 

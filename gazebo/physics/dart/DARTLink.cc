@@ -174,7 +174,8 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   {
     // Create DART BodyNode properties
     this->dataPtr->dtProperties.reset(
-          new dart::dynamics::BodyNode::Properties(dart::dynamics::BodyNode::AspectProperties(bodyName)));
+          new dart::dynamics::BodyNode::Properties(
+                 dart::dynamics::BodyNode::AspectProperties(bodyName)));
   }
 
 /*  for (auto child : this->children)
@@ -749,7 +750,8 @@ void DARTLink::SetSelfCollide(bool _collide)
   if (dtBodyNode->getSkeleton() == nullptr)
     return;
 
-  dart::simulation::WorldPtr dtWorld = this->dataPtr->dartPhysics->GetDARTWorldPtr();
+  dart::simulation::WorldPtr dtWorld =
+      this->dataPtr->dartPhysics->GetDARTWorldPtr();
   dart::dynamics::SkeletonPtr dtSkeleton = dtBodyNode->getSkeleton();
   dart::collision::CollisionDetectorPtr dtCollDet =
       dtWorld->getConstraintSolver()->getCollisionDetector();

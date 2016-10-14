@@ -96,8 +96,9 @@ namespace gazebo
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
-      public: void SetDARTCollisionShapeNode(dart::dynamics::ShapeNodePtr _shape,
-                                         bool _placeable = true);
+      public: void SetDARTCollisionShapeNode(
+                           dart::dynamics::ShapeNodePtr _shape,
+                           bool _placeable = true);
 
 
       /// \brief Get DART collision shape.

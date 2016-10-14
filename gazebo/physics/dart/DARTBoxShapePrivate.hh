@@ -39,20 +39,23 @@ namespace gazebo
 
       public: dart::dynamics::ShapeNodePtr GetShapeNode()
       {
-        return dtBoxShape; 
+        return dtBoxShape;
       }
 
       public: dart::dynamics::BoxShape* GetShape()
-      { 
+      {
         GZ_ASSERT(dtBoxShape.get() != nullptr, "BoxShape is NULL");
-        return static_cast<dart::dynamics::BoxShape*> (dtBoxShape->getShape().get()); 
+        return static_cast<dart::dynamics::BoxShape*>
+                        (dtBoxShape->getShape().get());
       }
 
       public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode)
       {
           GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
-          dart::dynamics::ShapePtr shape(new dart::dynamics::BoxShape(Eigen::Vector3d(1, 1, 1)));
-          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<dart::dynamics::VisualAspect,
+          dart::dynamics::ShapePtr shape(
+            new dart::dynamics::BoxShape(Eigen::Vector3d(1, 1, 1)));
+          dart::dynamics::ShapeNode * node =
+            bodyNode->createShapeNodeWith<dart::dynamics::VisualAspect,
                                         dart::dynamics::CollisionAspect,
                                         dart::dynamics::DynamicsAspect>(shape);
           dtBoxShape.set(node);
