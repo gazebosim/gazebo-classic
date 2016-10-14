@@ -36,6 +36,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace common
+  {
+    class HeightmapData;
+  }
+
   namespace rendering
   {
     /// \internal
@@ -421,7 +426,13 @@ namespace gazebo
 
       /// \brief Name of custom material to use for the terrain. If empty,
       /// default material with glsl shader will be used.
+
       public: std::string materialName;
+      /// \brief Filename of the terrain data
+      public: std::string filename;
+
+      /// \brief Pointer to heightmap data
+      public: common::HeightmapData *heightmapData = nullptr;
     };
   }
 }
