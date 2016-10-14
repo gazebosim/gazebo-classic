@@ -217,6 +217,9 @@ namespace gazebo
       /// \brief Vector of visuals which will be generated on demand.
       public: std::vector<std::pair<Visual::VisualType,
           google::protobuf::Message *>> pendingChildren;
+
+      /// \brief The initial pose of the visual.
+      public: ignition::math::Pose3d initialRelativePose;
     };
     /// \}
   }

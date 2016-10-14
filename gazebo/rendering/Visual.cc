@@ -380,6 +380,7 @@ void Visual::Load()
 
   // Set the pose of the scene node
   this->SetPose(pose);
+  this->dataPtr->initialRelativePose = pose.Ign();
 
   // Get the size of the mesh
   if (obj)
@@ -1768,6 +1769,12 @@ math::Pose Visual::GetPose() const
   pos.pos = this->GetPosition();
   pos.rot = this->GetRotation();
   return pos;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Visual::InitialRelativePose() const
+{
+  return this->dataPtr->initialRelativePose;
 }
 
 //////////////////////////////////////////////////
@@ -3417,7 +3424,7 @@ void Visual::SetTypeMsg(const google::protobuf::Message *_msg)
 }
 
 //////////////////////////////////////////////////
-void Visual::PushPendingChild(std::pair<VisualType,
+void Visual::AddPendingChild(std::pair<VisualType,
     const google::protobuf::Message *> _pair)
 {
   // Copy msg
@@ -3426,4 +3433,3 @@ void Visual::PushPendingChild(std::pair<VisualType,
 
   this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
 }
-

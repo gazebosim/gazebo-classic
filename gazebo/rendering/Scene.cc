@@ -2428,7 +2428,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     return false;
   }
 
-  childVis->PushPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
+  childVis->AddPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
   childVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
@@ -2777,7 +2777,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       return false;
     }
 
-    parent->second->PushPendingChild(std::make_pair(_type, &*_msg));
+    parent->second->AddPendingChild(std::make_pair(_type, &*_msg));
     parent->second->ShowCollision(this->dataPtr->showCollisions);
 
     return true;
