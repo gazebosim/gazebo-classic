@@ -95,9 +95,6 @@ namespace gazebo
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;
 
-      /// \brief Input for cutom paths.
-      private: QLineEdit *addPathEdit;
-
       /// \breif Button to add a cutom models path.
       private: QPushButton *addPathButton;
     };

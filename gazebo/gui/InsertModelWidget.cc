@@ -79,9 +79,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   mainLayout->addWidget(this->addPathButton);
   // Connect button signal to appropriate slot.
   connect(this->addPathButton, SIGNAL(released()), this,
-   SLOT(HandleButton()));
-  this->addPathEdit = new QLineEdit;
-  this->addPathEdit->setReadOnly(true);
+  SLOT(HandleButton()));
 
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
@@ -157,12 +155,10 @@ void InsertModelWidget::HandleButton()
     if (selected.empty())
       return;
 
-    this->addPathEdit->setText(selected[0] );
-  
   common::SystemPaths::Instance()->AddModelPaths(
-    this->addPathEdit->text().toStdString());
-  
-  this->UpdateLocalPath(this->addPathEdit->text().toStdString());
+    selected[0].toStdString());
+
+  this->UpdateLocalPath(selected[0].toStdString());
   }
 }
 
