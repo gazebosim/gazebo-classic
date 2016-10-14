@@ -65,6 +65,7 @@ class gazebo::common::VideoEncoderPrivate
   ///        recorded.
   public: std::string filename;
 
+#ifdef HAVE_FFMPEG
   /// \brief libav audio video stream
   public: AVStream *videoStream = nullptr;
 
@@ -86,6 +87,7 @@ class gazebo::common::VideoEncoderPrivate
 
   /// \brief Software scaling context
   public: SwsContext *swsCtx = nullptr;
+#endif
 
   /// \brief True if the encoder is running
   public: bool encoding = false;
@@ -142,6 +144,7 @@ unsigned int VideoEncoder::BitRate() const
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_FFMPEG
 bool VideoEncoder::Start(const std::string &_format,
                          const std::string &_filename,
                          const unsigned int _width,
@@ -219,13 +222,8 @@ bool VideoEncoder::Start(const std::string &_format,
     }
   }
 
-  // The resolution must be divisible by two
-  unsigned int outWidth = _width % 2 == 0 ? _width : _width + 1;
-  unsigned int outHeight = _height % 2 == 0 ? _height : _height + 1;
-
   // The remainder of this function handles FFMPEG initialization of a video
   // stream
-#ifdef HAVE_FFMPEG
   AVOutputFormat *outputFormat = nullptr;
 
   // This 'if' and 'free' are just for safety. We chech the value of formatCtx
@@ -364,9 +362,9 @@ bool VideoEncoder::Start(const std::string &_format,
   // Bitrate
   this->dataPtr->codecCtx->bit_rate = this->dataPtr->bitRate;
 
-  // Resolution
-  this->dataPtr->codecCtx->width = outWidth;
-  this->dataPtr->codecCtx->height = outHeight;
+  // The resolution must be divisible by two
+  this->dataPtr->codecCtx->width = _width % 2 == 0 ? _width : _width + 1;
+  this->dataPtr->codecCtx->height = _height % 2 == 0 ? _height : _height + 1;
 
   // Emit one intra-frame every 10 frames
   this->dataPtr->codecCtx->gop_size = 10;
@@ -499,14 +497,22 @@ bool VideoEncoder::Start(const std::string &_format,
 
   this->dataPtr->encoding = true;
   return true;
+}
 // #else for HAVE_FFMPEG version check
 #else
+bool VideoEncoder::Start(const std::string &/*_format*/,
+                         const std::string &/*_filename*/,
+                         const unsigned int /*_width*/,
+                         const unsigned int /*_height*/,
+                         const unsigned int /*_fps*/,
+                         const unsigned int /*_bitRate*/)
+{
   gzwarn << "Encoding capability not available. "
       << "Please install libavcodec, libavformat and libswscale dev packages."
       << std::endl;
   return false;
-#endif
 }
+#endif
 
 ////////////////////////////////////////////////
 bool VideoEncoder::IsEncoding() const
