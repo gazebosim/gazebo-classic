@@ -18,7 +18,8 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
-set (internal_qt_headers)
+set (internal_qt_headers
+  VideoRecorder.hh)
 
 set (sources
   Actions.cc
@@ -57,6 +58,7 @@ set (sources
   TopicSelector.cc
   TopToolbar.cc
   UserCmdHistory.cc
+  VideoRecorder.cc
   ViewAngleWidget.cc
 )
 
@@ -190,7 +192,7 @@ gz_add_executable(gzclient main.cc ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
+add_definitions(-DBUILDING_DLL_GZ_GUI)
 
 target_link_libraries(gazebo_gui
   libgazebo_client

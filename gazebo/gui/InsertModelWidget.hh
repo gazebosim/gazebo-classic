@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _INSERT_MODEL_WIDGET_HH_
-#define _INSERT_MODEL_WIDGET_HH_
+#ifndef GAZEBO_GUI_INSERTMODELWIDGET_HH_
+#define GAZEBO_GUI_INSERTMODELWIDGET_HH_
 
 
 #include <string>
@@ -50,14 +50,6 @@ namespace gazebo
 
       /// \brief Check if input path is in the fileTreeWidget.
       public: bool LocalPathInFileWidget(const std::string &_path);
-
-      /// \brief Get the save location.
-      /// \return Path of the save location.
-      public: std::string GetSaveLocation() const;
-      
-      /// \brief Set the save location.
-      /// \param[in] _location Location to save to.
-      public: void SetSaveLocation(const std::string &_location);
 
       /// \brief Callback triggered when the ModelDatabase has returned
       /// the list of models.

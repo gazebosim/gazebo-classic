@@ -152,22 +152,7 @@ namespace gazebo
       /// collision objects.
       /// \return True if audio is played on contact.
       /// \sa AddCollision()
-      /// \deprecated See OnContact() const
-      public: bool GetOnContact() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Return true if the audio source is played on contact with
-      /// another object. Contact is determine based on a set of
-      /// collision objects.
-      /// \return True if audio is played on contact.
-      /// \sa AddCollision()
       public: bool OnContact() const;
-
-      /// \brief Get a vector of all the collision names.
-      /// \return All the collision names used to trigger audio playback on
-      /// contact.
-      /// \deprecated See CollisionNames() const
-      public: std::vector<std::string> GetCollisionNames() const
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a vector of all the collision names.
       /// \return All the collision names used to trigger audio playback on

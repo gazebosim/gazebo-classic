@@ -157,28 +157,13 @@ void InsertModelWidget::HandleButton()
     if (selected.empty())
       return;
 
-    // Substitute everything up to the model folder
-    std::string folder = this->GetSaveLocation();
-    folder = folder.substr(folder.rfind("/")+1);
-
-    this->SetSaveLocation(selected[0].toStdString() + "/" + folder);
+    this->addPathEdit->setText(selected[0] );
   
   common::SystemPaths::Instance()->AddModelPaths(
-    this->GetSaveLocation());
-  this->UpdateLocalPath(this->GetSaveLocation());
+    this->addPathEdit->text().toStdString());
+  
+  this->UpdateLocalPath(this->addPathEdit->text().toStdString());
   }
-}
-
-/////////////////////////////////////////////////
-void InsertModelWidget::SetSaveLocation(const std::string &_location)
-{
-  this->addPathEdit->setText(tr(_location.c_str()));
-}
-
-/////////////////////////////////////////////////
-std::string InsertModelWidget::GetSaveLocation() const
-{
-  return this->addPathEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
