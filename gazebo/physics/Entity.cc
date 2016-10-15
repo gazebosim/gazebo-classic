@@ -131,16 +131,7 @@ void Entity::Load(sdf::ElementPtr _sdf)
   if (this->HasType(Base::LINK))
     this->visualMsg->set_type(msgs::Visual::LINK);
   if (this->HasType(Base::COLLISION))
-  {
-    this->visualMsg->set_id(physics::getUniqueId());
-    this->visualMsg->set_name(this->GetScopedName() + "__COLLISION_VISUAL__");
     this->visualMsg->set_type(msgs::Visual::COLLISION);
-    if (this->sdf->HasElement("geometry"))
-    {
-      auto geom = this->visualMsg->mutable_geometry();
-      geom->CopyFrom(msgs::GeometryFromSDF(this->sdf->GetElement("geometry")));
-    }
-  }
 
   this->visPub->Publish(*this->visualMsg);
 

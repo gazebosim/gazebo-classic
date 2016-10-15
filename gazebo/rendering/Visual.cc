@@ -2944,7 +2944,7 @@ void Visual::ShowCollision(bool _show)
       {
         gzerr << "Wrong message to generate collision visual." << std::endl;
       }
-      else
+      else if (!this->dataPtr->scene->GetVisual(msg->name()))
       {
         // Set orange transparent material
         msg->mutable_material()->mutable_script()->add_uri(
@@ -3052,15 +3052,16 @@ void Visual::ShowJoints(bool _show)
       }
 
       auto msg = dynamic_cast<const msgs::Joint *>(it->second);
+      std::string jointVisName = msg->name() + "_JOINT_VISUAL__";
       if (!msg)
       {
         ++it;
         continue;
       }
-      else
+      else if (!this->dataPtr->scene->GetVisual(jointVisName))
       {
-        JointVisualPtr jointVis(new JointVisual(
-            msg->name() + "_JOINT_VISUAL__", shared_from_this()));
+        JointVisualPtr jointVis(new JointVisual(jointVisName,
+            shared_from_this()));
 
         auto msgPtr = new ConstJointPtr(msg);
         jointVis->Load(*msgPtr);
