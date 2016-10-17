@@ -100,7 +100,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPostRender(std::bind(&Camera::Update, this)));
+      event::Events::ConnectPreRender(std::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
@@ -366,43 +366,17 @@ void Camera::Update()
   }
   else if (this->dataPtr->trackedVisual)
   {
+    double scaling = 0;
     ignition::math::Vector3d direction =
       this->dataPtr->trackedVisual->GetWorldPose().pos.Ign() -
                               this->WorldPose().Pos();
 
-    double yaw = atan2(direction.Y(), direction.X());
-    double pitch = atan2(-direction.Z(),
-                         sqrt(pow(direction.X(), 2) + pow(direction.Y(), 2)));
-
-    Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-    ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
-      localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-    double currPitch = localRot.Euler().Y();
-    double currYaw = localRot.Euler().Z();
-
-    double pitchError = currPitch - pitch;
-
-    double yawError = currYaw - yaw;
-    if (yawError > M_PI)
-      yawError -= M_PI*2;
-    if (yawError < -M_PI)
-      yawError += M_PI*2;
-
-    double pitchAdj = this->dataPtr->trackVisualPitchPID.Update(
-        pitchError, 0.01);
-    double yawAdj = this->dataPtr->trackVisualYawPID.Update(
-        yawError, 0.01);
-
-    this->SetWorldRotation(ignition::math::Quaterniond(0, currPitch + pitchAdj,
-          currYaw + yawAdj));
-
-    double error = 0.0;
     if (!this->dataPtr->trackIsStatic)
     {
       if (direction.Length() < this->dataPtr->trackMinDistance)
-        error = this->dataPtr->trackMinDistance - direction.Length();
+        scaling = direction.Length() - this->dataPtr->trackMinDistance;
       else if (direction.Length() > this->dataPtr->trackMaxDistance)
-        error = this->dataPtr->trackMaxDistance - direction.Length();
+        scaling = direction.Length() - this->dataPtr->trackMaxDistance;
     }
     else
     {
@@ -410,7 +384,7 @@ void Camera::Update()
       {
         if (this->dataPtr->trackInheritYaw)
         {
-          yaw =
+          double yaw =
               this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
           ignition::math::Quaterniond rot =
               ignition::math::Quaterniond(0.0, 0.0, yaw);
@@ -425,10 +399,9 @@ void Camera::Update()
       {
         direction = this->dataPtr->trackPos - this->WorldPose().Pos();
       }
-      error = -direction.Length();
-    }
 
-    double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
+      scaling = direction.Length();
+    }
 
     ignition::math::Vector3d displacement = direction;
     displacement.Normalize();
@@ -711,6 +684,15 @@ void Camera::SetClipDist(const float _near, const float _far)
   elem->GetElement("far")->Set(_far);
 
   this->SetClipDist();
+}
+
+//////////////////////////////////////////////////
+void Camera::SetFixedYawAxis(const bool _useFixed,
+    const ignition::math::Vector3d &_fixedAxis)
+{
+  this->camera->setFixedYawAxis(_useFixed, Conversions::Convert(_fixedAxis));
+  this->dataPtr->yawFixed = _useFixed;
+  this->dataPtr->yawFixedAxis = _fixedAxis;
 }
 
 //////////////////////////////////////////////////
@@ -1323,7 +1305,16 @@ bool Camera::ResetVideo()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
+  unsigned int fsaa = 0;
+
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   // Full-screen anti-aliasing only works correctly in 1.8 and above
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
@@ -1364,7 +1355,7 @@ void Camera::CreateCamera()
   if (this->sdf->HasElement("projection_type"))
     this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
 
-  this->camera->setFixedYawAxis(false);
+  this->SetFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
 }
@@ -1573,9 +1564,16 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
+  {
     return this->TrackVisualImpl(visual);
+  }
   else
+  {
+    this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
+    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
+        Conversions::Convert(this->dataPtr->yawFixedAxis));
+  }
 
   if (_name.empty())
     return true;
@@ -1586,22 +1584,21 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 //////////////////////////////////////////////////
 bool Camera::TrackVisualImpl(VisualPtr _visual)
 {
-  // if (this->sceneNode->getParent())
-  //  this->sceneNode->getParent()->removeChild(this->sceneNode);
-
   bool result = false;
   if (_visual)
   {
-    this->dataPtr->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
-    this->dataPtr->trackVisualPitchPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
-    this->dataPtr->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
-
     this->dataPtr->trackedVisual = _visual;
+    this->camera->setAutoTracking(true, _visual->GetSceneNode());
+    this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+
     result = true;
   }
   else
   {
+    this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
+    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
+        Conversions::Convert(this->dataPtr->yawFixedAxis));
   }
 
   return result;
