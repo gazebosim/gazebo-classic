@@ -54,7 +54,7 @@ namespace gazebo
       /// \param[in] _curve Pointer to the plot curve to add.
       public: void AddCurve(const std::string &_query, PlotCurveWeakPtr _curve);
 
-      /// \brief Remove a curve from the topic data hander
+      /// \brief Remove a curve from the topic data handler
       /// \param[in] _curve Pointer to the plot curve to remove.
       public: void RemoveCurve(PlotCurveWeakPtr _curve);
 

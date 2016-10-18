@@ -524,10 +524,9 @@ void Light::SetRange(const double _range)
 }
 
 //////////////////////////////////////////////////
-void Light::SetCastShadows(const bool /*_cast*/)
+void Light::SetCastShadows(const bool _cast)
 {
-    this->dataPtr->light->setCastShadows(true);
-  /*if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT ||
+  if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT ||
       this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
     this->dataPtr->light->setCastShadows(_cast);
@@ -535,7 +534,7 @@ void Light::SetCastShadows(const bool /*_cast*/)
   else
   {
     this->dataPtr->light->setCastShadows(false);
-  }*/
+  }
 }
 
 //////////////////////////////////////////////////

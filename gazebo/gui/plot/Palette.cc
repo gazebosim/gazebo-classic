@@ -727,12 +727,13 @@ void Palette::FillTopics()
     }
   }
 
+  std::string worldName = gui::get_world();
+  std::string prefix = "/gazebo/" + worldName;
+
   // Populate widget
   for (auto topic : topics)
   {
     // Shorten topic name
-    std::string worldName = gui::get_world();
-    std::string prefix = "/gazebo/" + worldName;
     auto shortName = topic;
     auto idX = shortName.find(prefix);
     if (idX != std::string::npos)
@@ -1168,6 +1169,9 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
     auto name = field->name();
 
+    if (field->is_repeated())
+      continue;
+
     switch (field->type())
     {
       case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
@@ -1225,9 +1229,6 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       // Message within a message
       case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
       {
-        if (field->is_repeated())
-          continue;
-
         // Treat time as double
         if (field->message_type()->name() == "Time")
         {

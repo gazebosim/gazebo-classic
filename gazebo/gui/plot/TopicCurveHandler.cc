@@ -49,7 +49,7 @@ namespace gazebo
 
       /// \brief Get last sim time.
       /// \return last sim time received.
-      public: double LastSimTime();
+      public: common::Time LastSimTime();
 
       /// \brief Callback when world stats message is receieved.
       /// \param[in] _msg WorldStats msg.
@@ -92,7 +92,8 @@ namespace gazebo
       /// \param[in] _curve Pointer to the plot curve to remove.
       public: bool RemoveCurve(PlotCurveWeakPtr _curve);
 
-      /// \brief Get whether the topic curve class has the specified curve.
+      /// \brief Get whether the topic curve has the specified plot curve.
+      /// \param[in] _curve Pointer to the plot curve
       /// \return True if curve exists
       public: bool HasCurve(PlotCurveWeakPtr _curve) const;
 
@@ -156,7 +157,10 @@ void TopicTime::Init()
 void TopicTime::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   if (!_msg)
+  {
+    GZ_ASSERT(_msg, "_msg pointer in OnStats method should not be null");
     return;
+  }
 
   msgs::Time t = _msg->sim_time();
 
@@ -165,10 +169,10 @@ void TopicTime::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-double TopicTime::LastSimTime()
+common::Time TopicTime::LastSimTime()
 {
   std::lock_guard<std::mutex> lock(this->mutex);
-  return this->lastSimTime.Double();
+  return this->lastSimTime;
 }
 
 /////////////////////////////////////////////////
@@ -209,7 +213,11 @@ bool TopicCurve::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
 
   common::URI topicURI(_name);
   if (!topicURI.Valid())
+  {
+    gzwarn << "topicURI '" << topicURI.Str() <<
+              "' is invalid" << std::endl;
     return false;
+  }
 
   common::URIQuery topicQuery = topicURI.Query();
   std::string topicQueryStr = topicQuery.Str();
@@ -221,7 +229,6 @@ bool TopicCurve::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
     CurveVariableSet curveSet;
     curveSet.insert(_curve);
     this->curves[topicQueryStr] = curveSet;
-    return true;
   }
   else
   {
@@ -229,10 +236,9 @@ bool TopicCurve::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
     if (cIt == it->second.end())
     {
       it->second.insert(_curve);
-      return true;
     }
   }
-  return false;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -300,7 +306,7 @@ void TopicCurve::OnTopicData(const std::string &_msg)
       ignition::math::Vector2d> > curvesUpdates;
 
   // nearest sim time - use this x value if the message is not timestamped
-  double x = TopicTime::Instance()->LastSimTime();
+  double x = TopicTime::Instance()->LastSimTime().Double();
 
   // collect updates
   this->UpdateCurve(msg.get(), 0, x, curvesUpdates);
@@ -325,6 +331,12 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
     std::vector<std::pair<TopicCurve::CurveVariableMapIt,
     ignition::math::Vector2d> > &_curvesUpdates)
 {
+  if (!_msg)
+  {
+    GZ_ASSERT(_msg,
+        "_msg pointer in TopicCurve::UpdateCurve should not be null");
+  }
+
   auto ref = _msg->GetReflection();
   if (!ref)
     return;
@@ -349,7 +361,8 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
     // TODO x axis is hardcoded to be the sim time for now. Once it is
     // configurable, remove this logic for setting the x value
     if (_index == 0 && (fieldName == "stamp" || fieldName == "time") &&
-        field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+        field->type() == google::protobuf::FieldDescriptor::TYPE_MESSAGE &&
+        !field->is_repeated())
     {
       auto valueMsg = ref->MutableMessage(_msg, field);
       if (field->message_type()->name() == "Time")
@@ -538,7 +551,11 @@ void TopicCurveHandler::AddCurve(const std::string &_name,
 
   common::URI topicURI(uriName);
   if (!topicURI.Valid())
+  {
+    gzwarn << "topicURI '" << topicURI.Str().c_str() <<
+              "' is invalid" << std::endl;
     return;
+  }
 
   common::URIPath topicPath = topicURI.Path();
   // append '/' to make it a valid topic name
