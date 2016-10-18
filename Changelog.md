@@ -3,7 +3,7 @@
 ## Gazebo 7.x.x (2016-xx-xx)
 
 1. Update QT render loop to throttle based on UserCamera::RenderRate. 
-    * [Pull request xxxx](https://bitbucket.org/osrf/gazebo/pull-request/xxxx)
+    * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
     * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
 
 1. Add GUI items to change the user camera clip distance
