@@ -67,6 +67,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->copyEntityName = "";
   this->dataPtr->modelEditorEnabled = false;
 
+  this->dataPtr->updateTimer = new QTimer(this);
+  connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
+          this, SLOT(OnUpdateTimer()));
+
   this->setFocusPolicy(Qt::StrongFocus);
 
   this->dataPtr->windowId = -1;
@@ -286,9 +290,14 @@ void GLWidget::paintEvent(QPaintEvent *_e)
     event::Events::preRender();
   }
 
-  this->update();
-
   _e->accept();
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnUpdateTimer()
+{
+  // Queue another render update
+  this->update();
 }
 
 /////////////////////////////////////////////////
@@ -875,6 +884,11 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
   this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
+
+  // Update at the camera's update rate
+  this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
 }
 
 /////////////////////////////////////////////////

@@ -216,6 +216,9 @@ namespace gazebo
       /// \brief QT Callback that turns on perspective projection
       private slots: void OnPerspective();
 
+      /// \brief QT callback that queues an update of the render window.
+      private slots: void OnUpdateTimer();
+
       /// \brief Set this->mouseEvent's Buttons property to the value of
       /// _event->buttons(). Note that this is different from the
       /// SetMouseEventButtons, plural, function.
