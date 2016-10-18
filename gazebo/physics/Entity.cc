@@ -622,7 +622,10 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  // get pose in the include?
+  /// TODO we may need to fix this
+  /// when it comes to models with a pose tag and
+  /// embedded include with yet another pose tag.
+  /// see issue #2074 for details.
   math::Pose newPose = _sdf->Get<math::Pose>("pose");
   if (newPose != this->GetRelativePose())
   {
