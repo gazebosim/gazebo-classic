@@ -66,6 +66,12 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/Visual.hh**
+    + ***Deprecation:*** public: void SetScale(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** public: void SetPosition(const math::Vector3 &_pos)
+    + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_pos)
+
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose)
@@ -304,6 +310,14 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
+
+## Gazebo 7.3.1 to 7.4
+
+### Deprecations
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
+    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
 
 ## Gazebo 7.1.0 to 7.X
 
@@ -756,8 +770,6 @@ release will remove the deprecated code.
 1. **gazebo/sensors/ImuSensor.hh**
     + ***Deprecation:** public: msgs::IMU GetImuMessage() const
     + ***Replacement:** public: msgs::IMU ImuMessage() const;
-    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
-    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
 
 1. **gazebo/sensors/MultiCameraSensor.hh**
     + ***Deprecation:** public: virtual std::string GetTopic() const;

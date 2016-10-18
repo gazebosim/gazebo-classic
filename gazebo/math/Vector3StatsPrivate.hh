@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_VECTOR3_STATS_PRIVATE_HH_
 #define _GAZEBO_VECTOR3_STATS_PRIVATE_HH_
 
+#include <ignition/math/Vector3Stats.hh>
+#include <ignition/math/SignalStats.hh>
 #include "gazebo/math/SignalStats.hh"
 
 namespace gazebo
@@ -26,6 +28,12 @@ namespace gazebo
     /// \brief Private data class for the Vector3Stats class.
     class Vector3StatsPrivate
     {
+      public: Vector3StatsPrivate() = default;
+
+      public: Vector3StatsPrivate(
+                  const ignition::math::Vector3Stats &_v)
+              : x(_v.X()), y(_v.Y()), z(_v.Z()), mag(_v.Mag()) {}
+
       /// \brief Statistics for x component of signal.
       public: SignalStats x;
 
