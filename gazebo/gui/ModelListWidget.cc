@@ -822,6 +822,38 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
     }
   }
 
+  QtProperty *cameraClipProperty = this->ChildItem(cameraProperty, "clip");
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+
+    if (cam)
+    {
+      if (changedProperty == "near")
+      {
+        cam->SetClipDist(this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "near")).toDouble(),
+            cam->FarClip());
+      }
+      else if (changedProperty == "far")
+      {
+        cam->SetClipDist(cam->NearClip(), this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "far")).toDouble());
+      }
+      else
+      {
+        gzerr << "Unable to process user camera clip property["
+          << changedProperty << "]\n";
+      }
+    }
+    else
+    {
+      gzerr << "Unable to get pointer to active user camera when setting clip "
+        << "plane values. This should not happen.\n";
+    }
+  }
+
   QtProperty *cameraFollowProperty = this->ChildItem(cameraProperty,
                                                         "track_visual");
   if (cameraFollowProperty)
@@ -3369,6 +3401,23 @@ void ModelListWidget::FillUserCamera()
   topItem->addSubProperty(item);
   item->setEnabled(false);
 
+  // Create and set the gui camera clip distance items
+  auto clipItem = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("clip"));
+  topItem->addSubProperty(clipItem);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("near"));
+  item->setValue(cam->NearClip());
+  clipItem->addSubProperty(item);
+  item->setEnabled(true);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("far"));
+  item->setValue(cam->FarClip());
+  clipItem->addSubProperty(item);
+  item->setEnabled(true);
+
   // Create and set the gui camera pose
   item = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
@@ -3377,6 +3426,12 @@ void ModelListWidget::FillUserCamera()
     ignition::math::Pose3d cameraPose = cam->WorldPose();
 
     this->FillPoseProperty(msgs::Convert(cameraPose), item);
+    // set expanded to true by default for easier viewing
+    this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
+    for (auto browser : cameraBrowser->children())
+    {
+      this->dataPtr->propTreeBrowser->setExpanded(browser, true);
+    }
   }
 
   // Create and set the gui camera position relative to a tracked model

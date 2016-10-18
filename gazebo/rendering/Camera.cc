@@ -25,6 +25,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
@@ -39,6 +40,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/VideoEncoder.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -215,6 +217,8 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  this->dataPtr->videoEncoder.Reset();
+
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
   this->saveFrameBuffer = NULL;
@@ -462,7 +466,8 @@ void Camera::RenderImpl()
 //////////////////////////////////////////////////
 void Camera::ReadPixelBuffer()
 {
-  if (this->newData && (this->captureData || this->captureDataOnce))
+  if (this->newData && (this->captureData || this->captureDataOnce ||
+      this->dataPtr->videoEncoder.IsEncoding()))
   {
     size_t size;
     unsigned int width = this->ImageWidth();
@@ -544,12 +549,21 @@ void Camera::PostRender()
   if (this->newData)
     this->lastRenderWallTime = common::Time::GetWallTime();
 
-  if (this->newData && (this->captureData || this->captureDataOnce))
+  if (this->newData && (this->captureData || this->captureDataOnce ||
+      this->dataPtr->videoEncoder.IsEncoding()))
   {
+    unsigned int width = this->ImageWidth();
+    unsigned int height = this->ImageHeight();
+    const unsigned char *buffer = this->saveFrameBuffer;
+
     if (this->captureDataOnce)
     {
       this->SaveFrame(this->FrameFilename());
       this->captureDataOnce = false;
+    }
+    else if (this->dataPtr->videoEncoder.IsEncoding())
+    {
+      this->dataPtr->videoEncoder.AddFrame(buffer, width, height);
     }
 
     if (this->sdf->HasElement("save") &&
@@ -557,10 +571,6 @@ void Camera::PostRender()
     {
       this->SaveFrame(this->FrameFilename());
     }
-
-    unsigned int width = this->ImageWidth();
-    unsigned int height = this->ImageHeight();
-    const unsigned char *buffer = this->saveFrameBuffer;
 
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
     if ((this->ImageFormat() == "BAYER_RGGB8") ||
@@ -1282,9 +1292,47 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
+bool Camera::StartVideo(const std::string &_format,
+                        const std::string &_filename)
+{
+  return this->dataPtr->videoEncoder.Start(_format, _filename,
+      this->ImageWidth(), this->ImageHeight());
+}
+
+//////////////////////////////////////////////////
+bool Camera::StopVideo()
+{
+  return this->dataPtr->videoEncoder.Stop();
+}
+
+//////////////////////////////////////////////////
+bool Camera::SaveVideo(const std::string &_filename)
+{
+  // This will stop video encoding, save the video file, and reset
+  // video encoding.
+  return this->dataPtr->videoEncoder.SaveToFile(_filename);
+}
+
+//////////////////////////////////////////////////
+bool Camera::ResetVideo()
+{
+  this->dataPtr->videoEncoder.Reset();
+  return true;
+}
+
+//////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
+  unsigned int fsaa = 0;
+
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   // Full-screen anti-aliasing only works correctly in 1.8 and above
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8

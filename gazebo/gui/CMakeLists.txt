@@ -18,7 +18,8 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
-set (internal_qt_headers)
+set (internal_qt_headers
+  VideoRecorder.hh)
 
 set (sources
   Actions.cc
@@ -57,6 +58,7 @@ set (sources
   TopicSelector.cc
   TopToolbar.cc
   UserCmdHistory.cc
+  VideoRecorder.cc
   ViewAngleWidget.cc
 )
 
