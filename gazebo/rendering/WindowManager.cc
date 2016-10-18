@@ -94,12 +94,8 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   params["stereoMode"] = "Frame Sequential";
 
   // Set the macAPI for Ogre based on the Qt implementation
-#ifdef QT_MAC_USE_COCOA
   params["macAPI"] = "cocoa";
   params["macAPICocoaUseNSView"] = "true";
-#else
-  params["macAPI"] = "carbon";
-#endif
 
   // Hide window if dimensions are less than or equal to one.
   if (_width <= 1 && _height <=1)
