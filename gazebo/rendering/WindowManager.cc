@@ -89,7 +89,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   params["FSAA"] = "4";
   params["stereoMode"] = "Frame Sequential";
 
-  // Set the macAPI for Ogre based on the Qt implementation
+  // Set the macAPI for Ogre
   params["macAPI"] = "cocoa";
   params["macAPICocoaUseNSView"] = "true";
 
