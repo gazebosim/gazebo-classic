@@ -202,11 +202,21 @@ void HeightmapShape::Init()
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
+  double heightmapSizeZ = this->heightmapData->GetMaxElevation();
+#ifdef HAVE_GDAL
+  // DEM
+  auto demData = dynamic_cast<common::Dem *>(this->heightmapData);
+  if (demData)
+  {
+    heightmapSizeZ = heightmapSizeZ -
+        std::max(0.0f, demData->GetMinElevation());
+  }
+#endif
+
   if (math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
     this->scale.z = fabs(terrainSize.z);
   else
-    this->scale.z = fabs(terrainSize.z) /
-                    this->heightmapData->GetMaxElevation();
+    this->scale.z = fabs(terrainSize.z) / heightmapSizeZ;
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,

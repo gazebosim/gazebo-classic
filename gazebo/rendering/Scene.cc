@@ -2750,19 +2750,13 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
           this->dataPtr->terrain == NULL)
       {
-        try
+        if (!this->dataPtr->terrain)
         {
-          if (!this->dataPtr->terrain)
-          {
-            this->dataPtr->terrain = new Heightmap(shared_from_this());
-            this->dataPtr->terrain->LoadFromMsg(_msg);
-          }
-          else
-            gzerr << "Only one Heightmap can be created per Scene\n";
-        } catch(...)
-        {
-          return false;
+          this->dataPtr->terrain = new Heightmap(shared_from_this());
+          this->dataPtr->terrain->LoadFromMsg(_msg);
         }
+        else
+          gzerr << "Only one Heightmap can be created per Scene" << std::endl;
       }
       return true;
     }
