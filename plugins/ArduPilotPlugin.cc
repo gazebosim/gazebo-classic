@@ -878,6 +878,7 @@ void ArduPilotPlugin::SendState() const
   // adding modelToXForwardZUp rotates model to the x-forward, y-left, z-up
   ignition::math::Pose3d gazeboXYZToModelXForwardZUp =
     // this->modelToXForwardZUp +
+    this->gazeboXYZToNED +
     this->dataPtr->model->GetWorldPose().Ign();
 
   // get transform from world NED to Model frame
