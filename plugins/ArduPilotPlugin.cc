@@ -877,13 +877,13 @@ void ArduPilotPlugin::SendState() const
   // adding modelXYZToAirplaneXForwardZDown rotates
   //   from: model XYZ
   //   to: airplane x-forward, y-left, z-down
-  ignition::math::Pose3d gazeboXYZToModelXForwardZUp =
+  ignition::math::Pose3d gazeboXYZToModelXForwardZDown =
     this->modelXYZToAirplaneXForwardZDown +
     this->dataPtr->model->GetWorldPose().Ign();
 
   // get transform from world NED to Model frame
   ignition::math::Pose3d NEDToModelXForwardZUp =
-    gazeboXYZToModelXForwardZUp - this->gazeboXYZToNED;
+    gazeboXYZToModelXForwardZDown - this->gazeboXYZToNED;
 
   // gzerr << "ned to model [" << NEDToModelXForwardZUp << "]\n";
 
@@ -903,7 +903,8 @@ void ArduPilotPlugin::SendState() const
   pkt.imuOrientationQuat[2] = NEDToModelXForwardZUp.Rot().Y();
   pkt.imuOrientationQuat[3] = NEDToModelXForwardZUp.Rot().Z();
 
-  // gzdbg << "imu [" << gazeboXYZToModelXForwardZUp.rot.GetAsEuler() << "]\n";
+  // gzdbg << "imu [" << gazeboXYZToModelXForwardZDown.rot.GetAsEuler()
+  //       << "]\n";
   // gzdbg << "ned [" << this->gazeboXYZToNED.rot.GetAsEuler() << "]\n";
   // gzdbg << "rot [" << NEDToModelXForwardZUp.rot.GetAsEuler() << "]\n";
 
