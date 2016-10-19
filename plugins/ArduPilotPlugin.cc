@@ -338,14 +338,15 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->dataPtr->model = _model;
 
-  // modelToXForwardZUp brings us from gazebo model frame:
+  // modelXYZToAirplaneXForwardZDown brings us from gazebo model frame:
   // x-forward, y-right, z-down
   // to the aerospace convention: x-forward, y-left, z-up
-  this->modelToXForwardZUp = ignition::math::Pose3d(0, 0, 0, 0, 0, 0);
-  if (_sdf->HasElement("modelToXForwardZUp"))
+  this->modelXYZToAirplaneXForwardZDown =
+    ignition::math::Pose3d(0, 0, 0, 0, 0, 0);
+  if (_sdf->HasElement("modelXYZToAirplaneXForwardZDown"))
   {
-    this->modelToXForwardZUp =
-        _sdf->Get<ignition::math::Pose3d>("modelToXForwardZUp");
+    this->modelXYZToAirplaneXForwardZDown =
+        _sdf->Get<ignition::math::Pose3d>("modelXYZToAirplaneXForwardZDown");
   }
 
   // gazeboXYZToNED: from gazebo model frame: x-forward, y-right, z-down
@@ -837,8 +838,7 @@ void ArduPilotPlugin::SendState() const
 
   // get linear acceleration in body frame
   ignition::math::Vector3d linearAccel =
-    this->modelToXForwardZUp.Rot().RotateVectorReverse(
-    this->dataPtr->imuSensor->LinearAcceleration());
+    this->dataPtr->imuSensor->LinearAcceleration();
 
   // copy to pkt
   pkt.imuLinearAccelerationXYZ[0] = linearAccel.X();
@@ -848,8 +848,7 @@ void ArduPilotPlugin::SendState() const
 
   // get angular velocity in body frame
   ignition::math::Vector3d angularVel =
-    this->modelToXForwardZUp.Rot().RotateVectorReverse(
-    this->dataPtr->imuSensor->AngularVelocity());
+    this->dataPtr->imuSensor->AngularVelocity();
 
   // copy to pkt
   pkt.imuAngularVelocityRPY[0] = angularVel.X();
@@ -875,10 +874,11 @@ void ArduPilotPlugin::SendState() const
 
   // model world pose brings us to model,
   // which for example zephyr has -y-forward, x-left, z-up
-  // adding modelToXForwardZUp rotates model to the x-forward, y-left, z-up
+  // adding modelXYZToAirplaneXForwardZDown rotates
+  //   from: model XYZ
+  //   to: airplane x-forward, y-left, z-down
   ignition::math::Pose3d gazeboXYZToModelXForwardZUp =
-    // this->modelToXForwardZUp +
-    this->gazeboXYZToNED +
+    this->modelXYZToAirplaneXForwardZDown +
     this->dataPtr->model->GetWorldPose().Ign();
 
   // get transform from world NED to Model frame
@@ -913,7 +913,8 @@ void ArduPilotPlugin::SendState() const
   ignition::math::Vector3d velGazeboWorldFrame =
     this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
   ignition::math::Vector3d velNEDFrame =
-    this->gazeboXYZToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
+    this->modelXYZToAirplaneXForwardZDown.Rot().RotateVectorReverse(
+    velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();
   pkt.velocityXYZ[1] = velNEDFrame.Y();
   pkt.velocityXYZ[2] = velNEDFrame.Z();
