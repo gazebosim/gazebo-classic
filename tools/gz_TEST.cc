@@ -21,9 +21,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
 
-#include <gazebo/gazebo_client.hh>
 #include <gazebo/common/CommonIface.hh>
-#include <gazebo/common/Time.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
@@ -107,30 +105,13 @@ void init()
     return;
   }
 
-  EXPECT_TRUE(gazebo::client::setup());
-
-  // Wait for world_stats topic to be available
-  {
-    int topicWaitCount = 0;
-    const std::string messageName = "gazebo.msgs.WorldStatistics";
-    const std::string topicName = "/gazebo/default/world_stats";
-    while (++topicWaitCount <= 20 &&
-           gazebo::transport::getAdvertisedTopics(messageName).size() == 0)
-    {
-      gzdbg << "Waiting for topics to be listed" << std::endl;
-      gazebo::common::Time::MSleep(200);
-    }
-    ASSERT_LE(topicWaitCount, 20);
-    auto topics = gazebo::transport::getAdvertisedTopics(messageName);
-    ASSERT_EQ(topics.size(), 1u);
-    EXPECT_EQ(topics.front(), topicName);
-  }
+  EXPECT_TRUE(gazebo::transport::init());
 }
 
 /////////////////////////////////////////////////
 void fini()
 {
-  EXPECT_TRUE(gazebo::client::shutdown());
+  gazebo::transport::fini();
   if (kill(g_pid, SIGINT) < 0)
     gzerr << "Failed to kill the gazebo server.\n";
 
@@ -228,6 +209,9 @@ TEST_F(gzTest, Joint)
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/simple_arm/joint_cmd", &JointCmdCB);
 
+  // Run the transport loop: starts a new thread
+  gazebo::transport::run();
+
   // Test joint force
   {
     waitForMsg("gz joint -w default -m simple_arm "
@@ -294,6 +278,9 @@ TEST_F(gzTest, Model)
   gazebo::transport::SubscriberPtr subFactory =
     node->Subscribe("~/factory", &FactoryCB);
 
+  // Run the transport loop: starts a new thread
+  gazebo::transport::run();
+
   // Test model info on existing model
   {
     std::string modelInfo = custom_exec_str("gz model -m simple_arm -i");
@@ -322,7 +309,6 @@ TEST_F(gzTest, Model)
   }
 
   // Test model spawn from file
-  // Some expectations in this code block are disabled due to issue 2069
   {
     std::string filename = std::string(TEST_PATH) + "/models/box.sdf";
 
@@ -336,7 +322,7 @@ TEST_F(gzTest, Model)
       gazebo::common::Time::MSleep(100);
       sleep++;
     }
-    // EXPECT_FALSE(g_msgDebugOut.empty());
+    EXPECT_FALSE(g_msgDebugOut.empty());
 
     // Create similar message to compare
     sdf::SDFPtr sdf(new sdf::SDF());
@@ -351,7 +337,7 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Set(msg.mutable_pose(),
         ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
-    // EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
   // Test model info of inserted model to verify insertion
@@ -372,11 +358,7 @@ TEST_F(gzTest, Model)
     waitForMsg("gz model -w default -m my_box -d");
 
     EXPECT_NE(g_msgDebugOut.find("entity_delete"), std::string::npos);
-    // The following expectation can fail, since Link::Fini publishes
-    // an entity_delete request with the integer id of its visuals.
-    // The expectation is disabled until model deletion is improved, see:
-    // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
-    // EXPECT_NE(g_msgDebugOut.find("my_box"), std::string::npos);
+    EXPECT_NE(g_msgDebugOut.find("my_box"), std::string::npos);
   }
 
   // Test model info of deleted model to verify deletion
@@ -388,7 +370,6 @@ TEST_F(gzTest, Model)
   }
 
   // Test model spawn from string
-  // Some expectations in this code block are disabled due to issue 2069
   {
     std::string filename = std::string(TEST_PATH) + "/models/box.sdf";
 
@@ -405,7 +386,7 @@ TEST_F(gzTest, Model)
       gazebo::common::Time::MSleep(100);
       sleep++;
     }
-    // EXPECT_FALSE(g_msgDebugOut.empty());
+    EXPECT_FALSE(g_msgDebugOut.empty());
 
     // Create similar message to compare
     sdf::SDFPtr sdf(new sdf::SDF());
@@ -420,7 +401,7 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Set(msg.mutable_pose(),
         ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
-    // EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
   // Check there were no extra copies of the model inserted
@@ -477,11 +458,7 @@ TEST_F(gzTest, Model)
     waitForMsg("gz model -w default -m simple_arm -d");
 
     EXPECT_NE(g_msgDebugOut.find("entity_delete"), std::string::npos);
-    // The following expectation can fail, since Link::Fini publishes
-    // an entity_delete request with the integer id of its visuals.
-    // The expectation is disabled until model deletion is improved, see:
-    // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
-    // EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
+    EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
   }
 
   fini();
@@ -499,6 +476,9 @@ TEST_F(gzTest, World)
   node->Init();
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/world_control", &WorldControlCB);
+
+  // Run the transport loop: starts a new thread
+  gazebo::transport::run();
 
   // Test world pause
   {
@@ -570,6 +550,9 @@ TEST_F(gzTest, Physics)
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/physics", &PhysicsCB);
 
+  // Run the transport loop: starts a new thread
+  gazebo::transport::run();
+
   // Test gravity
   {
     waitForMsg("gz physics -w default -g 1,2,3 ");
@@ -627,6 +610,9 @@ TEST_F(gzTest, Camera)
   node->Init();
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/user/cmd", &CameraCB);
+
+  // Run the transport loop: starts a new thread
+  gazebo::transport::run();
 
   // Test follow
   {
@@ -700,6 +686,7 @@ TEST_F(gzTest, SDF)
 {
   boost::filesystem::path path;
 
+  init();
   std::string helpOutput = custom_exec_str("gz help sdf");
   EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
 
@@ -783,6 +770,8 @@ TEST_F(gzTest, SDF)
       custom_exec_str(std::string("gz sdf -c ") + path.string());
     EXPECT_EQ(output, "Success\n");
   }
+
+  fini();
 }
 
 /////////////////////////////////////////////////

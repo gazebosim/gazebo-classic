@@ -80,7 +80,7 @@ namespace gazebo
       public: typedef MaterialGenerator::Perm Perm;
 
       ///////////////////////////////////////////////
-      public: explicit LightMaterialGeneratorGLSL(const std::string &_baseName)
+      public: LightMaterialGeneratorGLSL(const std::string &_baseName)
               : baseName(_baseName) {}
 
       ///////////////////////////////////////////////

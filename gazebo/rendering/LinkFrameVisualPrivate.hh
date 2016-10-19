@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
-#define GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
+
+#ifndef _GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
+#define _GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
 
 #include <string>
-#include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/AxisVisualPrivate.hh"
 
@@ -30,7 +30,7 @@ namespace gazebo
     class LinkFrameVisualPrivate : public AxisVisualPrivate
     {
       /// \brief Scale based on the size of the parent link.
-      public: ignition::math::Vector3d scaleToLink;
+      public: math::Vector3 scaleToLink;
 
       /// \brief Transparency when highlighted.
       public: float highlightedTransp;

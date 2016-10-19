@@ -703,7 +703,7 @@ find_package(ignition-transport2 QUIET)
 if (NOT ignition-transport2_FOUND)
   find_package(ignition-transport1 QUIET)
   if (NOT ignition-transport1_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
+    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev")
   endif()
 endif()
 
@@ -742,17 +742,14 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/include
   /usr/local/include
   /usr/local/lib/qwt.framework/Headers
-  ${QWT_WIN_INCLUDE_DIR}
-
   PATH_SUFFIXES qwt-qt4 qwt qwt5
-)
+  )
 
 find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
-  ${QWT_WIN_LIBRARY_DIR}
-)
+  )
 
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)

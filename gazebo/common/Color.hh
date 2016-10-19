@@ -48,7 +48,7 @@ namespace gazebo
       /// \brief (1, 1, 0)
       public: static const Color Yellow;
       /// \brief (1, 0, 1)
-      public: static const Color Magenta;
+      public: static const Color Purple;
 
       /// \def RGBA
       /// \brief A RGBA packed value as an unsigned int

@@ -133,10 +133,10 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
   transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
       &ReceiveSimEvent);
 
-  physics::ModelPtr regionEventBox = world->GetModel("RegionEventBox");
+  physics::ModelPtr regionEventBox = world->ModelByName("RegionEventBox");
   ASSERT_TRUE(regionEventBox != NULL);
 
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr boxModel = world->ModelByName("box");
   ASSERT_TRUE(boxModel != NULL);
 
   unsigned int startingCount = GetEventCount();
@@ -168,10 +168,10 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
       &ReceiveSimEvent);
 
-  physics::ModelPtr regionEventBox = world->GetModel("RegionEventBox");
+  physics::ModelPtr regionEventBox = world->ModelByName("RegionEventBox");
   ASSERT_TRUE(regionEventBox != NULL);
 
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr boxModel = world->ModelByName("box");
   ASSERT_TRUE(boxModel != NULL);
 
   math::Pose regionEventBoxPos = regionEventBox->GetWorldPose();

@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_MODEL_GRAPHSCENE_HH_
-#define GAZEBO_GUI_MODEL_GRAPHSCENE_HH_
+
+#ifndef _GAZEBO_GRAPH_SCENE_HH_
+#define _GAZEBO_GRAPH_SCENE_HH_
 
 #include <string>
 

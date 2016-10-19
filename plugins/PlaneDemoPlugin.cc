@@ -173,7 +173,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   this->dataPtr->world = this->dataPtr->model->GetWorld();
   GZ_ASSERT(this->dataPtr->world, "PlaneDemoPlugin world pointer is NULL");
 
-  this->dataPtr->physics = this->dataPtr->world->GetPhysicsEngine();
+  this->dataPtr->physics = this->dataPtr->world->Physics();
   GZ_ASSERT(this->dataPtr->physics, "PlaneDemoPlugin physics pointer is NULL");
 
   GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
@@ -351,7 +351,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::Init()
 {
-  this->dataPtr->lastUpdateTime = this->dataPtr->world->GetSimTime();
+  this->dataPtr->lastUpdateTime = this->dataPtr->world->SimTime();
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
           std::bind(&PlaneDemoPlugin::OnUpdate, this));
   gzdbg << "Init done.\n";
@@ -363,7 +363,7 @@ void PlaneDemoPlugin::OnUpdate()
   // gzdbg << "executing OnUpdate.\n";
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-    common::Time curTime = this->dataPtr->world->GetSimTime();
+    common::Time curTime = this->dataPtr->world->SimTime();
     for (std::vector<EngineControl>::iterator ei =
         this->dataPtr->engineControls.begin();
         ei != this->dataPtr->engineControls.end(); ++ei)

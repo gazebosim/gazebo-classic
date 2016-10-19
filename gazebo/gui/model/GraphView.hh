@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_MODEL_GRAPHVIEW_HH_
-#define GAZEBO_GUI_MODEL_GRAPHVIEW_HH_
+
+#ifndef _GAZEBO_GRAPH_VIEW_HH_
+#define _GAZEBO_GRAPH_VIEW_HH_
 
 #include "gazebo/gui/qt.h"
 

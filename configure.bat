@@ -34,15 +34,10 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
 @set IGNITION-TRANSPORT_PATH=%cd%\..\..\ign-transport\build\install\%build_type%
-@set IGNITION-MSGS_PATH=%cd%\..\..\ign-msgs\build\install\%build_type%
 
 @set TBB_PATH=%cd%\..\..\tbb43_20141023oss
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
 @set TBB_INCLUDEDIR=%TBB_PATH%\include
-
-@set QWT_PATH=%cd%\..\..\qwt_6.1.0~github_zalf_lsa
-@set QWT_LIBRARY_DIR=%QWT_PATH%\%build_type%\qwt-6.1.0-vc12-x64
-@set QWT_INCLUDEDIR=%QWT_PATH%\include
 
 @set OGRE_VERSION=1.9.0
 @set OGRE_PATH=%cd%\..\..\OGRE-SDK-1.9.0-vc120-x64-12.03.2016
@@ -52,7 +47,6 @@ set CURL_LIBRARY_NAME=libcurl_a
 set OGRE_LIB_SUFFIX=.lib
 @if "%build_type%"=="Debug" set OGRE_LIB_SUFFIX=_d.lib
 @set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
-@set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
 
 @set DLFCN_WIN32_PATH=%cd%\..\..\dlfcn-win32-vc12-x64-release-debug\build\install\%build_type%
 @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
@@ -66,7 +60,7 @@ set OGRE_LIB_SUFFIX=.lib
 @set PATH=%QT4_BIN_DIR%;%PATH%
 
 cmake -Wno-dev -G "NMake Makefiles"^
-    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-TRANSPORT_PATH%;%IGNITION-MSGS_PATH%"^
+    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-TRANSPORT_PATH%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DUSE_EXTERNAL_TINYXML2:BOOL=False^
     -DFREEIMAGE_RUNS=1^
@@ -80,8 +74,6 @@ cmake -Wno-dev -G "NMake Makefiles"^
     -DOGRE_PLUGINDIR="%OGRE_PLUGIN_DIR%"^
     -DOGRE_INCLUDE_DIRS="%OGRE_INCLUDE_DIR%"^
     -DOGRE_LIBRARIES="%OGRE_LIBS%"^
-    -DQWT_WIN_INCLUDE_DIR="%QWT_INCLUDEDIR%"^
-    -DQWT_WIN_LIBRARY_DIR="%QWT_LIBRARY_DIR%"^
     -DCURL_FOUND=1^
     -DCURL_INCLUDEDIR="%CURL_INCLUDE_DIR%"^
     -DCURL_LIBDIR="%CURL_LIBRARY_DIR%"^
@@ -93,3 +85,4 @@ cmake -Wno-dev -G "NMake Makefiles"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
     -DENABLE_TESTS_COMPILATION:BOOL=False^
     ..
+

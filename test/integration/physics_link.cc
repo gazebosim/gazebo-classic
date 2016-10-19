@@ -82,7 +82,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   else
     _link->AddLinkForce(_force, _offset);
 
-  double dt = _world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = _world->Physics()->GetMaxStepSize();
   _world->Step(1);
 
   int moreThanOneStep = 2;
@@ -164,7 +164,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   double dt = physics->GetMaxStepSize();
@@ -176,7 +176,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   // Spawn a box
   math::Vector3 size(1, 1, 1);
   SpawnBox("box", size, math::Vector3::Zero, math::Vector3::Zero, false);
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -251,7 +251,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -332,7 +332,7 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   double dt = physics->GetMaxStepSize();
@@ -346,7 +346,7 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   math::Vector3 size(1, 1, 1);
   math::Vector3 pos0(0, 0, z0 + size.z / 2);
   SpawnBox("box", size, pos0, math::Vector3::Zero, false);
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -377,7 +377,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -542,7 +542,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   double dt = physics->GetMaxStepSize();
@@ -554,7 +554,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   // Spawn a box
   math::Vector3 size(1, 1, 1);
   SpawnBox("box", size, math::Vector3::Zero, math::Vector3::Zero, false);
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -659,7 +659,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   double dt = physics->GetMaxStepSize();
@@ -672,7 +672,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   math::Vector3 size(1, 1, 1);
   math::Vector3 pos0(0, 0, 1);
   SpawnBox("box", size, pos0, math::Vector3::Zero, false);
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -686,7 +686,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
 
   // Step forward and check velocity again
   world->Step(44);
-  double time = world->GetSimTime().Double();
+  double time = world->SimTime().Double();
   EXPECT_EQ(vel, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 

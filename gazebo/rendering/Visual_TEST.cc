@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include <ignition/math/Rand.hh>
+#include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -123,15 +123,14 @@ TEST_F(Visual_TEST, BoundingBox)
   Load("worlds/empty.world");
 
   // Spawn a box and check its bounding box dimensions.
-  SpawnBox("box", ignition::math::Vector3d::One,
-      ignition::math::Vector3d(10, 10, 1),
-      ignition::math::Vector3d::Zero);
+  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
+      math::Vector3(0, 0, 0));
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
@@ -148,37 +147,35 @@ TEST_F(Visual_TEST, BoundingBox)
   ASSERT_NE(visual, nullptr);
 
   // verify initial bounding box
-  ignition::math::Vector3d bboxMin(-0.5, -0.5, -0.5);
-  ignition::math::Vector3d bboxMax(0.5, 0.5, 0.5);
-  ignition::math::Box boundingBox = visual->GetBoundingBox().Ign();
-  EXPECT_EQ(boundingBox.Min(), bboxMin);
-  EXPECT_EQ(boundingBox.Max(), bboxMax);
+  math::Vector3 bboxMin(-0.5, -0.5, -0.5);
+  math::Vector3 bboxMax(0.5, 0.5, 0.5);
+  math::Box boundingBox = visual->GetBoundingBox();
+  EXPECT_EQ(boundingBox.min, bboxMin);
+  EXPECT_EQ(boundingBox.max, bboxMax);
 
   // verify scale
-  ignition::math::Vector3d scale = visual->GetScale().Ign();
-  EXPECT_EQ(scale, ignition::math::Vector3d::One);
+  math::Vector3 scale = visual->GetScale();
+  EXPECT_EQ(scale, math::Vector3(1, 1, 1));
 
   // set new scale
-  ignition::math::Vector3d scaleToSet(2, 3, 4);
+  math::Vector3 scaleToSet(2, 3, 4);
   visual->SetScale(scaleToSet);
 
   // verify new scale
-  ignition::math::Vector3d newScale = visual->GetScale().Ign();
+  math::Vector3 newScale = visual->GetScale();
   EXPECT_EQ(newScale, scaleToSet);
-  EXPECT_EQ(newScale, ignition::math::Vector3d(2, 3, 4));
+  EXPECT_EQ(newScale, math::Vector3(2, 3, 4));
 
   // verify local bounding box dimensions remain the same
-  ignition::math::Box newBoundingBox = visual->GetBoundingBox().Ign();
-  EXPECT_EQ(newBoundingBox.Min(), bboxMin);
-  EXPECT_EQ(newBoundingBox.Max(), bboxMax);
+  math::Box newBoundingBox = visual->GetBoundingBox();
+  EXPECT_EQ(newBoundingBox.min, bboxMin);
+  EXPECT_EQ(newBoundingBox.max, bboxMax);
 
   // verify local bounding box dimensions with scale applied
-  EXPECT_EQ(newScale*newBoundingBox.Min(), newScale*bboxMin);
-  EXPECT_EQ(newScale*newBoundingBox.Max(), newScale*bboxMax);
-  EXPECT_EQ(newScale*newBoundingBox.Min(),
-      ignition::math::Vector3d(-1, -1.5, -2));
-  EXPECT_EQ(newScale*newBoundingBox.Max(),
-      ignition::math::Vector3d(1, 1.5, 2));
+  EXPECT_EQ(newScale*newBoundingBox.min, newScale*bboxMin);
+  EXPECT_EQ(newScale*newBoundingBox.max, newScale*bboxMax);
+  EXPECT_EQ(newScale*newBoundingBox.min, math::Vector3(-1, -1.5, -2));
+  EXPECT_EQ(newScale*newBoundingBox.max, math::Vector3(1, 1.5, 2));
 }
 
 /////////////////////////////////////////////////
@@ -355,8 +352,7 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
   sdf::readString(GetVisualSDFString("visual_sphere_no_transparency", "sphere",
-      ignition::math::Vector3d::One,
-      ignition::math::Pose3d::Zero, 0), sphereSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), sphereSDF);
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
@@ -365,7 +361,7 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF2);
   sdf::readString(GetVisualSDFString("visual_sphere_semi_transparent", "sphere",
-      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0.5),
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0.5),
       sphereSDF2);
   gazebo::rendering::VisualPtr sphereVis2(
       new gazebo::rendering::Visual("sphere_visual2", scene));
@@ -445,10 +441,10 @@ TEST_F(Visual_TEST, DerivedTransparency)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -743,8 +739,7 @@ TEST_F(Visual_TEST, Wireframe)
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
   sdf::readString(GetVisualSDFString("sphere_visual", "sphere",
-      ignition::math::Vector3d::One,
-      ignition::math::Pose3d::Zero, 0), sphereSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), sphereSDF);
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
@@ -752,7 +747,7 @@ TEST_F(Visual_TEST, Wireframe)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("box_visual", "box",
-      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0), boxSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", sphereVis));
   boxVis->Load(boxSDF);
@@ -1507,10 +1502,10 @@ TEST_F(Visual_TEST, Scale)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -1806,10 +1801,10 @@ TEST_F(Visual_TEST, VisibilityFlags)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();

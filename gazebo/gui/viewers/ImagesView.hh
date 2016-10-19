@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
-#define GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
+#ifndef _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
+#define _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
 
 #include <string>
 
@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: ImagesView(QWidget *_parent = nullptr);
+      public: ImagesView(QWidget *_parent = NULL);
 
       /// \brief Destructor
       public: virtual ~ImagesView();

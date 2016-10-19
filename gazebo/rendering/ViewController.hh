@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_RENDERING_VIEWCONTROLLER_HH_
-#define GAZEBO_RENDERING_VIEWCONTROLLER_HH_
+#ifndef _VIEWCONTROLLER_HH_
+#define _VIEWCONTROLLER_HH_
 
 #include <string>
 #include "gazebo/rendering/RenderTypes.hh"
@@ -39,7 +39,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _camera The user camera to controll.
-      public: explicit ViewController(UserCameraPtr _camera);
+      public: ViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~ViewController();

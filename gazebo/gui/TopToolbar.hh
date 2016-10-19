@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GAZEBO_GUI_TOPTOOLBAR_HH_
-#define GAZEBO_GUI_TOPTOOLBAR_HH_
+#ifndef _GAZEBO_TOP_TOOLBAR_HH_
+#define _GAZEBO_TOP_TOOLBAR_HH_
 
 #include <string>
 

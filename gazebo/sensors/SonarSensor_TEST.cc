@@ -67,7 +67,7 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
   sdf::readString(sonarSensorString, sdf);
 
   physics::WorldPtr world = physics::get_world("default");
-  physics::ModelPtr model = world->GetModel("ground_plane");
+  physics::ModelPtr model = world->ModelByName("ground_plane");
   physics::LinkPtr link = model->GetLink("link");
 
   // Create the Sonar sensor
@@ -160,7 +160,7 @@ void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
       ignition::math::Pose3d(0, 0, 1, 0, 0, 0), 0, 2, 0.2);
   ASSERT_TRUE(sonar != nullptr);
 
-  physics::ModelPtr model = world->GetModel("sonar");
+  physics::ModelPtr model = world->ModelByName("sonar");
   ASSERT_TRUE(model != nullptr);
 
   // Wait for collision engine to turn over

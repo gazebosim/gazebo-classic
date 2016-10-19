@@ -127,8 +127,8 @@ void InertiaVisual::Load(const math::Pose &_pose,
   boxVis->SetMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
   boxVis->SetCastShadows(false);
 
-  boxVis->SetScale(_scale.Ign());
-  boxVis->SetPosition(_pose.pos.Ign());
+  boxVis->SetScale(_scale);
+  boxVis->SetPosition(_pose.pos);
   boxVis->SetRotation(_pose.rot);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);

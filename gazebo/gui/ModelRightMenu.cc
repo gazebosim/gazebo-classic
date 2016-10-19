@@ -166,9 +166,7 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 ModelRightMenu::~ModelRightMenu()
 {
-  this->requestSub.reset();
   this->node->Fini();
-  this->node.reset();
 }
 
 /////////////////////////////////////////////////

@@ -756,19 +756,14 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
-  this->SetScale(_scale.Ign());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetScale(const ignition::math::Vector3d &_scale)
-{
-  if (this->dataPtr->scale == _scale)
+  if (this->dataPtr->scale == _scale.Ign())
     return;
 
   // update geom size based on scale.
-  this->UpdateGeomSize(this->DerivedScale() / this->dataPtr->scale * _scale);
+  this->UpdateGeomSize(
+      this->DerivedScale() / this->dataPtr->scale * _scale.Ign());
 
-  this->dataPtr->scale = _scale;
+  this->dataPtr->scale = _scale.Ign();
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(math::Vector3(this->dataPtr->scale)));
@@ -1684,14 +1679,15 @@ bool Visual::GetVisible() const
 //////////////////////////////////////////////////
 void Visual::SetPosition(const math::Vector3 &_pos)
 {
-  this->SetPosition(_pos.Ign());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetPosition(const ignition::math::Vector3d &_pos)
-{
-  GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
-  this->dataPtr->sceneNode->setPosition(_pos.X(), _pos.Y(), _pos.Z());
+  /*if (this->IsStatic() && this->staticGeom)
+  {
+    this->staticGeom->reset();
+    delete this->staticGeom;
+    this->staticGeom = nullptr;
+    // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
+  }*/
+  GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is null");
+  this->dataPtr->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 
   this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
 }
@@ -1709,7 +1705,7 @@ void Visual::SetRotation(const math::Quaternion &_rot)
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
-  this->SetPosition(_pose.pos.Ign());
+  this->SetPosition(_pose.pos);
   this->SetRotation(_pose.rot);
 }
 
@@ -2394,7 +2390,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       this->UpdateTransparency(true);
     }
 
-    ignition::math::Vector3d geomScale(1, 1, 1);
+    math::Vector3 geomScale(1, 1, 1);
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
@@ -2402,26 +2398,26 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
-      geomScale.X(_msg->geometry().cylinder().radius() * 2.0);
-      geomScale.Y(_msg->geometry().cylinder().radius() * 2.0);
-      geomScale.Z(_msg->geometry().cylinder().length());
+      geomScale.x = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.y = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.z = _msg->geometry().cylinder().length();
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
     {
-      geomScale.X() = geomScale.Y() = geomScale.Z()
+      geomScale.x = geomScale.y = geomScale.z
           = _msg->geometry().sphere().radius() * 2.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
       if (_msg->geometry().plane().has_size())
       {
-        geomScale.X(_msg->geometry().plane().size().x());
-        geomScale.Y(_msg->geometry().plane().size().y());
+        geomScale.x = _msg->geometry().plane().size().x();
+        geomScale.y = _msg->geometry().plane().size().y();
       }
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
     {
-      geomScale.X() = geomScale.Y() = geomScale.Z()
+      geomScale.x = geomScale.y = geomScale.z
           = _msg->geometry().image().scale();
     }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)

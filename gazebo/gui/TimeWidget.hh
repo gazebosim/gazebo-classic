@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GAZEBO_GUI_TIMEWIDGET_HH_
-#define GAZEBO_GUI_TIMEWIDGET_HH_
+#ifndef _GAZEBO_TIME_WIDGET_HH_
+#define _GAZEBO_TIME_WIDGET_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/TimePanel.hh"

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_RENDERING_ORTHOVIEWCONTROLLER_HH_
-#define GAZEBO_RENDERING_ORTHOVIEWCONTROLLER_HH_
+#ifndef _GAZEBO_ORTHOVIEWCONTROLLER_HH_
+#define _GAZEBO_ORTHOVIEWCONTROLLER_HH_
 
 #include <string>
 
@@ -39,7 +39,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _camera Pointer to the camera to control.
-      public: explicit OrthoViewController(UserCameraPtr _camera);
+      public: OrthoViewController(UserCameraPtr _camera);
 
       /// \brief Destructor.
       public: virtual ~OrthoViewController();

@@ -115,7 +115,7 @@ void ContactVisual::Update()
         this->CreateNewPoint();
 
       dPtr->points[c]->contactPointVis->SetVisible(true);
-      dPtr->points[c]->contactPointVis->SetPosition(pos.Ign());
+      dPtr->points[c]->contactPointVis->SetPosition(pos);
 
       dPtr->points[c]->normal->SetPoint(1, (normal*normalScale).Ign());
       dPtr->points[c]->depth->SetPoint(1, (normal*-depth*10).Ign());

@@ -14,8 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_RENDERING_DYNAMICLINES_HH
-#define GAZEBO_RENDERING_DYNAMICLINES_HH
+/* Desc: Dynamic line generator
+ * Author: Nate Koenig
+ * Date: 28 June 2007
+ */
+
+#ifndef DYNAMICLINES_HH
+#define DYNAMICLINES_HH
 
 #include <vector>
 #include <string>
@@ -38,8 +43,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _opType The type of Line
-      public: explicit DynamicLines(
-                  RenderOpType _opType = RENDERING_LINE_STRIP);
+      public: DynamicLines(RenderOpType _opType = RENDERING_LINE_STRIP);
 
       /// \brief Destructor
       public: virtual ~DynamicLines();

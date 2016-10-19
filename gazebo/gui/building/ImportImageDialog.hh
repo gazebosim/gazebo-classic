@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_BUILDING_IMPORTIMAGEDIALOG_HH_
-#define GAZEBO_GUI_BUILDING_IMPORTIMAGEDIALOG_HH_
+
+#ifndef _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
+#define _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
 
 #include <memory>
 

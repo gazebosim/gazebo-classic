@@ -76,7 +76,7 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   world->Step(200);
 
   // Try moving the model
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
 
   auto pose = model->GetWorldPose();
@@ -193,7 +193,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -250,8 +250,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor01->IsActive());
   EXPECT_TRUE(contactSensor02->IsActive());
 
-  physics::ModelPtr contactModel01 = world->GetModel(modelName01);
-  physics::ModelPtr contactModel02 = world->GetModel(modelName02);
+  physics::ModelPtr contactModel01 = world->ModelByName(modelName01);
+  physics::ModelPtr contactModel02 = world->ModelByName(modelName02);
   ASSERT_TRUE(contactModel01 != NULL);
   ASSERT_TRUE(contactModel02 != NULL);
 
@@ -429,7 +429,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -463,7 +463,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   EXPECT_TRUE(contactSensor->IsActive());
 
-  physics::ModelPtr contactModel = world->GetModel(modelName);
+  physics::ModelPtr contactModel = world->ModelByName(modelName);
   ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;

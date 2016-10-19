@@ -49,7 +49,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   physics::WorldPtr world = _model->GetWorld();
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(world->GetName());
+  this->node->Init(world->Name());
 
   this->velocitySub = this->node->Subscribe(
       "~/" + _model->GetName() + "/harness/velocity",
@@ -64,16 +64,31 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   while (jointElem)
   {
     std::string jointName = jointElem->Get<std::string>("name");
-    try
+    std::string jointType = jointElem->Get<std::string>("type");
+
+    // Create the joint
+    physics::JointPtr joint = world->Physics()->CreateJoint(jointType);
+    if (joint)
     {
-      auto joint = _model->CreateJoint(jointElem);
-      this->joints.push_back(joint);
+      // Load the joint
+      try
+      {
+        joint->SetModel(_model);
+        joint->SetWorld(world);
+
+        joint->Load(jointElem);
+        this->joints.push_back(joint);
+      }
+      catch(gazebo::common::Exception &_e)
+      {
+        gzerr << "Unable to load joint[" << jointName << "]. "
+              << _e.GetErrorStr()
+              << std::endl;
+      }
     }
-    catch(gazebo::common::Exception &_e)
+    else
     {
-      gzerr << "Unable to load joint[" << jointName << "]. "
-            << _e.GetErrorStr()
-            << std::endl;
+      gzerr << "Unable to create joint[" << jointName << "\n";
     }
 
     jointElem = jointElem->GetNextElement("joint");
@@ -224,19 +239,6 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   }
   common::Time dt = _info.simTime - this->prevSimTime;
 
-  if (this->winchIndex < 0 ||
-      this->winchIndex >= static_cast<int>(this->joints.size()))
-  {
-    if (this->detachIndex >= 0 &&
-        this->detachIndex < static_cast<int>(this->joints.size()))
-    {
-      gzmsg << "Detaching harness joint" << std::endl;
-      this->Detach();
-    }
-    gzerr << "No known winch joint to control" << std::endl;
-    return;
-  }
-
   double pError = 0;
   if (ignition::math::equal(this->winchTargetVel, 0.0f))
   {
@@ -267,31 +269,13 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 /////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
-  if (this->detachIndex < 0 ||
-      this->detachIndex >= static_cast<int>(this->joints.size()))
-  {
-    gzerr << "No known joint to detach" << std::endl;
-    return;
-  }
-  const auto detachName = this->joints[this->detachIndex]->GetName();
-  physics::BasePtr parent = this->joints[this->detachIndex]->Base::GetParent();
+  this->joints[this->detachIndex]->Detach();
+  (this->joints[this->detachIndex]).reset();
 
-  auto model = boost::dynamic_pointer_cast<physics::Model>(parent);
-  if (!model)
-  {
-    gzerr << "Can't get valid model pointer" << std::endl;
-    return;
-  }
+  this->prevSimTime == common::Time::Zero;
 
   // We no longer need to update
   this->updateConnection.reset();
-
-  (this->joints[this->detachIndex]).reset();
-  model->RemoveJoint(detachName);
-  this->detachIndex = -1;
-  this->winchIndex = -1;
-
-  this->prevSimTime == common::Time::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -303,13 +287,6 @@ double HarnessPlugin::WinchVelocity() const
 /////////////////////////////////////////////////
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
-  if (this->winchIndex < 0 ||
-      this->winchIndex >= static_cast<int>(this->joints.size()))
-  {
-    gzerr << "No known winch joint to set velocity" << std::endl;
-    return;
-  }
-
   this->winchTargetVel = _value;
   if (ignition::math::equal(_value, 0.0f))
   {
@@ -352,6 +329,6 @@ void HarnessPlugin::OnDetach(ConstGzStringPtr &_msg)
       _msg->data() == "TRUE" ||
       _msg->data() == "True")
   {
-    this->winchIndex = -1;
+    this->Detach();
   }
 }

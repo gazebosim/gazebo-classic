@@ -33,7 +33,7 @@ namespace gazebo
       public Ogre::RenderTargetListener
     {
       /// \brief Constructor
-      public: explicit SelectionRenderListener(MaterialSwitcher *_switcher);
+      public: SelectionRenderListener(MaterialSwitcher *_switcher);
 
       /// \brief Destructor
       public: ~SelectionRenderListener();

@@ -57,12 +57,12 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // create some fake links
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink("link_1");
   ASSERT_TRUE(link != NULL);
@@ -87,7 +87,7 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   {
     // try creating a joint
     {
-      joint = world->GetPhysicsEngine()->CreateJoint(
+      joint = world->Physics()->CreateJoint(
         "revolute", model);
       joint->Attach(parentLink, childLink);
       // load adds the joint to a vector of shared pointers kept
@@ -159,11 +159,11 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("double_pendulum");
+  physics::ModelPtr model = world->ModelByName("double_pendulum");
   ASSERT_TRUE(model != NULL);
 
   {
@@ -200,17 +200,17 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // All models should oscillate with the same frequency
-  physics::ModelPtr modelPrismatic = world->GetModel("model_3_prismatic");
-  physics::ModelPtr modelRevolute = world->GetModel("model_3_revolute");
-  physics::ModelPtr modelPlugin = world->GetModel("model_4_prismatic_plugin");
-  physics::ModelPtr modelContact = world->GetModel("model_5_soft_contact");
-  physics::ModelPtr modelPrismatic2 = world->GetModel("model_6_prismatic_sdf");
-  physics::ModelPtr modelRevolute2 = world->GetModel("model_7_revolute_sdf");
+  physics::ModelPtr modelPrismatic = world->ModelByName("model_3_prismatic");
+  physics::ModelPtr modelRevolute = world->ModelByName("model_3_revolute");
+  physics::ModelPtr modelPlugin = world->ModelByName("model_4_prismatic_plugin");
+  physics::ModelPtr modelContact = world->ModelByName("model_5_soft_contact");
+  physics::ModelPtr modelPrismatic2 = world->ModelByName("model_6_prismatic_sdf");
+  physics::ModelPtr modelRevolute2 = world->ModelByName("model_7_revolute_sdf");
 
   ASSERT_TRUE(modelPrismatic != NULL);
   ASSERT_TRUE(modelRevolute != NULL);
@@ -409,7 +409,7 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -418,8 +418,8 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
       math::Vector3::Zero, false);
   SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
       math::Vector3::Zero, false);
-  physics::ModelPtr model  = world->GetModel("box1");
-  physics::ModelPtr model2 = world->GetModel("box2");
+  physics::ModelPtr model  = world->ModelByName("box1");
+  physics::ModelPtr model2 = world->ModelByName("box2");
   ASSERT_TRUE(model  != NULL);
   ASSERT_TRUE(model2 != NULL);
 
@@ -469,7 +469,7 @@ TEST_F(JointTest, joint_SDF14)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   int i = 0;
@@ -482,9 +482,9 @@ TEST_F(JointTest, joint_SDF14)
   if (i > 20)
     gzthrow("Unable to get joint14_model");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
   EXPECT_TRUE(physicsEngine != NULL);
-  physics::ModelPtr model = world->GetModel("joint14_model");
+  physics::ModelPtr model = world->ModelByName("joint14_model");
   EXPECT_TRUE(model != NULL);
   physics::LinkPtr link1 = model->GetLink("body1");
   EXPECT_TRUE(link1 != NULL);

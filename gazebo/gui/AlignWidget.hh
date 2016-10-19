@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_ALIGNWIDGET_HH_
-#define GAZEBO_GUI_ALIGNWIDGET_HH_
+#ifndef _GAZEBO_ALIGN_WIDGET_HH_
+#define _GAZEBO_ALIGN_WIDGET_HH_
 
 #include <string>
 

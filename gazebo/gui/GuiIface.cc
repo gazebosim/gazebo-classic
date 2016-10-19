@@ -367,10 +367,10 @@ bool gui::run(int _argc, char **_argv)
   g_app->exec();
 
   gazebo::gui::fini();
+  gazebo::client::shutdown();
 
   delete g_splashScreen;
   delete g_main_win;
-  gazebo::client::shutdown();
   return true;
 }
 

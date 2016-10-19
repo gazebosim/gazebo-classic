@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_MODEL_EDITORMATERIALSWITCHER_HH_
-#define GAZEBO_GUI_MODEL_EDITORMATERIALSWITCHER_HH_
+
+#ifndef _GAZEBO_EDITOR_MATERIAL_SWITCHER_HH_
+#define _GAZEBO_EDITOR_MATERIAL_SWITCHER_HH_
 
 #include <string>
 
@@ -84,7 +85,7 @@ namespace gazebo
       /// \param[in] _switcher Material listener that will be added to or
       /// removed from Ogre material manager's list of listeners.
       public: EditorRenderTargetListener(
-                  const EditorMaterialListenerPtr &_switcher);
+          const EditorMaterialListenerPtr &_switcher);
 
       /// \brief Destructor
       public: ~EditorRenderTargetListener() = default;

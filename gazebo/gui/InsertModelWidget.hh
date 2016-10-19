@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_INSERTMODELWIDGET_HH_
-#define GAZEBO_GUI_INSERTMODELWIDGET_HH_
+#ifndef _INSERT_MODEL_WIDGET_HH_
+#define _INSERT_MODEL_WIDGET_HH_
 
 
 #include <string>

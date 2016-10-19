@@ -112,7 +112,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
     // Modify the reference geotedic latitude/longitude.
     // A GPS sensor will use the real georeferenced coordinates of the terrain.
     common::SphericalCoordinatesPtr sphericalCoordinates;
-    sphericalCoordinates = this->world->GetSphericalCoordinates();
+    sphericalCoordinates = this->world->SphericalCoords();
 
     if (sphericalCoordinates)
     {

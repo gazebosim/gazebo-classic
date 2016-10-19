@@ -45,7 +45,7 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera,
 
   this->refVisual->Load();
   this->refVisual->AttachMesh("unit_sphere");
-  this->refVisual->SetScale(ignition::math::Vector3d(0.2, 0.2, 0.1));
+  this->refVisual->SetScale(math::Vector3(0.2, 0.2, 0.1));
   this->refVisual->SetCastShadows(false);
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
@@ -374,8 +374,7 @@ void OrbitViewController::UpdateRefVisual()
   // Update the size of the referenve visual based on the distance to the
   // focal point.
   double scale = this->distance * atan(GZ_DTOR(1.0));
-  this->refVisual->SetScale(
-      ignition::math::Vector3d(scale, scale, scale * 0.5));
+  this->refVisual->SetScale(math::Vector3(scale, scale, scale * 0.5));
 }
 
 /////////////////////////////////////////////////

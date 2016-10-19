@@ -36,7 +36,7 @@ set (test_sources
   gz_log_TEST.cc
   gz_TEST.cc
 )
-gz_build_tests(${test_sources} EXTRA_LIBS libgazebo_client gazebo_transport gazebo_util)
+gz_build_tests(${test_sources} EXTRA_LIBS gazebo_transport gazebo_util)
 
 if (ENABLE_TESTS_COMPILATION)
   add_dependencies(${TEST_TYPE}_gz_log_TEST gz)

@@ -46,12 +46,12 @@ void LinkFrameVisual::Load()
   double linkSize = std::max(0.1,
       dPtr->parent->GetBoundingBox().GetSize().GetLength());
   linkSize = std::min(linkSize, 1.0);
-  dPtr->scaleToLink = ignition::math::Vector3d(linkSize * 0.7,
-                                               linkSize * 0.7,
-                                               linkSize * 0.7);
+  dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
+                                    linkSize * 0.7,
+                                    linkSize * 0.7);
 
   // Scale according to the link it is attached to
-  if (dPtr->scaleToLink != ignition::math::Vector3d::Zero)
+  if (dPtr->scaleToLink != math::Vector3::Zero)
     this->SetScale(dPtr->scaleToLink);
 
   // Don't scale when link is scaled

@@ -120,9 +120,9 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 
   // check if any model in the world is in the region or if a model that was
   // previously in the region has exited the region.
-  for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
+  for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
   {
-    physics::ModelPtr m = this->world->GetModel(i);
+    physics::ModelPtr m = this->world->ModelByIndex(i);
     std::string name = m->GetName();
 
     if (name == "ground_plane" || name == this->modelName)

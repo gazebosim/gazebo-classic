@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_RENDERING_JOINTVISUAL_PRIVATE_HH_
-#define GAZEBO_RENDERING_JOINTVISUAL_PRIVATE_HH_
+
+#ifndef _JOINTVISUAL_PRIVATE_HH_
+#define _JOINTVISUAL_PRIVATE_HH_
 
 #include <string>
-#include <ignition/math/Vector3.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 
@@ -42,7 +42,7 @@ namespace gazebo
       public: JointVisualPtr parentAxisVis;
 
       /// \brief Scale based on the size of the joint's child link.
-      public: ignition::math::Vector3d scaleToLink;
+      public: math::Vector3 scaleToLink;
     };
   }
 }

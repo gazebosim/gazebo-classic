@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
-#define GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
+#ifndef _GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
+#define _GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
 
 #include <mutex>
 #include <string>

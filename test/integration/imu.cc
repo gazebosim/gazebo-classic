@@ -125,7 +125,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get pendulum
   std::string pendulumName = "model_pendulum";
-  physics::ModelPtr pendulumModel = world->GetModel(pendulumName);
+  physics::ModelPtr pendulumModel = world->ModelByName(pendulumName);
   ASSERT_TRUE(pendulumModel != NULL);
 
   std::string pendulumSensorName = "pendulum_imu_sensor";
@@ -137,7 +137,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get friction ball
   std::string ballFrictionName = "model_ball";
-  physics::ModelPtr ballFrictionModel = world->GetModel(ballFrictionName);
+  physics::ModelPtr ballFrictionModel = world->ModelByName(ballFrictionName);
   ASSERT_TRUE(ballFrictionModel != NULL);
 
   std::string ballFrictionSensorName = "ball_imu_sensor";
@@ -149,7 +149,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get frictionless ball
   std::string ballNoFrictionName = "model_ball_no_friction";
-  physics::ModelPtr ballNoFrictionModel = world->GetModel(ballNoFrictionName);
+  physics::ModelPtr ballNoFrictionModel = world->ModelByName(ballNoFrictionName);
   ASSERT_TRUE(ballNoFrictionModel != NULL);
 
   std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";
@@ -161,7 +161,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get floating ball
   std::string ballFloatingName = "model_floating_imu";
-  physics::ModelPtr ballFloatingModel = world->GetModel(ballFloatingName);
+  physics::ModelPtr ballFloatingModel = world->ModelByName(ballFloatingName);
   ASSERT_TRUE(ballFloatingModel != NULL);
 
   std::string ballFloatingSensorName = "ball_floating_imu_sensor";
@@ -192,7 +192,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   for (unsigned n = 0; n < 1900; ++n)
   {
     world->Step(1);
-    // gzdbg << "time: " << world->GetSimTime().Double() << "\n";
+    // gzdbg << "time: " << world->SimTime().Double() << "\n";
 
     // pendulum
     // on startup
@@ -213,7 +213,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       math::Vector3 worldLinearAccel =
         pendulumModel->GetWorldLinearAccel();
 
-      if (world->GetSimTime().Double() == 1.872)
+      if (world->SimTime().Double() == 1.872)
       {
         // initial values
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
@@ -260,7 +260,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       math::Vector3 worldLinearAccel =
         ballFrictionModel->GetWorldLinearAccel();
 
-      if (world->GetSimTime().Double() <= 1.0)
+      if (world->SimTime().Double() <= 1.0)
       {
         // freefall
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
@@ -274,13 +274,13 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         EXPECT_NEAR(worldLinearAccel.z, g.Z(), IMU_TOL);
       }
       // should use contact detector for these timing stuff
-      else if (world->GetSimTime().Double() >= 1.2 &&
-               world->GetSimTime().Double() <= 1.84)
+      else if (world->SimTime().Double() >= 1.2 &&
+               world->SimTime().Double() <= 1.84)
       {
         // on ramp
         // ...hm, not much can be said in simple terms, leave out for now.
       }
-      else if (world->GetSimTime().Double() >= 1.85)
+      else if (world->SimTime().Double() >= 1.85)
       {
         // on the ground
         double imuMag = imuLinearAccel.Length();
@@ -318,7 +318,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       math::Vector3 worldLinearAccel =
         ballNoFrictionModel->GetWorldLinearAccel();
 
-      if (world->GetSimTime().Double() <= 1.0)
+      if (world->SimTime().Double() <= 1.0)
       {
         // freefall
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
@@ -331,8 +331,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         EXPECT_NEAR(worldLinearAccel.y, g.Y(), IMU_TOL);
         EXPECT_NEAR(worldLinearAccel.z, g.Z(), IMU_TOL);
       }
-      else if (world->GetSimTime().Double() >= 1.3 &&
-               world->GetSimTime().Double() <= 1.751)
+      else if (world->SimTime().Double() >= 1.3 &&
+               world->SimTime().Double() <= 1.751)
       {
         // on the ramp
         const double rampAngle = 0.5;
@@ -345,7 +345,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         double worMag = worldLinearAccel.GetLength();
         EXPECT_NEAR(worMag, gMag*sin(rampAngle), IMU_TOL);
       }
-      else if (world->GetSimTime().Double() >= 1.8)
+      else if (world->SimTime().Double() >= 1.8)
       {
         // on the ground
         double imuMag = imuLinearAccel.Length();
@@ -510,7 +510,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(iyy, 0.1, 1e-6);
 
   // sec
-  const double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  const double dt = world->Physics()->GetMaxStepSize();
   EXPECT_NEAR(dt, 0.001, 1e-6);
 
   // 1.5 m/s , pitch rate

@@ -61,6 +61,17 @@ QMessageBox > QLabel
   color: #333333;
 }
 
+QMessageBox > QPushButton
+{
+  padding: 8px;
+  background-color: #616161;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 2px;
+  border: 0px;
+}
+
+
 QMainWindow#mainWindow
 {
   margin: 0px;
@@ -427,8 +438,16 @@ QPushButton:pressed
 
 QPushButton:!enabled
 {
-  color: #7a7a7a;
-  background: #404040;
+  padding: 2px;
+  margin: 2px;
+  color: #909090;
+  background: #707070;
+}
+
+QPushButton:focus
+{
+  border: none;
+  outline: none;
 }
 
 QScrollBar:vertical
@@ -1087,6 +1106,45 @@ QFileDialog QLineEdit
   background-color: #fefefe;
   border-bottom: 1px solid black;
   border-radius: 0px;
+}
+
+QFileDialog QPushButton:!enabled
+{
+  color: rgba(0, 0, 0, 26%);
+  selection-color: transparent;
+}
+
+QFileDialog QPushButton
+{
+  padding: 8px;
+  font-weight: 300;
+  color: #393939;
+  text-align: center;
+  border-radius: 0px;
+  border: 0px;
+  selection-color: transparent;
+  min-width: 80px;
+  margin: 8px;
+  background-color: rgba(153, 153, 153, 20%);
+}
+
+QFileDialog QPushButton:hover
+{
+  color: #393939;
+  selection-color: transparent;
+  background-color: rgba(153, 153, 153, 40%);
+}
+
+QFileDialog QPushButton:pressed
+{
+  color: #393939;
+  background-color: rgba(153, 153, 153, 60%);
+  selection-color: transparent;
+}
+
+QFileDialog QPushButton:checked
+{
+  selection-color: transparent;
 }
 
 /* --------------------------------------------- */

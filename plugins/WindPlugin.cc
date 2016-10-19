@@ -118,7 +118,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
-  double period = this->world->GetPhysicsEngine()->GetMaxStepSize();
+  double period = this->world->Physics()->GetMaxStepSize();
 
   this->kMag = period / this->characteristicTimeForWindRise;
   this->kDir = period / this->characteristicTimeForWindOrientationChange;
@@ -141,7 +141,7 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
   double magnitude = this->magnitudeMean;
 
   magnitude += this->magnitudeSinAmplitudePercent * this->magnitudeMean *
-    sin(2 * M_PI * this->world->GetSimTime().Double() /
+    sin(2 * M_PI * this->world->SimTime().Double() /
         this->magnitudeSinPeriod);
 
   if (this->noiseMagnitude)
@@ -160,7 +160,7 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
   direction = this->directionMean;
 
   direction += this->orientationSinAmplitude *
-    sin(2 * M_PI * this->world->GetSimTime().Double() /
+    sin(2 * M_PI * this->world->SimTime().Double() /
         this->orientationSinPeriod);
 
   if (this->noiseDirection)
@@ -183,7 +183,7 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 void WindPlugin::OnUpdate()
 {
   // Get all the models
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->world->Models();
 
   // Process each model.
   for (auto const &model : models)

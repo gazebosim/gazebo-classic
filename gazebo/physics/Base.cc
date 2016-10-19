@@ -320,7 +320,7 @@ BasePtr Base::GetByName(const std::string &_name)
 std::string Base::GetScopedName(bool _prependWorldName) const
 {
   if (_prependWorldName && this->world)
-    return this->world->GetName() + "::" + this->scopedName;
+    return this->world->Name() + "::" + this->scopedName;
   else
     return this->scopedName;
 }
@@ -346,7 +346,7 @@ common::URI Base::URI() const
 
   uri.Path().PushBack(this->TypeStr());
   uri.Path().PushBack(this->GetName());
-  uri.Path().PushFront(this->world->GetName());
+  uri.Path().PushFront(this->world->Name());
   uri.Path().PushFront("world");
 
   return uri;

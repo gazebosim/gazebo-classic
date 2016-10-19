@@ -168,7 +168,7 @@ void Model::LoadLinks()
     while (linkElem)
     {
       // Create a new link
-      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
+      LinkPtr link = this->GetWorld()->Physics()->CreateLink(
           boost::static_pointer_cast<Model>(shared_from_this()));
 
       /// \TODO: canonical link is hardcoded to the first link.
@@ -234,7 +234,7 @@ void Model::LoadModels()
     while (modelElem)
     {
       // Create a new model
-      ModelPtr model = this->GetWorld()->GetPhysicsEngine()->CreateModel(
+      ModelPtr model = this->GetWorld()->Physics()->CreateModel(
           boost::static_pointer_cast<Model>(shared_from_this()));
       model->SetWorld(this->GetWorld());
       model->Load(modelElem);
@@ -366,7 +366,7 @@ void Model::Update()
       iter->second->GetInterpolatedKeyFrame(kf);
 
       iter->second->AddTime(
-          (this->world->GetSimTime() - this->prevAnimationTime).Double());
+          (this->world->SimTime() - this->prevAnimationTime).Double());
 
       if (iter->second->GetTime() < iter->second->GetLength())
       {
@@ -388,7 +388,7 @@ void Model::Update()
       if (this->onJointAnimationComplete)
         this->onJointAnimationComplete();
     }
-    this->prevAnimationTime = this->world->GetSimTime();
+    this->prevAnimationTime = this->world->SimTime();
   }
 
   for (auto &model : this->models)
@@ -968,7 +968,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   std::string stype = _sdf->Get<std::string>("type");
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
+  joint = this->GetWorld()->Physics()->CreateJoint(stype,
      boost::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
   {
@@ -1290,7 +1290,7 @@ void Model::SetJointAnimation(
     this->jointAnimations[iter->first] = iter->second;
   }
   this->onJointAnimationComplete = _onComplete;
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = this->world->SimTime();
 }
 
 //////////////////////////////////////////////////
@@ -1566,46 +1566,13 @@ gazebo::physics::JointPtr Model::CreateJoint(
            << "], skipping creating joint.\n";
     return joint;
   }
-  joint =
-    this->world->GetPhysicsEngine()->CreateJoint(_type, shared_from_this());
+  joint = this->world->Physics()->CreateJoint(_type, shared_from_this());
   joint->SetName(_name);
   joint->Attach(_parent, _child);
   // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
   joint->Load(_parent, _child, gazebo::math::Pose());
   this->joints.push_back(joint);
   return joint;
-}
-
-/////////////////////////////////////////////////
-gazebo::physics::JointPtr Model::CreateJoint(sdf::ElementPtr _sdf)
-{
-  if (_sdf->GetName() != "joint" ||
-      !_sdf->HasAttribute("name") ||
-      !_sdf->HasAttribute("type"))
-  {
-    gzerr << "Invalid _sdf passed to Model::CreateJoint" << std::endl;
-    return physics::JointPtr();
-  }
-
-  std::string jointName(_sdf->Get<std::string>("name"));
-  if (this->GetJoint(jointName))
-  {
-    gzwarn << "Model [" << this->GetName()
-           << "] already has a joint named [" << jointName
-           << "], skipping creating joint.\n";
-    return physics::JointPtr();
-  }
-
-  try
-  {
-    // LoadJoint can throw if the scoped name of the joint already exists.
-    this->LoadJoint(_sdf);
-  }
-  catch(...)
-  {
-    gzerr << "LoadJoint Failed" << std::endl;
-  }
-  return this->GetJoint(jointName);
 }
 
 /////////////////////////////////////////////////
@@ -1616,12 +1583,7 @@ bool Model::RemoveJoint(const std::string &_name)
   if (joint)
   {
     this->world->SetPaused(true);
-    if (this->jointController)
-    {
-      this->jointController->RemoveJoint(joint.get());
-    }
     joint->Detach();
-    joint->Fini();
 
     this->joints.erase(
       std::remove(this->joints.begin(), this->joints.end(), joint),
@@ -1727,7 +1689,7 @@ LinkPtr Model::CreateLink(const std::string &_name)
     return link;
   }
 
-  link = this->world->GetPhysicsEngine()->CreateLink(shared_from_this());
+  link = this->world->Physics()->CreateLink(shared_from_this());
 
   link->SetName(_name);
   this->links.push_back(link);

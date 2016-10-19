@@ -23,7 +23,7 @@ using namespace rendering;
 
 class SSAOListener: public Ogre::CompositorInstance::Listener
 {
-  public: explicit SSAOListener(Ogre::CompositorInstance *_instance)
+  public: SSAOListener(Ogre::CompositorInstance *_instance)
           : instance(_instance) {}
 
   // this callback we will use to modify SSAO parameters

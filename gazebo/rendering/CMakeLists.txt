@@ -166,7 +166,6 @@ set (gtest_sources_dri
   LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
-  RenderEngine_TEST.cc
   RenderingLight_TEST.cc
   RFIDVisual_TEST.cc
   Scene_TEST.cc

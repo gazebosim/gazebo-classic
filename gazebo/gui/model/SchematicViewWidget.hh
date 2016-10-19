@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_MODEL_SCHEMATICVIEWWIDGET_HH_
-#define GAZEBO_GUI_MODEL_SCHEMATICVIEWWIDGET_HH_
+
+#ifndef _GAZEBO_SCHEMATIC_VIEW_WIDGET_HH_
+#define _GAZEBO_SCHEMATIC_VIEW_WIDGET_HH_
 
 #include <utility>
 #include <map>

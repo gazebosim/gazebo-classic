@@ -455,7 +455,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
-      newScale = this->SnapPoint(newScale);
+      newScale = SnapPoint(newScale);
       // prevent setting zero scale
       newScale.X(std::max(1e-4, newScale.X()));
       newScale.Y(std::max(1e-4, newScale.Y()));
@@ -496,7 +496,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
 
         if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         {
-          newScale = this->SnapPoint(newScale);
+          newScale = SnapPoint(newScale);
           // prevent setting zero scale
           newScale.X(std::max(1e-4, newScale.X()));
           newScale.Y(std::max(1e-4, newScale.Y()));

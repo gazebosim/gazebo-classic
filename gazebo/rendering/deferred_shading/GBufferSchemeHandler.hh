@@ -38,8 +38,7 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE GBufferSchemeHandler :
       public Ogre::MaterialManager::Listener
     {
-      public: explicit GBufferSchemeHandler(
-                  GBufferMaterialGenerator::GBufferType _type)
+      public: GBufferSchemeHandler(GBufferMaterialGenerator::GBufferType _type)
               : type(_type), materialGenerator(_type) {}
 
       public: virtual Ogre::Technique* handleSchemeNotFound(

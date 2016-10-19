@@ -50,7 +50,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   EXPECT_EQ(g, ignition::math::Vector3d(0.1, 0, -9.81));
 
   // get model
-  physics::ModelPtr model = world->GetModel("inertia_ratio");
+  physics::ModelPtr model = world->ModelByName("inertia_ratio");
   ASSERT_TRUE(model != NULL);
 
   // get links

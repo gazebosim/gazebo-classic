@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_BUILDING_BUILDINGEDITORPALETTE_HH_
-#define GAZEBO_GUI_BUILDING_BUILDINGEDITORPALETTE_HH_
+
+#ifndef _BUILDING_EDITOR_PALETTE_HH_
+#define _BUILDING_EDITOR_PALETTE_HH_
 
 #include <string>
 

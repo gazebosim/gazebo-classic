@@ -122,9 +122,9 @@ BuildingMaker::~BuildingMaker()
 {
   this->dataPtr->modelSDF.reset();
 
-  this->dataPtr->makerPub.reset();
   this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+  this->dataPtr->makerPub.reset();
 }
 
 /////////////////////////////////////////////////

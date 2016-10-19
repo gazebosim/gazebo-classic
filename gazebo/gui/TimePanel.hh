@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GAZEBO_GUI_TIMEPANEL_HH_
-#define GAZEBO_GUI_TIMEPANEL_HH_
+#ifndef _TIME_PANEL_HH_
+#define _TIME_PANEL_HH_
 
 #include <vector>
 #include <list>

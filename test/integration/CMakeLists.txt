@@ -44,7 +44,6 @@ set(tests
   gz_model.cc
   gz_physics.cc
   gz_world.cc
-  harness.cc
   imu.cc
   introspection_items.cc
   joint_controller.cc

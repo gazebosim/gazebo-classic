@@ -130,7 +130,7 @@ TEST_F(CameraTest, Visible)
   // box should be visible to the camera.
   EXPECT_TRUE(camera->IsVisible(visual));
 
-  physics::ModelPtr box = world->GetModel("box");
+  physics::ModelPtr box = world->ModelByName("box");
   ASSERT_TRUE(box != NULL);
 
   // move the box behind the camera and it should not be visible to the camera

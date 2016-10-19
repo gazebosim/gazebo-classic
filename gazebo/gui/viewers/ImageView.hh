@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_VIEWERS_IMAGEVIEW_HH_
-#define GAZEBO_GUI_VIEWERS_IMAGEVIEW_HH_
+#ifndef _IMAGEVIEW_HH_
+#define _IMAGEVIEW_HH_
 
 #include <string>
 

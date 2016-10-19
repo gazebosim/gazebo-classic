@@ -33,7 +33,7 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE MergeSchemeHandler :
       public Ogre::MaterialManager::Listener
     {
-      public: explicit MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)
+      public: MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)
       {
         if (this->useDSF)
         {

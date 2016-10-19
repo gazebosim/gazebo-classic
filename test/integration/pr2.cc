@@ -68,7 +68,7 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
   while (!camSensor->SaveFrame(paths->DefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
 
-  physics::get_world("default")->GetPhysicsEngine()->SetGravity(
+  physics::get_world("default")->Physics()->SetGravity(
       math::Vector3(-0.5, 0, -0.1));
   for (int i = 11; i < 200; i++)
   {
@@ -107,11 +107,11 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("pr2");
+  physics::ModelPtr model = world->ModelByName("pr2");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("torso_lift_link");
@@ -173,22 +173,22 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
   // simulate a few steps
   int steps = 20;
   world->Step(steps);
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  t = world->GetSimTime().Double();
+  t = world->SimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 

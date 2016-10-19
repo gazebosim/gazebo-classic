@@ -192,12 +192,7 @@ namespace gazebo
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
-      /// \deprecated See version that accepts ignition math parameters.
-      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the scale.
-      /// \param[in] _scale The scaling factor for the visual.
-      public: void SetScale(const ignition::math::Vector3d &_scale);
+      public: void SetScale(const math::Vector3 &_scale);
 
       /// \brief Get the scale.
       /// \return The scaling factor.
@@ -331,13 +326,7 @@ namespace gazebo
 
       /// \brief Set the position of the visual.
       /// \param[in] _pos The position to set the visual to.
-      /// \deprecated See version that accepts ignition math parameters
-      public: void SetPosition(const math::Vector3 &_pos)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the position of the visual.
-      /// \param[in] _pos The position to set the visual to.
-      public: void SetPosition(const ignition::math::Vector3d &_pos);
+      public: void SetPosition(const math::Vector3 &_pos);
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.

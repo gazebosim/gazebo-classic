@@ -16,6 +16,10 @@
 */
 #include <math.h>
 
+#ifdef  __APPLE__
+# include <QtCore/qglobal.h>
+#endif
+
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Events.hh"
@@ -81,7 +85,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::RenderWindow *window = NULL;
 
   // Mac and Windows *must* use externalWindow handle.
-#if defined(__APPLE__) || defined(_MSC_VER)
+#if defined(Q_OS_MAC) || defined(_MSC_VER)
   params["externalWindowHandle"] = _ogreHandle;
 #else
   params["parentWindowHandle"] = _ogreHandle;
@@ -89,9 +93,13 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   params["FSAA"] = "4";
   params["stereoMode"] = "Frame Sequential";
 
-  // Set the macAPI for Ogre
+  // Set the macAPI for Ogre based on the Qt implementation
+#ifdef QT_MAC_USE_COCOA
   params["macAPI"] = "cocoa";
   params["macAPICocoaUseNSView"] = "true";
+#else
+  params["macAPI"] = "carbon";
+#endif
 
   // Hide window if dimensions are less than or equal to one.
   if (_width <= 1 && _height <=1)

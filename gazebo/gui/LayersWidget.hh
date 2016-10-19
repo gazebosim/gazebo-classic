@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GAZEBO_GUI_LAYERSWIDGET_HH_
-#define GAZEBO_GUI_LAYERSWIDGET_HH_
+#ifndef _GAZEBO_LAYERS_WIDGET_HH_
+#define _GAZEBO_LAYERS_WIDGET_HH_
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/util/system.hh"

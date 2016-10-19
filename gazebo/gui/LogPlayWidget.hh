@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef GAZEBO_GUI_LOGPLAYWIDGET_HH_
-#define GAZEBO_GUI_LOGPLAYWIDGET_HH_
+#ifndef _GAZEBO_LOG_PLAY_WIDGET_HH_
+#define _GAZEBO_LOG_PLAY_WIDGET_HH_
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/gui/qt.h"
