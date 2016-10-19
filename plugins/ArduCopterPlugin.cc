@@ -16,7 +16,14 @@
 */
 #include <functional>
 #include <fcntl.h>
-#include <sys/socket.h>
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+#else
+  #include <sys/socket.h>
+#endif
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
