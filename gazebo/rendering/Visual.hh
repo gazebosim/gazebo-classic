@@ -348,6 +348,10 @@ namespace gazebo
       /// \return The Visual's pose.
       public: math::Pose GetPose() const;
 
+      /// \brief Get the initial relative pose of the visual.
+      /// \return The visual's initial relative pose.
+      public: ignition::math::Pose3d InitialRelativePose() const;
+
       /// \brief Get the global pose of the node.
       /// \return The pose in the world coordinate frame.
       public: math::Pose GetWorldPose() const;
@@ -610,7 +614,7 @@ namespace gazebo
       /// \return True if RT shader is used.
       public: bool UseRTShader() const;
 
-      /// \brief Set a message specific for this visual type. For example, a i
+      /// \brief Set a message specific for this visual type. For example, a
       /// link visual will have a link message.
       /// \param[in] _msg Message for this visual.
       public: void SetTypeMsg(const google::protobuf::Message *_msg);
@@ -619,7 +623,7 @@ namespace gazebo
       /// loaded yet.
       /// \param[in] _pair Pair with the child visual type and the message for
       /// the child.
-      public: void PushPendingChild(std::pair<VisualType,
+      public: void AddPendingChild(std::pair<VisualType,
           const google::protobuf::Message *> _pair);
 
       /// \brief Convert from msgs::Visual::Type to VisualType.

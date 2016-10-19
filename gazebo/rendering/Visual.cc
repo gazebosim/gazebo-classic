@@ -208,6 +208,8 @@ Visual::~Visual()
   this->dataPtr->parent.reset();
   this->dataPtr->children.clear();
 
+  delete this->dataPtr->typeMsg;
+
   delete this->dataPtr;
   this->dataPtr = 0;
 }
@@ -378,6 +380,7 @@ void Visual::Load()
 
   // Set the pose of the scene node
   this->SetPose(pose);
+  this->dataPtr->initialRelativePose = pose.Ign();
 
   // Get the size of the mesh
   if (obj)
@@ -1769,6 +1772,12 @@ math::Pose Visual::GetPose() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Pose3d Visual::InitialRelativePose() const
+{
+  return this->dataPtr->initialRelativePose;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
@@ -2930,17 +2939,13 @@ void Visual::ShowCollision(bool _show)
         continue;
       }
 
-      auto constMsg = dynamic_cast<const msgs::Visual *>(it->second);
-      if (!constMsg)
+      auto msg = dynamic_cast<msgs::Visual *>(it->second);
+      if (!msg)
       {
         gzerr << "Wrong message to generate collision visual." << std::endl;
       }
-      else
+      else if (!this->dataPtr->scene->GetVisual(msg->name()))
       {
-        // Copy to non const message
-        msgs::Visual *msg = new msgs::Visual();
-        msg->CopyFrom(*constMsg);
-
         // Set orange transparent material
         msg->mutable_material()->mutable_script()->add_uri(
             "file://media/materials/scripts/gazebo.material");
@@ -2962,10 +2967,9 @@ void Visual::ShowCollision(bool _show)
         visual->SetVisible(_show);
         visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
         visual->SetWireframe(this->dataPtr->scene->Wireframe());
-
-        delete msg;
       }
 
+      delete msg;
       this->dataPtr->pendingChildren.erase(it);
     }
   }
@@ -3048,15 +3052,16 @@ void Visual::ShowJoints(bool _show)
       }
 
       auto msg = dynamic_cast<const msgs::Joint *>(it->second);
+      std::string jointVisName = msg->name() + "_JOINT_VISUAL__";
       if (!msg)
       {
         ++it;
         continue;
       }
-      else
+      else if (!this->dataPtr->scene->GetVisual(jointVisName))
       {
-        JointVisualPtr jointVis(new JointVisual(
-            msg->name() + "_JOINT_VISUAL__", shared_from_this()));
+        JointVisualPtr jointVis(new JointVisual(jointVisName,
+            shared_from_this()));
 
         auto msgPtr = new ConstJointPtr(msg);
         jointVis->Load(*msgPtr);
@@ -3066,6 +3071,7 @@ void Visual::ShowJoints(bool _show)
           jointVis->SetId(msg->id());
       }
 
+      delete msg;
       this->dataPtr->pendingChildren.erase(it);
     }
   }
@@ -3419,7 +3425,7 @@ void Visual::SetTypeMsg(const google::protobuf::Message *_msg)
 }
 
 //////////////////////////////////////////////////
-void Visual::PushPendingChild(std::pair<VisualType,
+void Visual::AddPendingChild(std::pair<VisualType,
     const google::protobuf::Message *> _pair)
 {
   // Copy msg
@@ -3428,4 +3434,3 @@ void Visual::PushPendingChild(std::pair<VisualType,
 
   this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
 }
-
