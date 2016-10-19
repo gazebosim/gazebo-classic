@@ -348,12 +348,12 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         _sdf->Get<ignition::math::Pose3d>("modelToXForwardZUp");
   }
 
-  // gazeboToNED brings us from gazebo model frame: x-forward, y-right, z-down
+  // gazeboXYZToNED: from gazebo model frame: x-forward, y-right, z-down
   // to the aerospace convention: x-forward, y-left, z-up
-  this->gazeboToNED = ignition::math::Pose3d(0, 0, 0, IGN_PI, 0, 0);
+  this->gazeboXYZToNED = ignition::math::Pose3d(0, 0, 0, IGN_PI, 0, 0);
   if (_sdf->HasElement("gazeboXYZToNED"))
   {
-    this->gazeboToNED = _sdf->Get<ignition::math::Pose3d>("gazeboXYZToNED");
+    this->gazeboXYZToNED = _sdf->Get<ignition::math::Pose3d>("gazeboXYZToNED");
   }
 
   // per control channel
@@ -873,35 +873,38 @@ void ArduPilotPlugin::SendState() const
   // assuming the world NED frame has xyz mapped to NED,
   // imuLink is NED - z down
 
-  // model world pose brings us to model, x-forward, y-left, z-up
-  // adding gazeboToNED gets us to the x-forward, y-right, z-down
-  ignition::math::Pose3d worldToModel = this->modelToXForwardZUp +
+  // model world pose brings us to model,
+  // which for example zephyr has -y-forward, x-left, z-up
+  // adding modelToXForwardZUp rotates model to the x-forward, y-left, z-up
+  ignition::math::Pose3d gazeboXYZToModelXForwardZUp =
+    // this->modelToXForwardZUp +
     this->dataPtr->model->GetWorldPose().Ign();
 
   // get transform from world NED to Model frame
-  ignition::math::Pose3d NEDToModel = worldToModel - this->gazeboToNED;
+  ignition::math::Pose3d NEDToModelXForwardZUp =
+    gazeboXYZToModelXForwardZUp - this->gazeboXYZToNED;
 
-  // gzerr << "ned to model [" << NEDToModel << "]\n";
+  // gzerr << "ned to model [" << NEDToModelXForwardZUp << "]\n";
 
   // N
-  pkt.positionXYZ[0] = NEDToModel.Pos().X();
+  pkt.positionXYZ[0] = NEDToModelXForwardZUp.Pos().X();
 
   // E
-  pkt.positionXYZ[1] = NEDToModel.Pos().Y();
+  pkt.positionXYZ[1] = NEDToModelXForwardZUp.Pos().Y();
 
   // D
-  pkt.positionXYZ[2] = NEDToModel.Pos().Z();
+  pkt.positionXYZ[2] = NEDToModelXForwardZUp.Pos().Z();
 
   // imuOrientationQuat is the rotation from world NED frame
   // to the uav frame.
-  pkt.imuOrientationQuat[0] = NEDToModel.Rot().W();
-  pkt.imuOrientationQuat[1] = NEDToModel.Rot().X();
-  pkt.imuOrientationQuat[2] = NEDToModel.Rot().Y();
-  pkt.imuOrientationQuat[3] = NEDToModel.Rot().Z();
+  pkt.imuOrientationQuat[0] = NEDToModelXForwardZUp.Rot().W();
+  pkt.imuOrientationQuat[1] = NEDToModelXForwardZUp.Rot().X();
+  pkt.imuOrientationQuat[2] = NEDToModelXForwardZUp.Rot().Y();
+  pkt.imuOrientationQuat[3] = NEDToModelXForwardZUp.Rot().Z();
 
-  // gzdbg << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
-  // gzdbg << "ned [" << this->gazeboToNED.rot.GetAsEuler() << "]\n";
-  // gzdbg << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
+  // gzdbg << "imu [" << gazeboXYZToModelXForwardZUp.rot.GetAsEuler() << "]\n";
+  // gzdbg << "ned [" << this->gazeboXYZToNED.rot.GetAsEuler() << "]\n";
+  // gzdbg << "rot [" << NEDToModelXForwardZUp.rot.GetAsEuler() << "]\n";
 
   // Get NED velocity in body frame *
   // or...
@@ -909,7 +912,7 @@ void ArduPilotPlugin::SendState() const
   ignition::math::Vector3d velGazeboWorldFrame =
     this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
   ignition::math::Vector3d velNEDFrame =
-    this->gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
+    this->gazeboXYZToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();
   pkt.velocityXYZ[1] = velNEDFrame.Y();
   pkt.velocityXYZ[2] = velNEDFrame.Z();

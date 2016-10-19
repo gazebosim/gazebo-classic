@@ -90,7 +90,7 @@ namespace gazebo
     private: ignition::math::Pose3d modelToXForwardZUp;
 
     /// \brief transform from world frame to NED frame
-    private: ignition::math::Pose3d gazeboToNED;
+    private: ignition::math::Pose3d gazeboXYZToNED;
   };
 }
 #endif
