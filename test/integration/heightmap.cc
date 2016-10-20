@@ -293,6 +293,9 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
 
   ignition::math::Pose3d boxNewRestPose = boxModel->GetWorldPose().Ign();
   EXPECT_EQ(boxNewRestPose, boxRestPose);
+#else
+  // prevent unused variable warning
+  (void)(_physicsEngine);
 #endif
 }
 
