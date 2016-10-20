@@ -84,7 +84,7 @@ namespace gazebo
       /// \param[in] _placeable True to make the object movable.
       public: void SetDARTCollisionShape(dart::dynamics::Shape *_shape,
                                          bool _placeable = true)
-              GAZEBO_DEPRECATED(6.0);
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
@@ -94,7 +94,7 @@ namespace gazebo
 
       /// \brief Get DART collision shape.
       public: dart::dynamics::Shape *GetDARTCollisionShape() const
-              GAZEBO_DEPRECATED(6.0);
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get DART collision shape.
       public: dart::dynamics::ShapePtr GetDARTCollisionShapePtr() const;
