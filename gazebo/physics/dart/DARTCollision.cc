@@ -154,11 +154,11 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
 //////////////////////////////////////////////////
 dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
 {
-  return this->GetDARTCollisionShapePtr().get();
+  return this->DARTCollisionShape().get();
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::ShapePtr DARTCollision::GetDARTCollisionShapePtr() const
+dart::dynamics::ShapePtr DARTCollision::DARTCollisionShape() const
 {
   return this->dataPtr->dtCollisionShape;
 }

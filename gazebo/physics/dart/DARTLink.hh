@@ -162,20 +162,20 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this link.
       /// \return Pointer to the DART World.
+      /// \deprecated See dart::simulation::WorldPtr DARTWorld(void) const
       public: dart::simulation::World *GetDARTWorld(void) const
-              DEPRECATED(6.0);
+              DEPRECATED(8.0);
 
       /// \brief Get pointer to DART World associated with this link.
       /// \return Pointer to the DART World.
-      public: dart::simulation::WorldPtr GetDARTWorldPtr(void) const;
-      // TODO: Rename to GetDARTWorld() in Gazebo 7.0.
+      public: dart::simulation::WorldPtr DARTWorld(void) const;
 
       /// \brief Get pointer to DART Model associated with this link.
       /// \return Pointer to the DART Model.
       public: DARTModelPtr GetDARTModel() const;
 
       /// \brief Get DART BodyNode properties
-      public: DARTBodyNodePropPtr GetDARTProperties() const;
+      public: DARTBodyNodePropPtr DARTProperties() const;
 
       /// \brief Set pointer to DART BodyNode associated with this link.
       /// \param[in] Pointer to DART BodyNode.

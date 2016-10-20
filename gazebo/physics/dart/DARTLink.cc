@@ -184,7 +184,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       DARTCollisionPtr dartCollision =
           boost::static_pointer_cast<DARTCollision>(child);
       this->dataPtr->dtProperties->mColShapes.push_back(
-            dartCollision->GetDARTCollisionShapePtr());
+            dartCollision->DARTCollisionShape());
     }
   }
 }
@@ -748,8 +748,7 @@ void DARTLink::SetSelfCollide(bool _collide)
   if (dtBodyNode->getSkeleton() == nullptr)
     return;
 
-  dart::simulation::WorldPtr dtWorld =
-      this->dataPtr->dartPhysics->GetDARTWorldPtr();
+  dart::simulation::WorldPtr dtWorld = this->dataPtr->dartPhysics->DARTWorld();
   dart::dynamics::SkeletonPtr dtSkeleton =
       dtBodyNode->getSkeleton();
   dart::collision::CollisionDetector *dtCollDet =
@@ -901,13 +900,13 @@ void DARTLink::SetLinkStatic(bool _static)
     // Add weld joint constraint to DART
     this->dataPtr->dtWeldJointConst =
         new dart::constraint::WeldJointConstraint(this->dataPtr->dtBodyNode);
-    GetDARTWorldPtr()->getConstraintSolver()->addConstraint(
+    this->DARTWorld()->getConstraintSolver()->addConstraint(
         this->dataPtr->dtWeldJointConst);
   }
   else
   {
     // Remove ball and revolute joint constraints from DART
-    GetDARTWorldPtr()->getConstraintSolver()->removeConstraint(
+    this->DARTWorld()->getConstraintSolver()->removeConstraint(
         this->dataPtr->dtWeldJointConst);
     delete this->dataPtr->dtWeldJointConst;
     this->dataPtr->dtWeldJointConst = nullptr;
@@ -950,13 +949,13 @@ DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 //////////////////////////////////////////////////
 dart::simulation::World *DARTLink::GetDARTWorld(void) const
 {
-  return GetDARTPhysics()->GetDARTWorldPtr().get();
+  return this->GetDARTPhysics()->DARTWorld().get();
 }
 
 //////////////////////////////////////////////////
-dart::simulation::WorldPtr DARTLink::GetDARTWorldPtr(void) const
+dart::simulation::WorldPtr DARTLink::DARTWorld(void) const
 {
-  return GetDARTPhysics()->GetDARTWorldPtr();
+  return this->GetDARTPhysics()->DARTWorld();
 }
 
 //////////////////////////////////////////////////
@@ -966,7 +965,7 @@ DARTModelPtr DARTLink::GetDARTModel() const
 }
 
 //////////////////////////////////////////////////
-DARTBodyNodePropPtr DARTLink::GetDARTProperties() const
+DARTBodyNodePropPtr DARTLink::DARTProperties() const
 {
   return this->dataPtr->dtProperties;
 }

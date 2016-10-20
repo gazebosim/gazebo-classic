@@ -82,23 +82,24 @@ namespace gazebo
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
+      /// \deprecated See version that accepts dart::dynamics::ShapePtr
       public: void SetDARTCollisionShape(dart::dynamics::Shape *_shape,
-                                         bool _placeable = true)
-              GAZEBO_DEPRECATED(6.0);
+                                         const bool _placeable = true)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
       public: void SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
-                                         bool _placeable = true);
+                                         const bool _placeable = true);
 
       /// \brief Get DART collision shape.
+      /// \deprecated See dart::dynamics::ShapePtr DARTCollisionShape()
       public: dart::dynamics::Shape *GetDARTCollisionShape() const
-              GAZEBO_DEPRECATED(6.0);
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get DART collision shape.
-      public: dart::dynamics::ShapePtr GetDARTCollisionShapePtr() const;
-      // TODO: Rename to GetDARTCollisionShape() in Gazebo 7.0.
+      public: dart::dynamics::ShapePtr DARTCollisionShape() const;
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to DARTSurfaceParams.

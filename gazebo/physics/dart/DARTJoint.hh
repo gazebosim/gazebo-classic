@@ -148,7 +148,7 @@ namespace gazebo
       public: DARTModelPtr GetDARTModel() const;
 
       /// \brief Get DART Joint properties
-      public: DARTJointPropPtr GetDARTProperties() const;
+      public: DARTJointPropPtr DARTProperties() const;
 
       /// \brief Set DART joint pointer.
       /// \param[in] A pointer to the DART joint.
