@@ -26,12 +26,8 @@
 #include <boost/filesystem.hpp>
 #include <sys/types.h>
 
-#ifdef __APPLE__
-# include <QtCore/qglobal.h>
-#endif
-
 // Not Apple or Windows
-#if not defined( Q_OS_MAC) && not defined(_WIN32)
+#if not defined(__APPLE__) && not defined(_WIN32)
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
@@ -382,7 +378,7 @@ void RenderEngine::Fini()
   this->dataPtr->scenes.clear();
 
   // Not Apple or Windows
-# if not defined( Q_OS_MAC) && not defined(_WIN32)
+# if not defined(__APPLE__) && not defined(_WIN32)
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -716,7 +712,7 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
-#if defined Q_OS_MAC || _WIN32
+#if defined __APPLE__ || _WIN32
   this->dummyDisplay = 0;
 #else
   try
