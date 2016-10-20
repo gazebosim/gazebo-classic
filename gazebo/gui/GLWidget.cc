@@ -69,7 +69,7 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->dataPtr->updateTimer = new QTimer(this);
   connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
-          this, SLOT(OnUpdateTimer()));
+          this, SLOT(update()));
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -291,13 +291,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   }
 
   _e->accept();
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnUpdateTimer()
-{
-  // Queue another render update
-  this->update();
 }
 
 /////////////////////////////////////////////////
@@ -888,7 +881,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   // Update at the camera's update rate
   this->dataPtr->updateTimer->start(
       static_cast<int>(
-        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
+        std::round(1000.0 / (4*this->dataPtr->userCamera->RenderRate()))));
 }
 
 /////////////////////////////////////////////////
