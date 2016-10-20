@@ -23,10 +23,10 @@
   #include <Ws2tcpip.h>
 #else
   #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
 #endif
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
 
 #include <mutex>
 #include <string>
