@@ -142,9 +142,9 @@ class Rotor
   public: double samplingRate;
   public: ignition::math::OnePole<double> velocityFilter;
 
-  public: static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
-  public: static constexpr double kDefaultFrequencyCutoff = 5.0;
-  public: static constexpr double kDefaultSamplingRate = 0.2;
+  public: static double kDefaultRotorVelocitySlowdownSim = 10.0;
+  public: static double kDefaultFrequencyCutoff = 5.0;
+  public: static double kDefaultSamplingRate = 0.2;
 };
 
 // Private data class
