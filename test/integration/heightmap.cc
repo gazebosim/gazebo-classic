@@ -384,7 +384,7 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
   // load a heightmap with red material
   Load("worlds/heightmap_material.world", false, _physicsEngine);
   physics::ModelPtr heightmap = GetModel("heightmap");
-  EXPECT_TRUE(heightmap != NULL);
+  ASSERT_NE(heightmap, nullptr);
 
   // spawn camera sensor to capture an image of heightmap
   std::string modelName = "camera_model";
