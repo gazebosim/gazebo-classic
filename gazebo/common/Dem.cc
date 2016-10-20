@@ -281,8 +281,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       double px4 = this->dataPtr->demData[y2 * this->dataPtr->side + x2];
       float h2 = (px3 - ((px3 - px4) * dx));
 
-      float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
-          this->GetMinElevation())) * _scale.Z();
+      float h = this->dataPtr->minElevation +
+          (h1 - ((h1 - h2) * dy) - this->dataPtr->minElevation) * _scale.Z();
 
       // Invert pixel definition so 1=ground, 0=full height,
       // if the terrain size has a negative z component
@@ -291,8 +291,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
         h *= -1;
 
       // Convert to 0 if a NODATA value is found
-      if (_size.Z() >= 0 && h < 0)
-        h = 0;
+      if (_size.Z() >= 0 && h < this->dataPtr->minElevation)
+        h = this->dataPtr->minElevation;
 
       // Store the height for future use
       if (!_flipY)

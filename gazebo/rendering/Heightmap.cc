@@ -393,14 +393,15 @@ void Heightmap::Load()
 
     if (this->dataPtr->heightmapData)
     {
+      // TODO add a virtual HeightmapData::GetMinElevation function to avoid the
+      // ifdef check. i.e. heightmapSizeZ = GetMaxElevation - GetMinElevation
       double heightmapSizeZ = this->dataPtr->heightmapData->GetMaxElevation();
 #ifdef HAVE_GDAL
       auto demData =
           dynamic_cast<common::Dem *>(this->dataPtr->heightmapData);
       if (demData)
       {
-        heightmapSizeZ = heightmapSizeZ -
-            std::max(0.0f, demData->GetMinElevation());
+        heightmapSizeZ = heightmapSizeZ - demData->GetMinElevation();
         if (this->dataPtr->terrainSize == ignition::math::Vector3d::Zero)
         {
           this->dataPtr->terrainSize = ignition::math::Vector3d(
@@ -420,15 +421,10 @@ void Heightmap::Load()
       scale.X(this->dataPtr->terrainSize.X() / vertSize);
       scale.Y(this->dataPtr->terrainSize.Y() / vertSize);
 
-      if (ignition::math::equal(
-          this->dataPtr->heightmapData->GetMaxElevation(), 0.0f))
-      {
-        scale.Z(fabs(this->dataPtr->terrainSize.Z()));
-      }
+      if (ignition::math::equal(heightmapSizeZ, 0.0))
+        scale.Z(1.0);
       else
-      {
         scale.Z(fabs(this->dataPtr->terrainSize.Z()) / heightmapSizeZ);
-      }
 
       // Construct the heightmap lookup table
       std::vector<float> lookup;

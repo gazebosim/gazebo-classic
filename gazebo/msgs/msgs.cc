@@ -954,7 +954,7 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::HEIGHTMAP);
 
-        // We do not want to set the size field to the default value of
+        // We do not want to set the size field to be the default values of
         // [1, 1, 1] if not specified (size is optional for DEMs). So mark it as
         // zero for now.
         // TODO remove the required rule in heightmapgeom.proto's size field

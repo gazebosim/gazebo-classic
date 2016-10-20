@@ -162,9 +162,27 @@ TEST_F(DemTest, FillHeightmap)
   EXPECT_EQ(vertSize * vertSize, elevations.size());
 
   // Check the elevation of some control points
-  EXPECT_FLOAT_EQ(119.58285, elevations.at(0));
-  EXPECT_FLOAT_EQ(114.27753, elevations.at(elevations.size() - 1));
-  EXPECT_FLOAT_EQ(148.07137, elevations.at(elevations.size() / 2));
+  EXPECT_FLOAT_EQ(184.94113, elevations.at(0));
+  EXPECT_FLOAT_EQ(179.63583, elevations.at(elevations.size() - 1));
+  EXPECT_FLOAT_EQ(213.42966, elevations.at(elevations.size() / 2));
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, NegDem)
+{
+  common::Dem dem;
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "media/materials/textures/dem_neg.tif";
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  // Check the heights and widths
+  EXPECT_EQ(33, static_cast<int>(dem.GetHeight()));
+  EXPECT_EQ(33, static_cast<int>(dem.GetWidth()));
+  EXPECT_FLOAT_EQ(293.51068, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(293.51089, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(-212.29616, dem.GetMinElevation());
+  EXPECT_FLOAT_EQ(-205.44009, dem.GetMaxElevation());
 }
 #endif
 

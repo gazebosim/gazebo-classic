@@ -133,6 +133,13 @@ TEST_F(Heightmap_TEST, LoadDEM)
   EXPECT_EQ(img.GetWidth(), vertSize);
   EXPECT_EQ(img.GetHeight(), vertSize);
 
+  // verify heights between value obtained using ray casting (heightmap->Height)
+  // and the actual elevation data (dem.GetElevation)
+  common::Dem dem;
+  EXPECT_EQ(dem.Load(path.string()), 0);
+  EXPECT_DOUBLE_EQ(heightmap->Height(0, 0),
+      dem.GetElevation(dem.GetWidth()/2, dem.GetHeight()/2));
+
   delete heightmap;
 }
 #endif
