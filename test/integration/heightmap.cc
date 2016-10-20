@@ -252,16 +252,16 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   Load("worlds/dem_neg.world", true, _physicsEngine);
 
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != nullptr);
+  ASSERT_NE(world, nullptr);
 
   physics::ModelPtr boxModel = GetModel("box");
-  EXPECT_TRUE(boxModel != nullptr);
+  ASSERT_NE(boxModel, nullptr);
 
   ignition::math::Pose3d boxInitPose(0, 0, -207, 0, 0, 0);
   EXPECT_EQ(boxModel->GetWorldPose().Ign(), boxInitPose);
 
   physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model != nullptr);
+  ASSERT_NE(model, nullptr);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -270,7 +270,7 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
     boost::dynamic_pointer_cast<physics::HeightmapShape>(
         collision->GetShape());
 
-  EXPECT_TRUE(shape != NULL);
+  ASSERT_NE(shape, nullptr);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
