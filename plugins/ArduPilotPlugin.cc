@@ -586,7 +586,6 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (imuScopedName.size() > 0)
   {
-    gzerr << imuScopedName[0] << "\n";
     this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
       (sensors::SensorManager::Instance()->GetSensor(imuScopedName[0]));
   }
