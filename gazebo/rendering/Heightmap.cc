@@ -68,15 +68,9 @@ Heightmap::Heightmap(ScenePtr _scene)
   : dataPtr(new HeightmapPrivate)
 {
   this->dataPtr->scene = _scene;
-  this->dataPtr->terrainGlobals = NULL;
-  this->dataPtr->terrainPaging = NULL;
-  this->dataPtr->pageManager = NULL;
 
   this->dataPtr->terrainIdx = 0;
   this->dataPtr->useTerrainPaging = false;
-
-  this->dataPtr->pageManager = NULL;
-  this->dataPtr->terrainPaging = NULL;
   this->dataPtr->terrainHashChanged = true;
   this->dataPtr->terrainsImported = true;
 
@@ -101,11 +95,11 @@ Heightmap::~Heightmap()
     this->dataPtr->terrainGroup->removeAllTerrains();
 
     OGRE_DELETE this->dataPtr->terrainGroup;
-    this->dataPtr->terrainGroup = NULL;
+    this->dataPtr->terrainGroup = nullptr;
   }
 
   OGRE_DELETE this->dataPtr->terrainGlobals;
-  this->dataPtr->terrainGlobals = NULL;
+  this->dataPtr->terrainGlobals = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -189,12 +183,12 @@ common::Image Heightmap::Image() const
   common::Image result;
 
   double height = 0.0;
-  unsigned char *imageData = NULL;
+  unsigned char *imageData = nullptr;
 
   /// \todo Support multiple terrain objects
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
 
   double minHeight = terrain->getMinHeight();
   double maxHeight = terrain->getMaxHeight() - minHeight;
@@ -350,7 +344,7 @@ bool Heightmap::PrepareTerrainPaging(
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
-  if (this->dataPtr->terrainGlobals != NULL)
+  if (this->dataPtr->terrainGlobals != nullptr)
     return;
 
   const Ogre::RenderSystemCapabilities *capabilities;
@@ -541,7 +535,9 @@ void Heightmap::Load()
 
   this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
-  this->SetupShadows(true);
+
+  // use gazebo shaders
+  this->CreateMaterial();
 
   if (!this->dataPtr->heights.empty())
   {
@@ -728,7 +724,7 @@ void Heightmap::ConfigureTerrainDefaults()
 void Heightmap::SetWireframe(const bool _show)
 {
   Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
 
   Ogre::Material *material = terrain->getMaterial().get();
 
@@ -1112,22 +1108,19 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, const double _outsideRadius,
 /////////////////////////////////////////////////
 void Heightmap::SetupShadows(bool _enableShadows)
 {
-  this->dataPtr->gzMatGen = new GzTerrainMatGen();
-
   // Assume we get a shader model 2 material profile
   Ogre::TerrainMaterialGeneratorA::SM2Profile *matProfile;
 
-  // RTSS PSSM shadows compatible terrain material
-  Ogre::TerrainMaterialGenerator *matGen = this->dataPtr->gzMatGen;
+  Ogre::TerrainMaterialGeneratorPtr matGen =
+      this->dataPtr->terrainGlobals->getDefaultMaterialGenerator();
 
-  Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
-  ptr.bind(matGen);
-
-  this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(ptr);
   matProfile = static_cast<GzTerrainMatGen::SM2Profile*>(
       matGen->getActiveProfile());
   if (!matProfile)
-    gzerr << "Invalid mat profile\n";
+  {
+    // using custom material script so ignore setting shadows
+    return;
+  }
 
   matProfile->setLayerParallaxMappingEnabled(false);
 
@@ -1142,7 +1135,50 @@ void Heightmap::SetupShadows(bool _enableShadows)
   }
   else
   {
-    matProfile->setReceiveDynamicShadowsPSSM(NULL);
+    matProfile->setReceiveDynamicShadowsPSSM(nullptr);
+  }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetMaterial(const std::string &_materialName)
+{
+  this->dataPtr->materialName = _materialName;
+  if (!this->dataPtr->materialName.empty() && this->dataPtr->terrainGlobals)
+    this->CreateMaterial();
+}
+
+/////////////////////////////////////////////////
+std::string Heightmap::MaterialName() const
+{
+  return this->dataPtr->materialName;
+}
+
+/////////////////////////////////////////////////
+void Heightmap::CreateMaterial()
+{
+  if (!this->dataPtr->materialName.empty())
+  {
+    // init custom material generator
+    Ogre::TerrainMaterialGeneratorPtr terrainMaterialGenerator;
+    TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial(
+        this->dataPtr->materialName);
+    terrainMaterialGenerator.bind(terrainMaterial);
+    this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(
+        terrainMaterialGenerator);
+  }
+  else
+  {
+    // use default material
+    // RTSS PSSM shadows compatible terrain material
+    if (!this->dataPtr->gzMatGen)
+      this->dataPtr->gzMatGen = new GzTerrainMatGen();
+
+    Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
+    ptr.bind(this->dataPtr->gzMatGen);
+
+    this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(ptr);
+
+    this->SetupShadows(true);
   }
 }
 
@@ -1195,7 +1231,7 @@ GzTerrainMatGen::SM2Profile::SM2Profile(
     const Ogre::String &_desc)
 : TerrainMaterialGeneratorA::SM2Profile(_parent, _name, _desc)
 {
-  this->mShaderGen = NULL;
+  this->mShaderGen = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -1203,7 +1239,7 @@ GzTerrainMatGen::SM2Profile::~SM2Profile()
 {
   // Because the base SM2Profile has no virtual destructor:
   delete this->mShaderGen;
-  this->mShaderGen = NULL;
+  this->mShaderGen = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -3087,4 +3123,112 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
   this->defaultFpParams(_prof, _terrain, _tt, ret);
 
   return ret;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// TerrainMaterial
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+TerrainMaterial::TerrainMaterial(const std::string &_materialname)
+{
+  this->materialName = _materialname;
+  this->mProfiles.push_back(OGRE_NEW Profile(this, "OgreMaterial",
+      "Profile for rendering Ogre standard material"));
+  this->setActiveProfile("OgreMaterial");
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::setMaterialByName(const std::string &_materialname)
+{
+  this->materialName = _materialname;
+}
+
+//////////////////////////////////////////////////
+TerrainMaterial::Profile::Profile(Ogre::TerrainMaterialGenerator *_parent,
+    const Ogre::String &_name, const Ogre::String &_desc)
+    : Ogre::TerrainMaterialGenerator::Profile(_parent, _name, _desc)
+{
+}
+
+//////////////////////////////////////////////////
+TerrainMaterial::Profile::~Profile()
+{
+}
+
+//////////////////////////////////////////////////
+bool TerrainMaterial::Profile::isVertexCompressionSupported() const
+{
+  return false;
+}
+
+//////////////////////////////////////////////////
+Ogre::MaterialPtr TerrainMaterial::Profile::generate(
+    const Ogre::Terrain *_terrain)
+{
+  const Ogre::String& matName = _terrain->getMaterialName();
+
+  Ogre::MaterialPtr mat =
+      Ogre::MaterialManager::getSingleton().getByName(matName);
+  if (!mat.isNull())
+      Ogre::MaterialManager::getSingleton().remove(matName);
+
+  // Set Ogre material
+  mat = Ogre::MaterialManager::getSingleton().getByName(
+      (dynamic_cast<TerrainMaterial *>(getParent()))->materialName);
+
+  // Get default pass
+  Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
+
+  // Add terrain's global normalmap to renderpass so the
+  // fragment program can find it.
+  Ogre::TextureUnitState *tu = p->createTextureUnitState(matName+"/nm");
+
+  Ogre::TexturePtr nmtx = _terrain->getTerrainNormalMap();
+      tu->_setTexturePtr(nmtx);
+
+  return mat;
+}
+
+//////////////////////////////////////////////////
+Ogre::MaterialPtr TerrainMaterial::Profile::generateForCompositeMap(
+    const Ogre::Terrain *_terrain)
+{
+  return _terrain->_getCompositeMapMaterial();
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::setLightmapEnabled(bool /*_enabled*/)
+{
+}
+
+//////////////////////////////////////////////////
+Ogre::uint8 TerrainMaterial::Profile::getMaxLayers(
+    const Ogre::Terrain */*_terrain*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::updateParams(const Ogre::MaterialPtr &/*_mat*/,
+    const Ogre::Terrain */*_terrain*/)
+{
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::updateParamsForCompositeMap(
+    const Ogre::MaterialPtr &/*_mat*/, const Ogre::Terrain */*_terrain*/)
+{
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::requestOptions(Ogre::Terrain *_terrain)
+{
+  _terrain->_setMorphRequired(true);
+  // enable global normal map
+  _terrain->_setNormalMapRequired(true);
+  _terrain->_setLightMapRequired(false);
+  _terrain->_setCompositeMapRequired(false);
 }
