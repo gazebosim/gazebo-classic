@@ -569,21 +569,57 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Get sensors
   std::string imuName;
   getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
-  std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
-      + "::" + this->dataPtr->model->GetScopedName()
-      + "::" + imuName;
-  this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
-    (sensors::SensorManager::Instance()->GetSensor(imuScopedName));
+  // std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
+  //     + "::" + this->dataPtr->model->GetScopedName()
+  //     + "::" + imuName;
+  std::vector<std::string> imuScopedName =
+    this->dataPtr->model->GetSensorScopedName(imuName);
+  if (imuScopedName.size() > 1)
+  {
+    gzwarn << "multiple names match [" << imuName << "] using first found"
+           << " name.\n";
+    for (unsigned k = 0; k < imuScopedName.size(); ++k)
+    {
+      gzwarn << "  sensor " << k << " [" << imuScopedName[k] << "].\n";
+    }
+  }
+
+  if (imuScopedName.size() > 0)
+  {
+    gzerr << imuScopedName[0] << "\n";
+    this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
+      (sensors::SensorManager::Instance()->GetSensor(imuScopedName[0]));
+  }
 
   if (!this->dataPtr->imuSensor)
   {
-    gzwarn << "imu_sensor scoped name [" << imuScopedName
-          << "] not found, trying unscoped name.\n" << "\n";
-    /// TODO: this fails for multi-nested models.
-    /// TODO: and transforms fail for rotated nested model,
-    ///       joints point the wrong way.
-    this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
-      (sensors::SensorManager::Instance()->GetSensor(imuName));
+    if (imuScopedName.size() > 1)
+    {
+      gzwarn << "first imu_sensor scoped name [" << imuScopedName[0]
+            << "] not found, trying the rest of the sensor names.\n";
+      for (unsigned k = 1; k < imuScopedName.size(); ++k)
+      {
+        this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
+          (sensors::SensorManager::Instance()->GetSensor(imuScopedName[k]));
+        if (this->dataPtr->imuSensor)
+        {
+          gzwarn << "found [" << imuScopedName[k] << "]\n";
+          break;
+        }
+      }
+    }
+
+    if (!this->dataPtr->imuSensor)
+    {
+      gzwarn << "imu_sensor scoped name [" << imuScopedName[0]
+            << "] not found, trying unscoped name.\n" << "\n";
+      /// TODO: this fails for multi-nested models.
+      /// TODO: and transforms fail for rotated nested model,
+      ///       joints point the wrong way.
+      this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
+        (sensors::SensorManager::Instance()->GetSensor(imuName));
+    }
+
     if (!this->dataPtr->imuSensor)
     {
       gzerr << "imu_sensor [" << imuName

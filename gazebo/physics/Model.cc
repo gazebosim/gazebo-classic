@@ -1082,6 +1082,38 @@ unsigned int Model::GetSensorCount() const
 }
 
 //////////////////////////////////////////////////
+std::vector<std::string> Model::GetSensorScopedName(
+  const std::string _name) const
+{
+  std::vector<std::string> names;
+  for (Link_V::const_iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetSensorCount(); ++j)
+    {
+      gzerr << (*iter)->GetSensorName(j)
+            << " : " << (*iter)->GetSensorName(j).size()
+            << " : "
+            << (*iter)->GetSensorName(j).substr(
+               (*iter)->GetSensorName(j).size()
+               - _name.size(), _name.size())
+            << " : " << _name
+            << "\n";
+      if ((*iter)->GetSensorName(j).substr(
+            (*iter)->GetSensorName(j).size()
+            - _name.size(), _name.size()) ==
+          _name)
+      {
+        gzerr << "found!\n";
+        names.push_back((*iter)->GetSensorName(j));
+      }
+    }
+  }
+
+  return names;
+}
+
+//////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->Get<std::string>("name");
