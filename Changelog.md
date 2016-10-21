@@ -10,6 +10,9 @@
     * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
     * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
 
+1. Support custom material scripts for heightmaps
+    * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
+
 ## Gazebo 7.4.0 (2016-10-11)
 
 1. Add test for HarnessPlugin, reduce likelihood of race condition
