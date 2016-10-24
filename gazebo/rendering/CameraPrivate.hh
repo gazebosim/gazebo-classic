@@ -71,15 +71,6 @@ namespace gazebo
       /// \brief Render period.
       public: common::Time renderPeriod;
 
-      /// \brief Position PID used to track a visual smoothly.
-      public: common::PID trackVisualPID;
-
-      /// \brief Pitch PID used to track a visual smoothly.
-      public: common::PID trackVisualPitchPID;
-
-      /// \brief Yaw PID used to track a visual smoothly.
-      public: common::PID trackVisualYawPID;
-
       /// \brief Communication Node
       public: transport::NodePtr node;
 
@@ -120,6 +111,12 @@ namespace gazebo
 
       /// \brief Video encoder.
       public: common::VideoEncoder videoEncoder;
+
+      /// \brief If set to true, the camera yaws around a fixed axis.
+      public: bool yawFixed;
+
+      /// \brief Fixed axis to yaw around.
+      public: ignition::math::Vector3d yawFixedAxis;
     };
   }
 }
