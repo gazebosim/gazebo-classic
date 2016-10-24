@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _MATRIX3_HH_
-#define _MATRIX3_HH_
+#ifndef GAZEBO_MATH_MATRIX3_HH_
+#define GAZEBO_MATH_MATRIX3_HH_
 
 #include <assert.h>
+#include <ignition/math/Matrix3.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
@@ -54,8 +55,16 @@ namespace gazebo
                       double _v10, double _v11, double _v12,
                       double _v20, double _v21, double _v22);
 
+      /// \brief Copy constructor for ignition math
+      /// \param _m Matrix to copy
+      public: Matrix3(const ignition::math::Matrix3d &_m);
+
       /// \brief Desctructor
       public: virtual ~Matrix3();
+
+      /// \brief Convert this matrix to an ignition::math::Matrix3d.
+      /// \return This matrix as an ignition::math::Matrix3d.
+      public: ignition::math::Matrix3d Ign() const;
 
       /// \brief Set the matrix from three axis (1 per column)
       /// \param[in] _xAxis The x axis

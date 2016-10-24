@@ -387,6 +387,14 @@ namespace gazebo
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
+      /// \brief Create a joint for this model
+      /// \param[in] _sdf SDF parameters for <joint>
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
+
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint
       /// \return true if successful, false if not.
@@ -437,6 +445,9 @@ namespace gazebo
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
       /// \brief Load all the links.
       private: void LoadLinks();
 
@@ -462,9 +473,6 @@ namespace gazebo
 
       /// \brief Publish the scale.
       private: virtual void PublishScale();
-
-      /// \brief Register items in the introspection service.
-      protected: virtual void RegisterIntrospectionItems();
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;

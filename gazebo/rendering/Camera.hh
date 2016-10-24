@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_RENDERING_CAMERA_HH_
-#define _GAZEBO_RENDERING_CAMERA_HH_
+#ifndef GAZEBO_RENDERING_CAMERA_HH_
+#define GAZEBO_RENDERING_CAMERA_HH_
 
 #include <memory>
 #include <functional>
@@ -401,6 +400,43 @@ namespace gazebo
       /// \brief Capture data once and save to disk
       public: void SetCaptureDataOnce();
 
+      /// \brief Turn on video recording.
+      /// \param[in] _format String that represents the video type.
+      /// Supported types include: "avi", "ogv", mp4", "v4l2". If using
+      /// "v4l2", you must also specify a _filename.
+      /// \param[in] _filename Name of the file that stores the video while it
+      /// is being created. This is a temporary file when recording to
+      /// disk, or a video4linux loopback device like /dev/video0 when
+      /// the _format is "v4l2". If blank, a default temporary file is used.
+      /// However, the "v4l2" _format must be accompanied with a video
+      /// loopback device filename.
+      /// \return True on success. The return value is set by
+      /// common::VideoEncoder::Start().
+      /// \sa common::VideoEncoder::Start
+      public: bool StartVideo(const std::string &_format,
+                              const std::string &_filename = "");
+
+      /// \brief Turn off video recording
+      /// \return True on success. The return value is set by
+      /// common::VideoEncoder::Stop().
+      /// \sa common::VideoEncoder::Stop
+      public: bool StopVideo();
+
+      /// \brief Save the last encoded video to disk
+      /// \param[in] _filename File in which to save the encoded video
+      /// \return True if saving was successful. The return value is set by
+      /// common::VideoEncoder::SaveToFile().
+      /// \sa common::VideoEncoder::SaveToFile
+      public: bool SaveVideo(const std::string &_filename);
+
+      /// \brief Reset video recording. This will call
+      /// common::VideoEncoder::Reset, which will cleanup temporary files and
+      /// set video encoding values to their default settings.
+      /// \sa common::VideoEncoder::Reset
+      /// \return True if reset was succesful. Currently this function will
+      /// always return true.
+      public: bool ResetVideo();
+
       /// \brief Set the render target
       /// \param[in] _textureName Name of the new render texture
       public: void CreateRenderTexture(const std::string &_textureName);
@@ -696,6 +732,16 @@ namespace gazebo
 
       /// \brief Set the clip distance based on stored SDF values
       protected: virtual void SetClipDist();
+
+      /// \brief Tell the camera whether to yaw around its own local Y axis or a
+      /// fixed axis of choice.
+      /// \param[in] _useFixed If true, the axis passed in the second parameter
+      /// will always be the yaw axis no matter what the camera orientation.
+      /// If false, the camera yaws around the local Y.
+      /// \param[in] _fixedAxis The axis to use if the first parameter is true.
+      protected: virtual void SetFixedYawAxis(const bool _useFixed,
+          const ignition::math::Vector3d &_fixedAxis =
+            ignition::math::Vector3d::UnitY);
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
