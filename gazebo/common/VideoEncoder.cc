@@ -21,7 +21,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifndef WIN32
+#ifndef _WIN32
   #include <sys/ioctl.h>
 #endif
 #ifdef HAVE_FFMPEG
