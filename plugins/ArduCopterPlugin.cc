@@ -142,10 +142,14 @@ class Rotor
   public: double samplingRate;
   public: ignition::math::OnePole<double> velocityFilter;
 
-  public: const static double kDefaultRotorVelocitySlowdownSim = 10.0;
-  public: const static double kDefaultFrequencyCutoff = 5.0;
-  public: const static double kDefaultSamplingRate = 0.2;
+  public: static double kDefaultRotorVelocitySlowdownSim;
+  public: static double kDefaultFrequencyCutoff;
+  public: static double kDefaultSamplingRate;
 };
+
+Rotor::kDefaultRotorVelocitySlowdownSim = 10.0;
+Rotor::kDefaultFrequencyCutoff = 5.0;
+Rotor::kDefaultSamplingRate = 0.2;
 
 // Private data class
 class gazebo::ArduCopterPluginPrivate
