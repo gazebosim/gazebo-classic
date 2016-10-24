@@ -2748,24 +2748,26 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       try
       {
         this->dataPtr->terrain = new Heightmap(shared_from_this());
-            // check the material fields and set material if it is specified
-            if (_msg->has_material())
+
+        // check the material fields and set material if it is specified
+        if (_msg->has_material())
+        {
+          auto matMsg = _msg->material();
+          if (matMsg.has_script())
+          {
+            auto scriptMsg = matMsg.script();
+            for (auto const uri : scriptMsg.uri())
             {
-              auto matMsg = _msg->material();
-              if (matMsg.has_script())
-              {
-                auto scriptMsg = matMsg.script();
-                for (auto const uri : scriptMsg.uri())
-                {
-                  if (!uri.empty())
-                    RenderEngine::Instance()->AddResourcePath(uri);
-                }
-                std::string matName = scriptMsg.name();
-                this->dataPtr->terrain->SetMaterial(matName);
-              }
+              if (!uri.empty())
+                RenderEngine::Instance()->AddResourcePath(uri);
             }
+            std::string matName = scriptMsg.name();
+            this->dataPtr->terrain->SetMaterial(matName);
+          }
+        }
         this->dataPtr->terrain->LoadFromMsg(_msg);
-      } catch(...)
+      }
+      catch(...)
       {
         return false;
       }
