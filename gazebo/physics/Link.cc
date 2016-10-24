@@ -1665,14 +1665,14 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 //////////////////////////////////////////////////
 void Link::SetStatic(const bool &_static)
 {
-  if (!_static)
+  if (!_static && !this->wrenchSub)
   {
     std::string topicName = "~/" + this->GetScopedName() + "/wrench";
     boost::replace_all(topicName, "::", "/");
     this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg,
         this);
   }
-  else
+  else if (_static)
   {
     this->wrenchSub.reset();
   }
