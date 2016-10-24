@@ -377,6 +377,24 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->tabWidget->hide();
   this->dataPtr->toolsWidget->hide();
 
+  this->dataPtr->responseSub.reset();
+  this->dataPtr->guiSub.reset();
+  this->dataPtr->newEntitySub.reset();
+  this->dataPtr->worldModSub.reset();
+  this->dataPtr->lightModifySub.reset();
+  this->dataPtr->lightFactorySub.reset();
+  this->dataPtr->worldControlPub.reset();
+  this->dataPtr->serverControlPub.reset();
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->scenePub.reset();
+  this->dataPtr->userCmdPub.reset();
+
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->pluginMsgs.clear();
+
+  this->dataPtr->node.reset();
+
   this->dataPtr->connections.clear();
 
 #ifdef HAVE_OCULUS
@@ -393,8 +411,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->dataPtr->spacenav = nullptr;
 
   emit Close();
-
-  gazebo::client::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -1405,7 +1421,7 @@ void MainWindow::CreateActions()
       tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
-  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setToolTip(tr("Log data (Ctrl+D)"));
   g_dataLoggerAct->setCheckable(true);
   g_dataLoggerAct->setChecked(false);
   this->connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
@@ -1886,7 +1902,6 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
-
   windowMenu->addAction(g_plotAct);
 
   bar->addSeparator();
