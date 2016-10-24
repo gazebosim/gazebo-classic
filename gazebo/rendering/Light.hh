@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_LIGHT_HH_
-#define _GAZEBO_RENDERING_LIGHT_HH_
+#ifndef GAZEBO_RENDERING_LIGHT_HH_
+#define GAZEBO_RENDERING_LIGHT_HH_
 
 #include <string>
 #include <iostream>
@@ -55,7 +55,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
-      public: Light(ScenePtr _scene);
+      public: explicit Light(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Light();

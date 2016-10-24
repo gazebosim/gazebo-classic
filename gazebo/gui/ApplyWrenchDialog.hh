@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
 #define GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
 

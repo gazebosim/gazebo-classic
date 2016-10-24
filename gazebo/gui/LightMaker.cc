@@ -59,6 +59,7 @@ LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
 //////////////////////////////////////////////////
 LightMaker::~LightMaker()
 {
+  this->dataPtr->lightPub.reset();
   this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
 }

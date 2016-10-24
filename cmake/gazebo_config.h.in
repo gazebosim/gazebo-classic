@@ -18,6 +18,7 @@
 #cmakedefine BUILD_TYPE_COVERAGE 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1
+#cmakedefine HAVE_AVDEVICE 1
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine HAVE_BULLET 1
 #cmakedefine HAVE_SIMBODY 1

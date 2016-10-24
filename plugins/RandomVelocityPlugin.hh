@@ -25,7 +25,7 @@
 namespace gazebo
 {
   // Forward declare private data class.
-  class RandomVelocityPrivate;
+  class RandomVelocityPluginPrivate;
 
   /// \brief Plugin that applies a random velocity to a linke periodically.
   ///
