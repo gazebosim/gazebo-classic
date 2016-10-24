@@ -15,14 +15,18 @@
  *
 */
 
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/rendering/Visual.hh"
+#include <ignition/math/Triangle.hh>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/common/MeshManager.hh"
+
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/RayQueryPrivate.hh"
 #include "gazebo/rendering/RayQuery.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 using namespace gazebo;
 using namespace rendering;

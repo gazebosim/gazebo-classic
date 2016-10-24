@@ -20,6 +20,11 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+#include <mutex>
+#include <ignition/math/Triangle.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"

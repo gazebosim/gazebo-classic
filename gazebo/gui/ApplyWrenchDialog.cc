@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 

@@ -17,8 +17,10 @@
 #ifndef GAZEBO_GUI_MODELSNAPPRIVATE_HH_
 #define GAZEBO_GUI_MODELSNAPPRIVATE_HH_
 
+#include <mutex>
 #include <ignition/math/Triangle3.hh>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"

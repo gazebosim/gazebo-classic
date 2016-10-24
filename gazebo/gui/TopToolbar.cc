@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/Actions.hh"
