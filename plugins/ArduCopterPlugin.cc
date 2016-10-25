@@ -223,7 +223,7 @@ class gazebo::ArduCopterPluginPrivate
     }
 
     #ifdef _WIN32
-    return recv(this->handle, (char *)_buf, _size, 0);
+    return recv(this->handle, reinterpret_cast<char *>(_buf), _size, 0);
     #else
     return recv(this->handle, _buf, _size, 0);
     #endif
@@ -290,8 +290,8 @@ ArduCopterPlugin::ArduCopterPlugin()
      reinterpret_cast<const char *>(&one), sizeof(one));
 
   #ifdef _WIN32
-  unsigned long on = 1;
-  ioctlsocket(this->dataPtr->handle, FIONBIO, &on);
+  u_long on = 1;
+  ioctlsocket(this->dataPtr->handle, FIONBIO, reinterpret_cast<u_long FAR *>(&on));
   #else
   fcntl(this->dataPtr->handle, F_SETFL,
       fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
