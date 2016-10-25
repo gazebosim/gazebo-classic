@@ -3,7 +3,7 @@
 ## Gazebo 8.x.x (2017-xx-xx)
 
 1. UserCamera overrides `Camera::Render` to reduce CPU usage. 
-    * [Pull request xxxx](https://bitbucket.org/osrf/gazebo/pull-request/xxxx)
+    * [Pull request 2480](https://bitbucket.org/osrf/gazebo/pull-request/2480)
 
 1. Add Gazebo math helper functions to convert to and from Ignition Math
    objects.
