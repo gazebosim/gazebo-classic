@@ -294,8 +294,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
     event::Events::preRender();
   }
 
-  this->update();
-
   _e->accept();
 }
 
