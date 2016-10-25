@@ -2406,6 +2406,8 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
   linkVis->ShowInertia(this->dataPtr->showInertias);
   linkVis->ShowCOM(this->dataPtr->showCOMs);
   linkVis->ShowLinkFrame(this->dataPtr->showLinkFrames);
+  linkVis->ShowCollision(this->dataPtr->showCollisions);
+  linkVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
@@ -2838,11 +2840,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   }
 
-  visual->ShowCOM(this->dataPtr->showCOMs);
-  visual->ShowInertia(this->dataPtr->showInertias);
-  visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
-  visual->ShowCollision(this->dataPtr->showCollisions);
-  visual->ShowJoints(this->dataPtr->showJoints);
   if (visual->GetType() == Visual::VT_MODEL)
     visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
   visual->SetWireframe(this->dataPtr->wireframe);
