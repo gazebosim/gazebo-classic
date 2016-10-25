@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. UserCamera overrides `Camera::Render` to reduce CPU usage. 
+    * [Pull request xxxx](https://bitbucket.org/osrf/gazebo/pull-request/xxxx)
+
 1. Add Gazebo math helper functions to convert to and from Ignition Math
    objects.
     * [Pull request #2461](https://bitbucket.org/osrf/gazebo/pull-request/2461)
@@ -170,10 +173,6 @@
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
-
-1. Update QT render loop to throttle based on UserCamera::RenderRate. 
-    * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
-    * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
 
 1. Add GUI items to change the user camera clip distance
     * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
