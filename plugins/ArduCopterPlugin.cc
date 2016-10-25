@@ -692,6 +692,6 @@ void ArduCopterPlugin::SendState() const
 
   ::sendto(this->dataPtr->handle,
            reinterpret_cast<raw_type *>(&pkt),
-	   sizeof(pkt), 0,
+           sizeof(pkt), 0,
            (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }
