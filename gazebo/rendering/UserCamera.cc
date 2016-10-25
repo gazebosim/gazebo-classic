@@ -252,6 +252,17 @@ void UserCamera::AnimationComplete()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::Render(const bool /*_force*/)
+{
+  if (this->initialized)
+  {
+    std::cout << "Here\n";
+    this->newData = true;
+    this->RenderImpl();
+  }
+}
+
+//////////////////////////////////////////////////
 void UserCamera::PostRender()
 {
   Camera::PostRender();

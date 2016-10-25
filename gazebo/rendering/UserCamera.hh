@@ -74,6 +74,14 @@ namespace gazebo
       /// \brief Render the camera
       public: virtual void Update();
 
+      /// \brief Render the camera. The _force parameter is igno
+      /// Called after the pre-render signal. This function will generate
+      /// camera images.
+      /// \param[in] _force Force camera to render. Ignore camera update
+      /// rate.
+      public: virtual void Render(const bool _force = false);
+      using Camera::Render;
+
       /// \brief Post render
       public: virtual void PostRender();
 
