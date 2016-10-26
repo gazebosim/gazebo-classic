@@ -2,8 +2,11 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
-1. UserCamera overrides `Camera::Render` to reduce CPU usage. 
+1. UserCamera overrides `Camera::Render` to reduce CPU usage.
     * [Pull request 2480](https://bitbucket.org/osrf/gazebo/pull-request/2480)
+
+1. Static links no longer subscribe to wrench topics.
+    * [Pull request #2452]((https://bitbucket.org/osrf/gazebo/pull-request/2452)
 
 1. Add Gazebo math helper functions to convert to and from Ignition Math
    objects.
@@ -11,7 +14,7 @@
 
 1. Add video recording of user camera. This change added an optional
    dependency on libavdevice>=56.4.100 for linux systems. When installed,
-   libavdevice will allow a user to stream a simulated camera to a video4linux2 
+   libavdevice will allow a user to stream a simulated camera to a video4linux2
    loopback device.
     * [Pull request #2443](https://bitbucket.org/osrf/gazebo/pull-request/2443)
 
