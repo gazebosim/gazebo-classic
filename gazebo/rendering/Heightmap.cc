@@ -210,9 +210,9 @@ common::Image Heightmap::Image() const
       height = (std::min(terrain->getHeightAtPoint(x, y),
           terrain->getMaxHeight()) - minHeight) / maxHeight;
 
-      GZ_ASSERT((height < 1.0 || ignition::math::equal(height, 1.0)),
+      GZ_ASSERT((height <= 1.0 + 1e-6),
           "Normalized terrain height > 1.0");
-      GZ_ASSERT((height > 0.0 || ignition::math::equal(height, 0.0)),
+      GZ_ASSERT((height >= 0.0 - 1e-6),
           "Normalized terrain height < 0.0");
 
       // Scale height to a value between 0 and 255
