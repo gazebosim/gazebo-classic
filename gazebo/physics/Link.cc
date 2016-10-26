@@ -204,13 +204,7 @@ void Link::Load(sdf::ElementPtr _sdf)
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
 
-  if (!this->IsStatic())
-  {
-    std::string topicName = "~/" + this->GetScopedName() + "/wrench";
-    boost::replace_all(topicName, "::", "/");
-    this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg,
-        this);
-  }
+  this->SetStatic(this->IsStatic());
 }
 
 //////////////////////////////////////////////////
