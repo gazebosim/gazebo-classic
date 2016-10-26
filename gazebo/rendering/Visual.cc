@@ -3052,13 +3052,14 @@ void Visual::ShowJoints(bool _show)
       }
 
       auto msg = dynamic_cast<const msgs::Joint *>(it->second);
-      std::string jointVisName = msg->name() + "_JOINT_VISUAL__";
       if (!msg)
       {
         ++it;
         continue;
       }
-      else if (!this->dataPtr->scene->GetVisual(jointVisName))
+
+      std::string jointVisName = msg->name() + "_JOINT_VISUAL__";
+      if (!this->dataPtr->scene->GetVisual(jointVisName))
       {
         JointVisualPtr jointVis(new JointVisual(jointVisName,
             shared_from_this()));

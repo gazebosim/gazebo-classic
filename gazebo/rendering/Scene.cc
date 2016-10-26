@@ -2431,7 +2431,9 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   }
 
   childVis->AddPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
-  childVis->ShowJoints(this->dataPtr->showJoints);
+  // If this needs to be added, make sure it is called after all of the visuals
+  // the childVis link have been loaded
+  // childVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
