@@ -2794,8 +2794,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     auto parent = this->dataPtr->visuals.find(_msg->parent_id());
     if (parent == this->dataPtr->visuals.end())
     {
-      gzerr << "Could not find visual with id [" << _msg->parent_id() <<
-          "] to be the parent of visual [" << _msg->name() << "]" << std::endl;
       return false;
     }
 
@@ -2816,8 +2814,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     iter = this->dataPtr->visuals.find(_msg->parent_id());
     if (iter == this->dataPtr->visuals.end())
     {
-      gzerr << "Could not find visual with id [" << _msg->parent_id() <<
-          "] to be the parent of visual [" << _msg->name() << "]" << std::endl;
       return false;
     }
 
