@@ -306,7 +306,7 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       if (_size.Z() < 0)
         h *= -1;
 
-      // Convert to 0 if a NODATA value is found
+      // Convert to minElevation if a NODATA value is found
       if (_size.Z() >= 0 && h < this->dataPtr->minElevation)
         h = this->dataPtr->minElevation;
 
