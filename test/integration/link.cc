@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/algorithm/string/replace.hpp>
+
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
