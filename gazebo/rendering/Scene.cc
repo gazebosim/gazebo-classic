@@ -2423,12 +2423,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     childVis = this->GetVisual(_msg->child_id());
 
   if (!childVis)
-  {
-    gzerr << "Could not find visual with child id [" << _msg->child_id() <<
-        "] to be the parent of joint visual [" << _msg->name() << "]" <<
-        std::endl;
     return false;
-  }
 
   childVis->AddPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
   // If this needs to be added, make sure it is called after all of the visuals
@@ -2749,32 +2744,27 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     }
     else
     {
-      try
-      {
-        this->dataPtr->terrain = new Heightmap(shared_from_this());
-
-        // check the material fields and set material if it is specified
-        if (_msg->has_material())
+        if (!this->dataPtr->terrain)
         {
-          auto matMsg = _msg->material();
-          if (matMsg.has_script())
+          this->dataPtr->terrain = new Heightmap(shared_from_this());
+          // check the material fields and set material if it is specified
+          if (_msg->has_material())
           {
-            auto scriptMsg = matMsg.script();
-            for (auto const uri : scriptMsg.uri())
+            auto matMsg = _msg->material();
+            if (matMsg.has_script())
             {
-              if (!uri.empty())
-                RenderEngine::Instance()->AddResourcePath(uri);
+              auto scriptMsg = matMsg.script();
+              for (auto const uri : scriptMsg.uri())
+              {
+                if (!uri.empty())
+                  RenderEngine::Instance()->AddResourcePath(uri);
+              }
+              std::string matName = scriptMsg.name();
+              this->dataPtr->terrain->SetMaterial(matName);
             }
-            std::string matName = scriptMsg.name();
-            this->dataPtr->terrain->SetMaterial(matName);
           }
+          this->dataPtr->terrain->LoadFromMsg(_msg);
         }
-        this->dataPtr->terrain->LoadFromMsg(_msg);
-      }
-      catch(...)
-      {
-        return false;
-      }
     }
     return true;
   }

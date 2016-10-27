@@ -30,6 +30,7 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Dem.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -204,10 +205,15 @@ common::Image Heightmap::Image() const
     for (uint16_t x = 0; x < size; ++x)
     {
       // Normalize height value
-      height = (terrain->getHeightAtPoint(x, y) - minHeight) / maxHeight;
+      // Weird Ogre issue: terrain->getHeightAtPoint could return a value
+      // larger than terrain->getMaxHeight().
+      height = (std::min(terrain->getHeightAtPoint(x, y),
+          terrain->getMaxHeight()) - minHeight) / maxHeight;
 
-      GZ_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
-      GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
+      GZ_ASSERT((height <= 1.0 + 1e-6),
+          "Normalized terrain height > 1.0");
+      GZ_ASSERT((height >= 0.0 - 1e-6),
+          "Normalized terrain height < 0.0");
 
       // Scale height to a value between 0 and 255
       imageData[(size - y - 1)*size+x] =
@@ -381,9 +387,26 @@ void Heightmap::Load()
 
     if (this->dataPtr->heightmapData)
     {
+      // TODO add a virtual HeightmapData::GetMinElevation function to avoid the
+      // ifdef check. i.e. heightmapSizeZ = GetMaxElevation - GetMinElevation
+      double heightmapSizeZ = this->dataPtr->heightmapData->GetMaxElevation();
+#ifdef HAVE_GDAL
+      auto demData =
+          dynamic_cast<common::Dem *>(this->dataPtr->heightmapData);
+      if (demData)
+      {
+        heightmapSizeZ = heightmapSizeZ - demData->GetMinElevation();
+        if (this->dataPtr->terrainSize == ignition::math::Vector3d::Zero)
+        {
+          this->dataPtr->terrainSize = ignition::math::Vector3d(
+              demData->GetWorldWidth(), demData->GetWorldHeight(),
+              heightmapSizeZ);
+        }
+      }
+#endif
       // these params need to be the same as physics/HeightmapShape.cc
       // in order to generate consistent height data
-      double subSampling = 2;
+      int subSampling = 2;
       bool flipY = false;
       // sampling size along image width and height
       unsigned int vertSize =
@@ -392,16 +415,10 @@ void Heightmap::Load()
       scale.X(this->dataPtr->terrainSize.X() / vertSize);
       scale.Y(this->dataPtr->terrainSize.Y() / vertSize);
 
-      if (ignition::math::equal(
-          this->dataPtr->heightmapData->GetMaxElevation(), 0.0f))
-      {
-        scale.Z(fabs(this->dataPtr->terrainSize.Z()));
-      }
+      if (ignition::math::equal(heightmapSizeZ, 0.0))
+        scale.Z(1.0);
       else
-      {
-        scale.Z(fabs(this->dataPtr->terrainSize.Z()) /
-            this->dataPtr->heightmapData->GetMaxElevation());
-      }
+        scale.Z(fabs(this->dataPtr->terrainSize.Z()) / heightmapSizeZ);
 
       // Construct the heightmap lookup table
       std::vector<float> lookup;
@@ -603,7 +620,10 @@ void Heightmap::Load()
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
-    if (this->dataPtr->terrainHashChanged)
+
+    // saving an ogre terrain dat file can take quite some time for large dems.
+    // so save only if doing terrain paging for now
+    if (this->dataPtr->terrainHashChanged && this->dataPtr->useTerrainPaging)
     {
       // Save all subterrains using files.
       this->dataPtr->terrainGroup->saveAllTerrains(true);
@@ -761,6 +781,11 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
     gzerr << "Invalid terrain\n";
     return false;
   }
+
+  // no blending to be done if there's only one texture or no textures at all.
+  if (this->dataPtr->blendHeight.size() <= 1u ||
+      this->dataPtr->diffuseTextures.size() <= 1u)
+    return false;
 
   Ogre::Real val, height;
   unsigned int i = 0;

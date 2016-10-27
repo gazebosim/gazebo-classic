@@ -50,6 +50,7 @@ class HeightmapTest : public ServerFixture,
   public: void WhiteAlpha(const std::string &_physicsEngine);
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
   public: void Volume(const std::string &_physicsEngine);
+  public: void LoadDEM(const std::string &_physicsEngine);
   public: void Material(const std::string &_physicsEngine);
   public: void NotSquareImage();
   public: void InvalidSizeImage();
@@ -245,6 +246,73 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
         collision->GetShape());
 
   EXPECT_DOUBLE_EQ(shape->ComputeVolume(), 0);
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
+{
+#ifdef HAVE_GDAL
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    return;
+  }
+
+  if (_physicsEngine == "bullet" || _physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for " << _physicsEngine <<
+        ", negative elevations are not working yet." << std::endl;
+    return;
+  }
+
+  Load("worlds/dem_neg.world", true, _physicsEngine);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::ModelPtr boxModel = GetModel("box");
+  ASSERT_NE(boxModel, nullptr);
+
+  ignition::math::Pose3d boxInitPose(0, 0, -207, 0, 0, 0);
+  EXPECT_EQ(boxModel->GetWorldPose().Ign(), boxInitPose);
+
+  physics::ModelPtr model = GetModel("heightmap");
+  ASSERT_NE(model, nullptr);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(
+        collision->GetShape());
+
+  ASSERT_NE(shape, nullptr);
+  EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
+
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+
+  double maxHeight = shape->GetMaxHeight();
+  double minHeight = shape->GetMinHeight();
+  EXPECT_GE(maxHeight, minHeight);
+  EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
+
+  // step the world
+  // let the box fall onto the heightmap and wait for it to rest
+  world->Step(1000);
+
+  ignition::math::Pose3d boxRestPose = boxModel->GetWorldPose().Ign();
+  EXPECT_NE(boxRestPose, boxInitPose);
+  EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
+
+  // step the world and verify the box is at rest
+  world->Step(100);
+
+  ignition::math::Pose3d boxNewRestPose = boxModel->GetWorldPose().Ign();
+  EXPECT_EQ(boxNewRestPose, boxRestPose);
+#else
+  // prevent unused variable warning
+  (void)(_physicsEngine);
+#endif
 }
 
 /*
@@ -472,6 +540,12 @@ TEST_P(HeightmapTest, WhiteNoAlpha)
 TEST_P(HeightmapTest, Volume)
 {
   Volume(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, LoadDEM)
+{
+  LoadDEM(GetParam());
 }
 
 /////////////////////////////////////////////////
