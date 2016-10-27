@@ -184,6 +184,27 @@ TEST_F(DemTest, NegDem)
   EXPECT_FLOAT_EQ(-212.29616, dem.GetMinElevation());
   EXPECT_FLOAT_EQ(-205.44009, dem.GetMaxElevation());
 }
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, UnfinishedDem)
+{
+  common::Dem dem;
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "data/dem_unfinished.tif";
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  // Check that the min and max elevations are valid for an unfinished
+  // and unfilled dem.
+  EXPECT_EQ(33, static_cast<int>(dem.GetHeight()));
+  EXPECT_EQ(33, static_cast<int>(dem.GetWidth()));
+  EXPECT_FLOAT_EQ(111287.59, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(88878.297, dem.GetWorldWidth());
+  // gdal reports min elevation as -32768 but this is treated as a nodata
+  // by our dem class and ignored when computing the min elevation
+  EXPECT_FLOAT_EQ(-10, dem.GetMinElevation());
+  EXPECT_FLOAT_EQ(1909, dem.GetMaxElevation());
+}
 #endif
 
 /////////////////////////////////////////////////
