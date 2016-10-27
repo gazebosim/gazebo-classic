@@ -16,10 +16,25 @@
 */
 #include <functional>
 #include <fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
+
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  using raw_type = char;
+#else
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
+  using raw_type = void;
+#endif
+
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
 
 #include <mutex>
 #include <string>
@@ -135,10 +150,14 @@ class Rotor
   public: double samplingRate;
   public: ignition::math::OnePole<double> velocityFilter;
 
-  public: static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
-  public: static constexpr double kDefaultFrequencyCutoff = 5.0;
-  public: static constexpr double kDefaultSamplingRate = 0.2;
+  public: static double kDefaultRotorVelocitySlowdownSim;
+  public: static double kDefaultFrequencyCutoff;
+  public: static double kDefaultSamplingRate;
 };
+
+double Rotor::kDefaultRotorVelocitySlowdownSim = 10.0;
+double Rotor::kDefaultFrequencyCutoff = 5.0;
+double Rotor::kDefaultSamplingRate = 0.2;
 
 // Private data class
 class gazebo::ArduCopterSocketPrivate
@@ -148,7 +167,10 @@ class gazebo::ArduCopterSocketPrivate
   {
     // initialize socket udp socket
     fd = socket(AF_INET, SOCK_DGRAM, 0);
-    fcntl(fd, F_SETFD, FD_CLOEXEC);
+    #ifndef _WIN32
+    // Windows does not support FD_CLOEXEC
+    fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
+    #endif
   }
 
   /// \brief destructor
@@ -156,7 +178,11 @@ class gazebo::ArduCopterSocketPrivate
   {
     if (fd != -1)
     {
+      #ifdef _WIN32
+      closesocket(fd);
+      #else
       ::close(fd);
+      #endif
       fd = -1;
     }
   }
@@ -173,15 +199,24 @@ class gazebo::ArduCopterSocketPrivate
     if (bind(this->fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
       shutdown(this->fd, 0);
+      #ifdef _WIN32
+      closesocket(this->fd);
+      #else
       close(this->fd);
+      #endif
       return false;
     }
     int one = 1;
     setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR,
-          &one, sizeof(one));
+      reinterpret_cast<const char *>(&one), sizeof(one));
 
+    #ifdef _WIN32
+    u_long on = 1;
+    ioctlsocket(this->fd, FIONBIO, reinterpret_cast<u_long FAR *>(&on));
+    #else
     fcntl(this->fd, F_SETFL,
-    fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+      fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+    #endif
     return true;
   }
 
@@ -197,15 +232,24 @@ class gazebo::ArduCopterSocketPrivate
     if (connect(this->fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
       shutdown(this->fd, 0);
+      #ifdef _WIN32
+      closesocket(this->fd);
+      #else
       close(this->fd);
+      #endif
       return false;
     }
     int one = 1;
     setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR,
-          &one, sizeof(one));
+      reinterpret_cast<const char *>(&one), sizeof(one));
 
+    #ifdef _WIN32
+    u_long on = 1;
+    ioctlsocket(this->fd, FIONBIO, reinterpret_cast<u_long FAR *>(&on));
+    #else
     fcntl(this->fd, F_SETFL,
-    fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+      fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+    #endif
     return true;
   }
 
@@ -229,7 +273,7 @@ class gazebo::ArduCopterSocketPrivate
 
   public: ssize_t Send(const void *_buf, size_t _size)
   {
-    return send(this->fd, _buf, _size, 0);
+    return send(this->fd, reinterpret_cast<const raw_type *>(_buf), _size, 0);
   }
 
   /// \brief Receive data
@@ -252,7 +296,11 @@ class gazebo::ArduCopterSocketPrivate
         return -1;
     }
 
+    #ifdef _WIN32
+    return recv(this->fd, reinterpret_cast<char *>(_buf), _size, 0);
+    #else
     return recv(this->fd, _buf, _size, 0);
+    #endif
   }
 
   /// \brief Socket handle

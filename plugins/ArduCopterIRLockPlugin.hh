@@ -21,10 +21,17 @@
 #include <string>
 #include <memory>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+#else
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
+#endif
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/util/system.hh"

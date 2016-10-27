@@ -18,6 +18,12 @@
 #include <memory>
 #include <functional>
 
+#ifdef _WIN32
+  using raw_type = char;
+#else
+  using raw_type = void;
+#endif
+
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
@@ -86,14 +92,22 @@ ArduCopterIRLockPlugin::ArduCopterIRLockPlugin()
 {
   // socket
   this->dataPtr->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
+  #ifndef _WIN32
+  // Windows does not support FD_CLOEXEC
   fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
+  #endif
   int one = 1;
-  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY, &one,
-      sizeof(one));
-  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR, &one,
-      sizeof(one));
+  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
+      reinterpret_cast<const char *>(&one), sizeof(one));
+  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
+      reinterpret_cast<const char *>(&one), sizeof(one));
+  #ifdef _WIN32
+  u_long on = 1;
+  ioctlsocket(this->dataPtr->handle, FIONBIO, reinterpret_cast<u_long FAR *>(&on));
+  #else
   fcntl(this->dataPtr->handle, F_SETFL,
       fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
+  #endif
 }
 
 /////////////////////////////////////////////////
@@ -236,6 +250,9 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
   sockaddr.sin_port = htons(9005);  // TODO: make it variable
   sockaddr.sin_family = AF_INET;
   sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");  // TODO: make it variable
-  ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
-    (struct sockaddr *)&sockaddr, sizeof(sockaddr));
+
+  ::sendto(this->dataPtr->handle,
+           reinterpret_cast<raw_type *>(&pkt),
+           sizeof(pkt), 0,
+           (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }
