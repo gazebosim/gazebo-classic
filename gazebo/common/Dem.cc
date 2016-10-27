@@ -146,7 +146,7 @@ int Dem::Load(const std::string &_filename)
   // Check for nodata value in dem data. This is used when computing thei
   // min elevation. If nodata value is not defined, we assume it will be one
   // of the commonly used values such as -9999, -32768, etc.
-  // For simplicity, we will treat values < -9999 as nodata values and
+  // For simplicity, we will treat values <= -9999 as nodata values and
   // ignore them when computing the min elevation.
   int validNoData = 0;
   const double defaultNoDataValue = -9999;
