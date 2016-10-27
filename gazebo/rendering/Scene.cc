@@ -2750,35 +2750,29 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
           this->dataPtr->terrain == NULL)
       {
-        try
+        if (!this->dataPtr->terrain)
         {
-          if (!this->dataPtr->terrain)
+          this->dataPtr->terrain = new Heightmap(shared_from_this());
+          // check the material fields and set material if it is specified
+          if (_msg->has_material())
           {
-            this->dataPtr->terrain = new Heightmap(shared_from_this());
-            // check the material fields and set material if it is specified
-            if (_msg->has_material())
+            auto matMsg = _msg->material();
+            if (matMsg.has_script())
             {
-              auto matMsg = _msg->material();
-              if (matMsg.has_script())
+              auto scriptMsg = matMsg.script();
+              for (auto const uri : scriptMsg.uri())
               {
-                auto scriptMsg = matMsg.script();
-                for (auto const uri : scriptMsg.uri())
-                {
-                  if (!uri.empty())
-                    RenderEngine::Instance()->AddResourcePath(uri);
-                }
-                std::string matName = scriptMsg.name();
-                this->dataPtr->terrain->SetMaterial(matName);
+                if (!uri.empty())
+                  RenderEngine::Instance()->AddResourcePath(uri);
               }
+              std::string matName = scriptMsg.name();
+              this->dataPtr->terrain->SetMaterial(matName);
             }
-            this->dataPtr->terrain->LoadFromMsg(_msg);
           }
-          else
-            gzerr << "Only one Heightmap can be created per Scene\n";
-        } catch(...)
-        {
-          return false;
+          this->dataPtr->terrain->LoadFromMsg(_msg);
         }
+        else
+          gzerr << "Only one Heightmap can be created per Scene" << std::endl;
       }
       return true;
     }
