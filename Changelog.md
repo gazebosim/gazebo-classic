@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. UserCamera overrides `Camera::Render` to reduce CPU usage.
+    * [Pull request 2480](https://bitbucket.org/osrf/gazebo/pull-request/2480)
+
 1. Static links no longer subscribe to wrench topics.
     * [Pull request #2452]((https://bitbucket.org/osrf/gazebo/pull-request/2452)
 
