@@ -74,12 +74,12 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // set name, size and location of the button.
   this->addPathButton = new QPushButton("Add Path", this);
   this->addPathButton->setGeometry(QRect(QPoint(100, 0),
-  QSize(200, 50)));
+    QSize(200, 50)));
 
   mainLayout->addWidget(this->addPathButton);
   // Connect button signal to appropriate slot.
   connect(this->addPathButton, SIGNAL(released()), this,
-  SLOT(HandleButton()));
+    SLOT(HandleButton()));
 
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
