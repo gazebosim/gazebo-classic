@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Constructor from ignition::math::Inertial.
       /// \param[in] _inertial Ignition inertial object to copy.
-      public: Inertial(const ignition::math::Inertiald &_inertial);
+      public: explicit Inertial(const ignition::math::Inertiald &_inertial);
 
       /// \brief Copy constructor.
       /// \param[in] _inertial Inertial element to copy
