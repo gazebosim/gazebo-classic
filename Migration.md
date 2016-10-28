@@ -5,6 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.3.1 to 7.X
+
+### Deprecations
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
+    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
+
 ## Gazebo 7.1.0 to 7.X
 
 ### Additions
@@ -14,6 +22,31 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/bullet/BulletJoint.hh**
     + public: virtual void Fini();
+
+### Deprecations
+
+1. **gazebo::common::VisualPlugin**
+    The custom inner xml inside visual plugins used to be wrapped in an extra
+    <sdf> tag. Now the inner xml should be accessed directly from the plugin's
+    sdf. For example, for the following plugin:
+
+          <visual ...>
+            <plugin ...>
+              <param>true</param>
+            </plugin>
+          </visual>
+
+     <param> should be accessed with:
+
+          auto param = _sdf->GetElement("param");
+
+     The old behaviour is still supported on Gazebo7, that is:
+
+          auto param = _sdf->GetElement("sdf")->GetElement("param");
+
+     but this behaviour will be removed on Gazebo8.
+
+    + [pull request #2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
 
 ## Gazebo 6.X to 7.X
 

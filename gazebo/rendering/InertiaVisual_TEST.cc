@@ -70,12 +70,6 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
 {
   Load("worlds/inertia_rotations.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
-
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
 
@@ -95,6 +89,10 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
   const int maxSleep = 50;
   while (sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     bool found = true;
     for (const auto name : inertiaVisualNames)
     {

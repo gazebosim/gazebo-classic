@@ -2,6 +2,65 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix DEM heightmap size, collision, scale
+    * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
+
+1. Update QT render loop to throttle based on UserCamera::RenderRate.
+    * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
+    * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
+
+1. Add GUI items to change the user camera clip distance
+    * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
+    * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
+
+1. Support custom material scripts for heightmaps
+    * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
+
+## Gazebo 7.4.0 (2016-10-11)
+
+1. Add test for HarnessPlugin, reduce likelihood of race condition
+    * [Pull request 2431](https://bitbucket.org/osrf/gazebo/pull-request/2431)
+    * [Issue 2034](https://bitbucket.org/osrf/gazebo/issues/2034)
+
+1. Add `syntax = proto2` in proto files to fix some protobuf3 warnings
+    * [Pull request 2456](https://bitbucket.org/osrf/gazebo/pull-request/2456)
+
+1. Add support for loading wavefront obj mesh files
+    * [Pull request 2454](https://bitbucket.org/osrf/gazebo/pull-request/2454)
+
+1. Added filesystem operations to the common library. Additions include
+   `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
+    * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
+
+1. Fix loading collada files with multiple texture coordinates.
+    * [Pull request 2413](https://bitbucket.org/osrf/gazebo/pull-request/2413)
+
+1. Added visualization of minimum range to laservisual.
+    * [Pull request 2412](https://bitbucket.org/osrf/gazebo/pull-request/2412)
+    * [Issue 2018](https://bitbucket.org/osrf/gazebo/issues/2018)
+
+1. Use precision 2 for FPS display in TimePanel
+    * [Pull request 2405](https://bitbucket.org/osrf/gazebo/pull-request/2405)
+
+1. Switch ImuSensor::worldToReference transform from Pose to Quaternion
+    * [Pull request 2410](https://bitbucket.org/osrf/gazebo/pull-request/2410)
+    * [Issue 1959](https://bitbucket.org/osrf/gazebo/issues/1959)
+
+1. Include Boost_LIBRARIES  in the linking of gazebo_physics
+    * [Pull request 2402](https://bitbucket.org/osrf/gazebo/pull-request/2402)
+
+1. Backported KeyboardGUIPlugin and msgs::Any
+    * [Pull request 2416](https://bitbucket.org/osrf/gazebo/pull-request/2416)
+
+1. Use XML_SUCCESS enum instead of XML_NO_ERROR, which has been deleted in tinyxml2 4.0
+    * [Pull request 2397](https://bitbucket.org/osrf/gazebo/pull-request/2397)
+
+1. Ignore ffmpeg deprecation warnings to clean up CI since they are noted in #2002
+    * [Pull request 2388](https://bitbucket.org/osrf/gazebo/pull-request/2388)
+
+1. Added a visual blinking plugin
+    * [Pull request 2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
+
 1. Fix InertiaVisual for non-diagonal inertia matrices
     * [Pull request 2354](https://bitbucket.org/osrf/gazebo/pull-request/2354)
 
@@ -2297,4 +2356,3 @@ compilation on Windows.
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-
