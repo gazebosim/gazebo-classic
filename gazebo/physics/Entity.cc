@@ -47,7 +47,6 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Entity.hh"
 
 using namespace gazebo;
