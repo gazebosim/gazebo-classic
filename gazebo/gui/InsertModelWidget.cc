@@ -71,14 +71,15 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
-  // set name, size and location of the button.
-  this->addPathButton = new QPushButton("Add Path", this);
-  this->addPathButton->setGeometry(QRect(QPoint(100, 0),
+  // set name, size and location of the button add model path gui.
+  QPushButton *addPathButton = new QPushButton("Add Path", this);
+
+  addPathButton->setGeometry(QRect(QPoint(100, 0),
     QSize(200, 50)));
 
-  mainLayout->addWidget(this->addPathButton);
+  mainLayout->addWidget(addPathButton);
   // Connect button signal to appropriate slot.
-  connect(this->addPathButton, SIGNAL(released()), this,
+  connect(addPathButton, SIGNAL(released()), this,
     SLOT(HandleButton()));
 
   mainLayout->addWidget(frame);

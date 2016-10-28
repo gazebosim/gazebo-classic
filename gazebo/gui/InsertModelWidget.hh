@@ -94,9 +94,6 @@ namespace gazebo
 
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;
-
-      /// \breif Button to add a cutom models path.
-      private: QPushButton *addPathButton;
     };
   }
 }
