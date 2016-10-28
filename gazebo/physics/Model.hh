@@ -210,7 +210,7 @@ namespace gazebo
       public: void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
@@ -387,6 +387,14 @@ namespace gazebo
       public: gazebo::physics::JointPtr CreateJoint(
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
+
+      /// \brief Create a joint for this model
+      /// \param[in] _sdf SDF parameters for <joint>
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
 
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint

@@ -224,7 +224,9 @@ void ServerFixture::LoadArgs(const std::string &_args)
   // Use a 30 second timeout.
   waitCount = 0;
   maxWaitCount = 3000;
-  while ((!physics::get_world() ||
+  while ((!this->server ||
+          !this->server->GetInitialized() ||
+          !physics::get_world() ||
            physics::get_world()->IsPaused() != paused) &&
          ++waitCount < maxWaitCount)
   {

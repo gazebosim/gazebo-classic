@@ -44,6 +44,7 @@ set(tests
   gz_model.cc
   gz_physics.cc
   gz_world.cc
+  harness.cc
   imu.cc
   joint_controller.cc
   joint_force_torque.cc
@@ -166,6 +167,7 @@ set(dri_tests
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
+  collada_visualization.cc
   insert_model.cc
   model_editor.cc
   model_manipulation.cc
