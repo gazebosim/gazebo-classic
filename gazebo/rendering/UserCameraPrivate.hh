@@ -84,6 +84,8 @@ namespace gazebo
 
       /// \brief Default camera pose.
       public: math::Pose defaultPose;
+
+      public: double devicePixelRatio = 1.0;
     };
   }
 }

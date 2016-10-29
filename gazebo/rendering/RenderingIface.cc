@@ -24,13 +24,13 @@
 using namespace gazebo;
 
 //////////////////////////////////////////////////
-bool rendering::load()
+bool rendering::load(const bool _createContext)
 {
   bool result = true;
 
   try
   {
-    rendering::RenderEngine::Instance()->Load();
+    rendering::RenderEngine::Instance()->Load(_createContext);
   }
   catch(common::Exception &e)
   {

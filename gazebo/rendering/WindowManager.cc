@@ -67,14 +67,15 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
   if (static_cast<unsigned int>(_windowId) < this->dataPtr->windows.size() &&
       this->dataPtr->windows[_windowId])
-    this->dataPtr->windows[_windowId]->removeAllViewports();
+  this->dataPtr->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->dataPtr->windows[_windowId]);
 }
 
 //////////////////////////////////////////////////
 int WindowManager::CreateWindow(const std::string &_ogreHandle,
                                 uint32_t _width,
-                                uint32_t _height)
+                                uint32_t _height,
+                                const double _devicePixelRatio)
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
@@ -99,6 +100,9 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 
   std::ostringstream stream;
   stream << "OgreWindow(" << this->dataPtr->windowCounter++ << ")";
+
+  // Needed for retina displays
+  params["contentScalingFactor"] = std::to_string(_devicePixelRatio);
 
   int attempts = 0;
   while (window == NULL && (attempts++) < 10)

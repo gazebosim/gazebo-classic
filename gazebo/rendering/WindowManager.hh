@@ -63,7 +63,8 @@ namespace gazebo
       /// \param[in] _height Height of the window in pixels.
       public: int CreateWindow(const std::string &_ogreHandle,
                                uint32_t _width,
-                               uint32_t _height);
+                               uint32_t _height,
+                               const double _devicePixelRatio = 1.0);
 
       /// \brief Attach a camera to a window.
       /// \param[in] _windowId Id of the window to add the camera to.

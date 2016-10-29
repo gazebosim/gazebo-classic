@@ -75,7 +75,7 @@ namespace gazebo
       private: virtual ~RenderEngine();
 
       /// \brief Load the parameters for Ogre. Load must happen before Init.
-      public: void Load();
+      public: void Load(const bool _createContext = true);
 
       /// \brief Initialize Ogre. Load must happen before Init.
       public: void Init();
@@ -163,7 +163,8 @@ namespace gazebo
       private: void PostRender();
 
       /// \brief Check the rendering capabilities of the system.
-      private: void CheckSystemCapabilities();
+//      private: void CheckSystemCapabilities();
+      public: void CheckSystemCapabilities();
 
       /// \brief ID for a dummy window. Used for gui-less operation
       protected: uint64_t dummyWindowId;

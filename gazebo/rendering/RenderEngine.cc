@@ -86,9 +86,9 @@ RenderEngine::~RenderEngine()
 }
 
 //////////////////////////////////////////////////
-void RenderEngine::Load()
+void RenderEngine::Load(const bool _createContext)
 {
-  if (!this->CreateContext())
+  if (_createContext && !this->CreateContext())
   {
     gzwarn << "Unable to create X window. Rendering will be disabled\n";
     return;
@@ -142,14 +142,17 @@ void RenderEngine::Load()
     this->SetupResources();
   }
 
-  // Create a 1x1 render window so that we can grab a GL context. Based on
-  // testing, this is a hard requirement by Apple. We also need it to
-  // properly initialize GLWidget and UserCameras. See the GLWidget
-  // constructor.
-  this->dataPtr->windowManager->CreateWindow(
-      std::to_string(this->dummyWindowId), 1, 1);
+  if (_createContext)
+  {
+    // Create a 1x1 render window so that we can grab a GL context. Based on
+    // testing, this is a hard requirement by Apple. We also need it to
+    // properly initialize GLWidget and UserCameras. See the GLWidget
+    // constructor.
+    this->dataPtr->windowManager->CreateWindow(
+        std::to_string(this->dummyWindowId), 1, 1);
 
-  this->CheckSystemCapabilities();
+    this->CheckSystemCapabilities();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -774,6 +777,11 @@ void RenderEngine::CheckSystemCapabilities()
   Ogre::RenderSystemCapabilities::ShaderProfiles::const_iterator iter;
 
   capabilities = this->dataPtr->root->getRenderSystem()->getCapabilities();
+  if (!capabilities)
+  {
+    gzerr << "Cannot get render system capabilities" << std::endl;
+    return;
+  }
   profiles = capabilities->getSupportedShaderProfiles();
 
   bool hasFragmentPrograms =

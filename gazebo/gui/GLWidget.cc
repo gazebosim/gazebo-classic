@@ -70,8 +70,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->dataPtr->windowId = -1;
 
-  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
-  this->setAttribute(Qt::WA_PaintOnScreen, true);
+//   TODO causes problem inserting models and mouse picking in qt5
+//  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
+//  this->setAttribute(Qt::WA_PaintOnScreen, true);
 
   this->setFocusPolicy(Qt::StrongFocus);
   this->setMouseTracking(true);
@@ -154,6 +155,7 @@ GLWidget::GLWidget(QWidget *_parent)
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
           SLOT(OnPerspective()));
 
+/*
   // Create the scene. This must be done in the constructor so that
   // we can then create a user camera.
   this->dataPtr->scene = rendering::create_scene(gui::get_world(), true);
@@ -173,6 +175,7 @@ GLWidget::GLWidget(QWidget *_parent)
     // we have to create a dummy 1x1 window in RenderEngine::Load.
     this->OnCreateScene(this->dataPtr->scene->Name());
   }
+  */
 }
 
 /////////////////////////////////////////////////
@@ -221,14 +224,45 @@ void GLWidget::showEvent(QShowEvent *_event)
     // Get the window handle in a form that OGRE can use.
     std::string winHandle = this->OgreHandle();
 
+    // TODO windowhandle() is available in qt 5.0 only
+    double ratio = this->windowHandle()->devicePixelRatio();
+
     // Create the OGRE render window
     this->dataPtr->windowId =
       rendering::RenderEngine::Instance()->GetWindowManager()->
-        CreateWindow(winHandle, this->width(), this->height());
+        CreateWindow(winHandle, this->width(), this->height(), ratio);
+
+ /////
+  // TODO Remove me
+  rendering::RenderEngine::Instance()->CheckSystemCapabilities();
+  rendering::RenderEngine::Instance()->Init();
+  // Create the scene. This must be done in the constructor so that
+  // we can then create a user camera.
+  this->dataPtr->scene = rendering::create_scene(gui::get_world(), true);
+
+  if (!this->dataPtr->scene)
+  {
+    gzerr << "GLWidget could not create a scene. This will likely result "
+      << "in a blank screen.\n";
+  }
+  else
+  {
+    // This will ultimately create a user camera. We need to create a user
+    // camera in the constructor so that communications (such as via the
+    // ~/gui topic) can work properly (see MainWindow::OnGUI).
+    //
+    // All of this means that we must have a GL Context by this point. So,
+    // we have to create a dummy 1x1 window in RenderEngine::Load.
+    this->OnCreateScene(this->dataPtr->scene->Name());
+  }
+//////
 
     // Attach the user camera to the window
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
         this->dataPtr->windowId, this->dataPtr->userCamera);
+
+    // for retina displays on osx
+    this->dataPtr->userCamera->SetDevicePixelRatio(ratio);
   }
 
   // Let QT continue processing the show event.

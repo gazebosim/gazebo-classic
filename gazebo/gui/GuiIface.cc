@@ -288,8 +288,8 @@ bool gui::load()
   g_modelRightMenu = new gui::ModelRightMenu();
 
   // Load the rendering engine.
-  rendering::load();
-  rendering::init();
+  rendering::load(false);
+//  rendering::init();
 
   g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
@@ -311,7 +311,7 @@ bool gui::load()
   if (!gui::register_metatypes())
     std::cerr << "Unable to register Qt metatypes" << std::endl;
 
-  g_splashScreen = new gui::SplashScreen();
+//  g_splashScreen = new gui::SplashScreen();
 
   g_main_win = new gui::MainWindow();
 

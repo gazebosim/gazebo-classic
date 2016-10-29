@@ -143,6 +143,15 @@ namespace gazebo
       /// \param[in] _visualName Name of the visual to move the camera to.
       public: void MoveToVisual(const std::string &_visualName);
 
+      public: void SetDevicePixelRatio(const double _ratio);
+
+      public: double DevicePixelRatio() const;
+
+      // Documentation Inherited
+      public: virtual void CameraToViewportRay(const int _screenx, const int _screeny,
+                  ignition::math::Vector3d &_origin,
+                  ignition::math::Vector3d &_dir) const;
+
       /// \brief Set to true to enable rendering
       ///
       /// Use this only if you really know what you're doing.

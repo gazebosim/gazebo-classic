@@ -594,6 +594,33 @@ void UserCamera::OnMoveToVisualComplete()
       this->dataPtr->orbitViewController->GetFocalPoint().Ign()));
 }
 
+
+//////////////////////////////////////////////////
+void UserCamera::SetDevicePixelRatio(const double _ratio)
+{
+  this->dataPtr->devicePixelRatio = _ratio;
+}
+
+//////////////////////////////////////////////////
+double UserCamera::DevicePixelRatio() const
+{
+  return this->dataPtr->devicePixelRatio;
+}
+
+
+//////////////////////////////////////////////////
+void UserCamera::CameraToViewportRay(const int _screenx,
+    const int _screeny,
+    ignition::math::Vector3d &_origin,
+    ignition::math::Vector3d &_dir) const
+{
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  int screenx = ratio * _screenx;
+  int screeny = ratio * _screeny;
+
+  Camera::CameraToViewportRay(screenx, screeny, _origin, _dir);
+}
+
 //////////////////////////////////////////////////
 void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
@@ -649,8 +676,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   if (!this->dataPtr->selectionBuffer)
     return result;
 
-  Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  ignition::math::Vector2i mousePos(ratio * _mousePos.x, ratio * _mousePos.y);
+
+  Ogre::Entity *entity = this->dataPtr->selectionBuffer->OnSelectionClick(
+      mousePos.X(), mousePos.Y());
 
   _mod = "";
   if (entity)
@@ -703,8 +733,11 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 {
   VisualPtr result;
 
-  Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  ignition::math::Vector2i mousePos(ratio * _mousePos.x, ratio * _mousePos.y);
+
+  Ogre::Entity *entity = this->dataPtr->selectionBuffer->OnSelectionClick(
+      mousePos.X(), mousePos.Y());
 
   if (entity && !entity->getUserObjectBindings().getUserAny().isEmpty())
   {

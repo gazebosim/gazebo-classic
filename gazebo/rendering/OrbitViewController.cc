@@ -152,6 +152,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     return;
 
   ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();
+  drag *= this->camera->DevicePixelRatio();
 
   ignition::math::Vector3d directionVec(0, 0, 0);
 
