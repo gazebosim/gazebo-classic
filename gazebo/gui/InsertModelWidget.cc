@@ -156,10 +156,10 @@ void InsertModelWidget::HandleButton()
     if (selected.empty())
       return;
 
-  common::SystemPaths::Instance()->AddModelPaths(
-    selected[0].toStdString());
+    common::SystemPaths::Instance()->AddModelPaths(
+      selected[0].toStdString());
 
-  this->UpdateLocalPath(selected[0].toStdString());
+    this->UpdateLocalPath(selected[0].toStdString());
   }
 }
 
