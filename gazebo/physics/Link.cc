@@ -204,9 +204,7 @@ void Link::Load(sdf::ElementPtr _sdf)
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
 
-  std::string topicName = "~/" + this->GetScopedName() + "/wrench";
-  boost::replace_all(topicName, "::", "/");
-  this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
+  this->SetStatic(this->IsStatic());
 }
 
 //////////////////////////////////////////////////
@@ -513,7 +511,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
      this->enabledSignal(this->enabled);
    }*/
 
-  if (!this->wrenchMsgs.empty())
+  if (!this->IsStatic() && !this->wrenchMsgs.empty())
   {
     std::vector<msgs::Wrench> messages;
     {
@@ -1659,8 +1657,34 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+void Link::SetStatic(const bool &_static)
+{
+  if (!_static && !this->wrenchSub)
+  {
+    std::string topicName = "~/" + this->GetScopedName() + "/wrench";
+    boost::replace_all(topicName, "::", "/");
+    this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg,
+        this);
+  }
+  else if (_static)
+  {
+    this->wrenchSub.reset();
+  }
+
+  Entity::SetStatic(_static);
+}
+
+//////////////////////////////////////////////////
 void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 {
+  // Sanity check
+  if (this->IsStatic())
+  {
+    gzerr << "Link [" << this->GetName() <<
+        "] received a wrench message, but it is static." << std::endl;
+    return;
+  }
+
   boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
   this->wrenchMsgs.push_back(*_msg);
 }
@@ -1668,6 +1692,14 @@ void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 //////////////////////////////////////////////////
 void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
 {
+  // Sanity check
+  if (this->IsStatic())
+  {
+    gzerr << "Link [" << this->GetName() <<
+        "] received a wrench message, but it is static." << std::endl;
+    return;
+  }
+
   math::Vector3 pos = math::Vector3::Zero;
   if (_msg.has_force_offset())
   {

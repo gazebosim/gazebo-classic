@@ -114,7 +114,7 @@ namespace gazebo
       /// camera images.
       /// \param[in] _force Force camera to render. Ignore camera update
       /// rate.
-      public: void Render(const bool _force = false);
+      public: virtual void Render(const bool _force = false);
 
       /// \brief Post render
       ///

@@ -1039,7 +1039,7 @@ void Model::LoadPlugins()
     {
       gzerr << "Sensors failed to initialize when loading model["
         << this->GetName() << "] via the factory mechanism."
-        << "Plugins for the model will not be loaded.\n";
+        << " Plugins for the model will not be loaded.\n";
     }
   }
 
