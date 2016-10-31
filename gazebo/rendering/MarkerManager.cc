@@ -144,12 +144,15 @@ void MarkerManagerPrivate::OnPreRender()
   for (auto mit = this->markers.begin();
        mit != this->markers.end();)
   {
-    for (auto it = mit->second.cbegin(); it != mit->second.cend();)
+    for (auto it = mit->second.cbegin();
+         it != mit->second.cend();)
     {
       // Erase a marker if it has a lifetime and it's expired.
       if (it->second->Lifetime() != common::Time::Zero &&
           it->second->Lifetime() <= this->scene->SimTime())
       {
+        it->second->Fini();
+        this->scene->RemoveVisual(it->second);
         it = mit->second.erase(it);
       }
       else

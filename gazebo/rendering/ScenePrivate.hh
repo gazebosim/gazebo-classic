@@ -224,6 +224,9 @@ namespace gazebo
       /// \brief Subscribe to scene topic
       public: transport::SubscriberPtr sceneSub;
 
+      /// \brief Subscribe to world_stats topic
+      public: transport::SubscriberPtr statsSub;
+
       /// \brief Subscribe to the request topic
       public: transport::SubscriberPtr requestSub;
 
@@ -334,6 +337,9 @@ namespace gazebo
       /// \brief SimTime of this Scene, after applying PosesStamped to
       /// scene, we update this time accordingly.
       public: common::Time sceneSimTimePosesApplied;
+
+      /// \brief Sim time according to world_stats
+      public: common::Time sceneSimTime;
 
       /// \brief Keeps track of the visual ID for contact visualization.
       public: uint32_t contactVisId;

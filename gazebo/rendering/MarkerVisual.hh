@@ -49,6 +49,7 @@ namespace gazebo
       /// \brief Load the marker
       /// \param[in] _msg The marker message to load the visual from.
       public: void Load(const ignition::msgs::Marker &_msg);
+      using Visual::Load;
 
       /// \brief Get the lifetime of the marker
       /// \return Life time of the marker in simulation time.
