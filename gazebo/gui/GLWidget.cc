@@ -200,9 +200,12 @@ GLWidget::~GLWidget()
   MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
 
-  this->dataPtr->connections.clear();
-  this->dataPtr->node.reset();
+  this->dataPtr->requestSub.reset();
   this->dataPtr->selectionPub.reset();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  this->dataPtr->connections.clear();
 
   ModelManipulator::Instance()->Clear();
   ModelSnap::Instance()->Clear();
@@ -383,11 +386,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   }
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -438,11 +441,11 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->dataPtr->keyModifiers = _event->modifiers();
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);

@@ -40,7 +40,7 @@ void EditorMaterialSwitcher_TEST::CreateMaterialSwitcher()
   // create a material swticher with a camera
   this->Load("test/worlds/box.world", false, false, true);
   rendering::ScenePtr scene =
-      gazebo::rendering::get_scene(gazebo::physics::get_world()->Name());
+      gazebo::rendering::get_scene(gazebo::physics::get_world()->GetName());
 
   rendering::CameraPtr camera = scene->CreateCamera("test_camera", false);
   camera->Load();
