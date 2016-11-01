@@ -62,7 +62,7 @@ class Factory : public WorldPlugin
       transport::NodePtr node(new transport::Node());
 
       // Initialize the node with the world name
-      node->Init(_parent->Ne());
+      node->Init(_parent->Name());
 
       // Create a publisher on the ~/factory topic
       transport::PublisherPtr factoryPub =
