@@ -147,7 +147,10 @@ do
       echo '# ls -l: '"$(ls -l ${c})" >> $CORE_BT_LOG
       gdb $CORE_EXECUTABLE_PATH $c -ex bt -ex 'thread apply all bt' -ex q >> $CORE_BT_LOG
       rm $c
-      if grep OnReadHeader $CORE_BT_LOG; then
+      if grep ConnectionManager::Unsubscribe $CORE_BT_LOG && \
+         grep Connection::ProcessWriteQueue $CORE_BT_LOG; then
+        mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-Unsubscribe-ProcessWriteQueue-backtrace.txt"
+      elif grep OnReadHeader $CORE_BT_LOG; then
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-OnReadHeader-backtrace.txt"
       elif grep IOManager::Stop $CORE_BT_LOG; then
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-IOManager-backtrace.txt"
