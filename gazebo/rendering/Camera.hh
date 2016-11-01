@@ -733,6 +733,16 @@ namespace gazebo
       /// \brief Set the clip distance based on stored SDF values
       protected: virtual void SetClipDist();
 
+      /// \brief Tell the camera whether to yaw around its own local Y axis or a
+      /// fixed axis of choice.
+      /// \param[in] _useFixed If true, the axis passed in the second parameter
+      /// will always be the yaw axis no matter what the camera orientation.
+      /// If false, the camera yaws around the local Y.
+      /// \param[in] _fixedAxis The axis to use if the first parameter is true.
+      protected: virtual void SetFixedYawAxis(const bool _useFixed,
+          const ignition::math::Vector3d &_fixedAxis =
+            ignition::math::Vector3d::UnitY);
+
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
       /// \param[out] _dst Destination buffer for the image data

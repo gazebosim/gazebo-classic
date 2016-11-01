@@ -904,6 +904,8 @@ void World::Fini()
     this->dataPtr->rootElement->Fini();
     this->dataPtr->rootElement.reset();
   }
+  this->dataPtr->prevStates[0].SetWorld(WorldPtr());
+  this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
@@ -1045,7 +1047,7 @@ BasePtr World::GetByName(const std::string &_name)
 BasePtr World::BaseByName(const std::string &_name) const
 {
   if (this->dataPtr->rootElement)
-    return BasePtr(this->dataPtr->rootElement->GetByName(_name));
+    return this->dataPtr->rootElement->GetByName(_name);
   else
     return BasePtr();
 }
@@ -2683,7 +2685,7 @@ void World::LogWorker()
   {
     int currState = (this->dataPtr->stateToggle + 1) % 2;
 
-    this->dataPtr->prevStates[currState].Load(shared_from_this());
+    this->dataPtr->prevStates[currState].Load(self);
     WorldState diffState = this->dataPtr->prevStates[currState] -
       this->dataPtr->prevStates[this->dataPtr->stateToggle];
     this->dataPtr->logPrevIteration = this->dataPtr->iterations;

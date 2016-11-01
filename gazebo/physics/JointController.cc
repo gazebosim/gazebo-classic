@@ -75,6 +75,17 @@ void JointController::AddJoint(JointPtr _joint)
 }
 
 /////////////////////////////////////////////////
+void JointController::RemoveJoint(Joint *_joint)
+{
+  if (_joint)
+  {
+    this->dataPtr->joints.erase(_joint->GetScopedName());
+    this->dataPtr->posPids.erase(_joint->GetScopedName());
+    this->dataPtr->velPids.erase(_joint->GetScopedName());
+  }
+}
+
+/////////////////////////////////////////////////
 void JointController::Reset()
 {
   // Reset setpoints and feed-forward.

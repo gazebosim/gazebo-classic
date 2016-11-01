@@ -441,12 +441,12 @@ namespace gazebo
       public: void RemovePlugin(const std::string &_name);
 
       /// \brief Get the set world pose mutex.
-      /// \return Pointer to the mutex.
+      /// \return Reference to the mutex.
       /// \deprecated See std::mutex &WorldPoseMutex() const;
       public: std::mutex &GetWorldPoseMutex() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the set world pose mutex.
-      /// \return Pointer to the mutex.
+      /// \return Reference to the mutex.
       public: std::mutex &WorldPoseMutex() const;
 
       /// \brief check if physics engine is enabled/disabled.

@@ -37,7 +37,7 @@ using namespace physics;
 DARTJoint::DARTJoint(BasePtr _parent)
   : Joint(_parent),
     dataPtr(new DARTJointPrivate(boost::dynamic_pointer_cast<DARTPhysics>(
-      this->GetWorld()-Physics())))
+      this->GetWorld()->Physics())))
 {
 }
 
