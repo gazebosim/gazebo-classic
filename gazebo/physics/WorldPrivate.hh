@@ -25,7 +25,6 @@
 #include <set>
 #include <sdf/sdf.hh>
 #include <string>
-#include <memory>
 #include <mutex>
 #include <thread>
 #include <condition_variable>

@@ -149,7 +149,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get frictionless ball
   std::string ballNoFrictionName = "model_ball_no_friction";
-  physics::ModelPtr ballNoFrictionModel = world->ModelByName(ballNoFrictionName);
+  physics::ModelPtr ballNoFrictionModel =
+    world->ModelByName(ballNoFrictionName);
   ASSERT_TRUE(ballNoFrictionModel != NULL);
 
   std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";

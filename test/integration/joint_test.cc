@@ -207,9 +207,11 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   // All models should oscillate with the same frequency
   physics::ModelPtr modelPrismatic = world->ModelByName("model_3_prismatic");
   physics::ModelPtr modelRevolute = world->ModelByName("model_3_revolute");
-  physics::ModelPtr modelPlugin = world->ModelByName("model_4_prismatic_plugin");
+  physics::ModelPtr modelPlugin =
+    world->ModelByName("model_4_prismatic_plugin");
   physics::ModelPtr modelContact = world->ModelByName("model_5_soft_contact");
-  physics::ModelPtr modelPrismatic2 = world->ModelByName("model_6_prismatic_sdf");
+  physics::ModelPtr modelPrismatic2 =
+    world->ModelByName("model_6_prismatic_sdf");
   physics::ModelPtr modelRevolute2 = world->ModelByName("model_7_revolute_sdf");
 
   ASSERT_TRUE(modelPrismatic != NULL);
