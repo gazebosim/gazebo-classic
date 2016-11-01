@@ -130,8 +130,9 @@ void Marker_TEST::AddRemove()
 
   // Check that a white object is rendered
   int shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth > 780);
-  QVERIFY(shapeWidth < 820);
+  gzdbg << "ShapeWidth[" << shapeWidth << "]\n";
+  QVERIFY(shapeWidth > 770);
+  QVERIFY(shapeWidth < 830);
 
   // Remove the shape
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);

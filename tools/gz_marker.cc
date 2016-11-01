@@ -175,7 +175,7 @@ void MarkerCommand::List()
     if (result)
     {
       std::map<std::string,
-        std::vector<std::tuple<uint64_t, int32_t, std::string>>> data;
+        std::vector<std::tuple<uint64_t, int32_t, std::string> > > data;
 
       // Organize the data
       for (int i = 0; i < rep.marker_size(); ++i)
