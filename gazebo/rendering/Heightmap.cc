@@ -33,6 +33,7 @@
 #include "gazebo/common/Dem.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/HeightmapData.hh"
+#include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -406,11 +407,12 @@ void Heightmap::Load()
 #endif
       // these params need to be the same as physics/HeightmapShape.cc
       // in order to generate consistent height data
-      int subSampling = 2;
+      int subSampling = 1;
       bool flipY = false;
       // sampling size along image width and height
       unsigned int vertSize =
-          (this->dataPtr->heightmapData->GetWidth() * subSampling)-1;
+          (this->dataPtr->heightmapData->GetWidth() * subSampling)
+          - subSampling + 1;
       ignition::math::Vector3d scale;
       scale.X(this->dataPtr->terrainSize.X() / vertSize);
       scale.Y(this->dataPtr->terrainSize.Y() / vertSize);
@@ -641,7 +643,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->dataPtr->terrainGlobals->setMaxPixelError(0);
+  this->dataPtr->terrainGlobals->setMaxPixelError(this->dataPtr->maxPixelError);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -1137,6 +1139,23 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(nullptr);
   }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetLOD(const double _value)
+{
+  this->dataPtr->maxPixelError = std::max(_value, 0.0);
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setMaxPixelError(
+        this->dataPtr->maxPixelError);
+  }
+}
+
+/////////////////////////////////////////////////
+double Heightmap::LOD() const
+{
+  return this->dataPtr->maxPixelError;
 }
 
 /////////////////////////////////////////////////

@@ -436,6 +436,10 @@ namespace gazebo
 
       /// \brief Pointer to heightmap data
       public: common::HeightmapData *heightmapData = nullptr;
+
+      /// \brief Max pixel error allowed for rendering the heightmap. This
+      /// affects LOD.
+      public: double maxPixelError = 0.0;
     };
   }
 }

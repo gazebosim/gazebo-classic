@@ -92,6 +92,28 @@ TEST_F(Heightmap_TEST, splitTerrain)
   }
 }
 
+/////////////////////////////////////////////////
+/// \brief Test terrain's level of detail API
+TEST_F(Heightmap_TEST, LOD)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_TRUE(scene != nullptr);
+
+  gazebo::rendering::Heightmap *heightmap =
+      new gazebo::rendering::Heightmap(scene);
+
+  // test basic API
+  EXPECT_DOUBLE_EQ(heightmap->LOD(), 0.0);
+  heightmap->SetLOD(3);
+  EXPECT_DOUBLE_EQ(heightmap->LOD(), 3.0);
+
+  // try negative LOD
+  heightmap->SetLOD(-1);
+  EXPECT_DOUBLE_EQ(heightmap->LOD(), 0.0);
+}
+
 #ifdef HAVE_GDAL
 /////////////////////////////////////////////////
 /// \brief Test Loading a terrain from a DEM file
@@ -126,9 +148,7 @@ TEST_F(Heightmap_TEST, LoadDEM)
   heightmap->LoadFromMsg(*visMsg);
 
   // verify heightmap image size
-  unsigned int subsampling = 2;
-  unsigned int tifSize = 129;
-  unsigned int vertSize = (tifSize * subsampling) - 1;
+  unsigned int vertSize = 129;
   common::Image img = heightmap->Image();
   EXPECT_EQ(img.GetWidth(), vertSize);
   EXPECT_EQ(img.GetHeight(), vertSize);

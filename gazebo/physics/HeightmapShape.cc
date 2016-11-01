@@ -33,6 +33,8 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/HeightmapData.hh"
+#include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
@@ -193,12 +195,13 @@ void HeightmapShape::Init()
       &HeightmapShape::OnRequest, this, true);
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
 
-  this->subSampling = 2;
+  this->subSampling = 1;
 
   math::Vector3 terrainSize = this->GetSize();
 
   // sampling size along image width and height
-  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
+  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)
+      - this->subSampling + 1;
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
@@ -333,7 +336,7 @@ common::Image HeightmapShape::GetImage() const
   double minHeight = this->GetMinHeight();
   double maxHeight = this->GetMaxHeight() - minHeight;
 
-  int size = (this->vertSize+1) / this->subSampling;
+  int size = (this->vertSize + this->subSampling - 1) / this->subSampling;
 
   // Create the image data buffer
   imageData = new unsigned char[size * size];

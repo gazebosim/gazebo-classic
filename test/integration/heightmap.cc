@@ -455,19 +455,26 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
   ASSERT_NE(heightmap, nullptr);
 
   // spawn camera sensor to capture an image of heightmap
-  std::string modelName = "camera_model";
-  std::string cameraName = "camera_sensor";
-  unsigned int width  = 320;
-  unsigned int height = 240;
-  double updateRate = 10;
+  std::string modelName = "camera";
+  std::string cameraName = "camera";
   ignition::math::Pose3d testPose(
       ignition::math::Vector3d(0, 0, 10),
       ignition::math::Quaterniond(0, 1.57, 0));
-  SpawnCamera(modelName, cameraName, testPose.Pos(),
-      testPose.Rot().Euler(), width, height, updateRate);
+
+  auto model = this->GetModel(modelName);
+  EXPECT_TRUE(model != nullptr);
+  model->SetWorldPose(testPose);
+
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  EXPECT_TRUE(sensor != nullptr);
+
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != nullptr);
+
+  unsigned int width  = camSensor->ImageWidth();
+  unsigned int height = camSensor->ImageHeight();
+
   int imageCount = 0;
   img = new unsigned char[width*height*3];
   event::ConnectionPtr c =

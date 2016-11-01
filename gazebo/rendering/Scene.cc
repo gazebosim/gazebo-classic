@@ -2769,6 +2769,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
               this->dataPtr->terrain->SetMaterial(matName);
             }
           }
+          this->dataPtr->terrain->SetLOD(this->HeightmapLOD());
           this->dataPtr->terrain->LoadFromMsg(_msg);
         }
         else
@@ -3304,6 +3305,23 @@ Heightmap *Scene::GetHeightmap() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
   return this->dataPtr->terrain;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapLOD(const double _value)
+{
+  this->dataPtr->heightmapLOD = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+}
+
+/////////////////////////////////////////////////
+double Scene::HeightmapLOD() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->LOD();
+
+  return this->dataPtr->heightmapLOD;
 }
 
 /////////////////////////////////////////////////
