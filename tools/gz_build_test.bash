@@ -171,6 +171,9 @@ do
         mv $CORE_BT_LOG "${junit_prefix}-test-$CORE_TEST_NUMBER-try-$i-LogWorker_WorldState-backtrace.txt"
       fi
     done
+
+    # remove empty diagnostics folders
+    rmdir --ignore-fail-on-non-empty ~/.gazebo/diagnostics/201*
   done
 done
 
