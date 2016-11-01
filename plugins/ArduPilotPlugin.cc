@@ -610,7 +610,7 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
     if (!this->dataPtr->imuSensor)
     {
-      gzwarn << "imu_sensor scoped name [" << imuScopedName[0]
+      gzwarn << "imu_sensor scoped name [" << imuName
             << "] not found, trying unscoped name.\n" << "\n";
       /// TODO: this fails for multi-nested models.
       /// TODO: and transforms fail for rotated nested model,

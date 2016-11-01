@@ -1091,6 +1091,10 @@ std::vector<std::string> Model::GetSensorScopedName(
   {
     for (unsigned int j = 0; j < (*iter)->GetSensorCount(); ++j)
     {
+      if ((*iter)->GetSensorName(j).size() < _name.size())
+      {
+        continue;
+      }
       if ((*iter)->GetSensorName(j).substr(
             (*iter)->GetSensorName(j).size()
             - _name.size(), _name.size()) ==
