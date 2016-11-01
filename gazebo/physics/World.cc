@@ -1073,10 +1073,17 @@ ModelPtr World::ModelByName(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+LightPtr World::Light(const std::string &_name)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
+  return boost::dynamic_pointer_cast<physics::Light>(this->BaseByName(_name));
+}
+
+//////////////////////////////////////////////////
 LightPtr World::LightByName(const std::string &_name) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
-  return boost::dynamic_pointer_cast<Light>(this->BaseByName(_name));
+  return boost::dynamic_pointer_cast<physics::Light>(this->BaseByName(_name));
 }
 
 //////////////////////////////////////////////////

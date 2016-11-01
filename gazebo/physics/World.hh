@@ -333,7 +333,7 @@ namespace gazebo
       /// \param[in] _name The name of the Light to find.
       /// \return A pointer to the Light, or NULL if no light was found.
       /// \deprecated See LightPtr LightByName(const std::string &_name) const
-      public: LightPtr Light(const std::string &_name) const
+      public: LightPtr Light(const std::string &_name)
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a light by name.
