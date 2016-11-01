@@ -47,7 +47,7 @@ namespace gazebo
     /// \param[in] _lifetime Length of time the marker should be visible.
     /// \param[in] _parent Name of a parent visual to attach a marker to.
     private: void Add(const std::string &_ns, const unsigned int _id,
-                 const std::string &_type, const common::Time _lifetime,
+                 const std::string &_type, const common::Time &_lifetime,
                  const std::string &_parent);
 
     /// \brief Send a marker message

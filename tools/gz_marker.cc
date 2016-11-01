@@ -242,7 +242,7 @@ void MarkerCommand::List()
             std::cout << "  ";
           else
             std::cout << " ";
-          std::string type = std::get<2>(m) ;
+          std::string type = std::get<2>(m);
           std::cout << "TYPE " << type;
           for (unsigned int i = 0; i < 15 - type.size(); ++i)
             std::cout << " ";
@@ -263,7 +263,7 @@ void MarkerCommand::List()
 
 /////////////////////////////////////////////////
 void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
-    const std::string &_type, const common::Time _lifetime,
+    const std::string &_type, const common::Time &_lifetime,
     const std::string &_parent)
 {
   // Construct the marker message

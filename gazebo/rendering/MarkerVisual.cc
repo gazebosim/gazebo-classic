@@ -141,13 +141,11 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
         ignition::math::Pose3d(
           ignition::math::Vector3d(_msg.pose().position().x(),
                                    _msg.pose().position().y(),
-                                   _msg.pose().position().z()
-                                   ),
+                                   _msg.pose().position().z()),
           ignition::math::Quaterniond(_msg.pose().orientation().w(),
                                       _msg.pose().orientation().x(),
                                       _msg.pose().orientation().y(),
-                                      _msg.pose().orientation().z()
-                                      )));
+                                      _msg.pose().orientation().z())));
   }
 
   // Set the marker's end time
@@ -156,7 +154,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
        (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
   {
     this->dPtr->lifetime = this->GetScene()->SimTime() +
-      gazebo::common::Time(_msg.lifetime().sec(),_msg.lifetime().nsec());
+      gazebo::common::Time(_msg.lifetime().sec(), _msg.lifetime().nsec());
   }
 
   // Attach marker to a parent visual, if specified in the message.
