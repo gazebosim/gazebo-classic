@@ -57,6 +57,35 @@ TEST_F(Light_TEST, LightVisualTest)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Light_TEST, CastShadows)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+
+  if (!scene)
+    scene = gazebo::rendering::create_scene("default", false);
+
+  EXPECT_TRUE(scene != nullptr);
+
+  // create a directional light
+  gazebo::rendering::LightPtr light(new gazebo::rendering::Light(scene));
+
+  msgs::Light msg;
+  msg.set_type(gazebo::msgs::Light::DIRECTIONAL);
+  msg.set_cast_shadows(true);
+
+  light->LoadFromMsg(msg);
+
+  // verify type and cast shadows.
+  EXPECT_EQ(light->LightType(), "directional");
+  EXPECT_TRUE(light->CastShadows());
+
+  scene->RemoveLight(light);
+  light.reset();
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
