@@ -2,7 +2,7 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
-1. Improve heightmap rendering performance
+1. Improve heightmap rendering performance: LOD
     * [Pull request 2485](https://bitbucket.org/osrf/gazebo/pull-request/2485)
 
 1. Fix DEM heightmap size, collision, scale
