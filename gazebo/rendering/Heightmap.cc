@@ -407,7 +407,7 @@ void Heightmap::Load()
 #endif
       // these params need to be the same as physics/HeightmapShape.cc
       // in order to generate consistent height data
-      int subSampling = 1;
+      int subSampling = 2;
       bool flipY = false;
       // sampling size along image width and height
       unsigned int vertSize =

@@ -148,7 +148,9 @@ TEST_F(Heightmap_TEST, LoadDEM)
   heightmap->LoadFromMsg(*visMsg);
 
   // verify heightmap image size
-  unsigned int vertSize = 129;
+  unsigned int subsampling = 2;
+  unsigned int tifSize = 129;
+  unsigned int vertSize = (tifSize * subsampling) - 1;
   common::Image img = heightmap->Image();
   EXPECT_EQ(img.GetWidth(), vertSize);
   EXPECT_EQ(img.GetHeight(), vertSize);
@@ -157,8 +159,8 @@ TEST_F(Heightmap_TEST, LoadDEM)
   // and the actual elevation data (dem.GetElevation)
   common::Dem dem;
   EXPECT_EQ(dem.Load(path.string()), 0);
-  EXPECT_TRUE(ignition::math::equal(heightmap->Height(0, 0),
-      dem.GetElevation(dem.GetWidth()/2, dem.GetHeight()/2), 1e-4));
+  EXPECT_DOUBLE_EQ(heightmap->Height(0, 0),
+      dem.GetElevation(dem.GetWidth()/2, dem.GetHeight()/2));
 
   delete heightmap;
 }

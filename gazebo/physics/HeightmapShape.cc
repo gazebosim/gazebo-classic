@@ -195,7 +195,7 @@ void HeightmapShape::Init()
       &HeightmapShape::OnRequest, this, true);
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
 
-  this->subSampling = 1;
+  this->subSampling = 2;
 
   math::Vector3 terrainSize = this->GetSize();
 
