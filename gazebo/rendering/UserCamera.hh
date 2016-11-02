@@ -74,6 +74,18 @@ namespace gazebo
       /// \brief Render the camera
       public: virtual void Update();
 
+      /// \brief Render the camera. The _force parameter is ignored.
+      /// Called after the pre-render signal. This function will generate
+      /// camera images.
+      ///
+      /// UserCamera does not throttle the Render function. It is assumed
+      /// Render is called at the desired and correct time interval.
+      /// We recommend setting this time interval to the value returned by
+      /// the RenderRate() function.
+      /// \param[in] _force This parameter is not used.
+      public: virtual void Render(const bool _force = false);
+      using Camera::Render;
+
       /// \brief Post render
       public: virtual void PostRender();
 
