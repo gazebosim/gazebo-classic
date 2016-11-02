@@ -209,6 +209,17 @@ namespace gazebo
 
       /// \brief True if wireframe mode is enabled
       public: bool wireframe;
+
+      /// \brief Stores the message for this visual according to the visual
+      /// type. For example, VT_LINK will have gazebo::msgs::Link.
+      public: google::protobuf::Message *typeMsg = nullptr;
+
+      /// \brief Vector of visuals which will be generated on demand.
+      public: std::vector<std::pair<Visual::VisualType,
+          google::protobuf::Message *>> pendingChildren;
+
+      /// \brief The initial pose of the visual.
+      public: ignition::math::Pose3d initialRelativePose;
     };
     /// \}
   }
