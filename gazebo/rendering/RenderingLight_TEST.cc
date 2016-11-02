@@ -66,7 +66,7 @@ TEST_F(Light_TEST, CastShadows)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != nullptr);
+  ASSERT_TRUE(scene != nullptr);
 
   // create a directional light and verify type and cast shadows.
   gazebo::rendering::LightPtr dirLight(new gazebo::rendering::Light(scene));
