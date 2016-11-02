@@ -2254,22 +2254,6 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
   }
 
-  std::string linkName = linkVis->GetName();
-  if (!this->GetVisual(linkName + "_COM_VISUAL__"))
-  {
-    this->CreateCOMVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_INERTIA_VISUAL__"))
-  {
-    this->CreateInertiaVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_LINK_FRAME_VISUAL__"))
-  {
-    this->CreateLinkFrameVisual(_msg, linkVis);
-  }
-
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2283,6 +2267,15 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
       this->dataPtr->projectors[pname] = projector;
     }
   }
+
+  linkVis->SetTypeMsg(&*_msg);
+
+  // Trigger visualizations that depend on type msg
+  linkVis->ShowInertia(this->dataPtr->showInertias);
+  linkVis->ShowCOM(this->dataPtr->showCOMs);
+  linkVis->ShowLinkFrame(this->dataPtr->showLinkFrames);
+  linkVis->ShowCollision(this->dataPtr->showCollisions);
+  linkVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
@@ -2300,14 +2293,10 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   if (!childVis)
     return false;
 
-  JointVisualPtr jointVis(new JointVisual(
-      _msg->name() + "_JOINT_VISUAL__", childVis));
-  jointVis->Load(_msg);
-  jointVis->SetVisible(this->dataPtr->showJoints);
-  if (_msg->has_id())
-    jointVis->SetId(_msg->id());
-
-  this->dataPtr->visuals[jointVis->GetId()] = jointVis;
+  childVis->AddPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
+  // If this needs to be added, make sure it is called after all of the visuals
+  // the childVis link have been loaded
+  // childVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
@@ -2612,7 +2601,6 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
-  bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
 
   if (_msg->has_id())
@@ -2624,110 +2612,126 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         this->dataPtr->visuals.end();
   }
 
+  // Deleting a visual
   if (_msg->has_delete_me() && _msg->delete_me())
   {
     if (iter != this->dataPtr->visuals.end())
     {
       this->dataPtr->visuals.erase(iter);
-      result = true;
-    }
-  }
-  else if (iter != this->dataPtr->visuals.end())
-  {
-    iter->second->UpdateFromMsg(_msg);
-    result = true;
-  }
-  else
-  {
-    VisualPtr visual;
-
-    // TODO: A bit of a hack.
-    if (_msg->has_geometry() &&
-        _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-    {
-      // Ignore collision visuals for the heightmap
-      if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
-          this->dataPtr->terrain == NULL)
-      {
-        try
-        {
-          if (!this->dataPtr->terrain)
-          {
-            this->dataPtr->terrain = new Heightmap(shared_from_this());
-            this->dataPtr->terrain->LoadFromMsg(_msg);
-          }
-          else
-            gzerr << "Only one Heightmap can be created per Scene\n";
-        } catch(...)
-        {
-          return false;
-        }
-      }
       return true;
     }
+    else
+      return false;
+  }
 
-    // If the visual has a parent which is not the name of the scene...
-    if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+  // Updating existing visual
+  if (iter != this->dataPtr->visuals.end())
+  {
+    iter->second->UpdateFromMsg(_msg);
+    return true;
+  }
+
+  // Creating heightmap
+  // FIXME: A bit of a hack.
+  if (_msg->has_geometry() &&
+      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+  {
+    if (this->dataPtr->terrain)
     {
-      if (_msg->has_id())
-        iter = this->dataPtr->visuals.find(_msg->id());
-      else
-      {
-        VisualPtr vis = this->GetVisual(_msg->name());
-        iter = vis ? this->dataPtr->visuals.find(vis->GetId()) :
-            this->dataPtr->visuals.end();
-      }
-
-      if (iter != this->dataPtr->visuals.end())
-        gzerr << "Visual already exists. This shouldn't happen.\n";
-
-      // Make sure the parent visual exists before trying to add a child
-      // visual
-      iter = this->dataPtr->visuals.find(_msg->parent_id());
-      if (iter != this->dataPtr->visuals.end())
-      {
-        visual.reset(new Visual(_msg->name(), iter->second));
-        if (_msg->has_id())
-          visual->SetId(_msg->id());
-      }
+      // Only one Heightmap can be created per Scene
+      return true;
     }
     else
     {
-      // Add a visual that is attached to the scene root
-      visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
-      if (_msg->has_id())
-        visual->SetId(_msg->id());
+        if (!this->dataPtr->terrain)
+        {
+          this->dataPtr->terrain = new Heightmap(shared_from_this());
+          // check the material fields and set material if it is specified
+          if (_msg->has_material())
+          {
+            auto matMsg = _msg->material();
+            if (matMsg.has_script())
+            {
+              auto scriptMsg = matMsg.script();
+              for (auto const uri : scriptMsg.uri())
+              {
+                if (!uri.empty())
+                  RenderEngine::Instance()->AddResourcePath(uri);
+              }
+              std::string matName = scriptMsg.name();
+              this->dataPtr->terrain->SetMaterial(matName);
+            }
+          }
+          this->dataPtr->terrain->LoadFromMsg(_msg);
+        }
     }
-
-    if (visual)
-    {
-      result = true;
-      visual->LoadFromMsg(_msg);
-      visual->SetType(_type);
-
-      this->dataPtr->visuals[visual->GetId()] = visual;
-      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
-          visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
-      {
-        visual->SetVisible(false);
-        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-      }
-
-      visual->ShowCOM(this->dataPtr->showCOMs);
-      visual->ShowInertia(this->dataPtr->showInertias);
-      visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
-      visual->ShowCollision(this->dataPtr->showCollisions);
-      visual->ShowJoints(this->dataPtr->showJoints);
-      if (visual->GetType() == Visual::VT_MODEL)
-      {
-        visual->ShowSkeleton(this->dataPtr->showSkeleton);
-        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
-      }
-      visual->SetWireframe(this->dataPtr->wireframe);
-    }
+    return true;
   }
 
-  return result;
+  // Creating collision
+  if (_type == Visual::VT_COLLISION)
+  {
+    // Collisions need a parent
+    if (!_msg->has_parent_name() && !_msg->has_parent_id())
+    {
+      gzerr << "Missing parent for collision visual [" << _msg->name() << "]"
+          << std::endl;
+      return false;
+    }
+
+    // Make sure the parent visual exists before trying to add a child visual
+    auto parent = this->dataPtr->visuals.find(_msg->parent_id());
+    if (parent == this->dataPtr->visuals.end())
+    {
+      return false;
+    }
+
+    parent->second->AddPendingChild(std::make_pair(_type, &*_msg));
+    parent->second->ShowCollision(this->dataPtr->showCollisions);
+
+    return true;
+  }
+
+  // All other visuals
+  VisualPtr visual;
+
+  // If the visual has a parent which is not the name of the scene...
+  if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+  {
+    // Make sure the parent visual exists before trying to add a child
+    // visual
+    iter = this->dataPtr->visuals.find(_msg->parent_id());
+    if (iter == this->dataPtr->visuals.end())
+    {
+      return false;
+    }
+
+    visual.reset(new Visual(_msg->name(), iter->second));
+  }
+  else
+  {
+    // Add a visual that is attached to the scene root
+    visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
+  }
+
+  if (_msg->has_id())
+    visual->SetId(_msg->id());
+
+  visual->LoadFromMsg(_msg);
+  visual->SetType(_type);
+
+  this->dataPtr->visuals[visual->GetId()] = visual;
+  if (visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+  {
+    visual->SetVisible(false);
+    visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  }
+
+  if (visual->GetType() == Visual::VT_MODEL)
+    visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+  visual->SetWireframe(this->dataPtr->wireframe);
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -3272,6 +3276,12 @@ void Scene::SetWireframe(const bool _show)
 
   if (this->dataPtr->terrain)
     this->dataPtr->terrain->SetWireframe(_show);
+}
+
+/////////////////////////////////////////////////
+bool Scene::Wireframe() const
+{
+  return this->dataPtr->wireframe;
 }
 
 /////////////////////////////////////////////////

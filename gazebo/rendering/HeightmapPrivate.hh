@@ -234,6 +234,66 @@ namespace gazebo
     };
 
     /// \internal
+    /// \brief Custom terrain material generator.
+    /// A custom material generator that lets user specify their own material
+    /// script for rendering the heightmap.
+    class TerrainMaterial : public Ogre::TerrainMaterialGenerator
+    {
+      /// \brief Constructor
+      /// \param[in] _materialName Name of material
+      public: TerrainMaterial(const std::string &_materialName);
+
+      /// \brief Set terrain material
+      /// \param[in] _materialName Name of material
+      public: void setMaterialByName(const std::string &_materialname);
+
+      /// \brief Subclassed to provide profile-specific material generation
+      class Profile : public Ogre::TerrainMaterialGenerator::Profile
+      {
+        /// \brief Constructor
+        /// \param[in] _parent Ogre terrain material generator object
+        /// \param[in] _name Name of the profile
+        /// \param[on] _desc Profile description
+        public: Profile(Ogre::TerrainMaterialGenerator *_parent,
+            const Ogre::String &_name, const Ogre::String &_desc);
+
+        /// \brief Destructor.
+        public: ~Profile();
+
+        // Documentation Inherited
+        public: bool isVertexCompressionSupported() const;
+
+        // Documentation Inherited
+        public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: Ogre::MaterialPtr generateForCompositeMap(
+            const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: void setLightmapEnabled(bool _enabled);
+
+        // Documentation Inherited
+        public: Ogre::uint8 getMaxLayers(const Ogre::Terrain *_terrain) const;
+
+        // Documentation Inherited
+        public: void updateParams(const Ogre::MaterialPtr& mat,
+            const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: void updateParamsForCompositeMap(const Ogre::MaterialPtr& mat,
+            const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: void requestOptions(Ogre::Terrain *_terrain);
+      };
+
+      /// \brief Name of material
+      protected: std::string materialName;
+    };
+
+
+    /// \internal
     /// \brief Pretends to provide procedural page content to avoid page loading
     class DummyPageProvider : public Ogre::PageProvider
     {
@@ -313,7 +373,7 @@ namespace gazebo
       public: ignition::math::Vector3d terrainOrigin;
 
       /// \brief Global options.
-      public: Ogre::TerrainGlobalOptions *terrainGlobals;
+      public: Ogre::TerrainGlobalOptions *terrainGlobals = nullptr;
 
       /// \brief Group of terrains.
       public: Ogre::TerrainGroup *terrainGroup;
@@ -340,17 +400,17 @@ namespace gazebo
       public: std::vector<float> heights;
 
       /// \brief Pointer to the terrain material generator.
-      public: GzTerrainMatGen *gzMatGen;
+      public: GzTerrainMatGen *gzMatGen = nullptr;
 
       /// \brief A page provider is needed to use the paging system.
       public: DummyPageProvider dummyPageProvider;
 
       /// \brief Central registration point for extension classes,
       /// such as the PageStrategy, PageContentFactory.
-      public: Ogre::PageManager *pageManager;
+      public: Ogre::PageManager *pageManager = nullptr;
 
       /// \brief Type of paging applied
-      public: Ogre::TerrainPaging *terrainPaging;
+      public: Ogre::TerrainPaging *terrainPaging = nullptr;
 
       /// \brief Collection of world content
       public: Ogre::PagedWorld *world;
@@ -366,6 +426,10 @@ namespace gazebo
 
       /// \brief True if the terrain's hash does not match the image's hash
       public: bool terrainHashChanged;
+
+      /// \brief Name of custom material to use for the terrain. If empty,
+      /// default material with glsl shader will be used.
+      public: std::string materialName;
 
       /// \brief Filename of the terrain data
       public: std::string filename;
