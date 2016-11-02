@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _FPSVIEWCONTROLLER_HH_
-#define _FPSVIEWCONTROLLER_HH_
+#ifndef GAZEBO_RENDERING_FPSVIEWCONTROLLER_HH_
+#define GAZEBO_RENDERING_FPSVIEWCONTROLLER_HH_
 
 #include <string>
 
@@ -36,7 +36,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] Camera to controll
-      public: FPSViewController(UserCameraPtr _camera);
+      public: explicit FPSViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~FPSViewController();

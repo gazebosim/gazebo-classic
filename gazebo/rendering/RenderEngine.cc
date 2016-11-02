@@ -26,12 +26,8 @@
 #include <boost/filesystem.hpp>
 #include <sys/types.h>
 
-#ifdef __APPLE__
-# include <QtCore/qglobal.h>
-#endif
-
 // Not Apple or Windows
-#if not defined( Q_OS_MAC) && not defined(_WIN32)
+#if not defined(__APPLE__) && not defined(_WIN32)
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
@@ -261,12 +257,6 @@ ScenePtr RenderEngine::GetScene(unsigned int index)
 }
 
 //////////////////////////////////////////////////
-unsigned int RenderEngine::GetSceneCount() const
-{
-  return this->SceneCount();
-}
-
-//////////////////////////////////////////////////
 unsigned int RenderEngine::SceneCount() const
 {
   return this->dataPtr->scenes.size();
@@ -388,7 +378,7 @@ void RenderEngine::Fini()
   this->dataPtr->scenes.clear();
 
   // Not Apple or Windows
-# if not defined( Q_OS_MAC) && not defined(_WIN32)
+# if not defined(__APPLE__) && not defined(_WIN32)
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -681,7 +671,38 @@ void RenderEngine::SetupRenderSystem()
   ///   FBO seem to be the only good option
   renderSys->setConfigOption("RTT Preferred Mode", "FBO");
 
-  renderSys->setConfigOption("FSAA", "4");
+  // get all supported fsaa values
+  Ogre::ConfigOptionMap configMap = renderSys->getConfigOptions();
+  auto fsaaOoption = configMap.find("FSAA");
+
+  if (fsaaOoption != configMap.end())
+  {
+    auto values = (*fsaaOoption).second.possibleValues;
+    for (auto const &str : values)
+    {
+      int value = 0;
+      try
+      {
+        value = std::stoi(str);
+      }
+      catch(...)
+      {
+        continue;
+      }
+      this->dataPtr->fsaaLevels.push_back(value);
+    }
+  }
+  std::sort(this->dataPtr->fsaaLevels.begin(), this->dataPtr->fsaaLevels.end());
+
+  // check if target fsaa is supported
+  unsigned int fsaa = 0;
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(this->dataPtr->fsaaLevels.begin(),
+      this->dataPtr->fsaaLevels.end(), targetFSAA);
+  if (it != this->dataPtr->fsaaLevels.end())
+    fsaa = targetFSAA;
+
+  renderSys->setConfigOption("FSAA", std::to_string(fsaa));
 
   this->dataPtr->root->setRenderSystem(renderSys);
 }
@@ -691,7 +712,7 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
-#if defined Q_OS_MAC || _WIN32
+#if defined __APPLE__ || _WIN32
   this->dummyDisplay = 0;
 #else
   try
@@ -811,13 +832,13 @@ Ogre::Root *RenderEngine::Root() const
   return this->dataPtr->root;
 }
 
-#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
 /////////////////////////////////////////////////
-Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
+std::vector<unsigned int> RenderEngine::FSAALevels() const
 {
-  return this->OverlaySystem();
+  return this->dataPtr->fsaaLevels;
 }
 
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
 /////////////////////////////////////////////////
 Ogre::OverlaySystem *RenderEngine::OverlaySystem() const
 {

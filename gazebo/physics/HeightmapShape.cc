@@ -25,19 +25,12 @@
   #include <Winsock2.h>
 #endif
 
-#include <gazebo/gazebo_config.h>
-
-#ifdef HAVE_GDAL
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wfloat-equal"
-# include <gdalwarper.h>
-# include <gdal_priv.h>
-# pragma GCC diagnostic pop
-#endif
-
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <ignition/math/Helpers.hh>
+#include <gazebo/gazebo_config.h>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
@@ -78,6 +71,7 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
     response.set_response("success");
 
     this->FillMsg(msg);
+    this->FillHeights(msg);
 
     response.set_type(msg.GetTypeName());
     std::string *serializedData = response.mutable_serialized_data();
@@ -88,105 +82,72 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
+int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 {
-  if (this->img.Load(_filename) != 0)
+  this->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(_filename);
+  if (!this->heightmapData)
   {
-    gzerr << "Unable to load an image as a terrain [" << _filename << "]\n";
+    gzerr << "Unable to load heightmap data" << std::endl;
     return -1;
   }
-
-  this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
-  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
-
-  return 0;
-}
 
 #ifdef HAVE_GDAL
-//////////////////////////////////////////////////
-int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
-{
-  if (this->dem.Load(_filename) != 0)
+  // DEM
+  auto demData = dynamic_cast<common::Dem *>(this->heightmapData);
+  if (demData)
   {
-    gzerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
-    return -1;
-  }
+    this->dem = *demData;
+    if (this->sdf->HasElement("size"))
+    {
+      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+    }
+    else
+    {
+      this->heightmapSize.x = this->dem.GetWorldWidth();
+      this->heightmapSize.y = this->dem.GetWorldHeight();
+      this->heightmapSize.z = this->dem.GetMaxElevation() -
+          std::max(0.0f, this->dem.GetMinElevation());
+    }
 
-  if (this->sdf->HasElement("size"))
-  {
-    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+    // Modify the reference geotedic latitude/longitude.
+    // A GPS sensor will use the real georeferenced coordinates of the terrain.
+    common::SphericalCoordinatesPtr sphericalCoordinates;
+    sphericalCoordinates = this->world->GetSphericalCoordinates();
+
+    if (sphericalCoordinates)
+    {
+      ignition::math::Angle latitude, longitude;
+      double elevation;
+
+      this->dem.GetGeoReferenceOrigin(latitude, longitude);
+      elevation = this->dem.GetElevation(0.0, 0.0);
+
+      sphericalCoordinates->SetLatitudeReference(latitude);
+      sphericalCoordinates->SetLongitudeReference(longitude);
+      sphericalCoordinates->SetElevationReference(elevation);
+      sphericalCoordinates.reset();
+    }
+    else
+      gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
+
+    return 0;
   }
+  // Image
   else
-  {
-    this->heightmapSize.x = this->dem.GetWorldWidth();
-    this->heightmapSize.y = this->dem.GetWorldHeight();
-    this->heightmapSize.z = this->dem.GetMaxElevation() -
-        std::max(0.0f, this->dem.GetMinElevation());
-  }
-
-  this->heightmapData = static_cast<common::HeightmapData*>(&this->dem);
-
-  // Modify the reference geotedic latitude/longitude.
-  // A GPS sensor will use the real georeferenced coordinates of the terrain.
-  common::SphericalCoordinatesPtr sphericalCoordinates;
-  sphericalCoordinates = this->world->GetSphericalCoordinates();
-
-  if (sphericalCoordinates)
-  {
-    ignition::math::Angle latitude, longitude;
-    double elevation;
-
-    this->dem.GetGeoReferenceOrigin(latitude, longitude);
-    elevation = this->dem.GetElevation(0.0, 0.0);
-
-    sphericalCoordinates->SetLatitudeReference(latitude);
-    sphericalCoordinates->SetLongitudeReference(longitude);
-    sphericalCoordinates->SetElevationReference(elevation);
-    sphericalCoordinates.reset();
-  }
-  else
-    gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
-
-  return 0;
-}
-
-//////////////////////////////////////////////////
-int HeightmapShape::LoadTerrainFile(const std::string &_filename)
-{
-  // Register the GDAL drivers
-  GDALAllRegister();
-
-  GDALDataset *poDataset = reinterpret_cast<GDALDataset *>
-      (GDALOpen(_filename.c_str(), GA_ReadOnly));
-
-  if (!poDataset)
-  {
-    gzerr << "Unrecognized terrain format in file [" << _filename << "]\n";
-    return -1;
-  }
-
-  this->fileFormat = poDataset->GetDriver()->GetDescription();
-  GDALClose(reinterpret_cast<GDALDataset *>(poDataset));
-
-  // Check if the heightmap file is an image
-  if (fileFormat == "JPEG" || fileFormat == "PNG")
-  {
-    // Load the terrain file as an image
-    return this->LoadImageAsTerrain(_filename);
-  }
-  else
-  {
-    // Load the terrain file as a DEM
-    return this->LoadDEMAsTerrain(_filename);
-  }
-}
-#else
-int HeightmapShape::LoadTerrainFile(const std::string &_filename)
-{
-  // Load the terrain file as an image
-  return this->LoadImageAsTerrain(_filename);
-}
 #endif
+  {
+    auto imageData =
+        dynamic_cast<common::ImageHeightmap *>(this->heightmapData);
+    if (imageData)
+    {
+      this->img = *imageData;
+      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      return 0;
+    }
+  }
+
+  return -1;
+}
 
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
@@ -201,7 +162,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     return;
   }
 
-  if (LoadTerrainFile(filename) != 0)
+  if (this->LoadTerrainFile(filename) != 0)
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
@@ -209,7 +170,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
-      !math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
+      !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
@@ -287,6 +248,14 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
   _msg.mutable_heightmap()->set_width(this->vertSize);
   _msg.mutable_heightmap()->set_height(this->vertSize);
 
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
+  _msg.mutable_heightmap()->set_filename(this->GetURI());
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::FillHeights(msgs::Geometry &_msg) const
+{
   for (unsigned int y = 0; y < this->vertSize; ++y)
   {
     for (unsigned int x = 0; x < this->vertSize; ++x)
@@ -295,10 +264,6 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
       _msg.mutable_heightmap()->add_heights(this->heights[index]);
     }
   }
-
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
-  _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
 }
 
 //////////////////////////////////////////////////
@@ -316,10 +281,11 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
-  if (_x < 0 || _y < 0)
+  int index =  _y * this->vertSize + _x;
+  if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
     return 0.0;
 
-  return this->heights[_y * this->vertSize + _x];
+  return this->heights[index];
 }
 
 /////////////////////////////////////////////////

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Helpers.hh>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/MouseEvent.hh"
 
@@ -44,7 +45,7 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera,
 
   this->refVisual->Load();
   this->refVisual->AttachMesh("unit_sphere");
-  this->refVisual->SetScale(math::Vector3(0.2, 0.2, 0.1));
+  this->refVisual->SetScale(ignition::math::Vector3d(0.2, 0.2, 0.1));
   this->refVisual->SetCastShadows(false);
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
@@ -88,7 +89,7 @@ void OrbitViewController::Init()
   }
 
   // If the plane is too far away.
-  if (dist < 0 || dist > 20 || math::isnan(dist))
+  if (dist < 0 || dist > 20 || ignition::math::isnan(dist))
   {
     // First, see if the camera is looking at the origin.
     ignition::math::Vector3d dir = this->camera->Direction();
@@ -373,7 +374,8 @@ void OrbitViewController::UpdateRefVisual()
   // Update the size of the referenve visual based on the distance to the
   // focal point.
   double scale = this->distance * atan(GZ_DTOR(1.0));
-  this->refVisual->SetScale(math::Vector3(scale, scale, scale * 0.5));
+  this->refVisual->SetScale(
+      ignition::math::Vector3d(scale, scale, scale * 0.5));
 }
 
 /////////////////////////////////////////////////

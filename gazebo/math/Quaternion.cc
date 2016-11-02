@@ -540,10 +540,17 @@ Matrix4 Quaternion::GetAsMatrix4() const
 //////////////////////////////////////////////////
 void Quaternion::Round(int _precision)
 {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->x = precision(this->x, _precision);
   this->y = precision(this->y, _precision);
   this->z = precision(this->z, _precision);
   this->w = precision(this->w, _precision);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

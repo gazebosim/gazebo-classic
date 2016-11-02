@@ -68,6 +68,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->copyEntityName = "";
   this->dataPtr->modelEditorEnabled = false;
 
+  this->dataPtr->updateTimer = new QTimer(this);
+  connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
+  this, SLOT(update()));
+
   this->setFocusPolicy(Qt::StrongFocus);
 
   this->dataPtr->windowId = -1;
@@ -196,9 +200,12 @@ GLWidget::~GLWidget()
   MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
 
-  this->dataPtr->connections.clear();
-  this->dataPtr->node.reset();
+  this->dataPtr->requestSub.reset();
   this->dataPtr->selectionPub.reset();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  this->dataPtr->connections.clear();
 
   ModelManipulator::Instance()->Clear();
   ModelSnap::Instance()->Clear();
@@ -286,8 +293,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   {
     event::Events::preRender();
   }
-
-  this->update();
 
   _e->accept();
 }
@@ -381,11 +386,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   }
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -436,11 +441,11 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->dataPtr->keyModifiers = _event->modifiers();
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -884,6 +889,11 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
       sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
   this->dataPtr->userCamera->SetDefaultPose(ignition::math::Pose3d(camPos,
         ignition::math::Quaterniond(0, pitch, yaw)));
+
+  // Update at the camera's update rate
+  this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
 }
 
 /////////////////////////////////////////////////
