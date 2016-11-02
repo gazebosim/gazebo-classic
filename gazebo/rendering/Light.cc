@@ -536,8 +536,7 @@ void Light::SetRange(const double _range)
 //////////////////////////////////////////////////
 void Light::SetCastShadows(const bool _cast)
 {
-  if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT ||
-      this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
+  if (this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
     this->dataPtr->light->setCastShadows(_cast);
   }
