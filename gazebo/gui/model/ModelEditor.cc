@@ -64,20 +64,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
 
-  rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
-      gui::get_active_camera());
-  if (camera)
-  {
-    this->dataPtr->materialSwitcher.reset(new EditorMaterialSwitcher(camera));
-  }
-  else
-  {
-    gzerr << "User camera is NULL. "
-        << "Non-editable models will keep their original material"
-        << std::endl;
-  }
-
-
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
 #ifdef HAVE_GRAPHVIZ
@@ -491,7 +477,27 @@ void ModelEditor::OnFinish()
 void ModelEditor::ToggleMaterialScheme()
 {
   if (this->dataPtr->active)
+  {
+    if (!this->dataPtr->materialSwitcher)
+    {
+      rendering::CameraPtr camera =
+          boost::dynamic_pointer_cast<rendering::Camera>(
+          gui::get_active_camera());
+      if (camera)
+      {
+        this->dataPtr->materialSwitcher.reset(
+            new EditorMaterialSwitcher(camera));
+      }
+      else
+      {
+        gzerr << "User camera is NULL. "
+            << "Non-editable models will keep their original material"
+            << std::endl;
+      }
+    }
+
     this->dataPtr->materialSwitcher->SetMaterialScheme("ModelEditor");
+  }
   else
     this->dataPtr->materialSwitcher->SetMaterialScheme("");
 }

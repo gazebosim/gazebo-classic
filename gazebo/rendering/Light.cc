@@ -108,9 +108,9 @@ void Light::Load()
 //////////////////////////////////////////////////
 void Light::Update()
 {
+  this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
 
-  this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetDiffuseColor(
       this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>());
   this->SetSpecularColor(

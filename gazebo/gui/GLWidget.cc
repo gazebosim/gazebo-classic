@@ -71,7 +71,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->windowId = -1;
 
 //   TODO causes problem inserting models and mouse picking in qt5
-//  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
+  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
 //  this->setAttribute(Qt::WA_PaintOnScreen, true);
 
   this->setFocusPolicy(Qt::StrongFocus);

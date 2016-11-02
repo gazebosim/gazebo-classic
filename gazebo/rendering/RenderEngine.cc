@@ -782,6 +782,7 @@ void RenderEngine::CheckSystemCapabilities()
     gzerr << "Cannot get render system capabilities" << std::endl;
     return;
   }
+
   profiles = capabilities->getSupportedShaderProfiles();
 
   bool hasFragmentPrograms =

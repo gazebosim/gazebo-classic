@@ -1635,6 +1635,13 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   this->dataPtr->menuLayout->addStretch(5);
   this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
+
+#ifdef __APPLE__
+  // there is a problem on osx with the qt5 menubar being out of focus when
+  // the application is launched from a terminal, so prevent using a native
+  // menubar for now.
+  this->dataPtr->menuBar->setNativeMenuBar(false);
+#endif
 }
 
 /////////////////////////////////////////////////
