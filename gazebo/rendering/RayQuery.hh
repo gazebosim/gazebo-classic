@@ -72,13 +72,13 @@ namespace gazebo
       public: bool SelectMeshTriangle(const int _x, const int _y,
           const VisualPtr &_visual,
           ignition::math::Vector3d &_intersect,
-          ignition::math::Triangle3d &_triangle);
+          ignition::math::Triangle3d &_triangle) const;
 
       /// \brief Helper method to recursively find all visuals that have a mesh.
       /// \param[in] _visual Parent visual to be traversed.
       /// \param[out] _visuals A list of visuals with mesh.
       private: void MeshVisuals(const rendering::VisualPtr _visual,
-          std::vector<rendering::VisualPtr> &_visuals);
+          std::vector<rendering::VisualPtr> &_visuals) const;
 
       /// \internal
       /// \brief Pointer to private data.

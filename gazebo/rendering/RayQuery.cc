@@ -64,7 +64,7 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 /////////////////////////////////////////////////
 bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
     const VisualPtr &_visual, ignition::math::Vector3d &_intersect,
-    ignition::math::Triangle3d &_triangle)
+    ignition::math::Triangle3d &_triangle) const
 {
   // create the ray to test
   Ogre::Ray ray =
@@ -150,7 +150,7 @@ bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
 
 /////////////////////////////////////////////////
 void RayQuery::MeshVisuals(const rendering::VisualPtr _visual,
-    std::vector<rendering::VisualPtr> &_visuals)
+    std::vector<rendering::VisualPtr> &_visuals) const
 {
   if (!_visual->GetMeshName().empty() &&
       (_visual->GetVisibilityFlags() & GZ_VISIBILITY_SELECTABLE))

@@ -118,7 +118,7 @@ namespace gazebo
       /// visual.
       /// \param[out] _trans Translation output.
       /// \param[out] _rotation Rotation output.
-      public: void SnapTransform(
+      public: static void SnapTransform(
           const ignition::math::Triangle3d &_triangleSrc,
           const ignition::math::Triangle3d &_triangleDest,
           const ignition::math::Pose3d &_poseSrc,
