@@ -484,7 +484,7 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
     common::Time::MSleep(10);
   EXPECT_GE(imageCount, total_images);
 
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  c.reset();
 
   unsigned int rSum = 0;
   unsigned int gSum = 0;
