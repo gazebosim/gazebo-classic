@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \brief Copy constructor for ignition math
       /// \param _m Matrix to copy
-      public: Matrix4(const ignition::math::Matrix4d &_m);
+      public: explicit Matrix4(const ignition::math::Matrix4d &_m);
 
       /// \brief Constructor
       /// \param[in] _v00 Row 0, Col 0 value

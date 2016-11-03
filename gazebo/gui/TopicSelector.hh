@@ -38,7 +38,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent widget pointer.
-      public: TopicSelector(QWidget *_parent = 0);
+      public: explicit TopicSelector(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~TopicSelector();

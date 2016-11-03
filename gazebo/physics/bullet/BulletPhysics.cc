@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -784,7 +786,13 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->SetGravity(_gravity.Ign());
+}
+
+//////////////////////////////////////////////////
+void BulletPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
+{
+  this->world->SetGravitySDF(_gravity);
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

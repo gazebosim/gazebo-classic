@@ -97,7 +97,7 @@ bool g_clearModels;
 
 class ModelUpdate_TBB
 {
-  public: ModelUpdate_TBB(Model_V *_models) : models(_models) {}
+  public: explicit ModelUpdate_TBB(Model_V *_models) : models(_models) {}
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
     for (size_t i = _r.begin(); i != _r.end(); i++)

@@ -21,6 +21,8 @@
 
 #include <math.h>
 
+#include <ignition/math/Vector4.hh>
+
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Vector4.hh"
 
@@ -95,6 +97,11 @@ void Vector4::Set(double _x, double _y, double _z, double _w)
   this->w = _w;
 }
 
+//////////////////////////////////////////////////
+ignition::math::Vector4d Vector4::Ign() const
+{
+  return ignition::math::Vector4d(this->x, this->y, this->z, this->w);
+}
 
 //////////////////////////////////////////////////
 Vector4 &Vector4::operator =(const Vector4 &pt)

@@ -20,15 +20,15 @@
 
 #include <string>
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/any.hpp>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
-#include "gazebo/physics/Shape.hh"
-
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Shape.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -76,7 +76,7 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      public: DARTPhysics(WorldPtr _world);
+      public: explicit DARTPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~DARTPhysics();
@@ -127,7 +127,12 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      /// \deprecated See version that accepts ignition math parameters.
+      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity)
+              GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;

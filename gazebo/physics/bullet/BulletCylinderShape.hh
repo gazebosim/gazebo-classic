@@ -39,7 +39,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
-      public: BulletCylinderShape(CollisionPtr _parent)
+      public: explicit BulletCylinderShape(CollisionPtr _parent)
               : CylinderShape(_parent) {}
 
       /// \brief Destructor
@@ -114,7 +114,7 @@ namespace gazebo
                         this->collisionParent->GetRelativePose();
                     relativePose.pos -= bLink->GetInertial()->GetCoG();
                     compoundShape->addChildShape(
-                        BulletTypes::ConvertPose(relativePose), shape);
+                        BulletTypes::ConvertPose(relativePose.Ign()), shape);
                   }
                 }
               }

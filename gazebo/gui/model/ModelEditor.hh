@@ -41,7 +41,7 @@ namespace gazebo
 
       /// \brief Constuctor.
       /// \param[in] _mainWindow Pointer to the mainwindow.
-      public: ModelEditor(MainWindow *_mainWindow);
+      public: explicit ModelEditor(MainWindow *_mainWindow);
 
       /// \brief Destuctor.
       public: virtual ~ModelEditor();

@@ -48,7 +48,7 @@ namespace SkyX
       /** Constructor
         @param s Parent SkyX pointer
      */
-    GPUManager(SkyX *s);
+    explicit GPUManager(SkyX *s);
 
     /** Destructor
      */

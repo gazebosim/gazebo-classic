@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _latching Set to true to make the callback helper
       /// latching.
-      public: CallbackHelper(bool _latching = false);
+      public: explicit CallbackHelper(bool _latching = false);
 
       /// \brief Destructor
       public: virtual ~CallbackHelper();

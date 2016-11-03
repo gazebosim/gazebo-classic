@@ -224,8 +224,10 @@ void RoadSegment::Load(msgs::Road _msg)
     // Every other point in the road
     else
     {
-      math::Vector3 v1 = (this->points[i+1] - this->points[i]).Normalize();
-      math::Vector3 v0 = (this->points[i] - this->points[i-1]).Normalize();
+      ignition::math::Vector3 v1 =
+        (this->points[i+1] - this->points[i]).Normalize();
+      ignition::math::Vector3 v0 =
+        (this->points[i] - this->points[i-1]).Normalize();
       double dot = v0.Dot(v1 * -1);
       tangent = (v1+v0).Normalize().Ign();
 

@@ -32,7 +32,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
-      public: BulletMultiRayShape(CollisionPtr parent);
+      public: explicit BulletMultiRayShape(CollisionPtr parent);
 
       /// \brief Destructor
       public: virtual ~BulletMultiRayShape();

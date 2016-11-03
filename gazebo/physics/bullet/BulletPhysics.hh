@@ -21,14 +21,15 @@
 
 #ifndef BULLETPHYSICS_HH
 #define BULLETPHYSICS_HH
+
 #include <string>
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/any.hpp>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/bullet/bullet_inc.h"
-#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
@@ -78,7 +79,7 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      public: BulletPhysics(WorldPtr _world);
+      public: explicit BulletPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~BulletPhysics();
@@ -141,7 +142,12 @@ namespace gazebo
                                        InertialPtr _inertial);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      /// \deprecated See version that accepts ignition math parameters.
+      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity)
+              GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void SetWorldCFM(double _cfm);

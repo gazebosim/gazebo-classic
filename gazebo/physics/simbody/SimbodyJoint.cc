@@ -110,7 +110,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   if (_sdf->GetElement("child")->HasElement("pose"))
     childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
 
-  this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
+  this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose.Ign());
 
   math::Pose parentPose;
   if (_sdf->GetElement("parent")->HasElement("pose"))
@@ -121,26 +121,26 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     if (this->parentLink)
     {
       X_MP = physics::SimbodyPhysics::Pose2Transform(
-        this->parentLink->GetRelativePose());
+        this->parentLink->GetRelativePose().Ign());
     }
     else
     {
       // TODO: verify
       // parent frame is at the world frame
       X_MP = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->GetWorldPose());
+        this->model->GetWorldPose().Ign());
     }
 
     if (this->childLink)
     {
       X_MC = physics::SimbodyPhysics::Pose2Transform(
-        this->childLink->GetRelativePose());
+        this->childLink->GetRelativePose().Ign());
     }
     else
     {
       // TODO: verify
       X_MC = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->GetWorldPose());
+        this->model->GetWorldPose().Ign());
     }
 
     const SimTK::Transform X_PC = ~X_MP*X_MC;

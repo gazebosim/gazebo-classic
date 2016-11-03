@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -124,6 +126,13 @@ void JointVisual::Load(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 {
+  this->Load(_msg, _worldPose.Ign());
+}
+
+/////////////////////////////////////////////////
+void JointVisual::Load(ConstJointPtr &_msg,
+    const ignition::math::Pose3d &_worldPose)
+{
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
@@ -144,6 +153,13 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
     bool _useParentFrame, msgs::Joint::Type _type)
 {
+  return this->CreateAxis(_axis.Ign(), _useParentFrame, _type);
+}
+
+/////////////////////////////////////////////////
+ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
+    bool _useParentFrame, msgs::Joint::Type _type)
+{
   ArrowVisualPtr axis;
 
   std::stringstream nameStr;
@@ -162,21 +178,29 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
 void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
 {
+  this->UpdateAxis(_arrowVisual, _axis.Ign(), _useParentFrame, _type);
+}
+
+/////////////////////////////////////////////////
+void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
+  const ignition::math::Vector3d &_axis, bool _useParentFrame,
+  msgs::Joint::Type _type)
+{
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
   // Get rotation to axis vector
-  math::Vector3 axisDir = _axis;
-  math::Vector3 u = axisDir.Normalize();
-  math::Vector3 v = math::Vector3::UnitZ;
+  ignition::math::Vector3d axisDir = _axis;
+  ignition::math::Vector3d u = axisDir.Normalize();
+  ignition::math::Vector3d v = ignition::math::Vector3d::UnitZ;
   double cosTheta = v.Dot(u);
   double angle = acos(cosTheta);
-  math::Quaternion quat;
+  ignition::math::Quaterniond quat;
   // check the parallel case
   if (math::equal(angle, M_PI))
-    quat.SetFromAxis(u.GetPerpendicular(), angle);
+    quat.Axis(u.Perpendicular(), angle);
   else
-    quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
+    quat.Axis((v.Cross(u)).Normalize(), angle);
   _arrowVisual->SetRotation(quat);
 
   if (_useParentFrame)
@@ -184,10 +208,11 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     // if set to use parent model frame
     // rotate the arrow visual relative to the model
     VisualPtr model = this->GetRootVisual();
-    math::Quaternion quatFromModel =
-        model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
-    _arrowVisual->SetRotation(quatFromModel.GetInverse() *
-        _arrowVisual->GetRotation());
+    ignition::math::Quaterniond quatFromModel =
+        model->GetWorldPose().Ign().Rot().Inverse() *
+        this->GetWorldPose().Ign().Rot();
+    _arrowVisual->SetRotation(quatFromModel.Inverse() *
+        _arrowVisual->GetRotation().Ign());
   }
   _arrowVisual->ShowRotation(_type == msgs::Joint::REVOLUTE ||
                              _type == msgs::Joint::REVOLUTE2 ||
@@ -204,26 +229,29 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
   }
 
   // Hide existing arrow head if it overlaps with the axis
-  math::Quaternion axisWorldRotation = _arrowVisual->GetWorldPose().rot;
-  math::Quaternion jointWorldRotation = this->GetWorldPose().rot;
+  ignition::math::Quaterniond axisWorldRotation =
+    _arrowVisual->GetWorldPose().Ign().Rot();
+  ignition::math::Quaterniond jointWorldRotation =
+     this->GetWorldPose().Ign().Rot();
 
   dPtr->axisVisual->ShowAxisHead(0, true);
   dPtr->axisVisual->ShowAxisHead(1, true);
   dPtr->axisVisual->ShowAxisHead(2, true);
   _arrowVisual->ShowShaft(true);
 
-  math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
-  if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
+  ignition::math::Vector3d axisWorld = axisWorldRotation *
+    ignition::math::Vector3d::UnitZ;
+  if (axisWorld == jointWorldRotation*ignition::math::Vector3d::UnitX)
   {
     dPtr->axisVisual->ShowAxisHead(0, false);
     _arrowVisual->ShowShaft(false);
   }
-  else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
+  else if (axisWorld == jointWorldRotation*ignition::math::Vector3d::UnitY)
   {
     dPtr->axisVisual->ShowAxisHead(1, false);
     _arrowVisual->ShowShaft(false);
   }
-  else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
+  else if (axisWorld == jointWorldRotation*ignition::math::Vector3d::UnitZ)
   {
     dPtr->axisVisual->ShowAxisHead(2, false);
     _arrowVisual->ShowShaft(false);

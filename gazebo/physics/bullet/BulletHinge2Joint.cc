@@ -121,7 +121,7 @@ math::Angle BulletHinge2Joint::GetAngle(unsigned int /*_index*/) const
     return math::Angle();
   }
 
-  return this->bulletHinge2->getAngle1();
+  return math::Angle(static_cast<double>(this->bulletHinge2->getAngle1()));
 }
 
 //////////////////////////////////////////////////
@@ -203,10 +203,10 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
 #endif
   motor = this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
-    return motor->m_hiLimit;
+    return math::Angle(static_cast<double>(motor->m_hiLimit));
 
   gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
-  return 0;
+  return math::Angle::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -225,10 +225,10 @@ math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
 #endif
   motor = this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
-    return motor->m_loLimit;
+    return math::Angle(static_cast<double>(motor->m_loLimit));
 
   gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
-  return 0;
+  return math::Angle::Zero;
 }
 
 //////////////////////////////////////////////////

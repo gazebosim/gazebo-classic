@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Construct a URIPath object from a string.
       /// \param[in] _str A string.
-      public: URIPath(const std::string &_str);
+      public: explicit URIPath(const std::string &_str);
 
       /// \brief Destructor
       public: virtual ~URIPath();
@@ -113,7 +113,7 @@ namespace gazebo
 
       /// \brief Construct a URIQuery object from a string.
       /// \param[in] _str A string.
-      public: URIQuery(const std::string &_str);
+      public: explicit URIQuery(const std::string &_str);
 
       /// \brief Copy constructor
       /// \param[in] _query Another query component
@@ -174,7 +174,7 @@ namespace gazebo
 
       /// \brief Construct a URI object from a string.
       /// \param[in] _str A string.
-      public: URI(const std::string &_str);
+      public: explicit URI(const std::string &_str);
 
       /// \brief Copy constructor
       /// \param[in] _uri Another URI.

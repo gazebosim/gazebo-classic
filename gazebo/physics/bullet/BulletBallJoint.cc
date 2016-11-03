@@ -98,8 +98,8 @@ void BulletBallJoint::Init()
     this->bulletBall = new btPoint2PointConstraint(
       *bulletChildLink->GetBulletLink(),
       *bulletParentLink->GetBulletLink(),
-      BulletTypes::ConvertVector3(pivotChild),
-      BulletTypes::ConvertVector3(pivotParent));
+      BulletTypes::ConvertVector3(pivotChild.Ign()),
+      BulletTypes::ConvertVector3(pivotParent.Ign()));
   }
   // If only the child exists, then create a joint between the child
   // and the world.
@@ -107,7 +107,7 @@ void BulletBallJoint::Init()
   {
     this->bulletBall = new btPoint2PointConstraint(
       *bulletChildLink->GetBulletLink(),
-      BulletTypes::ConvertVector3(pivotChild));
+      BulletTypes::ConvertVector3(pivotChild.Ign()));
   }
   // If only the parent exists, then create a joint between the parent
   // and the world.
@@ -115,7 +115,7 @@ void BulletBallJoint::Init()
   {
     this->bulletBall = new btPoint2PointConstraint(
       *bulletParentLink->GetBulletLink(),
-      BulletTypes::ConvertVector3(pivotParent));
+      BulletTypes::ConvertVector3(pivotParent.Ign()));
   }
   // Throw an error if no links are given.
   else

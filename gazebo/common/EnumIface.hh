@@ -140,7 +140,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _c Enum value
-      public: EnumIterator(const Enum _c) : c(_c)
+      public: explicit EnumIterator(const Enum _c) : c(_c)
       {
         GZ_ASSERT(this->c >= this->Begin() && this->c <= this->End(),
             "Invalid enum value in EnumIterator constructor");

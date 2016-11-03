@@ -39,7 +39,7 @@ namespace SkyX
       /** Constructor
         @param s Parent SkyX pointer
      */
-    VCloudsManager(SkyX *s);
+    explicit VCloudsManager(SkyX *s);
 
     /** Destructor
      */

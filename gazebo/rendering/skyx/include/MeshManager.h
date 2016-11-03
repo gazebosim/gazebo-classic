@@ -50,7 +50,7 @@ namespace SkyX
     /** Constructor
         @param s Parent SkyX pointer
      */
-    MeshManager(SkyX *s);
+    explicit MeshManager(SkyX *s);
 
     /** Destructor
      */

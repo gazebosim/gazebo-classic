@@ -34,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
-      public: FixedJoint(BasePtr _parent) : T(_parent)
+      public: explicit FixedJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::FIXED_JOINT); }
       /// \brief Destructor
       public: virtual ~FixedJoint()

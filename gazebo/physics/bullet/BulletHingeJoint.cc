@@ -244,7 +244,7 @@ math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
     {
       result = this->bulletHinge->getHingeAngle();
     }
-    result -= this->angleOffset;
+    result -= math::Angle(this->angleOffset);
   }
   return result;
 }

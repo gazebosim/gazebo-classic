@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: ImportDialog(QWidget *_parent = 0);
+      public: explicit ImportDialog(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ImportDialog();

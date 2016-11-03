@@ -57,7 +57,7 @@ namespace gazebo
 
       /// \brief Copy constructor for ignition math
       /// \param _m Matrix to copy
-      public: Matrix3(const ignition::math::Matrix3d &_m);
+      public: explicit Matrix3(const ignition::math::Matrix3d &_m);
 
       /// \brief Desctructor
       public: virtual ~Matrix3();

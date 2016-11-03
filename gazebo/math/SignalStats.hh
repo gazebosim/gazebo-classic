@@ -143,7 +143,7 @@ namespace gazebo
 
       /// \brief Ignition math copy constructor
       /// \param[in] _s SignalStats to copy
-      public: SignalStats(const ignition::math::SignalStats &_s);
+      public: explicit SignalStats(const ignition::math::SignalStats &_s);
 
       /// \brief Destructor
       public: ~SignalStats();

@@ -41,7 +41,7 @@ Plane::Plane(const Vector3 &_normal, const Vector2d &_size, double _offset)
 /////////////////////////////////////////////////
 Plane::Plane(const ignition::math::Planed &_plane)
 {
-  this->Set(_plane.Normal(), _plane.Size(), _plane.Offset());
+  this->Set(Vector3(_plane.Normal()), Vector2d(_plane.Size()), _plane.Offset());
 }
 
 /////////////////////////////////////////////////

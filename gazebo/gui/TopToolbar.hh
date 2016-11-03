@@ -35,7 +35,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent widget.
-      public: TopToolbar(QWidget *_parent = 0);
+      public: explicit TopToolbar(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: virtual ~TopToolbar();

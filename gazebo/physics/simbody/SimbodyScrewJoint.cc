@@ -472,11 +472,11 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
     }
     if (tp > 0)
     {
-      return this->GetUpperLimit(0) / tp;
+      return math::Angle(this->GetUpperLimit(0) / tp);
     }
     else
     {
-      return this->GetLowerLimit(0) / tp;
+      return math::Angle(this->GetLowerLimit(0) / tp);
     }
   }
   else
@@ -512,11 +512,11 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
     }
     if (tp > 0)
     {
-      return this->GetLowerLimit(0) / tp;
+      return math::Angle(this->GetLowerLimit(0) / tp);
     }
     else
     {
-      return this->GetUpperLimit(0) / tp;
+      return math::Angle(this->GetUpperLimit(0) / tp);
     }
   }
   else

@@ -119,7 +119,7 @@ namespace SkyX
       /** Constructor
         @param s Parent SkyX pointer
      */
-    AtmosphereManager(SkyX *s);
+    explicit AtmosphereManager(SkyX *s);
 
     /** Destructor
      */

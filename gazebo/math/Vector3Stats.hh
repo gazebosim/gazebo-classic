@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \brief Ignition math copy constructor
       /// \param[in] _stats An ignition math vector3stats to copy
-      public: Vector3Stats(const ignition::math::Vector3Stats &_stats);
+      public: explicit Vector3Stats(const ignition::math::Vector3Stats &_stats);
 
       /// \brief Destructor
       public: ~Vector3Stats();

@@ -35,7 +35,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyMeshShape : public MeshShape
     {
       /// \brief Constructor
-      public: SimbodyMeshShape(CollisionPtr _parent);
+      public: explicit SimbodyMeshShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyMeshShape();

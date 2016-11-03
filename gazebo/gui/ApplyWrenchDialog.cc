@@ -1303,8 +1303,8 @@ void ApplyWrenchDialog::changeEvent(QEvent *_event)
     // During tests it seems not to find main window, so this is true by default
     bool mainWindowActive = true;
 
-    if (!this->dataPtr->mainWindow || (this->dataPtr->mainWindow &&
-        !this->dataPtr->mainWindow->isActiveWindow()))
+    if (!this->dataPtr->mainWindow ||
+        !this->dataPtr->mainWindow->isActiveWindow())
     {
       mainWindowActive = false;
     }

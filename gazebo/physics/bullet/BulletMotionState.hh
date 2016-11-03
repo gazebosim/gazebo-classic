@@ -40,7 +40,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletMotionState : public btMotionState
     {
       /// \brief Constructor
-      public: BulletMotionState(LinkPtr _link);
+      public: explicit BulletMotionState(LinkPtr _link);
 
       /// \brief Destructor
       public: virtual ~BulletMotionState();

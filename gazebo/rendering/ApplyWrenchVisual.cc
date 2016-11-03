@@ -333,8 +333,8 @@ void ApplyWrenchVisual::UpdateForceVisual()
 
   // Set rotation in the vector direction
   ignition::math::Quaterniond quat = this->QuaternionFromVector(normVec);
-  dPtr->forceVisual->SetRotation(quat * ignition::math::Quaterniond(
-      ignition::math::Vector3d(0, M_PI/2.0, 0)));
+  dPtr->forceVisual->SetRotation(quat *
+      ignition::math::Vector3d(0, M_PI/2.0, 0));
 
   // Set arrow tip to forcePosVector
   dPtr->forceVisual->SetPosition(-normVec * 0.28 *
@@ -367,8 +367,8 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
 
   // Set rotation in the vector direction
   ignition::math::Quaterniond quat = this->QuaternionFromVector(normVec);
-  dPtr->torqueVisual->SetRotation(quat * ignition::math::Quaterniond(
-      ignition::math::Vector3d(0, M_PI/2.0, 0)));
+  dPtr->torqueVisual->SetRotation(quat *
+      ignition::math::Vector3d(0, M_PI/2.0, 0));
 
   // Position towards comVector
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();

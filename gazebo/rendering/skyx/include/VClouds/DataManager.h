@@ -65,7 +65,7 @@ namespace SkyX { namespace VClouds {
       /** Constructor
         @param vc VClouds parent pointer
         */
-      DataManager(VClouds *vc);
+      explicit DataManager(VClouds *vc);
 
       /** Destructor
       */

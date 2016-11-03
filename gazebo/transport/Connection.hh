@@ -62,9 +62,9 @@ namespace gazebo
       public: ConnectionReadTask(
                   boost::function<void (const std::string &)> _func,
                   const std::string &_data)
+                : func(_func),
+                  data(_data)
               {
-                this->func = _func;
-                this->data = _data;
               }
 
       /// \bried Overridden function from tbb::task that exectues the data

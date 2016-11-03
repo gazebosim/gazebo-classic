@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget
-      public: VideoRecorder(QWidget *_parent = 0);
+      public: explicit VideoRecorder(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~VideoRecorder();

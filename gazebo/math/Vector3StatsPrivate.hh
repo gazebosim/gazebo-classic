@@ -30,7 +30,7 @@ namespace gazebo
     {
       public: Vector3StatsPrivate() = default;
 
-      public: Vector3StatsPrivate(
+      public: explicit Vector3StatsPrivate(
                   const ignition::math::Vector3Stats &_v)
               : x(_v.X()), y(_v.Y()), z(_v.Z()), mag(_v.Mag()) {}
 

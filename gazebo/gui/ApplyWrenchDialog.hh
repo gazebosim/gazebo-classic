@@ -53,7 +53,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
-      public: ApplyWrenchDialog(QWidget *_parent = 0);
+      public: explicit ApplyWrenchDialog(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: ~ApplyWrenchDialog();

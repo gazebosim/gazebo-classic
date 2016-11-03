@@ -16,6 +16,8 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
@@ -1699,9 +1701,15 @@ void Visual::SetPosition(const ignition::math::Vector3d &_pos)
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  this->SetRotation(_rot.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetRotation(const ignition::math::Quaternion &_rot)
+{
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is null");
   this->dataPtr->sceneNode->setOrientation(
-      Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
+      Ogre::Quaternion(_rot.W(), _rot.X(), _rot.Y(), _rot.Z()));
 
   this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
 }
@@ -1709,8 +1717,14 @@ void Visual::SetRotation(const math::Quaternion &_rot)
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
-  this->SetPosition(_pose.pos.Ign());
-  this->SetRotation(_pose.rot);
+  this->SetPose(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetPosition(_pose.Pos());
+  this->SetRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
@@ -1741,9 +1755,16 @@ math::Pose Visual::GetPose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos);
-  this->SetWorldRotation(_pose.rot);
+  this->SetWorldPose(_pose.Ign());
 }
+
+//////////////////////////////////////////////////
+void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetWorldPosition(_pose.pos());
+  this->SetWorldRotation(_pose.rot());
+}
+
 
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)

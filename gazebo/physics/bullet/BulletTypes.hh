@@ -18,6 +18,10 @@
 #define _GAZEBO_BULLETTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector4.hh>
+
 #include "gazebo/physics/bullet/bullet_math_inc.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector4.hh"
@@ -64,9 +68,20 @@ namespace gazebo
       /// \brief Convert a gazebo Vector3 to a bullet btVector3.
       /// \param[in] _vec Gazebo Vector3.
       /// \return Bullet Vector3.
+      /// \deprecated See version that accepts ignition math parameters.
       public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
+              GAZEBO_DEPRECATED(8.0)
               {
-                return btVector3(_vec.x, _vec.y, _vec.z);
+                return ConvertVector3(_vec.Ign());
+              }
+
+      /// \brief Convert a gazebo Vector3 to a bullet btVector3.
+      /// \param[in] _vec Gazebo Vector3.
+      /// \return Bullet Vector3.
+      public: static btVector3 ConvertVector3(
+              const ignition::math::Vector3d &_vec)
+              {
+                return btVector3(_vec.X(), _vec.Y(), _vec.Z());
               }
 
       /// \brief Convert a bullet btVector4 to a gazebo Vector4.
@@ -81,9 +96,20 @@ namespace gazebo
       /// \brief Convert a gazebo Vector4 to a bullet btVector4.
       /// \param[in] _vec Gazebo Vector4.
       /// \return Bullet Vector4.
+      /// \deprecated See version that accepts ignition math parameters.
       public: static btVector4 ConvertVector4(const math::Vector4 &_vec)
+              GAZEBO_DEPRECATED(8.0)
               {
-                return btVector4(_vec.x, _vec.y, _vec.z, _vec.w);
+                return ConvertVector4(_vec.Ign());
+              }
+
+      /// \brief Convert a gazebo Vector4 to a bullet btVector4.
+      /// \param[in] _vec Gazebo Vector4.
+      /// \return Bullet Vector4.
+      public: static btVector4 ConvertVector4(
+              const ignition::math::Vector4d &_vec)
+              {
+                return btVector4(_vec.X(), _vec.Y(), _vec.Z(), _vec.W());
               }
 
       /// \brief Convert a bullet transform to a gazebo pose.
@@ -103,13 +129,24 @@ namespace gazebo
       /// \brief Convert a gazebo pose to a bullet transform.
       /// \param[in] _pose Gazebo pose.
       /// \return Bullet pose (btTransform).
+      /// \deprecated See version that accepts ignition math parameters.
       public: static btTransform ConvertPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0)
+              {
+                return ConvertPose(_pose.Ign());
+              }
+
+      /// \brief Convert a gazebo pose to a bullet transform.
+      /// \param[in] _pose Gazebo pose.
+      /// \return Bullet pose (btTransform).
+      public: static btTransform ConvertPose(
+              const ignition::math::Pose3d &_pose)
               {
                 btTransform trans;
 
-                trans.setOrigin(ConvertVector3(_pose.pos));
-                trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                               _pose.rot.z, _pose.rot.w));
+                trans.setOrigin(ConvertVector3(_pose.Pos()));
+                trans.setRotation(btQuaternion(_pose.Rot().X(), _pose.Rot().Y(),
+                                             _pose.Rot().Z(), _pose.Rot().W()));
                 return trans;
               }
     };

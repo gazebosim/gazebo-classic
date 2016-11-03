@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.k *
-*/  
+*/
 #ifndef _SIMEVENTS_EXCEPTION_HH_
 #define _SIMEVENTS_EXCEPTION_HH_
 
@@ -24,7 +24,8 @@ namespace gazebo
   {
     /// \brief Constructor
     /// param[in] m the exception message
-    public: SimEventsException(const char* m) : std::runtime_error(m) {}
+    public: explicit SimEventsException(const char* m)
+      : std::runtime_error(m) {}
   };
 }
 

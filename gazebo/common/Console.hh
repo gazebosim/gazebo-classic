@@ -72,7 +72,7 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _filename Filename to write into. If empty,
       /// FileLogger::Init must be called separately.
-      public: FileLogger(const std::string &_filename = "");
+      public: explicit FileLogger(const std::string &_filename = "");
 
       /// \brief Destructor.
       public: virtual ~FileLogger();
@@ -112,7 +112,7 @@ namespace gazebo
                  {
                    /// \brief Constructor.
                    /// \param[in] _filename Filename to write into.
-                   public: Buffer(const std::string &_filename);
+                   public: explicit Buffer(const std::string &_filename);
 
                    /// \brief Destructor.
                    public: virtual ~Buffer();

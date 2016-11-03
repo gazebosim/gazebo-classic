@@ -221,7 +221,7 @@ void SimbodyLink::OnPoseChange()
       /// the inboard joint is a free joint to the ground for now.
       this->masterMobod.setQToFitTransform(
          this->simbodyPhysics->integ->updAdvancedState(),
-         SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+         SimbodyPhysics::Pose2Transform(this->GetWorldPose().Ign()));
     }
     else
     {
@@ -341,7 +341,7 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & _vel)
 {
   this->masterMobod.setUToFitLinearVelocity(
     this->simbodyPhysics->integ->updAdvancedState(),
-    SimbodyPhysics::Vector3ToVec3(_vel));
+    SimbodyPhysics::Vector3ToVec3(_vel.Ign()));
   this->simbodyPhysics->system.realize(
     this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
@@ -350,7 +350,7 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & _vel)
 math::Vector3 SimbodyLink::GetWorldLinearVel(
   const math::Vector3& _offset) const
 {
-  SimTK::Vec3 station = SimbodyPhysics::Vector3ToVec3(_offset);
+  SimTK::Vec3 station = SimbodyPhysics::Vector3ToVec3(_offset.Ign());
   math::Vector3 v;
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -378,8 +378,8 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
   {
-    SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q));
-    SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset));
+    SimTK::Rotation R_WF(SimbodyPhysics::QuadToQuad(_q.Ign()));
+    SimTK::Vec3 p_F(SimbodyPhysics::Vector3ToVec3(_offset.Ign()));
     SimTK::Vec3 p_W(R_WF * p_F);
 
     // lock physics update mutex to ensure thread safety
@@ -428,7 +428,7 @@ void SimbodyLink::SetAngularVel(const math::Vector3 &_vel)
 {
   this->masterMobod.setUToFitAngularVelocity(
     this->simbodyPhysics->integ->updAdvancedState(),
-    SimbodyPhysics::Vector3ToVec3(_vel));
+    SimbodyPhysics::Vector3ToVec3(_vel.Ign()));
   this->simbodyPhysics->system.realize(
     this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
@@ -448,7 +448,7 @@ math::Vector3 SimbodyLink::GetWorldAngularVel() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetForce(const math::Vector3 &_force)
 {
-  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
+  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force.Ign()));
 
   this->simbodyPhysics->discreteForces.setOneBodyForce(
     this->simbodyPhysics->integ->updAdvancedState(),
@@ -470,7 +470,7 @@ math::Vector3 SimbodyLink::GetWorldForce() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetTorque(const math::Vector3 &_torque)
 {
-  SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
+  SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque.Ign()));
 
   this->simbodyPhysics->discreteForces.setOneBodyForce(
     this->simbodyPhysics->integ->updAdvancedState(),
@@ -504,7 +504,7 @@ void SimbodyLink::SetAngularDamping(double /*_damping*/)
 /////////////////////////////////////////////////
 void SimbodyLink::AddForce(const math::Vector3 &_force)
 {
-  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
+  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force.Ign()));
 
   this->simbodyPhysics->discreteForces.addForceToBodyPoint(
     this->simbodyPhysics->integ->updAdvancedState(),
@@ -567,7 +567,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
   {
     const SimTK::Real mass = this->inertial->GetMass();
     SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
-      this->inertial->GetPose());
+      this->inertial->GetPose().Ign());
     const SimTK::Vec3 &com_L = X_LI.p();  // vector from Lo to com, exp. in L
 
     if (math::equal(mass, 0.0))

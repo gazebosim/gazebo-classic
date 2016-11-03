@@ -46,9 +46,9 @@ TEST_F(RotationSplineTest, RotationSpline)
   EXPECT_TRUE(s.GetPoint(1) == math::Quaternion(.1, .1, .1));
 
   // ::UpdatePoint
-  s.UpdatePoint(1, math::Quaternion(.2, .2, .2));
+  s.UpdatePoint(1u, math::Quaternion(.2, .2, .2));
   s.SetAutoCalculate(false);
-  s.UpdatePoint(0, math::Vector3(-.1, -.1, -.1));
+  s.UpdatePoint(0u, math::Quaternion(math::Vector3(-.1, -.1, -.1)));
   s.SetAutoCalculate(true);
 
   // ::Interpolate

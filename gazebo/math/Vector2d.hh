@@ -49,7 +49,7 @@ namespace gazebo
 
       /// \brief Copy constructor for ignition math
       /// \param[in] _v the value
-      public: Vector2d(const ignition::math::Vector2d &_v);
+      public: explicit Vector2d(const ignition::math::Vector2d &_v);
 
       /// \brief Destructor
       public: virtual ~Vector2d();

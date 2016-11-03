@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 
@@ -41,11 +43,17 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->Get<math::Vector3>("size"));
+  this->SetSize(this->sdf->Get<ignition::math::Vector3>("size"));
 }
 
 //////////////////////////////////////////////////
 void BoxShape::SetSize(const math::Vector3 &_size)
+{
+  this->SetSize(_size.Ign());
+}
+
+//////////////////////////////////////////////////
+void BoxShape::SetSize(const ignition::math::Vector3d &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
 }
@@ -57,9 +65,22 @@ math::Vector3 BoxShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3 BoxShape::GetSize() const
+{
+  return this->sdf->Get<ignition::math::Vector3>("size");
+}
+
+
+//////////////////////////////////////////////////
 void BoxShape::SetScale(const math::Vector3 &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  this->SetScale(_scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
+{
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
   if (_scale == this->scale)

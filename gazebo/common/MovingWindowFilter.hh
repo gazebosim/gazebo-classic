@@ -49,7 +49,7 @@ namespace gazebo
       public: MovingWindowFilterPrivate();
 
       /// \brief For moving window smoothed value
-      public: unsigned int valWindowSize;
+      public: unsigned int valWindowSize = 0u;
 
       /// \brief buffer history of raw values
       public: std::vector<T> valHistory;
@@ -61,7 +61,7 @@ namespace gazebo
       public: T sum;
 
       /// \brief keep track of number of elements
-      public: unsigned int samples;
+      public: unsigned int samples = 0u;
     };
     /// \endcond
 
@@ -110,10 +110,11 @@ namespace gazebo
 
       /// \brief Allow subclasses to initialize their own data pointer.
       /// \param[in] _d Reference to data pointer.
-      protected: MovingWindowFilter<T>(MovingWindowFilterPrivate<T> &_d);
+      protected: explicit MovingWindowFilter<T>(
+          MovingWindowFilterPrivate<T> &_d);
 
       /// \brief Data pointer.
-      protected: MovingWindowFilterPrivate<T> *dataPtr;
+      protected: MovingWindowFilterPrivate<T> *dataPtr = nullptr;
     };
 
     //////////////////////////////////////////////////

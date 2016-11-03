@@ -147,7 +147,7 @@ namespace SkyX { namespace VClouds {
     /** Simple constructor
       @param sm Scene manager
      */
-    VClouds(Ogre::SceneManager *sm);
+    explicit VClouds(Ogre::SceneManager *sm);
 
     /** Destructor
      */

@@ -22,14 +22,15 @@
 #include <string>
 #include <utility>
 
-#include <boost/thread/thread.hpp>
+#include <boost/any.hpp>
+#include <ignition/math/Vector3.hh>
 
+#include "gazebo/gazebo_config.h"
+#include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
-#include "gazebo/gazebo_config.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -94,7 +95,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _world The World that uses this physics engine.
-      public: ODEPhysics(WorldPtr _world);
+      public: explicit ODEPhysics(WorldPtr _world);
 
       /// \brief Destructor.
       public: virtual ~ODEPhysics();
@@ -140,7 +141,12 @@ namespace gazebo
                                            ModelPtr _parent);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      /// \deprecated See version that accepts ignition math parameters.
+      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity)
+              GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void SetWorldCFM(double cfm);

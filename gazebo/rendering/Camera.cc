@@ -1786,9 +1786,9 @@ bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
 void Camera::SetRenderRate(const double _hz)
 {
   if (_hz > 0.0)
-    this->dataPtr->renderPeriod = 1.0 / _hz;
+    this->dataPtr->renderPeriod = common::Time(1.0 / _hz);
   else
-    this->dataPtr->renderPeriod = 0.0;
+    this->dataPtr->renderPeriod = common::Time::Zero;
 }
 
 //////////////////////////////////////////////////

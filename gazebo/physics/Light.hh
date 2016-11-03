@@ -34,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
-      public: Light(BasePtr _parent);
+      public: explicit Light(BasePtr _parent);
 
       /// \brief Initialize the light.
       public: void Init();

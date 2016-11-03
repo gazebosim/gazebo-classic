@@ -39,7 +39,7 @@ namespace SkyX
           @param deleteBySkyX true to automatically destroy the controller by
           SkyX, false otherwise
        */
-      BasicController(const bool& deleteBySkyX = true);
+      explicit BasicController(const bool& deleteBySkyX = true);
 
       /** Update controller
           @param simDeltaTime Simulation delta time (It's not the time since

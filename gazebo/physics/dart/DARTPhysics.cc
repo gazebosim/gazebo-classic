@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -365,10 +367,17 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 //////////////////////////////////////////////////
 void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
+  this->SetGravity(_gravity.Ign());
+}
+
+//////////////////////////////////////////////////
+void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
+{
   this->world->SetGravitySDF(_gravity.Ign());
   this->dataPtr->dtWorld->setGravity(
     Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
+
 
 //////////////////////////////////////////////////
 void DARTPhysics::DebugPrint() const

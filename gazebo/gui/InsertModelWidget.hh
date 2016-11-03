@@ -43,7 +43,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
-      public: InsertModelWidget(QWidget *_parent = 0);
+      public: explicit InsertModelWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~InsertModelWidget();

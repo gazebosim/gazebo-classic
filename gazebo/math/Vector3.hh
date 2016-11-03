@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief Ignition math copy constructor
       /// \param[in] _v a vector
-      public: Vector3(const ignition::math::Vector3d &_v);
+      public: explicit Vector3(const ignition::math::Vector3d &_v);
 
       /// \brief Copy constructor
       /// \param[in] _v a vector

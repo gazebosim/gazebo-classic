@@ -51,7 +51,7 @@ namespace gazebo
 
       /// \brief Copy constructor for ignition::math::Plane
       /// \param[in] _plane Plane to copy
-      public: Plane(const ignition::math::Planed &_plane);
+      public: explicit Plane(const ignition::math::Planed &_plane);
 
       /// \brief Destructor
       public: virtual ~Plane();

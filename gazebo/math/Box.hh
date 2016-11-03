@@ -45,7 +45,7 @@ namespace gazebo
 
       /// \brief Ignition math copy constructor
       /// \param[in] _box Ignition box to convert
-      public: Box(const ignition::math::Box &_box);
+      public: explicit Box(const ignition::math::Box &_box);
 
       /// \brief Copy Constructor
       /// \param[in]  _b Box to copy

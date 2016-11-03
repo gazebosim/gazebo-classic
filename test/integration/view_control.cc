@@ -147,10 +147,10 @@ void ViewControlTest::MouseZoomModelEditor()
   this->ProcessEventsAndDraw(mainWindow);
 
   // create the model editor
-  gazebo::gui::ModelCreator *modelCreator = new gazebo::gui::ModelCreator();
+  gazebo::gui::ModelCreator modelCreator;
 
   // Inserting a link
-  modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
+  modelCreator.AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
   QVERIFY(cylinder != nullptr);

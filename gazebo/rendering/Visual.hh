@@ -20,10 +20,14 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
+
 #include <string>
 #include <utility>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/Color.hh"
@@ -341,11 +345,23 @@ namespace gazebo
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.
-      public: void SetRotation(const math::Quaternion &_rot);
+      /// \deprecated See version that accepts ignition math parameters
+      public: void SetRotation(const math::Quaternion &_rot)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the rotation of the visual.
+      /// \param[in] _rot The rotation of the visual.
+      public: void SetRotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Set the pose of the visual.
       /// \param[in] _pose The new pose of the visual.
-      public: void SetPose(const math::Pose &_pose);
+      /// \deprecated See version that accepts ignition math parameters
+      public: void SetPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the pose of the visual.
+      /// \param[in] _pose The new pose of the visual.
+      public: void SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the position of the visual.
       /// \return The visual's position.
@@ -365,7 +381,13 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose &_pose);
+      /// \deprecated See version that accepts ignition math parameters
+      public: void SetWorldPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the world pose of the visual.
+      /// \param[in] _pose Pose of the visual in the world coordinate frame.
+      public: void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.

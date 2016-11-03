@@ -42,7 +42,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _label Plot label.
-      public: PlotCurve(const std::string &_label);
+      public: explicit PlotCurve(const std::string &_label);
 
       /// \brief Destructor.
       public: ~PlotCurve();

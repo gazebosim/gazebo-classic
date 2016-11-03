@@ -247,7 +247,7 @@ bool BulletUniversalJoint::SetHighStop(unsigned int _index,
            << "] to [" << angle << "] due to issue #1113.\n";
   }
 
-  Joint::SetHighStop(_index, angle);
+  Joint::SetHighStop(_index, math::Angle(angle));
   if (this->bulletUniversal)
   {
     if (_index == 1)
@@ -289,7 +289,7 @@ bool BulletUniversalJoint::SetLowStop(unsigned int _index,
            << "] to [" << angle << "] due to issue #1113.\n";
   }
 
-  Joint::SetLowStop(_index, angle);
+  Joint::SetLowStop(_index, math::Angle(angle));
   if (this->bulletUniversal)
   {
     if (_index == 1)

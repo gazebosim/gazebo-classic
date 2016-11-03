@@ -15,10 +15,12 @@
  *
 */
 
-#ifndef _JOINTVISUAL_HH_
-#define _JOINTVISUAL_HH_
+#ifndef GAZEBO_RENDERING_JOINTVISUAL_HH_
+#define GAZEBO_RENDERING_JOINTVISUAL_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -57,7 +59,19 @@ namespace gazebo
       /// joint types that have more than 1 axis.
       /// \param[in] _msg Joint message
       /// \param[in] _pose Pose of the joint visual in world coordinates.
-      public: void Load(ConstJointPtr &_msg, const math::Pose &_worldPose);
+      /// \deprecated See version that accepts ignition math parameters.
+      public: void Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \internal
+      /// \brief Load the joint visual based on a message and an offset pose
+      /// This is currently used internally for creating a second visual for
+      /// joint types that have more than 1 axis.
+      /// \param[in] _msg Joint message
+      /// \param[in] _worldPose Pose of the joint visual in world coordinates.
+
+      public: void Load(ConstJointPtr &_msg,
+          const ignition::math::Pose3d &_worldPose);
 
       /// \brief Create an axis and attach it to the joint visual.
       /// \param[in] _axis Axis vector
@@ -65,7 +79,18 @@ namespace gazebo
       /// joint frame.
       /// \param[in] _type Type of axis.
       /// \returns Newly created arrow visual.
+      /// \deprecated See version that accepts ignition math parameters.
       public: ArrowVisualPtr CreateAxis(const math::Vector3 &_axis,
+          bool _useParentFrame, msgs::Joint::Type _type)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Create an axis and attach it to the joint visual.
+      /// \param[in] _axis Axis vector
+      /// \param[in] _useParentFrame True to use parent frame instead of the
+      /// joint frame.
+      /// \param[in] _type Type of axis.
+      /// \returns Newly created arrow visual.
+      public: ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis,
           bool _useParentFrame, msgs::Joint::Type _type);
 
       // Documentation Inherited.
@@ -81,8 +106,20 @@ namespace gazebo
       /// \param[in] _useParentFrame True to use parent frame instead of the
       /// joint frame.
       /// \param[in] _type Type of axis.
+      /// \deprecated See version that accepts ignition math parameters.
       public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
           const math::Vector3 &_axis, bool _useParentFrame,
+          msgs::Joint::Type _type)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Update an axis' arrow visual.
+      /// \param[in] _arrowVisual Arrow visual to be updated.
+      /// \param[in] _axis Axis vector.
+      /// \param[in] _useParentFrame True to use parent frame instead of the
+      /// joint frame.
+      /// \param[in] _type Type of axis.
+      public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
+          const ignition::math::Vector3d &_axis, bool _useParentFrame,
           msgs::Joint::Type _type);
 
       /// \brief Get the JointVisual which is attached to the parent link.

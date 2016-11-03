@@ -69,7 +69,7 @@ TEST_F(EnumIfaceTest, Iterator)
   int i = 0;
 
   // Prefix ++ operator
-  for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
+  for (common::EnumIterator<MyType> typeIter = begin;
        typeIter != end; ++typeIter, ++i)
   {
     EXPECT_EQ(*typeIter, i);
@@ -81,8 +81,8 @@ TEST_F(EnumIfaceTest, Iterator)
 
   // Postfix ++ operator
   i = 0;
-  for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
-       typeIter != end; typeIter++, ++i)
+  for (common::EnumIterator<MyType> typeIter = begin;
+       typeIter != end; ++typeIter, ++i)
   {
     EXPECT_EQ(typeIter.Value(), i);
     if (i == 0)
@@ -107,7 +107,7 @@ TEST_F(EnumIfaceTest, Iterator)
   i = MY_TYPE_END - 1;
   common::EnumIterator<MyType> end2;
   for (common::EnumIterator<MyType> typeIter = --end2;
-       typeIter != begin; typeIter--, --i)
+       typeIter != begin; --typeIter, --i)
   {
     EXPECT_EQ(*typeIter, i);
     if (i == 0)

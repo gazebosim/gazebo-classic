@@ -32,6 +32,8 @@
 #include <utility>
 #include <vector>
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -926,8 +928,15 @@ void ODEPhysics::SetStepType(const std::string &_type)
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
-  dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
+  this->SetGravity(_gravity.Ign());
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
+{
+  this->world->SetGravitySDF(_gravity);
+  dWorldSetGravity(this->dataPtr->worldId,
+    _gravity.X(), _gravity.Y(), _gravity.Z());
 }
 
 //////////////////////////////////////////////////

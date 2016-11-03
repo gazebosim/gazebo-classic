@@ -46,7 +46,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent graphics item.
-      public: SegmentItem(QGraphicsItem *_parent = 0);
+      public: explicit SegmentItem(QGraphicsItem *_parent = 0);
 
       /// \brief Destructor
       public: ~SegmentItem();

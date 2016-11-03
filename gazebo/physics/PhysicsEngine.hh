@@ -17,8 +17,9 @@
 #ifndef _PHYSICSENGINE_HH_
 #define _PHYSICSENGINE_HH_
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <string>
+#include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -143,8 +144,15 @@ namespace gazebo
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
+      /// \deprecated See version that accepts ignition math parameters.
       public: virtual void SetGravity(
-                  const gazebo::math::Vector3 &_gravity) = 0;
+                  const gazebo::math::Vector3 &_gravity)
+                  GAZEBO_DEPRECATED(8.0) = 0;
+
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: virtual void SetGravity(
+                  const ignition::math::Vector3d &_gravity) = 0;
 
       /// \brief Return the magnetic field vector.
       /// \deprecated See World::MagneticField() const

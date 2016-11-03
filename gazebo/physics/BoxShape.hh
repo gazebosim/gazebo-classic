@@ -19,8 +19,10 @@
  * Date: 8 May 2003
  */
 
-#ifndef _BOXSHAPE_HH_
-#define _BOXSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BOXSHAPE_HH_
+#define GAZEBO_PHYSICS_BOXSHAPE_HH_
+
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
@@ -48,15 +50,33 @@ namespace gazebo
 
       /// \brief Set the size of the box.
       /// \param[in] _size Size of each side of the box.
-      public: virtual void SetSize(const math::Vector3 &_size);
+      /// \deprecated See version that accepts ignition math parameters.
+      public: virtual void SetSize(const math::Vector3 &_size)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the size of the box.
+      /// \param[in] _size Size of each side of the box.
+      public: virtual void SetSize(const ignition::math::Vector3d &_size);
 
       /// \brief Set the scale of the box.
       /// \param[in] _scale Scale of the box.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See version that accepts ignition math parameters.
+      public: virtual void SetScale(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the scale of the box.
+      /// \param[in] _scale Scale of the box.
+      public: virtual void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.
-      public: math::Vector3 GetSize() const;
+      /// \deprecated See version that accepts ignition math parameters.
+      public: math::Vector3 GetSize() const
+              GAZEBO_DEPRECATED(8.0);
+
+       /// \brief Get the size of the box.
+      /// \return The size of each side of the box.
+      public: ignition::math::Vector3d GetSize() const;
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

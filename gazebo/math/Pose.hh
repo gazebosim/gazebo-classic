@@ -63,7 +63,7 @@ namespace gazebo
 
       /// \brief Copy constructor for ignition math
       /// \param[in] _pose Pose to copy
-      public: Pose(const ignition::math::Pose3d &_pose);
+      public: explicit Pose(const ignition::math::Pose3d &_pose);
 
       /// \brief Destructor
       public: virtual ~Pose();

@@ -42,7 +42,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
-      public: BulletHeightmapShape(CollisionPtr _parent);
+      public: explicit BulletHeightmapShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletHeightmapShape();

@@ -68,7 +68,7 @@ namespace gazebo
 
     /// \brief Copy Constructor
     /// \param[in] _radian Radians
-    public: Angle(double _radian);
+    public: explicit Angle(double _radian);
 
     /// \brief Copy constructor
     /// \param[in] _angle Angle to copy
@@ -76,7 +76,7 @@ namespace gazebo
 
     /// \brief Ignition copy constructor
     /// \param[in] _angle Ignition angle to copy
-    public: Angle(const ignition::math::Angle &_angle);
+    public: explicit Angle(const ignition::math::Angle &_angle);
 
     /// \brief Destructor
     public: virtual ~Angle();

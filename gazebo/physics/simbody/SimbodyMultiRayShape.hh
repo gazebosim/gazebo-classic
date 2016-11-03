@@ -33,7 +33,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
-      public: SimbodyMultiRayShape(CollisionPtr parent);
+      public: explicit SimbodyMultiRayShape(CollisionPtr parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyMultiRayShape();

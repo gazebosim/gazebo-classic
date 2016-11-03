@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <ignition/math/Vector4.hh>
 #include "gazebo/math/Matrix4.hh"
 #include "gazebo/util/system.hh"
 
@@ -79,6 +80,10 @@ namespace gazebo
       /// \param[in] _w value along w axis
       public: void Set(double _x = 0, double _y = 0 , double _z = 0,
                        double _w = 0);
+
+      // \brief Convert this vector to an ignition::math::Vector4d.
+      /// \return This vector as an ignition::math::Vector4d.
+      public: ignition::math::Vector4d Ign() const;
 
       /// \brief Assignment operator
       /// \param[in] _v the vector

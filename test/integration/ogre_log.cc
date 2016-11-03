@@ -59,7 +59,7 @@ TEST_F(OgreLog, LogError)
     // We will skip the line that lists all the extensions. This line starts
     // with a date, so we just check that "GL_EXTENSIONS" is toward the
     // beginning.
-    if (line.find(" GL_EXTENSIONS =") < 12)
+    if (line.compare(" GL_EXTENSIONS =") < 12)
       continue;
 
     EXPECT_EQ(line.find("Error"), std::string::npos);

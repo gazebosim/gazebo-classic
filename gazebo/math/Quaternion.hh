@@ -50,14 +50,14 @@ namespace gazebo
     /// \param[in] _y Y param
     /// \param[in] _z Z param
     public: Quaternion(const double &_w, const double &_x, const double &_y,
-                        const double &_z);
+                       const double &_z);
 
     /// \brief Constructor from Euler angles in radians
     /// \param[in] _roll  roll
     /// \param[in] _pitch pitch
     /// \param[in] _yaw   yaw
     public: Quaternion(const double &_roll, const double &_pitch,
-                        const double &_yaw);
+                       const double &_yaw);
 
     /// \brief Constructor from axis angle
     /// \param[in] _axis the rotation axis
@@ -66,7 +66,7 @@ namespace gazebo
 
     /// \brief Constructor
     /// \param[in] _rpy euler angles
-    public: Quaternion(const Vector3 &_rpy);
+    public: explicit Quaternion(const Vector3 &_rpy);
 
     /// \brief Copy constructor
     /// \param[in] _qt Quaternion to copy
@@ -74,13 +74,14 @@ namespace gazebo
 
     /// \brief Copy constructor for ignition::math::Quaterniond
     /// \param[in] _qt Ignition math quaterniond to copy
-    public: Quaternion(const ignition::math::Quaterniond &_qt);
+    public: explicit Quaternion(const ignition::math::Quaterniond &_qt);
 
     /// \brief Destructor
     public: ~Quaternion();
 
     /// \brief Equal operator
     /// \param[in] _qt Quaternion to copy
+    /// \return The new quaternion
     public: Quaternion &operator =(const Quaternion &_qt);
 
     /// \brief Convert this quaternion to an ignition::math::Quaterniond.

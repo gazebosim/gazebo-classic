@@ -34,9 +34,9 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _canvas Canvas the tracker will be attached to.
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
-      public: PlotTracker(QwtPlotCanvas *_canvas);
+      public: explicit PlotTracker(QwtPlotCanvas *_canvas);
 #else
-      public: PlotTracker(QWidget *_canvas);
+      public: explicit PlotTracker(QWidget *_canvas);
 #endif
 
       /// \brief Update the tracker text.

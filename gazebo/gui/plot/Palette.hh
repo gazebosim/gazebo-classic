@@ -111,7 +111,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to parent widget.
-      public: Palette(QWidget *_parent);
+      public: explicit Palette(QWidget *_parent);
 
       /// \brief Destructor
       public: ~Palette();

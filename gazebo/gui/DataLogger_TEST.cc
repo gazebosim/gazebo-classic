@@ -173,7 +173,7 @@ void DataLogger_TEST::StressTest()
     pub->Publish(msg);
 
     // Create a new data logger widget
-    gazebo::gui::DataLogger *dataLogger = new gazebo::gui::DataLogger;
+    gazebo::gui::DataLogger dataLogger;
 
     // Get the record button
     QToolButton *recordButton = dataLogger->findChild<QToolButton*>(
