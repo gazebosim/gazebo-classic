@@ -795,8 +795,13 @@ bool LinkData::Apply()
         {
           msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
-          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
-              info.completeSuffix().toLower() != "stl"))
+
+          std::string suffix;
+          if (info.isFile())
+            suffix = info.completeSuffix().toLower().toStdString();
+
+          if (!info.isFile() || (suffix != "dae" && suffix != "stl" &&
+              suffix != "obj"))
           {
             std::string msg = "\"" + meshGeom->filename() +
                 "\" is not a valid mesh file.\nPlease select another file for ["
@@ -928,8 +933,13 @@ bool LinkData::Apply()
         {
           msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
-          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
-              info.completeSuffix().toLower() != "stl"))
+
+          std::string suffix;
+          if (info.isFile())
+            suffix = info.completeSuffix().toLower().toStdString();
+
+          if (!info.isFile() || (suffix != "dae" && suffix != "stl" &&
+              suffix != "obj"))
           {
             std::string msg = "\"" + meshGeom->filename() +
                 "\" is not a valid mesh file.\nPlease select another file for ["
