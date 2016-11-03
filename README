@@ -19,7 +19,7 @@ Gazebo cmake parameters available at configuring time:
    them to build the software.
  - USE_UPSTREAM_CFLAGS (bool) [default True]
    Use the recommend gazebo developers compiler optimizations flags
- - ENABLE_TESTS_COMPILATION (bool) [default True]
+ - ENABLE_TESTS_COMPILATION (bool) [default False]
    Enabled or disable the test suite compilation. 
  - USE_LOW_MEMORY_TEST (bool) [default False]
    Use reduced version of tests which need less quantity of RAM memory
