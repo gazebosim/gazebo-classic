@@ -24,105 +24,100 @@ using namespace gazebo;
 class KeysToJoints : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
-  /// \brief Key to joint commands
+  /// \brief Key to joint position
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void Commands(const std::string &_physicsEngine);
+  public: void Position(const std::string &_physicsEngine);
+
+  /// \brief Key to joint velocity
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void Velocity(const std::string &_physicsEngine);
+
+  /// \brief Key to joint force
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void Force(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
-void KeysToJoints::Commands(const std::string &_physicsEngine)
+void KeysToJoints::Position(const std::string &_physicsEngine)
 {
-  this->Load("worlds/simple_arm_teleop.world", false, _physicsEngine);
+  this->Load("worlds/keys_to_joints.world", false, _physicsEngine);
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
-  auto model = world->GetModel("simple_arm");
+  auto model = world->GetModel("position_teleop");
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
   auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
 
   // Position teleop
-  auto joint = model->GetJoint("simple_arm::arm_wrist_lift_joint");
+  auto joint = model->GetJoint("joint");
   ASSERT_NE(joint, nullptr);
 
-  // Wait to reach initial value
-  double tol = 1e-5;
-  if (_physicsEngine == "dart")
-    tol = 0.001;
+  // Trigger key to increase position
+  double target = joint->GetAngle(0).Radian() + 0.05;
 
-  double target = 0.05;
-  double current = -0.8;
+  msgs::Any msg;
+  msg.set_type(msgs::Any_ValueType_INT32);
+  msg.set_int_value(106);
+  keyboardPub->Publish(msg);
 
-  int maxSleep = 30;
+  int maxSleep = 50;
   int sleep = 0;
-  while (std::abs(current - joint->GetAngle(0).Radian()) > tol && sleep < maxSleep)
+  while (joint->GetAngle(0).Radian() < target && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     ++sleep;
   }
-  EXPECT_LT(std::abs(current - joint->GetAngle(0).Radian()), tol);
+  EXPECT_GT(joint->GetAngle(0).Radian(), target);
 
-  // Trigger key to increase position
-  current = joint->GetAngle(0).Radian();
+  // Trigger key to decrease position
+  target = joint->GetAngle(0).Radian() - 0.05;
+  msg.set_int_value(117);
+  keyboardPub->Publish(msg);
+
+  sleep = 0;
+  while (joint->GetAngle(0).Radian() > target && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    ++sleep;
+  }
+  EXPECT_LT(joint->GetAngle(0).Radian(), target);
+}
+
+TEST_P(KeysToJoints, Position)
+{
+  const std::string physicsEngine = GetParam();
+  Position(physicsEngine);
+}
+
+////////////////////////////////////////////////////////////////////////
+void KeysToJoints::Velocity(const std::string &_physicsEngine)
+{
+  this->Load("worlds/keys_to_joints.world", false, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_NE(world , nullptr);
+
+  auto model = world->GetModel("velocity_teleop");
+  ASSERT_NE(model, nullptr);
+
+  // Setup keyboard publisher
+  auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
+
+  // Velocity teleop
+  auto joint = model->GetJoint("joint");
+  ASSERT_NE(joint, nullptr);
+
+  // Trigger key to have a positive velocity
+  double target = 0.29;
+
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_INT32);
   msg.set_int_value(107);
   keyboardPub->Publish(msg);
 
-  sleep = 0;
-  while (std::abs(current - joint->GetAngle(0).Radian()) < target &&
-      sleep < maxSleep)
-  {
-    common::Time::MSleep(100);
-    ++sleep;
-  }
-  EXPECT_GT(std::abs(current - joint->GetAngle(0).Radian()), target);
-  EXPECT_LT(current, joint->GetAngle(0).Radian());
-
-  // Trigger key to decrease position
-  current = joint->GetAngle(0).Radian();
-  msg.set_int_value(105);
-  keyboardPub->Publish(msg);
-
-  sleep = 0;
-  while (std::abs(current - joint->GetAngle(0).Radian()) < target &&
-      sleep < maxSleep)
-  {
-    common::Time::MSleep(100);
-    ++sleep;
-  }
-  EXPECT_GT(std::abs(current - joint->GetAngle(0).Radian()), target);
-  EXPECT_GT(current, joint->GetAngle(0).Radian());
-
-  // Velocity teleop
-  joint = model->GetJoint("simple_arm::arm_shoulder_pan_joint");
-  ASSERT_NE(joint, nullptr);
-
-  // Wait to reach initial value
-  current = 0;
-  target = 0.09;
-
-  tol = 1e-5;
-  // TODO: Figure out why ode never stops
-  if (_physicsEngine == "ode")
-    tol = 0.2;
-  else if (_physicsEngine == "dart")
-    tol = 1e-4;
-
-  sleep = 0;
-  while (std::abs(current - joint->GetVelocity(0)) > tol && sleep < maxSleep)
-  {
-    common::Time::MSleep(100);
-    ++sleep;
-  }
-  EXPECT_LT(std::abs(current - joint->GetVelocity(0)), tol);
-
-  // Trigger key to have a positive velocity
-  msg.set_int_value(104);
-  keyboardPub->Publish(msg);
-
-  sleep = 0;
+  int maxSleep = 50;
+  int sleep = 0;
   while (joint->GetVelocity(0) < target && sleep < maxSleep)
   {
     common::Time::MSleep(100);
@@ -130,20 +125,10 @@ void KeysToJoints::Commands(const std::string &_physicsEngine)
   }
   EXPECT_GT(joint->GetVelocity(0), target);
 
-  // Trigger key to have a negative velocity
-  msg.set_int_value(54);
-  keyboardPub->Publish(msg);
-
-  sleep = 0;
-  while (joint->GetVelocity(0) > -target && sleep < maxSleep)
-  {
-    common::Time::MSleep(100);
-    ++sleep;
-  }
-  EXPECT_LT(joint->GetVelocity(0), -target);
-
   // Trigger key to stop
-  msg.set_int_value(121);
+  double tol = 1e-5;
+
+  msg.set_int_value(105);
   keyboardPub->Publish(msg);
 
   sleep = 0;
@@ -154,56 +139,98 @@ void KeysToJoints::Commands(const std::string &_physicsEngine)
   }
   EXPECT_LT(std::abs(joint->GetVelocity(0)), tol);
 
-  // Force teleop
-  joint = model->GetJoint("simple_arm::arm_elbow_pan_joint");
-  ASSERT_NE(joint, nullptr);
-
-  target = 0.015;
-
-  // Trigger key to push in positive direction
-  current = joint->GetAngle(0).Radian();
-  msg.set_int_value(106);
+  // Trigger key to have a negative velocity
+  msg.set_int_value(56);
   keyboardPub->Publish(msg);
 
   sleep = 0;
-  while (std::abs(current - joint->GetAngle(0).Radian()) < target &&
-      sleep < maxSleep)
+  while (joint->GetVelocity(0) > -target && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     ++sleep;
   }
-  EXPECT_GT(std::abs(current - joint->GetAngle(0).Radian()), target);
-  EXPECT_LT(current, joint->GetAngle(0).Radian());
-
-  // Trigger key to decrease position
-  current = joint->GetAngle(0).Radian();
-  msg.set_int_value(117);
-  keyboardPub->Publish(msg);
-
-  sleep = 0;
-  while (std::abs(current - joint->GetAngle(0).Radian()) < target &&
-      sleep < maxSleep)
-  {
-    common::Time::MSleep(100);
-    ++sleep;
-  }
-  EXPECT_GT(std::abs(current - joint->GetAngle(0).Radian()), target);
-  EXPECT_GT(current, joint->GetAngle(0).Radian());
+  EXPECT_LT(joint->GetVelocity(0), -target);
 }
 
-TEST_P(KeysToJoints, Commands)
+TEST_P(KeysToJoints, Velocity)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody")
+  Velocity(physicsEngine);
+}
+
+////////////////////////////////////////////////////////////////////////
+void KeysToJoints::Force(const std::string &_physicsEngine)
+{
+  this->Load("worlds/keys_to_joints.world", false, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_NE(world , nullptr);
+
+  auto model = world->GetModel("force_teleop");
+  ASSERT_NE(model, nullptr);
+
+  // Setup keyboard publisher
+  auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
+
+  // Force teleop
+  auto joint = model->GetJoint("joint");
+  ASSERT_NE(joint, nullptr);
+
+  // Trigger key to push in positive direction
+  double target = joint->GetAngle(0).Radian() + 0.1;
+
+  msgs::Any msg;
+  msg.set_type(msgs::Any_ValueType_INT32);
+  msg.set_int_value(108);
+  keyboardPub->Publish(msg);
+
+  // DART only responds after a few clicks: issue #
+  if (_physicsEngine == "dart")
+  {
+    for (int i = 0; i < 3; ++i)
+      keyboardPub->Publish(msg);
+  }
+
+  int maxSleep = 50;
+  int sleep = 0;
+  while (joint->GetAngle(0).Radian() < target && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    ++sleep;
+  }
+  EXPECT_GT(joint->GetAngle(0).Radian(), target);
+
+  // Trigger key to stop
+  double tol = 0.1;
+
+  msg.set_int_value(111);
+  keyboardPub->Publish(msg);
+
+  if (_physicsEngine == "dart")
+  {
+    return;
+  }
+
+  sleep = 0;
+  while (std::abs(joint->GetVelocity(0)) > tol && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    ++sleep;
+  }
+  EXPECT_LT(std::abs(joint->GetVelocity(0)), tol);
+}
+
+TEST_P(KeysToJoints, Force)
+{
+  const std::string physicsEngine = GetParam();
+  if (physicsEngine == "simbody" || physicsEngine == "dart")
   {
     gzerr << "Skipping test for ["
           << physicsEngine
-          << "] since it doesn't load the simple arm"
-          << ", see gazebo_models issue #33."
+          << "] due to issues with PID, see issue #1689"
           << std::endl;
     return;
   }
-  Commands(physicsEngine);
+  Force(physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, KeysToJoints, PHYSICS_ENGINE_VALUES);
