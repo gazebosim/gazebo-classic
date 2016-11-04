@@ -187,7 +187,7 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   msg.set_int_value(108);
   keyboardPub->Publish(msg);
 
-  // DART only responds after a few clicks: issue #
+  // DART only responds after a few clicks: issue #2091
   if (_physicsEngine == "dart")
   {
     for (int i = 0; i < 5; ++i)
@@ -206,7 +206,7 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   // Trigger key to stop
   if (_physicsEngine == "dart")
   {
-    gzerr << "Skipping rest of test for [dart] due to issue #" << std::endl;
+    gzerr << "Skipping rest of test for [dart] due to issue #2091" << std::endl;
     return;
   }
 
@@ -231,7 +231,7 @@ TEST_P(KeysToJoints, Force)
   {
     gzerr << "Skipping test for ["
           << physicsEngine
-          << "] due to issues with PID, see issue #1689"
+          << "] due to Joint::SetForce, see issue #2092"
           << std::endl;
     return;
   }
