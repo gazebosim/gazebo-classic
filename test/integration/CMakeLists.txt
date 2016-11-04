@@ -59,6 +59,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  link.cc
   logical_camera_sensor.cc
   model.cc
   model_database.cc
