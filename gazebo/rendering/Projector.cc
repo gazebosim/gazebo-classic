@@ -215,7 +215,9 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
   if (this->node)
   {
     this->node->detachObject(this->frustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
+    Ogre::SceneNode *n = this->visual->GetSceneNode();
+    if (n)
+      n->removeAndDestroyChild(this->nodeName);
     this->node = NULL;
   }
 

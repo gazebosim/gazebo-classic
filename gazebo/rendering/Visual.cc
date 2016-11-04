@@ -276,11 +276,20 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 
   while (itObject.hasMoreElements())
   {
-    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
-    if (ent->getMovableType() != DynamicLines::GetMovableType())
-      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
+    // Remove dynamic lines and entities in Visual
+    // Other objects such as cameras, lights, and projects
+    // should have their own class for handling the deletion
+    // of these ogre objects
+    Ogre::MovableObject *obj = itObject.getNext();
+    if (obj->getMovableType() == DynamicLines::GetMovableType())
+      delete obj;
     else
-      delete ent;
+    {
+      Ogre::Entity *ent = dynamic_cast<Ogre::Entity *>(obj);
+      if (!ent)
+        continue;
+      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
+    }
   }
   this->dataPtr->lines.clear();
 
@@ -297,6 +306,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
       this->DestroyAllAttachedMovableObjects(pChildNode);
     }
   }
+  _sceneNode->detachAllObjects();
 }
 
 //////////////////////////////////////////////////
