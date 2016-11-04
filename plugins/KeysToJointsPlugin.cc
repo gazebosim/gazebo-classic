@@ -78,7 +78,7 @@ void KeysToJointsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Initialize transport
-  this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
   this->keyboardSub =
@@ -113,5 +113,4 @@ void KeysToJointsPlugin::OnKeyPress(ConstAnyPtr &_msg)
     }
   }
 }
-
 

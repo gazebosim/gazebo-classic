@@ -35,6 +35,10 @@ class KeysToJoints : public ServerFixture,
   /// \brief Key to joint force
   /// \param[in] _physicsEngine Physics engine to use.
   public: void Force(const std::string &_physicsEngine);
+
+  /// \brief One key to many joints
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MultipleJoints(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -186,7 +190,7 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   // DART only responds after a few clicks: issue #
   if (_physicsEngine == "dart")
   {
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 5; ++i)
       keyboardPub->Publish(msg);
   }
 
@@ -200,15 +204,16 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   EXPECT_GT(joint->GetAngle(0).Radian(), target);
 
   // Trigger key to stop
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Skipping rest of test for [dart] due to issue #" << std::endl;
+    return;
+  }
+
   double tol = 0.1;
 
   msg.set_int_value(111);
   keyboardPub->Publish(msg);
-
-  if (_physicsEngine == "dart")
-  {
-    return;
-  }
 
   sleep = 0;
   while (std::abs(joint->GetVelocity(0)) > tol && sleep < maxSleep)
@@ -222,7 +227,7 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
 TEST_P(KeysToJoints, Force)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for ["
           << physicsEngine
@@ -231,6 +236,53 @@ TEST_P(KeysToJoints, Force)
     return;
   }
   Force(physicsEngine);
+}
+
+////////////////////////////////////////////////////////////////////////
+void KeysToJoints::MultipleJoints(const std::string &_physicsEngine)
+{
+  this->Load("worlds/keys_to_joints.world", false, _physicsEngine);
+  auto world = physics::get_world();
+  ASSERT_NE(world , nullptr);
+
+  auto model = world->GetModel("multiple_teleop");
+  ASSERT_NE(model, nullptr);
+
+  // Setup keyboard publisher
+  auto keyboardPub = this->node->Advertise<msgs::Any>("~/keyboard/keypress");
+
+  // MultipleJoints teleop
+  auto joint2 = model->GetJoint("joint_2");
+  ASSERT_NE(joint2, nullptr);
+
+  auto joint3 = model->GetJoint("joint_3");
+  ASSERT_NE(joint3, nullptr);
+
+  // Trigger a single key which increases joint2 and decreases joint3
+  double target2 = joint2->GetAngle(0).Radian() + 0.05;
+  double target3 = joint3->GetAngle(0).Radian() - 0.05;
+
+  msgs::Any msg;
+  msg.set_type(msgs::Any_ValueType_INT32);
+  msg.set_int_value(59);
+  keyboardPub->Publish(msg);
+
+  int maxSleep = 50;
+  int sleep = 0;
+  while (joint2->GetAngle(0).Radian() < target2 &&
+         joint3->GetAngle(0).Radian() > target3 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    ++sleep;
+  }
+  EXPECT_GT(joint2->GetAngle(0).Radian(), target2);
+  EXPECT_LT(joint3->GetAngle(0).Radian(), target3);
+}
+
+TEST_P(KeysToJoints, MultipleJoints)
+{
+  const std::string physicsEngine = GetParam();
+  MultipleJoints(physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, KeysToJoints, PHYSICS_ENGINE_VALUES);

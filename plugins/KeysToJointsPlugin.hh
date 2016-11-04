@@ -40,9 +40,9 @@ namespace gazebo
     double scale;
   };
 
-  /// \brief Control a joint based on keypress messages received.
+  /// \brief Control joints in a model based on keypress messages received.
   ///
-  /// The plugin accepts several <map> elements:
+  /// The plugin accepts multiple <map> elements:
   ///
   /// <map key='' joint='' type='' scale='' kp='' ki='' kd=''/>
   ///
@@ -69,12 +69,13 @@ namespace gazebo
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \brief Callback each time a key message is received.
+    /// \param[in] _msg Keypress message.
     private: void OnKeyPress(ConstAnyPtr &_msg);
 
-    /// \brief Stores information about each tracked key
+    /// \brief Stores information about each tracked key.
     private: std::vector<KeyInfo> keys;
 
-    /// \brief Pointer to model
+    /// \brief Pointer to model.
     private: physics::ModelPtr model;
 
     /// \brief Node for communication.
