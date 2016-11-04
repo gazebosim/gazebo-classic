@@ -9,6 +9,10 @@
     * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
     * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
 
+1. Generate visualization on demand, instead of on load. This helps to
+   reduce load time.
+    * [Pull request 2457](https://bitbucket.org/osrf/gazebo/pull-request/2457)
+
 1. Add GUI items to change the user camera clip distance
     * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
     * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
