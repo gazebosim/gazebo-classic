@@ -60,15 +60,18 @@ void KeysToJointsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         info.scale = mapElem->Get<double>("scale");
         info.type = mapElem->Get<std::string>("type");
 
-        double kp = mapElem->Get<double>("kp");
-        double ki = mapElem->Get<double>("ki");
-        double kd = mapElem->Get<double>("kd");
+        if (info.type != "force")
+        {
+          double kp = mapElem->Get<double>("kp");
+          double ki = mapElem->Get<double>("ki");
+          double kd = mapElem->Get<double>("kd");
 
-        common::PID pid(kp, ki, kd);
-        if (info.type == "position")
-          controller->SetPositionPID(info.joint->GetScopedName(), pid);
-        else if (info.type == "velocity")
-          controller->SetVelocityPID(info.joint->GetScopedName(), pid);
+          common::PID pid(kp, ki, kd);
+          if (info.type == "position")
+            controller->SetPositionPID(info.joint->GetScopedName(), pid);
+          else if (info.type == "velocity")
+            controller->SetVelocityPID(info.joint->GetScopedName(), pid);
+        }
 
         this->keys.push_back(info);
       }

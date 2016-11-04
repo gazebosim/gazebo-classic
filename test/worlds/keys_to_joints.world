@@ -237,9 +237,9 @@
 
       <plugin name='keystojoints' filename='libKeysToJointsPlugin.so'>
         <!-- o -->
-        <map key='111' joint='joint' scale='-1000' type='force' kp='1000' ki='0' kd='10'/>
+        <map key='111' joint='joint' scale='-1000' type='force'/>
         <!-- l -->
-        <map key='108' joint='joint' scale='1000' type='force' kp='1000' ki='0' kd='10'/>
+        <map key='108' joint='joint' scale='1000' type='force'/>
       </plugin>
     </model>
 
