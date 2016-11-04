@@ -59,7 +59,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
   // Set default UserCamera render rate to 120Hz when stereo rendering is
   // enabled. Otherwise use 60Hz.
   // Some padding is added for safety.
-  this->SetRenderRate(_stereoEnabled ? 130.0 : 70.0);
+  this->SetRenderRate(_stereoEnabled ? 124.0 : 62.0);
 
   this->SetUseSDFPose(false);
 }
@@ -249,6 +249,16 @@ void UserCamera::Update()
 void UserCamera::AnimationComplete()
 {
   this->dataPtr->viewController->Init();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::Render(const bool /*_force*/)
+{
+  if (this->initialized)
+  {
+    this->newData = true;
+    this->RenderImpl();
+  }
 }
 
 //////////////////////////////////////////////////

@@ -21,19 +21,20 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
+#include <mutex>
 #include <sstream>
-
-#include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/gui/TimeWidget.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/TimePanelPrivate.hh"
+#include "gazebo/gui/TimeWidget.hh"
+#include "gazebo/rendering/UserCamera.hh"
+
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -84,7 +85,7 @@ TimePanel::TimePanel(QWidget *_parent)
   // Connections
   this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-      boost::bind(&TimePanel::OnFullScreen, this, _1)));
+      std::bind(&TimePanel::OnFullScreen, this, std::placeholders::_1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
 
@@ -215,7 +216,7 @@ void TimePanel::TogglePause()
 /////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   if (_msg->has_paused())
     this->SetPaused(_msg->paused());
@@ -282,7 +283,7 @@ void TimePanel::Update()
   if (!this->isVisible())
     return;
 
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Avoid apparent race condition on start, seen on Windows.
   if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
