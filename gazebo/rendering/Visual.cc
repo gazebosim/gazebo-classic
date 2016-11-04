@@ -277,7 +277,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
   while (itObject.hasMoreElements())
   {
     // Remove dynamic lines and entities in Visual
-    // Other objects such as cameras, lights, and projects
+    // Other objects such as cameras, lights, and projectors
     // should have their own class for handling the deletion
     // of these ogre objects
     Ogre::MovableObject *obj = itObject.getNext();
