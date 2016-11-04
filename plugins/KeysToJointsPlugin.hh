@@ -18,6 +18,9 @@
 #ifndef GAZEBO_PLUGINS_KEYSTOJOINTSPLUGIN_HH_
 #define GAZEBO_PLUGINS_KEYSTOJOINTSPLUGIN_HH_
 
+#include <string>
+#include <vector>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/transport/Node.hh>
 
