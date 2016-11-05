@@ -106,6 +106,8 @@ LaserView::~LaserView()
 /////////////////////////////////////////////////
 void LaserView::UpdateImpl()
 {
+  this->laserItem->UpdateGeometry();
+
   std::ostringstream value;
   value << this->laserItem->GetHoverRange();
   this->rangeEdit->setText(tr(value.str().c_str()));
@@ -509,9 +511,18 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     this->points[this->ranges.size()] = QPointF(0, 0);
     this->noHitPoints[this->ranges.size()] = QPointF(0, 0);
   }
+  this->dirty = true;
+}
 
-  // Tell QT we have changed.
-  this->prepareGeometryChange();
+/////////////////////////////////////////////////
+void LaserView::LaserItem::UpdateGeometry()
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  if (this->dirty)
+  {
+    this->prepareGeometryChange();
+    this->dirty = false;
+  }
 }
 
 /////////////////////////////////////////////////
