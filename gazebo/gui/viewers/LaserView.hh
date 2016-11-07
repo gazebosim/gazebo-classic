@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _LASERVIEW_HH_
-#define _LASERVIEW_HH_
+#ifndef GAZEBO_GUI_VIEWERS_LASERVIEW_HH_
+#define GAZEBO_GUI_VIEWERS_LASERVIEW_HH_
 
 #include <string>
 #include <vector>

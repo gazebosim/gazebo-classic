@@ -44,6 +44,7 @@ set(tests
   gz_model.cc
   gz_physics.cc
   gz_world.cc
+  harness.cc
   imu.cc
   introspection_items.cc
   joint_controller.cc
@@ -57,6 +58,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  link.cc
   logical_camera_sensor.cc
   model.cc
   model_database.cc
