@@ -118,6 +118,33 @@ release will remove the deprecated code.
                                                                                    const ignition::math::Vector3d &_axis,
                                                                                    const bool _local)
 
+1. **gazebo/gui/ModelSnap.hh**
+    + ***Deprecation:*** public: void Snap(const std::vector<math::Vector3> &_triangleSrc,
+                                           const std::vector<math::Vector3> &_triangleDest,
+                                           rendering::VisualPtr _visualSrc)
+    + ***Replacement:*** public: void Snap(const ignition::math::Triangle3d &_triangleSrc,
+                                           const ignition::math::Triangle3d &_triangleDest,
+                                           rendering::VisualPtr _visualSrc);
+    + ***Deprecation:*** public: void GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
+                                                       const std::vector<math::Vector3> &_triangleDest,
+                                                       const math::Pose &_poseSrc, math::Vector3 &_trans,
+                                                       math::Quaternion &_rot)
+    + ***Replacement:*** public: void SnapTransform(const ignition::math::Triangle3d &_triangleSrc,
+                                                    const ignition::math::Triangle3d &_triangleDest,
+                                                    const ignition::math::Pose3d &_poseSrc,
+                                                    ignition::math::Vector3d &_trans,
+                                                    ignition::math::Quaterniond &_rot)
+
+1. **gazebo/rendering/RayQuery.hh**
+    + ***Deprecation:*** public: bool SelectMeshTriangle(int _x, int _y,
+                                                         VisualPtr _visual,
+                                                         math::Vector3 &_intersect,
+                                                         std::vector<math::Vector3> &_vertices)
+    + ***Replacement:*** public: bool SelectMeshTriangle(const int _x, const int _y,
+                                                         const VisualPtr _visual,
+                                                         ignition::math::Vector3d &_intersect,
+                                                         ignition::math::Triangle3d &_triangle)
+
 1. **gazebo/rendering/Road2d.hh**
     + ***Deprecation:*** public: void Load(VisualPtr);
     + ***Replacement:*** public: void Load(msgs::Road);
