@@ -177,16 +177,14 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 //////////////////////////////////////////////////
 math::Box ODECollision::GetBoundingBox() const
 {
-  math::Box box;
   dReal aabb[6];
-
   memset(aabb, 0, 6 * sizeof(dReal));
 
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 
-  box.min.Set(aabb[0], aabb[2], aabb[4]);
-  box.max.Set(aabb[1], aabb[3], aabb[5]);
+  math::Box box(math::Vector3(aabb[0], aabb[2], aabb[4]),
+                math::Vector3(aabb[1], aabb[3], aabb[5]));
 
   return box;
 }

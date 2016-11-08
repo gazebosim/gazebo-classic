@@ -105,8 +105,8 @@ math::Box BulletCollision::GetBoundingBox() const
     btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    result.min.Set(btMin.x(), btMin.y(), btMin.z());
-    result.max.Set(btMax.x(), btMax.y(), btMax.z());
+    result = math::Box(math::Vector3(btMin.x(), btMin.y(), btMin.z()),
+                       math::Vector3(btMax.x(), btMax.y(), btMax.z()));
 
     if (this->GetShapeType() & PLANE_SHAPE)
     {
