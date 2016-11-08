@@ -116,7 +116,6 @@ void Marker_TEST::AddRemove()
   // Publish to a Gazebo topic
   node.Advertise<ignition::msgs::Marker>(topicName);
 
-
   // Create the marker message
   ignition::msgs::Marker markerMsg;
   markerMsg.set_ns("default");

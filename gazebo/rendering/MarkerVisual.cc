@@ -87,7 +87,7 @@ void MarkerVisual::Load(const ignition::msgs::Marker &_msg)
 void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
 {
   // Set the type of visual
-  if (this->dPtr->msg.type() != _msg.type())
+  if (this->dPtr->msg.type() != _msg.type() && _msg.has_type())
   {
     this->dPtr->msg.set_type(_msg.type());
     switch (_msg.type())
@@ -137,15 +137,24 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   // Set the visual's pose
   if (_msg.has_pose())
   {
-    this->SetPose(
-        ignition::math::Pose3d(
-          ignition::math::Vector3d(_msg.pose().position().x(),
-                                   _msg.pose().position().y(),
-                                   _msg.pose().position().z()),
-          ignition::math::Quaterniond(_msg.pose().orientation().w(),
-                                      _msg.pose().orientation().x(),
-                                      _msg.pose().orientation().y(),
-                                      _msg.pose().orientation().z())));
+    ignition::math::Pose3d pose;
+
+    if (_msg.pose().has_position())
+    {
+      pose.Pos().Set(_msg.pose().position().x(),
+                     _msg.pose().position().y(),
+                     _msg.pose().position().z());
+    }
+
+    if (_msg.pose().has_orientation())
+    {
+      pose.Rot().Set(_msg.pose().orientation().w(),
+          _msg.pose().orientation().x(),
+          _msg.pose().orientation().y(),
+          _msg.pose().orientation().z());
+    }
+
+    this->SetPose(pose);
   }
 
   // Set the marker's end time

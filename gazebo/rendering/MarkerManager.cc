@@ -248,6 +248,11 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
       this->markers.clear();
     }
   }
+  else
+  {
+    gzerr << "Unknown marker action[" << _msg.action() << "]\n";
+    return false;
+  }
 
   return true;
 }

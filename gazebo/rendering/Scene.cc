@@ -2746,7 +2746,10 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 common::Time Scene::SimTime() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  return this->dataPtr->sceneSimTime;
+  // Return the most recent sim time.
+  return
+    this->dataPtr->sceneSimTime > this->dataPtr->sceneSimTimePosesApplied ?
+    this->dataPtr->sceneSimTime : this->dataPtr->sceneSimTimePosesApplied;
 }
 
 /////////////////////////////////////////////////

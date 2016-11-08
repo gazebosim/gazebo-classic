@@ -4,6 +4,7 @@ include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${IGNITION-MATH_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
   ${tinyxml2_INCLUDE_DIRS}

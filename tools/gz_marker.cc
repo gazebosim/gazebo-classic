@@ -127,7 +127,7 @@ bool MarkerCommand::RunImpl()
 
   node.Advertise<ignition::msgs::Marker>("/marker");
 
-  std::string ns = "default";
+  std::string ns = "";
   unsigned int id = 0;
   std::string type = "none";
   std::string parent;
@@ -329,6 +329,8 @@ void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
   bool result;
   ignition::msgs::StringMsg rep;
   this->node.Request("/marker", msg, 5000u, rep, result);
+  if (!result)
+    std::cerr << "Error adding a marker[" << rep.data() << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -339,6 +341,7 @@ void MarkerCommand::Msg(const std::string &_msg)
     ignition::msgs::Marker msg;
     if (google::protobuf::TextFormat::ParseFromString(_msg, &msg))
     {
+      std::cout << "Message[" << msg.DebugString() << "]\n";
       bool result;
       ignition::msgs::StringMsg rep;
       this->node.Request("/marker", msg, 5000u, rep, result);
