@@ -99,6 +99,7 @@ namespace gazebo
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get DART collision shape.
+      /// \return DART Collision shape pointer.
       public: dart::dynamics::ShapePtr DARTCollisionShape() const;
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
