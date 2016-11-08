@@ -35,7 +35,7 @@ void ReceiveSpecificModelPlugin(const ignition::msgs::Plugin_V &_plugins,
 {
   EXPECT_FALSE(g_specificModelPlugin);
   EXPECT_TRUE(_success);
-  EXPECT_EQ(_plugins.plugins().size(), 1u);
+  EXPECT_EQ(_plugins.plugins().size(), 1);
   EXPECT_EQ(_plugins.plugins(0).name(), "buoyancy");
   EXPECT_EQ(_plugins.plugins(0).filename(), "libBuoyancyPlugin.so");
   EXPECT_EQ(_plugins.plugins(0).innerxml(),
@@ -52,7 +52,7 @@ void ReceiveAllModelPlugins(const ignition::msgs::Plugin_V &_plugins,
 {
   EXPECT_FALSE(g_allModelPlugins);
   EXPECT_TRUE(_success);
-  EXPECT_EQ(_plugins.plugins().size(), 5u);
+  EXPECT_EQ(_plugins.plugins().size(), 5);
   EXPECT_EQ(_plugins.plugins(0).name(), "submarine_propeller_1");
   EXPECT_EQ(_plugins.plugins(1).name(), "submarine_propeller_2");
   EXPECT_EQ(_plugins.plugins(2).name(), "submarine_propeller_3");
