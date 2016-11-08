@@ -103,6 +103,7 @@ TEST(URITEST, URIPathContains)
   EXPECT_TRUE(path.Contains(URIPath("a")));
   EXPECT_TRUE(path.Contains(URIPath("a/b/")));
   EXPECT_TRUE(path.Contains(URIPath("a/b/c/")));
+  EXPECT_TRUE(path.Contains(URIPath("a/b/c/d/")));
   EXPECT_TRUE(path.Contains(path));
 
   EXPECT_FALSE(path.Contains(URIPath("d/e/f")));
