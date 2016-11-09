@@ -38,6 +38,7 @@ class ContactSensor : public ServerFixture,
   public: void MultipleSensors(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
+  public: void ModelRemoval(const std::string &_physicsEngine);
 
   /// \brief Callback for sensor subscribers in MultipleSensors test.
   private: void Callback(const ConstContactsPtr &_msg);
@@ -554,6 +555,71 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 TEST_P(ContactSensor, TorqueTest)
 {
   TorqueTest(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::string modelName = "contactModel";
+  std::string contactSensorName = "contactSensor";
+  math::Pose modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
+
+  std::string cylinderName = "cylinder";
+  math::Pose cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
+
+  SpawnUnitContactSensor(modelName, contactSensorName,
+      "cylinder", modelPose.pos, modelPose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
+  sensors::ContactSensorPtr contactSensor =
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+
+  ASSERT_TRUE(contactSensor != nullptr);
+
+  sensors::SensorManager::Instance()->Init();
+  sensors::SensorManager::Instance()->RunThreads();
+
+  EXPECT_FALSE(contactSensor->IsActive());
+
+  unsigned int expectedColCount = 1;
+  EXPECT_EQ(contactSensor->GetCollisionCount(), expectedColCount);
+
+  contactSensor->SetActive(true);
+
+  EXPECT_TRUE(contactSensor->IsActive());
+
+  physics::ModelPtr contactModel = world->GetModel(modelName);
+  ASSERT_TRUE(contactModel != nullptr);
+
+  world->RemoveModel(contactModel);
+
+  contactModel = world->GetModel(modelName);
+  EXPECT_TRUE(contactModel == nullptr);
+
+  int sleep = 0;
+  int maxSleep  = 20;
+  while (sensors::get_sensor(contactSensorName) && sleep < maxSleep)
+  {
+    common::Time::MSleep(30);
+    sleep++;
+  }
+  EXPECT_TRUE(sensors::get_sensor(contactSensorName) == nullptr);
+}
+
+
+TEST_P(ContactSensor, ModelRemoval)
+{
+  ModelRemoval(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES);
