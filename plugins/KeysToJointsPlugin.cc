@@ -54,6 +54,15 @@ void KeysToJointsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       }
       else
       {
+        if (!mapElem->HasAttribute("key") ||
+            !mapElem->HasAttribute("scale") ||
+            !mapElem->HasAttribute("type"))
+        {
+          gzwarn << "Missing [key], [scale] or [type] attribute, skipping map."
+              << std::endl;
+          mapElem = mapElem->GetNextElement("map");
+          continue;
+        }
         KeyInfo info;
         info.key = mapElem->Get<int>("key");
         info.joint = joint;
@@ -62,9 +71,13 @@ void KeysToJointsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
         if (info.type != "force")
         {
-          double kp = mapElem->Get<double>("kp");
-          double ki = mapElem->Get<double>("ki");
-          double kd = mapElem->Get<double>("kd");
+          double kp, ki, kd = 0;
+          if (mapElem->HasAttribute("kp"))
+            kp = mapElem->Get<double>("kp");
+          if (mapElem->HasAttribute("ki"))
+            ki = mapElem->Get<double>("ki");
+          if (mapElem->HasAttribute("kd"))
+            kd = mapElem->Get<double>("kd");
 
           common::PID pid(kp, ki, kd);
           if (info.type == "position")

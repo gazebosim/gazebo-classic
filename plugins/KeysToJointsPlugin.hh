@@ -60,6 +60,25 @@ namespace gazebo
   ///     * velocity: The velocity target. This is not increased at each
   ///       keypress.
   ///     * force: The force to apply to the joint each time the key is pressed.
+  ///
+  /// Examples:
+  ///
+  /// 1. Increase joint "revolute_joint_name"'s angle by 0.1 rad at every click
+  /// on the "i" key:
+  ///
+  /// <map key='105' joint='revolute_joint_name' scale='-0.1' type='position' kp='1000' ki='0' kd='10'/>
+  ///
+  /// 2. Set joint "revolute_joint_name"'s angular velocity to -0.1 rad/s at every click
+  /// on the "6" key:
+  ///
+  /// <map key='54' joint='revolute_joint_name' scale='-0.1' type='velocity' kp='200' ki='0' kd='0'/>
+  ///
+  /// 3. Apply -1000 N to joint "prismatic_joint_name" at every click on the "u" key:
+  ///
+  /// <map key='117' joint='prismatic_joint_name' scale='-1000' type='force'/>
+  ///
+  /// 4. Check the example world "simple_arm_teleop.world"
+  ///
   class GAZEBO_VISIBLE KeysToJointsPlugin : public ModelPlugin
   {
     /// \brief Constructor.
