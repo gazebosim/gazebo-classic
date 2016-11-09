@@ -71,7 +71,9 @@ void KeysToJointsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
         if (info.type != "force")
         {
-          double kp, ki, kd = 0;
+          double kp = 0;
+          double ki = 0;
+          double kd = 0;
           if (mapElem->HasAttribute("kp"))
             kp = mapElem->Get<double>("kp");
           if (mapElem->HasAttribute("ki"))
