@@ -85,7 +85,7 @@ void KeysToJointsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->node->Init();
 
   this->keyboardSub =
-      this->node->Subscribe("/gazebo/default/keyboard/keypress",
+      this->node->Subscribe("~/keyboard/keypress",
       &KeysToJointsPlugin::OnKeyPress, this, true);
 }
 
