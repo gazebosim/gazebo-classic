@@ -28,6 +28,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
 #include "gazebo/common/KeyFrame.hh"
