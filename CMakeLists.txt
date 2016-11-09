@@ -310,15 +310,19 @@ else (build_errors)
 
   if (BUILD_GAZEBO)
     set(TEST_TYPE "UNIT")
+    add_custom_target(tests)
+
     add_subdirectory(gazebo)
     add_subdirectory(media)
-    add_subdirectory(test)
+    add_subdirectory(test EXCLUDE_FROM_ALL)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
     add_subdirectory(worlds)
     add_subdirectory(models)
+
   endif (BUILD_GAZEBO)
+
 
   ########################################
   # Make the package config files
