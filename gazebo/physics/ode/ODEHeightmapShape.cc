@@ -71,7 +71,8 @@ void ODEHeightmapShape::Init()
       0);  // wrap mode
 
   // Step 4: Restrict the bounds of the AABB to improve efficiency
-  dGeomHeightfieldDataSetBounds(this->odeData, 0, this->GetSize().z);
+  dGeomHeightfieldDataSetBounds(this->odeData, this->GetMinHeight(),
+      this->GetMaxHeight());
 
   oParent->SetCollision(dCreateHeightfield(0, this->odeData, 1), false);
   oParent->SetStatic(true);

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_HEIGHTMAP_HH_
-#define _GAZEBO_RENDERING_HEIGHTMAP_HH_
+#ifndef GAZEBO_RENDERING_HEIGHTMAP_HH_
+#define GAZEBO_RENDERING_HEIGHTMAP_HH_
 
 #include <vector>
 #include <string>
@@ -68,7 +68,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
-      public: Heightmap(ScenePtr _scene);
+      public: explicit Heightmap(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Heightmap();
@@ -185,6 +185,20 @@ namespace gazebo
       /// into.
       /// \return Number of terrain subdivisions
       public: unsigned int TerrainSubdivisionCount() const;
+
+      /// \brief Set custom material for the terrain
+      /// \param[in] _materialName Name of the material
+      public: void SetMaterial(const std::string &_materialName);
+
+      /// \brief Get the custom material name used for the terrain.
+      /// \return Custom material name.
+      public: std::string MaterialName() const;
+
+      /// \brief Create terrain material generator. There are two types:
+      /// custom material generator that support user material scripts,
+      /// and a default material generator that uses our own glsl shader
+      /// and supports PSSM shadows.
+      private: void CreateMaterial();
 
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.

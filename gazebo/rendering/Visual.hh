@@ -192,7 +192,12 @@ namespace gazebo
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See version that accepts ignition math parameters.
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the scale.
+      /// \param[in] _scale The scaling factor for the visual.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the scale.
       /// \return The scaling factor.
@@ -326,7 +331,13 @@ namespace gazebo
 
       /// \brief Set the position of the visual.
       /// \param[in] _pos The position to set the visual to.
-      public: void SetPosition(const math::Vector3 &_pos);
+      /// \deprecated See version that accepts ignition math parameters
+      public: void SetPosition(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the position of the visual.
+      /// \param[in] _pos The position to set the visual to.
+      public: void SetPosition(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.
@@ -347,6 +358,10 @@ namespace gazebo
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
       public: math::Pose GetPose() const;
+
+      /// \brief Get the initial relative pose of the visual.
+      /// \return The visual's initial relative pose.
+      public: ignition::math::Pose3d InitialRelativePose() const;
 
       /// \brief Get the global pose of the node.
       /// \return The pose in the world coordinate frame.
@@ -613,6 +628,18 @@ namespace gazebo
       /// \brief Get whether this visual uses RT shader system.
       /// \return True if RT shader is used.
       public: bool UseRTShader() const;
+
+      /// \brief Set a message specific for this visual type. For example, a
+      /// link visual will have a link message.
+      /// \param[in] _msg Message for this visual.
+      public: void SetTypeMsg(const google::protobuf::Message *_msg);
+
+      /// \brief Push a message for a child of this visual which hasn't been
+      /// loaded yet.
+      /// \param[in] _pair Pair with the child visual type and the message for
+      /// the child.
+      public: void AddPendingChild(std::pair<VisualType,
+          const google::protobuf::Message *> _pair);
 
       /// \brief Convert from msgs::Visual::Type to VisualType.
       /// \param[in] _type A msgs::Visual::Type enum.
