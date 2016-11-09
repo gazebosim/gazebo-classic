@@ -769,9 +769,6 @@ find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   ${QWT_WIN_LIBRARY_DIR}
 )
 
-message (STATUS "\n\nQWT_INCLUDE_DIR=${QWT_INCLUDE_DIR}\n\n\n")
-message (STATUS "\n\nQWT_LIBRARY=${QWT_LIBRARY}\n\n\n")
-
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)
 else()
