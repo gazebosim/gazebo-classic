@@ -86,9 +86,9 @@ RenderEngine::~RenderEngine()
 }
 
 //////////////////////////////////////////////////
-void RenderEngine::Load(const bool _createContext)
+void RenderEngine::Load()
 {
-  if (_createContext && !this->CreateContext())
+  if (!this->CreateContext())
   {
     gzwarn << "Unable to create X window. Rendering will be disabled\n";
     return;
@@ -142,17 +142,14 @@ void RenderEngine::Load(const bool _createContext)
     this->SetupResources();
   }
 
-  if (_createContext)
-  {
-    // Create a 1x1 render window so that we can grab a GL context. Based on
-    // testing, this is a hard requirement by Apple. We also need it to
-    // properly initialize GLWidget and UserCameras. See the GLWidget
-    // constructor.
-    this->dataPtr->windowManager->CreateWindow(
-        std::to_string(this->dummyWindowId), 1, 1);
+  // Create a 1x1 render window so that we can grab a GL context. Based on
+  // testing, this is a hard requirement by Apple. We also need it to
+  // properly initialize GLWidget and UserCameras. See the GLWidget
+  // constructor.
+  this->dataPtr->windowManager->CreateWindow(
+      std::to_string(this->dummyWindowId), 1, 1);
 
-    this->CheckSystemCapabilities();
-  }
+  this->CheckSystemCapabilities();
 }
 
 //////////////////////////////////////////////////

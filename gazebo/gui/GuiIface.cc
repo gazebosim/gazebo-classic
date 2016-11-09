@@ -289,8 +289,8 @@ bool gui::load()
   g_modelRightMenu = new gui::ModelRightMenu();
 
   // Load the rendering engine.
-  rendering::load(false);
-//  rendering::init();
+  rendering::load();
+  rendering::init();
 
   g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
