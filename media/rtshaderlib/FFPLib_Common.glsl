@@ -1,3 +1,4 @@
+#version 120
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
@@ -76,7 +77,7 @@ void FFP_Assign(in mat3x4 vIn, out mat3x4 vOut)
 	vOut = vIn;
 }
 //-----------------------------------------------------------------------------
-void FFP_Construct(in float r,
+void FFP_Construct(in float r, 
 			 in float g,
 			 in float b,
 			 in float a,
@@ -86,7 +87,7 @@ void FFP_Construct(in float r,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Construct(in float r,
+void FFP_Construct(in float r, 
 			 in float g,
 			 in float b,
 			 out vec3 vOut)
@@ -95,14 +96,14 @@ void FFP_Construct(in float r,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Construct(in float r,
+void FFP_Construct(in float r, 				   
 				   out vec4 vOut)
 {
 	vOut = vec4(r,r,r,r);
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Construct(in float r,
+void FFP_Construct(in float r, 
 			 in float g,
 			 out vec2 vOut)
 {
