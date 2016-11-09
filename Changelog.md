@@ -94,6 +94,7 @@
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
     * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
+    * [Pull request #2436](https://bitbucket.org/osrf/gazebo/pull-request/2436)
     * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
 
 1. Add Wind support
@@ -177,9 +178,23 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix DEM heightmap size, collision, scale
+    * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
+
+1. Update QT render loop to throttle based on UserCamera::RenderRate.
+    * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
+    * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
+
+1. Generate visualization on demand, instead of on load. This helps to
+   reduce load time.
+    * [Pull request 2457](https://bitbucket.org/osrf/gazebo/pull-request/2457)
+
 1. Add GUI items to change the user camera clip distance
     * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
     * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
+
+1. Support custom material scripts for heightmaps
+    * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
 
 ## Gazebo 7.4.0 (2016-10-11)
 
