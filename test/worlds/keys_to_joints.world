@@ -4,6 +4,9 @@
 
     <gui fullscreen='0'>
       <plugin name='keyboard' filename='libKeyboardGUIPlugin.so'/>
+      <camera name='user_camera'>
+        <pose frame=''>4.5 0 11 0.000361 1.57 1.57036</pose>
+      </camera>
     </gui>
 
     <include>
