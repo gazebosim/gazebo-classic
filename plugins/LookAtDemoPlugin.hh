@@ -27,7 +27,20 @@
 namespace gazebo
 {
   /// \brief A GUI plugin that demos the ignition::math::Matrix4<T>::LookAt
-  /// function.
+  /// function. The plugin offers 3 input fields (XYZ) for each of 3 vectors:
+  /// the position of the eye, the position of the target and the desired up
+  /// direction. See more documentation on ignition math.
+  ///
+  /// It works with the lookat_demo.world, and expects that world to have 3
+  /// models:
+  ///
+  /// 1. "frame": A model representing the resulting frame, the one which
+  /// "looks at"
+  ///
+  /// 2. "target": A yellow sphere representing the target which is being
+  /// "looked at"
+  ///
+  /// 3. "desired_z": A single axis, representing the desired Z axis.
   class GAZEBO_VISIBLE LookAtDemoPlugin : public GUIPlugin
   {
     Q_OBJECT
