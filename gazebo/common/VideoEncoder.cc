@@ -46,7 +46,6 @@ extern "C"
 }
 #endif
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/VideoEncoder.hh"
