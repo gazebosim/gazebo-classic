@@ -38,6 +38,8 @@ class ContactSensor : public ServerFixture,
   public: void MultipleSensors(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
+
+  /// \brief Test removing a model that has a contact sensor
   public: void ModelRemoval(const std::string &_physicsEngine);
 
   /// \brief Callback for sensor subscribers in MultipleSensors test.
@@ -567,7 +569,7 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::string modelName = "contactModel";
@@ -575,10 +577,10 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
   math::Pose modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
 
   std::string cylinderName = "cylinder";
-  math::Pose cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
+  ignition::math::Pose cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
 
-  SpawnUnitContactSensor(modelName, contactSensorName,
-      "cylinder", modelPose.pos, modelPose.rot.GetAsEuler());
+  SpawnCylinder(cylinderName, cylinderPose.Pos(),
+      cylinderPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
   sensors::ContactSensorPtr contactSensor =
