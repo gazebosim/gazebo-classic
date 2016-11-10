@@ -127,18 +127,31 @@ void Marker_TEST::AddRemove()
 
   this->ProcessEventsAndDraw(mainWindow);
 
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != nullptr);
+
+  gazebo::rendering::VisualPtr vis =
+    scene->GetVisual("__GZ_MARKER_VISUAL_default_0");
+  QVERIFY(vis != nullptr);
+
+#ifndef __APPLE__
   // Check that a white object is rendered
   int shapeWidth = this->MidWhiteWidth();
-  gzdbg << "ShapeWidth[" << shapeWidth << "]\n";
   QVERIFY(shapeWidth > 770);
   QVERIFY(shapeWidth < 830);
+#endif
 
   // Remove the shape
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
+#endif
 
   // Add a box
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
@@ -146,8 +159,13 @@ void Marker_TEST::AddRemove()
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
+
+#ifndef __APPLE__
   QVERIFY(shapeWidth > 1125);
   QVERIFY(shapeWidth < 1140);
+#endif
 
   // Add a cylinder
   markerMsg.set_ns("default");
@@ -158,16 +176,28 @@ void Marker_TEST::AddRemove()
   markerMsg.set_type(ignition::msgs::Marker::CYLINDER);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") != nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth > 2165);
   QVERIFY(shapeWidth < 2180);
+#endif
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
+#endif
 
   // Draw a vertical line using LINE_LIST
   markerMsg.set_id(2);
@@ -181,9 +211,16 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(0, 0, 10));
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") != nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(180);
   QVERIFY(shapeWidth > 0);
   QVERIFY(shapeWidth < 10);
+#endif
 
   // Draw another vertical line using LINE_STRIP
   markerMsg.set_id(3);
@@ -201,16 +238,32 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(2, 0, -10));
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") != nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") != nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(180);
   QVERIFY(shapeWidth > 10);
   QVERIFY(shapeWidth < 20);
+#endif
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+
+#ifndef __APPLE__
   int count = this->WhiteCount(100);
   QVERIFY(count == 0);
+#endif
 
   // Draw a bunch of points
   markerMsg.set_id(4);
@@ -227,16 +280,33 @@ void Marker_TEST::AddRemove()
   }
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") != nullptr);
+
+#ifndef __APPLE__
   count = this->WhiteCount(180);
-  std::cout << "Count[" << count << "]\n";
   QVERIFY(count > 480);
   QVERIFY(count < 570);
+#endif
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+
+#ifndef __APPLE__
   QVERIFY(this->WhiteCount(100) == 0);
+#endif
 
   markerMsg.set_id(5);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
@@ -246,16 +316,36 @@ void Marker_TEST::AddRemove()
                       ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") != nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(250);
   QVERIFY(shapeWidth > 100);
   QVERIFY(shapeWidth < 130);
+#endif
 
   // Remove the text
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
+#endif
 
   // Draw a triangle fan
   markerMsg.set_id(5);
@@ -275,19 +365,38 @@ void Marker_TEST::AddRemove()
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
-  std::cout << "Triangle fan count[" << shapeWidth << "]\n";
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") != nullptr);
+
+#ifndef __APPLE__
   QVERIFY(shapeWidth > 1480);
   QVERIFY(shapeWidth < 1500);
+#endif
 
   // Remove the triangle fan
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
+#endif
 
   // Draw a triangle list
-  markerMsg.set_id(7);
+  markerMsg.set_id(6);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::TRIANGLE_LIST);
   markerMsg.clear_point();
@@ -309,20 +418,41 @@ void Marker_TEST::AddRemove()
 
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_6") != nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  std::cout << "Triangle list count[" << shapeWidth << "]\n";
   QVERIFY(shapeWidth > 5);
   QVERIFY(shapeWidth < 30);
+#endif
 
   // Remove the triangle list
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_6") == nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth == 0);
+#endif
 
   // Draw a triangle strip
-  markerMsg.set_id(8);
+  markerMsg.set_id(7);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::TRIANGLE_STRIP);
   markerMsg.clear_point();
@@ -341,10 +471,21 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(1, 2, 0.3));
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_6") == nullptr);
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_7") != nullptr);
+
+#ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  std::cout << "Triangle strip count[" << shapeWidth << "]\n";
   QVERIFY(shapeWidth > 1300);
   QVERIFY(shapeWidth < 1330);
+#endif
 
   mainWindow->close();
   delete mainWindow;
