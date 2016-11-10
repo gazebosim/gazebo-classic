@@ -12,9 +12,6 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    <include>
-      <uri>model://ground_plane</uri>
-    </include>
 
     <model name='position_teleop'>
       <pose>0 0 0.03 -1.57 -0 0</pose>

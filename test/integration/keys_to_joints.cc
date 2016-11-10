@@ -48,6 +48,9 @@ void KeysToJoints::Position(const std::string &_physicsEngine)
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
+  // Disable gravity
+  world->SetGravity(ignition::math::Vector3d::Zero);
+
   auto model = world->GetModel("position_teleop");
   ASSERT_NE(model, nullptr);
 
@@ -101,6 +104,9 @@ void KeysToJoints::Velocity(const std::string &_physicsEngine)
   this->Load("worlds/keys_to_joints.world", false, _physicsEngine);
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
+
+  // Disable gravity
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   auto model = world->GetModel("velocity_teleop");
   ASSERT_NE(model, nullptr);
@@ -168,6 +174,9 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   this->Load("worlds/keys_to_joints.world", false, _physicsEngine);
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
+
+  // Disable gravity
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   auto model = world->GetModel("force_teleop");
   ASSERT_NE(model, nullptr);
@@ -244,6 +253,9 @@ void KeysToJoints::MultipleJoints(const std::string &_physicsEngine)
   this->Load("worlds/keys_to_joints.world", false, _physicsEngine);
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
+
+  // Disable gravity
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   auto model = world->GetModel("multiple_teleop");
   ASSERT_NE(model, nullptr);
