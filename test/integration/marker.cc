@@ -158,11 +158,11 @@ void Marker_TEST::AddRemove()
   markerMsg.set_type(ignition::msgs::Marker::BOX);
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
-  shapeWidth = this->MidWhiteWidth();
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
 
 #ifndef __APPLE__
+  shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth > 1125);
   QVERIFY(shapeWidth < 1140);
 #endif
@@ -364,7 +364,6 @@ void Marker_TEST::AddRemove()
   }
   node.Request(topicName, markerMsg, 5000u, rep, result);
   this->ProcessEventsAndDraw(mainWindow);
-  shapeWidth = this->MidWhiteWidth();
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
@@ -374,6 +373,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") != nullptr);
 
 #ifndef __APPLE__
+  shapeWidth = this->MidWhiteWidth();
   QVERIFY(shapeWidth > 1480);
   QVERIFY(shapeWidth < 1500);
 #endif
