@@ -29,6 +29,9 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
+  /// \brief Test removing a model that has a contact sensor
+  public: void ModelRemoval(const std::string &_physicsEngine);
+
   /// \brief Test moving a model while in contact.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void MoveTool(const std::string &_physicsEngine);
@@ -49,6 +52,68 @@ unsigned int g_messageCount = 0;
 void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 {
   g_messageCount++;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != nullptr);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::string modelName = "contactModel";
+  std::string contactSensorName = "contactSensor";
+  ignition::math::Pose3d modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
+
+  SpawnUnitContactSensor(modelName, contactSensorName,
+      "cylinder", modelPose.Pos(), modelPose.Rot().Euler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
+  sensors::ContactSensorPtr contactSensor =
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+
+  ASSERT_TRUE(contactSensor != nullptr);
+
+  sensors::SensorManager::Instance()->Init();
+  sensors::SensorManager::Instance()->RunThreads();
+
+  EXPECT_FALSE(contactSensor->IsActive());
+
+  unsigned int expectedColCount = 1;
+  EXPECT_EQ(contactSensor->GetCollisionCount(), expectedColCount);
+
+  contactSensor->SetActive(true);
+
+  EXPECT_TRUE(contactSensor->IsActive());
+
+  physics::ModelPtr contactModel = world->GetModel(modelName);
+  ASSERT_TRUE(contactModel != nullptr);
+
+  world->RemoveModel(contactModel);
+
+  contactModel = world->GetModel(modelName);
+  EXPECT_TRUE(contactModel == nullptr);
+
+  int sleep = 0;
+  int maxSleep  = 20;
+  while (sensors::get_sensor(contactSensorName) && sleep < maxSleep)
+  {
+    common::Time::MSleep(30);
+    sleep++;
+  }
+  EXPECT_TRUE(sensors::get_sensor(contactSensorName) == nullptr);
+}
+
+TEST_P(ContactSensor, ModelRemoval)
+{
+  ModelRemoval(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
