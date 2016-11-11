@@ -1898,6 +1898,17 @@ std::string Camera::ProjectionType() const
 }
 
 //////////////////////////////////////////////////
+bool Camera::SetBackgroundColor(const common::Color &_color)
+{
+  if (this->OgreViewport())
+  {
+    this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
+    return true;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 ignition::math::Matrix4d Camera::ProjectionMatrix() const
 {
   return Conversions::ConvertIgn(this->camera->getProjectionMatrix());

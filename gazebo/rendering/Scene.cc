@@ -492,20 +492,14 @@ void Scene::SetBackgroundColor(const common::Color &_color)
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->OgreViewport() &&
-        (*iter)->OgreViewport()->getBackgroundColour() != clr)
-      (*iter)->OgreViewport()->setBackgroundColour(clr);
+    (*iter)->SetBackgroundColor(_color);
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->dataPtr->userCameras.begin();
        iter2 != this->dataPtr->userCameras.end(); ++iter2)
   {
-    if ((*iter2)->OgreViewport() &&
-        (*iter2)->OgreViewport()->getBackgroundColour() != clr)
-    {
-      (*iter2)->OgreViewport()->setBackgroundColour(clr);
-    }
+    (*iter2)->SetBackgroundColor(_color);
   }
 }
 
