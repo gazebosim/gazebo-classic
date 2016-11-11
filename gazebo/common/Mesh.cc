@@ -18,8 +18,6 @@
 #include <string.h>
 #include <algorithm>
 
-#include "gazebo/math/Helpers.hh"
-
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"

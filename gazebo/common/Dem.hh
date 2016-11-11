@@ -29,7 +29,6 @@
 # include <vector>
 
 # include "gazebo/common/HeightmapData.hh"
-# include "gazebo/math/Angle.hh"
 
 namespace gazebo
 {
