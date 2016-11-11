@@ -244,6 +244,14 @@ TEST_P(KeysToJoints, Force)
           << std::endl;
     return;
   }
+  if (physicsEngine == "bullet")
+  {
+    gzerr << "Skipping test for ["
+          << physicsEngine
+          << "] because of thread safety, see issue #2098"
+          << std::endl;
+    return;
+  }
   Force(physicsEngine);
 }
 
