@@ -287,8 +287,8 @@ namespace gazebo
     /// mapping function
     /// \param[in] _f For "custom" lens type, the focal length used in the
     /// mapping function
-    /// \param[in] _f For "custom" lens type, the trigonometirc function used in
-    /// the mapping function
+    /// \param[in] _fun For "custom" lens type, the trigonometirc function used
+    /// in the mapping function
     protected: void SpawnWideAngleCamera(const std::string &_modelName,
                   const std::string &_cameraName,
                   const ignition::math::Vector3d &_pos,

@@ -638,7 +638,6 @@ bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
   return retVal;
 }
 
-
 //////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
