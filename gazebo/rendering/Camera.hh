@@ -863,6 +863,11 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
 
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color 
+      /// \return True if successful. False if viewport is null
+      public: virtual bool SetBackgroundColor(const common::Color &_color);
+
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix
       public: ignition::math::Matrix4d ProjectionMatrix() const;
