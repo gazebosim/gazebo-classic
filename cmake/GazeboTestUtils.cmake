@@ -140,6 +140,8 @@ if (VALID_DISPLAY)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
         --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
     endif()
+
+    add_dependencies(tests ${BINARY_NAME})
     endforeach()
   endmacro()
 else()
