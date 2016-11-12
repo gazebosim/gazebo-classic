@@ -486,7 +486,6 @@ common::Color Scene::AmbientColor() const
 void Scene::SetBackgroundColor(const common::Color &_color)
 {
   this->dataPtr->sdf->GetElement("background")->Set(_color);
-  Ogre::ColourValue clr = Conversions::Convert(_color);
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->dataPtr->cameras.begin();
