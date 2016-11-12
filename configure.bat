@@ -96,5 +96,4 @@ cmake -G "NMake Makefiles"^
     -DCPPZMQ_HEADER_PATH="@CPPZMQ_PATH@"^
     -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
-    -DENABLE_TESTS_COMPILATION:BOOL=False^
     ..
