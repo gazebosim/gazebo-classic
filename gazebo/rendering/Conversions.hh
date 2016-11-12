@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CONVERSIONS_HH_
-#define _GAZEBO_CONVERSIONS_HH_
+#ifndef GAZEBO_RENDERING_CONVERSIONS_HH_
+#define GAZEBO_RENDERING_CONVERSIONS_HH_
 
+#include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -90,7 +91,7 @@ namespace gazebo
 
       /// \brief Ogre quaternion to ignition::math::Quaterniond
       /// \param[in] _q Ogre quaternion
-      /// return Ignition math quaternion
+      /// \return Ignition math quaternion
       public: static ignition::math::Quaterniond ConvertIgn(
                   const Ogre::Quaternion &_q);
 
