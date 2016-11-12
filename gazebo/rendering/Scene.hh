@@ -531,6 +531,19 @@ namespace gazebo
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
 
+      /// \brief Return whether a layer is on or off. A negative layer
+      /// is always active.
+      /// \param[in] _layer Index of the layer to check.
+      /// \return True if the layer is active, false otherwise. True is also
+      /// returned if _layer is negative.
+      public: bool LayerState(const int32_t _layer) const;
+
+      /// \brief Return true if the layer exits.
+      /// \param[in] _layer Index of the layer to check for existance.
+      /// \return True if the layer exists, otherwise false. All negative
+      /// value of _layer return true.
+      public: bool HasLayer(const int32_t _layer) const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 

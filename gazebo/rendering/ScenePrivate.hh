@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
-#define _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#define GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
 #include <list>
 #include <map>
@@ -349,6 +349,8 @@ namespace gazebo
 
       /// \brief Manager of marker visuals
       public: MarkerManager markerManager;
+
+      public: std::map<int32_t, bool> layerState;
     };
   }
 }

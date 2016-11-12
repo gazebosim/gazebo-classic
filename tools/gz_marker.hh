@@ -46,9 +46,10 @@ namespace gazebo
     /// ignition::msgs::Marker protobuf message
     /// \param[in] _lifetime Length of time the marker should be visible.
     /// \param[in] _parent Name of a parent visual to attach a marker to.
+    /// \param[in] _layer Layer to add this marker to.
     private: void Add(const std::string &_ns, const unsigned int _id,
                  const std::string &_type, const common::Time &_lifetime,
-                 const std::string &_parent);
+                 const std::string &_parent, const int32_t _layer);
 
     /// \brief Send a marker message
     /// \param[in] _msg String representation of a marker protobuf message.
@@ -60,7 +61,9 @@ namespace gazebo
     private: void Delete(const std::string &_ns, const unsigned int _id);
 
     /// \brief Delete all markers
-    private: void DeleteAll();
+    /// \param[in] _ns The namespace in which all markers should be deleted.
+    /// If empty, all markers in all namespaces will be deleted.
+    private: void DeleteAll(const std::string &_ns);
 
     /// \brief Node pointer.
     private: ignition::transport::Node node;

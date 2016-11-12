@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Added VisualMarkers to the rendering engine. Visual markers support
+   programmatic rendering of various shapes in a scene.
+    * [Pull request XXXX](https://bitbucket.org/osrf/gazebo/pull-request/XXXX)
+
 1. UserCamera overrides `Camera::Render` to reduce CPU usage.
     * [Pull request 2480](https://bitbucket.org/osrf/gazebo/pull-request/2480)
 

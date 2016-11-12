@@ -47,10 +47,12 @@ MarkerCommand::MarkerCommand()
     ("parent,p", po::value<std::string>(),
      "Name of a visual to which this marker should be attached.")
     ("lifetime,f", po::value<double>(),
-     "Simulation time the marker should last before deletion")
-    ("delete,d", "Delete an existing visual marker")
-    ("delete-all,x", "Delete all the visual markers")
-    ("list,l", "Get a list of the visual markers");
+     "Simulation time the marker should last before deletion.")
+    ("delete,d", "Delete an existing visual marker.")
+    ("delete-all,x", "Delete all markers, or all markers in a namespace.")
+    ("list,l", "Get a list of the visual markers.")
+    ("layer,y", po::value<int32_t>(),
+     "Add or move a marker to the specified layer.");
 }
 
 /////////////////////////////////////////////////
@@ -67,7 +69,7 @@ void MarkerCommand::HelpDetailed()
 
     << "-n, --namespace: string argument\n"
     << "  Namespaces allow markers to be grouped. This option can be used\n"
-    << "  the -a command. the default namespace is \"default\".\n"
+    << "  the -a and -x command. The default namespace is empty string.\n"
 
     << "-i, --id: integer argument\n"
     << "  Each marker has a unique id. Use this option with the -a command\n"
@@ -101,6 +103,10 @@ void MarkerCommand::HelpDetailed()
     << "-l, --list: no argument\n"
     << "   List all markers.\n"
 
+    << "-y, --layer: integer argument\n"
+    << "   Add or move a marker to the specified layer. Use this argument with"
+    << "   the -a argument.\n"
+
     << "-m, --msg: string argument\n"
     << "  Use this option to send a custom marker message. This option will\n"
     << "  override all other command line options. Details about the marker\n"
@@ -129,6 +135,7 @@ bool MarkerCommand::RunImpl()
 
   std::string ns = "";
   unsigned int id = 0;
+  int32_t layer = 0;
   std::string type = "none";
   std::string parent;
   common::Time lifetime;
@@ -143,17 +150,19 @@ bool MarkerCommand::RunImpl()
     parent = this->vm["parent"].as<std::string>();
   if (this->vm.count("lifetime"))
     lifetime.Set(this->vm["lifetime"].as<double>());
+  if (this->vm.count("layer"))
+    layer = this->vm["layer"].as<int32_t>();
 
   if (this->vm.count("msg"))
     this->Msg(this->vm["msg"].as<std::string>());
   else if (this->vm.count("list"))
     this->List();
   else if (this->vm.count("add"))
-    this->Add(ns, id, type, lifetime, parent);
+    this->Add(ns, id, type, lifetime, parent, layer);
   else if (this->vm.count("delete"))
     this->Delete(ns, id);
   else if (this->vm.count("delete-all"))
-    this->DeleteAll();
+    this->DeleteAll(ns);
   else
     this->Help();
 
@@ -264,13 +273,14 @@ void MarkerCommand::List()
 /////////////////////////////////////////////////
 void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
     const std::string &_type, const common::Time &_lifetime,
-    const std::string &_parent)
+    const std::string &_parent, const int32_t _layer)
 {
   // Construct the marker message
   ignition::msgs::Marker msg;
   msg.set_ns(_ns);
   msg.set_id(_id);
   msg.set_parent(_parent);
+  msg.set_layer(_layer);
   msg.set_action(ignition::msgs::Marker::ADD_MODIFY);
 
   // Set lifetime if non-zero
@@ -376,9 +386,10 @@ void MarkerCommand::Delete(const std::string &_ns, const unsigned int _id)
 }
 
 /////////////////////////////////////////////////
-void MarkerCommand::DeleteAll()
+void MarkerCommand::DeleteAll(const std::string &_ns)
 {
   ignition::msgs::Marker msg;
+  msg.set_ns(_ns);
   msg.set_action(ignition::msgs::Marker::DELETE_ALL);
 
   bool result;

@@ -3470,10 +3470,35 @@ void Scene::RemoveProjectors()
 /////////////////////////////////////////////////
 void Scene::ToggleLayer(const int32_t _layer)
 {
+  if (this->HasLayer(_layer))
+    this->dataPtr->layerState[_layer] = !this->dataPtr->layerState[_layer];
+  else
+    this->dataPtr->layerState[_layer] = false;
+
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+bool Scene::LayerState(const int32_t _layer) const
+{
+  if (_layer >= 0 &&
+      this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end())
+  {
+    std::cout << "HERE\n";
+    return this->dataPtr->layerState[_layer];
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::HasLayer(const int32_t _layer) const
+{
+  return _layer < 0 ||
+    this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end();
 }
 
 /////////////////////////////////////////////////

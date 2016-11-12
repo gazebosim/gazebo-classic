@@ -527,6 +527,10 @@ void Visual::Load()
       rendering::Events::newLayer(this->dataPtr->layer);
     }
   }
+
+  // Set invisible if this visual's layer is not active
+  if (!this->dataPtr->scene->LayerState(this->dataPtr->layer))
+    this->SetVisible(false);
 }
 
 //////////////////////////////////////////////////
@@ -2337,7 +2341,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->meta().has_layer())
     {
       this->dataPtr->layer = _msg->meta().layer();
-      rendering::Events::newLayer(this->dataPtr->layer);
+      if (!this->dataPtr->scene->HasLayer(this->dataPtr->layer))
+        rendering::Events::newLayer(this->dataPtr->layer);
+
+      // Set invisible if this visual's layer is not active
+      this->SetVisible(this->dataPtr->scene->LayerState(this->dataPtr->layer));
     }
   }
 
@@ -3268,6 +3276,9 @@ void Visual::ToggleLayer(const int32_t _layer)
 void Visual::SetLayer(const int32_t _layer)
 {
   this->dataPtr->layer = _layer;
+
+  // Set invisible if this visual's layer is not active
+  this->SetVisible(this->dataPtr->scene->LayerState(this->dataPtr->layer));
 }
 
 //////////////////////////////////////////////////
