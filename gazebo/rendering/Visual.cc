@@ -3503,7 +3503,6 @@ void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
   if (_msg.has_emissive())
     this->SetEmissive(msgs::Convert(_msg.emissive()));
 
-
   if (_msg.has_shader_type())
   {
     if (_msg.shader_type() == msgs::Material::VERTEX)

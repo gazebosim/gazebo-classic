@@ -3487,7 +3487,6 @@ bool Scene::LayerState(const int32_t _layer) const
   if (_layer >= 0 &&
       this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end())
   {
-    std::cout << "HERE\n";
     return this->dataPtr->layerState[_layer];
   }
 

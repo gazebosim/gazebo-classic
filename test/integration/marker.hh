@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TEST_INTEGRATION_MARKERTEST_HH_
-#define _GAZEBO_TEST_INTEGRATION_MARKERTEST_HH_
+#ifndef GAZEBO_TEST_INTEGRATION_MARKERTEST_HH_
+#define GAZEBO_TEST_INTEGRATION_MARKERTEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
