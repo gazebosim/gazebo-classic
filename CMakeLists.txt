@@ -138,7 +138,7 @@ if (BUILD_OSX_BUNDLE)
   SET(CMAKE_INSTALL_FULL_DATAROOTDIR ${BUNDLE_DATA_DEST_DIR})
   SET(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
   SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-  
+
   set (LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
   set (BIN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 
@@ -248,7 +248,7 @@ endif()
 filter_valid_compiler_flags(${WARN_LEVEL}
   -Wextra -Wno-long-long -Wno-unused-value -Wfloat-equal -Wshadow
   -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-				   
+
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
 if (UNIX AND NOT APPLE)
@@ -282,7 +282,8 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
+include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS}
+                           ${IGNITION-MSGS_INCLUDE_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -394,10 +395,6 @@ else (build_errors)
     gazebo_sensors
     gazebo_rendering
   )
-
-  if (INCLUDE_PLAYER)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
-  endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_physics

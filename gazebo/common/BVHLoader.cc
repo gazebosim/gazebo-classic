@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Helpers.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Matrix4.hh>
 
@@ -223,7 +224,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
             {
               if (channel == "Zrotation")
               {
-                zAngle = GZ_DTOR(value);
+                zAngle = IGN_DTOR(value);
                 mats.push_back(ignition::math::Matrix4d(
                       ignition::math::Quaterniond(zAxis, zAngle)));
               }
@@ -231,7 +232,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
               {
                 if (channel == "Xrotation")
                 {
-                  xAngle = GZ_DTOR(value);
+                  xAngle = IGN_DTOR(value);
                   mats.push_back(ignition::math::Matrix4d(
                     ignition::math::Quaterniond(xAxis, xAngle)));
                 }
@@ -239,7 +240,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
                 {
                   if (channel == "Yrotation")
                   {
-                    yAngle = GZ_DTOR(value);
+                    yAngle = IGN_DTOR(value);
                     mats.push_back(ignition::math::Matrix4d(
                       ignition::math::Quaterniond(yAxis, yAngle)));
                   }

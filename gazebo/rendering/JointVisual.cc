@@ -111,9 +111,8 @@ void JointVisual::Load(ConstJointPtr &_msg)
   // Scale according to the link it is attached to
   double linkSize = std::max(0.1,
       dPtr->parent->GetBoundingBox().GetSize().GetLength());
-  dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
-                                    linkSize * 0.7,
-                                    linkSize * 0.7);
+  dPtr->scaleToLink = ignition::math::Vector3d(linkSize * 0.7,
+      linkSize * 0.7, linkSize * 0.7);
   this->SetScale(dPtr->scaleToLink);
   if (dPtr->parentAxisVis)
     dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
@@ -182,13 +181,16 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
 
   if (_useParentFrame)
   {
-    // if set to use parent model frame
-    // rotate the arrow visual relative to the model
-    VisualPtr model = this->GetRootVisual();
-    math::Quaternion quatFromModel =
-        model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
-    _arrowVisual->SetRotation(quatFromModel.GetInverse() *
-        _arrowVisual->GetRotation());
+    VisualPtr linkVis = this->GetParent();
+    ignition::math::Pose3d linkInitPose = linkVis->InitialRelativePose();
+
+    // get rotation of joint visual in model frame
+    ignition::math::Quaterniond quatFromModel =
+        (this->GetPose().Ign() + linkInitPose).Rot();
+
+    // rotate arrow visual so that the axis vector applies to the model frame.
+    _arrowVisual->SetRotation(quatFromModel.Inverse() *
+        _arrowVisual->GetRotation().Ign());
   }
   _arrowVisual->ShowRotation(_type == msgs::Joint::REVOLUTE ||
                              _type == msgs::Joint::REVOLUTE2 ||

@@ -23,6 +23,7 @@
 #include <boost/program_options.hpp>
 
 #include "gazebo/transport/transport.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/msgs/msgs.hh"
 

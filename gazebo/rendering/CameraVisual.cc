@@ -161,4 +161,6 @@ void CameraVisual::Fini()
     this->dataPtr->scene->OgreSceneManager()->destroyEntity(
         this->GetName() + "__plane");
   }
+
+  Visual::Fini();
 }

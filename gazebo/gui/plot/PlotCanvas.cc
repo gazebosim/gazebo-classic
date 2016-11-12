@@ -22,6 +22,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/plot/EditableLabel.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
@@ -309,12 +310,24 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     this->dataPtr->plotSplitter->setVisible(true);
   }
 
-  PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
 
-  // give it a more compact, friendly name
-  // do this after PlotManager AddIntrospectionCurve call!
-  std::string label = PlotManager::Instance()->HumanReadableName(_variable);
-  this->SetVariableLabel(_id, label);
+  if (common::URI::Valid(_variable))
+  {
+    common::URI uri(_variable);
+    std::string schemeStr = uri.Scheme();
+    if (schemeStr == "data")
+    {
+      PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
+       // give it a more compact, friendly name
+      // do this after PlotManager AddIntrospectionCurve call!
+      std::string label = PlotManager::Instance()->HumanReadableName(_variable);
+      this->SetVariableLabel(_id, label);
+    }
+  }
+  else
+  {
+    PlotManager::Instance()->AddTopicCurve(_variable, curve);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -324,6 +337,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   auto it = this->dataPtr->plotData.end();
   if (_plotId == EmptyPlot)
   {
+    // find which plot the variable belongs to
     for (auto pIt = this->dataPtr->plotData.begin();
         pIt != this->dataPtr->plotData.end(); ++pIt)
     {
@@ -337,6 +351,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   }
   else
   {
+    // get the plot which the variable belongs to
     it = this->dataPtr->plotData.find(_plotId);
   }
 
@@ -351,7 +366,16 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
 
   // remove curve from manager
   PlotCurveWeakPtr plotCurve = it->second->plot->Curve(curveId);
-  PlotManager::Instance()->RemoveIntrospectionCurve(plotCurve);
+  std::string curveLabel;
+  {
+    auto pc = plotCurve.lock();
+    curveLabel = pc->Label();
+  }
+  // assume topic name starts with '/'
+  if (!curveLabel.empty() && curveLabel[0] == '/')
+    PlotManager::Instance()->RemoveTopicCurve(plotCurve);
+  else
+    PlotManager::Instance()->RemoveIntrospectionCurve(plotCurve);
 
   // erase from map
   it->second->variableCurves.erase(v);
@@ -668,7 +692,12 @@ void PlotCanvas::Restart()
       {
         c->SetActive(false);
         // remove from manager so they don't get updated any more.
-        PlotManager::Instance()->RemoveIntrospectionCurve(c);
+        // assume topic name starts with '/'
+        std::string curveLabel = c->Label();
+        if (!curveLabel.empty() && curveLabel[0] == '/')
+          PlotManager::Instance()->RemoveTopicCurve(c);
+        else
+          PlotManager::Instance()->RemoveIntrospectionCurve(c);
 
         // add to the list of variables to clone
         variableCurvesToClone.push_back(std::make_tuple(variablePill->Text(),

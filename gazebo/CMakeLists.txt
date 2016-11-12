@@ -28,9 +28,7 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
-if (WIN32)
- add_definitions(-DBUILDING_DLL)
-endif()
+add_definitions(-DBUILDING_DLL)
 
 add_subdirectory(msgs)
 add_subdirectory(math)
@@ -142,7 +140,7 @@ if (BUILD_OSX_BUNDLE)
   # Different libraries are not being installed into CMAKE_BINARY_DIR/lib
   # don't know why :/
   set (DIRS
-      ${OGRE_LIBRARY_DIRS} 
+      ${OGRE_LIBRARY_DIRS}
       ${CMAKE_BINARY_DIR}/lib
       ${CMAKE_BINARY_DIR}/gazebo/util
       ${CMAKE_BINARY_DIR}/gazebo/sensors

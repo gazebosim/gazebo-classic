@@ -31,7 +31,7 @@ void BuildingEditor_TEST::ExitBuildingEditor()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world", false, false, true);
+  this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);

@@ -211,12 +211,6 @@ ignition::math::Angle GpsSensor::Latitude() const
 }
 
 //////////////////////////////////////////////////
-double GpsSensor::GetAltitude() const
-{
-  return this->Altitude();
-}
-
-//////////////////////////////////////////////////
 double GpsSensor::Altitude() const
 {
   return this->dataPtr->lastGpsMsg.altitude();

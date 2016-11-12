@@ -151,4 +151,5 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
 void LogicalCameraVisual::Fini()
 {
   this->DetachObjects();
+  Visual::Fini();
 }
