@@ -51,7 +51,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
 /////////////////////////////////////////////////
 TEST_F(WideAngleCameraSensor, Background)
 {
-#if not defined(__APPLE_)
+#if not defined(__APPLE__)
   Load("worlds/usercamera_test.world");
 
   // Make sure the render engine is available.
