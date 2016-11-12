@@ -51,6 +51,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
 /////////////////////////////////////////////////
 TEST_F(WideAngleCameraSensor, Background)
 {
+#if not defined(__APPLE_)
   Load("worlds/usercamera_test.world");
 
   // Make sure the render engine is available.
@@ -110,4 +111,5 @@ TEST_F(WideAngleCameraSensor, Background)
   EXPECT_DOUBLE_EQ(bSum, 0.0);
 
   delete [] img;
+#endif
 }
