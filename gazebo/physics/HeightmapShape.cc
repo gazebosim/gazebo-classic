@@ -106,7 +106,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
       this->heightmapSize.x = this->dem.GetWorldWidth();
       this->heightmapSize.y = this->dem.GetWorldHeight();
       this->heightmapSize.z = this->dem.GetMaxElevation() -
-          std::max(0.0f, this->dem.GetMinElevation());
+          this->dem.GetMinElevation();
     }
 
     // Modify the reference geotedic latitude/longitude.
@@ -202,11 +202,20 @@ void HeightmapShape::Init()
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
-  if (math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
-    this->scale.z = fabs(terrainSize.z);
+  // TODO add a virtual HeightmapData::GetMinElevation function to avoid the
+  // ifdef check. i.e. heightmapSizeZ = GetMaxElevation - GetMinElevation
+  double heightmapSizeZ = this->heightmapData->GetMaxElevation();
+#ifdef HAVE_GDAL
+  // DEM
+  auto demData = dynamic_cast<common::Dem *>(this->heightmapData);
+  if (demData)
+    heightmapSizeZ = heightmapSizeZ - demData->GetMinElevation();
+#endif
+
+  if (ignition::math::equal(heightmapSizeZ, 0.0))
+    this->scale.z = 1.0;
   else
-    this->scale.z = fabs(terrainSize.z) /
-                    this->heightmapData->GetMaxElevation();
+    this->scale.z = fabs(terrainSize.z) / heightmapSizeZ;
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
