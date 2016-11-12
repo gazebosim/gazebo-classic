@@ -19,7 +19,9 @@
 #include <stdio.h>
 #include <memory>
 
-#include "gazebo/math/Helpers.hh"
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/STLLoader.hh"
