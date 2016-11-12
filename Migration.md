@@ -204,6 +204,16 @@ release will remove the deprecated code.
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
+1. **gazebo/rendering/Conversions.hh**
+    + ***Deprecation:*** public: static Ogre::Quaternion Convert(const math::Quaternion &)
+    + ***Replacement:*** public: static Ogre::Quaternion Convert(const ignition::math::Quaterniond &)
+    + ***Deprecation:*** public: static Ogre::Vector3 Convert(const math::Vector3 &)
+    + ***Replacement:*** public: static Ogre::Vector3 Convert(const ignition::math::Vector3d &)
+    + ***Deprecation:*** public: static math::Quaternion Convert(const Ogre::Quaternion &)
+    + ***Replacement:*** public: static ignition::math::Quaterniond ConvertIgn(const Ogre::Quaternion &)
+    + ***Deprecation:*** public: static math::Vector3 Convert(const Ogre::Vector3 &)
+    + ***Replacement:*** public: static ignition::math::Vector3d ConvertIgn(const Ogre::Vector3 &)
+
 1. **gazebo/physics/dart/DARTCollision.hh**
     + ***Deprecation:*** public: dart::dynamics::Shape *GetDARTCollisionShape() const
     + ***Replacement:*** public: dart::dynamics::ShapePtr DARTCollisionShape() const
