@@ -62,7 +62,7 @@ namespace gazebo
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       private: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml,
+          Skeleton *_skeleton,
           const ignition::math::Matrix4d &_transform, Mesh *_mesh);
 
       /// \brief Load animations for a skeleton

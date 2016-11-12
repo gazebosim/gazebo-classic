@@ -9,5 +9,8 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+    <include>
+      <uri>model://solar_panel</uri>
+    </include>
   </world>
 </sdf>

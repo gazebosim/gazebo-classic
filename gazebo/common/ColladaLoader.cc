@@ -264,7 +264,19 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
       bindMatXml = bindMatXml->NextSiblingElement("bind_material");
     }
 
-    this->LoadController(contrXml, rootNodeXml, transform, _mesh);
+    // Do animations outside of controllers
+    auto skeleton = new Skeleton(this->LoadSkeletonNodes(rootNodeXml, nullptr));
+    _mesh->SetSkeleton(skeleton);
+
+    auto rootXml = contrXml->GetDocument()->RootElement();
+
+    if (rootXml->FirstChildElement("library_animations"))
+    {
+      this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
+          skeleton);
+    }
+
+    this->LoadController(contrXml, skeleton, transform, _mesh);
     instContrXml = instContrXml->NextSiblingElement("instance_controller");
   }
 }
@@ -334,18 +346,9 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadController(TiXmlElement *_contrXml,
-      TiXmlElement *_skelXml,
+      Skeleton *_skeleton,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, nullptr));
-  _mesh->SetSkeleton(skeleton);
-
-  TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
-
-  if (rootXml->FirstChildElement("library_animations"))
-    this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
-        skeleton);
-
   TiXmlElement *skinXml = _contrXml->FirstChildElement("skin");
   std::string geomURL = skinXml->Attribute("source");
 
@@ -361,7 +364,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
                 values[8], values[9], values[10], values[11],
                 values[12], values[13], values[14], values[15]);
 
-  skeleton->SetBindShapeTransform(bindTrans);
+  _skeleton->SetBindShapeTransform(bindTrans);
 
   TiXmlElement *jointsXml = skinXml->FirstChildElement("joints");
   std::string jointsURL, invBindMatURL;
@@ -427,7 +430,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
             ignition::math::parseFloat(strs[id + 14]),
             ignition::math::parseFloat(strs[id + 15]));
 
-    skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
+    _skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
   }
 
   TiXmlElement *vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
@@ -481,14 +484,14 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   for (unsigned int i = 0; i < vStrs.size(); ++i)
     v.push_back(ignition::math::parseInt(vStrs[i]));
 
-  skeleton->SetNumVertAttached(vCount.size());
+  _skeleton->SetNumVertAttached(vCount.size());
 
   unsigned int vIndex = 0;
   for (unsigned int i = 0; i < vCount.size(); ++i)
   {
     for (unsigned int j = 0; j < vCount[i]; ++j)
     {
-      skeleton->AddVertNodeWeight(i, joints[v[vIndex + jOffset]],
+      _skeleton->AddVertNodeWeight(i, joints[v[vIndex + jOffset]],
                                     weights[v[vIndex + wOffset]]);
       vIndex += (jOffset + wOffset + 1);
     }
@@ -558,9 +561,12 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
       int idx2 = -1;
 
       if (sep == '.')
+      {
         idx1 = (idxStr == "X") ? 0 : ((idxStr == "Y") ? 1 : ((idxStr == "Z")
             ? 2 : ((idxStr == "ANGLE") ? 3 : -1)));
+      }
       else
+      {
         if (sep == '(')
         {
           std::string idx1Str = idxStr.substr(0, 1);
@@ -571,27 +577,50 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
             idx2 = ignition::math::parseInt(idx2Str);
           }
         }
+      }
 
       TiXmlElement *frameTimesXml = nullptr;
       TiXmlElement *frameTransXml = nullptr;
 
       TiXmlElement *sampXml = this->GetElementId("sampler", sourceURL);
+      if (!sampXml)
+      {
+        gzwarn << "Malformed file: Missing sampler with URL [" << sourceURL <<
+            "]" << std::endl;
+        continue;
+      }
+
+      // FIXME: It looks like this loop only keeps the last input into
+      // frameTimesXml and skips the rest
       TiXmlElement *inputXml = sampXml->FirstChildElement("input");
       while (inputXml)
       {
         std::string semantic = inputXml->Attribute("semantic");
         if (semantic == "INPUT")
+        {
           frameTimesXml = this->GetElementId("source",
                               inputXml->Attribute("source"));
+        }
+        else if (semantic == "OUTPUT")
+        {
+          frameTransXml = this->GetElementId("source",
+                            inputXml->Attribute("source"));
+        }
         else
-          if (semantic == "OUTPUT")
-            frameTransXml = this->GetElementId("source",
-                              inputXml->Attribute("source"));
-        /// FIXME interpolation semantic?
+        {
+          gzwarn << "Semantic [" << semantic <<
+              "] not supported. See issue #" << std::endl;
+        }
 
         inputXml = inputXml->NextSiblingElement("input");
       }
+
       TiXmlElement *timeArray = frameTimesXml->FirstChildElement("float_array");
+      if (!timeArray)
+      {
+        gzwarn << "Malformed file: missing float_array" << std::endl;
+        continue;
+      }
       std::string timeStr = timeArray->GetText();
       std::vector<std::string> timeStrs;
       boost::split(timeStrs, timeStr, boost::is_any_of("   "));
@@ -601,6 +630,11 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
         times.push_back(ignition::math::parseFloat(timeStrs[i]));
 
       TiXmlElement *output = frameTransXml->FirstChildElement("float_array");
+      if (!output)
+      {
+        gzwarn << "Malformed file: missing float_array" << std::endl;
+        continue;
+      }
       std::string outputStr = output->GetText();
       std::vector<std::string> outputStrs;
       boost::split(outputStrs, outputStr, boost::is_any_of("   "));
@@ -619,8 +653,10 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
       for (unsigned int i = 0; i < times.size(); ++i)
       {
         if (animation[targetBone].find(times[i]) == animation[targetBone].end())
+        {
           animation[targetBone][times[i]] =
                       _skel->GetNodeById(targetBone)->GetTransforms();
+        }
 
         std::vector<NodeTransform> *frame = &animation[targetBone][times[i]];
 
