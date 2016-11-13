@@ -23,6 +23,12 @@ message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
+if(NOT EXISTS "$ENV{ENABLE_TESTS_COMPILATION}")
+ message(FATAL_ERROR "The parameter ENABLE_TESTS_COMPILATION is deprecated. "
+   "The new behaviour is to call 'make tests' explicitly to compile the test"
+   "suite. Calling 'make' or 'make all' won't compile the tests")
+endif()
+
 ########################################
 # Package Creation:
 include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
@@ -315,15 +321,19 @@ else (build_errors)
 
   if (BUILD_GAZEBO)
     set(TEST_TYPE "UNIT")
+    add_custom_target(tests)
+
     add_subdirectory(gazebo)
     add_subdirectory(media)
-    add_subdirectory(test)
+    add_subdirectory(test EXCLUDE_FROM_ALL)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
     add_subdirectory(worlds)
     add_subdirectory(models)
+
   endif (BUILD_GAZEBO)
+
 
   ########################################
   # Make the package config files

@@ -1,8 +1,8 @@
 Gazebo - A dynamic multi-robot simulator
----------------------------------------- 
+----------------------------------------
 
 This is the Gazebo simulator.  Gazebo simulates multiple robots in a
-3D environment, with extensive dynamic interaction between objects. 
+3D environment, with extensive dynamic interaction between objects.
 
   http://gazebosim.org
 
@@ -23,8 +23,6 @@ Gazebo cmake parameters available at configuring time:
    Use external copy of tinyxml during the build.
  - USE_EXTERNAL_TINYXML2 (bool) [default True]
    Use external copy of tinyxml2 during the build.
- - ENABLE_TESTS_COMPILATION (bool) [default True]
-   Enabled or disable the test suite compilation. 
  - USE_LOW_MEMORY_TEST (bool) [default False]
    Use reduced version of tests which need less quantity of RAM memory
    available.
@@ -38,9 +36,15 @@ Gazebo cmake parameters available at configuring time:
  - USE_PCH (bool) [default False]
    Use GNU Precompiled Headers. Only works with the gnu compiler
 
+ - ENABLE_TESTS_COMPILATION (DEPRECATED)
+   The new behaviour is to call 'make tests' explicitly to compile the test
+   suite. Calling 'make' or 'make all' won't compile the tests
+
+
 Uninstallation
 --------------
-Read the uninstallation instructions (http://gazebosim.org/uninstall)
-in the online manual for generic instructions.  For most people, the following sequence will suffice:
+Read the uninstallation instructions (http://gazebosim.org/uninstall) in the
+online manual for generic instructions.  For most people, the following
+sequence will suffice (might need sudo if it installed in /usr):
 
-  $ make uninstall (inside the gazebo-trunk/build directory)
+  $ make uninstall (inside the gazebo/build directory)

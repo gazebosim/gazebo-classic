@@ -34,7 +34,8 @@ macro (gz_build_tests)
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
+    add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
+	           ${GTEST_SOURCE_file}
                    ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     link_directories(${PROJECT_BINARY_DIR}/test)
@@ -70,8 +71,11 @@ macro (gz_build_tests)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
         --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
     endif()
+
+    add_dependencies(tests ${BINARY_NAME})
   endforeach()
 
+  add_dependencies(tests ${BINARY_NAME})
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
 endmacro()
 
@@ -90,7 +94,7 @@ if (VALID_DISPLAY)
      set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
      QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
 
-     add_executable(${BINARY_NAME}
+     add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
       ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
 
     add_dependencies(${BINARY_NAME}
@@ -136,12 +140,24 @@ if (VALID_DISPLAY)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
         --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
     endif()
+
+    add_dependencies(tests ${BINARY_NAME})
     endforeach()
+  endmacro()
+else()
+  # Fake macros when no valid display is found
+  macro (gz_build_display_tests)
+  endmacro()
+  macro (gz_build_qt_tests)
   endmacro()
 endif()
 
 if (VALID_DRI_DISPLAY)
   macro (gz_build_dri_tests)
     gz_build_tests(${ARGV})
+  endmacro()
+else()
+  # Fake macro when no valid DRI display is found
+  macro (gz_build_dri_tests)
   endmacro()
 endif()
