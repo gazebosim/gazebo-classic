@@ -23,7 +23,7 @@ message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
-if(NOT EXISTS "$ENV{ENABLE_TESTS_COMPILATION}")
+if(EXISTS "$ENV{ENABLE_TESTS_COMPILATION}")
  message(FATAL_ERROR "The parameter ENABLE_TESTS_COMPILATION is deprecated. "
    "The new behaviour is to call 'make tests' explicitly to compile the test"
    "suite. Calling 'make' or 'make all' won't compile the tests")
