@@ -80,26 +80,28 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
 
   if (_index == 0)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getRelativeTransform().inverse() *
         this->dataPtr->dtJoint->getTransformFromParentBodyNode();
-    Eigen::Vector3d axis = dtUniveralJoint->getAxis1();
+    Eigen::Vector3d axis = dtUniversalJoint->getAxis1();
 
     globalAxis = T.linear() * axis;
   }
   else if (_index == 1)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = dtUniveralJoint->getAxis2();
+    Eigen::Vector3d axis = dtUniversalJoint->getAxis2();
 
     globalAxis = T.linear() * axis;
   }
@@ -131,17 +133,19 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
 
   if (_index == 0)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
-    dtUniveralJoint->setAxis1(dtAxis);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
+    dtUniversalJoint->setAxis1(dtAxis);
   }
   else if (_index == 1)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
-    dtUniveralJoint->setAxis2(dtAxis);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
+    dtUniversalJoint->setAxis2(dtAxis);
   }
   else
   {

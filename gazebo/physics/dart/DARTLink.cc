@@ -32,6 +32,8 @@
 
 #include "gazebo/physics/dart/DARTLinkPrivate.hh"
 
+#include <algorithm>
+
 using namespace gazebo;
 using namespace physics;
 
@@ -266,7 +268,9 @@ void DARTLink::Init()
   hackAvgMu1 /= static_cast<double>(numCollisions);
   hackAvgMu2 /= static_cast<double>(numCollisions);
 
-  this->dataPtr->dtBodyNode->setFrictionCoeff(0.5 * (hackAvgMu1 + hackAvgMu2));
+  float coeff = 0.5 * (hackAvgMu1 + hackAvgMu2);
+  coeff = std::min(0.0f,coeff);
+  this->dataPtr->dtBodyNode->setFrictionCoeff(coeff);
 
   // We don't add dart body node to the skeleton here because dart body node
   // should be set its parent joint before being added. This body node will be

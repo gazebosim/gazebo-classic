@@ -83,8 +83,9 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(unsigned int _index) const
   if (_index == 0)
   {
     dart::dynamics::RevoluteJoint *dtRevoluteJoint =
-        reinterpret_cast<dart::dynamics::RevoluteJoint *>(
+        dynamic_cast<dart::dynamics::RevoluteJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtRevoluteJoint, "RevoluteJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
@@ -110,11 +111,18 @@ void DARTHingeJoint::SetAxis(unsigned int _index, const math::Vector3& _axis)
     return;
   }
 
+  if (!this->dataPtr->dtJoint)
+  {
+    gzerr << " No Joint set \n";
+    return;
+  }
+
   if (_index == 0)
   {
     dart::dynamics::RevoluteJoint *dtRevoluteJoint =
-        reinterpret_cast<dart::dynamics::RevoluteJoint *>(
+        dynamic_cast<dart::dynamics::RevoluteJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtRevoluteJoint, "RevoluteJoint is NULL");
 
     Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
         this->GetAxisFrameOffset(0).RotateVector(_axis));

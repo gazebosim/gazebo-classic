@@ -93,7 +93,8 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
   if (_index < this->GetAngleCount())
   {
     dart::dynamics::ScrewJoint *dtScrewJoint =
-        reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+        dynamic_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+    GZ_ASSERT(dtScrewJoint, "ScrewJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
@@ -125,7 +126,8 @@ void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   if (_index < this->GetAngleCount())
   {
     dart::dynamics::ScrewJoint *dtScrewJoint =
-        reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+        dynamic_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+    GZ_ASSERT(dtScrewJoint, "ScrewJoint is NULL");
 
     // TODO: Issue #494
     // See: https://bitbucket.org/osrf/gazebo/issue/494
@@ -206,7 +208,8 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
   }
 
   dart::dynamics::ScrewJoint *dtScrewJoint =
-      reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+      dynamic_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+  GZ_ASSERT(dtScrewJoint, "ScrewJoint is NULL");
 
   this->threadPitch = _threadPitch;
   dtScrewJoint->setPitch(DARTTypes::InvertThreadPitch(_threadPitch));
@@ -226,13 +229,14 @@ double DARTScrewJoint::GetThreadPitch()
 {
   GZ_ASSERT(
     !this->dataPtr->IsInitialized() ||
-    (std::abs(reinterpret_cast<dart::dynamics::ScrewJoint *>(
+    (std::abs(dynamic_cast<dart::dynamics::ScrewJoint *>(
       this->dataPtr->dtJoint)->getPitch() -
       DARTTypes::InvertThreadPitch(this->threadPitch)) < 1e-6),
     "Gazebo and DART disagree in thread pitch.");
 
   dart::dynamics::ScrewJoint *dtScrewJoint =
-      reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+      dynamic_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+  GZ_ASSERT(dtScrewJoint, "ScrewJoint is NULL");
 
   double result = this->threadPitch;
   if (dtScrewJoint)

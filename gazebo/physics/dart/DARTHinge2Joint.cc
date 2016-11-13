@@ -83,9 +83,11 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 
   if (_index == 0)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
+
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     // TODO: Issue #494
     // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
@@ -93,21 +95,21 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
         = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
 
-    dtUniveralJoint->setAxis1(dartAxis);
+    dtUniversalJoint->setAxis1(dartAxis);
   }
   else if (_index == 1)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
-
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
     // TODO: Issue #494
     // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
 
-    dtUniveralJoint->setAxis2(dartAxis);
+    dtUniversalJoint->setAxis2(dartAxis);
   }
   else
   {
@@ -128,26 +130,28 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
 
   if (_index == 0)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getRelativeTransform().inverse() *
         this->dataPtr->dtJoint->getTransformFromParentBodyNode();
-    Eigen::Vector3d axis = dtUniveralJoint->getAxis1();
+    Eigen::Vector3d axis = dtUniversalJoint->getAxis1();
 
     globalAxis = T.linear() * axis;
   }
   else if (_index == 1)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = dtUniveralJoint->getAxis2();
+    Eigen::Vector3d axis = dtUniversalJoint->getAxis2();
 
     globalAxis = T.linear() * axis;
   }

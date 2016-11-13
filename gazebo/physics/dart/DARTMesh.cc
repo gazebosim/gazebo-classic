@@ -28,30 +28,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor of aiScene is missing so we define it here. This is temporary
-// workaround. For further discussion, please see:
-// https://github.com/dartsim/dart/issues/451
-// https://github.com/dartsim/dart/issues/452
-// https://github.com/dartsim/dart/issues/453
-aiScene::aiScene()
-{
-  mFlags = 0;
-  mRootNode = nullptr;
-  mNumMeshes = 0;
-  mMeshes = nullptr;
-  mNumMaterials = 0;
-  mMaterials = nullptr;
-  mNumAnimations = 0;
-  mAnimations = nullptr;
-  mNumTextures = 0;
-  mTextures = nullptr;
-  mNumLights = 0;
-  mLights = nullptr;
-  mNumCameras = 0;
-  mCameras = nullptr;
-}
-
-//////////////////////////////////////////////////
 DARTMesh::DARTMesh() : dataPtr(new DARTMeshPrivate())
 {
 }
@@ -117,6 +93,7 @@ void DARTMesh::CreateMesh(float *_vertices, int *_indices,
   assimpScene->mNumMeshes = 1;
   assimpScene->mMeshes = new aiMesh*[1];
   assimpScene->mMeshes[0] = assimpMesh;
+  assimpScene->mRootNode = new aiNode();
 
   // Set _vertices and normals
   assimpMesh->mNumVertices = _numVertices;

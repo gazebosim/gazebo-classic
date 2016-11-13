@@ -83,8 +83,9 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
   if (_index == 0)
   {
     dart::dynamics::PrismaticJoint *dtPrismaticJoint =
-        reinterpret_cast<dart::dynamics::PrismaticJoint *>(
+        dynamic_cast<dart::dynamics::PrismaticJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtPrismaticJoint, "PrismaticJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
@@ -113,8 +114,9 @@ void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   if (_index == 0)
   {
     dart::dynamics::PrismaticJoint *dtPrismaticJoint =
-        reinterpret_cast<dart::dynamics::PrismaticJoint *>(
+        dynamic_cast<dart::dynamics::PrismaticJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtPrismaticJoint, "PrismaticJoint is NULL");
 
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(
         this->GetAxisFrameOffset(0).RotateVector(_axis));
