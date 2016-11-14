@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -300,7 +302,7 @@ void DARTLink::OnPoseChange()
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache("DARTLink::OnPoseChange",
-                         boost::bind(&DARTLink::OnPoseChange, this));
+                         std::bind(&DARTLink::OnPoseChange, this));
     return;
   }
 
@@ -359,7 +361,7 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache("WorldLinearVel",
-                         boost::bind(&DARTLink::SetLinearVel, this, _vel),
+                         std::bind(&DARTLink::SetLinearVel, this, _vel),
                          _vel);
     return;
   }
@@ -426,7 +428,7 @@ void DARTLink::SetAngularVel(const math::Vector3 &_vel)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache("WorldAngularVel",
-                         boost::bind(&DARTLink::SetAngularVel, this, _vel),
+                         std::bind(&DARTLink::SetAngularVel, this, _vel),
                          _vel);
     return;
   }
@@ -497,7 +499,7 @@ void DARTLink::SetForce(const math::Vector3 &_force)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
-          "Force", boost::bind(&DARTLink::SetForce, this, _force));
+          "Force", std::bind(&DARTLink::SetForce, this, _force));
     return;
   }
 
@@ -511,7 +513,7 @@ void DARTLink::SetTorque(const math::Vector3 &_torque)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
-          "Torque", boost::bind(&DARTLink::SetTorque, this, _torque));
+          "Torque", std::bind(&DARTLink::SetTorque, this, _torque));
     return;
   }
 
@@ -525,7 +527,7 @@ void DARTLink::AddForce(const math::Vector3 &_force)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
-          "Force", boost::bind(&DARTLink::AddForce, this, _force));
+          "Force", std::bind(&DARTLink::AddForce, this, _force));
     return;
   }
 
@@ -539,7 +541,7 @@ void DARTLink::AddRelativeForce(const math::Vector3 &_force)
   {
     this->dataPtr->Cache(
           "RelativeForce",
-          boost::bind(&DARTLink::AddRelativeForce, this, _force));
+          std::bind(&DARTLink::AddRelativeForce, this, _force));
     return;
   }
 
@@ -556,7 +558,7 @@ void DARTLink::AddForceAtWorldPosition(const math::Vector3 &_force,
   {
     this->dataPtr->Cache(
           "ForceAtWorldPosition",
-          boost::bind(&DARTLink::AddForceAtWorldPosition, this, _force, _pos));
+          std::bind(&DARTLink::AddForceAtWorldPosition, this, _force, _pos));
     return;
   }
 
@@ -573,7 +575,7 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
   {
     this->dataPtr->Cache(
           "ForceAtRelativePosition",
-          boost::bind(
+          std::bind(
             &DARTLink::AddForceAtRelativePosition, this, _force, _relpos));
     return;
   }
@@ -597,7 +599,7 @@ void DARTLink::AddTorque(const math::Vector3 &_torque)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
-          "Torque", boost::bind(&DARTLink::AddTorque, this, _torque));
+          "Torque", std::bind(&DARTLink::AddTorque, this, _torque));
     return;
   }
 
@@ -611,7 +613,7 @@ void DARTLink::AddRelativeTorque(const math::Vector3 &_torque)
   {
     this->dataPtr->Cache(
           "RelativeTorque",
-          boost::bind(&DARTLink::AddRelativeTorque, this, _torque));
+          std::bind(&DARTLink::AddRelativeTorque, this, _torque));
     return;
   }
 
@@ -709,7 +711,7 @@ void DARTLink::SetGravityMode(bool _mode)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
-          "GravityMode", boost::bind(&DARTLink::SetGravityMode, this, _mode));
+          "GravityMode", std::bind(&DARTLink::SetGravityMode, this, _mode));
     return;
   }
 
@@ -736,7 +738,7 @@ void DARTLink::SetSelfCollide(bool _collide)
   {
     this->dataPtr->Cache(
           "SelfCollide",
-          boost::bind(&DARTLink::SetSelfCollide, this, _collide));
+          std::bind(&DARTLink::SetSelfCollide, this, _collide));
     return;
   }
 
@@ -888,7 +890,7 @@ void DARTLink::SetLinkStatic(bool _static)
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
-          "LinkStatic", boost::bind(&DARTLink::SetLinkStatic, this, _static));
+          "LinkStatic", std::bind(&DARTLink::SetLinkStatic, this, _static));
     return;
   }
 
@@ -922,7 +924,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
   {
     this->dataPtr->Cache(
           "DirtyPoseFromDARTTransformation",
-          boost::bind(&DARTLink::updateDirtyPoseFromDARTTransformation, this));
+          std::bind(&DARTLink::updateDirtyPoseFromDARTTransformation, this));
     return;
   }
 
