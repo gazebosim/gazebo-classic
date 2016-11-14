@@ -164,7 +164,7 @@ namespace gazebo
       /// \return Pointer to the DART World.
       /// \deprecated See dart::simulation::WorldPtr DARTWorld(void) const
       public: dart::simulation::World *GetDARTWorld(void) const
-              DEPRECATED(8.0);
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get pointer to DART World associated with this link.
       /// \return Pointer to the DART World.
