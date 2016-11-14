@@ -52,6 +52,7 @@ if (WIN32)
 endif()
 
 target_link_libraries(gz
+ libgazebo_client
  gazebo_gui
  gazebo_physics
  gazebo_sensors
