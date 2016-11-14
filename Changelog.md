@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Support version 5 of the DART Physics Engine.
+    * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
+
 1. UserCamera overrides `Camera::Render` to reduce CPU usage.
     * [Pull request 2480](https://bitbucket.org/osrf/gazebo/pull-request/2480)
 
