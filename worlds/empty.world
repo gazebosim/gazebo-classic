@@ -9,5 +9,16 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+    <model name="ploty">
+      <include>
+        <uri>model://double_pendulum_with_base</uri>
+      </include>
+      <plugin name='3dplot' filename='libLinkPlot3DPlugin.so'>
+        <frequency>100</frequency>
+
+        <plot link="double_pendulum_with_base::upper_link" pose="0 0 1 0 0 0" material="Gazebo/Red"/>
+        <plot link="double_pendulum_with_base::lower_link" pose="0 0 1 0 0 0" material="Gazebo/Blue"/>
+      </plugin>
+    </model>
   </world>
 </sdf>
