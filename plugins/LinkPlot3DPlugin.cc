@@ -92,6 +92,9 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
       ignition::msgs::Set(markerMsg.mutable_scale(),
           ignition::math::Vector3d(0.01, 0.01, 0.01));
 
+      auto timeMsg = markerMsg.mutable_lifetime();
+      timeMsg->set_sec(1);
+
       plot.msg = markerMsg;
 
       this->plots.push_back(plot);
