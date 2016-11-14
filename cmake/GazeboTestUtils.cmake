@@ -35,7 +35,7 @@ macro (gz_build_tests)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
     add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
-	           ${GTEST_SOURCE_file}
+                   ${GTEST_SOURCE_file}
                    ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     link_directories(${PROJECT_BINARY_DIR}/test)
