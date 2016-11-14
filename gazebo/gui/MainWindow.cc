@@ -367,8 +367,16 @@ void MainWindow::Init()
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
+  std::string service("/gui/info/plugin");
+  if (!this->dataPtr->ignNode.Advertise(service,
+    &MainWindow::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
+  }
+
   gui::Events::mainWindowReady();
 }
+
 
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
@@ -2075,7 +2083,6 @@ void MainWindow::OnAddPlugins()
       }
     }
   }
-  this->dataPtr->pluginMsgs.clear();
 
   g_overlayAct->setChecked(true);
   g_overlayAct->setEnabled(true);
@@ -2433,4 +2440,102 @@ void MainWindow::OnWindowMode(const std::string &_mode)
 
   // User commands
   this->dataPtr->userCmdHistory->SetActive(simulation);
+}
+
+//////////////////////////////////////////////////
+void MainWindow::PluginInfoService(const ignition::msgs::StringMsg &_req,
+  ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  this->PluginInfo(_req.data(), _plugins, _success);
+}
+
+//////////////////////////////////////////////////
+void MainWindow::PluginInfo(const common::URI &_pluginUri,
+  ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  _plugins.clear_plugins();
+  _success = false;
+
+  if (!_pluginUri.Valid())
+  {
+    gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
+    return;
+  }
+
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
+  auto myParts = common::split("/gui/gzclient/", "/");
+
+  // Plugin URI should be longer than GUI URI
+  if (myParts.size() >= parts.size())
+  {
+    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match GUI"
+        << "[/gui/gzclient/]" << std::endl;
+    return;
+  }
+
+  // Check if all segments match up to this GUI
+  size_t i = 0;
+  for ( ; i < myParts.size(); ++i)
+  {
+    if (parts[i] != myParts[i])
+    {
+      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match GUI"
+          << "[/gui/gzclient/]" << std::endl;
+      return;
+    }
+  }
+  for (; i < parts.size(); i = i+2)
+  {
+    // Look for plugins
+    if (parts[i] == "plugin")
+    {
+      // Return empty vector
+      if (this->dataPtr->pluginMsgs.size() <= 0)
+      {
+        _success = true;
+        return;
+      }
+
+      // Find correct plugin
+      for (auto iter = this->dataPtr->pluginMsgs.begin();
+        iter != this->dataPtr->pluginMsgs.end(); ++iter)
+        {
+          auto pluginName = (*iter)->name();
+
+        // If asking for a specific plugin, skip all other plugins
+        if (i+1 < parts.size() && parts[i+1] != pluginName)
+        {
+          continue;
+        }
+
+        // Get plugin info from pluginMsgs
+        auto pluginMsg = _plugins.add_plugins();
+
+        // Get plugin info from pluginMsgs
+        pluginMsg->set_name((*iter)->name());
+        pluginMsg->set_filename((*iter)->filename());
+        pluginMsg->set_innerxml((*iter)->innerxml());
+      }
+
+      // If asking for a specific plugin and it wasn't found
+      if (i+1 < parts.size() && _plugins.plugins_size() == 0)
+      {
+        gzwarn << "Plugin [" << parts[i+1] << "] not found in GUI"
+            << "[/gui/gzclient/]" << std::endl;
+        _success = false;
+        return;
+      }
+      _success = true;
+      return;
+    }
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
+  }
+
+  gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+      << std::endl;
 }

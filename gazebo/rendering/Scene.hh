@@ -29,6 +29,9 @@
 
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/visual_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
@@ -39,6 +42,9 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/common/URI.hh"
+
+#include <ignition/msgs/stringmsg.pb.h>
 
 namespace SkyX
 {
@@ -611,6 +617,39 @@ namespace gazebo
       /// \deprecated See ShowClouds()
       public: bool GetShowClouds() const GAZEBO_DEPRECATED(7.0);
 
+      /// \brief Get plugin from one of the visuals
+      /// according to the given _pluginUri. Some _pluginUri examples:
+      ///
+      /// * Info about a specific visual plugin in this scene:
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/visual/<visual_name>/plugin/<plugin_name>
+      ///
+      /// * Info about all visual plugins in this scene (empty plugin name):
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/visual/<visual_name>/plugin/
+      ///
+      ///
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfoService
+      public: void PluginInfo(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
+      /// \brief Get visual properties acording to
+      /// the given _visualUri. Some _visualUri examples:
+      ///
+      /// * Info about a specific visual:
+      ///    data://world/<this_name>/model/<model_name>/link/
+      ///    <link_name>/visual/<visual_name>
+      ///
+      /// \param[in] _visualUri URI for the desired visual properties.
+      /// \param[out] _visuals Message containing vector of visuals.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa VisualInfoService
+      public: void VisualInfo(const common::URI _visualUri,
+          ignition::msgs::Visual_V &_visuals, bool &_success);
+
       /// \brief Get whether or not clouds are displayed.
       /// \return True if clouds are displayed.
       public: bool ShowClouds() const;
@@ -822,6 +861,22 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
           VisualPtr _linkVisual);
+
+      /// \brief Callback for "rendering/info/plugin" service.
+      /// \param[in] _request Request containing plugin URI.
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa PluginInfo
+      private: void PluginInfoService(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
+      /// \brief Callback for "rendering/info/visual" service.
+      /// \param[in] _request Request containing visual URI.
+      /// \param[out] _visuals Message containing vector of visuals.
+      /// \param[out] _success True if the info was successfully obtained.
+      /// \sa VisualInfo
+      private: void VisualInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Visual_V &_visuals, bool &_success);
 
       /// \brief Create a new link frame visual.
       /// \param[in] _msg Message containing the link data.

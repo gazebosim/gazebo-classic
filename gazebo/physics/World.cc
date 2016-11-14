@@ -62,6 +62,8 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+
+#include "gazebo/util/IgnMsgSdf.hh"
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/IntrospectionManager.hh"
@@ -87,6 +89,7 @@
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Population.hh"
+
 
 using namespace gazebo;
 using namespace physics;
@@ -2948,7 +2951,7 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
   }
 
   // Check if all segments match up to this world
-  size_t i =0;
+  size_t i = 0;
   for ( ; i < myParts.size(); ++i)
   {
     if (parts[i] != myParts[i])
@@ -2976,7 +2979,48 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
       model->PluginInfo(pluginUri, _plugins, _success);
       return;
     }
-    // TODO: Handle world plugins
+    // Return specific plugin or in case there is no plugin name
+    // return all plugins
+    else if (parts[i] == "plugin")
+    {
+      // Return empty vector
+      if (!this->dataPtr->sdf->HasElement("plugin"))
+      {
+        _success = true;
+        return;
+      }
+
+      // Find correct plugin
+      sdf::ElementPtr pluginElem = this->dataPtr->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        auto pluginName = pluginElem->Get<std::string>("name");
+
+        // If asking for a specific plugin, skip all other plugins
+        if (i+1 < parts.size() && parts[i+1] != pluginName)
+        {
+          pluginElem = pluginElem->GetNextElement("plugin");
+          continue;
+        }
+
+        // Get plugin info from SDF
+        auto pluginMsg = _plugins.add_plugins();
+        pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
+
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+
+      // If asking for a specific plugin and it wasn't found
+      if (i+1 < parts.size() && _plugins.plugins_size() == 0)
+      {
+        gzwarn << "Plugin [" << parts[i+1] << "] not found in world [" <<
+            this->URI().Str() << "]" << std::endl;
+        _success = false;
+        return;
+      }
+      _success = true;
+      return;
+    }
     else
     {
       gzwarn << "Segment [" << parts[i] << "] in [" << pluginUri.Str() <<

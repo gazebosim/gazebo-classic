@@ -1414,4 +1414,3 @@ namespace gazebo
     }
   }
 }
-

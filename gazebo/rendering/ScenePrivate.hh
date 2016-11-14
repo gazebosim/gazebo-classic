@@ -26,6 +26,7 @@
 #include <boost/unordered/unordered_map.hpp>
 
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/gazebo_config.h"
@@ -339,6 +340,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
     };
   }
 }

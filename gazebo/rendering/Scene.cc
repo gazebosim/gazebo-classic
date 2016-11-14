@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/msgs/Utility.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -27,6 +28,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -72,6 +75,7 @@
 
 #include "gazebo/rendering/ScenePrivate.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/util/IgnMsgSdf.hh"
 
 #ifdef HAVE_OCULUS
 #include "gazebo/rendering/OculusCamera.hh"
@@ -316,6 +320,20 @@ void Scene::Load()
   this->dataPtr->manager->addRenderQueueListener(
       RenderEngine::Instance()->OverlaySystem());
 #endif
+
+  std::string service("/rendering/info/visual");
+  if (!this->dataPtr->ignNode.Advertise(service,
+      &Scene::VisualInfoService, this))
+  {
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
+  }
+
+  std::string pluginService("/rendering/info/plugin");
+  if (!this->dataPtr->ignNode.Advertise(pluginService,
+      &Scene::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << pluginService << "]" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -3611,4 +3629,156 @@ void Scene::ToggleLayer(const int32_t _layer)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+//////////////////////////////////////////////////
+void Scene::VisualInfoService(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::Visual_V &_visuals, bool &_success)
+{
+  this->VisualInfo(_req.data(), _visuals, _success);
+}
+
+//////////////////////////////////////////////////
+void Scene::VisualInfo(const common::URI _visualUri,
+    ignition::msgs::Visual_V &_visuals, bool &_success)
+{
+  _visuals.clear_visuals();
+  _success = false;
+
+  if (!_visualUri.Valid())
+  {
+    gzwarn << "URI [" << _visualUri.Str() << "] is not valid." << std::endl;
+    return;
+  }
+
+  auto parts = common::split(_visualUri.Path().Str(), "/");
+
+  for (size_t i = 0; i < parts.size(); i = i+2)
+  {
+    // See if there is a visual
+    if (parts[i] == "visual")
+    {
+      // Find correct visual
+      for (auto vis : this->dataPtr->visuals)
+      {
+        // Skip visuals not of visual type
+        if (vis.second->GetType() != Visual::VT_VISUAL)
+          continue;
+
+        auto visName = vis.second->GetName();
+
+        // If asking for a specific visual, skip all other visuals
+        // \todo: This is using the visual's scoped name. Change this to URI.
+        if (i+1 < parts.size() && parts[i+1] != visName)
+        {
+          continue;
+        }
+
+        // Add properties
+        auto visualMsg = _visuals.add_visuals();
+        visualMsg->CopyFrom(util::Convert<ignition::msgs::Visual>(
+            vis.second->GetSDF()));
+      }
+    }
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << _visualUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
+  }
+
+  _success = true;
+}
+
+//////////////////////////////////////////////////
+void Scene::PluginInfoService(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  this->PluginInfo(_req.data(), _plugins, _success);
+}
+
+//////////////////////////////////////////////////
+void Scene::PluginInfo(const common::URI &_pluginUri,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  _plugins.clear_plugins();
+  _success = false;
+
+  if (!_pluginUri.Valid())
+  {
+    gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
+    return;
+  }
+
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
+
+  // \todo Checking specific positions in the URI because we're using
+  // scoped names. Once we support full URI, the logic needs to change
+  // to take nested models into account.
+
+  if (parts.size() < 3 || parts[0] != "visual" || parts[2] != "plugin")
+  {
+    gzwarn << "URI [" << _pluginUri.Str() <<
+        "] doesn't correspond to a visual plugin." << std::endl;
+    _success = false;
+    return;
+  }
+
+  // Find correct visual
+  for (auto vis : this->dataPtr->visuals)
+  {
+    // Skip visuals not of visual type
+    if (vis.second->GetType() != Visual::VT_VISUAL)
+      continue;
+
+    // \todo: This is using the visual's scoped name. Change this to URI.
+    auto visName = vis.second->GetName();
+
+    // Skip if visual is different
+    if (parts[1] != visName)
+      continue;
+
+    if (vis.second->GetSDF()->HasElement("plugin"))
+    {
+      // Insert each plugin
+      auto pluginElem = vis.second->GetSDF()->GetElement("plugin");
+      while (pluginElem)
+      {
+        auto pluginName = pluginElem->Get<std::string>("name");
+
+        // If asking for a specific plugin, skip all other plugins
+        if (parts.size() > 3 && parts[3] != pluginName)
+        {
+          pluginElem = pluginElem->GetNextElement("plugin");
+          continue;
+        }
+
+        // Get plugin info from SDF
+        auto pluginMsg = _plugins.add_plugins();
+        pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(
+            pluginElem));
+
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+    }
+
+    // If asking for a specific plugin and it wasn't found
+    if (parts.size() > 3 && _plugins.plugins_size() == 0)
+    {
+      gzwarn << "Plugin [" << parts[3] << "] not found in visual [" <<
+          parts[1] << "]" << std::endl;
+      _success = false;
+      return;
+    }
+
+    // No need to keep checking other visuals
+    _success = true;
+    return;
+  }
+
+  gzwarn << "Could not find visual [" << parts[1] << "]" << std::endl;
+
+  _success = false;
+  return;
 }

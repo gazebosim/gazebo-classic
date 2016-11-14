@@ -11,6 +11,7 @@ import "contactsensor.proto";
 import "logical_camera_sensor.proto";
 import "gps_sensor.proto";
 import "imu_sensor.proto";
+import "plugin.proto";
 
 message Sensor
 {
@@ -64,4 +65,7 @@ message Sensor
 
   /// \brief Description of an IMU sensor
   optional IMUSensor imu          = 16;
+
+  /// \brief An array of plugins.
+  repeated Plugin plugin       = 17;
 }

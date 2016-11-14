@@ -159,6 +159,181 @@ TEST_F(SensorManager_TEST, InitRemove)
   printf("Done done\n");
 }
 
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, SensorInfo)
+{
+  this->Load("worlds/depth_camera.world", true);
+
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+  ASSERT_TRUE(mgr != nullptr);
+
+  ignition::msgs::Sensor_V sensors;
+  bool success;
+  common::URI sensorUri;
+
+  gzmsg << "Get an existing sensor" << std::endl;
+  {
+    sensorUri.Parse(
+        "data://world/default/model/camera_model/link/my_link/sensor/camera");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(sensors.sensors_size(), 1);
+    EXPECT_EQ(sensors.sensors(0).name(), "camera");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, PluginInfo)
+{
+  this->Load("worlds/depth_camera.world", true);
+
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+  ASSERT_TRUE(mgr != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get an existing plugin" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/camera_model/"
+      "link/my_link/sensor/camera/plugin/depth_camera_plugin");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "depth_camera_plugin");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, PluginInfoFailures)
+{
+  this->Load("worlds/magnetometer.world", true);
+
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  gazebo::common::URI pluginUri;
+
+  gzmsg << "Sensor has no plugins" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/magnetometerModel/link/link/sensor/"
+        "magnetometer/plugin");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 0);
+  }
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/wrong/model/magnetometerModel/link/link/sensor/"
+        "magnetometer/plugin");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = gazebo::common::URI("tell me about your plugins");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/wrong/model/magnetometerModel/link/link/sensor/"
+        "magnetometer");
+    mgr->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(SensorManager_TEST, SensorInfoFailures)
+{
+  this->Load("worlds/shapes.world", true);
+
+  // Get the SensorManager instance
+  auto mgr = sensors::SensorManager::Instance();
+
+  ignition::msgs::Sensor_V sensors;
+  bool success;
+  gazebo::common::URI sensorUri;
+
+  gzmsg << "Link has no sensors" << std::endl;
+  {
+    sensorUri.Parse(
+        "data://world/default/model/box/link/link/sensor/");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(sensors.sensors_size(), 0);
+  }
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    sensorUri.Parse(
+        "data://world/wrong/model/box/link/link/sensor/");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong model" << std::endl;
+  {
+    sensorUri.Parse(
+        "data://world/default/model/wrong/link/link/sensor/");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    sensorUri = gazebo::common::URI("tell me about your sensors");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    sensorUri.Parse("data://world/default/model/box/link/link/visual/visual/");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    sensorUri.Parse("data://world/default/model/box/link/link");
+    mgr->SensorInfo(sensorUri, sensors, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

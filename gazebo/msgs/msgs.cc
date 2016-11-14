@@ -1822,6 +1822,18 @@ namespace gazebo
           << std::endl;
       }
 
+      if (_sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          auto pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
+      }
+
       return result;
     }
 
@@ -2424,6 +2436,7 @@ namespace gazebo
           distortionElem->GetElement("p2")->Set(distortionMsg.p2());
         }
       }
+
       return cameraSDF;
     }
 

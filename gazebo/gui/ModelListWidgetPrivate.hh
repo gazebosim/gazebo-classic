@@ -110,6 +110,12 @@ namespace gazebo
       /// \brief Keep latest plugin message.
       public: ignition::msgs::Plugin pluginMsg;
 
+      /// \brief Keep latest visual message.
+      public: ignition::msgs::Visual visualMsg;
+
+      /// \brief Keep latest sensor message.
+      public: ignition::msgs::Sensor sensorMsg;
+
       public: msgs::Physics physicsMsg;
       public: msgs::Wind windMsg;
 
@@ -132,6 +138,9 @@ namespace gazebo
 
       /// \brief Node for ignition transport communication.
       public: ignition::transport::Node ignNode;
+
+      /// \brief Indicated if GUI plugin request message is sent.
+      public: bool guiInfoRequested;
     };
   }
 }

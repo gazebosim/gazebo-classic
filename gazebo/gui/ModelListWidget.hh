@@ -25,6 +25,9 @@
 
 #include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
+ #include <ignition/msgs/sensor_v.pb.h>
+ #include <ignition/msgs/visual_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
@@ -139,7 +142,18 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Surface &_msg,
                                      QtProperty *_parent);
 
-      private: void FillPropertyTree(const msgs::Visual &_msg,
+      /// \brief Fill the property tree with sensor info.
+      /// \param[in] _msg The plugin message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const ignition::msgs::Sensor &_msg,
+                                     QtProperty *_parent);
+
+      /// \brief Fill the property tree with visual info.
+      /// \param[in] _msg The plugin message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const ignition::msgs::Visual &_msg,
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Geometry &_msg,
@@ -235,6 +249,30 @@ namespace gazebo
       /// \param[in] _plugins Vector of plugins.
       /// \param[in] _success True if the info was successfully received.
       private: void OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
+
+      /// \brief Callback when sensor info is received.
+      /// \param[in] _plugins Vector of sensors.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnSensorInfo(const ignition::msgs::Sensor_V &_sensors,
+          const bool _success);
+
+      /// \brief Callback when visual info is received.
+      /// \param[in] _plugins Vector of visuals.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnVisualInfo(const ignition::msgs::Visual_V &_visuals,
+          const bool _success);
+
+      /// \brief Callback when GUI plugin list is received.
+      /// \param[in] _plugins Vector of plugins.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnGUIPluginList(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
+
+      /// \brief Callback when plugin list is received.
+      /// \param[in] _plugins Vector of plugins.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnWorldPluginList(const ignition::msgs::Plugin_V &_plugins,
           const bool _success);
 
       /// \internal

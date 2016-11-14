@@ -348,6 +348,262 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(newBoxLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
 }
 
+//////////////////////////////////////////////////
+TEST_F(Scene_TEST, VisualInfo)
+{
+  this->Load("worlds/shapes.world");
+
+  // FIXME need a camera otherwise visuals are never spawned
+  {
+    ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+    std::string cameraName = "test_camera";
+    this->SpawnCamera("test_camera_model", cameraName,
+        cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+  }
+
+  auto scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  ignition::msgs::Visual_V visuals;
+  bool success;
+  common::URI visualUri;
+
+  // Wait until visuals are loaded
+  std::string visScoped("box::link::visual");
+  int sleep = 0;
+  int maxSleep = 30;
+  while (sleep < maxSleep && !scene->GetVisual(visScoped))
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_TRUE(scene->GetVisual(visScoped) != nullptr);
+
+  gzmsg << "Get an existing visual" << std::endl;
+  {
+    visualUri.Parse("data://visual/" + visScoped);
+    scene->VisualInfo(visualUri, visuals, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(visuals.visuals_size(), 1);
+    EXPECT_EQ(visuals.visuals(0).name(), visScoped);
+  }
+
+  gzmsg << "Get all visuals" << std::endl;
+  {
+    visualUri.Parse("data://visual/");
+    scene->VisualInfo(visualUri, visuals, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(visuals.visuals_size(), 4);
+    EXPECT_EQ(visuals.visuals(0).name(), "ground_plane::link::visual");
+    EXPECT_EQ(visuals.visuals(1).name(), "box::link::visual");
+    EXPECT_EQ(visuals.visuals(2).name(), "sphere::link::visual");
+    EXPECT_EQ(visuals.visuals(3).name(), "cylinder::link::visual");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(Scene_TEST, VisualInfoFailures)
+{
+  this->Load("worlds/shapes.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("box");
+  ASSERT_TRUE(model != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse("data://world/wrong/model/box/link/link/visual/visual/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong model" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/wrong/link/link/visual/visual/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong visual" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual/wrong");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = common::URI("tell me about your plugins");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Inexistent nested model" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/box/model/box_in_a_box/link/link/visual/visual");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(Scene_TEST, PluginInfo)
+{
+  this->Load("worlds/blink_visual.world", true);
+
+  // FIXME need a camera otherwise visuals are never spawned
+  {
+    ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
+    std::string cameraName = "test_camera";
+    this->SpawnCamera("test_camera_model", cameraName,
+        cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+  }
+
+  auto scene = rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  // Wait until visuals are loaded
+  std::string visScoped("box_sim::link::visual");
+  int sleep = 0;
+  int maxSleep = 30;
+  while (sleep < maxSleep && !scene->GetVisual(visScoped))
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_TRUE(scene->GetVisual(visScoped) != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Get an existing plugin" << std::endl;
+  {
+    std::string pluginStr(visScoped + "/plugin/blink");
+    pluginUri.Parse("data://visual/" + pluginStr);
+    scene->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "blink");
+  }
+
+  gzmsg << "Get all plugins for a visual" << std::endl;
+  {
+    std::string pluginStr(visScoped + "/plugin/");
+    pluginUri.Parse("data://visual/" + pluginStr);
+    scene->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 1);
+    EXPECT_EQ(plugins.plugins(0).name(), "blink");
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(Scene_TEST, PluginInfoFailures)
+{
+  this->Load("worlds/shapes.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("box");
+  ASSERT_TRUE(model != nullptr);
+
+  ignition::msgs::Plugin_V plugins;
+  bool success;
+  common::URI pluginUri;
+
+  gzmsg << "Visual has no plugins" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual/visual/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_TRUE(success);
+    EXPECT_EQ(plugins.plugins_size(), 0);
+  }
+
+  gzmsg << "Wrong world" << std::endl;
+  {
+    pluginUri.Parse("data://world/wrong/model/box/link/link/visual/visual/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Wrong model" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/cone/link/link/visual/visual/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Invalid URI" << std::endl;
+  {
+    pluginUri = common::URI("tell me about your plugins");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Unhandled URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/plugin/");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Inexistent nested model" << std::endl;
+  {
+    pluginUri.Parse(
+        "data://world/default/model/box/model/box_in_a_box/link/link/visual/visual/plugin");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+
+  gzmsg << "Incomplete URI" << std::endl;
+  {
+    pluginUri.Parse("data://world/default/model/box/link/link/visual/visual");
+    model->PluginInfo(pluginUri, plugins, success);
+
+    EXPECT_FALSE(success);
+  }
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
