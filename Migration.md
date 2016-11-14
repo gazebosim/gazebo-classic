@@ -18,7 +18,7 @@ release will remove the deprecated code.
 1. ***New 'tests' target for make***: a new 'tests' target has been implemented.
    it will compile all the tests present in the code by calling 'make tests'.
 
-1. ***Deprecate ENABLE_TESTS_COMPILATIONS parameter:***  the previous cmake
+1. ***Deprecate ENABLE_TESTS_COMPILATION parameter:***  the previous cmake
    parameter to control tests make target generation has been deprecated. Tests
    compilation is disabled by default.
 
