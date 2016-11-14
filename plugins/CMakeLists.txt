@@ -120,8 +120,7 @@ endforeach ()
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} gazebo_gui
-                               libgazebo
+  target_link_libraries(${src} libgazebo
 			       ${ogre_libraries}
 			       ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
