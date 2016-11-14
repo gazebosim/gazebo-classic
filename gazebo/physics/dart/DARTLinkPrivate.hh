@@ -69,6 +69,8 @@ namespace gazebo
 
         for (auto func : mCachedFuncs)
           func();
+
+        mCachedFuncs.clear();
       }
 
       /// \brief Return true if DART BodyNode is initialized
