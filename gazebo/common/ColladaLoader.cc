@@ -173,6 +173,7 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     this->dataPtr->currentNodeName = _elem->Attribute("name");
   }
 
+  // Load nested nodes
   nodeXml = _elem->FirstChildElement("node");
   while (nodeXml)
   {
@@ -180,6 +181,7 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     nodeXml = nodeXml->NextSiblingElement("node");
   }
 
+  // If it has an instance_node, load that instead
   if (_elem->FirstChildElement("instance_node"))
   {
     std::string nodeURLStr =
@@ -194,9 +196,11 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     this->LoadNode(nodeXml, _mesh, transform);
     return;
   }
-  else
-    nodeXml = _elem;
 
+  // Go on loading this node
+  nodeXml = _elem;
+
+  // If it has instance_geometry
   instGeomXml = nodeXml->FirstChildElement("instance_geometry");
   while (instGeomXml)
   {
@@ -226,26 +230,49 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
   }
 
-  TiXmlElement *instContrXml =
-    nodeXml->FirstChildElement("instance_controller");
+  // If it has instance_controller for mesh deformation (skinning and morphing)
+  auto instContrXml = nodeXml->FirstChildElement("instance_controller");
   while (instContrXml)
   {
+    // Get controller element
     std::string contrURL = instContrXml->Attribute("url");
     TiXmlElement *contrXml = this->GetElementId("controller", contrURL);
 
+    if (!contrXml)
+    {
+      gzwarn << "Couldn't find controller with id [" << contrURL << "]"
+          << std::endl;
+
+      instContrXml = instContrXml->NextSiblingElement("instance_controller");
+      continue;
+    }
+
+    // Get skeleton node element
     TiXmlElement *instSkelXml = instContrXml->FirstChildElement("skeleton");
     if (!instSkelXml)
     {
       gzwarn << "<instance_controller> without a <skeleton> cannot be parsed"
           << std::endl;
+
       instContrXml = instContrXml->NextSiblingElement("instance_controller");
       continue;
     }
 
-    std::string rootURL = instSkelXml->GetText();
-    TiXmlElement *rootNodeXml = this->GetElementId("node", rootURL);
+    std::string skeletonURL = instSkelXml->GetText();
+    TiXmlElement *skeletonNodeXml = this->GetElementId("node", skeletonURL);
 
+    if (!skeletonNodeXml)
+    {
+      gzwarn << "Couldn't find node with id [" << skeletonURL << "]"
+          << std::endl;
+
+      instContrXml = instContrXml->NextSiblingElement("instance_controller");
+      continue;
+    }
+
+    // Fill material map
     this->dataPtr->materialMap.clear();
+
     TiXmlElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instContrXml->FirstChildElement("bind_material");
     while (bindMatXml)
@@ -264,21 +291,31 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
       bindMatXml = bindMatXml->NextSiblingElement("bind_material");
     }
 
-    // Do animations outside of controllers
-    auto skeleton = new Skeleton(this->LoadSkeletonNodes(rootNodeXml, nullptr));
+    // One skeleton per mesh
+    if (_mesh->GetSkeleton())
+    {
+      gzwarn << "Mesh already has a skeleton, does it make sense to overwrite it?\n";
+
+      instContrXml = instContrXml->NextSiblingElement("instance_controller");
+      continue;
+    }
+
+    auto skeleton = new Skeleton(this->LoadSkeletonNodes(skeletonNodeXml, nullptr));
     _mesh->SetSkeleton(skeleton);
 
-    auto rootXml = contrXml->GetDocument()->RootElement();
-
-    if (rootXml->FirstChildElement("library_animations"))
+    if (this->dataPtr->colladaXml->FirstChildElement("library_animations"))
     {
-      this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
+      this->LoadAnimations(
+          this->dataPtr->colladaXml->FirstChildElement("library_animations"),
           skeleton);
     }
 
     this->LoadController(contrXml, skeleton, transform, _mesh);
     instContrXml = instContrXml->NextSiblingElement("instance_controller");
   }
+
+  // If it has animations without controller skin/skeleton?
+
 }
 
 /////////////////////////////////////////////////
@@ -350,8 +387,14 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   TiXmlElement *skinXml = _contrXml->FirstChildElement("skin");
-  std::string geomURL = skinXml->Attribute("source");
 
+  if (!skinXml)
+  {
+    gzwarn << "Couldn't find <skin> inside <controller>" << std::endl;
+    return;
+  }
+
+  // Bind shape transform matrix
   ignition::math::Matrix4d bindTrans;
   std::string matrixStr =
         skinXml->FirstChildElement("bind_shape_matrix")->GetText();
@@ -366,7 +409,15 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   _skeleton->SetBindShapeTransform(bindTrans);
 
+  // Joints
   TiXmlElement *jointsXml = skinXml->FirstChildElement("joints");
+
+  if (!jointsXml)
+  {
+    gzwarn << "Couldn't find <joints> inside <skin>" << std::endl;
+    return;
+  }
+
   std::string jointsURL, invBindMatURL;
   TiXmlElement *inputXml = jointsXml->FirstChildElement("input");
   while (inputXml)
@@ -387,8 +438,9 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   if (!jointsXml)
   {
-    gzerr << "Could not find node[" << jointsURL << "]\n";
-    gzthrow("Faild to parse skinning information in Collada file.");
+    gzwarn << "Could not find node[" << jointsURL <<
+        "]. Failed to parse skinning information in Collada file.\n";
+    return;
   }
 
   std::string jointsStr = jointsXml->FirstChildElement("Name_array")->GetText();
@@ -400,8 +452,9 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   if (!invBMXml)
   {
-    gzerr << "Could not find node[" << invBindMatURL << "]\n";
-    gzthrow("Faild to parse skinning information in Collada file.");
+    gzwarn << "Could not find node[" << invBindMatURL <<
+        "] Faild to parse skinning information in Collada file.\n";
+    return;
   }
 
   std::string posesStr = invBMXml->FirstChildElement("float_array")->GetText();
@@ -434,6 +487,11 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   }
 
   TiXmlElement *vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
+  if (!vertWeightsXml)
+  {
+    gzwarn << "Could not find <vertex_weights> in <skin>" << std::endl;
+    return;
+  }
 
   inputXml = vertWeightsXml->FirstChildElement("input");
   unsigned int jOffset = 0;
@@ -447,13 +505,19 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
     inputXml->Attribute("offset", &offset);
 
     if (semantic == "JOINT")
+    {
       jOffset = offset;
+    }
+    else if (semantic == "WEIGHT")
+    {
+      weightsURL = source;
+      wOffset = offset;
+    }
     else
-      if (semantic == "WEIGHT")
-      {
-        weightsURL = source;
-        wOffset = offset;
-      }
+    {
+      gzwarn << "Skipping semantinc [" << semantic << "]" << std::endl;
+    }
+
     inputXml = inputXml->NextSiblingElement("input");
   }
 
@@ -497,7 +561,15 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
     }
   }
 
+  // Geometry
+  std::string geomURL = skinXml->Attribute("source");
   TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
+  if (!geomXml)
+  {
+    gzwarn << "Could not find <geometry> with id [" << geomURL << "]" <<
+        std::endl;
+    return;
+  }
   this->LoadGeometry(geomXml, _transform, _mesh);
 }
 

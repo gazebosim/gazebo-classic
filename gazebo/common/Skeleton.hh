@@ -108,7 +108,7 @@ namespace gazebo
       /// \brief Outputs the transforms to std::err stream
       public: void PrintTransforms();
 
-      /// \brief Get a copy or the node dictionary
+      /// \brief Get a copy of the node dictionary
       public: NodeMap GetNodes();
 
       /// \brief Resizes the raw node weight array
