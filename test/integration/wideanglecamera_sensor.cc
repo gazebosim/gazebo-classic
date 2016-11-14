@@ -62,7 +62,7 @@ TEST_F(WideAngleCameraSensor, Background)
     return;
   }
 
-  // Spawn two cameras in the same location, one with noise and one without.
+  // Spawn a wide angle camera
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
