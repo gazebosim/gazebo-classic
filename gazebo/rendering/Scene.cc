@@ -519,7 +519,12 @@ void Scene::SetBackgroundColor(const common::Color &_color)
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->OgreViewport() &&
+    // TODO do not merge forward. Changes are part of an ABI compatible fix
+    // for wideangle camera background color.
+    auto cam = boost::dynamic_pointer_cast<WideAngleCamera>(*iter);
+    if (cam)
+      cam->SetBackgroundColor(_color);
+    else if ((*iter)->OgreViewport() &&
         (*iter)->OgreViewport()->getBackgroundColour() != clr)
       (*iter)->OgreViewport()->setBackgroundColour(clr);
   }

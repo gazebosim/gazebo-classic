@@ -220,6 +220,11 @@ namespace gazebo
       // Documentation inherited
       public: void SetClipDist() override;
 
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: bool SetBackgroundColor(const common::Color &_color);
+
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);

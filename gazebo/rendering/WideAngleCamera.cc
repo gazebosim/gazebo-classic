@@ -607,6 +607,33 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
+bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+{
+  bool retVal = true;
+  Ogre::ColourValue clr = Conversions::Convert(_color);
+  if (this->OgreViewport())
+  {
+    this->OgreViewport()->setBackgroundColour(clr);
+    for (int i = 0; i < 6; ++i)
+    {
+      if (this->dataPtr->envViewports[i])
+      {
+        this->dataPtr->envViewports[i]->setBackgroundColour(clr);
+      }
+      else
+      {
+        retVal = false;
+      }
+    }
+  }
+  else
+  {
+    retVal = false;
+  }
+  return retVal;
+}
+
+//////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
   int fsaa = 4;
