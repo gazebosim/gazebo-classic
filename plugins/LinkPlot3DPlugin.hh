@@ -36,6 +36,8 @@ namespace gazebo
     physics::LinkPtr link;
 
     ignition::math::Pose3d pose;
+    ignition::math::Vector3d prevPos =
+        ignition::math::Vector3d(IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF);
   };
 
   /// \brief A plugin that simulates lift and drag.

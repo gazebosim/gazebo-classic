@@ -81,7 +81,8 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
       markerMsg.set_id(id++);
       markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
 //      markerMsg.set_type(ignition::msgs::Marker::POINTS);
-      markerMsg.set_type(ignition::msgs::Marker::SPHERE);
+//      markerMsg.set_type(ignition::msgs::Marker::SPHERE);
+      markerMsg.set_type(ignition::msgs::Marker::LINE_STRIP);
 
       // Material
       auto mat = plotElem->Get<std::string>("material", "Gazebo/Black").first;
@@ -89,11 +90,11 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
       ignition::msgs::Material *matMsg = markerMsg.mutable_material();
       matMsg->mutable_script()->set_name(mat);
 
-      ignition::msgs::Set(markerMsg.mutable_scale(),
-          ignition::math::Vector3d(0.01, 0.01, 0.01));
+  //    ignition::msgs::Set(markerMsg.mutable_scale(),
+    //      ignition::math::Vector3d(0.01, 0.01, 0.01));
 
       auto timeMsg = markerMsg.mutable_lifetime();
-      timeMsg->set_sec(1);
+      timeMsg->set_sec(3);
 
       plot.msg = markerMsg;
 
@@ -131,7 +132,7 @@ void LinkPlot3DPlugin::OnUpdate()
     return;
 
   int id = 0;
-  for (auto plot : this->plots)
+  for (auto &plot : this->plots)
   {
     auto linkWorld = ignition::math::Matrix4d(plot.link->GetWorldPose().Ign());
     auto plotLink = ignition::math::Matrix4d(plot.pose);
@@ -139,17 +140,20 @@ void LinkPlot3DPlugin::OnUpdate()
 
     plot.msg.set_id((currentTime.Double()*1000) + id++);
 
-    // POINTS
-//    plot.msg.clear_point();
-//    ignition::msgs::Set(plot.msg.add_point(), plotWorld.Pose().Pos());
+    if (plot.prevPos.Length() < 1e10)
+    {
+      // POINTS
+      plot.msg.clear_point();
+      ignition::msgs::Set(plot.msg.add_point(), plot.prevPos);
+      ignition::msgs::Set(plot.msg.add_point(), plotWorld.Pose().Pos());
 
-    // SPHERE
-    ignition::msgs::Set(plot.msg.mutable_pose(), plotWorld.Pose());
+      // SPHERE
+  //    ignition::msgs::Set(plot.msg.mutable_pose(), plotWorld.Pose());
 
-// gzdbg << plot.msg.DebugString() << std::endl;
+      this->node.Request("/marker", plot.msg, unused);
+    }
 
-    this->node.Request("/marker", plot.msg, unused);
-
+    plot.prevPos = plotWorld.Pose().Pos();
     prevTime = currentTime;
   }
 }
