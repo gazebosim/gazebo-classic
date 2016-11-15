@@ -23,14 +23,12 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
-#include <ignition/math/Helpers.hh>
 
-#include "gazebo/math/Helpers.hh"
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector2d.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Matrix4.hh"
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"

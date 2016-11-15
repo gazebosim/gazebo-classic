@@ -68,6 +68,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->copyEntityName = "";
   this->dataPtr->modelEditorEnabled = false;
 
+  this->dataPtr->updateTimer = new QTimer(this);
+  connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
+  this, SLOT(update()));
+
   this->setFocusPolicy(Qt::StrongFocus);
 
   this->dataPtr->windowId = -1;
@@ -153,19 +157,27 @@ GLWidget::GLWidget(QWidget *_parent)
   MouseEventHandler::Instance()->AddDoubleClickFilter("glwidget",
       std::bind(&GLWidget::OnMouseDoubleClick, this, std::placeholders::_1));
 
-  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
-
-  connect(g_editModelAct, SIGNAL(toggled(bool)), this,
-      SLOT(OnModelEditor(bool)));
-
+  if (g_copyAct)
+    connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  if (g_pasteAct)
+    connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  if (g_editModelAct)
+  {
+    connect(g_editModelAct, SIGNAL(toggled(bool)), this,
+        SLOT(OnModelEditor(bool)));
+  }
   // Connect the ortho action
-  connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
-          SLOT(OnOrtho()));
-
-  // Connect the perspective action
-  connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
-          SLOT(OnPerspective()));
+  if (g_cameraOrthoAct)
+  {
+    connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
+            SLOT(OnOrtho()));
+  }
+  if (g_cameraPerspectiveAct)
+  {
+    // Connect the perspective action
+    connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
+            SLOT(OnPerspective()));
+  }
 
   // Create the scene. This must be done in the constructor so that
   // we can then create a user camera.
@@ -289,8 +301,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   {
     event::Events::preRender();
   }
-
-  this->update();
 
   _e->accept();
 }
@@ -887,6 +897,11 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
       sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
   this->dataPtr->userCamera->SetDefaultPose(ignition::math::Pose3d(camPos,
         ignition::math::Quaterniond(0, pitch, yaw)));
+
+  // Update at the camera's update rate
+  this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
 }
 
 /////////////////////////////////////////////////

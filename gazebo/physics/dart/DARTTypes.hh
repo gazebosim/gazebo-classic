@@ -48,6 +48,11 @@ namespace gazebo
     typedef boost::shared_ptr<DARTRayShape>  DARTRayShapePtr;
     typedef boost::shared_ptr<DARTSurfaceParams> DARTSurfaceParamsPtr;
 
+    using DARTBodyNodePropPtr =
+      std::shared_ptr<dart::dynamics::BodyNode::Properties>;
+    using DARTJointPropPtr =
+      std::shared_ptr<dart::dynamics::Joint::Properties>;
+
     /// \addtogroup gazebo_physics_dart
     /// \{
 
