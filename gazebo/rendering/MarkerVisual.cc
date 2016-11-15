@@ -40,7 +40,7 @@ class gazebo::rendering::MarkerVisualPrivate : public VisualPrivate
   /// \brief Renders text.
   public: std::unique_ptr<MovableText> text;
 
-  /// \brief Mutex to protect the contact message.
+  /// \brief Mutex to protect processing messages.
   public: std::mutex mutex;
 
   /// \brief The last marker message received.
