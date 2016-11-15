@@ -1,8 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
   <world name="default">
-    <include><uri>model://camera</uri></include>
-
     <model name="heightmap">
       <static>true</static>
       <link name="link">
@@ -15,7 +13,6 @@
             </heightmap>
           </geometry>
         </collision>
-
       </link>
     </model>
   </world>
