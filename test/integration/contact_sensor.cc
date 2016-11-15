@@ -78,7 +78,7 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
       topicsCount++;
     }
   }
-  EXPECT_GT(topicsCount, 0u);
+  EXPECT_GT(topicsCount, 0);
 
   // spanw the model
   std::string modelName = "contactModel";
