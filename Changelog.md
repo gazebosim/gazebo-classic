@@ -23,6 +23,9 @@
 1. Support custom material scripts for heightmaps
     * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
 
+1. Model Editor: Show / hide collisions
+    * [Pull request 2503](https://bitbucket.org/osrf/gazebo/pull-request/2503)
+
 ## Gazebo 7.4.0 (2016-10-11)
 
 1. Add test for HarnessPlugin, reduce likelihood of race condition
