@@ -83,6 +83,8 @@
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -199,12 +201,6 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(this->GetName());
-
-  // pose pub for server side, mainly used for updating and timestamping
-  // Scene, which in turn will be used by rendering sensors.
-  // TODO: replace local communication with shared memory for efficiency.
-  this->dataPtr->poseLocalPub =
-    this->dataPtr->node->Advertise<msgs::PosesStamped>("~/pose/local/info", 10);
 
   // pose pub for client with a cap on publishing rate to reduce traffic
   // overhead
@@ -628,6 +624,12 @@ bool World::SensorsInitialized() const
   return this->dataPtr->sensorsInitialized;
 }
 
+/////////////////////////////////////////////////
+void World::SetSensorWaitFunc(std::function<void(double, double)> _func)
+{
+  this->waitForSensors = _func;
+}
+
 //////////////////////////////////////////////////
 void World::Step()
 {
@@ -649,6 +651,10 @@ void World::Step()
   this->PublishWorldStats();
 
   DIAG_TIMER_LAP("World::Step", "publishWorldStats");
+
+  if (this->waitForSensors)
+    this->waitForSensors(this->dataPtr->simTime.Double(),
+        this->dataPtr->physicsEngine->GetMaxStepSize());
 
   double updatePeriod = this->dataPtr->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
@@ -859,7 +865,6 @@ void World::Fini()
     this->dataPtr->lightFactoryMsgs.clear();
     this->dataPtr->lightModifyMsgs.clear();
 
-    this->dataPtr->poseLocalPub.reset();
     this->dataPtr->posePub.reset();
     this->dataPtr->guiPub.reset();
     this->dataPtr->responsePub.reset();
@@ -2413,61 +2418,55 @@ void World::ProcessMessages()
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
 
-    if ((this->dataPtr->posePub && this->dataPtr->posePub->HasConnections()) ||
-        (this->dataPtr->poseLocalPub &&
-         this->dataPtr->poseLocalPub->HasConnections()))
+    msgs::PosesStamped msg;
+
+    // Time stamp this PosesStamped message
+    msgs::Set(msg.mutable_time(), this->GetSimTime());
+
+    if (!this->dataPtr->publishModelPoses.empty())
     {
-      msgs::PosesStamped msg;
-
-      // Time stamp this PosesStamped message
-      msgs::Set(msg.mutable_time(), this->GetSimTime());
-
-      if (!this->dataPtr->publishModelPoses.empty())
+      for (auto const &model : this->dataPtr->publishModelPoses)
       {
-        for (auto const &model : this->dataPtr->publishModelPoses)
+        std::list<ModelPtr> modelList;
+        modelList.push_back(model);
+        while (!modelList.empty())
         {
-          std::list<ModelPtr> modelList;
-          modelList.push_back(model);
-          while (!modelList.empty())
+          ModelPtr m = modelList.front();
+          modelList.pop_front();
+          msgs::Pose *poseMsg = msg.add_pose();
+
+          // Publish the model's relative pose
+          poseMsg->set_name(m->GetScopedName());
+          poseMsg->set_id(m->GetId());
+          msgs::Set(poseMsg, m->GetRelativePose().Ign());
+
+          // Publish each of the model's child links relative poses
+          Link_V links = m->GetLinks();
+          for (auto const &link : links)
           {
-            ModelPtr m = modelList.front();
-            modelList.pop_front();
-            msgs::Pose *poseMsg = msg.add_pose();
-
-            // Publish the model's relative pose
-            poseMsg->set_name(m->GetScopedName());
-            poseMsg->set_id(m->GetId());
-            msgs::Set(poseMsg, m->GetRelativePose().Ign());
-
-            // Publish each of the model's child links relative poses
-            Link_V links = m->GetLinks();
-            for (auto const &link : links)
-            {
-              poseMsg = msg.add_pose();
-              poseMsg->set_name(link->GetScopedName());
-              poseMsg->set_id(link->GetId());
-              msgs::Set(poseMsg, link->GetRelativePose().Ign());
-            }
-
-            // add all nested models to the queue
-            Model_V models = m->NestedModels();
-            for (auto const &n : models)
-              modelList.push_back(n);
+            poseMsg = msg.add_pose();
+            poseMsg->set_name(link->GetScopedName());
+            poseMsg->set_id(link->GetId());
+            msgs::Set(poseMsg, link->GetRelativePose().Ign());
           }
+
+          // add all nested models to the queue
+          Model_V models = m->NestedModels();
+          for (auto const &n : models)
+            modelList.push_back(n);
         }
-
-        if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
-          this->dataPtr->posePub->Publish(msg);
       }
 
-      if (this->dataPtr->poseLocalPub &&
-          this->dataPtr->poseLocalPub->HasConnections())
-      {
-        // rendering::Scene depends on this timestamp, which is used by
-        // rendering sensors to time stamp their data
-        this->dataPtr->poseLocalPub->Publish(msg);
-      }
+      if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
+        this->dataPtr->posePub->Publish(msg);
     }
+
+    // rendering::Scene depends on this timestamp, which is used by
+    // rendering sensors to time stamp their data
+    rendering::ScenePtr scn = rendering::get_scene(this->GetName());
+    if (scn)
+      scn->SetPoseMsg(msg);
+    
     this->dataPtr->publishModelPoses.clear();
   }
 

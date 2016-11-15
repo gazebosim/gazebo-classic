@@ -99,6 +99,20 @@ void SensorManager::Stop()
 }
 
 //////////////////////////////////////////////////
+void SensorManager::WaitForSensors(double _clk, double _dt)
+{
+  double tnext = this->GetNextRequiredTimestamp();
+
+  while (!std::isnan(tnext)
+      && ignition::math::lessOrEqual(tnext - _dt / 2.0, _clk)
+      && physics::worlds_running())
+  {
+    this->WaitForPrerendered(0.001);
+    tnext = this->GetNextRequiredTimestamp();
+  }
+}
+
+//////////////////////////////////////////////////
 void SensorManager::Update(bool _force)
 {
   {
@@ -189,6 +203,24 @@ void SensorManager::ResetLastUpdateTimes()
     GZ_ASSERT((*iter) != nullptr, "SensorContainer is null");
     (*iter)->ResetLastUpdateTimes();
   }
+}
+
+//////////////////////////////////////////////////
+double SensorManager::GetNextRequiredTimestamp()
+{
+  double rv = std::numeric_limits<double>::quiet_NaN();
+
+  // scan all sensors whose category is IMAGE
+  for (auto& s : this->sensorContainers[sensors::IMAGE]->sensors)
+  {
+    double candidate = s->GetNextRequiredTimestamp();
+    // take the smallest valid value
+    if (!std::isnan(candidate)
+        && (std::isnan(rv) || rv > candidate))
+      rv = candidate;
+  }
+
+  return rv;
 }
 
 //////////////////////////////////////////////////
@@ -283,6 +315,11 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   // Load the sensor
   sensor->Load(_worldName, _elem);
   this->worlds[_worldName] = physics::get_world(_worldName);
+
+  // Provide the wait function to the given world
+  this->worlds[_worldName]->SetSensorWaitFunc(
+      std::bind(&SensorManager::WaitForSensors, this,
+        std::placeholders::_1, std::placeholders::_2));
 
   // If the SensorManager has not been initialized, then it's okay to push
   // the sensor into one of the sensor vectors because the sensor will get
@@ -390,6 +427,16 @@ void SensorManager::RemoveSensor(const std::string &_name)
     // to ensure correct access to rendering resources.
     this->removeSensors.push_back(sensor->ScopedName());
   }
+}
+
+//////////////////////////////////////////////////
+bool SensorManager::WaitForPrerendered(double _timeoutsec)
+{
+  if (this->sensorContainers[sensors::IMAGE]->sensors.size() > 0)
+    return ((ImageSensorContainer*)this->sensorContainers[sensors::IMAGE])
+                ->WaitForPrerendered(_timeoutsec);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -692,7 +739,14 @@ void SensorManager::SensorContainer::RemoveSensors()
 //////////////////////////////////////////////////
 void SensorManager::ImageSensorContainer::Update(bool _force)
 {
+  // Prerender phase
   event::Events::preRender();
+
+  // Signals end of prerender phase
+  event::Events::preRenderEnded();
+
+  // Notify that prerender is over
+  this->conditionPrerendered.notify_all();
 
   // Tell all the cameras to render
   event::Events::render();
@@ -703,8 +757,15 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   SensorContainer::Update(_force);
 }
 
-
-
+//////////////////////////////////////////////////
+bool SensorManager::ImageSensorContainer::WaitForPrerendered(double _timeoutsec)
+{
+  std::cv_status ret;
+  std::mutex mtx;
+  std::unique_lock<std::mutex> lck(mtx);
+  ret = this->conditionPrerendered.wait_for(lck, std::chrono::duration<double>(_timeoutsec));
+  return (ret == std::cv_status::no_timeout);
+}
 
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()

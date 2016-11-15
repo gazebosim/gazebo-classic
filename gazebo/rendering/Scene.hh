@@ -108,6 +108,11 @@ namespace gazebo
       /// \brief Process all received messages.
       public: void PreRender();
 
+      /// \brief Wait until a render request occurs
+      /// \param[in] _timeoutsec timeout expressed in seconds
+      /// \return True if timeout was NOT met
+      public: bool WaitForRenderRequest(double _timeoutsec);
+
       /// \brief Get the OGRE scene manager.
       /// \return Pointer to the Ogre SceneManager.
       public: Ogre::SceneManager *OgreSceneManager() const;
@@ -628,6 +633,10 @@ namespace gazebo
       /// \brief Pose message callback.
       /// \param[in] _msg The message data.
       private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
+
+      /// \brief Set new Pose message
+      /// \param[in] _msg The message data.
+      public: void SetPoseMsg(msgs::PosesStamped& _msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.

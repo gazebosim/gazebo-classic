@@ -161,6 +161,7 @@ target_link_libraries(gazebo_physics
   gazebo_util
   gazebo_ode
   gazebo_opcode
+  gazebo_rendering
   ${Boost_LIBRARIES}
 )
 

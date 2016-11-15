@@ -150,12 +150,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/light/modify",
       &Scene::OnLightModifyMsg, this);
 
-  if (_isServer)
-  {
-    this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
-        &Scene::OnPoseMsg, this);
-  }
-  else
+  if (!_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/info",
         &Scene::OnPoseMsg, this);
@@ -2758,6 +2753,42 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
       this->dataPtr->poseMsgs.insert(
           std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::SetPoseMsg(msgs::PosesStamped &_msg)
+{
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+  this->dataPtr->sceneSimTimePosesReceived =
+    common::Time(_msg.time().sec(), _msg.time().nsec());
+
+  for (int i = 0; i < _msg.pose_size(); ++i)
+  {
+    PoseMsgs_M::iterator iter =
+        this->dataPtr->poseMsgs.find(_msg.pose(i).id());
+    if (iter != this->dataPtr->poseMsgs.end())
+      iter->second.CopyFrom(_msg.pose(i));
+    else
+      this->dataPtr->poseMsgs.insert(
+          std::make_pair(_msg.pose(i).id(), _msg.pose(i)));
+  }
+
+  std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
+  this->dataPtr->newPoseAvailable = true;
+  this->dataPtr->newPoseCondition.notify_all();
+}
+
+/////////////////////////////////////////////////
+bool Scene::WaitForRenderRequest(double _timeoutsec)
+{
+  std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
+  bool ret = this->dataPtr->newPoseCondition.wait_for(lck,
+      std::chrono::duration<double>(_timeoutsec),
+      [&](){return this->dataPtr->newPoseAvailable;});
+
+  this->dataPtr->newPoseAvailable = false;
+
+  return ret;
 }
 
 /////////////////////////////////////////////////

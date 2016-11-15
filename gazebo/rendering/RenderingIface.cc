@@ -20,6 +20,7 @@
 
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
 using namespace gazebo;
 
@@ -106,4 +107,19 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
 void rendering::remove_scene(const std::string &_name)
 {
   rendering::RenderEngine::Instance()->RemoveScene(_name);
+}
+
+//////////////////////////////////////////////////
+bool rendering::wait_for_render_request(const std::string &_name,
+                                        double _timeoutsec)
+{
+  ScenePtr scene = get_scene(_name);
+
+  if (!scene)
+  {
+    common::Time::NSleep(_timeoutsec * 1e9);
+    return false;
+  }
+
+  return scene->WaitForRenderRequest(_timeoutsec);
 }

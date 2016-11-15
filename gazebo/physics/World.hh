@@ -437,6 +437,10 @@ namespace gazebo
       /// \return Unique model name.
       public: std::string UniqueModelName(const std::string &_name);
 
+      /// \brief Set callback 'waitForSensors'
+      /// \param[in] function to be called
+      public: void SetSensorWaitFunc(std::function<void(double, double)> _func);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -500,6 +504,9 @@ namespace gazebo
 
       /// \brief Step callback.
       private: void OnStep();
+
+      /// \brief Wait until all sensors do not need the current step any more
+      private: std::function<void(double, double)> waitForSensors;
 
       /// \brief Called when a world control message is received.
       /// \param[in] _data The world control message.

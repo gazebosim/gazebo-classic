@@ -41,9 +41,17 @@ namespace gazebo
     bool fini();
 
     /// \brief get pointer to rendering::Scene by name.
-    /// \param[in] _name Name of the scene to retreive.
+    /// \param[in] _name Name of the scene to retrieve.
     GZ_RENDERING_VISIBLE
     rendering::ScenePtr get_scene(const std::string &_name = "");
+
+    /// \brief wait until a render request occurs
+    /// \param[in] _name Name of the scene to retrieve
+    /// \param[in] _timeoutsec timeout expressed in seconds
+    /// \return true if a render request occured, false in case
+    ///          we waited until the timeout
+    GZ_RENDERING_VISIBLE
+    bool wait_for_render_request(const std::string &_name, double _timeoutsec);
 
     /// \brief create rendering::Scene by name.
     /// \param[in] _name Name of the scene to create.

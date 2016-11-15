@@ -55,6 +55,7 @@
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
@@ -569,9 +570,11 @@ void Server::Run()
   // Update the sensors.
   while (!this->dataPtr->stop && physics::worlds_running())
   {
+    bool ret = rendering::wait_for_render_request("", 0.100);
+    if (ret == false)
+      gzerr << "time out reached!" << std::endl;
     this->ProcessControlMsgs();
     sensors::run_once();
-    common::Time::MSleep(1);
   }
 
   // Shutdown gazebo

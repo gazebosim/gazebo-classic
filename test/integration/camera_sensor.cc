@@ -235,9 +235,11 @@ TEST_F(CameraSensor, CheckThrottle)
   // spawn sensors of various sizes to test speed
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
-  unsigned int width  = 320;
-  unsigned int height = 240;  // 106 fps
-  double updateRate = 10;
+  unsigned int width  = 1280;
+  unsigned int height = 720;
+  // we choose a high fps on purpose. The goal is to check the effect
+  // of the flag "strict_rate".
+  double updateRate = 500;
   math::Pose setPose, testPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
@@ -251,19 +253,24 @@ TEST_F(CameraSensor, CheckThrottle)
         std::bind(&::OnNewCameraFrame, &imageCount, img,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
-  common::Timer timer;
-  timer.Start();
 
-  // time how long it takes to get 50 images @ 10Hz
-  int total_images = 50;
+  // how many images produced for 5 seconds (in simulated clock domain)
+  int total_images = 5 * updateRate;
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  double simT0 = world->GetSimTime().Double();
 
+  // wait until we get the expected amount of images
   while (imageCount < total_images)
-    common::Time::MSleep(10);
-  common::Time dt = timer.GetElapsed();
-  double rate = static_cast<double>(total_images)/dt.Double();
-  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  EXPECT_GT(rate, 7.0);
-  EXPECT_LT(rate, 11.0);
+    common::Time::MSleep(1);
+
+  // check that the obtained rate is the one expected
+  double dt = world->GetSimTime().Double() - simT0;
+  double rate = static_cast<double>(total_images) / dt;
+  gzdbg << "timer [" << dt << "] seconds rate [" << rate << "] fps\n";
+  const double tolerance = 0.02;
+  EXPECT_GT(rate, updateRate * (1 - tolerance));
+  EXPECT_LT(rate, updateRate * (1 + tolerance));
   c.reset();
   delete [] img;
 }

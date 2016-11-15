@@ -209,7 +209,7 @@ void ServerFixture::LoadArgs(const std::string &_args)
 
   this->node = transport::NodePtr(new transport::Node());
   ASSERT_NO_THROW(this->node->Init());
-  this->poseSub = this->node->Subscribe("~/pose/local/info",
+  this->poseSub = this->node->Subscribe("~/pose/info",
       &ServerFixture::OnPose, this, true);
   this->statsSub = this->node->Subscribe("~/world_stats",
       &ServerFixture::OnStats, this);
@@ -582,6 +582,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "    <update_rate>" << _rate << "</update_rate>"
     << "    <visualize>true</visualize>"
     << "    <camera>"
+    << "      <strict_rate>true</strict_rate>"
     << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
     << "      <image>"
     << "        <width>" << _width << "</width>"
