@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/msgs.hh>
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Events.hh"
@@ -43,6 +44,7 @@ class gazebo::rendering::MarkerManagerPrivate
 
   /// \brief Process a marker message.
   /// \param[in] _msg The message data.
+  /// \return True if the marker was processed successfully.
   public: bool ProcessMarkerMsg(const ignition::msgs::Marker &_msg);
 
   /// \brief Update the markers. This function is called on
