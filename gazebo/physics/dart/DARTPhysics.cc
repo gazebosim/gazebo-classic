@@ -86,20 +86,11 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
-
-  // Time step
-  // double timeStep = this->sdf->GetValueDouble("time_step");
-  // this->dartWorld->setTimeStep(timeStep);
-
-  // TODO: Elements for dart settings
-  // sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  // this->stepTimeDouble = dartElem->GetElement("dt")->GetValueDouble();
 }
 
 //////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
-  // this->dartWorld->initialize();
 }
 
 //////////////////////////////////////////////////
@@ -147,16 +138,16 @@ void DARTPhysics::UpdateCollision()
   {
     const dart::collision::Contact &dtContact =
         dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1;
-    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2;
+    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1.lock().get();
+    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2.lock().get();
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
 
     GZ_ASSERT(dartLink1.get() != nullptr,
-        "dartLink1 in collision pare is null");
+        "dartLink1 in collision pair is null");
     GZ_ASSERT(dartLink2.get() != nullptr,
-        "dartLink2 in collision pare is null");
+        "dartLink2 in collision pair is null");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
@@ -250,8 +241,6 @@ void DARTPhysics::UpdatePhysics()
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
   }
-
-  // this->lastUpdateTime = currTime;
 }
 
 //////////////////////////////////////////////////
@@ -448,7 +437,13 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-dart::simulation::World *DARTPhysics::GetDARTWorld()
+dart::simulation::World *DARTPhysics::GetDARTWorld() const
+{
+  return this->DARTWorld().get();
+}
+
+//////////////////////////////////////////////////
+dart::simulation::WorldPtr DARTPhysics::DARTWorld() const
 {
   return this->dataPtr->dtWorld;
 }
