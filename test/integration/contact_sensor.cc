@@ -115,7 +115,8 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
   int wait = 0;
   int maxWait = 20;
   int topicsCountModel = 0;
-  while (topicsCountModel <= topicsCount+1 && wait < maxWait)
+  int topicsCountModelName = 0;
+  while (topicsCountModel <= topicsCount+2 && wait < maxWait)
   {
     common::Time::MSleep(100);
     topicsCountModel = 0;
@@ -125,11 +126,14 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
       for (auto str : iter.second)
       {
         topicsCountModel++;
+        if (str.find(modelName) != std::string::npos)
+          topicsCountModelName++;
       }
     }
     wait++;
   }
   EXPECT_GT(topicsCountModel, topicsCount+1);
+  EXPECT_GT(topicsCountModelName, 0);
 
   // remove the model
   world->RemoveModel(contactModel);
