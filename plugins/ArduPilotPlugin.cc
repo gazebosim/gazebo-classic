@@ -949,7 +949,7 @@ void ArduPilotPlugin::SendState() const
   ignition::math::Vector3d velGazeboWorldFrame =
     this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
   ignition::math::Vector3d velNEDFrame =
-    this->modelXYZToAirplaneXForwardZDown.Rot().RotateVectorReverse(
+    NEDToModelXForwardZUp.Rot().RotateVectorReverse(
     velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();
   pkt.velocityXYZ[1] = velNEDFrame.Y();
