@@ -60,9 +60,8 @@ else
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-rm $SUPPRESS
 # (warning) Redundant code: Found a statement that begins with string constant.
-echo "*:gazebo/common/SVGLoader.cc:869" >> $SUPPRESS
+echo "*:gazebo/common/SVGLoader.cc:869" > $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 
