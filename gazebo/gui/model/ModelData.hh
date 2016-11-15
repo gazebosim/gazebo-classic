@@ -143,6 +143,10 @@ namespace gazebo
       /// \return A clone of this link data.
       public: LinkData *Clone(const std::string &_newName);
 
+      /// \brief Show or hide collision visuals.
+      /// \param[in] _show True to show, false to hide.
+      public: void ShowCollisions(const bool _show);
+
       /// \brief Update callback on PreRender.
       private: void Update();
 

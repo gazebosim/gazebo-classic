@@ -2928,3 +2928,10 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
 }
+
+/////////////////////////////////////////////////
+void ModelCreator::ShowCollisions(const bool _show)
+{
+  for (auto link : this->dataPtr->allLinks)
+    link.second->ShowCollisions(_show);
+}

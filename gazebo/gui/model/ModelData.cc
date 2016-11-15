@@ -494,6 +494,13 @@ void LinkData::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+void LinkData::ShowCollisions(const bool _show)
+{
+  for (auto col : this->collisions)
+    col.first->SetVisible(_show);
+}
+
+/////////////////////////////////////////////////
 void LinkData::UpdateConfig()
 {
   // set new geom size if scale has changed.
