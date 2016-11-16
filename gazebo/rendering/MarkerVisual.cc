@@ -55,7 +55,7 @@ class gazebo::rendering::MarkerVisualPrivate : public VisualPrivate
 
 /////////////////////////////////////////////////
 MarkerVisual::MarkerVisual(const std::string &_name, VisualPtr _vis)
-: Visual(*new MarkerVisualPrivate, _name, _vis)
+: Visual(*new MarkerVisualPrivate, _name, _vis, false)
 {
   this->dPtr = reinterpret_cast<MarkerVisualPrivate *>(this->dataPtr);
 }
