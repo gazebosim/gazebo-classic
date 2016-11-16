@@ -665,6 +665,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   {
     Ogre::RenderTarget *rtt;
     rtt = this->dataPtr->envCubeMapTexture->getBuffer(i)->getRenderTarget();
+    rtt->setAutoUpdated(false);
 
     Ogre::Viewport *vp = rtt->addViewport(this->dataPtr->envCameras[i]);
     vp->setClearEveryFrame(true);
