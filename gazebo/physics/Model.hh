@@ -29,7 +29,7 @@
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/MessageTypes.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
