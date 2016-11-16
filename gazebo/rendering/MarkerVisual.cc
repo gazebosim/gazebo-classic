@@ -301,5 +301,19 @@ void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
   if (this->GetParent())
     _msg.set_parent(this->GetParent()->GetName());
 
+  // Set the scale
+  ignition::msgs::Set(_msg.mutable_scale(), this->dataPtr->scale);
+
+  // Add points, if present
+  for (unsigned int count = 0; this->dPtr->dynamicRenderable &&
+      count < this->dPtr->dynamicRenderable->GetPointCount(); ++count)
+  {
+    ignition::msgs::Set(_msg.add_point(),
+        this->dPtr->dynamicRenderable->Point(count));
+  }
+
+  this->FillMaterialMsg(*(_msg.mutable_material()));
+
+  _msg.set_layer(this->dataPtr->layer);
   _msg.set_type(this->dPtr->msg.type());
 }

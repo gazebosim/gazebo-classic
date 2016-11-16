@@ -3470,6 +3470,53 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 }
 
 /////////////////////////////////////////////////
+void Visual::FillMaterialMsg(ignition::msgs::Material &_msg) const
+{
+  _msg.set_lighting(this->GetLighting());
+
+  if (!this->dataPtr->origMaterialName.empty())
+  {
+    // \todo: Material URI's that are specific to a visual are not
+    // recoverable. Refert to the Visual::ProcessMaterialMsg function
+    _msg.mutable_script()->set_name(this->dataPtr->origMaterialName);
+  }
+
+  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.r);
+  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.g);
+  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.b);
+  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.a);
+
+  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.r);
+  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.g);
+  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.b);
+  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.a);
+
+  _msg.mutable_specular()->set_r(this->dataPtr->specular.r);
+  _msg.mutable_specular()->set_g(this->dataPtr->specular.g);
+  _msg.mutable_specular()->set_b(this->dataPtr->specular.b);
+  _msg.mutable_specular()->set_a(this->dataPtr->specular.a);
+
+  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.r);
+  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.g);
+  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.b);
+  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.a);
+
+  if (!this->GetNormalMap().empty())
+    _msg.set_normal_map(this->GetNormalMap());
+
+  if (this->GetShaderType().compare("vertex") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::VERTEX);
+  else if (this->GetShaderType().compare("pixel") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::PIXEL);
+  else if (this->GetShaderType().compare("normal_map_object_space") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE);
+  else if (this->GetShaderType().compare("normal_map_tangent_space") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE);
+  else if (!this->GetShaderType().empty())
+    gzerr << "Unrecognized shader type[" << this->GetShaderType() << "]\n";
+}
+
+/////////////////////////////////////////////////
 void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
 {
   if (_msg.has_lighting())
