@@ -513,13 +513,19 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void HeightmapTest::NoVisual()
 {
-  // load a heightmap with red material
+  // load a heightmap with no visual
   Load("worlds/heightmap_no_visual.world", false);
   physics::ModelPtr heightmap = GetModel("heightmap");
   ASSERT_NE(heightmap, nullptr);
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
   ASSERT_NE(scene, nullptr);
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
 
   // no heightmaps should exist in the scene
   EXPECT_EQ(scene->GetHeightmap(), nullptr);
