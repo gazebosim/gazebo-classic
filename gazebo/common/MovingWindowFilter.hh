@@ -69,8 +69,8 @@ namespace gazebo
     // cppcheck-suppress uninitMemberVar
     MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate() :
       valWindowSize(4),
-      samples(0),
-      sum(T())
+      sum(T()),
+      samples(0)
     {
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
