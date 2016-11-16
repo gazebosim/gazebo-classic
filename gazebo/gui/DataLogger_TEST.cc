@@ -31,8 +31,9 @@ void DataLogger_TEST::RecordButton()
     this->Load("worlds/empty.world");
 
     // Create a new data logger widget
-    gazebo::gui::DataLogger *dataLogger = new gazebo::gui::DataLogger;
-    dataLogger->show();
+    std::unique_ptr<gazebo::gui::DataLogger> dataLogger(
+                                               new gazebo::gui::DataLogger);
+    dataLogger>show();
     QCoreApplication::processEvents();
 
     // Get the record button
@@ -173,7 +174,8 @@ void DataLogger_TEST::StressTest()
     pub->Publish(msg);
 
     // Create a new data logger widget
-    gazebo::gui::DataLogger *dataLogger = new gazebo::gui::DataLogger;
+    std::unique_ptr<gazebo::gui::DataLogger> dataLogger(
+                                               new gazebo::gui::DataLogger);
 
     // Get the record button
     QToolButton *recordButton = dataLogger->findChild<QToolButton*>(

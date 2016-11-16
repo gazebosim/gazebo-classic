@@ -26,11 +26,9 @@ void ExtrudeDialog_TEST::BadFilename()
   // Check that bad filenames don't break anything
   std::string bad("/not/a/file.svg");
 
-  gazebo::gui::ExtrudeDialog *extrudeDialog =
-      new gazebo::gui::ExtrudeDialog(bad);
+  std::unique_ptr<gazebo::gui::ExtrudeDialog> extrudeDialog(
+                                          new gazebo::gui::ExtrudeDialog(bad));
   QVERIFY(extrudeDialog != NULL);
-
-  delete extrudeDialog;
 }
 
 /////////////////////////////////////////////////
@@ -39,8 +37,7 @@ void ExtrudeDialog_TEST::GetSpinValues()
   // Check a good file
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
   filePath += "/test/data/loader.svg";
-  gazebo::gui::ExtrudeDialog *extrudeDialog =
-      new gazebo::gui::ExtrudeDialog(filePath);
+  std::unique_ptr<gazebo::gui::ExtrudeDialog> extrudeDialog(filePath);
 
   // Get default thickness, change value and check new value
   double thickness = extrudeDialog->GetThickness();

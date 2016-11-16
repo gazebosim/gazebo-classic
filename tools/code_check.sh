@@ -68,26 +68,22 @@ echo "*:gazebo/common/STLLoader.cc:150" >> $SUPPRESS
 echo "*:gazebo/common/SVGLoader.cc:869" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
+# STOP: before use this suppress list please consider to use inline
+# cppcheck-suppress comments
 
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 
-# The follow suppression is useful when checking for missing includes.
-# It's disable for now because checking for missing includes is very
-# time consuming. See CPPCHECK_CMD3.
-# Only precise (12.04) and raring (13.04) need this. Fixed from Saucy on.
-if [ -n "$(which lsb_release)" ]; then
-   case `lsb_release -s -d | sed 's:Ubuntu ::' | cut -c1-5` in
-       "12.04" | "13.04" )
-         echo "missingIncludeSystem" >> $SUPPRESS
-       ;;
-   esac
+# Disable noExplicitConstructor warnings in gazebo7 release series
+# (release expected in 01/25/2017) relaxed to 31/01/2015
+if [ `date '+%Y%m%d'` -lt 20170131 ]; then
+  echo "noExplicitConstructor" >> $SUPPRESS
 fi
 
 #cppcheck.
 # MAKE_JOBS is used in jenkins. If not set or run manually, default to 1
 [ -z $MAKE_JOBS ] && MAKE_JOBS=1
-CPPCHECK_BASE="cppcheck -j$MAKE_JOBS -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
+CPPCHECK_BASE="cppcheck -j$MAKE_JOBS --inline-suppr -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"

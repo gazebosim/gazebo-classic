@@ -45,7 +45,7 @@ namespace gazebo
     class MovingWindowFilterPrivate
     {
       // \brief Constructor
-      public: MovingWindowFilterPrivate();
+      public: MovingWindowFilterPrivate<T>();
 
       /// \brief For moving window smoothed value
       public: unsigned int valWindowSize;
@@ -58,22 +58,22 @@ namespace gazebo
 
       /// \brief keep track of running sum
       public: T sum;
-
       /// \brief keep track of number of elements
       public: unsigned int samples;
     };
     /// \endcond
 
     //////////////////////////////////////////////////
+    /// \TODO FIXME hardcoded initial values for now
     template<typename T>
-    MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
+    // cppcheck-suppress uninitMemberVar
+    MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate() :
+      valWindowSize(4),
+      samples(0),
+      sum(T())
     {
-      /// \TODO FIXME hardcoded initial value for now
-      this->valWindowSize = 4;
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
-      this->sum = T();
-      this->samples = 0;
     }
 
     /// \class MovingWindowFilter MovingWindowFilter.hh common/common.hh
@@ -82,7 +82,7 @@ namespace gazebo
     class MovingWindowFilter
     {
       /// \brief Constructor
-      public: MovingWindowFilter();
+      public: MovingWindowFilter<T>();
 
       /// \brief Destructor
       public: virtual ~MovingWindowFilter();
@@ -117,6 +117,7 @@ namespace gazebo
 
     //////////////////////////////////////////////////
     template<typename T>
+    // cppcheck-suppress uninitMemberVar
     MovingWindowFilter<T>::MovingWindowFilter()
       : dataPtr(new MovingWindowFilterPrivate<T>())
     {

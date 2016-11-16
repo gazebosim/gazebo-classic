@@ -94,7 +94,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       continue;
 
     // Extract the first word in this line.
-    sscanf(next, "%s%n", token, &width);
+    sscanf(next, "%200s%n", token, &width);
 
     // Set NEXT to point to just after this token.
     next = next + width;
