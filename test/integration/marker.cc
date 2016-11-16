@@ -84,7 +84,7 @@ void Marker_TEST::AddRemove()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty_bright.world", false, false, true);
+  this->Load("worlds/empty_bright.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
