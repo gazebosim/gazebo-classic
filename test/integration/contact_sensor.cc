@@ -68,6 +68,19 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  // check initial topics count
+  auto topics = transport::getAdvertisedTopics();
+  int topicsCount = 0;
+  for (auto iter : topics)
+  {
+    for (auto str : iter.second)
+    {
+      topicsCount++;
+    }
+  }
+  EXPECT_GT(topicsCount, 0);
+
+  // spanw the model
   std::string modelName = "contactModel";
   std::string contactSensorName = "contactSensor";
   ignition::math::Pose3d modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
@@ -96,6 +109,33 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
   physics::ModelPtr contactModel = world->GetModel(modelName);
   ASSERT_TRUE(contactModel != nullptr);
 
+  // check new topic are published
+  // there should be more than 1 new topic:
+  //   1 new factory topic and 2 new contact sensor topics
+  int wait = 0;
+  int maxWait = 20;
+  int topicsCountModel = 0;
+  int topicsCountModelName = 0;
+  while (topicsCountModel <= topicsCount+2 && wait < maxWait)
+  {
+    common::Time::MSleep(100);
+    topicsCountModel = 0;
+    auto modelTopics = transport::getAdvertisedTopics();
+    for (auto iter : modelTopics)
+    {
+      for (auto str : iter.second)
+      {
+        topicsCountModel++;
+        if (str.find(modelName) != std::string::npos)
+          topicsCountModelName++;
+      }
+    }
+    wait++;
+  }
+  EXPECT_GT(topicsCountModel, topicsCount+1);
+  EXPECT_GT(topicsCountModelName, 0);
+
+  // remove the model
   world->RemoveModel(contactModel);
 
   contactModel = world->GetModel(modelName);
@@ -109,6 +149,28 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
     sleep++;
   }
   EXPECT_TRUE(sensors::get_sensor(contactSensorName) == nullptr);
+
+  // wait for topics cleanup
+  // verify there are no more contact sensor topics and the number of topics
+  // are back to the initial condition + 1 new factory topic.
+  auto topicsAfter = transport::getAdvertisedTopics();
+  int j = 0;
+  for (j = 0; j < 5 && topicsAfter.size() > (topics.size() + 1); ++j)
+  {
+    common::Time::MSleep(1000);
+    topicsAfter = transport::getAdvertisedTopics();
+  }
+  EXPECT_LT(j, 5);
+  int topicsCountAfter = 0;
+  for (auto iter : topicsAfter)
+  {
+    for (auto str : iter.second)
+    {
+      topicsCountAfter++;
+      EXPECT_TRUE(str.find(modelName) == std::string::npos);
+    }
+  }
+  EXPECT_EQ(topicsCountAfter, topicsCount+1);
 }
 
 TEST_P(ContactSensor, ModelRemoval)
