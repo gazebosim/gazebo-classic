@@ -54,6 +54,9 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ODERayShape();
 
+      // Documentation inherited
+      public: virtual void Fini();
+
       /// \brief Update the ray collision
       public: virtual void Update();
 

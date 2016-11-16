@@ -56,6 +56,7 @@ RaySensor::RaySensor()
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -130,9 +131,13 @@ void RaySensor::Init()
 //////////////////////////////////////////////////
 void RaySensor::Fini()
 {
-  Sensor::Fini();
-
   this->dataPtr->scanPub.reset();
+
+  if (this->node)
+  {
+    this->node->Fini();
+    this->node.reset();
+  }
 
   if (this->dataPtr->laserCollision)
   {
@@ -145,6 +150,10 @@ void RaySensor::Fini()
     this->dataPtr->laserShape->Fini();
     this->dataPtr->laserShape.reset();
   }
+
+  this->dataPtr->parentEntity.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////

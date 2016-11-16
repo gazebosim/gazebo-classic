@@ -84,7 +84,19 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 ODERayShape::~ODERayShape()
 {
-  dGeomDestroy(this->geomId);
+  //dGeomDestroy(this->geomId);
+
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void ODERayShape::Fini()
+{
+  // We're the only ones holding the collision parent, we have to release it so
+  // it releases us
+  this->collisionParent.reset();
+
+  RayShape::Fini();
 }
 
 //////////////////////////////////////////////////

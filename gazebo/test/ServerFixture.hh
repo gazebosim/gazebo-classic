@@ -269,8 +269,8 @@ namespace gazebo
     /// \brief Spawn a laser.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _raySensorName Name of the laser.
-    /// \param[in] _pos Camera position.
-    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _pos Sensor position.
+    /// \param[in] _rpy Sensor roll, pitch, yaw.
     /// \param[in] _hMinAngle Horizontal min angle
     /// \param[in] _hMaxAngle Horizontal max angle
     /// \param[in] _minRange Min range
@@ -310,8 +310,8 @@ namespace gazebo
     /// \brief Spawn a gpu laser.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _raySensorName Name of the laser.
-    /// \param[in] _pos Camera position.
-    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _pos Sensor position.
+    /// \param[in] _rpy Sensor roll, pitch, yaw.
     /// \param[in] _hMinAngle Horizontal min angle
     /// \param[in] _hMaxAngle Horizontal max angle
     /// \param[in] _minRange Min range
@@ -334,8 +334,8 @@ namespace gazebo
     /// \brief Spawn a depth camera.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _cameraName Name of the camera.
-    /// \param[in] _pos Camera position.
-    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _pos Sensor position.
+    /// \param[in] _rpy Sensor roll, pitch, yaw.
     /// \param[in] _width Output image width.
     /// \param[in] _height Output image height.
     /// \param[in] _rate Output Hz.
@@ -353,8 +353,8 @@ namespace gazebo
     /// \brief Spawn an imu sensor laser.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _imuSensorName Name of the imu sensor.
-    /// \param[in] _pos Camera position.
-    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _pos Sensor position.
+    /// \param[in] _rpy Sensor roll, pitch, yaw.
     /// \param[in] _noiseType Type of noise to apply.
     /// \param[in] _noiseMean Mean noise value.
     /// \param[in] _noiseStdDev Standard deviation of the noise.

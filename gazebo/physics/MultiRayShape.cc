@@ -45,7 +45,18 @@ MultiRayShape::MultiRayShape(PhysicsEnginePtr /*_physicsEngine*/)
 //////////////////////////////////////////////////
 MultiRayShape::~MultiRayShape()
 {
+  for (auto &ray : this->rays)
+  {
+    ray->Fini();
+  }
   this->rays.clear();
+
+  int count = 0;
+  while (this->newLaserScans.ConnectionCount() > 0)
+  {
+    this->newLaserScans.Disconnect(count);
+    count++;
+  }
 }
 
 //////////////////////////////////////////////////
