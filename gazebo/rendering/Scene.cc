@@ -389,7 +389,7 @@ void Scene::Init()
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
   // Initialize the marker manager
-  if (!this->dataPtr->markerManager.Init(shared_from_this()))
+  if (!this->dataPtr->markerManager.Init(this))
   {
     gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
       << "will not work.\n";

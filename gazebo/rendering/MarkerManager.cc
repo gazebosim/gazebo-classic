@@ -75,7 +75,7 @@ class gazebo::rendering::MarkerManagerPrivate
   public: MarkerMsgs_L markerMsgs;
 
   /// \brief Pointer to the scene
-  public: ScenePtr scene;
+  public: Scene *scene = nullptr;
 
   /// \brief Ignition node
   public: ignition::transport::Node node;
@@ -96,7 +96,7 @@ MarkerManager::~MarkerManager()
 }
 
 /////////////////////////////////////////////////
-bool MarkerManager::Init(ScenePtr _scene)
+bool MarkerManager::Init(Scene *_scene)
 {
   if (!_scene)
   {
