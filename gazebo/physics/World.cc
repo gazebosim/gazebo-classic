@@ -53,8 +53,6 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/URI.hh"
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/util/OpenAL.hh"
@@ -1317,7 +1315,10 @@ void World::Reset()
   {
     std::lock_guard<std::recursive_mutex> lk(this->dataPtr->worldUpdateMutex);
 
+    // \todo: The following is deprecated, but we're keeping it until other
+    // gazebo math functionality is removed.
     math::Rand::SetSeed(math::Rand::GetSeed());
+
     ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
 

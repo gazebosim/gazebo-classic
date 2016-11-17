@@ -111,7 +111,7 @@ void DARTPhysics::Reset()
   for (unsigned int i = 0; i < modelCount; ++i)
   {
     dartModelIt =
-      boost::dynamic_pointer_cast<DARTModel>(this->world->ModelByName(i));
+      boost::dynamic_pointer_cast<DARTModel>(this->world->ModelByIndex(i));
     GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is null");
 
     dartModelIt->RestoreState();
@@ -228,7 +228,7 @@ void DARTPhysics::UpdatePhysics()
 
   for (unsigned int i = 0; i < modelCount; ++i)
   {
-    modelItr = this->world->ModelByName(i);
+    modelItr = this->world->ModelByIndex(i);
     // TODO: need to improve speed
     Link_V links = modelItr->GetLinks();
     unsigned int linkCount = links.size();
@@ -465,7 +465,7 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
       msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->world->MagneticField()));
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -485,7 +485,7 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   PhysicsEngine::OnPhysicsMsg(_msg);
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+    this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
