@@ -17,7 +17,6 @@
 #ifndef GAZEBO_RENDERING_MARKERMANAGER_HH_
 #define GAZEBO_RENDERING_MARKERMANAGER_HH_
 
-#include <ignition/msgs.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -39,9 +38,9 @@ namespace gazebo
       public: virtual ~MarkerManager();
 
       /// \brief Initialize the marker manager.
-      /// \param[in] _scene Pointer to the scene.
+      /// \param[in] _scene Reference to the scene.
       /// \return True on success
-      private: bool Init(ScenePtr _scene);
+      private: bool Init(Scene *_scene);
 
       /// \internal
       /// \brief Private data pointer

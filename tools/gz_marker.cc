@@ -351,7 +351,6 @@ void MarkerCommand::Msg(const std::string &_msg)
     ignition::msgs::Marker msg;
     if (google::protobuf::TextFormat::ParseFromString(_msg, &msg))
     {
-      std::cout << "Message[" << msg.DebugString() << "]\n";
       bool result;
       ignition::msgs::StringMsg rep;
       this->node.Request("/marker", msg, 5000u, rep, result);

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/msgs.hh>
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Events.hh"
@@ -43,6 +44,7 @@ class gazebo::rendering::MarkerManagerPrivate
 
   /// \brief Process a marker message.
   /// \param[in] _msg The message data.
+  /// \return True if the marker was processed successfully.
   public: bool ProcessMarkerMsg(const ignition::msgs::Marker &_msg);
 
   /// \brief Update the markers. This function is called on
@@ -63,8 +65,8 @@ class gazebo::rendering::MarkerManagerPrivate
   public: void OnList(const ignition::msgs::StringMsg &_req,
                       ignition::msgs::Marker_V &_rep, bool &_result);
 
-  /// \brief Ignition node
-  public: ignition::transport::Node node;
+  /// \brief Mutex to protect message list.
+  public: std::mutex mutex;
 
   /// \brief Map of markers
   public: Marker_M markers;
@@ -72,14 +74,14 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \brief List of marker message to process.
   public: MarkerMsgs_L markerMsgs;
 
+  /// \brief Pointer to the scene
+  public: Scene *scene = nullptr;
+
+  /// \brief Ignition node
+  public: ignition::transport::Node node;
+
   /// \brief Connect to the prerender signal
   public: event::ConnectionPtr preRenderConnection;
-
-  /// \brief Mutex to protect message list.
-  public: std::mutex mutex;
-
-  /// \brief Pointer to the scene
-  public: ScenePtr scene;
 };
 
 /////////////////////////////////////////////////
@@ -94,7 +96,7 @@ MarkerManager::~MarkerManager()
 }
 
 /////////////////////////////////////////////////
-bool MarkerManager::Init(ScenePtr _scene)
+bool MarkerManager::Init(Scene *_scene)
 {
   if (!_scene)
   {

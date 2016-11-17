@@ -40,7 +40,7 @@ class gazebo::rendering::MarkerVisualPrivate : public VisualPrivate
   /// \brief Renders text.
   public: std::unique_ptr<MovableText> text;
 
-  /// \brief Mutex to protect the contact message.
+  /// \brief Mutex to protect processing messages.
   public: std::mutex mutex;
 
   /// \brief The last marker message received.
@@ -55,7 +55,7 @@ class gazebo::rendering::MarkerVisualPrivate : public VisualPrivate
 
 /////////////////////////////////////////////////
 MarkerVisual::MarkerVisual(const std::string &_name, VisualPtr _vis)
-: Visual(*new MarkerVisualPrivate, _name, _vis)
+: Visual(*new MarkerVisualPrivate, _name, _vis, false)
 {
   this->dPtr = reinterpret_cast<MarkerVisualPrivate *>(this->dataPtr);
 }
@@ -235,25 +235,55 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
           _msg.type() << "]\n";
         break;
     };
-
-    for (int i = 0; i < _msg.point_size(); ++i)
-    {
-      this->dPtr->dynamicRenderable->AddPoint(
-          ignition::math::Vector3d(_msg.point(i).x(),
-                                   _msg.point(i).y(),
-                                   _msg.point(i).z()));
-    }
   }
   else
   {
-    this->dPtr->dynamicRenderable->Clear();
-    for (int i = 0; i < _msg.point_size(); ++i)
+    // Change render operation, if present
+    if (_msg.has_type())
     {
-      this->dPtr->dynamicRenderable->AddPoint(
-          ignition::math::Vector3d(_msg.point(i).x(),
-                                   _msg.point(i).y(),
-                                   _msg.point(i).z()));
+      switch (_msg.type())
+      {
+        case ignition::msgs::Marker::LINE_STRIP:
+          this->dPtr->dynamicRenderable->SetOperationType(
+              rendering::RENDERING_LINE_STRIP);
+          break;
+        case ignition::msgs::Marker::LINE_LIST:
+          this->dPtr->dynamicRenderable->SetOperationType(
+              rendering::RENDERING_LINE_LIST);
+          break;
+        case ignition::msgs::Marker::POINTS:
+          this->dPtr->dynamicRenderable->SetOperationType(
+              rendering::RENDERING_POINT_LIST);
+          break;
+        case ignition::msgs::Marker::TRIANGLE_FAN:
+          this->dPtr->dynamicRenderable->SetOperationType(
+              rendering::RENDERING_TRIANGLE_FAN);
+          break;
+        case ignition::msgs::Marker::TRIANGLE_LIST:
+          this->dPtr->dynamicRenderable->SetOperationType(
+              rendering::RENDERING_TRIANGLE_LIST);
+          break;
+        case ignition::msgs::Marker::TRIANGLE_STRIP:
+          this->dPtr->dynamicRenderable->SetOperationType(
+              rendering::RENDERING_TRIANGLE_STRIP);
+          break;
+        default:
+          break;
+      };
     }
+
+    // We make the assumption that the presence of points means the existing
+    // points should be removed.
+    if (_msg.point_size() > 0)
+      this->dPtr->dynamicRenderable->Clear();
+  }
+
+  for (int i = 0; i < _msg.point_size(); ++i)
+  {
+    this->dPtr->dynamicRenderable->AddPoint(
+        ignition::math::Vector3d(_msg.point(i).x(),
+                                 _msg.point(i).y(),
+                                 _msg.point(i).z()));
   }
 }
 
@@ -301,5 +331,19 @@ void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
   if (this->GetParent())
     _msg.set_parent(this->GetParent()->GetName());
 
+  // Set the scale
+  ignition::msgs::Set(_msg.mutable_scale(), this->dataPtr->scale);
+
+  // Add points, if present
+  for (unsigned int count = 0; this->dPtr->dynamicRenderable &&
+      count < this->dPtr->dynamicRenderable->GetPointCount(); ++count)
+  {
+    ignition::msgs::Set(_msg.add_point(),
+        this->dPtr->dynamicRenderable->Point(count));
+  }
+
+  this->FillMaterialMsg(*(_msg.mutable_material()));
+
+  _msg.set_layer(this->dataPtr->layer);
   _msg.set_type(this->dPtr->msg.type());
 }

@@ -653,6 +653,11 @@ namespace gazebo
       public: static msgs::Visual::Type ConvertVisualType(
           const Visual::VisualType &_type);
 
+      /// \brief Fill an ignition::msgs::Material message based on this
+      /// visual's material properties.
+      /// \param[out] _msg Ignition message to fill.
+      public: void FillMaterialMsg(ignition::msgs::Material &_msg) const;
+
       /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
