@@ -29,8 +29,6 @@
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include <ignition/msgs/MessageTypes.hh>
-
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
@@ -41,6 +39,14 @@
 namespace boost
 {
   class recursive_mutex;
+}
+
+namespace ignition
+{
+  namespace msgs
+  {
+    class Plugin_V;
+  }
 }
 
 namespace gazebo
