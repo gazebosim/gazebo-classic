@@ -65,8 +65,8 @@ class gazebo::rendering::MarkerManagerPrivate
   public: void OnList(const ignition::msgs::StringMsg &_req,
                       ignition::msgs::Marker_V &_rep, bool &_result);
 
-  /// \brief Ignition node
-  public: ignition::transport::Node node;
+  /// \brief Mutex to protect message list.
+  public: std::mutex mutex;
 
   /// \brief Map of markers
   public: Marker_M markers;
@@ -74,14 +74,14 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \brief List of marker message to process.
   public: MarkerMsgs_L markerMsgs;
 
-  /// \brief Connect to the prerender signal
-  public: event::ConnectionPtr preRenderConnection;
-
-  /// \brief Mutex to protect message list.
-  public: std::mutex mutex;
-
   /// \brief Pointer to the scene
   public: ScenePtr scene;
+
+  /// \brief Ignition node
+  public: ignition::transport::Node node;
+
+  /// \brief Connect to the prerender signal
+  public: event::ConnectionPtr preRenderConnection;
 };
 
 /////////////////////////////////////////////////
