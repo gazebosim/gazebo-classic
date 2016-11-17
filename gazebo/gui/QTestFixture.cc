@@ -132,7 +132,7 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
   if (_createScene)
   {
     gazebo::rendering::create_scene(
-        gazebo::physics::get_world()->Name(), true);
+        gazebo::physics::get_world()->Name(), false);
   }
 
   this->server->Run();
