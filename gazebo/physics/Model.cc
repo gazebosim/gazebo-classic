@@ -37,6 +37,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
@@ -75,6 +76,11 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
+  this->requestSub = this->node->Subscribe("~/request",
+                                           &Model::OnRequest, this, true);
+  this->responsePub = this->node->Advertise<msgs::Response>(
+      "~/response");
+
   this->SetStatic(this->sdf->Get<bool>("static"));
   if (this->sdf->HasElement("static"))
   {
@@ -104,6 +110,49 @@ void Model::Load(sdf::ElementPtr _sdf)
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
+}
+
+//////////////////////////////////////////////////
+void Model::OnRequest(ConstRequestPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
+
+  // Only handle requests for model plugins in this model
+  if (_msg->request() == "model_plugin_info" && this->sdf->HasElement("plugin")
+      && _msg->data().find(this->URI().Str()) != std::string::npos)
+  {
+    // Find correct plugin
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      std::string pluginName = pluginElem->Get<std::string>("name");
+
+      if (_msg->data().find(pluginName) != std::string::npos)
+      {
+        // Get plugin info from SDF
+        msgs::Plugin pluginMsg;
+        pluginMsg.CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+        // Publish response with plugin info
+        msgs::Response response;
+        response.set_id(_msg->id());
+        response.set_request(_msg->request());
+        response.set_response("success");
+        response.set_type(pluginMsg.GetTypeName());
+
+        std::string *serializedData = response.mutable_serialized_data();
+        pluginMsg.SerializeToString(serializedData);
+
+        this->responsePub->Publish(response);
+
+        return;
+      }
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+
+    gzwarn << "Plugin [" << _msg->data() << "] not found in model [" <<
+        this->URI().Str() << "]" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -415,12 +464,40 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
+  // Destroy all attached models
+  for (auto &model : this->attachedModels)
+  {
+    if (model)
+      model->Fini();
+  }
   this->attachedModels.clear();
-  this->canonicalLink.reset();
-  this->jointController.reset();
-  this->joints.clear();
-  this->links.clear();
+
+  // Destroy all models
+  for (auto &model : this->models)
+  {
+    if (model)
+      model->Fini();
+  }
   this->models.clear();
+
+  // Destroy all joints
+  for (auto &joint : this->joints)
+  {
+    if (joint)
+      joint->Fini();
+  }
+  this->joints.clear();
+  this->jointController.reset();
+
+  // Destroy all links
+  for (auto &link : this->links)
+  {
+    if (link)
+      link->Fini();
+  }
+  this->canonicalLink.reset();
+  this->links.clear();
+
   this->plugins.clear();
 
   Entity::Fini();
@@ -962,7 +1039,7 @@ void Model::LoadPlugins()
     {
       gzerr << "Sensors failed to initialize when loading model["
         << this->GetName() << "] via the factory mechanism."
-        << "Plugins for the model will not be loaded.\n";
+        << " Plugins for the model will not be loaded.\n";
     }
   }
 
@@ -1151,6 +1228,18 @@ void Model::FillMsg(msgs::Model &_msg)
   {
     model->FillMsg(*_msg.add_model());
   }
+
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      auto pluginMsg = _msg.add_plugin();
+      pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1286,12 +1375,6 @@ void Model::SetState(const ModelState &_state)
   //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
   //                          jointState.GetAngle(0).Radian());
   // }
-}
-
-/////////////////////////////////////////////////
-void Model::SetScale(const math::Vector3 &_scale)
-{
-  this->SetScale(_scale.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -1494,6 +1577,38 @@ gazebo::physics::JointPtr Model::CreateJoint(
 }
 
 /////////////////////////////////////////////////
+gazebo::physics::JointPtr Model::CreateJoint(sdf::ElementPtr _sdf)
+{
+  if (_sdf->GetName() != "joint" ||
+      !_sdf->HasAttribute("name") ||
+      !_sdf->HasAttribute("type"))
+  {
+    gzerr << "Invalid _sdf passed to Model::CreateJoint" << std::endl;
+    return physics::JointPtr();
+  }
+
+  std::string jointName(_sdf->Get<std::string>("name"));
+  if (this->GetJoint(jointName))
+  {
+    gzwarn << "Model [" << this->GetName()
+           << "] already has a joint named [" << jointName
+           << "], skipping creating joint.\n";
+    return physics::JointPtr();
+  }
+
+  try
+  {
+    // LoadJoint can throw if the scoped name of the joint already exists.
+    this->LoadJoint(_sdf);
+  }
+  catch(...)
+  {
+    gzerr << "LoadJoint Failed" << std::endl;
+  }
+  return this->GetJoint(jointName);
+}
+
+/////////////////////////////////////////////////
 bool Model::RemoveJoint(const std::string &_name)
 {
   bool paused = this->world->IsPaused();
@@ -1501,7 +1616,12 @@ bool Model::RemoveJoint(const std::string &_name)
   if (joint)
   {
     this->world->SetPaused(true);
+    if (this->jointController)
+    {
+      this->jointController->RemoveJoint(joint.get());
+    }
     joint->Detach();
+    joint->Fini();
 
     this->joints.erase(
       std::remove(this->joints.begin(), this->joints.end(), joint),

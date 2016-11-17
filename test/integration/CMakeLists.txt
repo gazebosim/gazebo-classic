@@ -44,6 +44,7 @@ set(tests
   gz_model.cc
   gz_physics.cc
   gz_world.cc
+  harness.cc
   imu.cc
   introspection_items.cc
   joint_controller.cc
@@ -57,6 +58,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  link.cc
   logical_camera_sensor.cc
   model.cc
   model_database.cc
@@ -82,7 +84,6 @@ set(tests
   rayshape.cc
   region_events.cc
   rest_web.cc
-  road.cc
   saving_and_loading.cc
   sensor.cc
   server_fixture.cc
@@ -123,6 +124,7 @@ if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
   set_property(
@@ -139,9 +141,6 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
-
-  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
-    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests
@@ -155,6 +154,7 @@ set(dri_tests
   camera_sensor.cc
   depth_camera.cc
   factory.cc
+  fiducial.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
@@ -163,12 +163,14 @@ set(dri_tests
   pr2.cc
   projector.cc
   rendering_sensor.cc
+  road.cc
   speed_pr2.cc
   world_reset.cc
 )
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
+  collada_visualization.cc
   insert_model.cc
   model_editor.cc
   model_editor_undo.cc
@@ -188,7 +190,4 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
-
-  set_target_properties(${TEST_TYPE}_model_editor_undo PROPERTIES
-    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()

@@ -20,6 +20,10 @@
 #include "gazebo/math/SignalStatsPrivate.hh"
 #include "gazebo/math/SignalStats.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 
@@ -128,6 +132,18 @@ void SignalMaxAbsoluteValue::InsertData(const double _data)
 SignalStats::SignalStats()
   : dataPtr(new SignalStatsPrivate)
 {
+}
+
+//////////////////////////////////////////////////
+SignalStats::SignalStats(const ignition::math::SignalStats &_s)
+  : dataPtr(new SignalStatsPrivate)
+{
+  for (std::map<std::string, double>::const_iterator iter = _s.Map().begin();
+       iter != _s.Map().end(); ++iter)
+  {
+    this->InsertStatistic(iter->first);
+    this->InsertData(iter->second);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -244,3 +260,31 @@ void SignalStats::Reset()
   }
 }
 
+//////////////////////////////////////////////////
+ignition::math::SignalStats SignalStats::Ign() const
+{
+  ignition::math::SignalStats result;
+
+  for (auto const &statistic : this->dataPtr->stats)
+  {
+    result.InsertStatistic(statistic->ShortName());
+    result.InsertData(statistic->Value());
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+SignalStats &SignalStats::operator=(const ignition::math::SignalStats &_s)
+{
+  std::map<std::string, double> data = _s.Map();
+
+  for (std::map<std::string, double>::const_iterator iter =  data.begin();
+       iter != data.end(); ++iter)
+  {
+    this->InsertStatistic(iter->first);
+    this->InsertData(iter->second);
+  }
+
+  return *this;
+}

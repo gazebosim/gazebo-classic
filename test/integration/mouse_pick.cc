@@ -31,22 +31,6 @@
 #include "test_config.h"
 
 /////////////////////////////////////////////////
-ignition::math::Vector2i GetScreenSpaceCoords(ignition::math::Vector3d _pt,
-    gazebo::rendering::CameraPtr _cam)
-{
-  // Convert from 3D world pos to 2D screen pos
-  Ogre::Vector3 pos = _cam->OgreCamera()->getProjectionMatrix() *
-      _cam->OgreCamera()->getViewMatrix() *
-      gazebo::rendering::Conversions::Convert(_pt);
-
-  ignition::math::Vector2i screenPos;
-  screenPos.X() = ((pos.x / 2.0) + 0.5) * _cam->ViewportWidth();
-  screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * _cam->ViewportHeight();
-
-  return screenPos;
-}
-
-/////////////////////////////////////////////////
 void MouseDrag(QWidget *_widget, Qt::MouseButton _button,
     const ignition::math::Vector2d &_start,
     const ignition::math::Vector2d &_end)
@@ -136,7 +120,7 @@ void MousePickingTest::Shapes()
   this->ProcessEventsAndDraw(mainWindow);
 
   // pick the first model - sphere
-  auto pickPt = GetScreenSpaceCoords(model01Vis->GetWorldPose().pos.Ign(), cam);
+  auto pickPt = cam->Project(model01Vis->GetWorldPose().pos.Ign());
   auto pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -148,7 +132,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick the second model - box
-  pickPt = GetScreenSpaceCoords(model02Vis->GetWorldPose().pos.Ign(), cam);
+  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -160,7 +144,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick the third model - box
-  pickPt =GetScreenSpaceCoords(model03Vis->GetWorldPose().pos.Ign(), cam);
+  pickPt = cam->Project(model03Vis->GetWorldPose().pos.Ign());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -172,8 +156,8 @@ void MousePickingTest::Shapes()
   QVERIFY(model03Vis->GetHighlighted());
 
   // pick near the edge of box
-  pickPt = GetScreenSpaceCoords(model02Vis->GetWorldPose().pos.Ign() +
-      ignition::math::Vector3d(-0.5, 0.49, 0), cam);
+  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+      ignition::math::Vector3d(-0.5, 0.49, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -185,8 +169,8 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick just outside the edge of box and verify nothing is selected
-  pickPt = GetScreenSpaceCoords(model02Vis->GetWorldPose().pos.Ign() +
-      ignition::math::Vector3d(-0.5, 0.51, 0), cam);
+  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+      ignition::math::Vector3d(-0.5, 0.51, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -346,9 +330,7 @@ void MousePickingTest::Transparency()
   // mouse picking in arrow mode
   gazebo::gui::g_arrowAct->trigger();
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0, 3.0, 0.5),
-      gazebo::math::Vector3(0, 0, -1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0, 3.0, 0.5, 0, 0, -1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -369,9 +351,7 @@ void MousePickingTest::Transparency()
   QVERIFY(!model02Vis->GetHighlighted());
   QVERIFY(model03Vis->GetHighlighted());
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0, -3.0, 0.5),
-      gazebo::math::Vector3(0, 0, 1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0, -3.0, 0.5, 0, 0, 1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -389,9 +369,7 @@ void MousePickingTest::Transparency()
   // try mouse picking in translate mode
   gazebo::gui::g_translateAct->trigger();
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0.1, 3.0, 0.6),
-      gazebo::math::Vector3(0, 0, -1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0.1, 3.0, 0.6, 0, 0, -1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -409,9 +387,7 @@ void MousePickingTest::Transparency()
   QVERIFY(!model02Vis->GetHighlighted() && !model02LinkVis->GetHighlighted());
   QVERIFY(model03Vis->GetHighlighted() || model03LinkVis->GetHighlighted());
 
-  cam->SetWorldPose(gazebo::math::Pose(
-      gazebo::math::Vector3(0.1, -3.0, 0.6),
-      gazebo::math::Vector3(0, 0, 1.57)));
+  cam->SetWorldPose(ignition::math::Pose3d(0.1, -3.0, 0.6, 0, 0, 1.57));
 
   this->ProcessEventsAndDraw(mainWindow);
 

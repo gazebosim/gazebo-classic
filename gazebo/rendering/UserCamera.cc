@@ -59,7 +59,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
   // Set default UserCamera render rate to 120Hz when stereo rendering is
   // enabled. Otherwise use 60Hz.
   // Some padding is added for safety.
-  this->SetRenderRate(_stereoEnabled ? 130.0 : 70.0);
+  this->SetRenderRate(_stereoEnabled ? 124.0 : 62.0);
 
   this->SetUseSDFPose(false);
 }
@@ -116,7 +116,7 @@ void UserCamera::Init()
   Camera::Init();
 
   // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  this->SetFixedYawAxis(true, ignition::math::Vector3d::UnitZ);
   this->camera->setDirection(1, 0, 0);
   this->camera->setAutoAspectRatio(false);
 
@@ -210,7 +210,7 @@ void UserCamera::Init()
 void UserCamera::SetDefaultPose(const math::Pose &_pose)
 {
   this->dataPtr->defaultPose = _pose;
-  this->SetWorldPose(_pose);
+  this->SetWorldPose(_pose.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -223,6 +223,13 @@ math::Pose UserCamera::DefaultPose() const
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose.Ign());
+  this->dataPtr->viewController->Init();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
 }
 
@@ -242,6 +249,16 @@ void UserCamera::Update()
 void UserCamera::AnimationComplete()
 {
   this->dataPtr->viewController->Init();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::Render(const bool /*_force*/)
+{
+  if (this->initialized)
+  {
+    this->newData = true;
+    this->RenderImpl();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -483,12 +500,6 @@ void UserCamera::ToggleShowVisual()
 void UserCamera::ShowVisual(bool /*_s*/)
 {
   // this->visual->SetVisible(_s);
-}
-
-//////////////////////////////////////////////////
-bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  return Camera::MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////

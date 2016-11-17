@@ -537,6 +537,10 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
+      // Documentation inherited
+      public: virtual void SetStatic(const bool &_static);
+      using Entity::SetStatic;
+
       /// \brief Move Link given source and target frames specified in
       /// world coordinates. Assuming link's relative pose to
       /// source frame (_worldReferenceFrameSrc) remains unchanged relative
@@ -667,9 +671,6 @@ namespace gazebo
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
-
-      /// \brief Center of gravity visual elements.
-      protected: std::vector<std::string> cgVisuals;
 
       /// \def Visuals_M
       /// \brief Map of unique ID to visual message.

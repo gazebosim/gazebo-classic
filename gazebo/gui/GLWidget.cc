@@ -24,9 +24,10 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -66,6 +67,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->state = "select";
   this->dataPtr->copyEntityName = "";
   this->dataPtr->modelEditorEnabled = false;
+
+  this->dataPtr->updateTimer = new QTimer(this);
+  connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
+  this, SLOT(update()));
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -152,19 +157,27 @@ GLWidget::GLWidget(QWidget *_parent)
   MouseEventHandler::Instance()->AddDoubleClickFilter("glwidget",
       std::bind(&GLWidget::OnMouseDoubleClick, this, std::placeholders::_1));
 
-  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
-
-  connect(g_editModelAct, SIGNAL(toggled(bool)), this,
-      SLOT(OnModelEditor(bool)));
-
+  if (g_copyAct)
+    connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  if (g_pasteAct)
+    connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  if (g_editModelAct)
+  {
+    connect(g_editModelAct, SIGNAL(toggled(bool)), this,
+        SLOT(OnModelEditor(bool)));
+  }
   // Connect the ortho action
-  connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
-          SLOT(OnOrtho()));
-
-  // Connect the perspective action
-  connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
-          SLOT(OnPerspective()));
+  if (g_cameraOrthoAct)
+  {
+    connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
+            SLOT(OnOrtho()));
+  }
+  if (g_cameraPerspectiveAct)
+  {
+    // Connect the perspective action
+    connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
+            SLOT(OnPerspective()));
+  }
 
   // Create the scene. This must be done in the constructor so that
   // we can then create a user camera.
@@ -195,9 +208,12 @@ GLWidget::~GLWidget()
   MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
 
-  this->dataPtr->connections.clear();
-  this->dataPtr->node.reset();
+  this->dataPtr->requestSub.reset();
   this->dataPtr->selectionPub.reset();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  this->dataPtr->connections.clear();
 
   ModelManipulator::Instance()->Clear();
   ModelSnap::Instance()->Clear();
@@ -229,17 +245,20 @@ void GLWidget::showEvent(QShowEvent *_event)
   QApplication::flush();
   QApplication::syncX();
 
-  // Get the window handle in a form that OGRE can use.
-  std::string winHandle = this->OgreHandle();
+  if (this->dataPtr->windowId <=0)
+  {
+    // Get the window handle in a form that OGRE can use.
+    std::string winHandle = this->OgreHandle();
 
-  // Create the OGRE render window
-  this->dataPtr->windowId =
-    rendering::RenderEngine::Instance()->GetWindowManager()->
-      CreateWindow(winHandle, this->width(), this->height());
+    // Create the OGRE render window
+    this->dataPtr->windowId =
+      rendering::RenderEngine::Instance()->GetWindowManager()->
+        CreateWindow(winHandle, this->width(), this->height());
 
-  // Attach the user camera to the window
-  rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->dataPtr->windowId, this->dataPtr->userCamera);
+    // Attach the user camera to the window
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->dataPtr->windowId, this->dataPtr->userCamera);
+  }
 
   // Let QT continue processing the show event.
   QWidget::showEvent(_event);
@@ -282,8 +301,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   {
     event::Events::preRender();
   }
-
-  this->update();
 
   _e->accept();
 }
@@ -331,6 +348,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (_event->key() == Qt::Key_Delete &&
       this->dataPtr->selectionLevel == SelectionLevels::MODEL)
   {
+    ModelManipulator::Instance()->Detach();
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     while (!this->dataPtr->selectedVisuals.empty())
     {
@@ -376,11 +394,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   }
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -431,11 +449,11 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->dataPtr->keyModifiers = _event->modifiers();
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -540,18 +558,24 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 {
   // Update the view depending on the current GUI state
-  if (this->dataPtr->state == "make_entity")
-    this->OnMouseMoveMakeEntity();
-  else if (this->dataPtr->state == "select")
+  if (this->dataPtr->state == "select")
+  {
     this->OnMouseMoveNormal();
+  }
   else if (this->dataPtr->state == "translate" ||
            this->dataPtr->state == "rotate"    ||
            this->dataPtr->state == "scale")
   {
     ModelManipulator::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
   }
+  else if (this->dataPtr->state == "make_entity")
+  {
+    this->OnMouseMoveMakeEntity();
+  }
   else if (this->dataPtr->state == "snap")
+  {
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
+  }
 
   return true;
 }
@@ -863,21 +887,21 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->dataPtr->userCamera);
   this->dataPtr->scene = _scene;
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(5, -5, 2);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  auto delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y, delta.x);
+  double yaw = atan2(delta.Y(), delta.X());
 
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
-}
+  double pitch = atan2(-delta.Z(),
+      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
+  this->dataPtr->userCamera->SetDefaultPose(ignition::math::Pose3d(camPos,
+        ignition::math::Quaterniond(0, pitch, yaw)));
 
-/////////////////////////////////////////////////
-rendering::ScenePtr GLWidget::GetScene() const
-{
-  return this->Scene();
+  // Update at the camera's update rate
+  this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
 }
 
 /////////////////////////////////////////////////
@@ -894,12 +918,6 @@ void GLWidget::Clear()
   this->dataPtr->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
   this->dataPtr->keyModifiers = 0;
-}
-
-//////////////////////////////////////////////////
-rendering::UserCameraPtr GLWidget::GetCamera() const
-{
-  return this->Camera();
 }
 
 //////////////////////////////////////////////////
@@ -1154,8 +1172,8 @@ void GLWidget::OnManipMode(const std::string &_mode)
               = this->dataPtr->selectedVisuals.begin();
               it != --this->dataPtr->selectedVisuals.end();)
       {
-         (*it)->SetHighlighted(false);
-         it = this->dataPtr->selectedVisuals.erase(it);
+        (*it)->SetHighlighted(false);
+        it = this->dataPtr->selectedVisuals.erase(it);
       }
     }
   }
@@ -1331,7 +1349,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

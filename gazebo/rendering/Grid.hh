@@ -80,12 +80,12 @@ namespace gazebo
 
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
-      /// \deprecated See SceneNode()
+      /// \deprecated See GridVisual()
       public: Ogre::SceneNode *GetSceneNode() GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Get the Ogre scene node associated with this grid
-      /// \return The Ogre scene node associated with this grid
-      public: Ogre::SceneNode *SceneNode() const;
+      /// \brief Get thevisual associated with this grid
+      /// \return The visual associated with this grid
+      public: VisualPtr GridVisual() const;
 
       /// \brief Sets user data on all ogre objects we own
       /// \param[in] _data The user data
@@ -155,6 +155,14 @@ namespace gazebo
       /// \brief Get the number of cells in the normal direction of the grid.
       /// \return The height
       public: uint32_t Height() const;
+
+      /// \brief Set the height offset of the grid.
+      /// \param[in] _count Grid height offset.
+      public: void SetHeightOffset(const double _offset);
+
+      /// \brief Get the height offset.
+      /// \return The height offset.
+      public: double HeightOffset() const;
 
       /// \brief Create the grid.
       private: void Create();

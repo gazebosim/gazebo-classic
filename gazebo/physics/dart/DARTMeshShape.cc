@@ -38,6 +38,13 @@ DARTMeshShape::DARTMeshShape(CollisionPtr _parent)
 }
 
 //////////////////////////////////////////////////
+DARTMeshShape::DARTMeshShape(DARTCollisionPtr _parent)
+  : MeshShape(_parent),
+    dataPtr(new DARTMeshShapePrivate())
+{
+}
+
+//////////////////////////////////////////////////
 DARTMeshShape::~DARTMeshShape()
 {
   delete this->dataPtr;

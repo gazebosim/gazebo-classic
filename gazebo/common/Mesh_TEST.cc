@@ -24,7 +24,6 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/math/Vector3.hh"
 #include "test/util.hh"
 
 using namespace gazebo;

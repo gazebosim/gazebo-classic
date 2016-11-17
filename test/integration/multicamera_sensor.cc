@@ -401,8 +401,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // so grab it from it's ogre scene node
   Ogre::SceneNode *cameraNode = multicamera1->Camera(0)->SceneNode();
   ignition::math::Pose3d cameraPose(
-      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
-      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
+      rendering::Conversions::ConvertIgn(cameraNode->getPosition()),
+      rendering::Conversions::ConvertIgn(cameraNode->getOrientation()));
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.
@@ -468,8 +468,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // Get multicamera3 sensor's camera 0 local pose
   cameraNode = multicamera3->Camera(0)->SceneNode();
   cameraPose = ignition::math::Pose3d(
-      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
-      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
+      rendering::Conversions::ConvertIgn(cameraNode->getPosition()),
+      rendering::Conversions::ConvertIgn(cameraNode->getOrientation()));
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.
@@ -520,8 +520,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // Get multicamera4's camera 0 local pose
   cameraNode = multicamera4->Camera(0)->SceneNode();
   cameraPose = ignition::math::Pose3d(
-      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
-      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
+      rendering::Conversions::ConvertIgn(cameraNode->getPosition()),
+      rendering::Conversions::ConvertIgn(cameraNode->getOrientation()));
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.
@@ -546,8 +546,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // Get multicamera4 sensor's camera 1 local pose
   cameraNode = multicamera4->Camera(1)->SceneNode();
   cameraPose = ignition::math::Pose3d(
-      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
-      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
+      rendering::Conversions::ConvertIgn(cameraNode->getPosition()),
+      rendering::Conversions::ConvertIgn(cameraNode->getOrientation()));
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.

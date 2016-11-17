@@ -34,7 +34,7 @@ void ModelManipulator_TEST::Attach()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -43,7 +43,7 @@ void ModelManipulator_TEST::Attach()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::rendering::VisualPtr vis1;
   vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
@@ -78,7 +78,7 @@ void ModelManipulator_TEST::Attach()
   // remove vis1 while model manipulator is attached.
   scene->RemoveVisual(vis1);
   vis1.reset();
-  QVERIFY(scene->GetVisual("vis1") == NULL);
+  QVERIFY(scene->GetVisual("vis1") == nullptr);
 
   // verify we can still attach to vis2
   gazebo::gui::ModelManipulator::Instance()->SetAttachedVisual(vis2);
@@ -86,7 +86,7 @@ void ModelManipulator_TEST::Attach()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -99,7 +99,7 @@ void ModelManipulator_TEST::Transparency()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -114,7 +114,7 @@ void ModelManipulator_TEST::Transparency()
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   gazebo::event::Events::preRender();
 
@@ -128,11 +128,11 @@ void ModelManipulator_TEST::Transparency()
   }
 
   gazebo::rendering::VisualPtr vis1 = scene->GetVisual("box");
-  QVERIFY(vis1 != NULL);
+  QVERIFY(vis1 != nullptr);
 
   double vis1Transp = 0.2;
   vis1->SetTransparency(vis1Transp);
-  QVERIFY(gazebo::math::equal(
+  QVERIFY(ignition::math::equal(
       static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
 
   gazebo::gui::ModelManipulator::Instance()->Init();
@@ -177,7 +177,7 @@ void ModelManipulator_TEST::Transparency()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 // Generate a main function for the test

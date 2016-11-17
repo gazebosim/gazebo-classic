@@ -1,3 +1,4 @@
+syntax = "proto2";
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
@@ -7,6 +8,7 @@ package gazebo.msgs;
 
 import "joint.proto";
 import "link.proto";
+import "plugin.proto";
 import "pose.proto";
 import "visual.proto";
 import "vector3d.proto";
@@ -29,4 +31,7 @@ message Model
 
   /// \brief An array of nested models.
   repeated Model model         = 12;
+
+  /// \brief An array of plugins.
+  repeated Plugin plugin       = 13;
 }
