@@ -221,7 +221,8 @@ namespace gazebo
       public: void SetClipDist() override;
 
       // Documentation inherited
-      public: bool SetBackgroundColor(const common::Color &_color) override;
+      // this should be made override in gazebo8
+      public: bool SetBackgroundColor(const common::Color &_color);
 
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture

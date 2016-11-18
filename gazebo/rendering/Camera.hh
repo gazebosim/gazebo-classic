@@ -866,7 +866,8 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color
       /// \return True if successful. False if viewport is null
-      public: virtual bool SetBackgroundColor(const common::Color &_color);
+      // this should be made virtual in gazebo8
+      public: bool SetBackgroundColor(const common::Color &_color);
 
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix

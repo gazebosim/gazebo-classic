@@ -54,6 +54,10 @@
 #include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
+//////////////////////////////////////////////////
+// this should be removed in gazebo8
+#include "gazebo/rendering/WideAngleCamera.hh"
+//////////////////////////////////////////////////
 
 using namespace gazebo;
 using namespace rendering;
@@ -2186,6 +2190,16 @@ std::string Camera::ProjectionType() const
 //////////////////////////////////////////////////
 bool Camera::SetBackgroundColor(const common::Color &_color)
 {
+  //////////////////////////////////////////////////
+  // this block should be removed in gazebo8
+  auto wideAngleCamera =
+    boost::dynamic_pointer_cast<WideAngleCamera>(shared_from_this());
+  if (wideAngleCamera)
+  {
+    return wideAngleCamera->SetBackgroundColor(_color);
+  }
+  //////////////////////////////////////////////////
+
   if (this->OgreViewport())
   {
     this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
