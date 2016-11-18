@@ -864,7 +864,7 @@ namespace gazebo
       public: std::string ProjectionType() const;
 
       /// \brief Set background color for viewport (if viewport is not null)
-      /// \param[in] _color 
+      /// \param[in] _color
       /// \return True if successful. False if viewport is null
       public: virtual bool SetBackgroundColor(const common::Color &_color);
 

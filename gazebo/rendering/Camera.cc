@@ -2186,7 +2186,8 @@ std::string Camera::ProjectionType() const
 //////////////////////////////////////////////////
 bool Camera::SetBackgroundColor(const common::Color &_color)
 {
-  if( this->OgreViewport() ) {
+  if (this->OgreViewport())
+  {
     this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
     return true;
   }
