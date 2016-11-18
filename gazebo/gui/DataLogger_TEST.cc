@@ -33,7 +33,7 @@ void DataLogger_TEST::RecordButton()
     // Create a new data logger widget
     std::unique_ptr<gazebo::gui::DataLogger> dataLogger(
                                                new gazebo::gui::DataLogger);
-    dataLogger>show();
+    dataLogger->show();
     QCoreApplication::processEvents();
 
     // Get the record button
