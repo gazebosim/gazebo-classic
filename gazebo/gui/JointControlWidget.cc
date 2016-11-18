@@ -264,7 +264,10 @@ void JointPIDVelControl::OnDChanged(double _value)
 void JointControlWidget::SetModelName(const std::string &_modelName)
 {
   if (this->dataPtr->jointPub)
+  {
+    this->dataPtr->jointPub->Fini();
     this->dataPtr->jointPub.reset();
+  }
 
   msgs::Model modelMsg;
 
