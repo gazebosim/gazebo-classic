@@ -226,7 +226,7 @@ bool CameraSensor::NeedsUpdate()
   //  this->dataPtr->nextRenderingTime << ", " << dt << std::endl;
 
   // Trigger on the tick the closest from the targeted rendering time
-  return (ignition::math::lessOrEqual(
+  return (ignition::math::lessOrNearEqual(
         std::abs(simTime - this->dataPtr->nextRenderingTime), dt / 2.0));
 }
 

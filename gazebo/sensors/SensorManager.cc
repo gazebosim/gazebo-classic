@@ -104,7 +104,7 @@ void SensorManager::WaitForSensors(double _clk, double _dt)
   double tnext = this->GetNextRequiredTimestamp();
 
   while (!std::isnan(tnext)
-      && ignition::math::lessOrEqual(tnext - _dt / 2.0, _clk)
+      && ignition::math::lessOrNearEqual(tnext - _dt / 2.0, _clk)
       && physics::worlds_running())
   {
     this->WaitForPrerendered(0.001);
