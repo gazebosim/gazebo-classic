@@ -75,7 +75,6 @@ macro (gz_build_tests)
     add_dependencies(tests ${BINARY_NAME})
   endforeach()
 
-  add_dependencies(tests ${BINARY_NAME})
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
 endmacro()
 
