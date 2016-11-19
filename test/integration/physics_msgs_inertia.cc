@@ -289,7 +289,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   for (auto const &model : world->GetModels())
   {
     std::string name = model->GetName();
-    if (name.compare("pendulum_") == 0)
+    if (name.compare(0, 9, "pendulum_") == 0)
     {
       modelNames.push_back(name);
     }
