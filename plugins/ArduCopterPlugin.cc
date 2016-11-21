@@ -286,6 +286,9 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief Ardupilot address  
   public: std::string fdm_addr;
 
+  /// \brief Ardupilot listen address  
+  public: std::string listen_addr;
+
   /// \brief Ardupilot port for receiver socket
   public: uint16_t fdm_port_in;
 
@@ -555,15 +558,17 @@ bool ArduCopterPlugin::InitArduCopterSockets(sdf::ElementPtr _sdf) const
 {
     getSdfParam<std::string>(_sdf, "fdm_addr",
             this->dataPtr->fdm_addr, "127.0.0.1");
+    getSdfParam<std::string>(_sdf, "listen_addr",
+            this->dataPtr->listen_addr, "127.0.0.1");
     getSdfParam<uint16_t>(_sdf, "fdm_port_in",
             this->dataPtr->fdm_port_in, 9002);
     getSdfParam<uint16_t>(_sdf, "fdm_port_out",
             this->dataPtr->fdm_port_out, 9003);
 
-    if (!this->dataPtr->socket_in.Bind(this->dataPtr->fdm_addr.c_str(),
+    if (!this->dataPtr->socket_in.Bind(this->dataPtr->listen_addr.c_str(),
             this->dataPtr->fdm_port_in))
     {
-        gzerr << "failed to bind with " << this->dataPtr->fdm_addr
+        gzerr << "failed to bind with " << this->dataPtr->listen_addr
               << ":" << this->dataPtr->fdm_port_in << " aborting plugin.\n";
         return false;
     }
