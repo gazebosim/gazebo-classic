@@ -269,7 +269,7 @@ void DARTLink::Init()
   hackAvgMu2 /= static_cast<double>(numCollisions);
 
   float coeff = 0.5 * (hackAvgMu1 + hackAvgMu2);
-  coeff = std::min(0.0f,coeff);
+  coeff = std::max(0.0f,coeff);
   this->dataPtr->dtBodyNode->setFrictionCoeff(coeff);
 
   // We don't add dart body node to the skeleton here because dart body node
