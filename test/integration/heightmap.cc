@@ -52,6 +52,10 @@ class HeightmapTest : public ServerFixture,
   public: void Volume(const std::string &_physicsEngine);
   public: void LoadDEM(const std::string &_physicsEngine);
   public: void Material(const std::string &_physicsEngine);
+
+  /// \brief Test loading a heightmap that has no visuals
+  public: void NoVisual();
+
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -507,6 +511,27 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::NoVisual()
+{
+  // load a heightmap with no visual
+  Load("worlds/heightmap_no_visual.world", false);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // no heightmaps should exist in the scene
+  EXPECT_EQ(scene->GetHeightmap(), nullptr);
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -564,6 +589,12 @@ TEST_P(HeightmapTest, Heights)
 TEST_P(HeightmapTest, Material)
 {
   Material(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, NoVisual)
+{
+  NoVisual();
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, HeightmapTest, PHYSICS_ENGINE_VALUES);
