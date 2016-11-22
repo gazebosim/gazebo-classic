@@ -133,6 +133,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     // pose
     Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
     gzdbg << "pose" << T.matrix() << std::endl;
+
     if (softCollElem->HasElement("pose"))
     {
       T = DARTTypes::ConvPose(softCollElem->Get<math::Pose>("pose"));
@@ -175,21 +176,11 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   else
   {
     // Create DART BodyNode properties
+    dart::dynamics::BodyNode::AspectProperties properties(bodyName);
     this->dataPtr->dtProperties.reset(
-          new dart::dynamics::BodyNode::Properties(
-                 dart::dynamics::BodyNode::AspectProperties(bodyName)));
+          new dart::dynamics::BodyNode::Properties(properties));
   }
 
-/*  for (auto child : this->children)
-  {
-    if (child->HasType(Base::COLLISION))
-    {
-      DARTCollisionPtr dartCollision =
-          boost::static_pointer_cast<DARTCollision>(child);
-      this->dataPtr->dtProperties->mColShapes.push_back(
-            dartCollision->GetDARTCollisionShapePtr());
-    }
-  }*/
 }
 
 //////////////////////////////////////////////////
@@ -269,7 +260,7 @@ void DARTLink::Init()
   hackAvgMu2 /= static_cast<double>(numCollisions);
 
   float coeff = 0.5 * (hackAvgMu1 + hackAvgMu2);
-  // coeff = std::max(0.0f,coeff);
+  coeff = std::max(0.0f,coeff);  // friction coefficient may not be negative in DART
   this->dataPtr->dtBodyNode->setFrictionCoeff(coeff);
 
   // We don't add dart body node to the skeleton here because dart body node
@@ -746,6 +737,11 @@ void DARTLink::SetSelfCollide(bool _collide)
     return;
   }
 
+
+  /*
+  Following code is disabled currently because the newer DART version (from 6) does not
+  support CollisionManager::enablePair() and CollisionMangager::disablePair().
+
   dart::dynamics::BodyNode *dtBodyNode = this->dataPtr->dtBodyNode;
 
   // If this function is called before the body node is not added to a skeleton,
@@ -772,7 +768,7 @@ void DARTLink::SetSelfCollide(bool _collide)
     // pairs should be all and not itself each other.
     if (isSkeletonSelfCollidable)
     {
-/*      for (size_t i = 0; i < links.size(); ++i)
+      for (size_t i = 0; i < links.size(); ++i)
       {
         if (links[i].get() != this && links[i]->GetSelfCollide())
         {
@@ -788,7 +784,7 @@ void DARTLink::SetSelfCollide(bool _collide)
 
           dtCollDet->enablePair(dtBodyNode, itdtBodyNode);
         }
-      }*/
+      }
     }
     // If the skeleton is not self collidable, we first set the skeleton as
     // self collidable. If the skeleton is self collidable, then DART regards
@@ -799,7 +795,7 @@ void DARTLink::SetSelfCollide(bool _collide)
       dtSkeleton->enableSelfCollisionCheck();
       dtSkeleton->setAdjacentBodyCheck(false);
 
-      /*for (size_t i = 0; i < links.size() - 1; ++i)
+      for (size_t i = 0; i < links.size() - 1; ++i)
       {
         for (size_t j = i + 1; j < links.size(); ++j)
         {
@@ -818,14 +814,14 @@ void DARTLink::SetSelfCollide(bool _collide)
           if (!links[i]->GetSelfCollide() || !links[j]->GetSelfCollide())
             dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
         }
-      }*/
+      }
     }
   }
   else
   {
     // If the skeleton is self collidable, then we disable all the pairs
     // associated with this link.
-    /*if (isSkeletonSelfCollidable)
+    if (isSkeletonSelfCollidable)
     {
       for (size_t i = 0; i < links.size(); ++i)
       {
@@ -836,7 +832,7 @@ void DARTLink::SetSelfCollide(bool _collide)
           dtCollDet->disablePair(dtBodyNode, itdtBodyNode);
         }
       }
-    }*/
+    }
 
     // If now all the links are not self collidable, then we set the skeleton
     // as not self collidable.
@@ -855,6 +851,7 @@ void DARTLink::SetSelfCollide(bool _collide)
       dtSkeleton->setAdjacentBodyCheck(false);
     }
   }
+  */
 }
 
 //////////////////////////////////////////////////

@@ -80,17 +80,8 @@ void DARTCollision::Init()
 
     if (!isPlaneShape)
     {
-      /*dart::dynamics::BodyNode *bn = GetDARTBodyNode();
-      if (!bn)
-      {
-        gzerr << "Body node should have been initialized! \n";
-        return;
-      }*/
       Eigen::Isometry3d tf = DARTTypes::ConvPose(this->GetRelativePose());
-      // bn->getParentJoint()->setTransformFromParentBodyNode(tf);
       this->dataPtr->dtCollisionShape->setRelativeTransform(tf);
-      // this->dataPtr->dtCollisionShape->setLocalTransform(
-      //      DARTTypes::ConvPose(this->GetRelativePose()));
     }
   }
 }

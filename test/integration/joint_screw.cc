@@ -119,7 +119,9 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
 
       double vel = sqrt(2.0*torque*joint->GetAngle(0).Radian() / inertia);
       world->Step(1);
-      EXPECT_NEAR(joint->GetVelocity(0), vel, 2e-2);
+      double v_tol=2e-2;
+      if (_physicsEngine == "dart") v_tol=3e-2;
+      EXPECT_NEAR(joint->GetVelocity(0), vel, v_tol);
       double time = world->GetSimTime().Double();
       math::Angle angle(0.5 * torque * time*time / inertia);
       EXPECT_NEAR(joint->GetAngle(0).Radian(), angle.Radian(), g_tolerance);
@@ -343,6 +345,11 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
               << " joint_00 " << angle_00_linear
               << " shoudl be 0.3\n";
       }
+    }
+    else if (_physicsEngine == "dart")
+    {
+      // dart requires a slightly higher tolerance
+      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 2e-8);
     }
     else
     {
