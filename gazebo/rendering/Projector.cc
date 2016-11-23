@@ -333,8 +333,8 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
 {
-  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.rot);
-  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);
+  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.Ign().Rot());
+  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.Ign().Pos());
   Ogre::Quaternion offsetQuaternion;
 
   this->node->setPosition(ogreVec);

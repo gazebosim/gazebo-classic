@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelAlign.hh"
 
 #include "gazebo/rendering/RenderEvents.hh"
