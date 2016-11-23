@@ -31,16 +31,16 @@ class WideAngleCameraSensor : public ServerFixture
 
 std::mutex mutex;
 
-unsigned char* img = nullptr;
+unsigned char *img = nullptr;
 int imageCount = 0;
 std::string pixelFormat = "";
 
 /////////////////////////////////////////////////
-void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
-                  const unsigned char *_image,
-                  unsigned int _width, unsigned int _height,
-                  unsigned int _depth,
-                  const std::string &_format)
+void OnNewCameraFrame(int *_imageCounter, unsigned char *_imageDest,
+                      const unsigned char *_image,
+                      unsigned int _width, unsigned int _height,
+                      unsigned int _depth,
+                      const std::string &_format)
 {
   std::lock_guard<std::mutex> lock(mutex);
   pixelFormat = _format;
