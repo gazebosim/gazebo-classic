@@ -181,7 +181,7 @@ void LookAtDemoPlugin::OnChange(const double /*_newValue*/)
 
   msg.set_name("target");
   msgs::Set(msg.mutable_pose(), ignition::math::Pose3d(target,
-      ignition::math::Vector3d::Zero));
+      ignition::math::Quaterniond::Identity));
 
   this->modelModifyPub->Publish(msg);
 
