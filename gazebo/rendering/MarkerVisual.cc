@@ -86,6 +86,8 @@ void MarkerVisual::Load(const ignition::msgs::Marker &_msg)
 /////////////////////////////////////////////////
 void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
 {
+  bool dynamicRenderableCalled = false;
+
   // Set the type of visual
   if (this->dPtr->msg.type() != _msg.type() && _msg.has_type())
   {
@@ -107,6 +109,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
       case ignition::msgs::Marker::TRIANGLE_LIST:
       case ignition::msgs::Marker::TRIANGLE_STRIP:
         this->DynamicRenderable(_msg);
+        dynamicRenderableCalled = true;
         break;
       case ignition::msgs::Marker::SPHERE:
         this->DetachObjects();
@@ -191,6 +194,12 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
     rendering::Events::newLayer(_msg.layer());
     this->SetLayer(_msg.layer());
   }
+
+  if (!dynamicRenderableCalled &&
+      _msg.point_size() && this->dPtr->dynamicRenderable)
+  {
+    this->DynamicRenderable(_msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -244,28 +253,52 @@ void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
       switch (_msg.type())
       {
         case ignition::msgs::Marker::LINE_STRIP:
-          this->dPtr->dynamicRenderable->SetOperationType(
-              rendering::RENDERING_LINE_STRIP);
+          if (this->dPtr->dynamicRenderable->GetOperationType() !=
+              rendering::RENDERING_LINE_STRIP)
+          {
+            this->dPtr->dynamicRenderable->SetOperationType(
+                rendering::RENDERING_LINE_STRIP);
+          }
           break;
         case ignition::msgs::Marker::LINE_LIST:
-          this->dPtr->dynamicRenderable->SetOperationType(
-              rendering::RENDERING_LINE_LIST);
+          if (this->dPtr->dynamicRenderable->GetOperationType() !=
+              rendering::RENDERING_LINE_LIST)
+          {
+            this->dPtr->dynamicRenderable->SetOperationType(
+                rendering::RENDERING_LINE_LIST);
+          }
           break;
         case ignition::msgs::Marker::POINTS:
-          this->dPtr->dynamicRenderable->SetOperationType(
-              rendering::RENDERING_POINT_LIST);
+          if (this->dPtr->dynamicRenderable->GetOperationType() !=
+              rendering::RENDERING_POINT_LIST)
+          {
+            this->dPtr->dynamicRenderable->SetOperationType(
+                rendering::RENDERING_POINT_LIST);
+          }
           break;
         case ignition::msgs::Marker::TRIANGLE_FAN:
-          this->dPtr->dynamicRenderable->SetOperationType(
-              rendering::RENDERING_TRIANGLE_FAN);
+          if (this->dPtr->dynamicRenderable->GetOperationType() !=
+              rendering::RENDERING_TRIANGLE_FAN)
+          {
+            this->dPtr->dynamicRenderable->SetOperationType(
+                rendering::RENDERING_TRIANGLE_FAN);
+          }
           break;
         case ignition::msgs::Marker::TRIANGLE_LIST:
-          this->dPtr->dynamicRenderable->SetOperationType(
-              rendering::RENDERING_TRIANGLE_LIST);
+          if (this->dPtr->dynamicRenderable->GetOperationType() !=
+              rendering::RENDERING_TRIANGLE_LIST)
+          {
+            this->dPtr->dynamicRenderable->SetOperationType(
+                rendering::RENDERING_TRIANGLE_LIST);
+          }
           break;
         case ignition::msgs::Marker::TRIANGLE_STRIP:
-          this->dPtr->dynamicRenderable->SetOperationType(
-              rendering::RENDERING_TRIANGLE_STRIP);
+          if (this->dPtr->dynamicRenderable->GetOperationType() !=
+              rendering::RENDERING_TRIANGLE_STRIP)
+          {
+            this->dPtr->dynamicRenderable->SetOperationType(
+                rendering::RENDERING_TRIANGLE_STRIP);
+          }
           break;
         default:
           break;

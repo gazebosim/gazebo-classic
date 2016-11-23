@@ -14,31 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_LINK_PLOT_3D_PLUGIN_HH_
-#define GAZEBO_LINK_PLOT_3D_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_LINKPLOT3DPLUGIN_HH_
+#define GAZEBO_PLUGINS_LINKPLOT3DPLUGIN_HH_
 
-#include <string>
-#include <vector>
-#include <ignition/msgs.hh>
-#include <ignition/transport.hh>
+#include <memory>
 
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
-  /// \brief Information about each plot
-  struct Plot3D
-  {
-    /// \brief Message
-    ignition::msgs::Marker msg;
-
-    physics::LinkPtr link;
-
-    ignition::math::Pose3d pose;
-    ignition::math::Vector3d prevPos =
-        ignition::math::Vector3d(IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF);
-  };
+  // Forward declare private data class
+  class LinkPlot3DPluginPrivate;
 
   /// \brief A plugin that simulates lift and drag.
   class GAZEBO_VISIBLE LinkPlot3DPlugin : public ModelPlugin
@@ -53,18 +39,10 @@ namespace gazebo
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \brief Callback for World Update events.
-    protected: virtual void OnUpdate();
+    private: virtual void OnUpdate();
 
-    /// \brief Connection to World Update events.
-    protected: event::ConnectionPtr updateConnection;
-
-    protected: std::vector<Plot3D> plots;
-
-    protected: ignition::transport::Node node;
-
-    protected: physics::WorldPtr world;
-
-    protected: int frequency;
+    // Private data pointer.
+    private: std::unique_ptr<LinkPlot3DPluginPrivate> dataPtr;
   };
 }
 #endif

@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <string>
+#include <deque>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
@@ -28,8 +29,52 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(LinkPlot3DPlugin)
 
+#include <string>
+#include <vector>
+#include <ignition/msgs.hh>
+#include <ignition/transport.hh>
+
+/// \brief Information about each plot
+struct Plot3D
+{
+  /// \brief Message
+  ignition::msgs::Marker msg;
+
+  /// \brief Link to track
+  physics::LinkPtr link;
+
+  /// \brief Pose of the marker
+  ignition::math::Pose3d pose;
+
+  /// \brief Store the previous point for distance computation
+  ignition::math::Vector3d prevPoint;
+};
+
+/// \brief Private data class
+class gazebo::LinkPlot3DPluginPrivate
+{
+  /// \brief Connection to World Update events.
+  public: event::ConnectionPtr updateConnection;
+
+  /// \brief Set of plots
+  public: std::vector<Plot3D> plots;
+
+  /// \brief Communication node
+  public: ignition::transport::Node node;
+
+  /// \brief Pointer to the world
+  public: physics::WorldPtr world;
+
+  /// \brief Update period
+  public: int period;
+
+  /// \brief PRevious update time.
+  public: common::Time prevTime;
+};
+
 /////////////////////////////////////////////////
 LinkPlot3DPlugin::LinkPlot3DPlugin()
+: dataPtr(new LinkPlot3DPluginPrivate)
 {
 }
 
@@ -45,7 +90,7 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_model, "LinkPlot3DPlugin _model pointer is NULL");
   GZ_ASSERT(_sdf, "LinkPlot3DPlugin _sdf pointer is NULL");
 
-  this->world = _model->GetWorld();
+  this->dataPtr->world = _model->GetWorld();
 
   if (!_sdf->HasElement("plot"))
   {
@@ -53,17 +98,18 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
     return;
   }
 
-  // Frequency
-  this->frequency = _sdf->Get<int>("frequency", 30).first;
+  // Update period
+  this->dataPtr->period = 1.0/(_sdf->Get<int>("frequency", 30).first);
 
+  // Construct the plots
   auto plotElem = _sdf->GetElement("plot");
+  int id = 0;
   while (plotElem)
   {
     auto linkName = plotElem->Get<std::string>("link");
 
     auto link = _model->GetLink(linkName);
 
-    int id = 0;
     if (link)
     {
       Plot3D plot;
@@ -80,8 +126,6 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
       markerMsg.set_ns("plot_" + link->GetName());
       markerMsg.set_id(id++);
       markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
-//      markerMsg.set_type(ignition::msgs::Marker::POINTS);
-//      markerMsg.set_type(ignition::msgs::Marker::SPHERE);
       markerMsg.set_type(ignition::msgs::Marker::LINE_STRIP);
 
       // Material
@@ -90,15 +134,9 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
       ignition::msgs::Material *matMsg = markerMsg.mutable_material();
       matMsg->mutable_script()->set_name(mat);
 
-  //    ignition::msgs::Set(markerMsg.mutable_scale(),
-    //      ignition::math::Vector3d(0.01, 0.01, 0.01));
-
-      auto timeMsg = markerMsg.mutable_lifetime();
-      timeMsg->set_sec(3);
-
       plot.msg = markerMsg;
 
-      this->plots.push_back(plot);
+      this->dataPtr->plots.push_back(plot);
     }
     else
     {
@@ -109,9 +147,9 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
     plotElem = plotElem->GetNextElement("plot");
   }
 
-  if (!this->plots.empty())
+  if (!this->dataPtr->plots.empty())
   {
-    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+    this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
         std::bind(&LinkPlot3DPlugin::OnUpdate, this));
   }
 }
@@ -125,35 +163,31 @@ void LinkPlot3DPlugin::OnUpdate()
   {
   };
 
-  static common::Time prevTime = this->world->GetSimTime();
-  auto currentTime = this->world->GetSimTime();
+  auto currentTime = this->dataPtr->world->GetSimTime();
 
-  if ((currentTime - prevTime).Double() < (1.0 / this->frequency))
+  // Throttle update
+  if ((currentTime - this->dataPtr->prevTime).Double() < this->dataPtr->period)
     return;
 
-  int id = 0;
-  for (auto &plot : this->plots)
+  this->dataPtr->prevTime = currentTime;
+
+  // Process each plot
+  for (auto &plot : this->dataPtr->plots)
   {
-    auto linkWorld = ignition::math::Matrix4d(plot.link->GetWorldPose().Ign());
-    auto plotLink = ignition::math::Matrix4d(plot.pose);
-    auto plotWorld = linkWorld * plotLink;
+    auto point = (plot.pose + plot.link->GetWorldPose().Ign()).Pos();
 
-    plot.msg.set_id((currentTime.Double()*1000) + id++);
-
-    if (plot.prevPos.Length() < 1e10)
+    // Only add points if the distance is past a threshold.
+    if (point.Distance(plot.prevPoint) > 0.05)
     {
-      // POINTS
-      plot.msg.clear_point();
-      ignition::msgs::Set(plot.msg.add_point(), plot.prevPos);
-      ignition::msgs::Set(plot.msg.add_point(), plotWorld.Pose().Pos());
+      plot.prevPoint = point;
+      ignition::msgs::Set(plot.msg.add_point(), point);
 
-      // SPHERE
-  //    ignition::msgs::Set(plot.msg.mutable_pose(), plotWorld.Pose());
+      // Reduce message array
+      if (plot.msg.point_size() > 1000)
+        plot.msg.mutable_point()->DeleteSubrange(0,5);
 
-      this->node.Request("/marker", plot.msg, unused);
+      // plot.prevPoint = point;
+      this->dataPtr->node.Request("/marker", plot.msg, unused);
     }
-
-    plot.prevPos = plotWorld.Pose().Pos();
-    prevTime = currentTime;
   }
 }
