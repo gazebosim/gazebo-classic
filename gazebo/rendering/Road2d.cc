@@ -293,8 +293,8 @@ void RoadSegment::Load(msgs::Road _msg)
   vBuf->unlock();
   iBuf->unlock();
 
-  mesh->_setBounds(Ogre::AxisAlignedBox(Conversions::Convert(bounds.min),
-                   Conversions::Convert(bounds.max)));
+  mesh->_setBounds(Ogre::AxisAlignedBox(Conversions::Convert(bounds.min.Ign()),
+                   Conversions::Convert(bounds.max.Ign())));
 
   if (_msg.has_material())
   {
