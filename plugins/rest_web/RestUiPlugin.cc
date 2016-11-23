@@ -40,19 +40,19 @@ void RestUiPlugin::Load(int _argc, char ** _argv)
   for (int i = 0; i < _argc; ++i)
   {
     std::string arg = _argv[i];
-    if (arg.compare("menu=") == 0)
+    if (arg.compare("menu=") >= 0)
     {
       this->menuTitle = arg.substr(5);
     }
-    else if (arg.compare("title=") == 0 )
+    else if (arg.compare("title=") >= 0 )
     {
       this->loginTitle = arg.substr(6);
     }
-    else if (arg.compare("label=") == 0 )
+    else if (arg.compare("label=") >= 0 )
     {
       this->urlLabel = arg.substr(6);
     }
-    else if (arg.compare("url=") == 0 )
+    else if (arg.compare("url=") >= 0 )
     {
       this->defaultUrl = arg.substr(4);
     }
