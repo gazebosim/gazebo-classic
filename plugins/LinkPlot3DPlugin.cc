@@ -157,12 +157,6 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void LinkPlot3DPlugin::OnUpdate()
 {
-  // Unused callback
-  std::function<void(const ignition::msgs::StringMsg &, const bool)> unused =
-    [](const ignition::msgs::StringMsg &, const bool &)
-  {
-  };
-
   auto currentTime = this->dataPtr->world->GetSimTime();
 
   // Throttle update
@@ -187,7 +181,7 @@ void LinkPlot3DPlugin::OnUpdate()
         plot.msg.mutable_point()->DeleteSubrange(0,5);
 
       // plot.prevPoint = point;
-      this->dataPtr->node.Request("/marker", plot.msg, unused);
+      this->dataPtr->node.Request("/marker", plot.msg);
     }
   }
 }
