@@ -119,9 +119,9 @@ namespace gazebo
                rendering::UserCameraPtr userCam = gui::get_active_camera();
 
                if (_key == " ")
-                 this->++iter;
+                 ++this->iter;
                else if (_key == "b")
-                 this->--iter;
+                 --this->iter;
 
                if (this->iter != this->states.end())
                  this->Update();
