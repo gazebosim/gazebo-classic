@@ -55,8 +55,7 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \param[in] _req The marker message.
   /// \param[out] _rep The response message.
   /// \param[out] _result True/false result.
-  public: void OnMarkerMsg(const ignition::msgs::Marker &_req,
-                           ignition::msgs::StringMsg &_rep, bool &_result);
+  public: void OnMarkerMsg(const ignition::msgs::Marker &_req);
 
   /// \brief Service callback that returns a list of markers.
   /// \param[in] _req Service request.
@@ -260,13 +259,10 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 }
 
 /////////////////////////////////////////////////
-void MarkerManagerPrivate::OnMarkerMsg(const ignition::msgs::Marker &_req,
-    ignition::msgs::StringMsg &_rep, bool &_result)
+void MarkerManagerPrivate::OnMarkerMsg(const ignition::msgs::Marker &_req)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
   this->markerMsgs.push_back(_req);
-  _result = true;
-  _rep.set_data("success");
 }
 
 /////////////////////////////////////////////////

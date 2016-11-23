@@ -79,7 +79,6 @@ int Marker_TEST::MidWhiteWidth(const int _threshold)
 void Marker_TEST::AddRemove()
 {
   bool result;
-  ignition::msgs::StringMsg rep;
 
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
@@ -122,7 +121,7 @@ void Marker_TEST::AddRemove()
   markerMsg.set_id(0);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::SPHERE);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   QVERIFY(result != false);
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -143,7 +142,7 @@ void Marker_TEST::AddRemove()
 
   // Remove the shape
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -156,7 +155,7 @@ void Marker_TEST::AddRemove()
   // Add a box
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::BOX);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
@@ -174,7 +173,7 @@ void Marker_TEST::AddRemove()
                     ignition::math::Pose3d(2, 0, .5, 0, 0, 0));
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::CYLINDER);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
@@ -188,7 +187,7 @@ void Marker_TEST::AddRemove()
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -209,7 +208,7 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(0, 0, -10));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(0, 0, 10));
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -236,7 +235,7 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(2, 0, 10));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(2, 0, -10));
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -252,7 +251,7 @@ void Marker_TEST::AddRemove()
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -278,7 +277,7 @@ void Marker_TEST::AddRemove()
           ignition::math::Rand::DblUniform(-1, 1),
           ignition::math::Rand::DblUniform(-1, 1)));
   }
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -295,7 +294,7 @@ void Marker_TEST::AddRemove()
 
   // Delete everything
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -314,7 +313,7 @@ void Marker_TEST::AddRemove()
   markerMsg.set_text("HELLO");
   ignition::msgs::Set(markerMsg.mutable_pose(),
                       ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -332,7 +331,7 @@ void Marker_TEST::AddRemove()
 
   // Remove the text
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -362,7 +361,7 @@ void Marker_TEST::AddRemove()
     ignition::msgs::Set(markerMsg.add_point(),
         ignition::math::Vector3d(radius * cos(t), radius * sin(t), 0.05));
   }
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -380,7 +379,7 @@ void Marker_TEST::AddRemove()
 
   // Remove the triangle fan
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -416,7 +415,7 @@ void Marker_TEST::AddRemove()
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(2, 2, 0.5));
 
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -435,7 +434,7 @@ void Marker_TEST::AddRemove()
 
   // Remove the triangle list
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
@@ -469,7 +468,7 @@ void Marker_TEST::AddRemove()
       ignition::math::Vector3d(0, 2, 0.3));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(1, 2, 0.3));
-  node.Request(topicName, markerMsg, 5000u, rep, result);
+  result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
