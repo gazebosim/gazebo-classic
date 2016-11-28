@@ -16,10 +16,25 @@
 */
 #include <functional>
 #include <fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
+
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  using raw_type = char;
+#else
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
+  using raw_type = void;
+#endif
+
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
 
 #include <mutex>
 #include <string>
@@ -135,10 +150,14 @@ class Rotor
   public: double samplingRate;
   public: ignition::math::OnePole<double> velocityFilter;
 
-  public: static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
-  public: static constexpr double kDefaultFrequencyCutoff = 5.0;
-  public: static constexpr double kDefaultSamplingRate = 0.2;
+  public: static double kDefaultRotorVelocitySlowdownSim;
+  public: static double kDefaultFrequencyCutoff;
+  public: static double kDefaultSamplingRate;
 };
+
+double Rotor::kDefaultRotorVelocitySlowdownSim = 10.0;
+double Rotor::kDefaultFrequencyCutoff = 5.0;
+double Rotor::kDefaultSamplingRate = 0.2;
 
 // Private data class
 class gazebo::ArduCopterPluginPrivate
@@ -155,7 +174,11 @@ class gazebo::ArduCopterPluginPrivate
     if (bind(this->handle, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
       shutdown(this->handle, 0);
+      #ifdef _WIN32
+      closesocket(this->handle);
+      #else
       close(this->handle);
+      #endif
       return false;
     }
     return true;
@@ -199,7 +222,11 @@ class gazebo::ArduCopterPluginPrivate
         return -1;
     }
 
+    #ifdef _WIN32
+    return recv(this->handle, reinterpret_cast<char *>(_buf), _size, 0);
+    #else
     return recv(this->handle, _buf, _size, 0);
+    #endif
   }
 
   /// \brief Pointer to the update event connection.
@@ -241,10 +268,13 @@ ArduCopterPlugin::ArduCopterPlugin()
 {
   // socket
   this->dataPtr->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
+  #ifndef _WIN32
+  // Windows does not support FD_CLOEXEC
   fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
+  #endif
   int one = 1;
   setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
-      &one, sizeof(one));
+      reinterpret_cast<const char *>(&one), sizeof(one));
 
   if (!this->dataPtr->Bind("127.0.0.1", 9002))
   {
@@ -257,10 +287,15 @@ ArduCopterPlugin::ArduCopterPlugin()
   this->dataPtr->connectionTimeoutCount = 0;
 
   setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
-      &one, sizeof(one));
+     reinterpret_cast<const char *>(&one), sizeof(one));
 
+  #ifdef _WIN32
+  u_long on = 1;
+  ioctlsocket(this->dataPtr->handle, FIONBIO, reinterpret_cast<u_long FAR *>(&on));
+  #else
   fcntl(this->dataPtr->handle, F_SETFL,
       fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
+  #endif
 }
 
 /////////////////////////////////////////////////
@@ -655,6 +690,8 @@ void ArduCopterPlugin::SendState() const
   struct sockaddr_in sockaddr;
   this->dataPtr->MakeSockAddr("127.0.0.1", 9003, sockaddr);
 
-  ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
-    (struct sockaddr *)&sockaddr, sizeof(sockaddr));
+  ::sendto(this->dataPtr->handle,
+           reinterpret_cast<raw_type *>(&pkt),
+           sizeof(pkt), 0,
+           (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }
