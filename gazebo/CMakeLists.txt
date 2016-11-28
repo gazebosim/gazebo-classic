@@ -62,6 +62,7 @@ target_link_libraries(gzserver
   # Extra libs needed when linking statically (e.g., on WIN32)
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
+  ${ogre_libraries}
 )
 
 if (UNIX)

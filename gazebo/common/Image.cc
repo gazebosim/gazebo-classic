@@ -26,7 +26,6 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace common;

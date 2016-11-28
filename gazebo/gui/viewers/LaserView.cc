@@ -340,7 +340,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
           << this->indexAngle << " radians";
       else
         stream << std::fixed << std::setprecision(4)
-          << GZ_RTOD(this->indexAngle) << " degrees";
+          << IGN_RTOD(this->indexAngle) << " degrees";
 
       _painter->setPen(QPen(orange));
       _painter->drawText(x1, y1, stream.str().c_str());
@@ -352,7 +352,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
                   rangeMaxScaled * 1.1 * 2.0 + textWidth * 2.0);
 
       _painter->setPen(QPen(orange));
-      _painter->drawArc(rect, 0, GZ_RTOD(this->indexAngle) * 16);
+      _painter->drawArc(rect, 0, IGN_RTOD(this->indexAngle) * 16);
 
 
       // Draw the line that marks the start of the arc
@@ -409,7 +409,7 @@ double LaserView::LaserItem::GetHoverRange() const
 double LaserView::LaserItem::GetHoverAngle() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return this->radians ? this->indexAngle : GZ_RTOD(this->indexAngle);
+  return this->radians ? this->indexAngle : IGN_RTOD(this->indexAngle);
 }
 
 /////////////////////////////////////////////////

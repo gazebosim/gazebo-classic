@@ -210,9 +210,10 @@ void MainWindow_TEST::SceneDestruction()
 
   // Create the main window.
   mainWindow->Load();
-
   mainWindow->Init();
   mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -426,7 +427,7 @@ void MainWindow_TEST::Wireframe()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_dark_plane.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -519,7 +520,7 @@ void MainWindow_TEST::NonDefaultWorld()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_different_name.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -533,8 +534,7 @@ void MainWindow_TEST::NonDefaultWorld()
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
 
-  if (!cam)
-    return;
+  QVERIFY(cam != nullptr);
 
   cam->SetCaptureData(true);
 
@@ -664,7 +664,7 @@ void MainWindow_TEST::ActionCreationDestruction()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world", false, false, true);
+  this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -1048,7 +1048,7 @@ void MainWindow_TEST::WindowModes()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
