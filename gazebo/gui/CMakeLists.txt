@@ -187,6 +187,7 @@ set (resources resources.qrc)
 QT5_ADD_RESOURCES(resources_RCC ${resources})
 
 gz_add_library(gazebo_gui ${sources} ${resources_RCC})
+set_target_properties(gazebo_gui PROPERTIES COMPILE_DEFINITIONS "QWT_DLL")
 gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)

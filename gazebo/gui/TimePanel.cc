@@ -87,7 +87,8 @@ TimePanel::TimePanel(QWidget *_parent)
       gui::Events::ConnectFullScreen(
       std::bind(&TimePanel::OnFullScreen, this, std::placeholders::_1)));
 
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+  if (g_playAct)
+    connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
 
   QShortcut *space = new QShortcut(Qt::Key_Space, this);
   QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));

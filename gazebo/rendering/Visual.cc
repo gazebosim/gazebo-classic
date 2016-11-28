@@ -449,8 +449,7 @@ void Visual::Load()
       ignition::math::Vector3d derivedScale = this->DerivedScale();
       ignition::math::Vector3d localScale =
           geometrySize / (derivedScale / this->dataPtr->scale);
-      this->dataPtr->sceneNode->setScale(
-          Conversions::Convert(math::Vector3(localScale)));
+      this->dataPtr->sceneNode->setScale(Conversions::Convert(localScale));
       this->dataPtr->scale = localScale;
       this->dataPtr->geomSize = geometrySize;
     }
@@ -791,7 +790,7 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
   this->dataPtr->scale = _scale;
 
   this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(math::Vector3(this->dataPtr->scale)));
+      Conversions::Convert(this->dataPtr->scale));
 
   // Scale selection object in case we have one attached. Other children were
   // scaled from UpdateGeomSize
@@ -1738,7 +1737,7 @@ math::Vector3 Visual::GetPosition() const
 {
   if (!this->dataPtr->sceneNode)
     return math::Vector3::Zero;
-  return Conversions::Convert(this->dataPtr->sceneNode->getPosition());
+  return Conversions::ConvertIgn(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
@@ -1746,7 +1745,7 @@ math::Quaternion Visual::GetRotation() const
 {
   if (!this->dataPtr->sceneNode)
     return math::Vector3::Zero;
-  return Conversions::Convert(this->dataPtr->sceneNode->getOrientation());
+  return Conversions::ConvertIgn(this->dataPtr->sceneNode->getOrientation());
 }
 
 //////////////////////////////////////////////////
@@ -1776,7 +1775,8 @@ void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
+  this->dataPtr->sceneNode->_setDerivedPosition(
+    Conversions::Convert(_pos.Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -1784,7 +1784,8 @@ void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
+  this->dataPtr->sceneNode->_setDerivedOrientation(
+    Conversions::Convert(_q.Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -2001,14 +2002,14 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
       Ogre::AxisAlignedBox bb = obj->getBoundingBox();
 
-      math::Vector3 min;
-      math::Vector3 max;
+      ignition::math::Vector3d min;
+      ignition::math::Vector3d max;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = math::Vector3(-0.5, -0.5, -0.5);
-        max = math::Vector3(0.5, 0.5, 0.5);
+        min = ignition::math::Vector3d(-0.5, -0.5, -0.5);
+        max = ignition::math::Vector3d(0.5, 0.5, 0.5);
       }
       else
       {
@@ -2020,8 +2021,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         // get oriented bounding box in object's local space
         bb.transformAffine(transform);
 
-        min = Conversions::Convert(bb.getMinimum());
-        max = Conversions::Convert(bb.getMaximum());
+        min = Conversions::ConvertIgn(bb.getMinimum());
+        max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
       box.Merge(math::Box(min, max));
@@ -2836,7 +2837,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
     key = strack->createNodeKeyFrame(tt);
     key->setTranslate(Ogre::Vector3(
           _pts[i].pos.x, _pts[i].pos.y, _pts[i].pos.z));
-    key->setRotation(Conversions::Convert(_pts[i].rot));
+    key->setRotation(Conversions::Convert(_pts[i].Ign().Rot()));
 
     tt += dt;
   }
@@ -2880,7 +2881,7 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 
   key = strack->createNodeKeyFrame(_time);
   key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
-  key->setRotation(Conversions::Convert(rotFinal));
+  key->setRotation(Conversions::Convert(rotFinal.Ign()));
 
   this->dataPtr->animState =
     this->dataPtr->sceneNode->getCreator()->createAnimationState(animName);
