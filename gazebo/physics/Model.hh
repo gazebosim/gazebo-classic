@@ -41,6 +41,7 @@ namespace boost
   class recursive_mutex;
 }
 
+// Forward declare reference and pointer parameters
 namespace ignition
 {
   namespace msgs
@@ -437,10 +438,6 @@ namespace gazebo
       /// * Info about a model plugin in a nested model:
       ///    data://world/<world_name>/model/<this_name>/model/
       ///        <nested_model_name>/plugin/<plugin_name>
-      ///
-      /// * Info about a sensor plugin within this model:
-      ///    data://world/<world_name>/model/<this_name>/link/<link_name>/
-      ///    sensor/<sensor_name>/plugin/<plugin_name>
       ///
       /// \param[in] _pluginUri URI for the desired plugin(s).
       /// \param[out] _plugins Message containing vector of plugins.

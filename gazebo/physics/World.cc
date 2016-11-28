@@ -40,6 +40,10 @@
 #include <vector>
 
 #include <ignition/math/Rand.hh>
+
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
