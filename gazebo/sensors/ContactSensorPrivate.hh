@@ -54,9 +54,6 @@ namespace gazebo
 
       /// \brief List of incoming messages.
       public: ContactMsgs_L incomingContacts;
-
-      /// \brief Name of contact filter used to filter contact msgs
-      public: std::string filterName;
     };
   }
 }
