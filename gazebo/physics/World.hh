@@ -453,7 +453,7 @@ namespace gazebo
       /// \brief Get the set world pose mutex.
       /// \return Reference to the mutex.
       /// \deprecated See std::mutex &WorldPoseMutex() const;
-      public: std::mutex &GetWorldPoseMutex() const GAZEBO_DEPRECATED(8.0);
+      public: std::mutex &GetSetWorldPoseMutex() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the set world pose mutex.
       /// \return Reference to the mutex.
