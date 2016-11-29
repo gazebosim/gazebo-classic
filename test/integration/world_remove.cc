@@ -558,15 +558,6 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
   // Load an empty world
   this->Load("worlds/empty.world", false, _physicsEngine);
 
-  // Give time for everything to be created
-  int sleep = 0;
-  int maxSleep = 10;
-  while (sleep < maxSleep)
-  {
-    gazebo::common::Time::MSleep(300);
-    sleep++;
-  }
-
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
 
@@ -576,12 +567,12 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
     SpawnCamera("model", "sensor", ignition::math::Vector3d::Zero,
         ignition::math::Vector3d::Zero);
   }
-  else if (_sensorType == "ray_sensor")
+  else if (_sensorType == "ray")
   {
     SpawnRaySensor("model", "sensor", ignition::math::Vector3d::Zero,
         ignition::math::Vector3d::Zero);
   }
-  else if (_sensorType == "gpu_ray_sensor")
+  else if (_sensorType == "gpu_ray")
   {
     SpawnGpuRaySensor("model", "sensor", ignition::math::Vector3d::Zero,
         ignition::math::Vector3d::Zero);
@@ -648,8 +639,9 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
   physics::remove_worlds();
 
   // Give time for everything to be removed
-  sleep = 0;
-  while (sleep < maxSleep)
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sensor.use_count() != 1 && sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(300);
     sleep++;
@@ -698,10 +690,10 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
 ///////////////////////////////////////////////////
 TEST_P(WorldRemoveSensorsTest, RemoveWorldWithSensor)
 {
-//  if (this->physicsEngine != "simbody")
+//  if (this->physicsEngine != "bullet")
 //    return;
-  //if (this->sensorType != "contact")
-    //return;
+//  if (this->sensorType != "sonar")
+//    return;
 
   if (this->physicsEngine == "dart" && this->sensorType == "sonar")
   {
@@ -715,8 +707,8 @@ TEST_P(WorldRemoveSensorsTest, RemoveWorldWithSensor)
 INSTANTIATE_TEST_CASE_P(RemoveSensorTypes, WorldRemoveSensorsTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("camera",
-                    "ray_sensor",
-                    "gpu_ray_sensor",
+                    "ray",
+                    "gpu_ray",
                     "depth_camera",
                     "imu",
                     "contact",

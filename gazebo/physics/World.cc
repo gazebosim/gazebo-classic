@@ -466,6 +466,8 @@ void World::Stop()
 //////////////////////////////////////////////////
 void World::RunLoop()
 {
+  this->dataPtr->inRunLoop = true;
+
   this->dataPtr->physicsEngine->InitForThread();
 
   this->dataPtr->startTime = common::Time::GetWallTime();
@@ -517,6 +519,8 @@ void World::RunLoop()
     delete this->dataPtr->logThread;
     this->dataPtr->logThread = nullptr;
   }
+
+  this->dataPtr->inRunLoop = false;
 }
 
 //////////////////////////////////////////////////
@@ -836,6 +840,24 @@ void World::Update()
 void World::Fini()
 {
   this->dataPtr->stop = true;
+  this->dataPtr->enablePhysicsEngine = false;
+
+  // Make sure we're out of the RunLoop before cleaning up
+  // Maybe this could be done with a mutex?
+  int waitForRunLoop = 30;
+  int wait = 0;
+  while (this->dataPtr->inRunLoop && wait < waitForRunLoop)
+  {
+    common::Time::MSleep(100);
+    wait++;
+  }
+
+  if (this->dataPtr->inRunLoop)
+  {
+    gzerr << "Failed to finish the world, the run loop is taking a long time"
+          << std::endl;
+    return;
+  }
 
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();

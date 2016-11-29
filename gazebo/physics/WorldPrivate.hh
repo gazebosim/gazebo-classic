@@ -346,6 +346,9 @@ namespace gazebo
 
       /// \brief All the introspection items regsitered for this.
       public: std::vector<common::URI> introspectionItems;
+
+      /// \brief Indicates whether currently in the run loop or not.
+      public: bool inRunLoop = false;
     };
   }
 }

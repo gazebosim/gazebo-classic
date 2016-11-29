@@ -582,7 +582,7 @@ void ConnectionManager::Unsubscribe(const msgs::Subscribe &_sub)
 void ConnectionManager::Unsubscribe(const std::string &_topic,
                                      const std::string &_msgType)
 {
-  if (this->serverConn)
+  if (this->serverConn && this->masterConn)
   {
     msgs::Subscribe msg;
     msg.set_topic(_topic);
