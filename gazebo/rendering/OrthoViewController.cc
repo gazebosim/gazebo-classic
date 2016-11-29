@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,18 +51,7 @@ OrthoViewController::~OrthoViewController()
 //////////////////////////////////////////////////
 void OrthoViewController::Init()
 {
-  this->dataPtr->scale = 100;
-  this->distance = 1000.0/this->dataPtr->scale;
-
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
-
-  if (width > 0 && height > 0)
-  {
-    // set up the view projection
-    this->Zoom(1.0);
-  }
-
+  // this will call the overloaded Init function
   OrbitViewController::Init();
 }
 
@@ -70,10 +59,16 @@ void OrthoViewController::Init()
 void OrthoViewController::Init(const math::Vector3 &_focalPoint,
     double _yaw, double _pitch)
 {
-  this->dataPtr->scale = 100;
+  // this function also gets called when camera animation is complete so make
+  // sure zoom is reset only if not yet initialized.
+  if (!this->init)
+  {
+    this->dataPtr->scale = 100;
+    this->distance = 1000.0/this->dataPtr->scale;
+  }
 
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   if (width > 0 && height > 0)
   {
@@ -100,8 +95,8 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector3 directionVec(0, 0, 0);
 
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
   double orthoWidth = width/this->dataPtr->scale;
   double orthoHeight = height/this->dataPtr->scale;
 
@@ -109,7 +104,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // the focal point and distance.
   if (_event.PressPos() == _event.Pos())
   {
-    if (!this->camera->GetScene()->GetFirstContact(
+    if (!this->camera->GetScene()->FirstContact(
          this->camera, _event.PressPos(), this->focalPoint))
     {
       ignition::math::Vector3d origin, dir;
@@ -197,7 +192,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // The scroll wheel controls zoom.
   else if (_event.Type() == common::MouseEvent::SCROLL)
   {
-    if (!this->camera->GetScene()->GetFirstContact(
+    if (!this->camera->GetScene()->FirstContact(
          this->camera, _event.Pos(), this->focalPoint))
     {
       ignition::math::Vector3d origin, dir;
@@ -236,8 +231,8 @@ void OrthoViewController::Zoom(const float _amount,
   // Translate back to mouse cursor position
 
   math::Vector3 translation;
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   double orthoWidth = width / this->dataPtr->scale;
   double orthoHeight = height / this->dataPtr->scale;
@@ -262,7 +257,7 @@ void OrthoViewController::Zoom(const float _amount,
        height / this->dataPtr->scale / 2.0,
       -500, 500);
 
-  this->camera->GetOgreCamera()->setCustomProjectionMatrix(true, proj);
+  this->camera->OgreCamera()->setCustomProjectionMatrix(true, proj);
 
   double newOrthoWidth = width / this->dataPtr->scale;
   double newOrthoHeight = height / this->dataPtr->scale;
@@ -289,7 +284,7 @@ void OrthoViewController::Resize(
        _height / this->dataPtr->scale / 2.0,
       -500, 500);
 
-  this->camera->GetOgreCamera()->setCustomProjectionMatrix(true, proj);
+  this->camera->OgreCamera()->setCustomProjectionMatrix(true, proj);
 }
 
 //////////////////////////////////////////////////

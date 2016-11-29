@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_TRANSCEIVER_HH_
-#define _GAZEBO_WIRELESS_TRANSCEIVER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
 
 #include <string>
 #include <ignition/math/Pose3.hh>
 
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -43,7 +43,7 @@ namespace gazebo
       public: ~WirelessTransceiver();
 
       // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      public: virtual std::string Topic() const;
 
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
@@ -56,20 +56,20 @@ namespace gazebo
 
       /// \brief Returns the antenna's gain of the receiver (dBi).
       /// \return Antenna's gain of the receiver (dBi).
-      public: double GetGain() const;
+      public: double Gain() const;
 
       /// \brief Returns the receiver power (dBm).
       /// \return Receiver power (dBm).
-      public: double GetPower() const;
+      public: double Power() const;
 
       /// \brief Publisher to publish propagation model data
       protected: transport::PublisherPtr pub;
 
       /// \brief Receiver's power (dBm).
-      protected: double power;
+      protected: double power = 14.5;
 
       /// \brief Antenna's gain of the receiver (dBi).
-      protected: double gain;
+      protected: double gain = 2.5;
 
       /// \brief Parent entity which the sensor is attached to
       protected: boost::weak_ptr<physics::Link> parentEntity;

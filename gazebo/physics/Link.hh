@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,7 @@ namespace gazebo
 
       /// \brief Reset the link.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of link.
       public: void ResetPhysicsStates();
@@ -123,6 +124,14 @@ namespace gazebo
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
       public: virtual bool GetGravityMode() const = 0;
+
+      /// \brief Set whether wind affects this body.
+      /// \param[in] _mode True to enable wind.
+      public: virtual void SetWindMode(const bool _mode);
+
+      /// \brief Get the wind mode.
+      /// \return True if wind is enabled.
+      public: virtual bool WindMode() const;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
@@ -416,8 +425,10 @@ namespace gazebo
 
       /// \brief Disconnect to the add entity signal.
       /// \param[in] _conn Connection pointer to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectEnabled(event::ConnectionPtr &_conn)
-              {enabledSignal.Disconnect(_conn);}
+              GAZEBO_DEPRECATED(8.0)
+              {enabledSignal.Disconnect(_conn->Id());}
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
@@ -526,6 +537,10 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
+      // Documentation inherited
+      public: virtual void SetStatic(const bool &_static);
+      using Entity::SetStatic;
+
       /// \brief Move Link given source and target frames specified in
       /// world coordinates. Assuming link's relative pose to
       /// source frame (_worldReferenceFrameSrc) remains unchanged relative
@@ -555,6 +570,23 @@ namespace gazebo
         const LinkPtr &_originalParentLink,
         Link_V &_connectedLinks, bool _fistLink = false);
 
+      /// \brief Enable/disable wind for this link.
+      /// \param[in] _enable True to enable the wind.
+      public: void SetWindEnabled(const bool _enable);
+
+      /// \brief Returns this link's wind velocity in the world coordinate
+      /// frame.
+      /// \return this link's wind velocity.
+      public: const ignition::math::Vector3d WorldWindLinearVel() const;
+
+      /// \brief Returns this link's wind velocity.
+      /// \return this link's wind velocity.
+      public: const ignition::math::Vector3d RelativeWindLinearVel() const;
+
+      /// \brief Update the wind.
+      /// \param[in] _info Update information.
+      public: void UpdateWind(const common::UpdateInfo &_info);
+
       /// \brief Get a battery by name.
       /// \param[in] _name Name of the battery to get.
       /// \return Pointer to the battery, NULL if the name is invalid.
@@ -568,6 +600,27 @@ namespace gazebo
       /// \return Size of this->batteries array.
       /// \sa Link::Battery()
       public: size_t BatteryCount() const;
+
+      /// \brief Get the unique ID of a visual.
+      /// \param[in] _visName Name of the visual.
+      /// \param[out] _visualId The unique ID of the visual.
+      /// \return True if getting the unique ID of the visual was successful.
+      public: bool VisualId(const std::string &_visName, uint32_t &_visualId)
+        const;
+
+      /// \brief Get the pose of a visual.
+      /// \param[in] _id Unique ID of visual.
+      /// \param[out] _pose Pose of the visual relative to this link.
+      /// \return True if getting the pose of the visual was successful.
+      public: bool VisualPose(const uint32_t _id,
+                  ignition::math::Pose3d &_pose) const;
+
+      /// \brief Set the pose of a visual.
+      /// \param[in] _id Unique ID of visual message.
+      /// \param[in] _pose Pose relative to this link to place the visual.
+      /// \return True if setting the pose of the visual was successful.
+      public: bool SetVisualPose(const uint32_t _id,
+                                 const ignition::math::Pose3d &_pose);
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
@@ -613,11 +666,11 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadBattery(const sdf::ElementPtr _sdf);
 
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
-
-      /// \brief Center of gravity visual elements.
-      protected: std::vector<std::string> cgVisuals;
 
       /// \def Visuals_M
       /// \brief Map of unique ID to visual message.
@@ -679,6 +732,12 @@ namespace gazebo
 
       /// \brief Mutex to protect the wrenchMsgs variable.
       private: boost::mutex wrenchMsgMutex;
+
+      /// \brief Wind velocity.
+      private: ignition::math::Vector3d windLinearVel;
+
+      /// \brief Update connection to calculate wind velocity.
+      private: event::ConnectionPtr updateConnection;
 
       /// \brief All the attached batteries.
       private: std::vector<common::BatteryPtr> batteries;

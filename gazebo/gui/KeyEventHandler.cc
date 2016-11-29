@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,20 @@
  *
 */
 
+#include <list>
+#include <string>
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/gui/KeyEventHandlerPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 KeyEventHandler::KeyEventHandler()
+  : dataPtr(new KeyEventHandlerPrivate())
 {
-  autoRepeat = false;
+  this->dataPtr->autoRepeat = false;
 }
 
 /////////////////////////////////////////////////
@@ -35,50 +40,50 @@ KeyEventHandler::~KeyEventHandler()
 void KeyEventHandler::AddPressFilter(const std::string &_name,
     KeyEventFilter _filter)
 {
-  this->Add(_name, _filter, this->pressFilters);
+  this->Add(_name, _filter, this->dataPtr->pressFilters);
 }
 
 /////////////////////////////////////////////////
 void KeyEventHandler::AddReleaseFilter(const std::string &_name,
     KeyEventFilter _filter)
 {
-  this->Add(_name, _filter, this->releaseFilters);
+  this->Add(_name, _filter, this->dataPtr->releaseFilters);
 }
 
 /////////////////////////////////////////////////
 void KeyEventHandler::RemovePressFilter(const std::string &_name)
 {
-  this->Remove(_name, this->pressFilters);
+  this->Remove(_name, this->dataPtr->pressFilters);
 }
 
 /////////////////////////////////////////////////
 void KeyEventHandler::RemoveReleaseFilter(const std::string &_name)
 {
-  this->Remove(_name, this->releaseFilters);
+  this->Remove(_name, this->dataPtr->releaseFilters);
 }
 
 /////////////////////////////////////////////////
 bool KeyEventHandler::HandlePress(const common::KeyEvent &_event)
 {
-  return this->Handle(_event, this->pressFilters);
+  return this->Handle(_event, this->dataPtr->pressFilters);
 }
 
 /////////////////////////////////////////////////
 bool KeyEventHandler::HandleRelease(const common::KeyEvent &_event)
 {
-  return this->Handle(_event, this->releaseFilters);
+  return this->Handle(_event, this->dataPtr->releaseFilters);
 }
 
 /////////////////////////////////////////////////
-bool KeyEventHandler::GetAutoRepeat() const
+bool KeyEventHandler::AutoRepeat() const
 {
-  return this->autoRepeat;
+  return this->dataPtr->autoRepeat;
 }
 
 /////////////////////////////////////////////////
 void KeyEventHandler::SetAutoRepeat(const bool _autorepeat)
 {
-  this->autoRepeat = _autorepeat;
+  this->dataPtr->autoRepeat = _autorepeat;
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact plugin
- * Author: Nate Koenig mod by John Hsu
- */
+#include <functional>
 
 #include "gazebo/physics/physics.hh"
 #include "RayPlugin.hh"
@@ -35,8 +32,6 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
-  this->parentSensor->GetLaserShape()->DisconnectNewLaserScans(
-      this->newLaserScansConnection);
   this->newLaserScansConnection.reset();
 
   this->parentSensor.reset();
@@ -48,16 +43,16 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
   // Get then name of the parent sensor
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(_parent);
+    std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
   if (!this->parentSensor)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
-  this->world = physics::get_world(this->parentSensor->GetWorldName());
+  this->world = physics::get_world(this->parentSensor->WorldName());
 
   this->newLaserScansConnection =
-    this->parentSensor->GetLaserShape()->ConnectNewLaserScans(
-      boost::bind(&RayPlugin::OnNewLaserScans, this));
+    this->parentSensor->LaserShape()->ConnectNewLaserScans(
+      std::bind(&RayPlugin::OnNewLaserScans, this));
 }
 
 /////////////////////////////////////////////////

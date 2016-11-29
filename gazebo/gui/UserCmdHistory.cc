@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ UserCmdHistory::UserCmdHistory()
     gzerr << "Action missing, not initializing UserCmdHistory" << std::endl;
     return;
   }
+
+  this->dataPtr->active = true;
 
   // Action groups
   this->dataPtr->undoActions = new QActionGroup(this);
@@ -84,12 +86,18 @@ UserCmdHistory::~UserCmdHistory()
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndo()
 {
+  if (!this->dataPtr->active)
+    return;
+
   this->OnUndoCommand(NULL);
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoCommand(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   msgs::UndoRedo msg;
   msg.set_undo(true);
 
@@ -104,6 +112,9 @@ void UserCmdHistory::OnUndoCommand(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoHovered(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   bool beforeThis = true;
   for (auto action : this->dataPtr->undoActions->actions())
   {
@@ -119,12 +130,18 @@ void UserCmdHistory::OnUndoHovered(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedo()
 {
+  if (!this->dataPtr->active)
+    return;
+
   this->OnRedoCommand(NULL);
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedoCommand(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   msgs::UndoRedo msg;
   msg.set_undo(false);
 
@@ -139,6 +156,9 @@ void UserCmdHistory::OnRedoCommand(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedoHovered(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   bool beforeThis = true;
   for (auto action : this->dataPtr->redoActions->actions())
   {
@@ -154,6 +174,7 @@ void UserCmdHistory::OnRedoHovered(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
 {
+  this->dataPtr->msg.Clear();
   this->dataPtr->msg.CopyFrom(*_msg);
 
   this->StatsSignal();
@@ -162,57 +183,107 @@ void UserCmdHistory::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnStatsSlot()
 {
-  g_undoAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
-  g_redoAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
-  g_undoHistoryAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
-  g_redoHistoryAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
+  if (!this->dataPtr->active)
+    return;
+
+  g_undoAct->setEnabled(this->HasUndo());
+  g_redoAct->setEnabled(this->HasRedo());
+  g_undoHistoryAct->setEnabled(this->HasUndo());
+  g_redoHistoryAct->setEnabled(this->HasRedo());
+}
+
+/////////////////////////////////////////////////
+bool UserCmdHistory::HasUndo() const
+{
+  return this->dataPtr->msg.undo_cmd_count() > 0;
+}
+
+/////////////////////////////////////////////////
+bool UserCmdHistory::HasRedo() const
+{
+  return this->dataPtr->msg.redo_cmd_count() > 0;
+}
+
+/////////////////////////////////////////////////
+std::vector<std::pair<unsigned int, std::string>>
+    UserCmdHistory::Cmds(const bool _undo) const
+{
+  auto cmds = this->dataPtr->msg.undo_cmd();
+
+  if (!_undo)
+    cmds = this->dataPtr->msg.redo_cmd();
+
+  std::vector<std::pair<unsigned int, std::string>> result;
+  for (auto cmd : cmds)
+  {
+    result.push_back(std::pair<unsigned int, std::string>(
+        cmd.id(), cmd.description()));
+  }
+
+  return result;
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoCmdHistory()
 {
-  // Clear undo action group
-  for (auto action : this->dataPtr->undoActions->actions())
+  this->OnCmdHistory(true);
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnRedoCmdHistory()
+{
+  this->OnCmdHistory(false);
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnCmdHistory(const bool _undo)
+{
+  if (!this->dataPtr->active)
+    return;
+
+  // Clear action group
+  if (_undo)
   {
-    this->dataPtr->undoActions->removeAction(action);
+    for (auto action : this->dataPtr->undoActions->actions())
+      this->dataPtr->undoActions->removeAction(action);
+  }
+  else
+  {
+    for (auto action : this->dataPtr->redoActions->actions())
+      this->dataPtr->redoActions->removeAction(action);
   }
 
   // Create new menu
   QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.undo_cmd()))
+  auto cmds = this->Cmds(_undo);
+  for (auto cmd = cmds.rbegin(); cmd != cmds.rend(); ++cmd)
   {
-    QAction *action = new QAction(QString::fromStdString(cmd.description()),
-        this);
-    action->setData(QVariant(cmd.id()));
+    auto action = new QAction(QString::fromStdString((*cmd).second), this);
+    action->setData(QVariant((*cmd).first));
     action->setCheckable(true);
     menu.addAction(action);
-    this->dataPtr->undoActions->addAction(action);
+
+    if (_undo)
+      this->dataPtr->undoActions->addAction(action);
+    else
+      this->dataPtr->redoActions->addAction(action);
   }
 
   menu.exec(QCursor::pos());
 }
 
 /////////////////////////////////////////////////
-void UserCmdHistory::OnRedoCmdHistory()
+void UserCmdHistory::SetActive(const bool _active)
 {
-  // Clear redo action group
-  for (auto action : this->dataPtr->redoActions->actions())
-  {
-    this->dataPtr->redoActions->removeAction(action);
-  }
+  this->dataPtr->active = _active;
 
-  // Create new menu
-  QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.redo_cmd()))
-  {
-    QAction *action = new QAction(QString::fromStdString(cmd.description()),
-        this);
-    action->setData(QVariant(cmd.id()));
-    action->setCheckable(true);
-    menu.addAction(action);
-    this->dataPtr->redoActions->addAction(action);
-  }
+  if (_active)
+    this->StatsSignal();
+}
 
-  menu.exec(QCursor::pos());
+/////////////////////////////////////////////////
+bool UserCmdHistory::Active() const
+{
+  return this->dataPtr->active;
 }
 

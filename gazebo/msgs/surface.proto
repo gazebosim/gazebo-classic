@@ -1,3 +1,4 @@
+syntax = "proto2";
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
@@ -20,5 +21,6 @@ message Surface
   optional double min_depth                 = 9;
   optional bool collide_without_contact     = 10;
   optional uint32 collide_without_contact_bitmask = 11;
-  optional uint32 collide_bitmask = 12;
+  optional uint32 collide_bitmask           = 12;
+  optional double elastic_modulus           = 13;
 }

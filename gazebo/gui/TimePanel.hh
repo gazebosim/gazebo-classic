@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _TIME_PANEL_HH_
-#define _TIME_PANEL_HH_
+#ifndef GAZEBO_GUI_TIMEPANEL_HH_
+#define GAZEBO_GUI_TIMEPANEL_HH_
 
 #include <vector>
 #include <list>
@@ -84,6 +84,9 @@ namespace gazebo
       /// \param[in] _paused True to display the simulation as paused. False
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
+
+      /// \brief Toggle simulation paused state.
+      public slots: void TogglePause();
 
       /// \brief Qt call back when the step value in the spinbox changed
       /// \param[in] _value New step value.

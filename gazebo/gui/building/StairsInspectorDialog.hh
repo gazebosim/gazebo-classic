@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,25 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
+#define GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
 
-#ifndef _STAIRS_INSPECTOR_DIALOG_HH_
-#define _STAIRS_INSPECTOR_DIALOG_HH_
-
+#include <memory>
 #include <string>
-#include <vector>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class StairsInspectorDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -47,23 +52,23 @@ namespace gazebo
 
       /// \brief Get start position (bottom-end) of the staircase.
       /// \return The start position of the staircase in pixel coordinates.
-      public: QPointF GetStartPosition() const;
+      public: ignition::math::Vector2d StartPosition() const;
 
       /// \brief Get the width the staircase.
       /// \return Staircase width in pixels.
-      public: double GetWidth() const;
+      public: double Width() const;
 
       /// \brief Get the depth the staircase.
       /// \return Staircase depth in pixels.
-      public: double GetDepth() const;
+      public: double Depth() const;
 
       /// \brief Get the height the staircase.
       /// \return Staircase height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Get the number of steps in the staircase.
       /// \return Number of steps in the staircase.
-      public: int GetSteps() const;
+      public: int Steps() const;
 
       /// \brief Set the name of the staircase.
       /// \param[in] _name Name to set to.
@@ -71,61 +76,29 @@ namespace gazebo
 
       /// \brief Set the start position of the staircase.
       /// \param[in] _pos Start position in pixel coordinates.
-      public: void SetStartPosition(const QPointF &_pos);
+      public: void SetStartPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the width of the staircase.
       /// \param[in] _width Width in pixels.
-      public: void SetWidth(double _width);
+      public: void SetWidth(const double _width);
 
       /// \brief Set the depth of the staircase.
       /// \param[in] _depth Depth in pixels.
-      public: void SetDepth(double _depth);
+      public: void SetDepth(const double _depth);
 
       /// \brief Set the height of the staircase.
       /// \param[in] _height Height in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Set the number of steps in the staircase.
       /// \param[in] _steps Number of steps.
-      public: void SetSteps(int _steps);
+      public: void SetSteps(const int _steps);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
-
-      /// \brief Qt callback when the Cancel button is pressed.
-      private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
-      /// \brief Qt callback when the Ok button is pressed.
-      private slots: void OnOK();
-
-      /// \brief Spin box for configuring the X start position of the
-      /// staircase.
-      private: QDoubleSpinBox *startXSpinBox;
-
-      /// \brief Spin box for configuring the Y start position of the
-      /// staircase.
-      private: QDoubleSpinBox *startYSpinBox;
-
-      /// \brief Spin box for configuring the width of the staircase.
-      private: QDoubleSpinBox *widthSpinBox;
-
-      /// \brief Spin box for configuring the depth of the staircase.
-      private: QDoubleSpinBox *depthSpinBox;
-
-      /// \brief Spin box for configuring the height of the staircase.
-      private: QDoubleSpinBox *heightSpinBox;
-
-      /// \brief Spin box for configuring the number of steps in the staircase.
-      private: QSpinBox *stepsSpinBox;
-
-      /// \brief Label that holds the name of the staircase.
-      private: QLabel* stairsNameLabel;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<StairsInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }
 }
-
 #endif

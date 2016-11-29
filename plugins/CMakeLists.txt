@@ -14,9 +14,12 @@ include_directories(
 # which uses tinxyml. Not defining the link directory here will end up
 # failures in clang.
 link_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CURL_LIBDIR}
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
@@ -36,9 +39,12 @@ if (HAVE_UUID)
   add_definitions(${uuid_CFLAGS})
 endif()
 
-set (plugins
+set (plugins_single_header
+  ActorPlugin
   ActuatorPlugin
+  ArduCopterPlugin
   ArrangePlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
@@ -47,9 +53,12 @@ set (plugins
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
-  ElevatorPlugin
+  FiducialCameraPlugin
+  FollowerPlugin
   ForceTorquePlugin
+  GimbalSmall2dPlugin
   GpuRayPlugin
+  HarnessPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
@@ -58,19 +67,26 @@ set (plugins
   LinearBatteryPlugin
   ModelPropShop
   MudPlugin
+  PlaneDemoPlugin
   PressurePlugin
-  RandomVelocityPlugin
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  VehiclePlugin
+  WindPlugin
+)
+
+set (plugins_private_header
+  ElevatorPlugin
+  RandomVelocityPlugin
   TransporterPlugin
-  VehiclePlugin)
+)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
-  set (plugins ${plugins}
+  set (plugins_single_header ${plugins_single_header}
     HydraPlugin
     HydraDemoPlugin
   )
@@ -78,31 +94,39 @@ endif()
 
 set (GUIplugins
   CessnaGUIPlugin
+  KeyboardGUIPlugin
   TimerGUIPlugin
 )
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
-foreach (src ${plugins})
+
+foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${plugins})
+endforeach ()
 
-target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
-set_target_properties(BreakableJointPlugin PROPERTIES
-  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
-)
+foreach (src ${plugins_private_header})
+  add_library(${src} SHARED ${src}.cc)
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  gz_install_includes("plugins" ${src}.hh)
+  gz_install_includes("plugins" ${src}Private.hh)
+endforeach ()
 
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
+  target_link_libraries(${src} gazebo_gui
+                               libgazebo
+			       ${ogre_libraries}
+			       ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${GUIplugins})
+endforeach ()
 
 add_subdirectory(events)
 

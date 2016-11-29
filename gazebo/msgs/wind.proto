@@ -1,0 +1,14 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Wind
+/// \brief A message containing a description of the global wind properties
+
+import "vector3d.proto";
+
+message Wind
+{
+  optional Vector3d linear_velocity = 1;
+  optional bool enable_wind = 2;
+}

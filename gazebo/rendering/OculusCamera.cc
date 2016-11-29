@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
@@ -133,7 +135,7 @@ OculusCamera::~OculusCamera()
 {
   if (this->dataPtr->externalSceneManager)
   {
-    RenderEngine::Instance()->root->destroySceneManager(
+    RenderEngine::Instance()->Root()->destroySceneManager(
         this->dataPtr->externalSceneManager);
   }
 
@@ -178,7 +180,7 @@ void OculusCamera::Init()
 
   // Oculus
   {
-    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
+    this->dataPtr->rightCamera = this->scene->OgreSceneManager()->createCamera(
       "OculusUserRight");
     this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
@@ -305,7 +307,7 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
+    math::Pose origPose = this->WorldPose();
     double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
     double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
@@ -314,12 +316,12 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
     if (fabs(zDiff) > 1e-3)
     {
       double dist = _visual->GetWorldPose().pos.Distance(
-          this->GetWorldPose().pos);
+          this->WorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
 
-    this->Yaw(yaw);
-    this->Pitch(pitch);
+    this->Yaw(ignition::math::Angle(yaw));
+    this->Pitch(ignition::math::Angle(pitch));
 
     math::Box bb = _visual->GetBoundingBox();
     math::Vector3 pos = bb.GetCenter();
@@ -363,12 +365,6 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 }
 
 //////////////////////////////////////////////////
-bool OculusCamera::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  return Camera::MoveToPosition(_pose, _time);
-}
-
-//////////////////////////////////////////////////
 void OculusCamera::MoveToVisual(const std::string &_name)
 {
   VisualPtr visualPtr = this->scene->GetVisual(_name);
@@ -384,16 +380,16 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   if (!_visual)
     return;
 
-  if (this->scene->GetManager()->hasAnimation("cameratrack"))
+  if (this->scene->OgreSceneManager()->hasAnimation("cameratrack"))
   {
-    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->OgreSceneManager()->destroyAnimation("cameratrack");
   }
 
   math::Box box = _visual->GetBoundingBox();
   math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
 
-  math::Vector3 start = this->GetWorldPose().pos;
+  math::Vector3 start = this->WorldPose().Pos();
   start.Correct();
   math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
   end.Correct();
@@ -418,7 +414,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
 
   dir.Normalize();
 
-  double scale = maxSize / tan((this->GetHFOV()/2.0).Radian());
+  double scale = maxSize / tan((this->HFOV()/2.0).Radian());
 
   end = mid + dir*(dist - scale);
 
@@ -427,7 +423,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   double time = 0.5;  // dist / vel;
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", time);
+    this->scene->OgreSceneManager()->createAnimation("cameratrack", time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
@@ -443,7 +439,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   key->setRotation(yawFinal);
 
   this->animState =
-    this->scene->GetManager()->createAnimationState("cameratrack");
+    this->scene->OgreSceneManager()->createAnimationState("cameratrack");
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -465,7 +461,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   rt->getViewport(0)->setOverlaysEnabled(false);
   rt->getViewport(0)->setShadowsEnabled(true);
   rt->getViewport(0)->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
   rt->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
@@ -479,7 +475,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   rt->getViewport(0)->setShadowsEnabled(true);
   rt->getViewport(0)->setOverlaysEnabled(false);
   rt->getViewport(0)->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
   rt->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
@@ -496,11 +492,16 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   float aspectRatio = combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
 
+  double vfov = 2.0 * atan(combinedTanHalfFovVertical);
   this->camera->setAspectRatio(aspectRatio);
+  this->camera->setFOVy(Ogre::Radian(vfov));
   this->dataPtr->rightCamera->setAspectRatio(aspectRatio);
+  this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
 
-  ovrMatrix4f projL = ovrMatrix4f_Projection(fovLeft, 0.001, 500.0, true);
-  ovrMatrix4f projR = ovrMatrix4f_Projection(fovRight, 0.001, 500.0, true);
+  ovrMatrix4f projL = ovrMatrix4f_Projection(fovLeft, 0.001,
+      g_defaultFarClip, true);
+  ovrMatrix4f projR = ovrMatrix4f_Projection(fovRight, 0.001,
+      g_defaultFarClip, true);
 
   this->camera->setCustomProjectionMatrix(true,
     Ogre::Matrix4(
@@ -549,15 +550,18 @@ void OculusCamera::Oculus()
   // The distorted mesh receives the left and right camera images, and the
   // camera in the externalSceneManager renders the distorted meshes.
   this->dataPtr->externalSceneManager =
-    RenderEngine::Instance()->root->createSceneManager(Ogre::ST_GENERIC);
+    RenderEngine::Instance()->Root()->createSceneManager(Ogre::ST_GENERIC);
   this->dataPtr->externalSceneManager->setAmbientLight(
       Ogre::ColourValue(0.5, 0.5, 0.5));
 
+  ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
+  ovrFovPort fovRight = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
+
   // Get the texture sizes
   ovrSizei textureSizeLeft = ovrHmd_GetFovTextureSize(this->dataPtr->hmd,
-       ovrEye_Left, this->dataPtr->hmd->DefaultEyeFov[0], 1.0f);
+       ovrEye_Left, fovLeft, 1.0f);
   ovrSizei textureSizeRight = ovrHmd_GetFovTextureSize(this->dataPtr->hmd,
-      ovrEye_Right, this->dataPtr->hmd->DefaultEyeFov[1], 1.0f);
+      ovrEye_Right, fovRight, 1.0f);
 
   // Create the left and right render textures.
   this->dataPtr->renderTextureLeft =
@@ -593,9 +597,6 @@ void OculusCamera::Oculus()
       this->dataPtr->renderTextureLeft);
   matRight->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(
       this->dataPtr->renderTextureRight);
-
-  ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
-  ovrFovPort fovRight = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
 
   // Get eye description information
   ovrEyeRenderDesc eyeRenderDesc[2];

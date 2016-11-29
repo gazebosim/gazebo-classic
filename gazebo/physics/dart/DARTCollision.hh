@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 #ifndef _GAZEBO_DARTCOLLISION_HH_
 #define _GAZEBO_DARTCOLLISION_HH_
 
-#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/math/Box.hh"
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/dart/dart_inc.h"
@@ -31,6 +32,9 @@ namespace gazebo
   {
     /// Forward declare private data class
     class DARTCollisionPrivate;
+
+    /// \addtogroup gazebo_physics_dart
+    /// \{
 
     /// \brief Base class for all DART collisions.
     class GZ_PHYSICS_VISIBLE DARTCollision : public Collision
@@ -78,11 +82,25 @@ namespace gazebo
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
+      /// \deprecated See version that accepts dart::dynamics::ShapePtr
       public: void SetDARTCollisionShape(dart::dynamics::Shape *_shape,
-                                         bool _placeable = true);
+                                         const bool _placeable = true)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set DART collision shape.
+      /// \param[in] _shape DART Collision shape
+      /// \param[in] _placeable True to make the object movable.
+      public: void SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
+                                         const bool _placeable = true);
 
       /// \brief Get DART collision shape.
-      public: dart::dynamics::Shape *GetDARTCollisionShape() const;
+      /// \deprecated See dart::dynamics::ShapePtr DARTCollisionShape()
+      public: dart::dynamics::Shape *GetDARTCollisionShape() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get DART collision shape.
+      /// \return DART Collision shape pointer.
+      public: dart::dynamics::ShapePtr DARTCollisionShape() const;
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to DARTSurfaceParams.
@@ -93,6 +111,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTCollisionPrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

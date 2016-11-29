@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,25 +30,6 @@
 #ifndef NULL
 #define NULL 0
 #endif
-
-/////////////////////////////////////////////////////////////////////////////
-// Macros
-/////////////////////////////////////////////////////////////////////////////
-
-#if defined(__GNUC__)
-#define GAZEBO_DEPRECATED(version) __attribute__((deprecated))
-#define GAZEBO_FORCEINLINE __attribute__((always_inline))
-#elif defined(_WIN32)
-// GAZEBO_DEPRECATED should be defined as something like
-// __declspec(deprecated), but it needs to go *before* the function name,
-// and we're putting GAZEBO_DEPRECATED *after* the function.
-#define GAZEBO_DEPRECATED(version)
-#define GAZEBO_FORCEINLINE __forceinline
-#else
-#define GAZEBO_DEPRECATED(version) ()
-#define GAZEBO_FORCEINLINE
-#endif
-
 
 /// \file
 /// \ingroup gazebo_common

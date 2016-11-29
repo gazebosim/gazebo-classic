@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 */
 #include <boost/bind.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/math/Pose.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -57,7 +59,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
   // Set default UserCamera render rate to 120Hz when stereo rendering is
   // enabled. Otherwise use 60Hz.
   // Some padding is added for safety.
-  this->SetRenderRate(_stereoEnabled ? 130.0 : 70.0);
+  this->SetRenderRate(_stereoEnabled ? 124.0 : 62.0);
 
   this->SetUseSDFPose(false);
 }
@@ -114,14 +116,14 @@ void UserCamera::Init()
   Camera::Init();
 
   // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  this->SetFixedYawAxis(true, ignition::math::Vector3d::UnitZ);
   this->camera->setDirection(1, 0, 0);
   this->camera->setAutoAspectRatio(false);
 
   // Right camera
   if (this->dataPtr->stereoEnabled)
   {
-    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
+    this->dataPtr->rightCamera = this->scene->OgreSceneManager()->createCamera(
         "StereoUserRight");
     this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
@@ -175,7 +177,7 @@ void UserCamera::Init()
   axisNode->setInheritOrientation(false);
 
   Ogre::ManualObject *x =
-    this->scene->GetManager()->createManualObject("MyXAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyXAxis");
   x->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST);
   x->position(0, 0, 0);
   x->position(1, 0, 0);
@@ -183,7 +185,7 @@ void UserCamera::Init()
   x->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *y =
-    this->scene->GetManager()->createManualObject("MyYAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyYAxis");
   y->begin("Gazebo/Green", Ogre::RenderOperation::OT_LINE_LIST);
   y->position(0, 0, 0);
   y->position(0, 1, 0);
@@ -191,7 +193,7 @@ void UserCamera::Init()
   y->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *z =
-    this->scene->GetManager()->createManualObject("MyZAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyZAxis");
   z->begin("Gazebo/Blue", Ogre::RenderOperation::OT_LINE_LIST);
   z->position(0, 0, 0);
   z->position(0, 0, 1);
@@ -208,7 +210,7 @@ void UserCamera::Init()
 void UserCamera::SetDefaultPose(const math::Pose &_pose)
 {
   this->dataPtr->defaultPose = _pose;
-  this->SetWorldPose(_pose);
+  this->SetWorldPose(_pose.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -221,6 +223,13 @@ math::Pose UserCamera::DefaultPose() const
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose.Ign());
+  this->dataPtr->viewController->Init();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
 }
 
@@ -240,6 +249,16 @@ void UserCamera::Update()
 void UserCamera::AnimationComplete()
 {
   this->dataPtr->viewController->Init();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::Render(const bool /*_force*/)
+{
+  if (this->initialized)
+  {
+    this->newData = true;
+    this->RenderImpl();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -328,9 +347,9 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     this->Yaw(yaw);
     this->Pitch(pitch);
 
-    ignition::math::Box bb = _visual->BoundingBox();
-    ignition::math::Vector3d pos = bb.Center();
-    pos.Z(bb.Max().Z());
+    math::Box bb = _visual->GetBoundingBox();
+    math::Vector3 pos = bb.GetCenter();
+    pos.z = bb.max.z;
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }
@@ -484,12 +503,6 @@ void UserCamera::ShowVisual(bool /*_s*/)
 }
 
 //////////////////////////////////////////////////
-bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  return Camera::MoveToPosition(_pose.Ign(), _time);
-}
-
-//////////////////////////////////////////////////
 void UserCamera::MoveToVisual(const std::string &_name)
 {
   VisualPtr visualPtr = this->scene->GetVisual(_name);
@@ -505,9 +518,9 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   if (!_visual)
     return;
 
-  if (this->scene->GetManager()->hasAnimation("cameratrack"))
+  if (this->scene->OgreSceneManager()->hasAnimation("cameratrack"))
   {
-    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->OgreSceneManager()->destroyAnimation("cameratrack");
   }
 
   ignition::math::Box box = _visual->BoundingBox();
@@ -516,7 +529,8 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   ignition::math::Vector3d start = this->WorldPose().Pos();
   start.Correct();
-  ignition::math::Vector3d end = box.Center() + _visual->WorldPose().Pos();
+  ignition::math::Vector3d end = box.Center() +
+    _visual->WorldPose().Pos();
   end.Correct();
   ignition::math::Vector3d dir = end - start;
   dir.Correct();
@@ -548,7 +562,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   double time = 0.5;  // dist / vel;
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", time);
+    this->scene->OgreSceneManager()->createAnimation("cameratrack", time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
@@ -569,7 +583,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   key->setRotation(pitchYawFinal);
 
   this->animState =
-    this->scene->GetManager()->createAnimationState("cameratrack");
+    this->scene->OgreSceneManager()->createAnimationState("cameratrack");
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -612,7 +626,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
@@ -627,7 +641,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->initialized = true;
 
   this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
-      this->scene->GetManager(), this->renderTarget);
+      this->scene->OgreSceneManager(), this->renderTarget);
 }
 
 //////////////////////////////////////////////////

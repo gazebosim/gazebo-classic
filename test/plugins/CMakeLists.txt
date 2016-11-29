@@ -11,6 +11,8 @@ include_directories(
 
 link_directories(
   ${SDFormat_LIBRARY_DIRS}
+  ${CURL_LIBDIR}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -29,5 +31,5 @@ set (plugins
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
 endforeach (src ${plugins})

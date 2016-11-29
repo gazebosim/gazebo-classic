@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in axispliance with the License.
@@ -22,7 +22,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class LinkFrameVisual_TEST : public ServerFixture
+class LinkFrameVisual_TEST : public RenderingFixture
 {
 };
 
@@ -36,12 +36,16 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
+
+  // get scene visual child count before we create any visuals
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
+  unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
   linkVis.reset(
-      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("link", scene->WorldVisual()));
 
   // create frame visual for the link
   gazebo::rendering::LinkFrameVisualPtr linkFrameVis(
@@ -74,11 +78,14 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   scene->RemoveVisual(linkFrameVis);
 
   // Check that it was removed
-  EXPECT_TRUE(scene->GetVisual("_LINK_FRAME_VISUAL_") == NULL);
+  EXPECT_TRUE(scene->GetVisual("_LINK_FRAME_VISUAL_") == nullptr);
 
   // Reset pointer
   linkFrameVis.reset();
-  EXPECT_TRUE(linkFrameVis == NULL);
+  EXPECT_TRUE(linkFrameVis == nullptr);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

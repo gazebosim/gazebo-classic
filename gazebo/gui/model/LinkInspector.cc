@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,19 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
-
-#include "gazebo/gui/ConfigWidget.hh"
-
-#include "gazebo/gui/model/ModelEditorEvents.hh"
-#include "gazebo/gui/model/LinkConfig.hh"
-#include "gazebo/gui/model/VisualConfig.hh"
 #include "gazebo/gui/model/CollisionConfig.hh"
+#include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/LinkInspectorPrivate.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/VisualConfig.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
+LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
+    dataPtr(new LinkInspectorPrivate)
 {
   this->setObjectName("LinkInspector");
   this->setWindowTitle(tr("Link Inspector"));
@@ -37,30 +35,32 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QLabel *linkLabel = new QLabel(tr("Name:"));
-  this->linkNameLabel = new QLabel(tr(""));
+  this->dataPtr->linkNameLabel = new QLabel(tr(""));
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(linkLabel);
-  nameLayout->addWidget(this->linkNameLabel, QSizePolicy::Maximum);
-  nameLayout->setAlignment(this->linkNameLabel, Qt::AlignLeft);
+  nameLayout->addWidget(this->dataPtr->linkNameLabel, QSizePolicy::Maximum);
+  nameLayout->setAlignment(this->dataPtr->linkNameLabel, Qt::AlignLeft);
 
-  this->linkConfig = new LinkConfig;
-  connect(this->linkConfig, SIGNAL(Applied()), this, SLOT(OnConfigApplied()));
-  this->visualConfig = new VisualConfig;
-  connect(this->visualConfig, SIGNAL(Applied()), this, SLOT(OnConfigApplied()));
-  this->collisionConfig = new CollisionConfig;
-  connect(this->collisionConfig, SIGNAL(Applied()), this,
+  this->dataPtr->linkConfig = new LinkConfig;
+  connect(this->dataPtr->linkConfig, SIGNAL(Applied()), this,
+      SLOT(OnConfigApplied()));
+  this->dataPtr->visualConfig = new VisualConfig;
+  connect(this->dataPtr->visualConfig, SIGNAL(Applied()), this,
+      SLOT(OnConfigApplied()));
+  this->dataPtr->collisionConfig = new CollisionConfig;
+  connect(this->dataPtr->collisionConfig, SIGNAL(Applied()), this,
       SLOT(OnConfigApplied()));
 
   // Create the main tab widget for all components in a link
-  this->tabWidget = new QTabWidget();
-  this->tabWidget->setObjectName("linkInspectorTab");
-  this->tabWidget->setMinimumHeight(300);
-  this->tabWidget->setMinimumWidth(560);
+  this->dataPtr->tabWidget = new QTabWidget();
+  this->dataPtr->tabWidget->setObjectName("linkInspectorTab");
+  this->dataPtr->tabWidget->setMinimumHeight(300);
+  this->dataPtr->tabWidget->setMinimumWidth(560);
 
-  this->tabWidget->addTab(this->linkConfig, "Link");
-  this->tabWidget->addTab(this->visualConfig, "Visual");
-  this->tabWidget->addTab(this->collisionConfig, "Collision");
+  this->dataPtr->tabWidget->addTab(this->dataPtr->linkConfig, "Link");
+  this->dataPtr->tabWidget->addTab(this->dataPtr->visualConfig, "Visual");
+  this->dataPtr->tabWidget->addTab(this->dataPtr->collisionConfig, "Collision");
 
   // Buttons
   QToolButton *removeButton = new QToolButton(this);
@@ -91,53 +91,60 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(nameLayout);
-  mainLayout->addWidget(tabWidget);
+  mainLayout->addWidget(this->dataPtr->tabWidget);
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
 
   // Conections
-  connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
+  this->connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
+
+  this->connect(this->dataPtr->linkConfig,
+      SIGNAL(DensityValueChanged(const double &)),
+      this, SLOT(OnDensityValueChanged(const double &)));
+
+  this->connect(this->dataPtr->linkConfig,
+      SIGNAL(MassValueChanged(const double &)),
+      this, SLOT(OnMassValueChanged(const double &)));
+
+  this->connect(this->dataPtr->collisionConfig,
+      SIGNAL(CollisionChanged(const std::string &, const std::string &)),
+      this,
+      SLOT(OnCollisionChanged(const std::string &, const std::string &)));
 }
 
 /////////////////////////////////////////////////
 LinkInspector::~LinkInspector()
 {
-  delete this->linkConfig;
-  this->linkConfig = NULL;
-  delete this->visualConfig;
-  this->visualConfig = NULL;
-  delete this->collisionConfig;
-  this->collisionConfig = NULL;
 }
 
 /////////////////////////////////////////////////
 void LinkInspector::SetName(const std::string &_name)
 {
-  this->linkNameLabel->setText(tr(_name.c_str()));
+  this->dataPtr->linkNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-std::string LinkInspector::GetName() const
+std::string LinkInspector::Name() const
 {
-  return this->linkNameLabel->text().toStdString();
+  return this->dataPtr->linkNameLabel->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 LinkConfig *LinkInspector::GetLinkConfig() const
 {
-  return this->linkConfig;
+  return this->dataPtr->linkConfig;
 }
 
 /////////////////////////////////////////////////
 VisualConfig *LinkInspector::GetVisualConfig() const
 {
-  return this->visualConfig;
+  return this->dataPtr->visualConfig;
 }
 
 /////////////////////////////////////////////////
 CollisionConfig *LinkInspector::GetCollisionConfig() const
 {
-  return this->collisionConfig;
+  return this->dataPtr->collisionConfig;
 }
 
 /////////////////////////////////////////////////
@@ -145,13 +152,13 @@ void LinkInspector::OnRemove()
 {
   this->close();
 
-  model::Events::requestLinkRemoval(this->linkId);
+  model::Events::requestLinkRemoval(this->dataPtr->linkId);
 }
 
 /////////////////////////////////////////////////
 void LinkInspector::OnCancel()
 {
-  this->close();
+  this->reject();
 }
 
 /////////////////////////////////////////////////
@@ -175,15 +182,17 @@ void LinkInspector::enterEvent(QEvent */*_event*/)
 /////////////////////////////////////////////////
 void LinkInspector::SetLinkId(const std::string &_id)
 {
-  this->linkId = _id;
+  this->dataPtr->linkId = _id;
 }
 
 /////////////////////////////////////////////////
 void LinkInspector::Open()
 {
-  this->linkConfig->Init();
-  this->visualConfig->Init();
-  this->collisionConfig->Init();
+  emit this->Opened();
+
+  this->dataPtr->linkConfig->Init();
+  this->dataPtr->visualConfig->Init();
+  this->dataPtr->collisionConfig->Init();
 
   this->move(QCursor::pos());
   this->show();
@@ -192,9 +201,9 @@ void LinkInspector::Open()
 /////////////////////////////////////////////////
 void LinkInspector::RestoreOriginalData()
 {
-  this->linkConfig->RestoreOriginalData();
-  this->visualConfig->RestoreOriginalData();
-  this->collisionConfig->RestoreOriginalData();
+  this->dataPtr->linkConfig->RestoreOriginalData();
+  this->dataPtr->visualConfig->RestoreOriginalData();
+  this->dataPtr->collisionConfig->RestoreOriginalData();
 
   emit Applied();
 }
@@ -206,4 +215,93 @@ void LinkInspector::keyPressEvent(QKeyEvent *_event)
     _event->accept();
   else
     QDialog::keyPressEvent(_event);
+}
+
+/////////////////////////////////////////////////
+double LinkInspector::ComputeVolume() const
+{
+  double volume = 0;
+
+  for (auto it : this->dataPtr->collisionConfig->ConfigData())
+  {
+    msgs::Collision *coll =
+        this->dataPtr->collisionConfig->GetData(it.second->name);
+    if (coll)
+      volume += LinkData::ComputeVolume(*coll);
+  }
+  return volume;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d LinkInspector::ComputeInertia(const double _mass) const
+{
+  ignition::math::Vector3d I = ignition::math::Vector3d::Zero;
+
+  // Use first collision entry
+  for (auto it : this->dataPtr->collisionConfig->ConfigData())
+  {
+    msgs::Collision *coll =
+        this->dataPtr->collisionConfig->GetData(it.second->name);
+    if (coll)
+    {
+      I = gui::LinkData::ComputeMomentOfInertia(*coll, _mass);
+      break;
+    }
+  }
+  return I;
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnDensityValueChanged(const double _value)
+{
+  double volume = this->ComputeVolume();
+  double mass = volume * _value;
+
+  if (!ignition::math::equal(this->dataPtr->linkConfig->Mass(), mass))
+  {
+    ignition::math::Vector3d I = this->ComputeInertia(mass);
+    this->dataPtr->linkConfig->SetMass(mass);
+    this->dataPtr->linkConfig->SetInertiaMatrix(I.X(), I.Y(), I.Z(), 0, 0, 0);
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnMassValueChanged(const double _value)
+{
+  double volume = this->ComputeVolume();
+
+  if (volume > 0.0)
+  {
+    double density = _value / volume;
+    if (!ignition::math::equal(this->dataPtr->linkConfig->Density(), density))
+    {
+      ignition::math::Vector3d I = ComputeInertia(_value);
+      this->dataPtr->linkConfig->SetDensity(density);
+      this->dataPtr->linkConfig->SetInertiaMatrix(I.X(), I.Y(), I.Z(), 0, 0, 0);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
+    const std::string &_type)
+{
+  if (_type == "geometry")
+  {
+    double volume = this->ComputeVolume();
+
+    if (volume > 0.0)
+    {
+      double mass = this->dataPtr->linkConfig->Mass();
+      double density = mass / volume;
+
+      this->dataPtr->linkConfig->SetDensity(density);
+    }
+  }
+}
+
+////////////////////////////////////////////////
+void LinkInspector::closeEvent(QCloseEvent *_event)
+{
+  _event->accept();
 }

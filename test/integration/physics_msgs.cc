@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
+
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -48,12 +52,12 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
 
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // Set Gravity by publishing to "~/physics"
   transport::PublisherPtr physicsPub =
@@ -62,31 +66,30 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   // it doesn't actually seem to matter what type you set
   msg.set_type(msgs::Physics::Type_MIN);
 
-  std::vector<math::Vector3> gravity;
-  gravity.push_back(math::Vector3(0, 0, 9.81));
-  gravity.push_back(math::Vector3(0, 0, -20));
-  gravity.push_back(math::Vector3(0, 0, 20));
-  gravity.push_back(math::Vector3(0, 0, 0));
-  gravity.push_back(math::Vector3(0, 0, -9.81));
-  gravity.push_back(math::Vector3(1, 1, 9.81));
-  gravity.push_back(math::Vector3(2, 3, -20));
-  gravity.push_back(math::Vector3(2, -3, 20));
-  gravity.push_back(math::Vector3(-2, 3, 0));
-  gravity.push_back(math::Vector3(-2, -3, -9.81));
+  std::vector<ignition::math::Vector3d> gravityValues;
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, 9.81));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, -20));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, 20));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, 0));
+  gravityValues.push_back(ignition::math::Vector3d(0, 0, -9.81));
+  gravityValues.push_back(ignition::math::Vector3d(1, 1, 9.81));
+  gravityValues.push_back(ignition::math::Vector3d(2, 3, -20));
+  gravityValues.push_back(ignition::math::Vector3d(2, -3, 20));
+  gravityValues.push_back(ignition::math::Vector3d(-2, 3, 0));
+  gravityValues.push_back(ignition::math::Vector3d(-2, -3, -9.81));
 
-  for (std::vector<math::Vector3>::iterator iter = gravity.begin();
-       iter != gravity.end(); ++iter)
+  for (auto const &gravity : gravityValues)
   {
-    msgs::Set(msg.mutable_gravity(), (*iter).Ign());
+    msgs::Set(msg.mutable_gravity(), gravity);
     physicsPub->Publish(msg);
 
-    while (*iter != physics->GetGravity())
+    while (gravity != world->Gravity())
     {
       world->Step(1);
       common::Time::MSleep(1);
     }
 
-    EXPECT_EQ(*iter, physics->GetGravity());
+    EXPECT_EQ(gravity, world->Gravity());
   }
 }
 
@@ -101,7 +104,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // spawn a box
   std::string name = "test_box";
@@ -315,7 +318,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
@@ -402,11 +405,11 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -498,12 +501,12 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     else
     {
       // Use physics API to resize
-      model->SetScale(scaleFactor * math::Vector3::One);
+      model->SetScale(scaleFactor * ignition::math::Vector3d::One);
     }
   }
 
   // Predict time of contact with ground plane.
-  double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.z));
+  double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
@@ -534,8 +537,20 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
       y0 = modelPos[name].y;
-      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
+      double xTolerance = PHYSICS_TOL;
+      double yTolerance = PHYSICS_TOL;
+#ifdef HAVE_BULLET
+      if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+      {
+        if (name.find("test_box") != std::string::npos)
+        {
+          xTolerance *= 1.6;
+          yTolerance *= 2.3;
+        }
+      }
+#endif
+      EXPECT_NEAR(pose1.pos.x, x0, xTolerance);
+      EXPECT_NEAR(pose1.pos.y, y0, yTolerance);
       EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
     }
     else
@@ -913,7 +928,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.2);
     // only ode and bullet return correct hinge friction param value
     if (_physicsEngine == "ode" || _physicsEngine == "bullet")
-      EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.1);
+      EXPECT_FLOAT_EQ(axis1Msg.friction(), 0.1);
   }
 
   {

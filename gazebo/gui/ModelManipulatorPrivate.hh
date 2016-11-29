@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MANIPULATOR_PRIVATE_HH_
-#define _MODEL_MANIPULATOR_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MODELMANIPULATORPRIVATE_HH_
+#define GAZEBO_GUI_MODELMANIPULATORPRIVATE_HH_
 
 #include <string>
 #include <vector>
 
+#include <ignition/math/Box.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -42,22 +46,16 @@ namespace gazebo
       public: std::string manipMode;
 
       /// \brief Keep track of the mouse start pose before a move action.
-      public: math::Pose mouseMoveVisStartPose;
+      public: ignition::math::Pose3d mouseMoveVisStartPose;
 
       /// \brief Keep track of the mouse start screen position.
-      public: math::Vector2i mouseStart;
+      public: ignition::math::Vector2i mouseStart;
 
       /// \brief The current visual attached to the mouse.
       public: rendering::VisualPtr mouseMoveVis;
 
       /// \brief Transportation node.
       public: transport::NodePtr node;
-
-      /// \brief Model publisher that publishes model pose to the server.
-      public: transport::PublisherPtr modelPub;
-
-      /// \brief Light publisher that publishes light pose to the server.
-      public: transport::PublisherPtr lightPub;
 
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
@@ -76,19 +74,22 @@ namespace gazebo
       public: common::KeyEvent keyEvent;
 
       /// \brief True if the model manipulator is initialized.
-      public: bool initialized;
+      public: bool initialized = false;
 
       /// \brief Scale of the visual attached to the mouse.
-      public: math::Vector3 mouseVisualScale;
+      public: ignition::math::Vector3d mouseVisualScale;
 
       /// \brief Scale of all the child visuals attached to the mouse.
-      public: std::vector<math::Vector3> mouseChildVisualScale;
+      public: std::vector<ignition::math::Vector3d> mouseChildVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      public: math::Box mouseVisualBbox;
+      public: ignition::math::Box mouseVisualBbox;
 
       /// \brief True to manipulate model in global frame.
-      public: bool globalManip;
+      public: bool globalManip = false;
+
+      /// \brief True when a model is being manipulated, false otherwise.
+      public: bool transparent = false;
     };
   }
 }

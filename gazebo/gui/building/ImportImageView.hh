@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,24 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_BUILDING_IMPORTIMAGEVIEW_HH_
+#define GAZEBO_GUI_BUILDING_IMPORTIMAGEVIEW_HH_
 
-#ifndef _IMPORT_IMAGE_VIEW_HH_
-#define _IMPORT_IMAGE_VIEW_HH_
-
-#include <map>
+#include <memory>
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class EditorItem;
-    class MeasureItem;
-    class GridLines;
+    // Forward declare friend class.
     class ImportImageDialog;
+    // Forward declare provate data.
+    class ImportImageViewPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -41,6 +40,8 @@ namespace gazebo
     /// \brief Control the import image view and manage contents in the scene.
     class GZ_GUI_VISIBLE ImportImageView : public QGraphicsView
     {
+      friend class ImportImageDialog;
+
       Q_OBJECT
 
       /// \brief Constructor
@@ -86,51 +87,9 @@ namespace gazebo
       /// \param[in] _pos Start position of the measure in pixel coordinates.
       private: void DrawMeasure(const QPoint &_pos);
 
-      /// \brief Width of the pixmap in pixels.
-      public: int pixmapWidthPx;
-
-      /// \brief Height of the pixmap in pixels.
-      public: int pixmapHeightPx;
-
-      /// \brief Width of the image in pixels.
-      public: int imageWidthPx;
-
-      /// \brief Length of the measure on the scene in pixels.
-      public: int measureScenePx;
-
-      /// \brief Indicate whether or not a drawing operation is taking place.
-      private: bool drawInProgress;
-
-      /// \brief A list of gui editor events connected to this view.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Editor item currently attached to the mouse during a drawing.
-      /// operation.
-      private: QGraphicsItem *currentMouseItem;
-
-      /// \brief Grid lines drawn on the background of the editor.
-      private: GridLines *gridLines;
-
-      /// \brief Currently selected image item.
-      private: QGraphicsPixmapItem *imageItem;
-
-      /// \brief Currently selected image pixmap.
-      private: QPixmap *imagePixmap;
-
-      /// \brief Text to be displayed when no image has been selected.
-      private: QGraphicsTextItem *noImageText;
-
-      /// \brief Text to be displayed when an invalid file is selected.
-      private: QGraphicsTextItem *invalidImageText;
-
-      /// \brief Text to be displayed when an invalid file is selected.
-      private: MeasureItem *measureItem;
-
-      /// \brief Parent widget.
-      private: ImportImageDialog *parent;
-
-      /// \brief Indicates if it is allowed to draw on the view or not.
-      private: bool drawDistanceEnabled;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ImportImageViewPrivate> dataPtr;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,12 @@ LinkConfig::LinkConfig()
   this->configWidget = new ConfigWidget;
   configWidget->Load(&linkMsg);
 
+  this->connect(this->configWidget, SIGNAL(DensityValueChanged(const double)),
+      this, SLOT(OnDensityValueChanged(const double)));
+
+  this->connect(this->configWidget, SIGNAL(MassValueChanged(const double)),
+      this, SLOT(OnMassValueChanged(const double)));
+
   // set default values
   // TODO: auto-fill them with SDF defaults
   this->configWidget->SetDoubleWidgetValue("inertial::mass", 1.0);
@@ -43,6 +49,7 @@ LinkConfig::LinkConfig()
   this->configWidget->SetBoolWidgetValue("gravity", true);
   this->configWidget->SetBoolWidgetValue("self_collide", false);
   this->configWidget->SetBoolWidgetValue("kinematic", false);
+  this->configWidget->SetBoolWidgetValue("enable_wind", false);
 
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("name", false);
@@ -101,6 +108,12 @@ void LinkConfig::SetMass(const double _mass)
 }
 
 /////////////////////////////////////////////////
+void LinkConfig::SetDensity(const double _density)
+{
+  this->configWidget->SetDensityWidgetValue("density", _density);
+}
+
+/////////////////////////////////////////////////
 void LinkConfig::SetInertiaMatrix(const double _ixx, const double _iyy,
     const double _izz, const double _ixy, const double _ixz, const double _iyz)
 {
@@ -121,7 +134,7 @@ void LinkConfig::SetInertialPose(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 msgs::Link *LinkConfig::GetData() const
 {
-  return dynamic_cast<msgs::Link *>(this->configWidget->GetMsg());
+  return dynamic_cast<msgs::Link *>(this->configWidget->Msg());
 }
 
 /////////////////////////////////////////////////
@@ -129,6 +142,18 @@ void LinkConfig::OnPoseChanged(const QString &/*_name*/,
     const ignition::math::Pose3d &/*_pose*/)
 {
   emit Applied();
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::OnMassValueChanged(const double _value)
+{
+  emit MassValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::OnDensityValueChanged(const double _value)
+{
+  emit DensityValueChanged(_value);
 }
 
 /////////////////////////////////////////////////
@@ -149,3 +174,17 @@ const ConfigWidget *LinkConfig::LinkConfigWidget() const
 {
   return this->configWidget;
 }
+
+/////////////////////////////////////////////////
+double LinkConfig::Mass() const
+{
+  return this->configWidget->DoubleWidgetValue("inertial::mass");
+}
+
+/////////////////////////////////////////////////
+double LinkConfig::Density() const
+{
+  return this->configWidget->DensityWidgetValue("density");
+}
+
+

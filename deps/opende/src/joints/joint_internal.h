@@ -25,10 +25,10 @@
 #define _ODE_JOINT_INTERNAL_H_
 
 
-#include <ode/matrix.h>
-#include <ode/odemath.h>
-#include <ode/rotation.h>
-#include <ode/objects.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/rotation.h>
+#include <gazebo/ode/objects.h>
 
 #define checktype(j,t) dUASSERT(j->type() == dJointType##t, \
                                 "joint type is not " #t)

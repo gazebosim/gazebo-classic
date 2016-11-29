@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,14 +211,14 @@ void ImageGaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 {
-  GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is NULL");
+  GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is null");
 
   this->gaussianNoiseCompositorListener.reset(new
         GaussianNoiseCompositorListener(this->mean, this->stdDev));
 
   this->gaussianNoiseInstance =
     Ogre::CompositorManager::getSingleton().addCompositor(
-      _camera->GetViewport(), "CameraNoise/Gaussian");
+      _camera->OgreViewport(), "CameraNoise/Gaussian");
   this->gaussianNoiseInstance->setEnabled(true);
   this->gaussianNoiseInstance->addListener(
     this->gaussianNoiseCompositorListener.get());
@@ -228,11 +228,6 @@ void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 void ImageGaussianNoiseModel::Fini()
 {
   GaussianNoiseModel::Fini();
-  if (this->gaussianNoiseCompositorListener)
-  {
-    this->gaussianNoiseInstance->removeListener(
-      this->gaussianNoiseCompositorListener.get());
-  }
 }
 
 //////////////////////////////////////////////////

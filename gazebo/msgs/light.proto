@@ -1,3 +1,4 @@
+syntax = "proto2";
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
@@ -34,5 +35,3 @@ message Light
   optional float spot_outer_angle        = 13;
   optional float spot_falloff            = 14;
 }
-
-

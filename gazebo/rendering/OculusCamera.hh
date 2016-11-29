@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,10 +70,6 @@ namespace gazebo
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.
       public: void MoveToVisual(VisualPtr _visual);
-
-      // Doxygen automatically pulls in the correct documentation.
-      public: virtual bool MoveToPosition(const math::Pose &_pose,
-                                          double _time);
 
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visualName Name of the visual to move the camera to.

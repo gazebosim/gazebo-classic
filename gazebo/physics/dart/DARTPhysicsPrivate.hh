@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,14 +37,13 @@ namespace gazebo
       /// \brief Default destructor
       public: ~DARTPhysicsPrivate()
       {
-        delete dtWorld;
       }
 
       /// \brief Disabled copy constructor
       public: DARTPhysicsPrivate(const DARTPhysicsPrivate&) = delete;
 
       /// \brief Pointer to DART World associated with this DART Physics.
-      public: dart::simulation::World *dtWorld;
+      public: dart::simulation::WorldPtr dtWorld;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Open Source Robotics Foundation
+ * Copyright 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
   gui::MainWindow *mainWindow = qobject_cast<gui::MainWindow *>(_parent);
   if (mainWindow)
   {
-    gui::RenderWidget *renderWidget = mainWindow->GetRenderWidget();
+    gui::RenderWidget *renderWidget = mainWindow->RenderWidget();
     if (renderWidget)
     {
       this->toolbar = renderWidget->GetToolbar();
@@ -161,7 +161,7 @@ void RestUiWidget::Update()
     this->msgRespQ.pop_front();
 
     // look for login error, and reenable the login menu if necessary
-    if (msg->type() == msgs::RestResponse::ERROR)
+    if (msg->type() == msgs::RestResponse::ERR)
     {
       this->loginMenuAction.setEnabled(true);
       this->logoutMenuAction.setEnabled(false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,11 @@
  *
 */
 #include <boost/filesystem.hpp>
-#include "gazebo/math/Helpers.hh"
+
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"
@@ -34,6 +38,38 @@ void OnRequest(ConstRequestPtr &_msg)
     g_gotSetWireframe = true;
 }
 
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::MinimizeMaximize()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // repeat minimize and maximize a couple of times
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMinimized();
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMaximized();
+  this->ProcessEventsAndDraw(mainWindow);
+
+  mainWindow->showMinimized();
+  this->ProcessEventsAndDraw(mainWindow);
+  mainWindow->showMaximized();
+  this->ProcessEventsAndDraw(mainWindow);
+
+  mainWindow->close();
+  delete mainWindow;
+}
+
 /////////////////////////////////////////////////
 void MainWindow_TEST::StepState()
 {
@@ -49,13 +85,7 @@ void MainWindow_TEST::StepState()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(gazebo::gui::g_stepAct != NULL);
   QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
@@ -66,39 +96,21 @@ void MainWindow_TEST::StepState()
   // enabled / disabled.
   mainWindow->Pause();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(mainWindow->IsPaused());
   QVERIFY(gazebo::gui::g_stepAct->isEnabled());
 
   mainWindow->Play();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(!mainWindow->IsPaused());
   QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
 
   mainWindow->Pause();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(mainWindow->IsPaused());
   QVERIFY(gazebo::gui::g_stepAct->isEnabled());
@@ -122,13 +134,7 @@ void MainWindow_TEST::Selection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -138,7 +144,7 @@ void MainWindow_TEST::Selection()
     mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
-  gazebo::math::Vector2i glWidgetCenter(
+  ignition::math::Vector2i glWidgetCenter(
       glWidget->width()*0.5, glWidget->height()*0.5);
 
   // get model at center of window - should get the box
@@ -149,13 +155,13 @@ void MainWindow_TEST::Selection()
 
   // move camera to look at the box
   ignition::math::Pose3d cameraPose(ignition::math::Vector3d(-1, 0, 0.5),
-      ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Quaterniond(0, 0, 0));
   cam->SetWorldPose(cameraPose);
   QVERIFY(cam->WorldPose() == cameraPose);
 
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->GetVisual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis2 != NULL);
   QVERIFY(vis2->GetRootVisual()->GetName() == "box");
 
@@ -175,7 +181,7 @@ void MainWindow_TEST::Selection()
 
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->GetVisual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis4 != NULL);
   QVERIFY(vis4->GetRootVisual()->GetName() == "box");
 
@@ -204,9 +210,10 @@ void MainWindow_TEST::SceneDestruction()
 
   // Create the main window.
   mainWindow->Load();
-
   mainWindow->Init();
   mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -228,7 +235,7 @@ void MainWindow_TEST::UserCameraFPS()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -237,29 +244,33 @@ void MainWindow_TEST::UserCameraFPS()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
 
-  // Wait a little bit for the average FPS to even out.
-  for (unsigned int i = 0; i < 10000; ++i)
+  // some machines are unable to hit the target FPS
+  // sample update time and determine whether to skip FPS lower bound check
+  bool skipFPSTest = false;
+  gazebo::common::Time t = gazebo::common::Time::GetWallTime();
+  QCoreApplication::processEvents();
+  double dt = (gazebo::common::Time::GetWallTime()-t).Double();
+  if (dt >= 0.01)
   {
-    gazebo::common::Time::NSleep(500000);
-    QCoreApplication::processEvents();
+    std::cerr << "Skipping lower bound FPS check" << std::endl;
+    skipFPSTest = true;
   }
+  unsigned int iterations = skipFPSTest ? 50 : 5000;
+  double lowerFPSBound = skipFPSTest ? 0 : 45;
 
-  std::cerr << "\nFPS[" << cam->GetAvgFPS() << "]\n" << std::endl;
+  // Wait a little bit for the average FPS to even out.
+  this->ProcessEventsAndDraw(NULL, iterations, 1);
 
-  QVERIFY(cam->GetAvgFPS() > 55.0);
-  QVERIFY(cam->GetAvgFPS() < 75.0);
+  std::cerr << "\nFPS[" << cam->AvgFPS() << "]\n" << std::endl;
+
+  QVERIFY(cam->AvgFPS() > lowerFPSBound);
+  QVERIFY(cam->AvgFPS() < 75.0);
 
   cam->Fini();
   mainWindow->close();
@@ -302,13 +313,7 @@ void MainWindow_TEST::CopyPaste()
     // this call outside the rendering thread.
     gazebo::event::Events::setSelectedEntity(modelName, "normal");
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
     QVERIFY(modelVis != NULL);
@@ -326,13 +331,8 @@ void MainWindow_TEST::CopyPaste()
     }
     QVERIFY(modelVis->GetHighlighted());
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
+
     QVERIFY(gazebo::gui::g_copyAct != NULL);
     QVERIFY(gazebo::gui::g_pasteAct != NULL);
 
@@ -427,7 +427,7 @@ void MainWindow_TEST::Wireframe()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_dark_plane.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -442,13 +442,7 @@ void MainWindow_TEST::Wireframe()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -457,18 +451,12 @@ void MainWindow_TEST::Wireframe()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the image data
-  const unsigned char *image = cam->GetImageData();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int width = cam->GetImageWidth();
+  const unsigned char *image = cam->ImageData();
+  unsigned int height = cam->ImageHeight();
+  unsigned int width = cam->ImageWidth();
   unsigned int depth = 3;
 
   // Calculate the average color.
@@ -490,14 +478,14 @@ void MainWindow_TEST::Wireframe()
 
   // Redraw the screen
   for (unsigned int i = 0; i < 100 &&
-      gazebo::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
+      ignition::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
     mainWindow->repaint();
 
     // Get the new image data, and calculate the new average color
-    image = cam->GetImageData();
+    image = cam->ImageData();
     sum = 0;
     for (unsigned int y = 0; y < height; ++y)
     {
@@ -517,7 +505,7 @@ void MainWindow_TEST::Wireframe()
         << "] AvgPostWireframe[" << avgPostWireframe << "]\n";
 
   // Removing the grey ground plane should change the image.
-  QVERIFY(!gazebo::math::equal(avgPreWireframe, avgPostWireframe));
+  QVERIFY(!ignition::math::equal(avgPreWireframe, avgPostWireframe));
 
   cam->Fini();
   mainWindow->close();
@@ -532,7 +520,7 @@ void MainWindow_TEST::NonDefaultWorld()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_different_name.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -541,34 +529,21 @@ void MainWindow_TEST::NonDefaultWorld()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
 
-  if (!cam)
-    return;
+  QVERIFY(cam != nullptr);
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the image data
-  const unsigned char *image = cam->GetImageData();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int width = cam->GetImageWidth();
+  const unsigned char *image = cam->ImageData();
+  unsigned int height = cam->ImageHeight();
+  unsigned int width = cam->ImageWidth();
   unsigned int depth = 3;
 
   unsigned int sum = 0;
@@ -607,13 +582,7 @@ void MainWindow_TEST::UserCameraJoystick()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -639,13 +608,7 @@ void MainWindow_TEST::UserCameraJoystick()
 
     joyPub->Publish(joystickMsg);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     ignition::math::Pose3d endPose = cam->WorldPose();
     QVERIFY(endPose == ignition::math::Pose3d(4.98664, -5.00091, 2.01306,
@@ -662,13 +625,7 @@ void MainWindow_TEST::UserCameraJoystick()
 
     joyPub->Publish(joystickMsg);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     ignition::math::Pose3d endPose = cam->WorldPose();
     QVERIFY(endPose == ignition::math::Pose3d(4.98664, -5.00091, 2.01306,
@@ -689,13 +646,7 @@ void MainWindow_TEST::UserCameraJoystick()
 
     joyPub->Publish(joystickMsg);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     ignition::math::Pose3d endPose = cam->WorldPose();
     QVERIFY(endPose == ignition::math::Pose3d(4.84758, -5.01151, 2.15333,
@@ -713,7 +664,7 @@ void MainWindow_TEST::ActionCreationDestruction()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world", false, false, true);
+  this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -785,6 +736,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_showLinkFrameAct);
 
+  QVERIFY(gazebo::gui::g_showSkeletonAct);
+
   QVERIFY(gazebo::gui::g_transparentAct);
 
   QVERIFY(gazebo::gui::g_viewWireframeAct);
@@ -832,6 +785,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_undoHistoryAct);
 
   QVERIFY(gazebo::gui::g_redoAct);
+
+  QVERIFY(gazebo::gui::g_plotAct);
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
 
@@ -902,6 +857,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_showLinkFrameAct);
 
+  QVERIFY(!gazebo::gui::g_showSkeletonAct);
+
   QVERIFY(!gazebo::gui::g_transparentAct);
 
   QVERIFY(!gazebo::gui::g_viewWireframeAct);
@@ -951,6 +908,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_redoAct);
 
   QVERIFY(!gazebo::gui::g_redoHistoryAct);
+
+  QVERIFY(!gazebo::gui::g_plotAct);
 }
 
 /////////////////////////////////////////////////
@@ -975,18 +934,12 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
-  const unsigned char *data = cam->GetImageData();
-  unsigned int width = cam->GetImageWidth();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int depth = cam->GetImageDepth();
+  const unsigned char *data = cam->ImageData();
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  unsigned int depth = cam->ImageDepth();
 
   // Part 1 : The user camera should be positioned so that it sees only
   // a white box
@@ -1095,7 +1048,7 @@ void MainWindow_TEST::WindowModes()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -1104,13 +1057,7 @@ void MainWindow_TEST::WindowModes()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check edit actions are visible
   QVERIFY(gazebo::gui::g_resetModelsAct->isVisible());
@@ -1128,6 +1075,41 @@ void MainWindow_TEST::WindowModes()
   QVERIFY(!gazebo::gui::g_editModelAct->isVisible());
 
   // Terminate
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::MinimumSize()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+
+  // Check that minimum size is smaller then a predefined size
+  // This desired values are arbitrary, but increasing the minimum
+  // size could create problems on small screens (such as laptop's).
+  // See https://bitbucket.org/osrf/gazebo/issues/1706 for more info.
+  int desiredMinimumWidth  = 700;
+  int desiredMinimumHeight = 710;
+  QVERIFY(mainWindow->minimumSize().width() <= desiredMinimumWidth);
+  QVERIFY(mainWindow->minimumSize().height() <= desiredMinimumHeight);
+
+  // Check that resizing to a small window (10x10) actually result
+  // in a size that is smaller then desiredMinimum*
+  mainWindow->resize(10, 10);
+
+  QVERIFY(mainWindow->width() <= desiredMinimumWidth);
+  QVERIFY(mainWindow->height() <= desiredMinimumHeight);
+
   mainWindow->close();
   delete mainWindow;
 }

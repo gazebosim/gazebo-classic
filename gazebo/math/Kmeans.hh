@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _obs Set of observations to cluster.
-      public: Kmeans(const std::vector<Vector3> &_obs);
+      /// \deprecated See ignition::math::Kmeans
+      public: Kmeans(const std::vector<Vector3> &_obs) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Kmeans();

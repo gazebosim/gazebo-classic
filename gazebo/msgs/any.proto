@@ -1,0 +1,81 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Any
+/// \brief A message that is capable of containing a wide variety of data types.
+
+import "color.proto";
+import "pose.proto";
+import "quaternion.proto";
+import "time.proto";
+import "vector3d.proto";
+
+message Any
+{
+  /// \brief The type of data the message contains.
+  enum ValueType
+  {
+    /// \brief Indicates that the message is empty
+    NONE        = 1;
+
+    /// \brief Indicates that the message contains a double
+    DOUBLE      = 2;
+
+    /// \brief Indicates that the message contains an int32
+    INT32       = 3;
+
+    /// \brief Indicates that the message contains a string
+    STRING      = 4;
+
+    /// \brief Indicates that the message contains a Boolean
+    BOOLEAN     = 5;
+
+    /// \brief Indicates that the message contains a Vector3d
+    VECTOR3D    = 6;
+
+    /// \brief Indicates that the message contains a Color
+    COLOR       = 7;
+
+    /// \brief Indicates that the message contains a Pose
+    POSE3D      = 8;
+
+    /// \brief Indicates that the message contains a Quaternion
+    QUATERNIOND = 9;
+
+    /// \brief Indicates that the message contains a Time
+    TIME        = 10;
+  }
+
+  /// \todo: Use protobuf oneof feature when we support protobuf 2.6
+
+  /// \brief Type of value that is contained in this message.
+  required ValueType type              = 1 [default = NONE];
+
+  /// \brief A double value
+  optional double double_value         = 2;
+
+  /// \brief An int32 value
+  optional int32 int_value             = 3;
+
+  /// \brief A string value
+  optional string string_value         = 4;
+
+  /// \brief A boolean value
+  optional bool bool_value             = 5;
+
+  /// \brief A Vector3d value
+  optional Vector3d vector3d_value     = 6;
+
+  /// \brief A Color value
+  optional Color color_value           = 7;
+
+  /// \brief A Pose value
+  optional Pose pose3d_value           = 8;
+
+  /// \brief A Quaternion value
+  optional Quaternion quaternion_value = 9;
+
+  /// \brief A Time value
+  optional Time time_value             = 10;
+}

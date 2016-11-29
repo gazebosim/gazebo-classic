@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ namespace gazebo
       public: Level() : level(0), name("level"), baseHeight(0),
               // 2.4384m == 8ft, standard room height in US
               height(2.4384),
-              backgroundPixmap(NULL),
-              floorItem(NULL) {}
+              backgroundPixmap(nullptr),
+              floorItem(nullptr) {}
 
       /// \brief Level number
       public: int level;
@@ -246,7 +246,7 @@ namespace gazebo
       /// \param[in] _grabber1 First grabber to be unliked.
       /// \param[in] _grabber2 Second grabber to be unliked.
       private: void UnlinkGrabbers(GrabberHandle *_grabber1,
-          GrabberHandle *_grabber2 = NULL);
+          GrabberHandle *_grabber2 = nullptr);
 
       /// \brief Current draw mode
       private: int drawMode;
@@ -283,26 +283,26 @@ namespace gazebo
 
       /// \brief Editor item currently attached to the mouse during a drawing
       /// operation.
-      private: QGraphicsItem *currentMouseItem;
+      private: QGraphicsItem *currentMouseItem = nullptr;
 
       /// \brief Currently selected editor item.
-      private: QGraphicsItem *currentSelectedItem;
+      private: QGraphicsItem *currentSelectedItem = nullptr;
 
       /// \brief Building maker manages the creation of 3D visuals
-      private: BuildingMaker *buildingMaker;
+      private: BuildingMaker *buildingMaker = nullptr;
 
       /// \brief Current building level associated to the view.
-      private: int currentLevel;
+      private: int currentLevel = 0;
 
       /// \brief A list of building levels in the scene.
       private: std::vector<Level *> levels;
 
       /// \brief A counter that holds the total number of levels in the building
       /// model.
-      private: int levelCounter;
+      private: int levelCounter = 0;
 
       /// \brief Default height for levels
-      private: double levelDefaultHeight;
+      private: double levelDefaultHeight = 0.0;
 
       /// \brief Qt action for opening a building level inspector.
       private: QAction *openLevelInspectorAct;
@@ -328,13 +328,13 @@ namespace gazebo
 
       /// \brief Indicate whether or not the wall will snap to a grabber
       /// during a draw wall operation.
-      private: bool snapToGrabber;
+      private: bool snapToGrabber = false;
 
       /// \brief Existing grabber to snap towards.
-      private: GrabberHandle *snapGrabberOther;
+      private: GrabberHandle *snapGrabberOther = nullptr;
 
       /// \brief Currently held grabber which will be snapped.
-      private: GrabberHandle *snapGrabberCurrent;
+      private: GrabberHandle *snapGrabberCurrent = nullptr;
 
       /// \brief Text tooltip to follow the mouse.
       private: QGraphicsTextItem *mouseTooltip;

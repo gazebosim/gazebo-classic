@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ using namespace physics;
 Entity::Entity(BasePtr _parent)
   : Base(_parent)
 {
+  this->isStatic = false;
   this->isCanonicalLink = false;
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
@@ -80,22 +81,13 @@ Entity::Entity(BasePtr _parent)
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
 }
 
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
-
-  delete this->visualMsg;
-  this->visualMsg = NULL;
-
-  this->visPub.reset();
-  this->requestPub.reset();
-  this->poseSub.reset();
-  this->node.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -233,11 +225,7 @@ void Entity::StopAnimation()
 {
   this->animation.reset();
   this->onAnimationComplete.clear();
-  if (this->animationConnection)
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
-    this->animationConnection.reset();
-  }
+  this->animationConnection.reset();
 }
 
 //////////////////////////////////////////////////
@@ -584,27 +572,45 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
+  // TODO: put this back in
+  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+
   if (this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        this->GetScopedName());
+    auto msg = msgs::CreateRequest("entity_delete", this->GetScopedName());
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
-  this->parentEntity.reset();
-  Base::Fini();
+  // Clean transport
+  {
+    this->posePub.reset();
+    this->requestPub.reset();
+    this->visPub.reset();
 
+    this->poseSub.reset();
+
+    if (this->node)
+      this->node->Fini();
+    this->node.reset();
+  }
+
+  this->animationConnection.reset();
   this->connections.clear();
-  this->node->Fini();
+
+  if (this->visualMsg)
+    delete this->visualMsg;
+  this->visualMsg = NULL;
+
+  this->parentEntity.reset();
+
+  Base::Fini();
 }
 
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
-  if (this->HasType(Base::MODEL))
-    this->SetWorldPose(this->initialRelativePose);
-  else
-    this->SetRelativePose(this->initialRelativePose);
+  this->SetRelativePose(this->initialRelativePose);
 }
 
 //////////////////////////////////////////////////
@@ -640,7 +646,6 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 
   if (this->animation->GetLength() <= this->animation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
     if (this->onAnimationComplete)
     {

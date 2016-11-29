@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo.hh"
 #include "ServerFixture.hh"
@@ -60,6 +61,13 @@ std::string gazebo::custom_exec(std::string _cmd)
 #endif
 
   return result;
+}
+
+/////////////////////////////////////////////////
+void RenderingFixture::SetUp()
+{
+  // start rendering in test thread
+  rendering::load();
 }
 
 /////////////////////////////////////////////////
@@ -217,7 +225,9 @@ void ServerFixture::LoadArgs(const std::string &_args)
   // Use a 30 second timeout.
   waitCount = 0;
   maxWaitCount = 3000;
-  while ((!physics::get_world() ||
+  while ((!this->server ||
+          !this->server->GetInitialized() ||
+          !physics::get_world() ||
            physics::get_world()->IsPaused() != paused) &&
          ++waitCount < maxWaitCount)
   {
@@ -247,22 +257,18 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
 
   ASSERT_NO_THROW(this->server = new Server());
 
-  if (!this->server->ParseArgs(argc, argv))
+  if (this->server->ParseArgs(argc, argv))
   {
-    ASSERT_NO_THROW(delete this->server);
-    this->server = NULL;
-    return;
+    if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+    {
+      ASSERT_NO_THROW(rendering::create_scene(
+            gazebo::physics::get_world()->GetName(), false, true));
+    }
+
+    ASSERT_NO_THROW(this->server->Run());
+
+    ASSERT_NO_THROW(this->server->Fini());
   }
-
-  if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
-  {
-    ASSERT_NO_THROW(rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true));
-  }
-
-  ASSERT_NO_THROW(this->server->Run());
-
-  ASSERT_NO_THROW(this->server->Fini());
 
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
@@ -390,12 +396,12 @@ void ServerFixture::PrintScan(const std::string &_name, double *_scan,
   for (unsigned int i = 0; i < _sampleCount-1; ++i)
   {
     if ((i+1) % 5 == 0)
-      printf("%13.10f,\n", math::precision(_scan[i], 10));
+      printf("%13.10f,\n", ignition::math::precision(_scan[i], 10));
     else
-      printf("%13.10f, ", math::precision(_scan[i], 10));
+      printf("%13.10f, ", ignition::math::precision(_scan[i], 10));
   }
   printf("%13.10f};\n",
-      math::precision(_scan[_sampleCount-1], 10));
+      ignition::math::precision(_scan[_sampleCount-1], 10));
   printf("static double *%s = __%s;\n", _name.c_str(),
       _name.c_str());
 }
@@ -410,8 +416,8 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+    double diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                       ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -441,8 +447,8 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
     }
     else
     {
-      diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+      diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                  ignition::math::precision(_scanB[i], 10));
     }
 
     _diffSum += diff;
@@ -500,10 +506,10 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
   EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
-  _width = camSensor->GetImageWidth();
-  _height = camSensor->GetImageHeight();
+  _width = camSensor->ImageWidth();
+  _height = camSensor->ImageHeight();
 
   if (*_imgData)
   {
@@ -515,14 +521,14 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 
   this->gotImage = 0;
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&ServerFixture::OnNewFrame,
                     this, _1, _2, _3, _4, _5));
 
   while (this->gotImage < 20)
     common::Time::MSleep(100);
 
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  // c will disconnect automatically when it goes out of scope
 }
 
 /////////////////////////////////////////////////
@@ -724,7 +730,7 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_sonarName, 100, 100);
-  return boost::dynamic_pointer_cast<sensors::SonarSensor>(
+  return std::dynamic_pointer_cast<sensors::SonarSensor>(
       sensors::get_sensor(_sonarName));
 }
 
@@ -794,6 +800,47 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::SpawnDepthCameraSensor(const std::string &_modelName,
+    const std::string &_cameraName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    unsigned int _width, unsigned int _height, double _rate, double _near,
+    double _far)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _cameraName << "' type ='depth'>"
+    << "    <always_on>1</always_on>"
+    << "    <update_rate>" << _rate << "</update_rate>"
+    << "    <visualize>true</visualize>"
+    << "    <camera>"
+    << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+    << "      <image>"
+    << "        <width>" << _width << "</width>"
+    << "        <height>" << _height << "</height>"
+    << "      </image>"
+    << "      <clip>"
+    << "        <near>" << _near << "</near><far>" << _far << "</far>"
+    << "      </clip>"
+    << "    </camera>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 50);
+  WaitUntilSensorSpawn(_cameraName, 100, 100);
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnImuSensor(const std::string &_modelName,
     const std::string &_imuSensorName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -829,29 +876,53 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
 
   if (_noiseType.size() > 0)
   {
-    newModelStr << "      <noise>" << std::endl
-    << "        <type>" << _noiseType << "</type>" << std::endl
-    << "        <rate>" << std::endl
-    << "          <mean>" << _rateNoiseMean
-    << "</mean>" << std::endl
-    << "          <stddev>" << _rateNoiseStdDev
-    << "</stddev>" << std::endl
-    << "          <bias_mean>" << _rateBiasMean
-    << "</bias_mean>" << std::endl
-    << "          <bias_stddev>" << _rateBiasStdDev
-    << "</bias_stddev>" << std::endl
-    << "        </rate>" << std::endl
-    << "        <accel>" << std::endl
-    << "          <mean>" << _accelNoiseMean << "</mean>"
-    << std::endl
-    << "          <stddev>" << _accelNoiseStdDev << "</stddev>"
-    << std::endl
-    << "          <bias_mean>" << _accelBiasMean
-    << "</bias_mean>" << std::endl
-    << "          <bias_stddev>" << _accelBiasStdDev
-    << "</bias_stddev>" << std::endl
-    << "        </accel>" << std::endl
-    << "      </noise>" << std::endl;
+    newModelStr
+      << "<angular_velocity>\n"
+      << "<x><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _rateNoiseMean << "</mean>\n"
+      << "<stddev>" << _rateNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _rateBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _rateBiasStdDev << "</bias_stddev>\n"
+      << "</noise></x>\n"
+
+      << "<y><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _rateNoiseMean << "</mean>\n"
+      << "<stddev>" << _rateNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _rateBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _rateBiasStdDev << "</bias_stddev>\n"
+      << "</noise></y>\n"
+
+      << "<z><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _rateNoiseMean << "</mean>\n"
+      << "<stddev>" << _rateNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _rateBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _rateBiasStdDev << "</bias_stddev>\n"
+      << "</noise></z>\n"
+      << "</angular_velocity>\n"
+
+
+      << "<linear_acceleration>\n"
+      << "<x><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _accelNoiseMean << "</mean>\n"
+      << "<stddev>" << _accelNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _accelBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _accelBiasStdDev << "</bias_stddev>\n"
+      << "</noise></x>\n"
+
+      << "<y><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _accelNoiseMean << "</mean>\n"
+      << "<stddev>" << _accelNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _accelBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _accelBiasStdDev << "</bias_stddev>\n"
+      << "</noise></y>\n"
+
+      << "<z><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _accelNoiseMean << "</mean>\n"
+      << "<stddev>" << _accelNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _accelBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _accelBiasStdDev << "</bias_stddev>\n"
+      << "</noise></z>\n"
+      << "</linear_acceleration>\n";
   }
 
   newModelStr << "    </imu>" << std::endl
@@ -1323,8 +1394,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1388,8 +1459,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1420,8 +1491,8 @@ void ServerFixture::SpawnBox(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddBoxLink(model, 1.0, _size.Ign());
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1488,8 +1559,8 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 

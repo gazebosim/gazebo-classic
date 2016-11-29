@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,21 +62,7 @@ namespace gazebo
       /// \brief Set the CoM vector and update the position of the torque
       /// visual.
       /// \param[in] _comVector New vector.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetCoM(const math::Vector3 &_comVector)
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set the CoM vector and update the position of the torque
-      /// visual.
-      /// \param[in] _comVector New vector.
       public: void SetCoM(const ignition::math::Vector3d &_comVector);
-
-      /// \brief Set the force position vector and update the position of the
-      /// force visual.
-      /// \param[in] _forcePosVector New vector.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetForcePos(const math::Vector3 &_forcePosVector)
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set the force position vector and update the position of the
       /// force visual.
@@ -87,24 +73,8 @@ namespace gazebo
       /// \param[in] _forceVector New vector.
       /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
       /// or not.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetForce(const math::Vector3 &_forceVector,
-          const bool _rotatedByMouse) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Update force vector, force text and mode.
-      /// \param[in] _forceVector New vector.
-      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
-      /// or not.
       public: void SetForce(const ignition::math::Vector3d &_forceVector,
           const bool _rotatedByMouse);
-
-      /// \brief Update torque vector, torque text and mode.
-      /// \param[in] _torqueVector New vector.
-      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
-      /// or not.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetTorque(const math::Vector3 &_torqueVector,
-          const bool _rotatedByMouse) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Update torque vector, torque text and mode.
       /// \param[in] _torqueVector New vector.

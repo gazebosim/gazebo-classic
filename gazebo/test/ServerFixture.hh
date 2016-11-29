@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@
 #include <vector>
 
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/SignalStats.hh>
+#include <ignition/math/Vector3Stats.hh>
 
 #include "gazebo/transport/transport.hh"
 
@@ -328,6 +330,25 @@ namespace gazebo
                    double _rangeResolution = 0.01, unsigned int _samples = 640,
                    const std::string &_noiseType = "", double _noiseMean = 0.0,
                    double _noiseStdDev = 0.0);
+
+    /// \brief Spawn a depth camera.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _cameraName Name of the camera.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _width Output image width.
+    /// \param[in] _height Output image height.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _near Near clipping distance
+    /// \param[in] _far Far clipping distance
+    protected: void SpawnDepthCameraSensor(const std::string &_modelName,
+                   const std::string &_cameraName,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   const unsigned int _width = 320,
+                   const unsigned int _height = 240,
+                   const double _rate = 25, const double _near = 0.1,
+                   const double _far = 10);
 
     /// \brief Spawn an imu sensor laser.
     /// \param[in] _modelName Name of the model.
@@ -634,13 +655,29 @@ namespace gazebo
     /// \param[in] _prefix Prefix string for data names.
     /// \param[in] _stats Signal statistics to store.
     protected: void Record(const std::string &_prefix,
-                           const math::SignalStats &_stats);
+                           const ignition::math::SignalStats &_stats);
 
     /// \brief Helper to record Vector3 signal statistics to gtest xml output.
     /// \param[in] _prefix Prefix string for data names.
     /// \param[in] _stats Vector3 signal statistics to store.
     protected: void Record(const std::string &_prefix,
-                           const math::Vector3Stats &_stats);
+                           const ignition::math::Vector3Stats &_stats);
+
+    /// \brief Helper to record signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Signal statistics to store.
+    /// \deprecated See function that accepts ignition::math parameters.
+    protected: void Record(const std::string &_prefix,
+                           const math::SignalStats &_stats)
+                           GAZEBO_DEPRECATED(8.0);
+
+    /// \brief Helper to record Vector3 signal statistics to gtest xml output.
+    /// \param[in] _prefix Prefix string for data names.
+    /// \param[in] _stats Vector3 signal statistics to store.
+    /// \deprecated See function that accepts ignition::math parameters.
+    protected: void Record(const std::string &_prefix,
+                           const math::Vector3Stats &_stats)
+                           GAZEBO_DEPRECATED(8.0);
 
     /// \brief Pointer the Gazebo server.
     protected: Server *server;
@@ -689,6 +726,12 @@ namespace gazebo
 
     /// \brief Counter for unique name generation.
     private: int uniqueCounter;
+  };
+
+  class GAZEBO_VISIBLE RenderingFixture : public ServerFixture
+  {
+    // Documentation inherited.
+    public: virtual void SetUp();
   };
 }       // namespace gazebo
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_

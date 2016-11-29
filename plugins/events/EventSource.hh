@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,9 +98,11 @@ namespace gazebo
 
     /// \brief Disconnect a boost::slot to the spawn model event
     /// \param[in] _subscriber the subscriber to this event
+    /// \deprecated Use event::~Connection to disconnect
     public: static void DisconnectSpawnModel(
         event::ConnectionPtr _subscriber)
-      { spawnModel.Disconnect(_subscriber); }
+        GAZEBO_DEPRECATED(8.0)
+      { spawnModel.Disconnect(_subscriber->Id()); }
 
     /// \brief A model has been completed and uploaded onto the server.
     public: static event::EventT<void (std::string, bool)> spawnModel;

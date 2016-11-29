@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -109,7 +107,7 @@ namespace gazebo
 
       /// \brief Get a material
       /// \param[in] _index the index
-      /// \return the material or NULL if the index is out of bounds
+      /// \return the material or nullptr if the index is out of bounds
       public: const Material *GetMaterial(int _index) const;
 
       /// \brief Get the index of material
@@ -125,7 +123,7 @@ namespace gazebo
 
       /// \brief Get a child mesh by name.
       /// \param[in] _name Name of the submesh.
-      /// \return The submesh, NULL if the _name is not found.
+      /// \return The submesh, nullptr if the _name is not found.
       public: const SubMesh *GetSubMesh(const std::string &_name) const;
 
       /// \brief Put all the data into flat arrays
@@ -152,7 +150,7 @@ namespace gazebo
                   const ignition::math::Vector3d &_center);
 
       /// \brief Get the skeleton to which this mesh is attached.
-      /// \return pointer to skeleton, or NULL if none is present.
+      /// \return pointer to skeleton, or nullptr if none is present.
       public: Skeleton* GetSkeleton() const;
 
       /// \brief Set the mesh skeleton

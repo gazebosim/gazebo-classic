@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MAGNETOMETER_SENSOR_HH_
-#define _GAZEBO_MAGNETOMETER_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_HH_
+#define _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_HH_
 
 #include <string>
 
@@ -24,7 +23,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -61,7 +59,7 @@ namespace gazebo
       public: virtual std::string GetTopic() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
@@ -71,7 +69,7 @@ namespace gazebo
       public: ignition::math::Vector3d MagneticField() const;
 
       /// \brief Private data pointer.
-      private: MagnetometerSensorPrivate *dataPtr;
+      private: std::unique_ptr<MagnetometerSensorPrivate> dataPtr;
     };
     /// \}
   }

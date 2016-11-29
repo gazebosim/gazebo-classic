@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -39,6 +40,7 @@ Base::Base(BasePtr _parent)
 {
   this->type = BASE;
   this->id = physics::getUniqueId();
+  this->typeStr = "base";
   this->saveable = true;
   this->selected = false;
 
@@ -55,22 +57,7 @@ Base::Base(BasePtr _parent)
 //////////////////////////////////////////////////
 Base::~Base()
 {
-  // remove self as a child of the parent
-  if (this->parent)
-    this->parent->RemoveChild(this->id);
-
-  this->SetParent(BasePtr());
-
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    if (*iter)
-      (*iter)->SetParent(BasePtr());
-  }
-  this->children.clear();
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -93,6 +80,8 @@ void Base::Load(sdf::ElementPtr _sdf)
   }
 
   this->ComputeScopedName();
+
+  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -106,16 +95,28 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
-  Base_V::iterator iter;
+  this->UnregisterIntrospectionItems();
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter)
-      (*iter)->Fini();
+  // Remove self as a child of the parent
+  if (this->parent)
+  {
+    auto temp = this->parent;
+    this->parent.reset();
 
+    temp->RemoveChild(this->id);
+  }
+
+  // Also destroy all children.
+  while (!this->children.empty())
+  {
+    auto child = this->children.front();
+    this->RemoveChild(child);
+  }
   this->children.clear();
 
+  this->sdf.reset();
+
   this->world.reset();
-  this->parent.reset();
 }
 
 //////////////////////////////////////////////////
@@ -195,22 +196,17 @@ void Base::AddChild(BasePtr _child)
     gzthrow("Cannot add a null _child to an entity");
 
   // Add this _child to our list
-  this->children.push_back(_child);
+  if (std::find(this->children.begin(), this->children.end(), _child)
+      == this->children.end())
+  {
+    this->children.push_back(_child);
+  }
 }
 
 //////////////////////////////////////////////////
 void Base::RemoveChild(unsigned int _id)
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->GetId() == _id)
-    {
-      (*iter)->Fini();
-      this->children.erase(iter);
-      break;
-    }
-  }
+  this->RemoveChild(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -223,6 +219,23 @@ unsigned int Base::GetChildCount() const
 void Base::AddType(Base::EntityType _t)
 {
   this->type = this->type | (unsigned int)_t;
+
+  if (this->type & MODEL)
+    this->typeStr = "model";
+  else if (this->type & LINK)
+    this->typeStr = "link";
+  else if (this->type & COLLISION)
+    this->typeStr = "collision";
+  else if (this->type & ACTOR)
+    this->typeStr = "actor";
+  else if (this->type & LIGHT)
+    this->typeStr = "light";
+  else if (this->type & VISUAL)
+    this->typeStr = "visual";
+  else if (this->type & JOINT)
+    this->typeStr = "joint";
+  else if (this->type & SHAPE)
+    this->typeStr = "shape";
 }
 
 //////////////////////////////////////////////////
@@ -244,19 +257,23 @@ BasePtr Base::GetChild(const std::string &_name)
 //////////////////////////////////////////////////
 void Base::RemoveChild(const std::string &_name)
 {
-  Base_V::iterator iter;
+  this->RemoveChild(this->GetByName(_name));
+}
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->GetScopedName() == _name)
-      break;
-  }
+//////////////////////////////////////////////////
+void Base::RemoveChild(physics::BasePtr _child)
+{
+  if (!_child)
+    return;
 
-  if (iter != this->children.end())
-  {
-    (*iter)->Fini();
-    this->children.erase(iter);
-  }
+  // Fini
+  _child->SetParent(nullptr);
+  _child->Fini();
+
+  // Remove from vector if still there
+  this->children.erase(std::remove(this->children.begin(),
+                                   this->children.end(), _child),
+                                   this->children.end());
 }
 
 //////////////////////////////////////////////////
@@ -309,6 +326,48 @@ std::string Base::GetScopedName(bool _prependWorldName) const
 }
 
 //////////////////////////////////////////////////
+common::URI Base::URI() const
+{
+  common::URI uri;
+
+  uri.SetScheme("data");
+
+  BasePtr p = this->parent;
+  while (p)
+  {
+    if (p->GetParent())
+    {
+      uri.Path().PushFront(p->GetName());
+      uri.Path().PushFront(p->TypeStr());
+    }
+
+    p = p->GetParent();
+  }
+
+  uri.Path().PushBack(this->TypeStr());
+  uri.Path().PushBack(this->GetName());
+  uri.Path().PushFront(this->world->GetName());
+  uri.Path().PushFront("world");
+
+  return uri;
+}
+
+/////////////////////////////////////////////////
+void Base::RegisterIntrospectionItems()
+{
+  // nothing for now
+}
+
+/////////////////////////////////////////////////
+void Base::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
+}
+
+//////////////////////////////////////////////////
 void Base::ComputeScopedName()
 {
   BasePtr p = this->parent;
@@ -332,6 +391,12 @@ bool Base::HasType(const Base::EntityType &_t) const
 unsigned int Base::GetType() const
 {
   return this->type;
+}
+
+//////////////////////////////////////////////////
+std::string Base::TypeStr() const
+{
+  return this->typeStr;
 }
 
 //////////////////////////////////////////////////

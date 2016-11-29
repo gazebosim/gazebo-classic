@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,11 @@ using namespace physics;
 ODEJoint::ODEJoint(BasePtr _parent)
   : Joint(_parent)
 {
-  this->jointId = NULL;
+  this->jointId = nullptr;
   this->implicitDampingState[0] = ODEJoint::NONE;
   this->implicitDampingState[1] = ODEJoint::NONE;
   this->stiffnessDampingInitialized = false;
-  this->feedback = NULL;
+  this->feedback = nullptr;
   this->currentKd[0] = 0;
   this->currentKd[1] = 0;
   this->currentKp[0] = 0;
@@ -55,14 +55,25 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->Fini();
+}
 
-  delete this->feedback;
+//////////////////////////////////////////////////
+void ODEJoint::Fini()
+{
+  this->applyDamping.reset();
+
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = nullptr;
+
   this->Detach();
 
   if (this->jointId)
     dJointDestroy(this->jointId);
+  this->jointId = nullptr;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -136,7 +147,7 @@ LinkPtr ODEJoint::GetJointLink(unsigned int _index) const
   {
     ODELinkPtr odeLink1 = boost::static_pointer_cast<ODELink>(this->childLink);
     ODELinkPtr odeLink2 = boost::static_pointer_cast<ODELink>(this->parentLink);
-    if (odeLink1 != NULL &&
+    if (odeLink1 != nullptr &&
         dJointGetBody(this->jointId, _index) == odeLink1->GetODEId())
       result = this->childLink;
     else if (odeLink2)
@@ -152,7 +163,7 @@ bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
   ODELinkPtr odeLink1 = boost::dynamic_pointer_cast<ODELink>(_one);
   ODELinkPtr odeLink2 = boost::dynamic_pointer_cast<ODELink>(_two);
 
-  if (odeLink1 == NULL || odeLink2 == NULL)
+  if (odeLink1 == nullptr || odeLink2 == nullptr)
     gzthrow("ODEJoint requires ODE bodies\n");
 
   return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
@@ -173,14 +184,14 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
   ODELinkPtr odechild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
   ODELinkPtr odeparent = boost::dynamic_pointer_cast<ODELink>(this->parentLink);
 
-  if (odechild == NULL && odeparent == NULL)
+  if (odechild == nullptr && odeparent == nullptr)
     gzthrow("ODEJoint requires at least one ODE link\n");
 
   if (!this->jointId)
     gzerr << "ODE Joint ID is invalid\n";
 
   if (this->HasType(Base::HINGE2_JOINT) &&
-      (odechild == NULL || odeparent == NULL))
+      (odechild == nullptr || odeparent == nullptr))
     gzthrow("ODEHinge2Joint cannot be connected to the world");
 
   if (!odechild && odeparent)
@@ -203,9 +214,20 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
+  auto odeChild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
+  auto odeParent = boost::dynamic_pointer_cast<ODELink>(this->parentLink);
+
   Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
+
+  // By the time we get here, links and ODEIds might have already been
+  // cleaned up
+  if ((odeParent == nullptr || odeParent->GetODEId() == nullptr) ||
+      (odeChild == nullptr || odeChild->GetODEId() == nullptr))
+  {
+    return;
+  }
 
   if (this->jointId)
     dJointAttach(this->jointId, 0, 0);
@@ -254,7 +276,7 @@ dJointFeedback *ODEJoint::GetFeedback()
     return dJointGetFeedback(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
-  return NULL;
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -456,7 +478,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       ScrewJoint<ODEJoint>* screwJoint =
         dynamic_cast<ScrewJoint<ODEJoint>* >(this);
-      if (screwJoint != NULL)
+      if (screwJoint != nullptr)
       {
         screwJoint->SetThreadPitch(boost::any_cast<double>(_value));
       }
@@ -471,7 +493,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       GearboxJoint<ODEJoint>* gearboxJoint =
         dynamic_cast<GearboxJoint<ODEJoint>* >(this);
-      if (gearboxJoint != NULL)
+      if (gearboxJoint != nullptr)
       {
         gearboxJoint->SetGearboxRatio(boost::any_cast<double>(_value));
       }
@@ -574,7 +596,7 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     {
       ScrewJoint<ODEJoint>* screwJoint =
         dynamic_cast<ScrewJoint<ODEJoint>* >(this);
-      if (screwJoint != NULL)
+      if (screwJoint != nullptr)
       {
           return screwJoint->GetThreadPitch();
       }
@@ -589,7 +611,7 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     {
       GearboxJoint<ODEJoint>* gearboxJoint =
         dynamic_cast<GearboxJoint<ODEJoint>* >(this);
-      if (gearboxJoint != NULL)
+      if (gearboxJoint != nullptr)
       {
         return gearboxJoint->GetGearboxRatio();
       }
@@ -621,6 +643,8 @@ void ODEJoint::Reset()
     dJointReset(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
+
+  this->forceAppliedTime = common::Time::Zero;
 
   Joint::Reset();
 }
@@ -720,7 +744,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     // convert torque from about parent CG to joint anchor location
     if (this->parentLink)
     {
-      // get child pose, or it's the inertial world if childLink is NULL
+      // get child pose, or it's the inertial world if childLink is nullptr
       math::Pose childPose;
       if (this->childLink)
         childPose = this->childLink->GetWorldPose();
@@ -1079,7 +1103,7 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 
   if (this->provideFeedback)
   {
-    if (this->feedback == NULL)
+    if (this->feedback == nullptr)
     {
       this->feedback = new dJointFeedback;
       this->feedback->f1[0] = 0;

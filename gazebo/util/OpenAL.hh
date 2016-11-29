@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_OPENAL_HH_
-#define _GAZEBO_OPENAL_HH_
+#ifndef _GAZEBO_UTIL_OPENAL_HH_
+#define _GAZEBO_UTIL_OPENAL_HH_
 
+#include <set>
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
@@ -24,10 +25,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/UtilTypes.hh"
 
 #include "gazebo/gazebo_config.h"
@@ -35,16 +33,15 @@
 
 #ifdef HAVE_OPENAL
 
-struct ALCcontext_struct;
-struct ALCdevice_struct;
-
 namespace gazebo
 {
   namespace util
   {
-    class OpenALIface;
-    class OpenALSource;
-    class OpenALSink;
+    // Forward declare private openal data class
+    class OpenALPrivate;
+
+    // Forward declare private openal sourcedata class
+    class OpenALSourcePrivate;
 
     /// \addtogroup gazebo_util Utility
     /// \{
@@ -77,14 +74,13 @@ namespace gazebo
       /// \return A pointer to an OpenALSink object.
       public: OpenALSinkPtr CreateSink(sdf::ElementPtr _sdf);
 
-      /// \brief OpenAL audio context pointer.
-      private: ALCcontext_struct *context;
+      /// \brief Get a list of available audio devices
+      /// \return A list of audio device names
+      public: std::set<std::string> DeviceList() const;
 
-      /// \brief OpenAL audio device pointer.
-      private: ALCdevice_struct *audioDevice;
-
-      /// \brief OpenAL sink pointer.
-      private: OpenALSinkPtr sink;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<OpenALPrivate> dataPtr;
 
       /// \brief This is a singleton
       private: friend class SingletonT<OpenAL>;
@@ -156,12 +152,12 @@ namespace gazebo
       /// collision objects.
       /// \return True if audio is played on contact.
       /// \sa AddCollision()
-      public: bool GetOnContact() const;
+      public: bool OnContact() const;
 
       /// \brief Get a vector of all the collision names.
       /// \return All the collision names used to trigger audio playback on
       /// contact.
-      public: std::vector<std::string> GetCollisionNames() const;
+      public: std::vector<std::string> CollisionNames() const;
 
       /// \brief Get whether the source has a collision name set.
       /// \param[in] _name Name of a collision to check for.
@@ -195,15 +191,9 @@ namespace gazebo
       /// \param[in] _audioFile Name and an audio file.
       public: void FillBufferFromFile(const std::string &_audioFile);
 
-      /// \brief OpenAL source index.
-      private: unsigned int alSource;
-
-      /// \brief OpenAL buffer index.
-      private: unsigned int alBuffer;
-
-      /// \brief Names of collision objects that should trigger audio
-      /// playback.
-      private: std::vector<std::string> collisionNames;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<OpenALSourcePrivate> dataPtr;
     };
     /// \}
   }

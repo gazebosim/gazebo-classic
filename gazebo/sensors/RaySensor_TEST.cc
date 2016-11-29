@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 #include <sdf/sdf.hh>
-#include "gazebo/math/Angle.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -101,25 +100,25 @@ TEST_F(RaySensor_TEST, CreateLaser)
   mgr->Update();
 
   // Get a pointer to the Ray sensor
-  sensors::RaySensorPtr sensor = boost::dynamic_pointer_cast<sensors::RaySensor>
+  sensors::RaySensorPtr sensor = std::dynamic_pointer_cast<sensors::RaySensor>
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   double angleRes = (sensor->AngleMax() - sensor->AngleMin()).Radian() /
-                    sensor->GetRayCount();
+                     sensor->RayCount();
   EXPECT_EQ(sensor->AngleMin(), ignition::math::Angle(-2.2689));
   EXPECT_EQ(sensor->AngleMax(), ignition::math::Angle(2.2689));
-  EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
-  EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
-  EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);
-  EXPECT_NEAR(sensor->GetRangeResolution(), 0.01, 1e-3);
-  EXPECT_EQ(sensor->GetRayCount(), 640);
-  EXPECT_EQ(sensor->GetRangeCount(), 640);
+  EXPECT_NEAR(sensor->RangeMin(), 0.08, 1e-6);
+  EXPECT_NEAR(sensor->RangeMax(), 10.0, 1e-6);
+  EXPECT_NEAR(sensor->AngleResolution(), angleRes, 1e-3);
+  EXPECT_NEAR(sensor->RangeResolution(), 0.01, 1e-3);
+  EXPECT_EQ(sensor->RayCount(), 640);
+  EXPECT_EQ(sensor->RangeCount(), 640);
 
-  EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
-  EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
+  EXPECT_EQ(sensor->VerticalRayCount(), 1);
+  EXPECT_EQ(sensor->VerticalRangeCount(), 1);
   EXPECT_EQ(sensor->VerticalAngleMin(), 0);
   EXPECT_EQ(sensor->VerticalAngleMax(), 0);
 
@@ -130,16 +129,16 @@ TEST_F(RaySensor_TEST, CreateLaser)
 
   // Get all the range values
   std::vector<double> ranges;
-  sensor->GetRanges(ranges);
+  sensor->Ranges(ranges);
   EXPECT_EQ(ranges.size(), static_cast<size_t>(640));
 
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
-    EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
-    EXPECT_DOUBLE_EQ(sensor->GetRange(i), ranges[i]);
-    EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
-    EXPECT_EQ(sensor->GetFiducial(i), -1);
+    EXPECT_DOUBLE_EQ(ranges[i], IGN_DBL_INF);
+    EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
+    EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
+    EXPECT_EQ(sensor->Fiducial(i), -1);
   }
 }
 
@@ -165,18 +164,18 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
   mgr->Update();
 
   // Get a pointer to the Ray sensor
-  sensors::RaySensorPtr sensor = boost::dynamic_pointer_cast<sensors::RaySensor>
+  sensors::RaySensorPtr sensor = std::dynamic_pointer_cast<sensors::RaySensor>
     (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   // range count = ray count * resolution
-  EXPECT_EQ(sensor->GetRayCount(), 120);
-  EXPECT_EQ(sensor->GetRangeCount(), 240);
+  EXPECT_EQ(sensor->RayCount(), 120);
+  EXPECT_EQ(sensor->RangeCount(), 240);
 
-  EXPECT_EQ(sensor->GetVerticalRayCount(), 2);
-  EXPECT_EQ(sensor->GetVerticalRangeCount(), 6);
+  EXPECT_EQ(sensor->VerticalRayCount(), 2);
+  EXPECT_EQ(sensor->VerticalRangeCount(), 6);
 
   EXPECT_TRUE(sensor->IsActive());
 
@@ -185,16 +184,16 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
 
   // Get all the range values
   std::vector<double> ranges;
-  sensor->GetRanges(ranges);
+  sensor->Ranges(ranges);
   EXPECT_EQ(ranges.size(), static_cast<size_t>(240 * 6));
 
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
     EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
-    EXPECT_DOUBLE_EQ(sensor->GetRange(i), ranges[i]);
-    EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
-    EXPECT_EQ(sensor->GetFiducial(i), -1);
+    EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
+    EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
+    EXPECT_EQ(sensor->Fiducial(i), -1);
   }
 }
 

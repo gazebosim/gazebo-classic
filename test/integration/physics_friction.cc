@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
+
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
@@ -188,12 +193,12 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
 
   // Custom gravity vector for this demo world.
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, -1.0);
-  EXPECT_DOUBLE_EQ(g.z, -1.0);
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), -1.0);
+  EXPECT_DOUBLE_EQ(g.Z(), -1.0);
 
   if (_physicsEngine == "ode")
   {
@@ -251,8 +256,15 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
       {
         // Friction is small enough to allow motion
         // Expect velocity = acceleration * time
-        EXPECT_NEAR(vel.y, (g.y + box->friction) * t.Double(),
-                    yTolerance);
+        double vyTolerance = yTolerance;
+#ifdef HAVE_BULLET
+        if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+        {
+          vyTolerance *= 22;
+        }
+#endif
+        EXPECT_NEAR(vel.y, (g.Y() + box->friction) * t.Double(),
+                    vyTolerance);
       }
     }
   }
@@ -282,7 +294,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
 
   // get the gravity vector
   // small positive y component
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
 
   // Set friction model
   // "cone_model", "pyramid_model", "box_model"
@@ -390,8 +402,8 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // set the gravity vector
-  math::Vector3 g(0.0, 1.0, -9.81);
-  physics->SetGravity(g);
+  ignition::math::Vector3d g(0.0, 1.0, -9.81);
+  world->SetGravity(g);
 
   // Spawn concentric semi-circles of boxes
   int boxes = 10;
@@ -446,7 +458,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    double velMag = g.y * sinAngle * t;
+    double velMag = g.Y() * sinAngle * t;
     math::Vector3 vel = iter->first->GetWorldLinearVel();
     EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
     EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
@@ -492,8 +504,8 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 
   // set the gravity vector
   // small positive y component
-  math::Vector3 g(0.0, 1.5, -1.0);
-  physics->SetGravity(g);
+  ignition::math::Vector3d g(0.0, 1.5, -1.0);
+  world->SetGravity(g);
 
   // Spawn a single box
   double dx = 0.5;
@@ -514,7 +526,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   double t = world->GetSimTime().Double();
 
   gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
-  double velMag = (g.y+g.z) * t;
+  double velMag = (g.Y()+g.Z()) * t;
   math::Vector3 vel = model->GetWorldLinearVel();
   EXPECT_NEAR(0.0, vel.x, g_friction_tolerance);
   EXPECT_NEAR(velMag, vel.y, g_friction_tolerance);

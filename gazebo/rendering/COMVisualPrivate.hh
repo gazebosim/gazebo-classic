@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,6 @@
 
 #include "gazebo/rendering/VisualPrivate.hh"
 
-namespace ogre
-{
-  class SceneNode;
-}
-
 namespace gazebo
 {
   namespace rendering
@@ -38,9 +33,6 @@ namespace gazebo
     {
       /// \brief Lines that make the cross marking the center of mass.
       public: DynamicLines *crossLines;
-
-      /// \brief Sphere with density of lead and equivalent mass.
-      public: Ogre::SceneNode *sphereNode;
 
       /// \brief Inertia pose in link frame.
       public: math::Pose inertiaPose;

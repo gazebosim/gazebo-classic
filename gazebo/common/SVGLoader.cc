@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <tinyxml.h>
 #include <utility>
+#include <cmath>
 
 #include <gazebo/common/Console.hh>
 #include <gazebo/common/Assert.hh>
@@ -28,7 +29,9 @@
 using namespace gazebo;
 using namespace common;
 
+
 /////////////////////////////////////////////////
+// This local helper function transforms a string to its lowecase equivalent
 std::string lowercase(const std::string &_in)
 {
   std::string out = _in;
@@ -37,6 +40,7 @@ std::string lowercase(const std::string &_in)
 }
 
 /////////////////////////////////////////////////
+// This local helper function transforms a C string to its lowecase equivalent
 std::string lowercase(const char *_in)
 {
   std::string ins = _in;
@@ -44,6 +48,7 @@ std::string lowercase(const char *_in)
 }
 
 /////////////////////////////////////////////////
+// Local helper function that splits a string according to the delimiting char
 std::vector<std::string> &split(const std::string &_s,
                                 char _delim,
                                 std::vector<std::string> &_elems)
@@ -58,6 +63,161 @@ std::vector<std::string> &split(const std::string &_s,
 }
 
 /////////////////////////////////////////////////
+// This local helper function takes in a SVG transformation string
+// and returns the corresponding transformation matrix
+ignition::math::Matrix3d ParseTransformMatrixStr(
+                                              const std::string &_transformStr)
+{
+  // check for transformation
+  GZ_ASSERT(!_transformStr.empty(), "no data for ParseTransformMatrixStr");
+
+  // _transfromStr should not have a closing paren and look like this
+  // matrix(0,0.55669897,-0.55669897,0,194.55441,-149.50402
+  // we're going to extract the transform type and numbers
+  std::vector<std::string> tx;
+  split(_transformStr, '(', tx);
+
+  if (tx.size() < 2)
+  {
+    gzerr << "Invalid path transform: '" << &_transformStr << "'"
+          << std::endl;
+    return ignition::math::Matrix3d::Identity;
+  }
+  std::string transform = tx[0];
+  std::vector<std::string> numbers;
+  split(tx[1], ',', numbers);
+
+  // how to unpack the values into 3x3 matrices
+  // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
+  if (transform.find("matrix") != std::string::npos)
+  {
+    if (numbers.size() != 6)
+    {
+      gzerr << "Unsupported matrix transform with "
+            << numbers.size() << " parameters. Should be 6."
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double a = stod(numbers[0]);  // 00
+    double b = stod(numbers[1]);  // 10
+    double c = stod(numbers[2]);  // 01
+    double d = stod(numbers[3]);  // 11
+    double e = stod(numbers[4]);  // 02
+    double f = stod(numbers[5]);  // 12
+    ignition::math::Matrix3d m(a, c, e, b, d, f, 0, 0, 1);
+    return m;
+  }
+
+  if (transform.find("skewX") != std::string::npos)
+  {
+    if (numbers.size() != 1)
+    {
+      gzerr << "Unsupported skewX transform. Needs 1 parameter only"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double deg = stod(numbers[0]);
+    ignition::math::Angle angle;
+    angle.Degree(deg);
+    // get the tangent of the angle
+    double t = tan(angle.Radian());
+    ignition::math::Matrix3d m(1, t, 0, 0, 1, 0, 0, 0, 1);
+    return m;
+  }
+
+  if (transform.find("skewY") != std::string::npos)
+  {
+    if (numbers.size() != 1)
+    {
+      gzerr << "Unsupported skewY transform. Needs 1 parameter only"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double deg = stod(numbers[0]);
+    ignition::math::Angle angle;
+    angle.Degree(deg);
+    // get the tangent of the angle
+    double t = tan(angle.Radian());
+    ignition::math::Matrix3d m(1, 0, 0, t, 1, 0, 0, 0, 1);
+    return m;
+  }
+
+  // scale(<x> [<y>])
+  // if y is not provided, it is assumed to be equal to x.
+  if (transform.find("scale") != std::string::npos)
+  {
+    if (numbers.size() == 0 || numbers.size() > 2)
+    {
+      gzerr << "Unsupported scale transform with more than 2 parameters"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double x = stod(numbers[0]);
+    double y = x;
+    if (numbers.size() == 2)
+    {
+      y = stod(numbers[1]);
+    }
+    ignition::math::Matrix3d m(x, 0, 0, 0, y, 0, 0, 0, 1);
+    return m;
+  }
+  // translate(<x> [<y>])
+  // If y is not provided, it is assumed to be zero.
+  if (transform.find("translate") != std::string::npos)
+  {
+    if (numbers.size() == 0 || numbers.size() > 2)
+    {
+      gzerr << "Unsupported translate transform with more than 2 parameters"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double x = stod(numbers[0]);
+    double y = 0;
+    if (numbers.size() == 2)
+    {
+      y = stod(numbers[1]);
+    }
+    ignition::math::Matrix3d m(1, 0, x, 0, 1, y, 0, 0, 1);
+    return m;
+  }
+  // rotate(<a> [<x> <y>]) angle in degrees, center x and y
+  // if x, y are not supplied, rotation is about 0, 0
+  if (transform.find("rotate") != std::string::npos)
+  {
+    if (numbers.size() ==0 || numbers.size() == 2 || numbers.size() > 3 )
+    {
+      gzerr << "Unsupported rotate transform. Only angle and optional x y"
+            << " are supported" << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double deg = stod(numbers[0]);
+    ignition::math::Angle angle;
+    angle.Degree(deg);
+    double a = angle.Radian();
+    double sina = sin(a);
+    double cosa = cos(a);
+    double x = 0;
+    double y = 0;
+    if (numbers.size() == 3)
+    {
+      x = stod(numbers[1]);
+      y = stod(numbers[2]);
+    }
+    // we apply a translation to x, y, the rotation and the translation -x,-y
+    ignition::math::Matrix3d transToXy(1, 0, x, 0, 1, y, 0, 0, 1);
+    ignition::math::Matrix3d transFromXy(1, 0, -x, 0, 1, -y, 0, 0, 1);
+    ignition::math::Matrix3d rotate(cosa, -sina, 0, sina, cosa, 0, 0, 0, 1);
+    ignition::math::Matrix3d m = transToXy * rotate * transFromXy;
+    return m;
+  }
+  // we have no business being here
+  gzerr << "Unknown transformation: " << transform << std::endl;
+  ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
+  return m;
+}
+
+/////////////////////////////////////////////////
+// This local helper function interpolates a bezier curve at t (between 0 and 1)
 ignition::math::Vector2d bezierInterpolate(double _t,
                                            const ignition::math::Vector2d &_p0,
                                            const ignition::math::Vector2d &_p1,
@@ -79,6 +239,7 @@ ignition::math::Vector2d bezierInterpolate(double _t,
 }
 
 /////////////////////////////////////////////////
+// This helper function adds bezier interpolations to a list of points
 void cubicBezier(const ignition::math::Vector2d &_p0,
                  const ignition::math::Vector2d &_p1,
                  const ignition::math::Vector2d &_p2,
@@ -101,15 +262,16 @@ void cubicBezier(const ignition::math::Vector2d &_p0,
 }
 
 /////////////////////////////////////////////////
+// This helper function computes the square of a number
 static double Sqr(float _x)
 {
   return _x * _x;
 }
 
 /////////////////////////////////////////////////
+// This helper function computes the angle between 2 vectors, using acos
 static float VecAng(float _ux, float _uy, float _vx, float _vy)
 {
-  // computes the angle between 2 vectors, using acos
   double ux = _ux;
   double uy = _uy;
   double vx = _vx;
@@ -140,6 +302,7 @@ static float VecAng(float _ux, float _uy, float _vx, float _vy)
 }
 
 /////////////////////////////////////////////////
+// This helper function adds arc interpolations to a list of points
 void arcPath(const ignition::math::Vector2d &_p0,
              const double _rx,
              const double _ry,
@@ -576,13 +739,34 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
     std::vector<ignition::math::Vector2d> &polyline = _path.polylines.back();
     p = this->SubpathToPolyline(subpath, p, polyline);
   }
+  // if necessary, apply transform to p and polyline
+  if (_path.transform != ignition::math::Matrix3d::Identity)
+  {
+    // we need to transform all the points in the path
+    for (auto &polyline : _path.polylines)
+    {
+      for (auto  &polyPoint : polyline)
+      {
+        // make a 3d vector form the 2d point
+        ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 1);
+        // matrix multiply to get the new point, then save new coords in place
+        auto transformed = _path.transform * point3;
+        polyPoint.X(transformed.X());
+        polyPoint.Y(transformed.Y());
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
 {
   GZ_ASSERT(_pElement, "empty XML element where a path was expected");
+  _path.transform = ignition::math::Matrix3d::Identity;
   TiXmlAttribute *pAttrib = _pElement->FirstAttribute();
+
+  // this attribute contains a list of coordinates
+  std::vector<std::string> tokens;
   while (pAttrib)
   {
     std::string name = lowercase(pAttrib->Name());
@@ -597,16 +781,12 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     }
     else if (name == "transform")
     {
-      _path.transform = value;
-      gzwarn << "transform attribute \"" << name
-        << "\" not implemented yet"  << std::endl;
+      _path.transform = ParseTransformMatrixStr(value);
     }
     else if (name == "d")
     {
-      // this attribute contains a list of coordinates
-      std::vector<std::string> tokens;
+      // load in the path parameters
       split(value, ' ', tokens);
-      this->GetPathCommands(tokens, _path);
     }
     else
     {
@@ -614,6 +794,8 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     }
     pAttrib = pAttrib->Next();
   }
+  // Now that all attributes are loaded, we can compute the values
+  this->GetPathCommands(tokens, _path);
 }
 
 /////////////////////////////////////////////////

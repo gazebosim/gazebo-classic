@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// Forward declare private data class
@@ -38,7 +37,13 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit DARTMultiRayShape(CollisionPtr _parent);
+      /// \deprecated See version that accepts DARTCollisionPtr
+      public: explicit DARTMultiRayShape(CollisionPtr _parent)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit DARTMultiRayShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTMultiRayShape();
@@ -56,6 +61,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTMultiRayShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

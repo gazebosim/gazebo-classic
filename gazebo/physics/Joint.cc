@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/sensors/Sensor.hh"
-#include "gazebo/sensors/SensorsIface.hh"
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
@@ -37,6 +34,8 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Joint.hh"
+
+#include "gazebo/util/IntrospectionManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -82,12 +81,7 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-      iter != this->sensors.end(); ++iter)
-  {
-    sensors::remove_sensor(*iter);
-  }
-  this->sensors.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -251,8 +245,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
     }
     if (!this->parentLink)
     {
-      std::string parentNameThisModel =
-          parentName.substr(parentName.find("::"));
+      std::string parentNameThisModel;
+      auto doubleColon = parentName.find("::");
+      if (doubleColon != std::string::npos)
+      {
+        parentNameThisModel = parentName.substr(doubleColon);
+      }
+      else
+      {
+        parentNameThisModel = "::" + parentName;
+      }
       parentNameThisModel = parentModel->GetName() + parentNameThisModel;
 
       this->parentLink = boost::dynamic_pointer_cast<Link>(
@@ -273,11 +275,20 @@ void Joint::Load(sdf::ElementPtr _sdf)
       this->childLink = boost::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(scopedChildName));
 
-        parentModel = parentModel->GetParent();
+      parentModel = parentModel->GetParent();
     }
     if (!this->childLink)
     {
-      std::string childNameThisModel = childName.substr(childName.find("::"));
+      std::string childNameThisModel;
+      auto doubleColon = childName.find("::");
+      if (doubleColon != std::string::npos)
+      {
+        childNameThisModel = childName.substr(doubleColon);
+      }
+      else
+      {
+        childNameThisModel = "::" + childName;
+      }
       childNameThisModel = parentModel->GetName() + childNameThisModel;
 
       this->childLink = boost::dynamic_pointer_cast<Link>(
@@ -325,9 +336,14 @@ void Joint::LoadImpl(const math::Pose &_pose)
       /// other sensors. We should make this more generic.
       if (sensorElem->Get<std::string>("type") == "force_torque")
       {
-        std::string sensorName =
-          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
+        // This must match the implementation in Sensors::GetScopedName
+        std::string sensorName = this->GetScopedName(true) + "::" +
+          sensorElem->Get<std::string>("name");
+
+        // Tell the sensor library to create a sensor.
+        event::Events::createSensor(sensorElem,
+            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
+
         this->sensors.push_back(sensorName);
       }
       else
@@ -396,12 +412,20 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-      iter != this->sensors.end(); ++iter)
+  this->applyDamping.reset();
+
+  // Remove all the sensors attached to the joint
+  for (auto const &sensor : this->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(sensor);
   }
   this->sensors.clear();
+
+  this->anchorLink.reset();
+  this->childLink.reset();
+  this->parentLink.reset();
+  this->model.reset();
+  this->sdfJoint.reset();
 
   Base::Fini();
 }
@@ -477,6 +501,7 @@ void Joint::Update()
 void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
+  /// \todo Update joint specific parameters. Issue #1954
 }
 
 //////////////////////////////////////////////////
@@ -637,18 +662,17 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.set_parent_id(0);
   }
 
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); ++iter)
+  // Add in the sensor data.
+  if (this->sdf->HasElement("sensor"))
   {
-    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
-    if (sensor)
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
     {
-      msgs::Sensor *sensorMsg =_msg.add_sensor();
-      sensor->FillMsg(*sensorMsg);
-    }
-    else
-    {
-      gzlog << "Joint::FillMsg: sensor [" << *iter << "] not found.\n";
+      msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      msg->set_parent(this->GetScopedName());
+      msg->set_parent_id(this->GetId());
+      sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
 }
@@ -1443,4 +1467,47 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   }
 
   return newWorldPose;
+}
+
+/////////////////////////////////////////////////
+void Joint::RegisterIntrospectionItems()
+{
+  for (size_t i = 0; i < this->GetAngleCount(); ++i)
+  {
+    this->RegisterIntrospectionPosition(i);
+    this->RegisterIntrospectionVelocity(i);
+  }
+}
+
+/////////////////////////////////////////////////
+void Joint::RegisterIntrospectionPosition(const unsigned int _index)
+{
+  auto f = [this, _index]()
+  {
+    // For prismatic axes, Radian -> meters
+    return this->GetAngle(_index).Ign().Radian();
+  };
+
+  common::URI uri(this->URI());
+  uri.Query().Insert("p",
+      "axis/" + std::to_string(_index) + "/double/position");
+  this->introspectionItems.push_back(uri);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <double>(uri.Str(), f);
+}
+
+/////////////////////////////////////////////////
+void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
+{
+  auto f = [this, _index]()
+  {
+    return this->GetVelocity(_index);
+  };
+
+  common::URI uri(this->URI());
+  uri.Query().Insert("p",
+      "axis/" + std::to_string(_index) + "/double/velocity");
+  this->introspectionItems.push_back(uri);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <double>(uri.Str(), f);
 }

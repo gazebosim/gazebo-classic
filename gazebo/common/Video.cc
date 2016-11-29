@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  *
 */
 
-#include <gazebo/common/Console.hh>
-#include <gazebo/common/Video.hh>
-#include <gazebo/gazebo_config.h>
-#include <gazebo/common/ffmpeg_inc.h>
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Video.hh"
+#include "gazebo/common/ffmpeg_inc.h"
 
 using namespace gazebo;
 using namespace common;
@@ -42,27 +42,18 @@ using namespace common;
 /////////////////////////////////////////////////
 Video::Video()
 {
-  this->formatCtx = NULL;
-  this->codecCtx = NULL;
-  this->avFrame = NULL;
-  this->swsCtx = NULL;
-  this->avFrame = NULL;
-  this->pic = NULL;
+  this->formatCtx = nullptr;
+  this->codecCtx = nullptr;
+  this->swsCtx = nullptr;
+  this->avFrame = nullptr;
   this->videoStream = -1;
-
-#ifdef HAVE_FFMPEG
-  this->pic = new AVPicture;
-#endif
+  this->avFrameDst = nullptr;
 }
 
 /////////////////////////////////////////////////
 Video::~Video()
 {
   this->Cleanup();
-
-#ifdef HAVE_FFMPEG
-  delete this->pic;
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -78,7 +69,7 @@ void Video::Cleanup()
   // Close the codec
   avcodec_close(this->codecCtx);
 
-  avpicture_free(this->pic);
+  av_free(this->avFrameDst);
 #endif
 }
 
@@ -86,7 +77,7 @@ void Video::Cleanup()
 #ifdef HAVE_FFMPEG
 bool Video::Load(const std::string &_filename)
 {
-  AVCodec *codec = NULL;
+  AVCodec *codec = nullptr;
   this->videoStream = -1;
 
   if (this->formatCtx || this->avFrame || this->codecCtx)
@@ -95,14 +86,15 @@ bool Video::Load(const std::string &_filename)
   this->avFrame = common::AVFrameAlloc();
 
   // Open video file
-  if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)
+  if (avformat_open_input(&this->formatCtx, _filename.c_str(),
+        nullptr, nullptr) < 0)
   {
     gzerr << "Unable to read video file[" << _filename << "]\n";
     return false;
   }
 
   // Retrieve stream information
-  if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
+  if (avformat_find_stream_info(this->formatCtx, nullptr) < 0)
   {
     gzerr << "Couldn't find stream information\n";
     return false;
@@ -111,7 +103,14 @@ bool Video::Load(const std::string &_filename)
   // Find the first video stream
   for (unsigned int i = 0; i < this->formatCtx->nb_streams; ++i)
   {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     {
       this->videoStream = static_cast<int>(i);
       break;
@@ -125,11 +124,18 @@ bool Video::Load(const std::string &_filename)
   }
 
   // Get a pointer to the codec context for the video stream
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->codecCtx = this->formatCtx->streams[this->videoStream]->codec;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Find the decoder for the video stream
   codec = avcodec_find_decoder(this->codecCtx->codec_id);
-  if (codec == NULL)
+  if (codec == nullptr)
   {
     gzerr << "Codec not found\n";
     return false;
@@ -141,14 +147,11 @@ bool Video::Load(const std::string &_filename)
     this->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
 
   // Open codec
-  if (avcodec_open2(this->codecCtx, codec, NULL) < 0)
+  if (avcodec_open2(this->codecCtx, codec, nullptr) < 0)
   {
     gzerr << "Could not open codec\n";
     return false;
   }
-
-  avpicture_alloc(this->pic, PIX_FMT_RGB24, this->codecCtx->width,
-                  this->codecCtx->height);
 
   this->swsCtx = sws_getContext(
       this->codecCtx->width,
@@ -156,14 +159,22 @@ bool Video::Load(const std::string &_filename)
       this->codecCtx->pix_fmt,
       this->codecCtx->width,
       this->codecCtx->height,
-      PIX_FMT_RGB24,
-      SWS_BICUBIC, NULL, NULL, NULL);
+      AV_PIX_FMT_RGB24,
+      SWS_BICUBIC, nullptr, nullptr, nullptr);
 
-  if (this->swsCtx == NULL)
+  if (this->swsCtx == nullptr)
   {
     gzerr << "Error while calling sws_getContext\n";
     return false;
   }
+
+  this->avFrameDst = common::AVFrameAlloc();
+  this->avFrameDst->format = this->codecCtx->pix_fmt;
+  this->avFrameDst->width = this->codecCtx->width;
+  this->avFrameDst->height = this->codecCtx->height;
+  av_image_alloc(this->avFrameDst->data, this->avFrameDst->linesize,
+      this->codecCtx->width, this->codecCtx->height, this->codecCtx->pix_fmt,
+      1);
 
   // DEBUG: Will save all the frames
   /*Image img;
@@ -211,8 +222,15 @@ bool Video::GetNextFrame(unsigned char **_buffer)
     while (tmpPacket.size > 0)
     {
       // sending data to libavcodec
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       int processedLength = avcodec_decode_video2(this->codecCtx, this->avFrame,
           &frameAvailable, &tmpPacket);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
       if (processedLength < 0)
       {
         gzerr << "Error while processing the data\n";
@@ -226,9 +244,10 @@ bool Video::GetNextFrame(unsigned char **_buffer)
       if (frameAvailable)
       {
         sws_scale(swsCtx, this->avFrame->data, this->avFrame->linesize, 0,
-            this->codecCtx->height, this->pic->data, this->pic->linesize);
+            this->codecCtx->height, this->avFrameDst->data,
+            this->avFrameDst->linesize);
 
-        memcpy(*_buffer, this->pic->data[0],
+        memcpy(*_buffer, this->avFrameDst->data[0],
             this->codecCtx->height * (this->codecCtx->width*3));
 
         // Debug:
@@ -237,7 +256,7 @@ bool Video::GetNextFrame(unsigned char **_buffer)
       }
     }
   }
-  av_free_packet(&packet);
+  AVPacketUnref(&packet);
 
   return true;
 }

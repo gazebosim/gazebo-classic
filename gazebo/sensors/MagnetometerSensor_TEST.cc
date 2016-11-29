@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,10 +54,10 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
 {
   Load("worlds/empty.world", false, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
-  ASSERT_TRUE(mgr != NULL);
+  ASSERT_TRUE(mgr != nullptr);
 
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   sdf::ElementPtr sdf(new sdf::Element);
   sdf::initFile("sensor.sdf", sdf);
@@ -76,15 +76,14 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
 
   // Get a pointer to the magnetometer sensor
   sensors::MagnetometerSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::MagnetometerSensor>
+    std::dynamic_pointer_cast<sensors::MagnetometerSensor>
       (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   // At pose [0,0,0,0,0,0] the body frame magnetic field should be default
-  EXPECT_EQ(sensor->MagneticField(),
-      world->GetPhysicsEngine()->MagneticField());
+  EXPECT_EQ(sensor->MagneticField(), world->MagneticField());
 }
 
 /////////////////////////////////////////////////
@@ -93,11 +92,11 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
 {
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Spawn a magnetometer sensor with a PI/2 aniclockwise rotation about Z axis
@@ -110,9 +109,9 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
 
   sensors::SensorPtr sensor = sensors::get_sensor(magSensorName);
   sensors::MagnetometerSensorPtr magSensor =
-      boost::dynamic_pointer_cast<sensors::MagnetometerSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::MagnetometerSensor>(sensor);
 
-  ASSERT_TRUE(magSensor != NULL);
+  ASSERT_TRUE(magSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   magSensor->SetActive(true);
@@ -121,7 +120,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
 
   // Determine the magnetic field in the body frame
   ignition::math::Vector3d field = modelPose.Rot().Inverse().RotateVector(
-        world->GetPhysicsEngine()->MagneticField());
+        world->MagneticField());
 
   // Check for match
   EXPECT_EQ(magSensor->MagneticField(), field);

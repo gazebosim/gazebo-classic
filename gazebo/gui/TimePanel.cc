@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,20 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
+#include <mutex>
 #include <sstream>
-
-#include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/gui/TimeWidget.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/TimePanelPrivate.hh"
+#include "gazebo/gui/TimeWidget.hh"
+#include "gazebo/rendering/UserCamera.hh"
+
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -73,8 +74,8 @@ TimePanel::TimePanel(QWidget *_parent)
   this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
       "~/world_stats", &TimePanel::OnStats, this);
 
-  this->dataPtr->worldControlPub = this->dataPtr->node->
-      Advertise<msgs::WorldControl>("~/world_control");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   // Timer
   QTimer *timer = new QTimer(this);
@@ -84,9 +85,15 @@ TimePanel::TimePanel(QWidget *_parent)
   // Connections
   this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-      boost::bind(&TimePanel::OnFullScreen, this, _1)));
+      std::bind(&TimePanel::OnFullScreen, this, std::placeholders::_1)));
 
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+  if (g_playAct)
+    connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+
+  QShortcut *space = new QShortcut(Qt::Key_Space, this);
+  QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));
+
+  this->dataPtr->paused = false;
 }
 
 /////////////////////////////////////////////////
@@ -199,9 +206,18 @@ void TimePanel::SetPaused(bool _paused)
 }
 
 /////////////////////////////////////////////////
+void TimePanel::TogglePause()
+{
+  if (this->IsPaused())
+    g_playAct->trigger();
+  else
+    g_pauseAct->trigger();
+}
+
+/////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   if (_msg->has_paused())
     this->SetPaused(_msg->paused());
@@ -268,7 +284,7 @@ void TimePanel::Update()
   if (!this->isVisible())
     return;
 
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Avoid apparent race condition on start, seen on Windows.
   if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
@@ -306,7 +322,7 @@ void TimePanel::Update()
   if (cam)
   {
     std::ostringstream avgFPS;
-    avgFPS << cam->GetAvgFPS();
+    avgFPS << std::fixed << std::setprecision(2) << cam->AvgFPS();
 
     if (this->dataPtr->timeWidget->isVisible())
     {
@@ -323,7 +339,13 @@ void TimePanel::OnTimeReset()
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(true);
-  this->dataPtr->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset time");
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////

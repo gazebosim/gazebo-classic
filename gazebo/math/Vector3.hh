@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_VECTOR3_HH_
-#define _GAZEBO_VECTOR3_HH_
+#ifndef GAZEBO_MATH_VECTOR3_HH_
+#define GAZEBO_MATH_VECTOR3_HH_
 
 #include <math.h>
 #include <iostream>
@@ -323,8 +323,15 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Vector3 &_pt)
       {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         _out << precision(_pt.x, 6) << " " << precision(_pt.y, 6) << " "
              << precision(_pt.z, 6);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
         return _out;
       }
 

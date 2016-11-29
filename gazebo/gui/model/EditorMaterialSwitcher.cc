@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,24 +51,24 @@ EditorMaterialSwitcher::EditorMaterialSwitcher(
 /////////////////////////////////////////////////
 void EditorMaterialSwitcher::SetMaterialScheme(const std::string &_scheme)
 {
-  if (!this->camera || !this->camera->GetViewport())
+  if (!this->camera || !this->camera->OgreViewport())
     return;
 
   this->materialScheme = _scheme;
   if (_scheme.empty())
   {
-    this->camera->GetViewport()->setMaterialScheme(
+    this->camera->OgreViewport()->setMaterialScheme(
         this->originalMaterialScheme);
-    this->camera->GetViewport()->getTarget()->removeListener(
+    this->camera->OgreViewport()->getTarget()->removeListener(
         this->renderTargetListener.get());
   }
   else
   {
     this->originalMaterialScheme =
-        this->camera->GetViewport()->getMaterialScheme();
+        this->camera->OgreViewport()->getMaterialScheme();
 
-    this->camera->GetViewport()->setMaterialScheme(_scheme);
-    this->camera->GetViewport()->getTarget()->addListener(
+    this->camera->OgreViewport()->setMaterialScheme(_scheme);
+    this->camera->OgreViewport()->getTarget()->addListener(
         this->renderTargetListener.get());
   }
 }
@@ -147,6 +147,9 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
         return NULL;
       }
 
+      if (entity->getUserObjectBindings().getUserAny().isEmpty())
+        return NULL;
+
       std::string userAny = "";
       try
       {
@@ -195,9 +198,7 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
     }
 
     // OGRE 1.9 changes the shared pointer definition
-    // But the 1.9 RC, which we're using on Windows, doesn't have the
-    // staticCast change.  It will be in the final release.
-    #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
+    #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
     // Make sure we keep the same depth properties so that
     // certain overlay objects can be picked by the mouse.
     Ogre::Technique *newTechnique =

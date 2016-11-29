@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,11 +170,7 @@ void SphereAtlasDemoPlugin::Reset()
   gzlog << "SphereAtlasDemoPlugin: \n"
         << "  This is not a typical usage of plugin Reset function,\n"
         << "  we are doing this just for testing purposes.\n";
-  if (this->updateConnection)
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-    this->updateConnection.reset();
-  }
+  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////

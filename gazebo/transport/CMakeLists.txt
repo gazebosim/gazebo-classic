@@ -49,7 +49,7 @@ set_property(
   GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_TRANSPORT")
+add_definitions(-DBUILDING_DLL_GZ_TRANSPORT)
 if (WIN32)
   # 0x601 = Windows 7.  TBB needs to know this.
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x601")
@@ -67,6 +67,10 @@ if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
 endif()
 
+if (USE_PCH)
+  add_pch(gazebo_transport transport_pch.hh)
+endif()
+
 gz_install_library(gazebo_transport)
 gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)
 
@@ -74,4 +78,4 @@ gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport
 set (gtest_sources
   Connection_TEST.cc
 )
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_transport)

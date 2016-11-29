@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,17 @@ namespace gazebo
     class DARTSphereShapePrivate
     {
       /// \brief Constructor
-      public: DARTSphereShapePrivate() = default;
+      public: DARTSphereShapePrivate()
+        : dtEllipsoidShape(
+            new dart::dynamics::EllipsoidShape(Eigen::Vector3d(1, 1, 1)))
+      {
+      }
 
       /// \brief Default destructor
       public: ~DARTSphereShapePrivate() = default;
+
+      /// \brief DART sphere shape
+      public: std::shared_ptr<dart::dynamics::EllipsoidShape> dtEllipsoidShape;
     };
   }
 }

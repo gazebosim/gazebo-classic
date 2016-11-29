@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <gtest/gtest.h>
 #include <string>
+#include <fstream>
 #include <sstream>
 
 #include "gazebo/common/CommonIface.hh"
@@ -68,6 +69,142 @@ TEST_F(CommonIface_TEST, GetSHA1)
     std::string sha = common::get_sha1<std::string>(stream.str());
     EXPECT_EQ(sha.length(), 40u);
   }
+}
+
+/////////////////////////////////////////////////
+/// \brief Test the string tokenizer split() function.
+TEST_F(CommonIface_TEST, split)
+{
+  auto tokens = common::split("abc/def", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("abc/def/", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("//abc/def///", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("abc", "/");
+  ASSERT_EQ(tokens.size(), 1u);
+  EXPECT_EQ(tokens.at(0), "abc");
+
+  tokens = common::split("//abc/def::123::567///", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def::123::567");
+  tokens = common::split("//abc/def::123::567///", "::");
+  ASSERT_EQ(tokens.size(), 3u);
+  EXPECT_EQ(tokens.at(0), "//abc/def");
+  EXPECT_EQ(tokens.at(1), "123");
+  EXPECT_EQ(tokens.at(2), "567///");
+}
+
+/////////////////////////////////////////////////
+/// \brief Test file operations
+TEST_F(CommonIface_TEST, fileOps)
+{
+  EXPECT_FALSE(common::cwd().empty());
+  EXPECT_TRUE(common::exists(common::cwd()));
+  EXPECT_TRUE(common::isDirectory(common::cwd()));
+
+  EXPECT_TRUE(common::isFile(__FILE__));
+  EXPECT_FALSE(common::isDirectory(__FILE__));
+
+  std::ofstream tmpOut("test.tmp");
+  tmpOut << "Output" << std::endl;
+  tmpOut.close();
+
+  EXPECT_TRUE(common::copyFile("test.tmp", "test2.tmp"));
+  EXPECT_TRUE(common::exists("test.tmp"));
+  EXPECT_TRUE(common::exists("test2.tmp"));
+
+  std::ifstream testIn("test.tmp");
+  std::string testInContent((std::istreambuf_iterator<char>(testIn)),
+                            (std::istreambuf_iterator<char>()));
+
+  std::ifstream test2In("test2.tmp");
+  std::string test2InContent((std::istreambuf_iterator<char>(test2In)),
+                             (std::istreambuf_iterator<char>()));
+
+
+  EXPECT_EQ(testInContent, test2InContent);
+
+  EXPECT_TRUE(common::moveFile("test2.tmp", "test3.tmp"));
+  EXPECT_FALSE(common::exists("test2.tmp"));
+  EXPECT_TRUE(common::exists("test3.tmp"));
+
+  std::ifstream test3In("test3.tmp");
+  std::string test3InContent((std::istreambuf_iterator<char>(test3In)),
+                             (std::istreambuf_iterator<char>()));
+
+  EXPECT_EQ(testInContent, test3InContent);
+
+  EXPECT_FALSE(common::copyFile("test3.tmp", "test3.tmp"));
+  EXPECT_FALSE(common::copyFile("test3.tmp", "./test3.tmp"));
+
+  std::remove("test.tmp");
+
+  // This file shouldn't exist, but we'll try to remove just in case the
+  // test failed.
+  std::remove("test2.tmp");
+
+  std::remove("test3.tmp");
+}
+
+/////////////////////////////////////////////////
+/// \brief Test file operations
+TEST_F(CommonIface_TEST, moreFileOps)
+{
+  EXPECT_FALSE(common::copyFile("__wrong__.tmp", "test2.tmp"));
+  EXPECT_TRUE(!common::exists("test2.tmp"));
+  EXPECT_FALSE(common::copyFile("test.tmp", "__wrong_dir__/__wrong__.tmp"));
+  EXPECT_TRUE(!common::exists("__wrong_dir__"));
+
+  EXPECT_FALSE(common::moveFile("__wrong__.tmp", "test3.tmp"));
+  EXPECT_TRUE(!common::exists("test3.tmp"));
+  EXPECT_FALSE(common::moveFile("test2.tmp", "__wrong_dir__/__wrong__.tmp"));
+  EXPECT_TRUE(!common::exists("__wrong_dir__"));
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, replaceAll)
+{
+  std::string orig = "//abcd/efg///ijk////lm/////////////nop//";
+
+  // No change should occur
+  std::string result = common::replaceAll(orig, "//", "//");
+  EXPECT_EQ(result, orig);
+  result = common::replaceAll(orig, "/", "/");
+  EXPECT_EQ(result, orig);
+
+  result = common::replaceAll(orig, "//", "::");
+  EXPECT_EQ(result, "::abcd/efg::/ijk::::lm::::::::::::/nop::");
+
+  result = common::replaceAll(result, "a", "aaaa");
+  EXPECT_EQ(result, "::aaaabcd/efg::/ijk::::lm::::::::::::/nop::");
+
+  result = common::replaceAll(result, "::aaaa", " ");
+  EXPECT_EQ(result, " bcd/efg::/ijk::::lm::::::::::::/nop::");
+
+  result = common::replaceAll(result, " ", "_");
+  EXPECT_EQ(result, "_bcd/efg::/ijk::::lm::::::::::::/nop::");
+
+  std::string spaces = " 1  2   3    4     5      6       7 ";
+  result = common::replaceAll(spaces, " ", "_");
+  EXPECT_EQ(result, "_1__2___3____4_____5______6_______7_");
+
+  result = common::replaceAll(spaces, "  ", "_");
+  EXPECT_EQ(result, " 1_2_ 3__4__ 5___6___ 7 ");
+
+  std::string test = "12345555675";
+  common::replaceAll(test, test, "5", "*");
+  EXPECT_EQ(test, "1234****67*");
 }
 
 /////////////////////////////////////////////////

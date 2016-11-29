@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ FrictionPyramid::FrictionPyramid()
   : patchRadius(0.0)
   , surfaceRadius(IGN_DBL_MAX)
   , usePatchRadius(1)
+  , poissonsRatio(0.3)
+  , elasticModulus(0)
 {
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
@@ -36,18 +38,6 @@ FrictionPyramid::FrictionPyramid()
 //////////////////////////////////////////////////
 FrictionPyramid::~FrictionPyramid()
 {
-}
-
-//////////////////////////////////////////////////
-double FrictionPyramid::GetMuPrimary()
-{
-  return this->Mu(0);
-}
-
-//////////////////////////////////////////////////
-double FrictionPyramid::GetMuSecondary()
-{
-  return this->Mu(1);
 }
 
 //////////////////////////////////////////////////
@@ -120,6 +110,52 @@ void FrictionPyramid::SetSurfaceRadius(const double _radius)
 void FrictionPyramid::SetUsePatchRadius(const bool _use)
 {
   this->usePatchRadius = _use;
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::PoissonsRatio() const
+{
+  return this->poissonsRatio;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetPoissonsRatio(const double _ratio)
+{
+  if (_ratio < -1.0)
+  {
+    this->poissonsRatio = -1.00;
+    gzwarn << "Poisson's ratio out of bounds [" << _ratio
+      << "] default to [" << this->poissonsRatio << "]\n";
+  }
+  else if (_ratio > 0.5)
+  {
+    this->poissonsRatio = 0.5;
+    gzwarn << "Poisson's ratio out of bounds [" << _ratio
+      << "] default to [" << this->poissonsRatio << "]\n";
+  }
+  else
+  {
+    this->poissonsRatio = _ratio;
+  }
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::ElasticModulus() const
+{
+  return this->elasticModulus;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetElasticModulus(const double _modulus)
+{
+  if (_modulus < 0)
+  {
+    this->elasticModulus = 0;
+  }
+  else
+  {
+    this->elasticModulus = _modulus;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -199,12 +235,6 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->collideWithoutContactBitmask = _msg.collide_without_contact_bitmask();
   if (_msg.has_collide_bitmask())
     this->collideBitmask = _msg.collide_bitmask();
-}
-
-/////////////////////////////////////////////////
-FrictionPyramidPtr SurfaceParams::GetFrictionPyramid() const
-{
-  return FrictionPyramidPtr();
 }
 
 /////////////////////////////////////////////////

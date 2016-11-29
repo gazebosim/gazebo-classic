@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief A screw joint.
     class GZ_PHYSICS_VISIBLE DARTScrewJoint : public ScrewJoint<DARTJoint>
     {
@@ -73,7 +76,12 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetParam(const std::string &_key,
-                  unsigned int _index);
+                                      unsigned int _index);
+
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
@@ -93,6 +101,7 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
+    /// \}
   }
 }
 #endif

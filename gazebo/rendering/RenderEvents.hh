@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,11 @@ namespace gazebo
 
       /// \brief Disconnect from a scene created event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectCreateScene(
                   event::ConnectionPtr _connection)
-              { createScene.Disconnect(_connection); }
+                  GAZEBO_DEPRECATED(8.0)
+              { createScene.Disconnect(_connection->Id()); }
 
       /// \brief Connect to a scene removed event.
       /// \param[in] _subscriber Callback to trigger when event occurs.
@@ -55,9 +57,11 @@ namespace gazebo
 
       /// \brief Disconnect from a scene removed event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectRemoveScene(
                   event::ConnectionPtr _connection)
-              {removeScene.Disconnect(_connection);}
+                  GAZEBO_DEPRECATED(8.0)
+              {removeScene.Disconnect(_connection->Id());}
 
       /// \brief Connect to a layer toggle event.
       /// \param[in] _subscriber Callback to trigger when event occurs.
@@ -68,9 +72,11 @@ namespace gazebo
 
       /// \brief Disconnect from a layer toggle event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectToggleLayer(
                   event::ConnectionPtr _connection)
-              {toggleLayer.Disconnect(_connection);}
+                  GAZEBO_DEPRECATED(8.0)
+              {toggleLayer.Disconnect(_connection->Id());}
 
       /// \brief Connect to a new layer event.
       /// \param[in] _subscriber Callback to trigger when event occurs.
@@ -81,9 +87,11 @@ namespace gazebo
 
       /// \brief Disconnect from a new layer event.
       /// \param[in] _connection The connection to disconnect.
+      /// \deprecated Use event::~Connection to disconnect
       public: static void DisconnectNewLayer(
                   event::ConnectionPtr _connection)
-              {newLayer.Disconnect(_connection);}
+                  GAZEBO_DEPRECATED(8.0)
+              {newLayer.Disconnect(_connection->Id());}
 
       /// \brief The event used to trigger a create scene event.
       public: static event::EventT<void (const std::string &)> createScene;

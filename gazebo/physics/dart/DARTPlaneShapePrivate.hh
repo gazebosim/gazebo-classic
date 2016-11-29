@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,20 @@ namespace gazebo
     class DARTPlaneShapePrivate
     {
       /// \brief Constructor
-      public: DARTPlaneShapePrivate() = default;
+      public: DARTPlaneShapePrivate()
+        : dtBoxShape(new dart::dynamics::BoxShape(
+                       Eigen::Vector3d(2100, 2100, 2100)))
+      {
+        this->dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
+      }
 
       /// \brief Default destructor
       public: ~DARTPlaneShapePrivate() = default;
+
+      /// \brief DART box shape
+      public: std::shared_ptr<dart::dynamics::BoxShape> dtBoxShape;
+      // We use BoxShape untile PlaneShape is completely supported in DART.
+      // Please see: https://github.com/dartsim/dart/issues/114
     };
   }
 }

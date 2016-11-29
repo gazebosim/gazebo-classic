@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include <functional>
 #include <sstream>
 
 #include "gazebo/rendering/RenderEvents.hh"
@@ -42,7 +44,7 @@ LayersWidget::LayersWidget(QWidget *_parent)
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectNewLayer(
-        boost::bind(&LayersWidget::OnNewLayer, this, _1)));
+        std::bind(&LayersWidget::OnNewLayer, this, std::placeholders::_1)));
 }
 
 /////////////////////////////////////////////////

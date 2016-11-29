@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,13 @@ using namespace physics;
 ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
     : SliderJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateSlider(_worldId, NULL);
+  this->jointId = dJointCreateSlider(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODESliderJoint::~ODESliderJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////
@@ -58,7 +57,10 @@ math::Vector3 ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
   if (this->jointId)
     dJointGetSliderAxis(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -146,9 +148,8 @@ double ODESliderJoint::GetParam(unsigned int _parameter) const
 //////////////////////////////////////////////////
 math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  dVector3 result;
   gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
-  return math::Vector3(result[0], result[1], result[2]);
+  return math::Vector3::Zero;
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ class Colliders_TBB
 ODEPhysics::ODEPhysics(WorldPtr _world)
     : PhysicsEngine(_world), dataPtr(new ODEPhysicsPrivate)
 {
-  this->dataPtr->physicsStepFunc = NULL;
+  this->dataPtr->physicsStepFunc = nullptr;
   this->dataPtr->maxContacts = 0;
 
   // Collision detection init
@@ -158,32 +158,10 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 //////////////////////////////////////////////////
 ODEPhysics::~ODEPhysics()
 {
-  dCloseODE();
+  this->Fini();
 
-  dJointGroupDestroy(this->dataPtr->contactGroup);
-
-  // Delete all the joint feedbacks.
-  for (std::vector<ODEJointFeedback*>::iterator iter =
-      this->dataPtr->jointFeedbacks.begin(); iter !=
-          this->dataPtr->jointFeedbacks.end(); ++iter)
-  {
-    delete *iter;
-  }
-  this->dataPtr->jointFeedbacks.clear();
-
-  if (this->dataPtr->spaceId)
-  {
-    dSpaceSetCleanup(this->dataPtr->spaceId, 0);
-    dSpaceDestroy(this->dataPtr->spaceId);
-  }
-
-  if (this->dataPtr->worldId)
-    dWorldDestroy(this->dataPtr->worldId);
-
-  this->dataPtr->spaceId = NULL;
-  this->dataPtr->worldId = NULL;
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -230,12 +208,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->dataPtr->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->dataPtr->worldId, 5);
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
 
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
 
-  dWorldSetGravity(this->dataPtr->worldId, g.x, g.y, g.z);
+  dWorldSetGravity(this->dataPtr->worldId, g.X(), g.Y(), g.Z());
 
   if (odeElem->HasElement("constraints"))
   {
@@ -253,7 +231,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   // Set the physics update function
   this->SetStepType(this->dataPtr->stepType);
-  if (this->dataPtr->physicsStepFunc == NULL)
+  if (this->dataPtr->physicsStepFunc == nullptr)
     gzthrow(std::string("Invalid step type[") + this->dataPtr->stepType);
 }
 
@@ -293,9 +271,9 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -440,8 +418,8 @@ void ODEPhysics::UpdatePhysics()
       Collision *col1 = contactFeedback->collision1;
       Collision *col2 = contactFeedback->collision2;
 
-      GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
-      GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
+      GZ_ASSERT(col1 != nullptr, "Collision 1 is null");
+      GZ_ASSERT(col2 != nullptr, "Collision 2 is null");
 
       for (int j = 0; j < this->dataPtr->jointFeedbacks[i]->count; ++j)
       {
@@ -470,6 +448,30 @@ void ODEPhysics::UpdatePhysics()
 //////////////////////////////////////////////////
 void ODEPhysics::Fini()
 {
+  dCloseODE();
+
+  dJointGroupDestroy(this->dataPtr->contactGroup);
+
+  // Delete all the joint feedbacks.
+  for (auto iter = this->dataPtr->jointFeedbacks.begin();
+      iter != this->dataPtr->jointFeedbacks.end(); ++iter)
+  {
+    delete *iter;
+  }
+  this->dataPtr->jointFeedbacks.clear();
+
+  if (this->dataPtr->spaceId)
+  {
+    dSpaceSetCleanup(this->dataPtr->spaceId, 0);
+    dSpaceDestroy(this->dataPtr->spaceId);
+  }
+
+  if (this->dataPtr->worldId)
+    dWorldDestroy(this->dataPtr->worldId);
+  this->dataPtr->worldId = nullptr;
+
+  this->dataPtr->spaceId = nullptr;
+
   PhysicsEngine::Fini();
 }
 
@@ -484,7 +486,7 @@ void ODEPhysics::Reset()
 //////////////////////////////////////////////////
 LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
     gzthrow("Link must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
@@ -532,7 +534,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "polyline")
     shape.reset(new ODEPolylineShape(collision));
   else if (_type == "multiray")
-    shape.reset(new ODEMultiRayShape(collision));
+  {
+    if (_collision)
+      shape.reset(new ODEMultiRayShape(collision));
+    else
+      shape.reset(new ODEMultiRayShape(this->world->GetPhysicsEngine()));
+  }
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new ODEMeshShape(collision));
   else if (_type == "heightmap")
@@ -540,10 +547,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "map" || _type == "image")
     shape.reset(new MapShape(collision));
   else if (_type == "ray")
+  {
     if (_collision)
       shape.reset(new ODERayShape(collision));
     else
       shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
+  }
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -917,7 +926,7 @@ void ODEPhysics::SetStepType(const std::string &_type)
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 
@@ -941,8 +950,8 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
   else
   {
-    ODECollision *collision1 = NULL;
-    ODECollision *collision2 = NULL;
+    ODECollision *collision1 = nullptr;
+    ODECollision *collision2 = nullptr;
 
     // Exit if both bodies are not enabled
     if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
@@ -1049,7 +1058,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     this->dataPtr->indices[i] = i;
 
   // Choose only the best contacts if too many were generated.
-  if (numc > maxCollide)
+  if (maxCollide > 0 && numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
     for (unsigned int i = maxCollide; i < numc; ++i)
@@ -1196,6 +1205,25 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     }
   }
 
+  // Set the elastic modulus
+  // Using Hertzian contact
+  // equation 5.26 from Contact Mechanics and Friction by Popov
+  double nu1 = surf1->FrictionPyramid()->PoissonsRatio();
+  double nu2 = surf2->FrictionPyramid()->PoissonsRatio();
+  double e1 = surf1->FrictionPyramid()->ElasticModulus();
+  double e2 = surf2->FrictionPyramid()->ElasticModulus();
+  if (e1 > 0 && e2 > 0)
+  {
+    contact.surface.elastic_modulus = 1.0 /
+      ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
+
+    // Turn on Contact Elastic Modulus model if elastic modulus > 0
+    if (contact.surface.elastic_modulus > 0.0)
+    {
+      contact.surface.mode |= dContactEM;
+    }
+  }
+
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,
                                     surf2->bounce);
@@ -1207,12 +1235,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
-  // Add a new contact to the manager. This will return NULL if no one is
+  // Add a new contact to the manager. This will return nullptr if no one is
   // listening for contact information.
   Contact *contactFeedback = this->contactManager->NewContact(_collision1,
       _collision2, this->world->GetSimTime());
 
-  ODEJointFeedback *jointFeedback = NULL;
+  ODEJointFeedback *jointFeedback = nullptr;
 
   // Create a joint feedback mechanism
   if (contactFeedback)
@@ -1366,7 +1394,7 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+  GZ_ASSERT(odeElem != nullptr, "ODE SDF element does not exist");
 
   try
   {
@@ -1512,7 +1540,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
 bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+  GZ_ASSERT(odeElem != nullptr, "ODE SDF element does not exist");
 
   if (_key == "solver_type")
   {

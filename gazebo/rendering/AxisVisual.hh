@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 #include <string>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -63,29 +62,11 @@ namespace gazebo
 
       /// \brief Scale the X axis
       /// \param[in] _scale Scaling factor
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void ScaleXAxis(const math::Vector3 &_scale)
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Scale the X axis
-      /// \param[in] _scale Scaling factor
       public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Scale the Y axis
       /// \param[in] _scale Scaling factor
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void ScaleYAxis(const math::Vector3 &_scale)
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Scale the Y axis
-      /// \param[in] _scale Scaling factor
       public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
-
-      /// \brief Scale the Z axis
-      /// \param[in] _scale Scaling factor
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void ScaleZAxis(const math::Vector3 &_scale)
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Scale the Z axis
       /// \param[in] _scale Scaling factor

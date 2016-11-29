@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _INSERT_MODEL_WIDGET_HH_
-#define _INSERT_MODEL_WIDGET_HH_
+#ifndef GAZEBO_GUI_INSERTMODELWIDGET_HH_
+#define GAZEBO_GUI_INSERTMODELWIDGET_HH_
 
 
 #include <string>
@@ -72,6 +72,9 @@ namespace gazebo
       /// \brief QT callback when a path is changed.
       /// \param[in] _path The path that was changed.
       private slots: void OnDirectoryChanged(const QString &_path);
+
+      /// \brief QT callback when addPathButton is clicked.
+      private slots: void HandleButton();
 
       /// \brief check if path exists with special care to filesystem
       /// permissions

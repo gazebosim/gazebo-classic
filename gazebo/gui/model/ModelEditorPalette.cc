@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,51 @@
  *
 */
 
-#include <boost/bind.hpp>
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/KeyEvent.hh"
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
-#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \class ModelEditorPalette ModelEditorPalette.hh
+    /// \brief Private data for the ModelEditorPalette class.
+    class ModelEditorPalettePrivate
+    {
+      /// \brief Links button group.
+      public: QButtonGroup *linkButtonGroup;
+
+      /// \brief Model creator.
+      public: ModelCreator *modelCreator;
+
+      /// \brief Layout for other items in the palette.
+      public: QVBoxLayout *otherItemsLayout;
+
+      /// \brief Map of categories to their layout
+      public: std::map<std::string, QGridLayout *> categories;
+
+      /// \brief Vertical splitter between widgets.
+      public: QSplitter *splitter;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
-    : QWidget(_parent)
+    : QWidget(_parent), dataPtr(new ModelEditorPalettePrivate)
 {
   this->setObjectName("modelEditorPalette");
 
@@ -50,6 +76,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Cylinder button
   QToolButton *cylinderButton = new QToolButton(this);
+  cylinderButton->setObjectName("modelEditorPaletteCylinderButton");
   cylinderButton->setFixedSize(toolButtonSize);
   cylinderButton->setToolTip(tr("Cylinder"));
   cylinderButton->setIcon(QPixmap(":/images/cylinder.png"));
@@ -62,6 +89,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Sphere button
   QToolButton *sphereButton = new QToolButton(this);
+  sphereButton->setObjectName("modelEditorPaletteSphereButton");
   sphereButton->setFixedSize(toolButtonSize);
   sphereButton->setToolTip(tr("Sphere"));
   sphereButton->setIcon(QPixmap(":/images/sphere.png"));
@@ -74,6 +102,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Box button
   QToolButton *boxButton = new QToolButton(this);
+  boxButton->setObjectName("modelEditorPaletteBoxButton");
   boxButton->setFixedSize(toolButtonSize);
   boxButton->setToolTip(tr("Box"));
   boxButton->setIcon(QPixmap(":/images/box.png"));
@@ -101,17 +130,18 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customLayout->addWidget(customButton, 0, 0);
 
   // Button group
-  this->linkButtonGroup = new QButtonGroup;
-  this->linkButtonGroup->addButton(cylinderButton);
-  this->linkButtonGroup->addButton(sphereButton);
-  this->linkButtonGroup->addButton(boxButton);
-  this->linkButtonGroup->addButton(customButton);
+  this->dataPtr->linkButtonGroup = new QButtonGroup;
+  this->dataPtr->linkButtonGroup->addButton(cylinderButton);
+  this->dataPtr->linkButtonGroup->addButton(sphereButton);
+  this->dataPtr->linkButtonGroup->addButton(boxButton);
+  this->dataPtr->linkButtonGroup->addButton(customButton);
 
-  this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
+  this->dataPtr->modelCreator = new gui::ModelCreator(this);
+  connect(this->dataPtr->modelCreator, SIGNAL(LinkAdded()), this,
+      SLOT(OnLinkAdded()));
 
-  this->otherItemsLayout = new QVBoxLayout();
-  this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
+  this->dataPtr->otherItemsLayout = new QVBoxLayout();
+  this->dataPtr->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
 
   // Palette layout
   QVBoxLayout *paletteLayout = new QVBoxLayout();
@@ -119,7 +149,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   paletteLayout->addLayout(shapesLayout);
   paletteLayout->addWidget(customShapesLabel);
   paletteLayout->addLayout(customLayout);
-  paletteLayout->addLayout(this->otherItemsLayout);
+  paletteLayout->addLayout(this->dataPtr->otherItemsLayout);
   paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
       QSizePolicy::Minimum));
   paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
@@ -130,11 +160,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  this->splitter = new QSplitter(Qt::Vertical, this);
-  this->splitter->addWidget(paletteWidget);
-  splitter->setCollapsible(0, false);
+  this->dataPtr->splitter = new QSplitter(Qt::Vertical, this);
+  this->dataPtr->splitter->addWidget(paletteWidget);
+  this->dataPtr->splitter->setCollapsible(0, false);
 
-  frameLayout->addWidget(this->splitter);
+  frameLayout->addWidget(this->dataPtr->splitter);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
@@ -144,14 +174,12 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
   KeyEventHandler::Instance()->AddPressFilter("model_editor",
-    boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
+    std::bind(&ModelEditorPalette::OnKeyPress, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-  delete this->modelCreator;
-  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -160,7 +188,7 @@ void ModelEditorPalette::OnCylinder()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::ENTITY_CYLINDER);
+  this->dataPtr->modelCreator->AddLink(ModelCreator::ENTITY_CYLINDER);
 }
 
 /////////////////////////////////////////////////
@@ -169,7 +197,7 @@ void ModelEditorPalette::OnSphere()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::ENTITY_SPHERE);
+  this->dataPtr->modelCreator->AddLink(ModelCreator::ENTITY_SPHERE);
 }
 
 /////////////////////////////////////////////////
@@ -178,7 +206,7 @@ void ModelEditorPalette::OnBox()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::ENTITY_BOX);
+  this->dataPtr->modelCreator->AddLink(ModelCreator::ENTITY_BOX);
 }
 
 /////////////////////////////////////////////////
@@ -196,8 +224,9 @@ void ModelEditorPalette::OnCustom()
       if (info.completeSuffix().toLower() == "dae" ||
           info.completeSuffix().toLower() == "stl")
       {
-        this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
-            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+        this->dataPtr->modelCreator->AddCustomLink(ModelCreator::ENTITY_MESH,
+            ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
+            importDialog.GetImportPath());
       }
       else if (info.completeSuffix().toLower() == "svg")
       {
@@ -205,11 +234,12 @@ void ModelEditorPalette::OnCustom()
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
-          this->modelCreator->AddShape(ModelCreator::ENTITY_POLYLINE,
-              math::Vector3(1.0/extrudeDialog.GetResolution(),
+          this->dataPtr->modelCreator->AddCustomLink(
+              ModelCreator::ENTITY_POLYLINE,
+              ignition::math::Vector3d(1.0/extrudeDialog.GetResolution(),
               1.0/extrudeDialog.GetResolution(),
               extrudeDialog.GetThickness()),
-              math::Pose::Zero, importDialog.GetImportPath(),
+              ignition::math::Pose3d::Zero, importDialog.GetImportPath(),
               extrudeDialog.GetSamples());
         }
         else
@@ -234,18 +264,18 @@ void ModelEditorPalette::AddItem(QWidget *_item,
   if (category.empty())
     category = "Other";
 
-  auto iter = this->categories.find(category);
+  auto iter = this->dataPtr->categories.find(category);
   QGridLayout *catLayout = NULL;
-  if (iter == this->categories.end())
+  if (iter == this->dataPtr->categories.end())
   {
     catLayout = new QGridLayout();
-    this->categories[category] = catLayout;
+    this->dataPtr->categories[category] = catLayout;
 
     std::string catStr =
         "<font size=4 color='white'>" + category + "</font>";
     QLabel *catLabel = new QLabel(tr(catStr.c_str()));
-    this->otherItemsLayout->addWidget(catLabel);
-    this->otherItemsLayout->addLayout(catLayout);
+    this->dataPtr->otherItemsLayout->addWidget(catLabel);
+    this->dataPtr->otherItemsLayout->addLayout(catLayout);
   }
   else
     catLayout = iter->second;
@@ -259,7 +289,7 @@ void ModelEditorPalette::AddItem(QWidget *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::InsertWidget(unsigned int _index, QWidget *_widget)
 {
-  if (static_cast<int>(_index) > this->splitter->count())
+  if (static_cast<int>(_index) > this->dataPtr->splitter->count())
   {
     gzerr << "Unable to add widget, index out of range " << std::endl;
     return;
@@ -267,36 +297,35 @@ void ModelEditorPalette::InsertWidget(unsigned int _index, QWidget *_widget)
 
   // set equal size for now. There should always be at least one widget
   // (render3DFrame) in the splitter.
-  int childCount = this->splitter->count();
-  GZ_ASSERT(childCount > 0,
+  GZ_ASSERT(this->dataPtr->splitter->count() > 0,
       "ModelEditorPalette splitter has no child widget");
 
-  this->splitter->insertWidget(_index, _widget);
-  this->splitter->setStretchFactor(_index, 1);
+  this->dataPtr->splitter->insertWidget(_index, _widget);
+  this->dataPtr->splitter->setStretchFactor(_index, 1);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::RemoveWidget(QWidget *_widget)
 {
-  int idx = this->splitter->indexOf(_widget);
+  int idx = this->dataPtr->splitter->indexOf(_widget);
   if (idx > 0)
-    this->splitter->widget(idx)->hide();
+    this->dataPtr->splitter->widget(idx)->hide();
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::CreateJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
-  this->modelCreator->AddJoint(_type);
+  this->dataPtr->modelCreator->AddJoint(_type);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnLinkAdded()
 {
-  this->linkButtonGroup->setExclusive(false);
-  if (this->linkButtonGroup->checkedButton())
-    this->linkButtonGroup->checkedButton()->setChecked(false);
-  this->linkButtonGroup->setExclusive(true);
+  this->dataPtr->linkButtonGroup->setExclusive(false);
+  if (this->dataPtr->linkButtonGroup->checkedButton())
+    this->dataPtr->linkButtonGroup->checkedButton()->setChecked(false);
+  this->dataPtr->linkButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
@@ -316,7 +345,7 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-ModelCreator *ModelEditorPalette::GetModelCreator()
+gui::ModelCreator *ModelEditorPalette::ModelCreator()
 {
-  return this->modelCreator;
+  return this->dataPtr->modelCreator;
 }

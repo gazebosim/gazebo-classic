@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  *
 */
 #include <ignition/math/Rand.hh>
+#include <ignition/math/SignalStats.hh>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/gazebo_config.h"
-#include "gazebo/math/SignalStats.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/test/helper_physics_generator.hh"
@@ -133,7 +133,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 
     joint->SetVelocity(0, vel);
 
-    math::SignalMaxAbsoluteValue angleErrorMax;
+    ignition::math::SignalMaxAbsoluteValue angleErrorMax;
     // expect that joint velocity is constant
     // and that joint angle is unwrapped
     for (unsigned int i = 0; i < stepCount; ++i)

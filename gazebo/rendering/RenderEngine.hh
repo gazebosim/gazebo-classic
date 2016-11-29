@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
+#ifndef _GAZEBO_RENDERING_RENDERENGINE_HH_
+#define _GAZEBO_RENDERING_RENDERENGINE_HH_
 
-#ifndef _RENDERENGINE_HH_
-#define _RENDERENGINE_HH_
-
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/transport/TransportTypes.hh"
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +30,6 @@
 namespace Ogre
 {
   class Root;
-  class LogManager;
   class OverlaySystem;
 }
 
@@ -46,6 +39,9 @@ namespace gazebo
   /// \brief Rendering namespace
   namespace rendering
   {
+    // Forward declare private data.
+    class RenderEnginePrivate;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -113,7 +109,7 @@ namespace gazebo
 
       /// \brief Get the number of scenes.
       /// \return The number of scenes created by the RenderEngine.
-      public: unsigned int GetSceneCount() const;
+      public: unsigned int SceneCount() const;
 
       /// \brief Add a new path for Ogre to search for resources.
       /// \param[in] _uri URI of the path. The uri should be of the form
@@ -129,10 +125,19 @@ namespace gazebo
       /// \return Pointer to the window manager.
       public: WindowManagerPtr GetWindowManager() const;
 
+      /// \brief Get a pointer to the Ogre root object.
+      /// \return Pointer to the Ogre root object.
+      public: Ogre::Root *Root() const;
+
+      /// \brief Get a list of all supported FSAA levels for this render system
+      /// \return a list of FSAA levels
+      public: std::vector<unsigned int> FSAALevels() const;
+
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      /// \internal
       /// \brief Get a pointer to the Ogre overlay system.
       /// \return Pointer to the OGRE overlay system.
-      public: Ogre::OverlaySystem *GetOverlaySystem() const;
+      public: Ogre::OverlaySystem *OverlaySystem() const;
 #endif
 
       /// \brief Create a render context.
@@ -160,15 +165,6 @@ namespace gazebo
       /// \brief Check the rendering capabilities of the system.
       private: void CheckSystemCapabilities();
 
-      /// \brief Pointer to the root scene node
-      public: Ogre::Root *root;
-
-      /// \brief All of the scenes
-      private: std::vector< ScenePtr > scenes;
-
-      /// \brief Pointer the log manager
-      private: Ogre::LogManager *logManager;
-
       /// \brief ID for a dummy window. Used for gui-less operation
       protected: uint64_t dummyWindowId;
 
@@ -177,33 +173,14 @@ namespace gazebo
 
       /// \brief GLX context used to render the scenes.Used for gui-less
       /// operation.
-      protected: void* dummyContext;
-
-      /// \brief True if the GUI is enabled.
-      private: bool headless;
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Remove this in gazebo 3.0.
-      /// \brief Node for communications.
-      private: transport::NodePtr node;
-
-      /// \brief The type of render path used.
-      private: RenderPathType renderPathType;
-
-      /// \brief Pointer to the window manager.
-      private: WindowManagerPtr windowManager;
-
-#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
-      private: Ogre::OverlaySystem *overlaySystem;
-#endif
+      protected: void *dummyContext;
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<RenderEnginePrivate> dataPtr;
     };
     /// \}
   }

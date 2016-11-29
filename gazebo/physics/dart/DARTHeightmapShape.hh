@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,20 @@ namespace gazebo
     /// Forward declare private data class
     class DARTHeightmapShapePrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART Height map collision.
     class GZ_PHYSICS_VISIBLE DARTHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
-      public: DARTHeightmapShape(CollisionPtr _parent);
+      /// \deprecated See version that accepts DARTCollisionPtr
+      public: DARTHeightmapShape(CollisionPtr _parent) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Collision parent.
+      public: DARTHeightmapShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~DARTHeightmapShape();
@@ -49,6 +57,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTHeightmapShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,11 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   int index = _file.find_last_of("/") + 1;
 
   Console::log << "(" << Time::GetWallTime() << ") ";
-  (*this) << this->prefix
+  std::stringstream prefixString;
+  prefixString << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "] ";
+  (*this) << prefixString.str();
 
   return (*this);
 }
@@ -256,7 +258,7 @@ std::string FileLogger::GetLogDirectory() const
 
 /////////////////////////////////////////////////
 FileLogger::Buffer::Buffer(const std::string &_filename)
-  : stream(NULL)
+  : stream(nullptr)
 {
   if (!_filename.empty())
   {

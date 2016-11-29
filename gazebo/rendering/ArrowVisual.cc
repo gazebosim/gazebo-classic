@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,6 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
   dPtr->type = VT_GUI;
-  dPtr->headNode = NULL;
-  dPtr->shaftNode = NULL;
-  dPtr->rotationNode = NULL;
 
   dPtr->headNodeVisible = true;
   dPtr->shaftNodeVisible = true;
@@ -57,39 +54,34 @@ void ArrowVisual::Load()
   this->InsertMesh("axis_shaft");
   this->InsertMesh("axis_head");
 
-  Ogre::MovableObject *shaftObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SHAFT__", "axis_shaft"));
+  dPtr->shaftVis.reset(
+      new Visual(this->GetName()+"__SHAFT__", shared_from_this(), false));
+  dPtr->shaftVis->Load();
+  dPtr->shaftVis->AttachMesh("axis_shaft");
+  dPtr->shaftVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
+  dPtr->shaftVis->SetCastShadows(false);
+  dPtr->shaftVis->SetType(VT_GUI);
 
-  Ogre::MovableObject *headObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__HEAD__", "axis_head"));
-
-  dPtr->shaftNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_SHAFT");
-  dPtr->shaftNode->attachObject(shaftObj);
-  dPtr->shaftNode->setPosition(0, 0, 0.1);
-
-  dPtr->headNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_HEAD");
-  dPtr->headNode->attachObject(headObj);
-  dPtr->headNode->setPosition(0, 0, 0.24);
+  dPtr->headVis.reset(
+      new Visual(this->GetName()+"__HEAD__", shared_from_this(), false));
+  dPtr->headVis->Load();
+  dPtr->headVis->AttachMesh("axis_head");
+  dPtr->headVis->SetPosition(ignition::math::Vector3d(0, 0, 0.24));
+  dPtr->headVis->SetCastShadows(false);
+  dPtr->headVis->SetType(VT_GUI);
 
   common::MeshManager::Instance()->CreateTube("rotation_tube",
       0.035, 0.04, 0.01, 1, 32);
   this->InsertMesh("rotation_tube");
 
-  Ogre::MovableObject *rotationObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__ROTATION__", "rotation_tube"));
+  dPtr->rotationVis.reset(
+      new Visual(this->GetName()+"__ROTATION__", shared_from_this(), false));
+  dPtr->rotationVis->Load();
+  dPtr->rotationVis->AttachMesh("rotation_tube");
+  dPtr->rotationVis->SetPosition(ignition::math::Vector3d(0, 0, 0.24));
+  dPtr->rotationVis->SetCastShadows(false);
+  dPtr->rotationVis->SetType(VT_GUI);
 
-  dPtr->rotationNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_ROTATION");
-  dPtr->rotationNode->attachObject(rotationObj);
-  dPtr->rotationNode->setPosition(0, 0, 0.24);
   this->ShowRotation(false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -103,8 +95,8 @@ void ArrowVisual::ShowShaft(bool _show)
 
   dPtr->shaftNodeVisible = _show;
 
-  if (dPtr->shaftNode)
-    dPtr->shaftNode->setVisible(_show);
+  if (dPtr->shaftVis)
+    dPtr->shaftVis->SetVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -114,8 +106,8 @@ void ArrowVisual::ShowHead(bool _show)
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
   dPtr->headNodeVisible = _show;
-  if (dPtr->headNode)
-    dPtr->headNode->setVisible(_show);
+  if (dPtr->headVis)
+    dPtr->headVis->SetVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -126,8 +118,8 @@ void ArrowVisual::ShowRotation(bool _show)
 
   dPtr->rotationNodeVisible = _show;
 
-  if (dPtr->rotationNode)
-    dPtr->rotationNode->setVisible(_show);
+  if (dPtr->rotationVis)
+    dPtr->rotationVis->SetVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -136,9 +128,9 @@ void ArrowVisual::SetVisible(bool _visible, bool _cascade)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->headNode->setVisible(dPtr->headNodeVisible && _visible, _cascade);
-  dPtr->shaftNode->setVisible(dPtr->shaftNodeVisible && _visible, _cascade);
-  dPtr->rotationNode->setVisible(
+  dPtr->headVis->SetVisible(dPtr->headNodeVisible && _visible, _cascade);
+  dPtr->shaftVis->SetVisible(dPtr->shaftNodeVisible && _visible, _cascade);
+  dPtr->rotationVis->SetVisible(
       dPtr->rotationNodeVisible && _visible, _cascade);
 
   this->dataPtr->visible = _visible;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,13 +186,13 @@ void ModelPropShop::Update()
   if (this->camera && this->scene)
     event::Events::preRender();
 
-  if (this->camera && this->scene->GetInitialized() &&
-      this->camera->GetInitialized())
+  if (this->camera && this->scene->Initialized() &&
+      this->camera->Initialized())
   {
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
     {
-      math::Box bbox = vis->BoundingBox();
+      math::Box bbox = vis->GetBoundingBox();
 
       // Compute model scaling.
       double scaling = 1.0 / bbox.GetSize().GetMax();
@@ -203,18 +203,17 @@ void ModelPropShop::Update()
 
       // Normalize the size of the visual
       vis->SetScale(ignition::math::Vector3d(scaling, scaling, scaling));
-      vis->SetWorldPose(
-          ignition::math::Pose3d(trans.x, trans.y, trans.z, 0, 0, 0));
+      vis->SetWorldPose(math::Pose(trans.x, trans.y, trans.z, 0, 0, 0));
 
       // Place the visual at the origin
-      bbox = vis->BoundingBox();
+      bbox = vis->GetBoundingBox();
 
       ignition::math::Pose3d pose;
 
       // Perspective view
       pose.Pos().Set(1.6, -1.6, 1.2);
       pose.Rot().Euler(0, IGN_DTOR(30), IGN_DTOR(-225));
-      this->light->SetDirection(math::Vector3(-0.4, 0.4, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(-0.4, 0.4, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -224,7 +223,7 @@ void ModelPropShop::Update()
       // Top view
       pose.Pos().Set(0, 0, 2.2);
       pose.Rot().Euler(0, IGN_DTOR(90), 0);
-      this->light->SetDirection(math::Vector3(0, 0, -1.0));
+      this->light->SetDirection(ignition::math::Vector3d(0, 0, -1.0));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -234,7 +233,7 @@ void ModelPropShop::Update()
       // Front view
       pose.Pos().Set(2.2, 0, 0);
       pose.Rot().Euler(0, 0, IGN_DTOR(-180));
-      this->light->SetDirection(math::Vector3(-0.6, 0.0, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(-0.6, 0.0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -244,7 +243,7 @@ void ModelPropShop::Update()
       // Side view
       pose.Pos().Set(0, 2.2, 0);
       pose.Rot().Euler(0, 0, IGN_DTOR(-90));
-      this->light->SetDirection(math::Vector3(0, -0.6, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(0, -0.6, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -254,17 +253,14 @@ void ModelPropShop::Update()
       // Back view
       pose.Pos().Set(-2.2, 0, 0);
       pose.Rot().Euler(0, 0, 0);
-      this->light->SetDirection(math::Vector3(0.6, 0, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(0.6, 0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
       this->camera->PostRender();
       this->camera->SaveFrame((this->savePath / "5.png").string());
 
-      event::Events::DisconnectWorldCreated(this->worldCreatedConn);
       this->worldCreatedConn.reset();
-
-      event::Events::DisconnectWorldUpdateBegin(this->updateConn);
       this->updateConn.reset();
 
       // Clean up the camera.

@@ -1,9 +1,9 @@
+syntax = "proto2";
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface GPS
 /// \brief Data from a GPS sensor
-
 
 import "time.proto";
 

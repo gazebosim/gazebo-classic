@@ -1,0 +1,45 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface SensorNoise
+/// \brief Information about a sensor noise
+
+message SensorNoise
+{
+  /// \brief Noise types
+  enum Type
+  {
+    /// \brief No noise
+    NONE               = 1;
+
+    /// \brief Gaussian noise
+    GAUSSIAN           = 2;
+
+    /// \brief Gaussian noise plus quantization of outputs (rounding)
+    GAUSSIAN_QUANTIZED = 3;
+  }
+
+  /// \brief The type of noise
+  required Type type          = 1;
+
+  /// \brief Noise mean
+  /// Used by GAUSSIAN, and GAUSSIAN_QUANTIZED
+  optional double mean        = 2;
+
+  /// \brief Noise standard deviation
+  /// Used by GAUSSIAN, and GAUSSIAN_QUANTIZED
+  optional double stddev      = 3;
+
+  /// \brief Noise mean bias
+  /// Used by GAUSSIAN, and GAUSSIAN_QUANTIZED
+  optional double bias_mean   = 4;
+
+  /// \brief Noise standard deviation bias
+  /// Used by GAUSSIAN, and GAUSSIAN_QUANTIZED
+  optional double bias_stddev = 5;
+
+  /// \brief Noise  precision.
+  /// Used by GAUSSIAN_QUANTIZED
+  optional double precision   = 6;
+}

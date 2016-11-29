@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,8 @@ namespace gazebo
     class DARTCollisionPrivate
     {
       /// \brief Constructor
-      public: DARTCollisionPrivate(dart::dynamics::BodyNode *_dtBodyNode)
-        : dtBodyNode(_dtBodyNode),
-          dtCollisionShape(NULL),
+      public: DARTCollisionPrivate()
+        : dtCollisionShape(nullptr),
           categoryBits(0),
           collideBits(0)
       {
@@ -40,11 +39,8 @@ namespace gazebo
       /// \brief Default destructor
       public: ~DARTCollisionPrivate() = default;
 
-      /// \brief DART body node associated with this collision.
-      public: dart::dynamics::BodyNode *dtBodyNode;
-
       /// \brief DART collision shape associated with this collision.
-      public: dart::dynamics::Shape *dtCollisionShape;
+      public: dart::dynamics::ShapePtr dtCollisionShape;
 
       /// \brief Category bits for collision detection
       public: unsigned int categoryBits;

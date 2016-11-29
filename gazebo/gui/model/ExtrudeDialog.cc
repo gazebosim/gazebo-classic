@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/SVGLoader.hh"
 
@@ -194,30 +196,30 @@ void ExtrudeDialog::UpdateView()
   }
 
   // Find extreme values to center and scale
-  math::Vector2d min(paths[0].polylines[0][0]);
-  math::Vector2d max(min);
+  ignition::math::Vector2d min(paths[0].polylines[0][0]);
+  ignition::math::Vector2d max(min);
   for (const auto &p : paths)
   {
     for (const auto &poly : p.polylines)
     {
       for (const auto &pt : poly)
       {
-        if (pt.X() < min.x)
-          min.x = pt.X();
-        if (pt.Y() < min.y)
-          min.y = pt.Y();
-        if (pt.X() > max.x)
-          max.x = pt.X();
-        if (pt.Y() > max.y)
-          max.y = pt.Y();
+        if (pt.X() < min.X())
+          min.X(pt.X());
+        if (pt.Y() < min.Y())
+          min.Y(pt.Y());
+        if (pt.X() > max.X())
+          max.X(pt.X());
+        if (pt.Y() > max.Y())
+          max.Y(pt.Y());
       }
     }
   }
 
   int margin = 50;
   double svgWidth = this->dataPtr->viewWidth - margin * 2;
-  double resolutionView = svgWidth / (max.x-min.x);
-  double svgHeight = (max.y - min.y) * resolutionView;
+  double resolutionView = svgWidth / (max.X()-min.X());
+  double svgHeight = (max.Y() - min.Y()) * resolutionView;
   double viewHeight = svgHeight + 2 * margin;
   scene->setSceneRect(0, 0, this->dataPtr->viewWidth, viewHeight);
 
@@ -266,7 +268,7 @@ void ExtrudeDialog::UpdateView()
       for (ignition::math::Vector2d pt : poly)
       {
         // Centroid at SVG 0,0
-        pt = pt - min.Ign() - (max-min).Ign()*0.5;
+        pt = pt - min - (max-min)*0.5;
         // Scale to view while keeping aspect ratio
         pt = ignition::math::Vector2d(
             pt.X() * resolutionView, pt.Y() * resolutionView);

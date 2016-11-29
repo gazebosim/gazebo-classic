@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief An ODE Plane shape.
     class GZ_PHYSICS_VISIBLE ODEPlaneShape : public PlaneShape
     {
@@ -46,7 +49,7 @@ namespace gazebo
         math::Pose pose = oParent->GetWorldPose();
         double altitude = pose.pos.z;
         math::Vector3 n = this->GetNormal();
-        if (oParent->GetCollisionId() == NULL)
+        if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
                 n.x, n.y, n.z, altitude), false);
         else
@@ -73,6 +76,7 @@ namespace gazebo
                             vec4[2], vec4[3]);
       }
     };
+    /// \}
   }
 }
 #endif

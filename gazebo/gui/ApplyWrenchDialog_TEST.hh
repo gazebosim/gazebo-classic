@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_TEST_HH_
-#define _GAZEBO_APPLY_WRENCH_DIALOG_TEST_HH_
+#ifndef GAZEBO_GUI_APPLYWRENCHDIALOG_TEST_HH_
+#define GAZEBO_GUI_APPLYWRENCHDIALOG_TEST_HH_
 
-#include <string>
 #include "gazebo/gui/QTestFixture.hh"
-
 
 /// \brief A test class for the ApplyWrenchDialog.
 class ApplyWrenchDialog_TEST : public QTestFixture

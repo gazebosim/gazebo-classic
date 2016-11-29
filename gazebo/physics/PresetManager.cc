@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ Preset::Preset(const std::string &_name)
 //////////////////////////////////////////////////
 Preset::~Preset()
 {
+  this->dataPtr->elementSDF.reset();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -245,7 +247,9 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
 //////////////////////////////////////////////////
 PresetManager::~PresetManager()
 {
+  this->dataPtr->physicsEngine.reset();
   this->dataPtr->presetProfiles.clear();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }

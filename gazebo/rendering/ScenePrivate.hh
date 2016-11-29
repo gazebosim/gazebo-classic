@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _SCENE_PRIVATE_HH_
-#define _SCENE_PRIVATE_HH_
+#ifndef _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#define _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include <boost/unordered/unordered_map.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -43,11 +43,6 @@ namespace Ogre
 {
   class SceneManager;
   class RaySceneQuery;
-}
-
-namespace boost
-{
-  class mutex;
 }
 
 namespace gazebo
@@ -112,6 +107,10 @@ namespace gazebo
     /// \brief Map of joint names to joint messages.
     typedef boost::unordered_map<std::string,
         boost::shared_ptr<msgs::Joint const> > JointMsgs_M;
+
+    /// \def RoadMsgs_L
+    /// \brief List of road messages
+    typedef std::list<boost::shared_ptr<msgs::Road const> > RoadMsgs_L;
 
     /// \brief Private data for the Visual class
     class ScenePrivate
@@ -206,11 +205,14 @@ namespace gazebo
       /// \brief List of skeleton message to process.
       public: SkeletonPoseMsgs_L skeletonPoseMsgs;
 
+      /// \brief List of road messages to process.
+      public: RoadMsgs_L roadMsgs;
+
       /// \brief Mutex to lock the various message buffers.
-      public: boost::mutex *receiveMutex;
+      public: std::mutex *receiveMutex;
 
       /// \brief Mutex to lock the pose message buffers.
-      public: boost::recursive_mutex poseMsgMutex;
+      public: std::recursive_mutex poseMsgMutex;
 
       /// \brief Communication Node
       public: transport::NodePtr node;
@@ -257,6 +259,9 @@ namespace gazebo
       /// \brief Publish requests
       public: transport::PublisherPtr requestPub;
 
+      /// \brief Subscribe to roads topic
+      public: transport::SubscriberPtr roadSub;
+
       /// \brief Event connections
       public: std::vector<event::ConnectionPtr> connections;
 
@@ -302,6 +307,9 @@ namespace gazebo
 
       /// \brief True when all link frames should be visualized.
       public: bool showLinkFrames;
+
+      /// \brief True when all skeletons should be visualized.
+      public: bool showSkeleton;
 
       /// \brief True when all collisions should be visualized.
       public: bool showCollisions;

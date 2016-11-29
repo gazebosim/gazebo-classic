@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,14 +40,10 @@ void TimeWidget_TEST::Reset()
   mainWindow->show();
 
   // Wait a little bit so that time increases.
-  for (unsigned int i = 0; i < 1000; ++i)
-  {
-    gazebo::common::Time::MSleep(1);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw(NULL, 10, 100);
 
   // Get the time panel
-  gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+  gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
       GetTimePanel();
   QVERIFY(timePanel != NULL);
 
@@ -97,26 +93,14 @@ void TimeWidget_TEST::Reset()
   // pause the world before resetting
   mainWindow->Pause();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(mainWindow->IsPaused());
 
   // trigger reset world
   gazebo::gui::g_resetWorldAct->trigger();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Make sure real time is zero
   txt = realTimeEdit->text().toStdString();
@@ -136,22 +120,12 @@ void TimeWidget_TEST::Reset()
   // play the simulation and again and verify time increases
   mainWindow->Play();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(!mainWindow->IsPaused());
 
   // Wait a little bit so that time increases.
-  for (unsigned int i = 0; i < 1000; ++i)
-  {
-    gazebo::common::Time::MSleep(1);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw(NULL, 10, 100);
 
   // Make sure real time is greater than zero
   txt = realTimeEdit->text().toStdString();
@@ -190,18 +164,13 @@ void TimeWidget_TEST::ValidTimes()
     mainWindow->Init();
     mainWindow->show();
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
+
     gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
     QVERIFY(cam != NULL);
 
     // Get the time panel
-    gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+    gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
         GetTimePanel();
     QVERIFY(timePanel != NULL);
 
@@ -230,12 +199,22 @@ void TimeWidget_TEST::ValidTimes()
     QLineEdit *fpsEdit = timeWidget->findChild<QLineEdit *>("timeWidgetFPS");
     QVERIFY(fpsEdit != NULL);
 
-    // Wait a little bit so that time increases.
-    for (unsigned int i = 0; i < 10000; ++i)
+    // some machines are unable to hit the target FPS
+    // sample update time and determine whether to skip FPS lower bound check
+    bool skipFPSTest = false;
+    gazebo::common::Time t = gazebo::common::Time::GetWallTime();
+    QCoreApplication::processEvents();
+    double dt = (gazebo::common::Time::GetWallTime()-t).Double();
+    if (dt >= 0.01)
     {
-      gazebo::common::Time::NSleep(500000);
-      QCoreApplication::processEvents();
+      std::cerr << "Skipping lower bound FPS check" << std::endl;
+      skipFPSTest = true;
     }
+    unsigned int iterations = skipFPSTest ? 50 : 5000;
+    double lowerFPSBound = skipFPSTest ? 0 : 45;
+
+    // Wait a little bit so that time increases.
+    this->ProcessEventsAndDraw(NULL, iterations, 1);
 
     std::string txt;
     double value;
@@ -258,7 +237,8 @@ void TimeWidget_TEST::ValidTimes()
     // Make sure the fps is somewhere close to 60 fps
     txt = fpsEdit->text().toStdString();
     value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
-    QVERIFY(value > 45.0);
+
+    QVERIFY(value > lowerFPSBound);
     QVERIFY(value < 75.0);
 
     cam->Fini();
@@ -270,7 +250,7 @@ void TimeWidget_TEST::ValidTimes()
 /////////////////////////////////////////////////
 void TimeWidget_TEST::Visibility()
 {
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, false);
 
   // Create a new time widget
   gazebo::gui::TimeWidget *timeWidget = new gazebo::gui::TimeWidget;

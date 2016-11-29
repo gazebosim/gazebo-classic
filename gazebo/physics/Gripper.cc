@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #endif
 
 #include <boost/bind.hpp>
+
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Events.hh"
 
@@ -45,7 +47,6 @@ Gripper::Gripper(ModelPtr _model)
 {
   this->model = _model;
   this->world = this->model->GetWorld();
-  this->physics = this->world->GetPhysicsEngine();
 
   this->diffs.resize(10);
   this->diffIndex = 0;
@@ -69,7 +70,6 @@ Gripper::~Gripper()
   }
 
   this->model.reset();
-  this->physics.reset();
   this->world.reset();
   this->connections.clear();
 }
@@ -80,7 +80,9 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   this->node->Init(this->world->GetName());
 
   this->name = _sdf->Get<std::string>("name");
-  this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
+  this->fixedJoint =
+      this->world->GetPhysicsEngine()->CreateJoint("fixed", this->model);
+  this->fixedJoint->SetName(this->model->GetName() + "__gripper_fixed_joint__");
 
   sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
   this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");
@@ -223,8 +225,8 @@ void Gripper::HandleAttach()
         this->prevDiff = diff;
 
         this->diffs[this->diffIndex] = dd;
-        double var = math::variance<double>(this->diffs);
-        double max = math::max<double>(this->diffs);
+        double var = ignition::math::variance<double>(this->diffs);
+        double max = ignition::math::max<double>(this->diffs);
 
         if (var < 1e-5 && max < 1e-5)
         {
@@ -233,8 +235,6 @@ void Gripper::HandleAttach()
           this->fixedJoint->Load(this->palmLink,
               cc[iter->first]->GetLink(), math::Pose());
           this->fixedJoint->Init();
-          this->fixedJoint->SetHighStop(0, 0);
-          this->fixedJoint->SetLowStop(0, 0);
         }
 
         this->diffIndex = (this->diffIndex+1) % 10;

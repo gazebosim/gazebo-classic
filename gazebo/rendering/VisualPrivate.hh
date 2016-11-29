@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _VISUAL_PRIVATE_HH_
-#define _VISUAL_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_VISUALPRIVATE_HH_
+#define GAZEBO_RENDERING_VISUALPRIVATE_HH_
 
 #include <string>
 #include <utility>
@@ -27,7 +27,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Event.hh"
 #include "gazebo/math/Box.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -76,7 +75,9 @@ namespace gazebo
                 visibilityFlags(GZ_VISIBILITY_ALL),
                 type(Visual::VT_ENTITY),
                 layer(0),
-                geomSize(ignition::math::Vector3d::One)
+                geomSize(ignition::math::Vector3d::One),
+                inheritTransparency(true),
+                wireframe(false)
       {
       }
 
@@ -201,6 +202,23 @@ namespace gazebo
 
       /// \brief Size of attached geometry
       public: ignition::math::Vector3d geomSize;
+
+      /// \brief True to inherit transparency from parent.
+      public: bool inheritTransparency;
+
+      /// \brief True if wireframe mode is enabled
+      public: bool wireframe;
+
+      /// \brief Stores the message for this visual according to the visual
+      /// type. For example, VT_LINK will have gazebo::msgs::Link.
+      public: google::protobuf::Message *typeMsg = nullptr;
+
+      /// \brief Vector of visuals which will be generated on demand.
+      public: std::vector<std::pair<Visual::VisualType,
+          google::protobuf::Message *>> pendingChildren;
+
+      /// \brief The initial pose of the visual.
+      public: ignition::math::Pose3d initialRelativePose;
     };
     /// \}
   }

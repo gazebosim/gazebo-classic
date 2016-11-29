@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,6 @@
 // This disables warning messages for ODE
 #pragma GCC system_header
 
-#include <dart/common/common.h>
-#include <dart/math/math.h>
-#include <dart/collision/collision.h>
-#include <dart/integration/integration.h>
-#include <dart/dynamics/dynamics.h>
-#include <dart/constraint/constraint.h>
-#include <dart/simulation/simulation.h>
+#include <dart/dart-core.h>
 
 #endif

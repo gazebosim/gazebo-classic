@@ -9,6 +9,7 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
+  ${QWT_INCLUDE_DIR}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -17,7 +18,8 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
-set (internal_qt_headers)
+set (internal_qt_headers
+  VideoRecorder.hh)
 
 set (sources
   Actions.cc
@@ -25,14 +27,13 @@ set (sources
   ApplyWrenchDialog.cc
   CloneWindow.cc
   ConfigWidget.cc
+  Conversions.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
-  HotkeyDialog.cc
-  RenderWidget.cc
   GLWidget.cc
-  GuiIface.cc
   GuiEvents.cc
+  GuiIface.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -41,14 +42,14 @@ set (sources
   LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
-  ModelManipulator.cc
-  ModelSnap.cc
-  ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
+  ModelManipulator.cc
   ModelRightMenu.cc
+  ModelSnap.cc
   MouseEventHandler.cc
-  SaveDialog.cc
+  RenderWidget.cc
+  SaveEntityDialog.cc
   SpaceNav.cc
   SplashScreen.cc
   TimePanel.cc
@@ -57,6 +58,7 @@ set (sources
   TopicSelector.cc
   TopToolbar.cc
   UserCmdHistory.cc
+  VideoRecorder.cc
   ViewAngleWidget.cc
 )
 
@@ -78,17 +80,15 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
-  HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
   LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
-  ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
-  SaveDialog.hh
+  SaveEntityDialog.hh
   SplashScreen.hh
   TimePanel.hh
   TimeWidget.hh
@@ -102,10 +102,12 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
   GuiPlugin.hh
+  GuiTypes.hh
   KeyEventHandler.hh
   LightMaker.hh
   ModelAlign.hh
@@ -125,26 +127,20 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-#if (HAVE_QWT)
-#  set (sources ${sources}
-#    Diagnostics.cc
-#    IncrementalPlot.cc
-#  )
-#  set (qt_headers ${qt_headers}
-#    Diagnostics.hh
-#    IncrementalPlot.hh
-#  )
-#endif()
-
 set (qt_tests
+  BuildingEditor_TEST.cc
+  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
+  GLWidget_TEST.cc
+  GLWidget_TEST2.cc
   GuiIface_TEST.cc
-  HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
+  ModelListWidget_TEST.cc
   ModelMaker_TEST.cc
+  ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
-  SaveDialog_TEST.cc
+  SaveEntityDialog_TEST.cc
   SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
@@ -156,6 +152,7 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
+add_subdirectory(plot)
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
@@ -174,14 +171,9 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       ApplyWrenchDialog_TEST.cc
-      BuildingEditor_TEST.cc
-      ConfigWidget_TEST.cc
-      GLWidget_TEST.cc
-      GLWidget_TEST2.cc
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
-      ModelListWidget_TEST.cc
       ModelSnap_TEST.cc
       Projection_TEST.cc)
 endif()
@@ -194,13 +186,14 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC})
+gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${resources_RCC})
+set_target_properties(gazebo_gui PROPERTIES COMPILE_DEFINITIONS "QWT_DLL")
 gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
+add_definitions(-DBUILDING_DLL_GZ_GUI)
 
 target_link_libraries(gazebo_gui
   libgazebo_client
@@ -213,6 +206,7 @@ target_link_libraries(gazebo_gui
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${QWT_LIBRARY}
 )
 
 if (UNIX)
@@ -233,6 +227,16 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
+
+if (USE_PCH)
+  add_pch(gazebo_gui gui_pch.hh)
+endif()
+
+set (gtest_sources
+  Conversions_TEST.cc
+)
+
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_gui)
 
 add_definitions(${QT_DEFINITIONS})
 

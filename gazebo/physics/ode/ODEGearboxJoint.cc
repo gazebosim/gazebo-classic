@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ using namespace physics;
 ODEGearboxJoint::ODEGearboxJoint(dWorldID _worldId, BasePtr _parent)
     : GearboxJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateGearbox(_worldId, NULL);
+  this->jointId = dJointCreateGearbox(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
@@ -61,7 +61,7 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
 {
   ODELinkPtr odelink = boost::dynamic_pointer_cast<ODELink>(_body);
   dBodyID refId;
-  if (odelink == NULL)
+  if (odelink == nullptr)
   {
     gzwarn << "Reference body not valid, using inertial frame.\n";
     refId = 0;
@@ -91,7 +91,10 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
   else if (_index == 1)
     dJointGetGearboxAxis2(this->jointId, result);
   else
+  {
     gzerr << "index [" << _index << "] out of range\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
@@ -171,9 +174,8 @@ void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 //////////////////////////////////////////////////
 math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  dVector3 result;
   gzlog << "ODEGearboxJoint::GetAnchor not implemented.\n";
-  return math::Vector3(result[0], result[1], result[2]);
+  return math::Vector3::Zero;
 }
 
 //////////////////////////////////////////////////

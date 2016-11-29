@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _MODEL_IMPORT_DIALOG_HH_
-#define _MODEL_IMPORT_DIALOG_HH_
+#ifndef GAZEBO_GUI_MODEL_IMPORTDIALOG_HH_
+#define GAZEBO_GUI_MODEL_IMPORTDIALOG_HH_
 
 #include <string>
 #include "gazebo/gui/qt.h"

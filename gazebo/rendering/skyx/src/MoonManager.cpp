@@ -65,7 +65,7 @@ namespace SkyX
                      createChildSceneNode();
 
     mMoonBillboard = mSkyX->getSceneManager()->createBillboardSet(
-        "SkyXMoonBillboardSet", 1);
+        "SkyXMoonBillboardSet_" + mMoonSceneNode->getName(), 1);
     mMoonBillboard->setMaterialName(
         mSkyX->getGPUManager()->getMoonMaterialName());
     mMoonBillboard->setBillboardType(Ogre::BBT_ORIENTED_COMMON);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CONTACTSENSOR_HH_
-#define _GAZEBO_CONTACTSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_CONTACTSENSOR_HH_
+#define _GAZEBO_SENSORS_CONTACTSENSOR_HH_
 
-#include <vector>
 #include <map>
-#include <list>
 #include <string>
+#include <memory>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -34,6 +33,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class
+    class ContactSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -62,7 +64,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the sensor.
       protected: virtual void Fini();
@@ -120,37 +122,23 @@ namespace gazebo
       ///                           CG of perspective links for each collision
       ///                           body, specified in the inertial frame.
       ///    \li Time time          time at which this contact happened.
-      public: msgs::Contacts GetContacts() const;
+      public: msgs::Contacts Contacts() const;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
       /// \return Container of contacts
-      public: std::map<std::string, physics::Contact> GetContacts(
-                  const std::string &_collisionName);
+      public: std::map<std::string, physics::Contact> Contacts(
+                  const std::string &_collisionName) const;
 
       // Documentation inherited.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);
 
-      /// \brief Collisions this sensor monitors for contacts
-      private: std::vector<std::string> collisions;
-
-      /// \brief Output contact information.
-      private: transport::PublisherPtr contactsPub;
-
-      /// \brief Subscription to contact messages from the physics engine
-      private: transport::SubscriberPtr contactSub;
-
-      /// \brief Mutex to protect reads and writes.
-      private: mutable boost::mutex mutex;
-
-      /// \brief Contacts message used to output sensor data.
-      private: msgs::Contacts contactsMsg;
-
-      typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;
-      private: ContactMsgs_L incomingContacts;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<ContactSensorPrivate> dataPtr;
     };
     /// \}
   }

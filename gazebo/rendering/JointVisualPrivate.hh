@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-
-#ifndef _JOINTVISUAL_PRIVATE_HH_
-#define _JOINTVISUAL_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_JOINTVISUAL_PRIVATE_HH_
+#define GAZEBO_RENDERING_JOINTVISUAL_PRIVATE_HH_
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 
@@ -42,7 +42,7 @@ namespace gazebo
       public: JointVisualPtr parentAxisVis;
 
       /// \brief Scale based on the size of the joint's child link.
-      public: math::Vector3 scaleToLink;
+      public: ignition::math::Vector3d scaleToLink;
     };
   }
 }

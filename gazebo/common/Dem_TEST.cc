@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Helpers.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Dem.hh"
-#include "gazebo/math/Angle.hh"
 #include "test_config.h"
 #include "test/util.hh"
 
@@ -162,9 +162,48 @@ TEST_F(DemTest, FillHeightmap)
   EXPECT_EQ(vertSize * vertSize, elevations.size());
 
   // Check the elevation of some control points
-  EXPECT_FLOAT_EQ(119.58285, elevations.at(0));
-  EXPECT_FLOAT_EQ(114.27753, elevations.at(elevations.size() - 1));
-  EXPECT_FLOAT_EQ(148.07137, elevations.at(elevations.size() / 2));
+  EXPECT_FLOAT_EQ(184.94113, elevations.at(0));
+  EXPECT_FLOAT_EQ(179.63583, elevations.at(elevations.size() - 1));
+  EXPECT_FLOAT_EQ(213.42966, elevations.at(elevations.size() / 2));
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, NegDem)
+{
+  common::Dem dem;
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "media/materials/textures/dem_neg.tif";
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  // Check the heights and widths
+  EXPECT_EQ(33, static_cast<int>(dem.GetHeight()));
+  EXPECT_EQ(33, static_cast<int>(dem.GetWidth()));
+  EXPECT_FLOAT_EQ(293.51068, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(293.51089, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(-212.29616, dem.GetMinElevation());
+  EXPECT_FLOAT_EQ(-205.44009, dem.GetMaxElevation());
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, UnfinishedDem)
+{
+  common::Dem dem;
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "data/dem_unfinished.tif";
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  // Check that the min and max elevations are valid for an unfinished
+  // and unfilled dem.
+  EXPECT_EQ(33, static_cast<int>(dem.GetHeight()));
+  EXPECT_EQ(33, static_cast<int>(dem.GetWidth()));
+  EXPECT_FLOAT_EQ(111287.59, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(88878.297, dem.GetWorldWidth());
+  // gdal reports min elevation as -32768 but this is treated as a nodata
+  // by our dem class and ignored when computing the min elevation
+  EXPECT_FLOAT_EQ(-10, dem.GetMinElevation());
+  EXPECT_FLOAT_EQ(1909, dem.GetMaxElevation());
 }
 #endif
 

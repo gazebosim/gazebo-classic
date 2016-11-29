@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,20 @@
  * limitations under the License.
  *
 */
-#ifndef _VIEWCONTROLLER_HH_
-#define _VIEWCONTROLLER_HH_
+#ifndef GAZEBO_RENDERING_VIEWCONTROLLER_HH_
+#define GAZEBO_RENDERING_VIEWCONTROLLER_HH_
 
 #include <string>
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
   namespace rendering
   {
     /// \addtogroup gazebo_rendering
@@ -35,7 +39,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _camera The user camera to controll.
-      public: ViewController(UserCameraPtr _camera);
+      public: explicit ViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~ViewController();

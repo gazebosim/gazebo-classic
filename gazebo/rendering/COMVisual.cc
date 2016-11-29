@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,26 +42,6 @@ COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 COMVisual::~COMVisual()
 {
-  COMVisualPrivate *dPtr =
-      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
-  if (dPtr && dPtr->sceneNode)
-  {
-    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
-    dPtr->sceneNode->removeAndDestroyAllChildren();
-  }
-}
-
-/////////////////////////////////////////////////
-void COMVisual::Fini()
-{
-  COMVisualPrivate *dPtr =
-      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
-  if (dPtr && dPtr->sceneNode)
-  {
-    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
-    dPtr->sceneNode->removeAndDestroyAllChildren();
-  }
-  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
@@ -137,33 +117,30 @@ void COMVisual::Load()
 
   // Get the link's bounding box
   VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
-  ignition::math::Box box;
+  math::Box box;
 
   if (vis)
-    box = vis->BoundingBox();
+    box = vis->GetBoundingBox();
+
+  VisualPtr sphereVis(
+      new Visual(this->GetName()+"_SPHERE_", shared_from_this(), false));
+  sphereVis->Load();
 
   // Mass indicator: equivalent sphere with density of lead
-  this->InsertMesh("unit_sphere");
+  sphereVis->InsertMesh("unit_sphere");
+  sphereVis->AttachMesh("unit_sphere");
 
-  Ogre::MovableObject *sphereObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SPHERE__", "unit_sphere"));
-  sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
-  sphereObj->setCastShadows(false);
+  sphereVis->SetScale(ignition::math::Vector3d(
+      sphereRadius*2, sphereRadius*2, sphereRadius*2));
+  sphereVis->SetPosition(dPtr->inertiaPose.pos.Ign());
+  sphereVis->SetRotation(dPtr->inertiaPose.rot.Ign());
 
-  dPtr->sphereNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE_");
+  Ogre::SceneNode *sphereNode = sphereVis->GetSceneNode();
+  sphereNode->setInheritScale(false);
 
-  dPtr->sphereNode->attachObject(sphereObj);
-  dPtr->sphereNode->setScale(sphereRadius*2, sphereRadius*2, sphereRadius*2);
-  dPtr->sphereNode->setPosition(dPtr->inertiaPose.pos.x,
-      dPtr->inertiaPose.pos.y, dPtr->inertiaPose.pos.z);
-  dPtr->sphereNode->setOrientation(Ogre::Quaternion(
-      dPtr->inertiaPose.rot.w, dPtr->inertiaPose.rot.x,
-      dPtr->inertiaPose.rot.y, dPtr->inertiaPose.rot.z));
-  dPtr->sphereNode->setInheritScale(false);
-
-  this->SetMaterial("Gazebo/CoM");
+  sphereVis->SetMaterial("Gazebo/CoM");
+  sphereVis->SetCastShadows(false);
+  sphereVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
   // CoM position indicator
   ignition::math::Vector3d p1(0, 0, box.Min().Z() - dPtr->inertiaPose.pos.z);
@@ -198,34 +175,4 @@ math::Pose COMVisual::GetInertiaPose() const
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
   return dPtr->inertiaPose;
-}
-
-/////////////////////////////////////////////////
-void COMVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
-{
-  if (!_sceneNode)
-    return;
-
-  // Destroy all the attached objects
-  Ogre::SceneNode::ObjectIterator itObject =
-    _sceneNode->getAttachedObjectIterator();
-
-  while (itObject.hasMoreElements())
-  {
-    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
-    if (ent->getMovableType() != DynamicLines::GetMovableType())
-      this->dataPtr->scene->GetManager()->destroyEntity(ent);
-    else
-      delete ent;
-  }
-
-  // Recurse to child SceneNodes
-  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
-
-  while (itChild.hasMoreElements())
-  {
-    Ogre::SceneNode* pChildNode =
-        static_cast<Ogre::SceneNode*>(itChild.getNext());
-    this->DestroyAllAttachedMovableObjects(pChildNode);
-  }
 }

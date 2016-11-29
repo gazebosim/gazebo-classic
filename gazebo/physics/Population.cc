@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <ignition/math/Kmeans.hh>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Kmeans.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Rand.hh"
 #include "gazebo/physics/Population.hh"
@@ -353,19 +353,19 @@ void Population::CreatePosesBoxUniform(const PopulationParams &_populParams,
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
-  std::vector<math::Vector3> obs;
+  std::vector<ignition::math::Vector3d> obs;
 
   // Step1: Sample points in a box.
   double x = 0.0;
   double y = 0.0;
-  while (y < _populParams.size.y)
+  while (y < _populParams.size.Ign().Y())
   {
-    while (x < _populParams.size.x)
+    while (x < _populParams.size.Ign().X())
     {
-      math::Vector3 p;
-      p.x = x;
-      p.y = y;
-      p.z = math::Rand::GetDblUniform(0, _populParams.size.z);
+      ignition::math::Vector3d p;
+      p.X(x);
+      p.Y(y);
+      p.Z(math::Rand::GetDblUniform(0, _populParams.size.z));
       obs.push_back(p);
       x += .1;
     }
@@ -374,17 +374,18 @@ void Population::CreatePosesBoxUniform(const PopulationParams &_populParams,
   }
 
   // Step2: Cluster the sampled points in 'modelCount' clusters.
-  std::vector<math::Vector3> centroids;
+  std::vector<ignition::math::Vector3d> centroids;
   std::vector<unsigned int> labels;
-  math::Kmeans kmeans(obs);
+  ignition::math::Kmeans kmeans(obs);
   kmeans.Cluster(_populParams.modelCount, centroids, labels);
 
   // Step3: Create the list of object positions.
   _poses.clear();
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Pose p(centroids[i], math::Quaternion(0, 0, 0));
-    _poses.push_back((p + _populParams.pose).pos);
+    ignition::math::Pose3d p(centroids[i],
+                             ignition::math::Quaterniond::Identity);
+    _poses.push_back((p + _populParams.pose.Ign()).Pos());
   }
 
   // Check that we have generated the appropriate number of poses.
@@ -521,7 +522,7 @@ void Population::CreatePosesCylinderUniform(
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
-  std::vector<math::Vector3> obs;
+  std::vector<ignition::math::Vector3d> obs;
 
   // Step1: Sample points in the cylinder.
   unsigned int points = 10000;
@@ -529,26 +530,26 @@ void Population::CreatePosesCylinderUniform(
   {
     double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
     double r = math::Rand::GetDblUniform(0, _populParams.radius);
-    math::Vector3 p;
-    p.x = r * cos(ang);
-    p.y = r * sin(ang);
-    p.z = math::Rand::GetDblUniform(0, _populParams.length);
+    ignition::math::Vector3d p;
+    p.X(r * cos(ang));
+    p.Y(r * sin(ang));
+    p.Z(math::Rand::GetDblUniform(0, _populParams.length));
     obs.push_back(p);
   }
 
   // Step2: Cluster the sampled points in 'modelCount' clusters.
-  std::vector<math::Vector3> centroids;
+  std::vector<ignition::math::Vector3d> centroids;
   std::vector<unsigned int> labels;
-  math::Kmeans kmeans(obs);
+  ignition::math::Kmeans kmeans(obs);
   kmeans.Cluster(_populParams.modelCount, centroids, labels);
 
   // Step3: Create the list of object positions.
   _poses.clear();
-  math::Pose offset = math::Pose::Zero;
+  ignition::math::Pose3d offset = ignition::math::Pose3d::Zero;
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    offset.pos = centroids[i];
-    _poses.push_back((offset + _populParams.pose).pos);
+    offset.Pos() = centroids[i];
+    _poses.push_back((offset + _populParams.pose.Ign()).Pos());
   }
 
   // Check that we have generated the appropriate number of poses.

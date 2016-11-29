@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_SNAP_PRIVATE_HH_
-#define _MODEL_SNAP_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MODELSNAPPRIVATE_HH_
+#define GAZEBO_GUI_MODELSNAPPRIVATE_HH_
 
-#include <string>
-#include <vector>
+#include <mutex>
+#include <ignition/math/Triangle3.hh>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -37,9 +37,6 @@ namespace gazebo
     {
       /// \brief Transportation node.
       public: transport::NodePtr node;
-
-      /// \brief Model publisher that publishes model pose to the server.
-      public: transport::PublisherPtr modelPub;
 
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
@@ -60,11 +57,11 @@ namespace gazebo
       /// \brief True if the model align tool is initialized.
       public: bool initialized;
 
-      /// \brief Vertices of a mesh triangle used as the basis for alignment.
-      public: std::vector<math::Vector3> selectedTriangle;
+      /// \brief A mesh triangle used as the basis for alignment.
+      public: ignition::math::Triangle3d selectedTriangle;
 
-      /// \brief Vertices of a mesh triangle being hovered.
-      public: std::vector<math::Vector3> hoverTriangle;
+      /// \brief A mesh triangle being hovered.
+      public: ignition::math::Triangle3d hoverTriangle;
 
       /// \brief Currently selected visual.
       public: rendering::VisualPtr selectedVis;
@@ -76,7 +73,7 @@ namespace gazebo
       public: event::ConnectionPtr renderConnection;
 
       /// \brief Mutex to protect the selected triangle vertices.
-      public: boost::recursive_mutex *updateMutex;
+      public: std::recursive_mutex updateMutex;
 
       /// \brief A visual to represent the snap spot.
       public: rendering::VisualPtr snapVisual;

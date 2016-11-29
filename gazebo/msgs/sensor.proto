@@ -1,3 +1,4 @@
+syntax = "proto2";
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
@@ -9,23 +10,59 @@ import "camerasensor.proto";
 import "raysensor.proto";
 import "contactsensor.proto";
 import "logical_camera_sensor.proto";
+import "gps_sensor.proto";
+import "imu_sensor.proto";
 
 message Sensor
 {
+  /// \brief Name of the sensor
   required string name            = 1;
+
+  /// \brief Id of the sensor
   optional uint32 id              = 2;
+
+  /// \brief Name of the parent, usually a link or joint.
   required string parent          = 3;
-  required uint32 parent_id       = 4;
+
+  /// \brief Id of the parent, usually a link or joint.
+  optional uint32 parent_id       = 4;
+
+  /// \brief Sensor type
   required string type            = 5;
+
+  /// \brief True indicates that the sensor should always
+  /// produce data, instead of producing data only when
+  /// a consumer is connected to the data topic
   optional bool always_on         = 6;
+
+  /// \brief Refresh rate
   optional double update_rate     = 7;
+
+  /// \brief Sensor pose
   optional Pose pose              = 8;
+
+  /// \brief Description of a camera sensor
   optional CameraSensor camera    = 9;
+
+  /// \brief Description of a ray (laser) sensor
   optional RaySensor ray          = 10;
+
+  /// \brief Description of a contact sensor
   optional ContactSensor contact  = 11;
+
+  /// \brief True value indicates that sensor data should be
+  /// visualized in the GUI
   optional bool visualize         = 12;
+
+  /// \brief Topic on which sensor data is published
   optional string topic           = 13;
 
   /// \brief Description of a logical camera sensor
   optional LogicalCameraSensor logical_camera = 14;
+
+  /// \brief Description of a gps sensor
+  optional GPSSensor gps          = 15;
+
+  /// \brief Description of an IMU sensor
+  optional IMUSensor imu          = 16;
 }

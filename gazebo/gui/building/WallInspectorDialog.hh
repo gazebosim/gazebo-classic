@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,25 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOG_HH_
+#define GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOG_HH_
 
-#ifndef _WALL_INSPECTOR_DIALOG_HH_
-#define _WALL_INSPECTOR_DIALOG_HH_
-
+#include <memory>
 #include <string>
-#include <vector>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class WallInspectorDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -47,23 +52,23 @@ namespace gazebo
 
       /// \brief Get the length the wall segment.
       /// \return Wall segment length in pixels.
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief Get the start position of the wall segment.
       /// \return Wall segment start position in pixel coordinates.
-      public: QPointF GetStartPosition() const;
+      public: ignition::math::Vector2d StartPosition() const;
 
       /// \brief Get the end position of the wall segment.
       /// \return Wall segment end position in pixel coordinates.
-      public: QPointF GetEndPosition() const;
+      public: ignition::math::Vector2d EndPosition() const;
 
       /// \brief Get the height of the wall.
       /// \return Wall height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Get the thickness of the wall.
       /// \return Wall thickness in pixels.
-      public: double GetThickness() const;
+      public: double Thickness() const;
 
       /// \brief Set the name of the wall.
       /// \param[in] _name Name to set the wall to.
@@ -71,67 +76,30 @@ namespace gazebo
 
       /// \brief Set the length of the wall segment.
       /// \param[in] _length Length of the wall segment in pixels.
-      public: void SetLength(double _length);
+      public: void SetLength(const double _length);
 
       /// \brief Set the start position of the wall segment.
       /// \param[in] _pos Start position of the wall segment in pixel
       /// coordinates.
-      public: void SetStartPosition(const QPointF &_pos);
+      public: void SetStartPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the end position of the wall segment.
       /// \param[in] _pos end position of the wall segment in pixel coordinates.
-      public: void SetEndPosition(const QPointF &_pos);
+      public: void SetEndPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the height of the wall.
       /// \param[in] _height Height of wall in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Set the thickness of the wall.
       /// \param[in] _thickness Thickness of wall in pixels.
-      public: void SetThickness(double _thickness);
+      public: void SetThickness(const double _thickness);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
-
-      /// \brief Qt callback when the Cancel button is pressed.
-      private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
-      /// \brief Qt callback when the Ok button is pressed.
-      private slots: void OnOK();
-
-      /// \brief Spin box for configuring the X start position of the wall
-      /// segment.
-      private: QDoubleSpinBox *startXSpinBox;
-
-      /// \brief Spin box for configuring the Y start position of the wall
-      /// segment.
-      private: QDoubleSpinBox *startYSpinBox;
-
-      /// \brief Spin box for configuring the X end position of the wall
-      /// segment.
-      private: QDoubleSpinBox *endXSpinBox;
-
-      /// \brief Spin box for configuring the Y end position of the wall
-      /// segment.
-      private: QDoubleSpinBox *endYSpinBox;
-
-      /// \brief Spin box for configuring the height of the wall.
-      private: QDoubleSpinBox *heightSpinBox;
-
-      /// \brief Spin box for configuring the thickness of the wall.
-      private: QDoubleSpinBox *thicknessSpinBox;
-
-      /// \brief Spin box for configuring the length of the wall segment.
-      private: QDoubleSpinBox *lengthSpinBox;
-
-      /// \brief Label that holds the name of the wall.
-      private: QLabel* wallNameLabel;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<WallInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }
 }
-
 #endif

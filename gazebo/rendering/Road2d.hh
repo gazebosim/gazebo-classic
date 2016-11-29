@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _ROAD2D_HH_
-#define _ROAD2D_HH_
+#ifndef GAZEBO_RENDERING_ROAD2D_HH_
+#define GAZEBO_RENDERING_ROAD2D_HH_
 
 #include <string>
-#include <vector>
-#include <list>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Events.hh"
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Spline.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -40,75 +32,28 @@ namespace gazebo
 
     /// \class Road Road.hh rendering/rendering.hh
     /// \brief Used to render a strip of road.
-    class GZ_RENDERING_VISIBLE Road2d
+    class GZ_RENDERING_VISIBLE Road2d : public Visual
     {
       /// \brief Constructor
       public: Road2d();
 
+      /// \brief Constructor.
+      /// \param[in] _name Name of the road visual.
+      /// \param[in] _parent Pointer to the parent Visual.
+      public: Road2d(const std::string &_name, VisualPtr _parent);
+
       /// \brief Destructor
       public: virtual ~Road2d();
 
+      /// \brief Load the visual using a road msg.
+      /// \param[in] _msg Message containing road data.
+      public: void Load(msgs::Road _msg);
+      using Visual::Load;
+
       /// \brief Load the visual using a parent visual.
       /// \param[in] _parent Pointer to the parent visual.
-      public: void Load(VisualPtr _parent);
-
-      /// \brief Process all received messages
-      private: void PreRender();
-
-      /// \brief Recieve a road msg
-      private: void OnRoadMsg(ConstRoadPtr &_msg);
-
-      /// \brief A road segment
-      private: class Segment : public Ogre::SimpleRenderable
-               {
-                 /// \brief Load the road segment from message data.
-                 /// \param[in] _msg The robot data.
-                 public: void Load(msgs::Road _msg);
-
-
-                 /// \internal
-                 /// \brief Implementation of Ogre::SimpleRenderable
-                 public: virtual Ogre::Real getBoundingRadius() const;
-
-                 /// \internal
-                 /// \brief Implementation of Ogre::SimpleRenderable
-                 public: virtual Ogre::Real getSquaredViewDepth(
-                             const Ogre::Camera* cam) const;
-
-                 /// \brief Name of the road.
-                 public: std::string name;
-
-                 /// \brief Point that make up the middle of the road.
-                 public: std::vector<ignition::math::Vector3d> points;
-
-                 /// \brief Width of the road.
-                 public: double width;
-
-                 /// \brief Texture of the road
-                 public: std::string texture;
-               };
-
-      /// \def RoadMsgs_L
-      /// \brief List of road messages
-      typedef std::list<boost::shared_ptr<msgs::Road const> > RoadMsgs_L;
-
-      /// \brief List of messages to process.
-      private: RoadMsgs_L msgs;
-
-      /// \brief All the road segments.
-      private: std::vector<Road2d::Segment*> segments;
-
-      /// \brief The parent visual.
-      private: VisualPtr parent;
-
-      /// \brief Handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscribes to the road message topic.
-      private: transport::SubscriberPtr sub;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \sa see function that accepts msgs::Road parameter
+      public: void Load(VisualPtr _parent) GAZEBO_DEPRECATED(8.0);
     };
     /// \}
   }

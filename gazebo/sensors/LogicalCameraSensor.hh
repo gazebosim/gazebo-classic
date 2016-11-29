@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 #define _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 #include <sdf/sdf.hh>
 
@@ -56,8 +57,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
-      // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      // Documentation inherited.
+      public: virtual std::string Topic() const;
 
       /// \brief Get the near distance. This is the distance from the
       /// frustum's vertex to the closest plane.
@@ -86,17 +87,17 @@ namespace gazebo
       public: msgs::LogicalCameraImage Image() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      public: virtual bool IsActive() const;
+
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // \brief Finalize the logical camera
       protected: virtual void Fini();
 
-      // Documentation inherited
-      public: virtual bool IsActive();
-
       // \internal
       // \brief Private data pointer
-      private: LogicalCameraSensorPrivate *dataPtr;
+      private: std::unique_ptr<LogicalCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

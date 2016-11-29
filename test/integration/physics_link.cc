@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 */
 #include <string.h>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Vector3Stats.hh>
 
-#include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -171,7 +171,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
@@ -256,7 +256,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   physics::ModelPtr model;
   {
@@ -294,31 +294,21 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   ASSERT_EQ(I0, link->GetWorldInertiaMatrix());
 
   // Compute initial angular momentum
-  const math::Vector3 H0(I0 * w0);
-  ASSERT_EQ(H0, link->GetWorldAngularMomentum());
-  const double H0mag = H0.GetLength();
+  const auto H0((I0 * w0).Ign());
+  ASSERT_EQ(H0, link->GetWorldAngularMomentum().Ign());
+  const double H0mag = H0.Length();
 
-  math::Vector3Stats angularMomentumError;
+  ignition::math::Vector3Stats angularMomentumError;
   const std::string stat("maxAbs");
   EXPECT_TRUE(angularMomentumError.InsertStatistic(stat));
   const int steps = 5000;
   for (int i = 0; i < steps; ++i)
   {
     world->Step(1);
-    math::Vector3 H = link->GetWorldAngularMomentum();
+    auto H = link->GetWorldAngularMomentum().Ign();
     angularMomentumError.InsertData((H - H0) / H0mag);
   }
-  if (_physicsEngine == "dart")
-  {
-    gzdbg << "dart has higher error for this test (see #1487), "
-          << "so a larger tolerance is used."
-          << std::endl;
-    EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 1e3);
-  }
-  else
-  {
-    EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
-  }
+  EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
 
   RecordProperty("engine", _physicsEngine);
   this->Record("angularMomentumError", angularMomentumError);
@@ -339,7 +329,7 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // Get gravity magnitude
-  double g = physics->GetGravity().GetLength();
+  double g = world->Gravity().Length();
 
   // Spawn a box
   double z0 = 10.0;
@@ -382,7 +372,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Box size
   const double dx = 1.0;
@@ -549,7 +539,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
@@ -666,7 +656,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ using namespace common;
 Dem::Dem()
   : dataPtr(new DemPrivate)
 {
-  this->dataPtr->dataSet = NULL;
+  this->dataPtr->dataSet = nullptr;
   GDALAllRegister();
 }
 
@@ -55,7 +55,7 @@ Dem::~Dem()
     GDALClose(reinterpret_cast<GDALDataset *>(this->dataPtr->dataSet));
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -83,7 +83,7 @@ int Dem::Load(const std::string &_filename)
   this->dataPtr->dataSet = reinterpret_cast<GDALDataset *>(GDALOpen(
     fullName.c_str(), GA_ReadOnly));
 
-  if (this->dataPtr->dataSet == NULL)
+  if (this->dataPtr->dataSet == nullptr)
   {
     gzerr << "Unable to open DEM file[" << fullName
           << "]. Format not recognised as a supported dataset." << std::endl;
@@ -143,11 +143,27 @@ int Dem::Load(const std::string &_filename)
   if (this->LoadData() != 0)
     return -1;
 
-  // Set the min/max heights
-  this->dataPtr->minElevation = *std::min_element(&this->dataPtr->demData[0],
-      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
-  this->dataPtr->maxElevation = *std::max_element(&this->dataPtr->demData[0],
-      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
+  // Check for nodata value in dem data. This is used when computing the
+  // min elevation. If nodata value is not defined, we assume it will be one
+  // of the commonly used values such as -9999, -32768, etc.
+  // For simplicity, we will treat values <= -9999 as nodata values and
+  // ignore them when computing the min elevation.
+  int validNoData = 0;
+  const double defaultNoDataValue = -9999;
+  double noDataValue = this->dataPtr->band->GetNoDataValue(&validNoData);
+  if (validNoData <= 0)
+    noDataValue = defaultNoDataValue;
+
+  this->dataPtr->minElevation = *std::min_element(
+      this->dataPtr->demData.begin(),
+      this->dataPtr->demData.end(),
+      [noDataValue](double _a, double _b) -> bool
+      {
+        return _a < _b && _a > noDataValue;
+      });
+  this->dataPtr->maxElevation = *std::max_element(
+      this->dataPtr->demData.begin(),
+      this->dataPtr->demData.end());
 
   return 0;
 }
@@ -281,8 +297,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       double px4 = this->dataPtr->demData[y2 * this->dataPtr->side + x2];
       float h2 = (px3 - ((px3 - px4) * dx));
 
-      float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
-          this->GetMinElevation())) * _scale.Z();
+      float h = this->dataPtr->minElevation +
+          (h1 - ((h1 - h2) * dy) - this->dataPtr->minElevation) * _scale.Z();
 
       // Invert pixel definition so 1=ground, 0=full height,
       // if the terrain size has a negative z component
@@ -290,9 +306,9 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       if (_size.Z() < 0)
         h *= -1;
 
-      // Convert to 0 if a NODATA value is found
-      if (_size.Z() >= 0 && h < 0)
-        h = 0;
+      // Convert to minElevation if a NODATA value is found
+      if (_size.Z() >= 0 && h < this->dataPtr->minElevation)
+        h = this->dataPtr->minElevation;
 
       // Store the height for future use
       if (!_flipY)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
+#include <tinyxml.h>
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -69,6 +70,17 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   frameLayout->addWidget(this->dataPtr->fileTreeWidget, 0);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
+
+  // set name, size and location of the button add model path gui.
+  QPushButton *addPathButton = new QPushButton("Add Path", this);
+
+  addPathButton->setGeometry(QRect(QPoint(100, 0),
+    QSize(200, 50)));
+
+  mainLayout->addWidget(addPathButton);
+  // Connect button signal to appropriate slot.
+  connect(addPathButton, SIGNAL(released()), this,
+    SLOT(HandleButton()));
 
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
@@ -126,6 +138,29 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
   QTimer::singleShot(1000, this, SLOT(Update()));
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::HandleButton()
+{
+  QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
+  fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setOptions(QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks);
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
+
+    common::SystemPaths::Instance()->AddModelPaths(
+      selected[0].toStdString());
+
+    this->UpdateLocalPath(selected[0].toStdString());
+  }
 }
 
 /////////////////////////////////////////////////

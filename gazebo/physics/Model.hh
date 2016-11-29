@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -32,6 +33,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -83,6 +85,13 @@ namespace gazebo
       /// \return The SDF value for this model.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \internal
+      /// \brief Get the SDF element for the model, without all effects of
+      /// scaling. This is useful in cases when the scale will be applied
+      /// afterwards by, for example, states.
+      /// \return The SDF element.
+      public: virtual const sdf::ElementPtr UnscaledSDF();
+
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
       public: virtual void RemoveChild(EntityPtr _child);
@@ -90,6 +99,7 @@ namespace gazebo
 
       /// \brief Reset the model.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of
       /// all child links.
@@ -195,15 +205,15 @@ namespace gazebo
       /// Bodies connected by a joint are exempt from this, and will
       /// never collide.
       /// \return True if self-collide enabled for this model, false otherwise.
-      public: bool GetSelfCollide() const;
+      public: virtual bool GetSelfCollide() const;
 
       /// \brief Set this model's self_collide property
       /// \sa GetSelfCollide
       /// \param[in] _self_collide True if self-collisions enabled by default.
-      public: void SetSelfCollide(bool _self_collide);
+      public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
@@ -275,7 +285,17 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \param[in] _publish True to publish a message for the client with the
+      /// new scale.
+      /// \sa ignition::math::Vector3d Scale() const
+      public: void SetScale(const ignition::math::Vector3d &_scale,
+          const bool _publish = false);
+
+      /// \brief Get the scale of model.
+      /// \return Scale of the model.
+      /// \sa void SetScale(const ignition::math::Vector3d &_scale,
+      ///    const bool _publish = false)
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Enable all the links in all the models.
       /// \param[in] _enabled True to enable all the links.
@@ -365,17 +385,42 @@ namespace gazebo
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
+      /// \brief Create a joint for this model
+      /// \param[in] _sdf SDF parameters for <joint>
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
+
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint
       /// \return true if successful, false if not.
       public: bool RemoveJoint(const std::string &_name);
 
+      /// \brief Set whether wind affects this body.
+      /// \param[in] _mode True to enable wind.
+      public: virtual void SetWindMode(const bool _mode);
+
+      /// \brief Get the wind mode.
+      /// \return True if wind is enabled.
+      public: virtual bool WindMode() const;
+
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself
       public: boost::shared_ptr<Model> shared_from_this();
 
+      /// \brief Create a new link for this model
+      /// \param[in] _name name of the new link
+      /// \return a LinkPtr to the new link created,
+      /// returns NULL if link _name already exists.
+      public: LinkPtr CreateLink(const std::string &_name);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
+
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
 
       /// \brief Load all the links.
       private: void LoadLinks();
@@ -399,6 +444,13 @@ namespace gazebo
       /// This does not delete the link.
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
+
+      /// \brief Publish the scale.
+      private: virtual void PublishScale();
+
+      /// \brief Called when a request message is received.
+      /// \param[in] _msg The request message.
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
@@ -434,11 +486,20 @@ namespace gazebo
       /// \brief Callback used when a joint animation completes.
       private: boost::function<void()> onJointAnimationComplete;
 
+      /// \brief Controller for the joints.
+      private: JointControllerPtr jointController;
+
+      /// \brief Publisher for request response messages.
+      private: transport::PublisherPtr responsePub;
+
+      /// \brief Subscriber to request messages.
+      private: transport::SubscriberPtr requestSub;
+
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;
 
-      /// \brief Controller for the joints.
-      private: JointControllerPtr jointController;
+      /// \brief Mutex to protect incoming message buffers.
+      private: std::mutex receiveMutex;
     };
     /// \}
   }

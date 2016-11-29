@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,6 @@ namespace gazebo
       /// \brief Destructor
       public: ~InertiaVisual();
 
-      // Inherited from parent class
-      public: virtual void Fini();
-
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
@@ -59,11 +56,6 @@ namespace gazebo
       /// \param[in] _scale Scale factor for the box visual.
       private: void Load(const math::Pose &_pose,
           const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
-
-      /// \brief Destroy all the movable objects attached to a scene node.
-      /// \param[in] _sceneNode Pointer to the scene node to process.
-      private: void DestroyAllAttachedMovableObjects(
-                        Ogre::SceneNode *_sceneNode);
     };
     /// \}
   }

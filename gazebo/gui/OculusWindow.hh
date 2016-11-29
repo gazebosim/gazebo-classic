@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *
  */
 
-#ifndef _GAZEBO_OCULUS_WINDOW_HH_
-#define _GAZEBO_OCULUS_WINDOW_HH_
+#ifndef GAZEBO_GUI_OCULUS_WINDOW_HH_
+#define GAZEBO_GUI_OCULUS_WINDOW_HH_
 
-#include <boost/thread.hpp>
 #include <string>
+#include <thread>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -92,7 +92,7 @@ namespace gazebo
       private: std::string visualName;
 
       /// \brief Thread to attach oculus camera to visual
-      private: boost::thread *attachCameraThread;
+      private: std::thread *attachCameraThread;
     };
   }
 }

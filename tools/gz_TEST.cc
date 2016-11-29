@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
 
+#include <gazebo/gazebo_client.hh>
 #include <gazebo/common/CommonIface.hh>
+#include <gazebo/common/Time.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
@@ -97,7 +99,7 @@ void init()
   {
     boost::filesystem::path worldFilePath = TEST_PATH;
     worldFilePath = worldFilePath / "worlds" / "simple_arm_test.world";
-    if (execlp("gzserver", worldFilePath.string().c_str(),
+    if (execlp("gzserver", "gzserver", worldFilePath.string().c_str(),
         "--iters", "60000", NULL) < 0)
     {
       gzerr << "Failed to start the gazebo server.\n";
@@ -105,13 +107,30 @@ void init()
     return;
   }
 
-  EXPECT_TRUE(gazebo::transport::init());
+  EXPECT_TRUE(gazebo::client::setup());
+
+  // Wait for world_stats topic to be available
+  {
+    int topicWaitCount = 0;
+    const std::string messageName = "gazebo.msgs.WorldStatistics";
+    const std::string topicName = "/gazebo/default/world_stats";
+    while (++topicWaitCount <= 20 &&
+           gazebo::transport::getAdvertisedTopics(messageName).size() == 0)
+    {
+      gzdbg << "Waiting for topics to be listed" << std::endl;
+      gazebo::common::Time::MSleep(200);
+    }
+    ASSERT_LE(topicWaitCount, 20);
+    auto topics = gazebo::transport::getAdvertisedTopics(messageName);
+    ASSERT_EQ(topics.size(), 1u);
+    EXPECT_EQ(topics.front(), topicName);
+  }
 }
 
 /////////////////////////////////////////////////
 void fini()
 {
-  gazebo::transport::fini();
+  EXPECT_TRUE(gazebo::client::shutdown());
   if (kill(g_pid, SIGINT) < 0)
     gzerr << "Failed to kill the gazebo server.\n";
 
@@ -209,9 +228,6 @@ TEST_F(gzTest, Joint)
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/simple_arm/joint_cmd", &JointCmdCB);
 
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
-
   // Test joint force
   {
     waitForMsg("gz joint -w default -m simple_arm "
@@ -278,8 +294,20 @@ TEST_F(gzTest, Model)
   gazebo::transport::SubscriberPtr subFactory =
     node->Subscribe("~/factory", &FactoryCB);
 
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
+  // Test model info on existing model
+  {
+    std::string modelInfo = custom_exec_str("gz model -m simple_arm -i");
+
+    // Check that a few values exist. We don't check the sha1 value
+    // because a few values, such as pose, are dynamic.
+    EXPECT_TRUE(modelInfo.find("name: \"simple_arm\"") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find(
+        "name: \"simple_arm::arm_wrist_roll::arm_wrist_roll_geom_visual\"")
+        != std::string::npos);
+    EXPECT_TRUE(modelInfo.find(
+        "name: \"simple_arm::arm_wrist_lift::arm_wrist_lift_geom\"")
+        != std::string::npos);
+  }
 
   // Test model move
   {
@@ -294,11 +322,23 @@ TEST_F(gzTest, Model)
   }
 
   // Test model spawn from file
+  // Some expectations in this code block are disabled due to issue 2069
   {
     std::string filename = std::string(TEST_PATH) + "/models/box.sdf";
 
-    waitForMsg("gz model -w default -m my_box -f " + filename);
+    g_msgDebugOut.clear();
+    custom_exec_str("gz model -w default -m my_box -f " + filename);
 
+    int maxSleep = 10;
+    int sleep = 0;
+    while (g_msgDebugOut.empty() && sleep < maxSleep)
+    {
+      gazebo::common::Time::MSleep(100);
+      sleep++;
+    }
+    // EXPECT_FALSE(g_msgDebugOut.empty());
+
+    // Create similar message to compare
     sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
@@ -311,17 +351,63 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Set(msg.mutable_pose(),
         ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
-    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+    // EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  // Test model info of inserted model to verify insertion
+  {
+    std::string modelInfo = custom_exec_str("gz model -m my_box -i");
+
+    // Check that a few values exist. We don't check the sha1 value
+    // because a few values, such as pose, are dynamic.
+    EXPECT_TRUE(modelInfo.find("name: \"my_box\"") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("id: 56") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("is_static: false") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("name: \"my_box::link::collision\"")
+        != std::string::npos);
+  }
+
+  // Test model delete
+  {
+    waitForMsg("gz model -w default -m my_box -d");
+
+    EXPECT_NE(g_msgDebugOut.find("entity_delete"), std::string::npos);
+    // The following expectation can fail, since Link::Fini publishes
+    // an entity_delete request with the integer id of its visuals.
+    // The expectation is disabled until model deletion is improved, see:
+    // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
+    // EXPECT_NE(g_msgDebugOut.find("my_box"), std::string::npos);
+  }
+
+  // Test model info of deleted model to verify deletion
+  {
+    // Make sure the error message is output.
+    std::string modelInfo = custom_exec_str("gz model -m my_box -i");
+    EXPECT_EQ(modelInfo,
+        "Unable to get info on model[my_box] in the world[default]\n");
   }
 
   // Test model spawn from string
+  // Some expectations in this code block are disabled due to issue 2069
   {
     std::string filename = std::string(TEST_PATH) + "/models/box.sdf";
 
     std::string cmd = "cat ";
     cmd += filename + " | gz model -w default -m my_box -s";
-    waitForMsg(cmd);
 
+    g_msgDebugOut.clear();
+    custom_exec_str(cmd);
+
+    int maxSleep = 10;
+    int sleep = 0;
+    while (g_msgDebugOut.empty() && sleep < maxSleep)
+    {
+      gazebo::common::Time::MSleep(100);
+      sleep++;
+    }
+    // EXPECT_FALSE(g_msgDebugOut.empty());
+
+    // Create similar message to compare
     sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
@@ -334,7 +420,15 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Set(msg.mutable_pose(),
         ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
-    EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+    // EXPECT_EQ(g_msgDebugOut, msg.DebugString());
+  }
+
+  // Check there were no extra copies of the model inserted
+  {
+    // Make sure the error message is output.
+    std::string modelInfo = custom_exec_str("gz model -m my_box_0 -i");
+    EXPECT_EQ(modelInfo,
+        "Unable to get info on model[my_box_0] in the world[default]\n");
   }
 
   // Test model info and pose
@@ -350,7 +444,7 @@ TEST_F(gzTest, Model)
     // Check that a few values exist. We don't check the sha1 value
     // because a few values, such as pose, are dynamic.
     EXPECT_TRUE(modelInfo.find("name: \"my_box\"") != std::string::npos);
-    EXPECT_TRUE(modelInfo.find("id: 10") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("id: 62") != std::string::npos);
     EXPECT_TRUE(modelInfo.find("is_static: false") != std::string::npos);
     EXPECT_TRUE(modelInfo.find("name: \"my_box::link::collision\"")
         != std::string::npos);
@@ -360,8 +454,7 @@ TEST_F(gzTest, Model)
     boost::algorithm::trim(modelInfo);
 
     // Split the string into parts p.
-    std::vector<std::string> p;
-    boost::split(p, modelInfo, boost::is_any_of(" "));
+    auto p = common::split(modelInfo, " ");
 
     // Make sure we have the right number of parts.
     // Don't ASSERT_EQ, because we need to run fini at end of test
@@ -384,7 +477,11 @@ TEST_F(gzTest, Model)
     waitForMsg("gz model -w default -m simple_arm -d");
 
     EXPECT_NE(g_msgDebugOut.find("entity_delete"), std::string::npos);
-    EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
+    // The following expectation can fail, since Link::Fini publishes
+    // an entity_delete request with the integer id of its visuals.
+    // The expectation is disabled until model deletion is improved, see:
+    // https://bitbucket.org/osrf/gazebo_design/pull-requests/31
+    // EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
   }
 
   fini();
@@ -402,9 +499,6 @@ TEST_F(gzTest, World)
   node->Init();
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/world_control", &WorldControlCB);
-
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
 
   // Test world pause
   {
@@ -476,9 +570,6 @@ TEST_F(gzTest, Physics)
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/physics", &PhysicsCB);
 
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
-
   // Test gravity
   {
     waitForMsg("gz physics -w default -g 1,2,3 ");
@@ -536,9 +627,6 @@ TEST_F(gzTest, Camera)
   node->Init();
   gazebo::transport::SubscriberPtr sub =
     node->Subscribe("~/user/cmd", &CameraCB);
-
-  // Run the transport loop: starts a new thread
-  gazebo::transport::run();
 
   // Test follow
   {
@@ -612,7 +700,6 @@ TEST_F(gzTest, SDF)
 {
   boost::filesystem::path path;
 
-  init();
   std::string helpOutput = custom_exec_str("gz help sdf");
   EXPECT_NE(helpOutput.find("gz sdf"), std::string::npos);
 
@@ -659,26 +746,29 @@ TEST_F(gzTest, SDF)
   path /= "worlds/box_plane_low_friction_test.world";
 
   {
-    // Check empty.world
+    // Check box_plane_low_friction_test.world
     std::string output =
       custom_exec_str(std::string("gz sdf -k ") + path.string());
     EXPECT_EQ(output, "Check complete\n");
   }
 
-  {
-    // Print empty.world
-    // Regenerate using:
-    // gz sdf -p test/worlds/empty_different_name.world
-    // | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
-    std::string output =
-      custom_exec_str(std::string("gz sdf -p ") + path.string());
-    std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "ea127f9858a5e07c40ef6d949ef6113236adddfa");
-  }
+  // The checksums are changing too often for this test to be useful
+  // {
+  //   // Print box_plane_low_friction_test.world
+  //   // Regenerate using:
+  //   // gz sdf -p test/worlds/box_plane_low_friction_test.world
+  //   // | shasum
+  //   std::string output =
+  //     custom_exec_str(std::string("gz sdf -p ") + path.string());
+  //   std::string shasum = gazebo::common::get_sha1<std::string>(output);
+  //   EXPECT_EQ(shasum, "81960fabd921e1832aeb15d8b1ac39754c0eed81");
+  // }
 
   path = PROJECT_BINARY_PATH;
   path = path / "test" / "sdf_convert_test.world";
   std::ofstream file(path.string().c_str(), std::ios::out);
+  EXPECT_TRUE(file.is_open());
+
   file << "<?xml version='1.0' ?>"
     "<sdf version='1.3'>"
     "<world name='default'>"
@@ -693,8 +783,6 @@ TEST_F(gzTest, SDF)
       custom_exec_str(std::string("gz sdf -c ") + path.string());
     EXPECT_EQ(output, "Success\n");
   }
-
-  fini();
 }
 
 /////////////////////////////////////////////////

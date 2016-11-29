@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RAYSENSOR_HH_
-#define _GAZEBO_RAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RAYSENSOR_HH_
+#define _GAZEBO_SENSORS_RAYSENSOR_HH_
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include <ignition/math/Angle.hh>
-#include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
@@ -39,6 +36,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class.
+    class RaySensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -63,19 +63,13 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
 
       // Documentation inherited
-      public: virtual std::string GetTopic() const;
-
-      /// \brief Get the minimum angle
-      /// \return The minimum angle object
-      /// \deprecated See AngleMin() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetAngleMin() const GAZEBO_DEPRECATED(6.0);
+      public: virtual std::string Topic() const;
 
       /// \brief Get the minimum angle
       /// \return The minimum angle object
@@ -83,51 +77,39 @@ namespace gazebo
 
       /// \brief Get the maximum angle
       /// \return the maximum angle object
-      /// \deprecated See AngleMax() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetAngleMax() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the maximum angle
-      /// \return the maximum angle object
       public: ignition::math::Angle AngleMax() const;
 
       /// \brief Get the angle in radians between each range
       /// \return Resolution of the angle
-      public: double GetAngleResolution() const;
+      public: double AngleResolution() const;
 
       /// \brief Get the minimum range
       /// \return The minimum range
-      public: double GetRangeMin() const;
+      public: double RangeMin() const;
 
       /// \brief Get the maximum range
       /// \return The maximum range
-      public: double GetRangeMax() const;
+      public: double RangeMax() const;
 
       /// \brief Get the range resolution
       /// \return Resolution of the range
-      public: double GetRangeResolution() const;
+      public: double RangeResolution() const;
 
       /// \brief Get the ray count
       /// \return The number of rays
-      public: int GetRayCount() const;
+      public: int RayCount() const;
 
       /// \brief Get the range count
       /// \return The number of ranges
-      public: int GetRangeCount() const;
+      public: int RangeCount() const;
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
-      public: int GetVerticalRayCount() const;
+      public: int VerticalRayCount() const;
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
-      public: int GetVerticalRangeCount() const;
-
-      /// \brief Get the vertical scan bottom angle
-      /// \return The minimum angle of the scan block
-      /// \deprecated See VerticalAngleMin() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetVerticalAngleMin() const GAZEBO_DEPRECATED(6.0);
+      public: int VerticalRangeCount() const;
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
@@ -135,17 +117,11 @@ namespace gazebo
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      /// \deprecated See VerticalAngleMax() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetVerticalAngleMax() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the vertical scan line top angle
-      /// \return The Maximum angle of the scan block
       public: ignition::math::Angle VerticalAngleMax() const;
 
       /// \brief Get the vertical angle in radians between each range
       /// \return Resolution of the angle
-      public: double GetVerticalAngleResolution() const;
+      public: double VerticalAngleResolution() const;
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -156,11 +132,11 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Returns RangeMax for no detection.
-      public: double GetRange(unsigned int _index);
+      public: double Range(const unsigned int _index) const;
 
       /// \brief Get all the ranges
-      /// \param _ranges A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges);
+      /// \param[out] _ranges A vector that will contain all the range data
+      public: void Ranges(std::vector<double> &_ranges) const;
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -171,7 +147,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Retro (intensity) value for ray
-      public: double GetRetro(unsigned int _index);
+      public: double Retro(const unsigned int _index) const;
 
       /// \brief Get detected fiducial value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -182,23 +158,18 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index value of specific ray
       /// \return Fiducial value
-      public: int GetFiducial(unsigned int _index);
+      public: int Fiducial(const unsigned int _index) const;
 
       /// \brief Returns a pointer to the internal physics::MultiRayShape
       /// \return Pointer to ray shape
-      public: physics::MultiRayShapePtr GetLaserShape() const
-              {return this->laserShape;}
+      public: physics::MultiRayShapePtr LaserShape() const;
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
-      private: physics::CollisionPtr laserCollision;
-      private: physics::MultiRayShapePtr laserShape;
-      private: physics::EntityPtr parentEntity;
-
-      private: transport::PublisherPtr scanPub;
-      private: boost::mutex mutex;
-      private: msgs::LaserScanStamped laserMsg;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<RaySensorPrivate> dataPtr;
     };
     /// \}
   }

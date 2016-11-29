@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@ namespace gazebo
   {
     /// Forward declare private data class
     class DARTJointPrivate;
+
+    /// \addtogroup gazebo_physics_dart
+    /// \{
 
     /// \brief DART joint interface
     class GZ_PHYSICS_VISIBLE DARTJoint : public Joint
@@ -122,9 +125,6 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const;
-
-      // Documentation inherited.
       public: virtual void ApplyDamping();
 
       /// \brief Set the force applied to this physics::Joint.
@@ -147,6 +147,13 @@ namespace gazebo
       /// \return A pointer to the DART model.
       public: DARTModelPtr GetDARTModel() const;
 
+      /// \brief Get DART Joint properties
+      public: DARTJointPropPtr DARTProperties() const;
+
+      /// \brief Set DART joint pointer.
+      /// \param[in] A pointer to the DART joint.
+      public: void SetDARTJoint(dart::dynamics::Joint *_dtJoint);
+
       /// \brief Get DART joint pointer.
       /// \return A pointer to the DART joint.
       public: dart::dynamics::Joint *GetDARTJoint();
@@ -155,6 +162,7 @@ namespace gazebo
       /// \brief Pointer to private data
       protected: DARTJointPrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

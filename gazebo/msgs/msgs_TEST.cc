@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,106 @@ TEST_F(MsgsTest, BadPackage)
   EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
 }
 
+TEST_F(MsgsTest, ConvertDoubleToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(1.0);
+  EXPECT_EQ(msg.type(), msgs::Any::DOUBLE);
+  ASSERT_TRUE(msg.has_double_value());
+  EXPECT_DOUBLE_EQ(1, msg.double_value());
+}
+
+TEST_F(MsgsTest, ConvertIntToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(2);
+  EXPECT_EQ(msg.type(), msgs::Any::INT32);
+  ASSERT_TRUE(msg.has_int_value());
+  EXPECT_DOUBLE_EQ(2, msg.int_value());
+}
+
+TEST_F(MsgsTest, ConvertStringToAny)
+{
+  msgs::Any msg = msgs::ConvertAny("test_string");
+  EXPECT_EQ(msg.type(), msgs::Any::STRING);
+  ASSERT_TRUE(msg.has_string_value());
+  EXPECT_EQ("test_string", msg.string_value());
+}
+
+TEST_F(MsgsTest, ConvertBoolToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(true);
+
+  EXPECT_EQ(msg.type(), msgs::Any::BOOLEAN);
+  ASSERT_TRUE(msg.has_bool_value());
+  EXPECT_TRUE(msg.bool_value());
+}
+
+TEST_F(MsgsTest, ConvertVector3dToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Vector3d(1, 2, 3));
+  EXPECT_EQ(msg.type(), msgs::Any::VECTOR3D);
+  ASSERT_TRUE(msg.has_vector3d_value());
+
+  EXPECT_DOUBLE_EQ(1, msg.vector3d_value().x());
+  EXPECT_DOUBLE_EQ(2, msg.vector3d_value().y());
+  EXPECT_DOUBLE_EQ(3, msg.vector3d_value().z());
+}
+
+TEST_F(MsgsTest, ConvertColorToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(common::Color(.1, .2, .3, 1.0));
+  EXPECT_EQ(msg.type(), msgs::Any::COLOR);
+  ASSERT_TRUE(msg.has_color_value());
+
+  EXPECT_DOUBLE_EQ(0.1f, msg.color_value().r());
+  EXPECT_DOUBLE_EQ(0.2f, msg.color_value().g());
+  EXPECT_DOUBLE_EQ(0.3f, msg.color_value().b());
+  EXPECT_DOUBLE_EQ(1.0f, msg.color_value().a());
+}
+
+TEST_F(MsgsTest, ConvertPose3dToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Pose3d(
+      ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(4, 5, 6, 7)));
+
+  EXPECT_EQ(msg.type(), msgs::Any::POSE3D);
+  ASSERT_TRUE(msg.has_pose3d_value());
+
+  EXPECT_DOUBLE_EQ(1, msg.pose3d_value().position().x());
+  EXPECT_DOUBLE_EQ(2, msg.pose3d_value().position().y());
+  EXPECT_DOUBLE_EQ(3, msg.pose3d_value().position().z());
+
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().w(), 4.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().x(), 5.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().y(), 6.0);
+  EXPECT_DOUBLE_EQ(msg.pose3d_value().orientation().z(), 7.0);
+}
+
+TEST_F(MsgsTest, ConvertQuaternionToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(
+      ignition::math::Quaterniond(1, 2, 3, 4));
+
+  EXPECT_EQ(msg.type(), msgs::Any::QUATERNIOND);
+  ASSERT_TRUE(msg.has_quaternion_value());
+
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().w(), 1.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().x(), 2.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().y(), 3.0);
+  EXPECT_DOUBLE_EQ(msg.quaternion_value().z(), 4.0);
+}
+
+TEST_F(MsgsTest, ConvertTimeToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(common::Time(2, 123));
+
+  EXPECT_EQ(msg.type(), msgs::Any::TIME);
+  ASSERT_TRUE(msg.has_time_value());
+
+  EXPECT_EQ(2, msg.time_value().sec());
+  EXPECT_EQ(123, msg.time_value().nsec());
+}
+
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
   msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
@@ -124,23 +224,22 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
   msgs::Quaternion msg =
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
 
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.w(), 0.27059805007309851);
 }
 
-TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
+TEST_F(MsgsTest, ConvertMsgsQuaternionToMath)
 {
   msgs::Quaternion msg =
     msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
   ignition::math::Quaterniond v = msgs::ConvertIgn(msg);
 
-  // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
-  EXPECT_TRUE(math::equal(v.X(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.Y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.Z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.W(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(v.X(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(v.Y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(v.Z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(v.W(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
@@ -153,10 +252,10 @@ TEST_F(MsgsTest, ConvertPoseMathToMsgs)
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.orientation().x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.orientation().y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.orientation().z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.orientation().w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
@@ -169,20 +268,20 @@ TEST_F(MsgsTest, ConvertMsgPoseToMath)
   EXPECT_DOUBLE_EQ(1, v.Pos().X());
   EXPECT_DOUBLE_EQ(2, v.Pos().Y());
   EXPECT_DOUBLE_EQ(3, v.Pos().Z());
-  EXPECT_TRUE(math::equal(v.Rot().X(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.Rot().Y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.Rot().Z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.Rot().W(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(v.Rot().X(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(v.Rot().Y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(v.Rot().Z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(v.Rot().W(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
 
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  EXPECT_FLOAT_EQ(0.1f, msg.r());
+  EXPECT_FLOAT_EQ(0.2f, msg.g());
+  EXPECT_FLOAT_EQ(0.3f, msg.b());
+  EXPECT_FLOAT_EQ(1.0f, msg.a());
 }
 
 TEST_F(MsgsTest, ConvertMsgsColorToCommon)
@@ -190,10 +289,10 @@ TEST_F(MsgsTest, ConvertMsgsColorToCommon)
   msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
   common::Color v = msgs::Convert(msg);
 
-  EXPECT_TRUE(math::equal(0.1f, v.r));
-  EXPECT_TRUE(math::equal(0.2f, v.g));
-  EXPECT_TRUE(math::equal(0.3f, v.b));
-  EXPECT_TRUE(math::equal(1.0f, v.a));
+  EXPECT_FLOAT_EQ(0.1f, v.r);
+  EXPECT_FLOAT_EQ(0.2f, v.g);
+  EXPECT_FLOAT_EQ(0.3f, v.b);
+  EXPECT_FLOAT_EQ(1.0f, v.a);
 }
 
 TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
@@ -205,6 +304,63 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
   common::Time v = msgs::Convert(msg);
   EXPECT_EQ(2, v.sec);
   EXPECT_EQ(123, v.nsec);
+}
+
+TEST_F(MsgsTest, ConvertMathInertialToMsgs)
+{
+  const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
+  msgs::Inertial msg = msgs::Convert(
+      ignition::math::Inertiald(
+        ignition::math::MassMatrix3d(12.0,
+          ignition::math::Vector3d(2, 3, 4),
+          ignition::math::Vector3d(0.1, 0.2, 0.3)),
+        pose));
+
+  EXPECT_DOUBLE_EQ(12.0, msg.mass());
+  EXPECT_DOUBLE_EQ(2.0, msg.ixx());
+  EXPECT_DOUBLE_EQ(3.0, msg.iyy());
+  EXPECT_DOUBLE_EQ(4.0, msg.izz());
+  EXPECT_DOUBLE_EQ(0.1, msg.ixy());
+  EXPECT_DOUBLE_EQ(0.2, msg.ixz());
+  EXPECT_DOUBLE_EQ(0.3, msg.iyz());
+  EXPECT_EQ(pose, msgs::ConvertIgn(msg.pose()));
+}
+
+TEST_F(MsgsTest, ConvertMsgsInertialToMath)
+{
+  const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
+  msgs::Inertial msg = msgs::Convert(
+      ignition::math::Inertiald(
+        ignition::math::MassMatrix3d(12.0,
+          ignition::math::Vector3d(2, 3, 4),
+          ignition::math::Vector3d(0.1, 0.2, 0.3)),
+        pose));
+  auto inertial = msgs::Convert(msg);
+
+  EXPECT_DOUBLE_EQ(12.0, inertial.MassMatrix().Mass());
+  EXPECT_DOUBLE_EQ(2.0, inertial.MassMatrix().IXX());
+  EXPECT_DOUBLE_EQ(3.0, inertial.MassMatrix().IYY());
+  EXPECT_DOUBLE_EQ(4.0, inertial.MassMatrix().IZZ());
+  EXPECT_DOUBLE_EQ(0.1, inertial.MassMatrix().IXY());
+  EXPECT_DOUBLE_EQ(0.2, inertial.MassMatrix().IXZ());
+  EXPECT_DOUBLE_EQ(0.3, inertial.MassMatrix().IYZ());
+  EXPECT_EQ(pose, inertial.Pose());
+}
+
+TEST_F(MsgsTest, ConvertMathMassMatrix3ToMsgs)
+{
+  msgs::Inertial msg = msgs::Convert(
+      ignition::math::MassMatrix3d(12.0,
+        ignition::math::Vector3d(2, 3, 4),
+        ignition::math::Vector3d(0.1, 0.2, 0.3)));
+
+  EXPECT_DOUBLE_EQ(12.0, msg.mass());
+  EXPECT_DOUBLE_EQ(2.0, msg.ixx());
+  EXPECT_DOUBLE_EQ(3.0, msg.iyy());
+  EXPECT_DOUBLE_EQ(4.0, msg.izz());
+  EXPECT_DOUBLE_EQ(0.1, msg.ixy());
+  EXPECT_DOUBLE_EQ(0.2, msg.ixz());
+  EXPECT_DOUBLE_EQ(0.3, msg.iyz());
 }
 
 TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
@@ -235,7 +391,7 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_DOUBLE_EQ(123, v.Size().X());
   EXPECT_DOUBLE_EQ(456, v.Size().Y());
 
-  EXPECT_TRUE(math::equal(1.0, v.Offset()));
+  EXPECT_DOUBLE_EQ(1.0, v.Offset());
 }
 
 //////////////////////////////////////////////////
@@ -330,10 +486,10 @@ TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
   msgs::Set(&msg, ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, SetPose)
@@ -346,20 +502,20 @@ TEST_F(MsgsTest, SetPose)
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(msg.orientation().x(), -0.65328148243818818);
+  EXPECT_DOUBLE_EQ(msg.orientation().y(), 0.27059805007309856);
+  EXPECT_DOUBLE_EQ(msg.orientation().z(), 0.65328148243818829);
+  EXPECT_DOUBLE_EQ(msg.orientation().w(), 0.27059805007309851);
 }
 
 TEST_F(MsgsTest, SetColor)
 {
   msgs::Color msg;
   msgs::Set(&msg, common::Color(.1, .2, .3, 1.0));
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  EXPECT_FLOAT_EQ(0.1f, msg.r());
+  EXPECT_FLOAT_EQ(0.2f, msg.g());
+  EXPECT_FLOAT_EQ(0.3f, msg.b());
+  EXPECT_FLOAT_EQ(1.0f, msg.a());
 }
 
 TEST_F(MsgsTest, SetTime)
@@ -368,6 +524,44 @@ TEST_F(MsgsTest, SetTime)
   msgs::Set(&msg, common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());
+}
+
+TEST_F(MsgsTest, SetInertial)
+{
+  const auto pose = ignition::math::Pose3d(5, 6, 7, 0.4, 0.5, 0.6);
+  msgs::Inertial msg;
+  msgs::Set(&msg, ignition::math::Inertiald(
+      ignition::math::MassMatrix3d(
+        12.0,
+        ignition::math::Vector3d(2, 3, 4),
+        ignition::math::Vector3d(0.1, 0.2, 0.3)),
+      pose));
+
+  EXPECT_DOUBLE_EQ(12.0, msg.mass());
+  EXPECT_DOUBLE_EQ(2.0, msg.ixx());
+  EXPECT_DOUBLE_EQ(3.0, msg.iyy());
+  EXPECT_DOUBLE_EQ(4.0, msg.izz());
+  EXPECT_DOUBLE_EQ(0.1, msg.ixy());
+  EXPECT_DOUBLE_EQ(0.2, msg.ixz());
+  EXPECT_DOUBLE_EQ(0.3, msg.iyz());
+  EXPECT_EQ(pose, msgs::ConvertIgn(msg.pose()));
+}
+
+TEST_F(MsgsTest, SetMassMatrix3)
+{
+  msgs::Inertial msg;
+  msgs::Set(&msg, ignition::math::MassMatrix3d(
+        12.0,
+        ignition::math::Vector3d(2, 3, 4),
+        ignition::math::Vector3d(0.1, 0.2, 0.3)));
+
+  EXPECT_DOUBLE_EQ(12.0, msg.mass());
+  EXPECT_DOUBLE_EQ(2.0, msg.ixx());
+  EXPECT_DOUBLE_EQ(3.0, msg.iyy());
+  EXPECT_DOUBLE_EQ(4.0, msg.izz());
+  EXPECT_DOUBLE_EQ(0.1, msg.ixy());
+  EXPECT_DOUBLE_EQ(0.2, msg.ixz());
+  EXPECT_DOUBLE_EQ(0.3, msg.iyz());
 }
 
 TEST_F(MsgsTest, SetPlane)
@@ -384,7 +578,7 @@ TEST_F(MsgsTest, SetPlane)
   EXPECT_DOUBLE_EQ(123, msg.size().x());
   EXPECT_DOUBLE_EQ(456, msg.size().y());
 
-  EXPECT_TRUE(math::equal(1.0, msg.d()));
+  EXPECT_DOUBLE_EQ(1.0, msg.d());
 }
 
 TEST_F(MsgsTest, Initialization)
@@ -405,6 +599,323 @@ TEST_F(MsgsTest, Initialization)
     EXPECT_DOUBLE_EQ(0, msg.torque().y());
     EXPECT_DOUBLE_EQ(0, msg.torque().z());
   }
+}
+
+/////////////////////////////////////////////////
+/// Helper function for GPSSensorFromSDF
+void CheckGPSSensorMsg(const msgs::GPSSensor &_msg)
+{
+  EXPECT_EQ(_msg.position().horizontal_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.position().horizontal_noise().mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().stddev(), 0.2, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().bias_mean(), 0.3, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().bias_stddev(), 0.4, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().precision(), 0.5, 1e-4);
+
+  EXPECT_EQ(_msg.position().vertical_noise().type(),
+      msgs::SensorNoise::GAUSSIAN_QUANTIZED);
+  EXPECT_NEAR(_msg.position().vertical_noise().mean(), 0.6, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().stddev(), 0.7, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_mean(), 0.8, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_stddev(), 0.9, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().precision(), 1.0, 1e-4);
+
+  EXPECT_EQ(_msg.velocity().horizontal_noise().type(), msgs::SensorNoise::NONE);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().mean(), 1.1, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().stddev(), 1.2, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_mean(), 1.3, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_stddev(), 1.4, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().precision(), 1.5, 1e-4);
+
+  EXPECT_EQ(_msg.velocity().vertical_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().mean(), 1.6, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().stddev(), 1.7, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_mean(), 1.8, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_stddev(), 1.9, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().precision(), 2.0, 1e-4);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, GPSSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='gps' type='gps'>\
+           <always_on>true</always_on>\
+           <update_rate>15</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>true</visualize>\
+           <topic>/gazebo/test</topic>\
+           <gps>\
+             <position_sensing>\
+               <horizontal>\
+                 <noise type='gaussian'>\
+                   <mean>0.1</mean>\
+                   <stddev>0.2</stddev>\
+                   <bias_mean>0.3</bias_mean>\
+                   <bias_stddev>0.4</bias_stddev>\
+                   <precision>0.5</precision>\
+                 </noise>\
+               </horizontal>\
+               <vertical>\
+                 <noise type='gaussian_quantized'>\
+                   <mean>0.6</mean>\
+                   <stddev>0.7</stddev>\
+                   <bias_mean>0.8</bias_mean>\
+                   <bias_stddev>0.9</bias_stddev>\
+                   <precision>1.0</precision>\
+                 </noise>\
+               </vertical>\
+             </position_sensing>\
+             <velocity_sensing>\
+               <horizontal>\
+                 <noise type='none'>\
+                   <mean>1.1</mean>\
+                   <stddev>1.2</stddev>\
+                   <bias_mean>1.3</bias_mean>\
+                   <bias_stddev>1.4</bias_stddev>\
+                   <precision>1.5</precision>\
+                 </noise>\
+               </horizontal>\
+               <vertical>\
+                 <noise type='gaussian'>\
+                   <mean>1.6</mean>\
+                   <stddev>1.7</stddev>\
+                   <bias_mean>1.8</bias_mean>\
+                   <bias_stddev>1.9</bias_stddev>\
+                   <precision>2.0</precision>\
+                 </noise>\
+               </vertical>\
+             </velocity_sensing>\
+           </gps>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "gps");
+  EXPECT_EQ(msg.type(), "gps");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_gps());
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+
+  CheckGPSSensorMsg(msg.gps());
+
+  sdf::ElementPtr elem = msgs::GPSSensorToSDF(msg.gps());
+  msgs::GPSSensor sensorMsg = msgs::GPSSensorFromSDF(elem);
+  CheckGPSSensorMsg(sensorMsg);
+}
+
+/////////////////////////////////////////////////
+/// Helper function for IMUSensorFromSDF
+void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
+{
+  EXPECT_EQ(_msg.angular_velocity().x_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.angular_velocity().y_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.angular_velocity().z_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().x_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().y_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().z_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().precision(), 0.0, 1e-4);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, IMUSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+        <sensor name='imu_sensor' type='imu'>\
+          <update_rate>1000</update_rate>\
+          <always_on>true</always_on>\
+          <pose>1 2 3 0.1 0.2 0.3</pose>\
+          <visualize>true</visualize>\
+          <topic>/gazebo/test</topic>\
+          <imu>\
+            <angular_velocity>\
+              <x>\
+                <noise type='gaussian'>\
+                 <mean>0</mean>\
+                 <stddev>0.0002</stddev>\
+                 <bias_mean>7.5e-06</bias_mean>\
+                 <bias_stddev>8e-07</bias_stddev>\
+                </noise>\
+              </x>\
+              <y>\
+                <noise type='gaussian'>\
+                 <mean>0</mean>\
+                 <stddev>0.0002</stddev>\
+                 <bias_mean>7.5e-06</bias_mean>\
+                 <bias_stddev>8e-07</bias_stddev>\
+                </noise>\
+              </y>\
+              <z>\
+                <noise type='gaussian'>\
+                 <mean>0</mean>\
+                 <stddev>0.0002</stddev>\
+                 <bias_mean>7.5e-06</bias_mean>\
+                 <bias_stddev>8e-07</bias_stddev>\
+                </noise>\
+              </z>\
+            </angular_velocity>\
+            <linear_acceleration>\
+              <x>\
+                <noise type='gaussian'>\
+                  <mean>0</mean>\
+                  <stddev>0.017</stddev>\
+                  <bias_mean>0.1</bias_mean>\
+                  <bias_stddev>0.001</bias_stddev>\
+                </noise>\
+              </x>\
+              <y>\
+                <noise type='gaussian'>\
+                  <mean>0</mean>\
+                  <stddev>0.017</stddev>\
+                  <bias_mean>0.1</bias_mean>\
+                  <bias_stddev>0.001</bias_stddev>\
+                </noise>\
+              </y>\
+              <z>\
+                <noise type='gaussian'>\
+                  <mean>0</mean>\
+                  <stddev>0.017</stddev>\
+                  <bias_mean>0.1</bias_mean>\
+                  <bias_stddev>0.001</bias_stddev>\
+                </noise>\
+              </z>\
+            </linear_acceleration>\
+          </imu>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "imu_sensor");
+  EXPECT_EQ(msg.type(), "imu");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 1000.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_imu());
+  EXPECT_FALSE(msg.has_gps());
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+
+  CheckIMUSensorMsg(msg.imu());
+
+  sdf::ElementPtr elem = msgs::IMUSensorToSDF(msg.imu());
+  msgs::IMUSensor sensorMsg = msgs::IMUSensorFromSDF(elem);
+  CheckIMUSensorMsg(sensorMsg);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, LogicalCameraSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='camera' type='logical_camera'>\
+           <always_on>true</always_on>\
+           <update_rate>15</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>true</visualize>\
+           <topic>/gazebo/test</topic>\
+           <logical_camera>\
+             <near>0.1</near>\
+             <far>100.2</far>\
+             <aspect_ratio>1.43</aspect_ratio>\
+             <horizontal_fov>1.23</horizontal_fov>\
+           </logical_camera>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "camera");
+  EXPECT_EQ(msg.type(), "logical_camera");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_logical_camera());
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+  EXPECT_FALSE(msg.has_contact());
+
+  EXPECT_NEAR(msg.logical_camera().near_clip(), 0.1, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().far_clip(), 100.2, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().aspect_ratio(), 1.43, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().horizontal_fov(), 1.23, 1e-4);
+
+  sdf::ElementPtr elem = msgs::LogicalCameraSensorToSDF(msg.logical_camera());
+  msgs::LogicalCameraSensor sensorMsg = msgs::LogicalCameraSensorFromSDF(elem);
+
+  EXPECT_NEAR(sensorMsg.near_clip(), 0.1, 1e-4);
+  EXPECT_NEAR(sensorMsg.far_clip(), 100.2, 1e-4);
+  EXPECT_NEAR(sensorMsg.aspect_ratio(), 1.43, 1e-4);
+  EXPECT_NEAR(sensorMsg.horizontal_fov(), 1.23, 1e-4);
 }
 
 /////////////////////////////////////////////////
@@ -1435,7 +1946,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   sdf::initFile("surface.sdf", sdf2);
   msgs::SurfaceToSDF(surfaceMsg2, sdf2);
 
-  ASSERT_TRUE(sdf2 != NULL);
+  ASSERT_TRUE(sdf2 != nullptr);
 
   ASSERT_TRUE(sdf2->HasElement("bounce"));
   EXPECT_DOUBLE_EQ(
@@ -1851,15 +2362,17 @@ TEST_F(MsgsTest, JointFromSDF)
 TEST_F(MsgsTest, LinkToSDF)
 {
   const std::string name("test_link");
-  const math::Pose pose(math::Vector3(3, 2, 1),
-                        math::Quaternion(0.5, -0.5, -0.5, 0.5));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(3, 2, 1),
+      ignition::math::Quaterniond(0.5, -0.5, -0.5, 0.5));
 
   msgs::Link linkMsg;
   linkMsg.set_name(name);
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
-  msgs::Set(linkMsg.mutable_pose(), pose.Ign());
+  linkMsg.set_enable_wind(false);
+  msgs::Set(linkMsg.mutable_pose(), pose);
 
   const double laserRetro1 = 0.4;
   const double laserRetro2 = 0.5;
@@ -1889,7 +2402,8 @@ TEST_F(MsgsTest, LinkToSDF)
   EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
-  EXPECT_EQ(pose, linkSDF->Get<math::Pose>("pose"));
+  EXPECT_FALSE(linkSDF->Get<bool>("enable_wind"));
+  EXPECT_EQ(pose, linkSDF->Get<ignition::math::Pose3d>("pose"));
 
   sdf::ElementPtr collisionElem1 = linkSDF->GetElement("collision");
   EXPECT_DOUBLE_EQ(collisionElem1->Get<double>("laser_retro"), laserRetro1);
@@ -1918,9 +2432,10 @@ TEST_F(MsgsTest, CollisionToSDF)
   collisionMsg.set_name(name);
   collisionMsg.set_laser_retro(0.2);
   collisionMsg.set_max_contacts(5);
-  msgs::Set(collisionMsg.mutable_pose(),
-      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
-      ignition::math::Quaterniond(0, 0, 1, 0)));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(0, 0, 1, 0));
+  msgs::Set(collisionMsg.mutable_pose(), pose);
 
   // geometry - see GeometryToSDF for a more detailed test
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
@@ -1942,8 +2457,7 @@ TEST_F(MsgsTest, CollisionToSDF)
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("laser_retro"), 0.2);
   EXPECT_DOUBLE_EQ(collisionSDF->Get<double>("max_contacts"), 5);
 
-  EXPECT_TRUE(collisionSDF->Get<math::Pose>("pose") ==
-      math::Pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0)));
+  EXPECT_EQ(collisionSDF->Get<ignition::math::Pose3d>("pose"), pose);
 
   sdf::ElementPtr geomElem = collisionSDF->GetElement("geometry");
   sdf::ElementPtr cylinderElem = geomElem->GetElement("cylinder");
@@ -1961,7 +2475,9 @@ TEST_F(MsgsTest, VisualToSDF)
 {
   const std::string name("visual");
   const double laserRetro = 0.2;
-  const math::Pose pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 1, 0));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(0, 0, 1, 0));
   const double radius = 3.3;
   const std::string materialName("Gazebo/Grey");
   const std::string uri("pretend_this_is_a_URI");
@@ -1969,7 +2485,7 @@ TEST_F(MsgsTest, VisualToSDF)
   msgs::Visual visualMsg;
   visualMsg.set_name(name);
   visualMsg.set_laser_retro(laserRetro);
-  msgs::Set(visualMsg.mutable_pose(), pose.Ign());
+  msgs::Set(visualMsg.mutable_pose(), pose);
 
   // geometry - see GeometryToSDF for a more detailed test
   auto geomMsg = visualMsg.mutable_geometry();
@@ -1989,7 +2505,7 @@ TEST_F(MsgsTest, VisualToSDF)
 
   EXPECT_DOUBLE_EQ(visualSDF->Get<double>("laser_retro"), laserRetro);
 
-  EXPECT_EQ(pose, visualSDF->Get<math::Pose>("pose"));
+  EXPECT_EQ(pose, visualSDF->Get<ignition::math::Pose3d>("pose"));
 
   ASSERT_TRUE(visualSDF->HasElement("geometry"));
   sdf::ElementPtr geomElem = visualSDF->GetElement("geometry");
@@ -2029,15 +2545,15 @@ TEST_F(MsgsTest, VisualToSDF)
 TEST_F(MsgsTest, GeometryToSDF)
 {
   // box
+  const ignition::math::Vector3d boxSize(0.5, 0.75, 1.0);
   msgs::Geometry boxMsg;
   boxMsg.set_type(msgs::Geometry::BOX);
   msgs::BoxGeom *boxGeom = boxMsg.mutable_box();
-  msgs::Set(boxGeom->mutable_size(), ignition::math::Vector3d(0.5, 0.75, 1.0));
+  msgs::Set(boxGeom->mutable_size(), boxSize);
 
   sdf::ElementPtr boxSDF = msgs::GeometryToSDF(boxMsg);
   sdf::ElementPtr boxElem = boxSDF->GetElement("box");
-  EXPECT_TRUE(boxElem->Get<math::Vector3>("size") ==
-      math::Vector3(0.5, 0.75, 1.0));
+  EXPECT_EQ(boxElem->Get<ignition::math::Vector3d>("size"), boxSize);
 
   // cylinder
   msgs::Geometry cylinderMsg;
@@ -2070,10 +2586,10 @@ TEST_F(MsgsTest, GeometryToSDF)
 
   sdf::ElementPtr planeSDF = msgs::GeometryToSDF(planeMsg);
   sdf::ElementPtr planeElem = planeSDF->GetElement("plane");
-  EXPECT_TRUE(planeElem->Get<math::Vector3>("normal") ==
-      math::Vector3(0, 0, 1.0));
-  EXPECT_TRUE(planeElem->Get<math::Vector2d>("size") ==
-      math::Vector2d(0.5, 0.8));
+  EXPECT_TRUE(planeElem->Get<ignition::math::Vector3d>("normal") ==
+      ignition::math::Vector3d(0, 0, 1.0));
+  EXPECT_TRUE(planeElem->Get<ignition::math::Vector2d>("size") ==
+      ignition::math::Vector2d(0.5, 0.8));
 
   // image
   msgs::Geometry imageMsg;
@@ -2122,10 +2638,10 @@ TEST_F(MsgsTest, GeometryToSDF)
   sdf::ElementPtr heightmapElem = heightmapSDF->GetElement("heightmap");
   EXPECT_STREQ(heightmapElem->Get<std::string>("uri").c_str(),
       "test_heightmap_filename");
-  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("size") ==
-      math::Vector3(100, 200, 30));
-  EXPECT_TRUE(heightmapElem->Get<math::Vector3>("pos") ==
-      math::Vector3(50, 100, 15));
+  EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("size") ==
+      ignition::math::Vector3d(100, 200, 30));
+  EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("pos") ==
+      ignition::math::Vector3d(50, 100, 15));
   EXPECT_TRUE(heightmapElem->Get<bool>("use_terrain_paging"));
 
   sdf::ElementPtr textureElem1 = heightmapElem->GetElement("texture");
@@ -2158,8 +2674,8 @@ TEST_F(MsgsTest, GeometryToSDF)
   sdf::ElementPtr meshElem = meshSDF->GetElement("mesh");
   EXPECT_STREQ(meshElem->Get<std::string>("uri").c_str(),
       "test_mesh_filename");
-  EXPECT_TRUE(meshElem->Get<math::Vector3>("scale") ==
-      math::Vector3(2.3, 1.2, 2.9));
+  EXPECT_TRUE(meshElem->Get<ignition::math::Vector3d>("scale") ==
+      ignition::math::Vector3d(2.3, 1.2, 2.9));
   sdf::ElementPtr submeshElem = meshElem->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(),
       "test_mesh_submesh");
@@ -2170,50 +2686,75 @@ TEST_F(MsgsTest, GeometryToSDF)
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
   msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
-  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(0.5, 0.7));
-  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(3.5, 4.7));
-  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(1000, 2000));
+  const ignition::math::Vector2d point1(0.5, 0.7);
+  const ignition::math::Vector2d point2(3.5, 4.7);
+  const ignition::math::Vector2d point3(1000, 2000);
+  msgs::Set(polylineGeom->add_point(), point1);
+  msgs::Set(polylineGeom->add_point(), point2);
+  msgs::Set(polylineGeom->add_point(), point3);
 
   sdf::ElementPtr polylineSDF = msgs::GeometryToSDF(polylineMsg);
   sdf::ElementPtr polylineElem = polylineSDF->GetElement("polyline");
   EXPECT_DOUBLE_EQ(polylineElem->Get<double>("height"), 2.33);
 
   sdf::ElementPtr pointElem1 = polylineElem->GetElement("point");
-  EXPECT_TRUE(pointElem1->Get<math::Vector2d>() == math::Vector2d(0.5, 0.7));
   sdf::ElementPtr pointElem2 = pointElem1->GetNextElement("point");
-  EXPECT_TRUE(pointElem2->Get<math::Vector2d>() == math::Vector2d(3.5, 4.7));
   sdf::ElementPtr pointElem3 = pointElem2->GetNextElement("point");
-  EXPECT_TRUE(pointElem3->Get<math::Vector2d>() == math::Vector2d(1000, 2000));
+  EXPECT_EQ(pointElem1->Get<ignition::math::Vector2d>(), point1);
+  EXPECT_EQ(pointElem2->Get<ignition::math::Vector2d>(), point2);
+  EXPECT_EQ(pointElem3->Get<ignition::math::Vector2d>(), point3);
 }
 
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, MeshToSDF)
 {
+  const ignition::math::Vector3d meshScale(0.1, 0.2, 0.3);
   msgs::MeshGeom msg;
   msg.set_filename("test_filename");
-  msgs::Set(msg.mutable_scale(), ignition::math::Vector3d(0.1, 0.2, 0.3));
+  msgs::Set(msg.mutable_scale(), meshScale);
   msg.set_submesh("test_submesh");
   msg.set_center_submesh(true);
 
   sdf::ElementPtr meshSDF = msgs::MeshToSDF(msg);
 
   EXPECT_STREQ(meshSDF->Get<std::string>("uri").c_str(), "test_filename");
-  math::Vector3 scale = meshSDF->Get<math::Vector3>("scale");
-  EXPECT_DOUBLE_EQ(scale.x, 0.1);
-  EXPECT_DOUBLE_EQ(scale.y, 0.2);
-  EXPECT_DOUBLE_EQ(scale.z, 0.3);
+  EXPECT_TRUE(meshSDF->HasElement("scale"));
+  ignition::math::Vector3d scale =
+      meshSDF->Get<ignition::math::Vector3d>("scale");
+  EXPECT_DOUBLE_EQ(scale.X(), meshScale.X());
+  EXPECT_DOUBLE_EQ(scale.Y(), meshScale.Y());
+  EXPECT_DOUBLE_EQ(scale.Z(), meshScale.Z());
 
   sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
   EXPECT_STREQ(submeshElem->Get<std::string>("name").c_str(), "test_submesh");
   EXPECT_TRUE(submeshElem->Get<bool>("center"));
+
+  // no submesh
+  const ignition::math::Vector3d meshScale2(1, 2, 3);
+  msgs::MeshGeom msg2;
+  msg2.set_filename("test_filename2");
+  msgs::Set(msg2.mutable_scale(), meshScale2);
+
+  sdf::ElementPtr meshSDF2 = msgs::MeshToSDF(msg2);
+
+  EXPECT_STREQ(meshSDF2->Get<std::string>("uri").c_str(), "test_filename2");
+  EXPECT_TRUE(meshSDF2->HasElement("scale"));
+  ignition::math::Vector3d scale2 =
+      meshSDF2->Get<ignition::math::Vector3d>("scale");
+  EXPECT_DOUBLE_EQ(scale2.X(), meshScale2.X());
+  EXPECT_DOUBLE_EQ(scale2.Y(), meshScale2.Y());
+  EXPECT_DOUBLE_EQ(scale2.Z(), meshScale2.Z());
+
+  EXPECT_FALSE(meshSDF2->HasElement("submesh"));
 }
 
 /////////////////////////////////////////////////
 TEST_F(MsgsTest, InertialToSDF)
 {
   const double mass = 3.4;
-  const math::Pose pose = math::Pose(math::Vector3(1.2, 3.4, 5.6),
-      math::Quaternion(0.7071, 0.0, 0.7071, 0.0));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(1.2, 3.4, 5.6),
+      ignition::math::Quaterniond(0.7071, 0.0, 0.7071, 0.0));
   const double ixx = 0.0133;
   const double ixy = -0.0003;
   const double ixz = -0.0004;
@@ -2223,7 +2764,7 @@ TEST_F(MsgsTest, InertialToSDF)
 
   msgs::Inertial msg;
   msg.set_mass(mass);
-  msgs::Set(msg.mutable_pose(), pose.Ign());
+  msgs::Set(msg.mutable_pose(), pose);
   msg.set_ixx(ixx);
   msg.set_ixy(ixy);
   msg.set_ixz(ixz);
@@ -2237,7 +2778,7 @@ TEST_F(MsgsTest, InertialToSDF)
   EXPECT_DOUBLE_EQ(inertialSDF->Get<double>("mass"), mass);
 
   EXPECT_TRUE(inertialSDF->HasElement("pose"));
-  EXPECT_EQ(inertialSDF->Get<math::Pose>("pose"), pose);
+  EXPECT_EQ(inertialSDF->Get<ignition::math::Pose3d>("pose"), pose);
 
   {
     ASSERT_TRUE(inertialSDF->HasElement("inertia"));
@@ -2328,14 +2869,14 @@ TEST_F(MsgsTest, SurfaceToSDF)
   // friction
   const double mu = 0.1;
   const double mu2 = 0.2;
-  const math::Vector3 fdir1(0.3, 0.4, 0.5);
+  const ignition::math::Vector3d fdir1(0.3, 0.4, 0.5);
   const double slip1 = 0.6;
   const double slip2 = 0.7;
 
   msgs::Friction *friction = msg.mutable_friction();
   friction->set_mu(mu);
   friction->set_mu2(mu2);
-  msgs::Set(friction->mutable_fdir1(), fdir1.Ign());
+  msgs::Set(friction->mutable_fdir1(), fdir1);
   friction->set_slip1(slip1);
   friction->set_slip2(slip2);
 
@@ -2359,7 +2900,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   sdf::ElementPtr frictionPhysicsElem = frictionElem->GetElement("ode");
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu"), mu);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("mu2"), mu2);
-  EXPECT_TRUE(frictionPhysicsElem->Get<math::Vector3>("fdir1") == fdir1);
+  EXPECT_EQ(frictionPhysicsElem->Get<ignition::math::Vector3d>("fdir1"), fdir1);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip1"), slip1);
   EXPECT_DOUBLE_EQ(frictionPhysicsElem->Get<double>("slip2"), slip2);
 
@@ -2873,8 +3414,8 @@ TEST_F(MsgsTest, AddBoxLink)
   EXPECT_EQ(model.link_size(), 0);
 
   const double mass = 1.0;
-  const math::Vector3 size(1, 1, 1);
-  msgs::AddBoxLink(model, mass, size.Ign());
+  const ignition::math::Vector3d size(1, 1, 1);
+  msgs::AddBoxLink(model, mass, size);
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -2904,7 +3445,7 @@ TEST_F(MsgsTest, AddBoxLink)
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
     }
 
     EXPECT_EQ(link.visual_size(), 1);
@@ -2912,12 +3453,12 @@ TEST_F(MsgsTest, AddBoxLink)
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size);
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddBoxLink(model, mass*massRatio, size.Ign());
+  msgs::AddBoxLink(model, mass*massRatio, size);
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -3077,13 +3618,14 @@ TEST_F(MsgsTest, AddSphereLink)
 TEST_F(MsgsTest, ModelToSDF)
 {
   const std::string name("test_bicycle");
-  const math::Pose pose(math::Vector3(6, 1, 7),
-                        math::Quaternion(0.5, 0.5, 0.5, 0.5));
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(6, 1, 7),
+      ignition::math::Quaterniond(0.5, 0.5, 0.5, 0.5));
 
   msgs::Model model;
   model.set_name(name);
   model.set_is_static(false);
-  msgs::Set(model.mutable_pose(), pose.Ign());
+  msgs::Set(model.mutable_pose(), pose);
   EXPECT_EQ(model.link_size(), 0);
   EXPECT_EQ(model.joint_size(), 0);
 
@@ -3146,6 +3688,14 @@ TEST_F(MsgsTest, ModelToSDF)
   const ignition::math::Vector3d rearAxis(0, 0, 1);
   msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
 
+  // Add plugin
+  model.add_plugin();
+  ASSERT_EQ(model.plugin_size(), 1);
+  auto plugin = model.mutable_plugin(0);
+  plugin->set_name("plugin_name");
+  plugin->set_filename("plugin_filename");
+  plugin->set_innerxml("<plugin_param>param</plugin_param>");
+
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
   EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(modelSDF->Get<bool>("static"));
@@ -3175,6 +3725,12 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
       ignition::math::Pose3d());
+
+  sdf::ElementPtr pluginElem = modelSDF->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), "plugin_name");
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), "plugin_filename");
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }
 
 /////////////////////////////////////////////////
@@ -3228,9 +3784,76 @@ TEST_F(MsgsTest, PluginToFromSDF)
   sdf2.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", sdf2);
   msgs::PluginToSDF(msg2, sdf2);
-  EXPECT_TRUE(sdf2 != NULL);
+  EXPECT_TRUE(sdf2 != nullptr);
   EXPECT_EQ(sdf2->Get<std::string>("name"), name);
   EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
   EXPECT_TRUE(sdf2->HasElement("plugin_param"));
   EXPECT_EQ(sdf2->Get<std::string>("plugin_param"), "param");
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, VisualPluginToFromSDF)
+{
+  const std::string visName("visual_name");
+  const double radius = 3.3;
+  std::string pluginName("plugin_name");
+  std::string filename("plugin_filename");
+  std::string innerxml("<plugin_param>param</plugin_param>\n");
+
+  // Create SDF
+  sdf::ElementPtr sdf1(new sdf::Element());
+  sdf::initFile("visual.sdf", sdf1);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <visual name='" + visName + "'>\
+           <geometry>\
+             <sphere><radius>" + std::to_string(radius) + "</radius></sphere>\
+           </geometry>\
+           <plugin name='" + pluginName + "' filename='" + filename + "'>\
+             " + innerxml + "\
+           </plugin>\
+         </visual>\
+      </sdf>", sdf1));
+
+  // To msg
+  auto msg1 = msgs::VisualFromSDF(sdf1);
+
+  // Back to SDF
+  auto sdf2 = msgs::VisualToSDF(msg1);
+  ASSERT_TRUE(sdf2 != nullptr);
+
+  // DEPRECATED: Remove this test in Gazebo8
+  {
+    EXPECT_TRUE(sdf2->HasElement("plugin"));
+    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("plugin_param"));
+
+    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("sdf"));
+    EXPECT_TRUE(sdf2->GetElement("plugin")->GetElement("sdf")->
+        HasElement("plugin_param"));
+  }
+
+  // Back to Msg
+  auto msg2 = msgs::VisualFromSDF(sdf2);
+
+  // Back to SDF
+  auto sdf3 = msgs::VisualToSDF(msg2);
+  ASSERT_TRUE(sdf3 != nullptr);
+
+  ASSERT_TRUE(sdf3->HasAttribute("name"));
+  EXPECT_EQ(sdf3->Get<std::string>("name"), visName);
+
+  ASSERT_TRUE(sdf3->HasElement("geometry"));
+  auto geomElem = sdf3->GetElement("geometry");
+  ASSERT_TRUE(geomElem->HasElement("sphere"));
+  auto sphereElem = geomElem->GetElement("sphere");
+  EXPECT_TRUE(sphereElem->HasElement("radius"));
+  EXPECT_DOUBLE_EQ(sphereElem->Get<double>("radius"), radius);
+
+  ASSERT_TRUE(sdf3->HasElement("plugin"));
+  auto pluginElem = sdf3->GetElement("plugin");
+  EXPECT_EQ(pluginElem->Get<std::string>("name"), pluginName);
+  EXPECT_EQ(pluginElem->Get<std::string>("filename"), filename);
+
+  EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
+  EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
 }

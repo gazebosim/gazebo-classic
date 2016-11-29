@@ -1,7 +1,7 @@
 macro(ADD_MANPAGE_TARGET)
   # It is not possible add a dependency to target 'install'
-  # Run hard-coded 'make man' when 'make install' is invoked
-  install(CODE "EXECUTE_PROCESS(COMMAND make man)")
+  # Run hard-coded 'cmake --build . --target man' when the target install is built
+  install(CODE "EXECUTE_PROCESS(COMMAND cmake --build . --target man)")
   add_custom_target(man)
 endmacro(ADD_MANPAGE_TARGET)
 
@@ -19,6 +19,7 @@ else (NOT GZIP)
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_source}.${_section}.gz
       COMMAND ${GZIP} -c ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.${_section}.roff
         > ${CMAKE_CURRENT_BINARY_DIR}/${_source}.${_section}.gz
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.${_section}.roff
     )
 
     set(MANPAGE_TARGET "man-${_source}")

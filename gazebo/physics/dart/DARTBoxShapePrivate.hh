@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,18 @@ namespace gazebo
     class DARTBoxShapePrivate
     {
       /// \brief Constructor
-      public: DARTBoxShapePrivate() = default;
+      public: DARTBoxShapePrivate()
+        : dtBoxShape(new dart::dynamics::BoxShape(Eigen::Vector3d(1, 1, 1)))
+      {
+      }
 
       /// \brief Default destructor
       public: ~DARTBoxShapePrivate() = default;
+
+      /// \brief DART box shape
+      public: std::shared_ptr<dart::dynamics::BoxShape> dtBoxShape;
     };
   }
 }
+
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,9 @@ namespace gazebo
     /// \brief Action to show/hide link frame visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showLinkFrameAct;
 
+    /// \brief Action to show/hide skeleton visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showSkeletonAct;
+
     extern GZ_GUI_VISIBLE QAction *g_transparentAct;
 
     extern GZ_GUI_VISIBLE QAction *g_resetAct;
@@ -96,6 +99,9 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_scaleAct;
 
     extern GZ_GUI_VISIBLE QAction *g_topicVisAct;
+
+    /// \brief Action to show/hide the plotting utitlty
+    extern GZ_GUI_VISIBLE QAction *g_plotAct;
 
     extern GZ_GUI_VISIBLE QAction *g_diagnosticsAct;
 

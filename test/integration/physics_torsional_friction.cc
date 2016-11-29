@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 #include <string.h>
 
+#include <ignition/math/SignalStats.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
@@ -160,10 +161,10 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, 0);
-  EXPECT_DOUBLE_EQ(g.z, -9.8);
+  auto g = world->Gravity();
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), 0);
+  EXPECT_DOUBLE_EQ(g.Z(), -9.8);
 
   // Sleep to ensure transport topics are all advertised
   common::Time::MSleep(100);
@@ -254,7 +255,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
 
     // Check that contact depth is:
     // normal force = kp * depth
-    double expectedDepth = sphere.mass * -g.z / sphere.kp;
+    double expectedDepth = sphere.mass * -g.Z() / sphere.kp;
     double relativeError =
       std::abs(contact.depth(0) - expectedDepth)/expectedDepth;
     gzdbg << "sphere_mass_" << number
@@ -292,10 +293,10 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, 0);
-  EXPECT_DOUBLE_EQ(g.z, -9.8);
+  auto g = world->Gravity();
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), 0);
+  EXPECT_DOUBLE_EQ(g.Z(), -9.8);
 
   // Load the spheres
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
@@ -353,7 +354,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       EXPECT_NEAR(acc.y, 0, g_friction_tolerance);
 
       // Calculate torque due to friction
-      double normalZ = -sphere.mass * g.z;
+      double normalZ = -sphere.mass * g.Z();
       double frictionCoef = sphere.coefficient * 3*M_PI/16 *
           sphere.patch;
       double frictionTorque = normalZ * frictionCoef;
@@ -397,10 +398,10 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, 0);
-  EXPECT_DOUBLE_EQ(g.z, -9.8);
+  auto g = world->Gravity();
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), 0);
+  EXPECT_DOUBLE_EQ(g.Z(), -9.8);
 
   // Load the spheres
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
@@ -449,9 +450,9 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
       EXPECT_NEAR(acc.y, 0, g_friction_tolerance);
 
       // Calculate torque due to friction
-      double depthAtEquilibrium = sphere.mass * -g.z / sphere.kp;
+      double depthAtEquilibrium = sphere.mass * -g.Z() / sphere.kp;
       double patch = sqrt(sphere.radius * depthAtEquilibrium);
-      double normalZ = -sphere.mass * g.z;
+      double normalZ = -sphere.mass * g.Z();
       double frictionTorque =
           normalZ * sphere.coefficient * 3 * M_PI * patch / 16;
       gzdbg << sphere.model->GetName()

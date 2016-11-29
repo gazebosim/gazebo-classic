@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_MODEL_LINKINSPECTOR_HH_
+#define GAZEBO_GUI_MODEL_LINKINSPECTOR_HH_
 
-#ifndef _GAZEBO_LINK_INSPECTOR_HH_
-#define _GAZEBO_LINK_INSPECTOR_HH_
-
+#include <memory>
 #include <string>
+
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -27,9 +29,12 @@ namespace gazebo
 {
   namespace gui
   {
+    class CollisionConfig;
     class LinkConfig;
     class VisualConfig;
-    class CollisionConfig;
+
+    // Forward declare private data.
+    class LinkInspectorPrivate;
 
     class GZ_GUI_VISIBLE LinkInspector : public QDialog
     {
@@ -48,7 +53,7 @@ namespace gazebo
 
       /// \brief Get the name of the link.
       /// \return Name of the link.
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Get configurations of the link.
       /// \return Tab widget with link configurations.
@@ -73,9 +78,22 @@ namespace gazebo
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
 
+      /// \brief Computes volume of associated link.
+      /// \return The volume.
+      private: double ComputeVolume() const;
+
+      /// \brief Computes mass moment of inertia of associated link.
+      /// \param[in] _mass Mass of the link.
+      /// \return Vector containing principal moments of inertia.
+      private: ignition::math::Vector3d ComputeInertia(
+          const double _mass) const;
+
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
       // public: void SetName(const std::string &_name);
+
+      /// \brief Qt signal emitted to indicate that the inspector was opened.
+      Q_SIGNALS: void Opened();
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -96,6 +114,20 @@ namespace gazebo
       /// \brief Qt callback when one of the child configs has been applied.
       private slots: void OnConfigApplied();
 
+      /// \brief Callback for density changes in link config.
+      /// \param[in] _value The new density value.
+      private slots: void OnDensityValueChanged(const double _value);
+
+      /// \brief Callback for mass changes in link config.
+      /// \param[in] _value The new mass value.
+      private slots: void OnMassValueChanged(const double _value);
+
+      /// \brief Callback for changes to collisions.
+      /// \param[in] _name Name of the collision.
+      /// \param[in] _type Type of change (eg, "geometry", etc).
+      private slots: void OnCollisionChanged(const std::string &_name,
+          const std::string &_type);
+
       /// \brief Restore the widget's data to how it was when first opened.
       private slots: void RestoreOriginalData();
 
@@ -103,23 +135,13 @@ namespace gazebo
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
 
-      /// \brief Main tab widget within the link inspector.
-      private: QTabWidget *tabWidget;
+      /// \brief Qt close event
+      /// \param[in] _event Qt close event pointer
+      private: void closeEvent(QCloseEvent *_event);
 
-      /// \brief Label that displays the name of the link.
-      private: QLabel* linkNameLabel;
-
-      /// \brief Widget with configurable link properties.
-      private: LinkConfig *linkConfig;
-
-      /// \brief Widget with configurable visual properties.
-      private: VisualConfig *visualConfig;
-
-      /// \brief Widget with configurable collision properties.
-      private: CollisionConfig *collisionConfig;
-
-      /// \brief Unique id for this link.
-      private: std::string linkId;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LinkInspectorPrivate> dataPtr;
     };
     /// \}
   }

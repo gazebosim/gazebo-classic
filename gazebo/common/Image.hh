@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,14 +132,14 @@ namespace gazebo
                                Image::PixelFormat _format);
 
       /// \brief Get the image as a data array
-      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _data Pointer to a nullptr array of char.
       /// \param[out] _count The resulting data array size
       public: void GetData(unsigned char **_data,
                            unsigned int &_count) const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
-      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _data Pointer to a nullptr array of char.
       /// \param[out] _count The resulting data array size
       public: void GetRGBData(unsigned char **_data,
                               unsigned int &_count) const;

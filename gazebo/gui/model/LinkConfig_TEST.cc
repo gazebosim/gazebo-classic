@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,15 @@ void LinkConfig_TEST::Initialization()
 
   QVERIFY(cw != NULL);
 
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::mass"), 1.0);
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::ixx"), 1.0);
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::iyy"), 1.0);
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::izz"), 1.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::mass"), 1.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::ixx"), 1.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::iyy"), 1.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::izz"), 1.0);
 
-  QVERIFY(cw->GetBoolWidgetValue("gravity"));
-  QVERIFY(!cw->GetBoolWidgetValue("self_collide"));
-  QVERIFY(!cw->GetBoolWidgetValue("kinematic"));
+  QVERIFY(cw->BoolWidgetValue("gravity"));
+  QVERIFY(!cw->BoolWidgetValue("self_collide"));
+  QVERIFY(!cw->BoolWidgetValue("kinematic"));
+  QVERIFY(!cw->BoolWidgetValue("enable_wind"));
 }
 
 /////////////////////////////////////////////////
@@ -54,12 +55,14 @@ void LinkConfig_TEST::LinkMsgUpdate()
   linkMsgPtr->set_gravity(false);
   linkMsgPtr->set_self_collide(true);
   linkMsgPtr->set_kinematic(true);
+  linkMsgPtr->set_enable_wind(true);
 
   lc.Update(linkMsgPtr);
 
-  QVERIFY(!cw->GetBoolWidgetValue("gravity"));
-  QVERIFY(cw->GetBoolWidgetValue("self_collide"));
-  QVERIFY(cw->GetBoolWidgetValue("kinematic"));
+  QVERIFY(!cw->BoolWidgetValue("gravity"));
+  QVERIFY(cw->BoolWidgetValue("self_collide"));
+  QVERIFY(cw->BoolWidgetValue("kinematic"));
+  QVERIFY(cw->BoolWidgetValue("enable_wind"));
 }
 
 /////////////////////////////////////////////////
@@ -72,7 +75,7 @@ void LinkConfig_TEST::PoseUpdate()
   QVERIFY(cw != NULL);
 
   lc.SetPose(pose);
-  ignition::math::Pose3d p = cw->GetPoseWidgetValue("pose").Ign();
+  ignition::math::Pose3d p = cw->PoseWidgetValue("pose");
 
   QCOMPARE(p, pose);
 }
@@ -87,7 +90,7 @@ void LinkConfig_TEST::MassUpdate()
 
   lc.SetMass(50.0);
 
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::mass"), 50.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::mass"), 50.0);
 }
 
 /////////////////////////////////////////////////
@@ -100,13 +103,13 @@ void LinkConfig_TEST::InertiaMatrixUpdate()
 
   lc.SetInertiaMatrix(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
 
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::ixx"), 1.0);
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::iyy"), 2.0);
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::izz"), 3.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::ixx"), 1.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::iyy"), 2.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::izz"), 3.0);
 
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::ixy"), 4.0);
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::ixz"), 5.0);
-  QCOMPARE(cw->GetDoubleWidgetValue("inertial::iyz"), 6.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::ixy"), 4.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::ixz"), 5.0);
+  QCOMPARE(cw->DoubleWidgetValue("inertial::iyz"), 6.0);
 }
 
 /////////////////////////////////////////////////
@@ -119,7 +122,7 @@ void LinkConfig_TEST::InertialPoseUpdate()
   QVERIFY(cw != NULL);
 
   lc.SetInertialPose(pose);
-  ignition::math::Pose3d p = cw->GetPoseWidgetValue("inertial::pose").Ign();
+  ignition::math::Pose3d p = cw->PoseWidgetValue("inertial::pose");
 
   QCOMPARE(p, pose);
   QCOMPARE(p.Pos().X(), pose.Pos().X());

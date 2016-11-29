@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,19 +28,21 @@ using namespace physics;
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
   : BallJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::BallJoint();
 }
 
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
 void DARTBallJoint::Load(sdf::ElementPtr _sdf)
 {
   BallJoint<DARTJoint>::Load(_sdf);
+
+  this->dataPtr->dtProperties.reset(
+        new dart::dynamics::BallJoint::Properties(
+          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -50,8 +52,14 @@ void DARTBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
+math::Vector3 DARTBallJoint::GetAnchor(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Vector3>(
+          "Anchor" + std::to_string(_index));
+  }
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();

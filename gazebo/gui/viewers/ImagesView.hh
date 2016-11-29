@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _IMAGESVIEW_HH_
-#define _IMAGESVIEW_HH_
+#ifndef GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
+#define GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
 
 #include <string>
-#include <utility>
-#include <vector>
 
-#include <boost/thread/mutex.hpp>
-
-#include "gazebo/common/Time.hh"
-#include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/viewers/ImageFrame.hh"
-#include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/viewers/TopicView.hh"
 
 namespace gazebo
 {
@@ -45,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: ImagesView(QWidget *_parent = NULL);
+      public: ImagesView(QWidget *_parent = nullptr);
 
       /// \brief Destructor
       public: virtual ~ImagesView();

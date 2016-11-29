@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,27 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_BUILDING_BASEINSPECTORDIALOG_HH_
+#define GAZEBO_GUI_BUILDING_BASEINSPECTORDIALOG_HH_
 
-#ifndef _GAZEBO_BASE_INSPECTOR_DIALOG_HH_
-#define _GAZEBO_BASE_INSPECTOR_DIALOG_HH_
-
+#include <memory>
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace gui
   {
+    // Forward declare private data.
+    class BaseInspectorDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -51,31 +59,41 @@ namespace gazebo
 
       /// \brief Get the color.
       /// \return Color.
-      public: QColor GetColor() const;
+      public: common::Color Color() const;
 
       /// \brief Get the texture.
       /// \return Texture.
-      public: QString GetTexture() const;
+      public: std::string Texture() const;
 
       /// \brief Set the color.
       /// \param[in] _color Color.
-      public: void SetColor(const QColor _color);
+      public: void SetColor(const common::Color &_color);
 
       /// \brief Set the texture.
       /// \param[in] _texture Texture.
-      public: void SetTexture(const QString _texture);
+      public: void SetTexture(const std::string &_texture);
+
+      /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
+
+      /// \brief Qt callback when the Cancel button is pressed.
+      protected slots: void OnCancel();
+
+      /// \brief Qt callback when the Apply button is pressed.
+      protected slots: void OnApply();
+
+      /// \brief Qt callback when the Ok button is pressed.
+      protected slots: void OnOK();
 
       /// \brief Combo box for selecting the color.
-      public: QComboBox *colorComboBox;
-
-      /// \brief Vector of color options.
-      public: std::vector<QColor> colorList;
+      protected: QComboBox *colorComboBox;
 
       /// \brief Combo box for selecting the texture.
-      public: QComboBox *textureComboBox;
+      protected: QComboBox *textureComboBox;
 
-      /// \brief Vector of texture options.
-      public: std::vector<QString> textureList;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BaseInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }

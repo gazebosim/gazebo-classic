@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2015 Open Source Robotics Foundation
+* Copyright (C) 2012-2016 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ using namespace common;
 /////////////////////////////////////////////////
 AudioDecoder::AudioDecoder()
 {
-  this->formatCtx = NULL;
-  this->codecCtx = NULL;
-  this->codec = NULL;
+  this->formatCtx = nullptr;
+  this->codecCtx = nullptr;
+  this->codec = nullptr;
   this->audioStream = 0;
 }
 
@@ -62,17 +62,17 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
   AVPacket packet, packet1;
   int bytesDecoded = 0;
   unsigned int maxBufferSize = 0;
-  AVFrame *decodedFrame = NULL;
+  AVFrame *decodedFrame = nullptr;
 
-  if (this->codec == NULL)
+  if (this->codec == nullptr)
   {
     gzerr << "Set an audio file before decoding.\n";
     return false;
   }
 
-  if (_outBufferSize == NULL)
+  if (_outBufferSize == nullptr)
   {
-    gzerr << "outBufferSize is NULL!!\n";
+    gzerr << "outBufferSize is null!!\n";
     return false;
   }
 
@@ -81,7 +81,7 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
   if (*_outBuffer)
   {
     delete [] *_outBuffer;
-    *_outBuffer = NULL;
+    *_outBuffer = nullptr;
   }
 
   bool result = true;
@@ -109,8 +109,15 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
       {
         // Some frames rely on multiple packets, so we have to make sure
         // the frame is finished before we can use it
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         bytesDecoded = avcodec_decode_audio4(this->codecCtx, decodedFrame,
             &gotFrame, &packet1);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
         if (gotFrame)
         {
@@ -138,10 +145,10 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.size -= bytesDecoded;
       }
     }
-    av_free_packet(&packet);
+    AVPacketUnref(&packet);
   }
 
-  av_free_packet(&packet);
+  AVPacketUnref(&packet);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->formatCtx, this->audioStream, 0, 0);
@@ -175,10 +182,11 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->formatCtx = avformat_alloc_context();
 
   // Open file
-  if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)
+  if (avformat_open_input(&this->formatCtx,
+        _filename.c_str(), nullptr, nullptr) < 0)
   {
     gzerr << "Unable to open audio file[" << _filename << "]\n";
-    this->formatCtx = NULL;
+    this->formatCtx = nullptr;
     return false;
   }
 
@@ -186,11 +194,11 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   av_log_set_level(0);
 
   // Retrieve some information
-  if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
+  if (avformat_find_stream_info(this->formatCtx, nullptr) < 0)
   {
     gzerr << "Unable to find stream info.\n";
     avformat_close_input(&this->formatCtx);
-    this->formatCtx = NULL;
+    this->formatCtx = nullptr;
 
     return false;
   }
@@ -202,7 +210,14 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->audioStream = -1;
   for (i = 0; i < this->formatCtx->nb_streams; ++i)
   {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     {
       this->audioStream = i;
       break;
@@ -213,22 +228,29 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   {
     gzerr << "Couldn't find audio stream.\n";
     avformat_close_input(&this->formatCtx);
-    this->formatCtx = NULL;
+    this->formatCtx = nullptr;
 
     return false;
   }
 
   // Get the audio stream codec
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->codecCtx = this->formatCtx->streams[audioStream]->codec;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Find a decoder
   this->codec = avcodec_find_decoder(codecCtx->codec_id);
 
-  if (this->codec == NULL)
+  if (this->codec == nullptr)
   {
     gzerr << "Couldn't find codec for audio stream.\n";
     avformat_close_input(&this->formatCtx);
-    this->formatCtx = NULL;
+    this->formatCtx = nullptr;
 
     return false;
   }
@@ -237,11 +259,11 @@ bool AudioDecoder::SetFile(const std::string &_filename)
     this->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
 
   // Open codec
-  if (avcodec_open2(this->codecCtx, this->codec, NULL) < 0)
+  if (avcodec_open2(this->codecCtx, this->codec, nullptr) < 0)
   {
     gzerr << "Couldn't open audio codec.\n";
     avformat_close_input(&this->formatCtx);
-    this->formatCtx = NULL;
+    this->formatCtx = nullptr;
 
     return false;
   }

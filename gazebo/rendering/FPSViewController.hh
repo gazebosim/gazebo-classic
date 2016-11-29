@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _FPSVIEWCONTROLLER_HH_
-#define _FPSVIEWCONTROLLER_HH_
+#ifndef GAZEBO_RENDERING_FPSVIEWCONTROLLER_HH_
+#define GAZEBO_RENDERING_FPSVIEWCONTROLLER_HH_
 
 #include <string>
 
+#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/util/system.hh"
 
@@ -35,13 +36,14 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] Camera to controll
-      public: FPSViewController(UserCameraPtr _camera);
+      public: explicit FPSViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~FPSViewController();
 
       /// \brief Initialize the controller
       public: virtual void Init();
+      using ViewController::Init;
 
       /// \brief Update the camera position
       public: virtual void Update();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 #define SCALE 512.0
 
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 #include "gazebo/transport/transport.hh"
 
 namespace gazebo
@@ -61,10 +61,10 @@ namespace gazebo
       public: transport::PublisherPtr joyPub;
 
       /// \brief Translation values below which joystick values return zero.
-      public: math::Vector3 deadbandTrans;
+      public: ignition::math::Vector3d deadbandTrans;
 
       /// \brief Rotation values below which joystick values return zero.
-      public: math::Vector3 deadbandRot;
+      public: ignition::math::Vector3d deadbandRot;
 
       /// \brief button states
       public: int buttons[2];

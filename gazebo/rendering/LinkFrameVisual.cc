@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,15 +43,16 @@ void LinkFrameVisual::Load()
 
   AxisVisual::Load();
 
-  double linkSize = std::max(0.1, dPtr->parent->BoundingBox().Size().Length());
+  double linkSize = std::max(0.1,
+      dPtr->parent->GetBoundingBox().GetSize().GetLength());
   linkSize = std::min(linkSize, 1.0);
-  dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
-                                    linkSize * 0.7,
-                                    linkSize * 0.7);
+  dPtr->scaleToLink = ignition::math::Vector3d(linkSize * 0.7,
+                                               linkSize * 0.7,
+                                               linkSize * 0.7);
 
   // Scale according to the link it is attached to
-  if (dPtr->scaleToLink != math::Vector3::Zero)
-    this->SetScale(dPtr->scaleToLink.Ign());
+  if (dPtr->scaleToLink != ignition::math::Vector3d::Zero)
+    this->SetScale(dPtr->scaleToLink);
 
   // Don't scale when link is scaled
   this->GetSceneNode()->setInheritScale(false);
@@ -59,6 +60,7 @@ void LinkFrameVisual::Load()
   this->ShowAxisHead(0, false);
   this->ShowAxisHead(1, false);
   this->ShowAxisHead(2, false);
+  this->SetInheritTransparency(false);
   this->SetTransparency(dPtr->nonHighlightedTransp);
   this->SetCastShadows(false);
 }
@@ -87,4 +89,3 @@ bool LinkFrameVisual::GetHighlighted()
 
   return math::equal(this->GetTransparency(), dPtr->highlightedTransp);
 }
-

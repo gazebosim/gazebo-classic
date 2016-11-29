@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ namespace gazebo
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
+    /// \brief DART physics engine wrapper
     /// \{
 
     /// \brief DART physics engine
@@ -144,7 +145,13 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.
-      public: dart::simulation::World *GetDARTWorld();
+      /// \deprecated See dart::simulation::WorldPtr DARTWorld()
+      public: dart::simulation::World *GetDARTWorld() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get pointer to DART World associated with this DART Physics.
+      /// \return The pointer to DART World.
+      public: dart::simulation::WorldPtr DARTWorld() const;
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);

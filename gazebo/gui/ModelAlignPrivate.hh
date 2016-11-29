@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_ALIGN_PRIVATE_HH_
-#define _MODEL_ALIGN_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MODELALIGNPRIVATE_HH_
+#define GAZEBO_GUI_MODELALIGNPRIVATE_HH_
 
-#include <string>
-#include <vector>
 #include <map>
+#include <vector>
+#include <ignition/math/Pose3.hh>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -39,15 +38,9 @@ namespace gazebo
       /// \brief Transportation node.
       public: transport::NodePtr node;
 
-      /// \brief Model publisher that publishes model pose to the server.
-      public: transport::PublisherPtr modelPub;
-
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
       public: transport::PublisherPtr userCmdPub;
-
-      /// \brief Pointer to the user camera.
-      public: rendering::UserCameraPtr userCamera;
 
       /// \brief Pointer to the scene where models are in.
       public: rendering::ScenePtr scene;
@@ -66,7 +59,8 @@ namespace gazebo
       public: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Original model pose used when user resets alignment.
-      public: std::map<rendering::VisualPtr, math::Pose> originalVisualPose;
+      public: std::map<rendering::VisualPtr, ignition::math::Pose3d>
+          originalVisualPose;
     };
   }
 }

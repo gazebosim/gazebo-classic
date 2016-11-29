@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,12 @@
 using namespace gazebo;
 using namespace common;
 
+#ifdef _WIN32
+static const std::string PathDelimiter = ";";
+#else
+static const std::string PathDelimiter = ":";
+#endif
+
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
 {
@@ -69,7 +75,7 @@ SystemPaths::SystemPaths()
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = this->GetTmpPath() + "/gazebo";
+    home = this->TmpPath() + "/gazebo";
   else
     home = homePath;
 
@@ -81,7 +87,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != this->GetTmpPath() + "/gazebo")
+    if (home != this->TmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -93,7 +99,7 @@ SystemPaths::SystemPaths()
   if (!dir)
   {
 #ifdef _WIN32
-    mkdir(fullPath.c_str());
+    _mkdir(fullPath.c_str());
 #else
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
 #endif
@@ -161,11 +167,23 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 /////////////////////////////////////////////////
 std::string SystemPaths::GetTmpPath()
 {
+  return this->TmpPath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpPath() const
+{
   return this->tmpPath.string();
 }
 
 /////////////////////////////////////////////////
 std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->TmpInstancePath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpInstancePath() const
 {
   return this->tmpInstancePath.string();
 }
@@ -173,13 +191,18 @@ std::string SystemPaths::GetTmpInstancePath()
 /////////////////////////////////////////////////
 std::string SystemPaths::GetDefaultTestPath()
 {
-  return this->GetTmpInstancePath() + "/gazebo_test";
+  return this->DefaultTestPath();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::DefaultTestPath() const
+{
+  return this->TmpInstancePath() + "/gazebo_test";
 }
 
 /////////////////////////////////////////////////
 void SystemPaths::UpdateModelPaths()
 {
-  std::string delim(":");
   std::string path;
 
   char *pathCStr = getenv("GAZEBO_MODEL_PATH");
@@ -193,13 +216,13 @@ void SystemPaths::UpdateModelPaths()
 
   /// \TODO: Use boost to split string.
   size_t pos1 = 0;
-  size_t pos2 = path.find(delim);
+  size_t pos2 = path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
-    pos2 = path.find(delim, pos2+1);
+    pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->modelPaths);
 }
@@ -207,7 +230,6 @@ void SystemPaths::UpdateModelPaths()
 /////////////////////////////////////////////////
 void SystemPaths::UpdateGazeboPaths()
 {
-  std::string delim(":");
   std::string path;
 
   char *pathCStr = getenv("GAZEBO_RESOURCE_PATH");
@@ -220,12 +242,12 @@ void SystemPaths::UpdateGazeboPaths()
     path = pathCStr;
 
   size_t pos1 = 0;
-  size_t pos2 = path.find(delim);
+  size_t pos2 = path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->gazeboPaths);
     pos1 = pos2+1;
-    pos2 = path.find(delim, pos2+1);
+    pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->gazeboPaths);
 }
@@ -233,7 +255,6 @@ void SystemPaths::UpdateGazeboPaths()
 //////////////////////////////////////////////////
 void SystemPaths::UpdatePluginPaths()
 {
-  std::string delim(":");
   std::string path;
 
   char *pathCStr = getenv("GAZEBO_PLUGIN_PATH");
@@ -246,12 +267,12 @@ void SystemPaths::UpdatePluginPaths()
     path = pathCStr;
 
   size_t pos1 = 0;
-  size_t pos2 = path.find(delim);
+  size_t pos2 = path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->pluginPaths);
     pos1 = pos2+1;
-    pos2 = path.find(delim, pos2+1);
+    pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
 }
@@ -259,7 +280,6 @@ void SystemPaths::UpdatePluginPaths()
 //////////////////////////////////////////////////
 void SystemPaths::UpdateOgrePaths()
 {
-  std::string delim(":");
   std::string path;
 
   char *pathCStr = getenv("OGRE_RESOURCE_PATH");
@@ -272,12 +292,12 @@ void SystemPaths::UpdateOgrePaths()
     path = pathCStr;
 
   size_t pos1 = 0;
-  size_t pos2 = path.find(delim);
+  size_t pos2 = path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
     pos1 = pos2+1;
-    pos2 = path.find(delim, pos2+1);
+    pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
 }
@@ -441,15 +461,13 @@ void SystemPaths::ClearModelPaths()
 /////////////////////////////////////////////////
 void SystemPaths::AddGazeboPaths(const std::string &_path)
 {
-  std::string delim(":");
-
   size_t pos1 = 0;
-  size_t pos2 = _path.find(delim);
+  size_t pos2 = _path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->gazeboPaths);
     pos1 = pos2+1;
-    pos2 = _path.find(delim, pos2+1);
+    pos2 = _path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->gazeboPaths);
 }
@@ -457,14 +475,13 @@ void SystemPaths::AddGazeboPaths(const std::string &_path)
 /////////////////////////////////////////////////
 void SystemPaths::AddOgrePaths(const std::string &_path)
 {
-  std::string delim(":");
   size_t pos1 = 0;
-  size_t pos2 = _path.find(delim);
+  size_t pos2 = _path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->ogrePaths);
     pos1 = pos2+1;
-    pos2 = _path.find(delim, pos2+1);
+    pos2 = _path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->ogrePaths);
 }
@@ -472,14 +489,13 @@ void SystemPaths::AddOgrePaths(const std::string &_path)
 /////////////////////////////////////////////////
 void SystemPaths::AddPluginPaths(const std::string &_path)
 {
-  std::string delim(":");
   size_t pos1 = 0;
-  size_t pos2 = _path.find(delim);
+  size_t pos2 = _path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->pluginPaths);
     pos1 = pos2+1;
-    pos2 = _path.find(delim, pos2+1);
+    pos2 = _path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
 }
@@ -487,14 +503,13 @@ void SystemPaths::AddPluginPaths(const std::string &_path)
 /////////////////////////////////////////////////
 void SystemPaths::AddModelPaths(const std::string &_path)
 {
-  std::string delim(":");
   size_t pos1 = 0;
-  size_t pos2 = _path.find(delim);
+  size_t pos2 = _path.find(PathDelimiter);
   while (pos2 != std::string::npos)
   {
     this->InsertUnique(_path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
-    pos2 = _path.find(delim, pos2+1);
+    pos2 = _path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
 }

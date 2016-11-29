@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,13 +75,37 @@ void JointController::AddJoint(JointPtr _joint)
 }
 
 /////////////////////////////////////////////////
+void JointController::RemoveJoint(Joint *_joint)
+{
+  if (_joint)
+  {
+    this->dataPtr->joints.erase(_joint->GetScopedName());
+    this->dataPtr->posPids.erase(_joint->GetScopedName());
+    this->dataPtr->velPids.erase(_joint->GetScopedName());
+  }
+}
+
+/////////////////////////////////////////////////
 void JointController::Reset()
 {
   // Reset setpoints and feed-forward.
   this->dataPtr->positions.clear();
   this->dataPtr->velocities.clear();
   this->dataPtr->forces.clear();
-  // Should the PID's be reset as well?
+
+  std::map<std::string, common::PID>::iterator iter;
+
+  for (iter = this->dataPtr->posPids.begin();
+    iter != this->dataPtr->posPids.end(); ++iter)
+  {
+    iter->second.Reset();
+  }
+
+  for (iter = this->dataPtr->velPids.begin();
+    iter != this->dataPtr->velPids.end(); ++iter)
+  {
+    iter->second.Reset();
+  }
 }
 
 /////////////////////////////////////////////////

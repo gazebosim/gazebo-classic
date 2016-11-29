@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORTYPES_HH_
-#define _GAZEBO_SENSORTYPES_HH_
+#ifndef _GAZEBO_SENSORS_SENSORTYPES_HH_
+#define _GAZEBO_SENSORS_SENSORTYPES_HH_
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "gazebo/util/system.hh"
 #include "gazebo/common/EnumIface.hh"
 
@@ -56,87 +56,87 @@ namespace gazebo
 
     /// \def AltimeterSensorPtr
     /// \brief Shared pointer to AltimeterSensor
-    typedef boost::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
+    typedef std::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
-    typedef boost::shared_ptr<Sensor> SensorPtr;
+    typedef std::shared_ptr<Sensor> SensorPtr;
 
     /// \def RaySensorPtr
     /// \brief Shared pointer to RaySensor
-    typedef boost::shared_ptr<RaySensor> RaySensorPtr;
+    typedef std::shared_ptr<RaySensor> RaySensorPtr;
 
     /// \def CameraSensorPtr
     /// \brief Shared pointer to CameraSensor
-    typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
+    typedef std::shared_ptr<CameraSensor> CameraSensorPtr;
 
     /// \def MagnetometerSensorPtr
     /// \brief Shared pointer to MagnetometerSensor
-    typedef boost::shared_ptr<MagnetometerSensor> MagnetometerSensorPtr;
+    typedef std::shared_ptr<MagnetometerSensor> MagnetometerSensorPtr;
 
     /// \def MultiCameraSensorPtr
     /// \brief Shared pointer to MultiCameraSensor
-    typedef boost::shared_ptr<MultiCameraSensor> MultiCameraSensorPtr;
+    typedef std::shared_ptr<MultiCameraSensor> MultiCameraSensorPtr;
 
     /// \def DepthCameraSensorPtr
     /// \brief Shared pointer to DepthCameraSensor
-    typedef boost::shared_ptr<DepthCameraSensor> DepthCameraSensorPtr;
+    typedef std::shared_ptr<DepthCameraSensor> DepthCameraSensorPtr;
 
     /// \def ContactSensorPtr
     /// \brief Shared pointer to ContactSensor
-    typedef boost::shared_ptr<ContactSensor> ContactSensorPtr;
+    typedef std::shared_ptr<ContactSensor> ContactSensorPtr;
 
     /// \def ImuSensorPtr
     /// \brief Shared pointer to ImuSensor
-    typedef boost::shared_ptr<ImuSensor> ImuSensorPtr;
+    typedef std::shared_ptr<ImuSensor> ImuSensorPtr;
 
     /// \def GpuRaySensorPtr
     /// \brief Shared pointer to GpuRaySensor
-    typedef boost::shared_ptr<GpuRaySensor> GpuRaySensorPtr;
+    typedef std::shared_ptr<GpuRaySensor> GpuRaySensorPtr;
 
     /// \def RFIDSensorPtr
     /// \brief Shared pointer to RFIDSensor
-    typedef boost::shared_ptr<RFIDSensor> RFIDSensorPtr;
+    typedef std::shared_ptr<RFIDSensor> RFIDSensorPtr;
 
     /// \def RFIDTagPtr
     /// \brief Shared pointer to RFIDTag
-    typedef boost::shared_ptr<RFIDTag> RFIDTagPtr;
+    typedef std::shared_ptr<RFIDTag> RFIDTagPtr;
 
     /// \def SonarSensorPtr
     /// \brief Shared pointer to SonarSensor
-    typedef boost::shared_ptr<SonarSensor> SonarSensorPtr;
+    typedef std::shared_ptr<SonarSensor> SonarSensorPtr;
 
     /// \def ForceTorqueSensorPtr
     /// \brief Shared pointer to ForceTorqueSensor
-    typedef boost::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
+    typedef std::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
 
     /// \def GpsSensorPtr
     /// \brief Shared pointer to GpsSensor
-    typedef boost::shared_ptr<GpsSensor> GpsSensorPtr;
+    typedef std::shared_ptr<GpsSensor> GpsSensorPtr;
 
     /// \def NoisePtr
     /// \brief Shared pointer to Noise
-    typedef boost::shared_ptr<Noise> NoisePtr;
+    typedef std::shared_ptr<Noise> NoisePtr;
 
     /// \def GaussianNoisePtr
     /// \brief Shared pointer to Noise
-    typedef boost::shared_ptr<GaussianNoiseModel> GaussianNoiseModelPtr;
+    typedef std::shared_ptr<GaussianNoiseModel> GaussianNoiseModelPtr;
 
     /// \brief Shared pointer to Noise
-    typedef boost::shared_ptr<ImageGaussianNoiseModel>
+    typedef std::shared_ptr<ImageGaussianNoiseModel>
         ImageGaussianNoiseModelPtr;
 
     /// \def WirelessTransceiverPtr
     /// \brief Shared pointer to WirelessTransceiver
-    typedef boost::shared_ptr<WirelessTransceiver> WirelessTransceiverPtr;
+    typedef std::shared_ptr<WirelessTransceiver> WirelessTransceiverPtr;
 
     /// \def WirelessTransmitterPtr
     /// \brief Shared pointer to WirelessTransmitter
-    typedef boost::shared_ptr<WirelessTransmitter> WirelessTransmitterPtr;
+    typedef std::shared_ptr<WirelessTransmitter> WirelessTransmitterPtr;
 
     /// \def WirelessReceiverPtr
     /// \brief Shared pointer to WirelessReceiver
-    typedef boost::shared_ptr<WirelessReceiver> WirelessReceiverPtr;
+    typedef std::shared_ptr<WirelessReceiver> WirelessReceiverPtr;
 
     /// \def AltimeterSensor_V
     /// \brief Vector of AltimeterSensor shared pointers
@@ -196,13 +196,15 @@ namespace gazebo
 
     /// \def LogicalCameraSensorPtr
     /// \brief Shared pointer to LogicalCameraSensor
-    typedef boost::shared_ptr<LogicalCameraSensor> LogicalCameraSensorPtr;
+    typedef std::shared_ptr<LogicalCameraSensor> LogicalCameraSensorPtr;
 
     /// \def SensorNoiseType
     /// \brief Eumeration of all sensor noise types
     enum SensorNoiseType
     {
-      /// \brief Marks the start of the enum.
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
       SENSOR_NOISE_TYPE_BEGIN = 0,
 
       /// \brief Noise streams for the Camera sensor
@@ -289,10 +291,32 @@ namespace gazebo
       /// \sa ImuSensor
       IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20,
 
-      /// \brief Marks the end of the enum.
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
       SENSOR_NOISE_TYPE_END
     };
     /// \}
+
+    /// \brief SensorCategory is used to categorize sensors. This is used to
+    /// put sensors into different threads.
+    enum SensorCategory
+    {
+      // IMAGE must be the first element, and it must start with 0. Do not
+      // change this! See SensorManager::sensorContainers for reference.
+      /// \brief Image based sensor class. This type requires the rendering
+      /// engine.
+      IMAGE = 0,
+
+      /// \brief Ray based sensor class.
+      RAY = 1,
+
+      /// \brief A type of sensor is not a RAY or IMAGE sensor.
+      OTHER = 2,
+
+      /// \brief Number of Sensor Categories
+      CATEGORY_COUNT = 3
+    };
   }
 }
 #endif

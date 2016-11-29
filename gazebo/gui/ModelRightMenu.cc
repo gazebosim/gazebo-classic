@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,12 +123,12 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
-  // \todo Reimplement
-  // this->skeletonAction = new QAction(tr("Skeleton"), this);
-  // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
-  // this->skeletonAction->setCheckable(true);
-  // connect(this->skeletonAction, SIGNAL(triggered()), this,
-  //         SLOT(OnSkeleton()));
+  state = new ViewState(this, "show_skeleton", "hide_skeleton");
+  state->action = new QAction(tr("Skeleton"), this);
+  state->action->setStatusTip(tr("Show model skeleton"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
 
   // Window mode
   this->windowMode = "Simulation";
@@ -166,7 +166,9 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 ModelRightMenu::~ModelRightMenu()
 {
+  this->requestSub.reset();
   this->node->Fini();
+  this->node.reset();
 }
 
 /////////////////////////////////////////////////
@@ -247,9 +249,6 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     menu.addAction(g_deleteAct);
   }
 
-  /// \todo Reimplement these features.
-  // menu.addAction(this->skeletonAction);
-
   menu.exec(_pt);
 }
 
@@ -327,7 +326,13 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   // Delete the entity
   if (!name.empty())
+  {
     transport::requestNoReply(this->node, "entity_delete", name);
+
+    // Remove the entity from all modelStates in each ViewState.
+    for (auto &viewState : this->viewStates)
+      viewState->modelStates.erase(this->entityName);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -407,26 +412,3 @@ void ModelRightMenu::OnWindowMode(const std::string &_mode)
 {
   this->windowMode = _mode;
 }
-
-/// \todo Reimplement these functions.
-/////////////////////////////////////////////////
-// void ModelRightMenu::OnSkeleton()
-// {
-//   this->skeletonActionState[this->entityName] =
-//     this->skeletonAction->isChecked();
-//
-//   if (this->skeletonAction->isChecked())
-//   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton",
-//         this->entityName);
-//     this->requestMsg->set_dbl_data(1.0);
-//   }
-//   else
-//   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton",
-//         this->entityName);
-//     this->requestMsg->set_dbl_data(0.0);
-//   }
-//
-//   this->requestPub->Publish(*this->requestMsg);
-// }

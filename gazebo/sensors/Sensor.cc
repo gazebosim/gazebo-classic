@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <sdf/sdf.hh>
-
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
@@ -40,49 +38,43 @@
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/LogicalCameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
 
-sdf::ElementPtr Sensor::sdfSensor;
+sdf::ElementPtr SensorPrivate::sdfSensor;
 
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
+: dataPtr(new SensorPrivate)
 {
-  if (!this->sdfSensor)
+  if (!this->dataPtr->sdfSensor)
   {
-    this->sdfSensor.reset(new sdf::Element);
-    sdf::initFile("sensor.sdf", this->sdfSensor);
+    this->dataPtr->sdfSensor.reset(new sdf::Element);
+    sdf::initFile("sensor.sdf", this->dataPtr->sdfSensor);
   }
 
-  this->category = _cat;
+  this->dataPtr->category = _cat;
 
-  this->sdf = this->sdfSensor->Clone();
+  this->sdf = this->dataPtr->sdfSensor->Clone();
 
   this->active = false;
 
   this->node = transport::NodePtr(new transport::Node());
 
-  this->updateDelay = common::Time(0.0);
+  this->dataPtr->updateDelay = common::Time(0.0);
   this->updatePeriod = common::Time(0.0);
 
-  this->id = physics::getUniqueId();
+  this->dataPtr->id = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
-
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
-  this->connections.clear();
-  this->noises.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -97,7 +89,8 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->Get<ignition::math::Pose3d>("pose");
+    this->pose =
+      this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->sdf->Get<bool>("always_on"))
@@ -105,14 +98,15 @@ void Sensor::Load(const std::string &_worldName)
 
   this->world = physics::get_world(_worldName);
 
-  if (this->category == IMAGE)
+  if (this->dataPtr->category == IMAGE)
     this->scene = rendering::get_scene(_worldName);
 
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
 
   this->node->Init(this->world->GetName());
-  this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
+  this->dataPtr->sensorPub =
+    this->node->Advertise<msgs::Sensor>("~/sensor");
 }
 
 //////////////////////////////////////////////////
@@ -133,30 +127,30 @@ void Sensor::Init()
 
   msgs::Sensor msg;
   this->FillMsg(msg);
-  this->sensorPub->Publish(msg);
+  this->dataPtr->sensorPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetParent(const std::string &_name, uint32_t _id)
+void Sensor::SetParent(const std::string &_name, const uint32_t _id)
 {
   this->parentName = _name;
   this->parentId = _id;
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetParentName() const
+std::string Sensor::ParentName() const
 {
   return this->parentName;
 }
 
 //////////////////////////////////////////////////
-uint32_t Sensor::GetId() const
+uint32_t Sensor::Id() const
 {
-  return this->id;
+  return this->dataPtr->id;
 }
 
 //////////////////////////////////////////////////
-uint32_t Sensor::GetParentId() const
+uint32_t Sensor::ParentId() const
 {
   return this->parentId;
 }
@@ -168,31 +162,40 @@ bool Sensor::NeedsUpdate()
   // sensor's update in the same thread.
 
   common::Time simTime;
-  if (this->category == IMAGE && this->scene)
-    simTime = this->scene->GetSimTime();
+  if (this->dataPtr->category == IMAGE && this->scene)
+    simTime = this->scene->SimTime();
   else
     simTime = this->world->GetSimTime();
 
+  // case when last update occurred in the future probably due to
+  // world reset
   if (simTime <= this->lastMeasurementTime)
+  {
+    // Rendering sensors also set the lastMeasurementTime variable in Render()
+    // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
+    // could be outdated when the world is reset. In this case reset
+    // the variables back to 0.
+    this->ResetLastUpdateTime();
     return false;
+  }
 
   return (simTime - this->lastMeasurementTime +
-      this->updateDelay) >= this->updatePeriod;
+      this->dataPtr->updateDelay) >= this->updatePeriod;
 }
 
 //////////////////////////////////////////////////
-void Sensor::Update(bool _force)
+void Sensor::Update(const bool _force)
 {
   if (this->IsActive() || _force)
   {
     common::Time simTime;
-    if (this->category == IMAGE && this->scene)
-      simTime = this->scene->GetSimTime();
+    if (this->dataPtr->category == IMAGE && this->scene)
+      simTime = this->scene->SimTime();
     else
       simTime = this->world->GetSimTime();
 
     {
-      boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
+      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
 
       if (simTime <= this->lastUpdateTime && !_force)
         return;
@@ -201,28 +204,28 @@ void Sensor::Update(bool _force)
       // sensor's update in the same thread.
       // NOTE: If you change this equation, also change the matching equation in
       // Sensor::NeedsUpdate
-      common::Time adjustedElapsed = simTime - this->lastUpdateTime +
-        this->updateDelay;
+      common::Time adjustedElapsed = simTime -
+        this->lastUpdateTime + this->dataPtr->updateDelay;
 
       if (adjustedElapsed < this->updatePeriod && !_force)
         return;
 
-      this->updateDelay = std::max(common::Time::Zero,
+      this->dataPtr->updateDelay = std::max(common::Time::Zero,
           adjustedElapsed - this->updatePeriod);
 
       // if delay is more than a full update period, then give up trying
       // to catch up. This happens normally when the sensor just changed from
       // an inactive to an active state, or the sensor just cannot hit its
       // target update rate (worst case).
-      if (this->updateDelay >= this->updatePeriod)
-        this->updateDelay = common::Time::Zero;
+      if (this->dataPtr->updateDelay >= this->updatePeriod)
+        this->dataPtr->updateDelay = common::Time::Zero;
     }
 
     if (this->UpdateImpl(_force))
     {
-      boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
+      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
       this->lastUpdateTime = simTime;
-      this->updated();
+      this->dataPtr->updated();
     }
   }
 }
@@ -230,24 +233,42 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
+  this->connections.clear();
+
   for (auto &it : this->noises)
     it.second->Fini();
+  this->noises.clear();
 
   this->active = false;
   this->plugins.clear();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
+
+  this->scene.reset();
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetName() const
+std::string Sensor::Name() const
 {
-  return this->sdf->Get<std::string>("name");
+  if (this->sdf)
+    return this->sdf->Get<std::string>("name");
+
+  gzwarn << "Missing sensor SDF." << std::endl;
+  return "";
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetScopedName() const
+std::string Sensor::ScopedName() const
 {
-  return this->world->GetName() + "::" + this->parentName + "::" +
-    this->GetName();
+  return this->world->GetName() + "::" +
+         this->parentName + "::" + this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -261,7 +282,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
   {
     if (plugin->GetType() != SENSOR_PLUGIN)
     {
-      gzerr << "Sensor[" << this->GetName() << "] is attempting to load "
+      gzerr << "Sensor[" << this->Name() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
             << "Plugin filename[" << filename << "] name[" << name << "]\n";
       return;
@@ -275,21 +296,15 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetActive(bool _value)
+void Sensor::SetActive(const bool _value)
 {
   this->active = _value;
 }
 
 //////////////////////////////////////////////////
-bool Sensor::IsActive()
+bool Sensor::IsActive() const
 {
   return this->active;
-}
-
-//////////////////////////////////////////////////
-math::Pose Sensor::GetPose() const
-{
-  return this->Pose();
 }
 
 //////////////////////////////////////////////////
@@ -304,22 +319,22 @@ void Sensor::SetPose(const ignition::math::Pose3d &_pose)
   this->pose = _pose;
 
   // Update the visualization with the pose information.
-  if (this->sensorPub && this->GetVisualize())
+  if (this->dataPtr->sensorPub && this->Visualize())
   {
     msgs::Sensor msg;
-    msg.set_name(this->GetName());
-    msg.set_id(this->GetId());
-    msg.set_parent(this->GetParentName());
-    msg.set_parent_id(this->GetParentId());
-    msg.set_type(this->GetType());
+    msg.set_name(this->Name());
+    msg.set_id(this->Id());
+    msg.set_parent(this->ParentName());
+    msg.set_parent_id(this->ParentId());
+    msg.set_type(this->Type());
     msg.set_visualize(true);
     msgs::Set(msg.mutable_pose(), this->pose);
-    this->sensorPub->Publish(msg);
+    this->dataPtr->sensorPub->Publish(msg);
   }
 }
 
 //////////////////////////////////////////////////
-double Sensor::GetUpdateRate()
+double Sensor::UpdateRate() const
 {
   if (this->updatePeriod.Double() > 0.0)
     return 1.0/this->updatePeriod.Double();
@@ -328,7 +343,7 @@ double Sensor::GetUpdateRate()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetUpdateRate(double _hz)
+void Sensor::SetUpdateRate(const double _hz)
 {
   if (_hz > 0.0)
     this->updatePeriod = 1.0/_hz;
@@ -337,31 +352,31 @@ void Sensor::SetUpdateRate(double _hz)
 }
 
 //////////////////////////////////////////////////
-common::Time Sensor::GetLastUpdateTime()
+common::Time Sensor::LastUpdateTime() const
 {
   return this->lastUpdateTime;
 }
 
 //////////////////////////////////////////////////
-common::Time Sensor::GetLastMeasurementTime()
+common::Time Sensor::LastMeasurementTime() const
 {
   return this->lastMeasurementTime;
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetType() const
+std::string Sensor::Type() const
 {
   return this->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
-bool Sensor::GetVisualize() const
+bool Sensor::Visualize() const
 {
   return this->sdf->Get<bool>("visualize");
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetTopic() const
+std::string Sensor::Topic() const
 {
   std::string result;
   if (this->sdf->HasElement("topic") &&
@@ -373,19 +388,19 @@ std::string Sensor::GetTopic() const
 //////////////////////////////////////////////////
 void Sensor::FillMsg(msgs::Sensor &_msg)
 {
-  _msg.set_name(this->GetName());
-  _msg.set_id(this->GetId());
-  _msg.set_type(this->GetType());
-  _msg.set_parent(this->GetParentName());
-  _msg.set_parent_id(this->GetParentId());
+  _msg.set_name(this->Name());
+  _msg.set_id(this->Id());
+  _msg.set_type(this->Type());
+  _msg.set_parent(this->ParentName());
+  _msg.set_parent_id(this->ParentId());
   msgs::Set(_msg.mutable_pose(), this->Pose());
 
   _msg.set_always_on(this->IsActive());
-  _msg.set_topic(this->GetTopic());
-  _msg.set_update_rate(this->GetUpdateRate());
-  _msg.set_visualize(this->GetVisualize());
+  _msg.set_topic(this->Topic());
+  _msg.set_update_rate(this->UpdateRate());
+  _msg.set_visualize(this->Visualize());
 
-  if (this->GetType() == "logical_camera")
+  if (this->Type() == "logical_camera")
   {
     LogicalCameraSensor *camSensor = static_cast<LogicalCameraSensor*>(this);
     msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
@@ -394,18 +409,18 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
     camMsg->set_aspect_ratio(camSensor->AspectRatio());
   }
-  else if (this->GetType() == "camera" || this->GetType() == "wideanglecamera")
+  else if (this->Type() == "camera" || this->Type() == "wideanglecamera")
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
-    auto cam = camSensor->GetCamera();
+    auto cam = camSensor->Camera();
     camMsg->set_horizontal_fov(cam->HFOV().Radian());
-    camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
-    camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
-    camMsg->set_image_format(cam->GetImageFormat());
-    camMsg->set_near_clip(cam->GetNearClip());
-    camMsg->set_far_clip(cam->GetFarClip());
-    auto distortion = cam->GetDistortion();
+    camMsg->mutable_image_size()->set_x(camSensor->ImageWidth());
+    camMsg->mutable_image_size()->set_y(camSensor->ImageHeight());
+    camMsg->set_image_format(cam->ImageFormat());
+    camMsg->set_near_clip(cam->NearClip());
+    camMsg->set_far_clip(cam->FarClip());
+    auto distortion = cam->LensDistortion();
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
@@ -421,79 +436,19 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetWorldName() const
+std::string Sensor::WorldName() const
 {
   return this->world->GetName();
 }
 
 //////////////////////////////////////////////////
-SensorCategory Sensor::GetCategory() const
+SensorCategory Sensor::Category() const
 {
-  return this->category;
+  return this->dataPtr->category;
 }
 
 //////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise(unsigned int _index) const
-{
-  // By default, there is no noise
-  SensorNoiseType noiseType = NO_NOISE;
-
-  // Camera mapping
-  if (this->GetType().compare("camera") == 0 ||
-      this->GetType().compare("wideanglecamera") == 0)
-  {
-    noiseType = CAMERA_NOISE;
-  }
-  // GpuRay mapping
-  else if (this->GetType().compare("gpu_ray") == 0)
-  {
-    noiseType = GPU_RAY_NOISE;
-  }
-  // RaySensor mapping
-  else if (this->GetType().compare("ray") == 0)
-  {
-    noiseType = RAY_NOISE;
-  }
-  // GpsSensor mapping
-  else if (this->GetType().compare("gps") == 0)
-  {
-    switch (_index)
-    {
-      case 0:
-        noiseType = GPS_POSITION_LATITUDE_NOISE_METERS;
-        break;
-      case 1:
-        noiseType = GPS_POSITION_LONGITUDE_NOISE_METERS;
-        break;
-      case 2:
-        noiseType = GPS_POSITION_ALTITUDE_NOISE_METERS;
-        break;
-      case 3:
-        noiseType = GPS_VELOCITY_LATITUDE_NOISE_METERS;
-        break;
-      case 4:
-        noiseType = GPS_VELOCITY_LONGITUDE_NOISE_METERS;
-        break;
-      case 5:
-        noiseType = GPS_VELOCITY_ALTITUDE_NOISE_METERS;
-        break;
-      default:
-        noiseType = NO_NOISE;
-        break;
-    }
-  }
-  // Special case: unlimited number of multi-camera noise streams
-  else if (this->GetType().compare("multicamera") == 0)
-  {
-    if (this->noises.find(_index) != this->noises.end())
-      return this->noises.at(_index);
-  }
-
-  return this->GetNoise(noiseType);
-}
-
-//////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
+NoisePtr Sensor::Noise(const SensorNoiseType _type) const
 {
   if (this->noises.find(_type) == this->noises.end())
   {
@@ -506,6 +461,20 @@ NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
 //////////////////////////////////////////////////
 void Sensor::ResetLastUpdateTime()
 {
-  boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
+  this->lastMeasurementTime = 0.0;
+  this->dataPtr->updateDelay = 0.0;
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
+{
+  return this->dataPtr->updated.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
+{
+  this->dataPtr->updated.Disconnect(_c->Id());
 }

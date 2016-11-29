@@ -1,0 +1,13 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Param_V
+/// \brief Message for a vector of params.
+
+import "param.proto";
+
+message Param_V
+{
+  repeated Param param = 1;
+}

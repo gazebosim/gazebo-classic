@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/AudioDecoder.hh"
+#include "gazebo/util/OpenALPrivate.hh"
 #include "gazebo/util/OpenAL.hh"
 
 using namespace gazebo;
@@ -46,9 +47,10 @@ using namespace util;
 #ifdef HAVE_OPENAL
 /////////////////////////////////////////////////
 OpenAL::OpenAL()
+: dataPtr(new OpenALPrivate)
 {
-  this->context = NULL;
-  this->audioDevice = NULL;
+  this->dataPtr->context = NULL;
+  this->dataPtr->audioDevice = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -67,12 +69,17 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
 
   // Open the default audio device
   if (deviceName == "default")
-    this->audioDevice = alcOpenDevice(NULL);
+    this->dataPtr->audioDevice = alcOpenDevice(NULL);
   else
-    this->audioDevice = alcOpenDevice(deviceName.c_str());
+  {
+    auto deviceList = this->DeviceList();
+    if (deviceList.empty() || deviceList.find(deviceName) == deviceList.end())
+      return false;
+    this->dataPtr->audioDevice = alcOpenDevice(deviceName.c_str());
+  }
 
   // Make sure that we could open the audio device
-  if (this->audioDevice == NULL)
+  if (this->dataPtr->audioDevice == NULL)
   {
     gzerr << "Unable to open audio device["
       << deviceName << "]\n Audio will be disabled.\n";
@@ -80,16 +87,16 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
   }
 
   // Create the audio context
-  this->context = alcCreateContext(this->audioDevice, NULL);
+  this->dataPtr->context = alcCreateContext(this->dataPtr->audioDevice, NULL);
 
-  if (this->context == NULL)
+  if (this->dataPtr->context == NULL)
   {
     gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
     return false;
   }
 
   // Make the context current
-  alcMakeContextCurrent(this->context);
+  alcMakeContextCurrent(this->dataPtr->context);
 
   // Clear error code
   alGetError();
@@ -102,21 +109,21 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void OpenAL::Fini()
 {
-  if (this->audioDevice)
+  if (this->dataPtr->audioDevice)
   {
-    alcCloseDevice(this->audioDevice);
-    this->audioDevice = NULL;
+    alcCloseDevice(this->dataPtr->audioDevice);
+    this->dataPtr->audioDevice = NULL;
   }
 
-  if (this->context)
+  if (this->dataPtr->context)
   {
-    this->context = alcGetCurrentContext();
+    this->dataPtr->context = alcGetCurrentContext();
     alcMakeContextCurrent(NULL);
-    alcDestroyContext(this->context);
-    this->context = NULL;
+    alcDestroyContext(this->dataPtr->context);
+    this->dataPtr->context = NULL;
   }
 
-  this->sink.reset();
+  this->dataPtr->sink.reset();
 }
 
 /////////////////////////////////////////////////
@@ -124,10 +131,10 @@ OpenALSinkPtr OpenAL::CreateSink(sdf::ElementPtr /*_sdf*/)
 {
   OpenALSinkPtr result;
 
-  if (this->sink == NULL)
+  if (this->dataPtr->sink == NULL)
   {
-    this->sink.reset(new OpenALSink);
-    result  = this->sink;
+    this->dataPtr->sink.reset(new OpenALSink);
+    result  = this->dataPtr->sink;
   }
   else
     gzerr << "An OpenALSink has already been created."
@@ -142,7 +149,7 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
   OpenALSourcePtr source;
 
   // Make sure the audio device has been opened
-  if (!this->audioDevice)
+  if (!this->dataPtr->audioDevice)
   {
     gzerr << "Audio device not open\n";
     return source;
@@ -160,6 +167,20 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
 
   // Return a pointer to the source
   return source;
+}
+
+/////////////////////////////////////////////////
+std::set<std::string> OpenAL::DeviceList() const
+{
+  std::set<std::string> deviceList;
+  const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+  while (*devices != '\0')
+  {
+    std::string str(devices);
+    deviceList.emplace(str);
+    devices += str.size() + 1;
+  }
+  return deviceList;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -246,19 +267,20 @@ bool OpenALSink::SetVelocity(const ignition::math::Vector3d &_vel)
 
 /////////////////////////////////////////////////
 OpenALSource::OpenALSource()
+: dataPtr(new OpenALSourcePrivate)
 {
   // Create 1 source
-  alGenSources(1, &this->alSource);
+  alGenSources(1, &this->dataPtr->alSource);
 
   // Create 1 buffer
-  alGenBuffers(1, &this->alBuffer);
+  alGenBuffers(1, &this->dataPtr->alBuffer);
 }
 
 /////////////////////////////////////////////////
 OpenALSource::~OpenALSource()
 {
-  alDeleteSources(1, &this->alSource);
-  alDeleteBuffers(1, &this->alBuffer);
+  alDeleteSources(1, &this->dataPtr->alSource);
+  alDeleteBuffers(1, &this->dataPtr->alBuffer);
 }
 
 /////////////////////////////////////////////////
@@ -290,11 +312,12 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
 
     while (collisionElem)
     {
-      this->collisionNames.push_back(collisionElem->Get<std::string>());
+      this->dataPtr->collisionNames.push_back(
+          collisionElem->Get<std::string>());
       collisionElem = collisionElem->GetNextElement("collision");
     }
 
-    result = result && !this->collisionNames.empty();
+    result = result && !this->dataPtr->collisionNames.empty();
   }
   else
     this->Play();
@@ -312,7 +335,7 @@ bool OpenALSource::SetPose(const ignition::math::Pose3d &_pose)
   // Clear error state
   alGetError();
 
-  alSourcefv(this->alSource, AL_POSITION, p);
+  alSourcefv(this->dataPtr->alSource, AL_POSITION, p);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
@@ -333,7 +356,7 @@ bool OpenALSource::SetVelocity(const ignition::math::Vector3d &_vel)
   // Clear error state
   alGetError();
 
-  alSourcefv(this->alSource, AL_VELOCITY, v);
+  alSourcefv(this->dataPtr->alSource, AL_VELOCITY, v);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
@@ -352,7 +375,7 @@ bool OpenALSource::SetPitch(float _pitch)
   // clear error state
   alGetError();
 
-  alSourcef(this->alSource, AL_PITCH, _pitch);
+  alSourcef(this->dataPtr->alSource, AL_PITCH, _pitch);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
@@ -371,7 +394,7 @@ bool OpenALSource::SetGain(float _gain)
   // clear error state
   alGetError();
 
-  alSourcef(this->alSource, AL_GAIN, _gain);
+  alSourcef(this->dataPtr->alSource, AL_GAIN, _gain);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
@@ -391,7 +414,7 @@ bool OpenALSource::SetLoop(bool _state)
   alGetError();
 
   // Set looping state
-  alSourcei(this->alSource, AL_LOOPING, _state);
+  alSourcei(this->dataPtr->alSource, AL_LOOPING, _state);
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
@@ -403,61 +426,61 @@ bool OpenALSource::SetLoop(bool _state)
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> OpenALSource::GetCollisionNames() const
+std::vector<std::string> OpenALSource::CollisionNames() const
 {
-  return this->collisionNames;
+  return this->dataPtr->collisionNames;
 }
 
 /////////////////////////////////////////////////
-bool OpenALSource::GetOnContact() const
+bool OpenALSource::OnContact() const
 {
-  return !this->collisionNames.empty();
+  return !this->dataPtr->collisionNames.empty();
 }
 
 /////////////////////////////////////////////////
 void OpenALSource::Play()
 {
   int sourceState;
-  alGetSourcei(this->alSource, AL_SOURCE_STATE, &sourceState);
+  alGetSourcei(this->dataPtr->alSource, AL_SOURCE_STATE, &sourceState);
 
   // Play the source, if it's not already playing
   if (sourceState != AL_PLAYING)
-    alSourcePlay(this->alSource);
+    alSourcePlay(this->dataPtr->alSource);
 }
 
 /////////////////////////////////////////////////
 void OpenALSource::Pause()
 {
   int sourceState;
-  alGetSourcei(this->alSource, AL_SOURCE_STATE, &sourceState);
+  alGetSourcei(this->dataPtr->alSource, AL_SOURCE_STATE, &sourceState);
 
   // Pause the source if it playing
   if (sourceState == AL_PLAYING)
-    alSourcePause(this->alSource);
+    alSourcePause(this->dataPtr->alSource);
 }
 
 /////////////////////////////////////////////////
 void OpenALSource::Stop()
 {
   int sourceState;
-  alGetSourcei(this->alSource, AL_SOURCE_STATE, &sourceState);
+  alGetSourcei(this->dataPtr->alSource, AL_SOURCE_STATE, &sourceState);
 
   // Stop the source if it is not already stopped
   if (sourceState != AL_STOPPED)
-    alSourceStop(this->alSource);
+    alSourceStop(this->dataPtr->alSource);
 }
 
 /////////////////////////////////////////////////
 void OpenALSource::Rewind()
 {
-  alSourceRewind(this->alSource);
+  alSourceRewind(this->dataPtr->alSource);
 }
 
 /////////////////////////////////////////////////
 bool OpenALSource::IsPlaying()
 {
   int sourceState;
-  alGetSourcei(this->alSource, AL_SOURCE_STATE, &sourceState);
+  alGetSourcei(this->dataPtr->alSource, AL_SOURCE_STATE, &sourceState);
 
   return sourceState == AL_PLAYING;
 }
@@ -467,16 +490,16 @@ bool OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
     unsigned int _dataCount, int _sampleRate)
 {
   // First detach the buffer
-  alSourcei(this->alSource, AL_BUFFER, 0);
+  alSourcei(this->dataPtr->alSource, AL_BUFFER, 0);
 
   // Copy raw buffer into AL buffer
   // AL_FORMAT_MONO8, AL_FORMAT_MONO16, AL_FORMAT_STEREO8,
   // AL_FORMAT_STEREO16
-  alBufferData(this->alBuffer, AL_FORMAT_MONO16, _pcmData, _dataCount,
+  alBufferData(this->dataPtr->alBuffer, AL_FORMAT_MONO16, _pcmData, _dataCount,
       _sampleRate);
 
   // Attach buffer to source
-  alSourcei(this->alSource, AL_BUFFER, this->alBuffer);
+  alSourcei(this->dataPtr->alSource, AL_BUFFER, this->dataPtr->alBuffer);
 
   if (alGetError() != AL_NO_ERROR)
   {
@@ -532,7 +555,8 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
 bool OpenALSource::HasCollisionName(const std::string &_name) const
 {
   for (std::vector<std::string>::const_iterator iter =
-      this->collisionNames.begin(); iter != this->collisionNames.end(); ++iter)
+      this->dataPtr->collisionNames.begin();
+      iter != this->dataPtr->collisionNames.end(); ++iter)
   {
     if (*iter  == _name)
       return true;

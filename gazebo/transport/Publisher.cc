@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 //////////////////////////////////////////////////
 Publisher::~Publisher()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -255,7 +256,7 @@ void Publisher::Fini()
     this->SendMessage();
 
   if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
+    TopicManager::Instance()->Unadvertise(this->topic, this->id);
 
   common::Time slept;
 
@@ -290,4 +291,10 @@ MessagePtr Publisher::GetPrevMsgPtr() const
     return this->publication->GetPrevMsg(this->id);
   else
     return MessagePtr();
+}
+
+//////////////////////////////////////////////////
+uint32_t Publisher::Id() const
+{
+  return this->id;
 }

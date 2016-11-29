@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,21 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_BUILDING_BUILDINGEDITORWIDGET_HH_
+#define GAZEBO_GUI_BUILDING_BUILDINGEDITORWIDGET_HH_
 
-#ifndef _BUILDING_EDITOR_WIDGET_HH_
-#define _BUILDING_EDITOR_WIDGET_HH_
+#include <memory>
 
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class LevelWidget;
-    class ScaleWidget;
+    // Forward declare private data.
+    class BuildingEditorWidgetPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -50,20 +52,9 @@ namespace gazebo
       /// \brief Custom rotation cursor
       public: static QCursor rotateCursor;
 
-      /// \brief A widget to display and change building levels.
-      private: LevelWidget *levelWidget;
-
-      /// \brief A widget to display the scale of the 2D editor view.
-      private: ScaleWidget *scaleWidget;
-
-      /// \brief Qt Graphics Scene where graphics items are drawn in
-      private: QGraphicsScene *scene;
-
-      /// \brief Minimum width of the Qt graphics scene
-      private: int minimumWidth;
-
-      /// \brief Minimum height of the Qt graphics scene
-      private: int minimumHeight;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BuildingEditorWidgetPrivate> dataPtr;
     };
     /// \}
   }

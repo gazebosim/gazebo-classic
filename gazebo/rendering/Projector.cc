@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ Projector::Projector(rendering::VisualPtr _parent)
   this->visual = _parent;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->visual->GetScene()->GetName());
+  this->node->Init(this->visual->GetScene()->Name());
 }
 
 /////////////////////////////////////////////////
@@ -205,18 +205,20 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 {
   this->RemovePassFromMaterials();
 
-  if (this->node)
-  {
-    this->node->detachObject(this->frustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
-    this->node = NULL;
-  }
-
   if (this->filterNode)
   {
     this->filterNode->detachObject(this->filterFrustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
+    this->node->removeAndDestroyChild(this->filterNodeName);
     this->filterNode = NULL;
+  }
+
+  if (this->node)
+  {
+    this->node->detachObject(this->frustum);
+    Ogre::SceneNode *n = this->visual->GetSceneNode();
+    if (n)
+      n->removeAndDestroyChild(this->nodeName);
+    this->node = NULL;
   }
 
   delete this->frustum;
@@ -255,7 +257,7 @@ void Projector::ProjectorFrameListener::Init(VisualPtr _visual,
   this->filterFrustum = new Ogre::Frustum();
   this->filterFrustum->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
 
-  this->sceneMgr = this->visual->GetScene()->GetManager();
+  this->sceneMgr = this->visual->GetScene()->OgreSceneManager();
   this->projectorQuery = this->sceneMgr->createPlaneBoundedVolumeQuery(
       Ogre::PlaneBoundedVolumeList());
 
@@ -297,6 +299,13 @@ void Projector::ProjectorFrameListener::SetUsingShaders(bool _usingShaders)
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetSceneNode()
 {
+  if (this->filterNode)
+  {
+    this->filterNode->detachObject(this->filterFrustum);
+    this->node->removeAndDestroyChild(this->filterNodeName);
+    this->filterNode = NULL;
+  }
+
   if (this->node)
   {
     this->node->detachObject(this->frustum);
@@ -304,17 +313,10 @@ void Projector::ProjectorFrameListener::SetSceneNode()
     this->node = NULL;
   }
 
-  if (this->filterNode)
-  {
-    this->filterNode->detachObject(this->filterFrustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
-    this->filterNode = NULL;
-  }
-
   this->node = this->visual->GetSceneNode()->createChildSceneNode(
       this->nodeName);
 
-  this->filterNode = this->visual->GetSceneNode()->createChildSceneNode(
+  this->filterNode = this->node->createChildSceneNode(
       this->filterNodeName);
 
   if (this->node)
@@ -331,8 +333,8 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
 {
-  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.rot);
-  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);
+  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.Ign().Rot());
+  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.Ign().Pos());
   Ogre::Quaternion offsetQuaternion;
 
   this->node->setPosition(ogreVec);
@@ -340,7 +342,7 @@ void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
   this->filterNode->setPosition(ogreVec);
 
   offsetQuaternion = Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y);
-  this->filterNode->setOrientation(offsetQuaternion + ogreQuaternion);
+  this->filterNode->setOrientation(offsetQuaternion);
 }
 
 /////////////////////////////////////////////////

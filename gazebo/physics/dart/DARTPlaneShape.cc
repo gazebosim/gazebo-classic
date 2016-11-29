@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,31 +31,29 @@ DARTPlaneShape::DARTPlaneShape(CollisionPtr _parent)
   : PlaneShape(_parent),
     dataPtr(new DARTPlaneShapePrivate())
 {
+  boost::dynamic_pointer_cast<DARTCollision>(_parent)->SetDARTCollisionShape(
+        this->dataPtr->dtBoxShape, false);
+}
+
+//////////////////////////////////////////////////
+DARTPlaneShape::DARTPlaneShape(DARTCollisionPtr _parent)
+  : PlaneShape(_parent),
+    dataPtr(new DARTPlaneShapePrivate())
+{
+  _parent->SetDARTCollisionShape(this->dataPtr->dtBoxShape, false);
 }
 
 //////////////////////////////////////////////////
 DARTPlaneShape::~DARTPlaneShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
 void DARTPlaneShape::CreatePlane()
 {
   PlaneShape::CreatePlane();
-
-  DARTCollisionPtr dartCollisionParent =
-      boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-  // math::Vector3 n = this->GetNormal();
-
-  dart::dynamics::BodyNode *dtBodyNode =
-      dartCollisionParent->GetDARTBodyNode();
-  dart::dynamics::BoxShape *dtBoxShape =
-      new dart::dynamics::BoxShape(Eigen::Vector3d(2100, 2100, 0.01));
-  dtBodyNode->addCollisionShape(dtBoxShape);
-  dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -0.005));
-  dartCollisionParent->SetDARTCollisionShape(dtBoxShape, false);
 }
 
 //////////////////////////////////////////////////

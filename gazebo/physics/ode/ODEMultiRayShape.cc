@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
-  : MultiRayShape(_parent)
+: MultiRayShape(_parent)
 {
   this->SetName("ODE Multiray Shape");
 
@@ -44,13 +44,27 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
   // Set collision bits
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
+}
 
-  // These three lines may be unessecary
-  ODELinkPtr pLink =
-    boost::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
-  pLink->SetSpaceId(this->raySpaceId);
-  boost::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
-      this->raySpaceId);
+//////////////////////////////////////////////////
+ODEMultiRayShape::ODEMultiRayShape(PhysicsEnginePtr _physicsEngine)
+: MultiRayShape(_physicsEngine)
+{
+  this->defaultUpdate = false;
+
+  this->SetName("ODE Multiray Shape");
+
+  // Create a space to contain the ray space
+  this->superSpaceId = dSimpleSpaceCreate(0);
+
+  // Create a space to contain all the rays
+  this->raySpaceId = dSimpleSpaceCreate(this->superSpaceId);
+
+  // Set collision bits
+  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
+  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
+
+  this->SetWorld(_physicsEngine->World());
 }
 
 //////////////////////////////////////////////////
@@ -69,7 +83,7 @@ void ODEMultiRayShape::UpdateRays()
   ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
-  if (ode == NULL)
+  if (ode == nullptr)
     gzthrow("Invalid physics engine. Must use ODE.");
 
   // Do we need to lock the physics engine here? YES!
@@ -88,7 +102,7 @@ void ODEMultiRayShape::UpdateRays()
 void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dContactGeom contact;
-  ODEMultiRayShape *self = NULL;
+  ODEMultiRayShape *self = nullptr;
 
   self = static_cast<ODEMultiRayShape*>(_data);
 
@@ -97,16 +111,21 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   {
     if (dGeomGetSpace(_o1) == self->superSpaceId ||
         dGeomGetSpace(_o2) == self->superSpaceId)
+    {
       dSpaceCollide2(_o1, _o2, self, &UpdateCallback);
+    }
 
     if (dGeomGetSpace(_o1) == self->raySpaceId ||
         dGeomGetSpace(_o2) == self->raySpaceId)
+    {
       dSpaceCollide2(_o1, _o2, self, &UpdateCallback);
+    }
   }
   else
   {
-    ODECollision *collision1 = NULL;
-    ODECollision *collision2 = NULL;
+    ODECollision *collision1 = nullptr;
+    ODECollision *collision2 = nullptr;
+    dGeomID rayId = 0;
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
@@ -115,7 +134,9 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
           dGeomGetData(dGeomTransformGetGeom(_o1)));
     }
     else
+    {
       collision1 = static_cast<ODECollision*>(dGeomGetData(_o1));
+    }
 
     if (dGeomGetClass(_o2) == dGeomTransformClass)
     {
@@ -127,40 +148,40 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
     }
 
-    GZ_ASSERT(collision1, "collision1 is null");
-    GZ_ASSERT(collision2, "collision2 is null");
-
-    ODECollision *rayCollision = NULL;
-    ODECollision *hitCollision = NULL;
+    ODECollision *rayCollision = nullptr;
+    ODECollision *hitCollision = nullptr;
 
     // Figure out which one is a ray; note that this assumes
     // that the ODE dRayClass is used *soley* by the RayCollision.
     if (dGeomGetClass(_o1) == dRayClass)
     {
-      rayCollision = static_cast<ODECollision*>(collision1);
-      hitCollision = static_cast<ODECollision*>(collision2);
+      rayCollision = collision1;
+      rayId = _o1;
+      hitCollision = collision2;
       dGeomRaySetParams(_o1, 0, 0);
       dGeomRaySetClosestHit(_o1, 1);
     }
     else if (dGeomGetClass(_o2) == dRayClass)
     {
-      GZ_ASSERT(rayCollision == NULL, "rayCollision is not null");
-      rayCollision = static_cast<ODECollision*>(collision2);
-      hitCollision = static_cast<ODECollision*>(collision1);
+      GZ_ASSERT(rayCollision == nullptr, "rayCollision is not null");
+      rayCollision = collision2;
+      hitCollision = collision1;
+      rayId = _o2;
       dGeomRaySetParams(_o2, 0, 0);
       dGeomRaySetClosestHit(_o2, 1);
     }
 
-    // Check for ray/collision intersections
-    if (rayCollision && hitCollision)
+    if (!self->defaultUpdate || (rayCollision && hitCollision))
     {
       int n = dCollide(_o1, _o2, 1, &contact, sizeof(contact));
 
-      if (n > 0)
+      if (n > 0 && self->defaultUpdate)
       {
-        RayShapePtr shape = boost::static_pointer_cast<RayShape>(
-            rayCollision->GetShape());
-        if (contact.depth < shape->GetLength())
+        RayShape *shape = self->defaultUpdate ?
+          boost::static_pointer_cast<RayShape>(rayCollision->GetShape()).get() :
+          static_cast<RayShape*>(dGeomGetData(rayId));
+
+        if (shape && hitCollision && contact.depth < shape->GetLength())
         {
           // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
           //      << " depth[" << contact.depth << "]"
@@ -175,6 +196,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
           //      << "\n";
           shape->SetLength(contact.depth);
           shape->SetRetro(hitCollision->GetLaserRetro());
+          shape->SetCollisionName(hitCollision->GetScopedName());
         }
       }
     }
@@ -187,13 +209,28 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
 {
   MultiRayShape::AddRay(_start, _end);
 
-  ODECollisionPtr odeCollision(new ODECollision(
-        this->collisionParent->GetLink()));
-  odeCollision->SetName("ode_ray_collision");
-  odeCollision->SetSpaceId(this->raySpaceId);
+  ODECollisionPtr odeCollision;
+  ODERayShapePtr ray;
 
-  ODERayShapePtr ray(new ODERayShape(odeCollision));
-  odeCollision->SetShape(ray);
+  // The collisionParent will exist in instances where the multiray is
+  // attached to an object, such as in the case of laser range finders
+  if (this->collisionParent)
+  {
+    odeCollision.reset(new ODECollision(this->collisionParent->GetLink()));
+    odeCollision->SetName("ode_ray_collision");
+    odeCollision->SetSpaceId(this->raySpaceId);
+    ray.reset(new ODERayShape(odeCollision));
+    odeCollision->SetShape(ray);
+  }
+  // The else clause is run when a standalone multiray shape is
+  // instantiated.
+  // See test/integration/multirayshape.cc for an example.
+  else
+  {
+    ray.reset(new ODERayShape(boost::dynamic_pointer_cast<ODEPhysics>(
+            this->GetWorld()->GetPhysicsEngine()), this->raySpaceId));
+    dGeomSetData(ray->ODEGeomId(), ray.get());
+  }
 
   ray->SetPoints(_start, _end);
   this->rays.push_back(ray);

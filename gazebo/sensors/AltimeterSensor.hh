@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_ALTIMETER_SENSOR_HH_
-#define _GAZEBO_ALTIMETER_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_ALTIMETERSENSOR_HH_
+#define _GAZEBO_SENSORS_ALTIMETERSENSOR_HH_
 
 #include <string>
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -62,7 +61,7 @@ namespace gazebo
       public: virtual std::string GetTopic() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
@@ -85,7 +84,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: AltimeterSensorPrivate *dataPtr;
+      private: std::unique_ptr<AltimeterSensorPrivate> dataPtr;
     };
     /// \}
   }

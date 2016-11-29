@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  *
 */
 
-#include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/common/Console.hh"
 
-#include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
+#include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -41,9 +42,26 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   this->dataPtr->configWidget = new ConfigWidget;
   this->dataPtr->configWidget->Load(&pluginMsg);
 
-  this->dataPtr->configWidget->SetWidgetReadOnly("name", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("filename", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("innerxml", true);
+  this->SetReadOnly(true);
+
+  // set a more user friendly label for name
+  QWidget *childWidget =
+      this->dataPtr->configWidget->ConfigChildWidgetByName("name");
+  if (childWidget)
+  {
+    QList<QLabel *> labels = childWidget->findChildren<QLabel *>();
+    for (auto &label : labels)
+    {
+      std::string labelLower = label->text().toLower().toStdString();
+      if (labelLower == "name")
+      {
+        label->setText(QString("Plugin name"));
+        break;
+      }
+    }
+  }
+  else
+    gzerr << "Cannot find name field in model plugin inspector" << std::endl;
 
   // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
@@ -96,22 +114,27 @@ ModelPluginInspector::~ModelPluginInspector()
 /////////////////////////////////////////////////
 void ModelPluginInspector::OnRemove()
 {
-  this->close();
+  std::string pluginName =
+      this->dataPtr->configWidget->StringWidgetValue("name");
 
-  model::Events::requestModelPluginRemoval(
-      this->dataPtr->configWidget->GetStringWidgetValue("name"));
+  this->OnCancel();
+
+  // User request from inspector
+  model::Events::requestModelPluginRemoval(pluginName, true);
 }
 
 /////////////////////////////////////////////////
 void ModelPluginInspector::OnCancel()
 {
+  this->Clear();
   this->close();
 }
 
 /////////////////////////////////////////////////
 void ModelPluginInspector::OnOK()
 {
-  /// \todo emit accepted signal this->Accepted();
+  emit Applied();
+  this->Clear();
   this->close();
 }
 
@@ -127,3 +150,34 @@ void ModelPluginInspector::Update(ConstPluginPtr _pluginMsg)
   this->dataPtr->configWidget->UpdateFromMsg(_pluginMsg.get());
 }
 
+/////////////////////////////////////////////////
+void ModelPluginInspector::SetReadOnly(const bool _readOnly)
+{
+  this->dataPtr->readOnly = _readOnly;
+  this->dataPtr->configWidget->SetWidgetReadOnly("name", _readOnly);
+  this->dataPtr->configWidget->SetWidgetReadOnly("filename", _readOnly);
+  this->dataPtr->configWidget->SetWidgetReadOnly("innerxml", _readOnly);
+}
+
+/////////////////////////////////////////////////
+void ModelPluginInspector::Clear()
+{
+  if (this->dataPtr->readOnly)
+    return;
+  this->dataPtr->configWidget->SetStringWidgetValue("name", "");
+  this->dataPtr->configWidget->SetStringWidgetValue("filename", "");
+  this->dataPtr->configWidget->SetStringWidgetValue("innerxml", "");
+}
+
+/////////////////////////////////////////////////
+msgs::Plugin *ModelPluginInspector::Data() const
+{
+  msgs::Plugin *msg = dynamic_cast<msgs::Plugin *>(
+      this->dataPtr->configWidget->Msg());
+  if (!msg)
+  {
+    gzerr << "It wasn't possible to get the plugin message" << std::endl;
+    return NULL;
+  }
+  return msg;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
+#include <functional>
 #include <gtest/gtest.h>
-#include <boost/bind.hpp>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/Event.hh>
 #include "test/util.hh"
@@ -49,8 +49,15 @@ void callbackDisconnect()
 {
   // Remove both connections in the callback, which should not cause
   // a segfault.
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   g_event.Disconnect(g_conn);
   g_event.Disconnect(g_conn2);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -70,8 +77,8 @@ void callbackDisconnect2()
 TEST_F(EventTest, CallbackDisconnect)
 {
   // Create two connections
-  g_conn = g_event.Connect(boost::bind(&callbackDisconnect));
-  g_conn2 = g_event.Connect(boost::bind(&callbackDisconnect2));
+  g_conn = g_event.Connect(std::bind(&callbackDisconnect));
+  g_conn2 = g_event.Connect(std::bind(&callbackDisconnect2));
 
   // Call the event. See the callback functions for more info.
   g_event();
@@ -83,7 +90,7 @@ TEST_F(EventTest, SignalOnce)
   g_callback = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
   evt();
 
   EXPECT_EQ(g_callback, 1);
@@ -95,7 +102,7 @@ TEST_F(EventTest, SignalTwice)
   g_callback = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
   evt();
   evt();
 
@@ -108,7 +115,7 @@ TEST_F(EventTest, SignalN)
   g_callback = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
 
   for (unsigned int i = 0; i < 100; ++i)
     evt();
@@ -122,7 +129,7 @@ TEST_F(EventTest, Disconnect)
   g_callback = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
 
   conn.reset();
 
@@ -138,8 +145,8 @@ TEST_F(EventTest, MultiCallback)
   g_callback1 = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
-  event::ConnectionPtr conn1 = evt.Connect(boost::bind(&callback1));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
+  event::ConnectionPtr conn1 = evt.Connect(std::bind(&callback1));
 
   evt();
 
@@ -154,8 +161,8 @@ TEST_F(EventTest, MultiCallbackDisconnect)
   g_callback1 = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
-  event::ConnectionPtr conn1 = evt.Connect(boost::bind(&callback1));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
+  event::ConnectionPtr conn1 = evt.Connect(std::bind(&callback1));
   conn.reset();
 
   evt();
@@ -171,10 +178,10 @@ TEST_F(EventTest, MultiCallbackReconnect)
   g_callback1 = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
-  event::ConnectionPtr conn1 = evt.Connect(boost::bind(&callback1));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
+  event::ConnectionPtr conn1 = evt.Connect(std::bind(&callback1));
   conn.reset();
-  conn = evt.Connect(boost::bind(&callback));
+  conn = evt.Connect(std::bind(&callback));
 
   evt();
 
@@ -189,8 +196,8 @@ TEST_F(EventTest, ManyChanges)
   g_callback1 = 0;
 
   event::EventT<void ()> evt;
-  event::ConnectionPtr conn = evt.Connect(boost::bind(&callback));
-  event::ConnectionPtr conn1 = evt.Connect(boost::bind(&callback1));
+  event::ConnectionPtr conn = evt.Connect(std::bind(&callback));
+  event::ConnectionPtr conn1 = evt.Connect(std::bind(&callback1));
   conn.reset();
   conn1.reset();
 
@@ -199,8 +206,8 @@ TEST_F(EventTest, ManyChanges)
   EXPECT_EQ(g_callback, 0);
   EXPECT_EQ(g_callback1, 0);
 
-  conn = evt.Connect(boost::bind(&callback));
-  conn1 = evt.Connect(boost::bind(&callback1));
+  conn = evt.Connect(std::bind(&callback));
+  conn1 = evt.Connect(std::bind(&callback1));
 
   evt();
 

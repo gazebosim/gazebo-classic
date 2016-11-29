@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -396,9 +396,12 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")
+  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
   {
-    gzerr << "Aborting test for Simbody, see issue #862.\n";
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          << ", see issues #862 and #903."
+          << std::endl;
     return;
   }
   // Load empty world

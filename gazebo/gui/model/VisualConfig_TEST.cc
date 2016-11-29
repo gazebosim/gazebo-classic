@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ void VisualConfig_TEST::VisualUpdates()
     if (it.second->name == "v1")
     {
       const VisualConfigData *configData = it.second;
-      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("transparency"),
+      QCOMPARE(configData->configWidget->DoubleWidgetValue("transparency"),
           0.50);
       foundConfig = true;
       break;
@@ -172,6 +172,55 @@ void VisualConfig_TEST::AppliedSignal()
 void VisualConfig_TEST::OnApply()
 {
   g_appliedSignalCount++;
+}
+
+/////////////////////////////////////////////////
+void VisualConfig_TEST::Restore()
+{
+  VisualConfig vc;
+  msgs::Visual v1, v2, v3;
+
+  vc.AddVisual("v1", &v1);
+  vc.AddVisual("v2", &v2);
+
+  QCOMPARE(vc.GetVisualCount(), 2u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
+
+  // Set this as the original data
+  vc.Init();
+
+  // Add a visual and restore
+  vc.AddVisual("v3", &v3);
+  QCOMPARE(vc.GetVisualCount(), 3u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") != NULL);
+
+  vc.RestoreOriginalData();
+  QCOMPARE(vc.GetVisualCount(), 2u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
+
+  // Remove a visual and restore
+  auto button = vc.findChild<QToolButton *>("removeVisualButton_0");
+  QVERIFY(button);
+
+  // Note that the confirmation dialog has been disabled for tests (issue #1963)
+  button->click();
+
+  QCOMPARE(vc.GetVisualCount(), 1u);
+  QVERIFY(vc.GetData("v1") == NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
+
+  vc.RestoreOriginalData();
+  QCOMPARE(vc.GetVisualCount(), 2u);
+  QVERIFY(vc.GetData("v1") != NULL);
+  QVERIFY(vc.GetData("v2") != NULL);
+  QVERIFY(vc.GetData("v3") == NULL);
 }
 
 // Generate a main function for the test

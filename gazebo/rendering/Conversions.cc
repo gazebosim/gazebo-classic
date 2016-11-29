@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,6 @@ Ogre::Vector3 Conversions::Convert(const math::Vector3 &_v)
 }
 
 //////////////////////////////////////////////////
-Ogre::Vector3 Conversions::Convert(const ignition::math::Vector3d &_v)
-{
-  return Ogre::Vector3(_v.X(), _v.Y(), _v.Z());
-}
-
-//////////////////////////////////////////////////
 math::Vector3 Conversions::Convert(const Ogre::Vector3 &_v)
 {
   return math::Vector3(_v.x, _v.y, _v.z);
@@ -54,6 +48,12 @@ math::Vector3 Conversions::Convert(const Ogre::Vector3 &_v)
 ignition::math::Vector3d Conversions::ConvertIgn(const Ogre::Vector3 &_v)
 {
   return ignition::math::Vector3d(_v.x, _v.y, _v.z);
+}
+
+//////////////////////////////////////////////////
+Ogre::Vector3 Conversions::Convert(const ignition::math::Vector3d &_v)
+{
+  return Ogre::Vector3(_v.X(), _v.Y(), _v.Z());
 }
 
 //////////////////////////////////////////////////
@@ -72,4 +72,60 @@ math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
 ignition::math::Quaterniond Conversions::ConvertIgn(const Ogre::Quaternion &_v)
 {
   return ignition::math::Quaterniond(_v.w, _v.x, _v.y, _v.z);
+}
+
+//////////////////////////////////////////////////
+Ogre::Quaternion Conversions::Convert(const ignition::math::Quaterniond &_q)
+{
+  return Ogre::Quaternion(_q.W(), _q.X(), _q.Y(), _q.Z());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Conversions::ConvertIgn(const Ogre::Matrix4 &_m)
+{
+  return ignition::math::Matrix4d(_m[0][0], _m[0][1], _m[0][2], _m[0][3],
+                                  _m[1][0], _m[1][1], _m[1][2], _m[1][3],
+                                  _m[2][0], _m[2][1], _m[2][2], _m[2][3],
+                                  _m[3][0], _m[3][1], _m[3][2], _m[3][3]);
+}
+
+//////////////////////////////////////////////////
+Ogre::Matrix4 Conversions::Convert(const ignition::math::Matrix4d &_m)
+{
+  return Ogre::Matrix4(_m(0, 0), _m(0, 1), _m(0, 2), _m(0, 3),
+                       _m(1, 0), _m(1, 1), _m(1, 2), _m(1, 3),
+                       _m(2, 0), _m(2, 1), _m(2, 2), _m(2, 3),
+                       _m(3, 0), _m(3, 1), _m(3, 2), _m(3, 3));
+}
+
+//////////////////////////////////////////////////
+ReferenceFrame Conversions::Convert(const Ogre::Node::TransformSpace &_ts)
+{
+  switch (_ts)
+  {
+    case Ogre::Node::TS_LOCAL:
+      return RF_LOCAL;
+    case Ogre::Node::TS_PARENT:
+      return RF_PARENT;
+    case Ogre::Node::TS_WORLD:
+      return RF_WORLD;
+    default:
+      return RF_LOCAL;
+  }
+}
+
+//////////////////////////////////////////////////
+Ogre::Node::TransformSpace Conversions::Convert(const ReferenceFrame &_rf)
+{
+  switch (_rf)
+  {
+    case RF_LOCAL:
+      return Ogre::Node::TS_LOCAL;
+    case RF_PARENT:
+      return Ogre::Node::TS_PARENT;
+    case RF_WORLD:
+      return Ogre::Node::TS_WORLD;
+    default:
+      return Ogre::Node::TS_LOCAL;
+  }
 }

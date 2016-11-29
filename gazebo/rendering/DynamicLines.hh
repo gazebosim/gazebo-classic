@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Dynamic line generator
- * Author: Nate Koenig
- * Date: 28 June 2007
- */
-
-#ifndef DYNAMICLINES_HH
-#define DYNAMICLINES_HH
+#ifndef GAZEBO_RENDERING_DYNAMICLINES_HH
+#define GAZEBO_RENDERING_DYNAMICLINES_HH
 
 #include <vector>
 #include <string>
 
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicRenderable.hh"
 #include "gazebo/util/system.hh"
@@ -44,7 +38,8 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _opType The type of Line
-      public: DynamicLines(RenderOpType _opType = RENDERING_LINE_STRIP);
+      public: explicit DynamicLines(
+                  RenderOpType _opType = RENDERING_LINE_STRIP);
 
       /// \brief Destructor
       public: virtual ~DynamicLines();
@@ -56,14 +51,6 @@ namespace gazebo
       /// \brief Overridden function from Ogre's base class.
       /// \return Returns "gazebo::ogredynamicslines"
       public: virtual const Ogre::String &getMovableType() const;
-
-      /// \brief Add a point to the point list
-      /// \param[in] _pt math::Vector3 point
-      /// \param[in] _color common::Color Point color
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void AddPoint(const math::Vector3 &_pt,
-            const common::Color &_color = common::Color::White)
-              GAZEBO_DEPRECATED(7.0);
 
       /// \brief Add a point to the point list
       /// \param[in] _pt ignition::math::Vector3d point
@@ -81,16 +68,8 @@ namespace gazebo
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
-      /// \param[in] _value math::Vector3 value to set the point to
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetPoint(unsigned int _index, const math::Vector3 &_value)
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Change the location of an existing point in the point list
-      /// \param[in] _index Index of the point to set
       /// \param[in] _value ignition::math::Vector3d value to set the point to
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetPoint(unsigned int _index,
+      public: void SetPoint(const unsigned int _index,
                   const ignition::math::Vector3d &_value);
 
       /// \brief Change the color of an existing point in the point list
@@ -100,16 +79,11 @@ namespace gazebo
 
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
-      /// \return math::Vector3 value of the point
-      /// \deprecated See function that returns an ignition::math object
-      public: math::Vector3 GetPoint(unsigned int _index) const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Return the location of an existing point in the point list
-      /// \param[in] _index Number of the point to return
-      /// \return ignition::math::Vector3d value of the point
-      public: const ignition::math::Vector3d &Point(
-                  const unsigned int _index) const;
+      /// \return ignition::math::Vector3d value of the point. A vector of
+      /// [IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF] is returned when then the
+      /// _index is out of bounds.
+      /// IGN_DBL_INF==std::numeric_limits<double>::infinity()
+      public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
       /// \brief Return the total number of points in the point list
       /// \return Number of points

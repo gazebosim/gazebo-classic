@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,30 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_MODEL_MANIP_HH_
-#define _BUILDING_MODEL_MANIP_HH_
+#ifndef _GAZEBO_GUI_BUILDING_MODEL_MANIP_HH_
+#define _GAZEBO_GUI_BUILDING_MODEL_MANIP_HH_
 
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Color.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
+
 #include "gazebo/rendering/RenderTypes.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace gui
   {
+    // Forward declare pointers.
     class BuildingMaker;
+    // Forward declare private data.
+    class BuildingModelManipPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -50,23 +56,23 @@ namespace gazebo
 
       /// \brief Get the name of the manip object.
       /// \return Name of the manip object.
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Get the visual this manip manages.
       /// \return A pointer to the visual object.
-      public: rendering::VisualPtr GetVisual() const;
+      public: rendering::VisualPtr Visual() const;
 
       /// \brief Get the transparency of the manip.
       /// \return Transparency.
-      public: double GetTransparency() const;
+      public: double Transparency() const;
 
       /// \brief Get the color of the manip.
       /// \return Color.
-      public: common::Color GetColor() const;
+      public: common::Color Color() const;
 
       /// \brief Get the texture of the manip.
       /// \return Texture.
-      public: std::string GetTexture() const;
+      public: std::string Texture() const;
 
       /// \brief Set the name of the manip object.
       /// \param[in] _name Name to set the manip to.
@@ -79,40 +85,6 @@ namespace gazebo
       /// \brief Set the maker that the manip is managed by.
       /// \param[in] _maker Maker that manages the manip.
       public: void SetMaker(BuildingMaker *_maker);
-
-      /// \brief Get the parent of this manip.
-      /// \return Parent manip.
-      public: BuildingModelManip *GetParent() const;
-
-      /// \brief Attach a manip as a child to this manip.
-      /// \param[in] _manip manip to be attached.
-      public: void AttachManip(BuildingModelManip *_manip);
-
-      /// \brief Detach a child manip from this manip.
-      /// \param[in] _manip manip to be detached.
-      public: void DetachManip(BuildingModelManip *_manip);
-
-      /// \brief Set the parent manip of this manip.
-      /// \param[in] _parent Parent manip
-      public: void SetAttachedTo(BuildingModelManip *_parent);
-
-      /// \brief Detach this manip from its parent.
-      public: void DetachFromParent();
-
-      /// \brief Get a child manip by index.
-      /// \param[in] _index Index of the child manip.
-      /// \return The attached manip at index _index.
-      public: BuildingModelManip *GetAttachedManip(unsigned int _index) const;
-
-      /// \brief Get the number of child manips attached to this
-      /// manip.
-      /// \param[in] _index Index of the child manip.
-      /// \return The number of attached manips.
-      public: unsigned int GetAttachedManipCount() const;
-
-      /// \brief Get whether or not this manip is attached to another.
-      /// \return True if attached, false otherwise.
-      public: bool IsAttached() const;
 
       /// \brief Set the pose of the manip.
       /// \param[in] _x X position in pixel coordinates.
@@ -164,17 +136,17 @@ namespace gazebo
 
       /// \brief Get the level for this manip.
       /// \return The level for this manip.
-      public: int GetLevel() const;
+      public: int Level() const;
 
       /// \brief Qt signal emitted when the manip's color has changed from the
       /// 3D view.
       /// \param[in] _color New color.
-      Q_SIGNALS: void ColorChanged(QColor _color);
+      Q_SIGNALS: void ColorChanged(const common::Color &_color);
 
       /// \brief Qt signal emitted when the manip's texture has changed from the
       /// 3D view.
       /// \param[in] _texture New texture.
-      Q_SIGNALS: void TextureChanged(QString _texture);
+      Q_SIGNALS: void TextureChanged(const std::string &_texture);
 
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
@@ -264,12 +236,12 @@ namespace gazebo
       /// \brief Qt callback when the 3D visual's color has been changed from
       /// the associated editor item.
       /// \param[in] _color New color.
-      private slots: void OnColorChanged(QColor _color);
+      private slots: void OnColorChanged(const common::Color &_color);
 
       /// \brief Qt callback when the 3D visual's texture has been changed from
       /// the associated editor item.
       /// \param[in] _texture New texture.
-      private slots: void OnTextureChanged(QString _texture);
+      private slots: void OnTextureChanged(const std::string &_texture);
 
       /// \brief Qt callback when the 3D visual's transparency has been changed
       /// from the associated editor item.
@@ -285,41 +257,9 @@ namespace gazebo
       /// \param[in] _level The level that is currently being edited.
       private: void OnChangeLevel(int _level);
 
-      /// \brief Name of the manip.
-      private: std::string name;
-
-      /// \brief A pointer to the visual managed by the manip.
-      private: rendering::VisualPtr visual;
-
-      /// \brief Size of the manipular.
-      private: math::Vector3 size;
-
-      /// \brief Pose of the manip.
-      private: math::Pose pose;
-
-      /// \brief Maker that manages this manip.
-      private: BuildingMaker *maker;
-
-      /// \brief A list of attached manips.
-      private: std::vector<BuildingModelManip *> attachedManips;
-
-      /// \brief Parent manip.
-      private: BuildingModelManip *parent;
-
-      /// \brief Visual's transparency.
-      private: double transparency;
-
-      /// \brief Visual's color.
-      private: common::Color color;
-
-      /// \brief Visual's texture.
-      private: std::string texture;
-
-      /// \brief Level this manipulator is on.
-      private: int level;
-
-      /// \brief A list of gui editor events connected to this view.
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BuildingModelManipPrivate> dataPtr;
     };
     /// \}
   }

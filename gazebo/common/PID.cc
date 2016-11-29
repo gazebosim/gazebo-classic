@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,10 +151,12 @@ double PID::Update(double _error, common::Time _dt)
   this->cmd = -pTerm - iTerm - dTerm;
 
   // Check the command limits
-  if (!ignition::math::equal(this->cmdMax, 0.0) && this->cmd > this->cmdMax)
-    this->cmd = this->cmdMax;
-  if (!ignition::math::equal(this->cmdMin, 0.0) && this->cmd < this->cmdMin)
-    this->cmd = this->cmdMin;
+  // fixed for issue #1997
+  if (this->cmdMax >= this->cmdMin)
+  {
+    // truncate command
+    this->cmd = ignition::math::clamp(this->cmd, this->cmdMin, this->cmdMax);
+  }
 
   return this->cmd;
 }

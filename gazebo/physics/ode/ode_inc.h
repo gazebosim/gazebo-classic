@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *
 */
 
-#ifndef ODE_INC_H_
-#define ODE_INC_H_
+#ifndef _GAZEBO_PHYSICS_ODE_ODE_INC_H_
+#define _GAZEBO_PHYSICS_ODE_ODE_INC_H_
 
 // This disables warning messages for ODE
 #pragma GCC system_header
-#include <ode/ode.h>
+#include <gazebo/ode/ode.h>
 
 #endif

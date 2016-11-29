@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,8 +137,9 @@ namespace gazebo
                                            ModelPtr _parent = ModelPtr()) = 0;
 
       /// \brief Return the gravity vector.
+      /// \deprecated See World::Gravity() const
       /// \return The gravity vector.
-      public: virtual math::Vector3 GetGravity() const;
+      public: virtual math::Vector3 GetGravity() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
@@ -146,8 +147,10 @@ namespace gazebo
                   const gazebo::math::Vector3 &_gravity) = 0;
 
       /// \brief Return the magnetic field vector.
+      /// \deprecated See World::MagneticField() const
       /// \return The magnetic field vector.
-      public: virtual ignition::math::Vector3d MagneticField() const;
+      public: virtual ignition::math::Vector3d MagneticField() const
+              GAZEBO_DEPRECATED(8.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -217,6 +220,10 @@ namespace gazebo
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
+
+      /// \brief Get a pointer to the world.
+      /// \return Pointer to the world.
+      public: WorldPtr World() const;
 
       /// \brief Get a pointer to the contact manger.
       /// \return Pointer to the contact manager.

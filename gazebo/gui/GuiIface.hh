@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,11 @@ namespace gazebo
     unsigned int get_entity_id(const std::string &_name);
     GZ_GUI_VISIBLE
     bool has_entity_name(const std::string &_name);
+
+    /// \brief Register the Qt metatypes
+    /// \return True on success.
+    GZ_GUI_VISIBLE
+    bool register_metatypes();
 
     /// \brief Locate and load the INI configuration file.
     /// If the GAZEBO_GUI_INI_FILE environment variable is set and contains

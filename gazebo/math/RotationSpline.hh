@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _ROTATIONSPLINE_HH_
 
 #include <vector>
+
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/util/system.hh"
 
@@ -33,33 +34,42 @@ namespace gazebo
     class GZ_MATH_VISIBLE  RotationSpline
     {
         /// \brief Constructor. Sets the autoCalc to true
-        public: RotationSpline();
+        /// \deprecated See ignition::math::RotationSpline
+        public: RotationSpline() GAZEBO_DEPRECATED(8.0);
 
         /// \brief Destructor. Nothing is done
-        public: ~RotationSpline();
+        /// \deprecated See ignition::math::RotationSpline
+        public: ~RotationSpline() GAZEBO_DEPRECATED(8.0);
 
         /// \brief Adds a control point to the end of the spline.
         /// \param[in] _p control point
-        public: void AddPoint(const Quaternion &_p);
+        /// \deprecated See ignition::math::RotationSpline
+        public: void AddPoint(const Quaternion &_p) GAZEBO_DEPRECATED(8.0);
 
         /// \brief Gets the detail of one of the control points of the spline.
         /// \param[in] _index the index of the control point.
         /// \remarks This point must already exist in the spline.
         /// \return a quaternion (out of bound index result in assertion)
-        public: const Quaternion &GetPoint(unsigned int _index) const;
+        /// \deprecated See ignition::math::RotationSpline
+        public: const Quaternion &GetPoint(unsigned int _index) const
+            GAZEBO_DEPRECATED(8.0);
 
         /// \brief Gets the number of control points in the spline.
         /// \return the count
-        public: unsigned int GetNumPoints() const;
+        /// \deprecated See ignition::math::RotationSpline
+        public: unsigned int GetNumPoints() const GAZEBO_DEPRECATED(8.0);
 
         /// \brief Clears all the points in the spline.
-        public: void Clear();
+        /// \deprecated See ignition::math::RotationSpline
+        public: void Clear() GAZEBO_DEPRECATED(8.0);
 
         /// \brief Updates a single point in the spline.
         /// \remarks This point must already exist in the spline.
         /// \param[in] _index index
         /// \param[in] _value the new control point value
-        public: void UpdatePoint(unsigned int _index, const Quaternion &_value);
+        /// \deprecated See ignition::math::RotationSpline
+        public: void UpdatePoint(unsigned int _index, const Quaternion &_value)
+            GAZEBO_DEPRECATED(8.0);
 
         /// \brief Returns an interpolated point based on a parametric
         ///        value over the whole series.
@@ -70,7 +80,9 @@ namespace gazebo
         /// \param[in] _useShortestPath Defines if rotation should take the
         ///        shortest possible path
         /// \return the rotation
-        public: Quaternion Interpolate(double _t, bool _useShortestPath = true);
+        /// \deprecated See ignition::math::RotationSpline
+        public: Quaternion Interpolate(double _t, bool _useShortestPath = true)
+            GAZEBO_DEPRECATED(8.0);
 
         /// \brief Interpolates a single segment of the spline
         ///        given a parametric value.
@@ -80,8 +92,9 @@ namespace gazebo
         /// \param[in] _useShortestPath Defines if rotation should take the
         ///         shortest possible path
         /// \return the rotation
+        /// \deprecated See ignition::math::RotationSpline
         public: Quaternion Interpolate(unsigned int _fromIndex, double _t,
-            bool _useShortestPath = true);
+            bool _useShortestPath = true) GAZEBO_DEPRECATED(8.0);
 
         /// \brief Tells the spline whether it should automatically calculate
         ///        tangents on demand as points are added.
@@ -97,13 +110,15 @@ namespace gazebo
         /// \param[in] _autoCalc If true, tangents are calculated for you
         /// whenever a point changes. If false, you must call reclacTangents to
         /// recalculate them when it best suits.
-        public: void SetAutoCalculate(bool _autoCalc);
+        /// \deprecated See ignition::math::RotationSpline
+        public: void SetAutoCalculate(bool _autoCalc) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Recalculates the tangents associated with this spline.
       /// \remarks If you tell the spline not to update on demand by calling
       ///          setAutoCalculate(false) then you must call this after
       ///          completing your updates to the spline points.
-      public: void RecalcTangents();
+      /// \deprecated See ignition::math::RotationSpline
+      public: void RecalcTangents() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Automatic recalcultation of tangeants when control points are
       /// updated

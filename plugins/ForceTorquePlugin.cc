@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@
   #include <Winsock2.h>
 #endif
 
-#include "ForceTorquePlugin.hh"
+#include <functional>
+
+#include "plugins/ForceTorquePlugin.hh"
 
 using namespace gazebo;
 
@@ -35,7 +37,7 @@ ForceTorquePlugin::ForceTorquePlugin()
 /////////////////////////////////////////////////
 ForceTorquePlugin::~ForceTorquePlugin()
 {
-  this->parentSensor->DisconnectUpdate(this->connection);
+  this->connection.reset();
   this->parentSensor.reset();
 }
 
@@ -44,13 +46,17 @@ void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
     sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
 
   if (!this->parentSensor)
-    gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
+  {
+    gzerr << "ForceTorquePlugin requires a force_torque "
+          << "sensor as its parent.\n";
+    return;
+  }
 
   this->connection = this->parentSensor->ConnectUpdate(
-        boost::bind(&ForceTorquePlugin::OnUpdate, this, _1));
+        std::bind(&ForceTorquePlugin::OnUpdate, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////

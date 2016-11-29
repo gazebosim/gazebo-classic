@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,23 @@ DARTCylinderShape::DARTCylinderShape(CollisionPtr _parent)
   : CylinderShape(_parent),
     dataPtr(new DARTCylinderShapePrivate())
 {
+  boost::dynamic_pointer_cast<DARTCollision>(_parent)->SetDARTCollisionShape(
+        this->dataPtr->dtCylinderShape);
+}
+
+//////////////////////////////////////////////////
+DARTCylinderShape::DARTCylinderShape(DARTCollisionPtr _parent)
+  : CylinderShape(_parent),
+    dataPtr(new DARTCylinderShapePrivate())
+{
+  _parent->SetDARTCollisionShape(this->dataPtr->dtCylinderShape);
 }
 
 //////////////////////////////////////////////////
 DARTCylinderShape::~DARTCylinderShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -73,24 +84,6 @@ void DARTCylinderShape::SetSize(double _radius, double _length)
 
   CylinderShape::SetSize(_radius, _length);
 
-  DARTCollisionPtr dartCollisionParent =
-      boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-  if (dartCollisionParent->GetDARTCollisionShape() == NULL)
-  {
-    dart::dynamics::BodyNode *dtBodyNode =
-        dartCollisionParent->GetDARTBodyNode();
-    dart::dynamics::CylinderShape *dtCylinderShape =
-        new dart::dynamics::CylinderShape(_radius, _length);
-    dtBodyNode->addCollisionShape(dtCylinderShape);
-    dartCollisionParent->SetDARTCollisionShape(dtCylinderShape);
-  }
-  else
-  {
-    dart::dynamics::CylinderShape *dtCylinderShape =
-        dynamic_cast<dart::dynamics::CylinderShape*>(
-          dartCollisionParent->GetDARTCollisionShape());
-    dtCylinderShape->setRadius(_radius);
-    dtCylinderShape->setHeight(_length);
-  }
+  this->dataPtr->dtCylinderShape->setRadius(_radius);
+  this->dataPtr->dtCylinderShape->setHeight(_length);
 }

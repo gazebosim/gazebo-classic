@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,7 @@ namespace gazebo
     /// Forward declare private data class
     class DARTLinkPrivate;
 
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_dart DART Physics
-    /// \brief dart physics engine wrapper
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// \brief DART Link class
@@ -150,6 +148,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
 
+      // Documentation inherited.
+      public: virtual void UpdateMass();
+
       /// \brief Store DART Transformation to Entity::dirtyPose and add this
       ///        link to World::dirtyPoses so that World::Update() trigger
       ///        Entity::SetWorldPose() for this link.
@@ -161,11 +162,24 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this link.
       /// \return Pointer to the DART World.
-      public: dart::simulation::World *GetDARTWorld(void) const;
+      /// \deprecated See dart::simulation::WorldPtr DARTWorld(void) const
+      public: dart::simulation::World *GetDARTWorld(void) const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get pointer to DART World associated with this link.
+      /// \return Pointer to the DART World.
+      public: dart::simulation::WorldPtr DARTWorld(void) const;
 
       /// \brief Get pointer to DART Model associated with this link.
       /// \return Pointer to the DART Model.
       public: DARTModelPtr GetDARTModel() const;
+
+      /// \brief Get DART BodyNode properties
+      public: DARTBodyNodePropPtr DARTProperties() const;
+
+      /// \brief Set pointer to DART BodyNode associated with this link.
+      /// \param[in] Pointer to DART BodyNode.
+      public: void SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
 
       /// \brief Get pointer to DART BodyNode associated with this link.
       /// \return Pointer to DART BodyNode.
@@ -179,8 +193,9 @@ namespace gazebo
       /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
 
-      // Documentation inherited.
-      public: virtual void UpdateMass();
+      /// \brief Get whether this link is soft body.
+      /// \brief True if this link is soft body.
+      public: bool IsSoftBody() const;
 
       /// \internal
       /// \brief Pointer to private data

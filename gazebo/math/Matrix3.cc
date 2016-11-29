@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,19 @@ Matrix3::Matrix3(double _v00, double _v01, double _v02,
   this->m[2][2] = _v22;
 }
 
+//////////////////////////////////////////////////
+Matrix3::Matrix3(const ignition::math::Matrix3d &_m)
+{
+  this->m[0][0] = _m(0, 0);
+  this->m[0][1] = _m(0, 1);
+  this->m[0][2] = _m(0, 2);
+  this->m[1][0] = _m(1, 0);
+  this->m[1][1] = _m(1, 1);
+  this->m[1][2] = _m(1, 2);
+  this->m[2][0] = _m(2, 0);
+  this->m[2][1] = _m(2, 1);
+  this->m[2][2] = _m(2, 2);
+}
 
 //////////////////////////////////////////////////
 Matrix3::~Matrix3()
@@ -142,4 +155,13 @@ bool Matrix3::operator==(const Matrix3 &_m) const
          math::equal(this->m[2][0], _m[2][0]) &&
          math::equal(this->m[2][1], _m[2][1]) &&
          math::equal(this->m[2][2], _m[2][2]);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Matrix3::Ign() const
+{
+  return ignition::math::Matrix3d(
+      this->m[0][0], this->m[0][1], this->m[0][2],
+      this->m[1][0], this->m[1][1], this->m[1][2],
+      this->m[2][0], this->m[2][1], this->m[2][2]);
 }

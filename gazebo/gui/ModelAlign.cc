@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,18 +53,14 @@ ModelAlign::ModelAlign()
 ModelAlign::~ModelAlign()
 {
   this->Clear();
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void ModelAlign::Clear()
 {
   this->dataPtr->targetVis.reset();
-  this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
   this->dataPtr->node.reset();
-  this->dataPtr->modelPub.reset();
   this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectedVisuals.clear();
   this->dataPtr->connections.clear();
@@ -80,18 +76,22 @@ void ModelAlign::Init()
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (!cam)
-    return;
+  {
+    this->dataPtr->scene = rendering::get_scene();
+  }
+  else
+  {
+    this->dataPtr->scene = cam->GetScene();
+  }
 
-  if (!cam->GetScene())
-    return;
-
-  this->dataPtr->userCamera = cam;
-  this->dataPtr->scene = cam->GetScene();
+  if (!this->dataPtr->scene)
+  {
+    gzerr << "Unable to initialize Model Align tool, scene is NULL"
+        << std::endl;
+  }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -99,47 +99,48 @@ void ModelAlign::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Transform(math::Box _bbox, math::Pose _worldPose,
-    std::vector<math::Vector3> &_vertices)
+void ModelAlign::Transform(const ignition::math::Box &_bbox,
+    const ignition::math::Pose3d &_worldPose,
+    std::vector<ignition::math::Vector3d> &_vertices)
 {
-  math::Vector3 center = _bbox.GetCenter();
+  auto center = _bbox.Center();
 
   // Get the 8 corners of the bounding box.
-  math::Vector3 v0 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
-  math::Vector3 v1 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
-  math::Vector3 v2 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
-  math::Vector3 v3 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      _bbox.GetZLength()/2.0);
+  auto v0 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                               _bbox.YLength()/2.0,
+                                               _bbox.ZLength()/2.0);
+  auto v1 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                              _bbox.YLength()/2.0,
+                                              _bbox.ZLength()/2.0);
+  auto v2 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                              -_bbox.YLength()/2.0,
+                                               _bbox.ZLength()/2.0);
+  auto v3 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                             -_bbox.YLength()/2.0,
+                                              _bbox.ZLength()/2.0);
 
-  math::Vector3 v4 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
-  math::Vector3 v5 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
-  math::Vector3 v6 = center +
-      math::Vector3(-_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
-  math::Vector3 v7 = center +
-      math::Vector3(_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
-      -_bbox.GetZLength()/2.0);
+  auto v4 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                               _bbox.YLength()/2.0,
+                                              -_bbox.ZLength()/2.0);
+  auto v5 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                              _bbox.YLength()/2.0,
+                                             -_bbox.ZLength()/2.0);
+  auto v6 = center + ignition::math::Vector3d(-_bbox.XLength()/2.0,
+                                              -_bbox.YLength()/2.0,
+                                              -_bbox.ZLength()/2.0);
+  auto v7 = center + ignition::math::Vector3d(_bbox.XLength()/2.0,
+                                             -_bbox.YLength()/2.0,
+                                             -_bbox.ZLength()/2.0);
 
   // Transform corners into world spacce.
-  v0 = _worldPose.rot * v0 + _worldPose.pos;
-  v1 = _worldPose.rot * v1 + _worldPose.pos;
-  v2 = _worldPose.rot * v2 + _worldPose.pos;
-  v3 = _worldPose.rot * v3 + _worldPose.pos;
-  v4 = _worldPose.rot * v4 + _worldPose.pos;
-  v5 = _worldPose.rot * v5 + _worldPose.pos;
-  v6 = _worldPose.rot * v6 + _worldPose.pos;
-  v7 = _worldPose.rot * v7 + _worldPose.pos;
+  v0 = _worldPose.Rot() * v0 + _worldPose.Pos();
+  v1 = _worldPose.Rot() * v1 + _worldPose.Pos();
+  v2 = _worldPose.Rot() * v2 + _worldPose.Pos();
+  v3 = _worldPose.Rot() * v3 + _worldPose.Pos();
+  v4 = _worldPose.Rot() * v4 + _worldPose.Pos();
+  v5 = _worldPose.Rot() * v5 + _worldPose.Pos();
+  v6 = _worldPose.Rot() * v6 + _worldPose.Pos();
+  v7 = _worldPose.Rot() * v7 + _worldPose.Pos();
 
   _vertices.clear();
   _vertices.push_back(v0);
@@ -153,8 +154,8 @@ void ModelAlign::Transform(math::Box _bbox, math::Pose _worldPose,
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
-    math::Vector3 &_min, math::Vector3 &_max)
+void ModelAlign::MinMax(const std::vector<ignition::math::Vector3d> &_vertices,
+    ignition::math::Vector3d &_min, ignition::math::Vector3d &_max)
 {
   if (_vertices.empty())
     return;
@@ -165,36 +166,35 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
   // find min / max in world space;
   for (unsigned int i = 1; i < _vertices.size(); ++i)
   {
-    math::Vector3 v = _vertices[i];
-    if (_min.x > v.x)
-      _min.x = v.x;
-    if (_max.x < v.x)
-      _max.x = v.x;
-    if (_min.y > v.y)
-      _min.y = v.y;
-    if (_max.y < v.y)
-      _max.y = v.y;
-    if (_min.z > v.z)
-      _min.z = v.z;
-    if (_max.z < v.z)
-      _max.z = v.z;
+    auto v = _vertices[i];
+    if (_min.X() > v.X())
+      _min.X() = v.X();
+    if (_max.X() < v.X())
+      _max.X() = v.X();
+    if (_min.Y() > v.Y())
+      _min.Y() = v.Y();
+    if (_max.Y() < v.Y())
+      _max.Y() = v.Y();
+    if (_min.Z() > v.Z())
+      _min.Z() = v.Z();
+    if (_max.Z() < v.Z())
+      _max.Z() = v.Z();
   }
 }
 
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     const std::string &_axis, const std::string &_config,
-    const std::string &_target, bool _publish)
+    const std::string &_target, const bool _publish, const bool _inverted)
 {
   if (_config == "reset" || _publish)
   {
-    std::map<rendering::VisualPtr, math::Pose>::iterator it =
-        this->dataPtr->originalVisualPose.begin();
+    auto it = this->dataPtr->originalVisualPose.begin();
     for (it; it != this->dataPtr->originalVisualPose.end(); ++it)
     {
       if (it->first)
       {
-        it->first->SetWorldPose(it->second.Ign());
+        it->first->SetWorldPose(it->second);
         this->SetHighlighted(it->first, false);
       }
     }
@@ -225,41 +225,57 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
   }
 
-  math::Pose targetWorldPose = this->dataPtr->targetVis->WorldPose();
-  math::Box targetBbox = this->dataPtr->targetVis->BoundingBox();
-  targetBbox.min *= this->dataPtr->targetVis->Scale();
-  targetBbox.max *= this->dataPtr->targetVis->Scale();
+  auto targetWorldPose = this->dataPtr->targetVis->GetWorldPose().Ign();
+  auto targetBbox = this->dataPtr->targetVis->GetBoundingBox().Ign();
+  targetBbox.Min() *= this->dataPtr->targetVis->GetScale().Ign();
+  targetBbox.Max() *= this->dataPtr->targetVis->GetScale().Ign();
 
-  std::vector<math::Vector3> targetVertices;
+  std::vector<ignition::math::Vector3d> targetVertices;
   this->Transform(targetBbox, targetWorldPose, targetVertices);
 
-  math::Vector3 targetMin;
-  math::Vector3 targetMax;
-  this->GetMinMax(targetVertices, targetMin, targetMax);
+  ignition::math::Vector3d targetMin;
+  ignition::math::Vector3d targetMax;
+  this->MinMax(targetVertices, targetMin, targetMax);
 
+  std::vector<rendering::VisualPtr> visualsToPublish;
   for (unsigned i = start; i < end; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
 
-    math::Pose worldPose = vis->WorldPose();
-    math::Box bbox = vis->BoundingBox();
-    bbox.min *= vis->Scale();
-    bbox.max *= vis->Scale();
+    auto worldPose = vis->WorldPose();
+    auto bbox = vis->BoundingBox();
+    bbox.Min() *= vis->Scale();
+    bbox.Max() *= vis->Scale();
 
-    std::vector<math::Vector3> vertices;
+    std::vector<ignition::math::Vector3d> vertices;
     this->Transform(bbox, worldPose, vertices);
 
-    math::Vector3 min;
-    math::Vector3 max;
-    this->GetMinMax(vertices, min, max);
+    ignition::math::Vector3d min;
+    ignition::math::Vector3d max;
+    this->MinMax(vertices, min, max);
 
-    math::Vector3 trans;
-    if (_config == "min")
-      trans = targetMin - min;
-    else if (_config == "center")
+    ignition::math::Vector3d trans;
+    if (_config == "center")
+    {
       trans = (targetMin + (targetMax-targetMin)/2) - (min + (max-min)/2);
-    else if (_config == "max")
-      trans = targetMax - max;
+    }
+    else
+    {
+      if (!_inverted)
+      {
+        if (_config == "min")
+          trans = targetMin - min;
+        else if (_config == "max")
+          trans = targetMax - max;
+      }
+      else
+      {
+        if (_config == "min")
+          trans = targetMin - max;
+        else if (_config == "max")
+          trans = targetMax - min;
+      }
+    }
 
     if (!_publish)
     {
@@ -276,22 +292,22 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
     if (_axis == "x")
     {
-      trans.y = trans.z = 0;
-      vis->SetWorldPosition(vis->WorldPose().Pos() + trans.Ign());
+      trans.Y() = trans.Z() = 0;
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans);
     }
     else if (_axis == "y")
     {
-      trans.x = trans.z = 0;
-      vis->SetWorldPosition(vis->WorldPose().Pos() + trans.Ign());
+      trans.X() = trans.Z() = 0;
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans);
     }
     else if (_axis == "z")
     {
-      trans.x = trans.y = 0;
-      vis->SetWorldPosition(vis->WorldPose().Pos() + trans.Ign());
+      trans.X() = trans.Y() = 0;
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans);
     }
 
     if (_publish)
-      this->PublishVisualPose(vis);
+      visualsToPublish.push_back(vis);
   }
   // Register user command on server
   if (_publish)
@@ -300,30 +316,35 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     userCmdMsg.set_description(
         "Align to [" + this->dataPtr->targetVis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
+
+    for (const auto &vis : visualsToPublish)
+    {
+      // Only publish for models
+      if (vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
+      {
+        msgs::Model msg;
+
+        auto id = gui::get_entity_id(vis->GetName());
+        if (id)
+          msg.set_id(id);
+
+        msg.set_name(vis->Name());
+        msgs::Set(msg.mutable_pose(), vis->WorldPose());
+
+        auto modelMsg = userCmdMsg.add_model();
+        modelMsg->CopyFrom(msg);
+      }
+
+      Events::moveEntity(vis->Name(), vis->WorldPose(), true);
+    }
+
     this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
-{
-  if (!_vis)
-    return;
-
-  // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
-  {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
-    msg.set_name(_vis->GetName());
-
-    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
-    this->dataPtr->modelPub->Publish(msg);
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelAlign::SetHighlighted(rendering::VisualPtr _vis, bool _highlight)
+void ModelAlign::SetHighlighted(const rendering::VisualPtr &_vis,
+    const bool _highlight)
 {
   if (_vis->GetChildCount() != 0)
   {

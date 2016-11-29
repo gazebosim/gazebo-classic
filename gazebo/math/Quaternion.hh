@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -393,8 +393,15 @@ namespace gazebo
                 const gazebo::math::Quaternion &_q)
     {
       Vector3 v(_q.GetAsEuler());
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       _out << precision(v.x, 6) << " " << precision(v.y, 6) << " "
            << precision(v.z, 6);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
       return _out;
     }
 

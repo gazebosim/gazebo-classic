@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: A persepective OGRE Camera with Depth Sensor
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
 
-#ifndef _RENDERING_DEPTHCAMERA_HH_
-#define _RENDERING_DEPTHCAMERA_HH_
+#ifndef _GAZEBO_RENDERING_DEPTHCAMERA_HH_
+#define _GAZEBO_RENDERING_DEPTHCAMERA_HH_
+
+#include <memory>
 #include <string>
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Time.hh"
-
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector2i.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/util/system.hh"
@@ -47,7 +40,8 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
+    // Forward declare private data.
+    class DepthCameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering
     /// \{
@@ -88,7 +82,7 @@ namespace gazebo
 
       /// \brief All things needed to get back z buffer for depth data
       /// \return The z-buffer as a float array
-      public: virtual const float *GetDepthData();
+      public: virtual const float *DepthData() const;
 
       /// \brief Set the render target, which renders the depth data
       /// \param[in] _target Pointer to the render target
@@ -97,27 +91,28 @@ namespace gazebo
       /// \brief Connect a to the new depth image signal
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
-              { return newDepthFrame.Connect(_subscriber); }
+      public: event::ConnectionPtr ConnectNewDepthFrame(
+          std::function<void (const float *, unsigned int, unsigned int,
+          unsigned int, const std::string &)>  _subscriber);
 
       /// \brief Disconnect from an depth image singal
       /// \param[in] _c The connection to disconnect
+      /// \deprecated Use event::~Connection to disconnect
       public: void DisconnectNewDepthFrame(event::ConnectionPtr &_c)
-              { newDepthFrame.Disconnect(_c); }
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Connect a to the new rgb point cloud signal
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewRGBPointCloud(T _subscriber)
-              { return newRGBPointCloud.Connect(_subscriber); }
+      public: event::ConnectionPtr ConnectNewRGBPointCloud(
+          std::function<void (const float *, unsigned int, unsigned int,
+          unsigned int, const std::string &)>  _subscriber);
 
       /// \brief Disconnect from an rgb point cloud singal
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &c)
-              { newRGBPointCloud.Disconnect(c); }
-
+      /// \deprecated Use event::~Connection to disconnect
+      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Implementation of the render call
       private: virtual void RenderImpl();
@@ -139,37 +134,9 @@ namespace gazebo
       /// \brief Pointer to the depth viewport
       protected: Ogre::Viewport *depthViewport;
 
-      /// \brief The depth buffer
-      private: float *depthBuffer;
-
-      /// \brief The depth material
-      private: Ogre::Material *depthMaterial;
-
-      /// \brief True to generate point clouds
-      private: bool outputPoints;
-
-      /// \brief Point cloud data buffer
-      private: float *pcdBuffer;
-
-      /// \brief Point cloud view port
-      private: Ogre::Viewport *pcdViewport;
-
-      /// \brief Point cloud material
-      private: Ogre::Material *pcdMaterial;
-
-      /// \brief Point cloud texture
-      private: Ogre::Texture *pcdTexture;
-
-      /// \brief Point cloud texture
-      private: Ogre::RenderTarget *pcdTarget;
-
-      /// \brief Event used to signal rgb point cloud data
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newRGBPointCloud;
-
-      /// \brief Event used to signal depth data
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
-                   unsigned int, const std::string &)> newDepthFrame;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<DepthCameraPrivate> dataPtr;
     };
     /// \}
   }

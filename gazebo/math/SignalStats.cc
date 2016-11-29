@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@
 #include "gazebo/math/SignalStatsPrivate.hh"
 #include "gazebo/math/SignalStats.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 
@@ -34,8 +38,12 @@ SignalStatistic::SignalStatistic()
 //////////////////////////////////////////////////
 SignalStatistic::~SignalStatistic()
 {
-  delete this->dataPtr;
-  this->dataPtr = 0;
+}
+
+//////////////////////////////////////////////////
+SignalStatistic::SignalStatistic(const SignalStatistic &_ss)
+  : dataPtr(_ss.dataPtr->Clone())
+{
 }
 
 //////////////////////////////////////////////////
@@ -127,7 +135,25 @@ SignalStats::SignalStats()
 }
 
 //////////////////////////////////////////////////
+SignalStats::SignalStats(const ignition::math::SignalStats &_s)
+  : dataPtr(new SignalStatsPrivate)
+{
+  for (std::map<std::string, double>::const_iterator iter = _s.Map().begin();
+       iter != _s.Map().end(); ++iter)
+  {
+    this->InsertStatistic(iter->first);
+    this->InsertData(iter->second);
+  }
+}
+
+//////////////////////////////////////////////////
 SignalStats::~SignalStats()
+{
+}
+
+//////////////////////////////////////////////////
+SignalStats::SignalStats(const SignalStats &_ss)
+  : dataPtr(_ss.dataPtr->Clone())
 {
 }
 
@@ -234,3 +260,31 @@ void SignalStats::Reset()
   }
 }
 
+//////////////////////////////////////////////////
+ignition::math::SignalStats SignalStats::Ign() const
+{
+  ignition::math::SignalStats result;
+
+  for (auto const &statistic : this->dataPtr->stats)
+  {
+    result.InsertStatistic(statistic->ShortName());
+    result.InsertData(statistic->Value());
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+SignalStats &SignalStats::operator=(const ignition::math::SignalStats &_s)
+{
+  std::map<std::string, double> data = _s.Map();
+
+  for (std::map<std::string, double>::const_iterator iter =  data.begin();
+       iter != data.end(); ++iter)
+  {
+    this->InsertStatistic(iter->first);
+    this->InsertData(iter->second);
+  }
+
+  return *this;
+}

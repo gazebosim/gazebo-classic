@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,19 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_VECTOR3_STATS_HH_
-#define _GAZEBO_VECTOR3_STATS_HH_
+#ifndef GAZEBO_VECTOR3_STATS_HH_
+#define GAZEBO_VECTOR3_STATS_HH_
 
 #include <string>
+#include <ignition/math/Vector3Stats.hh>
 #include "gazebo/math/SignalStats.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
+
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 namespace gazebo
 {
@@ -37,7 +43,12 @@ namespace gazebo
     class GZ_MATH_VISIBLE Vector3Stats
     {
       /// \brief Constructor
-      public: Vector3Stats();
+      /// \deprecated See ignition::math::Vector3Stats
+      public: Vector3Stats() GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Ignition math copy constructor
+      /// \param[in] _stats An ignition math vector3stats to copy
+      public: Vector3Stats(const ignition::math::Vector3Stats &_stats);
 
       /// \brief Destructor
       public: ~Vector3Stats();
@@ -101,11 +112,24 @@ namespace gazebo
       /// \return Statistics for magnitude of signal.
       public: SignalStats &Mag();
 
+      /// \brief Convert this Vector3Stats to an
+      /// ignition::math::Vector3Stats.
+      /// \return This vector as an ignition::math::Vector3d.
+      public: ignition::math::Vector3Stats Ign() const;
+
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _v An ignition math vector3stats to copy
+      /// \return this
+      public: Vector3Stats &operator=(const ignition::math::Vector3Stats &_v);
+
       /// \brief Pointer to private data.
       protected: Vector3StatsPrivate *dataPtr;
     };
     /// \}
   }
 }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 #endif
 
