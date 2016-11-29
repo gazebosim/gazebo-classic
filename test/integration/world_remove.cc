@@ -586,6 +586,21 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
     SpawnGpuRaySensor("model", "sensor", ignition::math::Vector3d::Zero,
         ignition::math::Vector3d::Zero);
   }
+  else if (_sensorType == "depth_camera")
+  {
+    SpawnDepthCameraSensor("model", "sensor", ignition::math::Vector3d::Zero,
+        ignition::math::Vector3d::Zero);
+  }
+  else if (_sensorType == "imu")
+  {
+    SpawnImuSensor("model", "sensor", ignition::math::Vector3d::Zero,
+        ignition::math::Vector3d::Zero);
+  }
+  else if (_sensorType == "contact")
+  {
+    SpawnUnitContactSensor("model", "sensor", "box",
+        ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero);
+  }
   else if (_sensorType == "sonar")
   {
     SpawnSonar("model", "sensor", ignition::math::Pose3d::Zero, 0, 10, 1);
@@ -683,10 +698,10 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
 ///////////////////////////////////////////////////
 TEST_P(WorldRemoveSensorsTest, RemoveWorldWithSensor)
 {
-//  if (this->physicsEngine != "dart")
-  //  return;
-//  if (this->sensorType != "sonar")
-  //  return;
+//  if (this->physicsEngine != "simbody")
+    return;
+  //if (this->sensorType != "contact")
+    //return;
 
   if (this->physicsEngine == "dart" && this->sensorType == "sonar")
   {
@@ -702,6 +717,9 @@ INSTANTIATE_TEST_CASE_P(RemoveSensorTypes, WorldRemoveSensorsTest,
   ::testing::Values("camera",
                     "ray_sensor",
                     "gpu_ray_sensor",
+                    "depth_camera",
+                    "imu",
+                    "contact",
                     "sonar")));
 
 
