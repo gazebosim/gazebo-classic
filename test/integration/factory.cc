@@ -655,6 +655,13 @@ TEST_P(FactoryTest, ActorAll)
 /////////////////////////////////////////////////
 void FactoryTest::Clone(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
+
   ignition::math::Pose3d testPose;
   this->Load("worlds/pr2.world", true, _physicsEngine);
 
