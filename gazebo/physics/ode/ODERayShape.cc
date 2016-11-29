@@ -84,8 +84,6 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 ODERayShape::~ODERayShape()
 {
-  //dGeomDestroy(this->geomId);
-
   this->Fini();
 }
 

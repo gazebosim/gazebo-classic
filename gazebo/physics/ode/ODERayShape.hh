@@ -83,7 +83,8 @@ namespace gazebo
       private: static void UpdateCallback(void *_data, dGeomID _o1,
                                           dGeomID _o2);
 
-      /// \brief ODE geom id.
+      /// \brief ODE geom id. We're not responsible for cleaning this up, it
+      /// will be passed to ODECollision.
       private: dGeomID geomId;
 
       /// \brief Pointer to the ODE physics engine
