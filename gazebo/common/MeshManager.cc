@@ -356,6 +356,11 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   xlate.Translate(_normal * -_d);
   xform = xlate * rot;
+  if (!xform.IsAffine())
+  {
+    gzerr << "Matrix is not affine, plane creation failed\n";
+    return;
+  }
 
   ignition::math::Vector3d vec;
   ignition::math::Vector3d norm(0, 0, 1);
@@ -380,11 +385,11 @@ void MeshManager::CreatePlane(const std::string &_name,
         vec.X() = (x * xSpace) - halfWidth;
         vec.Y() = (y * ySpace) - halfHeight;
         vec.Z() = -z;
-        vec = xform.TransformAffine(vec);
+        xform.TransformAffine(vec, vec);
         subMesh->AddVertex(vec);
 
         // Compute the normal
-        vec = xform.TransformAffine(norm);
+        xform.TransformAffine(norm, vec);
         subMesh->AddNormal(vec);
 
         // Compute the texture coordinate
