@@ -449,12 +449,12 @@ namespace gazebo
     /// \param[in] _visualize Enable sensor visualization
     protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
                    const std::string &_sensorName,
-                   const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy,
-                   const std::string &_essid,
-                   double _freq,
-                   double _power,
-                   double _gain,
+                   const math::Vector3 &_pos = math::Vector3::Zero,
+                   const math::Vector3 &_rpy = math::Vector3::Zero,
+                   const std::string &_essid = "essid",
+                   double _freq = 1,
+                   double _power = 10,
+                   double _gain = 10,
                    bool _visualize = true);
 
     /// \brief Spawn an Wireless receiver sensor on a link
@@ -470,13 +470,13 @@ namespace gazebo
     /// \param[in] _visualize Enable sensor visualization
     protected: void SpawnWirelessReceiverSensor(const std::string &_name,
                    const std::string &_sensorName,
-                   const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy,
-                   double _minFreq,
-                   double _maxFreq,
-                   double _power,
-                   double _gain,
-                   double _sensitivity,
+                   const math::Vector3 &_pos = math::Vector3::Zero,
+                   const math::Vector3 &_rpy = math::Vector3::Zero,
+                   double _minFreq = 1,
+                   double _maxFreq = 2,
+                   double _power = 10,
+                   double _gain = 10,
+                   double _sensitivity = 10,
                    bool _visualize = true);
 
     /// \brief Wait for a number of ms. and attempts until the entity is spawned

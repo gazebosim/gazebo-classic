@@ -592,6 +592,24 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
     SpawnUnitContactSensor("model", "sensor", "box",
         ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero);
   }
+  else if (_sensorType == "altimeter")
+  {
+    SpawnUnitAltimeterSensor("model", "sensor", "box", "~/altimeter_test",
+        ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero);
+  }
+  else if (_sensorType == "magnetometer")
+  {
+    SpawnUnitMagnetometerSensor("model", "sensor", "box", "~/magnetometer_test",
+        ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero);
+  }
+  else if (_sensorType == "wireless_transmitter")
+  {
+    SpawnWirelessTransmitterSensor("model", "sensor");
+  }
+  else if (_sensorType == "wireless_receiver")
+  {
+    SpawnWirelessReceiverSensor("model", "sensor");
+  }
   else if (_sensorType == "sonar")
   {
     SpawnSonar("model", "sensor", ignition::math::Pose3d::Zero, 0, 10, 1);
@@ -705,14 +723,18 @@ TEST_P(WorldRemoveSensorsTest, RemoveWorldWithSensor)
 }
 
 INSTANTIATE_TEST_CASE_P(RemoveSensorTypes, WorldRemoveSensorsTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("camera",
-                    "ray",
-                    "gpu_ray",
-                    "depth_camera",
-                    "imu",
-                    "contact",
-                    "sonar")));
+  ::testing::Combine(PHYSICS_ENGINE_VALUES, ::testing::Values(
+      "altimeter",
+      "camera",
+      "contact",
+      "depth_camera",
+      "gpu_ray",
+      "imu",
+      "magnetometer",
+      "ray",
+      "sonar",
+      "wireless_receiver",
+      "wireless_transmitter")));
 
 
 int main(int argc, char **argv)
