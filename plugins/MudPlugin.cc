@@ -49,7 +49,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
   this->world = this->model->GetWorld();
   GZ_ASSERT(this->world, "MudPlugin world pointer is NULL");
 
-  this->physics = this->world->GetPhysicsEngine();
+  this->physics = this->world->Physics();
   GZ_ASSERT(this->physics, "MudPlugin physics pointer is NULL");
 
   this->link = _model->GetLink();
@@ -98,7 +98,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
 void MudPlugin::Init()
 {
   this->node.reset(new transport::Node());
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
 
   if (!this->contactSensorName.empty())
   {
@@ -113,7 +113,7 @@ void MudPlugin::Init()
     {
       std::string name = this->contactSensorName;
       boost::replace_all(name, "/", "::");
-      name = this->world->GetName() + "::"+ this->modelName + "::" + name;
+      name = this->world->Name() + "::"+ this->modelName + "::" + name;
       sensors::SensorManager *mgr = sensors::SensorManager::Instance();
       // Get a pointer to the contact sensor
       sensors::ContactSensorPtr sensor =
@@ -126,7 +126,7 @@ void MudPlugin::Init()
           std::string colName = sensor->GetCollisionName(i);
           physics::CollisionPtr colPtr =
               boost::dynamic_pointer_cast<physics::Collision>(
-              this->world->GetEntity(colName));
+              this->world->EntityByName(colName));
           if (colPtr)
           {
             this->contactSurfaceBitmask |=
@@ -144,7 +144,7 @@ void MudPlugin::Init()
   for (unsigned int i = 0; i < this->allowedLinks.size(); ++i)
   {
     physics::LinkPtr allowedLink = boost::dynamic_pointer_cast<physics::Link>(
-        this->world->GetEntity(this->allowedLinks[i]));
+        this->world->EntityByName(this->allowedLinks[i]));
 
     if (!allowedLink)
       continue;
@@ -267,7 +267,7 @@ void MudPlugin::OnUpdate()
             std::string targetModelName = (*iterLinkName).substr(0,
                                           (*iterLinkName).rfind("::"));
             physics::ModelPtr targetModel =
-              this->world->GetModel(targetModelName);
+              this->world->ModelByName(targetModelName);
             if (targetModel)
               *iterLink = targetModel->GetLink(*iterLinkName);
           }

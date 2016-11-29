@@ -87,7 +87,7 @@ int main(int _argc, char **_argv)
 
   for (unsigned int i = 0; i < modelNames.size(); i++)
   {
-    gazebo::physics::ModelPtr model = world->GetModel(modelNames[i]);
+    gazebo::physics::ModelPtr model = world->ModelByName(modelNames[i]);
     if (!model)
     {
       std::cout << "Couldn't find model: " << modelNames[i] << std::endl;

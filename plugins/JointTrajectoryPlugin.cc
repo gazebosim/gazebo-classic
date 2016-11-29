@@ -42,7 +42,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   this->model = _parent;
   this->world = this->model->GetWorld();
 
-  // this->world->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  // this->world->Physics()->SetGravity(math::Vector3(0,0,0));
 
   for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
                         j != this->model->GetJoints().end(); ++j)
@@ -58,7 +58,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 // void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
 // {
-//   this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
+//   this->joint = this->world->Physics()->CreateJoint("revolute",
 //       this->model);
 //
 //   this->joint->SetModel(this->model);
@@ -82,7 +82,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
-  common::Time cur_time = this->world->GetSimTime();
+  common::Time cur_time = this->world->SimTime();
 
   // for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
   //                       j != this->model->GetJoints().end(); ++j)

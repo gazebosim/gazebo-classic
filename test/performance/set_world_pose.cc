@@ -28,7 +28,7 @@ TEST_F(SetWorldPoseTest, Stress)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   math::Pose pose(1, 2, 3, 0, 0, 0);

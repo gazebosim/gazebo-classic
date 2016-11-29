@@ -45,7 +45,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -60,8 +60,8 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 
   // get pointers to the falling boxes.
   physics::ModelPtr contactBox, collideBox;
-  contactBox = world->GetModel("contact_box");
-  collideBox = world->GetModel("collide_box");
+  contactBox = world->ModelByName("contact_box");
+  collideBox = world->ModelByName("collide_box");
   ASSERT_TRUE(contactBox != NULL);
   ASSERT_TRUE(collideBox != NULL);
 
@@ -184,7 +184,7 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -199,10 +199,10 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
 
   // get pointers to the falling boxes.
   physics::ModelPtr box1, box2, box3, box4;
-  box1 = world->GetModel("box1");
-  box2 = world->GetModel("box2");
-  box3 = world->GetModel("box3");
-  box4 = world->GetModel("box4");
+  box1 = world->ModelByName("box1");
+  box2 = world->ModelByName("box2");
+  box3 = world->ModelByName("box3");
+  box4 = world->ModelByName("box4");
   ASSERT_TRUE(box1 != NULL);
   ASSERT_TRUE(box2 != NULL);
   ASSERT_TRUE(box3 != NULL);
@@ -236,7 +236,7 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   EXPECT_NEAR(box3->GetWorldPose().pos.z, 1.5, 1e-3);
 
   // Expect 4th box to still be falling
-  fallVelocity = g.Z() * world->GetSimTime().Double();
+  fallVelocity = g.Z() * world->SimTime().Double();
   EXPECT_LT(box4->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
 
   Unload();

@@ -42,8 +42,8 @@ JointState::JointState(JointPtr _joint, const common::Time &_realTime,
 
 /////////////////////////////////////////////////
 JointState::JointState(JointPtr _joint)
-: State(_joint->GetName(), _joint->GetWorld()->GetRealTime(),
-        _joint->GetWorld()->GetSimTime(), _joint->GetWorld()->GetIterations())
+: State(_joint->GetName(), _joint->GetWorld()->RealTime(),
+        _joint->GetWorld()->SimTime(), _joint->GetWorld()->Iterations())
 {
   // Set the joint angles.
   for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)

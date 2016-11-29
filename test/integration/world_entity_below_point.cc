@@ -49,12 +49,12 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
   physics::EntityPtr entity;
   for (iter = modelNames.begin(); iter != modelNames.end(); ++iter)
   {
-    model = world->GetModel(*iter);
+    model = world->ModelByName(*iter);
     ASSERT_TRUE(model != NULL);
     pos = model->GetWorldPose().pos;
     pos.z += 10;
 
-    entity = world->GetEntityBelowPoint(pos);
+    entity = world->EntityBelowPoint(pos.Ign());
     if (entity)
     {
       gzdbg << "hit: " << entity->GetScopedName()
@@ -70,7 +70,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 
     testPos = pos;
     testPos.z = pos.z + 5;
-    entity = world->GetEntityBelowPoint(testPos);
+    entity = world->EntityBelowPoint(testPos.Ign());
     if (entity)
     {
       gzdbg << "hit: " << entity->GetScopedName()
@@ -87,7 +87,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 
   // Ground plane
   pos.Set(25, 25, 1);
-  entity = world->GetEntityBelowPoint(pos);
+  entity = world->EntityBelowPoint(pos.Ign());
   if (entity)
   {
     gzdbg << "hit: " << entity->GetScopedName()
@@ -103,7 +103,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 
   // Expect no hit
   pos.Set(25, 25, -1);
-  entity = world->GetEntityBelowPoint(pos);
+  entity = world->EntityBelowPoint(pos.Ign());
   EXPECT_TRUE(entity == NULL);
 }
 

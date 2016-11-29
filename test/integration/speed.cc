@@ -126,7 +126,7 @@ void SpeedTest::UnthrottledStep(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Unthrottle physics updates
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   physics->SetRealTimeUpdateRate(0.0);
   double dt = physics->GetMaxStepSize();

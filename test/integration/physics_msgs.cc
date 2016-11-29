@@ -49,7 +49,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -101,7 +101,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   world->SetGravity(ignition::math::Vector3d::Zero);
@@ -129,7 +129,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
   poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
 
   {
@@ -178,7 +178,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -193,7 +193,7 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   transport::PublisherPtr modelPub =
     this->node->Advertise<msgs::Model>("~/model/modify");
 
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
 
   // change gravity mode and verify the msg gets through
@@ -315,7 +315,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   world->SetGravity(ignition::math::Vector3d::Zero);
@@ -337,7 +337,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   std::string name = "multilink";
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
 
   {
@@ -402,7 +402,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -470,7 +470,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   {
     std::string name = iter.first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     EXPECT_TRUE(model != NULL);
 
     pose1 = model->GetWorldPose();
@@ -487,7 +487,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   for (auto const &iter : modelPos)
   {
     std::string name = iter.first;
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     if (*(name.rbegin()) == '2')
     {
       // Use a message to resize this one
@@ -509,7 +509,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
-  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double dtHit = tHit+0.5 - world->SimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
   world->Step(steps);
@@ -529,7 +529,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   {
     std::string name = iter.first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     if (model != NULL)
     {
       gzdbg << "Check ground contact of model " << name << '\n';
@@ -564,7 +564,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   for (auto const &iter : modelPos)
   {
     std::string name = iter.first;
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     msgs::Model modelMsg;
     model->FillMsg(modelMsg);
 
@@ -628,7 +628,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   for (auto const &iter : modelPos)
   {
     std::string name = iter.first;
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     sdf::ElementPtr modelElem = model->GetSDF();
 
     EXPECT_TRUE(modelElem->HasElement("link"));
@@ -702,7 +702,7 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -743,7 +743,7 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   SpawnSDF(sdfStream.str());
 
   physics::ModelPtr model;
-  model = world->GetModel("box_test");
+  model = world->ModelByName("box_test");
   EXPECT_TRUE(model != NULL);
   msgs::Model msg;
   model->FillMsg(msg);
@@ -786,7 +786,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -896,7 +896,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   SpawnSDF(sdfStream.str());
 
   physics::ModelPtr model;
-  model = world->GetModel("joint_msg_test");
+  model = world->ModelByName("joint_msg_test");
   EXPECT_TRUE(model != NULL);
   msgs::Model msg;
   model->FillMsg(msg);

@@ -31,7 +31,7 @@ TEST_F(Issue1124Test, SetModelPose)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
@@ -68,7 +68,7 @@ TEST_F(Issue1124Test, SetLinkPose)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
@@ -94,7 +94,7 @@ TEST_F(Issue1124Test, MovingPose)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");

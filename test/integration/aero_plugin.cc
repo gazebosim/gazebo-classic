@@ -53,7 +53,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -61,10 +61,10 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -73,7 +73,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
-  physics::ModelPtr model_1 = world->GetModel("lift_drag_demo_model");
+  physics::ModelPtr model_1 = world->ModelByName("lift_drag_demo_model");
   physics::LinkPtr body = model_1->GetLink("body");
   physics::LinkPtr wing_1 = model_1->GetLink("wing_1");
   physics::LinkPtr wing_2 = model_1->GetLink("wing_2");

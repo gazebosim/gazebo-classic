@@ -45,7 +45,7 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -63,7 +63,7 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     physics->SetParam("world_step_solver", _worldSolverType);
   }
   math::Pose pose;
-  physics::ModelPtr sphere_model = world->GetModel("sphere");
+  physics::ModelPtr sphere_model = world->ModelByName("sphere");
   if (sphere_model)
     pose = sphere_model->GetWorldPose();
 
@@ -74,7 +74,7 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   double dynamic_duration = 2.4;
   double v = 0.0;
   double g = -10.0;
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   int steps = test_duration/dt;
   int dynamic_steps = dynamic_duration/dt;
   for (int i = 0; i < steps; ++i)
@@ -83,7 +83,7 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     z += dt * v;
 
     world->Step(1);
-    physics::ModelPtr sphere_model = world->GetModel("sphere");
+    physics::ModelPtr sphere_model = world->ModelByName("sphere");
     if (sphere_model)
     {
       math::Vector3 vel = sphere_model->GetWorldLinearVel();

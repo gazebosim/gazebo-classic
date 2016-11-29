@@ -156,7 +156,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName)
       "ForceTorqueSensor did not get a valid World pointer");
 
   this->dataPtr->parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
-      this->world->GetByName(this->ParentName()));
+      this->world->BaseByName(this->ParentName()));
 
   if (!this->dataPtr->parentJoint)
   {
@@ -208,7 +208,7 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->wrenchMsg.mutable_time(),
       this->lastMeasurementTime);
 

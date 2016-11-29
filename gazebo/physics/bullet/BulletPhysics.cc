@@ -142,7 +142,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!collisionPtr1 || !collisionPtr2)
       continue;
 
-    PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
+    PhysicsEnginePtr engine = collisionPtr1->GetWorld()->Physics();
     BulletPhysicsPtr bulletPhysics =
           boost::static_pointer_cast<BulletPhysics>(engine);
 
@@ -150,7 +150,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     // listening for contact information.
     Contact *contactFeedback = bulletPhysics->GetContactManager()->NewContact(
         collisionPtr1.get(), collisionPtr2.get(),
-        collisionPtr1->GetWorld()->GetSimTime());
+        collisionPtr1->GetWorld()->SimTime());
 
     if (!contactFeedback)
       continue;
@@ -378,7 +378,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
       boost::any_cast<double>(this->GetParam("min_step_size")));
     physicsMsg.set_iters(
       boost::any_cast<int>(this->GetParam("iters")));
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_sor(
       boost::any_cast<double>(this->GetParam("sor")));
     physicsMsg.set_cfm(
@@ -430,7 +430,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam("erp", _msg->erp());
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+    this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_contact_surface_layer())
     this->SetParam("contact_surface_layer", _msg->contact_surface_layer());
@@ -714,7 +714,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new BulletRayShape(_collision));
     else
-      shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new BulletRayShape(this->world->Physics()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 

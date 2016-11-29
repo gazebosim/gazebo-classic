@@ -70,7 +70,7 @@ void TrackVisualTest::TrackVisual()
   QVERIFY(trackedModelVis == boxModelVis);
 
   // Get box model
-  auto boxModel = world->GetModel("box");
+  auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
   QVERIFY(boxModel->GetWorldPose().Ign() == boxModelVisPose);
 

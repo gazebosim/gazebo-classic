@@ -35,9 +35,9 @@ TEST_P(PresetManagerTest, InitializeAllPhysicsEngines)
   Load("test/worlds/presets.world", false, physicsEngineName);
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -92,9 +92,9 @@ TEST_F(PresetManagerTest, MultipleDefaults)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -108,9 +108,9 @@ TEST_F(PresetManagerTest, NoDefault)
   Load("test/worlds/presets_nodefault.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -124,9 +124,9 @@ TEST_F(PresetManagerTest, SetProfileParam)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -157,9 +157,9 @@ TEST_F(PresetManagerTest, SetCurrentProfile)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
 
   if (!presetManager)
   {
@@ -197,9 +197,9 @@ TEST_F(PresetManagerTest, CreateProfileFromSDF)
   Load("test/worlds/presets.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();
@@ -252,9 +252,9 @@ TEST_F(PresetManagerTest, BackwardsCompatibilityTest)
   Load("worlds/empty.world", false, "ode");
   physics::WorldPtr world = physics::get_world("default");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   if (!presetManager)
   {
     FAIL();

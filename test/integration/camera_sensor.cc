@@ -104,10 +104,10 @@ TEST_F(CameraSensor, WorldReset)
   // reset the world and verify
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  common::Time simTime = world->GetSimTime().Double();
+  common::Time simTime = world->SimTime().Double();
   world->Reset();
-  EXPECT_TRUE(world->GetSimTime() == common::Time(0.0) ||
-      world->GetSimTime() < simTime);
+  EXPECT_TRUE(world->SimTime() == common::Time(0.0) ||
+      world->SimTime() < simTime);
 
   // verify that the camera can continue to render and generate images at
   // the specified rate

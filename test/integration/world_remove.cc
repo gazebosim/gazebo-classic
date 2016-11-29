@@ -126,7 +126,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   EXPECT_GT(worldPtrCount, 1);
 
   // Get physics engine pointer
-  auto physicsEngine = world->GetPhysicsEngine();
+  auto physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
@@ -218,7 +218,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   EXPECT_GT(worldPtrCount, 1);
 
   // Get physics engine pointer
-  auto physicsEngine = world->GetPhysicsEngine();
+  auto physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
@@ -241,7 +241,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   std::vector<physics::ModelPtr> modelPtrs;
   for (auto &name : modelNames)
   {
-    auto model = world->GetModel(name);
+    auto model = world->ModelByName(name);
     ASSERT_TRUE(model != nullptr);
     modelPtrs.push_back(model);
   }
@@ -253,7 +253,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   std::vector<physics::LightPtr> lightPtrs;
   for (auto &name : lightNames)
   {
-    auto light = world->Light(name);
+    auto light = world->LightByName(name);
     ASSERT_TRUE(light != nullptr);
     lightPtrs.push_back(light);
   }
@@ -408,7 +408,7 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   EXPECT_GT(worldPtrCount, 1);
 
   // Get model pointer
-  auto model = world->GetModel("joint_model0");
+  auto model = world->ModelByName("joint_model0");
   ASSERT_TRUE(model != nullptr);
 
   // Check model has the joint
@@ -423,7 +423,7 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   ASSERT_TRUE(childLink != nullptr);
 
   // Get physics engine pointer
-  auto physicsEngine = world->GetPhysicsEngine();
+  auto physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
@@ -620,7 +620,7 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
   ASSERT_TRUE(sensor != nullptr);
 
   // Get physics engine pointer
-  auto physicsEngine = world->GetPhysicsEngine();
+  auto physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
@@ -699,7 +699,7 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
 TEST_P(WorldRemoveSensorsTest, RemoveWorldWithSensor)
 {
 //  if (this->physicsEngine != "simbody")
-    return;
+//    return;
   //if (this->sensorType != "contact")
     //return;
 
