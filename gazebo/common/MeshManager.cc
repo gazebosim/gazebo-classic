@@ -19,11 +19,6 @@
 #include <string>
 #include <map>
 
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Matrix3.hh"
-#include "gazebo/math/Matrix4.hh"
-#include "gazebo/math/Vector2i.hh"
-
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -599,7 +594,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
         {
           int index = (ev0 + k + 1) % triangle.size();
           ignition::math::Vector3d triV = triangle[index];
-          if (math::Vector2d(triV.X(), triV.Y()) == edgeV1)
+          if (ignition::math::Vector2d(triV.X(), triV.Y()) == edgeV1)
           {
             // found another vertex in triangle that matches the vertex of the
             // other edge.

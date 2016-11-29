@@ -114,7 +114,9 @@ void RenderEngine::Load()
     // Make the root
     try
     {
-      this->dataPtr->root = new Ogre::Root();
+      // empty strings for config filenames (plugins.cfg and ogre.cfg)
+      // so ogre doesn't try to look for them.
+      this->dataPtr->root = new Ogre::Root("", "");
     }
     catch(Ogre::Exception &e)
     {

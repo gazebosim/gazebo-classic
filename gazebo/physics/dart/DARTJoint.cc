@@ -53,15 +53,13 @@ DARTJoint::~DARTJoint()
 //////////////////////////////////////////////////
 void DARTJoint::Load(sdf::ElementPtr _sdf)
 {
-  if (!this->dataPtr->dtJoint)
-  {
-    gzerr << "dtJoint should be created in each subclass constructor" <<
-        std::endl;
-  }
-
   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
   // parent link and child link.
   Joint::Load(_sdf);
+
+  this->dataPtr->dtProperties.reset(new dart::dynamics::Joint::Properties());
+  this->dataPtr->dtProperties->mName = this->GetName();
+  this->dataPtr->dtProperties->mIsPositionLimited = true;
 }
 
 //////////////////////////////////////////////////
@@ -69,9 +67,10 @@ void DARTJoint::Init()
 {
   Joint::Init();
 
-  // Name
-  std::string jointName = this->GetName();
-  this->dataPtr->dtJoint->setName(jointName.c_str());
+  this->dataPtr->Initialize();
+
+  // DARTModel::Load() should be called first
+  GZ_ASSERT(this->dataPtr->dtJoint != nullptr, "DARTJoint is not initialized.");
 
   // Parent and child link information
   DARTLinkPtr dartParentLink =
@@ -85,13 +84,11 @@ void DARTJoint::Init()
   Eigen::Isometry3d dtTransformParentBodyNode = Eigen::Isometry3d::Identity();
   Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
-  // if (theChildLink != nullptr)
   GZ_ASSERT(dartChildLink.get() != nullptr, "dartChildLink pointer is null");
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->GetWorldPose());
     this->dataPtr->dtChildBodyNode = dartChildLink->GetDARTBodyNode();
-    this->dataPtr->dtChildBodyNode->setParentJoint(this->dataPtr->dtJoint);
   }
   dtTransformChildLinkToJoint = DARTTypes::ConvPose(this->anchorPose);
 
@@ -99,9 +96,6 @@ void DARTJoint::Init()
   {
     dtTransformParentBodyNode =
         DARTTypes::ConvPose(dartParentLink->GetWorldPose());
-    dart::dynamics::BodyNode *dtParentBodyNode =
-      dartParentLink->GetDARTBodyNode();
-    dtParentBodyNode->addChildBodyNode(this->dataPtr->dtChildBodyNode);
   }
 
   dtTransformParentLinkToJoint = dtTransformParentBodyNode.inverse() *
@@ -248,6 +242,15 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     {
       if (!parentStatic && !childStatic)
       {
+        if (!this->dataPtr->IsInitialized())
+        {
+          this->dataPtr->Cache(
+                "StiffnessDamping",
+                boost::bind(&DARTJoint::SetStiffnessDamping, this,
+                            _index, _stiffness, _damping, _reference));
+          return;
+        }
+
         this->dataPtr->dtJoint->setSpringStiffness(
               static_cast<int>(_index), _stiffness);
         this->dataPtr->dtJoint->setRestPosition(
@@ -274,70 +277,87 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
-  switch (_index)
+  if (_index >= this->GetAngleCount())
   {
-    case 0:
-    case 1:
-    case 2:
-      this->dataPtr->dtJoint->setPositionUpperLimit(_index, _angle.Radian());
-      return true;
-    default:
-      gzerr << "Invalid index[" << _index << "]\n";
-      return false;
-  };
+    gzerr << "Invalid index[" << _index << "]\n";
+    return false;
+  }
+
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "HighStop" + std::to_string(_index),
+          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle));
+    return true;
+  }
+
+  this->dataPtr->dtJoint->setPositionUpperLimit(_index, _angle.Radian());
+  return true;
 }
 
 //////////////////////////////////////////////////
 bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
-  switch (_index)
+  if (_index >= this->GetAngleCount())
   {
-  case 0:
-  case 1:
-  case 2:
-    this->dataPtr->dtJoint->setPositionLowerLimit(_index, _angle.Radian());
-    return true;
-  default:
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
-  };
+  }
+
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "LowStop" + std::to_string(_index),
+          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle));
+    return true;
+  }
+
+  this->dataPtr->dtJoint->setPositionLowerLimit(_index, _angle.Radian());
+  return true;
 }
 
 //////////////////////////////////////////////////
 math::Angle DARTJoint::GetHighStop(unsigned int _index)
 {
-  switch (_index)
+  if (_index >= this->GetAngleCount())
   {
-  case 0:
-  case 1:
-  case 2:
-    return this->dataPtr->dtJoint->getPositionUpperLimit(_index);
-  default:
     gzerr << "Invalid index[" << _index << "]\n";
-  };
+    return math::Angle();
+  }
 
-  return 0;
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Angle>(
+          "HighStop" + std::to_string(_index));
+  }
+
+  return this->dataPtr->dtJoint->getPositionUpperLimit(_index);
 }
 
 //////////////////////////////////////////////////
 math::Angle DARTJoint::GetLowStop(unsigned int _index)
 {
-  switch (_index)
+  if (_index >= this->GetAngleCount())
   {
-  case 0:
-  case 1:
-  case 2:
-    return this->dataPtr->dtJoint->getPositionLowerLimit(_index);
-  default:
     gzerr << "Invalid index[" << _index << "]\n";
-  };
+    return math::Angle();
+  }
 
-  return 0;
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Angle>(
+          "LowStop" + std::to_string(_index));
+  }
+
+  return this->dataPtr->dtJoint->getPositionLowerLimit(_index);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+    return math::Vector3::Zero;
+
   math::Vector3 result;
 
   if (!this->dataPtr->dtJoint)
@@ -384,6 +404,9 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+    return math::Vector3::Zero;
+
   math::Vector3 result;
 
   if (!this->dataPtr->dtJoint)
@@ -429,6 +452,17 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
                          const boost::any &_value)
 {
+  if (_index >= this->GetAngleCount())
+    gzerr << "Invalid index[" << _index << "]\n";
+
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          _key + std::to_string(_index),
+          boost::bind(&DARTJoint::SetParam, this, _key, _index, _value));
+    return true;
+  }
+
   // try because boost::any_cast can throw
   try
   {
@@ -442,8 +476,8 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "friction")
     {
-      this->dataPtr->dtJoint->setCoulombFriction(_index,
-                                        boost::any_cast<double>(_value));
+      this->dataPtr->dtJoint->setCoulombFriction(
+            _index, boost::any_cast<double>(_value));
     }
     else
     {
@@ -465,6 +499,15 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
 //////////////////////////////////////////////////
 double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+    return false;
+  }
+
+  if (!this->dataPtr->IsInitialized())
+    return this->dataPtr->GetCached<double>(_key + std::to_string(_index));
+
   try
   {
     if (_key == "friction")
@@ -491,6 +534,9 @@ void DARTJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 {
+  if (!this->dataPtr->IsInitialized())
+    return JointWrench();
+
   JointWrench jointWrench;
 
   //---------------------------------------------
@@ -562,16 +608,6 @@ double DARTJoint::GetForce(unsigned int _index)
 }
 
 /////////////////////////////////////////////////
-unsigned int DARTJoint::GetAngleCount() const
-{
-  unsigned int angleCount = 0;
-
-  angleCount = this->dataPtr->dtJoint->getNumDofs();
-
-  return angleCount;
-}
-
-/////////////////////////////////////////////////
 void DARTJoint::ApplyDamping()
 {
   // rename ApplyDamping to ApplyStiffnessDamping (below) in gazebo 4.0.
@@ -591,6 +627,18 @@ DARTModelPtr DARTJoint::GetDARTModel() const
 }
 
 /////////////////////////////////////////////////
+DARTJointPropPtr DARTJoint::DARTProperties() const
+{
+  return this->dataPtr->dtProperties;
+}
+
+/////////////////////////////////////////////////
+void DARTJoint::SetDARTJoint(dart::dynamics::Joint *_dtJoint)
+{
+  this->dataPtr->dtJoint = _dtJoint;
+}
+
+/////////////////////////////////////////////////
 dart::dynamics::Joint *DARTJoint::GetDARTJoint()
 {
   return this->dataPtr->dtJoint;
@@ -599,6 +647,14 @@ dart::dynamics::Joint *DARTJoint::GetDARTJoint()
 /////////////////////////////////////////////////
 void DARTJoint::SaveForce(unsigned int _index, double _force)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "DARTJoint::SaveForce",
+          boost::bind(&DARTJoint::SaveForce, this, _index, _force));
+    return;
+  }
+
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->GetAngleCount())

@@ -26,6 +26,7 @@
 #include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Pose3.hh>
 
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
@@ -435,22 +436,22 @@ bool ModelCommand::RunImpl()
     return false;
   }
 
-  math::Pose pose;
-  math::Vector3 rpy;
+  ignition::math::Pose3d pose;
+  ignition::math::Vector3d rpy;
 
   if (this->vm.count("pose-x"))
-    pose.pos.x = this->vm["pose-x"].as<double>();
+    pose.Pos().X(this->vm["pose-x"].as<double>());
   if (this->vm.count("pose-y"))
-    pose.pos.y = this->vm["pose-y"].as<double>();
+    pose.Pos().Y(this->vm["pose-y"].as<double>());
   if (this->vm.count("pose-z"))
-    pose.pos.z = this->vm["pose-z"].as<double>();
+    pose.Pos().Z(this->vm["pose-z"].as<double>());
   if (this->vm.count("pose-R"))
-    rpy.x = this->vm["pose-R"].as<double>();
+    rpy.X(this->vm["pose-R"].as<double>());
   if (this->vm.count("pose-P"))
-    rpy.y = this->vm["pose-P"].as<double>();
+    rpy.Y(this->vm["pose-P"].as<double>());
   if (this->vm.count("pose-Y"))
-    rpy.z = this->vm["pose-Y"].as<double>();
-  pose.rot.SetFromEuler(rpy);
+    rpy.Z(this->vm["pose-Y"].as<double>());
+  pose.Rot().Euler(rpy);
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
@@ -545,7 +546,7 @@ bool ModelCommand::RunImpl()
 
     msgs::Model msg;
     msg.set_name(modelName);
-    msgs::Set(msg.mutable_pose(), pose.Ign());
+    msgs::Set(msg.mutable_pose(), pose);
     pub->Publish(msg, true);
   }
 

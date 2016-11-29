@@ -16,10 +16,11 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Vector2d.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
@@ -30,18 +31,24 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Skeleton.hh"
-#include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/WireBox.hh"
+
+#include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/RTShaderSystem.hh"
-#include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/InertiaVisual.hh"
+#include "gazebo/rendering/JointVisual.hh"
+#include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
-#include "gazebo/rendering/VisualPrivate.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/VisualPrivate.hh"
+#include "gazebo/rendering/WireBox.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -175,6 +182,8 @@ Visual::~Visual()
 {
   this->Fini();
 
+  delete this->dataPtr->typeMsg;
+
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }
@@ -267,11 +276,20 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 
   while (itObject.hasMoreElements())
   {
-    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
-    if (ent->getMovableType() != DynamicLines::GetMovableType())
-      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
+    // Remove dynamic lines and entities in Visual
+    // Other objects such as cameras, lights, and projectors
+    // should have their own class for handling the deletion
+    // of these ogre objects
+    Ogre::MovableObject *obj = itObject.getNext();
+    if (obj->getMovableType() == DynamicLines::GetMovableType())
+      delete obj;
     else
-      delete ent;
+    {
+      Ogre::Entity *ent = dynamic_cast<Ogre::Entity *>(obj);
+      if (!ent)
+        continue;
+      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
+    }
   }
   this->dataPtr->lines.clear();
 
@@ -288,6 +306,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
       this->DestroyAllAttachedMovableObjects(pChildNode);
     }
   }
+  _sceneNode->detachAllObjects();
 }
 
 //////////////////////////////////////////////////
@@ -372,6 +391,7 @@ void Visual::Load()
 
   // Set the pose of the scene node
   this->SetPose(pose);
+  this->dataPtr->initialRelativePose = pose.Ign();
 
   // Get the size of the mesh
   if (obj)
@@ -429,8 +449,7 @@ void Visual::Load()
       ignition::math::Vector3d derivedScale = this->DerivedScale();
       ignition::math::Vector3d localScale =
           geometrySize / (derivedScale / this->dataPtr->scale);
-      this->dataPtr->sceneNode->setScale(
-          Conversions::Convert(math::Vector3(localScale)));
+      this->dataPtr->sceneNode->setScale(Conversions::Convert(localScale));
       this->dataPtr->scale = localScale;
       this->dataPtr->geomSize = geometrySize;
     }
@@ -771,7 +790,7 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
   this->dataPtr->scale = _scale;
 
   this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(math::Vector3(this->dataPtr->scale)));
+      Conversions::Convert(this->dataPtr->scale));
 
   // Scale selection object in case we have one attached. Other children were
   // scaled from UpdateGeomSize
@@ -1718,7 +1737,7 @@ math::Vector3 Visual::GetPosition() const
 {
   if (!this->dataPtr->sceneNode)
     return math::Vector3::Zero;
-  return Conversions::Convert(this->dataPtr->sceneNode->getPosition());
+  return Conversions::ConvertIgn(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
@@ -1726,7 +1745,7 @@ math::Quaternion Visual::GetRotation() const
 {
   if (!this->dataPtr->sceneNode)
     return math::Vector3::Zero;
-  return Conversions::Convert(this->dataPtr->sceneNode->getOrientation());
+  return Conversions::ConvertIgn(this->dataPtr->sceneNode->getOrientation());
 }
 
 //////////////////////////////////////////////////
@@ -1736,6 +1755,12 @@ math::Pose Visual::GetPose() const
   pos.pos = this->GetPosition();
   pos.rot = this->GetRotation();
   return pos;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Visual::InitialRelativePose() const
+{
+  return this->dataPtr->initialRelativePose;
 }
 
 //////////////////////////////////////////////////
@@ -1750,7 +1775,8 @@ void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
+  this->dataPtr->sceneNode->_setDerivedPosition(
+    Conversions::Convert(_pos.Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -1758,7 +1784,8 @@ void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
+  this->dataPtr->sceneNode->_setDerivedOrientation(
+    Conversions::Convert(_q.Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -1975,14 +2002,14 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
       Ogre::AxisAlignedBox bb = obj->getBoundingBox();
 
-      math::Vector3 min;
-      math::Vector3 max;
+      ignition::math::Vector3d min;
+      ignition::math::Vector3d max;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = math::Vector3(-0.5, -0.5, -0.5);
-        max = math::Vector3(0.5, 0.5, 0.5);
+        min = ignition::math::Vector3d(-0.5, -0.5, -0.5);
+        max = ignition::math::Vector3d(0.5, 0.5, 0.5);
       }
       else
       {
@@ -1994,8 +2021,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         // get oriented bounding box in object's local space
         bb.transformAffine(transform);
 
-        min = Conversions::Convert(bb.getMinimum());
-        max = Conversions::Convert(bb.getMaximum());
+        min = Conversions::ConvertIgn(bb.getMinimum());
+        max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
       box.Merge(math::Box(min, max));
@@ -2810,7 +2837,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
     key = strack->createNodeKeyFrame(tt);
     key->setTranslate(Ogre::Vector3(
           _pts[i].pos.x, _pts[i].pos.y, _pts[i].pos.z));
-    key->setRotation(Conversions::Convert(_pts[i].rot));
+    key->setRotation(Conversions::Convert(_pts[i].Ign().Rot()));
 
     tt += dt;
   }
@@ -2854,7 +2881,7 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 
   key = strack->createNodeKeyFrame(_time);
   key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
-  key->setRotation(Conversions::Convert(rotFinal));
+  key->setRotation(Conversions::Convert(rotFinal.Ign()));
 
   this->dataPtr->animState =
     this->dataPtr->sceneNode->getCreator()->createAnimationState(animName);
@@ -2889,14 +2916,64 @@ ScenePtr Visual::GetScene() const
 //////////////////////////////////////////////////
 void Visual::ShowCollision(bool _show)
 {
-  if (this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
-    this->SetVisible(_show);
-
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  // If this is a collision visual, set it visible
+  if (this->dataPtr->type == VT_COLLISION)
   {
-    (*iter)->ShowCollision(_show);
+    this->SetVisible(_show);
+  }
+  // If this is a link, check if there are pending collision visuals
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->pendingChildren.empty())
+  {
+    auto it = std::begin(this->dataPtr->pendingChildren);
+    while (it != std::end(this->dataPtr->pendingChildren))
+    {
+      if (it->first != VT_COLLISION)
+      {
+        ++it;
+        continue;
+      }
+
+      auto msg = dynamic_cast<msgs::Visual *>(it->second);
+      if (!msg)
+      {
+        gzerr << "Wrong message to generate collision visual." << std::endl;
+      }
+      else if (!this->dataPtr->scene->GetVisual(msg->name()))
+      {
+        // Set orange transparent material
+        msg->mutable_material()->mutable_script()->add_uri(
+            "file://media/materials/scripts/gazebo.material");
+        msg->mutable_material()->mutable_script()->set_name(
+            "Gazebo/OrangeTransparent");
+        msg->set_cast_shadows(false);
+
+        // Create visual
+        VisualPtr visual;
+        visual.reset(new Visual(msg->name(), shared_from_this()));
+
+        if (msg->has_id())
+          visual->SetId(msg->id());
+
+        auto msgPtr = new ConstVisualPtr(msg);
+        visual->LoadFromMsg(*msgPtr);
+
+        visual->SetType(it->first);
+        visual->SetVisible(_show);
+        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+        visual->SetWireframe(this->dataPtr->scene->Wireframe());
+      }
+
+      delete msg;
+      this->dataPtr->pendingChildren.erase(it);
+    }
+  }
+
+
+  // Show for children
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowCollision(_show);
   }
 }
 
@@ -2950,9 +3027,50 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
 //////////////////////////////////////////////////
 void Visual::ShowJoints(bool _show)
 {
+  // If this is a joint visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link, check if there are pending joint visuals
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->pendingChildren.empty())
+  {
+    auto it = std::begin(this->dataPtr->pendingChildren);
+    while (it != std::end(this->dataPtr->pendingChildren))
+    {
+      if (it->first != VT_PHYSICS)
+      {
+        ++it;
+        continue;
+      }
+
+      auto msg = dynamic_cast<const msgs::Joint *>(it->second);
+      if (!msg)
+      {
+        ++it;
+        continue;
+      }
+
+      std::string jointVisName = msg->name() + "_JOINT_VISUAL__";
+      if (!this->dataPtr->scene->GetVisual(jointVisName))
+      {
+        JointVisualPtr jointVis(new JointVisual(jointVisName,
+            shared_from_this()));
+
+        auto msgPtr = new ConstJointPtr(msg);
+        jointVis->Load(*msgPtr);
+
+        jointVis->SetVisible(_show);
+        if (msg->has_id())
+          jointVis->SetId(msg->id());
+      }
+
+      delete msg;
+      this->dataPtr->pendingChildren.erase(it);
+    }
+  }
 
   for (auto &child : this->dataPtr->children)
   {
@@ -2963,10 +3081,32 @@ void Visual::ShowJoints(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowCOM(bool _show)
 {
+  // If this is a COM visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("COM_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link without COM visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + "_COM_VISUAL__"))
+  {
+    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    if (!msg)
+    {
+      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+          "]" << std::endl;
+      return;
+    }
+    auto msgPtr = new ConstLinkPtr(msg);
 
+    COMVisualPtr vis(new COMVisual(this->GetName() + "_COM_VISUAL__",
+        shared_from_this()));
+    vis->Load(*msgPtr);
+    vis->SetVisible(_show);
+  }
+
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowCOM(_show);
@@ -2976,10 +3116,34 @@ void Visual::ShowCOM(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowInertia(bool _show)
 {
-  if (this->dataPtr->type == VT_PHYSICS &&
-     this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
-    this->SetVisible(_show);
+  std::string suffix("_INERTIA_VISUAL__");
 
+  // If this is an inertia visual, set it visible
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find(suffix) != std::string::npos)
+  {
+    this->SetVisible(_show);
+  }
+  // If this is a link without inertia visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + suffix))
+  {
+    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    if (!msg)
+    {
+      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+          "]" << std::endl;
+      return;
+    }
+    auto msgPtr = new ConstLinkPtr(msg);
+
+    InertiaVisualPtr vis(new InertiaVisual(this->GetName() +
+        suffix, shared_from_this()));
+    vis->Load(*msgPtr);
+    vis->SetVisible(_show);
+  }
+
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowInertia(_show);
@@ -2989,10 +3153,23 @@ void Visual::ShowInertia(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowLinkFrame(bool _show)
 {
+  // If this is a link frame visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link without link frame visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
+    !this->dataPtr->scene->GetVisual(this->GetName() + "_LINK_FRAME_VISUAL__"))
+  {
+    LinkFrameVisualPtr vis(new LinkFrameVisual(this->GetName() +
+        "_LINK_FRAME_VISUAL__", shared_from_this()));
+    vis->Load();
+    vis->SetVisible(_show);
+  }
 
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowLinkFrame(_show);
@@ -3229,4 +3406,27 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
 bool Visual::UseRTShader() const
 {
   return this->dataPtr->useRTShader;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetTypeMsg(const google::protobuf::Message *_msg)
+{
+  if (!_msg)
+  {
+    gzerr << "Null type message." << std::endl;
+    return;
+  }
+  this->dataPtr->typeMsg = _msg->New();
+  this->dataPtr->typeMsg->CopyFrom(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Visual::AddPendingChild(std::pair<VisualType,
+    const google::protobuf::Message *> _pair)
+{
+  // Copy msg
+  auto msg = _pair.second->New();
+  msg->CopyFrom(*_pair.second);
+
+  this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
 }

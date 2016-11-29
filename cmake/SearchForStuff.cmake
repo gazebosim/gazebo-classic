@@ -148,13 +148,13 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.3.3 QUIET)
+  find_package(DARTCore 5.1.1 QUIET)
   if (DARTCore_FOUND)
-    message (STATUS "Looking for DARTCore - found")
+    message (STATUS "Looking for DARTCore - ${DARTCore_VERSION} found")
     set (HAVE_DART TRUE)
   else()
     message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core5-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -704,7 +704,7 @@ endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math2 2.4 QUIET)
+find_package(ignition-math2 2.6 QUIET)
 if (NOT ignition-math2_FOUND)
   message(STATUS "Looking for ignition-math2-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition math2 library.")
@@ -769,9 +769,6 @@ find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   ${QWT_WIN_LIBRARY_DIR}
 )
 
-message (STATUS "\n\nQWT_INCLUDE_DIR=${QWT_INCLUDE_DIR}\n\n\n")
-message (STATUS "\n\nQWT_LIBRARY=${QWT_LIBRARY}\n\n\n")
-
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)
 else()
@@ -793,6 +790,11 @@ if ( _VERSION_LINE )
   set(QWT_VERSION
     ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
 endif ()
+
+# in Windows, the path need to point to the parent to get correct qwt/foo headers
+if (WIN32)
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")	
+endif()
 
 if (HAVE_QWT)
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")

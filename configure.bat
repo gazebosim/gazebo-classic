@@ -53,7 +53,7 @@ set CURL_LIBRARY_NAME=libcurl_a
 set OGRE_LIB_SUFFIX=.lib
 @if "%build_type%"=="Debug" set OGRE_LIB_SUFFIX=_d.lib
 @set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
-@set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
+@set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%
 
 @set DLFCN_WIN32_PATH=%cd%\..\..\dlfcn-win32-vc12-x64-release-debug\build\install\%build_type%
 @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
@@ -77,6 +77,7 @@ cmake -Wno-dev -G "NMake Makefiles"^
     -DOGRE_FOUND=1^
     -DOGRE-RTShaderSystem_FOUND=1^
     -DOGRE-Terrain_FOUND=1^
+    -DOGRE-Overlay_FOUND=1^
     -DOGRE_VERSION=%OGRE_VERSION%^
     -DOGRE_PLUGINDIR="%OGRE_PLUGIN_DIR%"^
     -DOGRE_INCLUDE_DIRS="%OGRE_INCLUDE_DIR%"^
@@ -93,4 +94,4 @@ cmake -Wno-dev -G "NMake Makefiles"^
     -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
     -DENABLE_TESTS_COMPILATION:BOOL=False^
-    ..
+    ..

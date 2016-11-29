@@ -15,8 +15,9 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/rendering/RayQuery.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -200,24 +201,24 @@ void ModelSnap_TEST::Snap()
   ignition::math::Vector2i srcPt =
       cam->Project(model03Vis->GetWorldPose().pos.Ign() +
       ignition::math::Vector3d(0.5, 0, 0));
-  gazebo::math::Vector3 intersect;
-  std::vector<gazebo::math::Vector3> verticesSrc;
+  ignition::math::Vector3d intersect;
+  ignition::math::Triangle3d triangleSrc;
   rayQuery.SelectMeshTriangle(srcPt.X(), srcPt.Y(), model03Vis, intersect,
-      verticesSrc);
+      triangleSrc);
 
   // select the front face of the box
   ignition::math::Vector2i destPt =
       cam->Project(model02Vis->GetWorldPose().pos.Ign() +
       ignition::math::Vector3d(0.5, 0, 0));
-  std::vector<gazebo::math::Vector3> verticesDest;
+  ignition::math::Triangle3d triangleDest;
   rayQuery.SelectMeshTriangle(destPt.X(), destPt.Y(), model02Vis, intersect,
-      verticesDest);
+      triangleDest);
 
   this->ProcessEventsAndDraw(mainWindow);
 
   // Snap the sphere to the front face of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
-      verticesSrc, verticesDest, model03Vis);
+      triangleSrc, triangleDest, model03Vis);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -230,7 +231,7 @@ void ModelSnap_TEST::Snap()
   // within the box's x + 1.0.
   // The tolerance is higher as we did not select a triangle
   // that lies exactly [0.5, 0 , 0] from the center of the sphere.
-  QVERIFY(gazebo::math::equal(model03Vis->GetWorldPose().pos.x,
+  QVERIFY(ignition::math::equal(model03Vis->GetWorldPose().pos.x,
       model02Vis->GetWorldPose().pos.x + 1.0, 1e-2));
 
   // The y and z pos of the sphere should be within the y and z bounds of the
@@ -246,26 +247,30 @@ void ModelSnap_TEST::Snap()
   ignition::math::Vector2i srcPt2 =
       cam->Project(model01Vis->GetWorldPose().pos.Ign() +
       ignition::math::Vector3d(0.5, 0, 0.0));
-  verticesSrc.clear();
+  triangleSrc.Set(ignition::math::Vector3d::Zero,
+                  ignition::math::Vector3d::Zero,
+                  ignition::math::Vector3d::Zero);
   rayQuery.SelectMeshTriangle(srcPt2.X(), srcPt2.Y(), model01Vis, intersect,
-      verticesSrc);
+      triangleSrc);
 
   // select the top face of the box
   ignition::math::Vector2i destPt2 =
       cam->Project(model02Vis->GetWorldPose().pos.Ign() +
       ignition::math::Vector3d(0.0, 0, 0.5));
-  verticesDest.clear();
+  triangleDest.Set(ignition::math::Vector3d::Zero,
+                  ignition::math::Vector3d::Zero,
+                  ignition::math::Vector3d::Zero);
   rayQuery.SelectMeshTriangle(destPt2.X(), destPt2.Y(), model02Vis, intersect,
-      verticesDest);
+      triangleDest);
 
   // Snap the cylinder to the top of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
-      verticesSrc, verticesDest, model01Vis);
+      triangleSrc, triangleDest, model01Vis);
 
   // The cylinder should now be on top of the box
   // Given that they are both unit shapes, the height of the cylinder will now
   // be 1.0 + 0.5 = 1.5.
-  QVERIFY(gazebo::math::equal(model01Vis->GetWorldPose().pos.z, 1.5));
+  QVERIFY(ignition::math::equal(model01Vis->GetWorldPose().pos.z, 1.5));
 
   // The x and y pos of the cyinder should be within the x and y bounds of the
   // box.

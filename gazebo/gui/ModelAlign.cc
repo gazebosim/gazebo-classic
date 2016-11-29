@@ -282,7 +282,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       if (this->dataPtr->originalVisualPose.find(vis) ==
           this->dataPtr->originalVisualPose.end())
       {
-        this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose();
+        this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose().Ign();
         this->SetHighlighted(vis, true);
       }
       // prevent the visual pose from being updated by the server

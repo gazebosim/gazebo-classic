@@ -108,6 +108,7 @@ void Light::Load()
 //////////////////////////////////////////////////
 void Light::Update()
 {
+  // shadow support is also affected by light type so set type first.
   this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
 
@@ -432,6 +433,15 @@ void Light::SetLightType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
+std::string Light::LightType() const
+{
+  if (this->dataPtr->sdf)
+    return this->dataPtr->sdf->Get<std::string>("type");
+
+  return std::string();
+}
+
+//////////////////////////////////////////////////
 void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
@@ -526,8 +536,7 @@ void Light::SetRange(const double _range)
 //////////////////////////////////////////////////
 void Light::SetCastShadows(const bool _cast)
 {
-  if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT ||
-      this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
+  if (this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
     this->dataPtr->light->setCastShadows(_cast);
   }
@@ -535,6 +544,15 @@ void Light::SetCastShadows(const bool _cast)
   {
     this->dataPtr->light->setCastShadows(false);
   }
+}
+
+//////////////////////////////////////////////////
+bool Light::CastShadows() const
+{
+  if (this->dataPtr->light)
+    return this->dataPtr->light->getCastShadows();
+
+  return false;
 }
 
 //////////////////////////////////////////////////
