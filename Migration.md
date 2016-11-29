@@ -103,7 +103,7 @@ release will remove the deprecated code.
     + ***Replacement:*** ModelPtr ModelBelowPoint(const ignition::math::Vector3d &_pt) const
     + ***Deprecation:*** EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt)
     + ***Replacement:*** EntityPtr EntityBelowPoint(const ignition::math::Vector3d &_pt) const
-    + ***Deprecation:*** std::mutex &GetWorldPoseMutex() const
+    + ***Deprecation:*** std::mutex &GetSetWorldPoseMutex() const
     + ***Replacement:*** std::mutex &WorldPoseMutex() const
     + ***Deprecation:*** bool GetEnablePhysicsEngine()
     + ***Replacement:*** bool PhysicsEnabled() const
