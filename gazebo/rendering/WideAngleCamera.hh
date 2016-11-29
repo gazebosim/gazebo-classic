@@ -232,6 +232,9 @@ namespace gazebo
       // Documentation inherited
       protected: void RenderImpl() override;
 
+      // Documentation inherited
+      protected: void UpdateFOV() override;
+
       /// \bried Callback that is used to set mapping material uniform values,
       ///   implements Ogre::CompositorInstance::Listener interface
       /// \param[in] _pass_id Pass identifier
