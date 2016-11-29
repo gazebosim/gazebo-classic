@@ -255,12 +255,36 @@ if (UNIX)
 endif()
 
 if (BUILD_OSX_BUNDLE)
+
+  message ("bundle dirs qt: ${QT_LIBRARY_DIR}")
+
   install (TARGETS gzclient BUNDLE DESTINATION .)
-  set (APPS "${CMAKE_BINARY_DIR}/gzclient.app/Contents/MacOS/gzclient")
+  set (APP_CLIENT "${CMAKE_BINARY_DIR}/gzclient.app/Contents/MacOS/gzclient")
+
+  set (DIRS_CLIENT
+      ${IGNITION-MATH_LIBRARY_DIRS}
+      ${IGNITION-MSGS_LIBRARY_DIRS}
+      ${IGNITION-TRANSPORT_LIBRARY_DIRS}
+      ${SDFormat_LIBRARY_DIRS}
+      ${OGRE_LIBRARY_DIRS}
+      ${QT_LIBRARY_DIR}
+      ${CMAKE_BINARY_DIR}/lib
+      ${CMAKE_BINARY_DIR}/gazebo/util
+      ${CMAKE_BINARY_DIR}/gazebo/math
+      ${CMAKE_BINARY_DIR}/gazebo/msgs
+      ${CMAKE_BINARY_DIR}/gazebo/transport
+      ${CMAKE_BINARY_DIR}/gazebo/common
+      ${CMAKE_BINARY_DIR}/gazebo/rendering)
+
+  SET(OGRE_COMPONENT_DIR gzclient.app/Contents/)
+  FILE (GLOB OGRE_COMPONENTS "${OGRE_LIBRARY_DIRS}/libOgrePaging.*")
+    INSTALL(FILES ${OGRE_COMPONENTS}
+    DESTINATION ${OGRE_COMPONENT_DIR}/Components)
+
   INSTALL(CODE "
     # Needed for getting the right permissions when using brew
     set (BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-      fixup_bundle(\"${APPSC}\" \"\"  \"${OGRE_LIBRARY_DIRS}\")
+    fixup_bundle(\"${APP_CLIENT}\" \"\"  \"${DIRS_CLIENT}\")
   " COMPONENT Runtime)
 endif()

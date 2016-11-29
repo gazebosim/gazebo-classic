@@ -135,15 +135,22 @@ set(headers
 gz_install_includes("" ${headers})
 
 if (BUILD_OSX_BUNDLE)
+  message ("bundle dirs ogre: ${OGRE_LIBRARY_DIRS}")
+  message ("bundle dirs sformat: ${SDFormat_LIBRARY_DIRS}")
+
   install (TARGETS gzserver BUNDLE DESTINATION .)
   set (APPS "${CMAKE_BINARY_DIR}/gzserver.app/Contents/MacOS/gzserver")
   # Different libraries are not being installed into CMAKE_BINARY_DIR/lib
   # don't know why :/
   set (DIRS
+
+      ${IGNITION-MATH_LIBRARY_DIRS}
+      ${IGNITION-MSGS_LIBRARY_DIRS}
+      ${IGNITION-TRANSPORT_LIBRARY_DIRS}
+      ${SDFormat_LIBRARY_DIRS}
       ${OGRE_LIBRARY_DIRS}
       ${CMAKE_BINARY_DIR}/lib
       ${CMAKE_BINARY_DIR}/gazebo/util
-      ${CMAKE_BINARY_DIR}/gazebo/sensors
       ${CMAKE_BINARY_DIR}/gazebo/math
       ${CMAKE_BINARY_DIR}/gazebo/msgs
       ${CMAKE_BINARY_DIR}/gazebo/physics
@@ -152,9 +159,14 @@ if (BUILD_OSX_BUNDLE)
       ${CMAKE_BINARY_DIR}/gazebo/common
       ${CMAKE_BINARY_DIR}/gazebo/rendering)
 
-
+  SET(OGRE_COMPONENT_DIR gzserver.app/Contents/)
+  FILE (GLOB OGRE_COMPONENTS "${OGRE_LIBRARY_DIRS}/libOgrePaging.*")
+    INSTALL(FILES ${OGRE_COMPONENTS}
+    DESTINATION ${OGRE_COMPONENT_DIR}/Components)
 
   INSTALL(CODE "
+    file(GLOB_RECURSE LIBS
+      \"\${CMAKE_INSTALL_PREFIX}/${OGRE_COMPONENT_DIR}/Components/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
     # Needed for getting the right permissions when using brew
     set (BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
