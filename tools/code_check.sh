@@ -60,12 +60,8 @@ else
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/common/STLLoader.cc:95" > $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:106" >> $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:127" >> $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:150" >> $SUPPRESS
 # (warning) Redundant code: Found a statement that begins with string constant.
-echo "*:gazebo/common/SVGLoader.cc:869" >> $SUPPRESS
+echo "*:gazebo/common/SVGLoader.cc:869" > $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 # STOP: before use this suppress list please consider to use inline
