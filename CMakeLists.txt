@@ -322,6 +322,7 @@ else (build_errors)
   if (BUILD_GAZEBO)
     set(TEST_TYPE "UNIT")
     add_custom_target(tests)
+    add_dependencies(tests test)
 
     add_subdirectory(gazebo)
     add_subdirectory(media)
