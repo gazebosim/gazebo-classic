@@ -395,7 +395,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);
 
-      if (childVis->GetPose().pos != ignition::math::Vector3d::Zero)
+      if (childVis->Pose().Pos() != ignition::math::Vector3d::Zero)
       {
         gzwarn << "Scaling is currently limited to simple shapes with their "
             << "origin in the centroid." << std::endl;
@@ -407,7 +407,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
         rendering::VisualPtr grandChildVis = childVis->GetChild(j);
         std::string thisGeomType = grandChildVis->GetGeometryType();
 
-        if (grandChildVis->GetPose().pos != ignition::math::Vector3d::Zero)
+        if (grandChildVis->Pose().Pos() != ignition::math::Vector3d::Zero)
         {
           gzwarn << "Scaling is currently limited to simple shapes with their "
               << "origin in the centroid." << std::endl;

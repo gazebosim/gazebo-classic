@@ -947,8 +947,8 @@ void BuildingMaker::GenerateSDF()
               + "_Visual");
           collisionElem->GetAttribute("name")->Set(buildingModelManip->Name()
               + "_Collision");
-          visualElem->GetElement("pose")->Set(visual->GetPose());
-          collisionElem->GetElement("pose")->Set(visual->GetPose());
+          visualElem->GetElement("pose")->Set(visual->Pose());
+          collisionElem->GetElement("pose")->Set(visual->Pose());
           visualElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->Scale());
           collisionElem->GetElement("geometry")->GetElement("box")->

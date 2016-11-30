@@ -20,7 +20,6 @@
 
 #include <string>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
@@ -54,8 +53,9 @@ namespace gazebo
       /// \brief Load based on a math::Pose
       /// \param[in] _pose Pose of the Inertia visual
       /// \param[in] _scale Scale factor for the box visual.
-      private: void Load(const math::Pose &_pose,
-          const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
+      private: void Load(const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_scale =
+                   ignition::math::Vector3d(0.02, 0.02, 0.02));
     };
     /// \}
   }

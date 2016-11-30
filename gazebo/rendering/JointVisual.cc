@@ -165,17 +165,17 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
   // Get rotation to axis vector
-  math::Vector3 axisDir = _axis;
-  math::Vector3 u = axisDir.Normalize();
-  math::Vector3 v = math::Vector3::UnitZ;
+  ignition::math::Vector3d axisDir = _axis.Ign();
+  ignition::math::Vector3d u = axisDir.Normalize();
+  ignition::math::Vector3d v = ignition::math::Vector3d::UnitZ;
   double cosTheta = v.Dot(u);
   double angle = acos(cosTheta);
-  math::Quaternion quat;
+  ignition::math::Quaterniond quat;
   // check the parallel case
   if (math::equal(angle, M_PI))
-    quat.SetFromAxis(u.GetPerpendicular(), angle);
+    quat.Axis(u.Perpendicular(), angle);
   else
-    quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
+    quat.Axis((v.Cross(u)).Normalize(), angle);
   _arrowVisual->SetRotation(quat);
 
   if (_useParentFrame)
@@ -185,7 +185,7 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
 
     // get rotation of joint visual in model frame
     ignition::math::Quaterniond quatFromModel =
-        (this->GetPose().Ign() + linkInitPose).Rot();
+        (this->Pose() + linkInitPose).Rot();
 
     // rotate arrow visual so that the axis vector applies to the model frame.
     _arrowVisual->SetRotation(quatFromModel.Inverse() *

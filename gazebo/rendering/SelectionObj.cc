@@ -20,9 +20,10 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/MeshManager.hh"
-
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -407,9 +408,11 @@ void SelectionObj::CreateTranslateVisual()
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->transXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->transYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   this->SetHandleMaterial(TRANS_X, dPtr->xAxisMatOverlay);
   this->SetHandleMaterial(TRANS_Y, dPtr->yAxisMatOverlay);
@@ -495,9 +498,11 @@ void SelectionObj::CreateRotateVisual()
   rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->rotXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->rotYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   // By default the visuals are not overlays like translation or scale visuals.
   // This is so that the rings does not block the object it's attached too,
@@ -630,9 +635,11 @@ void SelectionObj::CreateScaleVisual()
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->scaleXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->scaleYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   this->SetHandleMaterial(SCALE_X, dPtr->xAxisMatOverlay);
   this->SetHandleMaterial(SCALE_Y, dPtr->yAxisMatOverlay);

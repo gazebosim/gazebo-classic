@@ -266,7 +266,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
   vis = scene->GetVisual("model_00");
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -276,7 +276,7 @@ void ModelMaker_TEST::FromNestedModelFile()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -488,7 +488,7 @@ void ModelMaker_TEST::FromNestedModel()
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
   vis = scene->GetVisual("model_00_clone_tmp");
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -498,7 +498,7 @@ void ModelMaker_TEST::FromNestedModel()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);

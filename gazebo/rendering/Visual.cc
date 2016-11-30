@@ -345,7 +345,7 @@ void Visual::Load(sdf::ElementPtr _sdf)
 void Visual::Load()
 {
   std::ostringstream stream;
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = nullptr;
 
@@ -353,7 +353,7 @@ void Visual::Load()
     this->dataPtr->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->dataPtr->sdf->Get<math::Pose>("pose");
+  pose = this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
 
   std::string mesh = this->GetMeshName();
   std::string subMesh = this->GetSubMeshName();
@@ -391,7 +391,7 @@ void Visual::Load()
 
   // Set the pose of the scene node
   this->SetPose(pose);
-  this->dataPtr->initialRelativePose = pose.Ign();
+  this->dataPtr->initialRelativePose = pose;
 
   // Get the size of the mesh
   if (obj)
@@ -1724,24 +1724,36 @@ void Visual::SetPosition(const ignition::math::Vector3d &_pos)
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(_pos.X(), _pos.Y(), _pos.Z());
 
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  this->SetRotation(_rot.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
+{
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is null");
   this->dataPtr->sceneNode->setOrientation(
-      Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
+      Ogre::Quaternion(_rot.W(), _rot.X(), _rot.Y(), _rot.Z()));
 
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
-  this->SetPosition(_pose.pos.Ign());
-  this->SetRotation(_pose.rot);
+  this->SetPose(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetPosition(_pose.Pos());
+  this->SetRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////

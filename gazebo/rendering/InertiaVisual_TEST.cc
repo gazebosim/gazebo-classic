@@ -128,7 +128,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
     // need to set these flags in order to GetBoundingBox
     visual->SetVisible(true);
     visual->SetVisibilityFlags(GZ_VISIBILITY_ALL);
-    EXPECT_EQ(visual->GetBoundingBox().Ign(), box);
+    EXPECT_EQ(visual->BoundingBox(), box);
   }
 }
 

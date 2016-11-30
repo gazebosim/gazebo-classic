@@ -351,11 +351,22 @@ namespace gazebo
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.
-      public: void SetRotation(const math::Quaternion &_rot);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void SetRotation(const math::Quaternion &_rot)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the rotation of the visual.
+      /// \param[in] _rot The rotation of the visual.
+      public: void SetRotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Set the pose of the visual.
       /// \param[in] _pose The new pose of the visual.
-      public: void SetPose(const math::Pose &_pose);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the pose of the visual.
+      /// \param[in] _pose The new pose of the visual.
+      public: void SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the position of the visual.
       /// \return The visual's position.
@@ -378,7 +389,7 @@ namespace gazebo
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
       /// \deprecated See ignition::math::Pose3d Pose() const;
-      public: math::Pose GetPose() const;
+      public: math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
