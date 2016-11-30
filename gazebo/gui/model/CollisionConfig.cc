@@ -57,10 +57,14 @@ CollisionConfig::CollisionConfig()
   this->setLayout(mainLayout);
 
   this->counter = 0;
-  this->signalMapper = new QSignalMapper(this);
 
-  connect(this->signalMapper, SIGNAL(mapped(int)),
+  this->mapperRemove = new QSignalMapper(this);
+  this->connect(this->mapperRemove, SIGNAL(mapped(int)),
      this, SLOT(OnRemoveCollision(int)));
+
+  this->mapperShow = new QSignalMapper(this);
+  this->connect(this->mapperShow, SIGNAL(mapped(int)),
+     this, SLOT(OnShowCollision(int)));
 }
 
 /////////////////////////////////////////////////
@@ -160,6 +164,20 @@ void CollisionConfig::AddCollision(const std::string &_name,
         image: url(:/images/down_arrow.png);\
       }");
 
+  // Show button
+  auto showCollisionButton = new QToolButton(this);
+  showCollisionButton->setObjectName(
+      "showCollisionButton_" + QString(_name.c_str()));
+  showCollisionButton->setFixedSize(QSize(30, 30));
+  showCollisionButton->setToolTip("Show/hide " + QString(_name.c_str()));
+  showCollisionButton->setIcon(QPixmap(":/images/eye.png"));
+  showCollisionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  showCollisionButton->setIconSize(QSize(16, 16));
+  showCollisionButton->setCheckable(true);
+  this->connect(showCollisionButton, SIGNAL(clicked()), this->mapperShow,
+      SLOT(map()));
+  this->mapperShow->setMapping(showCollisionButton, this->counter);
+
   // Remove button
   QToolButton *removeCollisionButton = new QToolButton(this);
   removeCollisionButton->setObjectName(
@@ -170,14 +188,15 @@ void CollisionConfig::AddCollision(const std::string &_name,
   removeCollisionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   removeCollisionButton->setIconSize(QSize(16, 16));
   removeCollisionButton->setCheckable(false);
-  connect(removeCollisionButton, SIGNAL(clicked()), this->signalMapper,
+  connect(removeCollisionButton, SIGNAL(clicked()), this->mapperRemove,
       SLOT(map()));
-  this->signalMapper->setMapping(removeCollisionButton, this->counter);
+  this->mapperRemove->setMapping(removeCollisionButton, this->counter);
 
   // Header Layout
   QHBoxLayout *headerLayout = new QHBoxLayout;
   headerLayout->setContentsMargins(0, 0, 0, 0);
   headerLayout->addWidget(headerButton);
+  headerLayout->addWidget(showCollisionButton);
   headerLayout->addWidget(removeCollisionButton);
 
   // Header widget
@@ -332,6 +351,40 @@ void CollisionConfig::OnRemoveCollision(int _id)
   {
     this->addedConfigs.erase(itAdded);
   }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::SetShowCollision(const bool _show,
+    const std::string &_name)
+{
+  auto button = this->findChild<QToolButton *>("showCollisionButton_" +
+      QString(_name.c_str()));
+
+  if (button)
+    button->setChecked(_show);
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnShowCollision(const int _id)
+{
+  auto it = this->configs.find(_id);
+  if (it == this->configs.end())
+  {
+    gzerr << "Collision not found " << std::endl;
+    return;
+  }
+
+  auto button = qobject_cast<QToolButton *>(this->mapperShow->mapping(_id));
+  if (!button)
+  {
+    gzerr << "Couldn't find button with ID [" << _id << "]" << std::endl;
+    return;
+  }
+
+  bool showCol = button->isChecked();
+
+  auto configData = this->configs[_id];
+  this->ShowCollision(showCol, configData->name);
 }
 
 /////////////////////////////////////////////////

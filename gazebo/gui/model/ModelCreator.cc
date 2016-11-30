@@ -193,6 +193,9 @@ namespace gazebo
 
       /// \brief Name of the canonical link in the model
       public: std::string canonicalLink;
+
+      /// \brief True to show all collisions of all links.
+      public: bool showCollisions = true;
     };
   }
 }
@@ -1120,6 +1123,7 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
     leafName = linkName.substr(idx+2);
 
   link->SetName(leafName);
+  link->ShowCollisions(this->dataPtr->showCollisions);
 
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
@@ -2927,4 +2931,13 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   ModelPluginData *modelPlugin = it->second;
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::ShowCollisions(const bool _show)
+{
+  this->dataPtr->showCollisions = _show;
+
+  for (auto link : this->dataPtr->allLinks)
+    link.second->ShowCollisions(_show);
 }

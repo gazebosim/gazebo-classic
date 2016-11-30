@@ -40,7 +40,7 @@ void ModelEditorTest::EditModel()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -49,19 +49,19 @@ void ModelEditorTest::EditModel()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Start never saved
   gazebo::gui::ModelCreator *modelCreator =
       mainWindow->findChild<gazebo::gui::ModelCreator *>();
-  QVERIFY(modelCreator != NULL);
+  QVERIFY(modelCreator != nullptr);
 
   // get the box visual
   gazebo::rendering::VisualPtr boxLink =
       scene->GetVisual("box::link");
-  QVERIFY(boxLink != NULL);
+  QVERIFY(boxLink != nullptr);
   QVERIFY(boxLink->GetVisible());
 
   // get number of visuals in the scene
@@ -71,7 +71,7 @@ void ModelEditorTest::EditModel()
   QVERIFY(visualCount > 0u);
 
   // trigger model editor mode and edit box model
-  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
   gazebo::gui::Events::editModel("box");
 
@@ -80,7 +80,7 @@ void ModelEditorTest::EditModel()
   // Make sure we have the tmp box visual in model editor
   gazebo::rendering::VisualPtr editorBoxLink =
       scene->GetVisual("ModelPreview_1::link");
-  QVERIFY(editorBoxLink != NULL);
+  QVERIFY(editorBoxLink != nullptr);
   QVERIFY(editorBoxLink->GetVisible());
 
   // save, finish, and spawn it onto the server
@@ -91,11 +91,11 @@ void ModelEditorTest::EditModel()
 
   // verify the tmp box visual is gone
   editorBoxLink = scene->GetVisual("ModelPreview_1::link");
-  QVERIFY(editorBoxLink == NULL);
+  QVERIFY(editorBoxLink == nullptr);
 
   // verify there is a box visual in the scene
   boxLink = scene->GetVisual("box::link");
-  QVERIFY(boxLink != NULL);
+  QVERIFY(boxLink != nullptr);
   QVERIFY(boxLink->GetVisible());
 
   // verify the number of visuals in the scene are the same before and after
@@ -104,7 +104,7 @@ void ModelEditorTest::EditModel()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -117,7 +117,7 @@ void ModelEditorTest::SaveModelPose()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -126,9 +126,9 @@ void ModelEditorTest::SaveModelPose()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Start never saved
   gazebo::gui::ModelCreator *modelCreator = new gazebo::gui::ModelCreator();
@@ -137,7 +137,7 @@ void ModelEditorTest::SaveModelPose()
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
-  QVERIFY(cylinder != NULL);
+  QVERIFY(cylinder != nullptr);
 
   // Move cylinder to new pose
   ignition::math::Pose3d cylinderPose(1, 1, 2, 4, 5, 6);
@@ -151,7 +151,7 @@ void ModelEditorTest::SaveModelPose()
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_BOX);
   gazebo::rendering::VisualPtr box =
       scene->GetVisual("ModelPreview_0_0::link_1");
-  QVERIFY(box != NULL);
+  QVERIFY(box != nullptr);
 
   // Move box to new pose
   ignition::math::Pose3d boxPose(2, 1, 0, 0, 0, 0);
@@ -163,7 +163,7 @@ void ModelEditorTest::SaveModelPose()
 
   // Add a revolute joint
   gazebo::gui::JointMaker *jointMaker = modelCreator->JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
   jointMaker->AddJoint(gazebo::gui::JointMaker::JOINT_HINGE);
   auto jointData = jointMaker->CreateJoint(cylinder, box);
   jointMaker->CreateHotSpot(jointData);
@@ -188,10 +188,10 @@ void ModelEditorTest::SaveModelPose()
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -204,7 +204,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -213,23 +213,23 @@ void ModelEditorTest::JointInspectorUpdate()
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Create a model creator
   gazebo::gui::ModelCreator *modelCreator = new gazebo::gui::ModelCreator();
-  QVERIFY(modelCreator != NULL);
+  QVERIFY(modelCreator != nullptr);
 
   // get the joint maker
   gazebo::gui::JointMaker *jointMaker = modelCreator->JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // add a cylinder link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
-  QVERIFY(cylinder != NULL);
+  QVERIFY(cylinder != nullptr);
 
   // Move cylinder to new pose
   ignition::math::Pose3d cylinderPose(1, 1, 2, 4, 5, 6);
@@ -243,7 +243,7 @@ void ModelEditorTest::JointInspectorUpdate()
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_SPHERE);
   gazebo::rendering::VisualPtr sphere =
       scene->GetVisual("ModelPreview_0_0::link_1");
-  QVERIFY(sphere != NULL);
+  QVERIFY(sphere != nullptr);
 
   // Move sphere to new pose
   ignition::math::Pose3d spherePose(0, 0, 0.5, 0, 0, 0);
@@ -265,10 +265,10 @@ void ModelEditorTest::JointInspectorUpdate()
   /// Verify the box model has been added
   gazebo::rendering::VisualPtr boxModelVis =
       scene->GetVisual("ModelPreview_0_0::box_model");
-  QVERIFY(boxModelVis != NULL);
+  QVERIFY(boxModelVis != nullptr);
   gazebo::rendering::VisualPtr boxModelLinkVis =
       scene->GetVisual("ModelPreview_0_0::box_model::link_1");
-  QVERIFY(boxModelLinkVis != NULL);
+  QVERIFY(boxModelLinkVis != nullptr);
 
   // Move box to new pose
   ignition::math::Pose3d boxPose(-1, -1, 1, 0, 0, 0);
@@ -292,7 +292,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   // get the joint inspector and populate it with data
   gazebo::gui::JointInspector *jointInspector = jointData->inspector;
-  QVERIFY(jointInspector != NULL);
+  QVERIFY(jointInspector != nullptr);
 
   // Add links to list
   gazebo::gui::model::Events::linkInserted("ModelPreview_0_0::link_0");
@@ -329,10 +329,72 @@ void ModelEditorTest::JointInspectorUpdate()
       cylinderPose.Pos() + (spherePose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;
-  modelCreator = NULL;
+  modelCreator = nullptr;
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorTest::ShowCollisions()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera and scene
+  auto cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  auto scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  // Create a model creator
+  auto modelCreator = new gazebo::gui::ModelCreator();
+  QVERIFY(modelCreator != nullptr);
+
+  // add a cylinder link
+  modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
+  auto newLinkCol = scene->GetVisual("ModelPreview_0_0::link_0::collision");
+  QVERIFY(newLinkCol != nullptr);
+  QVERIFY(newLinkCol->GetVisible());
+
+  // a box nested model
+  gazebo::msgs::Model model;
+  model.set_name("box_model");
+  gazebo::msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
+  auto boxModelSDF = gazebo::msgs::ModelToSDF(model);
+  modelCreator->AddModel(boxModelSDF);
+
+  auto newNestedCol = scene->GetVisual(
+      "ModelPreview_0_0::box_model::link_1::collision");
+  QVERIFY(newNestedCol != nullptr);
+  QVERIFY(newNestedCol->GetVisible());
+
+  // Hide collisions
+  modelCreator->ShowCollisions(false);
+  QVERIFY(!newLinkCol->GetVisible());
+  QVERIFY(!newNestedCol->GetVisible());
+
+  // Show collisions
+  modelCreator->ShowCollisions(true);
+  QVERIFY(newLinkCol->GetVisible());
+  QVERIFY(newNestedCol->GetVisible());
+
+  delete modelCreator;
+  modelCreator = nullptr;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
 }
 
 // Generate a main function for the test
