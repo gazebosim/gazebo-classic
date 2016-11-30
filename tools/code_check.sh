@@ -40,7 +40,8 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' \
+        | grep -v '^deps' | grep -v test_fixture/gtest`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
@@ -53,9 +54,9 @@ else
 " ./test/cmake ./test/pkgconfig"
   if [ $CPPCHECK_LT_157 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
-    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" | grep -v test_fixture/gtest`
   else
-    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh" | grep -v test_fixture/gtest`
   fi
   CPPLINT_FILES=`\
     find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | grep -v test_fixture/gtest`
@@ -65,7 +66,6 @@ SUPPRESS=/tmp/gazebo_cpp_check.suppress
 # (warning) Redundant code: Found a statement that begins with string constant.
 echo "*:gazebo/common/SVGLoader.cc:869" > $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
-echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 # STOP: before use this suppress list please consider to use inline
 # cppcheck-suppress comments
 
