@@ -189,6 +189,12 @@ bool URIPath::Parse(const std::string &_str)
 }
 
 /////////////////////////////////////////////////
+bool URIPath::Contains(const URIPath &_other) const
+{
+  return this->Str().find(_other.Str()) == 0;
+}
+
+/////////////////////////////////////////////////
 URIQuery::URIQuery()
   : dataPtr(new URIQueryPrivate())
 {

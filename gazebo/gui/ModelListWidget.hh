@@ -21,6 +21,9 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include <ignition/msgs/plugin.pb.h>
+#include <ignition/msgs/plugin_v.pb.h>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
@@ -119,7 +122,7 @@ namespace gazebo
       /// \param[in] _msg The plugin message.
       /// \param[in] _parent Pointer to the qtproperty which will receive
       /// the message data.
-      private: void FillPropertyTree(const msgs::Plugin &_msg,
+      private: void FillPropertyTree(const ignition::msgs::Plugin &_msg,
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Link &_msg,
@@ -225,6 +228,12 @@ namespace gazebo
       /// \brief Called when a GUI grid property is changed by the user.
       /// \param[in] _item The item that was changed.
       private: void GUIGridPropertyChanged(QtProperty *_item);
+
+      /// \brief Callback when plugin info is received.
+      /// \param[in] _plugins Vector of plugins.
+      /// \param[in] _success True if the info was successfully received.
+      private: void OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
+          const bool _success);
 
       /// \internal
       /// \brief Pointer to private data.

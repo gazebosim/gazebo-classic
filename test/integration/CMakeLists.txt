@@ -43,6 +43,7 @@ set(tests
   gz_world.cc
   harness.cc
   imu.cc
+  info_services.cc
   introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc

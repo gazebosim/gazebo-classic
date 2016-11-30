@@ -4,6 +4,7 @@ include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${IGNITION-MSGS_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
   ${tinyxml2_INCLUDE_DIRS}
@@ -16,6 +17,7 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
   ${TBB_LIBRARY_DIR}
   ${CURL_LIBDIR}
+  ${IGNITION-MSGS_LIBRARY_DIRS}
 )
 
 if (WIN32)
