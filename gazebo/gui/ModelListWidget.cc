@@ -27,6 +27,7 @@
 #include <google/protobuf/message.h>
 
 #include <ignition/math/Angle.hh>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include <sdf/sdf.hh>
 
@@ -263,18 +264,19 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      if (this->dataPtr->requestPub)
+      if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
       {
-        if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
-        {
-          this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
-              this->dataPtr->selectedEntityName);
-        }
-        else
-        {
-          this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-           this->dataPtr->selectedEntityName);
-        }
+        std::string pluginInfoService("/physics/info/plugin");
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        this->dataPtr->ignNode.Request(pluginInfoService, req,
+            &ModelListWidget::OnPluginInfo, this);
+      }
+      else if (this->dataPtr->requestPub)
+      {
+        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+            this->dataPtr->selectedEntityName);
         this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
@@ -530,10 +532,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   else if (_msg->has_type() && _msg->type() ==
     this->dataPtr->pluginMsg.GetTypeName())
   {
-    this->dataPtr->propMutex->lock();
-    this->dataPtr->pluginMsg.ParseFromString(_msg->serialized_data());
-    this->dataPtr->fillTypes.push_back("Plugin");
-    this->dataPtr->propMutex->unlock();
+    gzerr << "Plugin requests should use OnPluginInfo callback" << std::endl;
   }
   else if (_msg->has_type() && _msg->type() ==
       this->dataPtr->sceneMsg.GetTypeName())
@@ -2637,7 +2636,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Plugin &_msg,
+void ModelListWidget::FillPropertyTree(const ignition::msgs::Plugin &_msg,
                                        QtProperty *_parent)
 {
   QtVariantProperty *item = nullptr;
@@ -3578,4 +3577,23 @@ void ModelListWidget::FillGrid()
       tr("line color"));
   item->setValue(gui::Conversions::Convert(color));
   topItem->addSubProperty(item);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
+    const bool _success)
+{
+  if (!_success)
+  {
+    gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
+    return;
+  }
+
+  // We asked for only one plugin
+  GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+
+  this->dataPtr->propMutex->lock();
+  this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
+  this->dataPtr->fillTypes.push_back("Plugin");
+  this->dataPtr->propMutex->unlock();
 }
