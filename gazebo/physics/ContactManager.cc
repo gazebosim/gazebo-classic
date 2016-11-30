@@ -288,11 +288,8 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   // Contact sensors make use of this filter
   std::string topic = "~/" + name + "/contacts";
 
-  transport::PublisherPtr pub =
-    this->node->Advertise<msgs::Contacts>(topic);
-
   ContactPublisher *contactPublisher = new ContactPublisher;
-  contactPublisher->publisher = pub;
+  contactPublisher->publisher = this->node->Advertise<msgs::Contacts>(topic);
 
   std::map<std::string, physics::CollisionPtr>::const_iterator iter;
   for (iter = _collisions.begin(); iter != _collisions.end(); ++iter)
@@ -369,6 +366,7 @@ void ContactManager::RemoveFilter(const std::string &_name)
     contactPublisher->contacts.clear();
     contactPublisher->collisionNames.clear();
     contactPublisher->collisions.clear();
+    contactPublisher->publisher->Fini();
     contactPublisher->publisher.reset();
     this->customContactPublishers.erase(iter);
   }

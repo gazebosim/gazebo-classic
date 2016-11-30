@@ -73,6 +73,10 @@ namespace gazebo
       /// \brief Open the inspector.
       public: void Open();
 
+      /// \brief Set the state of a show collision button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowCollisions(const bool _show);
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -91,8 +95,17 @@ namespace gazebo
       /// and the inspector closed.
       Q_SIGNALS: void Accepted();
 
+      /// \brief Qt signal emitted to indicate that all collisions should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowCollisions(const bool _show);
+
       /// \brief Qt callback when the Remove button is pressed.
       private slots: void OnRemove();
+
+      /// \brief Qt callback when the show collisions button is pressed.
+      /// \param[in] _show Show if checked, show otherwise.
+      private slots: void OnShowCollisions(const bool _show);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
