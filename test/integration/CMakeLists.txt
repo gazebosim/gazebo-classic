@@ -166,6 +166,7 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  wideanglecamera_sensor.cc
   world_reset.cc
 )
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
