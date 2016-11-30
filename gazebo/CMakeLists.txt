@@ -30,9 +30,7 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
-if (WIN32)
- add_definitions(-DBUILDING_DLL)
-endif()
+add_definitions(-DBUILDING_DLL)
 
 add_subdirectory(msgs)
 add_subdirectory(math)
@@ -64,6 +62,7 @@ target_link_libraries(gzserver
   # Extra libs needed when linking statically (e.g., on WIN32)
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
+  ${ogre_libraries}
 )
 
 if (UNIX)

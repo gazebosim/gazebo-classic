@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_LIGHT_HH_
-#define _GAZEBO_RENDERING_LIGHT_HH_
+#ifndef GAZEBO_RENDERING_LIGHT_HH_
+#define GAZEBO_RENDERING_LIGHT_HH_
 
 #include <string>
 #include <iostream>
@@ -23,8 +23,6 @@
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Color.hh"
@@ -57,7 +55,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
-      public: Light(ScenePtr _scene);
+      public: explicit Light(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Light();
@@ -84,17 +82,7 @@ namespace gazebo
 
       /// \brief Get the name of the visual.
       /// \return The light's name.
-      /// \deprecated See Name()
-      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the name of the visual.
-      /// \return The light's name.
       public: std::string Name() const;
-
-      /// \brief Get the type of the light.
-      /// \return The light type: "point", "spot", "directional".
-      /// \deprecated See Type()
-      public: std::string GetType() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the type of the light.
       /// \return The light type: "point", "spot", "directional".
@@ -102,18 +90,7 @@ namespace gazebo
 
       /// \brief Set the position of the light
       /// \param[in] _p New position for the light
-      /// \deprecated See SetPosition() that accepts an
-      /// ignition::math::Vector3d object.
-      public: void SetPosition(const math::Vector3 &_p) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set the position of the light
-      /// \param[in] _p New position for the light
       public: void SetPosition(const ignition::math::Vector3d &_p);
-
-      /// \brief Get the position of the light
-      /// \return The position of the light
-      /// \deprecated See Position()
-      public: math::Vector3 GetPosition() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the position of the light
       /// \return The position of the light
@@ -121,19 +98,7 @@ namespace gazebo
 
       /// \brief Set the rotation of the light
       /// \param[in] _q New rotation for the light
-      /// \deprecated See SetRotation() that accepts an
-      /// ignition::math::Quaterniond object.
-      public: void SetRotation(const math::Quaternion &_q)
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set the rotation of the light
-      /// \param[in] _q New rotation for the light
       public: void SetRotation(const ignition::math::Quaterniond &_q);
-
-      /// \brief Get the rotation of the light
-      /// \return The rotation of the light
-      /// \deprecated See Rotation()
-      public: math::Quaternion GetRotation() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the rotation of the light
       /// \return The rotation of the light
@@ -153,25 +118,19 @@ namespace gazebo
 
       /// \brief Get whether the light is visible.
       /// \return True if the light is visible.
-      /// \deprecated See Visible()
-      public: bool GetVisible() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get whether the light is visible.
-      /// \return True if the light is visible.
       public: bool Visible() const;
 
       /// \brief Set the light type.
       /// \param[in] _type The light type: "point", "spot", "directional"
       public: void SetLightType(const std::string &_type);
 
+      /// \brief Get the light type.
+      /// \return The light type: "point", "spot", "directional".
+      public: std::string LightType() const;
+
       /// \brief Set the diffuse color
       /// \param[in] _color Light diffuse color.
       public: void SetDiffuseColor(const common::Color &_color);
-
-      /// \brief Get the diffuse color
-      /// \return The light's diffuse color.
-      /// \deprecated See DiffuseColor()
-      public: common::Color GetDiffuseColor() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the diffuse color
       /// \return The light's diffuse color.
@@ -183,30 +142,12 @@ namespace gazebo
 
       /// \brief Get the specular color
       /// \return  The specular color
-      /// \deprecated See SpecularColor()
-      public: common::Color GetSpecularColor() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the specular color
-      /// \return  The specular color
       public: common::Color SpecularColor() const;
 
       /// \brief Set the direction
       /// \param[in] _dir Set the light's direction. Only applicable to spot and
       /// directional lights.
-      /// \deprecated See SetDirection() that accepts an
-      /// ignition::math::Vector3d object.
-      public: void SetDirection(const math::Vector3 &_dir)
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Set the direction
-      /// \param[in] _dir Set the light's direction. Only applicable to spot and
-      /// directional lights.
       public: void SetDirection(const ignition::math::Vector3d &_dir);
-
-      /// \brief Get the direction
-      /// \return The light's direction.
-      /// \deprecated See Direction()
-      public: math::Vector3 GetDirection() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the direction
       /// \return The light's direction.
@@ -238,6 +179,10 @@ namespace gazebo
       /// \brief Set cast shadows
       /// \param[in] _cast Set to true to cast shadows.
       public: void SetCastShadows(const bool _cast);
+
+      /// \brief Get cast shadows
+      /// \return True if cast shadows.
+      public: bool CastShadows() const;
 
       /// \brief Fill the contents of a light message.
       /// \param[out] _msg Message to fill.

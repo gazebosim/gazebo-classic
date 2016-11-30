@@ -32,9 +32,6 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <ignition/msgs/plugin_v.pb.h>
-#include <ignition/msgs/stringmsg.pb.h>
-
 #include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -50,6 +47,16 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
 #include "gazebo/util/system.hh"
+
+// Forward declare reference and pointer parameters
+namespace ignition
+{
+  namespace msgs
+  {
+    class Plugin_V;
+    class StringMsg;
+  }
+}
 
 namespace gazebo
 {

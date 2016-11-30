@@ -130,10 +130,10 @@ void COMVisual::Load()
   sphereVis->InsertMesh("unit_sphere");
   sphereVis->AttachMesh("unit_sphere");
 
-  sphereVis->SetScale(math::Vector3(
+  sphereVis->SetScale(ignition::math::Vector3d(
       sphereRadius*2, sphereRadius*2, sphereRadius*2));
-  sphereVis->SetPosition(dPtr->inertiaPose.pos);
-  sphereVis->SetRotation(dPtr->inertiaPose.rot);
+  sphereVis->SetPosition(dPtr->inertiaPose.pos.Ign());
+  sphereVis->SetRotation(dPtr->inertiaPose.rot.Ign());
 
   Ogre::SceneNode *sphereNode = sphereVis->GetSceneNode();
   sphereNode->setInheritScale(false);

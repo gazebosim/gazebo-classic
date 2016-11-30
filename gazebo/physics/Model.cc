@@ -28,6 +28,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
 #include "gazebo/common/KeyFrame.hh"
@@ -993,7 +994,7 @@ void Model::LoadPlugins()
     {
       gzerr << "Sensors failed to initialize when loading model["
         << this->GetName() << "] via the factory mechanism."
-        << "Plugins for the model will not be loaded.\n";
+        << " Plugins for the model will not be loaded.\n";
     }
   }
 
@@ -1332,12 +1333,6 @@ void Model::SetState(const ModelState &_state)
 }
 
 /////////////////////////////////////////////////
-void Model::SetScale(const math::Vector3 &_scale)
-{
-  this->SetScale(_scale.Ign());
-}
-
-/////////////////////////////////////////////////
 void Model::SetScale(const ignition::math::Vector3d &_scale,
       const bool _publish)
 {
@@ -1537,6 +1532,38 @@ gazebo::physics::JointPtr Model::CreateJoint(
 }
 
 /////////////////////////////////////////////////
+gazebo::physics::JointPtr Model::CreateJoint(sdf::ElementPtr _sdf)
+{
+  if (_sdf->GetName() != "joint" ||
+      !_sdf->HasAttribute("name") ||
+      !_sdf->HasAttribute("type"))
+  {
+    gzerr << "Invalid _sdf passed to Model::CreateJoint" << std::endl;
+    return physics::JointPtr();
+  }
+
+  std::string jointName(_sdf->Get<std::string>("name"));
+  if (this->GetJoint(jointName))
+  {
+    gzwarn << "Model [" << this->GetName()
+           << "] already has a joint named [" << jointName
+           << "], skipping creating joint.\n";
+    return physics::JointPtr();
+  }
+
+  try
+  {
+    // LoadJoint can throw if the scoped name of the joint already exists.
+    this->LoadJoint(_sdf);
+  }
+  catch(...)
+  {
+    gzerr << "LoadJoint Failed" << std::endl;
+  }
+  return this->GetJoint(jointName);
+}
+
+/////////////////////////////////////////////////
 bool Model::RemoveJoint(const std::string &_name)
 {
   bool paused = this->world->IsPaused();
@@ -1544,7 +1571,12 @@ bool Model::RemoveJoint(const std::string &_name)
   if (joint)
   {
     this->world->SetPaused(true);
+    if (this->jointController)
+    {
+      this->jointController->RemoveJoint(joint.get());
+    }
     joint->Detach();
+    joint->Fini();
 
     this->joints.erase(
       std::remove(this->joints.begin(), this->joints.end(), joint),
@@ -1671,31 +1703,18 @@ void Model::PluginInfo(const common::URI &_pluginUri,
     return;
   }
 
-  auto parts = common::split(_pluginUri.Path().Str(), "/");
-  auto myParts = common::split(this->URI().Path().Str(), "/");
-
-  // Plugin URI should be longer than model URI
-  if (myParts.size() >= parts.size())
+  if (!_pluginUri.Path().Contains(this->URI().Path()))
   {
-    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
+    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
         this->URI().Str() << "]" << std::endl;
     return;
   }
 
-  // Check if all segments match up to this model
-  size_t i = 0;
-  for (; i < myParts.size(); ++i)
-  {
-    if (parts[i] != myParts[i])
-    {
-      gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match model [" <<
-          this->URI().Str() << "]" << std::endl;
-      return;
-    }
-  }
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
+  auto myParts = common::split(this->URI().Path().Str(), "/");
 
   // Iterate over parts following this model
-  for (; i < parts.size(); i = i+2)
+  for (size_t i = myParts.size(); i < parts.size(); i = i+2)
   {
     if (parts[i] == "model")
     {

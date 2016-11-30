@@ -15,8 +15,11 @@
  *
 */
 
+#include <ignition/msgs/plugin_v.pb.h>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "test/util.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Model.hh"
 
@@ -151,7 +154,7 @@ TEST_F(ModelTest, ModelPluginInfo)
     model->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
-    EXPECT_EQ(plugins.plugins_size(), 1);
+    ASSERT_EQ(plugins.plugins_size(), 1);
     EXPECT_EQ(plugins.plugins(0).name(), "submarine_propeller_3");
   }
 
@@ -161,7 +164,7 @@ TEST_F(ModelTest, ModelPluginInfo)
     model->PluginInfo(pluginUri, plugins, success);
 
     EXPECT_TRUE(success);
-    EXPECT_EQ(plugins.plugins_size(), 5);
+    ASSERT_EQ(plugins.plugins_size(), 5);
     EXPECT_EQ(plugins.plugins(0).name(), "submarine_propeller_1");
     EXPECT_EQ(plugins.plugins(1).name(), "submarine_propeller_2");
     EXPECT_EQ(plugins.plugins(2).name(), "submarine_propeller_3");
@@ -193,7 +196,7 @@ TEST_F(ModelTest, NestedModelPluginInfo)
   model->PluginInfo(pluginUri, plugins, success);
 
   EXPECT_TRUE(success);
-  EXPECT_EQ(plugins.plugins_size(), 1);
+  ASSERT_EQ(plugins.plugins_size(), 1);
   EXPECT_EQ(plugins.plugins(0).name(), "region_event_box");
 }
 

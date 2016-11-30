@@ -135,7 +135,7 @@ void JointPIDPosControl::SetToDegrees()
   if (this->dataPtr->radians)
   {
     this->dataPtr->radians = false;
-    this->dataPtr->posSpin->setValue(GZ_RTOD(this->dataPtr->posSpin->value()));
+    this->dataPtr->posSpin->setValue(IGN_RTOD(this->dataPtr->posSpin->value()));
   }
 }
 
@@ -145,7 +145,7 @@ void JointPIDPosControl::SetToRadians()
   if (!this->dataPtr->radians)
   {
     this->dataPtr->radians = true;
-    this->dataPtr->posSpin->setValue(GZ_DTOR(this->dataPtr->posSpin->value()));
+    this->dataPtr->posSpin->setValue(IGN_DTOR(this->dataPtr->posSpin->value()));
   }
 }
 
@@ -155,7 +155,7 @@ void JointPIDPosControl::OnChanged(double _value)
   if (this->dataPtr->radians)
     emit changed(_value, this->dataPtr->name);
   else
-    emit changed(GZ_DTOR(_value), this->dataPtr->name);
+    emit changed(IGN_DTOR(_value), this->dataPtr->name);
 }
 
 /////////////////////////////////////////////////

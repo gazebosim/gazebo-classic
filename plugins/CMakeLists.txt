@@ -40,6 +40,7 @@ endif()
 set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
+  ArduCopterPlugin
   ArrangePlugin
   BlinkVisualPlugin
   BreakableJointPlugin
@@ -53,6 +54,7 @@ set (plugins_single_header
   FiducialCameraPlugin
   FollowerPlugin
   ForceTorquePlugin
+  GimbalSmall2dPlugin
   GpuRayPlugin
   HarnessPlugin
   ImuSensorPlugin
@@ -63,6 +65,7 @@ set (plugins_single_header
   LinearBatteryPlugin
   ModelPropShop
   MudPlugin
+  PlaneDemoPlugin
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
@@ -115,7 +118,10 @@ endforeach ()
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
+  target_link_libraries(${src} gazebo_gui
+                               libgazebo
+			       ${ogre_libraries}
+			       ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()

@@ -108,9 +108,10 @@ void Light::Load()
 //////////////////////////////////////////////////
 void Light::Update()
 {
+  // shadow support is also affected by light type so set type first.
+  this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
 
-  this->SetLightType(this->dataPtr->sdf->Get<std::string>("type"));
   this->SetDiffuseColor(
       this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>());
   this->SetSpecularColor(
@@ -184,21 +185,9 @@ void Light::SetName(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-std::string Light::GetName() const
-{
-  return this->Name();
-}
-
-//////////////////////////////////////////////////
 std::string Light::Name() const
 {
   return this->dataPtr->sdf->Get<std::string>("name");
-}
-
-//////////////////////////////////////////////////
-std::string Light::GetType() const
-{
-  return this->Type();
 }
 
 //////////////////////////////////////////////////
@@ -367,21 +356,9 @@ void Light::CreateVisual()
 }
 
 //////////////////////////////////////////////////
-void Light::SetPosition(const math::Vector3 &_p)
-{
-  this->SetPosition(_p.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetPosition(const ignition::math::Vector3d &_p)
 {
   this->dataPtr->visual->SetPosition(_p);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Light::GetPosition() const
-{
-  return this->Position();
 }
 
 //////////////////////////////////////////////////
@@ -391,21 +368,9 @@ ignition::math::Vector3d Light::Position() const
 }
 
 //////////////////////////////////////////////////
-void Light::SetRotation(const math::Quaternion &_q)
-{
-  this->SetRotation(_q.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetRotation(const ignition::math::Quaterniond &_q)
 {
   this->dataPtr->visual->SetRotation(_q);
-}
-
-//////////////////////////////////////////////////
-math::Quaternion Light::GetRotation() const
-{
-  return this->Rotation();
 }
 
 //////////////////////////////////////////////////
@@ -441,12 +406,6 @@ void Light::ShowVisual(const bool _s)
 }
 
 //////////////////////////////////////////////////
-bool Light::GetVisible() const
-{
-  return this->Visible();
-}
-
-//////////////////////////////////////////////////
 bool Light::Visible() const
 {
   return this->dataPtr->visual->GetVisible();
@@ -474,6 +433,15 @@ void Light::SetLightType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
+std::string Light::LightType() const
+{
+  if (this->dataPtr->sdf)
+    return this->dataPtr->sdf->Get<std::string>("type");
+
+  return std::string();
+}
+
+//////////////////////////////////////////////////
 void Light::SetDiffuseColor(const common::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
@@ -485,21 +453,9 @@ void Light::SetDiffuseColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Light::GetDiffuseColor() const
-{
-  return this->DiffuseColor();
-}
-
-//////////////////////////////////////////////////
 common::Color Light::DiffuseColor() const
 {
   return this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>();
-}
-
-//////////////////////////////////////////////////
-common::Color Light::GetSpecularColor() const
-{
-  return this->SpecularColor();
 }
 
 //////////////////////////////////////////////////
@@ -520,12 +476,6 @@ void Light::SetSpecularColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-void Light::SetDirection(const math::Vector3 &_dir)
-{
-  this->SetDirection(_dir.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetDirection(const ignition::math::Vector3d &_dir)
 {
   // Set the direction which the light points
@@ -536,12 +486,6 @@ void Light::SetDirection(const ignition::math::Vector3d &_dir)
     this->dataPtr->sdf->GetElement("direction")->Set(vec);
 
   this->dataPtr->light->setDirection(vec.x, vec.y, vec.z);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Light::GetDirection() const
-{
-  return this->Direction();
 }
 
 //////////////////////////////////////////////////
@@ -590,18 +534,25 @@ void Light::SetRange(const double _range)
 }
 
 //////////////////////////////////////////////////
-void Light::SetCastShadows(const bool /*_cast*/)
+void Light::SetCastShadows(const bool _cast)
 {
-    this->dataPtr->light->setCastShadows(true);
-  /*if (this->dataPtr->light->getType() == Ogre::Light::LT_SPOTLIGHT ||
-      this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
+  if (this->dataPtr->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
     this->dataPtr->light->setCastShadows(_cast);
   }
   else
   {
     this->dataPtr->light->setCastShadows(false);
-  }*/
+  }
+}
+
+//////////////////////////////////////////////////
+bool Light::CastShadows() const
+{
+  if (this->dataPtr->light)
+    return this->dataPtr->light->getCastShadows();
+
+  return false;
 }
 
 //////////////////////////////////////////////////

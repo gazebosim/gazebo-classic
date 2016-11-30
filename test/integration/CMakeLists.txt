@@ -44,6 +44,7 @@ set(tests
   gz_model.cc
   gz_physics.cc
   gz_world.cc
+  harness.cc
   imu.cc
   info_services.cc
   introspection_items.cc
@@ -58,6 +59,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  link.cc
   logical_camera_sensor.cc
   model.cc
   model_database.cc
@@ -169,6 +171,7 @@ set(dri_tests
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
+  collada_visualization.cc
   insert_model.cc
   model_editor.cc
   model_editor_undo.cc

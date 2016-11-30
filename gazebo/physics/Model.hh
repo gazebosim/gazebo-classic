@@ -29,8 +29,6 @@
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include <ignition/msgs/plugin_v.pb.h>
-
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ModelState.hh"
@@ -41,6 +39,15 @@
 namespace boost
 {
   class recursive_mutex;
+}
+
+// Forward declare reference and pointer parameters
+namespace ignition
+{
+  namespace msgs
+  {
+    class Plugin_V;
+  }
 }
 
 namespace gazebo
@@ -215,7 +222,7 @@ namespace gazebo
       public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
@@ -284,12 +291,6 @@ namespace gazebo
       /// \brief Set the current model state.
       /// \param[in] _state State to set the model to.
       public: void SetState(const ModelState &_state);
-
-      /// \brief Set the scale of model.
-      /// \param[in] _scale Scale to set the model to.
-      /// \deprecated See function that accepts ignition::math parameters
-      public: void SetScale(const math::Vector3 &_scale)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
@@ -393,6 +394,14 @@ namespace gazebo
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
+      /// \brief Create a joint for this model
+      /// \param[in] _sdf SDF parameters for <joint>
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
+
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint
       /// \return true if successful, false if not.
@@ -430,10 +439,6 @@ namespace gazebo
       ///    data://world/<world_name>/model/<this_name>/model/
       ///        <nested_model_name>/plugin/<plugin_name>
       ///
-      /// * Info about a sensor plugin within this model:
-      ///    data://world/<world_name>/model/<this_name>/link/<link_name>/
-      ///    sensor/<sensor_name>/plugin/<plugin_name>
-      ///
       /// \param[in] _pluginUri URI for the desired plugin(s).
       /// \param[out] _plugins Message containing vector of plugins.
       /// \param[out] _success True if the info was successfully obtained.
@@ -442,6 +447,9 @@ namespace gazebo
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
+
+      /// \brief Register items in the introspection service.
+      protected: virtual void RegisterIntrospectionItems();
 
       /// \brief Load all the links.
       private: void LoadLinks();
@@ -468,9 +476,6 @@ namespace gazebo
 
       /// \brief Publish the scale.
       private: virtual void PublishScale();
-
-      /// \brief Register items in the introspection service.
-      protected: virtual void RegisterIntrospectionItems();
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;

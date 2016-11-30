@@ -148,13 +148,13 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.3.3 QUIET)
+  find_package(DARTCore 5.1.1 QUIET)
   if (DARTCore_FOUND)
-    message (STATUS "Looking for DARTCore - found")
+    message (STATUS "Looking for DARTCore - ${DARTCore_VERSION} found")
     set (HAVE_DART TRUE)
   else()
     message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core5-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -244,6 +244,9 @@ if (PKG_CONFIG_FOUND)
     if (tinyxml2_FAIL)
       message (STATUS "Looking for tinyxml2.h - not found")
       BUILD_ERROR("Missing: tinyxml2")
+    else()
+      include_directories(${tinyxml2_INCLUDE_DIRS})
+      link_directories(${tinyxml2_LIBRARY_DIRS})
     endif()
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
@@ -415,6 +418,24 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   ########################################
+  # Find AV device. Only check for this on linux.
+  if (UNIX)
+    pkg_check_modules(libavdevice libavdevice>="56.4.100")
+    if (NOT libavdevice_FOUND)
+      BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
+    else()
+      include_directories(${libavdevice_INCLUDE_DIRS})
+      link_directories(${libavdevice_LIBRARY_DIRS})
+    endif ()
+  endif ()
+
+  if (NOT libavdevice_FOUND)
+    set (HAVE_AVDEVICE False)
+  else()
+    set (HAVE_AVDEVICE True)
+  endif()
+
+  ########################################
   # Find AV format
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
@@ -441,8 +462,8 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
   endif ()
 
-
-  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND
+      libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -670,7 +691,7 @@ endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math2 2.4 QUIET)
+find_package(ignition-math2 2.6 QUIET)
 if (NOT ignition-math2_FOUND)
   message(STATUS "Looking for ignition-math2-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition math2 library.")
@@ -680,10 +701,19 @@ endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport1 QUIET)
-if (NOT ignition-transport1_FOUND)
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
+find_package(ignition-transport2 QUIET)
+if (NOT ignition-transport2_FOUND)
+  find_package(ignition-transport1 QUIET)
+  if (NOT ignition-transport1_FOUND)
+    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
+  else()
+    message(STATUS "Looking for ignition-transport1-config.cmake - found")
+  endif()
 else()
+  message(STATUS "Looking for ignition-transport2-config.cmake - found")
+endif()
+
+if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
@@ -718,14 +748,17 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/include
   /usr/local/include
   /usr/local/lib/qwt.framework/Headers
+  ${QWT_WIN_INCLUDE_DIR}
+
   PATH_SUFFIXES qwt-qt4 qwt qwt5
-  )
+)
 
 find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
-  )
+  ${QWT_WIN_LIBRARY_DIR}
+)
 
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)
@@ -748,6 +781,11 @@ if ( _VERSION_LINE )
   set(QWT_VERSION
     ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
 endif ()
+
+# in Windows, the path need to point to the parent to get correct qwt/foo headers
+if (WIN32)
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")	
+endif()
 
 if (HAVE_QWT)
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")

@@ -2,6 +2,28 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Support version 5 of the DART Physics Engine.
+    * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
+
+1. UserCamera overrides `Camera::Render` to reduce CPU usage.
+    * [Pull request 2480](https://bitbucket.org/osrf/gazebo/pull-request/2480)
+
+1. Static links no longer subscribe to wrench topics.
+    * [Pull request #2452]((https://bitbucket.org/osrf/gazebo/pull-request/2452)
+
+1. Add Gazebo math helper functions to convert to and from Ignition Math
+   objects.
+    * [Pull request #2461](https://bitbucket.org/osrf/gazebo/pull-request/2461)
+
+1. Add video recording of user camera. This change added an optional
+   dependency on libavdevice>=56.4.100 for linux systems. When installed,
+   libavdevice will allow a user to stream a simulated camera to a video4linux2
+   loopback device.
+    * [Pull request #2443](https://bitbucket.org/osrf/gazebo/pull-request/2443)
+
+1. Removed deprecations
+    * [Pull request #2427]((https://bitbucket.org/osrf/gazebo/pull-request/2427)
+
 1. Include basic support for GNU Precompiled Headers to reduce compile time
     * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
 
@@ -9,6 +31,7 @@
     * [Pull request #2348](https://bitbucket.org/osrf/gazebo/pull-request/2348)
     * [Pull request #2325](https://bitbucket.org/osrf/gazebo/pull-request/2325)
     * [Pull request #2382](https://bitbucket.org/osrf/gazebo/pull-request/2382)
+    * [Pull request #2448](https://bitbucket.org/osrf/gazebo/pull-request/2448)
 
 1. Renamed `gazebo/gui/SaveDialog` to `gazebo/gui/SaveEntityDialog`. A new
    `SaveDialog` class will be added in a future pull request. The migration
@@ -70,8 +93,12 @@
 
 1. Deprecate gazebo::math
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
+    * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
+    * [Pull request #2436](https://bitbucket.org/osrf/gazebo/pull-request/2436)
+    * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
@@ -157,9 +184,42 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix DEM heightmap size, collision, scale
+    * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
+
+1. Update QT render loop to throttle based on UserCamera::RenderRate.
+    * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
+    * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
+
+1. Generate visualization on demand, instead of on load. This helps to
+   reduce load time.
+    * [Pull request 2457](https://bitbucket.org/osrf/gazebo/pull-request/2457)
+
+1. Add GUI items to change the user camera clip distance
+    * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
+    * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
+
+1. Support custom material scripts for heightmaps
+    * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
+
+## Gazebo 7.4.0 (2016-10-11)
+
+1. Add test for HarnessPlugin, reduce likelihood of race condition
+    * [Pull request 2431](https://bitbucket.org/osrf/gazebo/pull-request/2431)
+    * [Issue 2034](https://bitbucket.org/osrf/gazebo/issues/2034)
+
+1. Add `syntax = proto2` in proto files to fix some protobuf3 warnings
+    * [Pull request 2456](https://bitbucket.org/osrf/gazebo/pull-request/2456)
+
+1. Add support for loading wavefront obj mesh files
+    * [Pull request 2454](https://bitbucket.org/osrf/gazebo/pull-request/2454)
+
 1. Added filesystem operations to the common library. Additions include
    `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
     * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
+
+1. Fix loading collada files with multiple texture coordinates.
+    * [Pull request 2413](https://bitbucket.org/osrf/gazebo/pull-request/2413)
 
 1. Added visualization of minimum range to laservisual.
     * [Pull request 2412](https://bitbucket.org/osrf/gazebo/pull-request/2412)

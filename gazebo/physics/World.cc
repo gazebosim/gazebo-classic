@@ -40,6 +40,10 @@
 #include <vector>
 
 #include <ignition/math/Rand.hh>
+
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -89,7 +93,6 @@
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Population.hh"
-
 
 using namespace gazebo;
 using namespace physics;
@@ -2939,30 +2942,17 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     return;
   }
 
-  auto parts = common::split(pluginUri.Path().Str(), "/");
-  auto myParts = common::split(this->URI().Path().Str(), "/");
-
-  // Plugin URI should be longer than world URI
-  if (myParts.size() >= parts.size())
+  if (!pluginUri.Path().Contains(this->URI().Path()))
   {
     gzwarn << "Plugin [" << pluginUri.Str() << "] does not match world [" <<
         this->URI().Str() << "]" << std::endl;
     return;
   }
 
-  // Check if all segments match up to this world
-  size_t i = 0;
-  for ( ; i < myParts.size(); ++i)
-  {
-    if (parts[i] != myParts[i])
-    {
-      gzwarn << "Plugin [" << pluginUri.Str() << "] does not match world [" <<
-          this->URI().Str() << "]" << std::endl;
-      return;
-    }
-  }
+  auto parts = common::split(pluginUri.Path().Str(), "/");
+  auto myParts = common::split(this->URI().Path().Str(), "/");
 
-  for (; i < parts.size(); i = i+2)
+  for (size_t i = myParts.size(); i < parts.size(); i = i+2)
   {
     // See if there is a model
     if (parts[i] == "model")
