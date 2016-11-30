@@ -18,6 +18,8 @@ fi
 CPPCHECK_VERSION=`cppcheck --version | sed -e 's@Cppcheck @@'`
 CPPCHECK_LT_157=`echo "$CPPCHECK_VERSION 1.57" | \
                  awk '{if ($1 < $2) print 1; else print 0}'`
+CPPCHECK_GE_169=`echo "$CPPCHECK_VERSION 1.69" | \
+                 awk '{if ($1 >= $2) print 1; else print 0}'`
 
 QUICK_CHECK=0
 if test "$1" = "--quick"
@@ -72,7 +74,7 @@ echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 
 # Disable noExplicitConstructor warnings in gazebo7 release series
 # (release expected in 01/25/2017) relaxed to 31/01/2015
-if [ `date '+%Y%m%d'` -lt 20170131 ]; then
+if [ $CPPCHECK_LT_169 -eq 0 && `date '+%Y%m%d'` -lt 20170131 ]; then
   echo "noExplicitConstructor" >> $SUPPRESS
 fi
 
