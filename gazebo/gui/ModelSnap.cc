@@ -329,7 +329,7 @@ void ModelSnap::Snap(const ignition::math::Triangle3d &_triangleSrc,
   ignition::math::Quaterniond rotation;
 
   this->SnapTransform(_triangleSrc, _triangleDest,
-      _visualSrc->GetWorldPose().Ign(), translation, rotation);
+      _visualSrc->WorldPose(), translation, rotation);
 
   _visualSrc->SetWorldPose(
       ignition::math::Pose3d(_visualSrc->WorldPose().Pos() +
@@ -420,8 +420,8 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     if (id)
       msg.set_id(id);
 
-    msg.set_name(_vis->GetName());
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msg.set_name(_vis->Name());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);

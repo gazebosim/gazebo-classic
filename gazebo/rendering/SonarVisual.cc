@@ -122,8 +122,8 @@ void SonarVisual::Update()
       - dPtr->sonarMsg->sonar().range_min();
   double radiusScale = dPtr->sonarMsg->sonar().radius()*2.0;
 
-  if (!ignition::math::equal(dPtr->coneVis->GetScale().z, rangeDelta) ||
-      !ignition::math::equal(dPtr->coneVis->GetScale().x, radiusScale))
+  if (!ignition::math::equal(dPtr->coneVis->Scale().Z(), rangeDelta) ||
+      !ignition::math::equal(dPtr->coneVis->Scale().X(), radiusScale))
   {
     dPtr->coneVis->SetScale(
         ignition::math::Vector3d(radiusScale, radiusScale, rangeDelta));

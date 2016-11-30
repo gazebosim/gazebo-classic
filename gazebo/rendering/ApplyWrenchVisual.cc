@@ -338,7 +338,7 @@ void ApplyWrenchVisual::UpdateForceVisual()
 
   // Set arrow tip to forcePosVector
   dPtr->forceVisual->SetPosition(-normVec * 0.28 *
-      dPtr->forceVisual->GetScale().z + dPtr->forcePosVector);
+      dPtr->forceVisual->Scale().Z() + dPtr->forcePosVector);
 
   // Rotation tool
   dPtr->rotTool->SetPosition(dPtr->forcePosVector);
@@ -371,7 +371,7 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
       ignition::math::Vector3d(0, M_PI/2.0, 0)));
 
   // Position towards comVector
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
+  double linkDiagonal = dPtr->parent->BoundingBox().Size().Length();
   dPtr->torqueVisual->SetPosition(normVec*linkDiagonal*0.75 + dPtr->comVector);
   dPtr->torqueLine->SetPoint(1,
       ignition::math::Vector3d(0, 0,
@@ -399,8 +399,7 @@ void ApplyWrenchVisual::Resize()
   // Protect force/torque visuals
   std::lock_guard<std::mutex> lock(dPtr->mutex);
 
-  double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+  double linkSize = std::max(0.1, dPtr->parent->BoundingBox().Size().Length());
 
   // Force visual
   dPtr->forceVisual->SetScale(ignition::math::Vector3d(2*linkSize,

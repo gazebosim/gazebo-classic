@@ -102,8 +102,7 @@ void BuildingModelManip::OnSizeChanged(double _width, double _depth,
 {
   this->dataPtr->size =
       BuildingMaker::ConvertSize(_width, _depth, _height);
-  double dScaleZ = this->dataPtr->visual->GetScale().Ign().Z() -
-                   this->dataPtr->size.Z();
+  double dScaleZ = this->dataPtr->visual->Scale().Z() - this->dataPtr->size.Z();
   this->dataPtr->visual->SetScale(this->dataPtr->size);
   auto originalPos = this->dataPtr->visual->Position();
   auto newPos = originalPos - ignition::math::Vector3d(0, 0, dScaleZ/2.0);
@@ -127,7 +126,7 @@ void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
   auto trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
       _yaw);
 
-  auto oldPose = this->dataPtr->visual->Parent()->WorldPose();
+  auto oldPose = this->dataPtr->visual->GetParent()->WorldPose();
 
   this->dataPtr->visual->GetParent()->SetWorldPose(oldPose + trans);
   this->dataPtr->maker->BuildingChanged();

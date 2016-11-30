@@ -364,7 +364,7 @@ void Light::SetPosition(const ignition::math::Vector3d &_p)
 //////////////////////////////////////////////////
 ignition::math::Vector3d Light::Position() const
 {
-  return this->dataPtr->visual->GetPosition().Ign();
+  return this->dataPtr->visual->Position();
 }
 
 //////////////////////////////////////////////////
@@ -376,7 +376,7 @@ void Light::SetRotation(const ignition::math::Quaterniond &_q)
 //////////////////////////////////////////////////
 ignition::math::Quaterniond Light::Rotation() const
 {
-  return this->dataPtr->visual->GetRotation().Ign();
+  return this->dataPtr->visual->Rotation();
 }
 
 //////////////////////////////////////////////////

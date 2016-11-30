@@ -22,16 +22,11 @@
 #include <utility>
 #include <list>
 #include <vector>
+#include <functional>
 
-#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Box.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -146,7 +141,7 @@ namespace gazebo
       public: common::Time prevAnimTime;
 
       /// \brief Callback for the animation complete event.
-      public: boost::function<void()> onAnimationComplete;
+      public: std::function<void()> onAnimationComplete;
 
       /// \brief True to use RT shader system.
       public: bool useRTShader;

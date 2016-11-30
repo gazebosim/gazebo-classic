@@ -139,7 +139,12 @@ namespace gazebo
 
       /// \brief Get the name of the visual.
       /// \return The name of the visual.
+      /// \deprecated See std::string Name() const
       public: std::string GetName() const;
+
+      /// \brief Get the name of the visual.
+      /// \return The name of the visual.
+      public: std::string Name() const;
 
       /// \brief Attach a visual to this visual.
       /// \param[in] _vis Visual to attach.
@@ -201,7 +206,12 @@ namespace gazebo
 
       /// \brief Get the scale.
       /// \return The scaling factor.
-      public: math::Vector3 GetScale();
+      /// \deprecated See version that return an ignition math object.
+      public: math::Vector3 GetScale() GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the scale.
+      /// \return The scaling factor.
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Get the scale of the visual as inherited from all parents.
       /// \return The derived scaling factor.
@@ -349,15 +359,31 @@ namespace gazebo
 
       /// \brief Get the position of the visual.
       /// \return The visual's position.
-      public: math::Vector3 GetPosition() const;
+      /// \deprecated See ignition::math::Vector3d Position() const
+      public: math::Vector3 GetPosition() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the position of the visual.
+      /// \return The visual's position.
+      public: ignition::math::Vector3d Position() const;
 
       /// \brief Get the rotation of the visual.
       /// \return The visual's rotation.
-      public: math::Quaternion GetRotation() const;
+      /// \deprecated ignition::math::Quaterniond Rotation() const
+      public: math::Quaternion GetRotation() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the rotation of the visual.
+      /// \return The visual's rotation.
+      public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
+      /// \deprecated See ignition::math::Pose3d Pose() const;
       public: math::Pose GetPose() const;
+
+      /// \brief Get the pose of the visual.
+      /// \return The Visual's pose.
+      /// \deprecated See ignition::math::Pose3d Pose() const;
+      public: ignition::math::Pose3d Pose() const;
 
       /// \brief Get the initial relative pose of the visual.
       /// \return The visual's initial relative pose.
@@ -365,7 +391,12 @@ namespace gazebo
 
       /// \brief Get the global pose of the node.
       /// \return The pose in the world coordinate frame.
-      public: math::Pose GetWorldPose() const;
+      /// \deprecated See ignition::math::Pose3d WorldPose() const.
+      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the global pose of the node.
+      /// \return The pose in the world coordinate frame.
+      public: ignition::math::Pose3d WorldPose() const;
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
@@ -415,7 +446,12 @@ namespace gazebo
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
-      public: math::Box GetBoundingBox() const;
+      /// \deprecated See version the returns an ignition math object.
+      public: math::Box GetBoundingBox() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the bounding box for the visual.
+      /// \return The bounding box in world coordinates.
+      public: ignition::math::Box BoundingBox() const;
 
       /// \brief Add a line to the visual.
       /// \param[in] _type The type of line to make.
@@ -514,7 +550,7 @@ namespace gazebo
       /// \param[in] _onComplete Callback used when the move is complete.
       public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete = NULL);
+                                   std::function<void()> _onComplete = NULL);
 
       /// \brief Set visibility flags for this visual and all children.
       /// \param[in] _flags The visiblity flags.
@@ -698,8 +734,8 @@ namespace gazebo
       /// \brief Helper function to get the bounding box for a visual.
       /// \param[in] _node Pointer to the Ogre Node to process.
       /// \param[in] _box Current bounding box information.
-      private: void GetBoundsHelper(Ogre::SceneNode *_node,
-                                    math::Box &_box) const;
+      private: void BoundsHelper(Ogre::SceneNode *_node,
+                                 ignition::math::Box &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted

@@ -109,7 +109,7 @@ void ModelSnap_TEST::Highlight()
 
   // select any triangle on the sphere
   ignition::math::Vector2i spherePt =
-      cam->Project(model03Vis->GetWorldPose().pos.Ign() +
+      cam->Project(model03Vis->WorldPose().Pos() +
       ignition::math::Vector3d(0.5, 0, 0));
 
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
@@ -137,7 +137,7 @@ void ModelSnap_TEST::Highlight()
 
     // select the front face of the box
     ignition::math::Vector2i boxPt =
-        cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+        cam->Project(model02Vis->WorldPose().Pos() +
         ignition::math::Vector3d(0.5, 0, 0));
 
     QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
@@ -236,8 +236,8 @@ void ModelSnap_TEST::Snap()
 
   // The y and z pos of the sphere should be within the y and z bounds of the
   // box.
-  yDiff = model03Vis->GetWorldPose().pos.y - model02Vis->GetWorldPose().pos.y;
-  zDiff = model03Vis->GetWorldPose().pos.z - model02Vis->GetWorldPose().pos.z;
+  yDiff = model03Vis->WorldPose().Pos().Y() - model02Vis->WorldPose().Pos().Y();
+  zDiff = model03Vis->WorldPose().Pos().Z() - model02Vis->WorldPose().Pos().Z();
   QVERIFY(fabs(yDiff) <= 0.5);
   QVERIFY(fabs(zDiff) <= 0.5);
 
@@ -274,8 +274,8 @@ void ModelSnap_TEST::Snap()
 
   // The x and y pos of the cyinder should be within the x and y bounds of the
   // box.
-  xDiff = model01Vis->GetWorldPose().pos.x - model02Vis->GetWorldPose().pos.x;
-  yDiff = model01Vis->GetWorldPose().pos.y - model02Vis->GetWorldPose().pos.y;
+  xDiff = model01Vis->WorldPose().Pos().X() - model02Vis->WorldPose().Pos().X();
+  yDiff = model01Vis->WorldPose().Pos().Y() - model02Vis->WorldPose().Pos().Y();
   QVERIFY(fabs(xDiff) <= 0.5);
   QVERIFY(fabs(yDiff) <= 0.5);
 

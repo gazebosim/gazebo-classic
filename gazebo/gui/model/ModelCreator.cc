@@ -544,7 +544,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           ignition::math::Pose3d pose;
           if (visual)
           {
-            pose = visual->GetWorldPose().Ign();
+            pose = visual->WorldPose();
             this->dataPtr->previewVisual->SetWorldPose(pose);
           }
 
@@ -2412,7 +2412,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   {
     pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
-  pose.Pos().Z(this->dataPtr->mouseVisual->GetWorldPose().Ign().Pos().Z());
+  pose.Pos().Z(this->dataPtr->mouseVisual->WorldPose().Pos().Z());
 
   this->dataPtr->mouseVisual->SetWorldPose(pose);
 

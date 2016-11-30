@@ -178,7 +178,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     rot = rot * this->dataPtr->mouseMoveVisStartPose.Rot();
 
   _vis->SetWorldRotation(rot);
-  Events::moveEntity(_vis->GetName(), _vis->GetWorldPose().Ign(), false);
+  Events::moveEntity(_vis->Name(), _vis->WorldPose(), false);
 }
 
 /////////////////////////////////////////////////
@@ -379,7 +379,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const ignition::math::Vector3d &_axis, const bool _local)
 {
   auto bbox = this->dataPtr->mouseVisualBbox;
-  auto pose = _vis->GetWorldPose().Ign();
+  auto pose = _vis->WorldPose();
   auto distance =  this->MouseMoveDistance(pose, _axis, _local);
 
   auto bboxSize = bbox.Size();
@@ -560,7 +560,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     const ignition::math::Vector3d &_axis, const bool _local)
 {
-  auto pose = _vis->GetWorldPose().Ign();
+  auto pose = _vis->WorldPose();
   auto distance =  this->MouseMoveDistance(pose, _axis, _local);
 
   pose.Pos() = this->dataPtr->mouseMoveVisStartPose.Pos() + distance;
@@ -571,10 +571,10 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
   }
 
   if (!(_axis.Z() > 0) && !_local)
-    pose.Pos().Z() = _vis->GetWorldPose().Ign().Pos().Z();
+    pose.Pos().Z() = _vis->WorldPose().Pos().Z();
 
   _vis->SetWorldPose(pose);
-  Events::moveEntity(_vis->GetName(), pose, false);
+  Events::moveEntity(_vis->Name(), pose, false);
 }
 
 /////////////////////////////////////////////////
@@ -613,18 +613,18 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     if (id)
       msg.set_id(id);
 
-    msg.set_name(_vis->GetName());
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msg.set_name(_vis->Name());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);
   }
   // Otherwise, check to see if the visual is a light
-  else if (this->dataPtr->scene->GetLight(_vis->GetName()))
+  else if (this->dataPtr->scene->GetLight(_vis->Name()))
   {
     msgs::Light msg;
-    msg.set_name(_vis->GetName());
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msg.set_name(_vis->Name());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto lightMsg = userCmdMsg.add_light();
     lightMsg->CopyFrom(msg);
@@ -658,8 +658,8 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
   if (id)
     msg.set_id(id);
 
-  msg.set_name(_vis->GetName());
-  msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
+  msg.set_name(_vis->Name());
+  msgs::Set(msg.mutable_scale(), _vis->Scale());
 
   auto modelMsg = userCmdMsg.add_model();
   modelMsg->CopyFrom(msg);

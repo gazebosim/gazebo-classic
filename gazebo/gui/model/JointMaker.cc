@@ -689,8 +689,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 
     // Set point in root frame
     this->dataPtr->newJoint->line->SetPoint(1, posWorld -
-        this->dataPtr->newJoint->parent->GetRootVisual()->
-        GetWorldPose().Ign().Pos());
+        this->dataPtr->newJoint->parent->GetRootVisual()->WorldPose().Pos());
   }
   return true;
 }
@@ -824,7 +823,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   color.a = 0.5;
 
   double linkSize = std::min(0.1,
-      _joint->parent->GetBoundingBox().GetSize().GetLength()*0.05);
+      _joint->parent->BoundingBox().Size().Length()*0.05);
   linkSize = std::max(linkSize, 0.01);
 
   double dimension = linkSize;
@@ -880,12 +879,12 @@ void JointMaker::Update()
            {
              // Parent
              this->SetVisualMoved(joint->parent,
-                 joint->parent->GetWorldPose().Ign() !=
+                 joint->parent->WorldPose() !=
                  this->dataPtr->parentLinkOriginalPose);
 
              // Child
              this->SetVisualMoved(joint->child,
-                 joint->child->GetWorldPose().Ign() !=
+                 joint->child->WorldPose() !=
                  this->dataPtr->childLinkOriginalPose);
            }
          }
@@ -902,9 +901,9 @@ void JointMaker::Update()
           {
             // Get poses as homogeneous transforms
             ignition::math::Matrix4d parentWorld(
-                this->dataPtr->newJoint->parent->GetWorldPose().Ign());
+                this->dataPtr->newJoint->parent->WorldPose());
             ignition::math::Matrix4d childWorld(
-                this->dataPtr->newJoint->child->GetWorldPose().Ign());
+                this->dataPtr->newJoint->child->WorldPose());
 
             // w_T_c = w_T_p * p_T_c
             // w_T_p^-1 * w_T_c = p_T_c
@@ -1167,7 +1166,7 @@ void JointData::Update()
     // Parent handle position
     this->handles->getBillboard(0)->setPosition(
         rendering::Conversions::Convert(parentOrigin -
-        this->hotspot->GetWorldPose().Ign().Pos()));
+        this->hotspot->WorldPose().Pos()));
     this->handles->_updateBounds();
 
     // set new material if joint type has changed
@@ -1223,16 +1222,15 @@ void JointData::Update()
     // Parent - child
     if (this->child && this->jointVisual)
     {
-      this->line->SetPoint(0, (this->child->GetWorldPose().pos
-          - this->child->GetParent()->GetWorldPose().pos).Ign());
-      this->line->SetPoint(1,
-          (this->jointVisual->GetWorldPose().pos
-          - this->child->GetParent()->GetWorldPose().pos).Ign());
+      this->line->SetPoint(0, this->child->WorldPose().Pos()
+          - this->child->GetParent()->WorldPose().Pos());
+      this->line->SetPoint(1, this->jointVisual->WorldPose().Pos()
+          - this->child->GetParent()->WorldPose().Pos());
     }
     // Parent - mouse
     else if (this->parent && this->parent->GetParent())
     {
-      this->line->SetPoint(0, this->parent->GetWorldPose().Ign().Pos());
+      this->line->SetPoint(0, this->parent->WorldPose().Pos());
     }
   }
 
@@ -1611,7 +1609,7 @@ bool JointMaker::SetParentLink(const rendering::VisualPtr &_parentLink)
     return false;
   }
 
-  this->dataPtr->parentLinkOriginalPose = _parentLink->GetWorldPose().Ign();
+  this->dataPtr->parentLinkOriginalPose = _parentLink->WorldPose();
   return true;
 }
 
@@ -1660,7 +1658,7 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
     _childLink->AttachVisual(this->dataPtr->newJoint->jointVisual);
   }
 
-  this->dataPtr->childLinkOriginalPose = _childLink->GetWorldPose().Ign();
+  this->dataPtr->childLinkOriginalPose = _childLink->WorldPose();
 
   // Change state to not creating joint
   gui::Events::manipMode("select");
@@ -1772,7 +1770,7 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
     return;
   }
 
-  auto newChildPose = this->dataPtr->newJoint->child->GetWorldPose().Ign();
+  auto newChildPose = this->dataPtr->newJoint->child->WorldPose();
 
   if (_resetAll)
   {
@@ -1796,7 +1794,7 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
   {
     // Get poses as homogeneous transforms
     ignition::math::Matrix4d parent_world(
-        this->dataPtr->newJoint->parent->GetWorldPose().Ign());
+        this->dataPtr->newJoint->parent->WorldPose());
     ignition::math::Matrix4d child_parent(_pose);
 
     // w_T_c = w_T_p * p_T_c

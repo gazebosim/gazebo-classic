@@ -347,9 +347,9 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     this->Yaw(yaw);
     this->Pitch(pitch);
 
-    math::Box bb = _visual->GetBoundingBox();
-    math::Vector3 pos = bb.GetCenter();
-    pos.z = bb.max.z;
+    auto bb = _visual->BoundingBox();
+    auto pos = bb.Center();
+    pos.Z(bb.Max().Z());
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }

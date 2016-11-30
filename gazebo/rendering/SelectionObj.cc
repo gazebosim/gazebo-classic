@@ -116,12 +116,11 @@ void SelectionObj::UpdateSize()
 
   // don't include the selection obj itself when calculating the size.
   this->Detach();
-  math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
-      * vis->GetScale();
+  auto bboxSize = vis->BoundingBox().Size() * vis->Scale();
   dPtr->parent = vis;
   dPtr->parent->AttachVisual(shared_from_this());
 
-  double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
+  double max = std::max(std::max(bboxSize.X(), bboxSize.Y()), bboxSize.Z());
 
   max = std::min(std::max(dPtr->minScale, max), dPtr->maxScale);
 

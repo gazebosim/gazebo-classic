@@ -584,7 +584,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   QVERIFY(boxApplyWrenchVis->GetRotTool()->Pose().Pos() ==
       ignition::math::Vector3d::Zero);
   QVERIFY(boxApplyWrenchVis->GetRotTool()->Pose().Rot() !=
-      ignition::math::Vector3d::Zero);
+      ignition::math::Quaterniond::Identity);
   QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->Pose() !=
       boxTorquePose0);
   QVERIFY(boxApplyWrenchVis->GetForceVisual()->Pose() ==

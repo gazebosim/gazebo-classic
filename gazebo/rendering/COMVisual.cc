@@ -117,10 +117,10 @@ void COMVisual::Load()
 
   // Get the link's bounding box
   VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
-  math::Box box;
+  ignition::math::Box box;
 
   if (vis)
-    box = vis->GetBoundingBox();
+    box = vis->BoundingBox();
 
   VisualPtr sphereVis(
       new Visual(this->GetName()+"_SPHERE_", shared_from_this(), false));

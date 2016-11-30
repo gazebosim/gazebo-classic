@@ -368,8 +368,7 @@ void Camera::Update()
   {
     double scaling = 0;
     ignition::math::Vector3d direction =
-      this->dataPtr->trackedVisual->GetWorldPose().pos.Ign() -
-                              this->WorldPose().Pos();
+      this->dataPtr->trackedVisual->WorldPose().Pos() - this->WorldPose().Pos();
 
     if (!this->dataPtr->trackIsStatic)
     {
@@ -385,7 +384,7 @@ void Camera::Update()
         if (this->dataPtr->trackInheritYaw)
         {
           double yaw =
-              this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
+              this->dataPtr->trackedVisual->WorldPose().Rot().Yaw();
           ignition::math::Quaterniond rot =
               ignition::math::Quaterniond(0.0, 0.0, yaw);
           direction += rot.RotateVector(this->dataPtr->trackPos);

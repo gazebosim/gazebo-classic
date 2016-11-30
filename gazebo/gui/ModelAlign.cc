@@ -225,10 +225,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
   }
 
-  auto targetWorldPose = this->dataPtr->targetVis->GetWorldPose().Ign();
-  auto targetBbox = this->dataPtr->targetVis->GetBoundingBox().Ign();
-  targetBbox.Min() *= this->dataPtr->targetVis->GetScale().Ign();
-  targetBbox.Max() *= this->dataPtr->targetVis->GetScale().Ign();
+  auto targetWorldPose = this->dataPtr->targetVis->WorldPose();
+  auto targetBbox = this->dataPtr->targetVis->BoundingBox();
+  targetBbox.Min() *= this->dataPtr->targetVis->Scale();
+  targetBbox.Max() *= this->dataPtr->targetVis->Scale();
 
   std::vector<ignition::math::Vector3d> targetVertices;
   this->Transform(targetBbox, targetWorldPose, targetVertices);

@@ -256,7 +256,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   }
 
   if (_newParent == this->dataPtr->scene->WorldVisual())
-    result->SetWorldPose(this->GetWorldPose());
+    result->SetWorldPose(this->WorldPose());
   result->ShowCollision(false);
   result->SetInheritTransparency(this->InheritTransparency());
 
@@ -580,6 +580,12 @@ void Visual::SetName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Visual::GetName() const
 {
+  return this->Name();
+}
+
+//////////////////////////////////////////////////
+std::string Visual::Name() const
+{
   return this->dataPtr->name;
 }
 
@@ -812,7 +818,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
   {
-    (*iter)->UpdateGeomSize(_scale * (*iter)->GetScale().Ign());
+    (*iter)->UpdateGeomSize(_scale * (*iter)->Scale());
   }
 
   // update the same way as server - see Link::UpdateVisualGeomSDF()
@@ -875,6 +881,12 @@ ignition::math::Vector3d Visual::GetGeometrySize() const
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
+  return this->Scale();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Visual::Scale() const
+{
   return this->dataPtr->scale;
 }
 
@@ -888,7 +900,7 @@ ignition::math::Vector3d Visual::DerivedScale() const
 
   while (vis && vis != worldVis)
   {
-    derivedScale = derivedScale * vis->GetScale().Ign();
+    derivedScale = derivedScale * vis->Scale();
     vis = vis->GetParent();
   }
 
@@ -1577,7 +1589,7 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
-    math::Box bbox = this->GetBoundingBox();
+    auto bbox = this->BoundingBox();
 
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
@@ -1735,25 +1747,43 @@ void Visual::SetPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetPosition() const
 {
+  return this->Position();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Visual::Position() const
+{
   if (!this->dataPtr->sceneNode)
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   return Conversions::ConvertIgn(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+  return this->Rotation();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Visual::Rotation() const
+{
   if (!this->dataPtr->sceneNode)
-    return math::Vector3::Zero;
+    return ignition::math::Quaterniond::Identity;
   return Conversions::ConvertIgn(this->dataPtr->sceneNode->getOrientation());
 }
 
 //////////////////////////////////////////////////
 math::Pose Visual::GetPose() const
 {
-  math::Pose pos;
-  pos.pos = this->GetPosition();
-  pos.rot = this->GetRotation();
+  return this->Pose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Visual::Pose() const
+{
+  ignition::math::Pose3d pos;
+  pos.Pos() = this->Position();
+  pos.Rot() = this->Rotation();
   return pos;
 }
 
@@ -1791,7 +1821,13 @@ void Visual::SetWorldRotation(const math::Quaternion &_q)
 //////////////////////////////////////////////////
 math::Pose Visual::GetWorldPose() const
 {
-  math::Pose pose;
+  return this->WorldPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Visual::WorldPose() const
+{
+  ignition::math::Pose3d pose;
 
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
@@ -1799,15 +1835,10 @@ math::Pose Visual::GetWorldPose() const
   if (this->dataPtr->sceneNode)
   {
     vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-    pose.pos.x = vpos.x;
-    pose.pos.y = vpos.y;
-    pose.pos.z = vpos.z;
+    pose.Pos().Set(vpos.x,vpos.y, vpos.z);
 
     vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-    pose.rot.w = vquatern.w;
-    pose.rot.x = vquatern.x;
-    pose.rot.y = vquatern.y;
-    pose.rot.z = vquatern.z;
+    pose.Rot().Set(vquatern.w, vquatern.x, vquatern.y, vquatern.z);
   }
 
   return pose;
@@ -1966,25 +1997,32 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 math::Box Visual::GetBoundingBox() const
 {
-  math::Box box;
-  this->GetBoundsHelper(this->GetSceneNode(), box);
+  return this->BoundingBox();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Visual::BoundingBox() const
+{
+  ignition::math::Box box;
+  this->BoundsHelper(this->GetSceneNode(), box);
   return box;
 }
 
 //////////////////////////////////////////////////
-void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
+void Visual::BoundsHelper(Ogre::SceneNode *_node,
+                          ignition::math::Box &_box) const
 {
-  node->_updateBounds();
-  node->_update(false, true);
+  _node->_updateBounds();
+  _node->_update(false, true);
 
   Ogre::Matrix4 invTransform =
       this->dataPtr->sceneNode->_getFullTransform().inverse();
 
-  Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
+  Ogre::SceneNode::ChildNodeIterator it = _node->getChildIterator();
 
-  for (int i = 0; i < node->numAttachedObjects(); i++)
+  for (int i = 0; i < _node->numAttachedObjects(); i++)
   {
-    Ogre::MovableObject *obj = node->getAttachedObject(i);
+    Ogre::MovableObject *obj = _node->getAttachedObject(i);
 
     if (obj->isVisible() && obj->getMovableType() != "gazebo::dynamiclines"
         && obj->getMovableType() != "BillboardSet"
@@ -2014,7 +2052,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       else
       {
         // Get transform to be applied to the current node.
-        Ogre::Matrix4 transform = invTransform * node->_getFullTransform();
+        Ogre::Matrix4 transform = invTransform * _node->_getFullTransform();
         // Correct precision error which makes ogre's isAffine check fail.
         transform[3][0] = transform[3][1] = transform[3][2] = 0;
         transform[3][3] = 1;
@@ -2025,14 +2063,14 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
-      box.Merge(math::Box(min, max));
+      _box.Merge(ignition::math::Box(min, max));
     }
   }
 
   while (it.hasMoreElements())
   {
     Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
-    this->GetBoundsHelper(next, box);
+    this->BoundsHelper(next, _box);
   }
 }
 
@@ -2810,10 +2848,10 @@ bool Visual::GetCenterSubMesh() const
 //////////////////////////////////////////////////
 void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
                              double _time,
-                             boost::function<void()> _onComplete)
+                             std::function<void()> _onComplete)
 {
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
+  auto start = this->WorldPose().Pos();
 
   this->dataPtr->onAnimationComplete = _onComplete;
 
@@ -2827,7 +2865,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
       this->dataPtr->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   double dt = _time / (_pts.size()-1);
@@ -2861,7 +2899,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 {
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
+  auto start = this->WorldPose().Pos();
   math::Vector3 rpy = _pose.rot.GetAsEuler();
 
   math::Quaternion rotFinal(0, rpy.y, rpy.z);
@@ -2876,7 +2914,7 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
       anim->createNodeTrack(0, this->dataPtr->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
