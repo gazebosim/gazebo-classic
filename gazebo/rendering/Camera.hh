@@ -249,8 +249,8 @@ namespace gazebo
       /// \return Image height
       public: virtual unsigned int ImageHeight() const;
 
-      /// \brief Get the depth of the image
-      /// \return Depth of the image
+      /// \brief Get the depth of the image in bytes
+      /// \return Depth of the image in bytes
       public: unsigned int ImageDepth() const;
 
       /// \brief Get the string representation of the image format.
