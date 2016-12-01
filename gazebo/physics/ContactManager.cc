@@ -76,7 +76,7 @@ void ContactManager::Init(WorldPtr _world)
   this->world = _world;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
 
   this->contactPub =
     this->node->Advertise<msgs::Contacts>("~/physics/contacts", 50);
@@ -113,7 +113,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
             it != iter->second->collisionNames.end();)
         {
           Collision *col = boost::dynamic_pointer_cast<Collision>(
-              this->world->GetByName(*it)).get();
+              this->world->BaseByName(*it)).get();
           if (!col)
           {
             ++it;
@@ -235,7 +235,7 @@ void ContactManager::PublishContacts()
       this->contacts[i]->FillMsg(*contactMsg);
     }
 
-    msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+    msgs::Set(msg.mutable_time(), this->world->SimTime());
     this->contactPub->Publish(msg);
   }
 
@@ -256,7 +256,7 @@ void ContactManager::PublishContacts()
       msgs::Contact *contactMsg = msg2.add_contact();
       contactPublisher->contacts[j]->FillMsg(*contactMsg);
     }
-    msgs::Set(msg2.mutable_time(), this->world->GetSimTime());
+    msgs::Set(msg2.mutable_time(), this->world->SimTime());
     contactPublisher->publisher->Publish(msg2);
     contactPublisher->contacts.clear();
   }
@@ -325,7 +325,7 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   for (unsigned int i = 0; i < _collisions.size(); ++i)
   {
     CollisionPtr colPtr = boost::dynamic_pointer_cast<Collision>(
-       this->world->GetByName(_collisions[i]));
+       this->world->BaseByName(_collisions[i]));
     if (colPtr)
     {
       collisionMap[_collisions[i]] = colPtr;

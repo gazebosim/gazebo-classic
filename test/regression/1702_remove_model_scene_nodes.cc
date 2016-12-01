@@ -49,7 +49,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -94,12 +94,12 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // world->RemoveModel(name);
 
   int count = 0;
-  while (world->GetModel(name) != NULL && ++count < 1000)
+  while (world->ModelByName(name) != NULL && ++count < 1000)
   {
     common::Time::MSleep(1);
     world->Step(1);
   }
-  EXPECT_TRUE(world->GetModel(name) == NULL);
+  EXPECT_TRUE(world->ModelByName(name) == NULL);
   EXPECT_LT(count, 1000);
 
   // gzerr << "deleted"; getchar();
@@ -108,13 +108,13 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // if this succeeds, we're OK.
   physics::ModelPtr newBox = ServerFixture::SpawnModel(model);
   count = 0;
-  while (world->GetModel(name) == NULL && ++count < 1000)
+  while (world->ModelByName(name) == NULL && ++count < 1000)
   {
     common::Time::MSleep(1);
     world->Step(1);
   }
 
-  EXPECT_TRUE(world->GetModel(name) != NULL);
+  EXPECT_TRUE(world->ModelByName(name) != NULL);
 
   // Look through a camera to ensure visuals are generated
   rendering::ScenePtr scene = rendering::get_scene();

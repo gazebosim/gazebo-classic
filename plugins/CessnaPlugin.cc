@@ -132,7 +132,7 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Controller time control.
-  this->lastControllerUpdateTime = this->model->GetWorld()->GetSimTime();
+  this->lastControllerUpdateTime = this->model->GetWorld()->SimTime();
 
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
@@ -155,7 +155,7 @@ void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  gazebo::common::Time curTime = this->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->model->GetWorld()->SimTime();
 
   if (curTime > this->lastControllerUpdateTime)
   {

@@ -259,10 +259,10 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
 
   if (this->server->ParseArgs(argc, argv))
   {
-    if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+    if (!rendering::get_scene(gazebo::physics::get_world()->Name()))
     {
       ASSERT_NO_THROW(rendering::create_scene(
-            gazebo::physics::get_world()->GetName(), false, true));
+            gazebo::physics::get_world()->Name(), false, true));
     }
 
     ASSERT_NO_THROW(this->server->Run());
@@ -555,7 +555,7 @@ physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
     }
   }
 
-  return world->GetModel(_msg.name());
+  return world->ModelByName(_msg.name());
 }
 
 /////////////////////////////////////////////////
@@ -1368,7 +1368,7 @@ void ServerFixture::WaitUntilIteration(const uint32_t _goalIteration,
 {
   int i = 0;
   auto world = physics::get_world();
-  while ((world->GetIterations() != _goalIteration) && (i < _retries))
+  while ((world->Iterations() != _goalIteration) && (i < _retries))
   {
     ++i;
     common::Time::MSleep(_sleepEach);
@@ -1381,7 +1381,7 @@ void ServerFixture::WaitUntilSimTime(const common::Time &_goalTime,
 {
   int i = 0;
   auto world = physics::get_world();
-  while ((world->GetSimTime() != _goalTime) && (i < _retries))
+  while ((world->SimTime() != _goalTime) && (i < _retries))
   {
     ++i;
     common::Time::MSleep(_sleepEach);
@@ -1442,7 +1442,7 @@ void ServerFixture::SpawnLight(const std::string &_name,
   int maxTimeOut = 10;
   while (timeOutCount < maxTimeOut)
   {
-    sceneMsg = world->GetSceneMsg();
+    sceneMsg = world->SceneMsg();
     for (int i = 0; i < sceneMsg.light_size(); ++i)
     {
       if (sceneMsg.light(i).name() == _name)
@@ -1695,7 +1695,7 @@ physics::ModelPtr ServerFixture::GetModel(const std::string &_name)
 {
   // Get the first world...we assume it the only one running
   physics::WorldPtr world = physics::get_world();
-  return world->GetModel(_name);
+  return world->ModelByName(_name);
 }
 
 /////////////////////////////////////////////////

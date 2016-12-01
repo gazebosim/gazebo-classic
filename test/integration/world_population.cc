@@ -44,7 +44,7 @@ void WorldEnvPopulationTest::EmptyPopulation(const std::string &/*_physicsEng*/)
   // verify it. We should only see two models (ground plane and sun).
   int i = 0;
   int retries = 20;
-  while (world->GetModelCount() < 2u && i < retries)
+  while (world->ModelCount() < 2u && i < retries)
   {
     common::Time::MSleep(100);
     ++i;
@@ -65,7 +65,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
   // Wait some time while the models are being loaded.
   int i = 0;
   int retries = 200;
-  while (world->GetModelCount() < 65u && i < retries)
+  while (world->ModelCount() < 65u && i < retries)
   {
     common::Time::MSleep(100);
     ++i;
@@ -73,7 +73,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
   ASSERT_LT(i, retries);
 
   // We should have multiple cloned models + the ground plane.
-  EXPECT_EQ(world->GetModelCount(), 64u + 1u);
+  EXPECT_EQ(world->ModelCount(), 64u + 1u);
 
   // Check elements distributed as a grid.
   double tolerance = 0.25;
@@ -87,7 +87,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     {
       std::string name = std::string("can2_clone_" +
         boost::lexical_cast<std::string>(i * 3 + j));
-      physics::ModelPtr model = world->GetModel(name);
+      physics::ModelPtr model = world->ModelByName(name);
       ASSERT_TRUE(model != NULL);
       math::Vector3 pos = model->GetWorldPose().pos;
       EXPECT_NEAR(pos.Distance(expectedPos), 0.0, tolerance);
@@ -99,7 +99,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
   }
 
   // Check that the objects are within the expected box.
-  std::vector<physics::ModelPtr> models = world->GetModels();
+  std::vector<physics::ModelPtr> models = world->Models();
   for (size_t i = 0; i < models.size(); ++i)
   {
     physics::ModelPtr model = models[i];

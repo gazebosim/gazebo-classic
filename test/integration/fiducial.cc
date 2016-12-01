@@ -50,13 +50,13 @@ TEST_F(FiducialCameraTest, Fiducial)
 
   // Get the fiducial_01 model
   std::string fiducial01Name = "fiducial_01";
-  physics::ModelPtr fiducial01 = world->GetModel(fiducial01Name);
+  physics::ModelPtr fiducial01 = world->ModelByName(fiducial01Name);
   ASSERT_TRUE(fiducial01 != nullptr);
   fiducials.insert(fiducial01Name);
 
   // Get the fiducial_02 model
   std::string fiducial02Name = "fiducial_02";
-  physics::ModelPtr fiducial02 = world->GetModel(fiducial02Name);
+  physics::ModelPtr fiducial02 = world->ModelByName(fiducial02Name);
   ASSERT_TRUE(fiducial02 != nullptr);
   fiducials.insert(fiducial02Name);
 
@@ -113,7 +113,7 @@ TEST_F(FiducialCameraTest, Fiducial)
 
   // wait for new fiducial message with a timestamp later than the time
   // fiducial_01 was moved
-  common::Time poseUpdateTime = world->GetSimTime();
+  common::Time poseUpdateTime = world->SimTime();
   sleep = 0;
   received = false;
   while (!received && sleep < maxSleep)
@@ -141,7 +141,7 @@ TEST_F(FiducialCameraTest, Fiducial)
 
   SpawnBox("test_box", ignition::math::Vector3d::One, boxPos,
       ignition::math::Vector3d::Zero);
-  common::Time spawnBoxTime = world->GetSimTime();
+  common::Time spawnBoxTime = world->SimTime();
 
   // wait for new fiducial message with a timestamp later than the time
   // test_box was spawned

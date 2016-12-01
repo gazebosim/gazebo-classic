@@ -38,7 +38,7 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -92,7 +92,7 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
     while (!this->HasEntity(name))
       common::Time::MSleep(100);
   }
-  physics::ModelPtr model = world->GetModel("box_1");
+  physics::ModelPtr model = world->ModelByName("box_1");
 
   physics::Link_V links = model->GetLinks();
   for (physics::Link_V::iterator li = links.begin(); li != links.end(); ++li)

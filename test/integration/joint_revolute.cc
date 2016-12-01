@@ -61,7 +61,7 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -108,7 +108,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -140,7 +140,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     {
       world->Step(stepSize);
       EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
-      double time = world->GetSimTime().Double();
+      double time = world->SimTime().Double();
       angleErrorMax.InsertData(joint->GetAngle(0).Radian() - time*vel);
     }
 #ifndef LIBBULLET_VERSION_GT_282
@@ -169,7 +169,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -221,7 +221,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       energy0 = model->GetWorldEnergy();
@@ -265,7 +265,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       EXPECT_NEAR(model->GetWorldEnergy() / energy0, 1.0, g_tolerance);
@@ -319,7 +319,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       EXPECT_NEAR(model->GetWorldEnergy() / energy0, 1.0, g_tolerance);
@@ -380,7 +380,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       std::vector<std::string>::iterator jointIter;
@@ -414,7 +414,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       gzdbg << "Check angle limits and velocity of joints of model "
@@ -450,7 +450,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
-    model = world->GetModel(*modelIter);
+    model = world->ModelByName(*modelIter);
     if (model)
     {
       gzdbg << "Check SetForce for model " << *modelIter << '\n';
@@ -582,7 +582,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -596,9 +596,9 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
   if (i > 20)
     gzthrow("Unable to get model_1");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
   EXPECT_TRUE(physicsEngine != NULL);
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   EXPECT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink("link_2");  // sphere link at end
   EXPECT_TRUE(link != NULL);
@@ -659,10 +659,10 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       if (joint)
       {
         double integ_theta = (
-          PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
+          PendulumAngle(g, l, 1.57079633, 0.0, world->SimTime().Double(),
           0.000001) - 1.5707963);
         double actual_theta = joint->GetAngle(0).Radian();
-        // gzdbg << "time [" << world->GetSimTime().Double()
+        // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
         //       << "] pose [" << model->GetWorldPose()
@@ -710,10 +710,10 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       if (joint)
       {
         double integ_theta = (
-          PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
+          PendulumAngle(g, l, 1.57079633, 0.0, world->SimTime().Double(),
           0.000001) - 1.5707963);
         double actual_theta = joint->GetAngle(0).Radian();
-        // gzdbg << "time [" << world->GetSimTime().Double()
+        // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
         //       << "] pose [" << model->GetWorldPose()

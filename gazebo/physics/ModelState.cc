@@ -65,8 +65,8 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
 
 /////////////////////////////////////////////////
 ModelState::ModelState(const ModelPtr _model)
-: State(_model->GetName(), _model->GetWorld()->GetRealTime(),
-        _model->GetWorld()->GetSimTime(), _model->GetWorld()->GetIterations())
+: State(_model->GetName(), _model->GetWorld()->RealTime(),
+        _model->GetWorld()->SimTime(), _model->GetWorld()->Iterations())
 {
   this->pose = _model->GetWorldPose();
   this->scale = _model->Scale();

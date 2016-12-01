@@ -115,13 +115,12 @@ void SonarSensor::Load(const std::string &_worldName)
       "SonarSensor did not get a valid World pointer");
 
   this->dataPtr->parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
 
-  physics::PhysicsEnginePtr physicsEngine =
-    this->world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = this->world->Physics();
 
   GZ_ASSERT(physicsEngine != nullptr,
       "Unable to get a pointer to the physics engine");
@@ -175,12 +174,12 @@ void SonarSensor::Load(const std::string &_worldName)
   collisions.push_back(this->dataPtr->sonarCollision->GetScopedName());
 
   physics::ContactManager *contactMgr =
-    this->world->GetPhysicsEngine()->GetContactManager();
+    this->world->Physics()->GetContactManager();
     */
 
   // Create a contact topic for the collision shape
   std::string topic =
-    this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+    this->world->Physics()->GetContactManager()->CreateFilter(
         this->dataPtr->sonarCollision->GetScopedName(),
         this->dataPtr->sonarCollision->GetScopedName());
 
@@ -210,8 +209,7 @@ void SonarSensor::Init()
 {
   Sensor::Init();
   this->dataPtr->sonarMsg.mutable_sonar()->set_frame(this->ParentName());
-  msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
-      this->world->GetSimTime());
+  msgs::Set(this->dataPtr->sonarMsg.mutable_time(), this->world->SimTime());
   this->dataPtr->sonarMsg.mutable_sonar()->set_range(this->dataPtr->rangeMax);
 
   if (this->dataPtr->sonarPub)
@@ -221,10 +219,9 @@ void SonarSensor::Init()
 //////////////////////////////////////////////////
 void SonarSensor::Fini()
 {
-  if (this->world && this->world->GetRunning())
+  if (this->world && this->world->Running())
   {
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
+    physics::ContactManager *mgr = this->world->Physics()->GetContactManager();
     mgr->RemoveFilter(this->dataPtr->sonarCollision->GetScopedName());
   }
 
@@ -263,7 +260,7 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
             this->lastMeasurementTime);
 

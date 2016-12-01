@@ -47,7 +47,7 @@ class PhysicsFrictionTest : public ServerFixture,
             : modelName(_name), world(_world), friction(0.0)
             {
               // Get the model pointer
-              model = world->GetModel(modelName);
+              model = world->ModelByName(modelName);
 
               // Get the friction coefficient
               physics::LinkPtr link = model->GetLink();
@@ -190,7 +190,7 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -225,11 +225,11 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
     ASSERT_GT(box->friction, 0.0);
   }
 
-  common::Time t = world->GetSimTime();
+  common::Time t = world->SimTime();
   while (t.sec < 10)
   {
     world->Step(500);
-    t = world->GetSimTime();
+    t = world->SimTime();
 
     double yTolerance = g_friction_tolerance;
     if (_solverType == "world")
@@ -288,7 +288,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -397,7 +397,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -450,7 +450,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
 
   // Step forward
   world->Step(1500);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
   std::map<physics::ModelPtr, double>::iterator iter;
@@ -498,7 +498,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -523,7 +523,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 
   // Step forward
   world->Step(1500);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
   double velMag = (g.Y()+g.Z()) * t;

@@ -49,7 +49,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   physics::WorldPtr world = _model->GetWorld();
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(world->GetName());
+  this->node->Init(world->Name());
 
   this->velocitySub = this->node->Subscribe(
       "~/" + _model->GetName() + "/harness/velocity",
