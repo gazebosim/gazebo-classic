@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_WORLD_PRIVATE_HH_
-#define GAZEBO_WORLD_PRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_WORLDPRIVATE_HH_
+#define GAZEBO_PHYSICS_WORLDPRIVATE_HH_
 
 #include <atomic>
 #include <deque>

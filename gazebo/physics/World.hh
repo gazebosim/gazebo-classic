@@ -637,6 +637,10 @@ namespace gazebo
       /// \brief Update the world.
       private: void Update();
 
+      /// \brief Pause callback.
+      /// \param[in] _p True if paused.
+      private: void OnPause(bool _p);
+
       /// \brief Step callback.
       private: void OnStep();
 
@@ -746,7 +750,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: WorldPrivate *dataPtr;
+      private: std::unique_ptr<WorldPrivate> dataPtr;
 
       /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
       private: friend class DARTLink;
