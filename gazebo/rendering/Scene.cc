@@ -2627,7 +2627,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   // Creating heightmap
   // FIXME: A bit of a hack.
   if (_msg->has_geometry() &&
-      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP &&
+      _type != Visual::VT_COLLISION)
   {
     if (this->dataPtr->terrain)
     {

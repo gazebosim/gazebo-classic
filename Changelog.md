@@ -196,12 +196,18 @@
    reduce load time.
     * [Pull request 2457](https://bitbucket.org/osrf/gazebo/pull-request/2457)
 
+1. Added a plugin to teleoperate joints in a model with the keyboard.
+    * [Pull request 2490](https://bitbucket.org/osrf/gazebo/pull-request/2490)
+
 1. Add GUI items to change the user camera clip distance
     * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
     * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
 
 1. Support custom material scripts for heightmaps
     * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
+
+1. Model Editor: Show / hide collisions
+    * [Pull request 2503](https://bitbucket.org/osrf/gazebo/pull-request/2503)
 
 ## Gazebo 7.4.0 (2016-10-11)
 

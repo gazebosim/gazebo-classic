@@ -58,6 +58,7 @@ set(tests
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
+  keys_to_joints.cc
   laser.cc
   link.cc
   logical_camera_sensor.cc

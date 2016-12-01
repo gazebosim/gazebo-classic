@@ -62,7 +62,19 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   this->dataPtr->tabWidget->addTab(this->dataPtr->visualConfig, "Visual");
   this->dataPtr->tabWidget->addTab(this->dataPtr->collisionConfig, "Collision");
 
-  // Buttons
+  // Show button
+  auto showCollisionsButton = new QToolButton(this);
+  showCollisionsButton->setObjectName("showCollisionsButton");
+  showCollisionsButton->setFixedSize(QSize(30, 30));
+  showCollisionsButton->setToolTip("Show/hide all collisions");
+  showCollisionsButton->setIcon(QPixmap(":/images/eye_collision.png"));
+  showCollisionsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  showCollisionsButton->setIconSize(QSize(16, 16));
+  showCollisionsButton->setCheckable(true);
+  this->connect(showCollisionsButton, SIGNAL(toggled(const bool)), this,
+      SLOT(OnShowCollisions(const bool)));
+
+  // Remove button
   QToolButton *removeButton = new QToolButton(this);
   removeButton->setFixedSize(QSize(30, 30));
   removeButton->setToolTip("Remove link");
@@ -72,17 +84,21 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   removeButton->setCheckable(false);
   connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
 
+  // Reset button
   QPushButton *resetButton = new QPushButton(tr("Reset"));
   connect(resetButton, SIGNAL(clicked()), this, SLOT(RestoreOriginalData()));
 
+  // Cancel button
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
+  // Ok button
   QPushButton *OKButton = new QPushButton(tr("OK"));
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(removeButton);
+  buttonsLayout->addWidget(showCollisionsButton);
   buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(resetButton);
   buttonsLayout->addWidget(cancelButton);
@@ -153,6 +169,21 @@ void LinkInspector::OnRemove()
   this->close();
 
   model::Events::requestLinkRemoval(this->dataPtr->linkId);
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnShowCollisions(const bool _show)
+{
+  this->ShowCollisions(_show);
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::SetShowCollisions(const bool _show)
+{
+  auto button = this->findChild<QToolButton *>("showCollisionsButton");
+
+  if (button)
+    button->setChecked(_show);
 }
 
 /////////////////////////////////////////////////
