@@ -2942,7 +2942,7 @@ msgs::Scene World::SceneMsg() const
 }
 
 /////////////////////////////////////////////////
-std::mutex &World::GetWorldPoseMutex() const
+std::mutex &World::GetSetWorldPoseMutex() const
 {
   return this->WorldPoseMutex();
 }

@@ -291,7 +291,8 @@ ArduCopterPlugin::ArduCopterPlugin()
 
   #ifdef _WIN32
   u_long on = 1;
-  ioctlsocket(this->dataPtr->handle, FIONBIO, reinterpret_cast<u_long FAR *>(&on));
+  ioctlsocket(this->dataPtr->handle, FIONBIO,
+              reinterpret_cast<u_long FAR *>(&on));
   #else
   fcntl(this->dataPtr->handle, F_SETFL,
       fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
