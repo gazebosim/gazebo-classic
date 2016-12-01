@@ -60,6 +60,9 @@
     * [Pull request #2311](https://bitbucket.org/osrf/gazebo/pull-requests/2311)
     * Writing libMyPlugin.so in the sdf file will look for MyPlugin.dll on windows.
 
+1. Don't shut down gazebo when removing a world
+    * [Pull request 2511](https://bitbucket.org/osrf/gazebo/pull-request/2511)
+
 1. Add Introspection Manager and Client util
     * [Pull request #2304](https://bitbucket.org/osrf/gazebo/pull-request/2304)
 

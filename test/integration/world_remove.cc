@@ -345,6 +345,9 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
 
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
+
   // Check the only shared pointers to entities left are the ones we're holding
   for (auto &ptr : modelPtrs)
   {
@@ -540,6 +543,9 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
 
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
+
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointers left are these
   EXPECT_EQ(model.use_count(), 1) << "Model pointer [" << model << "]";

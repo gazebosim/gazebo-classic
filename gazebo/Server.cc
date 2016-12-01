@@ -725,9 +725,19 @@ void Server::ProcessControlMsgs()
     }
     else if ((*iter).has_save_world_name())
     {
-      // FIXME: check if world exists
-      physics::WorldPtr world = physics::get_world((*iter).save_world_name());
-      if ((*iter).has_save_filename())
+      // Get the world pointer.
+      physics::WorldPtr world;
+      try
+      {
+        world = physics::get_world((*iter).save_world_name());
+      }
+      catch(const common::Exception &)
+      {
+        gzerr << "Unable to save world. Unknown world ["
+               << (*iter).save_world_name() << "]" << std::endl;
+      }
+
+      if (world && (*iter).has_save_filename())
         world->Save((*iter).save_filename());
       else
         gzerr << "No filename specified.\n";
