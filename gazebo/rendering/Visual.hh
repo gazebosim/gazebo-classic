@@ -144,7 +144,7 @@ namespace gazebo
       /// \brief Get the name of the visual.
       /// \return The name of the visual.
       /// \deprecated See std::string Name() const
-      public: std::string GetName() const;
+      public: std::string GetName() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the name of the visual.
       /// \return The name of the visual.
