@@ -86,7 +86,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+  world->Physics()->SetGravity(math::Vector3(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
   math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
@@ -177,9 +177,9 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
 
   // Move all boxes out of range
-  world->GetModel(box01)->SetWorldPose(
+  world->ModelByName(box01)->SetWorldPose(
       math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
-  world->GetModel(box02)->SetWorldPose(
+  world->ModelByName(box02)->SetWorldPose(
       math::Pose(math::Vector3(0, -(maxRange + 1), 0),
       math::Quaternion(0, 0, 0)));
 
@@ -257,7 +257,7 @@ TEST_F(GPURaySensorTest, NameCollision)
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+  world->Physics()->SetGravity(math::Vector3(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
   math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
@@ -349,7 +349,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   std::string gpuLaserModelName = "gpu_laser";
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->GetModel(gpuLaserModelName)->SetWorldPose(
+  world->ModelByName(gpuLaserModelName)->SetWorldPose(
       math::Pose(math::Vector3(13.2, 0, 0.035), math::Quaternion(0, 0, 0)));
 
   // wait for a few laser scans

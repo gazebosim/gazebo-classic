@@ -55,7 +55,7 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
   // Get a pointer to the parent link. This will be used to adjust the
   // orientation of the logical camera.
   physics::EntityPtr parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -130,7 +130,7 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
     msgs::Set(this->dataPtr->msg.mutable_pose(), myPose);
 
     // Check all models for inclusion in the frustum.
-    for (auto const &model : this->world->GetModels())
+    for (auto const &model : this->world->Models())
     {
       // Add the the model to the output if it is in the frustum, and
       // we are not detecting ourselves.

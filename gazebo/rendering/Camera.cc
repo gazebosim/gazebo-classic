@@ -1403,14 +1403,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
-    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-                   static_cast<double>(this->viewport->getActualHeight());
-
-    double hfov = this->HFOV().Radian();
-    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->UpdateFOV();
 
     // Setup Deferred rendering for the camera
     if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
@@ -1894,6 +1887,17 @@ std::string Camera::ProjectionType() const
   {
     return "perspective";
   }
+}
+
+//////////////////////////////////////////////////
+bool Camera::SetBackgroundColor(const common::Color &_color)
+{
+  if (this->OgreViewport())
+  {
+    this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
+    return true;
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////

@@ -37,7 +37,7 @@ void RayShapeTest::Standalone(const std::string &_physicsEngine)
 
   gazebo::physics::RayShapePtr ray =
     boost::dynamic_pointer_cast<gazebo::physics::RayShape>(
-        world->GetPhysicsEngine()->CreateShape("ray",
+        world->Physics()->CreateShape("ray",
           gazebo::physics::CollisionPtr()));
   ASSERT_TRUE(ray != NULL);
 

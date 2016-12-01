@@ -73,7 +73,7 @@ TEST_F(SpeedThreadPR2Test, PR2SplitImpulseWorld)
   ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the physics engine
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != NULL);
 
   // Unleash the physics engine to maximum speed.

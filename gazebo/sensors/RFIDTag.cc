@@ -70,7 +70,7 @@ void RFIDTag::Load(const std::string &_worldName)
         this->sdf->GetElement("topic")->Get<std::string>());
   }
 
-  this->dataPtr->entity = this->world->GetEntity(this->ParentName());
+  this->dataPtr->entity = this->world->EntityByName(this->ParentName());
 
   // Add the tag to all the RFID sensors.
   Sensor_V sensors = SensorManager::Instance()->GetSensors();

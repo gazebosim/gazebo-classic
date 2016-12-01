@@ -53,7 +53,7 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       {
         // Add names to map
         std::string modelName = elem->Get<std::string>();
-        physics::ModelPtr model = world->GetModel(modelName);
+        physics::ModelPtr model = world->ModelByName(modelName);
         if (model)
         {
           ObjectPtr object(new Object);
@@ -144,7 +144,7 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // Subscribe to the topic specified in the world file
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
+  this->node->Init(_world->Name());
 
   this->sub = this->node->Subscribe(this->eventTopicName,
                               &ArrangePlugin::ArrangementCallback, this);

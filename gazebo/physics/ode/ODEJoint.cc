@@ -880,7 +880,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
      return;
   }
 
-  double dt = this->GetWorld()->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = this->GetWorld()->Physics()->GetMaxStepSize();
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
     double angle = this->GetAngle(i).Radian();
@@ -1148,10 +1148,10 @@ void ODEJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->GetAngleCount())
   {
-    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
       // reset forces if time step is new
-      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceAppliedTime = this->GetWorld()->SimTime();
       this->forceApplied[0] = this->forceApplied[1] = 0;
     }
 

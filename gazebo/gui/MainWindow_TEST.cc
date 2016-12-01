@@ -577,7 +577,7 @@ void MainWindow_TEST::UserCameraJoystick()
   mainWindow->Load();
 
   gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
+      gazebo::physics::get_world()->Name(), false);
 
   mainWindow->Init();
   mainWindow->show();

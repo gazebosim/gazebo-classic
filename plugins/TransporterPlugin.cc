@@ -112,7 +112,7 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   {
     // Create and initialize the node.
     this->dataPtr->node = transport::NodePtr(new transport::Node());
-    this->dataPtr->node->Init(_world->GetName());
+    this->dataPtr->node->Init(_world->Name());
 
     // Subscribe to the activation topic.
     this->dataPtr->activationSub = this->dataPtr->node->Subscribe(
@@ -147,7 +147,7 @@ void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
 void TransporterPlugin::Update()
 {
   // Get all the models
-  physics::Model_V models = this->dataPtr->world->GetModels();
+  physics::Model_V models = this->dataPtr->world->Models();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->padMutex);
 

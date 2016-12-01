@@ -48,7 +48,7 @@ TEST_F(Issue1694Test, WorldAccel)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box_model");
+  physics::ModelPtr model = world->ModelByName("box_model");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("box_link");

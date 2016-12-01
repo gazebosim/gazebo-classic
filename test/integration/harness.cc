@@ -52,10 +52,10 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   const auto gravity = world->Gravity();
   EXPECT_EQ(gravity, ignition::math::Vector3d(0, 0, -9.8));
 
-  auto model = world->GetModel("box");
+  auto model = world->ModelByName("box");
   ASSERT_NE(model, nullptr);
 
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_NE(physics, nullptr);
   const double dt = physics->GetMaxStepSize();
   EXPECT_NEAR(dt, 1e-3, 1e-6);
@@ -152,10 +152,10 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
   const auto gravity = world->Gravity();
   EXPECT_EQ(gravity, ignition::math::Vector3d(0, 0, -9.8));
 
-  auto model = world->GetModel("box");
+  auto model = world->ModelByName("box");
   ASSERT_NE(model, nullptr);
 
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_NE(physics, nullptr);
   const double dt = physics->GetMaxStepSize();
   EXPECT_NEAR(dt, 1e-3, 1e-6);
@@ -223,12 +223,12 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_NE(physics, nullptr);
   double dt = physics->GetMaxStepSize();
   EXPECT_NEAR(dt, 1e-3, 1e-6);
 
-  auto model = world->GetModel("box");
+  auto model = world->ModelByName("box");
   ASSERT_NE(model, nullptr);
 
   // Wait for joint to load

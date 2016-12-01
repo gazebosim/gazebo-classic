@@ -71,7 +71,7 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   this->world = this->model->GetWorld();
   GZ_ASSERT(this->world, "LiftDragPlugin world pointer is NULL");
 
-  this->physics = this->world->GetPhysicsEngine();
+  this->physics = this->world->Physics();
   GZ_ASSERT(this->physics, "LiftDragPlugin physics pointer is NULL");
 
   GZ_ASSERT(_sdf, "LiftDragPlugin _sdf pointer is NULL");

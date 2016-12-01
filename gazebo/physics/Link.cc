@@ -125,7 +125,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
         // Tell the sensor library to create a sensor.
         event::Events::createSensor(sensorElem,
-            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
+            this->GetWorld()->Name(), this->GetScopedName(), this->GetId());
 
         this->sensors.push_back(sensorName);
       }
@@ -166,7 +166,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       }
 
       std::string topic =
-        this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+        this->world->Physics()->GetContactManager()->CreateFilter(
             this->GetScopedName() + "/audio_collision", collisionNames);
       this->audioContactsSub = this->node->Subscribe(topic,
           &Link::OnCollision, this);
@@ -292,10 +292,10 @@ void Link::Fini()
   this->visuals.clear();
 
 #ifdef HAVE_OPENAL
-  if (this->world && this->world->GetPhysicsEngine() &&
-      this->world->GetPhysicsEngine()->GetContactManager())
+  if (this->world && this->world->Physics() &&
+      this->world->Physics()->GetContactManager())
   {
-    this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+    this->world->Physics()->GetContactManager()->RemoveFilter(
         this->GetScopedName() + "/audio_collision");
   }
   this->audioContactsSub.reset();
@@ -589,7 +589,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
   if (geomType == "heightmap" || geomType == "map")
     this->SetStatic(true);
 
-  collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
+  collision = this->GetWorld()->Physics()->CreateCollision(geomType,
       boost::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
@@ -1156,7 +1156,7 @@ void Link::PublishData()
 {
   if (this->publishData && this->dataPub->HasConnections())
   {
-    msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
+    msgs::Set(this->linkDataMsg.mutable_time(), this->world->SimTime());
     linkDataMsg.set_name(this->GetScopedName());
     msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
         this->GetWorldLinearVel().Ign());

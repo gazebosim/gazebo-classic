@@ -42,7 +42,7 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
     std::dynamic_pointer_cast<sensors::ImuSensor>(_parent);
 
   this->world = physics::get_world(_parent->WorldName());
-  physics::EntityPtr entity = this->world->GetEntity(_parent->ParentName());
+  physics::EntityPtr entity = this->world->EntityByName(_parent->ParentName());
   this->link = boost::dynamic_pointer_cast<physics::Link>(entity);
 
   if (!this->link)

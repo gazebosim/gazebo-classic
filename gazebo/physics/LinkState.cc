@@ -45,8 +45,8 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
 
 /////////////////////////////////////////////////
 LinkState::LinkState(const LinkPtr _link)
-  : State(_link->GetName(), _link->GetWorld()->GetRealTime(),
-          _link->GetWorld()->GetSimTime(), _link->GetWorld()->GetIterations())
+  : State(_link->GetName(), _link->GetWorld()->RealTime(),
+          _link->GetWorld()->SimTime(), _link->GetWorld()->Iterations())
 {
   this->pose = _link->GetWorldPose();
   this->velocity = math::Pose(_link->GetWorldLinearVel(),

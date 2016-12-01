@@ -356,6 +356,11 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   xlate.Translate(_normal * -_d);
   xform = xlate * rot;
+  if (!xform.IsAffine())
+  {
+    gzerr << "Matrix is not affine, plane creation failed\n";
+    return;
+  }
 
   ignition::math::Vector3d vec;
   ignition::math::Vector3d norm(0, 0, 1);

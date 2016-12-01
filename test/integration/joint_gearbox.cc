@@ -40,7 +40,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   physics::JointPtr joint0 = model->GetJoint("joint_02");
   physics::JointPtr joint1 = model->GetJoint("joint_12");
   physics::JointPtr joint3 = model->GetJoint("joint_23");
@@ -74,7 +74,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
       joint3->SetForce(0, force3);
       world->Step(1);
       if (i%1000 == 0)
-        gzdbg << "gearbox time [" << world->GetSimTime().Double()
+        gzdbg << "gearbox time [" << world->SimTime().Double()
               << "] vel [" << joint1->GetVelocity(0)
               << "] pose [" << joint1->GetAngle(0).Radian()
               << "] vel [" << joint3->GetVelocity(0)
@@ -93,7 +93,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
       joint3->SetForce(0,  force3);
       world->Step(1);
       if (i%1000 == 0)
-        gzdbg << "gearbox time [" << world->GetSimTime().Double()
+        gzdbg << "gearbox time [" << world->SimTime().Double()
               << "] vel [" << joint1->GetVelocity(0)
               << "] pose [" << joint1->GetAngle(0).Radian()
               << "] vel [" << joint3->GetVelocity(0)
@@ -128,7 +128,7 @@ void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   physics::JointPtr joint1 = model->GetJoint("joint_12");
   physics::JointPtr joint3 = model->GetJoint("joint_23");
 
@@ -149,7 +149,7 @@ void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
     joint3->SetForce(0, force3);
     world->Step(1);
     if (i%1000 == 0)
-      gzdbg << "gearbox time [" << world->GetSimTime().Double()
+      gzdbg << "gearbox time [" << world->SimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)
             << "] pose [" << joint1->GetAngle(0).Radian()
             << "] vel [" << joint3->GetVelocity(0)
@@ -168,7 +168,7 @@ void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
     joint3->SetForce(0,  force3);
     world->Step(1);
     if (i%1000 == 0)
-      gzdbg << "gearbox time [" << world->GetSimTime().Double()
+      gzdbg << "gearbox time [" << world->SimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)
             << "] pose [" << joint1->GetAngle(0).Radian()
             << "] vel [" << joint3->GetVelocity(0)

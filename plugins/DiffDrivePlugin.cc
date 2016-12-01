@@ -39,7 +39,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
@@ -106,7 +106,7 @@ void DiffDrivePlugin::OnUpdate()
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   */
 
