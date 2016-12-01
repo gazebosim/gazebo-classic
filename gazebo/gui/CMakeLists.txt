@@ -132,8 +132,8 @@ set (qt_tests
   BuildingEditor_TEST.cc
   ConfigWidget_TEST.cc
   DataLogger_TEST.cc
-  #GLWidget_TEST.cc
-  #GLWidget_TEST2.cc
+  GLWidget_TEST.cc
+  GLWidget_TEST2.cc
   GuiIface_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
