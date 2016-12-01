@@ -33,7 +33,6 @@ set (sources
   Editor.cc
   EntityMaker.cc
   GLWidget.cc
-  GLWindow.cc
   GuiEvents.cc
   GuiIface.cc
   InsertModelWidget.cc
@@ -82,7 +81,6 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
-  GLWindow.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
@@ -210,6 +208,7 @@ target_link_libraries(gazebo_gui
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
   ${QWT_LIBRARY}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 if (UNIX)

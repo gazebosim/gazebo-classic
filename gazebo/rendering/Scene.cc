@@ -1007,8 +1007,6 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
                                   const ignition::math::Vector2i &_mousePos,
                                   const bool _ignoreSelectionObj)
 {
-  //Ogre::Camera *ogreCam = _camera->OgreCamera();
-
   Ogre::Real closest_distance = -1.0f;
 
   ignition::math::Vector3d origin;
@@ -1016,12 +1014,6 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
   _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
   Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
 
-/*  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
-*/
   this->dataPtr->raySceneQuery->setRay(mouseRay);
 
   // Perform the scene query
@@ -1106,17 +1098,8 @@ bool Scene::FirstContact(CameraPtr _camera,
                          ignition::math::Vector3d &_position)
 {
   bool valid = false;
-//  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   _position = ignition::math::Vector3d::Zero;
-
-  // Ogre::Real closest_distance = -1.0f;
-/*  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
-*/
 
   ignition::math::Vector3d origin;
   ignition::math::Vector3d dir;

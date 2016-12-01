@@ -32,7 +32,6 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
-#include "gazebo/gui/GLWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/TopToolbar.hh"
@@ -59,10 +58,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   // GLWigdet
   this->glWidget = new GLWidget(this->mainFrame);
-/*  GLWindow* glWindow = new GLWindow();
-  this->glWidget = QWidget::createWindowContainer(glWindow);
-  this->glWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-*/
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
       "QLabel { background-color : white; color : gray; }");

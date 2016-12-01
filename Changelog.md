@@ -139,6 +139,9 @@
     * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
     * A contribution from Oliver Crave
 
+1. Get plugin info with Ignition transport service
+    * [Pull request #2420](https://bitbucket.org/osrf/gazebo/pull-request/2420)
+
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
 
@@ -175,7 +178,7 @@
 
     1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
         * [Pull request #2323](https://bitbucket.org/osrf/gazebo/pull-request/2323)
-        * [Issue #1698](https://bitbucket.org/osrf/gazebo/pull-request/1698)
+        * [Issue #1698](https://bitbucket.org/osrf/gazebo/issues/1698)
 
 ## Gazebo 7
 
