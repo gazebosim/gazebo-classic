@@ -594,13 +594,16 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     // << "      <save enabled ='true' path ='/tmp/camera/'/>"
 
   if (_noiseType.size() > 0)
+  {
     newModelStr << "      <noise>"
     << "        <type>" << _noiseType << "</type>"
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+  }
 
   if (_distortion)
+  {
     newModelStr << "      <distortion>"
     << "        <k1>" << _distortionK1 << "</k1>"
     << "        <k2>" << _distortionK2 << "</k2>"
@@ -609,8 +612,70 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "        <p2>" << _distortionP2 << "</p2>"
     << "        <center>" << _cx << " " << _cy << "</center>"
     << "      </distortion>";
+  }
 
   newModelStr << "    </camera>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 50);
+  WaitUntilSensorSpawn(_cameraName, 100, 100);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnWideAngleCamera(const std::string &_modelName,
+    const std::string &_cameraName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    unsigned int _width, unsigned int _height, double _rate,
+    const double _hfov, const std::string &_lensType,
+    const bool _scaleToHfov, const double _cutoffAngle,
+    const double _envTextureSize, const double _c1, const double _c2,
+    const double _f, const std::string &_fun)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _cameraName
+    << "' type ='wideanglecamera'>"
+    << "    <always_on>1</always_on>"
+    << "    <update_rate>" << _rate << "</update_rate>"
+    << "    <visualize>false</visualize>"
+    << "    <camera>"
+    << "      <horizontal_fov>" << _hfov << "</horizontal_fov>"
+    << "      <image>"
+    << "        <width>" << _width << "</width>"
+    << "        <height>" << _height << "</height>"
+    << "      </image>"
+    << "      <clip>"
+    << "        <near>0.1</near><far>100</far>"
+    << "      </clip>"
+    << "      <lens>"
+    << "        <type>" << _lensType << "</type>"
+    << "        <scale_to_hfov>" << _scaleToHfov << "</scale_to_hfov>"
+    << "        <cutoff_angle>" << _cutoffAngle << "</cutoff_angle>"
+    << "        <env_texture_size>" << _envTextureSize << "</env_texture_size>";
+
+  if (_lensType == "custom")
+  {
+    newModelStr << "<custom_function>"
+    << "          <c1>" << _c1 << "</c1>"
+    << "          <c2>" << _c2 << "</c2>"
+    << "          <f>" << _f << "</f>"
+    << "          <fun>" << _fun << "</fun>"
+    << "        </custom_function>";
+  }
+  newModelStr << "</lens>"
+    << "    </camera>"
     << "  </sensor>"
     << "</link>"
     << "</model>"
@@ -676,11 +741,13 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      </range>";
 
   if (_noiseType.size() > 0)
+  {
     newModelStr << "      <noise>"
     << "        <type>" << _noiseType << "</type>"
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+  }
 
   newModelStr << "    </ray>"
     << "    <visualize>true</visualize>"
@@ -780,11 +847,13 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     << "      </range>";
 
   if (_noiseType.size() > 0)
+  {
     newModelStr << "      <noise>"
     << "        <type>" << _noiseType << "</type>"
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+  }
 
   newModelStr << "    </ray>"
     << "  </sensor>"

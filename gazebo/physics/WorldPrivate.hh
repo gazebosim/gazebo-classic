@@ -29,6 +29,8 @@
 #include <thread>
 #include <condition_variable>
 
+#include <ignition/transport.hh>
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/URI.hh"
@@ -349,6 +351,9 @@ namespace gazebo
 
       /// \brief Indicates whether currently in the run loop or not.
       public: bool inRunLoop = false;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
     };
   }
 }
