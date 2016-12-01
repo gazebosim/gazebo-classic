@@ -74,7 +74,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -82,10 +82,10 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -94,7 +94,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
-  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::ModelPtr model_1 = world->ModelByName("model_1");
   physics::LinkPtr link_1 = model_1->GetLink("link_1");
   physics::LinkPtr link_2 = model_1->GetLink("link_2");
   physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
@@ -183,7 +183,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -191,10 +191,10 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -203,7 +203,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
-  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::ModelPtr model_1 = world->ModelByName("model_1");
   physics::LinkPtr link_1 = model_1->GetLink("link_1");
   physics::LinkPtr link_2 = model_1->GetLink("link_2");
   physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
@@ -313,7 +313,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   // simulate a few steps
   int steps = 20;
   world->Step(steps);
-  t = world->GetSimTime().Double();
+  t = world->SimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
   gzdbg << "t after 20 steps : " << t << "\n";
 }
@@ -337,7 +337,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -345,10 +345,10 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -357,7 +357,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
-  physics::ModelPtr model_1 = world->GetModel("boxes");
+  physics::ModelPtr model_1 = world->ModelByName("boxes");
   physics::JointPtr joint_01 = model_1->GetJoint("joint1");
   physics::JointPtr joint_12 = model_1->GetJoint("joint2");
 
@@ -462,7 +462,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -470,10 +470,10 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -482,7 +482,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
   gzlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
-  physics::ModelPtr model_1 = world->GetModel("boxes");
+  physics::ModelPtr model_1 = world->ModelByName("boxes");
   physics::JointPtr joint_01 = model_1->GetJoint("joint1");
   physics::JointPtr joint_12 = model_1->GetJoint("joint2");
 
@@ -539,7 +539,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
     }
 
     world->Reset();
-    double simTime = world->GetSimTime().Double();
+    double simTime = world->SimTime().Double();
     EXPECT_NEAR(simTime, 0.0, dt);
   }
 }
@@ -558,20 +558,20 @@ void JointForceTorqueTest::JointTorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   {
     // get model
-    physics::ModelPtr model = world->GetModel("model_1");
+    physics::ModelPtr model = world->ModelByName("model_1");
     ASSERT_TRUE(model != NULL);
     physics::LinkPtr link = model->GetLink("link_1");
     ASSERT_TRUE(link != NULL);
     physics::JointPtr joint = model->GetJoint("joint_01");
 
     double lastV = 0;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+    double dt = world->Physics()->GetMaxStepSize();
     for (unsigned int i = 0; i < 10; ++i)
     {
       double torque = 1.3;
@@ -587,14 +587,14 @@ void JointForceTorqueTest::JointTorqueTest(const std::string &_physicsEngine)
 
   {
     // get model
-    physics::ModelPtr model = world->GetModel("model_2");
+    physics::ModelPtr model = world->ModelByName("model_2");
     ASSERT_TRUE(model != NULL);
     physics::LinkPtr link = model->GetLink("link_1");
     ASSERT_TRUE(link != NULL);
     physics::JointPtr joint = model->GetJoint("joint_01");
 
     double lastV = 0;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+    double dt = world->Physics()->GetMaxStepSize();
     for (unsigned int i = 0; i < 10; ++i)
     {
       double torque = 1.3;

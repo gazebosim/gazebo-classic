@@ -41,7 +41,7 @@ SimbodyRayShape::SimbodyRayShape(CollisionPtr _parent)
 {
   this->SetName("Simbody Ray Shape");
   this->physicsEngine = boost::static_pointer_cast<SimbodyPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->collisionParent->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////

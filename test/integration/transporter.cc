@@ -34,7 +34,7 @@ TEST_F(TransporterTest, Transport)
   ASSERT_TRUE(world != NULL);
 
   // Get the box model
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr boxModel = world->ModelByName("box");
   ASSERT_TRUE(boxModel != NULL);
 
   // Make sure the starting location is correct.

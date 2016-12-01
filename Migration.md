@@ -66,6 +66,54 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/physics/World.hh**
+    + ***Deprecation:*** bool GetRunning() const
+    + ***Replacement:*** bool Running() const;
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+    + ***Deprecation:*** PhysicsEnginePtr GetPhysicsEngine() const
+    + ***Replacement:*** PhysicsEnginePtr Physics() const
+    + ***Deprecation:*** PresetManagerPtr GetPresetManager() const
+    + ***Replacement:*** PresetManagerPtr PresetMgr() const
+    + ***Deprecation:*** common::SphericalCoordinatesPtr GetSphericalCoordinates() const
+    + ***Replacement:*** common::SphericalCoordinatesPtr SphericalCoords() const
+    + ***Deprecation:*** unsigned int GetModelCount() const
+    + ***Replacement:*** unsigned int ModelCount() const
+    + ***Deprecation:*** ModelPtr GetModel(unsigned int _index) const
+    + ***Replacement:*** ModelPtr ModelByIndex(const unsigned int _index) const
+    + ***Deprecation:*** Model_V GetModels() const
+    + ***Replacement:*** Model_V Models() const
+    + ***Deprecation:*** common::Time GetSimTime() const
+    + ***Replacement:*** common::Time SimTime() const
+    + ***Deprecation:*** common::Time GetPauseTime() const
+    + ***Replacement:*** common::Time PauseTime() const
+    + ***Deprecation:*** common::Time GetStartTime() const
+    + ***Replacement:*** common::Time StartTime() const
+    + ***Deprecation:*** common::Time GetRealTime() const
+    + ***Replacement:*** common::Time RealTime() const
+    + ***Deprecation:*** BasePtr GetByName(const std::string &_name)
+    + ***Replacement:*** BasePtr BaseByName(const std::string &_name) const
+    + ***Deprecation:*** ModelPtr GetModel(const std::string &_name)
+    + ***Replacement:*** ModelPtr ModelByName(const std::string &_name) const
+    + ***Deprecation:*** LightPtr Light(const std::string &_name) const
+    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const 
+    + ***Deprecation:*** EntityPtr GetEntity(const std::string &_name)
+    + ***Replacement:*** EntityPtr EntityByName(const std::string &_name) const
+    + ***Deprecation:*** ModelPtr GetModelBelowPoint(const math::Vector3 &_pt)
+    + ***Replacement:*** ModelPtr ModelBelowPoint(const ignition::math::Vector3d &_pt) const
+    + ***Deprecation:*** EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt)
+    + ***Replacement:*** EntityPtr EntityBelowPoint(const ignition::math::Vector3d &_pt) const
+    + ***Deprecation:*** std::mutex &GetSetWorldPoseMutex() const
+    + ***Replacement:*** std::mutex &WorldPoseMutex() const
+    + ***Deprecation:*** bool GetEnablePhysicsEngine()
+    + ***Replacement:*** bool PhysicsEnabled() const
+    + ***Deprecation:*** void EnablePhysicsEngine(const bool _enable)
+    + ***Replacement:*** void SetPhysicsEnabled(const bool _enable)
+    + ***Deprecation:*** uint32_t GetIterations() const 
+    + ***Replacement:*** uint32_t Iterations() const
+    + ***Deprecation:*** msgs::Scene GetSceneMsg() const
+    + ***Replacement:*** msgs::Scene SceneMsg() const
+
 1. **gazebo/rendering/Visual.hh**
     + ***Deprecation:*** public: void SetScale(const math::Vector3 &_scale)
     + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale)

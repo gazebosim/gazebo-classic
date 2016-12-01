@@ -266,6 +266,43 @@ namespace gazebo
                    double _distortionP1 = 0.0, double _distortionP2 = 0.0,
                    double _cx = 0.5, double _cy = 0.5);
 
+    /// \brief Spawn a wide angle camera.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _cameraName Name of the camera.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _width Output image width.
+    /// \param[in] _height Output image height.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _hfov Horizontal field of view.
+    /// \param[in] _lensType Type of lens: gnomonical, stereographic,
+    /// equidistant, equisolid_angle, or orthographic.
+    /// \param[in] _scaleToHfov True to use horizontal field of view as defined,
+    /// otherwise it depends on lens type and custom function.
+    /// \param[in] _cutoffAngle Clip everything outside this angle
+    /// \param[in] _envTextureSize Cubemap environment texture size.
+    /// \param[in] _c1 For "custom" lens type, the c1 coefficient used in the
+    /// mapping function
+    /// \param[in] _c2 For "custom" lens type, the c2 coefficient used in the
+    /// mapping function
+    /// \param[in] _f For "custom" lens type, the focal length used in the
+    /// mapping function
+    /// \param[in] _fun For "custom" lens type, the trigonometirc function used
+    /// in the mapping function
+    protected: void SpawnWideAngleCamera(const std::string &_modelName,
+                  const std::string &_cameraName,
+                  const ignition::math::Vector3d &_pos,
+                  const ignition::math::Vector3d &_rpy,
+                  unsigned int _width, unsigned int _height, double _rate,
+                  const double _hfov,
+                  const std::string &_lensType = "stereographic",
+                  const bool _scaleToHfov = true,
+                  const double _cutoffAngle = 3.1415,
+                  const double _envTextureSize = 512,
+                  const double _c1 = 1.05, const double _c2 = 4,
+                  const double _f = 1.0,
+                  const std::string &_fun = "tan");
+
     /// \brief Spawn a laser.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _raySensorName Name of the laser.

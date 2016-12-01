@@ -59,7 +59,7 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 
   // Check bounding box of ground plane
   {
-    physics::ModelPtr model = world->GetModel("ground_plane");
+    physics::ModelPtr model = world->ModelByName("ground_plane");
     math::Box box = model->GetBoundingBox();
     EXPECT_LT(box.min.x, -g_big);
     EXPECT_LT(box.min.y, -g_big);
@@ -176,7 +176,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
                 collision->GetWorldPose().pos);
     }
 
-    auto physics = world->GetPhysicsEngine();
+    auto physics = world->Physics();
     ASSERT_TRUE(physics != nullptr);
     physics->SetRealTimeUpdateRate(0);
     const double dt = physics->GetMaxStepSize();
@@ -208,7 +208,7 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   auto g = world->Gravity();
@@ -230,7 +230,7 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   for (auto &iter : models)
   {
     gzdbg << "Getting model " << iter.first << std::endl;
-    iter.second = world->GetModel(iter.first);
+    iter.second = world->ModelByName(iter.first);
     ASSERT_TRUE(iter.second != NULL);
   }
 

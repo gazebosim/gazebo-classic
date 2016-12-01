@@ -61,7 +61,7 @@ void GpsSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   physics::EntityPtr parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -123,8 +123,7 @@ void GpsSensor::Init()
 {
   Sensor::Init();
 
-  this->dataPtr->sphericalCoordinates =
-    this->world->GetSphericalCoordinates();
+  this->dataPtr->sphericalCoordinates = this->world->SphericalCoords();
 }
 
 //////////////////////////////////////////////////
@@ -184,7 +183,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
       this->dataPtr->lastGpsMsg.set_velocity_up(gpsVelocity.Z());
     }
   }
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
       this->lastMeasurementTime);
 

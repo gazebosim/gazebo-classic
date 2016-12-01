@@ -81,7 +81,7 @@ void DepthCameraSensorTest::DepthUnitBox()
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d(0, 0, 0));
+  world->Physics()->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // box in front of depth sensor
   ignition::math::Pose3d box01Pose(3, 0, 0.50, 0, 0, 0);
@@ -138,7 +138,7 @@ void DepthCameraSensorTest::DepthUnitBox()
   EXPECT_DOUBLE_EQ(this->depthBuffer[right], IGN_DBL_INF);
 
   // move the box out of the range
-  world->GetModel(box01)->SetWorldPose(
+  world->ModelByName(box01)->SetWorldPose(
       ignition::math::Pose3d(far + unitBoxSize, 0, 0, 0, 0, 0));
 
   // wait for a few depth images
@@ -157,7 +157,7 @@ void DepthCameraSensorTest::DepthUnitBox()
   EXPECT_DOUBLE_EQ(this->depthBuffer[right], IGN_DBL_INF);
 
   // move the box closer than near clipping plane
-  world->GetModel(box01)->SetWorldPose(
+  world->ModelByName(box01)->SetWorldPose(
       ignition::math::Pose3d((near * 0.9) + unitBoxSize * 0.5, 0, 0, 0, 0, 0));
 
   // wait for a few depth images

@@ -59,7 +59,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   std::string bodyName = this->GetName();
 
   this->dataPtr->dartPhysics = boost::dynamic_pointer_cast<DARTPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->GetWorld()->Physics());
 
   if (this->dataPtr->dartPhysics == nullptr)
     gzthrow("Not using the dart physics engine");
@@ -945,7 +945,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 {
   return boost::dynamic_pointer_cast<DARTPhysics>(
-        this->GetWorld()->GetPhysicsEngine());
+        this->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////

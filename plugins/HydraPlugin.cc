@@ -184,7 +184,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
+  this->node->Init(_world->Name());
   this->pub = this->node->Advertise<msgs::Hydra>("~/hydra");
 }
 

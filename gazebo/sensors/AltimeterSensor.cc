@@ -69,7 +69,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::EntityPtr parentEntity = this->world->GetEntity(
+  physics::EntityPtr parentEntity = this->world->EntityByName(
       this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
@@ -171,8 +171,7 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
   }
 
   // Save the time of the measurement
-  msgs::Set(this->dataPtr->altMsg.mutable_time(),
-      this->world->GetSimTime());
+  msgs::Set(this->dataPtr->altMsg.mutable_time(), this->world->SimTime());
 
   // Publish the message if needed
   if (this->dataPtr->altPub)

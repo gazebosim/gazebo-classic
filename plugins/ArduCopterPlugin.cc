@@ -434,7 +434,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Get sensors
   std::string imuName;
   getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
-  std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
+  std::string imuScopedName = this->dataPtr->model->GetWorld()->Name()
       + "::" + this->dataPtr->model->GetScopedName()
       + "::" + imuName;
   this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
@@ -467,7 +467,7 @@ void ArduCopterPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->SimTime();
 
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
@@ -600,7 +600,7 @@ void ArduCopterPlugin::SendState() const
   // send_fdm
   fdmPacket pkt;
 
-  pkt.timestamp = this->dataPtr->model->GetWorld()->GetSimTime().Double();
+  pkt.timestamp = this->dataPtr->model->GetWorld()->SimTime().Double();
 
   // asssumed that the imu orientation is:
   //   x forward

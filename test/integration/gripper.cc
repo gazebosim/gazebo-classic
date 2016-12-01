@@ -35,7 +35,7 @@ TEST_F(GripperTest, Close)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("simple_gripper");
+  physics::ModelPtr model = world->ModelByName("simple_gripper");
   ASSERT_TRUE(model != NULL);
 
   physics::JointPtr leftJoint = model->GetJoint("palm_left_finger");
@@ -86,7 +86,7 @@ TEST_F(GripperTest, CloseOpen)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("simple_gripper");
+  physics::ModelPtr model = world->ModelByName("simple_gripper");
   ASSERT_TRUE(model != NULL);
 
   physics::JointPtr leftJoint = model->GetJoint("palm_left_finger");
