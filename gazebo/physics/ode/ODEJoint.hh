@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,11 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE joint interface
-    class GZ_PHYSICS_ODE_VISIBLE ODEJoint : public Joint
+    class GZ_PHYSICS_VISIBLE ODEJoint : public Joint
     {
       /// \brief internal variables used for implicit damping
       public:  enum CFMMode
@@ -53,6 +56,9 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
+      public: virtual void Fini();
+
+      // Documentation inherited.
       public: virtual void Reset();
 
       // Documentation inherited.
@@ -60,6 +66,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
+
+      // Documentation inherited.
+      public: virtual void CacheForceTorque();
 
       /// \brief Get an ODE joint parameter.
       ///
@@ -282,6 +291,7 @@ namespace gazebo
       /// This will let us know if it's time to clean up forceApplied.
       private: common::Time forceAppliedTime;
     };
+    /// \}
   }
 }
 #endif

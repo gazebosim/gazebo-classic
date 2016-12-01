@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,28 +88,51 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
+  // Clean up transport
+  {
+    this->responsePub.reset();
+    this->requestSub.reset();
+
+    this->node.reset();
+  }
+
+  if (this->sdf)
+  {
+    this->sdf->Reset();
+    this->sdf.reset();
+  }
+
+  if (this->contactManager)
+  {
+    delete this->contactManager;
+    this->contactManager = NULL;
+  }
+
+  if (this->physicsUpdateMutex)
+  {
+    delete this->physicsUpdateMutex;
+    this->physicsUpdateMutex = NULL;
+  }
+
   this->world.reset();
-  this->node->Fini();
 }
 
 //////////////////////////////////////////////////
 PhysicsEngine::~PhysicsEngine()
 {
-  this->sdf->Reset();
-  this->sdf.reset();
-  delete this->physicsUpdateMutex;
-  this->physicsUpdateMutex = NULL;
-  this->responsePub.reset();
-  this->requestSub.reset();
-  this->node.reset();
-
-  delete this->contactManager;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->Get<math::Vector3>("gravity");
+  return this->world->Gravity();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d PhysicsEngine::MagneticField() const
+{
+  return this->world->MagneticField();
 }
 
 //////////////////////////////////////////////////
@@ -225,23 +248,40 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "gravity")
     {
       boost::any copy = _value;
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       if (_value.type() == typeid(sdf::Vector3))
       {
-        copy = boost::lexical_cast<math::Vector3>
+        copy = boost::lexical_cast<ignition::math::Vector3d>
             (boost::any_cast<sdf::Vector3>(_value));
       }
-      this->SetGravity(boost::any_cast<math::Vector3>(copy));
+      else if (_value.type() == typeid(math::Vector3))
+      {
+        copy = boost::lexical_cast<ignition::math::Vector3d>
+            (boost::any_cast<math::Vector3>(_value));
+      }
+      this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else if (_key == "magnetic_field")
     {
       boost::any copy = _value;
       if (_value.type() == typeid(sdf::Vector3))
       {
-        copy = boost::lexical_cast<math::Vector3>
+        copy = boost::lexical_cast<ignition::math::Vector3d>
             (boost::any_cast<sdf::Vector3>(_value));
       }
-      this->sdf->GetElement("magnetic_field")->
-          Set(boost::any_cast<math::Vector3>(copy));
+      else if (_value.type() == typeid(math::Vector3))
+      {
+        copy = boost::lexical_cast<ignition::math::Vector3d>
+            (boost::any_cast<math::Vector3>(_value));
+      }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
+      this->world->SetMagneticField(
+          boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
@@ -266,9 +306,11 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
+boost::any PhysicsEngine::GetParam(const std::string &_key) const
 {
-  return 0;
+  boost::any value;
+  this->PhysicsEngine::GetParam(_key, value);
+  return value;
 }
 
 //////////////////////////////////////////////////
@@ -286,7 +328,7 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   else if (_key == "gravity")
     _value = this->GetGravity();
   else if (_key == "magnetic_field")
-    _value = this->sdf->Get<math::Vector3>("magnetic_field");
+    _value = this->world->MagneticField();
   else
   {
     gzwarn << "GetParam failed for [" << _key << "] in physics engine "

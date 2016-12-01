@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 
 #include <sdf/sdf.hh>
 
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/common/UpdateInfo.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
 
@@ -38,6 +40,10 @@ namespace gazebo
   ///     <lift_joint>elevator::lift</lift_joint>
   ///     <door_joint>elevator::door</door_joint>
   ///     <floor_height>3.075</floor_height>
+  ///
+  ///     <!-- Time the elevator door will stay open in seconds -->
+  ///     <door_wait_time>5</door_wait_time>
+  ///
   ///     <topic>~/elevator</topic>
   ///   </plugin>
   /// \endverbatim
@@ -56,6 +62,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Reset();
+
+    /// \brief Move to a particular floor.
+    /// \param[in] _floor Number of the floor to move the elevator to.
+    public: void MoveToFloor(const int _floor);
 
     /// \brief Update the plugin once every iteration of simulation.
     /// \param[in] _info Update information provided by the server.

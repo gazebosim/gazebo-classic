@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
@@ -129,7 +129,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,

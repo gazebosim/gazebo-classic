@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
 #include "gazebo/physics/dart/DARTUniversalJoint.hh"
+#include "gazebo/physics/dart/DARTFixedJoint.hh"
 
 #include "gazebo/physics/dart/DARTRayShape.hh"
 #include "gazebo/physics/dart/DARTBoxShape.hh"
@@ -54,6 +55,8 @@
 
 #include "gazebo/physics/dart/DARTPhysics.hh"
 
+#include "gazebo/physics/dart/DARTPhysicsPrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -61,24 +64,15 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 
 //////////////////////////////////////////////////
 DARTPhysics::DARTPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), dataPtr(new DARTPhysicsPrivate())
 {
-  this->dtWorld = new dart::simulation::World;
-//  this->dtWorld->getConstraintSolver()->setCollisionDetector(
-//        new dart::collision::DARTCollisionDetector());
-//  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
-//  this->dtWorld->getConstraintHandler()->setMaxReducingPenetrationVelocity(
-//        0.01);
-//  this->dtWorld->getConstraintHandler()->setAllowableJointViolation(
-//        DART_TO_RADIAN*1e-1);
-//  this->dtWorld->getConstraintHandler()->setMaxReducingJointViolationVelocity(
-//        DART_TO_RADIAN*1e-0);
 }
 
 //////////////////////////////////////////////////
 DARTPhysics::~DARTPhysics()
 {
-  delete this->dtWorld;
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -87,11 +81,11 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   PhysicsEngine::Load(_sdf);
 
   // Gravity
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
+  this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
 
   // Time step
   // double timeStep = this->sdf->GetValueDouble("time_step");
@@ -144,7 +138,7 @@ void DARTPhysics::UpdateCollision()
   this->contactManager->ResetCount();
 
   dart::constraint::ConstraintSolver *dtConstraintSolver =
-      this->dtWorld->getConstraintSolver();
+      this->dataPtr->dtWorld->getConstraintSolver();
   dart::collision::CollisionDetector *dtCollisionDetector =
       dtConstraintSolver->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
@@ -231,8 +225,8 @@ void DARTPhysics::UpdatePhysics()
 
   // common::Time currTime =  this->world->GetRealTime();
 
-  this->dtWorld->setTimeStep(this->maxStepSize);
-  this->dtWorld->step();
+  this->dataPtr->dtWorld->setTimeStep(this->maxStepSize);
+  this->dataPtr->dtWorld->step();
 
   // Update all the transformation of DART's links to gazebo's links
   // TODO: How to visit all the links in the world?
@@ -358,6 +352,8 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new DARTBallJoint(_parent));
   else if (_type == "universal")
     joint.reset(new DARTUniversalJoint(_parent));
+  else if (_type == "fixed")
+    joint.reset(new DARTFixedJoint(_parent));
   else
     gzerr << "Unable to create joint of type[" << _type << "]";
 
@@ -367,8 +363,8 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 //////////////////////////////////////////////////
 void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
-  this->dtWorld->setGravity(
+  this->world->SetGravitySDF(_gravity.Ign());
+  this->dataPtr->dtWorld->setGravity(
     Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
 
@@ -435,7 +431,7 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     {
       if (_key == "max_step_size")
       {
-        this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+        this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
       }
       return PhysicsEngine::SetParam(_key, _value);
     }
@@ -452,7 +448,7 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 dart::simulation::World *DARTPhysics::GetDARTWorld()
 {
-  return this->dtWorld;
+  return this->dataPtr->dtWorld;
 }
 
 //////////////////////////////////////////////////
@@ -468,7 +464,10 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::DART);
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->world->Gravity()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+      msgs::Convert(this->MagneticField()));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -492,7 +491,7 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());

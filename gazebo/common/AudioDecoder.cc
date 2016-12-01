@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2015 Open Source Robotics Foundation
+* Copyright (C) 2012-2016 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -109,8 +109,15 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
       {
         // Some frames rely on multiple packets, so we have to make sure
         // the frame is finished before we can use it
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         bytesDecoded = avcodec_decode_audio4(this->codecCtx, decodedFrame,
             &gotFrame, &packet1);
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
         if (gotFrame)
         {
@@ -138,10 +145,10 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.size -= bytesDecoded;
       }
     }
-    av_free_packet(&packet);
+    AVPacketUnref(&packet);
   }
 
-  av_free_packet(&packet);
+  AVPacketUnref(&packet);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->formatCtx, this->audioStream, 0, 0);
@@ -202,7 +209,14 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   this->audioStream = -1;
   for (i = 0; i < this->formatCtx->nb_streams; ++i)
   {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     {
       this->audioStream = i;
       break;
@@ -219,7 +233,14 @@ bool AudioDecoder::SetFile(const std::string &_filename)
   }
 
   // Get the audio stream codec
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->codecCtx = this->formatCtx->streams[audioStream]->codec;
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
   // Find a decoder
   this->codec = avcodec_find_decoder(codecCtx->codec_id);

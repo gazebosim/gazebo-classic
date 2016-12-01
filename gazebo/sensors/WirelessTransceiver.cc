@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <sstream>
-#include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/WirelessTransceiver.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
+
+#include "gazebo/sensors/WirelessTransceiver.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -39,8 +39,6 @@ WirelessTransceiver::WirelessTransceiver()
   : Sensor(sensors::OTHER)
 {
   this->active = false;
-  this->gain = 2.5;
-  this->power = 14.5;
 }
 
 /////////////////////////////////////////////////
@@ -49,10 +47,10 @@ WirelessTransceiver::~WirelessTransceiver()
 }
 
 //////////////////////////////////////////////////
-std::string WirelessTransceiver::GetTopic() const
+std::string WirelessTransceiver::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->parentName + "/" + this->GetName() + "/transceiver";
+  topicName += this->ParentName() + "/" + this->Name() + "/transceiver";
   boost::replace_all(topicName, "::", "/");
 
   return topicName;
@@ -64,31 +62,35 @@ void WirelessTransceiver::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-    this->world->GetEntity(this->parentName));
+    this->world->GetEntity(this->ParentName()));
 
   GZ_ASSERT(this->parentEntity.lock() != NULL, "parentEntity is NULL");
 
-  this->referencePose = this->pose + this->parentEntity.lock()->GetWorldPose();
+  this->referencePose = this->pose +
+    this->parentEntity.lock()->GetWorldPose().Ign();
 
   if (!this->sdf->HasElement("transceiver"))
   {
     gzthrow("Transceiver sensor is missing <transceiver> SDF element");
   }
 
-  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
+  sdf::ElementPtr transceiverElem =
+    this->sdf->GetElement("transceiver");
   this->gain = transceiverElem->Get<double>("gain");
   this->power = transceiverElem->Get<double>("power");
 
   if (this->gain < 0)
   {
-    gzthrow("Wireless transceiver gain must be > 0. Current value is [" <<
-        this->gain << "]");
+    gzerr << "Attempting to set a negative gain of [" <<
+        this->gain << "]. Using a value of 1.\n";
+    this->gain = 1;
   }
 
   if (this->power < 0)
   {
-    gzthrow("Wireless transceiver power must be > 0. Current value is [" <<
-        this->power << "]");
+    gzerr << "Attempting to set a negative transceiver power of[" <<
+        this->power << "]. Using a value of 1.\n";
+    this->power = 1;
   }
 }
 
@@ -109,11 +111,23 @@ void WirelessTransceiver::Fini()
 /////////////////////////////////////////////////
 double WirelessTransceiver::GetPower() const
 {
+  return this->Power();
+}
+
+/////////////////////////////////////////////////
+double WirelessTransceiver::Power() const
+{
   return this->power;
 }
 
 /////////////////////////////////////////////////
 double WirelessTransceiver::GetGain() const
+{
+  return this->Gain();
+}
+
+/////////////////////////////////////////////////
+double WirelessTransceiver::Gain() const
 {
   return this->gain;
 }

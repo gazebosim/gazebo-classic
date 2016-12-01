@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,22 +312,6 @@ math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
     result = this->bulletSlider->getLowerLinLimit();
   else
     gzlog << "Joint must be created before getting low stop\n";
-  return result;
-}
-
-//////////////////////////////////////////////////
-void BulletSliderJoint::SetMaxForce(unsigned int /*_index*/, double _force)
-{
-  if (this->bulletSlider)
-    this->bulletSlider->setMaxLinMotorForce(_force);
-}
-
-//////////////////////////////////////////////////
-double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  double result = 0;
-  if (this->bulletSlider)
-    result = this->bulletSlider->getMaxLinMotorForce();
   return result;
 }
 

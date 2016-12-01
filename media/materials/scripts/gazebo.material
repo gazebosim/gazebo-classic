@@ -287,6 +287,20 @@ material Gazebo/ZincYellow
   }
 }
 
+material Gazebo/DarkYellow
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.7 0.7 0 1
+      diffuse 0.7 0.7 0 1
+      specular 0 0 0 0 0
+    }
+  }
+}
+
+
 material Gazebo/Purple
 {
   technique
@@ -324,6 +338,19 @@ material Gazebo/Orange
       ambient 1 0.5088 0.0468 1
       diffuse 1 0.5088 0.0468 1
       specular 0.5 0.5 0.5 128
+    }
+  }
+}
+
+material Gazebo/Indigo
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.33 0.0 0.5
+      diffuse 0.33 0.0 0.5
+      specular 0.1 0.1 0.1 1
     }
   }
 }
@@ -509,6 +536,27 @@ material Gazebo/GreenTransparentOverlay
   }
 }
 
+material Gazebo/OrangeTransparentOverlay
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+      depth_check off
+      ambient 1 0.5088 0.0468
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 1 0.5088 0.0468
+        alpha_op_ex source1 src_manual src_current 0.8
+      }
+    }
+  }
+}
+
 material Gazebo/DarkOrangeTransparentOverlay
 {
   technique
@@ -591,6 +639,27 @@ material Gazebo/BlueTransparent
   }
 }
 
+material Gazebo/DarkMagentaTransparent
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      ambient 0.6 0.0 0.6 1
+      diffuse 0.6 0.0 0.6 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0.6 0 0.6
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
 material Gazebo/GreyTransparent
 {
   technique
@@ -602,6 +671,27 @@ material Gazebo/GreyTransparent
 
       ambient 0.5 0.5 0.5 1
       diffuse 0.5 0.5 0.5 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
+material Gazebo/BlackTransparent
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      ambient 0.0 0.0 0.0 1
+      diffuse 0.0 0.0 0.0 1
 
       texture_unit
       {
@@ -1361,6 +1451,42 @@ material Gazebo/CameraDistortionMap
   }
 }
 
+vertex_program Gazebo/WideLensMapVS glsl
+{
+  source wide_lens_map_vs.glsl
+  default_params
+  {
+    param_named ratio float 1
+  }
+}
+
+fragment_program Gazebo/WideLensMapFS glsl
+{
+  source wide_lens_map_fp.glsl
+  default_params
+  {
+    param_named envMap int 0
+    param_named c1 float 1
+    param_named c2 float 1
+    param_named c3 float 0
+    param_named f float 1
+    param_named fun float3 0 1
+    param_named cutOffAngle float 3.14
+  }
+}
+
+material Gazebo/WideLensMap
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/WideLensMapVS { }
+      fragment_program_ref Gazebo/WideLensMapFS { }
+    }
+  }
+}
+
 material Gazebo/PointCloud
 {
    technique
@@ -1448,3 +1574,30 @@ material Gazebo/Grass
   }
 }
 
+material Gazebo/Editor
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1
+      specular .1 .1 .1 128
+    }
+  }
+}
+
+material Gazebo/EditorPlane
+{
+  technique
+  {
+    pass
+    {
+      scene_blend colour_blend
+
+      ambient .3 .3 .3  1.0
+      diffuse .7 .7 .7  1.0
+      specular 0.01 0.01 0.01 1.000000 1.500000
+    }
+  }
+}

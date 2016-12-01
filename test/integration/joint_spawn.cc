@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -454,8 +454,8 @@ TEST_P(JointSpawningTest_All, SpawnJointTypes)
 {
   if (this->jointType == "gearbox" && this->physicsEngine != "ode")
   {
-    gzerr << "Skip test, gearbox is only supported in ODE."
-          << std::endl;
+    gzerr << "Skip test, gearbox is only supported in ODE. " <<
+         "See issues: #859, #1914, #1915" << std::endl;
     return;
   }
   if (physicsEngine == "simbody" && jointType == "revolute2")
@@ -483,6 +483,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
                   , "prismatic"
                   , "screw"
                   , "universal"
+                  , "fixed"
                   , "ball"
                   , "revolute2"
                   , "gearbox")));
@@ -492,6 +493,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "universal"
+                  , "fixed"
                   , "ball")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
@@ -499,6 +501,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "universal"
+                  , "fixed"
                   , "ball")));
 
 int main(int argc, char **argv)

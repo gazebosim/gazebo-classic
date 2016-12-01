@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 #include "gazebo/physics/bullet/BulletSliderJoint.hh"
 #include "gazebo/physics/bullet/BulletHinge2Joint.hh"
 #include "gazebo/physics/bullet/BulletScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletFixedJoint.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -286,18 +287,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 //////////////////////////////////////////////////
 BulletPhysics::~BulletPhysics()
 {
-  // Delete in reverse-order of creation
-  delete this->dynamicsWorld;
-  delete this->solver;
-  delete this->broadPhase;
-  delete this->dispatcher;
-  delete this->collisionConfig;
-
-  this->dynamicsWorld = NULL;
-  this->solver = NULL;
-  this->broadPhase = NULL;
-  this->dispatcher = NULL;
-  this->collisionConfig = NULL;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -307,11 +297,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
+  this->dynamicsWorld->setGravity(btVector3(g.X(), g.Y(), g.Z()));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
@@ -399,7 +389,10 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       boost::any_cast<double>(this->GetParam("contact_surface_layer")));
 
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->world->Gravity()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+        msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -443,7 +436,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam("contact_surface_layer", _msg->contact_surface_layer());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -481,6 +474,27 @@ void BulletPhysics::UpdatePhysics()
 //////////////////////////////////////////////////
 void BulletPhysics::Fini()
 {
+  // Delete in reverse-order of creation
+  if (this->dynamicsWorld)
+    delete this->dynamicsWorld;
+  this->dynamicsWorld = NULL;
+
+  if (this->solver)
+    delete this->solver;
+  this->solver = NULL;
+
+  if (this->broadPhase)
+    delete this->broadPhase;
+  this->broadPhase = NULL;
+
+  if (this->dispatcher)
+    delete this->dispatcher;
+  this->dispatcher = NULL;
+
+  if (this->collisionConfig)
+    delete this->collisionConfig;
+  this->collisionConfig = NULL;
+
   PhysicsEngine::Fini();
 }
 
@@ -728,6 +742,8 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new BulletHinge2Joint(this->dynamicsWorld, _parent));
   else if (_type == "screw")
     joint.reset(new BulletScrewJoint(this->dynamicsWorld, _parent));
+  else if (_type == "fixed")
+    joint.reset(new BulletFixedJoint(this->dynamicsWorld, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -768,7 +784,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

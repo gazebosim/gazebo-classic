@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/algorithm/string/regex.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
@@ -215,7 +215,7 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
       }
       catch(...)
       {
-        std::cerr << "Inavlid axis value[" << *elemIter << "]\n";
+        std::cerr << "Invalid axis value[" << *elemIter << "]\n";
       }
     }
   }
@@ -729,10 +729,10 @@ void LogCommand::Info(const std::string &_filename)
     }
 
       // Get the last chunk for the endTime
-    if (play->GetChunkCount() > 1)
+    if (play->ChunkCount() > 1)
     {
       std::string stateString;
-      play->GetChunk(play->GetChunkCount()-1, stateString);
+      play->Chunk(play->ChunkCount()-1, stateString);
 
       g_stateSdf->ClearElements();
       sdf::readString(stateString, g_stateSdf);
@@ -757,9 +757,9 @@ void LogCommand::Info(const std::string &_filename)
 
   // Output info
   std::cout
-    << "Log Version:    " << play->GetLogVersion() << "\n"
-    << "Gazebo Version: " << play->GetGazeboVersion() << "\n"
-    << "Random Seed:    " << play->GetRandSeed() << "\n"
+    << "Log Version:    " << play->LogVersion() << "\n"
+    << "Gazebo Version: " << play->GazeboVersion() << "\n"
+    << "Random Seed:    " << play->RandSeed() << "\n"
     // << "Start:          " << boost::posix_time::from_time_t(startTime.sec)
     // << "." << startTime.nsec << "\n"
     // << "End:            " << boost::posix_time::from_time_t(endTime.sec)
@@ -773,7 +773,7 @@ void LogCommand::Info(const std::string &_filename)
     //                       << deltaTime.nsec << "\n"
     // << "Steps:          " << play->GetChunkCount() << "\n"
     << "Size:           " << this->GetFileSizeStr(_filename) << "\n"
-    << "Encoding:       " << play->GetEncoding() << "\n"
+    << "Encoding:       " << play->Encoding() << "\n"
     // << "Model Count:    " << modelCount << "\n"
     << "\n";
 }
@@ -787,7 +787,7 @@ void LogCommand::Echo(const std::string &_filter, bool _raw,
 
   // Output the header
   if (!_raw)
-    std::cout << play->GetHeader() << std::endl;
+    std::cout << play->Header() << std::endl;
 
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
@@ -826,7 +826,7 @@ void LogCommand::Step(const std::string &_filter, bool _raw,
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
 
   if (!_raw)
-    std::cout << play->GetHeader() << std::endl;
+    std::cout << play->Header() << std::endl;
 
   char c = '\0';
 

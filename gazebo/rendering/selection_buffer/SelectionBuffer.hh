@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,27 @@
  * limitations under the License.
  *
 */
-#ifndef _SELECTIONBUFFER_HH_
-#define _SELECTIONBUFFER_HH_
+#ifndef _GAZEBO_RENDERING_SELECTION_BUFFER_SELECTIONBUFFER_HH_
+#define _GAZEBO_RENDERING_SELECTION_BUFFER_SELECTIONBUFFER_HH_
 
+#include <memory>
 #include <string>
 #include "gazebo/util/system.hh"
 
 namespace Ogre
 {
-  class SceneManager;
-  class Camera;
+  class Entity;
   class RenderTarget;
-  class RenderTexture;
-  class PixelBox;
-  class Overlay;
+  class SceneManager;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class MaterialSwitcher;
-    class SelectionRenderListener;
-    class Scene;
+    struct SelectionBufferPrivate;
 
-    class GZ_SELECTION_BUFF_VISIBLE SelectionBuffer
+    class GZ_RENDERING_VISIBLE SelectionBuffer
     {
       /// \brief Constructor
       /// \param[in] _camera Name of the camera to generate a selection
@@ -73,24 +69,9 @@ namespace gazebo
       /// \brief Create the selection buffer offscreen render texture.
       private: void CreateRTTOverlays();
 
-      /// \brief Update the size of the offscreen render texture.
-      private: void UpdateBufferSize();
-
-      /// \brief This is the material listener - Note: it is controlled by a
-      /// separate RenderTargetListener, not applied globally to all
-      /// targets.
-      private: MaterialSwitcher *materialSwitchListener;
-
-      private: SelectionRenderListener *selectionTargetListener;
-
-      private: Ogre::SceneManager *sceneMgr;
-      private: Ogre::Camera *camera;
-      private: Ogre::RenderTarget *renderTarget;
-      private: Ogre::TexturePtr texture;
-      private: Ogre::RenderTexture *renderTexture;
-      private: uint8_t *buffer;
-      private: Ogre::PixelBox *pixelBox;
-      private: Ogre::Overlay *selectionDebugOverlay;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<SelectionBufferPrivate> dataPtr;
     };
   }
 }

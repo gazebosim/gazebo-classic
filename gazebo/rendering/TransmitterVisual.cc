@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -44,7 +45,7 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->points = NULL;
 
@@ -120,7 +121,7 @@ void TransmitterVisual::Update()
   for (int i = 0; i < dPtr->gridMsg->particle_size(); ++i)
   {
     p = dPtr->gridMsg->particle(i);
-    dPtr->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
+    dPtr->points->SetPoint(i, ignition::math::Vector3d(p.x(), p.y(), 0));
 
     // Crop the signal strength between 0 and 255
     double strength = std::min(std::max(0.0, -p.signal_level()), 255.0);

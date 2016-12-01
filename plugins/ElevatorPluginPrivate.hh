@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <gazebo/transport/Subscriber.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/common/PID.hh>
+#include <gazebo/common/Timer.hh>
 
 namespace gazebo
 {
@@ -252,7 +253,8 @@ namespace gazebo
     public: class WaitState : public State
     {
       /// \brief Constructor
-      public: WaitState();
+      /// \param[in] _waitTime Length of the wait state
+      public: WaitState(const common::Time &_waitTime);
 
       // Documentation inherited
       public: virtual void Start();
@@ -260,8 +262,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool Update();
 
-      /// \brief Start time.
-      public: common::Time start;
+      /// \brief Timer to hold the door open.
+      public: common::Timer waitTimer;
     };
 
     /// \brief Pointer to the elevator model.
@@ -297,6 +299,9 @@ namespace gazebo
 
     /// \brief Mutex to protect states.
     public: std::mutex stateMutex;
+
+    /// \brief Time to hold the door in the open state.
+    public: common::Time doorWaitTime;
   };
 }
 #endif

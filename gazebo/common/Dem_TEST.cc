@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Dem.hh"
 #include "gazebo/math/Angle.hh"
@@ -117,7 +119,7 @@ TEST_F(DemTest, BasicAPI)
   ASSERT_ANY_THROW(dem.GetElevation(width, height));
 
   // Check GetGeoReferenceOrigin()
-  math::Angle latitude, longitude;
+  ignition::math::Angle latitude, longitude;
   dem.GetGeoReferenceOrigin(latitude, longitude);
   EXPECT_FLOAT_EQ(38.001667, latitude.Degree());
   EXPECT_FLOAT_EQ(-122.22278, longitude.Degree());
@@ -135,22 +137,23 @@ TEST_F(DemTest, FillHeightmap)
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
   int subsampling;
   unsigned vertSize;
-  math::Vector3 size;
-  math::Vector3 scale;
+  ignition::math::Vector3d size;
+  ignition::math::Vector3d scale;
   bool flipY;
   std::vector<float> elevations;
 
   subsampling = 2;
   vertSize = (dem.GetWidth() * subsampling) - 1;
-  size.x = dem.GetWorldWidth();
-  size.y = dem.GetWorldHeight();
-  size.z = dem.GetMaxElevation() - dem.GetMinElevation();
-  scale.x = size.x / vertSize;
-  scale.y = size.y / vertSize;
-  if (math::equal(dem.GetMaxElevation(), 0.0f))
-    scale.z = fabs(size.z);
+  size.X(dem.GetWorldWidth());
+  size.Y(dem.GetWorldHeight());
+  size.Z(dem.GetMaxElevation() - dem.GetMinElevation());
+  scale.X(size.X() / vertSize);
+  scale.Y(size.Y() / vertSize);
+
+  if (ignition::math::equal(dem.GetMaxElevation(), 0.0f))
+    scale.Z(fabs(size.Z()));
   else
-    scale.z = fabs(size.z) / dem.GetMaxElevation();
+    scale.Z(fabs(size.Z()) / dem.GetMaxElevation());
   flipY = false;
 
   dem.FillHeightMap(subsampling, vertSize, size, scale, flipY, elevations);
@@ -159,9 +162,48 @@ TEST_F(DemTest, FillHeightmap)
   EXPECT_EQ(vertSize * vertSize, elevations.size());
 
   // Check the elevation of some control points
-  EXPECT_FLOAT_EQ(119.58285, elevations.at(0));
-  EXPECT_FLOAT_EQ(114.27753, elevations.at(elevations.size() - 1));
-  EXPECT_FLOAT_EQ(148.07137, elevations.at(elevations.size() / 2));
+  EXPECT_FLOAT_EQ(184.94113, elevations.at(0));
+  EXPECT_FLOAT_EQ(179.63583, elevations.at(elevations.size() - 1));
+  EXPECT_FLOAT_EQ(213.42966, elevations.at(elevations.size() / 2));
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, NegDem)
+{
+  common::Dem dem;
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "media/materials/textures/dem_neg.tif";
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  // Check the heights and widths
+  EXPECT_EQ(33, static_cast<int>(dem.GetHeight()));
+  EXPECT_EQ(33, static_cast<int>(dem.GetWidth()));
+  EXPECT_FLOAT_EQ(293.51068, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(293.51089, dem.GetWorldWidth());
+  EXPECT_FLOAT_EQ(-212.29616, dem.GetMinElevation());
+  EXPECT_FLOAT_EQ(-205.44009, dem.GetMaxElevation());
+}
+
+/////////////////////////////////////////////////
+TEST_F(DemTest, UnfinishedDem)
+{
+  common::Dem dem;
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "data/dem_unfinished.tif";
+  EXPECT_EQ(dem.Load(path.string()), 0);
+
+  // Check that the min and max elevations are valid for an unfinished
+  // and unfilled dem.
+  EXPECT_EQ(33, static_cast<int>(dem.GetHeight()));
+  EXPECT_EQ(33, static_cast<int>(dem.GetWidth()));
+  EXPECT_FLOAT_EQ(111287.59, dem.GetWorldHeight());
+  EXPECT_FLOAT_EQ(88878.297, dem.GetWorldWidth());
+  // gdal reports min elevation as -32768 but this is treated as a nodata
+  // by our dem class and ignored when computing the min elevation
+  EXPECT_FLOAT_EQ(-10, dem.GetMinElevation());
+  EXPECT_FLOAT_EQ(1909, dem.GetMaxElevation());
 }
 #endif
 

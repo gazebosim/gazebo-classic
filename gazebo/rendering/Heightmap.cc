@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,31 +21,40 @@
   #include <Winsock2.h>
 #endif
 
+#include <memory>
+
 #include <string.h>
 #include <math.h>
 
+#include <boost/filesystem.hpp>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Dem.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+
+#include "gazebo/rendering/Heightmap.hh"
+#include "gazebo/rendering/HeightmapPrivate.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int Heightmap::numTerrainSubdivisions = 16;
-const double Heightmap::loadRadiusFactor = 1.0;
-const double Heightmap::holdRadiusFactor = 1.15;
-const boost::filesystem::path Heightmap::pagingDirname = "paging";
-const boost::filesystem::path Heightmap::hashFilename = "gzterrain.SHA1";
+const unsigned int HeightmapPrivate::numTerrainSubdivisions = 16;
+const double HeightmapPrivate::loadRadiusFactor = 1.0;
+const double HeightmapPrivate::holdRadiusFactor = 1.15;
+const boost::filesystem::path HeightmapPrivate::pagingDirname = "paging";
+const boost::filesystem::path HeightmapPrivate::hashFilename = "gzterrain.SHA1";
 
 static std::string glslVersion = "130";
 static std::string vpInStr = "in";
@@ -56,52 +65,50 @@ static std::string textureStr = "texture";
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
+  : dataPtr(new HeightmapPrivate)
 {
-  this->scene = _scene;
-  this->terrainGlobals = NULL;
-  this->terrainPaging = NULL;
-  this->pageManager = NULL;
+  this->dataPtr->scene = _scene;
 
-  this->terrainIdx = 0;
-  this->useTerrainPaging = false;
+  this->dataPtr->terrainIdx = 0;
+  this->dataPtr->useTerrainPaging = false;
+  this->dataPtr->terrainHashChanged = true;
+  this->dataPtr->terrainsImported = true;
 
-  this->pageManager = NULL;
-  this->terrainPaging = NULL;
-  this->terrainHashChanged = true;
-  this->terrainsImported = true;
-
-  this->gzPagingDir =
-      common::SystemPaths::Instance()->GetLogPath() / this->pagingDirname;
+  this->dataPtr->gzPagingDir =
+      common::SystemPaths::Instance()->GetLogPath() /
+      this->dataPtr->pagingDirname;
 }
 
 //////////////////////////////////////////////////
 Heightmap::~Heightmap()
 {
-  this->scene.reset();
+  this->dataPtr->scene.reset();
 
-  if (this->terrainPaging)
+  if (this->dataPtr->terrainPaging)
   {
-    OGRE_DELETE this->terrainPaging;
-    pageManager->destroyWorld(this->world);
-    OGRE_DELETE this->pageManager;
+    OGRE_DELETE this->dataPtr->terrainPaging;
+    this->dataPtr->pageManager->destroyWorld(this->dataPtr->world);
+    OGRE_DELETE this->dataPtr->pageManager;
   }
   else
   {
-    this->terrainGroup->removeAllTerrains();
+    this->dataPtr->terrainGroup->removeAllTerrains();
 
-    OGRE_DELETE this->terrainGroup;
-    this->terrainGroup = NULL;
+    OGRE_DELETE this->dataPtr->terrainGroup;
+    this->dataPtr->terrainGroup = nullptr;
   }
 
-  OGRE_DELETE this->terrainGlobals;
-  this->terrainGlobals = NULL;
+  OGRE_DELETE this->dataPtr->terrainGlobals;
+  this->dataPtr->terrainGlobals = nullptr;
 }
 
 //////////////////////////////////////////////////
 void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 {
-  this->terrainSize = msgs::Convert(_msg->geometry().heightmap().size());
-  this->terrainOrigin = msgs::Convert(_msg->geometry().heightmap().origin());
+  this->dataPtr->terrainSize =
+      msgs::ConvertIgn(_msg->geometry().heightmap().size());
+  this->dataPtr->terrainOrigin =
+      msgs::ConvertIgn(_msg->geometry().heightmap().origin());
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
@@ -113,22 +120,40 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
     RenderEngine::Instance()->AddResourcePath(diffusePath);
     RenderEngine::Instance()->AddResourcePath(normalPath);
 
-    this->diffuseTextures.push_back(diffusePath);
-    this->normalTextures.push_back(normalPath);
-    this->worldSizes.push_back(_msg->geometry().heightmap().texture(i).size());
+    this->dataPtr->diffuseTextures.push_back(diffusePath);
+    this->dataPtr->normalTextures.push_back(normalPath);
+    this->dataPtr->worldSizes.push_back(
+        _msg->geometry().heightmap().texture(i).size());
   }
 
   for (int i = 0; i < _msg->geometry().heightmap().blend_size(); ++i)
   {
-    this->blendHeight.push_back(
+    this->dataPtr->blendHeight.push_back(
         _msg->geometry().heightmap().blend(i).min_height());
-    this->blendFade.push_back(
+    this->dataPtr->blendFade.push_back(
         _msg->geometry().heightmap().blend(i).fade_dist());
   }
 
   if (_msg->geometry().heightmap().has_use_terrain_paging())
   {
-    this->useTerrainPaging = _msg->geometry().heightmap().use_terrain_paging();
+    this->dataPtr->useTerrainPaging =
+        _msg->geometry().heightmap().use_terrain_paging();
+  }
+
+  if (_msg->geometry().heightmap().has_filename())
+  {
+    std::string uri = _msg->geometry().heightmap().filename();
+    if (!uri.empty())
+    {
+      this->dataPtr->filename = common::find_file(
+          _msg->geometry().heightmap().filename());
+      if (this->dataPtr->filename.empty())
+      {
+        gzerr << "Unable to find file "
+              << _msg->geometry().heightmap().filename()
+              << std::endl;
+      }
+    }
   }
 
   this->Load();
@@ -137,21 +162,33 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 //////////////////////////////////////////////////
 Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
 {
-  return this->terrainGroup;
+  return this->OgreTerrain();
+}
+
+//////////////////////////////////////////////////
+Ogre::TerrainGroup *Heightmap::OgreTerrain() const
+{
+  return this->dataPtr->terrainGroup;
 }
 
 //////////////////////////////////////////////////
 common::Image Heightmap::GetImage() const
 {
+  return this->Image();
+}
+
+//////////////////////////////////////////////////
+common::Image Heightmap::Image() const
+{
   common::Image result;
 
   double height = 0.0;
-  unsigned char *imageData = NULL;
+  unsigned char *imageData = nullptr;
 
   /// \todo Support multiple terrain objects
-  Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
+  Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
 
   double minHeight = terrain->getMinHeight();
   double maxHeight = terrain->getMaxHeight() - minHeight;
@@ -168,10 +205,15 @@ common::Image Heightmap::GetImage() const
     for (uint16_t x = 0; x < size; ++x)
     {
       // Normalize height value
-      height = (terrain->getHeightAtPoint(x, y) - minHeight) / maxHeight;
+      // Weird Ogre issue: terrain->getHeightAtPoint could return a value
+      // larger than terrain->getMaxHeight().
+      height = (std::min(terrain->getHeightAtPoint(x, y),
+          terrain->getMaxHeight()) - minHeight) / maxHeight;
 
-      GZ_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
-      GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
+      GZ_ASSERT((height <= 1.0 + 1e-6),
+          "Normalized terrain height > 1.0");
+      GZ_ASSERT((height >= 0.0 - 1e-6),
+          "Normalized terrain height < 0.0");
 
       // Scale height to a value between 0 and 255
       imageData[(size - y - 1)*size+x] =
@@ -186,8 +228,8 @@ common::Image Heightmap::GetImage() const
 }
 
 //////////////////////////////////////////////////
-void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
-    std::vector<std::vector<float> > &_v)
+void Heightmap::SplitHeights(const std::vector<float> &_heightmap,
+    const int _n, std::vector<std::vector<float> > &_v)
 {
   // We support splitting the terrain in 4 or 16 pieces
   GZ_ASSERT(_n == 4 || _n == 16,
@@ -242,7 +284,7 @@ void Heightmap::UpdateTerrainHash(const std::string &_hash,
   // Create the subdirectories if they do not exist
   boost::filesystem::create_directories(_terrainDir);
 
-  terrainHashFullPath = _terrainDir / this->hashFilename;
+  terrainHashFullPath = _terrainDir / this->dataPtr->hashFilename;
 
   // Update the terrain hash
   terrainHashFile.open(terrainHashFullPath.string().c_str());
@@ -269,10 +311,10 @@ bool Heightmap::PrepareTerrainPaging(
   bool updateHash = true;
 
   // Compute the original heightmap's image.
-  heightmapHash = common::get_sha1<std::vector<float> >(this->heights);
+  heightmapHash = common::get_sha1<std::vector<float> >(this->dataPtr->heights);
 
   // Check if the terrain hash exists
-  terrainHashFullPath = _terrainDirPath / this->hashFilename;
+  terrainHashFullPath = _terrainDirPath / this->dataPtr->hashFilename;
   if (boost::filesystem::exists(terrainHashFullPath))
   {
     try
@@ -302,7 +344,7 @@ bool Heightmap::PrepareTerrainPaging(
 //////////////////////////////////////////////////
 void Heightmap::Load()
 {
-  if (this->terrainGlobals != NULL)
+  if (this->dataPtr->terrainGlobals != nullptr)
     return;
 
   const Ogre::RenderSystemCapabilities *capabilities;
@@ -328,63 +370,138 @@ void Heightmap::Load()
   // The terraingGroup is composed by a number of terrains (1 by default)
   int nTerrains = 1;
 
-  this->terrainGlobals = new Ogre::TerrainGlobalOptions();
+  this->dataPtr->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
 #if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
     OGRE_VERSION_MAJOR > 1
   // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
   // a depth map.
-  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+  this->dataPtr->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
 #endif
 
-  msgs::Geometry geomMsg;
+  // try loading heightmap data locally
+  if (!this->dataPtr->filename.empty())
+  {
+    this->dataPtr->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(
+        this->dataPtr->filename);
+
+    if (this->dataPtr->heightmapData)
+    {
+      // TODO add a virtual HeightmapData::GetMinElevation function to avoid the
+      // ifdef check. i.e. heightmapSizeZ = GetMaxElevation - GetMinElevation
+      double heightmapSizeZ = this->dataPtr->heightmapData->GetMaxElevation();
+#ifdef HAVE_GDAL
+      auto demData =
+          dynamic_cast<common::Dem *>(this->dataPtr->heightmapData);
+      if (demData)
+      {
+        heightmapSizeZ = heightmapSizeZ - demData->GetMinElevation();
+        if (this->dataPtr->terrainSize == ignition::math::Vector3d::Zero)
+        {
+          this->dataPtr->terrainSize = ignition::math::Vector3d(
+              demData->GetWorldWidth(), demData->GetWorldHeight(),
+              heightmapSizeZ);
+        }
+      }
+#endif
+      // these params need to be the same as physics/HeightmapShape.cc
+      // in order to generate consistent height data
+      int subSampling = 2;
+      bool flipY = false;
+      // sampling size along image width and height
+      unsigned int vertSize =
+          (this->dataPtr->heightmapData->GetWidth() * subSampling)-1;
+      ignition::math::Vector3d scale;
+      scale.X(this->dataPtr->terrainSize.X() / vertSize);
+      scale.Y(this->dataPtr->terrainSize.Y() / vertSize);
+
+      if (ignition::math::equal(heightmapSizeZ, 0.0))
+        scale.Z(1.0);
+      else
+        scale.Z(fabs(this->dataPtr->terrainSize.Z()) / heightmapSizeZ);
+
+      // Construct the heightmap lookup table
+      std::vector<float> lookup;
+      this->dataPtr->heightmapData->FillHeightMap(subSampling, vertSize,
+          this->dataPtr->terrainSize, scale, flipY, lookup);
+
+      for (unsigned int y = 0; y < vertSize; ++y)
+      {
+        for (unsigned int x = 0; x < vertSize; ++x)
+        {
+          int index = (vertSize - y - 1) * vertSize + x;
+          this->dataPtr->heights.push_back(lookup[index]);
+        }
+      }
+
+      this->dataPtr->dataSize = vertSize;
+    }
+  }
+
+  // if heightmap fails to load locally, get the data from the server side
+  if (this->dataPtr->heights.empty())
+  {
+    gzmsg << "Heightmap could not be loaded locally "
+          << "(is it in the GAZEBO_RESOURCE_PATH?)- requesting data from "
+          << "the server" << std::endl;
+
+    msgs::Geometry geomMsg;
+
+    boost::shared_ptr<msgs::Response> response = transport::request(
+       this->dataPtr->scene->Name(), "heightmap_data");
+
+    if (response->response() != "error" &&
+        response->type() == geomMsg.GetTypeName())
+    {
+      geomMsg.ParseFromString(response->serialized_data());
+
+      // Copy the height data.
+      this->dataPtr->terrainSize = msgs::ConvertIgn(geomMsg.heightmap().size());
+      this->dataPtr->heights.resize(geomMsg.heightmap().heights().size());
+      memcpy(&this->dataPtr->heights[0], geomMsg.heightmap().heights().data(),
+          sizeof(this->dataPtr->heights[0]) *
+          geomMsg.heightmap().heights().size());
+
+      this->dataPtr->dataSize = geomMsg.heightmap().width();
+    }
+  }
+
+  if (this->dataPtr->heights.empty())
+  {
+    gzerr << "Failed to load terrain. Heightmap data is empty" << std::endl;
+    return;
+  }
+
   boost::filesystem::path imgPath;
   boost::filesystem::path terrainName;
   boost::filesystem::path terrainDirPath;
   boost::filesystem::path prefix;
-  boost::shared_ptr<msgs::Response> response = transport::request(
-     this->scene->GetName(), "heightmap_data");
-
-  if (response->response() != "error" &&
-      response->type() == geomMsg.GetTypeName())
+  if (!this->dataPtr->filename.empty())
   {
-    geomMsg.ParseFromString(response->serialized_data());
+    // Get the full path of the image heightmap
+    imgPath = this->dataPtr->filename;
+    terrainName = imgPath.filename().stem();
+    terrainDirPath = this->dataPtr->gzPagingDir / terrainName;
 
-    // Copy the height data.
-    this->terrainSize = msgs::Convert(geomMsg.heightmap().size());
-    this->heights.resize(geomMsg.heightmap().heights().size());
-    memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
-        sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
-
-    this->dataSize = geomMsg.heightmap().width();
-
-    if (geomMsg.heightmap().has_filename())
+    // Add the top level terrain paging directory to the OGRE
+    // ResourceGroupManager
+    if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
+          this->dataPtr->gzPagingDir.string(), "General"))
     {
-      // Get the full path of the image heightmap
-      imgPath = geomMsg.heightmap().filename();
-      terrainName = imgPath.filename().stem();
-      terrainDirPath = this->gzPagingDir / terrainName;
-
-      // Add the top level terrain paging directory to the OGRE
-      // ResourceGroupManager
-      if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
-            this->gzPagingDir.string(), "General"))
-      {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            this->gzPagingDir.string(), "FileSystem", "General", true);
-        Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
-            "General");
-      }
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+          this->dataPtr->gzPagingDir.string(), "FileSystem", "General", true);
+      Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
+          "General");
     }
   }
 
-  if (!math::isPowerOfTwo(this->dataSize - 1))
+  if (!ignition::math::isPowerOfTwo(this->dataPtr->dataSize - 1))
     gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
   // If the paging is enabled we modify the number of subterrains
-  if (this->useTerrainPaging)
+  if (this->dataPtr->useTerrainPaging)
   {
-    nTerrains = this->numTerrainSubdivisions;
+    nTerrains = this->dataPtr->numTerrainSubdivisions;
     prefix = terrainDirPath / "gazebo_terrain_cache";
   }
   else
@@ -401,76 +518,88 @@ void Heightmap::Load()
   //          Terrains must be square, with each side a power of 2 in size
   // Param 4: World size of each terrain instance, in meters.
 
-  this->terrainGroup = new Ogre::TerrainGroup(
-      this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
-      1 + ((this->dataSize - 1) / sqrtN),
-      this->terrainSize.x / (sqrtN));
+  this->dataPtr->terrainGroup = new Ogre::TerrainGroup(
+      this->dataPtr->scene->OgreSceneManager(), Ogre::Terrain::ALIGN_X_Y,
+      1 + ((this->dataPtr->dataSize - 1) / sqrtN),
+      this->dataPtr->terrainSize.X() / (sqrtN));
 
-  this->terrainGroup->setFilenameConvention(
+  this->dataPtr->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
-  Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
-  math::Vector3 origin(
-      orig.x -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
-      orig.y -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
+  Ogre::Vector3 orig = Conversions::Convert(this->dataPtr->terrainOrigin);
+  ignition::math::Vector3d origin(orig.x -0.5 * this->dataPtr->terrainSize.X() +
+      0.5 * this->dataPtr->terrainSize.X() / sqrtN,
+      orig.y -0.5 * this->dataPtr->terrainSize.X() +
+      0.5 * this->dataPtr->terrainSize.X() / sqrtN,
       orig.z);
 
-  this->terrainGroup->setOrigin(Conversions::Convert(origin));
+  this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
-  this->SetupShadows(true);
 
-  if (!this->heights.empty())
+  // use gazebo shaders
+  this->CreateMaterial();
+
+  if (!this->dataPtr->heights.empty())
   {
-    UserCameraPtr userCam = this->scene->GetUserCamera(0);
+    UserCameraPtr userCam = this->dataPtr->scene->GetUserCamera(0);
 
     // Move the camera above the terrain only if the user did not modify the
     // camera position in the world file
     if (userCam && !userCam->IsCameraSetInWorldFile())
     {
       double h = *std::max_element(
-        &this->heights[0], &this->heights[0] + this->heights.size());
+        &this->dataPtr->heights[0],
+        &this->dataPtr->heights[0] + this->dataPtr->heights.size());
 
-      math::Vector3 camPos(5, -5, h + 200);
-      math::Vector3 lookAt(0, 0, h);
-      math::Vector3 delta = lookAt - camPos;
+      ignition::math::Vector3d camPos(5, -5, h + 200);
+      ignition::math::Vector3d lookAt(0, 0, h);
+      ignition::math::Vector3d delta = lookAt - camPos;
 
-      double yaw = atan2(delta.y, delta.x);
-      double pitch = atan2(-delta.z,
-                           sqrt(delta.x * delta.x + delta.y * delta.y));
+      double yaw = atan2(delta.Y(), delta.X());
+      double pitch = atan2(-delta.Z(),
+                           sqrt(delta.X() * delta.X() + delta.Y() * delta.Y()));
 
-      userCam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+      userCam->SetWorldPose(ignition::math::Pose3d(camPos,
+          ignition::math::Quaterniond(0, pitch, yaw)));
     }
   }
 
-  if (this->useTerrainPaging)
+  if (this->dataPtr->useTerrainPaging)
   {
-    this->terrainHashChanged = this->PrepareTerrainPaging(terrainDirPath);
+    this->dataPtr->terrainHashChanged =
+        this->PrepareTerrainPaging(terrainDirPath);
 
-    if (this->terrainHashChanged)
+    if (this->dataPtr->terrainHashChanged)
     {
       // Split the terrain. Every subterrain will be saved on disk and paged
-      this->SplitHeights(this->heights, nTerrains, this->subTerrains);
+      this->SplitHeights(this->dataPtr->heights, nTerrains,
+          this->dataPtr->subTerrains);
     }
 
-    this->pageManager = OGRE_NEW Ogre::PageManager();
-    this->pageManager->setPageProvider(&this->dummyPageProvider);
+    this->dataPtr->pageManager = OGRE_NEW Ogre::PageManager();
+    this->dataPtr->pageManager->setPageProvider(
+        &this->dataPtr->dummyPageProvider);
 
     // Add cameras
-    for (unsigned int i = 0; i < this->scene->GetCameraCount(); ++i)
+    for (unsigned int i = 0; i < this->dataPtr->scene->CameraCount(); ++i)
     {
-      this->pageManager->addCamera(this->scene->GetCamera(i)->GetOgreCamera());
+      this->dataPtr->pageManager->addCamera(
+          this->dataPtr->scene->GetCamera(i)->OgreCamera());
     }
-    for (unsigned int i = 0; i < this->scene->GetUserCameraCount(); ++i)
+    for (unsigned int i = 0; i < this->dataPtr->scene->UserCameraCount();
+        ++i)
     {
-      this->pageManager->addCamera(
-          this->scene->GetUserCamera(i)->GetOgreCamera());
+      this->dataPtr->pageManager->addCamera(
+          this->dataPtr->scene->GetUserCamera(i)->OgreCamera());
     }
 
-    this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
-    this->world = pageManager->createWorld();
-    this->terrainPaging->createWorldSection(world, this->terrainGroup,
-        this->loadRadiusFactor * this->terrainSize.x,
-        this->holdRadiusFactor * this->terrainSize.x,
+    this->dataPtr->terrainPaging =
+        OGRE_NEW Ogre::TerrainPaging(this->dataPtr->pageManager);
+    this->dataPtr->world = this->dataPtr->pageManager->createWorld();
+    this->dataPtr->terrainPaging->createWorldSection(
+        this->dataPtr->world, this->dataPtr->terrainGroup,
+        this->dataPtr->loadRadiusFactor * this->dataPtr->terrainSize.X(),
+        this->dataPtr->holdRadiusFactor * this->dataPtr->terrainSize.X(),
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
@@ -479,26 +608,29 @@ void Heightmap::Load()
       this->DefineTerrain(x, y);
 
   // Sync load since we want everything in place when we start
-  this->terrainGroup->loadAllTerrains(true);
+  this->dataPtr->terrainGroup->loadAllTerrains(true);
 
   // Calculate blend maps
-  if (this->terrainsImported)
+  if (this->dataPtr->terrainsImported)
   {
     Ogre::TerrainGroup::TerrainIterator ti =
-      this->terrainGroup->getTerrainIterator();
+      this->dataPtr->terrainGroup->getTerrainIterator();
     while (ti.hasMoreElements())
     {
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
-    if (this->terrainHashChanged)
+
+    // saving an ogre terrain dat file can take quite some time for large dems.
+    // so save only if doing terrain paging for now
+    if (this->dataPtr->terrainHashChanged && this->dataPtr->useTerrainPaging)
     {
       // Save all subterrains using files.
-      this->terrainGroup->saveAllTerrains(true);
+      this->dataPtr->terrainGroup->saveAllTerrains(true);
     }
   }
 
-  this->terrainGroup->freeTemporaryResources();
+  this->dataPtr->terrainGroup->freeTemporaryResources();
 }
 
 ///////////////////////////////////////////////////
@@ -509,57 +641,58 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->terrainGlobals->setMaxPixelError(0);
+  this->dataPtr->terrainGlobals->setMaxPixelError(0);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
-  this->terrainGlobals->setCompositeMapDistance(2000);
+  this->dataPtr->terrainGlobals->setCompositeMapDistance(2000);
 
 #if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
     OGRE_VERSION_MAJOR > 1
   // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
   // a depth map.
-  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+  this->dataPtr->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
 #endif
 
   // Get the first directional light
   LightPtr directionalLight;
-  for (unsigned int i = 0; i < this->scene->GetLightCount(); ++i)
+  for (unsigned int i = 0; i < this->dataPtr->scene->LightCount(); ++i)
   {
-    LightPtr light = this->scene->GetLight(i);
-    if (light->GetType() == "directional")
+    LightPtr light = this->dataPtr->scene->GetLight(i);
+    if (light->Type() == "directional")
     {
       directionalLight = light;
       break;
     }
   }
 
-  this->terrainGlobals->setCompositeMapAmbient(
-      this->scene->GetManager()->getAmbientLight());
+  this->dataPtr->terrainGlobals->setCompositeMapAmbient(
+      this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
 
   // Important to set these so that the terrain knows what to use for
   // derived (non-realtime) data
   if (directionalLight)
   {
-    this->terrainGlobals->setLightMapDirection(
-        Conversions::Convert(directionalLight->GetDirection()));
+    this->dataPtr->terrainGlobals->setLightMapDirection(
+        Conversions::Convert(directionalLight->Direction()));
 
-    this->terrainGlobals->setCompositeMapDiffuse(
-        Conversions::Convert(directionalLight->GetDiffuseColor()));
+    this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
+        Conversions::Convert(directionalLight->DiffuseColor()));
   }
   else
   {
-    this->terrainGlobals->setLightMapDirection(Ogre::Vector3(0, 0, -1));
-    this->terrainGlobals->setCompositeMapDiffuse(
+    this->dataPtr->terrainGlobals->setLightMapDirection(
+        Ogre::Vector3(0, 0, -1));
+    this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
         Ogre::ColourValue(.6, .6, .6, 1));
   }
 
   // Configure default import settings for if we use imported image
   Ogre::Terrain::ImportData &defaultimp =
-    this->terrainGroup->getDefaultImportSettings();
+    this->dataPtr->terrainGroup->getDefaultImportSettings();
 
-  defaultimp.terrainSize = this->dataSize;
-  defaultimp.worldSize = this->terrainSize.x;
+  defaultimp.terrainSize = this->dataPtr->dataSize;
+  defaultimp.worldSize = this->dataPtr->terrainSize.X();
 
   defaultimp.inputScale = 1.0;
 
@@ -572,24 +705,26 @@ void Heightmap::ConfigureTerrainDefaults()
   //    2. normal_height - normal map with a height map in the alpha channel
   {
     // number of texture layers
-    defaultimp.layerList.resize(this->diffuseTextures.size());
+    defaultimp.layerList.resize(this->dataPtr->diffuseTextures.size());
 
     // The worldSize decides how big each splat of textures will be.
     // A smaller value will increase the resolution
-    for (unsigned int i = 0; i < this->diffuseTextures.size(); ++i)
+    for (unsigned int i = 0; i < this->dataPtr->diffuseTextures.size(); ++i)
     {
-      defaultimp.layerList[i].worldSize = this->worldSizes[i];
-      defaultimp.layerList[i].textureNames.push_back(this->diffuseTextures[i]);
-      defaultimp.layerList[i].textureNames.push_back(this->normalTextures[i]);
+      defaultimp.layerList[i].worldSize = this->dataPtr->worldSizes[i];
+      defaultimp.layerList[i].textureNames.push_back(
+          this->dataPtr->diffuseTextures[i]);
+      defaultimp.layerList[i].textureNames.push_back(
+          this->dataPtr->normalTextures[i]);
     }
   }
 }
 
 /////////////////////////////////////////////////
-void Heightmap::SetWireframe(bool _show)
+void Heightmap::SetWireframe(const bool _show)
 {
-  Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
+  GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
 
   Ogre::Material *material = terrain->getMaterial().get();
 
@@ -614,26 +749,27 @@ void Heightmap::SetWireframe(bool _show)
 }
 
 /////////////////////////////////////////////////
-void Heightmap::DefineTerrain(int _x, int _y)
+void Heightmap::DefineTerrain(const int _x, const int _y)
 {
-  Ogre::String filename = this->terrainGroup->generateFilename(_x, _y);
+  Ogre::String filename = this->dataPtr->terrainGroup->generateFilename(_x, _y);
 
-  if (!this->useTerrainPaging)
+  if (!this->dataPtr->useTerrainPaging)
   {
-    this->terrainGroup->defineTerrain(_x, _y, &this->heights[0]);
+    this->dataPtr->terrainGroup->defineTerrain(_x, _y,
+        &this->dataPtr->heights[0]);
   }
   else if ((Ogre::ResourceGroupManager::getSingleton().resourceExists(
-             this->terrainGroup->getResourceGroup(), filename)) &&
-          (!this->terrainHashChanged))
+             this->dataPtr->terrainGroup->getResourceGroup(), filename)) &&
+          (!this->dataPtr->terrainHashChanged))
   {
-    this->terrainGroup->defineTerrain(_x, _y);
-    this->terrainsImported = false;
+    this->dataPtr->terrainGroup->defineTerrain(_x, _y);
+    this->dataPtr->terrainsImported = false;
   }
   else
   {
-      this->terrainGroup->defineTerrain(_x, _y,
-          &this->subTerrains[this->terrainIdx][0]);
-      ++terrainIdx;
+      this->dataPtr->terrainGroup->defineTerrain(_x, _y,
+          &this->dataPtr->subTerrains[this->dataPtr->terrainIdx][0]);
+      ++this->dataPtr->terrainIdx;
   }
 }
 
@@ -646,6 +782,11 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
     return false;
   }
 
+  // no blending to be done if there's only one texture or no textures at all.
+  if (this->dataPtr->blendHeight.size() <= 1u ||
+      this->dataPtr->diffuseTextures.size() <= 1u)
+    return false;
+
   Ogre::Real val, height;
   unsigned int i = 0;
 
@@ -653,7 +794,7 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
   std::vector<float*> pBlend;
 
   // Create the blend maps
-  for (i = 0; i < this->blendHeight.size(); ++i)
+  for (i = 0; i < this->dataPtr->blendHeight.size(); ++i)
   {
     blendMaps.push_back(_terrain->getLayerBlendMap(i+1));
     pBlend.push_back(blendMaps[i]->getBlendPointer());
@@ -669,9 +810,10 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
       blendMaps[0]->convertImageToTerrainSpace(x, y, &tx, &ty);
       height = _terrain->getHeightAtTerrainPosition(tx, ty);
 
-      for (i = 0; i < this->blendHeight.size(); ++i)
+      for (i = 0; i < this->dataPtr->blendHeight.size(); ++i)
       {
-        val = (height - this->blendHeight[i]) / this->blendFade[i];
+        val = (height - this->dataPtr->blendHeight[i]) /
+            this->dataPtr->blendFade[i];
         val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
         *pBlend[i]++ = val;
       }
@@ -691,9 +833,17 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 /////////////////////////////////////////////////
 double Heightmap::GetHeight(double _x, double _y, double _z)
 {
-  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
+  return this->Height(_x, _y, _z);
+}
 
-  Ogre::TerrainGroup::RayResult result = this->terrainGroup->rayIntersects(
+/////////////////////////////////////////////////
+double Heightmap::Height(const double _x, const double _y, const double _z)
+    const
+{
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is NULL");
+
+  Ogre::TerrainGroup::RayResult result =
+      this->dataPtr->terrainGroup->rayIntersects(
       Ogre::Ray(Ogre::Vector3(_x, _y, _z), Ogre::Vector3(0, 0, -1)));
 
   if (result.hit)
@@ -708,14 +858,21 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
     math::Vector2i _mousePos)
 {
-  Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_mousePos.x) /
-      _camera->GetViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.y) /
-      _camera->GetViewport()->getActualHeight());
+  return this->MouseHit(_camera, _mousePos.Ign());
+}
+
+/////////////////////////////////////////////////
+Ogre::TerrainGroup::RayResult Heightmap::MouseHit(CameraPtr _camera,
+    const ignition::math::Vector2i &_mousePos) const
+{
+  Ogre::Ray mouseRay = _camera->OgreCamera()->getCameraToViewportRay(
+      static_cast<float>(_mousePos.X()) /
+      _camera->OgreViewport()->getActualWidth(),
+      static_cast<float>(_mousePos.Y()) /
+      _camera->OgreViewport()->getActualHeight());
 
   // The terrain uses a special ray intersection test.
-  return this->terrainGroup->rayIntersects(mouseRay);
+  return this->dataPtr->terrainGroup->rayIntersects(mouseRay);
 }
 
 /////////////////////////////////////////////////
@@ -723,8 +880,18 @@ bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight)
 {
+  return this->Smooth(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
+      _weight);
+}
+
+/////////////////////////////////////////////////
+bool Heightmap::Smooth(CameraPtr _camera,
+                       const ignition::math::Vector2i &_mousePos,
+                       const double _outsideRadius, const double _insideRadius,
+                       const double _weight)
+{
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetMouseHit(_camera, _mousePos);
+    this->MouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _outsideRadius, _insideRadius,
@@ -738,8 +905,18 @@ bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight)
 {
+  return this->Flatten(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
+      _weight);
+}
+
+/////////////////////////////////////////////////
+bool Heightmap::Flatten(CameraPtr _camera,
+                        const ignition::math::Vector2i &_mousePos,
+                        const double _outsideRadius, const double _insideRadius,
+                        const double _weight)
+{
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetMouseHit(_camera, _mousePos);
+    this->MouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _outsideRadius,
@@ -752,9 +929,19 @@ bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
 bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
     double _outsideRadius, double _insideRadius, double _weight)
 {
+  return this->Raise(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
+      _weight);
+}
+
+/////////////////////////////////////////////////
+bool Heightmap::Raise(CameraPtr _camera,
+    const ignition::math::Vector2i &_mousePos,
+    const double _outsideRadius, const double _insideRadius,
+    const double _weight)
+{
   // The terrain uses a special ray intersection test.
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetMouseHit(_camera, _mousePos);
+    this->MouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _outsideRadius,
@@ -767,9 +954,19 @@ bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
 bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
     double _outsideRadius, double _insideRadius, double _weight)
 {
+  return this->Lower(_camera, _mousePos.Ign(), _outsideRadius, _insideRadius,
+      _weight);
+}
+
+/////////////////////////////////////////////////
+bool Heightmap::Lower(CameraPtr _camera,
+    const ignition::math::Vector2i &_mousePos,
+    const double _outsideRadius, const double _insideRadius,
+    const double _weight)
+{
   // The terrain uses a special ray intersection test.
   Ogre::TerrainGroup::RayResult terrainResult =
-    this->GetMouseHit(_camera, _mousePos);
+    this->MouseHit(_camera, _mousePos);
 
   if (terrainResult.hit)
     this->ModifyTerrain(terrainResult.position, _outsideRadius,
@@ -781,8 +978,15 @@ bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
 /////////////////////////////////////////////////
 double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
 {
-  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
-  Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
+  return this->AvgHeight(Conversions::ConvertIgn(_pos), _radius);
+}
+
+/////////////////////////////////////////////////
+double Heightmap::AvgHeight(const ignition::math::Vector3d &_pos,
+    const double _radius) const
+{
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is NULL");
+  Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)
   {
@@ -793,7 +997,7 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
   int size = static_cast<int>(terrain->getSize());
 
   Ogre::Vector3 pos;
-  terrain->getTerrainPosition(_pos, &pos);
+  terrain->getTerrainPosition(Conversions::Convert(_pos), &pos);
 
   int startx = (pos.x - _radius) * size;
   int starty = (pos.y - _radius) * size;
@@ -821,11 +1025,11 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
 }
 
 /////////////////////////////////////////////////
-void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
-    double _insideRadius, double _weight, const std::string &_op)
+void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, const double _outsideRadius,
+    const double _insideRadius, const double _weight, const std::string &_op)
 {
-  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
-  Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
+  GZ_ASSERT(this->dataPtr->terrainGroup, "TerrainGroup pointer is NULL");
+  Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)
   {
@@ -852,7 +1056,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
   double avgHeight = 0;
 
   if (_op == "flatten" || _op == "smooth")
-    avgHeight = this->GetAvgHeight(pos, _outsideRadius);
+    avgHeight = this->AvgHeight(Conversions::ConvertIgn(pos), _outsideRadius);
 
   for (int y = starty; y <= endy; ++y)
   {
@@ -866,7 +1070,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
 
       if (dist > _insideRadius)
       {
-        weight = math::clamp(dist / _outsideRadius, 0.0, 1.0);
+        weight = ignition::math::clamp(dist / _outsideRadius, 0.0, 1.0);
         weight = 1.0 - (weight * weight);
       }
 
@@ -904,22 +1108,19 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
 /////////////////////////////////////////////////
 void Heightmap::SetupShadows(bool _enableShadows)
 {
-  this->gzMatGen = new GzTerrainMatGen();
-
   // Assume we get a shader model 2 material profile
   Ogre::TerrainMaterialGeneratorA::SM2Profile *matProfile;
 
-  // RTSS PSSM shadows compatible terrain material
-  Ogre::TerrainMaterialGenerator *matGen = this->gzMatGen;
+  Ogre::TerrainMaterialGeneratorPtr matGen =
+      this->dataPtr->terrainGlobals->getDefaultMaterialGenerator();
 
-  Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
-  ptr.bind(matGen);
-
-  this->terrainGlobals->setDefaultMaterialGenerator(ptr);
   matProfile = static_cast<GzTerrainMatGen::SM2Profile*>(
       matGen->getActiveProfile());
   if (!matProfile)
-    gzerr << "Invalid mat profile\n";
+  {
+    // using custom material script so ignore setting shadows
+    return;
+  }
 
   matProfile->setLayerParallaxMappingEnabled(false);
 
@@ -934,14 +1135,63 @@ void Heightmap::SetupShadows(bool _enableShadows)
   }
   else
   {
-    matProfile->setReceiveDynamicShadowsPSSM(NULL);
+    matProfile->setReceiveDynamicShadowsPSSM(nullptr);
+  }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetMaterial(const std::string &_materialName)
+{
+  this->dataPtr->materialName = _materialName;
+  if (!this->dataPtr->materialName.empty() && this->dataPtr->terrainGlobals)
+    this->CreateMaterial();
+}
+
+/////////////////////////////////////////////////
+std::string Heightmap::MaterialName() const
+{
+  return this->dataPtr->materialName;
+}
+
+/////////////////////////////////////////////////
+void Heightmap::CreateMaterial()
+{
+  if (!this->dataPtr->materialName.empty())
+  {
+    // init custom material generator
+    Ogre::TerrainMaterialGeneratorPtr terrainMaterialGenerator;
+    TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial(
+        this->dataPtr->materialName);
+    terrainMaterialGenerator.bind(terrainMaterial);
+    this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(
+        terrainMaterialGenerator);
+  }
+  else
+  {
+    // use default material
+    // RTSS PSSM shadows compatible terrain material
+    if (!this->dataPtr->gzMatGen)
+      this->dataPtr->gzMatGen = new GzTerrainMatGen();
+
+    Ogre::TerrainMaterialGeneratorPtr ptr = Ogre::TerrainMaterialGeneratorPtr();
+    ptr.bind(this->dataPtr->gzMatGen);
+
+    this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(ptr);
+
+    this->SetupShadows(true);
   }
 }
 
 /////////////////////////////////////////////////
 unsigned int Heightmap::GetTerrainSubdivisionCount() const
 {
-  return this->numTerrainSubdivisions;
+  return this->TerrainSubdivisionCount();
+}
+
+/////////////////////////////////////////////////
+unsigned int Heightmap::TerrainSubdivisionCount() const
+{
+  return this->dataPtr->numTerrainSubdivisions;
 }
 
 /////////////////////////////////////////////////
@@ -981,7 +1231,7 @@ GzTerrainMatGen::SM2Profile::SM2Profile(
     const Ogre::String &_desc)
 : TerrainMaterialGeneratorA::SM2Profile(_parent, _name, _desc)
 {
-  this->mShaderGen = NULL;
+  this->mShaderGen = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -989,7 +1239,7 @@ GzTerrainMatGen::SM2Profile::~SM2Profile()
 {
   // Because the base SM2Profile has no virtual destructor:
   delete this->mShaderGen;
-  this->mShaderGen = NULL;
+  this->mShaderGen = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -1962,7 +2212,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
           _outStream << "  vec3 tangent = vec3(0.0, 0.0, -1.0);\n";
           break;
         default:
-          gzerr << "Inavlid terrain alignment\n";
+          gzerr << "Invalid terrain alignment\n";
           break;
       };
 
@@ -2873,4 +3123,112 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
   this->defaultFpParams(_prof, _terrain, _tt, ret);
 
   return ret;
+}
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// TerrainMaterial
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+TerrainMaterial::TerrainMaterial(const std::string &_materialname)
+{
+  this->materialName = _materialname;
+  this->mProfiles.push_back(OGRE_NEW Profile(this, "OgreMaterial",
+      "Profile for rendering Ogre standard material"));
+  this->setActiveProfile("OgreMaterial");
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::setMaterialByName(const std::string &_materialname)
+{
+  this->materialName = _materialname;
+}
+
+//////////////////////////////////////////////////
+TerrainMaterial::Profile::Profile(Ogre::TerrainMaterialGenerator *_parent,
+    const Ogre::String &_name, const Ogre::String &_desc)
+    : Ogre::TerrainMaterialGenerator::Profile(_parent, _name, _desc)
+{
+}
+
+//////////////////////////////////////////////////
+TerrainMaterial::Profile::~Profile()
+{
+}
+
+//////////////////////////////////////////////////
+bool TerrainMaterial::Profile::isVertexCompressionSupported() const
+{
+  return false;
+}
+
+//////////////////////////////////////////////////
+Ogre::MaterialPtr TerrainMaterial::Profile::generate(
+    const Ogre::Terrain *_terrain)
+{
+  const Ogre::String& matName = _terrain->getMaterialName();
+
+  Ogre::MaterialPtr mat =
+      Ogre::MaterialManager::getSingleton().getByName(matName);
+  if (!mat.isNull())
+      Ogre::MaterialManager::getSingleton().remove(matName);
+
+  // Set Ogre material
+  mat = Ogre::MaterialManager::getSingleton().getByName(
+      (dynamic_cast<TerrainMaterial *>(getParent()))->materialName);
+
+  // Get default pass
+  Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
+
+  // Add terrain's global normalmap to renderpass so the
+  // fragment program can find it.
+  Ogre::TextureUnitState *tu = p->createTextureUnitState(matName+"/nm");
+
+  Ogre::TexturePtr nmtx = _terrain->getTerrainNormalMap();
+      tu->_setTexturePtr(nmtx);
+
+  return mat;
+}
+
+//////////////////////////////////////////////////
+Ogre::MaterialPtr TerrainMaterial::Profile::generateForCompositeMap(
+    const Ogre::Terrain *_terrain)
+{
+  return _terrain->_getCompositeMapMaterial();
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::setLightmapEnabled(bool /*_enabled*/)
+{
+}
+
+//////////////////////////////////////////////////
+Ogre::uint8 TerrainMaterial::Profile::getMaxLayers(
+    const Ogre::Terrain */*_terrain*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::updateParams(const Ogre::MaterialPtr &/*_mat*/,
+    const Ogre::Terrain */*_terrain*/)
+{
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::updateParamsForCompositeMap(
+    const Ogre::MaterialPtr &/*_mat*/, const Ogre::Terrain */*_terrain*/)
+{
+}
+
+//////////////////////////////////////////////////
+void TerrainMaterial::Profile::requestOptions(Ogre::Terrain *_terrain)
+{
+  _terrain->_setMorphRequired(true);
+  // enable global normal map
+  _terrain->_setNormalMapRequired(true);
+  _terrain->_setLightMapRequired(false);
+  _terrain->_setCompositeMapRequired(false);
 }

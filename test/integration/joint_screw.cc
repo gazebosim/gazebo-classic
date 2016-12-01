@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,12 +275,6 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     return;
   }
 
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issues #1096.\n";
-    return;
-  }
-
   // Load our screw joint test world
   Load("worlds/screw_joint_test.world", true, _physicsEngine);
 
@@ -483,6 +477,16 @@ TEST_P(JointTestScrew, ScrewJointForce)
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << _physicsEngine
+          << " is broken for this test,"
+          << " because of the pr2 gripper's closed kinematic chain,"
+          << " see issues #1435 and #1933."
+          << std::endl;
+    return;
+  }
+
   // Load pr2 world
   ServerFixture::Load("worlds/pr2.world", true, _physicsEngine);
 
@@ -503,16 +507,6 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   // get model, joints and get links
   physics::ModelPtr model = world->GetModel("pr2");
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
-
-  if (_physicsEngine == "dart")
-  {
-    gzerr << _physicsEngine
-          << " is broken for this test,"
-          << " because of the pr2 gripper's closed kinematic chain,"
-          << " see issue #1435."
-          << std::endl;
-    return;
-  }
 
   // drop from some height
   model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));

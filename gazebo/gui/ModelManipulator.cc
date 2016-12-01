@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,7 @@ ModelManipulator::~ModelManipulator()
 /////////////////////////////////////////////////
 void ModelManipulator::Clear()
 {
-  this->dataPtr->modelPub.reset();
-  this->dataPtr->lightPub.reset();
+  this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
@@ -93,13 +92,11 @@ void ModelManipulator::Init()
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
-  this->dataPtr->lightPub =
-      this->dataPtr->node->Advertise<msgs::Light>("~/light");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
-      this->dataPtr->scene->GetWorldVisual()));
+      this->dataPtr->scene->WorldVisual()));
   this->dataPtr->selectionObj->Load();
 
   this->dataPtr->initialized = true;
@@ -117,40 +114,42 @@ void ModelManipulator::Detach()
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
-  math::Vector3 normal;
+  ignition::math::Vector3d normal;
 
   if (_local)
   {
     if (_axis.x > 0)
-      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetXAxis();
+      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetXAxis().Ign();
     else if (_axis.y > 0)
-      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetYAxis();
+      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetYAxis().Ign();
     else if (_axis.z > 0)
-      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetZAxis();
+      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetZAxis().Ign();
   }
   else
-    normal = _axis;
+    normal = _axis.Ign();
 
   double offset = this->dataPtr->mouseMoveVisStartPose.pos.Dot(normal);
 
-  math::Vector3 pressPoint;
-  this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pressPos.x,
-      this->dataPtr->mouseEvent.pressPos.y,
-      math::Plane(normal, offset), pressPoint);
+  ignition::math::Vector3d pressPoint;
+  this->dataPtr->userCamera->WorldPointOnPlane(
+      this->dataPtr->mouseEvent.PressPos().X(),
+      this->dataPtr->mouseEvent.PressPos().Y(),
+      ignition::math::Planed(normal, offset), pressPoint);
 
-  math::Vector3 newPoint;
-  this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pos.x,
-      this->dataPtr->mouseEvent.pos.y,
-      math::Plane(normal, offset), newPoint);
+  ignition::math::Vector3d newPoint;
+  this->dataPtr->userCamera->WorldPointOnPlane(
+      this->dataPtr->mouseEvent.Pos().X(),
+      this->dataPtr->mouseEvent.Pos().Y(),
+      ignition::math::Planed(normal, offset), newPoint);
 
-  math::Vector3 v1 = pressPoint - this->dataPtr->mouseMoveVisStartPose.pos;
-  math::Vector3 v2 = newPoint - this->dataPtr->mouseMoveVisStartPose.pos;
+  ignition::math::Vector3d v1 = pressPoint -
+    this->dataPtr->mouseMoveVisStartPose.pos.Ign();
+  ignition::math::Vector3d v2 = newPoint -
+    this->dataPtr->mouseMoveVisStartPose.pos.Ign();
   v1 = v1.Normalize();
   v2 = v2.Normalize();
   double signTest = v1.Cross(v2).Dot(normal);
-  double angle = atan2((v1.Cross(v2)).GetLength(), v1.Dot(v2));
+  double angle = atan2((v1.Cross(v2)).Length(), v1.Dot(v2));
 
   if (signTest < 0 )
     angle *= -1;
@@ -175,20 +174,21 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
     rendering::CameraPtr _camera,
     const common::MouseEvent &_event)
 {
-  math::Vector3 origin1, dir1, p1;
+  ignition::math::Vector3d origin1, dir1, p1;
 
   // Cast ray from the camera into the world
-  _camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  _camera->CameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
       origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
+  ignition::math::Planed plane(ignition::math::Vector3d(0, 0, 1), 0);
   double dist1 = plane.Distance(origin1, dir1);
 
   p1 = origin1 + dir1 * dist1;
 
   return p1;
 }
+
 /////////////////////////////////////////////////
 math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
     double _interval, double _sensitivity)
@@ -239,57 +239,55 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
     const math::Vector2i &_start, const math::Vector2i &_end,
     const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
 {
-  math::Pose pose = _pose;
+  ignition::math::Pose3d pose = _pose.Ign();
 
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
+  ignition::math::Vector3d origin1, dir1, p1;
+  ignition::math::Vector3d origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  _camera->GetCameraToViewportRay(_end.x,
-      _end.y, origin1, dir1);
-  _camera->GetCameraToViewportRay(_start.x,
-      _start.y, origin2, dir2);
+  _camera->CameraToViewportRay(_end.x, _end.y, origin1, dir1);
+  _camera->CameraToViewportRay(_start.x, _start.y, origin2, dir2);
 
-  math::Vector3 planeNorm(0, 0, 0);
-  math::Vector3 projNorm(0, 0, 0);
+  ignition::math::Vector3d planeNorm(0, 0, 0);
+  ignition::math::Vector3d projNorm(0, 0, 0);
 
-  math::Vector3 planeNormOther(0, 0, 0);
+  ignition::math::Vector3d planeNormOther(0, 0, 0);
 
   if (_axis.x > 0 && _axis.y > 0)
   {
-    planeNorm.z = 1;
-    projNorm.z = 1;
+    planeNorm.Z(1);
+    projNorm.Z(1);
   }
   else if (_axis.z > 0)
   {
-    planeNorm.y = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
+    planeNorm.Y(1);
+    projNorm.X(1);
+    planeNormOther.X(1);
   }
   else if (_axis.x > 0)
   {
-    planeNorm.z = 1;
-    projNorm.y = 1;
-    planeNormOther.y = 1;
+    planeNorm.Z(1);
+    projNorm.Y(1);
+    planeNormOther.Y(1);
   }
   else if (_axis.y > 0)
   {
-    planeNorm.z = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
+    planeNorm.Z(1);
+    projNorm.X(1);
+    planeNormOther.X(1);
   }
 
   if (_local)
   {
-    planeNorm = pose.rot.RotateVector(planeNorm);
-    projNorm = pose.rot.RotateVector(projNorm);
+    planeNorm = pose.Rot().RotateVector(planeNorm);
+    projNorm = pose.Rot().RotateVector(projNorm);
   }
 
   // Fine tune ray casting: cast a second ray and compare the two rays' angle
   // to plane. Use the one that is less parallel to plane for better results.
   double angle = dir1.Dot(planeNorm);
   if (_local)
-    planeNormOther = pose.rot.RotateVector(planeNormOther);
+    planeNormOther = pose.Rot().RotateVector(planeNormOther);
   double angleOther = dir1.Dot(planeNormOther);
   if (fabs(angleOther) > fabs(angle))
   {
@@ -298,8 +296,8 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
   }
 
   // Compute the distance from the camera to plane
-  double d = pose.pos.Dot(planeNorm);
-  math::Plane plane(planeNorm, d);
+  double d = pose.Pos().Dot(planeNorm);
+  ignition::math::Planed plane(planeNorm, d);
   double dist1 = plane.Distance(origin1, dir1);
   double dist2 = plane.Distance(origin2, dir2);
 
@@ -311,10 +309,10 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
   if (_local)
     p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
 
-  math::Vector3 distance = p1 - p2;
+  ignition::math::Vector3d distance = p1 - p2;
 
   if (!_local)
-    distance *= _axis;
+    distance *= _axis.Ign();
 
   return distance;
 }
@@ -324,8 +322,9 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
     const math::Vector3 &_axis, bool _local) const
 {
   return GetMouseMoveDistance(this->dataPtr->userCamera,
-      this->dataPtr->mouseStart, math::Vector2i(this->dataPtr->mouseEvent.pos.x,
-      this->dataPtr->mouseEvent.pos.y), _pose, _axis, _local);
+      this->dataPtr->mouseStart,
+      math::Vector2i(this->dataPtr->mouseEvent.Pos().X(),
+      this->dataPtr->mouseEvent.Pos().Y()), _pose, _axis, _local);
 }
 
 /////////////////////////////////////////////////
@@ -385,7 +384,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       }
     }
 
-    if (this->dataPtr->keyEvent.key == Qt::Key_Shift || geomType == "sphere")
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier ||
+        geomType == "sphere")
     {
       scale = this->UpdateScale(_axis, scale, "sphere");
     }
@@ -435,8 +435,16 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       if (childVis != this->dataPtr->selectionObj &&
           geomType != "" && geomType != "mesh")
       {
-        math::Vector3 geomScale = this->UpdateScale(_axis, scale,
-            childVis->GetGeometryType());
+        math::Vector3 geomScale;
+        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        {
+          geomScale = this->UpdateScale(_axis, scale, "sphere");
+        }
+        else
+        {
+          geomScale = this->UpdateScale(_axis, scale, geomType);
+        }
+
         math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
             * geomScale.GetAbs();
 
@@ -448,6 +456,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           newScale.y = std::max(1e-4, newScale.y);
           newScale.z = std::max(1e-4, newScale.z);
         }
+
         childVis->SetScale(newScale);
         Events::scaleEntity(childVis->GetName(), newScale);
       }
@@ -516,61 +525,115 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 /////////////////////////////////////////////////
 void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
 {
-  if (_vis)
-  {
-    // Check to see if the visual is a model.
-    if (gui::get_entity_id(_vis->GetName()))
-    {
-      msgs::Model msg;
-      msg.set_id(gui::get_entity_id(_vis->GetName()));
-      msg.set_name(_vis->GetName());
+  if (!_vis)
+    return;
 
-      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
-      this->dataPtr->modelPub->Publish(msg);
-    }
-    // Otherwise, check to see if the visual is a light
-    else if (this->dataPtr->scene->GetLight(_vis->GetName()))
-    {
-      msgs::Light msg;
-      msg.set_name(_vis->GetName());
-      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
-      this->dataPtr->lightPub->Publish(msg);
-    }
+  // Register user command on server
+  std::string description;
+  if (this->dataPtr->manipMode == "translate")
+  {
+    description = "Translate [";
   }
+  else if (this->dataPtr->manipMode == "rotate")
+  {
+    description = "Rotate [";
+  }
+  else
+  {
+    gzerr << "Unknown mode [" << this->dataPtr->manipMode << "]. " <<
+        "Not sending user command." << std::endl;
+    return;
+  }
+
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description(description + _vis->GetName() + "]");
+  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+
+  // Only publish for models
+  if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
+  {
+    msgs::Model msg;
+
+    auto id = gui::get_entity_id(_vis->GetName());
+    if (id)
+      msg.set_id(id);
+
+    msg.set_name(_vis->GetName());
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+
+    auto modelMsg = userCmdMsg.add_model();
+    modelMsg->CopyFrom(msg);
+  }
+  // Otherwise, check to see if the visual is a light
+  else if (this->dataPtr->scene->GetLight(_vis->GetName()))
+  {
+    msgs::Light msg;
+    msg.set_name(_vis->GetName());
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+
+    auto lightMsg = userCmdMsg.add_light();
+    lightMsg->CopyFrom(msg);
+  }
+  else
+  {
+    gzerr << "Visual [" << _vis->GetName() << "] isn't a model or a light"
+        << std::endl;
+    return;
+  }
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
 void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 {
-  if (_vis)
+  if (!_vis || this->dataPtr->manipMode != "scale" ||
+      _vis->GetType() != gazebo::rendering::Visual::VT_MODEL)
   {
-    // Check to see if the visual is a model.
-    if (gui::get_entity_id(_vis->GetName()))
-    {
-      msgs::Model msg;
-      msg.set_id(gui::get_entity_id(_vis->GetName()));
-      msg.set_name(_vis->GetName());
-
-      msgs::Set(msg.mutable_scale(), _vis->GetScale());
-      this->dataPtr->modelPub->Publish(msg);
-      _vis->SetScale(this->dataPtr->mouseVisualScale);
-    }
+    return;
   }
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Scale [" + _vis->GetName() + "]");
+  userCmdMsg.set_type(msgs::UserCmd::SCALING);
+
+  msgs::Model msg;
+
+  auto id = gui::get_entity_id(_vis->GetName());
+  if (id)
+    msg.set_id(id);
+
+  msg.set_name(_vis->GetName());
+  msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
+
+  auto modelMsg = userCmdMsg.add_model();
+  modelMsg->CopyFrom(msg);
+
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
+  _vis->SetScale(this->dataPtr->mouseVisualScale);
 }
 
 /////////////////////////////////////////////////
 void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
-  this->dataPtr->mouseStart = _event.pressPos;
+  this->dataPtr->mouseStart = _event.PressPos();
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   rendering::VisualPtr vis;
+  std::string manipState;
   rendering::VisualPtr mouseVis
-      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos);
+      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseStart,
+      manipState);
+
+  this->dataPtr->selectionObj->SetState(manipState);
+
+  // See issue #1510
+  bool keyIsPressed = (QApplication::keyboardModifiers() != Qt::NoModifier);
+
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
-  if (!this->dataPtr->keyEvent.key && (this->dataPtr->selectionObj->GetMode() ==
+  if (!keyIsPressed && (this->dataPtr->selectionObj->GetMode() ==
        rendering::SelectionObj::SELECTION_NONE
       || (mouseVis && mouseVis != this->dataPtr->selectionObj->GetParent())))
   {
@@ -582,7 +645,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   }
 
   if (vis && !vis->IsPlane() &&
-      this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+      this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
   {
     // Root visual
     rendering::VisualPtr rootVis = vis->GetRootVisual();
@@ -591,6 +654,8 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
     // If the root visual's ID can be found, it is a model in the main window
+    // TODO gui::get_entity_id always return 0 in QTestFixture due to NULL
+    // g_main_win
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
@@ -599,7 +664,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     // If it is not a model and its parent is either a direct child or
     // grandchild of the world, this is a light, so just keep vis = vis
     else if (vis->GetParent() == rootVis ||
-        vis->GetParent() == this->dataPtr->scene->GetWorldVisual())
+        vis->GetParent() == this->dataPtr->scene->WorldVisual())
     {
       // select light
     }
@@ -639,10 +704,10 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
-  if (this->dataPtr->mouseEvent.dragging)
+  if (this->dataPtr->mouseEvent.Dragging())
   {
     if (this->dataPtr->mouseMoveVis &&
-        this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+        this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
       math::Vector3 axis = math::Vector3::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
@@ -748,7 +813,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
   else
   {
     std::string manipState;
-    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos,
+    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos(),
         manipState);
     this->dataPtr->selectionObj->SetState(manipState);
 
@@ -757,7 +822,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     else
     {
       rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-          this->dataPtr->mouseEvent.pos);
+          this->dataPtr->mouseEvent.Pos());
 
       if (vis && !vis->IsPlane())
         QApplication::setOverrideCursor(Qt::OpenHandCursor);
@@ -772,7 +837,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
 void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
-  if (this->dataPtr->mouseEvent.dragging)
+  if (this->dataPtr->mouseEvent.Dragging())
   {
     // If we were dragging a visual around, then publish its new pose to the
     // server
@@ -792,10 +857,10 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
   }
   else
   {
-    if (this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+    if (this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
       rendering::VisualPtr vis =
-        this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos);
+        this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
       if (vis && vis->IsPlane())
       {
         this->dataPtr->selectionObj->SetMode(
@@ -871,14 +936,14 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
     if (_event.key == Qt::Key_X || _event.key == Qt::Key_Y
         || _event.key == Qt::Key_Z)
     {
-      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.pos;
+      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.Pos();
       if (this->dataPtr->mouseMoveVis)
       {
         this->dataPtr->mouseMoveVisStartPose =
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       this->dataPtr->globalManip = true;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -898,14 +963,14 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     if (_event.key == Qt::Key_X || _event.key == Qt::Key_Y
         || _event.key == Qt::Key_Z)
     {
-      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.pos;
+      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.Pos();
       if (this->dataPtr->mouseMoveVis)
       {
         this->dataPtr->mouseMoveVisStartPose =
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);

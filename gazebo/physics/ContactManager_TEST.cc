@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +121,19 @@ TEST_F(ContactManagerTest, RemoveFilter)
     EXPECT_TRUE(!manager->HasFilter(ss.str()));
     EXPECT_EQ(manager->GetFilterCount(), runs - (i+1));
   }
+  EXPECT_EQ(manager->GetFilterCount(), 0u);
+
+  // Add and remove filter with :: in name
+  collisionMapName = "link::collision";
+  collisionMap[collisionMapName] = physics::CollisionPtr();
+  topic  = manager->CreateFilter(collisionMapName, collisionMap);
+  EXPECT_TRUE(topic.find("link/collision") != std::string::npos);
+  EXPECT_TRUE(manager->HasFilter(collisionMapName));
+  EXPECT_EQ(manager->GetFilterCount(), 1u);
+  // Verify that the filter is removed
+  manager->RemoveFilter(collisionMapName);
+  EXPECT_FALSE(manager->HasFilter(collisionMapName));
+  EXPECT_EQ(manager->GetFilterCount(), 0u);
 }
 
 int main(int argc, char **argv)

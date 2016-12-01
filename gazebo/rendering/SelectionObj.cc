@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 #include "gazebo/common/MeshManager.hh"
 
-#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -64,6 +63,7 @@ SelectionObj::~SelectionObj()
 {
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
   dPtr->parent.reset();
 }
 
@@ -94,7 +94,7 @@ void SelectionObj::Fini()
   // Destroy objects and nodes created by this visual
   if (!dPtr->scene)
     return;
-  Ogre::SceneManager *manager = dPtr->scene->GetManager();
+  Ogre::SceneManager *manager = dPtr->scene->OgreSceneManager();
   if (!manager)
     return;
 
@@ -129,7 +129,6 @@ void SelectionObj::Fini()
       }
     }
   }
-
   Visual::Fini();
 }
 
@@ -385,10 +384,10 @@ void SelectionObj::CreateTranslateVisual()
   this->InsertMesh("axis_head");
 
   Ogre::MovableObject *shaftXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_TRANS_SHAFT_X__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *headXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_TRANS_HEAD_X__" + this->GetName(), "axis_head"));
   Ogre::SceneNode *transShaftXNode =
       dPtr->transXVisual->GetSceneNode()->createChildSceneNode(
@@ -410,10 +409,10 @@ void SelectionObj::CreateTranslateVisual()
   headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *shaftYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_TRANS_SHAFT_Y__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *headYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_TRANS_HEAD_Y__" + this->GetName(), "axis_head"));
   Ogre::SceneNode *transShaftYNode =
       dPtr->transYVisual->GetSceneNode()->createChildSceneNode(
@@ -435,10 +434,10 @@ void SelectionObj::CreateTranslateVisual()
   headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *shaftZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_TRANS_SHAFT_Z__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *headZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_TRANS_HEAD_Z__" + this->GetName(), "axis_head"));
   Ogre::SceneNode *transShaftZNode =
       dPtr->transZVisual->GetSceneNode()->createChildSceneNode(
@@ -503,7 +502,7 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotVisual->InsertMesh("selection_tube");
 
   Ogre::MovableObject *rotXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_ROT_X__" + this->GetName(), "selection_tube"));
   Ogre::SceneNode *xNode =
       dPtr->rotXVisual->GetSceneNode()->createChildSceneNode(
@@ -514,7 +513,7 @@ void SelectionObj::CreateRotateVisual()
   rotXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_ROT_Y__" + this->GetName(), "selection_tube"));
   Ogre::SceneNode *yNode =
       dPtr->rotYVisual->GetSceneNode()->createChildSceneNode(
@@ -525,7 +524,7 @@ void SelectionObj::CreateRotateVisual()
   rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *rotZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_ROT_Z__" + this->GetName(), "selection_tube"));
   Ogre::SceneNode *zNode =
       dPtr->rotZVisual->GetSceneNode()->createChildSceneNode(
@@ -590,10 +589,10 @@ void SelectionObj::CreateScaleVisual()
   this->InsertMesh("unit_box");
 
   Ogre::MovableObject *scaleShaftXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_SCALE_SHAFT_X__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *scaleHeadXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_SCALE_HEAD_X__" + this->GetName(), "unit_box"));
   Ogre::SceneNode *scaleShaftXNode =
       dPtr->scaleXVisual->GetSceneNode()->createChildSceneNode(
@@ -615,10 +614,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *scaleShaftYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_SCALE_SHAFT_Y__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *scaleHeadYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_SCALE_HEAD_Y__" + this->GetName(), "unit_box"));
   Ogre::SceneNode *scaleShaftYNode =
       dPtr->scaleYVisual->GetSceneNode()->createChildSceneNode(
@@ -640,10 +639,10 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   Ogre::MovableObject *scaleShaftZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_SCALE_SHAFT_Z__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *scaleHeadZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_SCALE_HEAD_Z__" + this->GetName(), "unit_box"));
   Ogre::SceneNode *scaleShaftZNode =
       dPtr->scaleZVisual->GetSceneNode()->createChildSceneNode(

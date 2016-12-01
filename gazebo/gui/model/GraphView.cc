@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 */
 
 #include <cstdlib>
+
+#include "gazebo/common/Events.hh"
+
 #include "gazebo/gui/model/GraphView.hh"
 
 using namespace gazebo;
@@ -48,6 +51,13 @@ void GraphView::contextMenuEvent(QContextMenuEvent *_event)
   QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
   if (item)
   {
+    QString itemData = item->data(0).toString();
+    if (!itemData.isEmpty())
+    {
+      emit customContextMenuRequested(itemData);
+      _event->accept();
+      return;
+    }
     _event->ignore();
     QGraphicsView::contextMenuEvent(_event);
     return;
@@ -90,23 +100,54 @@ void GraphView::wheelEvent(QWheelEvent *_event)
 /////////////////////////////////////////////////
 void GraphView::mousePressEvent(QMouseEvent *_event)
 {
-  if (_event->button() != Qt::RightButton)
-  {
-    QGraphicsItem *mouseItem =
-        this->scene()->itemAt(this->mapToScene(_event->pos()));
-    if (mouseItem && !mouseItem->isSelected())
-    {
-      this->scene()->clearSelection();
-      mouseItem->setSelected(true);
-    }
-    QGraphicsView::mousePressEvent(_event);
-  }
+  _event->accept();
 }
 
 /////////////////////////////////////////////////
 void GraphView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  QGraphicsView::mouseReleaseEvent(_event);
+  if (_event->button() != Qt::LeftButton)
+  {
+    QGraphicsView::mouseReleaseEvent(_event);
+    return;
+  }
+
+  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  this->lastClickedItem = item;
+  if (item)
+  {
+    // multi-selection
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+    {
+      if (!item->isSelected())
+      {
+        QList<QGraphicsItem *> selectedItems = this->scene()->selectedItems();
+        if (!selectedItems.empty())
+        {
+          // select on links or joints but not both types
+          std::string selectedType =
+              selectedItems[0]->data(1).toString().toStdString();
+          std::string type = item->data(1).toString().toStdString();
+          if (selectedType != type)
+            this->scene()->clearSelection();
+        }
+      }
+      item->setSelected(!item->isSelected());
+    }
+    else
+    {
+      // select single item
+      this->scene()->clearSelection();
+      item->setSelected(true);
+      this->repaint();
+    }
+    _event->accept();
+  }
+  else
+  {
+    this->scene()->clearSelection();
+    event::Events::setSelectedEntity("", "normal");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -124,5 +165,17 @@ void GraphView::keyPressEvent(QKeyEvent *_event)
 /////////////////////////////////////////////////
 void GraphView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
+  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  if (item)
+  {
+    QString itemData = item->data(0).toString();
+    if (!itemData.isEmpty())
+    {
+      emit itemDoubleClicked(itemData);
+      _event->accept();
+      return;
+    }
+  }
+  _event->ignore();
   QGraphicsView::mouseDoubleClickEvent(_event);
 }

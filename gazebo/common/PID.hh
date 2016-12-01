@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,10 @@ namespace gazebo
     {
       /// \brief Constructor, zeros out Pid values when created and
       /// initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].
+      ///
+      /// Disable command clamping by setting _cmdMin to a value larger
+      /// than _cmdMax. Command clamping is disabled by default.
+      ///
       /// \param[in] _p  The proportional gain.
       /// \param[in] _i  The integral gain.
       /// \param[in] _d  The derivative gain.
@@ -46,13 +50,17 @@ namespace gazebo
       /// \param[in] _cmdMin Output min value.
       public: PID(double _p = 0.0, double _i = 0.0, double _d = 0.0,
                   double _imax = 0.0, double _imin = 0.0,
-                  double _cmdMax = 0.0, double _cmdMin = 0.0);
+                  double _cmdMax = -1.0, double _cmdMin = 0.0);
 
       /// \brief Destructor
       public: virtual ~PID();
 
       /// \brief Initialize PID-gains and integral term
       ///        limits:[iMax:iMin]-[I1:I2]
+      ///
+      /// Disable command clamping by setting _cmdMin to a value larger
+      /// than _cmdMax. Command clamping is disabled by default.
+      ///
       /// \param[in] _p  The proportional gain.
       /// \param[in] _i  The integral gain.
       /// \param[in] _d  The derivative gain.
@@ -62,7 +70,7 @@ namespace gazebo
       /// \param[in] _cmdMin Output min value.
       public: void Init(double _p = 0.0, double _i = 0.0, double _d = 0.0,
                         double _imax = 0.0, double _imin = 0.0,
-                        double _cmdMax = 0.0, double _cmdMin = 0.0);
+                        double _cmdMax = -1.0, double _cmdMin = 0.0);
 
       /// \brief Set the proportional Gain.
       /// \param[in] _p proportional gain value
@@ -202,10 +210,10 @@ namespace gazebo
       private: double cmd;
 
       /// \brief Max command clamping value.
-      private: double cmdMax;
+      private: double cmdMax = -1.0;
 
       /// \brief Min command clamping value.
-      private: double cmdMin;
+      private: double cmdMin = 0.0;
     };
     /// \}
   }

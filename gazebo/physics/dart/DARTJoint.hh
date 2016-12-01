@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,12 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTJointPrivate;
+
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART joint interface
     class GZ_PHYSICS_VISIBLE DARTJoint : public Joint
     {
@@ -58,6 +64,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
+
+      // Documentation inherited.
+      public: virtual void CacheForceTorque();
 
       // Documentation inherited.
       public: virtual void Detach();
@@ -145,26 +154,11 @@ namespace gazebo
       /// \return A pointer to the DART joint.
       public: dart::dynamics::Joint *GetDARTJoint();
 
-      /// \brief Save force applied by user
-      /// This plus the joint feedback (joint contstraint forces) is the
-      /// equivalent of simulated force torque sensor reading
-      /// Allocate a 2 vector in case hinge2 joint is used.
-      /// This is used by DART to store external force applied by the user.
-      private: double forceApplied[MAX_JOINT_AXIS];
-
-      /// \brief Save time at which force is applied by user
-      /// This will let us know if it's time to clean up forceApplied.
-      private: common::Time forceAppliedTime;
-
-      /// \brief DARTPhysics engine pointer
-      protected: DARTPhysicsPtr dartPhysicsEngine;
-
-      /// \brief DART joint pointer
-      protected: dart::dynamics::Joint *dtJoint;
-
-      /// \brief DART child body node pointer
-      protected: dart::dynamics::BodyNode *dtChildBodyNode;
+      /// \internal
+      /// \brief Pointer to private data
+      protected: DARTJointPrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

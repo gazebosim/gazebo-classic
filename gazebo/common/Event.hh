@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,16 @@
  *
 */
 
-#ifndef _EVENT_HH_
-#define _EVENT_HH_
+#ifndef _GAZEBO_EVENT_HH_
+#define _GAZEBO_EVENT_HH_
 
+#include <atomic>
 #include <iostream>
 #include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <list>
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
@@ -40,9 +42,11 @@ namespace gazebo
   namespace event
   {
     /// \addtogroup gazebo_event Events
+    /// \brief Signals and connections to send and receive event-based
+    /// triggers.
     /// \{
 
-    /// \internal
+    /// \cond
     // Private data members for Event class.
     // This must be in the header due to templatization.
     class GZ_COMMON_VISIBLE EventPrivate
@@ -53,6 +57,7 @@ namespace gazebo
       /// \brief True if the event has been signaled.
       public: bool signaled;
     };
+    /// \endcond
 
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
@@ -84,7 +89,7 @@ namespace gazebo
       protected: EventPrivate *dataPtr;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for Connection class.
     class GZ_COMMON_VISIBLE ConnectionPrivate
     {
@@ -105,6 +110,7 @@ namespace gazebo
       /// \brief set during the constructor
       public: common::Time creationTime;
     };
+    /// \endcond
 
     /// \brief A class that encapsulates a connection.
     class GZ_COMMON_VISIBLE Connection
@@ -132,26 +138,52 @@ namespace gazebo
     };
 
     /// \internal
+    template<typename T>
+    class EventConnection
+    {
+      /// \brief Constructor
+      public: EventConnection(const bool _on,
+                  boost::function<T> *_cb)
+              : callback(_cb)
+      {
+        // Windows Visual Studio 2012 does not have atomic_bool constructor,
+        // so we have to set "on" using operator=
+        this->on = _on;
+      }
+
+      /// \brief On/off value for the event callback
+      public: std::atomic_bool on;
+
+      /// \brief Callback function
+      public: std::shared_ptr<boost::function<T> > callback;
+    };
+
+    /// \cond
     // Private data members for EventT<T> class.
     template< typename T>
-    class GZ_COMMON_VISIBLE EventTPrivate : public EventPrivate
+    class EventTPrivate : public EventPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
-      typedef std::map<int,
-              std::shared_ptr<boost::function<T> > > EvtConnectionMap;
+      typedef std::map<int, std::shared_ptr<EventConnection<T> > >
+        EvtConnectionMap;
 
       /// \brief Array of connection callbacks.
       public: EvtConnectionMap connections;
 
       /// \brief A thread lock.
-      public: std::recursive_mutex mutex;
+      public: std::mutex mutex;
+
+      /// \brief List of connections to remove
+      public: std::list<typename EvtConnectionMap::const_iterator>
+              connectionsToRemove;
     };
+    /// \endcond
 
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
     template< typename T>
-    class GZ_COMMON_VISIBLE EventT : public Event
+    class EventT : public Event
     {
       /// \brief Constructor.
       public: EventT();
@@ -329,11 +361,14 @@ namespace gazebo
       /// \brief Signal the event for all subscribers.
       public: void Signal()
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)();
+        {
+          if (iter.second->on)
+            (*iter.second->callback)();
+        }
       }
 
       /// \brief Signal the event with one parameter.
@@ -341,10 +376,14 @@ namespace gazebo
       public: template< typename P >
               void Signal(const P &_p)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p);
+        }
       }
 
       /// \brief Signal the event with two parameter.
@@ -353,10 +392,14 @@ namespace gazebo
       public: template< typename P1, typename P2 >
               void Signal(const P1 &_p1, const P2 &_p2)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2);
+        }
       }
 
       /// \brief Signal the event with three parameter.
@@ -366,10 +409,14 @@ namespace gazebo
       public: template< typename P1, typename P2, typename P3 >
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3);
+        }
       }
 
       /// \brief Signal the event with four parameter.
@@ -381,10 +428,14 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4);
+        }
       }
 
       /// \brief Signal the event with five parameter.
@@ -398,10 +449,14 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4, const P5 &_p5)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5);
+        }
       }
 
       /// \brief Signal the event with six parameter.
@@ -416,10 +471,14 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6);
+        }
       }
 
       /// \brief Signal the event with seven parameter.
@@ -435,10 +494,14 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections.begin())
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+        }
       }
 
       /// \brief Signal the event with eight parameter.
@@ -456,10 +519,16 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+        {
+          if (iter.second->on)
+          {
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+          }
+        }
       }
 
       /// \brief Signal the event with nine parameter.
@@ -479,10 +548,17 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+        {
+          if (iter.second->on)
+          {
+            (*iter.second->callback)(
+                _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+          }
+        }
       }
 
       /// \brief Signal the event with ten parameter.
@@ -503,11 +579,23 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9, const P10 &_p10)
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->Cleanup();
+
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+        {
+          if (iter.second->on)
+          {
+            (*iter.second->callback)(
+                _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+          }
+        }
       }
+
+      /// \internal
+      /// \brief Removes queued connections.
+      /// We assume that this function is called from a Signal function.
+      private: void Cleanup();
 
       /// \brief Private data pointer.
       private: EventTPrivate<T> *myDataPtr;
@@ -539,8 +627,8 @@ namespace gazebo
         auto const &iter = this->myDataPtr->connections.rbegin();
         index = iter->first + 1;
       }
-      this->myDataPtr->connections[index].reset(
-          new boost::function<T>(_subscriber));
+      this->myDataPtr->connections[index].reset(new EventConnection<T>(true,
+          new boost::function<T>(_subscriber)));
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -570,13 +658,27 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
+      // Find the connection
       auto const &it = this->myDataPtr->connections.find(_id);
+
       if (it != this->myDataPtr->connections.end())
       {
-        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
-        this->myDataPtr->connections.erase(it);
+        it->second->on = false;
+        this->myDataPtr->connectionsToRemove.push_back(it);
       }
     }
+
+    /////////////////////////////////////////////
+    template<typename T>
+    void EventT<T>::Cleanup()
+    {
+      std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
+      // Remove all queue connections.
+      for (auto &conn : this->myDataPtr->connectionsToRemove)
+        this->myDataPtr->connections.erase(conn);
+      this->myDataPtr->connectionsToRemove.clear();
+    }
+
     /// \}
   }
 }

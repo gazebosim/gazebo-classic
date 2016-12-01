@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,11 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_physics_dart
     /// \{
+
+    /// Forward declare private data class
+    class DARTSurfaceParamsPrivate;
 
     /// \brief DART surface parameters.
     class GZ_PHYSICS_VISIBLE DARTSurfaceParams : public SurfaceParams
@@ -52,10 +55,15 @@ namespace gazebo
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
       // Documentation inherited.
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Friction pyramid parameters (mu1, mu2).
-      private: FrictionPyramidPtr frictionPyramid;
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
+
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTSurfaceParamsPrivate *dataPtr;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,78 @@
  *
 */
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture
+class WorldTest : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
 {
+  /// \brief Test clearing an empty (blank) world.
+  /// \param[in] _physicsEngine Name of physics engine.
+  public: void ClearEmptyWorld(const std::string &_physicsEngine);
 };
 
-/////////////////////////////////////////////////
-TEST_F(WorldTest, ClearEmptyWorld)
+/// \brief Pose after physics update
+ignition::math::Pose3d g_poseAfterUpdate;
+
+/// \brief Pose before physics update
+ignition::math::Pose3d g_poseBeforeUpdate;
+
+/// \brief Has the WorldUpdateBegin event been called
+bool g_updateBeginCalled = false;
+
+/// \brief Has the BeforePhysicsUpdate event been called
+bool g_beforePhysicsUpdateCalled = false;
+
+/// \brief Has the WorldUpdateEnd event been called
+bool g_updateEndCalled = false;
+
+/// \brief Callback for WorldUpdateBegin event, just records it's been called.
+/// \param[in] _updateInfo Information about the event time and world.
+void onWorldUpdateBegin(const common::UpdateInfo & /*_updateInfo*/)
 {
-  Load("worlds/blank.world");
+  g_updateBeginCalled = true;
+}
+
+/// \brief Callback for BeforePhysicsUpdate event.
+/// Record that it has been called, and also record the reported ball
+/// position.
+/// \param[in] updateInfo Information about the event time and world.
+void beforePhysicsUpdate(const common::UpdateInfo &_updateInfo)
+{
+  g_beforePhysicsUpdateCalled = true;
+
+  physics::WorldPtr world = physics::get_world(_updateInfo.worldName);
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  g_poseBeforeUpdate = link->GetWorldPose().Ign();
+}
+
+/// \brief Callback for WorldUpdateEnd event, just records it's been called.
+void onWorldUpdateEnd()
+{
+  g_updateEndCalled = true;
+}
+
+/////////////////////////////////////////////////
+void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
+{
+  this->Load("worlds/blank.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -42,6 +101,12 @@ TEST_F(WorldTest, ClearEmptyWorld)
   // Now spawn something, and the model count should increase
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, ClearEmptyWorld)
+{
+  ClearEmptyWorld(GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -70,31 +135,50 @@ TEST_F(WorldTest, ModifyLight)
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+  world->SetPaused(true);
 
   // Make sure there is only one light, and it is named "sun"
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 1u);
+    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
 
-  transport::PublisherPtr lightPub = this->node->Advertise<msgs::Light>(
-        "~/light");
+  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
+        "~/light/modify");
 
   // Set the light to be green
   {
     msgs::Light lightMsg;
     lightMsg.set_name("sun");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 1, 0));
-    lightPub->Publish(lightMsg);
+    lightModifyPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  // Must be big enough to pass `processMsgsPeriod`
+  world->Step(1000);
 
   // Get the new scene, and make sure the color of the "sun" light is
   // correct.
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 1u);
+    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+    msgs::Light lightMsg;
+    lights[0]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 0);
+    EXPECT_EQ(lightMsg.diffuse().g(), 1);
+    EXPECT_EQ(lightMsg.diffuse().b(), 0);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
@@ -103,19 +187,34 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(sceneMsg.light(0).diffuse().b(), 0);
   }
 
+  transport::PublisherPtr lightFactoryPub = this->node->Advertise<msgs::Light>(
+        "~/factory/light");
+
   // Add a new light
   {
     msgs::Light lightMsg;
     lightMsg.set_name("test_light");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 0, 1));
     lightMsg.set_type(msgs::Light::POINT);
-    lightPub->Publish(lightMsg);
+    lightFactoryPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  world->Step(1000);
 
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 2u);
+    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_light");
+    msgs::Light lightMsg;
+    lights[1]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 1);
+    EXPECT_EQ(lightMsg.diffuse().g(), 0);
+    EXPECT_EQ(lightMsg.diffuse().b(), 1);
+    EXPECT_EQ(lightMsg.type(), msgs::Light::POINT);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_light");
@@ -133,6 +232,12 @@ TEST_F(WorldTest, ModifyLight)
 
   // Verify that the test_light is gone and that the sun remains
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 1u);
+    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
@@ -144,13 +249,25 @@ TEST_F(WorldTest, ModifyLight)
     lightMsg.set_name("test_spot_light");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 1, 0));
     lightMsg.set_type(msgs::Light::SPOT);
-    lightPub->Publish(lightMsg);
+    lightFactoryPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  world->Step(1000);
 
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 2u);
+    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
+    msgs::Light lightMsg;
+    lights[1]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 1);
+    EXPECT_EQ(lightMsg.diffuse().g(), 1);
+    EXPECT_EQ(lightMsg.diffuse().b(), 0);
+    EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
@@ -165,15 +282,38 @@ TEST_F(WorldTest, ModifyLight)
     msgs::Light lightMsg;
     lightMsg.set_name("test_spot_light");
     msgs::Set(lightMsg.mutable_pose(),
-        math::Pose(math::Vector3(3, 2, 1), math::Quaternion(0, 1, 0, 0)));
-    lightPub->Publish(lightMsg);
+        ignition::math::Pose3d(
+          ignition::math::Vector3d(3, 2, 1),
+          ignition::math::Quaterniond(0, 1, 0, 0)));
+    lightModifyPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  world->Step(1000);
 
   // Verify the light gets the new pose and retains values of other properties
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 2u);
+    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
+    msgs::Light lightMsg;
+    lights[1]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 1);
+    EXPECT_EQ(lightMsg.diffuse().g(), 1);
+    EXPECT_EQ(lightMsg.diffuse().b(), 0);
+
+    EXPECT_EQ(lightMsg.pose().position().x(), 3);
+    EXPECT_EQ(lightMsg.pose().position().y(), 2);
+    EXPECT_EQ(lightMsg.pose().position().z(), 1);
+    EXPECT_EQ(lightMsg.pose().orientation().w(), 0);
+    EXPECT_EQ(lightMsg.pose().orientation().x(), 1);
+    EXPECT_EQ(lightMsg.pose().orientation().y(), 0);
+    EXPECT_EQ(lightMsg.pose().orientation().z(), 0);
+
+    EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
@@ -191,8 +331,41 @@ TEST_F(WorldTest, ModifyLight)
 
     EXPECT_EQ(sceneMsg.light(1).type(), msgs::Light::SPOT);
   }
-}
 
+  // Add a new light with the name of a light that has been deleted
+  {
+    msgs::Light lightMsg;
+    lightMsg.set_name("test_light");
+    msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 0, 1));
+    lightMsg.set_type(msgs::Light::DIRECTIONAL);
+    lightFactoryPub->Publish(lightMsg);
+  }
+
+  // Allow the world time to process the messages
+  world->Step(1000);
+
+  {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 3u);
+    EXPECT_STREQ(lights[2]->GetName().c_str(), "test_light");
+    msgs::Light lightMsg;
+    lights[2]->FillMsg(lightMsg);
+    EXPECT_DOUBLE_EQ(lightMsg.diffuse().r(), 0);
+    EXPECT_EQ(lightMsg.diffuse().g(), 0);
+    EXPECT_EQ(lightMsg.diffuse().b(), 1);
+    EXPECT_EQ(lightMsg.type(), msgs::Light::DIRECTIONAL);
+
+    // Check scene message
+    msgs::Scene sceneMsg = world->GetSceneMsg();
+    EXPECT_EQ(sceneMsg.light_size(), 3);
+    EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_light");
+    EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 0);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().g(), 0);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().b(), 1);
+    EXPECT_EQ(sceneMsg.light(2).type(), msgs::Light::DIRECTIONAL);
+  }
+}
 
 /////////////////////////////////////////////////
 TEST_F(WorldTest, RemoveModelPaused)
@@ -230,6 +403,7 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   EXPECT_TRUE(sphereModel != NULL);
   EXPECT_TRUE(boxModel != NULL);
 
+  world->Step(1);
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
 
@@ -239,6 +413,81 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   EXPECT_FALSE(sphereModel != NULL);
   EXPECT_FALSE(boxModel != NULL);
 }
+
+/////////////////////////////////////////////////
+/// \brief Check if WorldUpdateBegin, BeforePhysicsUpdate and WorldUpdateEnd
+/// events are called, and if the BeforePhysicsUpdate event is really called
+/// before the physics engine update happens
+TEST_F(WorldTest, CheckWorldEventsWork)
+{
+  Load("worlds/shapes.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  // run the world for a while just to stabilize
+  world->Step(10);
+
+  // initial pose of the link
+  ignition::math::Pose3d initialPose = link->GetWorldPose().Ign();
+
+  // connect to the world events
+  event::ConnectionPtr worldUpdateBeginEventConnection =
+    event::Events::ConnectWorldUpdateBegin(&onWorldUpdateBegin);
+
+  event::ConnectionPtr beforePhysicsUpdateConnection =
+    event::Events::ConnectBeforePhysicsUpdate(&beforePhysicsUpdate);
+
+  event::ConnectionPtr worldUpdateEndEventConnection =
+    event::Events::ConnectWorldUpdateEnd(&onWorldUpdateEnd);
+
+  // iterate for a while pushing to the ball and check the events get called
+  // and that the pose changes only after BeforePhysicUpdate is called.
+  for (size_t i = 0; i < 100; ++i)
+  {
+    ASSERT_FALSE(g_updateBeginCalled);
+    ASSERT_FALSE(g_beforePhysicsUpdateCalled);
+    ASSERT_FALSE(g_updateEndCalled);
+
+    // push to the ball
+    link->AddForce(ignition::math::Vector3d(1000, 0, 0));
+
+    world->Step(1);
+
+    // pose after the physics update
+    ignition::math::Pose3d poseAfterUpdate = link->GetWorldPose().Ign();
+
+    // initial pose and pose before physics update should be the same
+    EXPECT_EQ(initialPose.Pos(), g_poseBeforeUpdate.Pos());
+
+    // pose before physics update and after it should be different
+    EXPECT_GT((g_poseAfterUpdate - g_poseBeforeUpdate).Pos().Abs().Sum(), 1e-9);
+
+    // the events should get called
+    EXPECT_TRUE(g_updateBeginCalled);
+    EXPECT_TRUE(g_beforePhysicsUpdateCalled);
+    EXPECT_TRUE(g_updateEndCalled);
+
+    g_updateBeginCalled = false;
+    g_beforePhysicsUpdateCalled = false;
+    g_updateEndCalled = false;
+
+    // remember the current pose to compare it in the next iteration
+    initialPose = poseAfterUpdate;
+  }
+
+  // disconnect from world events
+  event::Events::DisconnectWorldUpdateBegin(worldUpdateBeginEventConnection);
+  event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
+  event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

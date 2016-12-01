@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -27,6 +22,9 @@
 
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Entity.hh"
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -34,6 +32,7 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/sensors/RFIDSensor.hh"
+#include "gazebo/sensors/RFIDTagPrivate.hh"
 #include "gazebo/sensors/RFIDTag.hh"
 
 using namespace gazebo;
@@ -43,7 +42,8 @@ GZ_REGISTER_STATIC_SENSOR("rfidtag", RFIDTag)
 
 /////////////////////////////////////////////////
 RFIDTag::RFIDTag()
-: Sensor(sensors::OTHER)
+: Sensor(sensors::OTHER),
+  dataPtr(new RFIDTagPrivate)
 {
   this->active = false;
 }
@@ -66,19 +66,19 @@ void RFIDTag::Load(const std::string &_worldName)
 
   if (this->sdf->GetElement("topic"))
   {
-    this->scanPub = this->node->Advertise<msgs::Pose>(
+    this->dataPtr->scanPub = this->node->Advertise<msgs::Pose>(
         this->sdf->GetElement("topic")->Get<std::string>());
   }
 
-  this->entity = this->world->GetEntity(this->parentName);
+  this->dataPtr->entity = this->world->GetEntity(this->ParentName());
 
   // Add the tag to all the RFID sensors.
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
   for (Sensor_V::iterator iter = sensors.begin(); iter != sensors.end(); ++iter)
   {
-    if ((*iter)->GetType() == "rfid")
+    if ((*iter)->Type() == "rfid")
     {
-      boost::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
+      std::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
     }
   }
 }
@@ -87,7 +87,7 @@ void RFIDTag::Load(const std::string &_worldName)
 void RFIDTag::Fini()
 {
   Sensor::Fini();
-  this->entity.reset();
+  this->dataPtr->entity.reset();
 }
 
 //////////////////////////////////////////////////
@@ -97,12 +97,12 @@ void RFIDTag::Init()
 }
 
 //////////////////////////////////////////////////
-bool RFIDTag::UpdateImpl(bool /*_force*/)
+bool RFIDTag::UpdateImpl(const bool /*_force*/)
 {
-  if (this->scanPub)
+  if (this->dataPtr->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, entity->GetWorldPose());
+    msgs::Set(&msg, this->dataPtr->entity->GetWorldPose().Ign());
 
     // msg.set_position(link->GetWorldPose().pos);
     // msg.set_orientation(link->GetWorldPose().rot);
@@ -123,9 +123,15 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
     //   msg.add_intensities(0);
     // }
 
-    this->scanPub->Publish(msg);
+    this->dataPtr->scanPub->Publish(msg);
     // std::cout << "update impl for rfidtag called" << std::endl;
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d RFIDTag::TagPose() const
+{
+  return this->dataPtr->entity->GetWorldPose().Ign();
 }

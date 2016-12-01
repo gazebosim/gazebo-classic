@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,67 +14,51 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_RENDERING_HEIGHTMAP_HH_
 #define _GAZEBO_RENDERING_HEIGHTMAP_HH_
 
-#include <string>
 #include <vector>
-#include <boost/filesystem.hpp>
+#include <string>
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector2.hh>
+
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/common/Image.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
-#include "gazebo/rendering/Scene.hh"
 #include "gazebo/util/system.hh"
+
+namespace boost
+{
+  namespace filesystem
+  {
+    class path;
+  }
+}
 
 namespace Ogre
 {
-  class TerrainGlobalOptions;
   class TerrainGroup;
   class Terrain;
 }
 
 namespace gazebo
 {
+  namespace math
+  {
+    class Vector2i;
+  }
+
+  namespace common
+  {
+    class Image;
+  }
+
   namespace rendering
   {
-    class GzTerrainMatGen;
-
-    /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
-    /// \brief Pretends to provide procedural page content to avoid page loading
-    class GZ_RENDERING_VISIBLE DummyPageProvider : public Ogre::PageProvider
-    {
-      /// \brief Give a provider the opportunity to prepare page content
-      /// procedurally. The parameters are not used.
-      public: bool prepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-
-      /// \brief Give a provider the opportunity to load page content
-      /// procedurally. The parameters are not used.
-      public: bool loadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-
-      /// \brief Give a provider the opportunity to unload page content
-      /// procedurally. The parameters are not used.
-      public: bool unloadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-
-      /// \brief Give a provider the opportunity to unprepare page content
-      /// procedurally. The parameters are not used.
-      public:
-          bool unprepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-    };
+    // Forward declare private data.
+    class HeightmapPrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -102,7 +86,17 @@ namespace gazebo
       /// \param[in] _y Y location
       /// \param[in] _z Z location
       /// \return The height at the specified location
-      public: double GetHeight(double _x, double _y, double _z = 1000);
+      /// \deprecated See Height()
+      public: double GetHeight(double _x, double _y, double _z = 1000)
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the height at a location
+      /// \param[in] _x X location
+      /// \param[in] _y Y location
+      /// \param[in] _z Z location
+      /// \return The height at the specified location
+      public: double Height(const double _x, const double _y,
+          const double _z = 1000) const;
 
       /// \brief Flatten the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -113,9 +107,25 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
+      /// \deprecated See function that accepts an ignition::math parameter.
       public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1);
+                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Flatten the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Flatten(CameraPtr _camera,
+                          const ignition::math::Vector2i &_mousePos,
+                          const double _outsideRadius,
+                          const double _insideRadius,
+                          const double _weight = 0.1);
 
       /// \brief Smooth the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -126,9 +136,25 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
+      /// \deprecated See function that accepts an ignition::math parameter.
       public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1);
+                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Smooth the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Smooth(CameraPtr _camera,
+                          const ignition::math::Vector2i &_mousePos,
+                          const double _outsideRadius,
+                          const double _insideRadius,
+                          const double _weight = 0.1);
 
       /// \brief Raise the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -139,9 +165,25 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
+      /// \deprecated See function that accepts an ignition::math parameter.
       public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1);
+                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Raise the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Raise(CameraPtr _camera,
+                         const ignition::math::Vector2i &_mousePos,
+                         const double _outsideRadius,
+                         const double _insideRadius,
+                         const double _weight = 0.1);
 
       /// \brief Lower the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -152,46 +194,110 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
+      /// \deprecated See function that accepts an ignition::math parameter.
       public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1);
+                         double _weight = 0.1) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Lower the terrain based on a mouse press.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \param[in] _outsideRadius Controls the radius of effect.
+      /// \param[in] _insideRadius Controls the size of the radius with the
+      /// maximum effect (value between 0 and 1).
+      /// \param[in] _weight Controls modification magnitude.
+      /// \return True if the terrain was modified
+      public: bool Lower(CameraPtr _camera,
+                         const ignition::math::Vector2i &_mousePos,
+                         const double _outsideRadius,
+                         const double _insideRadius,
+                         const double _weight = 0.1);
 
       /// \brief Get the average height around a point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _brushSize Controls the radius of effect.
-      public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+      /// \deprecated See AvgHeight()
+      public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize)
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the average height around a point.
+      /// \param[in] _pos Position in world coordinates.
+      /// \param[in] _brushSize Controls the radius of effect.
+      public: double AvgHeight(const ignition::math::Vector3d &_pos,
+          const double _brushSize) const;
 
       /// \brief Set the heightmap to render in wireframe mode.
       /// \param[in] _show True to render wireframe, false to render solid.
-      public: void SetWireframe(bool _show);
+      public: void SetWireframe(const bool _show);
 
       /// \brief Get a pointer to the OGRE terrain group object.
       /// \return Pointer to the OGRE terrain.
-      public: Ogre::TerrainGroup *GetOgreTerrain() const;
+      /// \deprecated See OgreTerrain()
+      public: Ogre::TerrainGroup *GetOgreTerrain() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a pointer to the OGRE terrain group object.
+      /// \return Pointer to the OGRE terrain.
+      public: Ogre::TerrainGroup *OgreTerrain() const;
 
       /// \brief Get the heightmap as an image
       /// \return An image that contains the terrain data.
-      public: common::Image GetImage() const;
+      /// \deprecated See Image()
+      public: common::Image GetImage() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the heightmap as an image
+      /// \return An image that contains the terrain data.
+      public: common::Image Image() const;
 
       /// \brief Calculate a mouse ray hit on the terrain.
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport
       /// coordinates.
       /// \return The result of the mouse ray hit.
+      /// \deprecated See MouseHit()
       public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
-                  math::Vector2i _mousePos);
+                  math::Vector2i _mousePos) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Calculate a mouse ray hit on the terrain.
+      /// \param[in] _camera Camera associated with the mouse press.
+      /// \param[in] _mousePos Position of the mouse in viewport
+      /// coordinates.
+      /// \return The result of the mouse ray hit.
+      public: Ogre::TerrainGroup::RayResult MouseHit(CameraPtr _camera,
+                  const ignition::math::Vector2i &_mousePos) const;
 
       /// \brief Split a terrain into subterrains
       /// \param[in] _heightmap Source vector of floats with the heights.
       /// \param[in] _n Number of subterrains.
       /// \param[out] _v Destination vector with the subterrains.
-      public: void SplitHeights(const std::vector<float> &_heightmap, int _n,
-                  std::vector<std::vector<float> > &_v);
+      public: void SplitHeights(const std::vector<float> &_heightmap,
+                  const int _n, std::vector<std::vector<float> > &_v);
 
       /// \brief Get the number of subdivision the terrain will be split
       /// into.
       /// \return Number of terrain subdivisions
-      public: unsigned int GetTerrainSubdivisionCount() const;
+      /// \deprecated See TerrainSubdivisionCount()
+      public: unsigned int GetTerrainSubdivisionCount() const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of subdivision the terrain will be split
+      /// into.
+      /// \return Number of terrain subdivisions
+      public: unsigned int TerrainSubdivisionCount() const;
+
+      /// \brief Set custom material for the terrain
+      /// \param[in] _materialName Name of the material
+      public: void SetMaterial(const std::string &_materialName);
+
+      /// \brief Get the custom material name used for the terrain.
+      /// \return Custom material name.
+      public: std::string MaterialName() const;
+
+      /// \brief Create terrain material generator. There are two types:
+      /// custom material generator that support user material scripts,
+      /// and a default material generator that uses our own glsl shader
+      /// and supports PSSM shadows.
+      private: void CreateMaterial();
 
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
@@ -200,9 +306,9 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \param[in] _op Type of operation to perform.
-      private: void ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
-                   double _insideRadius, double _weight,
-                   const std::string &_op);
+      private: void ModifyTerrain(Ogre::Vector3 _pos,
+                    const double _outsideRadius, const double _insideRadius,
+                    const double _weight, const std::string &_op);
 
       /// \brief Initialize all the blend material maps.
       /// \param[in] _terrain The terrain to initialize the blend maps.
@@ -214,11 +320,11 @@ namespace gazebo
       /// \brief Define a section of the terrain.
       /// \param[in] _x X coordinate of the terrain.
       /// \param[in] _y Y coordinate of the terrain.
-      private: void DefineTerrain(int _x, int _y);
+      private: void DefineTerrain(const int _x, const int _y);
 
       /// \brief Internal function used to setup shadows for the terrain.
       /// \param[in] _enabled True to enable shadows.
-      private: void SetupShadows(bool _enabled);
+      private: void SetupShadows(const bool _enabled);
 
       /// \brief Update the hash of a terrain file. The hash will be written in
       /// a file called gzterrain.SHA1 . This method will be used when the
@@ -239,288 +345,11 @@ namespace gazebo
       private: bool PrepareTerrainPaging(
         const boost::filesystem::path &_terrainDirPath);
 
-      /// \brief Number of pieces in which a terrain is subdivided for paging.
-      private: static const unsigned int numTerrainSubdivisions;
-
-      /// \brief The terrain pages are loaded if the distance from the camera is
-      /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
-      /// LoadRadiusFactor is a multiplier applied to the terrain size to create
-      /// a load radius that depends on the terrain size.
-      private: static const double loadRadiusFactor;
-
-      /// \brief The terrain pages are held in memory but not loaded if they
-      /// are not ready when the camera is within holdRadius distance. See
-      /// Ogre::TerrainPaging::createWorldSection(). HoldRadiusFactor is a
-      /// multiplier applied to the terrain size to create a hold radius that
-      /// depends on the terrain size.
-      private: static const double holdRadiusFactor;
-
-      /// \brief Hash file name that should be present for every terrain file
-      /// loaded using paging.
-      private: static const boost::filesystem::path hashFilename;
-
-      /// \brief Name of the top level directory where all the paging info is
-      /// stored
-      private: static const boost::filesystem::path pagingDirname;
-
-      /// \brief When the terrain paging is enabled, the terrain information
-      /// for every piece of terrain is stored in disk. This is the path of
-      /// the top level directory where these files are located.
-      private: boost::filesystem::path gzPagingDir;
-
-      /// \brief The scene.
-      private: ScenePtr scene;
-
-      /// \brief Image used to generate the heightmap.
-      private: common::Image heightImage;
-
-      /// \brief Size of the terrain.
-      private: math::Vector3 terrainSize;
-
-      /// \brief Size of the heightmap data.
-      private: unsigned int dataSize;
-
-      /// \brief Origin of the terrain.
-      private: math::Vector3 terrainOrigin;
-
-      /// \brief Global options.
-      private: Ogre::TerrainGlobalOptions *terrainGlobals;
-
-      /// \brief Group of terrains.
-      private: Ogre::TerrainGroup *terrainGroup;
-
-      /// \brief True if the terrain was imported.
-      private: bool terrainsImported;
-
-      /// \brief The diffuse textures.
-      private: std::vector<std::string> diffuseTextures;
-
-      /// \brief The normal textures.
-      private: std::vector<std::string> normalTextures;
-
-      /// \brief The size of the world sections.
-      private: std::vector<double> worldSizes;
-
-      /// \brief The material blending heights.
-      private: std::vector<double> blendHeight;
-
-      /// \brief Material blend fade distances.
-      private: std::vector<double> blendFade;
-
-      /// \brief The raw height values received from physics.
-      private: std::vector<float> heights;
-
-      /// \brief Pointer to the terrain material generator.
-      private: GzTerrainMatGen *gzMatGen;
-
-      /// \brief A page provider is needed to use the paging system.
-      private: DummyPageProvider dummyPageProvider;
-
-      /// \brief Central registration point for extension classes,
-      /// such as the PageStrategy, PageContentFactory.
-      private: Ogre::PageManager *pageManager;
-
-      /// \brief Type of paging applied
-      private: Ogre::TerrainPaging *terrainPaging;
-
-      /// \brief Collection of world content
-      private: Ogre::PagedWorld *world;
-
-      /// \brief Collection of terrains. Every terrain might be paged.
-      private: std::vector<std::vector<float> > subTerrains;
-
-      /// \brief Used to iterate over all the terrains
-      private: int terrainIdx;
-
-      /// \brief Flag that enables/disables the terrain paging
-      private: bool useTerrainPaging;
-
-      /// \brief True if the terrain's hash does not match the image's hash
-      private: bool terrainHashChanged;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<HeightmapPrivate> dataPtr;
     };
     /// \}
-
-    /// \internal
-    /// \brief Custom terrain material generator for GLSL terrains.
-    class GZ_RENDERING_VISIBLE GzTerrainMatGen
-      : public Ogre::TerrainMaterialGeneratorA
-    {
-      /// \brief Constructor
-      public: GzTerrainMatGen();
-
-      /// \brief Destructor
-      public: virtual ~GzTerrainMatGen();
-
-      /// \brief Shader model 2 profile target.
-      public: class SM2Profile :
-              public Ogre::TerrainMaterialGeneratorA::SM2Profile
-      {
-        /// \brief Constructor
-        public: SM2Profile(Ogre::TerrainMaterialGenerator *_parent,
-                    const Ogre::String &_name, const Ogre::String &_desc);
-
-        /// \brief Destructor
-        public: virtual ~SM2Profile();
-
-        public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
-
-        public: Ogre::MaterialPtr generateForCompositeMap(
-                    const Ogre::Terrain *_terrain);
-
-        public: void UpdateParams(const Ogre::MaterialPtr &_mat,
-                                  const Ogre::Terrain *_terrain);
-
-        public: void UpdateParamsForCompositeMap(const Ogre::MaterialPtr &_mat,
-                                                 const Ogre::Terrain *_terrain);
-
-        protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
-                       const Ogre::Terrain *_terrain, TechniqueType _tt);
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Woverloaded-virtual"
-#endif  // ifdef __clang__
-        /// \brief Utility class to help with generating shaders for GLSL.
-        protected: class ShaderHelperGLSL :
-            public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
-        {
-          public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          public: virtual void updateParams(const SM2Profile *_prof,
-                      const Ogre::MaterialPtr &_mat,
-                      const Ogre::Terrain *_terrain, bool _compositeMap);
-
-          protected: virtual void generateVpHeader(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpFooter(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVertexProgramSource(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void defaultVpParams(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         const Ogre::HighLevelGpuProgramPtr &_prog);
-
-          protected: virtual unsigned int generateVpDynamicShadowsParams(
-                         unsigned int _texCoordStart, const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpDynamicShadows(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpHeader(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpLayer(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType tt,
-                         Ogre::uint _layer,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpFooter(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpDynamicShadowsParams(
-                         Ogre::uint *_texCoord, Ogre::uint *_sampler,
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpDynamicShadowsHelpers(
-                         const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: void generateFpDynamicShadows(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFragmentProgramSource(
-                         const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void updateVpParams(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         const Ogre::GpuProgramParametersSharedPtr &_params);
-
-          private: Ogre::String GetChannel(Ogre::uint _idx);
-        };
-
-        // Needed to allow access from ShaderHelperGLSL to protected members
-        // of SM2Profile.
-        friend ShaderHelperGLSL;
-
-        /// Keeping the CG shader for reference.
-        /// Utility class to help with generating shaders for Cg / HLSL.
-        protected: class ShaderHelperCg :
-            public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
-        {
-          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          protected: virtual void generateVpHeader(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpFooter(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVertexProgramSource(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void defaultVpParams(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         const Ogre::HighLevelGpuProgramPtr &_prog);
-
-          protected: virtual unsigned int generateVpDynamicShadowsParams(
-                         unsigned int _texCoordStart, const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpDynamicShadows(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-        };
-
-        // Needed to allow access from ShaderHelperCg to protected members
-        // of SM2Profile.
-        friend ShaderHelperCg;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif  // ifdef __clang__
-      };
-    };
   }
 }
 #endif

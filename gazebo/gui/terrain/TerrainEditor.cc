@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,22 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
-
-#include "gazebo/gui/terrain/TerrainEditorPalette.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/terrain/TerrainEditorPalette.hh"
+#include "gazebo/gui/terrain/TerrainEditorPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 TerrainEditor::TerrainEditor(MainWindow *_mainWindow)
-  : Editor(_mainWindow)
+  : Editor(_mainWindow),
+    dataPtr(new TerrainEditorPrivate())
 {
   // Create the terrain editor tab
-  this->terrainPalette = new TerrainEditorPalette;
-  this->Init("terrainEditorTab", "Terrain Editor", this->terrainPalette);
+  this->dataPtr->terrainPalette = new TerrainEditorPalette;
+  this->Init("terrainEditorTab", "Terrain Editor",
+    this->dataPtr->terrainPalette);
 
   connect(g_editTerrainAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
+      /// \brief Material for the current mode.
+      public: std::string selectedMaterial;
+
       /// \brief Material for the unselected mode.
       public: std::string unselectedMaterial;
 
@@ -43,19 +46,32 @@ namespace gazebo
       public: rendering::DynamicLines *torqueLine;
 
       /// \brief CoM position in link coordinates.
-      public: math::Vector3 comVector;
+      public: ignition::math::Vector3d comVector;
 
       /// \brief Force application point in link coordinates.
-      public: math::Vector3 forcePosVector;
+      public: ignition::math::Vector3d forcePosVector;
 
       /// \brief Force vector expressed in the link frame.
-      public: math::Vector3 forceVector;
+      public: ignition::math::Vector3d forceVector;
 
       /// \brief Torque vector expressed in the link frame.
-      public: math::Vector3 torqueVector;
+      public: ignition::math::Vector3d torqueVector;
 
       /// \brief Mutex to protect variables
       public: std::mutex mutex;
+
+      /// \brief Rotation tool composed of two circles.
+      public: rendering::SelectionObjPtr rotTool;
+
+      /// \brief If true, the rotation tool was rotated by the mouse and
+      /// shouldn't be oriented again according to the vector.
+      public: bool rotatedByMouse;
+
+      /// \brief Text displaying the force magnitude.
+      public: MovableText forceText;
+
+      /// \brief Text displaying the torque magnitude.
+      public: MovableText torqueText;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
     << "        <type>custom</type>"
     << "      </noise>"
     << "    </ray>"
-    << "    <plugin name ='laser' filename='" << pluginFileName << "'>"
+    << "    <plugin name ='laser' filename='" << pluginFileName << "'/>"
     << "  </sensor>"
     << "</link>"
     << "</model>"
@@ -89,7 +89,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   EXPECT_TRUE(raySensor != NULL);
 
@@ -102,9 +102,9 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   // Noise rate value also taken directly from plugin.
   double fixedNoiseRate = 0.005;
   double noise = maxRange*fixedNoiseRate;
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (int i = 0; i < raySensor->RayCount(); ++i)
   {
-    double range = raySensor->GetRange(i);
+    double range = raySensor->Range(i);
     if (std::isinf(range))
     {
       continue;

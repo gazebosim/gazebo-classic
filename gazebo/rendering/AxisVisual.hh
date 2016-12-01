@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _AXISVISUAL_HH_
-#define _AXISVISUAL_HH_
+#ifndef _GAZEBO_AXISVISUAL_HH_
+#define _GAZEBO_AXISVISUAL_HH_
 
 #include <string>
 
@@ -37,8 +37,8 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _name Name of the AxisVisual
-      /// \param[in] _vis Parent visual
-      public: AxisVisual(const std::string &_name, VisualPtr _vis);
+      /// \param[in] _parent Parent visual
+      public: AxisVisual(const std::string &_name, VisualPtr _parent);
 
       /// \brief Destructor
       public: virtual ~AxisVisual();
@@ -63,15 +63,33 @@ namespace gazebo
 
       /// \brief Scale the X axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleXAxis(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void ScaleXAxis(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Scale the X axis
+      /// \param[in] _scale Scaling factor
+      public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Scale the Y axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleYAxis(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void ScaleYAxis(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Scale the Y axis
+      /// \param[in] _scale Scaling factor
+      public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Scale the Z axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleZAxis(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void ScaleZAxis(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Scale the Z axis
+      /// \param[in] _scale Scaling factor
+      public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Set the material used to render and axis
       /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
@@ -83,6 +101,14 @@ namespace gazebo
       /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
       /// \param[in] _visible True to set the axis to be visible.
       public: void SetAxisVisible(unsigned int _axis, bool _visible);
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _parent Parent of the visual.
+      protected: AxisVisual(VisualPrivate &_dataPtr,
+          const std::string &_name, VisualPtr _parent);
     };
     /// \}
   }

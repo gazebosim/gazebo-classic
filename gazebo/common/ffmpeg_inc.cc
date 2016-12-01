@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,16 @@ void common::AVFrameUnref(AVFrame *_frame)
   av_frame_unref(_frame);
 #else
   avcodec_get_frame_defaults(_frame);
+#endif
+}
+
+//////////////////////////////////////////////////
+void common::AVPacketUnref(AVPacket *_packet)
+{
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 24, 102)
+  av_packet_unref(_packet);
+#else
+  av_free_packet(_packet);
 #endif
 }
 

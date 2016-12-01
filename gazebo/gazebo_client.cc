@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,24 +62,6 @@ bool gazebo::client::setup(int _argc, char **_argv)
     gzerr << "Unable to setup Gazebo\n";
     return false;
   }
-
-  common::Time waitTime(1, 0);
-  int waitCount = 0;
-  int maxWaitCount = 10;
-
-  // Wait for namespaces.
-  while (!gazebo::transport::waitForNamespaces(waitTime) &&
-      (waitCount++) < maxWaitCount)
-  {
-    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
-  }
-
-  if (waitCount >= maxWaitCount)
-  {
-    gzerr << "Waited " << (waitTime * waitCount).Double()
-      << " seconds for namespaces. Giving up.\n";
-  }
-
   return true;
 }
 

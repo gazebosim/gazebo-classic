@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class COMVisual_TEST : public ServerFixture
+class COMVisual_TEST : public RenderingFixture
 {
 };
 
@@ -45,7 +45,7 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   // create a link visual
   gazebo::rendering::VisualPtr linkDefaultVis;
   linkDefaultVis.reset(
-      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("link", scene->WorldVisual()));
 
   // create CoMVisual for the link using msg Load
   gazebo::rendering::COMVisualPtr comDefaultVis(
@@ -63,14 +63,14 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   gazebo::msgs::Link linkMsg;
   linkMsg.set_name("link");
   msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_position(),
-      pos);
+      pos.Ign());
   msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_orientation(),
-      quat);
+      quat.Ign());
 
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
   linkVis.reset(
-      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("link", scene->WorldVisual()));
 
   // create CoMVisual for the link using SDF Load
   gazebo::rendering::COMVisualPtr comVis(

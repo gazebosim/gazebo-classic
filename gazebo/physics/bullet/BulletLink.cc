@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,31 +40,34 @@ using namespace physics;
 BulletLink::BulletLink(EntityPtr _parent)
     : Link(_parent)
 {
-  this->rigidLink = NULL;
-  this->compoundShape = NULL;
+  this->rigidLink = nullptr;
+  this->compoundShape = nullptr;
+
+  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
+      this->GetWorld()->GetPhysicsEngine());
+  if (this->bulletPhysics == nullptr)
+    gzerr << "Not using the bullet physics engine\n";
 }
 
 //////////////////////////////////////////////////
 BulletLink::~BulletLink()
 {
-  delete this->compoundShape;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
 void BulletLink::Load(sdf::ElementPtr _sdf)
 {
-  this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
-
-  if (this->bulletPhysics == NULL)
-    gzthrow("Not using the bullet physics engine");
-
-  Link::Load(_sdf);
+  if (this->bulletPhysics)
+    Link::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
 void BulletLink::Init()
 {
+  if (!this->bulletPhysics)
+    return;
+
   // Set the initial pose of the body
   this->motionState.reset(new BulletMotionState(
     boost::dynamic_pointer_cast<Link>(shared_from_this())));
@@ -110,11 +113,11 @@ void BulletLink::Init()
 
       SurfaceParamsPtr surface = collision->GetSurface();
       GZ_ASSERT(surface, "Surface pointer for is invalid");
-      FrictionPyramidPtr friction = surface->GetFrictionPyramid();
+      FrictionPyramidPtr friction = surface->FrictionPyramid();
       GZ_ASSERT(friction, "Friction pointer is invalid");
 
-      hackMu1 = friction->GetMuPrimary();
-      hackMu2 = friction->GetMuSecondary();
+      hackMu1 = friction->MuPrimary();
+      hackMu2 = friction->MuSecondary();
       // gzerr << "link[" << this->GetName()
       //       << "] mu[" << hackMu1
       //       << "] mu2[" << hackMu2 << "]\n";
@@ -209,10 +212,34 @@ void BulletLink::Init()
 //////////////////////////////////////////////////
 void BulletLink::Fini()
 {
+  if (this->bulletPhysics && this->rigidLink)
+  {
+    btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+    if (bulletWorld)
+      bulletWorld->removeRigidBody(this->rigidLink);
+
+    delete this->rigidLink;
+  }
+  this->bulletPhysics.reset();
+  this->rigidLink = NULL;
+
+  this->motionState.reset();
+
+  if (this->compoundShape)
+    delete this->compoundShape;
+  this->compoundShape = NULL;
+
   Link::Fini();
-  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
-  GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
-  bulletWorld->removeRigidBody(this->rigidLink);
+}
+
+/////////////////////////////////////////////////////////////////////
+void BulletLink::UpdateMass()
+{
+  if (this->rigidLink && this->inertial)
+  {
+    this->rigidLink->setMassProps(this->inertial->GetMass(),
+        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+  }
 }
 
 //////////////////////////////////////////////////

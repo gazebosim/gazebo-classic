@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/algorithm/string.hpp>
+
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -30,14 +33,11 @@
 
 #include "gazebo/common/Assert.hh"
 
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/SonarSensorPrivate.hh"
 #include "gazebo/sensors/SonarSensor.hh"
 
 using namespace gazebo;
@@ -47,25 +47,27 @@ GZ_REGISTER_STATIC_SENSOR("sonar", SonarSensor)
 
 //////////////////////////////////////////////////
 SonarSensor::SonarSensor()
-: Sensor(sensors::OTHER)
+: Sensor(sensors::OTHER),
+  dataPtr(new SonarSensorPrivate)
 {
+  this->dataPtr->emptyContactCount = 0;
 }
 
 //////////////////////////////////////////////////
 SonarSensor::~SonarSensor()
 {
-  this->sonarCollision->Fini();
-  this->sonarCollision.reset();
+  this->dataPtr->sonarCollision->Fini();
+  this->dataPtr->sonarCollision.reset();
 
-  this->sonarShape->Fini();
-  this->sonarShape.reset();
+  this->dataPtr->sonarShape->Fini();
+  this->dataPtr->sonarShape.reset();
 }
 
 //////////////////////////////////////////////////
-std::string SonarSensor::GetTopic() const
+std::string SonarSensor::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->parentName + "/" + this->GetName() + "/sonar";
+  topicName += this->ParentName() + "/" + this->Name() + "/sonar";
   boost::replace_all(topicName, "::", "/");
 
   return topicName;
@@ -81,29 +83,30 @@ void SonarSensor::Load(const std::string &_worldName)
     return;
   }
 
-  this->rangeMin = sonarElem->Get<double>("min");
-  this->rangeMax = sonarElem->Get<double>("max");
-  this->radius = sonarElem->Get<double>("radius");
-  double range = this->rangeMax - this->rangeMin;
+  this->dataPtr->rangeMin = sonarElem->Get<double>("min");
+  this->dataPtr->rangeMax = sonarElem->Get<double>("max");
+  this->dataPtr->radius = sonarElem->Get<double>("radius");
+  double range = this->dataPtr->rangeMax - this->dataPtr->rangeMin;
 
-  if (this->radius < 0)
+  if (this->dataPtr->radius < 0)
   {
     gzerr << "Sonar radius must be > 0. Current value is["
-      << this->radius << "]\n";
+      << this->dataPtr->radius << "]\n";
     return;
   }
 
-  if (this->rangeMin < 0)
+  if (this->dataPtr->rangeMin < 0)
   {
     gzerr << "Min sonar range must be >= 0. Current value is["
-      << this->rangeMin << "]\n";
+      << this->dataPtr->rangeMin << "]\n";
     return;
   }
 
-  if (this->rangeMin > this->rangeMax)
+  if (this->dataPtr->rangeMin > this->dataPtr->rangeMax)
   {
-    gzerr << "Min sonar range of [" << this->rangeMin << "] must be less than"
-      << "the max sonar range of[" << this->rangeMax << "]\n";
+    gzerr << "Min sonar range of [" << this->dataPtr->rangeMin
+          << "] must be less than" << "the max sonar range of["
+          << this->dataPtr->rangeMax << "]\n";
     return;
   }
 
@@ -111,60 +114,65 @@ void SonarSensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->world != NULL,
       "SonarSensor did not get a valid World pointer");
 
-  this->parentEntity = this->world->GetEntity(this->parentName);
+  this->dataPtr->parentEntity =
+    this->world->GetEntity(this->ParentName());
 
-  GZ_ASSERT(this->parentEntity != NULL,
+  GZ_ASSERT(this->dataPtr->parentEntity != NULL,
       "Unable to get the parent entity.");
 
-  physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine =
+    this->world->GetPhysicsEngine();
 
   GZ_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
 
   /// \todo: Change the collision shape to a cone. Needs a collision shape
   /// within ODE. Or, switch out the collision engine.
-  this->sonarCollision = physicsEngine->CreateCollision("mesh",
-      this->parentName);
+  this->dataPtr->sonarCollision = physicsEngine->CreateCollision("mesh",
+      this->ParentName());
 
-  GZ_ASSERT(this->sonarCollision != NULL,
+  GZ_ASSERT(this->dataPtr->sonarCollision != NULL,
       "Unable to create a cylinder collision using the physics engine.");
 
-  this->sonarCollision->SetName(this->GetScopedName() + "sensor_collision");
+  this->dataPtr->sonarCollision->SetName(this->ScopedName() +
+      "sensor_collision");
 
   // We need a few contacts in order to get the closest collision. This is
   // not guaranteed to return the closest contact.
-  this->sonarCollision->SetMaxContacts(2);
-  this->sonarCollision->AddType(physics::Base::SENSOR_COLLISION);
-  this->parentEntity->AddChild(this->sonarCollision);
+  this->dataPtr->sonarCollision->SetMaxContacts(2);
+  this->dataPtr->sonarCollision->AddType(physics::Base::SENSOR_COLLISION);
+  this->dataPtr->parentEntity->AddChild(this->dataPtr->sonarCollision);
 
-  this->sonarShape = boost::dynamic_pointer_cast<physics::MeshShape>(
-      this->sonarCollision->GetShape());
+  this->dataPtr->sonarShape = boost::dynamic_pointer_cast<physics::MeshShape>(
+      this->dataPtr->sonarCollision->GetShape());
 
-  GZ_ASSERT(this->sonarShape != NULL,
+  GZ_ASSERT(this->dataPtr->sonarShape != NULL,
       "Unable to get the sonar shape from the sonar collision.");
 
   // Use a scaled cone mesh for the sonar collision shape.
-  this->sonarShape->SetMesh("unit_cone");
-  this->sonarShape->SetScale(math::Vector3(this->radius*2.0,
-        this->radius*2.0, range));
+  this->dataPtr->sonarShape->SetMesh("unit_cone");
+  this->dataPtr->sonarShape->SetScale(ignition::math::Vector3d(
+        this->dataPtr->radius*2.0, this->dataPtr->radius*2.0, range));
 
   // Position the collision shape properly. Without this, the shape will be
   // centered at the start of the sonar.
-  math::Vector3 offset(0, 0, range * 0.5);
-  offset = this->pose.rot.RotateVector(offset);
-  this->sonarMidPose.Set(this->pose.pos - offset, this->pose.rot);
+  ignition::math::Vector3d offset(0, 0, range * 0.5);
+  offset = this->pose.Rot().RotateVector(offset);
+  this->dataPtr->sonarMidPose.Set(this->pose.Pos() - offset,
+      this->pose.Rot());
 
-  this->sonarCollision->SetRelativePose(this->sonarMidPose);
-  this->sonarCollision->SetInitialRelativePose(this->sonarMidPose);
+  this->dataPtr->sonarCollision->SetRelativePose(this->dataPtr->sonarMidPose);
+  this->dataPtr->sonarCollision->SetInitialRelativePose(
+      this->dataPtr->sonarMidPose);
 
   // Don't create contacts when objects collide with the sonar shape
-  this->sonarCollision->GetSurface()->collideWithoutContact = true;
-  this->sonarCollision->GetSurface()->collideWithoutContactBitmask = 1;
-  this->sonarCollision->SetCollideBits(~GZ_SENSOR_COLLIDE);
-  this->sonarCollision->SetCategoryBits(GZ_SENSOR_COLLIDE);
+  this->dataPtr->sonarCollision->GetSurface()->collideWithoutContact = true;
+  this->dataPtr->sonarCollision->GetSurface()->collideWithoutContactBitmask = 1;
+  this->dataPtr->sonarCollision->SetCollideBits(~GZ_SENSOR_COLLIDE);
+  this->dataPtr->sonarCollision->SetCategoryBits(GZ_SENSOR_COLLIDE);
 
   /*std::vector<std::string> collisions;
-  collisions.push_back(this->sonarCollision->GetScopedName());
+  collisions.push_back(this->dataPtr->sonarCollision->GetScopedName());
 
   physics::ContactManager *contactMgr =
     this->world->GetPhysicsEngine()->GetContactManager();
@@ -173,36 +181,41 @@ void SonarSensor::Load(const std::string &_worldName)
   // Create a contact topic for the collision shape
   std::string topic =
     this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
-        this->sonarCollision->GetScopedName(),
-        this->sonarCollision->GetScopedName());
+        this->dataPtr->sonarCollision->GetScopedName(),
+        this->dataPtr->sonarCollision->GetScopedName());
 
   // Subscribe to the contact topic
-  this->contactSub = this->node->Subscribe(topic,
+  this->dataPtr->contactSub = this->node->Subscribe(topic,
       &SonarSensor::OnContacts, this);
 
   // Advertise the sensor's topic on which we will output range data.
-  this->sonarPub = this->node->Advertise<msgs::SonarStamped>(this->GetTopic());
+  this->dataPtr->sonarPub = this->node->Advertise<msgs::SonarStamped>(
+      this->Topic());
 
-  // Initialize the message that will be published on this->sonarPub.
-  this->sonarMsg.mutable_sonar()->set_range_min(this->rangeMin);
-  this->sonarMsg.mutable_sonar()->set_range_max(this->rangeMax);
-  this->sonarMsg.mutable_sonar()->set_radius(this->radius);
+  // Initialize the message that will be published on this->dataPtr->sonarPub.
+  this->dataPtr->sonarMsg.mutable_sonar()->set_range_min(
+      this->dataPtr->rangeMin);
+  this->dataPtr->sonarMsg.mutable_sonar()->set_range_max(
+      this->dataPtr->rangeMax);
+  this->dataPtr->sonarMsg.mutable_sonar()->set_radius(
+      this->dataPtr->radius);
 
-  msgs::Set(this->sonarMsg.mutable_sonar()->mutable_world_pose(),
-      this->sonarMidPose);
-  this->sonarMsg.mutable_sonar()->set_range(0);
+  msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_world_pose(),
+      this->dataPtr->sonarMidPose);
+  this->dataPtr->sonarMsg.mutable_sonar()->set_range(0);
 }
 
 //////////////////////////////////////////////////
 void SonarSensor::Init()
 {
   Sensor::Init();
-  this->sonarMsg.mutable_sonar()->set_frame(this->parentName);
-  msgs::Set(this->sonarMsg.mutable_time(), this->world->GetSimTime());
-  this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
+  this->dataPtr->sonarMsg.mutable_sonar()->set_frame(this->ParentName());
+  msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
+      this->world->GetSimTime());
+  this->dataPtr->sonarMsg.mutable_sonar()->set_range(this->dataPtr->rangeMax);
 
-  if (this->sonarPub)
-    this->sonarPub->Publish(this->sonarMsg);
+  if (this->dataPtr->sonarPub)
+    this->dataPtr->sonarPub->Publish(this->dataPtr->sonarMsg);
 }
 
 //////////////////////////////////////////////////
@@ -212,114 +225,169 @@ void SonarSensor::Fini()
   {
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(this->sonarCollision->GetScopedName());
+    mgr->RemoveFilter(this->dataPtr->sonarCollision->GetScopedName());
   }
 
-  this->sonarPub.reset();
-  this->contactSub.reset();
+  this->dataPtr->sonarPub.reset();
+  this->dataPtr->contactSub.reset();
   Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
 double SonarSensor::GetRangeMin() const
 {
-  return this->rangeMin;
+  return this->RangeMin();
+}
+
+//////////////////////////////////////////////////
+double SonarSensor::RangeMin() const
+{
+  return this->dataPtr->rangeMin;
 }
 
 //////////////////////////////////////////////////
 double SonarSensor::GetRangeMax() const
 {
-  return this->rangeMax;
+  return this->RangeMax();
+}
+
+//////////////////////////////////////////////////
+double SonarSensor::RangeMax() const
+{
+  return this->dataPtr->rangeMax;
 }
 
 //////////////////////////////////////////////////
 double SonarSensor::GetRadius() const
 {
-  return this->radius;
+  return this->Radius();
+}
+
+//////////////////////////////////////////////////
+double SonarSensor::Radius() const
+{
+  return this->dataPtr->radius;
 }
 
 //////////////////////////////////////////////////
 double SonarSensor::GetRange()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  return this->sonarMsg.sonar().range();
+  return this->Range();
 }
 
 //////////////////////////////////////////////////
-bool SonarSensor::UpdateImpl(bool /*_force*/)
+double SonarSensor::Range()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  return this->dataPtr->sonarMsg.sonar().range();
+}
+
+//////////////////////////////////////////////////
+bool SonarSensor::UpdateImpl(const bool /*_force*/)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   this->lastMeasurementTime = this->world->GetSimTime();
-  msgs::Set(this->sonarMsg.mutable_time(), this->lastMeasurementTime);
+  msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
+            this->lastMeasurementTime);
 
-  math::Pose referencePose = this->pose + this->parentEntity->GetWorldPose();
-  math::Vector3 pos;
+  ignition::math::Pose3d referencePose =
+    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+  ignition::math::Vector3d pos;
 
-  if (!this->incomingContacts.empty())
-    this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
+  // A 5-step hysteresis window was chosen to reduce range value from
+  // bouncing.
+  if (!this->dataPtr->incomingContacts.empty() ||
+      this->dataPtr->emptyContactCount > 5)
+  {
+    this->dataPtr->sonarMsg.mutable_sonar()->set_range(
+        this->dataPtr->rangeMax);
+    this->dataPtr->emptyContactCount = 0;
+  }
+  else
+  {
+    ++this->dataPtr->emptyContactCount;
+  }
+
 
   // Iterate over all the contact messages
-  for (ContactMsgs_L::iterator iter = this->incomingContacts.begin();
-      iter != this->incomingContacts.end(); ++iter)
+  for (auto iter = this->dataPtr->incomingContacts.begin();
+      iter != this->dataPtr->incomingContacts.end(); ++iter)
   {
     // Iterate over all the contacts in the message
     for (int i = 0; i < (*iter)->contact_size(); ++i)
     {
       // Debug output:
-      // std::cout << "Collision1[" << (*iter)->contact(i).collision1() << "]"
-      //  << "C2[" << (*iter)->contact(i).collision2() << "]\n";
+      // std::cout << "C1[" << (*iter)->contact(i).collision1() << "]"
+      //   << "C2[" << (*iter)->contact(i).collision2() << "]\n";
 
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
-        pos = msgs::Convert((*iter)->contact(i).position(j));
-        math::Vector3 relPos = pos - referencePose.pos;
-        double len = pos.Distance(referencePose.pos);
+        // Get the contact position relative to the reference position.
+        pos = msgs::ConvertIgn((*iter)->contact(i).position(j)) -
+          referencePose.Pos();
+
+        // Compute the sensed range.
+        double len = pos.Length() - (*iter)->contact(i).depth(j);
 
         // Debug output:
-        // std::cout << "  SP[" << this->pose.pos << "]  P[" << pos
-        //  << "] Len[" << len << "]D["
-        //  << (*iter)->contact(i).depth(j) << "]\n";
+        // std::cout << "  RP[" << referencePose << "]  P[" << pos
+        //   << "] L[" << len << "] D["
+        //   << (*iter)->contact(i).depth(j) << "]\n";
 
         // Copy the contact message.
-        if (len < this->sonarMsg.sonar().range())
+        if (len < this->dataPtr->sonarMsg.sonar().range())
         {
-          this->sonarMsg.mutable_sonar()->set_range(len);
+          this->dataPtr->sonarMsg.mutable_sonar()->set_range(len);
         }
       }
     }
   }
 
   // Clear the incoming contact list.
-  this->incomingContacts.clear();
+  this->dataPtr->incomingContacts.clear();
 
-  this->update(this->sonarMsg);
+  this->dataPtr->update(this->dataPtr->sonarMsg);
 
-  if (this->sonarPub)
-    this->sonarPub->Publish(this->sonarMsg);
+  if (this->dataPtr->sonarPub)
+    this->dataPtr->sonarPub->Publish(this->dataPtr->sonarMsg);
 
   return true;
 }
 
 //////////////////////////////////////////////////
-bool SonarSensor::IsActive()
+bool SonarSensor::IsActive() const
 {
-  return Sensor::IsActive() || this->sonarPub->HasConnections();
+  return Sensor::IsActive() || this->dataPtr->sonarPub->HasConnections();
 }
 
 //////////////////////////////////////////////////
 void SonarSensor::OnContacts(ConstContactsPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Only store information if the sensor is active
   if (this->IsActive() && _msg->contact_size() > 0)
   {
     // Store the contacts message for processing in UpdateImpl
-    this->incomingContacts.push_back(_msg);
+    this->dataPtr->incomingContacts.push_back(_msg);
 
     // Prevent the incomingContacts list to grow indefinitely.
-    if (this->incomingContacts.size() > 100)
-      this->incomingContacts.pop_front();
+    if (this->dataPtr->incomingContacts.size() > 100)
+      this->dataPtr->incomingContacts.pop_front();
   }
 }
+
+//////////////////////////////////////////////////
+event::ConnectionPtr SonarSensor::ConnectUpdate(
+    std::function<void (msgs::SonarStamped)> _subscriber)
+{
+  return this->dataPtr->update.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void SonarSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
+{
+  this->dataPtr->update.Disconnect(_conn);
+}
+

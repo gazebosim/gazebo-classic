@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,6 @@ namespace gazebo
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     template<typename T>
-    GZ_COMMON_VISIBLE
     std::string get_sha1(const T &_buffer);
 
     /// \brief Cross platform retrieval of an environment variable.
@@ -76,13 +75,84 @@ namespace gazebo
     /// \return Environment variable contents, or NULL on error.
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
+
+    /// \brief Get the current working directory
+    /// \return Name of the current directory
+    GZ_COMMON_VISIBLE
+    std::string cwd();
+
+    /// \brief Returns true if _path is a file or directory
+    /// \param[in] _path Path to check.
+    /// \return True if _path is a file or directory
+    GZ_COMMON_VISIBLE
+    bool exists(const std::string &_path);
+
+    /// \brief Check if the given path is a directory.
+    /// \param[in] _path Path to a directory.
+    /// \return True if _path is a directory.
+    GZ_COMMON_VISIBLE
+    bool isDirectory(const std::string &_path);
+
+    /// \brief Check if the given path is a file.
+    /// \param[in] _path Path to a file.
+    /// \return True if _path is a file.
+    GZ_COMMON_VISIBLE
+    bool isFile(const std::string &_path);
+
+    /// \brief Get the absolute path of a provided path.
+    /// \param[in] _path Relative or absolute path.
+    /// \return Absolute path
+    GZ_COMMON_VISIBLE
+    std::string absPath(const std::string &_path);
+
+    /// \brief Copy a file.
+    /// \param[in] _existingFilename Path to an existing file.
+    /// \param[in] _newFilename Path of the new file.
+    /// \return True on success.
+    GZ_COMMON_VISIBLE
+    bool copyFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Move a file.
+    /// \param[in] _existingFilename Full path to an existing file.
+    /// \param[in] _newFilename Full path of the new file.
+    /// \return True on success.
+    GZ_COMMON_VISIBLE
+    bool moveFile(const std::string &_existingFilename,
+                  const std::string &_newFilename);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[out] _result The new string that has had _key replaced
+    /// with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \sa  std::string replaceAll(const std::string &_orig,
+    /// const std::string &_key, const std::string &_replacement)
+    GZ_COMMON_VISIBLE
+    void replaceAll(std::string &_result,
+                    const std::string &_orig,
+                    const std::string &_key,
+                    const std::string &_replacement);
+
+    /// \brief Replace all occurances of _key with _replacement.
+    /// \param[in] _orig Original string.
+    /// \param[in] _key String to replace.
+    /// \param[in] _replacement The string that replaces _key.
+    /// \return The new string that has had _key replaced with _replacement.
+    /// \sa void common::replaceAll(std::string &_result,
+    /// const std::string &_orig, const std::string &_key,
+    /// const std::string &_replacement)
+    GZ_COMMON_VISIBLE
+    std::string replaceAll(const std::string &_orig,
+                           const std::string &_key,
+                           const std::string &_replacement);
     /// \}
   }
 
   ///////////////////////////////////////////////
   // Implementation of get_sha1
   template<typename T>
-  GZ_COMMON_VISIBLE
   std::string common::get_sha1(const T &_buffer)
   {
     boost::uuids::detail::sha1 sha1;

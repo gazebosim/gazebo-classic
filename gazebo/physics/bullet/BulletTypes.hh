@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _BULLETTYPES_HH
-#define _BULLETTYPES_HH
+#ifndef _GAZEBO_BULLETTYPES_HH_
+#define _GAZEBO_BULLETTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
 #include "gazebo/physics/bullet/bullet_math_inc.h"
@@ -117,4 +116,4 @@ namespace gazebo
     /// \}
   }
 }
-#endif  // #ifndef _BULLETTYPES_HH
+#endif

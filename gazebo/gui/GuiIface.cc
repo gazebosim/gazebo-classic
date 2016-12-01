@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/gui/SplashScreen.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -61,6 +62,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
+gui::SplashScreen *g_splashScreen = NULL;
 gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
@@ -68,6 +70,44 @@ bool g_fullscreen = false;
 // This makes it possible to use common::Time in QT signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(common::Time)
+
+//////////////////////////////////////////////////
+// QT message handler that pipes qt messages into gazebo's console system.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
+    const QString &_msg)
+{
+  std::string msg = _msg.toStdString();
+  msg += "(" + _context.function + ")";
+#else
+void messageHandler(QtMsgType _type, const char *_msg)
+{
+  const char *msg = _msg;
+#endif
+
+  switch (_type)
+  {
+    case QtDebugMsg:
+      gzdbg << msg << std::endl;
+      break;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+    case QtInfoMsg:
+      gzmsg << msg << std::endl;
+      break;
+#endif
+    case QtWarningMsg:
+      gzwarn << msg << std::endl;
+      break;
+    case QtFatalMsg:
+    case QtCriticalMsg:
+      gzerr << msg << std::endl;
+      break;
+    default:
+      gzwarn << "Unknown QT Message type[" << _type << "]: "
+        << msg << std::endl;
+      break;
+  }
+}
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -250,12 +290,21 @@ bool gui::load()
     snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
 
+  // Register custom message handler
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  qInstallMessageHandler(messageHandler);
+#else
+  qInstallMsgHandler(messageHandler);
+#endif
+
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
-  // Register common::Time as a type that can be used in signals and slots.
-  // Q_DECLARE_METATYPE is also required, see above.
-  qRegisterMetaType<common::Time>();
+  if (!gui::register_metatypes())
+    std::cerr << "Unable to register Qt metatypes" << std::endl;
+
+
+  g_splashScreen = new gui::SplashScreen();
 
   g_main_win = new gui::MainWindow();
 
@@ -268,7 +317,7 @@ bool gui::load()
 unsigned int gui::get_entity_id(const std::string &_name)
 {
   if (g_main_win)
-    return g_main_win->GetEntityId(_name);
+    return g_main_win->EntityId(_name);
   else
     return 0;
 }
@@ -297,7 +346,10 @@ bool gui::run(int _argc, char **_argv)
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
+  sigact.sa_flags = 0;
   sigact.sa_handler = signal_handler;
+  if (sigemptyset(&sigact.sa_mask) != 0)
+    std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -310,6 +362,7 @@ bool gui::run(int _argc, char **_argv)
   gazebo::gui::fini();
   gazebo::client::shutdown();
 
+  delete g_splashScreen;
   delete g_main_win;
   return true;
 }
@@ -356,6 +409,16 @@ rendering::UserCameraPtr gui::get_active_camera()
 bool gui::has_entity_name(const std::string &_name)
 {
   return g_main_win->HasEntityName(_name);
+}
+
+/////////////////////////////////////////////////
+bool gui::register_metatypes()
+{
+  // Register common::Time as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<common::Time>();
+
+  return true;
 }
 
 /////////////////////////////////////////////////

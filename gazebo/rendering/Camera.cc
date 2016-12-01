@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,22 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
   #include <dirent.h>
 #else
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
 #endif
 
@@ -78,7 +83,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   this->bayerFrameBuffer = NULL;
 
   this->name = _name;
-  this->scopedName = this->scene->GetName() + "::" + _name;
+  this->scopedName = this->scene->Name() + "::" + _name;
   this->scopedUniqueName = this->scopedName + "(" +
     boost::lexical_cast<std::string>(++this->dataPtr->cameraCounter) + ")";
 
@@ -98,15 +103,15 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPostRender(boost::bind(&Camera::Update, this)));
+      event::Events::ConnectPostRender(std::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
     this->connections.push_back(event::Events::ConnectRender(
-          boost::bind(&Camera::Render, this, false)));
+          std::bind(&Camera::Render, this, false)));
     this->connections.push_back(
         event::Events::ConnectPostRender(
-          boost::bind(&Camera::PostRender, this)));
+          std::bind(&Camera::PostRender, this)));
   }
 
   this->lastRenderWallTime = common::Time::GetWallTime();
@@ -121,18 +126,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 //////////////////////////////////////////////////
 Camera::~Camera()
 {
-  delete [] this->saveFrameBuffer;
-  this->saveFrameBuffer = NULL;
-  delete [] this->bayerFrameBuffer;
-  this->bayerFrameBuffer = NULL;
-
   this->Fini();
-
-  this->sdf->Reset();
-  this->sdf.reset();
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -150,7 +144,7 @@ void Camera::Load()
   {
     this->imageWidth = imgElem->Get<int>("width");
     this->imageHeight = imgElem->Get<int>("height");
-    this->imageFormat = this->GetOgrePixelFormat(
+    this->imageFormat = this->OgrePixelFormat(
         imgElem->Get<std::string>("format"));
   }
   else
@@ -171,8 +165,8 @@ void Camera::Load()
   if (this->sdf->HasElement("horizontal_fov"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
-    double angle = elem->Get<double>();
-    if (angle < 0.01 || angle > M_PI)
+    ignition::math::Angle angle = elem->Get<double>();
+    if (angle < 0.01 || angle > M_PI*2)
     {
       gzthrow("Camera horizontal field of view invalid.");
     }
@@ -183,8 +177,11 @@ void Camera::Load()
   // created for visualization purposes.
   if (this->name.find("_GUIONLY_") == std::string::npos)
   {
+    std::string topicName = this->Name();
+    boost::replace_all(topicName, "::", "/");
+
     this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
-        "~/" + this->GetName() + "/cmd", &Camera::OnCmdMsg, this, true);
+        "~/" + topicName + "/cmd", &Camera::OnCmdMsg, this, true);
   }
 
   if (this->sdf->HasElement("distortion"))
@@ -198,7 +195,7 @@ void Camera::Load()
 void Camera::Init()
 {
   this->SetSceneNode(
-      this->scene->GetManager()->getRootSceneNode()->createChildSceneNode(
+      this->scene->OgreSceneManager()->getRootSceneNode()->createChildSceneNode(
         this->scopedUniqueName + "_SceneNode"));
 
   this->CreateCamera();
@@ -216,8 +213,23 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  if (this->saveFrameBuffer)
+    delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
+
+  if (this->bayerFrameBuffer)
+    delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
+
   this->initialized = false;
+
+  this->dataPtr->cmdSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+
+  this->dataPtr->distortion.reset();
+  this->dataPtr->trackedVisual.reset();
 
   if (this->viewport && this->scene)
     RTShaderSystem::DetachViewport(this->viewport, this->scene);
@@ -232,7 +244,7 @@ void Camera::Fini()
 
   if (this->camera)
   {
-    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
+    this->scene->OgreSceneManager()->destroyCamera(this->scopedUniqueName);
     this->camera = NULL;
   }
 
@@ -241,16 +253,26 @@ void Camera::Fini()
 
   this->scene.reset();
   this->connections.clear();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWindowId(unsigned int windowId_)
+void Camera::SetWindowId(unsigned int _windowId)
 {
-  this->windowId = windowId_;
+  this->windowId = _windowId;
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetWindowId() const
+{
+  return this->WindowId();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::WindowId() const
 {
   return this->windowId;
 }
@@ -264,7 +286,7 @@ void Camera::SetScene(ScenePtr _scene)
 //////////////////////////////////////////////////
 void Camera::Update()
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->receiveMutex);
 
   // Process all the command messages.
   for (CameraPrivate::CameraCmdMsgs_L::iterator iter =
@@ -311,15 +333,11 @@ void Camera::Update()
   // Update animations
   if (this->animState)
   {
-    this->animState->addTime(
-        (common::Time::GetWallTime() - this->prevAnimTime).Double());
-    this->prevAnimTime = common::Time::GetWallTime();
-
     if (this->animState->hasEnded())
     {
       try
       {
-        this->scene->GetManager()->destroyAnimation(
+        this->scene->OgreSceneManager()->destroyAnimation(
             std::string(this->animState->getAnimationName()));
       } catch(Ogre::Exception &_e)
       {
@@ -339,21 +357,28 @@ void Camera::Update()
         this->dataPtr->moveToPositionQueue.pop_front();
       }
     }
+    else
+    {
+      common::Time wallTime = common::Time::GetWallTime();
+      this->animState->addTime((wallTime - this->prevAnimTime).Double());
+      this->prevAnimTime = wallTime;
+    }
   }
   else if (this->dataPtr->trackedVisual)
   {
-    math::Vector3 direction = this->dataPtr->trackedVisual->GetWorldPose().pos -
-                              this->GetWorldPose().pos;
+    ignition::math::Vector3d direction =
+      this->dataPtr->trackedVisual->GetWorldPose().pos.Ign() -
+                              this->WorldPose().Pos();
 
-    double yaw = atan2(direction.y, direction.x);
-    double pitch = atan2(-direction.z,
-                         sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
+    double yaw = atan2(direction.Y(), direction.X());
+    double pitch = atan2(-direction.Z(),
+                         sqrt(pow(direction.X(), 2) + pow(direction.Y(), 2)));
 
     Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-    math::Quaternion localRot = math::Quaternion(
+    ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
       localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-    double currPitch = localRot.GetAsEuler().y;
-    double currYaw = localRot.GetAsEuler().z;
+    double currPitch = localRot.Euler().Y();
+    double currYaw = localRot.Euler().Z();
 
     double pitchError = currPitch - pitch;
 
@@ -368,29 +393,29 @@ void Camera::Update()
     double yawAdj = this->dataPtr->trackVisualYawPID.Update(
         yawError, 0.01);
 
-    this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
+    this->SetWorldRotation(ignition::math::Quaterniond(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
     double origDistance = 8.0;
-    double distance = direction.GetLength();
+    double distance = direction.Length();
     double error = origDistance - distance;
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
 
-    math::Vector3 displacement = direction;
+    ignition::math::Vector3d displacement = direction;
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 localPos =
-      Conversions::Convert(this->sceneNode->_getDerivedPosition());
-    math::Vector3 pos = localPos + displacement;
+    ignition::math::Vector3d localPos =
+      Conversions::ConvertIgn(this->sceneNode->_getDerivedPosition());
+    ignition::math::Vector3d pos = localPos + displacement;
 
     this->SetWorldPosition(pos);
   }
 }
 
 //////////////////////////////////////////////////
-void Camera::Render(bool _force)
+void Camera::Render(const bool _force)
 {
   if (this->initialized && (_force ||
        common::Time::GetWallTime() - this->lastRenderWallTime >=
@@ -416,8 +441,8 @@ void Camera::ReadPixelBuffer()
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
-    unsigned int width = this->GetImageWidth();
-    unsigned int height = this->GetImageHeight();
+    unsigned int width = this->ImageWidth();
+    unsigned int height = this->ImageHeight();
 
     // Get access to the buffer and make an image and write it to file
     size = Ogre::PixelUtil::getMemorySize(width, height, 1,
@@ -444,8 +469,8 @@ void Camera::ReadPixelBuffer()
         this->renderTarget->getName() + "_tex",
         "General",
         Ogre::TEX_TYPE_2D,
-        this->GetImageWidth(),
-        this->GetImageHeight(),
+        this->ImageWidth(),
+        this->ImageHeight(),
         0,
         (Ogre::PixelFormat)this->imageFormat,
         Ogre::TU_RENDERTARGET)).getPointer();
@@ -482,6 +507,12 @@ void Camera::ReadPixelBuffer()
 //////////////////////////////////////////////////
 common::Time Camera::GetLastRenderWallTime()
 {
+  return this->LastRenderWallTime();
+}
+
+//////////////////////////////////////////////////
+common::Time Camera::LastRenderWallTime() const
+{
   return this->lastRenderWallTime;
 }
 
@@ -499,38 +530,38 @@ void Camera::PostRender()
   {
     if (this->captureDataOnce)
     {
-      this->SaveFrame(this->GetFrameFilename());
+      this->SaveFrame(this->FrameFilename());
       this->captureDataOnce = false;
     }
 
     if (this->sdf->HasElement("save") &&
         this->sdf->GetElement("save")->Get<bool>("enabled"))
     {
-      this->SaveFrame(this->GetFrameFilename());
+      this->SaveFrame(this->FrameFilename());
     }
 
-    unsigned int width = this->GetImageWidth();
-    unsigned int height = this->GetImageHeight();
+    unsigned int width = this->ImageWidth();
+    unsigned int height = this->ImageHeight();
     const unsigned char *buffer = this->saveFrameBuffer;
 
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
-    if ((this->GetImageFormat() == "BAYER_RGGB8") ||
-         (this->GetImageFormat() == "BAYER_BGGR8") ||
-         (this->GetImageFormat() == "BAYER_GBRG8") ||
-         (this->GetImageFormat() == "BAYER_GRBG8"))
+    if ((this->ImageFormat() == "BAYER_RGGB8") ||
+         (this->ImageFormat() == "BAYER_BGGR8") ||
+         (this->ImageFormat() == "BAYER_GBRG8") ||
+         (this->ImageFormat() == "BAYER_GRBG8"))
     {
       if (!this->bayerFrameBuffer)
         this->bayerFrameBuffer = new unsigned char[width * height];
 
       this->ConvertRGBToBAYER(this->bayerFrameBuffer,
-          this->saveFrameBuffer, this->GetImageFormat(),
+          this->saveFrameBuffer, this->ImageFormat(),
           width, height);
 
       buffer = this->bayerFrameBuffer;
     }
 
-    this->newImageFrame(buffer, width, height, this->GetImageDepth(),
-                    this->GetImageFormat());
+    this->newImageFrame(buffer, width, height, this->ImageDepth(),
+                    this->ImageFormat());
   }
 
   this->newData = false;
@@ -543,6 +574,12 @@ math::Vector3 Camera::GetWorldPosition() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Camera::WorldPosition() const
+{
+  return Conversions::ConvertIgn(this->sceneNode->_getDerivedPosition());
+}
+
+//////////////////////////////////////////////////
 math::Quaternion Camera::GetWorldRotation() const
 {
   Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
@@ -550,46 +587,84 @@ math::Quaternion Camera::GetWorldRotation() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Quaterniond Camera::WorldRotation() const
+{
+  Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
+  return ignition::math::Quaterniond(rot.w, rot.x, rot.y, rot.z);
+}
+
+//////////////////////////////////////////////////
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos);
-  this->SetWorldRotation(_pose.rot);
+  this->SetWorldPosition(_pose.pos.Ign());
+  this->SetWorldRotation(_pose.rot.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetWorldPosition(_pose.Pos());
+  this->SetWorldRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose() const
 {
-  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
+  return WorldPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Camera::WorldPose() const
+{
+  return ignition::math::Pose3d(this->WorldPosition(), this->WorldRotation());
 }
 
 //////////////////////////////////////////////////
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
-  if (this->animState)
-    return;
-
-  this->sceneNode->_setDerivedPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
-  this->sceneNode->needUpdate();
+  this->SetWorldPosition(_pos.Ign());
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldRotation(const math::Quaternion &_quant)
+void Camera::SetWorldPosition(const ignition::math::Vector3d &_pos)
 {
   if (this->animState)
     return;
 
-  math::Vector3 rpy = _quant.GetAsEuler();
+  this->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
+  this->sceneNode->needUpdate();
+}
+
+//////////////////////////////////////////////////
+void Camera::SetWorldRotation(const math::Quaternion &_quat)
+{
+  this->SetWorldRotation(_quat.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::SetWorldRotation(const ignition::math::Quaterniond &_quat)
+{
+  if (this->animState)
+    return;
+
+  ignition::math::Vector3d rpy = _quat.Euler();
 
   // Set the roll and yaw for sceneNode
-  math::Quaternion s(rpy.x, rpy.y, rpy.z);
+  ignition::math::Quaterniond s(rpy.X(), rpy.Y(), rpy.Z());
 
-  this->sceneNode->_setDerivedOrientation(Ogre::Quaternion(s.w, s.x, s.y, s.z));
+  this->sceneNode->_setDerivedOrientation(Conversions::Convert(s));
 
   this->sceneNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
 void Camera::Translate(const math::Vector3 &_direction)
+{
+  this->Translate(_direction.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::Translate(const ignition::math::Vector3d &_direction)
 {
   this->sceneNode->translate(this->sceneNode->getOrientation() *
       Conversions::Convert(_direction));
@@ -599,33 +674,45 @@ void Camera::Translate(const math::Vector3 &_direction)
 void Camera::Roll(const math::Angle &_angle,
     Ogre::Node::TransformSpace _relativeTo)
 {
-  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()), _relativeTo);
+  this->Roll(_angle.Ign(), Conversions::Convert(_relativeTo));
+}
+
+//////////////////////////////////////////////////
+void Camera::Roll(const ignition::math::Angle &_angle,
+    ReferenceFrame _relativeTo)
+{
+  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()),
+      Conversions::Convert(_relativeTo));
 }
 
 //////////////////////////////////////////////////
 void Camera::Yaw(const math::Angle &_angle,
     Ogre::Node::TransformSpace _relativeTo)
 {
-  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), _relativeTo);
+  this->Yaw(_angle.Ign(), Conversions::Convert(_relativeTo));
+}
+
+//////////////////////////////////////////////////
+void Camera::Yaw(const ignition::math::Angle &_angle,
+    ReferenceFrame _relativeTo)
+{
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()),
+      Conversions::Convert(_relativeTo));
 }
 
 //////////////////////////////////////////////////
 void Camera::Pitch(const math::Angle &_angle,
     Ogre::Node::TransformSpace _relativeTo)
 {
-  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()), _relativeTo);
+  this->Pitch(_angle.Ign(), Conversions::Convert(_relativeTo));
 }
 
 //////////////////////////////////////////////////
-void Camera::RotateYaw(math::Angle _angle)
+void Camera::Pitch(const ignition::math::Angle &_angle,
+    ReferenceFrame _relativeTo)
 {
-  this->Yaw(_angle);
-}
-
-//////////////////////////////////////////////////
-void Camera::RotatePitch(math::Angle _angle)
-{
-  this->Pitch(_angle);
+  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()),
+      Conversions::Convert(_relativeTo));
 }
 
 //////////////////////////////////////////////////
@@ -646,7 +733,7 @@ void Camera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
-void Camera::SetClipDist(float _near, float _far)
+void Camera::SetClipDist(const float _near, const float _far)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("clip");
 
@@ -659,6 +746,12 @@ void Camera::SetClipDist(float _near, float _far)
 //////////////////////////////////////////////////
 void Camera::SetHFOV(math::Angle _angle)
 {
+  this->SetHFOV(_angle.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::SetHFOV(const ignition::math::Angle &_angle)
+{
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
   this->UpdateFOV();
 }
@@ -670,27 +763,39 @@ math::Angle Camera::GetHFOV() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Angle Camera::HFOV() const
+{
+  return ignition::math::Angle(this->sdf->Get<double>("horizontal_fov"));
+}
+
+//////////////////////////////////////////////////
 math::Angle Camera::GetVFOV() const
 {
   return math::Angle(this->camera->getFOVy().valueRadians());
 }
 
 //////////////////////////////////////////////////
-void Camera::SetImageSize(unsigned int _w, unsigned int _h)
+ignition::math::Angle Camera::VFOV() const
+{
+  return ignition::math::Angle(this->camera->getFOVy().valueRadians());
+}
+
+//////////////////////////////////////////////////
+void Camera::SetImageSize(const unsigned int _w, const unsigned int _h)
 {
   this->SetImageWidth(_w);
   this->SetImageHeight(_h);
 }
 
 //////////////////////////////////////////////////
-void Camera::SetImageWidth(unsigned int _w)
+void Camera::SetImageWidth(const unsigned int _w)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("image");
   elem->GetElement("width")->Set(_w);
 }
 
 //////////////////////////////////////////////////
-void Camera::SetImageHeight(unsigned int _h)
+void Camera::SetImageHeight(const unsigned int _h)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("image");
   elem->GetElement("height")->Set(_h);
@@ -698,6 +803,12 @@ void Camera::SetImageHeight(unsigned int _h)
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageWidth() const
+{
+  return this->ImageWidth();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ImageWidth() const
 {
   unsigned int width = 0;
   if (this->viewport)
@@ -715,6 +826,12 @@ unsigned int Camera::GetImageWidth() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageHeight() const
 {
+  return this->ImageHeight();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ImageHeight() const
+{
   unsigned int height = 0;
   if (this->viewport)
   {
@@ -730,6 +847,12 @@ unsigned int Camera::GetImageHeight() const
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageDepth() const
+{
+  return this->ImageDepth();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ImageDepth() const
 {
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   std::string imgFmt = imgElem->Get<std::string>("format");
@@ -754,6 +877,12 @@ unsigned int Camera::GetImageDepth() const
 //////////////////////////////////////////////////
 std::string Camera::GetImageFormat() const
 {
+  return this->ImageFormat();
+}
+
+//////////////////////////////////////////////////
+std::string Camera::ImageFormat() const
+{
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   return imgElem->Get<std::string>("format");
 }
@@ -761,36 +890,61 @@ std::string Camera::GetImageFormat() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetTextureWidth() const
 {
+  return this->TextureWidth();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::TextureWidth() const
+{
   return this->renderTexture->getBuffer(0, 0)->getWidth();
 }
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetTextureHeight() const
 {
-  return this->renderTexture->getBuffer(0, 0)->getHeight();
+  return this->TextureHeight();
 }
 
+//////////////////////////////////////////////////
+unsigned int Camera::TextureHeight() const
+{
+  return this->renderTexture->getBuffer(0, 0)->getHeight();
+}
 
 //////////////////////////////////////////////////
 size_t Camera::GetImageByteSize() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("image");
-  return this->GetImageByteSize(elem->Get<int>("width"),
-                                elem->Get<int>("height"),
-                                this->GetImageFormat());
+  return this->ImageByteSize();
 }
 
-// Get the image size in bytes
+//////////////////////////////////////////////////
+size_t Camera::ImageByteSize() const
+{
+  sdf::ElementPtr elem = this->sdf->GetElement("image");
+  return this->ImageByteSize(elem->Get<int>("width"),
+                             elem->Get<int>("height"),
+                             this->ImageFormat());
+}
+
+//////////////////////////////////////////////////
 size_t Camera::GetImageByteSize(unsigned int _width, unsigned int _height,
                                 const std::string &_format)
 {
+  return ImageByteSize(_width, _height, _format);
+}
+
+//////////////////////////////////////////////////
+size_t Camera::ImageByteSize(const unsigned int _width,
+    const unsigned int _height, const std::string &_format)
+{
   Ogre::PixelFormat fmt =
-    (Ogre::PixelFormat)(Camera::GetOgrePixelFormat(_format));
+    (Ogre::PixelFormat)(Camera::OgrePixelFormat(_format));
 
   return Ogre::PixelUtil::getMemorySize(_width, _height, 1, fmt);
 }
 
-int Camera::GetOgrePixelFormat(const std::string &_format)
+//////////////////////////////////////////////////
+int Camera::OgrePixelFormat(const std::string &_format)
 {
   int result;
 
@@ -824,7 +978,7 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-void Camera::EnableSaveFrame(bool _enable)
+void Camera::EnableSaveFrame(const bool _enable)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(_enable);
@@ -833,6 +987,12 @@ void Camera::EnableSaveFrame(bool _enable)
 
 //////////////////////////////////////////////////
 bool Camera::GetCaptureData() const
+{
+  return this->CaptureData();
+}
+
+//////////////////////////////////////////////////
+bool Camera::CaptureData() const
 {
   return this->captureData;
 }
@@ -856,17 +1016,35 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
 //////////////////////////////////////////////////
 Ogre::Camera *Camera::GetOgreCamera() const
 {
+  return this->OgreCamera();
+}
+
+//////////////////////////////////////////////////
+Ogre::Camera *Camera::OgreCamera() const
+{
   return this->camera;
 }
 
 //////////////////////////////////////////////////
 Ogre::Viewport *Camera::GetViewport() const
 {
+  return this->OgreViewport();
+}
+
+//////////////////////////////////////////////////
+Ogre::Viewport *Camera::OgreViewport() const
+{
   return this->viewport;
 }
 
 //////////////////////////////////////////////////
 double Camera::GetNearClip()
+{
+  return this->NearClip();
+}
+
+//////////////////////////////////////////////////
+double Camera::NearClip() const
 {
   if (this->camera)
     return this->camera->getNearClipDistance();
@@ -877,6 +1055,12 @@ double Camera::GetNearClip()
 //////////////////////////////////////////////////
 double Camera::GetFarClip()
 {
+  return this->FarClip();
+}
+
+//////////////////////////////////////////////////
+double Camera::FarClip() const
+{
   if (this->camera)
     return this->camera->getFarClipDistance();
   else
@@ -885,6 +1069,12 @@ double Camera::GetFarClip()
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetViewportWidth() const
+{
+  return this->ViewportWidth();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ViewportWidth() const
 {
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualWidth();
@@ -897,6 +1087,12 @@ unsigned int Camera::GetViewportWidth() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetViewportHeight() const
 {
+  return this->ViewportHeight();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ViewportHeight() const
+{
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualHeight();
   else if (this->camera && this->camera->getViewport())
@@ -906,13 +1102,19 @@ unsigned int Camera::GetViewportHeight() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetAspectRatio(float ratio)
+void Camera::SetAspectRatio(const float ratio)
 {
   this->camera->setAspectRatio(ratio);
 }
 
 //////////////////////////////////////////////////
 float Camera::GetAspectRatio() const
+{
+  return this->AspectRatio();
+}
+
+//////////////////////////////////////////////////
+float Camera::AspectRatio() const
 {
   return this->camera->getAspectRatio();
 }
@@ -925,10 +1127,24 @@ math::Vector3 Camera::GetUp()
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Camera::Up() const
+{
+  Ogre::Vector3 up = this->camera->getRealUp();
+  return ignition::math::Vector3d(up.x, up.y, up.z);
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Camera::GetRight()
 {
   Ogre::Vector3 right = this->camera->getRealRight();
   return math::Vector3(right.x, right.y, right.z);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Camera::Right() const
+{
+  Ogre::Vector3 right = this->camera->getRealRight();
+  return ignition::math::Vector3d(right.x, right.y, right.z);
 }
 
 //////////////////////////////////////////////////
@@ -940,20 +1156,32 @@ void Camera::SetSceneNode(Ogre::SceneNode *_node)
 //////////////////////////////////////////////////
 Ogre::SceneNode *Camera::GetSceneNode() const
 {
+  return this->SceneNode();
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Camera::SceneNode() const
+{
   return this->sceneNode;
 }
 
 //////////////////////////////////////////////////
 const unsigned char *Camera::GetImageData(unsigned int _i)
 {
+  return this->ImageData(_i);
+}
+
+//////////////////////////////////////////////////
+const unsigned char *Camera::ImageData(const unsigned int _i) const
+{
   if (_i != 0)
     gzerr << "Camera index must be zero for cam";
 
   // do last minute conversion if Bayer pattern is requested, go from R8G8B8
-  if ((this->GetImageFormat() == "BAYER_RGGB8") ||
-       (this->GetImageFormat() == "BAYER_BGGR8") ||
-       (this->GetImageFormat() == "BAYER_GBRG8") ||
-       (this->GetImageFormat() == "BAYER_GRBG8"))
+  if ((this->ImageFormat() == "BAYER_RGGB8") ||
+       (this->ImageFormat() == "BAYER_BGGR8") ||
+       (this->ImageFormat() == "BAYER_GBRG8") ||
+       (this->ImageFormat() == "BAYER_GRBG8"))
   {
     return this->bayerFrameBuffer;
   }
@@ -964,11 +1192,23 @@ const unsigned char *Camera::GetImageData(unsigned int _i)
 //////////////////////////////////////////////////
 std::string Camera::GetName() const
 {
+  return this->Name();
+}
+
+//////////////////////////////////////////////////
+std::string Camera::Name() const
+{
   return this->name;
 }
 
 //////////////////////////////////////////////////
 std::string Camera::GetScopedName() const
+{
+  return this->ScopedName();
+}
+
+//////////////////////////////////////////////////
+std::string Camera::ScopedName() const
 {
   return this->scopedName;
 }
@@ -976,13 +1216,19 @@ std::string Camera::GetScopedName() const
 //////////////////////////////////////////////////
 bool Camera::SaveFrame(const std::string &_filename)
 {
-  return Camera::SaveFrame(this->saveFrameBuffer, this->GetImageWidth(),
-                          this->GetImageHeight(), this->GetImageDepth(),
-                          this->GetImageFormat(), _filename);
+  return Camera::SaveFrame(this->saveFrameBuffer, this->ImageWidth(),
+                          this->ImageHeight(), this->ImageDepth(),
+                          this->ImageFormat(), _filename);
 }
 
 //////////////////////////////////////////////////
 std::string Camera::GetFrameFilename()
+{
+  return FrameFilename();
+}
+
+//////////////////////////////////////////////////
+std::string Camera::FrameFilename()
 {
   sdf::ElementPtr saveElem = this->sdf->GetElement("save");
 
@@ -1018,12 +1264,19 @@ std::string Camera::GetFrameFilename()
 /////////////////////////////////////////////////
 std::string Camera::GetScreenshotPath() const
 {
+  return this->ScreenshotPath();
+}
+
+/////////////////////////////////////////////////
+std::string Camera::ScreenshotPath() const
+{
   return this->screenshotPath;
 }
 
 /////////////////////////////////////////////////
 bool Camera::SaveFrame(const unsigned char *_image,
-                       unsigned int _width, unsigned int _height, int _depth,
+                       const unsigned int _width, const unsigned int _height,
+                       const int _depth,
                        const std::string &_format,
                        const std::string &_filename)
 {
@@ -1042,8 +1295,8 @@ bool Camera::SaveFrame(const unsigned char *_image,
   imgData->width  =  _width;
   imgData->height = _height;
   imgData->depth  = _depth;
-  imgData->format = (Ogre::PixelFormat)Camera::GetOgrePixelFormat(_format);
-  size = Camera::GetImageByteSize(_width, _height, _format);
+  imgData->format = (Ogre::PixelFormat)Camera::OgrePixelFormat(_format);
+  size = Camera::ImageByteSize(_width, _height, _format);
 
   // Wrap buffer in a chunk
   Ogre::MemoryDataStreamPtr stream(
@@ -1087,7 +1340,7 @@ void Camera::ToggleShowWireframe()
 }
 
 //////////////////////////////////////////////////
-void Camera::ShowWireframe(bool s)
+void Camera::ShowWireframe(const bool s)
 {
   if (this->camera)
   {
@@ -1108,26 +1361,39 @@ void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
                                     math::Vector3 &_dir)
 {
   Ogre::Ray ray = this->camera->getCameraToViewportRay(
-      static_cast<float>(_screenx) / this->GetViewportWidth(),
-      static_cast<float>(_screeny) / this->GetViewportHeight());
+      static_cast<float>(_screenx) / this->ViewportWidth(),
+      static_cast<float>(_screeny) / this->ViewportHeight());
 
   _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
   _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
 }
 
+//////////////////////////////////////////////////
+void Camera::CameraToViewportRay(const int _screenx, const int _screeny,
+    ignition::math::Vector3d &_origin,
+    ignition::math::Vector3d &_dir) const
+{
+  Ogre::Ray ray = this->camera->getCameraToViewportRay(
+      static_cast<float>(_screenx) / this->ViewportWidth(),
+      static_cast<float>(_screeny) / this->ViewportHeight());
+
+  _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
+  _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
+}
 
 //////////////////////////////////////////////////
-void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
-                               std::string format, int width, int height)
+void Camera::ConvertRGBToBAYER(unsigned char *_dst,
+    const unsigned char *_src, const std::string &_format, const int _width,
+    const int _height)
 {
-  if (src)
+  if (_src)
   {
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
-    if (format == "BAYER_RGGB8")
+    if (_format == "BAYER_RGGB8")
     {
-      for (int i = 0; i < width; i++)
+      for (int i = 0; i < _width; i++)
       {
-        for (int j = 0; j < height; j++)
+        for (int j = 0; j < _height; j++)
         {
           //
           // RG
@@ -1136,22 +1402,22 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
           // determine position
           if (j%2)  // even column
             if (i%2)  // even row, red
-              dst[i+j*width] = src[i*3+j*width*3+2];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+2];
             else  // odd row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
           else  // odd column
             if (i%2)  // even row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
             else  // odd row, blue
-              dst[i+j*width] = src[i*3+j*width*3+0];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+0];
         }
       }
     }
-    else if (format == "BAYER_BGGR8")
+    else if (_format == "BAYER_BGGR8")
     {
-      for (int i = 0; i < width; i++)
+      for (int i = 0; i < _width; i++)
       {
-        for (int j = 0; j < height; j++)
+        for (int j = 0; j < _height; j++)
         {
           //
           // BG
@@ -1160,22 +1426,22 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
           // determine position
           if (j%2)  // even column
             if (i%2)  // even row, blue
-              dst[i+j*width] = src[i*3+j*width*3+0];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+0];
             else  // odd row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
           else  // odd column
             if (i%2)  // even row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
             else  // odd row, red
-              dst[i+j*width] = src[i*3+j*width*3+2];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+2];
         }
       }
     }
-    else if (format == "BAYER_GBRG8")
+    else if (_format == "BAYER_GBRG8")
     {
-      for (int i = 0; i < width; i++)
+      for (int i = 0; i < _width; i++)
       {
-        for (int j = 0; j < height; j++)
+        for (int j = 0; j < _height; j++)
         {
           //
           // GB
@@ -1184,22 +1450,22 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
           // determine position
           if (j%2)  // even column
             if (i%2)  // even row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
             else  // odd row, blue
-              dst[i+j*width] = src[i*3+j*width*3+2];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+2];
           else  // odd column
             if (i%2)  // even row, red
-              dst[i+j*width] = src[i*3+j*width*3+0];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+0];
             else  // odd row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
         }
       }
     }
-    else if (format == "BAYER_GRBG8")
+    else if (_format == "BAYER_GRBG8")
     {
-      for (int i = 0; i < width; i++)
+      for (int i = 0; i < _width; i++)
       {
-        for (int j = 0; j < height; j++)
+        for (int j = 0; j < _height; j++)
         {
           //
           // GR
@@ -1208,14 +1474,14 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
           // determine position
           if (j%2)  // even column
             if (i%2)  // even row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
             else  // odd row, red
-              dst[i+j*width] = src[i*3+j*width*3+0];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+0];
           else  // odd column
             if (i%2)  // even row, blue
-              dst[i+j*width] = src[i*3+j*width*3+2];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+2];
             else  // odd row, green
-              dst[i+j*width] = src[i*3+j*width*3+1];
+              _dst[i+j*_width] = _src[i*3+j*_width*3+1];
         }
       }
     }
@@ -1223,7 +1489,7 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetCaptureData(bool _value)
+void Camera::SetCaptureData(const bool _value)
 {
   this->captureData = _value;
 }
@@ -1237,7 +1503,16 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
+  unsigned int fsaa = 0;
+
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   // Full-screen anti-aliasing only works correctly in 1.8 and above
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
@@ -1249,8 +1524,8 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       _textureName,
       "General",
       Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(),
-      this->GetImageHeight(),
+      this->ImageWidth(),
+      this->ImageHeight(),
       0,
       (Ogre::PixelFormat)this->imageFormat,
       Ogre::TU_RENDERTARGET,
@@ -1272,7 +1547,7 @@ ScenePtr Camera::GetScene() const
 //////////////////////////////////////////////////
 void Camera::CreateCamera()
 {
-  this->camera = this->scene->GetManager()->createCamera(
+  this->camera = this->scene->OgreSceneManager()->createCamera(
       this->scopedUniqueName);
 
   if (this->sdf->HasElement("projection_type"))
@@ -1288,6 +1563,10 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
                                   const math::Plane &_plane,
                                   math::Vector3 &_result)
 {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   math::Vector3 origin, dir;
   double dist;
 
@@ -1299,6 +1578,30 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
   _result = origin + dir * dist;
 
   if (!math::equal(dist, -1.0))
+    return true;
+  else
+    return false;
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+bool Camera::WorldPointOnPlane(const int _x, const int _y,
+    const ignition::math::Planed &_plane,
+    ignition::math::Vector3d &_result)
+{
+  ignition::math::Vector3d origin, dir;
+  double dist;
+
+  // Cast two rays from the camera into the world
+  this->CameraToViewportRay(_x, _y, origin, dir);
+
+  dist = _plane.Distance(origin, dir);
+
+  _result = origin + dir * dist;
+
+  if (!ignition::math::equal(dist, -1.0))
     return true;
   else
     return false;
@@ -1323,14 +1626,14 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
     this->viewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->GetHFOV().Radian();
+    double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
@@ -1382,14 +1685,14 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(uint32_t _visualId,
-                            bool _inheritOrientation,
-                            double _minDist, double _maxDist)
+void Camera::AttachToVisual(const uint32_t _visualId,
+                            const bool _inheritOrientation,
+                            const double _minDist, const double _maxDist)
 {
   msgs::Request request;
   msgs::TrackVisual track;
 
-  track.set_name(this->GetName() + "_attach_to_visual_track");
+  track.set_name(this->Name() + "_attach_to_visual_track");
   track.set_id(_visualId);
   track.set_min_dist(_minDist);
   track.set_max_dist(_maxDist);
@@ -1405,8 +1708,8 @@ void Camera::AttachToVisual(uint32_t _visualId,
 
 //////////////////////////////////////////////////
 void Camera::AttachToVisual(const std::string &_visualName,
-                            bool _inheritOrientation,
-                            double _minDist, double _maxDist)
+                            const bool _inheritOrientation,
+                            const double _minDist, const double _maxDist)
 {
   msgs::Request request;
   msgs::TrackVisual track;
@@ -1445,8 +1748,9 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(uint32_t _id,
-    bool _inheritOrientation, double _minDist, double _maxDist)
+bool Camera::AttachToVisualImpl(const uint32_t _id,
+    const bool _inheritOrientation, const double _minDist,
+    const double _maxDist)
 {
   VisualPtr visual = this->scene->GetVisual(_id);
   return this->AttachToVisualImpl(visual, _inheritOrientation,
@@ -1455,7 +1759,8 @@ bool Camera::AttachToVisualImpl(uint32_t _id,
 
 //////////////////////////////////////////////////
 bool Camera::AttachToVisualImpl(const std::string &_name,
-    bool _inheritOrientation, double _minDist, double _maxDist)
+    const bool _inheritOrientation, const double _minDist,
+    const double _maxDist)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   return this->AttachToVisualImpl(visual, _inheritOrientation,
@@ -1463,8 +1768,9 @@ bool Camera::AttachToVisualImpl(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
-    double /*_minDist*/, double /*_maxDist*/)
+bool Camera::AttachToVisualImpl(VisualPtr _visual,
+    const bool _inheritOrientation,
+    const double /*_minDist*/, const double /*_maxDist*/)
 {
   if (this->sceneNode->getParent())
       this->sceneNode->getParent()->removeChild(this->sceneNode);
@@ -1521,13 +1827,25 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
 //////////////////////////////////////////////////
 Ogre::Texture *Camera::GetRenderTexture() const
 {
+  return this->RenderTexture();
+}
+
+//////////////////////////////////////////////////
+Ogre::Texture *Camera::RenderTexture() const
+{
   return this->renderTexture;
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Camera::GetDirection() const
 {
-  return Conversions::Convert(this->camera->getDerivedDirection());
+  return this->Direction();
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Camera::Direction() const
+{
+  return Conversions::ConvertIgn(this->camera->getDerivedDirection());
 }
 
 /////////////////////////////////////////////////
@@ -1535,10 +1853,10 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    math::Box bbox = _visual->GetBoundingBox();
+    ignition::math::Box bbox = _visual->GetBoundingBox().Ign();
     Ogre::AxisAlignedBox box;
-    box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
-    box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
+    box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
+    box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());
 
     box.transformAffine(_visual->GetSceneNode()->_getFullTransform());
     return this->camera->isVisible(box);
@@ -1560,7 +1878,14 @@ bool Camera::IsAnimating() const
 }
 
 /////////////////////////////////////////////////
-bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
+bool Camera::MoveToPosition(const math::Pose &_pose, const double _time)
+{
+  return this->MoveToPosition(_pose.Ign(), _time);
+}
+
+/////////////////////////////////////////////////
+bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose,
+    const double _time)
 {
   if (this->animState)
   {
@@ -1569,26 +1894,26 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   }
 
   Ogre::TransformKeyFrame *key;
-  math::Vector3 rpy = _pose.rot.GetAsEuler();
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
+  ignition::math::Vector3d start = this->WorldPose().Pos();
 
   Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-  math::Quaternion localRot = math::Quaternion(
+  ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
     localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-  double dyaw =  localRot.GetAsEuler().z - rpy.z;
+  double dyaw =  localRot.Euler().Z() - rpy.Z();
 
   if (dyaw > M_PI)
-    rpy.z += 2*M_PI;
+    rpy.Z() += 2*M_PI;
   else if (dyaw < -M_PI)
-    rpy.z -= 2*M_PI;
+    rpy.Z() -= 2*M_PI;
 
-  math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
-  Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
-    pitchYawOnly.y, pitchYawOnly.z);
+  ignition::math::Quaterniond pitchYawOnly(0, rpy.Y(), rpy.Z());
+  Ogre::Quaternion pitchYawFinal(pitchYawOnly.W(), pitchYawOnly.X(),
+    pitchYawOnly.Y(), pitchYawOnly.Z());
 
   std::string trackName = "cameratrack";
   int i = 0;
-  while (this->scene->GetManager()->hasAnimation(trackName))
+  while (this->scene->OgreSceneManager()->hasAnimation(trackName))
   {
     trackName = std::string("cameratrack_") +
       boost::lexical_cast<std::string>(i);
@@ -1596,22 +1921,22 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   }
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation(trackName, _time);
+    this->scene->OgreSceneManager()->createAnimation(trackName, _time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
+  key->setTranslate(Ogre::Vector3(_pose.Pos().X(), _pose.Pos().Y(),
+        _pose.Pos().Z()));
   key->setRotation(pitchYawFinal);
 
-
   this->animState =
-    this->scene->GetManager()->createAnimationState(trackName);
+    this->scene->OgreSceneManager()->createAnimationState(trackName);
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -1623,7 +1948,20 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 
 /////////////////////////////////////////////////
 bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
-                             double _time, boost::function<void()> _onComplete)
+                             const double _time,
+                             std::function<void()> _onComplete)
+{
+  std::vector<ignition::math::Pose3d> pts;
+  for (auto const p : _pts)
+    pts.push_back(p.Ign());
+
+  return this->MoveToPositions(pts, _time, _onComplete);
+}
+
+/////////////////////////////////////////////////
+bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
+                             const double _time,
+                             std::function<void()> _onComplete)
 {
   if (this->animState)
     return false;
@@ -1631,11 +1969,11 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->onAnimationComplete = _onComplete;
 
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->WorldPose().Pos();
 
   std::string trackName = "cameratrack";
   int i = 0;
-  while (this->scene->GetManager()->hasAnimation(trackName))
+  while (this->scene->OgreSceneManager()->hasAnimation(trackName))
   {
     trackName = std::string("cameratrack_") +
       boost::lexical_cast<std::string>(i);
@@ -1643,47 +1981,48 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   }
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation(trackName, _time);
+    this->scene->OgreSceneManager()->createAnimation(trackName, _time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->sceneNode->getOrientation());
 
   double dt = _time / (_pts.size()-1);
   double tt = 0;
 
   Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-  math::Quaternion localRot = math::Quaternion(
+  ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
     localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-  double prevYaw = localRot.GetAsEuler().z;
+  double prevYaw = localRot.Euler().Z();
   for (unsigned int j = 0; j < _pts.size(); j++)
   {
-    math::Vector3 pos = _pts[j].pos;
-    math::Vector3 rpy = _pts[j].rot.GetAsEuler();
-    double dyaw = prevYaw - rpy.z;
+    ignition::math::Vector3d pos = _pts[j].Pos();
+    ignition::math::Vector3d rpy = _pts[j].Rot().Euler();
+    double dyaw = prevYaw - rpy.Z();
 
     if (dyaw > M_PI)
-      rpy.z += 2*M_PI;
+      rpy.Z() += 2*M_PI;
     else if (dyaw < -M_PI)
-      rpy.z -= 2*M_PI;
+      rpy.Z() -= 2*M_PI;
 
-    prevYaw = rpy.z;
+    prevYaw = rpy.Z();
 
-    math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
-    Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
-      pitchYawOnly.y, pitchYawOnly.z);
+    ignition::math::Quaterniond pitchYawOnly(0, rpy.Y(), rpy.Z());
+    Ogre::Quaternion pitchYawFinal(pitchYawOnly.W(), pitchYawOnly.X(),
+      pitchYawOnly.Y(), pitchYawOnly.Z());
 
     key = strack->createNodeKeyFrame(tt);
-    key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
+    key->setTranslate(Ogre::Vector3(pos.X(), pos.Y(), pos.Z()));
     key->setRotation(pitchYawFinal);
 
     tt += dt;
   }
 
-  this->animState = this->scene->GetManager()->createAnimationState(trackName);
+  this->animState =
+      this->scene->OgreSceneManager()->createAnimationState(trackName);
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -1694,7 +2033,7 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetRenderRate(double _hz)
+void Camera::SetRenderRate(const double _hz)
 {
   if (_hz > 0.0)
     this->dataPtr->renderPeriod = 1.0 / _hz;
@@ -1704,6 +2043,12 @@ void Camera::SetRenderRate(double _hz)
 
 //////////////////////////////////////////////////
 double Camera::GetRenderRate() const
+{
+  return this->RenderRate();
+}
+
+//////////////////////////////////////////////////
+double Camera::RenderRate() const
 {
   return 1.0 / this->dataPtr->renderPeriod.Double();
 }
@@ -1716,18 +2061,30 @@ void Camera::AnimationComplete()
 //////////////////////////////////////////////////
 bool Camera::GetInitialized() const
 {
-  return this->initialized && this->scene->GetInitialized();
+  return this->Initialized();
+}
+
+//////////////////////////////////////////////////
+bool Camera::Initialized() const
+{
+  return this->initialized && this->scene->Initialized();
 }
 
 //////////////////////////////////////////////////
 void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->commandMsgs.push_back(_msg);
 }
 
 //////////////////////////////////////////////////
 DistortionPtr Camera::GetDistortion() const
+{
+  return this->dataPtr->distortion;
+}
+
+//////////////////////////////////////////////////
+DistortionPtr Camera::LensDistortion() const
 {
   return this->dataPtr->distortion;
 }
@@ -1755,6 +2112,12 @@ void Camera::UpdateFOV()
 //////////////////////////////////////////////////
 float Camera::GetAvgFPS() const
 {
+  return this->AvgFPS();
+}
+
+//////////////////////////////////////////////////
+float Camera::AvgFPS() const
+{
   if (this->renderTarget)
     return this->renderTarget->getAverageFPS();
   else
@@ -1763,6 +2126,12 @@ float Camera::GetAvgFPS() const
 
 //////////////////////////////////////////////////
 unsigned int Camera::GetTriangleCount() const
+{
+  return this->TriangleCount();
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::TriangleCount() const
 {
   return this->renderTarget->getTriangleCount();
 }
@@ -1797,6 +2166,12 @@ bool Camera::SetProjectionType(const std::string &_type)
 //////////////////////////////////////////////////
 std::string Camera::GetProjectionType() const
 {
+  return this->ProjectionType();
+}
+
+//////////////////////////////////////////////////
+std::string Camera::ProjectionType() const
+{
   if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
   {
     return "orthographic";
@@ -1806,4 +2181,39 @@ std::string Camera::GetProjectionType() const
   {
     return "perspective";
   }
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr Camera::ConnectNewImageFrame(
+    std::function<void (const unsigned char *, unsigned int, unsigned int,
+    unsigned int, const std::string &)> _subscriber)
+{
+  return this->newImageFrame.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
+{
+  this->newImageFrame.Disconnect(_c);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2i Camera::Project(
+    const ignition::math::Vector3d &_pt) const
+{
+  // Convert from 3D world pos to 2D screen pos
+  Ogre::Vector3 pos = this->OgreCamera()->getProjectionMatrix() *
+      this->OgreCamera()->getViewMatrix() * Conversions::Convert(_pt);
+
+  ignition::math::Vector2i screenPos;
+  screenPos.X() = ((pos.x / 2.0) + 0.5) * this->ViewportWidth();
+  screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * this->ViewportHeight();
+
+  return screenPos;
 }

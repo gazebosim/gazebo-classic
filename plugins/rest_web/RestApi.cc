@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ static void DumpRequest(const char *_text,
 
   for (i = 0; i < _size; i += width)
   {
-    fprintf(_stream, "%4.4lx: ", i);
+    fprintf(_stream, "%4.4zu: ", i);
     if (!_nohex)
     {
       // hex not disabled, show it
@@ -203,7 +203,7 @@ void RestApi::PostJsonData(const char *_route, const char *_json)
     boost::mutex::scoped_lock lock(this->postsMutex);
     this->posts.push_back(post);
   }
-  SendUnpostedPosts();
+  this->SendUnpostedPosts();
 }
 
 /////////////////////////////////////////////////
@@ -360,8 +360,8 @@ std::string RestApi::Request(const std::string &_reqUrl,
   curl_easy_cleanup(curl);
   if (res != CURLE_OK)
   {
-    gzerr << "Request to " << url << " failed: ";
-    gzerr << curl_easy_strerror(res) << std::endl;
+    gzerr << "Request to " << url << " failed: "
+          << curl_easy_strerror(res) << std::endl;
     throw RestException(curl_easy_strerror(res));
   }
   // copy the data into a string

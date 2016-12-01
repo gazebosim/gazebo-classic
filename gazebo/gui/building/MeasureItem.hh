@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,30 @@
  *
 */
 
-#ifndef _MEASURE_ITEM_HH_
-#define _MEASURE_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_MEASUREITEM_HH_
+#define _GAZEBO_GUI_BUILDING_MEASUREITEM_HH_
+
+#include <memory>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/SegmentItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class SegmentItem;
+    // Forward declare private data.
+    class MeasureItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class MeasureItem MeasureItem.hh
     /// \brief Measurement lines and values.
-    class GZ_GUI_BUILDING_VISIBLE MeasureItem : public SegmentItem
+    class GZ_GUI_VISIBLE MeasureItem : public SegmentItem
     {
       Q_OBJECT
 
@@ -41,7 +46,8 @@ namespace gazebo
       /// param[in] _start Start position of the measure item in pixel
       /// coordinates.
       /// param[in] _end End position of the measure item in pixel coordinates.
-      public: MeasureItem(const QPointF &_start, const QPointF &_end);
+      public: MeasureItem(const ignition::math::Vector2d &_start,
+          const ignition::math::Vector2d &_end);
 
       /// \brief Destructor
       public: ~MeasureItem();
@@ -52,14 +58,15 @@ namespace gazebo
 
       /// \brief Get distance between end points
       /// \return Distance between end points.
-      public: double GetDistance() const;
+      public: double Distance() const;
 
       /// \brief Set value in meters
       /// \param[in] _value Value measured in meters.
       public: void SetValue(double _value);
 
-      /// \brief Value measured in meters.
-      private: double value;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<MeasureItemPrivate> dataPtr;
     };
     /// \}
   }

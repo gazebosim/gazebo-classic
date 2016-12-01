@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,49 @@
 */
 
 #include <sstream>
+#include <string>
+#include <vector>
+
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ScaleWidget.hh"
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \brief Private data for the ScaleWidget class
+    class ScaleWidgetPrivate
+    {
+      /// \brief Text displaying the scale.
+      public: std::string scaleText;
+
+      /// \brief A list of gui editor events connected to this widget.
+      public: std::vector<event::ConnectionPtr> connections;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace gui;
 
 //////////////////////////////////////////////////
-ScaleWidget::ScaleWidget(QWidget *_parent) : QWidget(_parent)
+ScaleWidget::ScaleWidget(QWidget *_parent)
+  : QWidget(_parent), dataPtr(new ScaleWidgetPrivate)
 {
   this->setObjectName("scaleWidget");
-  this->scaleText = "1.00 m";
+  this->dataPtr->scaleText = "1.00 m";
 
   this->setAttribute(Qt::WA_TransparentForMouseEvents);
-  this->connections.push_back(
-    gui::editor::Events::ConnectChangeBuildingEditorZoom(
-    boost::bind(&ScaleWidget::OnChangeZoom, this, _1)));
+  this->dataPtr->connections.push_back(
+      gui::editor::Events::ConnectChangeBuildingEditorZoom(
+      std::bind(&ScaleWidget::OnChangeZoom, this, std::placeholders::_1)));
 }
 
 //////////////////////////////////////////////////
 ScaleWidget::~ScaleWidget()
 {
+  this->dataPtr->connections.clear();
 }
 
 //////////////////////////////////////////////////
@@ -61,14 +83,14 @@ void ScaleWidget::paintEvent(QPaintEvent *)
     (bottomRight.y() - topLeft.y()));
   QRect rulerRect(textTopLeft, textBottomRight);
   painter.drawText(rulerRect, Qt::AlignHCenter,
-    QString(this->scaleText.c_str()));
+    QString(this->dataPtr->scaleText.c_str()));
 }
 
 //////////////////////////////////////////////////
-void ScaleWidget::OnChangeZoom(double _zoomFactor)
+void ScaleWidget::OnChangeZoom(const double _zoomFactor)
 {
   std::stringstream str;
   double places = pow(10.0, 2);
   str << round((1.0/_zoomFactor) * places) / places << " m";
-  this->scaleText = str.str();
+  this->dataPtr->scaleText = str.str();
 }

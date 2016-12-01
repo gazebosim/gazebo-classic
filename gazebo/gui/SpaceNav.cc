@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,14 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include <gazebo/gazebo_config.h>
 #ifdef HAVE_SPNAV
 #include <spnav.h>
+// Status is defined in X11/Xlib.h which is included by spnav.h
+// protobuf define a class named Status. To avoid conflicts, remove here
+// the definition of Status.
+#undef Status
 #endif
 
 #include "gazebo/gui/GuiIface.hh"

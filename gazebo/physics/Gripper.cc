@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Events.hh"
 
@@ -44,7 +45,6 @@ Gripper::Gripper(ModelPtr _model)
 {
   this->model = _model;
   this->world = this->model->GetWorld();
-  this->physics = this->world->GetPhysicsEngine();
 
   this->diffs.resize(10);
   this->diffIndex = 0;
@@ -68,7 +68,6 @@ Gripper::~Gripper()
   }
 
   this->model.reset();
-  this->physics.reset();
   this->world.reset();
   this->connections.clear();
 }
@@ -79,7 +78,9 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   this->node->Init(this->world->GetName());
 
   this->name = _sdf->Get<std::string>("name");
-  this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
+  this->fixedJoint =
+      this->world->GetPhysicsEngine()->CreateJoint("fixed", this->model);
+  this->fixedJoint->SetName(this->model->GetName() + "__gripper_fixed_joint__");
 
   sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
   this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");
@@ -232,8 +233,6 @@ void Gripper::HandleAttach()
           this->fixedJoint->Load(this->palmLink,
               cc[iter->first]->GetLink(), math::Pose());
           this->fixedJoint->Init();
-          this->fixedJoint->SetHighStop(0, 0);
-          this->fixedJoint->SetLowStop(0, 0);
         }
 
         this->diffIndex = (this->diffIndex+1) % 10;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
+
+#include "gazebo/transport/Node.hh"
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/LogPlayWidgetPrivate.hh"
@@ -34,52 +37,83 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   QSize bigSize(70, 70);
   QSize bigIconSize(40, 40);
-  QSize smallSize(50, 50);
-  QSize smallIconSize(30, 30);
 
   // Empty space on the left
   QWidget *leftSpacer = new QWidget();
   leftSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // Play
-  QToolButton *playButton = new QToolButton(this);
-  playButton->setFixedSize(bigSize);
-  playButton->setCheckable(false);
-  playButton->setIcon(QPixmap(":/images/log_play.png"));
-  playButton->setIconSize(bigIconSize);
-  playButton->setStyleSheet(
-      QString("border-radius: %1px").arg(bigSize.width()/2-2));
-  connect(playButton, SIGNAL(clicked()), this, SLOT(OnPlay()));
-  connect(this, SIGNAL(ShowPlay()), playButton, SLOT(show()));
-  connect(this, SIGNAL(HidePlay()), playButton, SLOT(hide()));
+  this->dataPtr->playButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->playButton,
+      ":/images/log_play.png", false);
+  connect(this->dataPtr->playButton, SIGNAL(clicked()), this, SLOT(OnPlay()));
+  connect(this, SIGNAL(ShowPlay()), this->dataPtr->playButton, SLOT(show()));
+  connect(this, SIGNAL(HidePlay()), this->dataPtr->playButton, SLOT(hide()));
 
   // Pause
-  QToolButton *pauseButton = new QToolButton(this);
-  pauseButton->setFixedSize(bigSize);
-  pauseButton->setCheckable(false);
-  pauseButton->setIcon(QPixmap(":/images/log_pause.png"));
-  pauseButton->setIconSize(bigIconSize);
-  pauseButton->setStyleSheet(
-      QString("border-radius: %1px").arg(bigSize.width()/2-2));
-  connect(pauseButton, SIGNAL(clicked()), this, SLOT(OnPause()));
-  connect(this, SIGNAL(ShowPause()), pauseButton, SLOT(show()));
-  connect(this, SIGNAL(HidePause()), pauseButton, SLOT(hide()));
+  this->dataPtr->pauseButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->pauseButton,
+      ":/images/log_pause.png", false);
+  connect(this->dataPtr->pauseButton, SIGNAL(clicked()), this, SLOT(OnPause()));
+  connect(this, SIGNAL(ShowPause()), this->dataPtr->pauseButton, SLOT(show()));
+  connect(this, SIGNAL(HidePause()), this->dataPtr->pauseButton, SLOT(hide()));
 
   // Step forward
-  QToolButton *stepForwardButton = new QToolButton(this);
-  stepForwardButton->setFixedSize(smallSize);
-  stepForwardButton->setCheckable(false);
-  stepForwardButton->setIcon(QPixmap(":/images/log_step_forward.png"));
-  stepForwardButton->setIconSize(smallIconSize);
-  stepForwardButton->setStyleSheet(
-      QString("border-radius: %1px").arg(smallSize.width()/2-2));
-  connect(stepForwardButton, SIGNAL(clicked()), this, SLOT(OnStepForward()));
+  this->dataPtr->stepForwardButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->stepForwardButton,
+      ":/images/log_step_forward.png", true);
+  connect(this->dataPtr->stepForwardButton, SIGNAL(clicked()), this,
+      SLOT(OnStepForward()));
+
+  // Step back
+  this->dataPtr->stepBackButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->stepBackButton,
+      ":/images/log_step_back.png", true);
+  connect(this->dataPtr->stepBackButton, SIGNAL(clicked()), this,
+      SLOT(OnStepBack()));
+
+  // Rewind
+  this->dataPtr->rewindButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->rewindButton,
+      ":/images/log_rewind.png", true);
+  connect(this->dataPtr->rewindButton, SIGNAL(clicked()), this,
+      SLOT(OnRewind()));
+
+  // Forward
+  this->dataPtr->forwardButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->forwardButton,
+      ":/images/log_forward.png", true);
+  connect(this->dataPtr->forwardButton, SIGNAL(clicked()), this,
+      SLOT(OnForward()));
+
+  // Step size
+  QLabel *stepLabel = new QLabel("Step: ");
+
+  this->dataPtr->stepSpin = new QSpinBox();
+  this->dataPtr->stepSpin->setMaximumWidth(30);
+  this->dataPtr->stepSpin->setValue(1);
+  this->dataPtr->stepSpin->setRange(1, 10000);
+
+  QHBoxLayout *stepLayout = new QHBoxLayout();
+  stepLayout->addWidget(stepLabel);
+  stepLayout->addWidget(this->dataPtr->stepSpin);
+
+  stepLayout->setAlignment(stepLabel, Qt::AlignRight);
+  stepLayout->setAlignment(this->dataPtr->stepSpin, Qt::AlignLeft);
 
   // Play layout
   QHBoxLayout *playLayout = new QHBoxLayout();
-  playLayout->addWidget(playButton);
-  playLayout->addWidget(pauseButton);
-  playLayout->addWidget(stepForwardButton);
+  playLayout->addWidget(this->dataPtr->rewindButton);
+  playLayout->addWidget(this->dataPtr->stepBackButton);
+  playLayout->addWidget(this->dataPtr->playButton);
+  playLayout->addWidget(this->dataPtr->pauseButton);
+  playLayout->addWidget(this->dataPtr->stepForwardButton);
+  playLayout->addWidget(this->dataPtr->forwardButton);
+
+  // Controls layout
+  QVBoxLayout *controlsLayout = new QVBoxLayout();
+  controlsLayout->addLayout(playLayout);
+  controlsLayout->addLayout(stepLayout);
 
   // View
   this->dataPtr->view = new LogPlayView(this);
@@ -90,21 +124,95 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   connect(this, SIGNAL(SetEndTime(common::Time)), this->dataPtr->view,
       SLOT(SetEndTime(common::Time)));
 
-  // Time
-  QLineEdit *currentTime = new QLineEdit();
-  currentTime->setObjectName("logPlayCurrentTime");
-  currentTime->setMaximumWidth(110);
-  currentTime->setAlignment(Qt::AlignRight);
-  connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
-      SLOT(setText(const QString &)));
+  // Current time fields
+  // Day edit
+  this->dataPtr->currentDayEdit = new QLineEdit();
+  this->dataPtr->currentDayEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentDayEdit->setValidator(new QIntValidator(0, 99));
+  this->dataPtr->currentDayEdit->setMaximumWidth(25);
+  this->dataPtr->currentDayEdit->setText("00");
+  connect(this->dataPtr->currentDayEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentDays(const QString &)),
+      this->dataPtr->currentDayEdit, SLOT(setText(const QString &)));
 
+  // Hour edit
+  this->dataPtr->currentHourEdit = new QLineEdit();
+  this->dataPtr->currentHourEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentHourEdit->setValidator(new QIntValidator(0, 23));
+  this->dataPtr->currentHourEdit->setMaximumWidth(25);
+  this->dataPtr->currentHourEdit->setText("00");
+  connect(this->dataPtr->currentHourEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentHours(const QString &)),
+      this->dataPtr->currentHourEdit, SLOT(setText(const QString &)));
+
+  // Minute edit
+  this->dataPtr->currentMinuteEdit = new QLineEdit();
+  this->dataPtr->currentMinuteEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentMinuteEdit->setValidator(new QIntValidator(0, 59));
+  this->dataPtr->currentMinuteEdit->setMaximumWidth(25);
+  this->dataPtr->currentMinuteEdit->setText("00");
+  connect(this->dataPtr->currentMinuteEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentMinutes(const QString &)),
+      this->dataPtr->currentMinuteEdit, SLOT(setText(const QString &)));
+
+  // Second edit
+  this->dataPtr->currentSecondEdit = new QLineEdit();
+  this->dataPtr->currentSecondEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentSecondEdit->setValidator(
+      new QDoubleValidator(0, 59.999, 3));
+  this->dataPtr->currentSecondEdit->setMaximumWidth(60);
+  this->dataPtr->currentSecondEdit->setText("00.000");
+  connect(this->dataPtr->currentSecondEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentSeconds(const QString &)),
+      this->dataPtr->currentSecondEdit, SLOT(setText(const QString &)));
+
+  // Labels
+  this->dataPtr->dayLabel = new QLabel("d");
+  this->dataPtr->hourLabel = new QLabel("h");
+  this->dataPtr->hourSeparator = new QLabel(":");
+
+  std::vector<QLabel *> currentTimeLabels;
+  currentTimeLabels.push_back(this->dataPtr->dayLabel);
+  currentTimeLabels.push_back(this->dataPtr->hourLabel);
+  currentTimeLabels.push_back(new QLabel("min"));
+  currentTimeLabels.push_back(new QLabel("s"));
+
+  // End time
   QLabel *endTime = new QLabel();
+  endTime->setMaximumHeight(10);
   connect(this, SIGNAL(SetEndTime(const QString &)), endTime,
       SLOT(setText(const QString &)));
 
-  QHBoxLayout *timeLayout = new QHBoxLayout();
-  timeLayout->addWidget(currentTime);
-  timeLayout->addWidget(endTime);
+  auto timeLayout = new QGridLayout();
+  timeLayout->setContentsMargins(0, 0, 0, 0);
+  timeLayout->addWidget(this->dataPtr->currentDayEdit, 0, 0);
+  timeLayout->addWidget(this->dataPtr->currentHourEdit, 0, 1);
+  timeLayout->addWidget(this->dataPtr->hourSeparator, 0, 2);
+  timeLayout->addWidget(this->dataPtr->currentMinuteEdit, 0, 3);
+  timeLayout->addWidget(new QLabel(":"), 0, 4);
+  timeLayout->addWidget(this->dataPtr->currentSecondEdit, 0, 5);
+  timeLayout->addWidget(currentTimeLabels[0], 1, 0);
+  timeLayout->addWidget(currentTimeLabels[1], 1, 1);
+  timeLayout->addWidget(currentTimeLabels[2], 1, 3);
+  timeLayout->addWidget(currentTimeLabels[3], 1, 5);
+  timeLayout->addWidget(endTime, 2, 0, 1, 6);
+
+  for (auto label : currentTimeLabels)
+  {
+    label->setStyleSheet("QLabel{font-size:11px; color:#444444}");
+    label->setMaximumHeight(10);
+    timeLayout->setAlignment(label, Qt::AlignRight);
+  }
+  timeLayout->setAlignment(endTime, Qt::AlignRight);
+
+  auto timeWidget = new QWidget();
+  timeWidget->setLayout(timeLayout);
+  timeWidget->setMaximumHeight(50);
+  timeWidget->setMaximumWidth(200);
 
   // Empty space on the right
   QWidget *rightSpacer = new QWidget();
@@ -113,17 +221,24 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(leftSpacer);
-  mainLayout->addLayout(playLayout);
+  mainLayout->addLayout(controlsLayout);
   mainLayout->addWidget(this->dataPtr->view);
-  mainLayout->addLayout(timeLayout);
+  mainLayout->addWidget(timeWidget);
   mainLayout->addWidget(rightSpacer);
 
   this->setLayout(mainLayout);
-  mainLayout->setAlignment(playLayout, Qt::AlignRight);
+  mainLayout->setAlignment(controlsLayout, Qt::AlignRight);
   mainLayout->setAlignment(timeLayout, Qt::AlignLeft);
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
+
+  // Transport
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  this->dataPtr->logPlaybackControlPub = this->dataPtr->node->
+      Advertise<msgs::LogPlaybackControl>("~/playback_control");
 }
 
 /////////////////////////////////////////////////
@@ -131,6 +246,43 @@ LogPlayWidget::~LogPlayWidget()
 {
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::SetupButton(QToolButton *_button, QString _icon,
+    bool _isSmall)
+{
+  QPixmap pixmap(_icon);
+  QPixmap disabledPixmap(pixmap.size());
+  disabledPixmap.fill(Qt::transparent);
+  QPainter p(&disabledPixmap);
+  p.setOpacity(0.4);
+  p.drawPixmap(0, 0, pixmap);
+
+  QIcon icon(pixmap);
+  icon.addPixmap(disabledPixmap, QIcon::Disabled);
+
+  QSize buttonSize;
+  QSize iconSize;
+
+  if (_isSmall)
+  {
+    buttonSize = QSize(50, 50);
+    iconSize = QSize(30, 30);
+  }
+  else
+  {
+    buttonSize = QSize(70, 70);
+    iconSize = QSize(40, 40);
+  }
+
+  _button->setFixedSize(buttonSize);
+  _button->setCheckable(false);
+  _button->setEnabled(false);
+  _button->setIcon(icon);
+  _button->setIconSize(iconSize);
+  _button->setStyleSheet(
+      QString("border-radius: %1px").arg(buttonSize.width()/2-2));
 }
 
 /////////////////////////////////////////////////
@@ -148,6 +300,13 @@ void LogPlayWidget::SetPaused(const bool _paused)
   {
     emit ShowPlay();
     emit HidePause();
+
+    // Check if there are pending steps and publish now that it's paused
+    if (this->dataPtr->pendingStep != 0)
+    {
+      this->PublishMultistep(this->dataPtr->pendingStep);
+      this->dataPtr->pendingStep = 0;
+    }
   }
   else
   {
@@ -159,19 +318,89 @@ void LogPlayWidget::SetPaused(const bool _paused)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPlay()
 {
-  g_playAct->trigger();
+  msgs::LogPlaybackControl msg;
+  msg.set_pause(false);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPause()
 {
-  g_pauseAct->trigger();
+  msgs::LogPlaybackControl msg;
+  msg.set_pause(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStepForward()
 {
-  g_stepAct->trigger();
+  if (this->dataPtr->paused)
+  {
+    this->PublishMultistep(this->dataPtr->stepSpin->value());
+  }
+  // Only step after it's paused, to sync with server
+  else
+  {
+    this->OnPause();
+    this->dataPtr->pendingStep += this->dataPtr->stepSpin->value();
+  }
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnStepBack()
+{
+  if (this->dataPtr->paused)
+  {
+    this->PublishMultistep(-this->dataPtr->stepSpin->value());
+  }
+  // Only step after it's paused, to sync with server
+  else
+  {
+    this->OnPause();
+    this->dataPtr->pendingStep += -this->dataPtr->stepSpin->value();
+  }
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnRewind()
+{
+  msgs::LogPlaybackControl msg;
+  msg.set_rewind(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnForward()
+{
+  msgs::LogPlaybackControl msg;
+  msg.set_forward(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnSeek(const common::Time &_time)
+{
+  msgs::LogPlaybackControl msg;
+  msgs::Set(msg.mutable_seek(), _time);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnCurrentTime()
+{
+  auto day = this->dataPtr->currentDayEdit->text().toInt();
+  auto hour = this->dataPtr->currentHourEdit->text().toInt();
+  auto min = this->dataPtr->currentMinuteEdit->text().toInt();
+  auto sec = this->dataPtr->currentSecondEdit->text().toDouble();
+
+  auto time = common::Time(24*60*60*day + 60*60*hour + 60*min + sec);
+
+  this->OnSeek(time);
+
+  this->dataPtr->currentDayEdit->clearFocus();
+  this->dataPtr->currentHourEdit->clearFocus();
+  this->dataPtr->currentMinuteEdit->clearFocus();
+  this->dataPtr->currentSecondEdit->clearFocus();
 }
 
 /////////////////////////////////////////////////
@@ -184,15 +413,47 @@ void LogPlayWidget::EmitSetCurrentTime(const common::Time &_time)
 
   this->dataPtr->currentTime = time;
 
-  // Update current time line edit
-  if (this->dataPtr->lessThan1h)
+  // Enable/disable buttons
+  this->dataPtr->stepBackButton->setEnabled(time != this->dataPtr->startTime);
+  this->dataPtr->rewindButton->setEnabled(time != this->dataPtr->startTime);
+  this->dataPtr->stepForwardButton->setEnabled(time != this->dataPtr->endTime);
+  this->dataPtr->forwardButton->setEnabled(time != this->dataPtr->endTime);
+  this->dataPtr->pauseButton->setEnabled(time != this->dataPtr->endTime);
+  this->dataPtr->playButton->setEnabled(time != this->dataPtr->endTime);
+
+  // Update current time line edit if the user is not editing it
+  if (!(this->dataPtr->currentDayEdit->hasFocus() ||
+        this->dataPtr->currentHourEdit->hasFocus() ||
+        this->dataPtr->currentMinuteEdit->hasFocus() ||
+        this->dataPtr->currentSecondEdit->hasFocus()))
   {
-    this->SetCurrentTime(QString::fromStdString(time.FormattedString(
-        common::Time::FormatOption::MINUTES)));
-  }
-  else
-  {
-    this->SetCurrentTime(QString::fromStdString(time.FormattedString()));
+    // milliseconds
+    double msec = time.nsec / common::Time::nsInMs;
+
+    // seconds
+    double s = time.sec;
+
+    int seconds = msec / 1000;
+    msec -= seconds * 1000;
+    s += seconds;
+
+    // days
+    unsigned int day = s / 86400;
+    s -= day * 86400;
+
+    // hours
+    unsigned int hour = s / 3600;
+    s -= hour * 3600;
+
+    // minutes
+    unsigned int min = s / 60;
+    s -= min * 60;
+
+    this->SetCurrentDays(QString::number(day));
+    this->SetCurrentHours(QString::number(hour));
+    this->SetCurrentMinutes(QString::number(min));
+
+    this->SetCurrentSeconds(QString::number(s + msec / 1000.0, 'f', 3));
   }
 
   // Update current time item in view
@@ -257,6 +518,21 @@ void LogPlayWidget::EmitSetEndTime(const common::Time &_time)
   // Keep current time within bounds
   if (this->dataPtr->endTime < this->dataPtr->currentTime)
     this->EmitSetCurrentTime(this->dataPtr->endTime);
+
+  // Hide unecessary widgets
+  this->dataPtr->currentDayEdit->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->currentHourEdit->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->dayLabel->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->hourLabel->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->hourSeparator->setVisible(!this->dataPtr->lessThan1h);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::PublishMultistep(const int _step)
+{
+  msgs::LogPlaybackControl msg;
+  msg.set_multi_step(_step);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -295,11 +571,22 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 
   this->dataPtr->startTimeSet = false;
   this->dataPtr->endTimeSet = false;
+
+  // Send controls to parent
+  LogPlayWidget *widget = qobject_cast<LogPlayWidget *>(_parent);
+  if (!widget)
+    return;
+
+  connect(this, SIGNAL(Seek(const common::Time &)), widget,
+      SLOT(OnSeek(const common::Time &)));
 }
 
 /////////////////////////////////////////////////
 void LogPlayView::SetCurrentTime(const common::Time &_time)
 {
+  if (this->dataPtr->currentTimeItem->isSelected())
+    return;
+
   common::Time totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
 
   if (totalTime == common::Time::Zero)
@@ -422,10 +709,82 @@ void LogPlayView::DrawTimeline()
 }
 
 /////////////////////////////////////////////////
+void LogPlayView::mousePressEvent(QMouseEvent *_event)
+{
+  QGraphicsItem *mouseItem =
+      this->scene()->itemAt(this->mapToScene(_event->pos()));
+
+  if (mouseItem == this->dataPtr->currentTimeItem)
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
+    mouseItem->setSelected(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void LogPlayView::mouseMoveEvent(QMouseEvent *_event)
+{
+  // If nothing is selected
+  if (this->scene()->selectedItems().isEmpty())
+  {
+    QGraphicsItem *mouseItem =
+        this->scene()->itemAt(this->mapToScene(_event->pos()));
+
+    // Change cursor when hovering over current time item
+    if (mouseItem == this->dataPtr->currentTimeItem)
+      QApplication::setOverrideCursor(QCursor(Qt::OpenHandCursor));
+    else
+      QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+  }
+
+  // If dragging current time item, keep it within bounds
+  if (this->dataPtr->currentTimeItem->isSelected())
+  {
+    QPointF newPos(this->mapToScene(_event->pos()));
+
+    if (newPos.x() < this->dataPtr->margin)
+      newPos.setX(this->dataPtr->margin);
+    else if (newPos.x() > (this->dataPtr->sceneWidth - this->dataPtr->margin))
+      newPos.setX(this->dataPtr->sceneWidth - this->dataPtr->margin);
+
+    newPos.setY(this->dataPtr->sceneHeight/2);
+    this->dataPtr->currentTimeItem->setPos(newPos);
+  }
+}
+
+/////////////////////////////////////////////////
+void LogPlayView::mouseReleaseEvent(QMouseEvent */*_event*/)
+{
+  // Send time seek if releasing current time item
+  if (this->dataPtr->currentTimeItem->isSelected())
+  {
+    double relPos =
+        (this->dataPtr->currentTimeItem->pos().x() - this->dataPtr->margin) /
+        (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin);
+
+    common::Time totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+
+    common::Time seekTime = (totalTime * relPos) + this->dataPtr->startTime;
+
+    this->Seek(seekTime);
+  }
+
+  this->scene()->clearSelection();
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+}
+
+/////////////////////////////////////////////////
 CurrentTimeItem::CurrentTimeItem()
 {
   this->setEnabled(true);
+  this->setRect(-8, -25, 16, 50);
   this->setZValue(10);
+  this->setAcceptHoverEvents(true);
+  this->setAcceptedMouseButtons(Qt::LeftButton);
+  this->setFlag(QGraphicsItem::ItemIsSelectable);
+  this->setFlag(QGraphicsItem::ItemIsMovable);
+  this->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
+  this->setCursor(Qt::SizeAllCursor);
 }
 
 /////////////////////////////////////////////////
@@ -458,8 +817,16 @@ void CurrentTimeItem::paint(QPainter *_painter,
   QBrush whiteBrush(Qt::white);
   QBrush orangeBrush(QColor(245, 129, 19, 255));
 
-  _painter->setPen(orangePen);
-  _painter->setBrush(orangeBrush);
+  if (this->isSelected())
+  {
+    _painter->setPen(whitePen);
+    _painter->setBrush(whiteBrush);
+  }
+  else
+  {
+    _painter->setPen(orangePen);
+    _painter->setBrush(orangeBrush);
+  }
 
   _painter->drawPolygon(triangle);
 }

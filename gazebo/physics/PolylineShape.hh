@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,8 @@ namespace gazebo
       /// Each element in the outer vector consists of a vector of vertices that
       /// describe one polyline.
       /// \sa SetVertices
-      public: std::vector<std::vector<math::Vector2d> > GetVertices() const;
+      public: std::vector<std::vector<ignition::math::Vector2d> >
+              Vertices() const;
 
       /// \brief Get the height of the polylines.
       /// \return The height of the polylines.
@@ -78,7 +79,8 @@ namespace gazebo
       /// vertices. Each element in the outer vector consists of a vector of
       /// vertices that describe one polyline.
       private: virtual void SetVertices(
-                  const std::vector<std::vector<math::Vector2d> > &_vertices);
+                   const std::vector<std::vector<ignition::math::Vector2d> >
+                   &_vertices);
 
       /// \brief Set the vertices of the polyline
       /// \param[in] _msg geometry msg containing the vertex information
@@ -89,7 +91,8 @@ namespace gazebo
       /// \param[in] _vertices std::vector<math::Vector2d>
       /// containing the vertex information
       private: void SetPolylineShape(const double &_height,
-                  const std::vector<std::vector<math::Vector2d> > &_vertices);
+                  const std::vector<std::vector<ignition::math::Vector2d> >
+                  &_vertices);
 
       /// \brief Set the height of the polylines. The same height value is set
       /// for all polylines.

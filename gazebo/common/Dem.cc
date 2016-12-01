@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@
 #include "gazebo/common/DemPrivate.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -66,8 +65,8 @@ int Dem::Load(const std::string &_filename)
   unsigned int height;
   int xSize, ySize;
   double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
-  math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
-  math::Angle lowLeftLat, lowLeftLong;
+  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  ignition::math::Angle lowLeftLat, lowLeftLong;
 
   // Sanity check
   std::string fullName = _filename;
@@ -128,15 +127,15 @@ int Dem::Load(const std::string &_filename)
                                             lowLeftLat, lowLeftLong);
 
   // Set the terrain's side (the terrain will be squared after the padding)
-  if (math::isPowerOfTwo(ySize - 1))
+  if (ignition::math::isPowerOfTwo(ySize - 1))
     height = ySize;
   else
-    height = math::roundUpPowerOfTwo(ySize) + 1;
+    height = ignition::math::roundUpPowerOfTwo(ySize) + 1;
 
-  if (math::isPowerOfTwo(xSize - 1))
+  if (ignition::math::isPowerOfTwo(xSize - 1))
     width = xSize;
   else
-    width = math::roundUpPowerOfTwo(xSize) + 1;
+    width = ignition::math::roundUpPowerOfTwo(xSize) + 1;
 
   this->dataPtr->side = std::max(width, height);
 
@@ -144,11 +143,27 @@ int Dem::Load(const std::string &_filename)
   if (this->LoadData() != 0)
     return -1;
 
-  // Set the min/max heights
-  this->dataPtr->minElevation = *std::min_element(&this->dataPtr->demData[0],
-      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
-  this->dataPtr->maxElevation = *std::max_element(&this->dataPtr->demData[0],
-      &this->dataPtr->demData[0] + this->dataPtr->side * this->dataPtr->side);
+  // Check for nodata value in dem data. This is used when computing the
+  // min elevation. If nodata value is not defined, we assume it will be one
+  // of the commonly used values such as -9999, -32768, etc.
+  // For simplicity, we will treat values <= -9999 as nodata values and
+  // ignore them when computing the min elevation.
+  int validNoData = 0;
+  const double defaultNoDataValue = -9999;
+  double noDataValue = this->dataPtr->band->GetNoDataValue(&validNoData);
+  if (validNoData <= 0)
+    noDataValue = defaultNoDataValue;
+
+  this->dataPtr->minElevation = *std::min_element(
+      this->dataPtr->demData.begin(),
+      this->dataPtr->demData.end(),
+      [noDataValue](double _a, double _b) -> bool
+      {
+        return _a < _b && _a > noDataValue;
+      });
+  this->dataPtr->maxElevation = *std::max_element(
+      this->dataPtr->demData.begin(),
+      this->dataPtr->demData.end());
 
   return 0;
 }
@@ -180,7 +195,7 @@ float Dem::GetMaxElevation() const
 
 //////////////////////////////////////////////////
 void Dem::GetGeoReference(double _x, double _y,
-                          math::Angle &_latitude, math::Angle &_longitude)
+    ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
 {
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
@@ -201,8 +216,8 @@ void Dem::GetGeoReference(double _x, double _y,
 
     cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
-    _latitude.SetFromDegree(yGeoDeg);
-    _longitude.SetFromDegree(xGeoDeg);
+    _latitude.Degree(yGeoDeg);
+    _longitude.Degree(xGeoDeg);
   }
   else
     gzthrow("Unable to obtain the georeferenced values for coordinates ("
@@ -210,7 +225,8 @@ void Dem::GetGeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-void Dem::GetGeoReferenceOrigin(math::Angle &_latitude, math::Angle &_longitude)
+void Dem::GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
+    ignition::math::Angle &_longitude) const
 {
   return this->GetGeoReference(0, 0, _latitude, _longitude);
 }
@@ -241,8 +257,9 @@ double Dem::GetWorldHeight() const
 
 //////////////////////////////////////////////////
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-                        const math::Vector3 &_size, const math::Vector3 &_scale,
-                        bool _flipY, std::vector<float> &_heights)
+    const ignition::math::Vector3d &_size,
+    const ignition::math::Vector3d &_scale,
+    bool _flipY, std::vector<float> &_heights)
 {
   if (_subSampling <= 0)
   {
@@ -280,18 +297,18 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       double px4 = this->dataPtr->demData[y2 * this->dataPtr->side + x2];
       float h2 = (px3 - ((px3 - px4) * dx));
 
-      float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
-          this->GetMinElevation())) * _scale.z;
+      float h = this->dataPtr->minElevation +
+          (h1 - ((h1 - h2) * dy) - this->dataPtr->minElevation) * _scale.Z();
 
       // Invert pixel definition so 1=ground, 0=full height,
       // if the terrain size has a negative z component
       // this is mainly for backward compatibility
-      if (_size.z < 0)
+      if (_size.Z() < 0)
         h *= -1;
 
-      // Convert to 0 if a NODATA value is found
-      if (_size.z >= 0 && h < 0)
-        h = 0;
+      // Convert to minElevation if a NODATA value is found
+      if (_size.Z() >= 0 && h < this->dataPtr->minElevation)
+        h = this->dataPtr->minElevation;
 
       // Store the height for future use
       if (!_flipY)

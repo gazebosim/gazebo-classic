@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,9 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  math::Pose pose = this->GetRelativePose();
-  BulletLinkPtr bbody = boost::dynamic_pointer_cast<BulletLink>(this->parent);
+  // math::Pose pose = this->GetRelativePose();
+  // BulletLinkPtr bbody =
+  //     boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
 }
@@ -104,8 +105,8 @@ math::Box BulletCollision::GetBoundingBox() const
     btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    result.min.Set(btMin.x(), btMin.y(), btMin.z());
-    result.max.Set(btMax.x(), btMax.y(), btMax.z());
+    result = math::Box(math::Vector3(btMin.x(), btMin.y(), btMin.z()),
+                       math::Vector3(btMax.x(), btMax.y(), btMax.z()));
 
     if (this->GetShapeType() & PLANE_SHAPE)
     {

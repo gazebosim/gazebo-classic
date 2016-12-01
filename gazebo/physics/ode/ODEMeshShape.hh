@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ namespace gazebo
   {
     class ODEMesh;
 
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief Triangle mesh collision.
-    class GZ_PHYSICS_ODE_VISIBLE ODEMeshShape : public MeshShape
+    class GZ_PHYSICS_VISIBLE ODEMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -49,6 +52,7 @@ namespace gazebo
       /// \brief ODE collsion mesh helper class.
       private: ODEMesh *odeMesh;
     };
+    /// \}
   }
 }
 #endif

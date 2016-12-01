@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_dart DART Physics
-    /// \brief dart physics engine wrapper
+    /// Forward declare private data class
+    class DARTLinkPrivate;
+
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// \brief DART Link class
@@ -176,23 +177,12 @@ namespace gazebo
       /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
 
-      /// \brief Pointer to the DART physics engine.
-      private: DARTPhysicsPtr dartPhysics;
+      // Documentation inherited.
+      public: virtual void UpdateMass();
 
-      /// \brief Pointer to the DART BodyNode.
-      private: dart::dynamics::BodyNode *dtBodyNode;
-
-      /// \brief Pointer to the parent joint.
-      private: DARTJointPtr dartParentJoint;
-
-      /// \brief List of pointers to the child joints.
-      private: std::vector<DARTJointPtr> dartChildJoints;
-
-      /// \brief If true, freeze link to world (inertial) frame.
-      private: bool staticLink;
-
-      /// \brief Weld joint constraint for SetLinkStatic()
-      private: dart::constraint::WeldJointConstraint *weldJointConst;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTLinkPrivate *dataPtr;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,12 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTHeightmapShapePrivate;
+
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART Height map collision.
     class GZ_PHYSICS_VISIBLE DARTHeightmapShape : public HeightmapShape
     {
@@ -42,15 +48,11 @@ namespace gazebo
       // Documentation inerited.
       public: virtual void Init();
 
-      /// \brief Called by ODE to get the height at a vertex.
-      /// \param[in] _data Pointer to the heightmap data.
-      /// \param[in] _x X location.
-      /// \param[in] _y Y location.
-      // private: static dReal GetHeightCallback(void *_data, int _x, int _y);
-
-      /// \brief The heightmap data.
-      // private: dHeightfieldDataID odeData;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTHeightmapShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

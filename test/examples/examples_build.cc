@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  *
  */
 #include <gtest/gtest.h>
+#include <iostream>
 #include <stdio.h>
 #include <string>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/common/Console.hh"
+#include "gazebo/gazebo_config.h"
 
 ///////////////////////////////////////////////////////////////////
 // Create a temporary build folder
@@ -28,7 +29,7 @@ boost::filesystem::path createTempBuildFolder(const std::string &_prefix)
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
   path /= boost::filesystem::unique_path(_prefix + "-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directories(path);
-  gzdbg << "mkdir " << path.string() << std::endl;
+  std::cout << "mkdir " << path.string() << std::endl;
   return path;
 }
 
@@ -41,7 +42,7 @@ boost::filesystem::path getSourcePath(const std::string &_folder,
   path /= std::string("examples");
   path /= _folder;
   path /= _suffix;
-  gzdbg << "source " << path.string() << std::endl;
+  std::cout << "source " << path.string() << std::endl;
   return path;
 }
 
@@ -78,7 +79,7 @@ void ExamplesBuild::Build(const std::string &_type, const std::string &_name)
   ASSERT_EQ(system(cmd), 0);
 
   // remove temporary folder
-  gzdbg << "removing " << build.string() << std::endl;
+  std::cout << "removing " << build.string() << std::endl;
   boost::filesystem::remove_all(build);
 }
 
@@ -96,6 +97,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "gui_overlay_plugin_spawn"
   , "gui_overlay_plugin_time"
   , "hello_world"
+  , "mainwindow_example"
   , "model_push"
   , "model_move"
   , "parameters"
@@ -111,17 +113,22 @@ TEST_P(ExamplesBuild_Standalone, Standalone)
 }
 
 ///////////////////////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
+auto standaloneValues = ::testing::Values(
   "actuator"
-  // , "animated_box"
-  // , "arrange"
+  , "animated_box"
+  , "arrange"
   , "clone_simulation"
   , "custom_main"
   , "custom_main_pkgconfig"
-  // , "listener"
-  // , "publisher"
+  , "harness"
+  , "listener"
+  , "publisher"
+#ifndef BUILD_TYPE_COVERAGE
   , "test_fixture"
-));
+#endif
+  , "transporter"
+);
+INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, standaloneValues);
 
 int main(int argc, char **argv)
 {

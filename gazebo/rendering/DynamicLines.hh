@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,15 @@ namespace gazebo
       /// \brief Add a point to the point list
       /// \param[in] _pt math::Vector3 point
       /// \param[in] _color common::Color Point color
+      /// \deprecated See function that accepts ignition::math parameters
       public: void AddPoint(const math::Vector3 &_pt,
+            const common::Color &_color = common::Color::White)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Add a point to the point list
+      /// \param[in] _pt ignition::math::Vector3d point
+      /// \param[in] _color common::Color Point color
+      public: void AddPoint(const ignition::math::Vector3d &_pt,
             const common::Color &_color = common::Color::White);
 
       /// \brief Add a point to the point list.
@@ -74,7 +82,15 @@ namespace gazebo
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
       /// \param[in] _value math::Vector3 value to set the point to
-      public: void SetPoint(unsigned int _index, const math::Vector3 &_value);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetPoint(unsigned int _index, const math::Vector3 &_value)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Change the location of an existing point in the point list
+      /// \param[in] _index Index of the point to set
+      /// \param[in] _value ignition::math::Vector3d value to set the point to
+      public: void SetPoint(const unsigned int _index,
+                  const ignition::math::Vector3d &_value);
 
       /// \brief Change the color of an existing point in the point list
       /// \param[in] _index Index of the point to set
@@ -84,7 +100,19 @@ namespace gazebo
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
       /// \return math::Vector3 value of the point
-      public: const math::Vector3& GetPoint(unsigned int _index) const;
+      /// \deprecated See function that returns an ignition::math object
+      /// \throw Throws an gazebo::common::Exception if the _index is out
+      /// of bounds
+      public: math::Vector3 GetPoint(unsigned int _index) const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the location of an existing point in the point list
+      /// \param[in] _index Number of the point to return
+      /// \return ignition::math::Vector3d value of the point. A vector of
+      /// [IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF] is returned when then the
+      /// _index is out of bounds.
+      /// IGN_DBL_INF==std::numeric_limits<double>::infinity()
+      public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
       /// \brief Return the total number of points in the point list
       /// \return Number of points
@@ -105,7 +133,7 @@ namespace gazebo
       private: virtual void FillHardwareBuffers();
 
       /// \brief List of points for the line
-      private: std::vector<math::Vector3> points;
+      private: std::vector<ignition::math::Vector3d> points;
 
       /// \brief Used to indicate if the lines require an update
       private: bool dirty;

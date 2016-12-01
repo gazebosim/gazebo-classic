@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,11 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE Link class.
-    class GZ_PHYSICS_ODE_VISIBLE ODELink : public Link
+    class GZ_PHYSICS_VISIBLE ODELink : public Link
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent model.
@@ -57,6 +60,12 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual bool GetEnabled() const;
+
+      /// \brief Update location of collisions relative to center of mass.
+      /// This used to be done only in the Init function, but was moved
+      /// to a separate function to handle dynamic updates to the
+      /// center of mass.
+      public: void UpdateCollisionOffsets();
 
       // Documentation inherited
       public: virtual void UpdateMass();
@@ -185,6 +194,7 @@ namespace gazebo
       /// \brief Cache torque applied on body
       private: math::Vector3 torque;
     };
+    /// \}
   }
 }
 #endif

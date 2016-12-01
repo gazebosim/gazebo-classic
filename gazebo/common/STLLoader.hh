@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _STLLOADER_HH_
-#define _STLLOADER_HH_
+#ifndef _GAZEBO_STLLOADER_HH_
+#define _GAZEBO_STLLOADER_HH_
 
 #include <stdint.h>
 #include <string>

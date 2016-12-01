@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _RAYSENSOR_HH_
-#define _RAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RAYSENSOR_HH_
+#define _GAZEBO_SENSORS_RAYSENSOR_HH_
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
@@ -36,6 +36,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class.
+    class RaySensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -60,65 +63,110 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
 
       // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      public: virtual std::string Topic() const;
 
       /// \brief Get the minimum angle
       /// \return The minimum angle object
-      public: math::Angle GetAngleMin() const;
+      public: ignition::math::Angle AngleMin() const;
 
       /// \brief Get the maximum angle
       /// \return the maximum angle object
-      public: math::Angle GetAngleMax() const;
+      public: ignition::math::Angle AngleMax() const;
 
       /// \brief Get the angle in radians between each range
       /// \return Resolution of the angle
-      public: double GetAngleResolution() const;
+      /// \deprecated See AngleResolution()
+      public: double GetAngleResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angle in radians between each range
+      /// \return Resolution of the angle
+      public: double AngleResolution() const;
 
       /// \brief Get the minimum range
       /// \return The minimum range
-      public: double GetRangeMin() const;
+      /// \deprecated See RangeMin()
+      public: double GetRangeMin() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the minimum range
+      /// \return The minimum range
+      public: double RangeMin() const;
 
       /// \brief Get the maximum range
       /// \return The maximum range
-      public: double GetRangeMax() const;
+      /// \deprecated See RangeMax()
+      public: double GetRangeMax() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the maximum range
+      /// \return The maximum range
+      public: double RangeMax() const;
 
       /// \brief Get the range resolution
       /// \return Resolution of the range
-      public: double GetRangeResolution() const;
+      /// \deprecated See RangeResolution()
+      public: double GetRangeResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the range resolution
+      /// \return Resolution of the range
+      public: double RangeResolution() const;
 
       /// \brief Get the ray count
       /// \return The number of rays
-      public: int GetRayCount() const;
+      /// \deprecated See RayCount()
+      public: int GetRayCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the ray count
+      /// \return The number of rays
+      public: int RayCount() const;
 
       /// \brief Get the range count
       /// \return The number of ranges
-      public: int GetRangeCount() const;
+      /// \deprecated See RangeCount
+      public: int GetRangeCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the range count
+      /// \return The number of ranges
+      public: int RangeCount() const;
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
-      public: int GetVerticalRayCount() const;
+      /// \deprecated See VerticalRayCount()
+      public: int GetVerticalRayCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
-      public: int GetVerticalRangeCount() const;
+      public: int VerticalRayCount() const;
+
+      /// \brief Get the vertical scan line count
+      /// \return The number of scan lines vertically
+      /// \deprecated See VerticalRangeCount();
+      public: int GetVerticalRangeCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the vertical scan line count
+      /// \return The number of scan lines vertically
+      public: int VerticalRangeCount() const;
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: math::Angle GetVerticalAngleMin() const;
+      public: ignition::math::Angle VerticalAngleMin() const;
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: math::Angle GetVerticalAngleMax() const;
+      public: ignition::math::Angle VerticalAngleMax() const;
 
       /// \brief Get the vertical angle in radians between each range
       /// \return Resolution of the angle
-      public: double GetVerticalAngleResolution() const;
+      /// \deprecated See VerticalAngleResolution()
+      public: double GetVerticalAngleResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the vertical angle in radians between each range
+      /// \return Resolution of the angle
+      public: double VerticalAngleResolution() const;
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -129,11 +177,29 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Returns RangeMax for no detection.
-      public: double GetRange(unsigned int _index);
+      /// \deprecated See Range(unsigned int _index)
+      public: double GetRange(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected range for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your access loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \param[in] _index Index of specific ray
+      /// \return Returns RangeMax for no detection.
+      public: double Range(const unsigned int _index) const;
 
       /// \brief Get all the ranges
       /// \param _ranges A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges);
+      /// \deprecated See Ranges(std::vector<double> &_ranges)
+      public: void GetRanges(std::vector<double> &_ranges)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get all the ranges
+      /// \param[out] _ranges A vector that will contain all the range data
+      public: void Ranges(std::vector<double> &_ranges) const;
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -144,7 +210,19 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Retro (intensity) value for ray
-      public: double GetRetro(unsigned int _index);
+      /// \deprecated See Retro(unsigned int _index)
+      public: double GetRetro(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected retro (intensity) value for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your access loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \param[in] _index Index of specific ray
+      /// \return Retro (intensity) value for ray
+      public: double Retro(const unsigned int _index) const;
 
       /// \brief Get detected fiducial value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -155,23 +233,36 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index value of specific ray
       /// \return Fiducial value
-      public: int GetFiducial(unsigned int _index);
+      /// \deprecated See Fiducial(unsigned int _index)
+      public: int GetFiducial(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected fiducial value for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your access loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \param[in] _index Index value of specific ray
+      /// \return Fiducial value
+      public: int Fiducial(const unsigned int _index) const;
 
       /// \brief Returns a pointer to the internal physics::MultiRayShape
       /// \return Pointer to ray shape
-      public: physics::MultiRayShapePtr GetLaserShape() const
-              {return this->laserShape;}
+      /// \deprecated See LaserShape()
+      public: physics::MultiRayShapePtr GetLaserShape()
+              const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns a pointer to the internal physics::MultiRayShape
+      /// \return Pointer to ray shape
+      public: physics::MultiRayShapePtr LaserShape() const;
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
-      private: physics::CollisionPtr laserCollision;
-      private: physics::MultiRayShapePtr laserShape;
-      private: physics::EntityPtr parentEntity;
-
-      private: transport::PublisherPtr scanPub;
-      private: boost::mutex mutex;
-      private: msgs::LaserScanStamped laserMsg;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<RaySensorPrivate> dataPtr;
     };
     /// \}
   }

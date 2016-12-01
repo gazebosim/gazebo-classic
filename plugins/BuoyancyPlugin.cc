@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("link"))
   {
     for (sdf::ElementPtr linkElem = this->sdf->GetElement("link"); linkElem;
-         linkElem = this->sdf->GetNextElement("link"))
+         linkElem = linkElem->GetNextElement("link"))
     {
       int id = -1;
       std::string name = "";

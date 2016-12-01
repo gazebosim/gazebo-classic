@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
@@ -46,7 +47,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
@@ -84,7 +85,7 @@ void SonarVisual::Load()
   // Make sure the meshes are in Ogre
   this->InsertMesh("unit_cone");
   Ogre::MovableObject *coneObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__SONAR_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
 
@@ -120,9 +121,9 @@ void SonarVisual::Update()
     return;
 
   // Skip the update if the user is moving the sonar.
-  if (this->GetScene()->GetSelectedVisual() &&
+  if (this->GetScene()->SelectedVisual() &&
       this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName())
+      this->GetScene()->SelectedVisual()->GetName())
   {
     return;
   }
@@ -135,20 +136,23 @@ void SonarVisual::Update()
       !math::equal(dPtr->coneNode->getScale().x, radiusScale))
   {
     dPtr->coneNode->setScale(radiusScale, radiusScale, rangeDelta);
-    dPtr->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
+    dPtr->sonarRay->SetPoint(0,
+        ignition::math::Vector3d(0, 0, rangeDelta * 0.5));
   }
 
-  math::Pose pose = msgs::Convert(dPtr->sonarMsg->sonar().world_pose());
+  ignition::math::Pose3d pose =
+    msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
   if (dPtr->sonarMsg->sonar().has_contact())
   {
-    math::Vector3 pos = msgs::Convert(dPtr->sonarMsg->sonar().contact());
+    ignition::math::Vector3d pos =
+      msgs::ConvertIgn(dPtr->sonarMsg->sonar().contact());
     dPtr->sonarRay->SetPoint(1, pos);
   }
   else
   {
-    dPtr->sonarRay->SetPoint(1, math::Vector3(0, 0,
+    dPtr->sonarRay->SetPoint(1, ignition::math::Vector3d(0, 0,
           (rangeDelta * 0.5) - dPtr->sonarMsg->sonar().range()));
   }
   dPtr->receivedMsg = false;

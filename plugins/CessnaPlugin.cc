@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(CessnaPlugin)
 
 ////////////////////////////////////////////////////////////////////////////////
-CessnaPlugin::CessnaPlugin()
+CessnaPlugin::CessnaPlugin() : cmds {{0, 0, 0, 0, 0, 0, 0}}
 {
   // PID default parameters.
   this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20000.0, -20000.0);

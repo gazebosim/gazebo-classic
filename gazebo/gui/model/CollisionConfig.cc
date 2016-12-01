@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ CollisionConfig::CollisionConfig()
   // Add Collision button
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
   addCollisionButton->setMaximumWidth(200);
+  addCollisionButton->setDefault(false);
+  addCollisionButton->setAutoDefault(false);
   connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
   // Main layout
@@ -55,10 +57,14 @@ CollisionConfig::CollisionConfig()
   this->setLayout(mainLayout);
 
   this->counter = 0;
-  this->signalMapper = new QSignalMapper(this);
 
-  connect(this->signalMapper, SIGNAL(mapped(int)),
+  this->mapperRemove = new QSignalMapper(this);
+  this->connect(this->mapperRemove, SIGNAL(mapped(int)),
      this, SLOT(OnRemoveCollision(int)));
+
+  this->mapperShow = new QSignalMapper(this);
+  this->connect(this->mapperShow, SIGNAL(mapped(int)),
+     this, SLOT(OnShowCollision(int)));
 }
 
 /////////////////////////////////////////////////
@@ -67,8 +73,33 @@ CollisionConfig::~CollisionConfig()
   while (!this->configs.empty())
   {
     auto config = this->configs.begin();
+    delete config->second;
     this->configs.erase(config);
   }
+  while (!this->deletedConfigs.empty())
+  {
+    auto config = this->deletedConfigs.begin();
+    delete config->second;
+    this->deletedConfigs.erase(config);
+  }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::Init()
+{
+  // Keep original data in case user cancels
+  for (auto &it : this->configs)
+  {
+    CollisionConfigData *configData = it.second;
+    configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
+  }
+
+  // Clear lists
+  for (auto &it : this->deletedConfigs)
+    delete it.second->widget;
+  this->deletedConfigs.clear();
+
+  this->addedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -133,22 +164,39 @@ void CollisionConfig::AddCollision(const std::string &_name,
         image: url(:/images/down_arrow.png);\
       }");
 
+  // Show button
+  auto showCollisionButton = new QToolButton(this);
+  showCollisionButton->setObjectName(
+      "showCollisionButton_" + QString(_name.c_str()));
+  showCollisionButton->setFixedSize(QSize(30, 30));
+  showCollisionButton->setToolTip("Show/hide " + QString(_name.c_str()));
+  showCollisionButton->setIcon(QPixmap(":/images/eye.png"));
+  showCollisionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  showCollisionButton->setIconSize(QSize(16, 16));
+  showCollisionButton->setCheckable(true);
+  this->connect(showCollisionButton, SIGNAL(clicked()), this->mapperShow,
+      SLOT(map()));
+  this->mapperShow->setMapping(showCollisionButton, this->counter);
+
   // Remove button
   QToolButton *removeCollisionButton = new QToolButton(this);
+  removeCollisionButton->setObjectName(
+      "removeCollisionButton_" + QString::number(this->counter));
   removeCollisionButton->setFixedSize(QSize(30, 30));
   removeCollisionButton->setToolTip("Remove " + QString(_name.c_str()));
   removeCollisionButton->setIcon(QPixmap(":/images/trashcan.png"));
   removeCollisionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   removeCollisionButton->setIconSize(QSize(16, 16));
   removeCollisionButton->setCheckable(false);
-  connect(removeCollisionButton, SIGNAL(clicked()), this->signalMapper,
+  connect(removeCollisionButton, SIGNAL(clicked()), this->mapperRemove,
       SLOT(map()));
-  this->signalMapper->setMapping(removeCollisionButton, this->counter);
+  this->mapperRemove->setMapping(removeCollisionButton, this->counter);
 
   // Header Layout
   QHBoxLayout *headerLayout = new QHBoxLayout;
   headerLayout->setContentsMargins(0, 0, 0, 0);
   headerLayout->addWidget(headerButton);
+  headerLayout->addWidget(showCollisionButton);
   headerLayout->addWidget(removeCollisionButton);
 
   // Header widget
@@ -164,6 +212,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   // TODO: auto-fill them with SDF defaults
   if (!msgToLoad.has_max_contacts())
     msgToLoad.set_max_contacts(10);
+
   msgs::Surface *surfaceMsg = msgToLoad.mutable_surface();
   if (!surfaceMsg->has_bounce_threshold())
     surfaceMsg->set_bounce_threshold(10e5);
@@ -179,11 +228,23 @@ void CollisionConfig::AddCollision(const std::string &_name,
     surfaceMsg->set_collide_without_contact_bitmask(1);
   if (!surfaceMsg->has_collide_bitmask())
     surfaceMsg->set_collide_bitmask(1);
+
   msgs::Friction *frictionMsg = surfaceMsg->mutable_friction();
   if (!frictionMsg->has_mu())
     frictionMsg->set_mu(1.0);
   if (!frictionMsg->has_mu2())
     frictionMsg->set_mu2(1.0);
+
+  msgs::Friction::Torsional *torsionalMsg =
+      frictionMsg->mutable_torsional();
+  if (!torsionalMsg->has_coefficient())
+    torsionalMsg->set_coefficient(1.0);
+  if (!torsionalMsg->has_use_patch_radius())
+    torsionalMsg->set_use_patch_radius(true);
+  if (!torsionalMsg->has_patch_radius())
+    torsionalMsg->set_patch_radius(0.0);
+  if (!torsionalMsg->has_surface_radius())
+    torsionalMsg->set_surface_radius(0.0);
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
@@ -193,6 +254,16 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configWidget->SetWidgetVisible("name", false);
   configWidget->SetWidgetReadOnly("id", true);
   configWidget->SetWidgetReadOnly("name", true);
+
+  connect(configWidget, SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
+
+  connect(configWidget, SIGNAL(GeometryValueChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)), this, SLOT(OnGeometryChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)));
 
   // Item layout
   QVBoxLayout *itemLayout = new QVBoxLayout();
@@ -215,6 +286,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
+  this->addedConfigs[this->counter] = configData;
 
   this->counter++;
 }
@@ -249,7 +321,8 @@ void CollisionConfig::OnRemoveCollision(int _id)
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
       QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QPushButton *cancelButton =
       msgBox.addButton("Cancel", QMessageBox::RejectRole);
@@ -258,15 +331,60 @@ void CollisionConfig::OnRemoveCollision(int _id)
   msgBox.setDefaultButton(removeButton);
   msgBox.setEscapeButton(cancelButton);
   msgBox.exec();
-  if (msgBox.clickedButton() != removeButton)
+  if (msgBox.clickedButton() && msgBox.clickedButton() != removeButton)
     return;
 
   // Remove
   this->listLayout->removeWidget(configData->widget);
-  delete configData->widget;
+  configData->widget->hide();
 
   emit CollisionRemoved(configData->name);
-  this->configs.erase(it);
+
+  // Add to delete list only if this existed from the beginning
+  auto itAdded = this->addedConfigs.find(_id);
+  if (itAdded == this->addedConfigs.end())
+  {
+    this->deletedConfigs[_id] = configData;
+    this->configs.erase(it);
+  }
+  else
+  {
+    this->addedConfigs.erase(itAdded);
+  }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::SetShowCollision(const bool _show,
+    const std::string &_name)
+{
+  auto button = this->findChild<QToolButton *>("showCollisionButton_" +
+      QString(_name.c_str()));
+
+  if (button)
+    button->setChecked(_show);
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnShowCollision(const int _id)
+{
+  auto it = this->configs.find(_id);
+  if (it == this->configs.end())
+  {
+    gzerr << "Collision not found " << std::endl;
+    return;
+  }
+
+  auto button = qobject_cast<QToolButton *>(this->mapperShow->mapping(_id));
+  if (!button)
+  {
+    gzerr << "Couldn't find button with ID [" << _id << "]" << std::endl;
+    return;
+  }
+
+  bool showCol = button->isChecked();
+
+  auto configData = this->configs[_id];
+  this->ShowCollision(showCol, configData->name);
 }
 
 /////////////////////////////////////////////////
@@ -277,7 +395,7 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
     std::string name = it.second->name;
     if (name == _name)
     {
-      return dynamic_cast<msgs::Collision *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Collision *>(it.second->configWidget->Msg());
     }
   }
   return NULL;
@@ -285,15 +403,15 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
 
 /////////////////////////////////////////////////
 void CollisionConfig::SetGeometry(const std::string &_name,
-    const math::Vector3 &_size, const std::string &_uri)
+    const ignition::math::Vector3d &_size, const std::string &_uri)
 {
-  for (auto &it : this->configs)
+  for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
     {
-      math::Vector3 dimensions;
+      ignition::math::Vector3d dimensions;
       std::string uri;
-      std::string type = it.second->configWidget->GetGeometryWidgetValue(
+      std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
@@ -303,10 +421,94 @@ void CollisionConfig::SetGeometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void CollisionConfig::Geometry(const std::string &_name,
+    ignition::math::Vector3d &_size, std::string &_uri) const
+{
+  for (auto const &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      it.second->configWidget->GeometryWidgetValue("geometry", _size, _uri);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+const std::map<int, CollisionConfigData *> &CollisionConfig::ConfigData() const
+{
+  return this->configs;
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
+    const std::string &/*_value*/,
+    const ignition::math::Vector3d &/*dimensions*/,
+    const std::string &/*_uri*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::RestoreOriginalData()
+{
+  // Remove added configs
+  for (auto &it : this->addedConfigs)
+  {
+    auto configData = it.second;
+
+    this->listLayout->removeWidget(configData->widget);
+    delete configData->widget;
+
+    emit CollisionRemoved(configData->name);
+
+    this->configs.erase(it.first);
+  }
+  this->addedConfigs.clear();
+
+  // Restore previously existing configs
+  for (auto &it : this->configs)
+  {
+    it.second->RestoreOriginalData();
+  }
+
+  // Reinsert deleted configs
+  for (auto &it : this->deletedConfigs)
+  {
+    this->listLayout->addWidget(it.second->widget);
+    it.second->widget->show();
+
+    this->configs[it.first] = it.second;
+    emit CollisionAdded(it.second->name);
+  }
+  this->deletedConfigs.clear();
+}
+
+/////////////////////////////////////////////////
 void CollisionConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::RestoreOriginalData()
+{
+  msgs::CollisionPtr collisionPtr;
+  collisionPtr.reset(new msgs::Collision);
+  collisionPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->configWidget->blockSignals(true);
+  this->configWidget->UpdateFromMsg(collisionPtr.get());
+  this->configWidget->blockSignals(false);
 }

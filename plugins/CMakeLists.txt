@@ -1,3 +1,7 @@
+if (WIN32)
+  add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -32,9 +36,10 @@ if (HAVE_UUID)
   add_definitions(${uuid_CFLAGS})
 endif()
 
-set (plugins
+set (plugins_single_header
   ActuatorPlugin
   ArrangePlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
@@ -43,13 +48,17 @@ set (plugins
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
-  ElevatorPlugin
+  FollowerPlugin
   ForceTorquePlugin
   GpuRayPlugin
+  HarnessPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
+  KeysToJointsPlugin
   LiftDragPlugin
+  LinearBatteryConsumerPlugin
+  LinearBatteryPlugin
   ModelPropShop
   MudPlugin
   PressurePlugin
@@ -59,8 +68,12 @@ set (plugins
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
-  TransporterPlugin
   VehiclePlugin)
+
+set (plugins_private_header
+  ElevatorPlugin
+  RandomVelocityPlugin
+  TransporterPlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
@@ -71,18 +84,28 @@ endif()
 
 set (GUIplugins
   CessnaGUIPlugin
+  KeyboardGUIPlugin
   TimerGUIPlugin
 )
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
-  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/
+  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
-foreach (src ${plugins})
+
+foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${plugins})
+endforeach (src ${plugins_single_header})
+
+foreach (src ${plugins_private_header})
+  add_library(${src} SHARED ${src}.cc)
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  gz_install_includes("plugins" ${src}.hh)
+  gz_install_includes("plugins" ${src}Private.hh)
+endforeach (src ${plugins_single_header})
 
 target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
 set_target_properties(BreakableJointPlugin PROPERTIES
@@ -92,10 +115,13 @@ set_target_properties(BreakableJointPlugin PROPERTIES
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
+  target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
-add_subdirectory(rest_web)
+
+if (NOT WIN32)
+  add_subdirectory(rest_web)
+endif()

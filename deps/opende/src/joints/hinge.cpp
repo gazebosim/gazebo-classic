@@ -75,9 +75,6 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
     }
-    // joint damping
-    if ( use_damping )
-      info->m = 6;
 }
 
 
@@ -96,7 +93,6 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
       info->cfm[2] = cfm;
       info->cfm[3] = cfm;
       info->cfm[4] = cfm;
-      info->cfm[5] = cfm;
     }
 
     // set the three ball-and-socket rows
@@ -181,22 +177,6 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
 
     // if the hinge is powered, or has joint limits, add in the stuff
     limot.addLimot( this, info, 5, ax1, 1 );
-
-    // joint damping
-    if (this->use_damping)
-    {
-      // added J1ad and J2ad for damping, only 1 row
-      info->J1ad[0] = ax1[0];
-      info->J1ad[1] = ax1[1];
-      info->J1ad[2] = ax1[2];
-      if ( this->node[1].body )
-      {
-        info->J2ad[0] = -ax1[0];
-        info->J2ad[1] = -ax1[1];
-        info->J2ad[2] = -ax1[2];
-      }
-      // there's no rhs for damping setup, all we want to use is the jacobian information above
-    }
 }
 
 

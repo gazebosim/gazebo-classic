@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
@@ -81,6 +82,13 @@ namespace gazebo
       /// \brief Get the SDF values for the model.
       /// \return The SDF value for this model.
       public: virtual const sdf::ElementPtr GetSDF();
+
+      /// \internal
+      /// \brief Get the SDF element for the model, without all effects of
+      /// scaling. This is useful in cases when the scale will be applied
+      /// afterwards by, for example, states.
+      /// \return The SDF element.
+      public: virtual const sdf::ElementPtr UnscaledSDF();
 
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
@@ -152,6 +160,15 @@ namespace gazebo
       /// \return Get the number of joints.
       public: unsigned int GetJointCount() const;
 
+      /// \brief Get a nested model that is a direct child of this model.
+      /// \param[in] _name Name of the child model to get.
+      /// \return Pointer to the model, NULL if the name is invalid.
+      public: ModelPtr NestedModel(const std::string &_name) const;
+
+      /// \brief Get all the nested models.
+      /// \return a vector of Model's in this model
+      public: const Model_V &NestedModels() const;
+
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
@@ -193,7 +210,7 @@ namespace gazebo
       public: void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
@@ -265,7 +282,23 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetScale(const math::Vector3 &_scale)
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the scale of model.
+      /// \param[in] _scale Scale to set the model to.
+      /// \param[in] _publish True to publish a message for the client with the
+      /// new scale.
+      /// \sa ignition::math::Vector3d Scale() const
+      public: void SetScale(const ignition::math::Vector3d &_scale,
+          const bool _publish = false);
+
+      /// \brief Get the scale of model.
+      /// \return Scale of the model.
+      /// \sa void SetScale(const ignition::math::Vector3d &_scale,
+      ///    const bool _publish = false)
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Enable all the links in all the models.
       /// \param[in] _enabled True to enable all the links.
@@ -342,11 +375,50 @@ namespace gazebo
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
+      /// \brief Create a joint for this model
+      /// \param[in] _name name of joint
+      /// \param[in] _type type of joint
+      /// \param[in] _parent parent link of joint
+      /// \param[in] _child child link of joint
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+
+      /// \brief Create a joint for this model
+      /// \param[in] _sdf SDF parameters for <joint>
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
+
+      /// \brief Remove a joint for this model
+      /// \param[in] _name name of joint
+      /// \return true if successful, false if not.
+      public: bool RemoveJoint(const std::string &_name);
+
+      /// \brief Allow Model class to share itself as a boost shared_ptr
+      /// \return a shared pointer to itself
+      public: boost::shared_ptr<Model> shared_from_this();
+
+      /// \brief Create a new link for this model
+      /// \param[in] _name name of the new link
+      /// \return a LinkPtr to the new link created,
+      /// returns NULL if link _name already exists.
+      public: LinkPtr CreateLink(const std::string &_name);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
       /// \brief Load all the links.
       private: void LoadLinks();
+
+      /// \brief Load all the nested models.
+      private: void LoadModels();
 
       /// \brief Load a joint helper function.
       /// \param[in] _sdf SDF parameter.
@@ -365,6 +437,9 @@ namespace gazebo
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
 
+      /// \brief Publish the scale.
+      private: virtual void PublishScale();
+
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
 
@@ -382,6 +457,9 @@ namespace gazebo
 
       /// \brief Cached list of links. This is here for performance.
       private: Link_V links;
+
+      /// \brief Cached list of nested models.
+      private: Model_V models;
 
       /// \brief All the grippers in the model.
       private: std::vector<GripperPtr> grippers;

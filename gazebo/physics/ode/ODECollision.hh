@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,11 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief Base class for all ODE collisions.
-    class GZ_PHYSICS_ODE_VISIBLE ODECollision : public Collision
+    class GZ_PHYSICS_VISIBLE ODECollision : public Collision
     {
       /// \brief Constructor.
       /// \param[in] _link Parent Link
@@ -107,6 +110,7 @@ namespace gazebo
       /// \brief Function used to set the pose of the ODE object.
       private: void (ODECollision::*onPoseChangeFunc)();
     };
+    /// \}
   }
 }
 #endif

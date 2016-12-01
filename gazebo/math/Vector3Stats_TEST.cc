@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Vector3Stats.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class Vector3StatsTest : public gazebo::testing::AutoLogFixture
+class Vector3StatsTest : public ::testing::Test
 {
   /// \brief Get X value of statistic _name.
   public: double X(const std::string &_name) const;

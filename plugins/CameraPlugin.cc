@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+#include <Winsock2.h>
+#endif
+
 #include "gazebo/sensors/DepthCameraSensor.hh"
 #include "plugins/CameraPlugin.hh"
 
@@ -40,16 +46,16 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     gzerr << "Invalid sensor pointer.\n";
 
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
   if (!this->parentSensor)
   {
     gzerr << "CameraPlugin requires a CameraSensor.\n";
-    if (boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
+    if (std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
       gzmsg << "It is a depth camera sensor\n";
   }
 
-  this->camera = this->parentSensor->GetCamera();
+  this->camera = this->parentSensor->Camera();
 
   if (!this->parentSensor)
   {
@@ -57,13 +63,15 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     return;
   }
 
-  this->width = this->camera->GetImageWidth();
-  this->height = this->camera->GetImageHeight();
-  this->depth = this->camera->GetImageDepth();
-  this->format = this->camera->GetImageFormat();
+  this->width = this->camera->ImageWidth();
+  this->height = this->camera->ImageHeight();
+  this->depth = this->camera->ImageDepth();
+  this->format = this->camera->ImageFormat();
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
-      boost::bind(&CameraPlugin::OnNewFrame, this, _1, _2, _3, _4, _5));
+      std::bind(&CameraPlugin::OnNewFrame, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+        std::placeholders::_4, std::placeholders::_5));
 
   this->parentSensor->SetActive(true);
 }

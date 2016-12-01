@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ class SimEventsTest : public ServerFixture,
   public: void SpawnAndDeleteModel(const std::string &_physicsEngine);
   public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
   public: void OccupiedEventSource(const std::string &_physicsEngine);
+  public: void JointEventSource(const std::string &_physicsEngine);
 };
 
 // globals to exchange data between threads
@@ -53,6 +54,9 @@ void ReceiveSimEvent(ConstSimEventPtr &_msg)
   g_event_type = _msg->type();
   g_event_name = _msg->name();
   g_event_data = _msg->data();
+  gzdbg << "ReceiveSimEvent " << g_event_type
+        << " " << g_event_name
+        << std::endl;
 }
 
 // get the count in a thread safe way
@@ -79,8 +83,8 @@ std::string GetEventData()
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewEvent(unsigned int current,
-                             unsigned int max_tries = 10,
-                             unsigned int ms = 10)
+                             unsigned int max_tries = 20,
+                             unsigned int ms = 100)
 {
   for (unsigned int i = 0; i < max_tries; i++)
   {
@@ -100,7 +104,7 @@ unsigned int WaitForNewEvent(unsigned int current,
 ////////////////////////////////////////////////////////////////////////
 void SimEventsTest::SimPauseRun(const std::string &_physicsEngine)
 {
-  Load("test/worlds/sim_events.world", false, _physicsEngine);
+  Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
   // setup the callback that increments the counter everytime a
@@ -131,7 +135,7 @@ void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
 {
   if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
 
-  Load("test/worlds/sim_events.world", false, _physicsEngine);
+  Load("worlds/sim_events.world", false, _physicsEngine);
   // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
@@ -165,7 +169,7 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   // simbody stepTo() failure
   if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
 
-  Load("test/worlds/sim_events.world", false, _physicsEngine);
+  Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
@@ -227,8 +231,55 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
 }
 
+////////////////////////////////////////////////////////////////////////
+// JointEventSource:
+// Load test world, rotate joint and verify that events are generated
+////////////////////////////////////////////////////////////////////////
+void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
+{
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode")
+    return;
+
+  this->Load("worlds/sim_events.world", false, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+
+  // Get the revoluter model
+  physics::ModelPtr model = world->GetModel("revoluter");
+  physics::JointPtr joint = model->GetJoint("joint");
+
+  // setup the callback that increments the counter everytime a
+  // SimEvent is emitted.
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+  transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
+      &ReceiveSimEvent);
+
+  // check that after position, we have received a new event
+  unsigned int count_before = GetEventCount();
+
+  // rotate joint
+  joint->SetPosition(0, 3.1);
+
+  // check for event
+  unsigned int count_after = WaitForNewEvent(count_before);
+  EXPECT_GT(count_after, count_before);
+
+  count_before = GetEventCount();
+
+  joint->SetVelocity(0, 3.1);
+  // check for event
+  count_after = WaitForNewEvent(count_before);
+  EXPECT_GT(count_after, count_before);
+}
+
+
 // Run all test cases
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, SimEventsTest, PHYSICS_ENGINE_VALUES);
+
+TEST_P(SimEventsTest, JointEventSource)
+{
+  JointEventSource(GetParam());
+}
 
 TEST_P(SimEventsTest, SimPauseRun)
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,17 @@
 #ifndef _TOPICVIEW_HH_
 #define _TOPICVIEW_HH_
 
-#include <string>
 #include <list>
+#include <string>
+
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
-#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/transport/TransportTypes.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -35,7 +37,7 @@ namespace gazebo
     /// \cond
     /// \brief A custom combobox that pull in a list of topics for user
     /// selection.
-    class GZ_GUI_VIEWERS_VISIBLE TopicCombo : public QComboBox
+    class GZ_GUI_VISIBLE TopicCombo : public QComboBox
     {
       /// \brief Constructor
       /// \param[in] _w Parent widget.
@@ -73,7 +75,7 @@ namespace gazebo
     /// \endcond
 
     /// \brief Base class for widgets that display topic data.
-    class GZ_GUI_VIEWERS_VISIBLE TopicView : public QDialog
+    class GZ_GUI_VISIBLE TopicView : public QDialog
     {
       Q_OBJECT
 
