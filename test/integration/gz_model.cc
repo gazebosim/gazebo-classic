@@ -49,7 +49,7 @@ TEST_F(GzModel, Spawn)
 
     world->Step(100);
 
-    EXPECT_TRUE(world->GetModel("my_model") != NULL);
+    EXPECT_TRUE(world->ModelByName("my_model") != NULL);
   }
 
   // Spawn another box at a different location
@@ -63,9 +63,9 @@ TEST_F(GzModel, Spawn)
     custom_exec(cmd);
     world->Step(100);
 
-    EXPECT_TRUE(world->GetModel("next_model") != NULL);
+    EXPECT_TRUE(world->ModelByName("next_model") != NULL);
 
-    physics::ModelPtr model = world->GetModel("next_model");
+    physics::ModelPtr model = world->ModelByName("next_model");
     ASSERT_TRUE(model != NULL);
 
     // Check the pose of the spawned model
@@ -110,7 +110,7 @@ TEST_F(GzModel, SpawnAndDelete)
 
   common::Time::MSleep(1000);
 
-  EXPECT_FALSE(world->GetModel("my_model"));
+  EXPECT_FALSE(world->ModelByName("my_model"));
 }
 
 /////////////////////////////////////////////////
@@ -135,7 +135,7 @@ TEST_F(GzModel, SpawnAndMove)
   common::Time::MSleep(1000);
 
   EXPECT_TRUE(HasEntity("my_model"));
-  physics::ModelPtr model = world->GetModel("my_model");
+  physics::ModelPtr model = world->ModelByName("my_model");
 
   world->SetPaused(true);
 

@@ -65,7 +65,7 @@ Entity::Entity(BasePtr _parent)
   this->visualMsg->set_id(this->id);
 
   if (this->world)
-    this->visualMsg->set_parent_name(this->world->GetName());
+    this->visualMsg->set_parent_name(this->world->Name());
   else
   {
     gzerr << "No world set when constructing an Entity.\n";
@@ -94,7 +94,7 @@ Entity::~Entity()
 void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
-  this->node->Init(this->GetWorld()->GetName());
+  this->node->Init(this->GetWorld()->Name());
 
   this->poseSub = this->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
@@ -120,7 +120,7 @@ void Entity::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->visualMsg->set_parent_name(this->world->GetName());
+    this->visualMsg->set_parent_name(this->world->Name());
     this->visualMsg->set_parent_id(0);
   }
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
@@ -200,7 +200,7 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
 {
   this->animationStartPose = this->worldPose;
 
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = this->world->SimTime();
   this->animation = _anim;
   this->onAnimationComplete.clear();
   this->animationConnection = event::Events::ConnectWorldUpdateBegin(
@@ -213,7 +213,7 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
 {
   this->animationStartPose = this->worldPose;
 
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = this->world->SimTime();
   this->animation = _anim;
   this->onAnimationComplete = _onComplete;
   this->animationConnection = event::Events::ConnectWorldUpdateBegin(
@@ -470,7 +470,7 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
 {
   {
-    boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
+    std::lock_guard<std::mutex> lock(this->GetWorld()->WorldPoseMutex());
     (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
   }
   if (_publish)
@@ -573,7 +573,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 void Entity::Fini()
 {
   // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+  // this->GetWorld()-Physics()->RemoveEntity(this);
 
   if (this->requestPub)
   {
@@ -686,7 +686,7 @@ math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 //////////////////////////////////////////////////
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
-  EntityPtr onEntity = this->GetWorld()->GetEntity(_entityName);
+  EntityPtr onEntity = this->GetWorld()->EntityByName(_entityName);
   math::Box box = this->GetCollisionBoundingBox();
   math::Box onBox = onEntity->GetCollisionBoundingBox();
 
@@ -699,9 +699,9 @@ void Entity::PlaceOnEntity(const std::string &_entityName)
 void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)
 {
-  this->GetWorld()->GetPhysicsEngine()->InitForThread();
+  this->GetWorld()->Physics()->InitForThread();
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
-    this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+    this->GetWorld()->Physics()->CreateShape("ray", CollisionPtr()));
 
   math::Box box = this->GetCollisionBoundingBox();
   math::Vector3 start = this->GetWorldPose().pos;

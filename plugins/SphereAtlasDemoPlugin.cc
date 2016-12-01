@@ -176,7 +176,7 @@ void SphereAtlasDemoPlugin::Reset()
 /////////////////////////////////////////////////
 void SphereAtlasDemoPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
   double dt = stepTime.Double();

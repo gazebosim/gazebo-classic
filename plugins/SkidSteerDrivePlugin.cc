@@ -64,7 +64,7 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
   int err = 0;
 

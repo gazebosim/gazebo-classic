@@ -64,7 +64,7 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
 
   EXPECT_FALSE(presetManager->CurrentProfile(""));
   EXPECT_FALSE(presetManager->CurrentProfile("preset_does_not_exist"));
@@ -123,7 +123,7 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
   boost::any value;
 
   presetManager->RemoveProfile("preset_2");
@@ -170,7 +170,7 @@ TEST_F(PresetManagerTest, SDF)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  physics::PresetManagerPtr presetManager = world->GetPresetManager();
+  physics::PresetManagerPtr presetManager = world->PresetMgr();
 
   EXPECT_TRUE(!presetManager->ProfileSDF("profile_does_not_exist"));
 

@@ -35,7 +35,7 @@ namespace gazebo
       transport::NodePtr node(new transport::Node());
 
       // Initialize the node with the world name
-      node->Init(_parent->GetName());
+      node->Init(_parent->Name());
 
       // Create a publisher on the ~/physics topic
       transport::PublisherPtr physicsPub =

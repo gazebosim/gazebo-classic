@@ -56,7 +56,7 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   const std::string modelName("cube1");
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -130,14 +130,14 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
   EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
 
   const std::string modelName("plank");
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -204,14 +204,14 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
   EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
 
   const std::string modelName("cube1");
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -277,7 +277,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -286,7 +286,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   EXPECT_NEAR(dt, 1e-3, 1e-6);
 
   std::vector<std::string> modelNames;
-  for (auto const &model : world->GetModels())
+  for (auto const &model : world->Models())
   {
     std::string name = model->GetName();
     if (name.find("pendulum_") == 0)
@@ -309,7 +309,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
           << modelName
           << std::endl;
 
-    auto model = world->GetModel(modelName);
+    auto model = world->ModelByName(modelName);
     ASSERT_TRUE(model != NULL);
     models.push_back(model);
 

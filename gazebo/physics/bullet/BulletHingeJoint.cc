@@ -398,7 +398,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
         // enableAngularMotor takes max impulse as a parameter
         // instead of max force.
         // this means the friction will change when the step size changes.
-        double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+        double dt = this->world->Physics()->GetMaxStepSize();
         this->bulletHinge->enableAngularMotor(true, 0.0,
           dt * boost::any_cast<double>(_value));
       }
@@ -436,7 +436,7 @@ double BulletHingeJoint::GetParam(const std::string &_key, unsigned int _index)
   {
     if (this->bulletHinge)
     {
-      double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+      double dt = this->world->Physics()->GetMaxStepSize();
       return this->bulletHinge->getMaxMotorImpulse() / dt;
     }
     else

@@ -77,7 +77,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -171,7 +171,7 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -217,7 +217,7 @@ void JointSpawningTest::SpawnJointRotationalWorld(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -271,7 +271,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 {
   physics::WorldPtr world = physics::get_world();
   ASSERT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   bool isBullet = physics->GetType().compare("bullet") == 0;
   bool isDart = physics->GetType().compare("dart") == 0;

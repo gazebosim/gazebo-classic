@@ -48,7 +48,7 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -57,7 +57,7 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
 
   // verify top level model
   physics::ModelPtr model;
-  EXPECT_NO_THROW(model = world->GetModel("model_00"));
+  EXPECT_NO_THROW(model = world->ModelByName("model_00"));
 
   if (_physicsEngine == "simbody")
   {
@@ -168,7 +168,7 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -246,7 +246,7 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
 
   // verify top level model
   physics::ModelPtr model;
-  model = world->GetModel("model_00");
+  model = world->ModelByName("model_00");
   EXPECT_TRUE(model != NULL);
   EXPECT_EQ(model->GetWorldPose().Ign(),
       ignition::math::Pose3d(0, 0, 1, 0, 0, 0));

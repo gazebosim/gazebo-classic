@@ -81,7 +81,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 void ODEMultiRayShape::UpdateRays()
 {
   ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->GetWorld()->Physics());
 
   if (ode == nullptr)
     gzthrow("Invalid physics engine. Must use ODE.");
@@ -228,7 +228,7 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
   else
   {
     ray.reset(new ODERayShape(boost::dynamic_pointer_cast<ODEPhysics>(
-            this->GetWorld()->GetPhysicsEngine()), this->raySpaceId));
+            this->GetWorld()->Physics()), this->raySpaceId));
     dGeomSetData(ray->ODEGeomId(), ray.get());
   }
 
