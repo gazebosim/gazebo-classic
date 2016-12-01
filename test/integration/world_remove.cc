@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -86,6 +87,7 @@ class WorldRemoveSensorsTest : public ServerFixture,
 unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
     &_msgTypes)
 {
+        gzdbg << "------------" << std::endl;
   unsigned int count = 0;
   for (auto msgType : _msgTypes)
   {
@@ -93,6 +95,7 @@ unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
     {
       if (topic.find("/gazebo/default") != std::string::npos)
       {
+        gzdbg << topic << std::endl;
         count++;
       }
     }
@@ -103,8 +106,19 @@ unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
 /////////////////////////////////////////////////
 void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
 {
+  if (_physicsEngine != "ode")
+    return;
+
   // Load a blank world
   this->Load("worlds/blank.world", false, _physicsEngine);
+
+  // Clean up ServerFixture transport so it doesn't affect the test
+  this->poseSub.reset();
+  this->statsSub.reset();
+  this->factoryPub.reset();
+  this->requestPub.reset();
+  this->node->Fini();
+  this->node.reset();
 
   // Give time for everything to be created
   int sleep = 0;
@@ -159,6 +173,9 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
 
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
+
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointer left to the physics engine is this one
   EXPECT_LT(physicsEngine.use_count(), physicsEnginePtrCount);
@@ -708,10 +725,10 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
 ///////////////////////////////////////////////////
 TEST_P(WorldRemoveSensorsTest, RemoveWorldWithSensor)
 {
-//  if (this->physicsEngine != "bullet")
-//    return;
-//  if (this->sensorType != "sonar")
-//    return;
+  if (this->physicsEngine != "ode")
+    return;
+  if (this->sensorType != "altimeter")
+    return;
 
   if (this->physicsEngine == "dart" && this->sensorType == "sonar")
   {

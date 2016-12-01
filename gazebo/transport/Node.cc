@@ -71,7 +71,7 @@ void Node::Fini()
   }
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
     this->callbacks.clear();
   }
 }
@@ -163,7 +163,7 @@ void Node::ProcessPublishers()
 /////////////////////////////////////////////////
 bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
   this->incomingMsgs[_topic].push_back(_msg);
   ConnectionManager::Instance()->TriggerUpdate();
   return true;
@@ -172,7 +172,7 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 /////////////////////////////////////////////////
 bool Node::HandleMessage(const std::string &_topic, MessagePtr _msg)
 {
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
   this->incomingMsgsLocal[_topic].push_back(_msg);
   ConnectionManager::Instance()->TriggerUpdate();
   return true;
@@ -196,7 +196,7 @@ void Node::ProcessIncoming()
     std::map<std::string, std::list<std::string> >::iterator inIter;
     std::map<std::string, std::list<std::string> >::iterator endIter;
 
-    boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+    std::lock_guard<std::recursive_mutex> l(this->incomingMutex);
     inIter = this->incomingMsgs.begin();
     endIter = this->incomingMsgs.end();
 
@@ -234,7 +234,7 @@ void Node::ProcessIncoming()
     std::map<std::string, std::list<MessagePtr> >::iterator inIter;
     std::map<std::string, std::list<MessagePtr> >::iterator endIter;
 
-    boost::recursive_mutex::scoped_lock lock2(this->incomingMutex);
+    std::lock_guard<std::recursive_mutex> l(this->incomingMutex);
     inIter = this->incomingMsgsLocal.begin();
     endIter = this->incomingMsgsLocal.end();
 
@@ -335,7 +335,7 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
   if (!this->initialized)
     return;
 
-  boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
 
   // Find the topic list in the map.
   Callback_M::iterator iter = this->callbacks.find(_topic);

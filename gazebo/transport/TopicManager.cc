@@ -253,6 +253,9 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const NodePtr &_node)
 {
+  if (!_node)
+    return;
+
   boost::mutex::scoped_lock lock(this->subscriberMutex);
 
   PublicationPtr publication = this->FindPublication(_topic);
@@ -263,7 +266,13 @@ void TopicManager::Unsubscribe(const std::string &_topic,
   ConnectionManager::Instance()->Unsubscribe(_topic,
       _node->GetMsgType(_topic));
 
-  this->subscribedNodes[_topic].remove(_node);
+  if (this->subscribedNodes.find(_topic) != this->subscribedNodes.end() &&
+      std::find(this->subscribedNodes[_topic].begin(),
+                this->subscribedNodes[_topic].end(), _node) !=
+                this->subscribedNodes[_topic].end())
+  {
+    this->subscribedNodes[_topic].remove(_node);
+  }
 }
 
 //////////////////////////////////////////////////

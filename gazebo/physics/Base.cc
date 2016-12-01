@@ -361,7 +361,7 @@ void Base::RegisterIntrospectionItems()
 /////////////////////////////////////////////////
 void Base::UnregisterIntrospectionItems()
 {
-  for (auto &item : this->introspectionItems)
+  for (const auto &item : this->introspectionItems)
     util::IntrospectionManager::Instance()->Unregister(item.Str());
 
   this->introspectionItems.clear();

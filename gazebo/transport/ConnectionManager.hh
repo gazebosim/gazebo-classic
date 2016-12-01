@@ -189,6 +189,9 @@ namespace gazebo
 
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;
+
+      /// \brief Mutex to protect destruction process.
+      private: std::mutex finiMutex;
     };
     /// \}
   }

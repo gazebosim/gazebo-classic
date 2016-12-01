@@ -265,7 +265,7 @@ void Link::Fini()
   // FIXME: Do we really need to send 2 msgs to delete a visual?!
   if (this->visPub && this->requestPub)
   {
-    for (auto iter : this->visuals)
+    for (const auto &iter : this->visuals)
     {
       auto deleteMsg = msgs::CreateRequest("entity_delete",
           std::to_string(iter.second.id()));
@@ -289,7 +289,8 @@ void Link::Fini()
       this->visPub->Publish(msg);
     }
   }
-  this->visuals.clear();
+  // Do not clear visual msgs, entity will delete them
+  // this->visuals.clear();
 
 #ifdef HAVE_OPENAL
   if (this->world && this->world->Physics() &&

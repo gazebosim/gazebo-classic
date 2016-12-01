@@ -79,10 +79,6 @@ ConnectionManager::ConnectionManager()
 //////////////////////////////////////////////////
 ConnectionManager::~ConnectionManager()
 {
-  this->eventConnections.clear();
-
-  delete this->serverConn;
-  this->serverConn = NULL;
   this->Fini();
 }
 
@@ -211,10 +207,14 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 //////////////////////////////////////////////////
 void ConnectionManager::Fini()
 {
+  std::lock_guard<std::mutex> lock(this->finiMutex);
+
   if (!this->initialized)
     return;
 
   this->Stop();
+
+  this->initialized = false;
 
   if (this->masterConn)
   {
@@ -236,8 +236,6 @@ void ConnectionManager::Fini()
   this->publishers.clear();
   this->namespaces.clear();
   this->masterMessages.clear();
-
-  this->initialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -524,6 +522,8 @@ void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
 //////////////////////////////////////////////////
 void ConnectionManager::Unadvertise(const std::string &_topic)
 {
+  std::lock_guard<std::mutex> lock(this->finiMutex);
+
   msgs::Publish msg;
   msg.set_topic(_topic);
   msg.set_msg_type("");
@@ -574,6 +574,8 @@ void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 //////////////////////////////////////////////////
 void ConnectionManager::Unsubscribe(const msgs::Subscribe &_sub)
 {
+  std::lock_guard<std::mutex> lock(this->finiMutex);
+
   // Inform the master that we want to unsubscribe from a topic.
   this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", _sub), true);
 }
@@ -582,6 +584,8 @@ void ConnectionManager::Unsubscribe(const msgs::Subscribe &_sub)
 void ConnectionManager::Unsubscribe(const std::string &_topic,
                                      const std::string &_msgType)
 {
+  std::lock_guard<std::mutex> lock(this->finiMutex);
+
   if (this->serverConn && this->masterConn)
   {
     msgs::Subscribe msg;

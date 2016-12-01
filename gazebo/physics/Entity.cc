@@ -598,6 +598,7 @@ void Entity::Fini()
   this->animationConnection.reset();
   this->connections.clear();
 
+  // FIXME: Crashes here sometimes at gazebo::msgs::~Visual
   if (this->visualMsg)
     delete this->visualMsg;
   this->visualMsg = NULL;

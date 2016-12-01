@@ -566,11 +566,17 @@ void Server::Run()
 
   this->dataPtr->initialized = true;
 
-  // Update the sensors.
-  while (!this->dataPtr->stop && physics::worlds_running())
+  // Stay on this loop until Gazebo needs to be shut down
+  // The server and sensor manager outlive worlds
+  while (!this->dataPtr->stop)
   {
     this->ProcessControlMsgs();
-    sensors::run_once();
+
+    if (physics::worlds_running())
+      sensors::run_once();
+    else if (sensors::running())
+      sensors::stop();
+
     common::Time::MSleep(1);
   }
 
@@ -719,6 +725,7 @@ void Server::ProcessControlMsgs()
     }
     else if ((*iter).has_save_world_name())
     {
+      // FIXME: check if world exists
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
       if ((*iter).has_save_filename())
         world->Save((*iter).save_filename());

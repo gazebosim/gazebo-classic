@@ -22,6 +22,7 @@
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
+#include <mutex>
 #include <list>
 #include <string>
 #include <vector>
@@ -183,7 +184,7 @@ namespace gazebo
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
         {
-          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
           this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
                 new CallbackHelperT<M>(boost::bind(_fp, _obj, _1), _latching)));
         }
@@ -212,7 +213,7 @@ namespace gazebo
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
         {
-          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
           this->callbacks[decodedTopic].push_back(
               CallbackHelperPtr(new CallbackHelperT<M>(_fp, _latching)));
         }
@@ -242,7 +243,7 @@ namespace gazebo
         ops.Init(decodedTopic, shared_from_this(), _latching);
 
         {
-          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
           this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
                 new RawCallbackHelper(boost::bind(_fp, _obj, _1))));
         }
@@ -270,7 +271,7 @@ namespace gazebo
         ops.Init(decodedTopic, shared_from_this(), _latching);
 
         {
-          boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
+          std::lock_guard<std::recursive_mutex> lock(this->incomingMutex);
           this->callbacks[decodedTopic].push_back(
               CallbackHelperPtr(new RawCallbackHelper(_fp)));
         }
@@ -342,7 +343,7 @@ namespace gazebo
 
       private: boost::mutex publisherMutex;
       private: boost::mutex publisherDeleteMutex;
-      private: boost::recursive_mutex incomingMutex;
+      private: std::recursive_mutex incomingMutex;
 
       /// \brief make sure we don't call ProcessingIncoming simultaneously
       /// from separate threads.
