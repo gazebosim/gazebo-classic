@@ -198,7 +198,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->dataPtr->node->Fini();
   this->dataPtr->modelMsgs.clear();
   this->dataPtr->visualMsgs.clear();
   this->dataPtr->lightFactoryMsgs.clear();
@@ -225,6 +224,10 @@ void Scene::Clear()
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->roadSub.reset();
+
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 
   this->dataPtr->joints.clear();
 

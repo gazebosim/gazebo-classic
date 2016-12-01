@@ -75,6 +75,8 @@ ODEMultiRayShape::~ODEMultiRayShape()
 
   dSpaceSetCleanup(this->superSpaceId, 0);
   dSpaceDestroy(this->superSpaceId);
+
+  this->Fini();
 }
 
 //////////////////////////////////////////////////

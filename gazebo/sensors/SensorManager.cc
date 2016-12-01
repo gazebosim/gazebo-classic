@@ -96,6 +96,20 @@ void SensorManager::Stop()
     GZ_ASSERT((*iter) != nullptr, "Sensor Constainer is null");
     (*iter)->Stop();
   }
+
+  if (!physics::worlds_running())
+    this->worlds.clear();
+}
+
+//////////////////////////////////////////////////
+bool SensorManager::Running()
+{
+  for (auto const &container : this->sensorContainers)
+  {
+    if (container->Running())
+      return true;
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -162,6 +176,10 @@ void SensorManager::Update(bool _force)
         (*iter2)->RemoveSensors();
       }
       this->initSensors.clear();
+
+      // Also clear the list of worlds
+      this->worlds.clear();
+
       this->removeAllSensors = false;
     }
   }
@@ -473,6 +491,12 @@ void SensorManager::SensorContainer::Stop()
 }
 
 //////////////////////////////////////////////////
+bool SensorManager::SensorContainer::Running()
+{
+  return !this->stop;
+}
+
+//////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
   this->stop = false;
@@ -489,6 +513,9 @@ void SensorManager::SensorContainer::RunLoop()
   // 1000 * MaxStepSize in order to handle simulation with a
   // large step size.
   double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
+
+  // Release engine pointer, we don't need it in the loop
+  engine.reset();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
