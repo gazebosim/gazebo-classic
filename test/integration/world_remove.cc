@@ -56,7 +56,6 @@ class WorldRemoveJointsTest : public JointTest
 unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
     &_msgTypes)
 {
-//        gzdbg << "------------" << std::endl;
   unsigned int count = 0;
   for (auto msgType : _msgTypes)
   {
@@ -64,7 +63,6 @@ unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
     {
       if (topic.find("/gazebo/default") != std::string::npos)
       {
-  //      gzdbg << topic << std::endl;
         count++;
       }
     }
@@ -158,7 +156,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   EXPECT_FALSE(physics::worlds_running());
 
   // Check there are no sensors running
-//  EXPECT_FALSE(sensors::running());
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointer left to the physics engine is this one
   EXPECT_LT(physicsEngine.use_count(), physicsEnginePtrCount);
@@ -313,6 +311,9 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
 
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
+
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointers to entities left are the ones we're holding
   for (auto &ptr : modelPtrs)
@@ -509,6 +510,9 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
 
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
+
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointers left are these
   EXPECT_EQ(model.use_count(), 1) << "Model pointer [" << model << "]";
