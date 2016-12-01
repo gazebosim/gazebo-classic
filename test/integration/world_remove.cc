@@ -106,9 +106,6 @@ unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
 /////////////////////////////////////////////////
 void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
 {
-  if (_physicsEngine != "ode")
-    return;
-
   // Load a blank world
   this->Load("worlds/blank.world", false, _physicsEngine);
 
@@ -119,6 +116,10 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   this->requestPub.reset();
   this->node->Fini();
   this->node.reset();
+
+  // Clear scene created by ServerFixture
+  auto scene = this->GetScene();
+  scene->Clear();
 
   // Give time for everything to be created
   int sleep = 0;
