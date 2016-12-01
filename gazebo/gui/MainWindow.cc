@@ -61,7 +61,9 @@
 #include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/UserCmdHistory.hh"
 #include "gazebo/gui/ViewAngleWidget.hh"
+#if HAVE_QWT
 #include "gazebo/gui/plot/PlotWindow.hh"
+#endif
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
@@ -424,8 +426,10 @@ void MainWindow::New()
 /////////////////////////////////////////////////
 void MainWindow::Plot()
 {
+#if HAVE_QWT
   gui::PlotWindow *plot = new gui::PlotWindow(this);
   plot->show();
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -1097,11 +1101,13 @@ void MainWindow::CreateActions()
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   this->connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
+#if HAVE_QWT
   g_plotAct = new QAction(QIcon(":images/graph_line_toolbar.svg"),
       tr("Plot"), this);
   g_plotAct->setShortcut(tr("Ctrl+P"));
   g_plotAct->setToolTip(tr("Create plot (Ctrl+P)"));
   this->connect(g_plotAct, SIGNAL(triggered()), this, SLOT(Plot()));
+#endif
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));

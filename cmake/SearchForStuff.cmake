@@ -775,12 +775,6 @@ find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   ${QWT_WIN_LIBRARY_DIR}
 )
 
-if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-  set(HAVE_QWT TRUE)
-else()
-  set(HAVE_QWT FALSE)
-endif ()
-
 # version
 set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
 file ( STRINGS ${_VERSION_FILE} _VERSION_LINE REGEX "define[ ]+QWT_VERSION_STR" )
@@ -799,12 +793,18 @@ endif ()
 
 # in Windows, the path need to point to the parent to get correct qwt/foo headers
 if (WIN32)
-  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")	
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")
 endif()
+
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY AND (NOT ${QWT_VERSION} VERSION_LESS 6.1.0))
+  set(HAVE_QWT TRUE)
+else()
+  set(HAVE_QWT FALSE)
+endif ()
 
 if (HAVE_QWT)
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
 else()
-  message (STATUS "Looking for qwt - not found")
-  BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
+  message (STATUS "Looking for qwt >= 6.1.0 - not found")
+  BUILD_WARNING ("Missing: libqwt-dev. Required for plotting.")
 endif ()
