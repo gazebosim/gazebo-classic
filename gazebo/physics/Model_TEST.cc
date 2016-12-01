@@ -66,7 +66,7 @@ TEST_F(ModelTest, PluginInfoFailures)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  auto model = world->GetModel("box");
+  auto model = world->ModelByName("box");
   ASSERT_TRUE(model != nullptr);
 
   ignition::msgs::Plugin_V plugins;
@@ -140,7 +140,7 @@ TEST_F(ModelTest, ModelPluginInfo)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  auto model = world->GetModel("submarine");
+  auto model = world->ModelByName("submarine");
   ASSERT_TRUE(model != nullptr);
 
   ignition::msgs::Plugin_V plugins;
@@ -181,7 +181,7 @@ TEST_F(ModelTest, NestedModelPluginInfo)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  auto model = world->GetModel("model_00");
+  auto model = world->ModelByName("model_00");
   ASSERT_TRUE(model != nullptr);
 
   ignition::msgs::Plugin_V plugins;
