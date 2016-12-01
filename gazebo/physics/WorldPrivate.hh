@@ -25,10 +25,11 @@
 #include <set>
 #include <sdf/sdf.hh>
 #include <string>
-#include <memory>
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+
+#include <ignition/transport.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
@@ -347,6 +348,9 @@ namespace gazebo
 
       /// \brief All the introspection items regsitered for this.
       public: std::vector<common::URI> introspectionItems;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
     };
   }
 }

@@ -47,6 +47,16 @@
 #include "gazebo/physics/Wind.hh"
 #include "gazebo/util/system.hh"
 
+// Forward declare reference and pointer parameters
+namespace ignition
+{
+  namespace msgs
+  {
+    class Plugin_V;
+    class StringMsg;
+  }
+}
+
 namespace gazebo
 {
   namespace physics
@@ -326,7 +336,16 @@ namespace gazebo
       public: ModelPtr ModelByName(const std::string &_name) const;
 
       /// \brief Get a light by name.
-      /// This function is the same as baseByName, but limits the search to
+      /// This function is the same as BaseByName(), but limits the search to
+      /// only lights.
+      /// \param[in] _name The name of the Light to find.
+      /// \return A pointer to the Light, or NULL if no light was found.
+      /// \deprecated See LightPtr LightByName(const std::string &_name) const
+      public: LightPtr Light(const std::string &_name)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get a light by name.
+      /// This function is the same as BaseByName(), but limits the search to
       /// only lights.
       /// \param[in] _name The name of the Light to find.
       /// \return A pointer to the Light, or NULL if no light was found.
@@ -439,22 +458,22 @@ namespace gazebo
       public: void RemovePlugin(const std::string &_name);
 
       /// \brief Get the set world pose mutex.
-      /// \return Pointer to the mutex.
+      /// \return Reference to the mutex.
       /// \deprecated See std::mutex &WorldPoseMutex() const;
-      public: std::mutex &GetWorldPoseMutex() const GAZEBO_DEPRECATED(8.0);
+      public: std::mutex &GetSetWorldPoseMutex() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the set world pose mutex.
-      /// \return Pointer to the mutex.
+      /// \return Reference to the mutex.
       public: std::mutex &WorldPoseMutex() const;
 
       /// \brief check if physics engine is enabled/disabled.
       /// \param True if the physics engine is enabled.
-      /// \deprecated See bool PhysicsEngineEnabled() const;
+      /// \deprecated See bool PhysicsEnabled() const;
       public: bool GetEnablePhysicsEngine() GAZEBO_DEPRECATED(8.0);
 
       /// \brief check if physics engine is enabled/disabled.
       /// \param True if the physics engine is enabled.
-      public: bool PhysicsEngineEnabled() const;
+      public: bool PhysicsEnabled() const;
 
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
@@ -464,7 +483,7 @@ namespace gazebo
 
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
-      public: void SetPhysicsEngineEnabled(const bool _enable);
+      public: void SetPhysicsEnabled(const bool _enable);
 
       /// \brief check if wind is enabled/disabled.
       /// \param True if the wind is enabled.
@@ -747,6 +766,25 @@ namespace gazebo
       /// ~/light/modify topic.
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightModifyMsg(ConstLightPtr &_msg);
+
+      /// \brief Callback for "<this_name>/physics/info/plugin" service.
+      /// Get information about plugins in this world or one of its
+      /// children, according to the given _pluginUri. Some _pluginUri examples:
+      ///
+      /// * Info about a specific world plugin in this world:
+      ///    data://world/<this_name>/plugin/<plugin_name>
+      ///
+      /// * Info about all world plugins in this world (empty plugin name):
+      ///    data://world/<this_name>/plugin
+      ///
+      /// * Info about a model plugin in a child model:
+      ///    data://world/<this_name>/model/<model_name>/plugin/<plugin_name>
+      ///
+      /// \param[in] _request Request containing plugin URI.
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \internal
       /// \brief Private data pointer.

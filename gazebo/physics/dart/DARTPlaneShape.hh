@@ -36,7 +36,13 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit DARTPlaneShape(CollisionPtr _parent);
+      /// \deprecated See version that accepts DARTCollisionPtr
+      public: explicit DARTPlaneShape(CollisionPtr _parent)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit DARTPlaneShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTPlaneShape();

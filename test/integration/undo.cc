@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/common/MouseEvent.hh"

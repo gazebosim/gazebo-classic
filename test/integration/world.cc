@@ -69,7 +69,7 @@ void beforePhysicsUpdate(const common::UpdateInfo &_updateInfo)
   physics::WorldPtr world = physics::get_world(_updateInfo.worldName);
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
   ASSERT_TRUE(sphereModel != NULL);
 
   physics::LinkPtr link = sphereModel->GetLink("link");
@@ -93,7 +93,7 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
 
   // Verify physics engine type
   gzdbg << "Engine: " << _physicsEngine << std::endl;
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 

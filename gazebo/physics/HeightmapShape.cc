@@ -221,21 +221,20 @@ void HeightmapShape::Init()
       this->heightmapShapeDPtr->heightmapData->GetWidth() *
       this->heightmapShapeDPtr->subSampling)-1;
 
-  this->heightmapShapeDPtr->scale.X(
-      terrainSize.X() / this->heightmapShapeDPtr->vertSize);
-  this->heightmapShapeDPtr->scale.Y(
-      terrainSize.Y() / this->heightmapShapeDPtr->vertSize);
+  // TODO add a virtual HeightmapData::GetMinElevation function to avoid the
+  // ifdef check. i.e. heightmapSizeZ = GetMaxElevation - GetMinElevation
+  double heightmapSizeZ = this->heightmapData->GetMaxElevation();
+#ifdef HAVE_GDAL
+  // DEM
+  auto demData = dynamic_cast<common::Dem *>(this->heightmapData);
+  if (demData)
+    heightmapSizeZ = heightmapSizeZ - demData->GetMinElevation();
+#endif
 
-  if (ignition::math::equal(
-        this->heightmapShapeDPtr->heightmapData->GetMaxElevation(), 0.0f))
-  {
-    this->heightmapShapeDPtr->scale.Z(fabs(terrainSize.Z()));
-  }
+  if (ignition::math::equal(heightmapSizeZ, 0.0))
+    this->scale.z = 1.0;
   else
-  {
-    this->heightmapShapeDPtr->scale.Z(fabs(terrainSize.Z()) /
-                  this->heightmapShapeDPtr->heightmapData->GetMaxElevation());
-  }
+    this->scale.z = fabs(terrainSize.z) / heightmapSizeZ;
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapShapeDPtr->heightmapData->FillHeightMap(

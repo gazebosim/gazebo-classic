@@ -35,6 +35,10 @@
 #include <vector>
 
 #include <ignition/math/Rand.hh>
+
+#include <ignition/msgs/plugin_v.pb.h>
+#include <ignition/msgs/stringmsg.pb.h>
+
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -52,8 +56,6 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/URI.hh"
-
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -160,9 +162,6 @@ World::World(const std::string &_name)
 World::~World()
 {
   this->Fini();
-
-  delete this->dataPtr;
-  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -243,6 +242,15 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
 
+  // Ignition transport
+  std::string pluginInfoService("/physics/info/plugin");
+  if (!this->dataPtr->ignNode.Advertise(pluginInfoService,
+      &World::PluginInfoService, this))
+  {
+    gzerr << "Error advertising service [" << pluginInfoService << "]"
+        << std::endl;
+  }
+
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 
@@ -322,7 +330,8 @@ void World::Load(sdf::ElementPtr _sdf)
 
   event::Events::worldCreated(this->Name());
 
-  this->dataPtr->userCmdManager = UserCmdManagerPtr(new UserCmdManager(*this));
+  this->dataPtr->userCmdManager = UserCmdManagerPtr(
+      new UserCmdManager(shared_from_this()));
 
   // Initialize the world URI.
   this->dataPtr->uri.Clear();
@@ -358,7 +367,7 @@ void World::Save(const std::string &_filename)
 void World::Init()
 {
   // Initialize all the entities (i.e. Model)
-  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); ++i)
     this->dataPtr->rootElement->Child(i)->Init();
 
   // Initialize the physics engine
@@ -370,8 +379,8 @@ void World::Init()
   this->dataPtr->testRay = std::dynamic_pointer_cast<RayShape>(
       this->Physics()->CreateShape("ray", CollisionPtr()));
 
-  this->dataPtr->prevStates[0].SetWorld(*this);
-  this->dataPtr->prevStates[1].SetWorld(*this);
+  this->dataPtr->prevStates[0].SetWorld(shared_from_this());
+  this->dataPtr->prevStates[1].SetWorld(shared_from_this());
 
   this->dataPtr->prevStates[0].SetName(this->Name());
   this->dataPtr->prevStates[1].SetName(this->Name());
@@ -481,8 +490,8 @@ void World::RunLoop()
   this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
   // Get the first state
-  this->dataPtr->prevStates[0] = WorldState(*this);
-  this->dataPtr->prevStates[1] = WorldState(*this);
+  this->dataPtr->prevStates[0] = WorldState(shared_from_this());
+  this->dataPtr->prevStates[1] = WorldState(shared_from_this());
   this->dataPtr->stateToggle = 0;
 
   this->dataPtr->logThread =
@@ -906,6 +915,8 @@ void World::Fini()
     this->dataPtr->rootElement->Fini();
     this->dataPtr->rootElement.reset();
   }
+  this->dataPtr->prevStates[0].SetWorld(WorldPtr());
+  this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
@@ -1073,10 +1084,17 @@ ModelPtr World::ModelByName(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+LightPtr World::Light(const std::string &_name)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
+  return std::dynamic_pointer_cast<physics::Light>(this->BaseByName(_name));
+}
+
+//////////////////////////////////////////////////
 LightPtr World::LightByName(const std::string &_name) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
-  return std::dynamic_pointer_cast<Light>(this->BaseByName(_name));
+  return std::dynamic_pointer_cast<physics::Light>(this->BaseByName(_name));
 }
 
 //////////////////////////////////////////////////
@@ -1310,7 +1328,10 @@ void World::Reset()
   {
     std::lock_guard<std::recursive_mutex> lk(this->dataPtr->worldUpdateMutex);
 
+    // \todo: The following is deprecated, but we're keeping it until other
+    // gazebo math functionality is removed.
     math::Rand::SetSeed(math::Rand::GetSeed());
+
     ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
 
@@ -1339,7 +1360,7 @@ void World::OnStep()
 void World::PrintEntityTree()
 {
   // Initialize all the entities
-  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); ++i)
     this->dataPtr->rootElement->Child(i)->Print("");
 }
 
@@ -1603,7 +1624,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 void World::ModelUpdateSingleLoop()
 {
   // Update all the models
-  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); ++i)
     this->dataPtr->rootElement->Child(i)->Update();
 }
 
@@ -1623,7 +1644,7 @@ void World::LoadPlugins()
   }
 
   // Load the plugins for all the models
-  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->ChildCount(); ++i)
   {
     if (this->dataPtr->rootElement->Child(i)->HasType(Base::MODEL))
     {
@@ -2882,7 +2903,7 @@ msgs::Scene World::SceneMsg() const
 }
 
 /////////////////////////////////////////////////
-std::mutex &World::GetWorldPoseMutex() const
+std::mutex &World::GetSetWorldPoseMutex() const
 {
   return this->WorldPoseMutex();
 }
@@ -2896,11 +2917,11 @@ std::mutex &World::WorldPoseMutex() const
 /////////////////////////////////////////////////
 bool World::GetEnablePhysicsEngine()
 {
-  return this->PhysicsEngineEnabled();
+  return this->PhysicsEnabled();
 }
 
 /////////////////////////////////////////////////
-bool World::PhysicsEngineEnabled() const
+bool World::PhysicsEnabled() const
 {
   return this->dataPtr->enablePhysicsEngine;
 }
@@ -2908,11 +2929,11 @@ bool World::PhysicsEngineEnabled() const
 /////////////////////////////////////////////////
 void World::EnablePhysicsEngine(const bool _enable)
 {
-  this->SetPhysicsEngineEnabled(_enable);
+  this->SetPhysicsEnabled(_enable);
 }
 
 /////////////////////////////////////////////////
-void World::SetPhysicsEngineEnabled(const bool _enable)
+void World::SetPhysicsEnabled(const bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
 }
@@ -3006,4 +3027,58 @@ std::string World::UniqueModelName(const std::string &_name)
     result = _name + "_" + std::to_string(i++);
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  _plugins.clear_plugins();
+  _success = false;
+
+  common::URI pluginUri = _req.data();
+  if (!pluginUri.Valid())
+  {
+    gzwarn << "URI [" << _req.data() << "] is not valid." << std::endl;
+    return;
+  }
+
+  if (!pluginUri.Path().Contains(this->URI().Path()))
+  {
+    gzwarn << "Plugin [" << pluginUri.Str() << "] does not match world [" <<
+        this->URI().Str() << "]" << std::endl;
+    return;
+  }
+
+  auto parts = common::split(pluginUri.Path().Str(), "/");
+  auto myParts = common::split(this->URI().Path().Str(), "/");
+
+  for (size_t i = myParts.size(); i < parts.size(); i = i+2)
+  {
+    // See if there is a model
+    if (parts[i] == "model")
+    {
+      auto model = this->GetModel(parts[i+1]);
+
+      if (!model)
+      {
+        gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
+            this->GetName() << "]" << std::endl;
+        return;
+      }
+
+      model->PluginInfo(pluginUri, _plugins, _success);
+      return;
+    }
+    // TODO: Handle world plugins
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << pluginUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
+  }
+
+  gzwarn << "Couldn't get information for plugin [" << pluginUri.Str() << "]"
+      << std::endl;
 }

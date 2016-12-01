@@ -39,6 +39,14 @@ DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
 }
 
 //////////////////////////////////////////////////
+DARTMultiRayShape::DARTMultiRayShape(DARTCollisionPtr _parent)
+  : MultiRayShape(_parent),
+    dataPtr(new DARTMultiRayShapePrivate())
+{
+  this->SetName("DART_multiray_shape");
+}
+
+//////////////////////////////////////////////////
 DARTMultiRayShape::~DARTMultiRayShape()
 {
   delete this->dataPtr;

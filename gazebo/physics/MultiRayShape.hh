@@ -54,7 +54,7 @@ namespace gazebo
       ///
       ///  gazebo::physics::MultiRayShapePtr rays =
       ///      boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
-      ///        world->GetPhysicsEngine()->CreateShape("multiray",
+      ///        world->Physics()->CreateShape("multiray",
       ///          gazebo::physics::CollisionPtr()));
       ///
       /// \param[in] _physicsEngine Pointer to the physics engine.

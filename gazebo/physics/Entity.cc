@@ -258,7 +258,7 @@ void Entity::SetAnimation(common::PoseAnimationPtr _anim)
 
   this->entityDPtr->prevAnimationTime = this->entityDPtr->world->SimTime();
   this->entityDPtr->animation = _anim;
-  this->entityDPtr->onAnimationComplete = NULL;
+  this->entityDPtr->onAnimationComplete = nullptr;
   this->entityDPtr->animationConnection =
     event::Events::ConnectWorldUpdateBegin(
         std::bind(&Entity::UpdateAnimation, this, std::placeholders::_1));
@@ -567,7 +567,6 @@ void Entity::SetWorldPose(const ignition::math::Pose3d &_pose,
 {
   {
     std::lock_guard<std::mutex> (this->World()->WorldPoseMutex());
-    // (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
     this->entityDPtr->setWorldPoseFunc(_pose, _notify, _publish);
   }
   if (_publish)
@@ -688,7 +687,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 void Entity::Fini()
 {
   // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+  // this->GetWorld()->PhysicsEngine()->RemoveEntity(this);
 
   if (this->entityDPtr->requestPub)
   {

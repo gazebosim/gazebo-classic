@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYMESH_HH_
 #define _GAZEBO_PHYSICS_SIMBODY_SIMBODYMESH_HH_
 
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/util/system.hh"
 

@@ -120,6 +120,7 @@ CollisionState CollisionState::operator+(const CollisionState &_state) const
 
   return result;
 }
+
 /////////////////////////////////////////////////
 void CollisionState::FillSDF(sdf::ElementPtr _sdf)
 {

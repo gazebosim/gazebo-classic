@@ -22,6 +22,7 @@
 
 #include <float.h>
 
+#include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
 #include "gazebo/util/OpenAL.hh"
@@ -1061,7 +1062,7 @@ void Model::LoadPlugins()
     {
       gzerr << "Sensors failed to initialize when loading model["
         << this->Name() << "] via the factory mechanism."
-        << "Plugins for the model will not be loaded.\n";
+        << " Plugins for the model will not be loaded.\n";
     }
   }
 
@@ -1835,4 +1836,97 @@ LinkPtr Model::CreateLink(const std::string &_name)
   this->modelDPtr->links.push_back(link);
 
   return link;
+}
+
+//////////////////////////////////////////////////
+void Model::PluginInfo(const common::URI &_pluginUri,
+    ignition::msgs::Plugin_V &_plugins, bool &_success)
+{
+  _plugins.clear_plugins();
+  _success = false;
+
+  if (!_pluginUri.Valid())
+  {
+    gzwarn << "URI [" << _pluginUri.Str() << "] is not valid." << std::endl;
+    return;
+  }
+
+  if (!_pluginUri.Path().Contains(this->URI().Path()))
+  {
+    gzwarn << "Plugin [" << _pluginUri.Str() << "] does not match world [" <<
+        this->URI().Str() << "]" << std::endl;
+    return;
+  }
+
+  auto parts = common::split(_pluginUri.Path().Str(), "/");
+  auto myParts = common::split(this->URI().Path().Str(), "/");
+
+  // Iterate over parts following this model
+  for (size_t i = myParts.size(); i < parts.size(); i = i+2)
+  {
+    if (parts[i] == "model")
+    {
+      // Look in nested models
+      auto model = this->NestedModel(parts[i+1]);
+
+      if (!model)
+      {
+        gzwarn << "Model [" << parts[i+1] << "] not found in model [" <<
+            this->GetName() << "]" << std::endl;
+        return;
+      }
+
+      model->PluginInfo(_pluginUri, _plugins, _success);
+      return;
+    }
+    // Look for plugin
+    else if (parts[i] == "plugin")
+    {
+      // Return empty vector
+      if (!this->sdf->HasElement("plugin"))
+      {
+        _success = true;
+        return;
+      }
+
+      // Find correct plugin
+      auto pluginElem = this->sdf->GetElement("plugin");
+      while (pluginElem)
+      {
+        auto pluginName = pluginElem->Get<std::string>("name");
+
+        // If asking for a specific plugin, skip all other plugins
+        if (i+1 < parts.size() && parts[i+1] != pluginName)
+        {
+          pluginElem = pluginElem->GetNextElement("plugin");
+          continue;
+        }
+
+        // Get plugin info from SDF
+        auto pluginMsg = _plugins.add_plugins();
+        pluginMsg->CopyFrom(util::Convert<ignition::msgs::Plugin>(pluginElem));
+
+        pluginElem = pluginElem->GetNextElement("plugin");
+      }
+
+      // If asking for a specific plugin and it wasn't found
+      if (i+1 < parts.size() && _plugins.plugins_size() == 0)
+      {
+        gzwarn << "Plugin [" << parts[i+1] << "] not found in model [" <<
+            this->URI().Str() << "]" << std::endl;
+        return;
+      }
+      _success = true;
+      return;
+    }
+    else
+    {
+      gzwarn << "Segment [" << parts[i] << "] in [" << _pluginUri.Str() <<
+         "] cannot be handled." << std::endl;
+      return;
+    }
+  }
+
+  gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
+      << std::endl;
 }

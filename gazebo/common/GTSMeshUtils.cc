@@ -19,7 +19,6 @@
 
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/GTSMeshUtils.hh"
 
 using namespace gazebo;

@@ -107,7 +107,7 @@ namespace gazebo
       /// \return the YUV  color
       /// \deprecated See YUV() function that returns an
       /// ignition::math::Vector3d object.
-      public: math::Vector3 GetAsYUV() const;
+      public: math::Vector3 GetAsYUV() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the color in YUV colorspace
       /// \return The YUV color in an ignition::math::Vector3d format.

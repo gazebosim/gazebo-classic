@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_DARTHEIGHTMAPSHAPE_HH_
-#define _GAZEBO_PHYSICS_DARTHEIGHTMAPSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_DART_DARTHEIGHTMAPSHAPE_HH_
+#define GAZEBO_PHYSICS_DART_DARTHEIGHTMAPSHAPE_HH_
 
 #include <vector>
 
@@ -39,7 +39,12 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
-      public: explicit DARTHeightmapShape(CollisionPtr _parent);
+      /// \deprecated See version that accepts DARTCollisionPtr
+      public: DARTHeightmapShape(CollisionPtr _parent) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Collision parent.
+      public: DARTHeightmapShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~DARTHeightmapShape();

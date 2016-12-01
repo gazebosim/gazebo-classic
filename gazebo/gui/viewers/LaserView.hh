@@ -19,7 +19,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -110,6 +110,9 @@ namespace gazebo
                              double _angleStep, double _rangeMax,
                              double _rangeMin);
 
+                 /// \brief Update Qt geometry and bounding box
+                 public: void UpdateGeometry();
+
                  /// \brief A QT pure virtual function that must be defined.
                  /// This calls GetBoundingRect.
                  private: virtual QRectF boundingRect() const;
@@ -177,7 +180,10 @@ namespace gazebo
                  public: bool radians;
 
                  /// \brief Mutex to protect the laser data.
-                 private: mutable boost::mutex mutex;
+                 private: mutable std::mutex mutex;
+
+                 /// \brief Flag to indicate there are new range values.
+                 private: bool dirty = false;
                };
 
       /// \brief This class exists so that we can properly capture the

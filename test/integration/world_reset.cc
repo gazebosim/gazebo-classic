@@ -71,7 +71,7 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -80,20 +80,20 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
 
   // Step forward, verify time increasing
   world->Step(steps);
-  double simTime = world->GetSimTime().Double();
+  double simTime = world->SimTime().Double();
   EXPECT_NEAR(simTime, dt*steps, dt);
 
   // spawn a box with known initial pose
   ignition::math::Pose3d initialPose(1, 2, 0.0, 0, 0, 1.57);
   math::Vector3 size(1, 1, 1);
   SpawnBox("box", size, initialPose.Pos(), initialPose.Rot().Euler(), false);
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   // spawn another box that overlaps with the previous box
   ignition::math::Pose3d initialPose2(1.2, 2, 0.5, 0, 0, 0);
   SpawnBox("box2", size, initialPose2.Pos(), initialPose2.Rot().Euler(), false);
-  physics::ModelPtr model2 = world->GetModel("box2");
+  physics::ModelPtr model2 = world->ModelByName("box2");
   ASSERT_TRUE(model2 != NULL);
 
   // physics engine has not stepped yet since the boxes were spawned so they
@@ -103,7 +103,7 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
 
   // Step forward, verify time increasing
   world->Step(steps);
-  double simTime2 = world->GetSimTime().Double();
+  double simTime2 = world->SimTime().Double();
   EXPECT_NEAR(simTime2, simTime + dt*steps, dt);
 
   // physics engine has stepped, verify the models are pushed apart
@@ -130,14 +130,14 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
   // Wait for sim time to be reset
   while (sleep < maxSleep)
   {
-    simTime = world->GetSimTime().Double();
+    simTime = world->SimTime().Double();
     if (ignition::math::equal(simTime, 0.0, dt))
       break;
     sleep++;
     gazebo::common::Time::MSleep(100);
   }
 
-  simTime = world->GetSimTime().Double();
+  simTime = world->SimTime().Double();
   EXPECT_NEAR(simTime, 0.0, dt);
 
   // verify boxes have moved back to initial pose and they are not pushed

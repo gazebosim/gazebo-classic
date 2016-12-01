@@ -440,7 +440,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   if (_msg->has_enable_physics())
   {
-    this->physicsEngineDPtr->world->SetPhysicsEngineEnabled(
+    this->physicsEngineDPtr->world->SetPhysicsEnabled(
         _msg->enable_physics());
   }
 

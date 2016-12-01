@@ -163,7 +163,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get floating ball
   std::string ballFloatingName = "model_floating_imu";
-  physics::ModelPtr ballFloatingModel = world->GetModel(ballFloatingName);
+  physics::ModelPtr ballFloatingModel = world->ModelByName(ballFloatingName);
   ASSERT_TRUE(ballFloatingModel != NULL);
 
   std::string ballFloatingSensorName = "ball_floating_imu_sensor";
@@ -512,7 +512,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   EXPECT_NEAR(iyy, 0.1, 1e-6);
 
   // sec
-  const double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  const double dt = world->Physics()->GetMaxStepSize();
   EXPECT_NEAR(dt, 0.001, 1e-6);
 
   // 1.5 m/s , pitch rate

@@ -73,6 +73,9 @@ namespace gazebo
       /// \param[in] _path The path that was changed.
       private slots: void OnDirectoryChanged(const QString &_path);
 
+      /// \brief QT callback when addPathButton is clicked.
+      private slots: void HandleButton();
+
       /// \brief check if path exists with special care to filesystem
       /// permissions
       /// \param[in] _path The path to check.

@@ -23,8 +23,6 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 

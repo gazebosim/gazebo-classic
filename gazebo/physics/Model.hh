@@ -30,6 +30,15 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
+// Forward declare reference and pointer parameters
+namespace ignition
+{
+  namespace msgs
+  {
+    class Plugin_V;
+  }
+}
+
 namespace gazebo
 {
   namespace physics
@@ -632,6 +641,26 @@ namespace gazebo
       /// returns NULL if link _name already exists.
       public: LinkPtr CreateLink(const std::string &_name);
 
+      /// \brief Get information about plugins in this model or one of its
+      /// children, according to the given _pluginUri. Some accepted URI
+      /// patterns:
+      ///
+      /// * Info about a specific model plugin in this model:
+      ///    data://world/<world_name>/model/<this_name>/plugin/<plugin_name>
+      ///
+      /// * Info about all model plugins in this model (empty plugin name):
+      ///    data://world/<world_name>/model/<this_name>/plugin
+      ///
+      /// * Info about a model plugin in a nested model:
+      ///    data://world/<world_name>/model/<this_name>/model/
+      ///        <nested_model_name>/plugin/<plugin_name>
+      ///
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      public: void PluginInfo(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
+
       /// \internal
       /// \brief Constructor used by inherited classes.
       /// \param[in] _dataPtr Protected data class
@@ -643,10 +672,6 @@ namespace gazebo
 
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
-
-      /// \brief Called when a request message is received.
-      /// \param[in] _msg The request message.
-      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \brief Load all the links.
       private: void LoadLinks();
