@@ -1808,26 +1808,42 @@ ignition::math::Pose3d Visual::InitialRelativePose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos);
-  this->SetWorldRotation(_pose.rot);
+  this->SetWorldPose(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetWorldPosition(_pose.Pos());
+  this->SetWorldRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+  this->SetWorldPosition(_pos.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
+{
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedPosition(
-    Conversions::Convert(_pos.Ign()));
+  this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
+  this->SetWorldRotation(_q.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
+{
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedOrientation(
-    Conversions::Convert(_q.Ign()));
+  this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
 //////////////////////////////////////////////////
@@ -2910,11 +2926,17 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 //////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 {
+  this->MoveToPosition(_pose.Ign(), _time);
+}
+
+//////////////////////////////////////////////////
+void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
+{
   Ogre::TransformKeyFrame *key;
   auto start = this->WorldPose().Pos();
-  math::Vector3 rpy = _pose.rot.GetAsEuler();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
-  math::Quaternion rotFinal(0, rpy.y, rpy.z);
+  math::Quaternion rotFinal(0, rpy.Y(), rpy.Z());
 
   std::string animName = this->GetName() + "_animation";
 
@@ -2930,7 +2952,8 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
+  key->setTranslate(Ogre::Vector3(_pose.Pos().X(), _pose.Pos().Y(),
+        _pose.Pos().Z()));
   key->setRotation(Conversions::Convert(rotFinal.Ign()));
 
   this->dataPtr->animState =

@@ -53,17 +53,17 @@ void VisualPoseTest::VisualPose()
   // Get box model visual (rendering)
   auto boxModelVis = scene->GetVisual("box");
   QVERIFY(boxModelVis != NULL);
-  auto boxModelVisPose = boxModelVis->GetPose().Ign();
+  auto boxModelVisPose = boxModelVis->Pose();
 
   // Get box link visual (rendering)
   auto boxLinkVis = scene->GetVisual("box::link");
   QVERIFY(boxLinkVis != NULL);
-  auto boxLinkVisPose = boxLinkVis->GetPose().Ign();
+  auto boxLinkVisPose = boxLinkVis->Pose();
 
   // Get box visual visual (rendering)
   auto boxVisualVis = scene->GetVisual("box::link::visual");
   QVERIFY(boxVisualVis != NULL);
-  auto boxVisualVisPose = boxVisualVis->GetPose().Ign();
+  auto boxVisualVisPose = boxVisualVis->Pose();
 
   // Get box model (physics)
   auto boxModel = world->GetModel("box");
@@ -98,9 +98,9 @@ void VisualPoseTest::VisualPose()
   QVERIFY(boxModelVisPose == boxModel->GetRelativePose().Ign());
 
   // Check that only visual pose changed (rendering)
-  QVERIFY(newVisualPose == boxVisualVis->GetPose().Ign());
-  QVERIFY(boxModelVisPose == boxModelVis->GetPose().Ign());
-  QVERIFY(boxLinkVisPose == boxLinkVis->GetPose().Ign());
+  QVERIFY(newVisualPose == boxVisualVis->Pose());
+  QVERIFY(boxModelVisPose == boxModelVis->Pose());
+  QVERIFY(boxLinkVisPose == boxLinkVis->Pose());
 
   // Clean up
   delete mainWindow;

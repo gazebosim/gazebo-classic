@@ -1950,7 +1950,7 @@ TEST_F(Visual_TEST, Pose)
       new gazebo::rendering::Visual("box_visual", scene));
   boxVis->Load(boxSDF);
   EXPECT_EQ(boxVis->Pose(), boxPose);
-  EXPECT_EQ(boxVis->GetWorldPose(), boxPose);
+  EXPECT_EQ(boxVis->WorldPose(), boxPose);
   EXPECT_EQ(boxVis->InitialRelativePose(), boxPose);
 
   // child sphere vis
@@ -1963,14 +1963,14 @@ TEST_F(Visual_TEST, Pose)
       new gazebo::rendering::Visual("sphere_visual", boxVis));
   sphereVis->Load(sphereSDF);
   EXPECT_EQ(sphereVis->Pose(), spherePose);
-  EXPECT_EQ(sphereVis->GetWorldPose(), spherePose + boxPose);
+  EXPECT_EQ(sphereVis->WorldPose(), spherePose + boxPose);
   EXPECT_EQ(sphereVis->InitialRelativePose(), spherePose);
 
   // set new sphere pose and verify
   ignition::math::Pose3d newSpherePose(1.0, 20.0, 0.0, 0.0, 0.0, 1.57);
   sphereVis->SetPose(newSpherePose);
   EXPECT_EQ(sphereVis->Pose(), newSpherePose);
-  EXPECT_EQ(sphereVis->GetWorldPose(), newSpherePose + boxPose);
+  EXPECT_EQ(sphereVis->WorldPose(), newSpherePose + boxPose);
   EXPECT_EQ(sphereVis->InitialRelativePose(), spherePose);
 }
 

@@ -133,7 +133,7 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
       axis1Msg.use_parent_model_frame(), _msg->type());
 
   // joint pose is always relative to the child link so update axis pose
-  this->SetWorldPose(_worldPose);
+  this->SetWorldPose(_worldPose.Ign());
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);

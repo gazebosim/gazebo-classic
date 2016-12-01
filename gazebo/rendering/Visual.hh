@@ -25,6 +25,10 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Box.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Mesh.hh"
@@ -411,15 +415,32 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose &_pose);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void SetWorldPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the world pose of the visual.
+      /// \param[in] _pose Pose of the visual in the world coordinate frame.
+      public: void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
-      public: void SetWorldPosition(const math::Vector3 &_pos);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void SetWorldPosition(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the world linear position of the visual.
+      /// \param[in] _pose Position in the world coordinate frame.
+      public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the world orientation of the visual
       /// \param[in] _rot Rotation in the world coordinate frame.
-      public: void SetWorldRotation(const math::Quaternion &_rot);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void SetWorldRotation(const math::Quaternion &_rot)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the world orientation of the visual
+      /// \param[in] _rot Rotation in the world coordinate frame.
+      public: void SetWorldRotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Return the scene Node of this visual entity.
       /// \return The Ogre scene node.
@@ -553,7 +574,15 @@ namespace gazebo
       /// \brief Move to a pose and over a given time.
       /// \param[in] _pose Pose the visual will end at.
       /// \param[in] _time Time it takes the visual to move to the pose.
-      public: void MoveToPosition(const math::Pose &_pose, double _time);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void MoveToPosition(const math::Pose &_pose, double _time)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Move to a pose and over a given time.
+      /// \param[in] _pose Pose the visual will end at.
+      /// \param[in] _time Time it takes the visual to move to the pose.
+      public: void MoveToPosition(const ignition::math::Pose3d &_pose,
+                  double _time);
 
       /// \brief Move to a series of pose and over a given time.
       /// \param[in] _poses Series of poses the visual will move to.

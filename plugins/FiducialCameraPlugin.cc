@@ -211,7 +211,7 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
       continue;
 
     ignition::math::Vector2i pt =
-        this->dataPtr->camera->Project(vis->GetWorldPose().pos.Ign());
+        this->dataPtr->camera->Project(vis->WorldPose().Pos());
 
     // use selection buffer to check if visual is occluded by other entities
     // in the camera view
