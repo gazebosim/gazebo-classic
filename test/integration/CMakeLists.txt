@@ -172,6 +172,7 @@ set(dri_tests
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
+  camera_gui.cc
   collada_visualization.cc
   insert_model.cc
   model_editor.cc

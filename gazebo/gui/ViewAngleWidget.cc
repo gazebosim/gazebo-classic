@@ -173,16 +173,10 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   ignition::math::Vector3d newCamPos = lookAt - _dir * distance;
 
   // Calculate camera orientation
-  double roll = 0;
-  double pitch = -std::atan2(_dir.Z(),
-      std::sqrt(std::pow(_dir.X(), 2) + std::pow(_dir.Y(), 2)));
-  double yaw = std::atan2(_dir.Y(), _dir.X());
-
-  ignition::math::Quaterniond quat =
-      ignition::math::Quaterniond(roll, pitch, yaw);
+  auto mat = ignition::math::Matrix4d::LookAt(newCamPos, lookAt);
 
   // Move camera to that pose in 1s
-  cam->MoveToPosition(ignition::math::Pose3d(newCamPos, quat), 1);
+  cam->MoveToPosition(mat.Pose(), 1);
 }
 
 /////////////////////////////////////////////////
