@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 
 // Moved to top to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
