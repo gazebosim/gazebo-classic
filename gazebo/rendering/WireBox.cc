@@ -15,8 +15,6 @@
  *
 */
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/WireBoxPrivate.hh"
 #include "gazebo/rendering/WireBox.hh"
@@ -34,6 +32,19 @@ WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
   this->dataPtr->parent->AttachObject(this->dataPtr->lines);
   this->dataPtr->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
+  this->Init(_box.Ign());
+}
+
+/////////////////////////////////////////////////
+WireBox::WireBox(VisualPtr _parent, const ignition::math::Box &_box)
+  : dataPtr(new WireBoxPrivate)
+{
+  this->dataPtr->parent = _parent;
+  this->dataPtr->lines = new DynamicLines(RENDERING_LINE_LIST);
+  this->dataPtr->lines->setMaterial("BaseWhiteNoLighting");
+  this->dataPtr->parent->AttachObject(this->dataPtr->lines);
+  this->dataPtr->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
+
   this->Init(_box);
 }
 
@@ -41,66 +52,70 @@ WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
 WireBox::~WireBox()
 {
   delete this->dataPtr->lines;
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void WireBox::Init(const math::Box &_box)
 {
+  this->Init(_box.Ign());
+}
+
+/////////////////////////////////////////////////
+void WireBox::Init(const ignition::math::Box &_box)
+{
   this->dataPtr->box = _box;
-  math::Vector3 max = _box.max;
-  math::Vector3 min = _box.min;
+  ignition::math::Vector3d max = _box.Max();
+  ignition::math::Vector3d min = _box.Min();
 
   this->dataPtr->lines->Clear();
 
   // line 0
-  this->dataPtr->lines->AddPoint(min.x, min.y, min.z);
-  this->dataPtr->lines->AddPoint(max.x, min.y, min.z);
+  this->dataPtr->lines->AddPoint(min.X(), min.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(max.X(), min.Y(), min.Z());
 
   // line 1
-  this->dataPtr->lines->AddPoint(min.x, min.y, min.z);
-  this->dataPtr->lines->AddPoint(min.x, min.y, max.z);
+  this->dataPtr->lines->AddPoint(min.X(), min.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(min.X(), min.Y(), max.Z());
 
   // line 2
-  this->dataPtr->lines->AddPoint(min.x, min.y, min.z);
-  this->dataPtr->lines->AddPoint(min.x, max.y, min.z);
+  this->dataPtr->lines->AddPoint(min.X(), min.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(min.X(), max.Y(), min.Z());
 
   // line 3
-  this->dataPtr->lines->AddPoint(min.x, max.y, min.z);
-  this->dataPtr->lines->AddPoint(min.x, max.y, max.z);
+  this->dataPtr->lines->AddPoint(min.X(), max.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(min.X(), max.Y(), max.Z());
 
   // line 4
-  this->dataPtr->lines->AddPoint(min.x, max.y, min.z);
-  this->dataPtr->lines->AddPoint(max.x, max.y, min.z);
+  this->dataPtr->lines->AddPoint(min.X(), max.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(max.X(), max.Y(), min.Z());
 
   // line 5
-  this->dataPtr->lines->AddPoint(max.x, min.y, min.z);
-  this->dataPtr->lines->AddPoint(max.x, min.y, max.z);
+  this->dataPtr->lines->AddPoint(max.X(), min.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(max.X(), min.Y(), max.Z());
 
   // line 6
-  this->dataPtr->lines->AddPoint(max.x, min.y, min.z);
-  this->dataPtr->lines->AddPoint(max.x, max.y, min.z);
+  this->dataPtr->lines->AddPoint(max.X(), min.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(max.X(), max.Y(), min.Z());
 
   // line 7
-  this->dataPtr->lines->AddPoint(min.x, max.y, max.z);
-  this->dataPtr->lines->AddPoint(max.x, max.y, max.z);
+  this->dataPtr->lines->AddPoint(min.X(), max.Y(), max.Z());
+  this->dataPtr->lines->AddPoint(max.X(), max.Y(), max.Z());
 
   // line 8
-  this->dataPtr->lines->AddPoint(min.x, max.y, max.z);
-  this->dataPtr->lines->AddPoint(min.x, min.y, max.z);
+  this->dataPtr->lines->AddPoint(min.X(), max.Y(), max.Z());
+  this->dataPtr->lines->AddPoint(min.X(), min.Y(), max.Z());
 
   // line 9
-  this->dataPtr->lines->AddPoint(max.x, max.y, min.z);
-  this->dataPtr->lines->AddPoint(max.x, max.y, max.z);
+  this->dataPtr->lines->AddPoint(max.X(), max.Y(), min.Z());
+  this->dataPtr->lines->AddPoint(max.X(), max.Y(), max.Z());
 
   // line 10
-  this->dataPtr->lines->AddPoint(max.x, min.y, max.z);
-  this->dataPtr->lines->AddPoint(max.x, max.y, max.z);
+  this->dataPtr->lines->AddPoint(max.X(), min.Y(), max.Z());
+  this->dataPtr->lines->AddPoint(max.X(), max.Y(), max.Z());
 
   // line 11
-  this->dataPtr->lines->AddPoint(min.x, min.y, max.z);
-  this->dataPtr->lines->AddPoint(max.x, min.y, max.z);
+  this->dataPtr->lines->AddPoint(min.X(), min.Y(), max.Z());
+  this->dataPtr->lines->AddPoint(max.X(), min.Y(), max.Z());
 
   this->dataPtr->lines->Update();
 }
@@ -114,11 +129,23 @@ void WireBox::SetVisible(bool _visible)
 /////////////////////////////////////////////////
 bool WireBox::GetVisible() const
 {
+  return this->Visible();
+}
+
+/////////////////////////////////////////////////
+bool WireBox::Visible() const
+{
   return this->dataPtr->lines->isVisible();
 }
 
 /////////////////////////////////////////////////
 math::Box WireBox::GetBox() const
+{
+  return this->Box();
+}
+
+/////////////////////////////////////////////////
+ignition::math::Box WireBox::Box() const
 {
   return this->dataPtr->box;
 }

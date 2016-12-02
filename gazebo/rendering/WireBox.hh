@@ -15,8 +15,11 @@
  *
  */
 
-#ifndef _WIREBOX_HH_
-#define _WIREBOX_HH_
+#ifndef GAZEBO_RENDERING_WIREBOX_HH_
+#define GAZEBO_RENDERING_WIREBOX_HH_
+
+#include <memory>
+#include <ignition/math/Box.hh>
 
 #include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -38,14 +41,27 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _box Dimension of the box to draw.
       /// \param[in] _parent Parent visual of the box.
-      public: explicit WireBox(VisualPtr _parent, const math::Box &_box);
+      /// \deprecated See function that takes ignition::math
+      public: explicit WireBox(VisualPtr _parent, const math::Box &_box)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor
+      /// \param[in] _box Dimension of the box to draw.
+      /// \param[in] _parent Parent visual of the box.
+      public: explicit WireBox(VisualPtr _parent,
+          const ignition::math::Box &_box);
 
       /// \brief Destructor.
       public: ~WireBox();
 
       /// \brief Builds the wireframe line list.
       /// \param[in] _box Box to build a wireframe from.
-      public: void Init(const math::Box &_box);
+      /// \deprecated See function that takes ignition::math
+      public: void Init(const math::Box &_box) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Builds the wireframe line list.
+      /// \param[in] _box Box to build a wireframe from.
+      public: void Init(const ignition::math::Box &_box);
 
       /// \brief Set the visibility of the box.
       /// \param[in] _visible True to make the box visible, False to hide.
@@ -53,15 +69,25 @@ namespace gazebo
 
       /// \brief Get the visibility of the box.
       /// \return True if the box is visual.
-      public: bool GetVisible() const;
+      /// \deprecated See Visible()
+      public: bool GetVisible() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the visibility of the box.
+      /// \return True if the box is visual.
+      public: bool Visible() const;
 
       /// \brief Get the wireframe box.
       /// \return The wireframe box.
-      public: math::Box GetBox() const;
+      /// \deprecated See function that returns ignition::math
+      public: math::Box GetBox() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the wireframe box.
+      /// \return The wireframe box.
+      public: ignition::math::Box Box() const;
 
       /// \internal
       /// \brief Pointer to private data.
-      private: WireBoxPrivate *dataPtr;
+      private: std::unique_ptr<WireBoxPrivate> dataPtr;
     };
     /// \}
   }

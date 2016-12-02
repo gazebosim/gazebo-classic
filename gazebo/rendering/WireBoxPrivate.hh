@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _WIREBOX_PRIVATE_HH_
-#define _WIREBOX_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_WIREBOX_PRIVATE_HH_
+#define GAZEBO_RENDERING_WIREBOX_PRIVATE_HH_
 
-#include "gazebo/math/Box.hh"
+#include <ignition/math/Box.hh>
+
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
@@ -29,7 +30,7 @@ namespace gazebo
     class WireBoxPrivate
     {
       /// \brief Copy of bounding box.
-      public: math::Box box;
+      public: ignition::math::Box box;
 
       /// \brief The lines which outline the box.
       public: DynamicLines *lines;
