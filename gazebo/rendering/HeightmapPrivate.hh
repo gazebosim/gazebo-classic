@@ -436,6 +436,9 @@ namespace gazebo
 
       /// \brief Pointer to heightmap data
       public: common::HeightmapData *heightmapData = nullptr;
+
+      /// \brief Number of samples per heightmap datum
+      public: unsigned int sampling = 2;
     };
   }
 }

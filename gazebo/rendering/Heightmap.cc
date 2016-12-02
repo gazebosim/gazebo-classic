@@ -156,6 +156,11 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
     }
   }
 
+  if (_msg->geometry().heightmap().has_sampling())
+  {
+    this->dataPtr->sampling = _msg->geometry().heightmap().sampling();
+  }
+
   this->Load();
 }
 
@@ -406,11 +411,10 @@ void Heightmap::Load()
 #endif
       // these params need to be the same as physics/HeightmapShape.cc
       // in order to generate consistent height data
-      int subSampling = 2;
       bool flipY = false;
       // sampling size along image width and height
       unsigned int vertSize =
-          (this->dataPtr->heightmapData->GetWidth() * subSampling)-1;
+          (this->dataPtr->heightmapData->GetWidth() * this->dataPtr->sampling)-1;
       ignition::math::Vector3d scale;
       scale.X(this->dataPtr->terrainSize.X() / vertSize);
       scale.Y(this->dataPtr->terrainSize.Y() / vertSize);
@@ -422,7 +426,7 @@ void Heightmap::Load()
 
       // Construct the heightmap lookup table
       std::vector<float> lookup;
-      this->dataPtr->heightmapData->FillHeightMap(subSampling, vertSize,
+      this->dataPtr->heightmapData->FillHeightMap(this->dataPtr->sampling, vertSize,
           this->dataPtr->terrainSize, scale, flipY, lookup);
 
       for (unsigned int y = 0; y < vertSize; ++y)

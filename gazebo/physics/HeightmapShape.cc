@@ -168,6 +168,12 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     return;
   }
 
+  if (this->sdf->HasElement("sampling"))
+  {
+    this->subSampling =
+        static_cast<int>(this->sdf->Get<unsigned int>("sampling"));
+  }
+
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
       !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
@@ -260,6 +266,8 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
   _msg.mutable_heightmap()->set_filename(this->GetURI());
+  _msg.mutable_heightmap()->set_sampling(
+      static_cast<unsigned int>(this->subSampling));
 }
 
 //////////////////////////////////////////////////
