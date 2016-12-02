@@ -786,7 +786,9 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_redoAct);
 
+#if HAVE_QWT
   QVERIFY(gazebo::gui::g_plotAct);
+#endif
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
 

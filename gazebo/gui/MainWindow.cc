@@ -1915,7 +1915,9 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
+#if HAVE_QWT
   windowMenu->addAction(g_plotAct);
+#endif
 
   bar->addSeparator();
 
@@ -2444,7 +2446,9 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_overlayAct->setVisible(simOrLog);
   g_showToolbarsAct->setVisible(simOrLog);
   g_fullScreenAct->setVisible(simOrLog);
+#if HAVE_QWT
   g_plotAct->setVisible(simOrLog);
+#endif
 
   // About
   g_hotkeyChartAct->setVisible(simOrLog);
