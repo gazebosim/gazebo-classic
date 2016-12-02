@@ -60,7 +60,7 @@ else
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:94" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
@@ -68,6 +68,10 @@ echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
 echo "*:gazebo/common/SVGLoader.cc:869" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
+
+# false positive unusedStructMember
+echo "*:plugins/KeysToJointsPlugin.hh:33" >> $SUPPRESS
+echo "*:plugins/KeysToJointsPlugin.hh:43" >> $SUPPRESS
 
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS

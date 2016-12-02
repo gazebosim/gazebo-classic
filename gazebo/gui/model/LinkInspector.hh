@@ -77,6 +77,10 @@ namespace gazebo
       /// \param[in] _show If true, button is checked.
       public: void SetShowCollisions(const bool _show);
 
+      /// \brief Set the state of a show visual button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowVisuals(const bool _show);
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -100,12 +104,21 @@ namespace gazebo
       /// \param[in] _show True to show.
       Q_SIGNALS: void ShowCollisions(const bool _show);
 
+      /// \brief Qt signal emitted to indicate that all visuals should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowVisuals(const bool _show);
+
       /// \brief Qt callback when the Remove button is pressed.
       private slots: void OnRemove();
 
       /// \brief Qt callback when the show collisions button is pressed.
       /// \param[in] _show Show if checked, show otherwise.
       private slots: void OnShowCollisions(const bool _show);
+
+      /// \brief Qt callback when the show visuals button is pressed.
+      /// \param[in] _show Show if checked, show otherwise.
+      private slots: void OnShowVisuals(const bool _show);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();

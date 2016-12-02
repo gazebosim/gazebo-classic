@@ -223,6 +223,10 @@ namespace gazebo
       /// \param[in] _show True to show, false to hide.
       public slots: void ShowCollisions(const bool _show);
 
+      /// \brief Show or hide visual visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowVisuals(const bool _show);
+
       /// \brief Helper function to generate link sdf from link data.
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
