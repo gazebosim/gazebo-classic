@@ -1577,7 +1577,7 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
-    math::Box bbox = this->GetBoundingBox();
+    auto bbox = this->GetBoundingBox().Ign();
 
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
@@ -1611,7 +1611,7 @@ bool Visual::GetHighlighted() const
 {
   if (this->dataPtr->boundingBox)
   {
-    return this->dataPtr->boundingBox->GetVisible();
+    return this->dataPtr->boundingBox->Visible();
   }
   return false;
 }
