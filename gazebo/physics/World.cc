@@ -332,7 +332,7 @@ void World::Save(const std::string &_filename)
 void World::Init()
 {
   // Initialize all the entities (i.e. Model)
-  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Init();
 
   // Initialize the physics engine
@@ -804,6 +804,7 @@ void World::Update()
 void World::Fini()
 {
   this->dataPtr->stop = true;
+  this->dataPtr->enablePhysicsEngine = false;
 
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
@@ -836,6 +837,8 @@ void World::Fini()
     this->dataPtr->lightModifySub.reset();
     this->dataPtr->modelSub.reset();
 
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
 
@@ -872,10 +875,21 @@ void World::Fini()
   }
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
+  this->dataPtr->logPlayState.SetWorld(WorldPtr());
+  this->dataPtr->states[0].clear();
+  this->dataPtr->states[1].clear();
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
+
+  // Engine shouldn't outlive world
+  if (this->dataPtr->physicsEngine)
+    this->dataPtr->physicsEngine->Fini();
   this->dataPtr->physicsEngine.reset();
+
+  // Clear singletons whose states are tied to this world
+  util::DiagnosticManager::Instance()->Fini();
+  util::LogRecord::Instance()->Fini();
 
   // Clean mutexes
   if (this->dataPtr->receiveMutex)

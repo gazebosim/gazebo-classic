@@ -19,7 +19,6 @@
 
 #include <string>
 #include <sdf/sdf.hh>
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -100,6 +99,11 @@ namespace gazebo
     /// \brief Enable sensors.
     GAZEBO_VISIBLE
     void enable();
+
+    /// \brief Return true if the manager is running.
+    /// \return True if manager is running.
+    GAZEBO_VISIBLE
+    bool running();
     /// \}
   }
 }

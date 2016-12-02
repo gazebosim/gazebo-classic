@@ -254,6 +254,7 @@ void Publisher::Fini()
 {
   if (!this->messages.empty())
     this->SendMessage();
+  this->messages.clear();
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic, this->id);
