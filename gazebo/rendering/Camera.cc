@@ -2096,9 +2096,6 @@ void Camera::UpdateFOV()
 
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
-
-    delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
   }
 }
 
