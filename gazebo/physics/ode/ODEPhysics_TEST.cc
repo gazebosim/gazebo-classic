@@ -305,7 +305,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   // convenient for disabling LCP internal error messages from world solver
   {
     // ode_quiet should be off by default
-    bool odeQuiet;
+    bool odeQuiet = true;
     EXPECT_NO_THROW(
       odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
     EXPECT_FALSE(odeQuiet);
