@@ -123,7 +123,7 @@ void COMVisual::Load()
     box = vis->BoundingBox();
 
   VisualPtr sphereVis(
-      new Visual(this->GetName()+"_SPHERE_", shared_from_this(), false));
+      new Visual(this->Name()+"_SPHERE_", shared_from_this(), false));
   sphereVis->Load();
 
   // Mass indicator: equivalent sphere with density of lead

@@ -102,8 +102,8 @@ void LaserVisual::Update()
 
   // Skip the update if the user is moving the laser.
   if ((this->GetScene()->SelectedVisual() &&
-      this->GetRootVisual()->GetName() ==
-      this->GetScene()->SelectedVisual()->GetName()))
+      this->GetRootVisual()->Name() ==
+      this->GetScene()->SelectedVisual()->Name()))
   {
     return;
   }

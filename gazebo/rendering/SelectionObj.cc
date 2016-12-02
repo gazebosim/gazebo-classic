@@ -308,19 +308,19 @@ void SelectionObj::CreateTranslateVisual()
 
   // Translation mainipulation tool
   dPtr->transVisual.reset(new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_TRANS__",
+      this->Name() + "__SELECTION_OBJ_TRANS__",
       shared_from_this(), false));
   dPtr->transVisual->Load();
 
   dPtr->transXVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_TRANS_X__" + this->GetName(), dPtr->transVisual, false));
+      "__SELECTION_OBJ_TRANS_X__" + this->Name(), dPtr->transVisual, false));
   dPtr->transYVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_TRANS_Y__" + this->GetName(), dPtr->transVisual, false));
+      "__SELECTION_OBJ_TRANS_Y__" + this->Name(), dPtr->transVisual, false));
   dPtr->transZVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_TRANS_Z__" + this->GetName(), dPtr->transVisual, false));
+      "__SELECTION_OBJ_TRANS_Z__" + this->Name(), dPtr->transVisual, false));
 
   dPtr->transXVisual->Load();
   dPtr->transYVisual->Load();
@@ -330,7 +330,7 @@ void SelectionObj::CreateTranslateVisual()
   this->InsertMesh("axis_head");
 
   VisualPtr transShaftXVis(
-      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_X__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_X__"  + this->Name(),
       dPtr->transXVisual, false));
   transShaftXVis->Load();
   transShaftXVis->AttachMesh("axis_shaft");
@@ -343,7 +343,7 @@ void SelectionObj::CreateTranslateVisual()
   shaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr transHeadXVis(
-      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_X__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_X__"  + this->Name(),
       dPtr->transXVisual, false));
   transHeadXVis->Load();
   transHeadXVis->AttachMesh("axis_head");
@@ -356,7 +356,7 @@ void SelectionObj::CreateTranslateVisual()
   headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr transShaftYVis(
-      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_Y__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_Y__"  + this->Name(),
       dPtr->transYVisual, false));
   transShaftYVis->Load();
   transShaftYVis->AttachMesh("axis_shaft");
@@ -369,7 +369,7 @@ void SelectionObj::CreateTranslateVisual()
   shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr transHeadYVis(
-      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_Y__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_Y__"  + this->Name(),
       dPtr->transYVisual, false));
   transHeadYVis->Load();
   transHeadYVis->AttachMesh("axis_head");
@@ -382,7 +382,7 @@ void SelectionObj::CreateTranslateVisual()
   headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr transShaftZVis(
-      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_Z__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_Z__"  + this->Name(),
       dPtr->transZVisual, false));
   transShaftZVis->Load();
   transShaftZVis->AttachMesh("axis_shaft");
@@ -395,7 +395,7 @@ void SelectionObj::CreateTranslateVisual()
   shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr transHeadZVis(
-      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_Z__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_Z__"  + this->Name(),
       dPtr->transZVisual, false));
   transHeadZVis->Load();
   transHeadZVis->AttachMesh("axis_head");
@@ -444,19 +444,19 @@ void SelectionObj::CreateRotateVisual()
 
   // Rotation mainipulation tool
   dPtr->rotVisual.reset(new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_ROT__",
+      this->Name() + "__SELECTION_OBJ_ROT__",
       shared_from_this(), false));
   dPtr->rotVisual->Load();
 
   dPtr->rotXVisual.reset(
       new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_ROT_X__", dPtr->rotVisual, false));
+      this->Name() + "__SELECTION_OBJ_ROT_X__", dPtr->rotVisual, false));
   dPtr->rotYVisual.reset(
       new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_ROT_Y__", dPtr->rotVisual, false));
+      this->Name() + "__SELECTION_OBJ_ROT_Y__", dPtr->rotVisual, false));
   dPtr->rotZVisual.reset(
       new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_ROT_Z__", dPtr->rotVisual, false));
+      this->Name() + "__SELECTION_OBJ_ROT_Z__", dPtr->rotVisual, false));
 
   dPtr->rotVisual->InsertMesh("selection_tube");
 
@@ -465,7 +465,7 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotZVisual->Load();
 
   VisualPtr rotRingXVis(
-      new Visual("__SELECTION_OBJ__ROT_NODE_X__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__ROT_NODE_X__"  + this->Name(),
       dPtr->rotXVisual, false));
   rotRingXVis->Load();
   rotRingXVis->AttachMesh("selection_tube");
@@ -476,7 +476,7 @@ void SelectionObj::CreateRotateVisual()
   rotXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr rotRingYVis(
-      new Visual("__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__ROT_NODE_Y__"  + this->Name(),
       dPtr->rotYVisual, false));
   rotRingYVis->Load();
   rotRingYVis->AttachMesh("selection_tube");
@@ -487,7 +487,7 @@ void SelectionObj::CreateRotateVisual()
   rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr rotRingZVis(
-      new Visual("__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__ROT_NODE_Z__"  + this->Name(),
       dPtr->rotZVisual, false));
   rotRingZVis->Load();
   rotRingZVis->AttachMesh("selection_tube");
@@ -536,19 +536,19 @@ void SelectionObj::CreateScaleVisual()
 
   // Scale mainipulation tool
   dPtr->scaleVisual.reset(new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_SCALE__",
+      this->Name() + "__SELECTION_OBJ_SCALE__",
       shared_from_this(), false));
   dPtr->scaleVisual->Load();
 
   dPtr->scaleXVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_SCALE_X__" + this->GetName(), dPtr->scaleVisual, false));
+      "__SELECTION_OBJ_SCALE_X__" + this->Name(), dPtr->scaleVisual, false));
   dPtr->scaleYVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_SCALE_Y__" + this->GetName(), dPtr->scaleVisual, false));
+      "__SELECTION_OBJ_SCALE_Y__" + this->Name(), dPtr->scaleVisual, false));
   dPtr->scaleZVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_SCALE_Z__" + this->GetName(), dPtr->scaleVisual, false));
+      "__SELECTION_OBJ_SCALE_Z__" + this->Name(), dPtr->scaleVisual, false));
 
   dPtr->scaleXVisual->Load();
   dPtr->scaleYVisual->Load();
@@ -557,7 +557,7 @@ void SelectionObj::CreateScaleVisual()
   this->InsertMesh("unit_box");
 
   VisualPtr scaleShaftXVis(
-      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->Name(),
       dPtr->scaleXVisual, false));
   scaleShaftXVis->Load();
   scaleShaftXVis->AttachMesh("axis_shaft");
@@ -570,7 +570,7 @@ void SelectionObj::CreateScaleVisual()
   scaleXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr scaleHeadXVis(
-      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->Name(),
       dPtr->scaleXVisual, false));
   scaleHeadXVis->Load();
   scaleHeadXVis->AttachMesh("unit_box");
@@ -583,7 +583,7 @@ void SelectionObj::CreateScaleVisual()
   headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr scaleShaftYVis(
-      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_Y__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_Y__"  + this->Name(),
       dPtr->scaleYVisual, false));
   scaleShaftYVis->Load();
   scaleShaftYVis->AttachMesh("axis_shaft");
@@ -596,7 +596,7 @@ void SelectionObj::CreateScaleVisual()
   scaleYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr scaleHeadYVis(
-      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Y__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Y__"  + this->Name(),
       dPtr->scaleYVisual, false));
   scaleHeadYVis->Load();
   scaleHeadYVis->AttachMesh("unit_box");
@@ -609,7 +609,7 @@ void SelectionObj::CreateScaleVisual()
   headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr scaleShaftZVis(
-      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_Z__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_Z__"  + this->Name(),
       dPtr->scaleZVisual, false));
   scaleShaftZVis->Load();
   scaleShaftZVis->AttachMesh("axis_shaft");
@@ -622,7 +622,7 @@ void SelectionObj::CreateScaleVisual()
   scaleZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   VisualPtr scaleHeadZVis(
-      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Z__"  + this->GetName(),
+      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Z__"  + this->Name(),
       dPtr->scaleZVisual, false));
   scaleHeadZVis->Load();
   scaleHeadZVis->AttachMesh("unit_box");

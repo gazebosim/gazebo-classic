@@ -81,12 +81,12 @@ void ApplyWrenchVisual::Load()
 
   // Force visual
   dPtr->forceVisual.reset(new rendering::Visual(
-      this->GetName() + "_FORCE_VISUAL_", shared_from_this(), false));
+      this->Name() + "_FORCE_VISUAL_", shared_from_this(), false));
   dPtr->forceVisual->Load();
 
   // Force shaft
   VisualPtr forceShaftVisual(new rendering::Visual(
-      this->GetName() + "_FORCE_SHAFT_", dPtr->forceVisual, false));
+      this->Name() + "_FORCE_SHAFT_", dPtr->forceVisual, false));
   forceShaftVisual->Load();
 
   forceShaftVisual->AttachMesh("axis_shaft");
@@ -94,12 +94,12 @@ void ApplyWrenchVisual::Load()
       forceShaftVisual->GetSceneNode()->getAttachedObject(0);
   shaftObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   shaftObj->getUserObjectBindings().setUserAny(
-        Ogre::Any(std::string(dPtr->forceVisual->GetName())));
+        Ogre::Any(std::string(dPtr->forceVisual->Name())));
   forceShaftVisual->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
 
   // Force head
   VisualPtr forceHeadVisual(new rendering::Visual(
-      this->GetName() + "_FORCE_HEAD_", dPtr->forceVisual, false));
+      this->Name() + "_FORCE_HEAD_", dPtr->forceVisual, false));
   forceHeadVisual->Load();
 
   forceHeadVisual->AttachMesh("axis_head");
@@ -107,7 +107,7 @@ void ApplyWrenchVisual::Load()
       forceHeadVisual->GetSceneNode()->getAttachedObject(0);
   headObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headObj->getUserObjectBindings().setUserAny(
-        Ogre::Any(std::string(dPtr->forceVisual->GetName())));
+        Ogre::Any(std::string(dPtr->forceVisual->Name())));
   forceHeadVisual->SetPosition(ignition::math::Vector3d(0, 0, 0.24));
 
   dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
@@ -117,22 +117,22 @@ void ApplyWrenchVisual::Load()
   common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
   rendering::Material::GetMaterialAsColor(dPtr->unselectedMaterial,
       matAmbient, matDiffuse, matSpecular, matEmissive);
-  dPtr->forceText.Load(this->GetName()+"__FORCE_TEXT__",
+  dPtr->forceText.Load(this->Name()+"__FORCE_TEXT__",
       "0N", "Arial", 0.03, matAmbient);
   dPtr->forceText.SetShowOnTop(true);
 
   dPtr->forceText.MovableObject::getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string(dPtr->forceVisual->GetName())));
+      Ogre::Any(std::string(dPtr->forceVisual->Name())));
 
   VisualPtr forceTextVisual(new rendering::Visual(
-      this->GetName() + "_FORCE_TEXT_", dPtr->forceVisual, false));
+      this->Name() + "_FORCE_TEXT_", dPtr->forceVisual, false));
   forceTextVisual->Load();
   forceTextVisual->GetSceneNode()->attachObject(&(dPtr->forceText));
   forceTextVisual->GetSceneNode()->setInheritScale(false);
 
   // Torque visual
   dPtr->torqueVisual.reset(new rendering::Visual(
-      this->GetName() + "_TORQUE_VISUAL_", shared_from_this(), false));
+      this->Name() + "_TORQUE_VISUAL_", shared_from_this(), false));
   dPtr->torqueVisual->Load();
 
   // Torque tube
@@ -141,7 +141,7 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("torque_tube");
 
   VisualPtr torqueTubeVisual(new rendering::Visual(
-      this->GetName() + "_TORQUE_TUBE_", dPtr->torqueVisual, false));
+      this->Name() + "_TORQUE_TUBE_", dPtr->torqueVisual, false));
   torqueTubeVisual->Load();
 
   torqueTubeVisual->AttachMesh("torque_tube");
@@ -149,11 +149,11 @@ void ApplyWrenchVisual::Load()
       torqueTubeVisual->GetSceneNode()->getAttachedObject(0);
   tubeObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   tubeObj->getUserObjectBindings().setUserAny(
-        Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
+        Ogre::Any(std::string(dPtr->torqueVisual->Name())));
 
   // Torque arrow
   VisualPtr torqueArrowVisual(new rendering::Visual(
-      this->GetName() + "_TORQUE_HEAD_", dPtr->torqueVisual, false));
+      this->Name() + "_TORQUE_HEAD_", dPtr->torqueVisual, false));
   torqueArrowVisual->Load();
 
   torqueArrowVisual->AttachMesh("axis_head");
@@ -161,7 +161,7 @@ void ApplyWrenchVisual::Load()
       torqueArrowVisual->GetSceneNode()->getAttachedObject(0);
   torqueHeadObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   torqueHeadObj->getUserObjectBindings().setUserAny(
-        Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
+        Ogre::Any(std::string(dPtr->torqueVisual->Name())));
 
   torqueArrowVisual->SetScale(ignition::math::Vector3d(3, 3, 1));
   torqueArrowVisual->SetPosition(ignition::math::Vector3d(-0.04, 0.125, 0));
@@ -179,15 +179,15 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
   // Torque text
-  dPtr->torqueText.Load(this->GetName()+"__TORQUE_TEXT__",
+  dPtr->torqueText.Load(this->Name()+"__TORQUE_TEXT__",
       "0Nm", "Arial", 0.03, matAmbient);
   dPtr->torqueText.SetShowOnTop(true);
 
   dPtr->torqueText.MovableObject::getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
+      Ogre::Any(std::string(dPtr->torqueVisual->Name())));
 
   VisualPtr torqueTextVisual(new rendering::Visual(
-      this->GetName() + "_TORQUE_TEXT_", dPtr->torqueVisual, false));
+      this->Name() + "_TORQUE_TEXT_", dPtr->torqueVisual, false));
   torqueTextVisual->Load();
 
   torqueTextVisual->GetSceneNode()->attachObject(&(dPtr->torqueText));
@@ -195,7 +195,7 @@ void ApplyWrenchVisual::Load()
 
   // Rotation manipulator
   dPtr->rotTool.reset(new rendering::SelectionObj(
-      this->GetName() + "__SELECTION_OBJ", shared_from_this()));
+      this->Name() + "__SELECTION_OBJ", shared_from_this()));
   dPtr->rotTool->Load();
   dPtr->rotTool->SetMode("rotate");
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_X, false);

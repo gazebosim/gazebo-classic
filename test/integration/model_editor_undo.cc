@@ -875,7 +875,7 @@ void ModelEditorUndoTest::LinkTranslation()
     QVERIFY(linkVis->WorldPose() != initialPose);
 
     // Undo
-    gzmsg << "Undo moving [" << linkVis->GetName() << "]" << std::endl;
+    gzmsg << "Undo moving [" << linkVis->Name() << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
     // Check redo is enabled
@@ -888,7 +888,7 @@ void ModelEditorUndoTest::LinkTranslation()
     QVERIFY(initialPose == linkVis->WorldPose());
 
     // Redo
-    gzmsg << "Redo moving [" << linkVis->GetName() << "]" << std::endl;
+    gzmsg << "Redo moving [" << linkVis->Name() << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 
@@ -1092,7 +1092,7 @@ void ModelEditorUndoTest::NestedModelAlign()
     QVERIFY(nestedVis->WorldPose() != initialPose);
 
     // Undo
-    gzmsg << "Undo moving [" << nestedVis->GetName() << "]" << std::endl;
+    gzmsg << "Undo moving [" << nestedVis->Name() << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
     // Check redo is enabled
@@ -1105,7 +1105,7 @@ void ModelEditorUndoTest::NestedModelAlign()
     QVERIFY(initialPose == nestedVis->WorldPose());
 
     // Redo
-    gzmsg << "Redo moving [" << nestedVis->GetName() << "]" << std::endl;
+    gzmsg << "Redo moving [" << nestedVis->Name() << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 

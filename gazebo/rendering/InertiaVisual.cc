@@ -114,7 +114,7 @@ void InertiaVisual::Load(const ignition::math::Pose3d &_pose,
   dPtr->crossLines->AddPoint(p6);
 
   VisualPtr boxVis(
-      new Visual(this->GetName()+"_BOX_", shared_from_this(), false));
+      new Visual(this->Name()+"_BOX_", shared_from_this(), false));
   boxVis->Load();
 
   // Inertia indicator: equivalent box of uniform density

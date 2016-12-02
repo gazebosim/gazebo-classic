@@ -3059,12 +3059,12 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
     // See if there is a model
     if (parts[i] == "model")
     {
-      auto model = this->GetModel(parts[i+1]);
+      auto model = this->ModelByName(parts[i+1]);
 
       if (!model)
       {
         gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
-            this->GetName() << "]" << std::endl;
+            this->Name() << "]" << std::endl;
         return;
       }
 

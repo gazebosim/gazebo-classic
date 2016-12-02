@@ -1781,21 +1781,21 @@ TEST_F(Visual_TEST, Clone)
   gazebo::rendering::VisualPtr vis1Clone = vis1->Clone("vis1_clone",
       vis1->GetParent());
   ASSERT_NE(vis1Clone, nullptr);
-  EXPECT_EQ(vis1Clone->GetName(), "vis1_clone");
+  EXPECT_EQ(vis1Clone->Name(), "vis1_clone");
 
   EXPECT_EQ(vis1Clone->GetChildCount(), vis1->GetChildCount());
   EXPECT_EQ(vis1Clone->GetChildCount(), 1u);
 
   gazebo::rendering::VisualPtr vis2Clone = vis1Clone->GetChild(0);
   ASSERT_NE(vis2Clone, nullptr);
-  EXPECT_EQ(vis2Clone->GetName(), "vis1_clone::vis2");
+  EXPECT_EQ(vis2Clone->Name(), "vis1_clone::vis2");
 
   EXPECT_EQ(vis2Clone->GetChildCount(), vis2->GetChildCount());
   EXPECT_EQ(vis2Clone->GetChildCount(), 1u);
 
   gazebo::rendering::VisualPtr vis3Clone = vis2Clone->GetChild(0);
   ASSERT_NE(vis3Clone, nullptr);
-  EXPECT_EQ(vis3Clone->GetName(), "vis1_clone::vis2::vis3");
+  EXPECT_EQ(vis3Clone->Name(), "vis1_clone::vis2::vis3");
 
   EXPECT_EQ(vis3Clone->GetChildCount(), vis3->GetChildCount());
   EXPECT_EQ(vis3Clone->GetChildCount(), 0u);

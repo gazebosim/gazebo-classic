@@ -147,7 +147,7 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // move the box to the left of the camera and it should not be visible
   pose = math::Pose(0, -1, 0.5, 0, 0, 0);
@@ -163,7 +163,7 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // move the box to the right of the camera with some rotations,
   // it should still not be visible.
@@ -180,12 +180,12 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // rotate the camera counter-clockwise to see the box
   camera->Yaw(ignition::math::Angle(1.57));
   EXPECT_TRUE(camera->IsVisible(visual));
-  EXPECT_TRUE(camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(camera->IsVisible(visual->Name()));
 
   // move the box up and let it drop. The camera should not see the box
   // initially but the box should eventually move into the camera view
@@ -203,7 +203,7 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
-  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   sleep = 0;
   maxSleep = 100;
@@ -213,7 +213,7 @@ TEST_F(CameraTest, Visible)
     sleep++;
   }
   EXPECT_TRUE(camera->IsVisible(visual));
-  EXPECT_TRUE(camera->IsVisible(visual->GetName()));
+  EXPECT_TRUE(camera->IsVisible(visual->Name()));
 }
 
 /////////////////////////////////////////////////

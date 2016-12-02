@@ -53,9 +53,9 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // create a joint message for testing
   gazebo::msgs::JointPtr jointMsg;
   jointMsg.reset(new gazebo::msgs::Joint);
-  jointMsg->set_parent(scene->WorldVisual()->GetName());
+  jointMsg->set_parent(scene->WorldVisual()->Name());
   jointMsg->set_parent_id(scene->WorldVisual()->GetId());
-  jointMsg->set_child(childVis->GetName());
+  jointMsg->set_child(childVis->Name());
   jointMsg->set_child_id(childVis->GetId());
   jointMsg->set_name("test_joint");
   jointMsg->set_id(11111);

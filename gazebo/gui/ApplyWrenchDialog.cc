@@ -447,11 +447,11 @@ void ApplyWrenchDialog::Fini()
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
 
     this->dataPtr->applyWrenchVisual->Fini();
   }
@@ -491,7 +491,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
   for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = vis->GetChild(i);
-    std::string linkName = childVis->GetName();
+    std::string linkName = childVis->Name();
 
     // Issue #1553: This is failing to get real links sometimes:
     // uint32_t flags = childVis->GetVisibilityFlags();
@@ -586,7 +586,7 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->AddReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
         std::bind(&ApplyWrenchDialog::OnMouseRelease, this,
         std::placeholders::_1));
   }
@@ -601,7 +601,7 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 
   if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
@@ -1206,12 +1206,12 @@ void ApplyWrenchDialog::SetActive(bool _active)
       g_arrowAct->trigger();
 
     MouseEventHandler::Instance()->AddPressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
         std::bind(&ApplyWrenchDialog::OnMousePress, this,
         std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
         std::bind(&ApplyWrenchDialog::OnMouseMove, this,
         std::placeholders::_1));
   }
@@ -1221,9 +1221,9 @@ void ApplyWrenchDialog::SetActive(bool _active)
         rendering::ApplyWrenchVisual::Mode::NONE);
 
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 }
 

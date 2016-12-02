@@ -205,7 +205,7 @@ bool ModelMaker::Init()
   this->dataPtr->modelVisual->Load();
   this->dataPtr->modelVisual->SetPose(modelPose);
 
-  modelName = this->dataPtr->modelVisual->GetName();
+  modelName = this->dataPtr->modelVisual->Name();
   modelElem->GetAttribute("name")->Set(modelName);
 
   if (modelElem->GetName() == "model")
@@ -240,7 +240,7 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
     rendering::VisualPtr modelVis = modelElemList.front().second;
     modelElemList.pop_front();
 
-    std::string modelName = modelVis->GetName();
+    std::string modelName = modelVis->Name();
 
     // create model
     sdf::ElementPtr linkElem;

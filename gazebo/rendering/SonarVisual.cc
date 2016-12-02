@@ -78,7 +78,7 @@ void SonarVisual::Load()
   dPtr->sonarRay->AddPoint(0, 0, 0);
 
   dPtr->coneVis.reset(
-      new Visual(this->GetName() + "_SONAR_CONE_", shared_from_this(), false));
+      new Visual(this->Name() + "_SONAR_CONE_", shared_from_this(), false));
   dPtr->coneVis->Load();
   dPtr->coneVis->InsertMesh("unit_cone");
   dPtr->coneVis->AttachMesh("unit_cone");
@@ -112,8 +112,8 @@ void SonarVisual::Update()
 
   // Skip the update if the user is moving the sonar.
   if (this->GetScene()->SelectedVisual() &&
-      this->GetRootVisual()->GetName() ==
-      this->GetScene()->SelectedVisual()->GetName())
+      this->GetRootVisual()->Name() ==
+      this->GetScene()->SelectedVisual()->Name())
   {
     return;
   }

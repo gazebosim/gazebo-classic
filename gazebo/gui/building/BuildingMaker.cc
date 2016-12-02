@@ -1745,13 +1745,13 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
   // Highlight visual on hover
   if (vis)
   {
-    std::string visName = vis->GetParent()->GetName();
+    std::string visName = vis->GetParent()->Name();
 
     // Stairs have nested visuals
     if (visName.find("Stair") != std::string::npos)
     {
       vis = vis->GetParent();
-      visName = vis->GetParent()->GetName();
+      visName = vis->GetParent()->Name();
     }
 
     if (this->dataPtr->hoverVis && this->dataPtr->hoverVis != vis)
@@ -1838,7 +1838,7 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
 
   if (this->dataPtr->hoverVis)
   {
-    std::string hoverName = this->dataPtr->hoverVis->GetParent()->GetName();
+    std::string hoverName = this->dataPtr->hoverVis->GetParent()->Name();
     hoverName = hoverName.substr(hoverName.find("::")+2);
 
     std::map<std::string, BuildingModelManip *>::const_iterator it =
@@ -1895,7 +1895,7 @@ void BuildingMaker::ResetHoverVis()
 {
   if (this->dataPtr->hoverVis)
   {
-    std::string hoverName = this->dataPtr->hoverVis->GetParent()->GetName();
+    std::string hoverName = this->dataPtr->hoverVis->GetParent()->Name();
     hoverName = hoverName.substr(hoverName.find("::")+2);
 
     std::map<std::string, BuildingModelManip *>::const_iterator it =

@@ -66,7 +66,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
   Visual::Load();
 
   dPtr->axisVisual.reset(
-      new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
+      new AxisVisual(this->Name() + "_AXIS", shared_from_this()));
   dPtr->axisVisual->Load();
 
   ignition::math::Pose3d pose;
@@ -89,7 +89,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
       parentVis = this->GetScene()->GetVisual(_msg->parent_id());
 
     JointVisualPtr jointVis;
-    jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
+    jointVis.reset(new JointVisual(this->Name() + "_parent_", parentVis));
     jointVis->Load(_msg, pose + this->GetParent()->WorldPose());
 
     // attach axis2 to this visual
@@ -146,7 +146,7 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
   ArrowVisualPtr axis;
 
   std::stringstream nameStr;
-  nameStr << this->GetName() << "_axis_" << this->GetChildCount() << "_AXIS";
+  nameStr << this->Name() << "_axis_" << this->GetChildCount() << "_AXIS";
 
   axis.reset(new ArrowVisual(nameStr.str(), shared_from_this()));
   axis->Load();
@@ -287,7 +287,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
         parentVis = this->GetScene()->GetVisual(_msg->parent_id());
 
       JointVisualPtr jointVis;
-      jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
+      jointVis.reset(new JointVisual(this->Name() + "_parent_", parentVis));
       jointVis->Load(_msg,
           msgs::ConvertIgn(_msg->pose()) + this->GetParent()->WorldPose());
 

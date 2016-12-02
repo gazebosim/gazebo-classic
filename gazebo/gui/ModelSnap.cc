@@ -247,7 +247,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     rendering::VisualPtr previousParent;
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
-    if (gui::get_entity_id(currentParent->GetName()))
+    if (gui::get_entity_id(currentParent->Name()))
     {
       if (this->dataPtr->selectedVis)
         previousParent = this->dataPtr->selectedVis->GetRootVisual();
@@ -335,7 +335,7 @@ void ModelSnap::Snap(const ignition::math::Triangle3d &_triangleSrc,
       ignition::math::Pose3d(_visualSrc->WorldPose().Pos() +
       translation, rotation * _visualSrc->WorldPose().Rot()));
 
-  Events::moveEntity(_visualSrc->GetName(), _visualSrc->WorldPose(),
+  Events::moveEntity(_visualSrc->Name(), _visualSrc->WorldPose(),
       true);
 
   this->PublishVisualPose(_visualSrc);
@@ -411,12 +411,12 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   {
     // Register user command on server
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_description("Snap [" + _vis->Name() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
     msgs::Model msg;
 
-    auto id = gui::get_entity_id(_vis->GetName());
+    auto id = gui::get_entity_id(_vis->Name());
     if (id)
       msg.set_id(id);
 

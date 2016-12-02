@@ -528,9 +528,9 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   start.Correct();
 
   // Center of visual
-  ignition::math::Box box = _visual->GetBoundingBox().Ign();
+  ignition::math::Box box = _visual->BoundingBox();
   ignition::math::Vector3d visCenter = box.Center() +
-    _visual->GetWorldPose().pos.Ign();
+    _visual->WorldPose().Pos();
   visCenter.Correct();
 
   // Direction from start to visual center

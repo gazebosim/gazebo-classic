@@ -287,7 +287,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       }
       // prevent the visual pose from being updated by the server
       if (this->dataPtr->scene)
-        this->dataPtr->scene->SelectVisual(vis->GetName(), "move");
+        this->dataPtr->scene->SelectVisual(vis->Name(), "move");
     }
 
     if (_axis == "x")
@@ -314,7 +314,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   {
     msgs::UserCmd userCmdMsg;
     userCmdMsg.set_description(
-        "Align to [" + this->dataPtr->targetVis->GetName() + "]");
+        "Align to [" + this->dataPtr->targetVis->Name() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
     for (const auto &vis : visualsToPublish)
@@ -324,7 +324,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       {
         msgs::Model msg;
 
-        auto id = gui::get_entity_id(vis->GetName());
+        auto id = gui::get_entity_id(vis->Name());
         if (id)
           msg.set_id(id);
 

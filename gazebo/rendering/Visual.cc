@@ -109,11 +109,11 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->layer = -1;
   this->dataPtr->inheritTransparency = true;
 
-  std::string uniqueName = this->GetName();
+  std::string uniqueName = this->Name();
   int index = 0;
   while (_scene->OgreSceneManager()->hasSceneNode(uniqueName))
   {
-    uniqueName = this->GetName() + "_" +
+    uniqueName = this->Name() + "_" +
                  boost::lexical_cast<std::string>(index++);
   }
 
@@ -121,7 +121,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->SetName(uniqueName);
   this->dataPtr->sceneNode =
     this->dataPtr->scene->OgreSceneManager()->getRootSceneNode()->
-        createChildSceneNode(this->GetName());
+        createChildSceneNode(this->Name());
 
   this->Init();
 }
@@ -162,15 +162,15 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
     return;
   }
 
-  std::string uniqueName = this->GetName();
+  std::string uniqueName = this->Name();
   int index = 0;
   while (pnode->getCreator()->hasSceneNode(uniqueName))
-    uniqueName = this->GetName() + "_" +
+    uniqueName = this->Name() + "_" +
                  boost::lexical_cast<std::string>(index++);
 
   this->SetName(uniqueName);
 
-  this->dataPtr->sceneNode = pnode->createChildSceneNode(this->GetName());
+  this->dataPtr->sceneNode = pnode->createChildSceneNode(this->Name());
 
   this->dataPtr->parent = _parent;
   this->dataPtr->scene = this->dataPtr->parent->GetScene();
@@ -207,7 +207,7 @@ void Visual::Fini()
 
   // Detach from the parent
   if (this->dataPtr->parent)
-    this->dataPtr->parent->DetachVisual(this->GetName());
+    this->dataPtr->parent->DetachVisual(this->Name());
   this->dataPtr->parent.reset();
 
   if (this->dataPtr->boundingBox)
@@ -243,11 +243,11 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   result->Load(this->dataPtr->sdf);
   result->SetScale(this->dataPtr->scale);
   result->SetVisibilityFlags(this->dataPtr->visibilityFlags);
-  std::string visName = this->GetName();
+  std::string visName = this->Name();
   for (auto iter: this->dataPtr->children)
   {
     // give a unique name by prefixing child visuals with the new clone name
-    std::string childName = iter->GetName();
+    std::string childName = iter->Name();
     std::string newName = childName;
     size_t pos = childName.find(visName);
     if (pos == 0)
@@ -562,7 +562,7 @@ void Visual::Update()
     {
       this->dataPtr->animState = nullptr;
       this->dataPtr->sceneNode->getCreator()->destroyAnimation(
-          this->GetName() + "_animation");
+          this->Name() + "_animation");
       if (this->dataPtr->onAnimationComplete)
         this->dataPtr->onAnimationComplete();
       // event::Events::DisconnectPreRender(this->preRenderConnection);
@@ -610,7 +610,7 @@ void Visual::AttachVisual(VisualPtr _vis)
 //////////////////////////////////////////////////
 void Visual::DetachVisual(VisualPtr _vis)
 {
-  this->DetachVisual(_vis->GetName());
+  this->DetachVisual(_vis->Name());
 }
 
 //////////////////////////////////////////////////
@@ -619,7 +619,7 @@ void Visual::DetachVisual(const std::string &_name)
   for (auto iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
@@ -667,10 +667,10 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     {
       RTShaderSystem::Instance()->UpdateShaders();
     }
-    _obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
+    _obj->getUserObjectBindings().setUserAny(Ogre::Any(this->Name()));
   }
   else
-    gzerr << "Visual[" << this->GetName() << "] already has object["
+    gzerr << "Visual[" << this->Name() << "] already has object["
           << _obj->getName() << "] attached.";
 
   _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
@@ -1105,7 +1105,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->Initialized()
       && this->dataPtr->lighting &&
-      this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
+      this->Name().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();
   }
@@ -1122,7 +1122,7 @@ void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 
   if (this->dataPtr->myMaterialName.empty())
   {
-    std::string matName = this->GetName() + "_MATERIAL_";
+    std::string matName = this->Name() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
   }
@@ -1186,7 +1186,7 @@ void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
 
   if (this->dataPtr->myMaterialName.empty())
   {
-    std::string matName = this->GetName() + "_MATERIAL_";
+    std::string matName = this->Name() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
   }
@@ -1255,7 +1255,7 @@ void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 
   if (this->dataPtr->myMaterialName.empty())
   {
-    std::string matName = this->GetName() + "_MATERIAL_";
+    std::string matName = this->Name() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
   }
@@ -1612,7 +1612,7 @@ void Visual::SetHighlighted(bool _highlighted)
   {
     for (auto child : this->dataPtr->children)
     {
-      if (child->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+      if (child->Name().find("LINK_FRAME_VISUAL__") != std::string::npos)
         child->SetHighlighted(_highlighted);
     }
   }
@@ -1945,7 +1945,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
   {
     this->dataPtr->ribbonTrail =
         this->dataPtr->scene->OgreSceneManager()->createRibbonTrail(
-        this->GetName() + "_RibbonTrail");
+        this->Name() + "_RibbonTrail");
     this->dataPtr->ribbonTrail->setMaterialName("Gazebo/RibbonTrail");
     // this->dataPtr->ribbonTrail->setTrailLength(100);
     this->dataPtr->ribbonTrail->setMaxChainElements(10000);
@@ -2667,7 +2667,7 @@ bool Visual::IsAncestorOf(const rendering::VisualPtr _visual) const
   rendering::VisualPtr vis = _visual->GetParent();
   while (vis)
   {
-    if (vis->GetName() == this->GetName())
+    if (vis->Name() == this->Name())
       return true;
     vis = vis->GetParent();
   }
@@ -2685,7 +2685,7 @@ bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
   rendering::VisualPtr vis = this->GetParent();
   while (vis)
   {
-    if (vis->GetName() == _visual->GetName())
+    if (vis->Name() == _visual->Name())
       return true;
     vis = vis->GetParent();
   }
@@ -2774,7 +2774,7 @@ std::string Visual::GetMeshName() const
       return "unit_plane";
     else if (geomElem->HasElement("polyline"))
     {
-      std::string polyLineName = this->GetName();
+      std::string polyLineName = this->Name();
       common::MeshManager *meshManager = common::MeshManager::Instance();
 
       if (!meshManager->IsValidFilename(polyLineName))
@@ -2883,7 +2883,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 
   this->dataPtr->onAnimationComplete = _onComplete;
 
-  std::string animName = this->GetName() + "_animation";
+  std::string animName = this->Name() + "_animation";
 
   Ogre::Animation *anim =
     this->dataPtr->sceneNode->getCreator()->createAnimation(animName, _time);
@@ -2938,7 +2938,7 @@ void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
 
   math::Quaternion rotFinal(0, rpy.Y(), rpy.Z());
 
-  std::string animName = this->GetName() + "_animation";
+  std::string animName = this->Name() + "_animation";
 
   Ogre::Animation *anim =
     this->dataPtr->sceneNode->getCreator()->createAnimation(animName, _time);
@@ -3060,7 +3060,7 @@ void Visual::ShowSkeleton(bool _show)
   ///  make the rest of the model transparent
   this->SetTransparency(transp);
 
-  if (this->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+  if (this->Name().find("__SKELETON_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   std::vector<VisualPtr>::iterator iter;
@@ -3102,7 +3102,7 @@ void Visual::ShowJoints(bool _show)
 {
   // If this is a joint visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+      this->Name().find("JOINT_VISUAL__") != std::string::npos)
   {
     this->SetVisible(_show);
   }
@@ -3156,24 +3156,24 @@ void Visual::ShowCOM(bool _show)
 {
   // If this is a COM visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find("COM_VISUAL__") != std::string::npos)
+      this->Name().find("COM_VISUAL__") != std::string::npos)
   {
     this->SetVisible(_show);
   }
   // If this is a link without COM visuals, create them
   else if (_show && this->dataPtr->type == VT_LINK &&
-      !this->dataPtr->scene->GetVisual(this->GetName() + "_COM_VISUAL__"))
+      !this->dataPtr->scene->GetVisual(this->Name() + "_COM_VISUAL__"))
   {
     auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
     if (!msg)
     {
-      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+      gzerr << "Couldn't get link message for visual [" << this->Name() <<
           "]" << std::endl;
       return;
     }
     auto msgPtr = new ConstLinkPtr(msg);
 
-    COMVisualPtr vis(new COMVisual(this->GetName() + "_COM_VISUAL__",
+    COMVisualPtr vis(new COMVisual(this->Name() + "_COM_VISUAL__",
         shared_from_this()));
     vis->Load(*msgPtr);
     vis->SetVisible(_show);
@@ -3193,24 +3193,24 @@ void Visual::ShowInertia(bool _show)
 
   // If this is an inertia visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find(suffix) != std::string::npos)
+      this->Name().find(suffix) != std::string::npos)
   {
     this->SetVisible(_show);
   }
   // If this is a link without inertia visuals, create them
   else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
-      !this->dataPtr->scene->GetVisual(this->GetName() + suffix))
+      !this->dataPtr->scene->GetVisual(this->Name() + suffix))
   {
     auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
     if (!msg)
     {
-      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+      gzerr << "Couldn't get link message for visual [" << this->Name() <<
           "]" << std::endl;
       return;
     }
     auto msgPtr = new ConstLinkPtr(msg);
 
-    InertiaVisualPtr vis(new InertiaVisual(this->GetName() +
+    InertiaVisualPtr vis(new InertiaVisual(this->Name() +
         suffix, shared_from_this()));
     vis->Load(*msgPtr);
     vis->SetVisible(_show);
@@ -3228,15 +3228,15 @@ void Visual::ShowLinkFrame(bool _show)
 {
   // If this is a link frame visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+      this->Name().find("LINK_FRAME_VISUAL__") != std::string::npos)
   {
     this->SetVisible(_show);
   }
   // If this is a link without link frame visuals, create them
   else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
-    !this->dataPtr->scene->GetVisual(this->GetName() + "_LINK_FRAME_VISUAL__"))
+    !this->dataPtr->scene->GetVisual(this->Name() + "_LINK_FRAME_VISUAL__"))
   {
-    LinkFrameVisualPtr vis(new LinkFrameVisual(this->GetName() +
+    LinkFrameVisualPtr vis(new LinkFrameVisual(this->Name() +
         "_LINK_FRAME_VISUAL__", shared_from_this()));
     vis->Load();
     vis->SetVisible(_show);
@@ -3254,7 +3254,7 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
 {
   if (!this->dataPtr->skeleton)
   {
-    gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
+    gzerr << "Visual " << this->Name() << " has no skeleton.\n";
     return;
   }
 
@@ -3313,7 +3313,7 @@ void Visual::LoadPlugin(const std::string &_filename,
   {
     if (plugin->GetType() != VISUAL_PLUGIN)
     {
-      gzerr << "Visual[" << this->GetName() << "] is attempting to load "
+      gzerr << "Visual[" << this->Name() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
             << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
       return;

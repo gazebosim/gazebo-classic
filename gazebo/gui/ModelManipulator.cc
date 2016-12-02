@@ -462,7 +462,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       newScale.Z(std::max(1e-4, newScale.Z()));
     }
     _vis->SetScale(newScale);
-    Events::scaleEntity(_vis->GetName(), newScale);
+    Events::scaleEntity(_vis->Name(), newScale);
   }
   else
   {
@@ -504,7 +504,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
         }
 
         childVis->SetScale(newScale);
-        Events::scaleEntity(childVis->GetName(), newScale);
+        Events::scaleEntity(childVis->Name(), newScale);
       }
     }
   }
@@ -601,7 +601,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   }
 
   msgs::UserCmd userCmdMsg;
-  userCmdMsg.set_description(description + _vis->GetName() + "]");
+  userCmdMsg.set_description(description + _vis->Name() + "]");
   userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
   // Only publish for models
@@ -609,7 +609,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   {
     msgs::Model msg;
 
-    auto id = gui::get_entity_id(_vis->GetName());
+    auto id = gui::get_entity_id(_vis->Name());
     if (id)
       msg.set_id(id);
 
@@ -631,7 +631,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   }
   else
   {
-    gzerr << "Visual [" << _vis->GetName() << "] isn't a model or a light"
+    gzerr << "Visual [" << _vis->Name() << "] isn't a model or a light"
         << std::endl;
     return;
   }
@@ -649,12 +649,12 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;
-  userCmdMsg.set_description("Scale [" + _vis->GetName() + "]");
+  userCmdMsg.set_description("Scale [" + _vis->Name() + "]");
   userCmdMsg.set_type(msgs::UserCmd::SCALING);
 
   msgs::Model msg;
 
-  auto id = gui::get_entity_id(_vis->GetName());
+  auto id = gui::get_entity_id(_vis->Name());
   if (id)
     msg.set_id(id);
 
@@ -711,7 +711,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     // If the root visual's ID can be found, it is a model in the main window
     // TODO gui::get_entity_id always return 0 in QTestFixture due to nullptr
     // g_main_win
-    if (gui::get_entity_id(rootVis->GetName()))
+    if (gui::get_entity_id(rootVis->Name()))
     {
       // select model
       vis = rootVis;
@@ -736,7 +736,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     this->SetMouseMoveVisual(vis);
 
     event::Events::setSelectedEntity(
-        this->dataPtr->mouseMoveVis->GetName(), "move");
+        this->dataPtr->mouseMoveVis->Name(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
 
     if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
@@ -958,7 +958,7 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 {
   rendering::VisualPtr vis = _vis;
 
-  if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+  if (gui::get_entity_id(vis->GetRootVisual()->Name()))
     vis = vis->GetRootVisual();
 
   this->dataPtr->mouseMoveVisStartPose = vis->WorldPose();
