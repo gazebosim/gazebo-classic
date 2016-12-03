@@ -60,7 +60,7 @@ else
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/common/STLLoader.cc:94" >> $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
