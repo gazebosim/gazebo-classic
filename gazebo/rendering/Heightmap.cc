@@ -413,8 +413,8 @@ void Heightmap::Load()
       // in order to generate consistent height data
       bool flipY = false;
       // sampling size along image width and height
-      unsigned int vertSize =
-          (this->dataPtr->heightmapData->GetWidth() * this->dataPtr->sampling)-1;
+      unsigned int vertSize = (this->dataPtr->heightmapData->GetWidth() *
+          this->dataPtr->sampling) - this->dataPtr->sampling + 1;
       ignition::math::Vector3d scale;
       scale.X(this->dataPtr->terrainSize.X() / vertSize);
       scale.Y(this->dataPtr->terrainSize.Y() / vertSize);
@@ -426,8 +426,8 @@ void Heightmap::Load()
 
       // Construct the heightmap lookup table
       std::vector<float> lookup;
-      this->dataPtr->heightmapData->FillHeightMap(this->dataPtr->sampling, vertSize,
-          this->dataPtr->terrainSize, scale, flipY, lookup);
+      this->dataPtr->heightmapData->FillHeightMap(this->dataPtr->sampling,
+          vertSize, this->dataPtr->terrainSize, scale, flipY, lookup);
 
       for (unsigned int y = 0; y < vertSize; ++y)
       {

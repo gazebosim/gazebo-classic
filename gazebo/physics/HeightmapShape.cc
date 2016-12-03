@@ -173,6 +173,10 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     this->subSampling =
         static_cast<int>(this->sdf->Get<unsigned int>("sampling"));
   }
+  else
+  {
+    this->subSampling = 2;
+  }
 
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
@@ -199,12 +203,11 @@ void HeightmapShape::Init()
       &HeightmapShape::OnRequest, this, true);
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
 
-  this->subSampling = 2;
-
   math::Vector3 terrainSize = this->GetSize();
 
   // sampling size along image width and height
-  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
+  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)
+      - this->subSampling + 1;
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
