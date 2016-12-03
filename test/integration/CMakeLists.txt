@@ -101,6 +101,7 @@ set(tests
   world.cc
   world_clone.cc
   world_entity_below_point.cc
+  world_open.cc
   world_playback.cc
   world_population.cc
   world_remove.cc
