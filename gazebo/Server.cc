@@ -575,7 +575,7 @@ void Server::Run()
     if (physics::worlds_running())
       sensors::run_once();
     else if (sensors::running())
-      sensors::stop();
+      sensors::fini();
 
     common::Time::MSleep(1);
   }

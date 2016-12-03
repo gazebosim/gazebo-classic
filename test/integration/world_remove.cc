@@ -709,11 +709,10 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
   }
 
   // Check advertised topics
-  msgTypes = gazebo::transport::getAdvertisedTopics();
   EXPECT_FALSE(msgTypes.empty());
 
   auto worldTopicCount = WorldTopicCount(msgTypes);
-  EXPECT_GT(worldTopicCount, 0u);
+  EXPECT_GE(worldTopicCount, startupTopics);
 
   // Clean up ServerFixture transport so it doesn't affect the test
   // Do this after Spawn
@@ -725,8 +724,8 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
   this->node.reset();
 
   // Clear scene created by ServerFixture
-  auto scene = this->GetScene();
-  scene->Clear();
+//  auto scene = this->GetScene();
+//  scene->Clear();
 
   // Get world pointer
   auto world = physics::get_world("default");
@@ -760,13 +759,20 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
   // Remove world
   physics::remove_worlds();
 
-  // Wait until sensor is cleared
+  // Wait until transport is cleared
+  msgTypes = gazebo::transport::getAdvertisedTopics();
   sleep = 0;
-  while (sensor.use_count() > 1 && sleep < maxSleep)
+  while (WorldTopicCount(msgTypes) > 0 && sleep < maxSleep)
   {
+    msgTypes = gazebo::transport::getAdvertisedTopics();
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
+
+  // Check all topics related to that world are gone
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
+  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
 
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
@@ -791,18 +797,13 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
   // Release the last world pointer
   world.reset();
 
-  // Check all topics related to that world are gone
-  msgTypes = gazebo::transport::getAdvertisedTopics();
-  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
-  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
-
   // Stats after removing world
   gzmsg << "Stats after removing world:" << std::endl;
   gzmsg << "- WorldPtr use count: [" << world.use_count() << "]"
         << std::endl;
   gzmsg << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count()
         << "]" << std::endl;
-  gzmsg << "- Topics in this world: [" << worldTopicCount << "]"
+  gzmsg << "- Topics in this world: [" << WorldTopicCount(msgTypes) << "]"
         << std::endl;
   gzmsg << "- sensor ptr use count: [" << sensor.use_count() << "]"
         << std::endl;
@@ -811,10 +812,10 @@ void WorldRemoveSensorsTest::RemoveWorldWithSensor(
 ///////////////////////////////////////////////////
 TEST_P(WorldRemoveSensorsTest, RemoveWorldWithSensor)
 {
-  if (this->physicsEngine != "ode")
-    return;
-  if (this->sensorType != "altimeter")
-    return;
+//  if (this->physicsEngine != "ode")
+//    return;
+//  if (this->sensorType != "depth_camera")
+//    return;
 
   if (this->physicsEngine == "dart" && this->sensorType == "sonar")
   {
