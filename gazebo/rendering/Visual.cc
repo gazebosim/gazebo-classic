@@ -2878,6 +2878,20 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
                              double _time,
                              std::function<void()> _onComplete)
 {
+  std::vector<ignition::math::Pose3d> pts;
+  for (auto const &pt : _pts)
+  {
+    pts.push_back(pt.Ign());
+  }
+
+  this->MoveToPositions(pts, _time, _onComplete);
+}
+
+//////////////////////////////////////////////////
+void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
+                             double _time,
+                             std::function<void()> _onComplete)
+{
   Ogre::TransformKeyFrame *key;
   auto start = this->WorldPose().Pos();
 
@@ -2902,8 +2916,8 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   {
     key = strack->createNodeKeyFrame(tt);
     key->setTranslate(Ogre::Vector3(
-          _pts[i].pos.x, _pts[i].pos.y, _pts[i].pos.z));
-    key->setRotation(Conversions::Convert(_pts[i].Ign().Rot()));
+          _pts[i].Pos().X(), _pts[i].Pos().Y(), _pts[i].Pos().Z()));
+    key->setRotation(Conversions::Convert(_pts[i].Rot()));
 
     tt += dt;
   }

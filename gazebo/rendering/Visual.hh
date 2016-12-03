@@ -588,9 +588,19 @@ namespace gazebo
       /// \param[in] _poses Series of poses the visual will move to.
       /// \param[in] _time Time it takes the visual to move to the pose.
       /// \param[in] _onComplete Callback used when the move is complete.
+      /// \deprecated See version that accepts an ignition math object.
       public: void MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   std::function<void()> _onComplete = NULL);
+                                   std::function<void()> _onComplete = nullptr)
+                                   GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Move to a series of pose and over a given time.
+      /// \param[in] _poses Series of poses the visual will move to.
+      /// \param[in] _time Time it takes the visual to move to the pose.
+      /// \param[in] _onComplete Callback used when the move is complete.
+      public: void MoveToPositions(
+          const std::vector<ignition::math::Pose3d> &_pts, const double _time,
+          std::function<void()> _onComplete = nullptr);
 
       /// \brief Set visibility flags for this visual and all children.
       /// \param[in] _flags The visiblity flags.

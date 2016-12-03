@@ -96,7 +96,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** ModelPtr GetModel(const std::string &_name)
     + ***Replacement:*** ModelPtr ModelByName(const std::string &_name) const
     + ***Deprecation:*** LightPtr Light(const std::string &_name) const
-    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const 
+    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const
     + ***Deprecation:*** EntityPtr GetEntity(const std::string &_name)
     + ***Replacement:*** EntityPtr EntityByName(const std::string &_name) const
     + ***Deprecation:*** ModelPtr GetModelBelowPoint(const math::Vector3 &_pt)
@@ -109,7 +109,7 @@ release will remove the deprecated code.
     + ***Replacement:*** bool PhysicsEnabled() const
     + ***Deprecation:*** void EnablePhysicsEngine(const bool _enable)
     + ***Replacement:*** void SetPhysicsEnabled(const bool _enable)
-    + ***Deprecation:*** uint32_t GetIterations() const 
+    + ***Deprecation:*** uint32_t GetIterations() const
     + ***Replacement:*** uint32_t Iterations() const
     + ***Deprecation:*** msgs::Scene GetSceneMsg() const
     + ***Replacement:*** msgs::Scene SceneMsg() const
@@ -132,7 +132,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Quaternion GetRotation() const
     + ***Replacement:*** ignition::math::Quaterniond Rotation() const
     + ***Deprecation:*** math::Pose GetPose() const
-    + ***Replacement:*** ignition::math::Pose3d Pose() 
+    + ***Replacement:*** ignition::math::Pose3d Pose()
     + ***Deprecation:*** math::Pose GetWorldPose() const
     + ***Replacement:*** ignition::math::Pose3d WorldPose() const
     + ***Deprecation:*** void SetWorldPosition(const math::Vector3 &_pos)
@@ -141,6 +141,8 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Box BoundingBox() const
     + ***Deprecation:*** void MoveToPosition(const math::Pose &_pose, double _time)
     + ***Replacement:*** void MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
+    + ***Deprecation:*** void MoveToPositions(const std::vector<math::Pose> &_pts, double _time, std::function<void()> _onComplete = nullptr)
+    + ***Replacement:*** void MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts, const double _time, std::function<void()> _onComplete = nullptr)
     + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose)
 
