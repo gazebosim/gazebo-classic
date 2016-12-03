@@ -287,7 +287,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   // this->dataPtr->ProcessPrarams.
   //
   // Set the parameter to playback a log file. The log file contains the
-  // world description, so don't try to reead the world file from the
+  // world description, so don't try to read the world file from the
   // command line.
   if (this->dataPtr->vm.count("play"))
   {
@@ -759,51 +759,147 @@ void Server::ProcessControlMsgs()
 }
 
 /////////////////////////////////////////////////
-bool Server::OpenWorld(const std::string & /*_filename*/)
+bool Server::OpenWorld(const std::string &_filename)
 {
-  gzerr << "Open World is not implemented\n";
-  return false;
-/*
+  gzmsg << "Opening world file [" << _filename << "]" << std::endl;
+
+  // Before removing old world, make sure new world is valid
+  FILE *test = fopen(common::find_file(_filename).c_str(), "r");
+  if (!test)
+  {
+    gzerr << "Could not open file [" << _filename << "]" << std::endl;
+    return false;
+  }
+  fclose(test);
+
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize sdf\n";
+    gzerr << "Unable to initialize sdf [" << _filename << "]" << std::endl;
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
-    gzerr << "Unable to read sdf file[" << _filename << "]\n";
+    gzerr << "Unable to read sdf file[" << _filename << "]" << std::endl;
     return false;
   }
 
-  msgs::WorldModify worldMsg;
-  worldMsg.set_world_name("default");
-  worldMsg.set_remove(true);
-  this->worldModPub->Publish(worldMsg);
+  auto worldElem = sdf->Root()->GetElement("world");
+  if (!worldElem)
+  {
+    gzerr << "Unable to find world element on world file [" << _filename << "]"
+        << std::endl;
+    return false;
+  }
 
-  physics::stop_worlds();
-
+  // Stop and remove current worlds
   physics::remove_worlds();
 
-  sensors::remove_sensors();
+  int time = 0;
+  int timeout = 100;
+  while (time < timeout && physics::worlds_running())
+  {
+    common::Time::MSleep(10);
+    ++time;
+  }
+  if (physics::worlds_running())
+  {
+    gzerr << "It wasn't possible to remove worlds, timed out." << std::endl;
+    return false;
+  }
 
+  // Keep transport system but clear all previous messages
   gazebo::transport::clear_buffers();
 
-  sdf::ElementPtr worldElem = sdf->Root()->GetElement("world");
+  // Keep sensor manager but make sure it is clear.
+  // (All sensors should be removed when the links containing them are removed,
+  // but we do this here just to make sure.)
+  sensors::remove_sensors();
+  sensors::run_once(true);
 
-  physics::WorldPtr world = physics::create_world();
+  // Wait until sensors are clear
+  time = 0;
+  while (time < timeout && !sensors::get_sensors().empty())
+  {
+    common::Time::MSleep(10);
+    ++time;
+  }
+  if (!sensors::get_sensors().empty())
+  {
+    gzerr << "It wasn't possible to remove sensors, timed out." << std::endl;
+    return false;
+  }
+
+  // Notify clients that world has been removed
+  // FIXME: hardcoded world name "default"
+  std::string worldName = "default";
+  {
+    msgs::WorldModify worldMsg;
+    worldMsg.set_world_name(worldName);
+    worldMsg.set_remove(true);
+    this->dataPtr->worldModPub->Publish(worldMsg);
+  }
+
+  // Wait for all transport related to the world to be cleaned up
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+  time = 0;
+  std::vector<std::string> leftOvers;
+  leftOvers.push_back("garbage");
+  while (time < timeout && !leftOvers.empty())
+  {
+    leftOvers.clear();
+    common::Time::MSleep(30);
+
+    for (auto msgType : msgTypes)
+    {
+      for (auto topic : msgType.second)
+      {
+        if (topic.find(worldName) != std::string::npos)
+        {
+          leftOvers.push_back(topic);
+        }
+      }
+    }
+    msgTypes = gazebo::transport::getAdvertisedTopics();
+    ++time;
+  }
+  if (!leftOvers.empty())
+  {
+    // If there are standalone programs using these topics, we can't guarantee
+    // their publishers and subscribers are cleaned.
+    std::ostringstream errorMsg;
+    errorMsg << "The following topics are still advertised for the old world ["
+        << worldName << "], if they're not from external programs, there's a "
+        << "problem in Gazebo." << std::endl;
+
+    for (auto topic : leftOvers)
+      errorMsg << "    " << topic << std::endl;
+
+    gzerr << errorMsg.str();
+  }
+
+  auto world = physics::create_world(worldName);
+  if (!world)
+  {
+    gzerr << "Failed to create world [" << worldName << "]" << std::endl;
+    return false;
+  }
 
   physics::load_world(world, worldElem);
-
   physics::init_world(world);
-
   physics::run_world(world);
+  sensors::run_once(true);
 
-  worldMsg.set_world_name("default");
-  worldMsg.set_remove(false);
-  worldMsg.set_create(true);
-  this->worldModPub->Publish(worldMsg);
+  // Notify clients that a new world is available
+  {
+    msgs::WorldModify worldMsg;
+    worldMsg.set_world_name(worldName);
+    worldMsg.set_create(true);
+    this->dataPtr->worldModPub->Publish(worldMsg);
+  }
+
+  gzmsg << "- Opened world file [" << _filename << "]" << std::endl;
   return true;
-  */
 }
+
