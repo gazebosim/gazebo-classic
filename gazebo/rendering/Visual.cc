@@ -1623,7 +1623,7 @@ bool Visual::GetHighlighted() const
 {
   if (this->dataPtr->boundingBox)
   {
-    return this->dataPtr->boundingBox->GetVisible();
+    return this->dataPtr->boundingBox->Visible();
   }
   return false;
 }

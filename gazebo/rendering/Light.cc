@@ -82,8 +82,6 @@ void Light::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Light::Load()
 {
-  math::Vector3 vec;
-
   try
   {
     this->dataPtr->light =
@@ -479,13 +477,13 @@ void Light::SetSpecularColor(const common::Color &_color)
 void Light::SetDirection(const ignition::math::Vector3d &_dir)
 {
   // Set the direction which the light points
-  math::Vector3 vec = _dir;
+  ignition::math::Vector3d vec = _dir;
   vec.Normalize();
 
-  if (vec != this->dataPtr->sdf->Get<math::Vector3>("direction"))
+  if (vec != this->dataPtr->sdf->Get<ignition::math::Vector3d>("direction"))
     this->dataPtr->sdf->GetElement("direction")->Set(vec);
 
-  this->dataPtr->light->setDirection(vec.x, vec.y, vec.z);
+  this->dataPtr->light->setDirection(vec.X(), vec.Y(), vec.Z());
 }
 
 //////////////////////////////////////////////////

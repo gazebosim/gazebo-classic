@@ -150,6 +150,16 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose)
 
+1. **gazebo/rendering/WireBox.hh**
+    + ***Deprecation:*** public: explicit WireBox(VisualPtr _parent, const math::Box &_box)
+    + ***Replacement:*** public: explicit WireBox(VisualPtr _parent, const ignition::math::Box &_box);
+    + ***Deprecation:*** public: void Init(const math::Box &_box)
+    + ***Replacement:*** public: void Init(const ignition::math::Box &_box)
+    + ***Deprecation:*** public: bool GetVisible() const
+    + ***Replacement:*** public: bool Visible() const
+    + ***Deprecation:*** public: math::Box GetBox() const
+    + ***Replacement:*** public: ignition::math::Box Box()
+
 1. **gazebo/gui/ModelManipulator.hh**
     + ***Deprecation:*** public: void RotateEntity(rendering::VisualPtr &_vis,
                                                    const math::Vector3 &_axis,
