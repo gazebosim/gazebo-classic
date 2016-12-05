@@ -2740,7 +2740,7 @@ std::string Visual::GetMeshName() const
       else
         return std::string();
     }
-    else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
+    else if (geomElem->HasElement("mesh"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
