@@ -69,10 +69,6 @@ echo "*:gazebo/common/SVGLoader.cc:869" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 
-# false positive unusedStructMember
-echo "*:plugins/KeysToJointsPlugin.hh:33" >> $SUPPRESS
-echo "*:plugins/KeysToJointsPlugin.hh:43" >> $SUPPRESS
-
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 
