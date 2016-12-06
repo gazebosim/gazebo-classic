@@ -96,7 +96,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** ModelPtr GetModel(const std::string &_name)
     + ***Replacement:*** ModelPtr ModelByName(const std::string &_name) const
     + ***Deprecation:*** LightPtr Light(const std::string &_name) const
-    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const 
+    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const
     + ***Deprecation:*** EntityPtr GetEntity(const std::string &_name)
     + ***Replacement:*** EntityPtr EntityByName(const std::string &_name) const
     + ***Deprecation:*** ModelPtr GetModelBelowPoint(const math::Vector3 &_pt)
@@ -109,7 +109,7 @@ release will remove the deprecated code.
     + ***Replacement:*** bool PhysicsEnabled() const
     + ***Deprecation:*** void EnablePhysicsEngine(const bool _enable)
     + ***Replacement:*** void SetPhysicsEnabled(const bool _enable)
-    + ***Deprecation:*** uint32_t GetIterations() const 
+    + ***Deprecation:*** uint32_t GetIterations() const
     + ***Replacement:*** uint32_t Iterations() const
     + ***Deprecation:*** msgs::Scene GetSceneMsg() const
     + ***Replacement:*** msgs::Scene SceneMsg() const
@@ -123,6 +123,16 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose)
+
+1. **gazebo/rendering/WireBox.hh**
+    + ***Deprecation:*** public: explicit WireBox(VisualPtr _parent, const math::Box &_box)
+    + ***Replacement:*** public: explicit WireBox(VisualPtr _parent, const ignition::math::Box &_box);
+    + ***Deprecation:*** public: void Init(const math::Box &_box)
+    + ***Replacement:*** public: void Init(const ignition::math::Box &_box)
+    + ***Deprecation:*** public: bool GetVisible() const
+    + ***Replacement:*** public: bool Visible() const
+    + ***Deprecation:*** public: math::Box GetBox() const
+    + ***Replacement:*** public: ignition::math::Box Box()
 
 1. **gazebo/gui/ModelManipulator.hh**
     + ***Deprecation:*** public: void RotateEntity(rendering::VisualPtr &_vis,
