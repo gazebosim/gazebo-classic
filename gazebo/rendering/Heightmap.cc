@@ -26,6 +26,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <ignition/math/Matrix4.hh>
+
 #include <boost/filesystem.hpp>
 
 #include "gazebo/common/Assert.hh"
@@ -540,14 +542,9 @@ void Heightmap::Load()
 
       ignition::math::Vector3d camPos(5, -5, h + 200);
       ignition::math::Vector3d lookAt(0, 0, h);
-      ignition::math::Vector3d delta = lookAt - camPos;
+      auto mat = ignition::math::Matrix4d::LookAt(camPos, lookAt);
 
-      double yaw = atan2(delta.Y(), delta.X());
-      double pitch = atan2(-delta.Z(),
-                           sqrt(delta.X() * delta.X() + delta.Y() * delta.Y()));
-
-      userCam->SetWorldPose(ignition::math::Pose3d(camPos,
-          ignition::math::Quaterniond(0.0, pitch, yaw)));
+      userCam->SetWorldPose(mat.Pose());
     }
   }
 

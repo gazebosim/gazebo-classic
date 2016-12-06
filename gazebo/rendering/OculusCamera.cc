@@ -385,58 +385,67 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
     this->scene->OgreSceneManager()->destroyAnimation("cameratrack");
   }
 
-  math::Box box = _visual->GetBoundingBox();
-  math::Vector3 size = box.GetSize();
-  double maxSize = std::max(std::max(size.x, size.y), size.z);
-
-  math::Vector3 start = this->WorldPose().Pos();
+  // Start from current position
+  ignition::math::Vector3d start = this->WorldPose().Pos();
   start.Correct();
-  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
-  end.Correct();
-  math::Vector3 dir = end - start;
+
+  // Center of visual
+  ignition::math::Box box = _visual->GetBoundingBox().Ign();
+  ignition::math::Vector3d visCenter = box.Center() +
+    _visual->GetWorldPose().pos.Ign();
+  visCenter.Correct();
+
+  // Direction from start to visual center
+  ignition::math::Vector3d dir = visCenter - start;
   dir.Correct();
   dir.Normalize();
 
-  double dist = start.Distance(end) - maxSize;
+  // Distance to move
+  ignition::math::Vector3d size = box.Size();
+  double maxSize = size.Max();
+  double dist = start.Distance(visCenter) - maxSize;
 
-  math::Vector3 mid = start + dir*(dist*.5);
-  mid.z = box.GetCenter().z + box.GetSize().z + 2.0;
+  // Find midway point and change its Z
+  ignition::math::Vector3d mid = start + dir*(dist*.5);
+  mid.Z(box.Center().Z() + box.Size().Z() + 2.0);
 
-  dir = end - mid;
+  // Direction from mid to visual center
+  dir = visCenter - mid;
   dir.Correct();
-
-  dist = mid.Distance(end) - maxSize;
-
-  double yawAngle = atan2(dir.y, dir.x);
-  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-  Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0, 0, 1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0, 1, 0));
-
   dir.Normalize();
 
+  // Get new distance
+  dist = mid.Distance(visCenter) - maxSize;
+
+  // Scale to fit in view
   double scale = maxSize / tan((this->HFOV()/2.0).Radian());
 
-  end = mid + dir*(dist - scale);
+  // End position
+  auto end = mid + dir*(dist - scale);
 
-  // dist = start.Distance(end);
-  // double vel = 5.0;
-  double time = 0.5;  // dist / vel;
+  // Orientation
+  auto mat = ignition::math::Matrix4d::LookAt(end, visCenter);
 
+  // Time
+  double time = 0.5;
+
+  // Ogre animation
   Ogre::Animation *anim =
     this->scene->OgreSceneManager()->createAnimation("cameratrack", time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
+  // Start keyframe
   Ogre::TransformKeyFrame *key;
-
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Conversions::Convert(start));
   key->setRotation(this->sceneNode->getOrientation());
 
+  // End keyframe
   key = strack->createNodeKeyFrame(time);
-  key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
-  key->setRotation(yawFinal);
+  key->setTranslate(Conversions::Convert(end));
+  key->setRotation(Conversions::Convert(mat.Rotation()));
 
   this->animState =
     this->scene->OgreSceneManager()->createAnimationState("cameratrack");

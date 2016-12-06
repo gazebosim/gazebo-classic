@@ -231,6 +231,10 @@ namespace gazebo
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
 
+      /// \brief Show or hide collision visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowCollisions(const bool _show);
+
       /// \brief Convert a given pose from the world frame to the local frame
       /// of the model being edited.
       /// \param[in] _world Pose in world frame.

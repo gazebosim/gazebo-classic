@@ -1581,7 +1581,7 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
-    math::Box bbox = this->GetBoundingBox();
+    auto bbox = this->GetBoundingBox().Ign();
 
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
@@ -1615,7 +1615,7 @@ bool Visual::GetHighlighted() const
 {
   if (this->dataPtr->boundingBox)
   {
-    return this->dataPtr->boundingBox->GetVisible();
+    return this->dataPtr->boundingBox->Visible();
   }
   return false;
 }
@@ -2689,7 +2689,7 @@ std::string Visual::GetMeshName() const
       else
         return std::string();
     }
-    else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
+    else if (geomElem->HasElement("mesh"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
