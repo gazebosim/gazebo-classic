@@ -60,6 +60,7 @@ set (plugins_single_header
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
+  KeysToJointsPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
@@ -93,6 +94,7 @@ endif()
 set (GUIplugins
   CessnaGUIPlugin
   KeyboardGUIPlugin
+  LookAtDemoPlugin
   TimerGUIPlugin
 )
 

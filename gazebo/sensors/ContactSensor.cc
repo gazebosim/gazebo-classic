@@ -98,7 +98,7 @@ void ContactSensor::Load(const std::string &_worldName)
 
   std::string entityName =
       this->world->EntityByName(this->ParentName())->GetScopedName();
-  std::string filterName = entityName + "::" + this->Name();
+  this->dataPtr->filterName = entityName + "::" + this->Name();
 
   // Get all the collision elements
   while (collisionElem)
@@ -118,7 +118,7 @@ void ContactSensor::Load(const std::string &_worldName)
     // request the contact manager to publish messages to a custom topic for
     // this sensor
     physics::ContactManager *mgr = this->world->Physics()->GetContactManager();
-    std::string topic = mgr->CreateFilter(filterName,
+    std::string topic = mgr->CreateFilter(this->dataPtr->filterName,
         this->dataPtr->collisions);
     if (!this->dataPtr->contactSub)
     {
@@ -214,13 +214,9 @@ void ContactSensor::Fini()
 {
   if (this->world && this->world->Running())
   {
-    std::string entityName =
-        this->world->EntityByName(this->ParentName())->GetScopedName();
-    std::string filterName = entityName + "::" + this->Name();
-
     physics::ContactManager *mgr =
         this->world->Physics()->GetContactManager();
-    mgr->RemoveFilter(filterName);
+    mgr->RemoveFilter(this->dataPtr->filterName);
   }
 
   this->dataPtr->contactSub.reset();
