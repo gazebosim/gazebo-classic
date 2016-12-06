@@ -53,8 +53,6 @@ class gazebo::rendering::MarkerManagerPrivate
 
   /// \brief Callback that receives marker messages.
   /// \param[in] _req The marker message.
-  /// \param[out] _rep The response message.
-  /// \param[out] _result True/false result.
   public: void OnMarkerMsg(const ignition::msgs::Marker &_req);
 
   /// \brief Service callback that returns a list of markers.
