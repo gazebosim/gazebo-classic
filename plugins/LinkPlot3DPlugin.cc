@@ -99,7 +99,10 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
   }
 
   // Update period
-  this->dataPtr->period = 1.0/(_sdf->Get<int>("frequency", 30).first);
+  if (_sdf->HasElement("frequency"))
+      this->dataPtr->period = 1.0/_sdf->Get<int>("frequency");
+  else
+      this->dataPtr->period = 1.0/30.0;
 
   // Construct the plots
   auto plotElem = _sdf->GetElement("plot");
