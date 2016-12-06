@@ -3477,7 +3477,7 @@ void Visual::FillMaterialMsg(ignition::msgs::Material &_msg) const
   if (!this->dataPtr->origMaterialName.empty())
   {
     // \todo: Material URI's that are specific to a visual are not
-    // recoverable. Refert to the Visual::ProcessMaterialMsg function
+    // recoverable. Refer to the Visual::ProcessMaterialMsg function
     _msg.mutable_script()->set_name(this->dataPtr->origMaterialName);
   }
 
