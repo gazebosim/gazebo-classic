@@ -290,14 +290,8 @@ void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
     msg.mutable_lifetime()->set_nsec(_lifetime.nsec);
   }
 
-  if (_type == "cube" || _type == "box")
+  if (_type == "box")
   {
-    if (_type == "cube")
-    {
-      std::cerr << "Warning: 'cube' is deprecated, please use 'box'. "
-        << " The shape should still appear.\n";
-    }
-
     msg.set_type(ignition::msgs::Marker::BOX);
   }
   else if (_type == "sphere")
