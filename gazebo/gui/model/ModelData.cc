@@ -23,6 +23,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -140,19 +141,22 @@ LinkData::LinkData()
   this->connect(this->inspector, SIGNAL(ShowVisuals(const bool)),
       this, SLOT(ShowVisuals(const bool)));
 
-  connect(this->inspector->GetVisualConfig(),
+  this->connect(this->inspector, SIGNAL(ShowLinkFrame(const bool)),
+      this, SLOT(ShowLinkFrame(const bool)));
+
+  this->connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualAdded(const std::string &)),
       this, SLOT(OnAddVisual(const std::string &)));
 
-  connect(this->inspector->GetCollisionConfig(),
+  this->connect(this->inspector->GetCollisionConfig(),
       SIGNAL(CollisionAdded(const std::string &)),
       this, SLOT(OnAddCollision(const std::string &)));
 
-  connect(this->inspector->GetVisualConfig(),
+  this->connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualRemoved(const std::string &)), this,
       SLOT(OnRemoveVisual(const std::string &)));
 
-  connect(this->inspector->GetCollisionConfig(),
+  this->connect(this->inspector->GetCollisionConfig(),
       SIGNAL(CollisionRemoved(const std::string &)),
       this, SLOT(OnRemoveCollision(const std::string &)));
 
@@ -178,6 +182,28 @@ LinkData::~LinkData()
   this->connections.clear();
   delete this->inspector;
   delete this->updateMutex;
+}
+
+/////////////////////////////////////////////////
+rendering::VisualPtr LinkData::LinkVisual() const
+{
+  return this->linkVisual;
+}
+
+/////////////////////////////////////////////////
+void LinkData::SetLinkVisual(rendering::VisualPtr _linkVisual)
+{
+  this->linkVisual = _linkVisual;
+
+  if (!this->linkFrameVis)
+  {
+    rendering::LinkFrameVisualPtr vis(new rendering::LinkFrameVisual(
+        _linkVisual->GetName() + "_LINK_FRAME_VISUAL__", _linkVisual));
+    vis->Load();
+    vis->SetVisible(this->showLinkFrame);
+
+    this->linkFrameVis = vis;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -593,6 +619,17 @@ void LinkData::ShowVisuals(const bool _show)
 }
 
 /////////////////////////////////////////////////
+void LinkData::ShowLinkFrame(const bool _show)
+{
+  this->showLinkFrame = _show;
+
+  // Check inspector button
+  this->inspector->SetShowLinkFrame(_show);
+
+  this->linkFrameVis->SetVisible(_show);
+}
+
+/////////////////////////////////////////////////
 void LinkData::UpdateConfig()
 {
   // set new geom size if scale has changed.
@@ -663,6 +700,7 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
     leafName = visName.substr(idx+2);
 
   visualConfig->AddVisual(leafName, &visualMsg);
+  this->linkFrameVis->RecalculateScale();
 }
 
 /////////////////////////////////////////////////
@@ -701,6 +739,8 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
 
   this->collisions[_collisionVis] = collisionMsg;
   collisionConfig->AddCollision(leafName, &collisionMsg);
+
+  this->linkFrameVis->RecalculateScale();
 }
 
 /////////////////////////////////////////////////

@@ -86,6 +86,18 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   this->connect(showVisualsButton, SIGNAL(toggled(const bool)), this,
       SLOT(OnShowVisuals(const bool)));
 
+  // Show link frame button
+  auto showLinkFrameButton = new QToolButton(this);
+  showLinkFrameButton->setObjectName("showLinkFrameButton");
+  showLinkFrameButton->setFixedSize(QSize(30, 30));
+  showLinkFrameButton->setToolTip("Show/hide link frame");
+  showLinkFrameButton->setIcon(QPixmap(":/images/eye_frame.svg"));
+  showLinkFrameButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  showLinkFrameButton->setIconSize(QSize(16, 16));
+  showLinkFrameButton->setCheckable(true);
+  this->connect(showLinkFrameButton, SIGNAL(toggled(const bool)), this,
+      SLOT(OnShowLinkFrame(const bool)));
+
   // Remove button
   QToolButton *removeButton = new QToolButton(this);
   removeButton->setFixedSize(QSize(30, 30));
@@ -112,6 +124,7 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   buttonsLayout->addWidget(removeButton);
   buttonsLayout->addWidget(showCollisionsButton);
   buttonsLayout->addWidget(showVisualsButton);
+  buttonsLayout->addWidget(showLinkFrameButton);
   buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(resetButton);
   buttonsLayout->addWidget(cancelButton);
@@ -196,6 +209,21 @@ void LinkInspector::OnShowVisuals(const bool _show)
 void LinkInspector::SetShowVisuals(const bool _show)
 {
   auto button = this->findChild<QToolButton *>("showVisualsButton");
+
+  if (button)
+    button->setChecked(_show);
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnShowLinkFrame(const bool _show)
+{
+  this->ShowLinkFrame(_show);
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::SetShowLinkFrame(const bool _show)
+{
+  auto button = this->findChild<QToolButton *>("showLinkFrameButton");
 
   if (button)
     button->setChecked(_show);

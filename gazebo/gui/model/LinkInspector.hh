@@ -73,13 +73,17 @@ namespace gazebo
       /// \brief Open the inspector.
       public: void Open();
 
-      /// \brief Set the state of a show collision button.
+      /// \brief Set the state of show collisions button.
       /// \param[in] _show If true, button is checked.
       public: void SetShowCollisions(const bool _show);
 
-      /// \brief Set the state of a show visual button.
+      /// \brief Set the state of show visuals button.
       /// \param[in] _show If true, button is checked.
       public: void SetShowVisuals(const bool _show);
+
+      /// \brief Set the state of show link frame button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowLinkFrame(const bool _show);
 
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
@@ -109,6 +113,11 @@ namespace gazebo
       /// \param[in] _show True to show.
       Q_SIGNALS: void ShowVisuals(const bool _show);
 
+      /// \brief Qt signal emitted to indicate that link frame should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowLinkFrame(const bool _show);
+
       /// \brief Qt callback when the Remove button is pressed.
       private slots: void OnRemove();
 
@@ -119,6 +128,10 @@ namespace gazebo
       /// \brief Qt callback when the show visuals button is pressed.
       /// \param[in] _show Show if checked, show otherwise.
       private slots: void OnShowVisuals(const bool _show);
+
+      /// \brief Qt callback when the show link frame button is pressed.
+      /// \param[in] _show Show if checked, show otherwise.
+      private slots: void OnShowLinkFrame(const bool _show);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();

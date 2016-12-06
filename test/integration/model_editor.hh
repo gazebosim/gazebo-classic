@@ -40,6 +40,9 @@ class ModelEditorTest : public QTestFixture
 
   /// \brief Test showing and hiding visuals.
   private slots: void ShowVisuals();
+
+  /// \brief Test showing and hiding link frames.
+  private slots: void ShowLinkFrames();
 };
 
 #endif
