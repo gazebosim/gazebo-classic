@@ -34,7 +34,8 @@ TEST_F(MaterialTest, Material)
   EXPECT_STREQ("texture_image", mat.GetTextureImage().c_str());
 
   mat.SetTextureImage("texture_image", "/path");
-  EXPECT_TRUE(mat.GetTextureImage().empty());
+  EXPECT_STREQ("/path/../materials/textures/texture_image",
+               mat.GetTextureImage().c_str());
 
   mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
   EXPECT_TRUE(mat.GetAmbient() == common::Color(0.1, 0.2, 0.3, 0.4));
