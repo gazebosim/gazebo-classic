@@ -2,6 +2,10 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix `model.config` dependency support, and add ability to reference
+   textures using a URI.
+    * [Pull request 2517](https://bitbucket.org/osrf/gazebo/pull-request/2517)
+
 1. Fix DEM heightmap size, collision, scale
     * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
 
