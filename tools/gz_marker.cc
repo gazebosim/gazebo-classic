@@ -42,7 +42,7 @@ MarkerCommand::MarkerCommand()
     ("id,i", po::value<unsigned int>(),
      "Positive integer value of a visual marker")
     ("type,t", po::value<std::string>(),
-     "Type of geometry: cube, cylinder, sphere, line_list, line_strip, "
+     "Type of geometry: box, cylinder, sphere, line_list, line_strip, "
      "points, text, triangle_fan, triangle_list, triangle_strip")
     ("parent,p", po::value<std::string>(),
      "Name of a visual to which this marker should be attached.")
@@ -292,6 +292,12 @@ void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
 
   if (_type == "cube" || _type == "box")
   {
+    if (_type == "cube")
+    {
+      std::cerr << "Warning: 'cube' is deprecated, please use 'box'. "
+        << " The shape should still appear.\n";
+    }
+
     msg.set_type(ignition::msgs::Marker::BOX);
   }
   else if (_type == "sphere")
