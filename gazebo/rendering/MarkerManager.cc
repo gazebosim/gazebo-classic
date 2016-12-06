@@ -218,6 +218,11 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
       this->scene->RemoveVisual(markerIter->second);
       this->markers[ns].erase(markerIter);
     }
+    else
+    {
+      gzerr << "Unable to delete marker with id[" << _msg.id() << "] "
+        << "in namespace[" << ns << "]\n";
+    }
   }
   // Remove all markers, or all markers in a namespace
   else if (_msg.action() == ignition::msgs::Marker::DELETE_ALL)

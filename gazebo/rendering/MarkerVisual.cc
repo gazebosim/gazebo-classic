@@ -139,26 +139,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
 
   // Set the visual's pose
   if (_msg.has_pose())
-  {
-    ignition::math::Pose3d pose;
-
-    if (_msg.pose().has_position())
-    {
-      pose.Pos().Set(_msg.pose().position().x(),
-                     _msg.pose().position().y(),
-                     _msg.pose().position().z());
-    }
-
-    if (_msg.pose().has_orientation())
-    {
-      pose.Rot().Set(_msg.pose().orientation().w(),
-          _msg.pose().orientation().x(),
-          _msg.pose().orientation().y(),
-          _msg.pose().orientation().z());
-    }
-
-    this->SetPose(pose);
-  }
+    this->SetPose(ignition::msgs::Convert(_msg.pose()));
 
   // Set the marker's end time
   if (_msg.has_lifetime() &&
