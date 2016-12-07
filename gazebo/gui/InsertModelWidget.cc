@@ -194,7 +194,6 @@ void InsertModelWidget::OnModels(
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   if (_item)
   {
     std::string path, filename;
@@ -210,7 +209,11 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       filename = common::ModelDatabase::Instance()->GetModelFile(path);
       gui::Events::createEntity("model", filename);
 
-      this->dataPtr->fileTreeWidget->clearSelection();
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+        this->dataPtr->fileTreeWidget->clearSelection();
+      }
+
       QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
   }
