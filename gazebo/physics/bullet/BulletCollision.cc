@@ -104,8 +104,8 @@ ignition::math::Box BulletCollision::BoundingBox() const
     this->bulletCollisionDPtr->collisionShape->getAabb(
         btTransform::getIdentity(), btMin, btMax);
 
-    result.Min().Set(btMin.x(), btMin.y(), btMin.z());
-    result.Max().Set(btMax.x(), btMax.y(), btMax.z());
+    result = math::Box(math::Vector3(btMin.x(), btMin.y(), btMin.z()),
+                       math::Vector3(btMax.x(), btMax.y(), btMax.z()));
 
     if (this->ShapeType() & PLANE_SHAPE)
     {

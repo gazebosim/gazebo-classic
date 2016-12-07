@@ -203,6 +203,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
       auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
       wrenchPub->Publish(_msg->wrench());
+      wrenchPub->Fini();
 
       break;
     }

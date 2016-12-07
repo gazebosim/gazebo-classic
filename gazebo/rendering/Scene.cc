@@ -1387,8 +1387,7 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ?
         _mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) ||
-        (submesh->useSharedVertices && !added_shared))
+    if ((!submesh->useSharedVertices) || !added_shared)
     {
       if (submesh->useSharedVertices)
       {
@@ -2627,7 +2626,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   // Creating heightmap
   // FIXME: A bit of a hack.
   if (_msg->has_geometry() &&
-      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP &&
+      _type != Visual::VT_COLLISION)
   {
     if (this->dataPtr->terrain)
     {
