@@ -164,7 +164,8 @@ namespace gazebo
       public: double DevicePixelRatio() const;
 
       // Documentation Inherited
-      public: virtual void CameraToViewportRay(const int _screenx, const int _screeny,
+      public: virtual void CameraToViewportRay(const int _screenx,
+                  const int _screeny,
                   ignition::math::Vector3d &_origin,
                   ignition::math::Vector3d &_dir) const;
 
