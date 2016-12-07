@@ -16,6 +16,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/gui/**
+    + Dropped support for Qt4 and migrated the gui library to use Qt5.
+
 1. **gazebo/physics/dart/**
     + Updated to support version 5 of DART physics engine.
 
