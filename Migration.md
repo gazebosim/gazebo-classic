@@ -410,6 +410,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** public:   gazebo::math::Kmeans
     + ***Replacement:*** public: ignition::math::Kmeans
 
+1. **gazebo/math/Plane.hh**
+    + ***Deprecation:*** public:   gazebo::math::Plane
+    + ***Replacement:*** public: ignition::math::Plane
+
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline
     + ***Replacement:*** public: ignition::math::RotationSpline
