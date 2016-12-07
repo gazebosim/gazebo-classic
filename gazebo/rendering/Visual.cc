@@ -428,9 +428,8 @@ void Visual::Load()
     }
     else if (geomElem->HasElement("plane"))
     {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      geometrySize.Set(size.x, size.y, 1);
+      geometrySize =
+          geomElem->GetElement("plane")->Get<ignition::math::Vector3d>("size");
     }
     else if (geomElem->HasElement("mesh"))
     {
@@ -1563,7 +1562,7 @@ void Visual::UpdateTransparency(const bool _cascade)
 //////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
-  if (math::equal(this->dataPtr->transparency, _trans))
+  if (ignition::math::equal(this->dataPtr->transparency, _trans))
     return;
 
   this->dataPtr->transparency = std::min(
@@ -2950,7 +2949,7 @@ void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
   auto start = this->WorldPose().Pos();
   ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
-  math::Quaternion rotFinal(0, rpy.Y(), rpy.Z());
+  ignition::math::Quaterniond rotFinal(0, rpy.Y(), rpy.Z());
 
   std::string animName = this->Name() + "_animation";
 
@@ -2968,7 +2967,7 @@ void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
   key = strack->createNodeKeyFrame(_time);
   key->setTranslate(Ogre::Vector3(_pose.Pos().X(), _pose.Pos().Y(),
         _pose.Pos().Z()));
-  key->setRotation(Conversions::Convert(rotFinal.Ign()));
+  key->setRotation(Conversions::Convert(rotFinal));
 
   this->dataPtr->animState =
     this->dataPtr->sceneNode->getCreator()->createAnimationState(animName);
