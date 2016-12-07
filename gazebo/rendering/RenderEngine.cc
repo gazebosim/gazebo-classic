@@ -428,10 +428,11 @@ void RenderEngine::LoadPlugins()
     std::string extension = ".so";
 #endif
 
-    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
-    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
-    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
-    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
+    std::string pluginDir = path + "/";
+    plugins.push_back(pluginDir+prefix+"RenderSystem_GL");
+    plugins.push_back(pluginDir+prefix+"Plugin_ParticleFX");
+    plugins.push_back(pluginDir+prefix+"Plugin_BSPSceneManager");
+    plugins.push_back(pluginDir+prefix+"Plugin_OctreeSceneManager");
 
 #ifdef HAVE_OCULUS
     plugins.push_back(path+"/Plugin_CgProgramManager");
@@ -658,7 +659,7 @@ void RenderEngine::SetupRenderSystem()
 
   if (renderSys == NULL)
   {
-    gzthrow("unable to find OpenGL rendering system. OGRE is probably "
+    gzthrow("Unable to find OpenGL rendering system. OGRE is probably "
             "installed incorrectly. Double check the OGRE cmake output, "
             "and make sure OpenGL is enabled.");
   }

@@ -33,6 +33,15 @@
   #include "win_dirent.h"
 #endif
 
+// for getting the application path
+#if defined(__APPLE__)
+  #include <mach-o/dyld.h>
+#elif defined(_WIN32)
+  #include <Windows.h>
+#else
+  #include <unistd.h>
+#endif
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/ModelDatabase.hh"
@@ -112,7 +121,6 @@ SystemPaths::SystemPaths()
   this->UpdateModelPaths();
   this->UpdateGazeboPaths();
   this->UpdatePluginPaths();
-  this->UpdateOgrePaths();
 
   // Add some search paths
   // this->suffixPaths.push_back(std::string("/sdf/") + SDF_VERSION + "/");
@@ -123,7 +131,18 @@ SystemPaths::SystemPaths()
   this->pluginPathsFromEnv = true;
   this->gazeboPathsFromEnv = true;
   this->modelPathsFromEnv = true;
-  this->ogrePathsFromEnv = true;
+
+  if (BUILD_OSX_BUNDLE)
+  {
+    this->ogrePathsFromEnv = false;
+    this->InsertUnique(this->ApplicationPath(), this->ogrePaths);
+  }
+  else
+  {
+    this->UpdateOgrePaths();
+    this->ogrePathsFromEnv = true;
+  }
+//#endif
 }
 
 /////////////////////////////////////////////////
@@ -543,4 +562,29 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
     s += "/";
 
   this->suffixPaths.push_back(s);
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::ApplicationPath() const
+{
+  char buf[1024] = {0};
+#if defined(__APPLE__)
+  uint32_t size = sizeof(buf);
+  int ret = _NSGetExecutablePath(buf, &size);
+  if (0 != ret)
+    return "";
+#elif defined(_WIN32)
+  DWORD ret = GetModuleFileNameA(nullptr, buf, sizeof(buf));
+  if (ret == 0 || ret == sizeof(buf))
+    return "";
+#else
+  size_t size = readlink("/proc/self/exe", buf, sizeof(buf));
+  if (size == 0 || size == sizeof(buf))
+    return "";
+#endif
+  std::string p(buf);
+  size_t idx = p.find_last_of("/\\");
+  if (idx != std::string::npos)
+    return p.substr(0, idx);
+  return "";
 }

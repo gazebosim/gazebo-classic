@@ -132,3 +132,7 @@ set(headers
   Server.hh
 )
 gz_install_includes("" ${headers})
+
+if (BUILD_OSX_BUNDLE)
+  gz_build_bundle(gzserver FALSE)
+endif()

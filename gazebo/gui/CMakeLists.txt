@@ -257,3 +257,7 @@ gz_install_executable(gzclient)
 if (UNIX)
   manpage(gzclient 1)
 endif()
+
+if (BUILD_OSX_BUNDLE)
+  gz_build_bundle(gzclient TRUE)
+endif()

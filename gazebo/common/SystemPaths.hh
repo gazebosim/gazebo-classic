@@ -161,6 +161,11 @@ namespace gazebo
       /// \brief clear out SystemPaths#pluginPaths
       public: void ClearPluginPaths();
 
+      /// \brief Get the path to the directory where the application executable
+      /// is located.
+      /// \return Path to the applicaiton executable directory.
+      public: std::string ApplicationPath() const;
+
       /// \brief add _suffix to the list of path search suffixes
       /// \param[in] _suffix The suffix to add
       public: void AddSearchPathSuffix(const std::string &_suffix);

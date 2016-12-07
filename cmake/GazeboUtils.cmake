@@ -102,20 +102,30 @@ endmacro ()
 
 #################################################
 macro (gz_add_executable _name)
-  add_executable(${_name} ${ARGN})
+  if (BUILD_OSX_BUNDLE)
+    set (EXEC_MODIFIER "MACOSX_BUNDLE")
+  endif()
+
+  add_executable(${_name} ${EXEC_MODIFIER} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
 
 #################################################
 macro (gz_install_includes _subdir)
-  install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
+  if (NOT BUILD_OSX_BUNDLE)
+    install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
+  endif()
 endmacro()
 
 #################################################
 macro (gz_install_library _name)
   set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION_FULL})
-  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+  if (BUILD_OSX_BUNDLE)
+    install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR})
+  else()
+    install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+  endif()
 endmacro ()
 
 #################################################
@@ -265,3 +275,52 @@ macro(add_pch target_name filename)
   add_dependencies(${target_name} ${target_name}_pch)
 
 endmacro()
+
+include (${gazebo_cmake_dir}/DeployQt5.cmake)
+#################################################
+macro (gz_build_bundle _name _gui)
+  install (TARGETS ${_name} BUNDLE DESTINATION .)
+  set (APPS "${CMAKE_BINARY_DIR}/${_name}.app/Contents/MacOS/${_name}")
+  set (DIRS
+      ${IGNITION-MATH_LIBRARY_DIRS}
+      ${IGNITION-MSGS_LIBRARY_DIRS}
+      ${IGNITION-TRANSPORT_LIBRARY_DIRS}
+      ${SDFormat_LIBRARY_DIRS}
+      ${OGRE_LIBRARY_DIRS}
+      ${CMAKE_BINARY_DIR}/lib
+      ${CMAKE_BINARY_DIR}/gazebo/util
+      ${CMAKE_BINARY_DIR}/gazebo/math
+      ${CMAKE_BINARY_DIR}/gazebo/msgs
+      ${CMAKE_BINARY_DIR}/gazebo/physics
+      ${CMAKE_BINARY_DIR}/gazebo/sensors
+      ${CMAKE_BINARY_DIR}/gazebo/transport
+      ${CMAKE_BINARY_DIR}/gazebo/common
+      ${CMAKE_BINARY_DIR}/gazebo/rendering
+      ${CMAKE_BINARY_DIR}/gazebo/gui)
+  SET(OGRE_PLUGIN_DIR "${_name}.app/Contents/MacOS")
+  FILE (GLOB OGRE_PLUGINS "${OGRE_PLUGINDIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  FOREACH (item ${OGRE_PLUGINS})
+    IF (${item} MATCHES ".*OctreeZone.*")
+      LIST (REMOVE_ITEM OGRE_PLUGINS ${item})
+    ELSE ()
+      STRING (REPLACE "${OGRE_PLUGINDIR}" "${CMAKE_INSTALL_PREFIX}/${OGRE_PLUGIN_DIR}" output ${item})
+      LIST (APPEND OUTPUT_LIBS ${output})
+    ENDIF ()
+  ENDFOREACH()
+
+  INSTALL(FILES ${OGRE_PLUGINS} DESTINATION ${OGRE_PLUGIN_DIR} COMPONENT Runtime)
+
+  if (${_gui})
+    # fixup_qt5_executable(${APPS} "" "${OUTPUT_LIBS}"  "${DIRS}")
+
+  else()
+    INSTALL(CODE "
+      # Needed for getting the right permissions when using brew
+      set (BU_CHMOD_BUNDLE_ITEMS ON)
+      include(BundleUtilities)
+      fixup_bundle(\"${APPS}\" \"${OUTPUT_LIBS}\"  \"${DIRS}\")
+    " COMPONENT Runtime)
+  endif()
+
+endmacro()
+

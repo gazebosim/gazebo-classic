@@ -173,6 +173,10 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("gui-plugin,g", po::value<std::vector<std::string> >(),
      "Gui plugin ignored.")
     ("world_file", po::value<std::string>(), "SDF world to load.")
+    // Catch OSX -psn_x_xxx arg when app is launched
+    // by the "open" cmd or the Finder. Otherwise it'll be
+    // incorrectly parsed as the play -p option
+    ("psn", po::value<std::string>(), "osx process serial number")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
@@ -182,10 +186,23 @@ bool Server::ParseArgs(int _argc, char **_argv)
   po::positional_options_description positionalDesc;
   positionalDesc.add("world_file", 1).add("pass_through", -1);
 
+  // function to filter out the osx -psn arg
+  auto argsFilter = [](const std::string &_s)
+  {
+    if (_s.find("-psn_") == 0)
+    {
+      return std::make_pair(std::string("psn"), _s.substr(5));
+    }
+    return std::make_pair(std::string(), std::string());
+  };
+
   try
   {
-    po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
-          positionalDesc).allow_unregistered().run(), this->dataPtr->vm);
+    po::store(po::command_line_parser(_argc, _argv)
+        .options(desc)
+        .positional(positionalDesc).allow_unregistered()
+        .extra_parser(argsFilter)
+        .run(), this->dataPtr->vm);
 
     po::notify(this->dataPtr->vm);
   }
