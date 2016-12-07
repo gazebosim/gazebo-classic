@@ -48,7 +48,7 @@ void KeysToJoints::Position(const std::string &_physicsEngine)
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
-  auto model = world->GetModel("position_teleop");
+  auto model = world->ModelByName("position_teleop");
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
@@ -102,7 +102,7 @@ void KeysToJoints::Velocity(const std::string &_physicsEngine)
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
-  auto model = world->GetModel("velocity_teleop");
+  auto model = world->ModelByName("velocity_teleop");
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
@@ -169,7 +169,7 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
-  auto model = world->GetModel("force_teleop");
+  auto model = world->ModelByName("force_teleop");
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher
@@ -253,7 +253,7 @@ void KeysToJoints::MultipleJoints(const std::string &_physicsEngine)
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
-  auto model = world->GetModel("multiple_teleop");
+  auto model = world->ModelByName("multiple_teleop");
   ASSERT_NE(model, nullptr);
 
   // Setup keyboard publisher

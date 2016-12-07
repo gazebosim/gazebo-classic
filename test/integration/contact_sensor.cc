@@ -64,7 +64,7 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -106,7 +106,7 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
 
   EXPECT_TRUE(contactSensor->IsActive());
 
-  physics::ModelPtr contactModel = world->GetModel(modelName);
+  physics::ModelPtr contactModel = world->ModelByName(modelName);
   ASSERT_TRUE(contactModel != nullptr);
 
   // check new topic are published
@@ -138,7 +138,7 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
   // remove the model
   world->RemoveModel(contactModel);
 
-  contactModel = world->GetModel(modelName);
+  contactModel = world->ModelByName(modelName);
   EXPECT_TRUE(contactModel == nullptr);
 
   int sleep = 0;
