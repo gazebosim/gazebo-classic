@@ -63,6 +63,7 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE Visual :
       public std::enable_shared_from_this<Visual>
     {
+      /// \todo Move this to RenderingTypes.hh
       /// \brief Type of visual
       public: enum VisualType
       {
