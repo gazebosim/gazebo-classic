@@ -137,6 +137,8 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Pose3d WorldPose() const
     + ***Deprecation:*** void SetWorldPosition(const math::Vector3 &_pos)
     + ***Replacement:*** void SetWorldPosition(const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** void SetWorldRotation(const math::Quaternion &_pos)
+    + ***Replacement:*** void SetWorldRotation(const ignition::math::Quaterniond &_pos)
     + ***Deprecation:*** math::Box GetBoundingBox() const
     + ***Replacement:*** ignition::math::Box BoundingBox() const
     + ***Deprecation:*** void MoveToPosition(const math::Pose &_pose, double _time)
