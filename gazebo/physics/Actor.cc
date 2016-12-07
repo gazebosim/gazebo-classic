@@ -503,7 +503,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 void Actor::Init()
 {
   this->scriptTime = 0;
-  this->prevFrameTime = this->world->GetSimTime();
+  this->prevFrameTime = this->world->SimTime();
   if (this->autoStart)
     this->Play();
   this->mainLink = this->GetChildLink(this->GetName() + "_pose");
@@ -513,7 +513,7 @@ void Actor::Init()
 void Actor::Play()
 {
   this->active = true;
-  this->playStartTime = this->world->GetSimTime();
+  this->playStartTime = this->world->SimTime();
 }
 
 //////////////////////////////////////////////////
@@ -537,7 +537,7 @@ void Actor::Update()
   if (this->skelAnimation.empty() && this->trajectories.empty())
     return;
 
-  common::Time currentTime = this->world->GetSimTime();
+  common::Time currentTime = this->world->SimTime();
 
   // do not refresh animation faster than 30 Hz sim time
   if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))

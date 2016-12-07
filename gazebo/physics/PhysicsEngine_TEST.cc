@@ -98,7 +98,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   // Test PhysicsEngine::[GS]etParam()
   {
-    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    physics::PhysicsEnginePtr physics = world->Physics();
     boost::any dt = physics->GetParam("max_step_size");
     EXPECT_DOUBLE_EQ(boost::any_cast<double>(dt),
       physicsPubMsg.max_step_size());
@@ -112,7 +112,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   {
     // Test SetParam for non-implementation-specific parameters
-    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    physics::PhysicsEnginePtr physics = world->Physics();
     try
     {
       boost::any value;
@@ -181,7 +181,7 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
 
   // Initialize to failure conditions
   boost::any value;

@@ -144,7 +144,7 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   // Store the pointer to the model
   this->model = _parent;
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
   // Get parameters from sdf, if provided
   if (_sdf->HasElement("goals"))

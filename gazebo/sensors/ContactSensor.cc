@@ -97,8 +97,8 @@ void ContactSensor::Load(const std::string &_worldName)
     this->sdf->GetElement("contact")->GetElement("collision");
 
   std::string entityName =
-      this->world->GetEntity(this->ParentName())->GetScopedName();
-  std::string filterName = entityName + "::" + this->Name();
+      this->world->EntityByName(this->ParentName())->GetScopedName();
+  this->dataPtr->filterName = entityName + "::" + this->Name();
 
   // Get all the collision elements
   while (collisionElem)
@@ -117,9 +117,8 @@ void ContactSensor::Load(const std::string &_worldName)
   {
     // request the contact manager to publish messages to a custom topic for
     // this sensor
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(filterName,
+    physics::ContactManager *mgr = this->world->Physics()->GetContactManager();
+    std::string topic = mgr->CreateFilter(this->dataPtr->filterName,
         this->dataPtr->collisions);
     if (!this->dataPtr->contactSub)
     {
@@ -196,7 +195,7 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
   // Clear the incoming contact list.
   this->dataPtr->incomingContacts.clear();
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
             this->lastMeasurementTime);
 
@@ -213,15 +212,11 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
-  if (this->world && this->world->GetRunning())
+  if (this->world && this->world->Running())
   {
-    std::string entityName =
-        this->world->GetEntity(this->ParentName())->GetScopedName();
-    std::string filterName = entityName + "::" + this->Name();
-
     physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(filterName);
+        this->world->Physics()->GetContactManager();
+    mgr->RemoveFilter(this->dataPtr->filterName);
   }
 
   this->dataPtr->contactSub.reset();

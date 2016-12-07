@@ -37,7 +37,7 @@ using namespace physics;
 DARTJoint::DARTJoint(BasePtr _parent)
   : Joint(_parent),
     dataPtr(new DARTJointPrivate(boost::dynamic_pointer_cast<DARTPhysics>(
-      this->GetWorld()->GetPhysicsEngine())))
+      this->GetWorld()->Physics())))
 {
 }
 
@@ -659,10 +659,10 @@ void DARTJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->GetAngleCount())
   {
-    if (this->dataPtr->forceAppliedTime < this->GetWorld()->GetSimTime())
+    if (this->dataPtr->forceAppliedTime < this->GetWorld()->SimTime())
     {
       // reset forces if time step is new
-      this->dataPtr->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->dataPtr->forceAppliedTime = this->GetWorld()->SimTime();
       this->dataPtr->forceApplied[0] = this->dataPtr->forceApplied[1] = 0.0;
     }
 

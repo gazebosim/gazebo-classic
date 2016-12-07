@@ -55,6 +55,7 @@ set(tests
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
+  keys_to_joints.cc
   laser.cc
   link.cc
   logical_camera_sensor.cc
@@ -163,11 +164,13 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  wideanglecamera_sensor.cc
   world_reset.cc
 )
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
+  camera_gui.cc
   collada_visualization.cc
   insert_model.cc
   model_editor.cc

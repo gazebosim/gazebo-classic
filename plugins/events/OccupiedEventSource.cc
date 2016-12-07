@@ -93,7 +93,7 @@ void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
   {
     // Setup communication
     this->node = transport::NodePtr(new transport::Node());
-    this->node->Init(this->world->GetName());
+    this->node->Init(this->world->Name());
     this->msgPub = this->node->Advertise<gazebo::msgs::GzString>(topic);
 
     this->msg.set_data(data);
@@ -108,7 +108,7 @@ void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
 void OccupiedEventSource::Update()
 {
   // Get all the models.
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->world->Models();
 
   // Process each model.
   for (physics::Model_V::iterator iter = models.begin();

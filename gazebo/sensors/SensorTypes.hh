@@ -50,6 +50,7 @@ namespace gazebo
     class Noise;
     class GaussianNoiseModel;
     class ImageGaussianNoiseModel;
+    class WideAngleCameraSensor;
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
@@ -81,6 +82,10 @@ namespace gazebo
     /// \def DepthCameraSensorPtr
     /// \brief Shared pointer to DepthCameraSensor
     typedef std::shared_ptr<DepthCameraSensor> DepthCameraSensorPtr;
+
+    /// \def WideAngleCameraSensorPtr
+    /// \brief Shared pointer to WideAngleCameraSensor
+    typedef std::shared_ptr<WideAngleCameraSensor> WideAngleCameraSensorPtr;
 
     /// \def ContactSensorPtr
     /// \brief Shared pointer to ContactSensor

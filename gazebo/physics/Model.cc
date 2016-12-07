@@ -123,7 +123,7 @@ void Model::LoadLinks()
     while (linkElem)
     {
       // Create a new link
-      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
+      LinkPtr link = this->GetWorld()->Physics()->CreateLink(
           boost::static_pointer_cast<Model>(shared_from_this()));
 
       /// \TODO: canonical link is hardcoded to the first link.
@@ -189,7 +189,7 @@ void Model::LoadModels()
     while (modelElem)
     {
       // Create a new model
-      ModelPtr model = this->GetWorld()->GetPhysicsEngine()->CreateModel(
+      ModelPtr model = this->GetWorld()->Physics()->CreateModel(
           boost::static_pointer_cast<Model>(shared_from_this()));
       model->SetWorld(this->GetWorld());
       model->Load(modelElem);
@@ -321,7 +321,7 @@ void Model::Update()
       iter->second->GetInterpolatedKeyFrame(kf);
 
       iter->second->AddTime(
-          (this->world->GetSimTime() - this->prevAnimationTime).Double());
+          (this->world->SimTime() - this->prevAnimationTime).Double());
 
       if (iter->second->GetTime() < iter->second->GetLength())
       {
@@ -343,7 +343,7 @@ void Model::Update()
       if (this->onJointAnimationComplete)
         this->onJointAnimationComplete();
     }
-    this->prevAnimationTime = this->world->GetSimTime();
+    this->prevAnimationTime = this->world->SimTime();
   }
 
   for (auto &model : this->models)
@@ -923,7 +923,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   std::string stype = _sdf->Get<std::string>("type");
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
+  joint = this->GetWorld()->Physics()->CreateJoint(stype,
      boost::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
   {
@@ -1245,7 +1245,7 @@ void Model::SetJointAnimation(
     this->jointAnimations[iter->first] = iter->second;
   }
   this->onJointAnimationComplete = _onComplete;
-  this->prevAnimationTime = this->world->GetSimTime();
+  this->prevAnimationTime = this->world->SimTime();
 }
 
 //////////////////////////////////////////////////
@@ -1521,8 +1521,7 @@ gazebo::physics::JointPtr Model::CreateJoint(
            << "], skipping creating joint.\n";
     return joint;
   }
-  joint =
-    this->world->GetPhysicsEngine()->CreateJoint(_type, shared_from_this());
+  joint = this->world->Physics()->CreateJoint(_type, shared_from_this());
   joint->SetName(_name);
   joint->Attach(_parent, _child);
   // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
@@ -1682,7 +1681,7 @@ LinkPtr Model::CreateLink(const std::string &_name)
     return link;
   }
 
-  link = this->world->GetPhysicsEngine()->CreateLink(shared_from_this());
+  link = this->world->Physics()->CreateLink(shared_from_this());
 
   link->SetName(_name);
   this->links.push_back(link);

@@ -46,7 +46,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
         const std::string &_name)
     {
       // Get the model pointer
-      this->model = _world->GetModel(_name);
+      this->model = _world->ModelByName(_name);
 
       // Get the link pointer
       this->link = this->model->GetLink();
@@ -158,7 +158,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   world->Step(1);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -290,7 +290,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -395,7 +395,7 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -440,7 +440,7 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
 
     world->Step(1);
     step++;
-    gzdbg << "world time: " << world->GetSimTime().Double() << std::endl;
+    gzdbg << "world time: " << world->SimTime().Double() << std::endl;
 
     for (auto sphere : spheres)
     {

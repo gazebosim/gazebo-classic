@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/gui/OculusWindow.hh"
@@ -114,15 +116,9 @@ void OculusWindow::AttachCameraToVisual()
 
   ignition::math::Vector3d camPos(0.1, 0, 0);
   ignition::math::Vector3d lookAt(0, 0, 0);
-  auto delta = lookAt - camPos;
+  auto mat = ignition::math::Matrix4d::LookAt(camPos, lookAt);
 
-  double yaw = atan2(delta.Y(), delta.X());
-
-  double pitch = atan2(-delta.Z(),
-      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
-
-  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(camPos,
-      ignition::math::Quaterniond(0.0, pitch, yaw)));
+  this->oculusCamera->SetWorldPose(mat.Pose());
 }
 
 /////////////////////////////////////////////////

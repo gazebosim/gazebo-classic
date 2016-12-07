@@ -24,6 +24,7 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Assert.hh"
@@ -885,14 +886,9 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 
   ignition::math::Vector3d camPos(5, -5, 2);
   ignition::math::Vector3d lookAt(0, 0, 0);
-  auto delta = lookAt - camPos;
+  auto mat = ignition::math::Matrix4d::LookAt(camPos, lookAt);
 
-  double yaw = atan2(delta.Y(), delta.X());
-
-  double pitch = atan2(-delta.Z(),
-      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
-  this->dataPtr->userCamera->SetDefaultPose(ignition::math::Pose3d(camPos,
-        ignition::math::Quaterniond(0, pitch, yaw)));
+  this->dataPtr->userCamera->SetDefaultPose(mat.Pose());
 
   // Update at the camera's update rate
   this->dataPtr->updateTimer->start(

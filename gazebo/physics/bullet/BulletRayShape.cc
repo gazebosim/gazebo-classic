@@ -47,7 +47,7 @@ BulletRayShape::BulletRayShape(CollisionPtr _parent)
 {
   this->SetName("Bullet Ray Shape");
   this->physicsEngine = boost::static_pointer_cast<BulletPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->collisionParent->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////

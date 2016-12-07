@@ -354,22 +354,22 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   std::string modelRotated2 = "cam_x_rot_test_rotated_cameras_2";
   std::string multicameraRotated2 = "multicamera_sensor_rotated2";
 
-  physics::ModelPtr model1 = world->GetModel(modelUnrotated);
+  physics::ModelPtr model1 = world->ModelByName(modelUnrotated);
   sensors::SensorPtr sensor1 = sensors::get_sensor(multicameraUnrotated);
   sensors::MultiCameraSensorPtr multicamera1 =
     std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
 
-  physics::ModelPtr model2 = world->GetModel(modelTranslated);
+  physics::ModelPtr model2 = world->ModelByName(modelTranslated);
   sensors::SensorPtr sensor2 = sensors::get_sensor(cameraTranslated);
   sensors::CameraSensorPtr camera2 =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
 
-  physics::ModelPtr model3 = world->GetModel(modelRotated1);
+  physics::ModelPtr model3 = world->ModelByName(modelRotated1);
   sensors::SensorPtr sensor3 = sensors::get_sensor(multicameraRotated1);
   sensors::MultiCameraSensorPtr multicamera3 =
     std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
 
-  physics::ModelPtr model4 = world->GetModel(modelRotated2);
+  physics::ModelPtr model4 = world->ModelByName(modelRotated2);
   sensors::SensorPtr sensor4 = sensors::get_sensor(multicameraRotated2);
   sensors::MultiCameraSensorPtr multicamera4 =
     std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
