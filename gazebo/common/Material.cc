@@ -94,9 +94,6 @@ void Material::SetTextureImage(const std::string &_tex,
       this->texImage = SystemPaths::Instance()->FindFile(_tex);
       if (!boost::filesystem::exists(this->texImage))
       {
-        // this line is deprecated in gazebo8. A change in Material_TEST
-        // is necessary.
-        this->texImage = _resourcePath + "/../materials/textures/" + _tex;
         gzerr << "Unable to find texture[" << _tex << "] in path["
               << _resourcePath << "]\n";
       }
