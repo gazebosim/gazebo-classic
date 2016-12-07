@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Console.hh"
 
@@ -90,8 +91,15 @@ void Material::SetTextureImage(const std::string &_tex,
     this->texImage = _resourcePath + "/../materials/textures/" + _tex;
     if (!boost::filesystem::exists(this->texImage))
     {
-      gzerr << "Unable to find texture[" << _tex << "] in path["
-            << _resourcePath << "]\n";
+      this->texImage = SystemPaths::Instance()->FindFile(_tex);
+      if (!boost::filesystem::exists(this->texImage))
+      {
+        // this line is deprecated in gazebo8. A change in Material_TEST
+        // is necessary.
+        this->texImage = _resourcePath + "/../materials/textures/" + _tex;
+        gzerr << "Unable to find texture[" << _tex << "] in path["
+              << _resourcePath << "]\n";
+      }
     }
   }
 }

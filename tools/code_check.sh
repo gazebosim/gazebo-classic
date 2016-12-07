@@ -87,7 +87,7 @@ fi
 #cppcheck.
 # MAKE_JOBS is used in jenkins. If not set or run manually, default to 1
 [ -z $MAKE_JOBS ] && MAKE_JOBS=1
-CPPCHECK_BASE="cppcheck -j$MAKE_JOBS -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
+CPPCHECK_BASE="cppcheck -j$MAKE_JOBS --inline-suppr -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
