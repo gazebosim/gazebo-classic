@@ -442,11 +442,14 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->dataPtr->keyModifiers = _event->modifiers();
 
   this->dataPtr->keyEvent.control =
-    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier)
+    && (_event->key() != Qt::Key_Control) ? true : false;
   this->dataPtr->keyEvent.shift =
-    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier)
+    && (_event->key() != Qt::Key_Shift) ? true : false;
   this->dataPtr->keyEvent.alt =
-    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier)
+    && (_event->key() != Qt::Key_Alt) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
