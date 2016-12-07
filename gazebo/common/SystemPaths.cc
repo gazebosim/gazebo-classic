@@ -25,14 +25,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-// See below for Windows dirent include. cpplint complains about system
-// header order if "win_dirent.h" is in the wrong location.
-#ifndef _WIN32
-  #include <dirent.h>
-#else
-  #include "win_dirent.h"
-#endif
-
 // for getting the application path
 #if defined(__APPLE__)
   #include <mach-o/dyld.h>
@@ -40,6 +32,14 @@
   #include <Windows.h>
 #else
   #include <unistd.h>
+#endif
+
+// See below for Windows dirent include. cpplint complains about system
+// header order if "win_dirent.h" is in the wrong location.
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  #include "win_dirent.h"
 #endif
 
 #include "gazebo/common/Console.hh"
@@ -557,20 +557,20 @@ void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
 /////////////////////////////////////////////////
 std::string SystemPaths::ApplicationPath() const
 {
- char buf[1024] = {0};
+  char buf[1024] = {0};
 #if defined(__APPLE__)
- uint32_t size = sizeof(buf);
- int ret = _NSGetExecutablePath(buf, &size);
- if (ret != 0)
-   return "";
+  uint32_t size = sizeof(buf);
+  int ret = _NSGetExecutablePath(buf, &size);
+  if (ret != 0)
+    return "";
 #elif defined(_WIN32)
- DWORD ret = GetModuleFileNameA(nullptr, buf, sizeof(buf));
- if (ret == 0 || ret == sizeof(buf))
-   return "";
+  DWORD ret = GetModuleFileNameA(nullptr, buf, sizeof(buf));
+  if (ret == 0 || ret == sizeof(buf))
+    return "";
 #else
- size_t size = readlink("/proc/self/exe", buf, sizeof(buf));
- if (size == 0 || size == sizeof(buf))
-   return "";
+  size_t size = readlink("/proc/self/exe", buf, sizeof(buf));
+  if (size == 0 || size == sizeof(buf))
+    return "";
 #endif
   std::string p(buf);
   size_t idx = p.find_last_of("/\\");
