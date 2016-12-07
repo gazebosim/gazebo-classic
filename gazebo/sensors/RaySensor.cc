@@ -78,8 +78,7 @@ void RaySensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->world != nullptr,
       "RaySensor did not get a valid World pointer");
 
-  physics::PhysicsEnginePtr physicsEngine =
-    this->world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = this->world->Physics();
 
   GZ_ASSERT(physicsEngine != nullptr,
       "Unable to get a pointer to the physics engine");
@@ -113,8 +112,7 @@ void RaySensor::Load(const std::string &_worldName)
         this->Type());
   }
 
-  this->dataPtr->parentEntity =
-    this->world->GetEntity(this->ParentName());
+  this->dataPtr->parentEntity = this->world->EntityByName(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
@@ -353,7 +351,7 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->dataPtr->laserShape->Update();
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
 
   // moving this behind laserShape update
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);

@@ -42,7 +42,7 @@ void CartDemoPlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
   if (!_sdf->HasElement("steer"))
     gzerr << "CartTest plugin missing <steer> element\n";
@@ -107,7 +107,7 @@ void CartDemoPlugin::Init()
 /////////////////////////////////////////////////
 void CartDemoPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 

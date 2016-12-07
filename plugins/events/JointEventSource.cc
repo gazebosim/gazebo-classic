@@ -171,14 +171,14 @@ bool JointEventSource::LookupJoint()
 {
   if (!this->model)
   {
-    this->model = this->world->GetModel(this->modelName);
+    this->model = this->world->ModelByName(this->modelName);
     // if the model name is not found
     if (!this->model)
     {
       // look for a model with a name that starts with our model name
-      for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
+      for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
       {
-        physics::ModelPtr m = this->world->GetModel(i);
+        physics::ModelPtr m = this->world->ModelByIndex(i);
         size_t pos = m->GetName().find(this->modelName);
         if (pos == 0)
         {

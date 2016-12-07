@@ -486,26 +486,19 @@ common::Color Scene::AmbientColor() const
 void Scene::SetBackgroundColor(const common::Color &_color)
 {
   this->dataPtr->sdf->GetElement("background")->Set(_color);
-  Ogre::ColourValue clr = Conversions::Convert(_color);
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->OgreViewport() &&
-        (*iter)->OgreViewport()->getBackgroundColour() != clr)
-      (*iter)->OgreViewport()->setBackgroundColour(clr);
+    (*iter)->SetBackgroundColor(_color);
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->dataPtr->userCameras.begin();
        iter2 != this->dataPtr->userCameras.end(); ++iter2)
   {
-    if ((*iter2)->OgreViewport() &&
-        (*iter2)->OgreViewport()->getBackgroundColour() != clr)
-    {
-      (*iter2)->OgreViewport()->setBackgroundColour(clr);
-    }
+    (*iter2)->SetBackgroundColor(_color);
   }
 }
 
@@ -1389,8 +1382,7 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ?
         _mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) ||
-        (submesh->useSharedVertices && !added_shared))
+    if ((!submesh->useSharedVertices) || !added_shared)
     {
       if (submesh->useSharedVertices)
       {
@@ -2629,7 +2621,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   // Creating heightmap
   // FIXME: A bit of a hack.
   if (_msg->has_geometry() &&
-      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP &&
+      _type != Visual::VT_COLLISION)
   {
     if (this->dataPtr->terrain)
     {

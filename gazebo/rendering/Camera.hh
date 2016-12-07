@@ -249,8 +249,8 @@ namespace gazebo
       /// \return Image height
       public: virtual unsigned int ImageHeight() const;
 
-      /// \brief Get the depth of the image
-      /// \return Depth of the image
+      /// \brief Get the depth of the image in bytes per pixel
+      /// \return Depth of the image in bytes per pixel
       public: unsigned int ImageDepth() const;
 
       /// \brief Get the string representation of the image format.
@@ -578,6 +578,11 @@ namespace gazebo
       /// \return "perspective" or "orthographic"
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
+
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: virtual bool SetBackgroundColor(const common::Color &_color);
 
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix

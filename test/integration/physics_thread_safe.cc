@@ -46,7 +46,7 @@ void PhysicsThreadSafeTest::BlankWorld(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -63,7 +63,7 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -73,7 +73,7 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   std::string modelName = "pendulum_0deg";
   std::string linkName = "lower_link";
 
-  physics::ModelPtr model = world->GetModel(modelName);
+  physics::ModelPtr model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink(linkName);
@@ -83,7 +83,7 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   world->SetPaused(false);
 
   // Run for 5 seconds of sim time
-  while (world->GetSimTime().sec < 5)
+  while (world->SimTime().sec < 5)
   {
     // Call these functions repeatedly
     // Test passes if it doesn't abort early

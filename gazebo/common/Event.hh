@@ -530,7 +530,7 @@ namespace gazebo
       private: class EventConnection
       {
         /// \brief Constructor
-        public: EventConnection(const bool _on, std::function<T> _cb)
+        public: EventConnection(const bool _on, const std::function<T> &_cb)
                 : callback(_cb)
         {
           // Windows Visual Studio 2012 does not have atomic_bool constructor,

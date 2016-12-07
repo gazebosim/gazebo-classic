@@ -15,66 +15,70 @@
  *
 */
 
-#ifndef GAZEBO_QT_HEADERS_H_
-#define GAZEBO_QT_HEADERS_H_
+#ifndef GAZEBO_GUI_QT_H_
+#define GAZEBO_GUI_QT_H_
 
 #ifndef _MSC_VER
 #pragma GCC system_header
 #endif
 
-#include <QtGui/QWindow>
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QPushButton>
 #include <QtCore/QtCore>
 #include <QtCore/QPoint>
-#include <QtWidgets/QWidgetAction>
-#include <QtWidgets/QFrame>
-#include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QTreeWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QPlainTextEdit>
-#include <QtWidgets/QGraphicsDropShadowEffect>
-#include <QtGui/QPainter>
-#include <QtGui/QBitmap>
-#include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QSplitter>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QFileDialog>
-#include <QtWidgets/QDoubleSpinBox>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/qmainwindow.h>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QScrollArea>
-#include <QtWidgets/QToolTip>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsItem>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QColorDialog>
-#include <QtWidgets/QMessageBox>
-#include <QtCore/QSignalMapper>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QStackedLayout>
-#include <QtWidgets/QToolBar>
-#include <QtGui/QResizeEvent>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QTextBrowser>
-#include <QtWidgets/QRadioButton>
-#include <QtWidgets/QItemDelegate>
-#include <QtWidgets/QSizeGrip>
-#include <QtWidgets/QShortcut>
-#include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QGraphicsSceneHoverEvent>
-#include <QtGui/QVector3D>
 #include <QtCore/QPointF>
+#include <QtCore/QSignalMapper>
+
+#include <QtGui/QBitmap>
+#include <QtGui/QDrag>
+#include <QtGui/QPainter>
+#include <QtGui/QResizeEvent>
 #include <QtGui/QStandardItem>
+#include <QtGui/QVector3D>
+#include <QtGui/QWindow>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QColorDialog>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QGraphicsDropShadowEffect>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsSceneHoverEvent>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QItemDelegate>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QShortcut>
+#include <QtWidgets/QSizeGrip>
+#include <QtWidgets/QSplashScreen>
+#include <QtWidgets/QSplitter>
+#include <QtWidgets/QStackedLayout>
+#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QToolTip>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QWidgetAction>
 
 #endif

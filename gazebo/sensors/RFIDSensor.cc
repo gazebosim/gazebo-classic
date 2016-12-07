@@ -68,11 +68,11 @@ void RFIDSensor::Load(const std::string &_worldName)
         this->sdf->GetElement("topic")->Get<std::string>());
   }
 
-  this->dataPtr->entity = this->world->GetEntity(this->ParentName());
+  this->dataPtr->entity = this->world->EntityByName(this->ParentName());
 
   // this->sdf->PrintDescription("something");
   /*std::cout << " setup ray" << std::endl;
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = world->Physics();
 
   //trying to use just "ray" gives a seg fault
   this->laserCollision = physicsEngine->CreateCollision("multiray",
@@ -122,7 +122,7 @@ void RFIDSensor::Init()
 bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
   this->EvaluateTags();
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
 
   if (this->dataPtr->scanPub)
   {

@@ -118,7 +118,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     physics::WorldPtr world = physics::get_world("default");
     ASSERT_TRUE(world != NULL);
 
-    physics::ModelPtr model = world->GetModel(modelName);
+    physics::ModelPtr model = world->ModelByName(modelName);
 
     prevTime = laser->LastUpdateTime();
     model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
@@ -238,7 +238,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  EXPECT_TRUE(world->GetModel(box02)->IsStatic());
+  EXPECT_TRUE(world->ModelByName(box02)->IsStatic());
 
   int mid = samples / 2;
   double unitBoxSize = 1.0;
@@ -250,9 +250,9 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
 
   // Move all boxes out of range
-  world->GetModel(box01)->SetWorldPose(
+  world->ModelByName(box01)->SetWorldPose(
       math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
-  world->GetModel(box02)->SetWorldPose(
+  world->ModelByName(box02)->SetWorldPose(
       math::Pose(math::Vector3(0, -(maxRange + 1), 0),
       math::Quaternion(0, 0, 0)));
   world->Step(1);
@@ -350,7 +350,7 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   }
 
   // Move box out of range
-  world->GetModel(box01)->SetWorldPose(
+  world->ModelByName(box01)->SetWorldPose(
       math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
   world->Step(1);
   raySensor->Update(true);

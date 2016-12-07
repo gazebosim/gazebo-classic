@@ -50,7 +50,7 @@ ODELink::~ODELink()
 void ODELink::Load(sdf::ElementPtr _sdf)
 {
   this->odePhysics = boost::dynamic_pointer_cast<ODEPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->GetWorld()->Physics());
 
   if (this->odePhysics == nullptr)
     gzthrow("Not using the ode physics engine");
@@ -359,7 +359,7 @@ void ODELink::UpdateSurface()
         // Set max_vel and min_depth
         boost::any value;
         if (g->GetODESurface()->maxVel < 0 && this->GetWorld()->
-            GetPhysicsEngine()->GetParam("contact_max_correcting_vel", value))
+            Physics()->GetParam("contact_max_correcting_vel", value))
         {
           try
           {

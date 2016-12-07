@@ -583,8 +583,8 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   // Check that only rot tool and torque were rotated
   QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().Ign().Pos() ==
       ignition::math::Vector3d::Zero);
-  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().Ign().Rot().Euler() !=
-      ignition::math::Vector3d::Zero);
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().Ign().Rot() !=
+      ignition::math::Quaterniond::Identity);
   QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->GetPose().Ign() !=
       boxTorquePose0);
   QVERIFY(boxApplyWrenchVis->GetForceVisual()->GetPose().Ign() ==

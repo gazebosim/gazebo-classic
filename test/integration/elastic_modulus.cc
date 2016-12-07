@@ -81,9 +81,9 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     gzthrow("Unable to get sphere");
 
   // get models and links
-  physics::ModelPtr box_model = world->GetModel("box");
+  physics::ModelPtr box_model = world->ModelByName("box");
   physics::LinkPtr box_link = box_model->GetLink("link");
-  physics::ModelPtr sphere_model = world->GetModel("sphere");
+  physics::ModelPtr sphere_model = world->ModelByName("sphere");
   physics::LinkPtr sphere_link = sphere_model->GetLink("link");
 
   // Sleep to ensure transport topics are all advertised
@@ -203,7 +203,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     EXPECT_FLOAT_EQ(k_lin, k_lin_converged);
 
     gzdbg << "Contact State:\n"
-          << "  t [" << world->GetSimTime().Double()
+          << "  t [" << world->SimTime().Double()
           << "]\n f1 [" << f1
           << "]\n  E* [" << eStar
           << "]\n  R* [" << rStar

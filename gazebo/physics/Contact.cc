@@ -81,9 +81,9 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
   if (world)
   {
     this->collision1 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_contact.collision1())).get();
+        this->world->EntityByName(_contact.collision1())).get();
     this->collision2 = boost::dynamic_pointer_cast<Collision>(
-      this->world->GetEntity(_contact.collision2())).get();
+      this->world->EntityByName(_contact.collision2())).get();
   }
   else
   {
@@ -130,7 +130,7 @@ std::string Contact::DebugString() const
 {
   std::ostringstream stream;
 
-  stream << "World [" << this->world->GetName() << "]\n"
+  stream << "World [" << this->world->Name() << "]\n"
          << "Collision 1[" << this->collision1->GetScopedName() << "]\n"
          << "Collision 2[" << this->collision2->GetScopedName() << "]\n"
          << "Time[" << this->time << "]\n"
@@ -154,7 +154,7 @@ std::string Contact::DebugString() const
 //////////////////////////////////////////////////
 void Contact::FillMsg(msgs::Contact &_msg) const
 {
-  _msg.set_world(this->world->GetName());
+  _msg.set_world(this->world->Name());
   _msg.set_collision1(this->collision1->GetScopedName());
   _msg.set_collision2(this->collision2->GetScopedName());
   msgs::Set(_msg.mutable_time(), this->time);

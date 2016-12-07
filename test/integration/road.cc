@@ -44,16 +44,16 @@ void RoadTest::TexturedWorld()
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
   // simulate a few steps
   int steps = 20;
   world->Step(steps);
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  t = world->GetSimTime().Double();
+  t = world->SimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 

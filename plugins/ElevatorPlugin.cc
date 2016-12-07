@@ -120,7 +120,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Create the node for communication
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
+  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->Name());
 
   // Subscribe to the elevator topic.
   this->dataPtr->elevatorSub = this->dataPtr->node->Subscribe(elevatorTopic,
