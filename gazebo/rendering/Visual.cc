@@ -428,8 +428,9 @@ void Visual::Load()
     }
     else if (geomElem->HasElement("plane"))
     {
-      geometrySize =
+      ignition::math::Vector2d size =
           geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
+      geometrySize.Set(size.X(), size.Y(), 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
