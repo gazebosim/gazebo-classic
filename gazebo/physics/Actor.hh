@@ -19,7 +19,6 @@
 
 #include <string>
 #include <map>
-#include <vector>
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/common/Time.hh"
@@ -28,13 +27,6 @@
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Mesh;
-    class Color;
-    class Skeleton;
-  }
-
   namespace physics
   {
     // Forward declare private data.
@@ -81,6 +73,10 @@ namespace gazebo
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
+
+      /// \brief Get the SDF values for the actor.
+      /// \return Pointer to the SDF values.
+      public: virtual const sdf::ElementPtr GetSDF();
 
       /// \brief Set the current script time.
       /// \param[in] _time Time in seconds from the beginning of the current

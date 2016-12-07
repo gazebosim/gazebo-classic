@@ -32,7 +32,9 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/util/IntrospectionManager.hh"
 

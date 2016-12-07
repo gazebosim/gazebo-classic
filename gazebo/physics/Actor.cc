@@ -23,6 +23,7 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <vector>
 
 #include "gazebo/common/BVHLoader.hh"
 #include "gazebo/common/Console.hh"
@@ -39,11 +40,141 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 
-#include "gazebo/physics/ActorPrivate.hh"
 #include "gazebo/physics/Actor.hh"
 
 using namespace gazebo;
 using namespace physics;
+using namespace common;
+
+/// \brief Information about a trajectory for an Actor.
+/// This doesn't contain the keyframes information, just duration.
+class gazebo::physics::TrajectoryInfo
+{
+  /// \brief Constructor.
+  public: TrajectoryInfo();
+
+  /// \brief ID of the trajectory.
+  public: unsigned int id;
+
+  /// \brief Type of trajectory. If it matches the name of a skeleton
+  /// animation, they will be played together.
+  public: std::string type;
+
+  /// \brief Duration of this keyframe in seconds.
+  public: double duration;
+
+  /// \brief Start time of this keyframe within the trajectory, in seconds.
+  public: double startTime;
+
+  /// \brief End time of this keyframe within the trajectory, in seconds.
+  public: double endTime;
+
+  /// \brief True if the trajectory is translated.
+  public: bool translated;
+};
+
+/// \brief Private data for the Actor class
+class gazebo::physics::ActorPrivate : public ModelPrivate
+{
+  /// \brief Pointer to the actor's mesh.
+  public: const common::Mesh *mesh = nullptr;
+
+  /// \brief The actor's skeleton.
+  public: common::Skeleton *skeleton = nullptr;
+
+  /// \brief Filename for the skin.
+  public: std::string skinFile;
+
+  /// \brief Scaling factor to apply to the skin.
+  public: double skinScale;
+
+  /// \brief Time to wait before starting the script. If running in a loop,
+  /// this time will be waited before starting each cycle.
+  public: double startDelay;
+
+  /// \brief Total time length of the script, in seconds.
+  public: double scriptLength;
+
+  /// \brief True if the animation should loop.
+  public: bool loop;
+
+  /// \brief True if the actor is being updated.
+  public: bool active;
+
+  /// \brief True if the actor should start running automatically,
+  /// otherwise it will only start once Play is called.
+  public: bool autoStart;
+
+  /// \brief Pointer to the actor's canonical link.
+  public: LinkPtr mainLink;
+
+  /// \brief Time of the previous frame.
+  public: common::Time prevFrameTime;
+
+  /// \brief Time when the animation was started.
+  public: common::Time playStartTime;
+
+  /// \brief Map of all the trajectories (pose animations) and their
+  /// indices. The indices here match the order in `trajInfo`.
+  /// \sa trajInfo
+  public: std::map<unsigned int, common::PoseAnimation *> trajectories;
+
+  /// \brief A vector of trajectory information, which contains information
+  /// such as their durations, uniquely identifiable by their IDs. The IDs
+  /// here match those on the `trajectories` vector.
+  /// \sa trajectories
+  public: std::vector<TrajectoryInfo> trajInfo;
+
+  /// \brief Map of skeleton animations, indexed by their names. The names
+  /// match those in `interpolateX` and `skelNodesMap`.
+  /// \sa interpolateX
+  /// \sa skelNodesMap
+  public: SkeletonAnimation_M skelAnimation;
+
+  /// \brief Skeleton to node map:
+  /// * Skeleton animation name (should match those in `skelAnimation` and
+  /// `interpolateX`)
+  /// * Map holding:
+  ///     * Skeleton node names from skin
+  ///     * Skeleton node names from animation
+  /// \sa interpolateX
+  /// \sa skelAnimation
+  protected: std::map<std::string, std::map<std::string, std::string> >
+                                                        skelNodesMap;
+
+  /// \brief Map of animation types (the same name as in `skelAnimation` and
+  /// `skelNodesMap`) and whether they should be interpolated along X
+  // direction.
+  /// \sa skelAnimation
+  /// \sa skelNodesMap
+  public: std::map<std::string, bool> interpolateX;
+
+  /// \brief Last position of the actor.
+  public: ignition::math::Vector3d lastPos;
+
+  /// \brief Length of the actor's path.
+  public: double pathLength;
+
+  /// \brief Id of the last trajectory
+  public: unsigned int lastTraj;
+
+  /// \brief Name of the visual representing the skin.
+  public: std::string visualName;
+
+  /// \brief ID for the visual representing the skin.
+  public: uint32_t visualId;
+
+  /// \brief Current time within the script, which is the current time minus
+  /// the time when the script started.
+  public: double scriptTime;
+
+  /// \brief Publisher to send bone info.
+  public: transport::PublisherPtr bonePosePub;
+
+  /// \brief Custom trajectory.
+  /// Used to control an actor with a plugin.
+  public: TrajectoryInfoPtr customTrajectoryInfo;
+};
 
 //////////////////////////////////////////////////
 Actor::Actor(BasePtr _parent)
@@ -135,10 +266,10 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
   // If there is a skin, check that the skin visual was created and save its id
   std::string actorLinkName = actorName + "::" + actorName + "_pose";
-  LinkPtr actorLinkPtr = this->LinkByName(actorLinkName);
+  LinkPtr actorLinkPtr = Model::GetLink(actorLinkName);
   if (actorLinkPtr)
   {
-    msgs::Visual actorVisualMsg = actorLinkPtr->VisualMessage(
+    msgs::Visual actorVisualMsg = actorLinkPtr->GetVisualMessage(
         this->actorDPtr->visualName);
     if (actorVisualMsg.has_id())
       this->actorDPtr->visualId = actorVisualMsg.id();
@@ -187,7 +318,7 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
   }
   this->actorDPtr->skeleton->Scale(this->actorDPtr->skinScale);
 
-  auto actorName = this->Name();
+  auto actorName = this->GetName();
 
   // Create a link to hold the skin visual
   auto linkSdf = _skinSdf->GetParent()->GetElement("link");
@@ -726,19 +857,12 @@ void Actor::SetPose(
     common::SkeletonNode *bone = this->actorDPtr->skeleton->GetNodeByHandle(i);
     common::SkeletonNode *parentBone = bone->GetParent();
     ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
-
-    std::map<std::string, std::string>::const_iterator skelIter =
-      _skelMap.find(bone->GetName());
-
-    std::map<std::string, ignition::math::Matrix4d>::const_iterator frameIter =
-      _frame.find(skelIter->second);
-
-    if (frameIter != _frame.end())
-      transform = frameIter->second;
+    if (_frame.find(_skelMap[bone->GetName()]) != _frame.end())
+      transform = _frame[_skelMap[bone->GetName()]];
     else
       transform = bone->Transform();
 
-    LinkPtr currentLink = this->ChildLink(bone->GetName());
+    LinkPtr currentLink = this->GetChildLink(bone->GetName());
     ignition::math::Pose3d bonePose = transform.Pose();
 
     if (!bonePose.IsFinite())
@@ -764,16 +888,16 @@ void Actor::SetPose(
     {
       bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.Pos()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.Rot()));
-      LinkPtr parentLink = this->ChildLink(parentBone->GetName());
-      ignition::math::Pose3d parentPose = parentLink->WorldPose();
-      ignition::math::Matrix4d parentTrans(parentPose.Rot());
-      parentTrans.Translate(parentPose.Pos());
-      transform = (parentTrans * transform);
+      LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
+      math::Pose parentPose = parentLink->GetWorldPose();
+      math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
+      parentTrans.SetTranslate(parentPose.pos);
+      transform = (parentTrans * transform).Ign();
     }
 
     msgs::Pose *link_pose = msg.add_pose();
-    link_pose->set_name(currentLink->ScopedName());
-    link_pose->set_id(currentLink->Id());
+    link_pose->set_name(currentLink->GetScopedName());
+    link_pose->set_id(currentLink->GetId());
     ignition::math::Pose3d linkPose = transform.Pose() - mainLinkPose;
     link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.Pos()));
     link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.Rot()));
@@ -781,11 +905,11 @@ void Actor::SetPose(
   }
 
   msgs::Time *stamp = msg.add_time();
-  stamp->CopyFrom(msgs::Convert(common::Time(_time)));
+  stamp->CopyFrom(msgs::Convert(_time));
 
   msgs::Pose *model_pose = msg.add_pose();
-  model_pose->set_name(this->ScopedName());
-  model_pose->set_id(this->Id());
+  model_pose->set_name(this->GetScopedName());
+  model_pose->set_id(this->GetId());
   if (!this->actorDPtr->customTrajectoryInfo)
   {
     model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.Pos()));
@@ -821,6 +945,12 @@ void Actor::Fini()
 void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
 //  Model::UpdateParameters(_sdf);
+}
+
+//////////////////////////////////////////////////
+const sdf::ElementPtr Actor::GetSDF()
+{
+  return Model::GetSDF();
 }
 
 //////////////////////////////////////////////////

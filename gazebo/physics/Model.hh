@@ -30,15 +30,6 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
-// Forward declare reference and pointer parameters
-namespace ignition
-{
-  namespace msgs
-  {
-    class Plugin_V;
-  }
-}
-
 namespace gazebo
 {
   namespace physics
