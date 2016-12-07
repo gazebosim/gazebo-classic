@@ -137,6 +137,9 @@ LinkData::LinkData()
   this->connect(this->inspector, SIGNAL(ShowCollisions(const bool)),
       this, SLOT(ShowCollisions(const bool)));
 
+  this->connect(this->inspector, SIGNAL(ShowVisuals(const bool)),
+      this, SLOT(ShowVisuals(const bool)));
+
   connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualAdded(const std::string &)),
       this, SLOT(OnAddVisual(const std::string &)));
@@ -156,6 +159,10 @@ LinkData::LinkData()
   this->connect(this->inspector->GetCollisionConfig(),
       SIGNAL(ShowCollision(const bool, const std::string &)),
       this, SLOT(OnShowCollision(const bool, const std::string &)));
+
+  this->connect(this->inspector->GetVisualConfig(),
+      SIGNAL(ShowVisual(const bool, const std::string &)),
+      this, SLOT(OnShowVisual(const bool, const std::string &)));
 
   // note the destructor removes this connection with the assumption that it is
   // the first one in the vector
@@ -521,6 +528,25 @@ void LinkData::OnShowCollision(const bool _show, const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+void LinkData::OnShowVisual(const bool _show, const std::string &_name)
+{
+  for (auto col : this->visuals)
+  {
+    auto leafName = col.first->GetName();
+    size_t idx = leafName.rfind("::");
+    if (idx != std::string::npos)
+      leafName = leafName.substr(idx+2);
+
+    // Only show one visual
+    if (leafName == _name)
+    {
+      col.first->SetVisible(_show);
+      return;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void LinkData::ShowCollisions(const bool _show)
 {
   this->showCollisions = _show;
@@ -539,6 +565,29 @@ void LinkData::ShowCollisions(const bool _show)
 
     // Show all collisions and set button checked
     config->SetShowCollision(_show, leafName);
+    col.first->SetVisible(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkData::ShowVisuals(const bool _show)
+{
+  this->showVisuals = _show;
+
+  // Check inspector button
+  this->inspector->SetShowVisuals(_show);
+
+  auto config = this->inspector->GetVisualConfig();
+
+  for (auto col : this->visuals)
+  {
+    auto leafName = col.first->GetName();
+    size_t idx = leafName.rfind("::");
+    if (idx != std::string::npos)
+      leafName = leafName.substr(idx+2);
+
+    // Show all visuals and set button checked
+    config->SetShowVisual(_show, leafName);
     col.first->SetVisible(_show);
   }
 }
@@ -602,6 +651,8 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
+
+  _visual->SetVisible(this->showVisuals);
 
   this->visuals[_visual] = visualMsg;
 
@@ -1073,6 +1124,9 @@ void LinkData::OnAddVisual(const std::string &_name)
   msgs::VisualPtr visualMsgPtr(new msgs::Visual);
   visualMsgPtr->CopyFrom(visualMsg);
   visualConfig->UpdateVisual(_name, visualMsgPtr);
+
+  visVisual->SetVisible(this->showVisuals);
+  visualConfig->SetShowVisual(this->showVisuals, _name);
   this->visuals[visVisual] = visualMsg;
   visVisual->SetTransparency(visualMsg.transparency() *
       (1-ModelData::GetEditTransparency()-0.1)

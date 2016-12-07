@@ -37,6 +37,9 @@ class ModelEditorTest : public QTestFixture
 
   /// \brief Test showing and hiding collisions.
   private slots: void ShowCollisions();
+
+  /// \brief Test showing and hiding visuals.
+  private slots: void ShowVisuals();
 };
 
 #endif

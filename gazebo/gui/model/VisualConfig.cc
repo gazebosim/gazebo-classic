@@ -59,10 +59,14 @@ VisualConfig::VisualConfig()
   this->setLayout(mainLayout);
 
   this->counter = 0;
-  this->signalMapper = new QSignalMapper(this);
+  this->mapperRemove = new QSignalMapper(this);
 
-  connect(this->signalMapper, SIGNAL(mapped(int)),
+  this->connect(this->mapperRemove, SIGNAL(mapped(int)),
      this, SLOT(OnRemoveVisual(int)));
+
+  this->mapperShow = new QSignalMapper(this);
+  this->connect(this->mapperShow, SIGNAL(mapped(int)),
+     this, SLOT(OnShowVisual(int)));
 }
 
 /////////////////////////////////////////////////
@@ -147,6 +151,20 @@ void VisualConfig::AddVisual(const std::string &_name,
         image: url(:/images/down_arrow.png);\
       }");
 
+  // Show button
+  auto showVisualButton = new QToolButton(this);
+  showVisualButton->setObjectName(
+      "showVisualButton_" + QString(_name.c_str()));
+  showVisualButton->setFixedSize(QSize(30, 30));
+  showVisualButton->setToolTip("Show/hide " + QString(_name.c_str()));
+  showVisualButton->setIcon(QPixmap(":/images/eye.png"));
+  showVisualButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  showVisualButton->setIconSize(QSize(16, 16));
+  showVisualButton->setCheckable(true);
+  this->connect(showVisualButton, SIGNAL(clicked()), this->mapperShow,
+      SLOT(map()));
+  this->mapperShow->setMapping(showVisualButton, this->counter);
+
   // Remove button
   QToolButton *removeVisualButton = new QToolButton(this);
   removeVisualButton->setObjectName(
@@ -157,14 +175,15 @@ void VisualConfig::AddVisual(const std::string &_name,
   removeVisualButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   removeVisualButton->setIconSize(QSize(16, 16));
   removeVisualButton->setCheckable(false);
-  connect(removeVisualButton, SIGNAL(clicked()), this->signalMapper,
+  connect(removeVisualButton, SIGNAL(clicked()), this->mapperRemove,
       SLOT(map()));
-  this->signalMapper->setMapping(removeVisualButton, this->counter);
+  this->mapperRemove->setMapping(removeVisualButton, this->counter);
 
   // Header Layout
   QHBoxLayout *headerLayout = new QHBoxLayout;
   headerLayout->setContentsMargins(0, 0, 0, 0);
   headerLayout->addWidget(headerButton);
+  headerLayout->addWidget(showVisualButton);
   headerLayout->addWidget(removeVisualButton);
 
   // Header widget
@@ -330,6 +349,40 @@ void VisualConfig::OnRemoveVisual(int _id)
   {
     this->addedConfigs.erase(itAdded);
   }
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::SetShowVisual(const bool _show,
+    const std::string &_name)
+{
+  auto button = this->findChild<QToolButton *>("showVisualButton_" +
+      QString(_name.c_str()));
+
+  if (button)
+    button->setChecked(_show);
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnShowVisual(const int _id)
+{
+  auto it = this->configs.find(_id);
+  if (it == this->configs.end())
+  {
+    gzerr << "Visual not found " << std::endl;
+    return;
+  }
+
+  auto button = qobject_cast<QToolButton *>(this->mapperShow->mapping(_id));
+  if (!button)
+  {
+    gzerr << "Couldn't find button with ID [" << _id << "]" << std::endl;
+    return;
+  }
+
+  bool showVis = button->isChecked();
+
+  auto configData = this->configs[_id];
+  this->ShowVisual(showVis, configData->name);
 }
 
 /////////////////////////////////////////////////

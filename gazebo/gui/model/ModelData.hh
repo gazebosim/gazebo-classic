@@ -147,6 +147,10 @@ namespace gazebo
       /// \param[in] _show True to show, false to hide.
       public slots: void ShowCollisions(const bool _show);
 
+      /// \brief Show or hide visual visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowVisuals(const bool _show);
+
       /// \brief Update callback on PreRender.
       private: void Update();
 
@@ -182,6 +186,12 @@ namespace gazebo
       /// \param[in] _show True to show.
       /// \param[in] _name Name of collision.
       private slots: void OnShowCollision(const bool _show,
+          const std::string &_name);
+
+      /// \brief Qt callback when a visual is to be shown/hidden.
+      /// \param[in] _show True to show.
+      /// \param[in] _name Name of visual.
+      private slots: void OnShowVisual(const bool _show,
           const std::string &_name);
 
       /// \brief Qt callback when the inspector is opened.
@@ -240,6 +250,9 @@ namespace gazebo
 
       /// \brief True if all collisions are currently visible, false otherwise.
       public: bool showCollisions = true;
+
+      /// \brief True if all visuals are currently visible, false otherwise.
+      public: bool showVisuals = true;
     };
 
     /// \brief Helper class to store model plugin data

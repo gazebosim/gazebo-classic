@@ -30,6 +30,7 @@ namespace gazebo
   struct KeyInfo
   {
     /// \brief Key ASCII value (reference: http://ascii.cl/)
+    // cppcheck-suppress unusedStructMember
     int key;
 
     /// \brief Pointer to the joint controlled by this key.
@@ -40,6 +41,7 @@ namespace gazebo
 
     /// \brief Increments for position, absolute values for velocity and
     /// force.
+    // cppcheck-suppress unusedStructMember
     double scale;
   };
 
