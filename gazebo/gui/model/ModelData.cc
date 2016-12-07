@@ -554,7 +554,7 @@ void LinkData::OnShowCollision(const bool _show, const std::string &_name)
 {
   for (auto col : this->collisions)
   {
-    auto leafName = col.first->GetName();
+    auto leafName = col.first->Name();
     size_t idx = leafName.rfind("::");
     if (idx != std::string::npos)
       leafName = leafName.substr(idx+2);
@@ -580,7 +580,7 @@ void LinkData::ShowCollisions(const bool _show)
 
   for (auto col : this->collisions)
   {
-    auto leafName = col.first->GetName();
+    auto leafName = col.first->Name();
     size_t idx = leafName.rfind("::");
     if (idx != std::string::npos)
       leafName = leafName.substr(idx+2);
