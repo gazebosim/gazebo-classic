@@ -450,7 +450,8 @@ namespace gazebo
       /// \param[out] _origin Origin in the world coordinate frame of the
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
-      public: virtual void CameraToViewportRay(const int _screenx, const int _screeny,
+      public: virtual void CameraToViewportRay(const int _screenx,
+                  const int _screeny,
                   ignition::math::Vector3d &_origin,
                   ignition::math::Vector3d &_dir) const;
 
