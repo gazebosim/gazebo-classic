@@ -1823,14 +1823,11 @@ void Camera::UpdateFOV()
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->sdf->Get<double>("horizontal_fov");
+    double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
-
-    delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
   }
 }
 
