@@ -221,14 +221,14 @@ void ModelEditorPalette::OnCustom()
     {
       event::Events::setSelectedEntity("", "normal");
       g_arrowAct->trigger();
-      if (info.completeSuffix().toLower() == "dae" ||
-          info.completeSuffix().toLower() == "stl")
+      auto suffix = info.completeSuffix().toLower().toStdString();
+      if (suffix == "dae" || suffix == "stl" || suffix == "obj")
       {
         this->dataPtr->modelCreator->AddCustomLink(ModelCreator::ENTITY_MESH,
             ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
             importDialog.GetImportPath());
       }
-      else if (info.completeSuffix().toLower() == "svg")
+      else if (suffix == "svg")
       {
         ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
         extrudeDialog.deleteLater();

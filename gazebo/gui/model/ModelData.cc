@@ -156,6 +156,10 @@ LinkData::LinkData()
   connect(this->inspector, SIGNAL(Opened()), this, SLOT(OnInspectorOpened()));
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
+
+  this->connect(this->inspector, SIGNAL(ShowCollisions(const bool)),
+      this, SLOT(ShowCollisions(const bool)));
+
   connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualAdded(const std::string &)),
       this, SLOT(OnAddVisual(const std::string &)));
@@ -171,6 +175,10 @@ LinkData::LinkData()
   connect(this->inspector->GetCollisionConfig(),
       SIGNAL(CollisionRemoved(const std::string &)),
       this, SLOT(OnRemoveCollision(const std::string &)));
+
+  this->connect(this->inspector->GetCollisionConfig(),
+      SIGNAL(ShowCollision(const bool, const std::string &)),
+      this, SLOT(OnShowCollision(const bool, const std::string &)));
 
   // note the destructor removes this connection with the assumption that it is
   // the first one in the vector
@@ -542,6 +550,48 @@ void LinkData::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+void LinkData::OnShowCollision(const bool _show, const std::string &_name)
+{
+  for (auto col : this->collisions)
+  {
+    auto leafName = col.first->GetName();
+    size_t idx = leafName.rfind("::");
+    if (idx != std::string::npos)
+      leafName = leafName.substr(idx+2);
+
+    // Only show one collision
+    if (leafName == _name)
+    {
+      col.first->SetVisible(_show);
+      return;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkData::ShowCollisions(const bool _show)
+{
+  this->showCollisions = _show;
+
+  // Check inspector button
+  this->inspector->SetShowCollisions(_show);
+
+  auto config = this->inspector->GetCollisionConfig();
+
+  for (auto col : this->collisions)
+  {
+    auto leafName = col.first->GetName();
+    size_t idx = leafName.rfind("::");
+    if (idx != std::string::npos)
+      leafName = leafName.substr(idx+2);
+
+    // Show all collisions and set button checked
+    config->SetShowCollision(_show, leafName);
+    col.first->SetVisible(_show);
+  }
+}
+
+/////////////////////////////////////////////////
 void LinkData::UpdateConfig()
 {
   // set new geom size if scale has changed.
@@ -644,6 +694,8 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
     msgs::Pose *poseMsg = collisionMsg.mutable_pose();
     poseMsg->CopyFrom(visualMsg.pose());
   }
+
+  _collisionVis->SetVisible(this->showCollisions);
 
   this->collisions[_collisionVis] = collisionMsg;
   this->scales[_collisionVis->Name()] = _collisionVis->GetGeometrySize();
@@ -1046,8 +1098,13 @@ bool LinkData::Apply()
         {
           msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
-          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
-              info.completeSuffix().toLower() != "stl"))
+
+          std::string suffix;
+          if (info.isFile())
+            suffix = info.completeSuffix().toLower().toStdString();
+
+          if (!info.isFile() || (suffix != "dae" && suffix != "stl" &&
+              suffix != "obj"))
           {
             std::string msg = "\"" + meshGeom->filename() +
                 "\" is not a valid mesh file.\nPlease select another file for ["
@@ -1179,8 +1236,13 @@ bool LinkData::Apply()
         {
           msgs::MeshGeom *meshGeom = geomMsg->mutable_mesh();
           QFileInfo info(QString::fromStdString(meshGeom->filename()));
-          if (!info.isFile() || (info.completeSuffix().toLower() != "dae" &&
-              info.completeSuffix().toLower() != "stl"))
+
+          std::string suffix;
+          if (info.isFile())
+            suffix = info.completeSuffix().toLower().toStdString();
+
+          if (!info.isFile() || (suffix != "dae" && suffix != "stl" &&
+              suffix != "obj"))
           {
             std::string msg = "\"" + meshGeom->filename() +
                 "\" is not a valid mesh file.\nPlease select another file for ["
@@ -1333,6 +1395,9 @@ void LinkData::OnAddCollision(const std::string &_name)
   msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
   collisionMsgPtr->CopyFrom(collisionMsg);
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
+
+  collisionVis->SetVisible(this->showCollisions);
+  collisionConfig->SetShowCollision(this->showCollisions, _name);
   this->collisions[collisionVis] = collisionMsg;
   this->scales[collisionVis->Name()] = collisionVis->GetGeometrySize();
 
