@@ -700,6 +700,8 @@ if (NOT ignition-msgs0_FOUND)
   BUILD_ERROR ("Missing: Ignition msgs0 library.")
 else()
   message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+  include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
+  link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -718,8 +720,12 @@ find_package(ignition-transport2 QUIET)
 if (NOT ignition-transport2_FOUND)
   find_package(ignition-transport1 QUIET)
   if (NOT ignition-transport1_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
+    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
+  else()
+    message(STATUS "Looking for ignition-transport1-config.cmake - found")
   endif()
+else()
+  message(STATUS "Looking for ignition-transport2-config.cmake - found")
 endif()
 
 if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
@@ -769,12 +775,6 @@ find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   ${QWT_WIN_LIBRARY_DIR}
 )
 
-if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-  set(HAVE_QWT TRUE)
-else()
-  set(HAVE_QWT FALSE)
-endif ()
-
 # version
 set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
 file ( STRINGS ${_VERSION_FILE} _VERSION_LINE REGEX "define[ ]+QWT_VERSION_STR" )
@@ -796,9 +796,15 @@ if (WIN32)
   SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")
 endif()
 
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY AND (NOT ${QWT_VERSION} VERSION_LESS 6.1.0))
+  set(HAVE_QWT TRUE)
+else()
+  set(HAVE_QWT FALSE)
+endif ()
+
 if (HAVE_QWT)
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
 else()
-  message (STATUS "Looking for qwt - not found")
-  BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
+  message (STATUS "Looking for qwt >= 6.1.0 - not found")
+  BUILD_WARNING ("Missing: libqwt-dev. Required for plotting.")
 endif ()

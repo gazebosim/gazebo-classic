@@ -155,8 +155,12 @@ namespace gazebo
       /// \param[in] _visualName Name of the visual to move the camera to.
       public: void MoveToVisual(const std::string &_visualName);
 
+      /// \brief Set the screen point to device pixel ratio
+      /// \param[in] _ratio Point to pixel ratio.
       public: void SetDevicePixelRatio(const double _ratio);
 
+      /// \brief Get the screen point to device pixel ratio
+      /// \return Point to pixel ratio
       public: double DevicePixelRatio() const;
 
       // Documentation Inherited

@@ -31,8 +31,8 @@ namespace gazebo
   namespace gui
   {
     class TopToolbar;
-    class TimePanel;
     class GLWidget;
+    class TimePanel;
 
     class GZ_GUI_VISIBLE RenderWidget : public QWidget
     {
@@ -94,7 +94,6 @@ namespace gazebo
       private: void OnFollow(const std::string &_modelName);
 
       /// \brief Widget used to draw the scene.
-//      private: QWidget *glWidget;
       private: GLWidget *glWidget;
 
       /// \brief Frame that holds the contents of this widget.

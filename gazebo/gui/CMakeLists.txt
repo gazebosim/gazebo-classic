@@ -33,7 +33,6 @@ set (sources
   Editor.cc
   EntityMaker.cc
   GLWidget.cc
-  GLWindow.cc
   GuiEvents.cc
   GuiIface.cc
   InsertModelWidget.cc
@@ -82,7 +81,6 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
-  GLWindow.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
@@ -134,8 +132,8 @@ set (qt_tests
   BuildingEditor_TEST.cc
   ConfigWidget_TEST.cc
   DataLogger_TEST.cc
-  #GLWidget_TEST.cc
-  #GLWidget_TEST2.cc
+  GLWidget_TEST.cc
+  GLWidget_TEST2.cc
   GuiIface_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
@@ -155,7 +153,9 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
-add_subdirectory(plot)
+if (HAVE_QWT)
+  add_subdirectory(plot)
+endif()
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
@@ -210,6 +210,7 @@ target_link_libraries(gazebo_gui
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
   ${QWT_LIBRARY}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 if (UNIX)

@@ -479,6 +479,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                                        absPositionOnWall.y());
           editorItem->SetPositionOnWall(positionLength /
               wallSegmentItem->line().length());
+          editorItem->SetRotation(editorItem->Rotation());
         }
         return;
       }

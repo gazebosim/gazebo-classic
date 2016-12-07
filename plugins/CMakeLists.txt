@@ -7,7 +7,6 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
-  ${IGNITION-MATH_INCLUDE_DIRS}
   ${Qt5Core_INCLUDE_DIRS}
 )
 
@@ -20,7 +19,6 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
-  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 add_definitions(${Qt5Core_DEFINITIONS})

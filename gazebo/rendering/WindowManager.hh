@@ -61,6 +61,7 @@ namespace gazebo
       /// \param[in] _ogreHandle String representing the ogre window handle.
       /// \param[in] _width With of the window in pixels.
       /// \param[in] _height Height of the window in pixels.
+      /// \param[in] _devicePixelRatio Screen point to pixel ratio
       public: int CreateWindow(const std::string &_ogreHandle,
                                uint32_t _width,
                                uint32_t _height,
