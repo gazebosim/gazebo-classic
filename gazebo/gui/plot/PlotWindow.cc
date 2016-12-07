@@ -15,8 +15,8 @@
  *
 */
 #include <mutex>
-#include <QtGui/QDrag>
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"

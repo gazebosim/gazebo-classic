@@ -18,7 +18,6 @@
 #define _GAZEBO_SPLASH_SCREEN_PRIVATE_HH_
 
 #include <vector>
-#include <QtWidgets/qsplashscreen.h>
 
 #include "gazebo/gui/qt.h"
 
