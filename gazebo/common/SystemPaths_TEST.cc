@@ -126,6 +126,29 @@ TEST_F(SystemPathsTest, SystemPaths)
   putenv(const_cast<char*>(pluginPathBackup.c_str()));
 }
 
+TEST_F(SystemPathsTest, ApplicationPath)
+{
+  // get dir path to application exe
+  std::string path = common::SystemPaths::Instance()->ApplicationPath();
+
+  // path should not be empty
+  EXPECT_TRUE(!path.empty());
+
+#ifdef _WIN32
+  char separator = '\\';
+#else
+  char separator = '/';
+  // verify absolute path in *nix systems
+  EXPECT_EQ(path[0], separator);
+#endif
+
+  // test based on assumption about gazebo src tree directory structure
+  std::string dirPath = "gazebo";
+  dirPath += separator;
+  dirPath += "common";
+  EXPECT_NE(path.find(dirPath), std::string::npos);
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
