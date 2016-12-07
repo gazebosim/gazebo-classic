@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Support heightmap sampling configuration
+    * [Pull request 25xx](https://bitbucket.org/osrf/gazebo/pull-request/25xx)
+
 1. Fix `model.config` dependency support, and add ability to reference
    textures using a URI.
     * [Pull request 2517](https://bitbucket.org/osrf/gazebo/pull-request/2517)
