@@ -425,7 +425,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       // ungetc( ch, stdin );
       // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
-    ei->torque = math::clamp(ei->torque, ei->minVal, ei->maxVal);
+    ei->torque = ignition::math::clamp(ei->torque, ei->minVal, ei->maxVal);
     gzerr << "torque: " << ei->torque << "\n";
   }
 
@@ -447,9 +447,12 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       // ungetc( ch, stdin );
       // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
-    ti->force.X() = math::clamp(ti->force.X(), ti->minVal.X(), ti->maxVal.X());
-    ti->force.Y() = math::clamp(ti->force.Y(), ti->minVal.Y(), ti->maxVal.Y());
-    ti->force.Z() = math::clamp(ti->force.Z(), ti->minVal.Z(), ti->maxVal.Z());
+    ti->force.X() =
+      ignition::math::clamp(ti->force.X(), ti->minVal.X(), ti->maxVal.X());
+    ti->force.Y() =
+      ignition::math::clamp(ti->force.Y(), ti->minVal.Y(), ti->maxVal.Y());
+    ti->force.Z() =
+      ignition::math::clamp(ti->force.Z(), ti->minVal.Z(), ti->maxVal.Z());
     gzerr << "force: " << ti->force << "\n";
   }
 
@@ -461,7 +464,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     {
       // spin up motor
       ji->cmd += ji->incVal;
-      ji->cmd = math::clamp(ji->cmd, ji->minVal, ji->maxVal);
+      ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
             << " cur: " << ji->joint->GetAngle(0).Radian()
@@ -470,7 +473,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     else if (static_cast<int>(ch) == ji->decKey)
     {
       ji->cmd -= ji->incVal;
-      ji->cmd = math::clamp(ji->cmd, ji->minVal, ji->maxVal);
+      ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
             << " cur: " << ji->joint->GetAngle(0).Radian()

@@ -59,21 +59,21 @@ void BulletUniversalJoint::Init()
   math::Vector3 axis2 = this->initialWorldAxis[1];
 
   // Check that axis1 and axis2 are orthogonal unit vectors
-  if (math::equal(axis1.GetLength(), 0.0))
+  if (ignition::math::equal(axis1.GetLength(), 0.0))
   {
     gzerr << "Joint [" << this->GetScopedName()
           << "] axis1 must have non-zero length, aborting"
           << std::endl;
     return;
   }
-  if (math::equal(axis2.GetLength(), 0.0))
+  if (ignition::math::equal(axis2.GetLength(), 0.0))
   {
     gzerr << "Joint [" << this->GetScopedName()
           << "] axis2 must have non-zero length, aborting"
           << std::endl;
     return;
   }
-  if (math::equal(axis1.Cross(axis2).GetLength(), 0.0))
+  if (ignition::math::equal(axis1.Cross(axis2).GetLength(), 0.0))
   {
     gzerr << "Joint [" << this->GetScopedName()
           << "] axis1 and axis2 must not be parallel, aborting"
@@ -242,7 +242,7 @@ bool BulletUniversalJoint::SetHighStop(unsigned int _index,
   double angle = _angle.Radian();
   if (angle < -M_PI/2.1 || angle > M_PI/2.1)
   {
-    angle = math::clamp(angle, -M_PI/2.1, M_PI/2.1);
+    angle = ignition::math::clamp(angle, -M_PI/2.1, M_PI/2.1);
     gzwarn << "Truncating joint limit [" << _angle.Radian()
            << "] to [" << angle << "] due to issue #1113.\n";
   }
@@ -284,7 +284,7 @@ bool BulletUniversalJoint::SetLowStop(unsigned int _index,
   double angle = _angle.Radian();
   if (angle < -M_PI/2.1 || angle > M_PI/2.1)
   {
-    angle = math::clamp(angle, -M_PI/2.1, M_PI/2.1);
+    angle = ignition::math::clamp(angle, -M_PI/2.1, M_PI/2.1);
     gzwarn << "Truncating joint limit [" << _angle.Radian()
            << "] to [" << angle << "] due to issue #1113.\n";
   }
