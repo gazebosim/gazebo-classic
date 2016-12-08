@@ -301,6 +301,26 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     EXPECT_EQ(param, frictionModel);
   }
 
+  // Test ode_quiet
+  // convenient for disabling LCP internal error messages from world solver
+  {
+    // ode_quiet should be off by default
+    bool odeQuiet = true;
+    EXPECT_NO_THROW(
+      odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+    EXPECT_FALSE(odeQuiet);
+
+    // try turning it on, then off again
+    std::vector<bool> bools = {true, false};
+    for (const bool odeQuietSet : bools)
+    {
+      odePhysics->SetParam("ode_quiet", odeQuietSet);
+      EXPECT_NO_THROW(
+        odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+      EXPECT_EQ(odeQuiet, odeQuietSet);
+    }
+  }
+
   // Test world step solvers
   {
     // Default value "ODE_DANTZIG"

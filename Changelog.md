@@ -194,6 +194,9 @@
 1. Fix DEM heightmap size, collision, scale
     * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
 
+1. Create ode_quiet parameter to silence solver messages
+    * [Pull request 2512](https://bitbucket.org/osrf/gazebo/pull-request/2512)
+
 1. Update QT render loop to throttle based on UserCamera::RenderRate.
     * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
     * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
