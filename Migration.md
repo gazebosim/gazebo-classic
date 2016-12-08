@@ -66,6 +66,10 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/physics/Gripper.hh**
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+
 1. **gazebo/physics/World.hh**
     + ***Deprecation:*** bool GetRunning() const
     + ***Replacement:*** bool Running() const;
