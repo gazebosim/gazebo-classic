@@ -1330,7 +1330,15 @@ void World::Reset()
 
     // \todo: The following is deprecated, but we're keeping it until other
     // gazebo math functionality is removed.
+
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     math::Rand::SetSeed(math::Rand::GetSeed());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
     ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(ignition::math::Rand::Seed());
@@ -1492,7 +1500,14 @@ void World::OnControl(ConstWorldControlPtr &_data)
 
   if (_data->has_seed())
   {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     math::Rand::SetSeed(_data->seed());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     ignition::math::Rand::Seed(_data->seed());
     this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
