@@ -1863,7 +1863,7 @@ ignition::math::Pose3d Visual::WorldPose() const
   if (this->dataPtr->sceneNode)
   {
     vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-    pose.Pos().Set(vpos.x,vpos.y, vpos.z);
+    pose.Pos().Set(vpos.x, vpos.y, vpos.z);
 
     vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
     pose.Rot().Set(vquatern.w, vquatern.x, vquatern.y, vquatern.z);
