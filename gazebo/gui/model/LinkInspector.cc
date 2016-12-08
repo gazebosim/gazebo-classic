@@ -65,11 +65,11 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   // Show collisions button
   auto showCollisionsButton = new QToolButton(this);
   showCollisionsButton->setObjectName("showCollisionsButton");
-  showCollisionsButton->setFixedSize(QSize(30, 30));
+  showCollisionsButton->setFixedSize(QSize(40, 40));
   showCollisionsButton->setToolTip("Show/hide all collisions");
   showCollisionsButton->setIcon(QPixmap(":/images/eye_collision.svg"));
   showCollisionsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  showCollisionsButton->setIconSize(QSize(16, 16));
+  showCollisionsButton->setIconSize(QSize(25, 25));
   showCollisionsButton->setCheckable(true);
   this->connect(showCollisionsButton, SIGNAL(toggled(const bool)), this,
       SLOT(OnShowCollisions(const bool)));
@@ -77,11 +77,11 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   // Show visuals button
   auto showVisualsButton = new QToolButton(this);
   showVisualsButton->setObjectName("showVisualsButton");
-  showVisualsButton->setFixedSize(QSize(30, 30));
+  showVisualsButton->setFixedSize(QSize(40, 40));
   showVisualsButton->setToolTip("Show/hide all visuals");
   showVisualsButton->setIcon(QPixmap(":/images/eye_visual.svg"));
   showVisualsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  showVisualsButton->setIconSize(QSize(16, 16));
+  showVisualsButton->setIconSize(QSize(25, 25));
   showVisualsButton->setCheckable(true);
   this->connect(showVisualsButton, SIGNAL(toggled(const bool)), this,
       SLOT(OnShowVisuals(const bool)));
@@ -89,22 +89,22 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   // Show link frame button
   auto showLinkFrameButton = new QToolButton(this);
   showLinkFrameButton->setObjectName("showLinkFrameButton");
-  showLinkFrameButton->setFixedSize(QSize(30, 30));
+  showLinkFrameButton->setFixedSize(QSize(40, 40));
   showLinkFrameButton->setToolTip("Show/hide link frame");
   showLinkFrameButton->setIcon(QPixmap(":/images/eye_frame.svg"));
   showLinkFrameButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  showLinkFrameButton->setIconSize(QSize(16, 16));
+  showLinkFrameButton->setIconSize(QSize(25, 25));
   showLinkFrameButton->setCheckable(true);
   this->connect(showLinkFrameButton, SIGNAL(toggled(const bool)), this,
       SLOT(OnShowLinkFrame(const bool)));
 
   // Remove button
   QToolButton *removeButton = new QToolButton(this);
-  removeButton->setFixedSize(QSize(30, 30));
+  removeButton->setFixedSize(QSize(40, 40));
   removeButton->setToolTip("Remove link");
   removeButton->setIcon(QPixmap(":/images/trashcan.png"));
   removeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  removeButton->setIconSize(QSize(16, 16));
+  removeButton->setIconSize(QSize(25, 25));
   removeButton->setCheckable(false);
   connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
 
@@ -122,9 +122,9 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(removeButton);
-  buttonsLayout->addWidget(showCollisionsButton);
-  buttonsLayout->addWidget(showVisualsButton);
   buttonsLayout->addWidget(showLinkFrameButton);
+  buttonsLayout->addWidget(showVisualsButton);
+  buttonsLayout->addWidget(showCollisionsButton);
   buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(resetButton);
   buttonsLayout->addWidget(cancelButton);
