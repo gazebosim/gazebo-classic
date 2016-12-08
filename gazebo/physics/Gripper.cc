@@ -48,6 +48,8 @@
 using namespace gazebo;
 using namespace physics;
 
+/// \internal
+/// \brief Private data class for Gripper
 class gazebo::physics::GripperPrivate
 {
   /// \brief Callback used when the gripper contacts an object.
