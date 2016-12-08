@@ -2889,7 +2889,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 
 //////////////////////////////////////////////////
 void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
-                             double _time,
+                             const double _time,
                              std::function<void()> _onComplete)
 {
   Ogre::TransformKeyFrame *key;

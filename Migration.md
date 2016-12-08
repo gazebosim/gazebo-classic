@@ -142,7 +142,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Box GetBoundingBox() const
     + ***Replacement:*** ignition::math::Box BoundingBox() const
     + ***Deprecation:*** void MoveToPosition(const math::Pose &_pose, double _time)
-    + ***Replacement:*** void MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
+    + ***Replacement:*** void MoveToPosition(const ignition::math::Pose3d &_pose, const double _time)
     + ***Deprecation:*** void MoveToPositions(const std::vector<math::Pose> &_pts, double _time, std::function<void()> _onComplete = nullptr)
     + ***Replacement:*** void MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts, const double _time, std::function<void()> _onComplete = nullptr)
     + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose)

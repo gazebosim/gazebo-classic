@@ -333,7 +333,7 @@ namespace gazebo
       public: void SetCastShadows(bool _shadows);
 
       /// \brief Set whether the visual is visible.
-      /// \param[in] _visible set this node visible.
+      /// \param[in] _visible set this visual visible.
       /// \param[in] _cascade setting this parameter in children too.
       public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
@@ -410,7 +410,7 @@ namespace gazebo
       /// \deprecated See ignition::math::Pose3d WorldPose() const.
       public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Get the global pose of the node.
+      /// \brief Get the global pose of the visual.
       /// \return The pose in the world coordinate frame.
       public: ignition::math::Pose3d WorldPose() const;
 
@@ -583,7 +583,7 @@ namespace gazebo
       /// \param[in] _pose Pose the visual will end at.
       /// \param[in] _time Time it takes the visual to move to the pose.
       public: void MoveToPosition(const ignition::math::Pose3d &_pose,
-                  double _time);
+                  const double _time);
 
       /// \brief Move to a series of pose and over a given time.
       /// \param[in] _poses Series of poses the visual will move to.
