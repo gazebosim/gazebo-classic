@@ -77,7 +77,9 @@ namespace gazebo
       /// \brief Get a double from a normal distribution
       /// \param[in] _mean Mean value for the distribution
       /// \param[in] _sigma Sigma value for the distribution
-      public: static double GetDblNormal(double _mean = 0, double _sigma = 1);
+      /// \deprecated See ignition::math::Rand::DblNormal
+      public: static double GetDblNormal(double _mean = 0, double _sigma = 1)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a integer from a uniform distribution
       /// \param[in] _min Minimum bound for the random number
@@ -87,7 +89,9 @@ namespace gazebo
       /// \brief Get a double from a normal distribution
       /// \param[in] _mean Mean value for the distribution
       /// \param[in] _sigma Sigma value for the distribution
-      public: static int GetIntNormal(int _mean, int _sigma);
+      /// \deprecated See ignition::math::Rand::IntNormal
+      public: static int GetIntNormal(int _mean, int _sigma)
+              GAZEBO_DEPRECATED(8.0);
 
       // The random number generator
       private: static GeneratorType *randGenerator;
