@@ -172,12 +172,9 @@ bool MarkerCommand::RunImpl()
 /////////////////////////////////////////////////
 void MarkerCommand::List()
 {
-  ignition::msgs::StringMsg req;
-  req.set_data("list");
-
   ignition::msgs::Marker_V rep;
   bool result;
-  bool executed = this->node.Request("/marker/list", req, 5000u, rep, result);
+  bool executed = this->node.Request("/marker/list", 5000u, rep, result);
 
   if (executed)
   {

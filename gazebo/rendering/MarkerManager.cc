@@ -56,11 +56,9 @@ class gazebo::rendering::MarkerManagerPrivate
   public: void OnMarkerMsg(const ignition::msgs::Marker &_req);
 
   /// \brief Service callback that returns a list of markers.
-  /// \param[in] _req Service request.
   /// \param[out] _rep Service reply
   /// \param[out] _result True on success.
-  public: void OnList(const ignition::msgs::StringMsg &_req,
-                      ignition::msgs::Marker_V &_rep, bool &_result);
+  public: void OnList(ignition::msgs::Marker_V &_rep, bool &_result);
 
   /// \brief Mutex to protect message list.
   public: std::mutex mutex;
@@ -269,8 +267,7 @@ void MarkerManagerPrivate::OnMarkerMsg(const ignition::msgs::Marker &_req)
 }
 
 /////////////////////////////////////////////////
-void MarkerManagerPrivate::OnList(const ignition::msgs::StringMsg & /*_req*/,
-    ignition::msgs::Marker_V &_rep, bool &_result)
+void MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep, bool &_result)
 {
   _result = true;
 

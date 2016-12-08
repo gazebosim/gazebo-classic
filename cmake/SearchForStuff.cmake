@@ -703,21 +703,15 @@ endif()
 # Find the Ignition_Transport library
 find_package(ignition-transport2 QUIET)
 if (NOT ignition-transport2_FOUND)
-  find_package(ignition-transport1 QUIET)
-  if (NOT ignition-transport1_FOUND)
-    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport2-dev or libignition-transport1-dev)")
-  else()
-    message(STATUS "Looking for ignition-transport1-config.cmake - found")
-  endif()
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport2-dev)")
 else()
   message(STATUS "Looking for ignition-transport2-config.cmake - found")
-endif()
 
-if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
+
 
 ################################################
 # Find Valgrind for checking memory leaks in the
