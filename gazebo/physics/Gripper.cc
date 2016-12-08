@@ -71,11 +71,6 @@ class gazebo::physics::GripperPrivate
   /// \brief Model that contains this gripper.
   public: physics::ModelPtr model;
 
-  /// \brief The physics engine.
-  // NOTE: Variable not used, left here for ABI compatibility. Remove when
-  // merging forward.
-  public: physics::PhysicsEnginePtr physics;
-
   /// \brief Pointer to the world.
   public: physics::WorldPtr world;
 
@@ -171,7 +166,6 @@ Gripper::~Gripper()
   }
 
   this->dataPtr->model.reset();
-  this->dataPtr->physics.reset();
   this->dataPtr->world.reset();
   this->dataPtr->connections.clear();
 }
@@ -272,8 +266,7 @@ bool Gripper::IsAttached() const
 /////////////////////////////////////////////////
 void GripperPrivate::OnUpdate()
 {
-  if (common::Time::GetWallTime() -
-      this->prevUpdateTime < this->updateRate)
+  if (common::Time::GetWallTime() - this->prevUpdateTime < this->updateRate)
   {
     return;
   }
@@ -290,13 +283,11 @@ void GripperPrivate::OnUpdate()
     this->posCount = std::max(0, this->posCount-1);
   }
 
-  if (this->posCount > this->attachSteps &&
-      !this->attached)
+  if (this->posCount > this->attachSteps && !this->attached)
   {
     this->HandleAttach();
   }
-  else if (this->zeroCount > this->detachSteps &&
-           this->attached)
+  else if (this->zeroCount > this->detachSteps && this->attached)
   {
     this->HandleDetach();
   }
@@ -331,16 +322,14 @@ void GripperPrivate::HandleAttach()
     std::string name1 = this->contacts[i].collision1();
     std::string name2 = this->contacts[i].collision2();
 
-    if (this->collisions.find(name1) ==
-        this->collisions.end())
+    if (this->collisions.find(name1) == this->collisions.end())
     {
       cc[name1] = boost::dynamic_pointer_cast<Collision>(
           this->world->EntityByName(name1));
       contactCounts[name1] += 1;
     }
 
-    if (this->collisions.find(name2) ==
-        this->collisions.end())
+    if (this->collisions.find(name2) == this->collisions.end())
     {
       cc[name2] = boost::dynamic_pointer_cast<Collision>(
           this->world->EntityByName(name2));
@@ -352,7 +341,9 @@ void GripperPrivate::HandleAttach()
   while (iter != contactCounts.end())
   {
     if (iter->second < 2)
+    {
       contactCounts.erase(iter++);
+    }
     else
     {
       if (!this->attached && cc[iter->first])
