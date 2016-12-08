@@ -732,10 +732,9 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
       bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.Pos()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.Rot()));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
-      math::Pose parentPose = parentLink->GetWorldPose();
-      math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
-      parentTrans.SetTranslate(parentPose.pos);
-      transform = (parentTrans * transform).Ign();
+      auto parentPose = parentLink->GetWorldPose().Ign();
+      ignition::math::Matrix4d parentTrans(parentPose);
+      transform = parentTrans * transform;
     }
 
     msgs::Pose *link_pose = msg.add_pose();
