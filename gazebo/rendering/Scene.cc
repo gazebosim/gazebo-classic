@@ -319,12 +319,6 @@ void Scene::Load()
 }
 
 //////////////////////////////////////////////////
-VisualPtr Scene::GetWorldVisual() const
-{
-  return this->WorldVisual();
-}
-
-//////////////////////////////////////////////////
 VisualPtr Scene::WorldVisual() const
 {
   return this->dataPtr->worldVisual;
@@ -388,12 +382,6 @@ void Scene::Init()
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
-}
-
-//////////////////////////////////////////////////
-bool Scene::GetInitialized() const
-{
-  return this->Initialized();
 }
 
 //////////////////////////////////////////////////
@@ -464,21 +452,9 @@ void Scene::InitDeferredShading()
 }
 
 //////////////////////////////////////////////////
-Ogre::SceneManager *Scene::GetManager() const
-{
-  return this->OgreSceneManager();
-}
-
-//////////////////////////////////////////////////
 Ogre::SceneManager *Scene::OgreSceneManager() const
 {
   return this->dataPtr->manager;
-}
-
-//////////////////////////////////////////////////
-std::string Scene::GetName() const
-{
-  return this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -501,12 +477,6 @@ void Scene::SetAmbientColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Scene::GetAmbientColor() const
-{
-  return this->AmbientColor();
-}
-
-//////////////////////////////////////////////////
 common::Color Scene::AmbientColor() const
 {
   return this->dataPtr->sdf->Get<common::Color>("ambient");
@@ -516,33 +486,20 @@ common::Color Scene::AmbientColor() const
 void Scene::SetBackgroundColor(const common::Color &_color)
 {
   this->dataPtr->sdf->GetElement("background")->Set(_color);
-  Ogre::ColourValue clr = Conversions::Convert(_color);
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->OgreViewport() &&
-        (*iter)->OgreViewport()->getBackgroundColour() != clr)
-      (*iter)->OgreViewport()->setBackgroundColour(clr);
+    (*iter)->SetBackgroundColor(_color);
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->dataPtr->userCameras.begin();
        iter2 != this->dataPtr->userCameras.end(); ++iter2)
   {
-    if ((*iter2)->OgreViewport() &&
-        (*iter2)->OgreViewport()->getBackgroundColour() != clr)
-    {
-      (*iter2)->OgreViewport()->setBackgroundColour(clr);
-    }
+    (*iter2)->SetBackgroundColor(_color);
   }
-}
-
-//////////////////////////////////////////////////
-common::Color Scene::GetBackgroundColor() const
-{
-  return this->BackgroundColor();
 }
 
 //////////////////////////////////////////////////
@@ -573,12 +530,6 @@ Grid *Scene::GetGrid(const uint32_t index) const
   }
 
   return this->dataPtr->grids[index];
-}
-
-//////////////////////////////////////////////////
-uint32_t Scene::GetGridCount() const
-{
-  return this->GridCount();
 }
 
 //////////////////////////////////////////////////
@@ -630,12 +581,6 @@ GpuLaserPtr Scene::CreateGpuLaser(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-uint32_t Scene::GetCameraCount() const
-{
-  return this->CameraCount();
-}
-
-//////////////////////////////////////////////////
 uint32_t Scene::CameraCount() const
 {
   return this->dataPtr->cameras.size();
@@ -684,12 +629,6 @@ OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-uint32_t Scene::GetOculusCameraCount() const
-{
-  return this->OculusCameraCount();
-}
-
-//////////////////////////////////////////////////
 uint32_t Scene::OculusCameraCount() const
 {
   return this->dataPtr->oculusCameras.size();
@@ -707,12 +646,6 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &_name,
   this->dataPtr->userCameras.push_back(camera);
 
   return camera;
-}
-
-//////////////////////////////////////////////////
-uint32_t Scene::GetUserCameraCount() const
-{
-  return this->UserCameraCount();
 }
 
 //////////////////////////////////////////////////
@@ -757,12 +690,6 @@ LightPtr Scene::GetLight(const std::string &_name) const
   if (iter != this->dataPtr->lights.end())
     result = iter->second;
   return result;
-}
-
-//////////////////////////////////////////////////
-uint32_t Scene::GetLightCount() const
-{
-  return this->LightCount();
 }
 
 //////////////////////////////////////////////////
@@ -832,12 +759,6 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-uint32_t Scene::GetVisualCount() const
-{
-  return this->VisualCount();
-}
-
-//////////////////////////////////////////////////
 uint32_t Scene::VisualCount() const
 {
   return this->dataPtr->visuals.size();
@@ -851,23 +772,9 @@ void Scene::SelectVisual(const std::string &_name, const std::string &_mode)
 }
 
 //////////////////////////////////////////////////
-VisualPtr Scene::GetSelectedVisual() const
-{
-  return this->SelectedVisual();
-}
-
-//////////////////////////////////////////////////
 VisualPtr Scene::SelectedVisual() const
 {
   return this->dataPtr->selectedVis;
-}
-
-//////////////////////////////////////////////////
-VisualPtr Scene::GetVisualAt(CameraPtr _camera,
-                             const math::Vector2i &_mousePos,
-                             std::string &_mod)
-{
-  return this->VisualAt(_camera, _mousePos.Ign(), _mod);
 }
 
 //////////////////////////////////////////////////
@@ -912,13 +819,6 @@ VisualPtr Scene::VisualAt(CameraPtr _camera,
 }
 
 //////////////////////////////////////////////////
-VisualPtr Scene::GetModelVisualAt(CameraPtr _camera,
-                                  const math::Vector2i &_mousePos)
-{
-  return this->ModelVisualAt(_camera, _mousePos.Ign());
-}
-
-//////////////////////////////////////////////////
 VisualPtr Scene::ModelVisualAt(CameraPtr _camera,
                                const ignition::math::Vector2i &_mousePos)
 {
@@ -942,12 +842,6 @@ void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
     pos.z -= dz;
     vis->SetWorldPosition(pos);
   }
-}
-
-//////////////////////////////////////////////////
-VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
-{
-  return this->VisualBelow(_visualName);
 }
 
 //////////////////////////////////////////////////
@@ -975,12 +869,6 @@ VisualPtr Scene::VisualBelow(const std::string &_visualName)
   }
 
   return result;
-}
-
-//////////////////////////////////////////////////
-double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
-{
-  return this->HeightBelowPoint(_pt.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1029,13 +917,6 @@ double Scene::HeightBelowPoint(const ignition::math::Vector3d &_pt)
   }
 
   return height;
-}
-
-//////////////////////////////////////////////////
-void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
-                                 std::vector<VisualPtr> &_visuals)
-{
-  return this->VisualsBelowPoint(_pt.Ign(), _visuals);
 }
 
 //////////////////////////////////////////////////
@@ -1088,13 +969,6 @@ void Scene::VisualsBelowPoint(const ignition::math::Vector3d &_pt,
       }
     }
   }
-}
-
-//////////////////////////////////////////////////
-VisualPtr Scene::GetVisualAt(CameraPtr _camera,
-                             const math::Vector2i &_mousePos)
-{
-  return this->VisualAt(_camera, _mousePos.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1211,17 +1085,6 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
   }
 
   return closestEntity;
-}
-
-//////////////////////////////////////////////////
-bool Scene::GetFirstContact(CameraPtr _camera,
-                            const math::Vector2i &_mousePos,
-                            math::Vector3 &_position)
-{
-  ignition::math::Vector3d position;
-  bool result = this->FirstContact(_camera, _mousePos.Ign(), position);
-  _position = position;
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -1386,14 +1249,6 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 }
 
 //////////////////////////////////////////////////
-void Scene::DrawLine(const math::Vector3 &_start,
-                     const math::Vector3 &_end,
-                     const std::string &_name)
-{
-  this->DrawLine(_start.Ign(), _end.Ign(), _name);
-}
-
-//////////////////////////////////////////////////
 void Scene::DrawLine(const ignition::math::Vector3d &_start,
                      const ignition::math::Vector3d &_end,
                      const std::string &_name)
@@ -1466,21 +1321,9 @@ void Scene::SetVisible(const std::string &_name, const bool _visible)
 }
 
 //////////////////////////////////////////////////
-uint32_t Scene::GetId() const
-{
-  return this->Id();
-}
-
-//////////////////////////////////////////////////
 uint32_t Scene::Id() const
 {
   return this->dataPtr->id;
-}
-
-//////////////////////////////////////////////////
-std::string Scene::GetIdString() const
-{
-  return this->IdString();
 }
 
 //////////////////////////////////////////////////
@@ -1544,8 +1387,7 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ?
         _mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) ||
-        (submesh->useSharedVertices && !added_shared))
+    if ((!submesh->useSharedVertices) || !added_shared)
     {
       if (submesh->useSharedVertices)
       {
@@ -2404,22 +2246,6 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
   }
 
-  std::string linkName = linkVis->GetName();
-  if (!this->GetVisual(linkName + "_COM_VISUAL__"))
-  {
-    this->CreateCOMVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_INERTIA_VISUAL__"))
-  {
-    this->CreateInertiaVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_LINK_FRAME_VISUAL__"))
-  {
-    this->CreateLinkFrameVisual(_msg, linkVis);
-  }
-
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2433,6 +2259,15 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
       this->dataPtr->projectors[pname] = projector;
     }
   }
+
+  linkVis->SetTypeMsg(&*_msg);
+
+  // Trigger visualizations that depend on type msg
+  linkVis->ShowInertia(this->dataPtr->showInertias);
+  linkVis->ShowCOM(this->dataPtr->showCOMs);
+  linkVis->ShowLinkFrame(this->dataPtr->showLinkFrames);
+  linkVis->ShowCollision(this->dataPtr->showCollisions);
+  linkVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
@@ -2450,14 +2285,10 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   if (!childVis)
     return false;
 
-  JointVisualPtr jointVis(new JointVisual(
-      _msg->name() + "_JOINT_VISUAL__", childVis));
-  jointVis->Load(_msg);
-  jointVis->SetVisible(this->dataPtr->showJoints);
-  if (_msg->has_id())
-    jointVis->SetId(_msg->id());
-
-  this->dataPtr->visuals[jointVis->GetId()] = jointVis;
+  childVis->AddPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
+  // If this needs to be added, make sure it is called after all of the visuals
+  // the childVis link have been loaded
+  // childVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
@@ -2762,7 +2593,6 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
-  bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
 
   if (_msg->has_id())
@@ -2774,116 +2604,127 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         this->dataPtr->visuals.end();
   }
 
+  // Deleting a visual
   if (_msg->has_delete_me() && _msg->delete_me())
   {
     if (iter != this->dataPtr->visuals.end())
     {
       this->dataPtr->visuals.erase(iter);
-      result = true;
-    }
-  }
-  else if (iter != this->dataPtr->visuals.end())
-  {
-    iter->second->UpdateFromMsg(_msg);
-    result = true;
-  }
-  else
-  {
-    VisualPtr visual;
-
-    // TODO: A bit of a hack.
-    if (_msg->has_geometry() &&
-        _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-    {
-      // Ignore collision visuals for the heightmap
-      if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
-          this->dataPtr->terrain == NULL)
-      {
-        try
-        {
-          if (!this->dataPtr->terrain)
-          {
-            this->dataPtr->terrain = new Heightmap(shared_from_this());
-            this->dataPtr->terrain->LoadFromMsg(_msg);
-          }
-          else
-            gzerr << "Only one Heightmap can be created per Scene\n";
-        } catch(...)
-        {
-          return false;
-        }
-      }
       return true;
     }
+    else
+      return false;
+  }
 
-    // If the visual has a parent which is not the name of the scene...
-    if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+  // Updating existing visual
+  if (iter != this->dataPtr->visuals.end())
+  {
+    iter->second->UpdateFromMsg(_msg);
+    return true;
+  }
+
+  // Creating heightmap
+  // FIXME: A bit of a hack.
+  if (_msg->has_geometry() &&
+      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP &&
+      _type != Visual::VT_COLLISION)
+  {
+    if (this->dataPtr->terrain)
     {
-      if (_msg->has_id())
-        iter = this->dataPtr->visuals.find(_msg->id());
-      else
-      {
-        VisualPtr vis = this->GetVisual(_msg->name());
-        iter = vis ? this->dataPtr->visuals.find(vis->GetId()) :
-            this->dataPtr->visuals.end();
-      }
-
-      if (iter != this->dataPtr->visuals.end())
-        gzerr << "Visual already exists. This shouldn't happen.\n";
-
-      // Make sure the parent visual exists before trying to add a child
-      // visual
-      iter = this->dataPtr->visuals.find(_msg->parent_id());
-      if (iter != this->dataPtr->visuals.end())
-      {
-        visual.reset(new Visual(_msg->name(), iter->second));
-        if (_msg->has_id())
-          visual->SetId(_msg->id());
-      }
+      // Only one Heightmap can be created per Scene
+      return true;
     }
     else
     {
-      // Add a visual that is attached to the scene root
-      visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
-      if (_msg->has_id())
-        visual->SetId(_msg->id());
+        if (!this->dataPtr->terrain)
+        {
+          this->dataPtr->terrain = new Heightmap(shared_from_this());
+          // check the material fields and set material if it is specified
+          if (_msg->has_material())
+          {
+            auto matMsg = _msg->material();
+            if (matMsg.has_script())
+            {
+              auto scriptMsg = matMsg.script();
+              for (auto const uri : scriptMsg.uri())
+              {
+                if (!uri.empty())
+                  RenderEngine::Instance()->AddResourcePath(uri);
+              }
+              std::string matName = scriptMsg.name();
+              this->dataPtr->terrain->SetMaterial(matName);
+            }
+          }
+          this->dataPtr->terrain->LoadFromMsg(_msg);
+        }
     }
-
-    if (visual)
-    {
-      result = true;
-      visual->LoadFromMsg(_msg);
-      visual->SetType(_type);
-
-      this->dataPtr->visuals[visual->GetId()] = visual;
-      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
-          visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
-      {
-        visual->SetVisible(false);
-        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-      }
-
-      visual->ShowCOM(this->dataPtr->showCOMs);
-      visual->ShowInertia(this->dataPtr->showInertias);
-      visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
-      visual->ShowCollision(this->dataPtr->showCollisions);
-      visual->ShowJoints(this->dataPtr->showJoints);
-      if (visual->GetType() == Visual::VT_MODEL)
-      {
-        visual->ShowSkeleton(this->dataPtr->showSkeleton);
-        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
-      }
-      visual->SetWireframe(this->dataPtr->wireframe);
-    }
+    return true;
   }
 
-  return result;
-}
+  // Creating collision
+  if (_type == Visual::VT_COLLISION)
+  {
+    // Collisions need a parent
+    if (!_msg->has_parent_name() && !_msg->has_parent_id())
+    {
+      gzerr << "Missing parent for collision visual [" << _msg->name() << "]"
+          << std::endl;
+      return false;
+    }
 
-/////////////////////////////////////////////////
-common::Time Scene::GetSimTime() const
-{
-  return this->SimTime();
+    // Make sure the parent visual exists before trying to add a child visual
+    auto parent = this->dataPtr->visuals.find(_msg->parent_id());
+    if (parent == this->dataPtr->visuals.end())
+    {
+      return false;
+    }
+
+    parent->second->AddPendingChild(std::make_pair(_type, &*_msg));
+    parent->second->ShowCollision(this->dataPtr->showCollisions);
+
+    return true;
+  }
+
+  // All other visuals
+  VisualPtr visual;
+
+  // If the visual has a parent which is not the name of the scene...
+  if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+  {
+    // Make sure the parent visual exists before trying to add a child
+    // visual
+    iter = this->dataPtr->visuals.find(_msg->parent_id());
+    if (iter == this->dataPtr->visuals.end())
+    {
+      return false;
+    }
+
+    visual.reset(new Visual(_msg->name(), iter->second));
+  }
+  else
+  {
+    // Add a visual that is attached to the scene root
+    visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
+  }
+
+  if (_msg->has_id())
+    visual->SetId(_msg->id());
+
+  visual->LoadFromMsg(_msg);
+  visual->SetType(_type);
+
+  this->dataPtr->visuals[visual->GetId()] = visual;
+  if (visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+  {
+    visual->SetVisible(false);
+    visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  }
+
+  if (visual->GetType() == Visual::VT_MODEL)
+    visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+  visual->SetWireframe(this->dataPtr->wireframe);
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -3021,21 +2862,21 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (_msg->has_time())
   {
     Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
-    t.x = math::clamp(_msg->time(), 0.0, 24.0);
+    t.x = ignition::math::clamp(_msg->time(), 0.0, 24.0);
     this->dataPtr->skyxController->setTime(t);
   }
 
   if (_msg->has_sunrise())
   {
     Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
-    t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
+    t.y = ignition::math::clamp(_msg->sunrise(), 0.0, 24.0);
     this->dataPtr->skyxController->setTime(t);
   }
 
   if (_msg->has_sunset())
   {
     Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
-    t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
+    t.z = ignition::math::clamp(_msg->sunset(), 0.0, 24.0);
     this->dataPtr->skyxController->setTime(t);
   }
 
@@ -3057,7 +2898,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (_msg->has_humidity())
   {
     Ogre::Vector2 wheater = vclouds->getWheater();
-    vclouds->setWheater(math::clamp(_msg->humidity(), 0.0, 1.0),
+    vclouds->setWheater(ignition::math::clamp(_msg->humidity(), 0.0, 1.0),
                         wheater.y, true);
   }
 
@@ -3065,7 +2906,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   {
     Ogre::Vector2 wheater = vclouds->getWheater();
     vclouds->setWheater(wheater.x,
-                        math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
+      ignition::math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
   }
 
   this->dataPtr->skyx->update(0);
@@ -3218,7 +3059,7 @@ void Scene::SetShadowsEnabled(bool _value)
 }
 
 /////////////////////////////////////////////////
-bool Scene::GetShadowsEnabled() const
+bool Scene::ShadowsEnabled() const
 {
   return this->dataPtr->sdf->Get<bool>("shadows");
 }
@@ -3431,6 +3272,12 @@ void Scene::SetWireframe(const bool _show)
 }
 
 /////////////////////////////////////////////////
+bool Scene::Wireframe() const
+{
+  return this->dataPtr->wireframe;
+}
+
+/////////////////////////////////////////////////
 void Scene::SetTransparent(const bool _show)
 {
   this->dataPtr->transparent = _show;
@@ -3539,12 +3386,6 @@ void Scene::ShowClouds(const bool _show)
     if (vclouds)
       vclouds->setVisible(_show);
   }
-}
-
-/////////////////////////////////////////////////
-bool Scene::GetShowClouds() const
-{
-  return this->ShowClouds();
 }
 
 /////////////////////////////////////////////////

@@ -63,7 +63,7 @@ void SpringTestPlugin::Init()
 /////////////////////////////////////////////////
 void SpringTestPlugin::ExplicitUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 

@@ -115,7 +115,7 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
   if (_clientScene)
   {
     gazebo::rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false);
+        gazebo::physics::get_world()->Name(), true);
   }
 }
 
@@ -130,8 +130,10 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
   this->SetPause(_paused);
 
   if (_createScene)
+  {
     gazebo::rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false);
+        gazebo::physics::get_world()->Name(), false);
+  }
 
   this->server->Run();
 

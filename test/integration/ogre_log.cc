@@ -59,6 +59,9 @@ TEST_F(OgreLog, LogError)
     // We will skip the line that lists all the extensions. This line starts
     // with a date, so we just check that "GL_EXTENSIONS" is toward the
     // beginning.
+    // False positive cppcheck
+    // https://sourceforge.net/p/cppcheck/discussion/general/thread/0c113d65/
+    // cppcheck-suppress stlIfStrFind
     if (line.find(" GL_EXTENSIONS =") < 12)
       continue;
 

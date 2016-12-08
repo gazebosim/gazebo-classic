@@ -210,6 +210,9 @@ namespace gazebo
 
       /// \brief Name of the canonical link in the model
       public: std::string canonicalLink;
+
+      /// \brief True to show all collisions of all links.
+      public: bool showCollisions = true;
     };
   }
 }
@@ -422,11 +425,11 @@ ModelCreator::~ModelCreator()
   this->dataPtr->allNestedModels.clear();
   this->dataPtr->allLinks.clear();
   this->dataPtr->allModelPlugins.clear();
-  this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
   this->dataPtr->modelTemplateSDF.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->makerPub.reset();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
   this->dataPtr->connections.clear();
 
   delete this->dataPtr->saveDialog;
@@ -1199,6 +1202,7 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
     leafName = linkName.substr(idx+2);
 
   link->SetName(leafName);
+  link->ShowCollisions(this->dataPtr->showCollisions);
 
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
@@ -2403,14 +2407,14 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   }
 
   auto pose = this->dataPtr->mouseVisual->GetWorldPose().Ign();
-  pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
-      userCamera, _event).Ign();
+  pose.Pos() = ModelManipulator::MousePositionOnPlane(
+      userCamera, _event);
 
   // there is a problem detecting control key from common::MouseEvent, so
   // check using Qt for now
   if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
-    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
+    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
   pose.Pos().Z(this->dataPtr->mouseVisual->GetWorldPose().Ign().Pos().Z());
 
@@ -2506,8 +2510,8 @@ void ModelCreator::OnPaste()
   if (userCamera)
   {
     ignition::math::Vector3d mousePosition =
-        ModelManipulator::GetMousePositionOnPlane(
-        userCamera, this->dataPtr->lastMouseEvent).Ign();
+        ModelManipulator::MousePositionOnPlane(
+        userCamera, this->dataPtr->lastMouseEvent);
     clonePose.Pos().X() = mousePosition.X();
     clonePose.Pos().Y() = mousePosition.Y();
   }
@@ -3224,6 +3228,15 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   ModelPluginData *modelPlugin = it->second;
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::ShowCollisions(const bool _show)
+{
+  this->dataPtr->showCollisions = _show;
+
+  for (auto link : this->dataPtr->allLinks)
+    link.second->ShowCollisions(_show);
 }
 
 /////////////////////////////////////////////////

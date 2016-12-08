@@ -503,7 +503,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 void Actor::Init()
 {
   this->scriptTime = 0;
-  this->prevFrameTime = this->world->GetSimTime();
+  this->prevFrameTime = this->world->SimTime();
   if (this->autoStart)
     this->Play();
   this->mainLink = this->GetChildLink(this->GetName() + "_pose");
@@ -513,7 +513,7 @@ void Actor::Init()
 void Actor::Play()
 {
   this->active = true;
-  this->playStartTime = this->world->GetSimTime();
+  this->playStartTime = this->world->SimTime();
 }
 
 //////////////////////////////////////////////////
@@ -537,7 +537,7 @@ void Actor::Update()
   if (this->skelAnimation.empty() && this->trajectories.empty())
     return;
 
-  common::Time currentTime = this->world->GetSimTime();
+  common::Time currentTime = this->world->SimTime();
 
   // do not refresh animation faster than 30 Hz sim time
   if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
@@ -732,10 +732,9 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
       bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.Pos()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.Rot()));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
-      math::Pose parentPose = parentLink->GetWorldPose();
-      math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
-      parentTrans.SetTranslate(parentPose.pos);
-      transform = (parentTrans * transform).Ign();
+      auto parentPose = parentLink->GetWorldPose().Ign();
+      ignition::math::Matrix4d parentTrans(parentPose);
+      transform = parentTrans * transform;
     }
 
     msgs::Pose *link_pose = msg.add_pose();

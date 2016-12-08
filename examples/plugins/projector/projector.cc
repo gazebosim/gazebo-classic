@@ -31,7 +31,7 @@ namespace gazebo
       this->node.reset(new transport::Node());
 
       // Initialize the node with the world name
-      this->node->Init(_parent->GetWorld()->GetName());
+      this->node->Init(_parent->GetWorld()->Name());
 
       std::string name = std::string("~/") + _parent->GetName() + "/" +
                           _sdf->Get<std::string>("projector");

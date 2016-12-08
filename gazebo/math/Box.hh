@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BOX_HH_
-#define _GAZEBO_BOX_HH_
+#ifndef GAZEBO_MATH_BOX_HH_
+#define GAZEBO_MATH_BOX_HH_
 
 #include <iostream>
 #include <ignition/math/Box.hh>
@@ -36,7 +36,6 @@ namespace gazebo
     {
       /// \brief Default constructor
       public: Box();
-
 
       /// \brief Constructor. This constructor will compute the box's
       /// minumum and maximum corners based on the two arguments.

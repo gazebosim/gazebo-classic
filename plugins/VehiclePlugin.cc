@@ -44,7 +44,7 @@ VehiclePlugin::VehiclePlugin()
 void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   this->model = _model;
-  // this->physics = this->model->GetWorld()->GetPhysicsEngine();
+  // this->physics = this->model->GetWorld()->Physics();
 
   this->joints[0] = this->model->GetJoint(_sdf->Get<std::string>("front_left"));
   if (!this->joints[0])
@@ -146,7 +146,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           boost::bind(&VehiclePlugin::OnUpdate, this)));
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &VehiclePlugin::OnVelMsg, this);

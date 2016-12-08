@@ -29,6 +29,9 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
+  /// \brief Test removing a model that has a contact sensor
+  public: void ModelRemoval(const std::string &_physicsEngine);
+
   /// \brief Test moving a model while in contact.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void MoveTool(const std::string &_physicsEngine);
@@ -49,6 +52,130 @@ unsigned int g_messageCount = 0;
 void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 {
   g_messageCount++;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
+{
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // check initial topics count
+  auto topics = transport::getAdvertisedTopics();
+  int topicsCount = 0;
+  for (auto iter : topics)
+  {
+    for (auto str : iter.second)
+    {
+      topicsCount++;
+    }
+  }
+  EXPECT_GT(topicsCount, 0);
+
+  // spanw the model
+  std::string modelName = "contactModel";
+  std::string contactSensorName = "contactSensor";
+  ignition::math::Pose3d modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
+
+  SpawnUnitContactSensor(modelName, contactSensorName,
+      "cylinder", modelPose.Pos(), modelPose.Rot().Euler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
+  sensors::ContactSensorPtr contactSensor =
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+
+  ASSERT_TRUE(contactSensor != nullptr);
+
+  sensors::SensorManager::Instance()->Init();
+  sensors::SensorManager::Instance()->RunThreads();
+
+  EXPECT_FALSE(contactSensor->IsActive());
+
+  unsigned int expectedColCount = 1;
+  EXPECT_EQ(contactSensor->GetCollisionCount(), expectedColCount);
+
+  contactSensor->SetActive(true);
+
+  EXPECT_TRUE(contactSensor->IsActive());
+
+  physics::ModelPtr contactModel = world->ModelByName(modelName);
+  ASSERT_TRUE(contactModel != nullptr);
+
+  // check new topic are published
+  // there should be more than 1 new topic:
+  //   1 new factory topic and 2 new contact sensor topics
+  int wait = 0;
+  int maxWait = 20;
+  int topicsCountModel = 0;
+  int topicsCountModelName = 0;
+  while (topicsCountModel <= topicsCount+2 && wait < maxWait)
+  {
+    common::Time::MSleep(100);
+    topicsCountModel = 0;
+    auto modelTopics = transport::getAdvertisedTopics();
+    for (auto iter : modelTopics)
+    {
+      for (auto str : iter.second)
+      {
+        topicsCountModel++;
+        if (str.find(modelName) != std::string::npos)
+          topicsCountModelName++;
+      }
+    }
+    wait++;
+  }
+  EXPECT_GT(topicsCountModel, topicsCount+1);
+  EXPECT_GT(topicsCountModelName, 0);
+
+  // remove the model
+  world->RemoveModel(contactModel);
+
+  contactModel = world->ModelByName(modelName);
+  EXPECT_TRUE(contactModel == nullptr);
+
+  int sleep = 0;
+  int maxSleep  = 20;
+  while (sensors::get_sensor(contactSensorName) && sleep < maxSleep)
+  {
+    common::Time::MSleep(30);
+    sleep++;
+  }
+  EXPECT_TRUE(sensors::get_sensor(contactSensorName) == nullptr);
+
+  // wait for topics cleanup
+  // verify there are no more contact sensor topics and the number of topics
+  // are back to the initial condition + 1 new factory topic.
+  auto topicsAfter = transport::getAdvertisedTopics();
+  int j = 0;
+  for (j = 0; j < 5 && topicsAfter.size() > (topics.size() + 1); ++j)
+  {
+    common::Time::MSleep(1000);
+    topicsAfter = transport::getAdvertisedTopics();
+  }
+  EXPECT_LT(j, 5);
+  int topicsCountAfter = 0;
+  for (auto iter : topicsAfter)
+  {
+    for (auto str : iter.second)
+    {
+      topicsCountAfter++;
+      EXPECT_TRUE(str.find(modelName) == std::string::npos);
+    }
+  }
+  EXPECT_EQ(topicsCountAfter, topicsCount+1);
+}
+
+TEST_P(ContactSensor, ModelRemoval)
+{
+  ModelRemoval(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,7 +203,7 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   world->Step(200);
 
   // Try moving the model
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
 
   auto pose = model->GetWorldPose();
@@ -193,7 +320,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -250,8 +377,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor01->IsActive());
   EXPECT_TRUE(contactSensor02->IsActive());
 
-  physics::ModelPtr contactModel01 = world->GetModel(modelName01);
-  physics::ModelPtr contactModel02 = world->GetModel(modelName02);
+  physics::ModelPtr contactModel01 = world->ModelByName(modelName01);
+  physics::ModelPtr contactModel02 = world->ModelByName(modelName02);
   ASSERT_TRUE(contactModel01 != NULL);
   ASSERT_TRUE(contactModel02 != NULL);
 
@@ -429,7 +556,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -463,7 +590,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   EXPECT_TRUE(contactSensor->IsActive());
 
-  physics::ModelPtr contactModel = world->GetModel(modelName);
+  physics::ModelPtr contactModel = world->ModelByName(modelName);
   ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;

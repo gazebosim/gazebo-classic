@@ -72,7 +72,7 @@ void DepthCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (!worldName.empty())
   {
@@ -187,12 +187,6 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 const float *DepthCameraSensor::DepthData() const
 {
   return this->dataPtr->depthBuffer;
-}
-
-//////////////////////////////////////////////////
-rendering::DepthCameraPtr DepthCameraSensor::GetDepthCamera() const
-{
-  return this->DepthCamera();
 }
 
 //////////////////////////////////////////////////

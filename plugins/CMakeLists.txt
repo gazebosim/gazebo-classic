@@ -7,7 +7,6 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
-  ${IGNITION-MATH_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -19,7 +18,6 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
-  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
@@ -42,7 +40,9 @@ endif()
 set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
+  ArduCopterPlugin
   ArrangePlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
@@ -54,16 +54,19 @@ set (plugins_single_header
   FiducialCameraPlugin
   FollowerPlugin
   ForceTorquePlugin
+  GimbalSmall2dPlugin
   GpuRayPlugin
   HarnessPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
+  KeysToJointsPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
   ModelPropShop
   MudPlugin
+  PlaneDemoPlugin
   PressurePlugin
   RayPlugin
   RaySensorNoisePlugin
@@ -90,6 +93,8 @@ endif()
 
 set (GUIplugins
   CessnaGUIPlugin
+  KeyboardGUIPlugin
+  LookAtDemoPlugin
   TimerGUIPlugin
 )
 
@@ -115,7 +120,10 @@ endforeach ()
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
+  target_link_libraries(${src} gazebo_gui
+                               libgazebo
+			       ${ogre_libraries}
+			       ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()

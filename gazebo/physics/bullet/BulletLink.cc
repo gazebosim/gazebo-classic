@@ -44,7 +44,7 @@ BulletLink::BulletLink(EntityPtr _parent)
   this->compoundShape = nullptr;
 
   this->bulletPhysics = boost::dynamic_pointer_cast<BulletPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->GetWorld()->Physics());
   if (this->bulletPhysics == nullptr)
     gzerr << "Not using the bullet physics engine\n";
 }

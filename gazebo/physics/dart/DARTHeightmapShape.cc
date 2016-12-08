@@ -33,6 +33,13 @@ DARTHeightmapShape::DARTHeightmapShape(CollisionPtr _parent)
 }
 
 //////////////////////////////////////////////////
+DARTHeightmapShape::DARTHeightmapShape(DARTCollisionPtr _parent)
+  : HeightmapShape(_parent),
+    dataPtr(new DARTHeightmapShapePrivate())
+{
+}
+
+//////////////////////////////////////////////////
 DARTHeightmapShape::~DARTHeightmapShape()
 {
   delete this->dataPtr;

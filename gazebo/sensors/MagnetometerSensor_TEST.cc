@@ -95,7 +95,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 

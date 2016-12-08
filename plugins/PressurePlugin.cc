@@ -71,7 +71,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     std::string collisionName =
       collisionScopedName.substr(collisionScopedName.rfind("::") + 2);
     // Get physics pointers
-    physics::EntityPtr entity = world->GetEntity(linkName);
+    physics::EntityPtr entity = world->EntityByName(linkName);
     if (entity && entity->HasType(physics::Base::LINK))
     {
       physics::LinkPtr link =

@@ -33,7 +33,7 @@ TEST_F(ActorTest, Load)
   ASSERT_TRUE(world != nullptr);
 
   // Get model
-  auto model = world->GetModel("actor");
+  auto model = world->ModelByName("actor");
   ASSERT_TRUE(model != nullptr);
 
   // Convert to actor
@@ -71,7 +71,7 @@ TEST_F(ActorTest, TrajectoryFromSDF)
   ASSERT_TRUE(world != nullptr);
 
   // Get model
-  auto model = world->GetModel("actor");
+  auto model = world->ModelByName("actor");
   ASSERT_TRUE(model != nullptr);
 
   // Convert to actor
@@ -90,7 +90,7 @@ TEST_F(ActorTest, TrajectoryFromSDF)
   EXPECT_LT((target - actor->GetWorldPose().Ign().Pos()).Length(), 0.1);
 
   // Difference betwee script time and sim time is lower than update rate
-  EXPECT_LT(fabs(actor->ScriptTime() - world->GetSimTime().Double()), 1.0 / 30);
+  EXPECT_LT(fabs(actor->ScriptTime() - world->SimTime().Double()), 1.0 / 30);
 
   // Pass some time and check actor is near the target pose
   world->Step(4000);
@@ -99,7 +99,7 @@ TEST_F(ActorTest, TrajectoryFromSDF)
   EXPECT_LT((target - actor->GetWorldPose().Ign().Pos()).Length(), 0.1);
 
   // Difference betwee script time and sim time is lower than update rate
-  EXPECT_LT(fabs(actor->ScriptTime() - world->GetSimTime().Double()), 1.0 / 30);
+  EXPECT_LT(fabs(actor->ScriptTime() - world->SimTime().Double()), 1.0 / 30);
 }
 
 //////////////////////////////////////////////////

@@ -57,12 +57,12 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // get model and joints
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   ASSERT_TRUE(model != NULL);
   physics::JointPtr jointUpper = model->GetJoint("joint_00");
   physics::JointPtr jointLower = model->GetJoint("joint_01");
@@ -150,12 +150,12 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // get model and joints
-  physics::ModelPtr model = world->GetModel("model_1");
+  physics::ModelPtr model = world->ModelByName("model_1");
   ASSERT_TRUE(model != NULL);
   physics::JointPtr jointLower = model->GetJoint("joint_01");
   ASSERT_TRUE(jointLower != NULL);
@@ -205,7 +205,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -213,10 +213,10 @@ void JointTestUniversal::UniversalJointSetWorldPose(
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -225,7 +225,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   gzlog << "t after one step : " << t << "\n";
 
   // get model, joint and links
-  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::ModelPtr model_1 = world->ModelByName("model_1");
   physics::LinkPtr link_00 = model_1->GetLink("link_00");
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
   physics::JointPtr joint_00 = model_1->GetJoint("joint_00");
@@ -318,7 +318,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -326,10 +326,10 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -338,7 +338,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   gzlog << "t after one step : " << t << "\n";
 
   // get model, joints and get links
-  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::ModelPtr model_1 = world->ModelByName("model_1");
   physics::LinkPtr link_00 = model_1->GetLink("link_00");
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
   physics::JointPtr joint_00 = model_1->GetJoint("joint_00");

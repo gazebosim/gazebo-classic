@@ -24,8 +24,6 @@
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/math/MathTypes.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

@@ -62,7 +62,7 @@ void WirelessTransceiver::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-    this->world->GetEntity(this->ParentName()));
+    this->world->EntityByName(this->ParentName()));
 
   GZ_ASSERT(this->parentEntity.lock() != nullptr, "parentEntity is null");
 
@@ -109,21 +109,9 @@ void WirelessTransceiver::Fini()
 }
 
 /////////////////////////////////////////////////
-double WirelessTransceiver::GetPower() const
-{
-  return this->Power();
-}
-
-/////////////////////////////////////////////////
 double WirelessTransceiver::Power() const
 {
   return this->power;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransceiver::GetGain() const
-{
-  return this->Gain();
 }
 
 /////////////////////////////////////////////////

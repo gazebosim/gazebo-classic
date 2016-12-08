@@ -111,7 +111,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -151,11 +151,11 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != nullptr);
 
   physics::JointPtr joint = model->GetJoint("joint");
@@ -193,11 +193,11 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != nullptr);
 
   physics::JointPtr joint = model->GetJoint("joint");
@@ -242,7 +242,7 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 

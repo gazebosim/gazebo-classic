@@ -1,0 +1,187 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.6">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>0 5 1 0 0.2 -1.5707</pose>
+      </camera>
+      <plugin name="keyboard" filename="libKeyboardGUIPlugin.so"/>
+    </gui>
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>100</iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0.0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>400</real_time_update_rate>
+      <max_step_size>0.0025</max_step_size>
+    </physics>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="runway">
+          <pose>000 0 0.005 0 0 -1.5707</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1829 45</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Runway</name>
+            </script>
+          </material>
+        </visual>
+
+        <visual name="grass">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grass</name>
+            </script>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <model name="zephyr_demo">
+      <include>
+        <uri>model://zephyr_delta_wing</uri>
+        <pose>0 0 0.2 0 0 0</pose>
+      </include>
+
+      <link name="skid_pad">
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0.083137104</ixx>
+            <ixy>0</ixy>
+            <iyy>0.387382402</iyy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+            <izz>0.469845106</izz>
+          </inertia>
+        </inertial>
+<!--
+        <visual name="skid_pad">
+          <pose>0 -0.05 0.025 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>.5 1.0 .05</size>
+            </box>
+          </geometry>
+        </visual>
+-->
+        <collision name="skid_pad">
+          <pose>0 -0.05 0.025 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>.5 1.0 .05</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0</mu>
+                <mu2>1</mu2>
+                <fdir1>0 1 0</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+      </link>
+      <joint name="skid_pad_mount" type="revolute">
+        <parent>zephyr_delta_wing::wing</parent>
+        <child>skid_pad</child>
+        <axis>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <plugin name="plane_demo_plugin" filename="libPlaneDemoPlugin.so">
+        <engine name="engine1">
+          <joint_name>zephyr_delta_wing::propeller_joint</joint_name>
+          <max_torque>4</max_torque>
+          <inc_key>119</inc_key> <!-- w -->
+          <dec_key>115</dec_key> <!-- d -->
+          <inc_val>0.2</inc_val>
+          <max_val>2.0</max_val>
+          <min_val>-0.2</min_val>
+          <p>0.5</p>
+          <i>0</i>
+          <d>0</d>
+        </engine>
+        <control name="flap_left_control">
+          <joint_name>zephyr_delta_wing::flap_left_joint</joint_name>
+          <inc_key>97</inc_key> <!-- a -->
+          <inc_val>-0.02</inc_val>
+          <dec_key>113</dec_key> <!-- q -->
+          <max_val>0.08</max_val>
+          <min_val>-0.08</min_val>
+          <p>1</p>
+          <i>0</i>
+          <d>0</d>
+        </control>
+        <control name="flap_right_control">
+          <joint_name>zephyr_delta_wing::flap_right_joint</joint_name>
+          <inc_key>101</inc_key> <!-- e -->
+          <inc_val>0.02</inc_val>
+          <dec_key>100</dec_key> <!-- d -->
+          <max_val>0.08</max_val>
+          <min_val>-0.08</min_val>
+          <p>1</p>
+          <i>0</i>
+          <d>0</d>
+        </control>
+      </plugin>
+
+    </model>
+  </world>
+</sdf>

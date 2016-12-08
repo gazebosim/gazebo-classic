@@ -228,12 +228,6 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 }
 
 //////////////////////////////////////////////////
-const std::string &LogRecord::GetEncoding() const
-{
-  return this->Encoding();
-}
-
-//////////////////////////////////////////////////
 const std::string &LogRecord::Encoding() const
 {
   return this->dataPtr->encoding;
@@ -296,21 +290,9 @@ void LogRecord::SetPaused(const bool _paused)
 }
 
 //////////////////////////////////////////////////
-bool LogRecord::GetPaused() const
-{
-  return this->Paused();
-}
-
-//////////////////////////////////////////////////
 bool LogRecord::Paused() const
 {
   return this->dataPtr->paused;
-}
-
-//////////////////////////////////////////////////
-bool LogRecord::GetRunning() const
-{
-  return this->Running();
 }
 
 //////////////////////////////////////////////////
@@ -401,12 +383,6 @@ bool LogRecord::Remove(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-std::string LogRecord::GetFilename(const std::string &_name) const
-{
-  return this->Filename(_name);
-}
-
-//////////////////////////////////////////////////
 std::string LogRecord::Filename(const std::string &_name) const
 {
   std::lock_guard<std::mutex> logLock(this->dataPtr->writeMutex);
@@ -424,12 +400,6 @@ std::string LogRecord::Filename(const std::string &_name) const
     result = this->dataPtr->logs.begin()->second->CompleteFilename();
 
   return result;
-}
-
-//////////////////////////////////////////////////
-unsigned int LogRecord::GetFileSize(const std::string &_name) const
-{
-  return this->FileSize(_name);
 }
 
 //////////////////////////////////////////////////
@@ -492,21 +462,9 @@ void LogRecord::SetBasePath(const std::string &_path)
 }
 
 //////////////////////////////////////////////////
-std::string LogRecord::GetBasePath() const
-{
-  return this->BasePath();
-}
-
-//////////////////////////////////////////////////
 std::string LogRecord::BasePath() const
 {
   return this->dataPtr->logBasePath.string();
-}
-
-//////////////////////////////////////////////////
-bool LogRecord::GetFirstUpdate() const
-{
-  return this->FirstUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -603,12 +561,6 @@ void LogRecord::Write(const bool /*_force*/)
   {
     this->dataPtr->updateIter->second->Write();
   }
-}
-
-//////////////////////////////////////////////////
-common::Time LogRecord::GetRunTime() const
-{
-  return this->RunTime();
 }
 
 //////////////////////////////////////////////////
@@ -937,12 +889,6 @@ void LogRecord::Cleanup()
 bool LogRecord::IsReadyToStart() const
 {
   return this->dataPtr->readyToStart;
-}
-
-//////////////////////////////////////////////////
-unsigned int LogRecord::GetBufferSize() const
-{
-  return this->BufferSize();
 }
 
 //////////////////////////////////////////////////

@@ -32,7 +32,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
-      tr("You can import a 3D mesh (.dae, .stl) \n"
+      tr("You can import a 3D mesh (.dae, .stl, .obj) \n"
       "that you have made with a modelling tool \n"
       "such as Blender, Maya or SolidWorks.\n\n"
       "You can also extrude a 2D image (.svg) to \n"
@@ -113,7 +113,7 @@ void ImportDialog::SetTitle(const std::string &_title)
 void ImportDialog::OnBrowse()
 {
   QFileDialog fd(this, tr("Import Link"), QDir::homePath(),
-      tr("Files (*.svg *.dae *.stl)"));
+      tr("Files (*.svg *.dae *.stl *.obj)"));
   fd.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   fd.setFilter(QDir::AllDirs | QDir::Hidden);
@@ -141,12 +141,16 @@ void ImportDialog::OnCancel()
 void ImportDialog::OnImport()
 {
   QFileInfo info(this->pathLineEdit->text());
-  if (info.isFile() && (info.completeSuffix().toLower() == "dae" ||
-      info.completeSuffix().toLower() == "stl"))
+
+  std::string suffix;
+  if (info.isFile())
+    suffix = info.completeSuffix().toLower().toStdString();
+
+  if (suffix == "dae" || suffix == "stl" || suffix == "obj")
   {
     this->accept();
   }
-  else if (info.completeSuffix().toLower() == "svg")
+  else if (suffix == "svg")
   {
     // Check if the SVG has any paths before accepting
     std::string filename = this->pathLineEdit->text().toStdString();

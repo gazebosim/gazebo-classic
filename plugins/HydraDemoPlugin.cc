@@ -51,7 +51,7 @@ void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
   this->hydraSub = this->node->Subscribe("~/hydra",
       &HydraDemoPlugin::OnHydra, this);
 

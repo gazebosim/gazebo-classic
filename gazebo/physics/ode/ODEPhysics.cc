@@ -262,7 +262,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     }
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_sor(this->GetSORPGSW());
     physicsMsg.set_cfm(this->GetWorldCFM());
     physicsMsg.set_erp(this->GetWorldERP());
@@ -314,7 +314,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetWorldERP(_msg->erp());
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+    this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_contact_max_correcting_vel())
     this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
@@ -538,7 +538,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new ODEMultiRayShape(collision));
     else
-      shape.reset(new ODEMultiRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new ODEMultiRayShape(this->world->Physics()));
   }
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new ODEMeshShape(collision));
@@ -551,7 +551,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new ODERayShape(collision));
     else
-      shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new ODERayShape(this->world->Physics()));
   }
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
@@ -1238,7 +1238,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Add a new contact to the manager. This will return nullptr if no one is
   // listening for contact information.
   Contact *contactFeedback = this->contactManager->NewContact(_collision1,
-      _collision2, this->world->GetSimTime());
+      _collision2, this->world->SimTime());
 
   ODEJointFeedback *jointFeedback = nullptr;
 

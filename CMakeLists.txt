@@ -247,8 +247,8 @@ else()
 endif()
 filter_valid_compiler_flags(${WARN_LEVEL}
   -Wextra -Wno-long-long -Wno-unused-value -Wfloat-equal -Wshadow
-  -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-				   
+  -Wswitch-default -Wmissing-include-dirs -pedantic)
+
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
 if (UNIX AND NOT APPLE)
@@ -394,10 +394,6 @@ else (build_errors)
     gazebo_sensors
     gazebo_rendering
   )
-
-  if (INCLUDE_PLAYER)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
-  endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_physics

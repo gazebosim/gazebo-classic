@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_RENDER_WIDGET_HH_
-#define _GAZEBO_RENDER_WIDGET_HH_
+#ifndef GAZEBO_GUI_RENDERWIDGET_HH_
+#define GAZEBO_GUI_RENDERWIDGET_HH_
 
 #include <string>
 #include <vector>

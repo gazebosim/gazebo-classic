@@ -36,7 +36,7 @@ void PolylineTest::ComputeVolume(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr cubeModel = world->GetModel("cube");
+  physics::ModelPtr cubeModel = world->ModelByName("cube");
   EXPECT_TRUE(cubeModel != NULL);
 
   physics::LinkPtr cubeLink = cubeModel->GetLink("polyLine2");
@@ -82,7 +82,7 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr triangleModel = world->GetModel("triangle");
+  physics::ModelPtr triangleModel = world->ModelByName("triangle");
   EXPECT_TRUE(triangleModel != NULL);
 
   physics::LinkPtr triangleLink = triangleModel->GetLink("link");

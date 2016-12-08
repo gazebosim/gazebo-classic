@@ -34,7 +34,7 @@ TEST_F(GzJoint, Force)
   ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
@@ -66,12 +66,12 @@ TEST_F(GzJoint, PositionPID)
   ASSERT_TRUE(world != NULL);
 
   // Disable gravity to simplify PID control
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   physics->SetGravity(math::Vector3::Zero);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
@@ -108,7 +108,7 @@ TEST_F(GzJoint, VelocityPID)
   ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint

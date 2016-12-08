@@ -62,10 +62,10 @@ Gripper::Gripper(ModelPtr _model)
 /////////////////////////////////////////////////
 Gripper::~Gripper()
 {
-  if (this->world && this->world->GetRunning())
+  if (this->world && this->world->Running())
   {
     physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
+        this->world->Physics()->GetContactManager();
     mgr->RemoveFilter(this->GetName());
   }
 
@@ -77,11 +77,11 @@ Gripper::~Gripper()
 /////////////////////////////////////////////////
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
 
   this->name = _sdf->Get<std::string>("name");
   this->fixedJoint =
-      this->world->GetPhysicsEngine()->CreateJoint("fixed", this->model);
+      this->world->Physics()->CreateJoint("fixed", this->model);
   this->fixedJoint->SetName(this->model->GetName() + "__gripper_fixed_joint__");
 
   sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
@@ -119,7 +119,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
     // request the contact manager to publish messages to a custom topic for
     // this sensor
     physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
+        this->world->Physics()->GetContactManager();
     std::string topic = mgr->CreateFilter(this->GetName(), this->collisions);
     if (!this->contactSub)
     {
@@ -196,14 +196,14 @@ void Gripper::HandleAttach()
     if (this->collisions.find(name1) == this->collisions.end())
     {
       cc[name1] = boost::dynamic_pointer_cast<Collision>(
-          this->world->GetEntity(name1));
+          this->world->EntityByName(name1));
       contactCounts[name1] += 1;
     }
 
     if (this->collisions.find(name2) == this->collisions.end())
     {
       cc[name2] = boost::dynamic_pointer_cast<Collision>(
-          this->world->GetEntity(name2));
+          this->world->EntityByName(name2));
       contactCounts[name2] += 1;
     }
   }
@@ -257,9 +257,9 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
   for (int i = 0; i < _msg->contact_size(); ++i)
   {
     CollisionPtr collision1 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_msg->contact(i).collision1()));
+        this->world->EntityByName(_msg->contact(i).collision1()));
     CollisionPtr collision2 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_msg->contact(i).collision2()));
+        this->world->EntityByName(_msg->contact(i).collision2()));
 
     if ((collision1 && !collision1->IsStatic()) &&
         (collision2 && !collision2->IsStatic()))

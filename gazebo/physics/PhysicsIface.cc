@@ -74,7 +74,7 @@ physics::WorldPtr physics::get_world(const std::string &_name)
   {
     for (auto const &world : g_worlds)
     {
-      if (world->GetName() == _name)
+      if (world->Name() == _name)
         return world;
     }
   }
@@ -166,7 +166,7 @@ bool physics::worlds_running()
 {
   for (auto const &world : g_worlds)
   {
-    if (world->GetRunning())
+    if (world->Running())
       return true;
   }
 
