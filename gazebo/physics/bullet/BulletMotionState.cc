@@ -73,7 +73,7 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   //     link defined in cg frame.
   // pose: transform from world origin to cg in inertial frame.
   // -cg + pose:  transform from world origin to link frame in inertial frame.
-  math::Pose cg = this->link->GetInertial()->GetPose();
+  math::Pose cg = this->link->GetInertial()->Pose();
   pose = -cg + pose;
 
   // The second argument is set to false to prevent Entity.cc from propagating

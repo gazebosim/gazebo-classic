@@ -847,23 +847,23 @@ void ODEPhysics::ConvertMass(void *_engineMass, InertialPtr _inertial)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 
-  odeMass->mass = _inertial->GetMass();
-  odeMass->c[0] = _inertial->GetCoG()[0];
-  odeMass->c[1] = _inertial->GetCoG()[1];
-  odeMass->c[2] = _inertial->GetCoG()[2];
+  odeMass->mass = _inertial->Mass();
+  odeMass->c[0] = _inertial->CoG()[0];
+  odeMass->c[1] = _inertial->CoG()[1];
+  odeMass->c[2] = _inertial->CoG()[2];
 
-  odeMass->I[0*4+0] = _inertial->GetPrincipalMoments()[0];
-  odeMass->I[1*4+1] = _inertial->GetPrincipalMoments()[1];
-  odeMass->I[2*4+2] = _inertial->GetPrincipalMoments()[2];
+  odeMass->I[0*4+0] = _inertial->PrincipalMoments()[0];
+  odeMass->I[1*4+1] = _inertial->PrincipalMoments()[1];
+  odeMass->I[2*4+2] = _inertial->PrincipalMoments()[2];
 
-  odeMass->I[0*4+1] = _inertial->GetProductsofInertia()[0];
-  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[0];
+  odeMass->I[0*4+1] = _inertial->ProductsOfInertia()[0];
+  odeMass->I[1*4+0] = _inertial->ProductsOfInertia()[0];
 
-  odeMass->I[0*4+2] = _inertial->GetProductsofInertia()[1];
-  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[1];
+  odeMass->I[0*4+2] = _inertial->ProductsOfInertia()[1];
+  odeMass->I[1*4+0] = _inertial->ProductsOfInertia()[1];
 
-  odeMass->I[1*4+2] = _inertial->GetProductsofInertia()[2];
-  odeMass->I[2*4+1] = _inertial->GetProductsofInertia()[2];
+  odeMass->I[1*4+2] = _inertial->ProductsOfInertia()[2];
+  odeMass->I[2*4+1] = _inertial->ProductsOfInertia()[2];
 }
 
 //////////////////////////////////////////////////

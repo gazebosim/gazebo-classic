@@ -1063,7 +1063,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
     double f = 1000.0;
     double v = 0;
     double x = 0;
-    double m = box_link->GetInertial()->GetMass();
+    double m = box_link->GetInertial()->Mass();
 
     int steps = test_duration/dt;
 

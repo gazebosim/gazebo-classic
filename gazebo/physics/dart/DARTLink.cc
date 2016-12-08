@@ -207,23 +207,23 @@ void DARTLink::Init()
   this->dataPtr->dtBodyNode->setName(bodyName);
 
   // Mass
-  double mass = this->inertial->GetMass();
+  double mass = this->inertial->Mass();
   this->dataPtr->dtBodyNode->setMass(mass);
 
   // Inertia
-  double Ixx = this->inertial->GetIXX();
-  double Iyy = this->inertial->GetIYY();
-  double Izz = this->inertial->GetIZZ();
-  double Ixy = this->inertial->GetIXY();
-  double Ixz = this->inertial->GetIXZ();
-  double Iyz = this->inertial->GetIYZ();
+  double Ixx = this->inertial->IXX();
+  double Iyy = this->inertial->IYY();
+  double Izz = this->inertial->IZZ();
+  double Ixy = this->inertial->IXY();
+  double Ixz = this->inertial->IXZ();
+  double Iyz = this->inertial->IYZ();
   this->dataPtr->dtBodyNode->setMomentOfInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
 
   // Visual
   this->visuals;
 
   // COG offset
-  math::Vector3 cog = this->inertial->GetCoG();
+  math::Vector3 cog = this->inertial->CoG();
   this->dataPtr->dtBodyNode->setLocalCOM(DARTTypes::ConvVec3(cog));
 
   // Gravity mode
@@ -285,13 +285,13 @@ void DARTLink::UpdateMass()
 {
   if (this->dataPtr->dtBodyNode && this->inertial)
   {
-    this->dataPtr->dtBodyNode->setMass(this->inertial->GetMass());
-    auto Ixxyyzz = this->inertial->GetPrincipalMoments();
-    auto Ixyxzyz = this->inertial->GetProductsofInertia();
+    this->dataPtr->dtBodyNode->setMass(this->inertial->Mass());
+    auto Ixxyyzz = this->inertial->PrincipalMoments();
+    auto Ixyxzyz = this->inertial->ProductsOfInertia();
     this->dataPtr->dtBodyNode->setMomentOfInertia(
         Ixxyyzz[0], Ixxyyzz[1], Ixxyyzz[2],
         Ixyxzyz[0], Ixyxzyz[1], Ixyxzyz[2]);
-    auto cog = DARTTypes::ConvVec3(this->inertial->GetCoG());
+    auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
     this->dataPtr->dtBodyNode->setLocalCOM(cog);
   }
 }

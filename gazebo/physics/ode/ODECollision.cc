@@ -220,8 +220,8 @@ void ODECollision::OnPoseChangeGlobal()
   math::Pose localPose = this->GetWorldPose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
+  ignition::math::Vector3d cogVec = this->link->GetInertial()->CoG();
+  localPose.pos = localPose.pos.Ign() - cogVec;
 
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;
@@ -245,8 +245,8 @@ void ODECollision::OnPoseChangeRelative()
   math::Pose localPose = this->GetRelativePose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
+  ignition::math::Vector3d cog_vec = this->link->GetInertial()->CoG();
+  localPose.pos = localPose.pos.Ign() - cog_vec;
 
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;

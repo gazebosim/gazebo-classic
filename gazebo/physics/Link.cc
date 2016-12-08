@@ -657,7 +657,7 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 math::Pose Link::GetWorldCoGPose() const
 {
   math::Pose pose = this->GetWorldPose();
-  pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
+  pose.pos += pose.rot.RotateVector(this->inertial->CoG());
   return pose;
 }
 
@@ -678,13 +678,13 @@ math::Vector3 Link::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeLinearAccel() const
 {
-  return this->GetRelativeForce() / this->inertial->GetMass();
+  return this->GetRelativeForce() / this->inertial->Mass();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldLinearAccel() const
 {
-  return this->GetWorldForce() / this->inertial->GetMass();
+  return this->GetWorldForce() / this->inertial->Mass();
 }
 
 //////////////////////////////////////////////////
@@ -808,7 +808,7 @@ math::Pose Link::GetWorldInertialPose() const
 {
   math::Pose inertialPose;
   if (this->inertial)
-    inertialPose = this->inertial->GetPose();
+    inertialPose = this->inertial->Pose();
   return inertialPose + this->GetWorldPose();
 }
 
@@ -818,9 +818,10 @@ math::Matrix3 Link::GetWorldInertiaMatrix() const
   math::Matrix3 moi;
   if (this->inertial)
   {
-    math::Vector3 pos = this->inertial->GetPose().pos;
-    math::Quaternion rot = this->GetWorldPose().rot.GetInverse();
-    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+    ignition::math::Vector3d pos = this->inertial->Pose().Pos();
+    ignition::math::Quaterniond rot =
+      this->GetWorldPose().rot.GetInverse().Ign();
+    moi = this->inertial->MOI(ignition::math::Pose3d(pos, rot));
   }
   return moi;
 }
@@ -891,15 +892,14 @@ void Link::FillMsg(msgs::Link &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), relPose.Ign());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
-  _msg.mutable_inertial()->set_ixx(this->inertial->GetIXX());
-  _msg.mutable_inertial()->set_ixy(this->inertial->GetIXY());
-  _msg.mutable_inertial()->set_ixz(this->inertial->GetIXZ());
-  _msg.mutable_inertial()->set_iyy(this->inertial->GetIYY());
-  _msg.mutable_inertial()->set_iyz(this->inertial->GetIYZ());
-  _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
-  msgs::Set(_msg.mutable_inertial()->mutable_pose(),
-      this->inertial->GetPose().Ign());
+  _msg.mutable_inertial()->set_mass(this->inertial->Mass());
+  _msg.mutable_inertial()->set_ixx(this->inertial->IXX());
+  _msg.mutable_inertial()->set_ixy(this->inertial->IXY());
+  _msg.mutable_inertial()->set_ixz(this->inertial->IXZ());
+  _msg.mutable_inertial()->set_iyy(this->inertial->IYY());
+  _msg.mutable_inertial()->set_iyz(this->inertial->IYZ());
+  _msg.mutable_inertial()->set_izz(this->inertial->IZZ());
+  msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->Pose());
 
   for (auto &child : this->children)
   {
@@ -1470,7 +1470,7 @@ double Link::GetWorldEnergyPotential() const
   // compute gravitational potential energy for link CG location
   // use origin as reference position
   // E = -m g^T z
-  double m = this->GetInertial()->GetMass();
+  double m = this->GetInertial()->Mass();
   auto g = this->GetWorld()->Gravity();
   math::Vector3 z = this->GetWorldCoGPose().pos;
   return -m * g.Dot(z.Ign());
@@ -1484,7 +1484,7 @@ double Link::GetWorldEnergyKinetic() const
   // compute linear kinetic energy
   // E = 1/2 m v^T v
   {
-    double m = this->GetInertial()->GetMass();
+    double m = this->GetInertial()->Mass();
     math::Vector3 v = this->GetWorldCoGLinearVel();
     energy += 0.5 * m * v.Dot(v);
   }

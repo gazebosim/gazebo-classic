@@ -731,12 +731,12 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     // Check inertial
     physics::InertialPtr inertial = link->GetInertial();
     physics::InertialPtr inertialClone = linkClone->GetInertial();
-    EXPECT_EQ(inertial->GetMass(), inertialClone->GetMass());
-    EXPECT_EQ(inertial->GetCoG(), inertialClone->GetCoG());
-    EXPECT_EQ(inertial->GetPrincipalMoments(),
-        inertialClone->GetPrincipalMoments());
-    EXPECT_EQ(inertial->GetProductsofInertia(),
-        inertialClone->GetProductsofInertia());
+    EXPECT_EQ(inertial->Mass(), inertialClone->Mass());
+    EXPECT_EQ(inertial->CoG(), inertialClone->CoG());
+    EXPECT_EQ(inertial->PrincipalMoments(),
+        inertialClone->PrincipalMoments());
+    EXPECT_EQ(inertial->ProductsOfInertia(),
+        inertialClone->ProductsOfInertia());
   }
 
   // Check joints
