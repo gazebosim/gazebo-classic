@@ -62,12 +62,16 @@ namespace gazebo
       /// \brief Set the seed value.
       /// \param[in] _seed The seed used to initialize the randon number
       /// generator.
-      public: static void SetSeed(uint32_t _seed);
+      /// \deprecated See void ignition::math::Rand::Seed(unsigned int)
+      public: static void SetSeed(uint32_t _seed)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the seed value.
       /// \return The seed value used to initialize the random number
       /// generator.
-      public: static uint32_t GetSeed();
+      /// \deprecated See unsigned int ignition::math::Rand::Seed()
+      public: static uint32_t GetSeed()
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a double from a uniform distribution
       /// \param[in] _min Minimum bound for the random number

@@ -429,6 +429,10 @@ release will remove the deprecated code.
     + ***Replacement:*** public: static double ignition::math::DblUniform(double, double)
     + ***Deprecation:*** public: static int   gazebo::math::GetIntUniform(int, int)
     + ***Replacement:*** public: static int ignition::math::IntUniform(int, int)
+    + ***Deprecation:*** public: static       uint32_t gazebo::math::GetSeed()
+    + ***Replacement:*** public: static unsigned int ignition::math::Seed()
+    + ***Deprecation:*** public: static   void gazebo::math::SetSeed(uint32_t)
+    + ***Replacement:*** public: static void ignition::math::Seed(unsigned int)
 
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline

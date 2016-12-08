@@ -1333,7 +1333,7 @@ void World::Reset()
     math::Rand::SetSeed(math::Rand::GetSeed());
 
     ignition::math::Rand::Seed(ignition::math::Rand::Seed());
-    this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
+    this->dataPtr->physicsEngine->SetSeed(ignition::math::Rand::Seed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
