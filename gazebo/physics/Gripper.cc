@@ -89,7 +89,7 @@ class gazebo::physics::GripperPrivate
   /// \brief The current contacts.
   public: std::vector<msgs::Contact> contacts;
 
-  /// \brief Mutex used to protect reading/writing the sonar message.
+  /// \brief Mutex used to protect reading/writing the contact message.
   public: std::mutex mutexContacts;
 
   /// \brief True if the gripper has an object.
