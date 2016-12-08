@@ -93,8 +93,9 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     if (*next == '\0' || *next == '#' || *next == '!' || *next == '$')
       continue;
 
-    // Extract the first word in this line.
-    sscanf(next, "%s%n", token, &width);
+    // Extract the first word in this line
+    std::string sscanf_format = "%" + std::to_string(LINE_MAX_LEN) + "s%n";
+    sscanf(next, sscanf_format.c_str() , token, &width);
 
     // Set NEXT to point to just after this token.
     next = next + width;
@@ -105,6 +106,8 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       ignition::math::Vector3d normal;
 
       // Get the XYZ coordinates of the normal vector to the face.
+      // cppcheck-suppress invalidscanf
+      // cppcheck-suppress invalidscanf_libc
       sscanf(next, "%*s %e %e %e", &r1, &r2, &r3);
 
       normal.X(r1);
@@ -126,6 +129,8 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
           break;
         }
 
+      // cppcheck-suppress invalidscanf
+      // cppcheck-suppress invalidscanf_libc
         count = sscanf(input, "%*s %e %e %e", &r1, &r2, &r3);
 
         if (count != 3)
@@ -149,6 +154,8 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     // COLOR
     else if (this->Leqi (token, const_cast<char*>("color")))
     {
+      // cppcheck-suppress invalidscanf
+      // cppcheck-suppress invalidscanf_libc
       sscanf(next, "%*s %f %f %f %f", &r1, &r2, &r3, &r4);
     }
     // SOLID
