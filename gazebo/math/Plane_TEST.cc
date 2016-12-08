@@ -20,6 +20,10 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Plane.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class PlaneTest : public ::testing::Test { };
