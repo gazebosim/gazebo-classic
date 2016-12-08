@@ -121,8 +121,11 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
       plot.link = link;
 
       // Relative pose to link
-      plot.pose = plotElem->Get<ignition::math::Pose3d>("pose",
-          ignition::math::Pose3d::Zero).first;
+      ignition::math::Pose3d p;
+      if (plotElem->HasElement("pose"))
+        plot.pose = plotElem->Get<ignition::math::Pose3d>("pose");
+      else
+        plot.pose = ignition::math::Pose3d::Zero;
 
       // Message
       ignition::msgs::Marker markerMsg;
@@ -132,8 +135,11 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
       markerMsg.set_type(ignition::msgs::Marker::LINE_STRIP);
 
       // Material
-      auto mat = plotElem->Get<std::string>("material", "Gazebo/Black").first;
-
+      std::string mat;
+      if (plotElem->HasElement("material"))
+        mat = plotElem->Get<std::string>("material");
+      else
+        mat = "Gazebo/Black";
       ignition::msgs::Material *matMsg = markerMsg.mutable_material();
       matMsg->mutable_script()->set_name(mat);
 
@@ -160,7 +166,7 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void LinkPlot3DPlugin::OnUpdate()
 {
-  auto currentTime = this->dataPtr->world->GetSimTime();
+  auto currentTime = this->dataPtr->world->SimTime();
 
   // Throttle update
   if ((currentTime - this->dataPtr->prevTime).Double() < this->dataPtr->period)
