@@ -130,7 +130,7 @@ namespace gazebo
       private slots: void OnShowVisuals(const bool _show);
 
       /// \brief Qt callback when the show link frame button is pressed.
-      /// \param[in] _show Show if checked, show otherwise.
+      /// \param[in] _show Show if checked, hide otherwise.
       private slots: void OnShowLinkFrame(const bool _show);
 
       /// \brief Qt callback when the Cancel button is pressed.
