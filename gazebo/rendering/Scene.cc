@@ -1390,8 +1390,7 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ?
         _mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) ||
-        (submesh->useSharedVertices && !added_shared))
+    if ((!submesh->useSharedVertices) || !added_shared)
     {
       if (submesh->useSharedVertices)
       {
@@ -2866,21 +2865,21 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (_msg->has_time())
   {
     Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
-    t.x = math::clamp(_msg->time(), 0.0, 24.0);
+    t.x = ignition::math::clamp(_msg->time(), 0.0, 24.0);
     this->dataPtr->skyxController->setTime(t);
   }
 
   if (_msg->has_sunrise())
   {
     Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
-    t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
+    t.y = ignition::math::clamp(_msg->sunrise(), 0.0, 24.0);
     this->dataPtr->skyxController->setTime(t);
   }
 
   if (_msg->has_sunset())
   {
     Ogre::Vector3 t = this->dataPtr->skyxController->getTime();
-    t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
+    t.z = ignition::math::clamp(_msg->sunset(), 0.0, 24.0);
     this->dataPtr->skyxController->setTime(t);
   }
 
@@ -2902,7 +2901,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (_msg->has_humidity())
   {
     Ogre::Vector2 wheater = vclouds->getWheater();
-    vclouds->setWheater(math::clamp(_msg->humidity(), 0.0, 1.0),
+    vclouds->setWheater(ignition::math::clamp(_msg->humidity(), 0.0, 1.0),
                         wheater.y, true);
   }
 
@@ -2910,7 +2909,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   {
     Ogre::Vector2 wheater = vclouds->getWheater();
     vclouds->setWheater(wheater.x,
-                        math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
+      ignition::math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
   }
 
   this->dataPtr->skyx->update(0);
