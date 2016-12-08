@@ -762,7 +762,7 @@ LinkData *LinkData::Clone(const std::string &_newName)
       this->linkVisual->GetParent()));
   linkVis->Load();
 
-  cloneLink->linkVisual = linkVis;
+  cloneLink->SetLinkVisual(linkVis);
 
   for (auto &visIt : this->visuals)
   {
@@ -775,7 +775,7 @@ LinkData *LinkData::Clone(const std::string &_newName)
       newVisName = cloneVisName + "::" + newVisName;
 
     rendering::VisualPtr cloneVis =
-        visIt.first->Clone(newVisName, cloneLink->linkVisual);
+        visIt.first->Clone(newVisName, cloneLink->LinkVisual());
 
     // store the leaf name in sdf not the full scoped name
     cloneVis->GetSDF()->GetAttribute("name")->Set(leafName);
@@ -798,7 +798,7 @@ LinkData *LinkData::Clone(const std::string &_newName)
     else
       newColName = cloneVisName + "::" + newColName;
     rendering::VisualPtr collisionVis = colIt.first->Clone(newColName,
-        cloneLink->linkVisual);
+        cloneLink->LinkVisual());
 
     // store the leaf name in sdf not the full scoped name
     collisionVis->GetSDF()->GetAttribute("name")->Set(leafName);
