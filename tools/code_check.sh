@@ -18,6 +18,8 @@ fi
 CPPCHECK_VERSION=`cppcheck --version | sed -e 's@Cppcheck @@'`
 CPPCHECK_LT_157=`echo "$CPPCHECK_VERSION 1.57" | \
                  awk '{if ($1 < $2) print 1; else print 0}'`
+CPPCHECK_GE_169=`echo "$CPPCHECK_VERSION 1.69" | \
+                 awk '{if ($1 >= $2) print 1; else print 0}'`
 
 QUICK_CHECK=0
 if test "$1" = "--quick"
@@ -38,7 +40,8 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' \
+        | grep -v '^deps' | grep -v test_fixture/gtest`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
@@ -51,37 +54,28 @@ else
 " ./test/cmake ./test/pkgconfig"
   if [ $CPPCHECK_LT_157 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
-    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" | grep -v test_fixture/gtest`
   else
-    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh" | grep -v test_fixture/gtest`
   fi
   CPPLINT_FILES=`\
     find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h" | grep -v test_fixture/gtest`
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/common/STLLoader.cc:95" > $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:106" >> $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:127" >> $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:150" >> $SUPPRESS
 # (warning) Redundant code: Found a statement that begins with string constant.
-echo "*:gazebo/common/SVGLoader.cc:869" >> $SUPPRESS
+echo "*:gazebo/common/SVGLoader.cc:869" > $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
-echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
+# STOP: before use this suppress list please consider to use inline
+# cppcheck-suppress comments
 
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 
-# The follow suppression is useful when checking for missing includes.
-# It's disable for now because checking for missing includes is very
-# time consuming. See CPPCHECK_CMD3.
-# Only precise (12.04) and raring (13.04) need this. Fixed from Saucy on.
-if [ -n "$(which lsb_release)" ]; then
-   case `lsb_release -s -d | sed 's:Ubuntu ::' | cut -c1-5` in
-       "12.04" | "13.04" )
-         echo "missingIncludeSystem" >> $SUPPRESS
-       ;;
-   esac
+# Disable noExplicitConstructor warnings in gazebo7 release series
+# (release expected in 01/25/2017) relaxed to 31/01/2015
+if [ $CPPCHECK_GE_169 -eq 1 ] && [ `date '+%Y%m%d'` -lt 20170131 ]; then
+  echo "noExplicitConstructor" >> $SUPPRESS
 fi
 
 #cppcheck.
