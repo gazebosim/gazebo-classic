@@ -74,6 +74,9 @@ namespace gazebo
       /// \brief Action to show collisions.
       public: QAction *showCollisionsAct;
 
+      /// \brief Action to show visuals.
+      public: QAction *showVisualsAct;
+
       /// \brief Action to show joints.
       public: QAction *showJointsAct;
 

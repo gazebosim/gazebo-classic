@@ -670,7 +670,6 @@ void ModelCreator_TEST::CopyPaste()
       scene->GetVisual(cylinder->GetName() + "_clone");
   QVERIFY(cylinderClone != NULL);
 
-
   // copy and paste box model
   modelCreator->SetSelected(boxModel, true);
   QVERIFY(boxModel->GetHighlighted());
