@@ -162,8 +162,9 @@ namespace gazebo
       public: void ClearPluginPaths();
 
       /// \brief Get the path to the directory where the application executable
-      /// is located.
-      /// \return Path to the application executable directory.
+      /// is located. An empty string is returned on error.
+      /// \return Path to the application executable directory, or empty string
+      /// on error.
       public: std::string ApplicationPath() const;
 
       /// \brief add _suffix to the list of path search suffixes
