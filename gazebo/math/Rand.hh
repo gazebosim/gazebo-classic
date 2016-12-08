@@ -72,7 +72,9 @@ namespace gazebo
       /// \brief Get a double from a uniform distribution
       /// \param[in] _min Minimum bound for the random number
       /// \param[in] _max Maximum bound for the random number
-      public: static double GetDblUniform(double _min = 0, double _max = 1);
+      /// \deprecated See ignition::math::Rand::DblUniform
+      public: static double GetDblUniform(double _min = 0, double _max = 1)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a double from a normal distribution
       /// \param[in] _mean Mean value for the distribution
@@ -84,7 +86,9 @@ namespace gazebo
       /// \brief Get a integer from a uniform distribution
       /// \param[in] _min Minimum bound for the random number
       /// \param[in] _max Maximum bound for the random number
-      public: static int GetIntUniform(int _min, int _max);
+      /// \deprecated See ignition::math::Rand::IntUniform
+      public: static int GetIntUniform(int _min, int _max)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a double from a normal distribution
       /// \param[in] _mean Mean value for the distribution

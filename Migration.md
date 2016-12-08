@@ -425,6 +425,10 @@ release will remove the deprecated code.
     + ***Replacement:*** public: static double ignition::math::DblNormal(double, double)
     + ***Deprecation:*** public: static int   gazebo::math::GetIntNormal(int, int)
     + ***Replacement:*** public: static int ignition::math::IntNormal(int, int)
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblUniform(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblUniform(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntUniform(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntUniform(int, int)
 
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline

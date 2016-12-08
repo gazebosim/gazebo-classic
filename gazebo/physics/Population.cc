@@ -333,9 +333,9 @@ void Population::CreatePosesBoxRandom(const PopulationParams &_populParams,
   _poses.clear();
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Pose offset(math::Rand::GetDblUniform(0, _populParams.size.x),
-                      math::Rand::GetDblUniform(0, _populParams.size.y),
-                      math::Rand::GetDblUniform(0, _populParams.size.z),
+    math::Pose offset(ignition::math::Rand::DblUniform(0, _populParams.size.x),
+                      ignition::math::Rand::DblUniform(0, _populParams.size.y),
+                      ignition::math::Rand::DblUniform(0, _populParams.size.z),
                       0, 0, 0);
 
     _poses.push_back((offset + _populParams.pose).pos);
@@ -365,7 +365,7 @@ void Population::CreatePosesBoxUniform(const PopulationParams &_populParams,
       ignition::math::Vector3d p;
       p.X(x);
       p.Y(y);
-      p.Z(math::Rand::GetDblUniform(0, _populParams.size.z));
+      p.Z(ignition::math::Rand::DblUniform(0, _populParams.size.z));
       obs.push_back(p);
       x += .1;
     }
@@ -501,12 +501,12 @@ void Population::CreatePosesCylinderRandom(const PopulationParams &_populParams,
   _poses.clear();
   for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
-    double r = math::Rand::GetDblUniform(0, _populParams.radius);
+    double ang = ignition::math::Rand::DblUniform(0, 2 * M_PI);
+    double r = ignition::math::Rand::DblUniform(0, _populParams.radius);
     math::Pose offset = math::Pose::Zero;
     offset.pos.x = r * cos(ang);
     offset.pos.y = r * sin(ang);
-    offset.pos.z = math::Rand::GetDblUniform(0, _populParams.length);
+    offset.pos.z = ignition::math::Rand::DblUniform(0, _populParams.length);
     _poses.push_back((offset + _populParams.pose).pos);
   }
 
@@ -528,12 +528,12 @@ void Population::CreatePosesCylinderUniform(
   unsigned int points = 10000;
   for (size_t i = 0; i < points; ++i)
   {
-    double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
-    double r = math::Rand::GetDblUniform(0, _populParams.radius);
+    double ang = ignition::math::Rand::DblUniform(0, 2 * M_PI);
+    double r = ignition::math::Rand::DblUniform(0, _populParams.radius);
     ignition::math::Vector3d p;
     p.X(r * cos(ang));
     p.Y(r * sin(ang));
-    p.Z(math::Rand::GetDblUniform(0, _populParams.length));
+    p.Z(ignition::math::Rand::DblUniform(0, _populParams.length));
     obs.push_back(p);
   }
 

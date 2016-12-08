@@ -44,19 +44,19 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   for (unsigned int i = 0; i < count; ++i)
   {
-    int rubbleType = math::Rand::GetIntUniform(0, 1);
-    double mass = math::Rand::GetDblUniform(minMass, maxMass);
+    int rubbleType = ignition::math::Rand::IntUniform(0, 1);
+    double mass = ignition::math::Rand::DblUniform(minMass, maxMass);
 
     Obj obj;
 
-    obj.pose.pos.x = math::Rand::GetDblUniform(bottomRight.x, topLeft.x);
-    obj.pose.pos.y = math::Rand::GetDblUniform(bottomRight.y, topLeft.y);
-    obj.pose.pos.z = math::Rand::GetDblUniform(bottomRight.z, topLeft.z);
+    obj.pose.pos.x = ignition::math::Rand::DblUniform(bottomRight.x, topLeft.x);
+    obj.pose.pos.y = ignition::math::Rand::DblUniform(bottomRight.y, topLeft.y);
+    obj.pose.pos.z = ignition::math::Rand::DblUniform(bottomRight.z, topLeft.z);
 
     obj.pose.rot.SetFromEuler(math::Vector3(
-        math::Rand::GetDblUniform(0.0, 3.1415),
-        math::Rand::GetDblUniform(-0.1, 0.1),
-        math::Rand::GetDblUniform(0.0, 3.1415)));
+        ignition::math::Rand::DblUniform(0.0, 3.1415),
+        ignition::math::Rand::DblUniform(-0.1, 0.1),
+        ignition::math::Rand::DblUniform(0.0, 3.1415)));
 
 
     obj.type = rubbleType;
@@ -65,7 +65,7 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     if (rubbleType == 0)
     {
       // between 2 and 8 feet.
-      obj.size.x = math::Rand::GetDblUniform(0.6096, 2.4384);
+      obj.size.x = ignition::math::Rand::DblUniform(0.6096, 2.4384);
 
       // 4 inches
       obj.size.y = 0.1016;
@@ -84,8 +84,8 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     // Make a cylinder
     else
     {
-      obj.size.x = math::Rand::GetDblUniform(minSize.x, maxSize.x);
-      obj.size.z = math::Rand::GetDblUniform(minSize.z, maxSize.z);
+      obj.size.x = ignition::math::Rand::DblUniform(minSize.x, maxSize.x);
+      obj.size.z = ignition::math::Rand::DblUniform(minSize.z, maxSize.z);
       obj.size.y = obj.size.x;
     }
 
