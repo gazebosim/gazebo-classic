@@ -15,8 +15,8 @@
  *
 */
 
+#include <ignition/math/Rand.hh>
 #include "gazebo/test/ServerFixture.hh"
-#include "gazebo/math/Rand.hh"
 
 using namespace gazebo;
 
