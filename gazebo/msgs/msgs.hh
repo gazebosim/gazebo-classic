@@ -29,6 +29,9 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
+#include <ignition/msgs/color.pb.h>
+#include <ignition/msgs/material.pb.h>
+
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
@@ -715,6 +718,62 @@ namespace gazebo
     GAZEBO_VISIBLE
     sdf::ElementPtr GPSSensorToSDF(const msgs::GPSSensor &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Convert gazebo::msgs::Color to ignition::msgs::Color
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    ignition::msgs::Color ConvertIgnMsg(const msgs::Color &_msg);
+
+    /// \brief Convert ignition::msgs::Color to gazebo::msgs::Color
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    msgs::Color ConvertIgnMsg(const ignition::msgs::Color &_msg);
+
+    /// \brief Convert gazebo::msgs::Material::ShaderType to
+    /// ignition::msgs::Material::ShaderType
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    ignition::msgs::Material::ShaderType ConvertIgnMsg(
+        const msgs::Material::ShaderType _type);
+
+    /// \brief Convert ignition::msgs::Material::ShaderType to
+    /// gazebo::msgs::Material::ShaderType
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    msgs::Material::ShaderType ConvertIgnMsg(
+        const ignition::msgs::Material::ShaderType _type);
+
+    /// \brief Convert gazebo::msgs::Material::Script to
+    /// ignition::msgs::Material::Script
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    ignition::msgs::Material::Script ConvertIgnMsg(
+        const msgs::Material::Script _script);
+
+    /// \brief Convert ignition::msgs::Material::Script to
+    /// gazebo::msgs::Material::Script
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    msgs::Material::Script ConvertIgnMsg(
+        const ignition::msgs::Material::Script _script);
+
+    /// \brief Convert gazebo::msgs::Material to ignition::msgs::Material
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    ignition::msgs::Material ConvertIgnMsg(const msgs::Material &_msg);
+
+    /// \brief Convert ignition::msgs::Material to gazebo::msgs::Material
+    /// \param[in] _msg The message to convert
+    /// \return The resulting message
+    GAZEBO_VISIBLE
+    msgs::Material ConvertIgnMsg(const ignition::msgs::Material &_msg);
     /// \}
   }
 }
