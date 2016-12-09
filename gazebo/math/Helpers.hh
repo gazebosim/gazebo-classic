@@ -75,7 +75,9 @@ namespace gazebo
     /// \param[in] _min minimum
     /// \param[in] _max maximum
     template<typename T>
-    inline T clamp(T _v, T _min, T _max)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    clamp(T _v, T _min, T _max)
     {
       return std::max(std::min(_v, _max), _min);
     }

@@ -751,9 +751,9 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   double lower = this->GetLowStop(_index).Radian();
   double upper = this->GetHighStop(_index).Radian();
   if (lower < upper)
-    _position = math::clamp(_position, lower, upper);
+    _position = ignition::math::clamp(_position, lower, upper);
   else
-    _position = math::clamp(_position, upper, lower);
+    _position = ignition::math::clamp(_position, upper, lower);
 
   // only deal with hinge, universal, slider joints in the user
   // request joint_names list
@@ -961,7 +961,7 @@ double Joint::CheckAndTruncateForce(unsigned int _index, double _effort)
 
   // truncate effort if effortLimit is not negative
   if (this->effortLimit[_index] >= 0.0)
-    _effort = math::clamp(_effort, -this->effortLimit[_index],
+    _effort = ignition::math::clamp(_effort, -this->effortLimit[_index],
       this->effortLimit[_index]);
 
   return _effort;
@@ -996,7 +996,7 @@ double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
     double ciam = cia.GetLength();
 
     // return ratio of child MOI to parent MOI.
-    if (!math::equal(piam, 0.0))
+    if (!ignition::math::equal(piam, 0.0))
     {
       return ciam/piam;
     }

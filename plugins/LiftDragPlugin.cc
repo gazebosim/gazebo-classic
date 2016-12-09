@@ -198,7 +198,7 @@ void LiftDragPlugin::OnUpdate()
   const double minRatio = -1.0;
   const double maxRatio = 1.0;
   // check sweep (angle between velI and lift-drag-plane)
-  double sinSweepAngle = math::clamp(
+  double sinSweepAngle = ignition::math::clamp(
       spanwiseI.Dot(velI), minRatio, maxRatio);
 
   // get cos from trig identity
@@ -237,7 +237,8 @@ void LiftDragPlugin::OnUpdate()
   //   cos(theta) = a.Dot(b)/(a.Length()*b.Lenghth())
   // given upwardI and liftI are both unit vectors, we can drop the denominator
   //   cos(theta) = a.Dot(b)
-  double cosAlpha = math::clamp(liftI.Dot(upwardI), minRatio, maxRatio);
+  double cosAlpha =
+    ignition::math::clamp(liftI.Dot(upwardI), minRatio, maxRatio);
 
   // Is alpha positive or negative? Test:
   // forwardI points toward zero alpha

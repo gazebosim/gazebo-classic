@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
+    * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
+
 1. Support version 5 of the DART Physics Engine.
     * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
 
@@ -101,6 +104,7 @@
     * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
     * [Pull request #2505](https://bitbucket.org/osrf/gazebo/pull-request/2505)
     * [Pull request #2514](https://bitbucket.org/osrf/gazebo/pull-request/2514)
+    * [Pull request #2522](https://bitbucket.org/osrf/gazebo/pull-request/2522)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
