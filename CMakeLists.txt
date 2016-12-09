@@ -29,6 +29,10 @@ if(DEFINED ENABLE_TESTS_COMPILATION)
    "suite. Calling 'make' or 'make all' won't compile the tests")
 endif()
 
+if(NOT DEFINED BUILD_TESTING)
+    set(BUILD_TESTING OFF)
+endif()
+
 ########################################
 # Package Creation:
 include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
@@ -320,18 +324,21 @@ else (build_errors)
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
 
   if (BUILD_GAZEBO)
-    set(TEST_TYPE "UNIT")
     add_custom_target(tests)
-    add_dependencies(tests test)
-
+    set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
     add_subdirectory(media)
-    add_subdirectory(test EXCLUDE_FROM_ALL)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
     add_subdirectory(worlds)
     add_subdirectory(models)
+
+    if (BUILD_TESTING)
+      add_subdirectory(test)
+    else()
+      add_subdirectory(test EXCLUDE_FROM_ALL)
+    endif()
 
   endif (BUILD_GAZEBO)
 
