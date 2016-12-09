@@ -173,7 +173,7 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
   double angle = acos(cosTheta);
   math::Quaternion quat;
   // check the parallel case
-  if (math::equal(angle, M_PI))
+  if (ignition::math::equal(angle, M_PI))
     quat.SetFromAxis(u.GetPerpendicular(), angle);
   else
     quat.SetFromAxis((v.Cross(u)).Normalize(), angle);

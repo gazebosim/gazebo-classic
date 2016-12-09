@@ -381,6 +381,8 @@ release will remove the deprecated code.
 1. **gazebo/math/Helpers.hh**
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
     + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
+    + ***Deprecation:*** public: bool   gazebo::math::equal(T, T, T)
+    + ***Replacement:*** public: bool ignition::math::equal(T, T, T)
     + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
     + ***Replacement:*** public: double ignition::math::fixnan(double)
     + ***Deprecation:*** public: float   gazebo::math::fixnan(float)

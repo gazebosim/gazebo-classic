@@ -243,7 +243,7 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
-  while (!math::equal(newMass, inertial->GetMass()))
+  while (!ignition::math::equal(newMass, inertial->GetMass()))
   {
     world->Step(1);
     common::Time::MSleep(1);

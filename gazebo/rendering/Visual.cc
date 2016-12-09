@@ -1551,7 +1551,7 @@ void Visual::UpdateTransparency(const bool _cascade)
 //////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
-  if (math::equal(this->dataPtr->transparency, _trans))
+  if (ignition::math::equal(this->dataPtr->transparency, _trans))
     return;
 
   this->dataPtr->transparency = std::min(
