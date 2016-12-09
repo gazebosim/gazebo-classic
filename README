@@ -14,6 +14,8 @@ Instructions are located at
 
 Gazebo cmake parameters available at configuring time:
 
+ - BUILD_TESTING (boot) [default False]
+   Include the testsuite compilation in the default make call (make all)
  - USE_HOST_CFLAGS (bool) [default True]
    Check the building machine for supported compiler optimizations and use 
    them to build the software.
