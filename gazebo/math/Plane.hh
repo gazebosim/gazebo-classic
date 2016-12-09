@@ -35,23 +35,25 @@ namespace gazebo
     class GZ_MATH_VISIBLE Plane
     {
       /// \brief Constructor
-      public: Plane();
+      public: Plane() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor from a normal and a distanec
       /// \param[in] _normal The plane normal
       /// \param[in] _offset Offset along the normal
-      public: Plane(const Vector3 &_normal, double _offset = 0.0);
+      public: Plane(const Vector3 &_normal, double _offset = 0.0)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor
       /// \param[in] _normal The plane normal
       /// \param[in] _size Size of the plane
       /// \param[in] _offset Offset along the normal
       public: Plane(const Vector3 &_normal, const Vector2d &_size,
-                    double _offset);
+                    double _offset) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor for ignition::math::Plane
       /// \param[in] _plane Plane to copy
-      public: Plane(const ignition::math::Planed &_plane);
+      public: Plane(const ignition::math::Planed &_plane)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Plane();

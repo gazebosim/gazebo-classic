@@ -21,6 +21,10 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Pose.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 

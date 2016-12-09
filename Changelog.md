@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
+    * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
+
 1. Added VisualMarkers to the rendering engine. Visual markers support
    programmatic rendering of various shapes in a scene.
     * [Pull request 2498](https://bitbucket.org/osrf/gazebo/pull-request/2498)
@@ -105,6 +108,7 @@
     * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
     * [Pull request #2505](https://bitbucket.org/osrf/gazebo/pull-request/2505)
     * [Pull request #2514](https://bitbucket.org/osrf/gazebo/pull-request/2514)
+    * [Pull request #2522](https://bitbucket.org/osrf/gazebo/pull-request/2522)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)

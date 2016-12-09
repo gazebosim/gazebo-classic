@@ -20,9 +20,15 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
+#include <map>
+#include <mutex>
+#include <vector>
 
 #include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Events.hh"
 
@@ -42,109 +48,228 @@
 using namespace gazebo;
 using namespace physics;
 
+/// \internal
+/// \brief Private data class for Gripper
+class gazebo::physics::GripperPrivate
+{
+  /// \brief Callback used when the gripper contacts an object.
+  /// \param[in] _msg Message that contains contact information.
+  public: void OnContacts(ConstContactsPtr &_msg);
+
+  /// \brief Update the gripper.
+  public: void OnUpdate();
+
+  /// \brief Attach an object to the gripper.
+  public: void HandleAttach();
+
+  /// \brief Detach an object from the gripper.
+  public: void HandleDetach();
+
+  /// \brief A reset function.
+  public: void ResetDiffs();
+
+  /// \brief Model that contains this gripper.
+  public: physics::ModelPtr model;
+
+  /// \brief Pointer to the world.
+  public: physics::WorldPtr world;
+
+  /// \brief A fixed joint to connect the gripper to a grasped object.
+  public: physics::JointPtr fixedJoint;
+
+  /// \brief The base link for the gripper.
+  public: physics::LinkPtr palmLink;
+
+  /// \brief All our connections.
+  public: std::vector<event::ConnectionPtr> connections;
+
+  /// \brief The collisions for the links in the gripper.
+  public: std::map<std::string, physics::CollisionPtr> collisions;
+
+  /// \brief The current contacts.
+  public: std::vector<msgs::Contact> contacts;
+
+  /// \brief Mutex used to protect reading/writing the contact message.
+  public: std::mutex mutexContacts;
+
+  /// \brief True if the gripper has an object.
+  public: bool attached;
+
+  /// \brief Previous difference between the palm link and grasped
+  /// object.
+  public: ignition::math::Pose3d prevDiff;
+
+  /// \brief Used to determine when to create the fixed joint.
+  public: std::vector<double> diffs;
+
+  /// \brief Current index into the diff array.
+  public: int diffIndex;
+
+  /// \brief Rate at which to update the gripper.
+  public: common::Time updateRate;
+
+  /// \brief Previous time when the gripper was updated.
+  public: common::Time prevUpdateTime;
+
+  /// \brief Number of iterations the gripper was contacting the same
+  /// object.
+  public: int posCount;
+
+  /// \brief Number of iterations the gripper was not contacting the same
+  /// object.
+  public: int zeroCount;
+
+  /// \brief Minimum number of links touching.
+  public: unsigned int minContactCount;
+
+  /// \brief Steps touching before engaging fixed joint
+  public: int attachSteps;
+
+  /// \brief Steps not touching before disengaging fixed joint
+  public: int detachSteps;
+
+  /// \brief Name of the gripper.
+  public: std::string name;
+
+  /// \brief Node for communication.
+  public: transport::NodePtr node;
+
+  /// \brief Subscription to contact messages from the physics engine.
+  public: transport::SubscriberPtr contactSub;
+};
+
 /////////////////////////////////////////////////
 Gripper::Gripper(ModelPtr _model)
 {
-  this->model = _model;
-  this->world = this->model->GetWorld();
+  this->dataPtr->model = _model;
+  this->dataPtr->world = this->dataPtr->model->GetWorld();
 
-  this->diffs.resize(10);
-  this->diffIndex = 0;
-  this->ResetDiffs();
+  this->dataPtr->diffs.resize(10);
+  this->dataPtr->diffIndex = 0;
+  this->dataPtr->ResetDiffs();
 
-  this->attached = false;
+  this->dataPtr->attached = false;
 
-  this->updateRate = common::Time(0, common::Time::SecToNano(0.75));
+  this->dataPtr->updateRate = common::Time(0, common::Time::SecToNano(0.75));
 
-  this->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
 }
 
 /////////////////////////////////////////////////
 Gripper::~Gripper()
 {
-  if (this->world && this->world->Running())
+  if (this->dataPtr->world && this->dataPtr->world->Running())
   {
     physics::ContactManager *mgr =
-        this->world->Physics()->GetContactManager();
-    mgr->RemoveFilter(this->GetName());
+        this->dataPtr->world->Physics()->GetContactManager();
+    mgr->RemoveFilter(this->Name());
   }
 
-  this->model.reset();
-  this->world.reset();
-  this->connections.clear();
+  this->dataPtr->model.reset();
+  this->dataPtr->world.reset();
+  this->dataPtr->connections.clear();
 }
 
 /////////////////////////////////////////////////
 void Gripper::Load(sdf::ElementPtr _sdf)
 {
-  this->node->Init(this->world->Name());
+  this->dataPtr->node->Init(this->dataPtr->world->Name());
 
-  this->name = _sdf->Get<std::string>("name");
-  this->fixedJoint =
-      this->world->Physics()->CreateJoint("fixed", this->model);
-  this->fixedJoint->SetName(this->model->GetName() + "__gripper_fixed_joint__");
+  this->dataPtr->name = _sdf->Get<std::string>("name");
+  this->dataPtr->fixedJoint =
+      this->dataPtr->world->Physics()->CreateJoint("fixed",
+          this->dataPtr->model);
+
+  this->dataPtr->fixedJoint->SetName(
+      this->dataPtr->model->GetName() + "__gripper_fixed_joint__");
 
   sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
-  this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");
-  this->attachSteps = graspCheck->Get<int>("attach_steps");
-  this->detachSteps = graspCheck->Get<int>("detach_steps");
+  this->dataPtr->minContactCount =
+    graspCheck->Get<unsigned int>("min_contact_count");
+  this->dataPtr->attachSteps = graspCheck->Get<int>("attach_steps");
+  this->dataPtr->detachSteps = graspCheck->Get<int>("detach_steps");
 
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
-  this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
-  if (!this->palmLink)
+  this->dataPtr->palmLink =
+    this->dataPtr->model->GetLink(palmLinkElem->Get<std::string>());
+
+  if (!this->dataPtr->palmLink)
+  {
     gzerr << "palm link [" << palmLinkElem->Get<std::string>()
           << "] not found!\n";
+  }
 
   sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
 
   while (gripperLinkElem)
   {
     physics::LinkPtr gripperLink
-      = this->model->GetLink(gripperLinkElem->Get<std::string>());
+      = this->dataPtr->model->GetLink(gripperLinkElem->Get<std::string>());
     for (unsigned int j = 0; j < gripperLink->GetChildCount(); ++j)
     {
       physics::CollisionPtr collision = gripperLink->GetCollision(j);
       std::map<std::string, physics::CollisionPtr>::iterator collIter
-        = this->collisions.find(collision->GetScopedName());
-      if (collIter != this->collisions.end())
+        = this->dataPtr->collisions.find(collision->GetScopedName());
+      if (collIter != this->dataPtr->collisions.end())
         continue;
 
-      this->collisions[collision->GetScopedName()] = collision;
+      this->dataPtr->collisions[collision->GetScopedName()] = collision;
     }
     gripperLinkElem = gripperLinkElem->GetNextElement("gripper_link");
   }
 
-  if (!this->collisions.empty())
+  if (!this->dataPtr->collisions.empty())
   {
     // request the contact manager to publish messages to a custom topic for
     // this sensor
     physics::ContactManager *mgr =
-        this->world->Physics()->GetContactManager();
-    std::string topic = mgr->CreateFilter(this->GetName(), this->collisions);
-    if (!this->contactSub)
+        this->dataPtr->world->Physics()->GetContactManager();
+    std::string topic = mgr->CreateFilter(this->Name(),
+        this->dataPtr->collisions);
+    if (!this->dataPtr->contactSub)
     {
-      this->contactSub = this->node->Subscribe(topic,
-          &Gripper::OnContacts, this);
+      this->dataPtr->contactSub = this->dataPtr->node->Subscribe(topic,
+          &GripperPrivate::OnContacts, this->dataPtr.get());
     }
   }
-  this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
-          boost::bind(&Gripper::OnUpdate, this)));
+  this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateEnd(
+          std::bind(&GripperPrivate::OnUpdate, this->dataPtr.get())));
 }
 
 /////////////////////////////////////////////////
 void Gripper::Init()
 {
-  this->prevUpdateTime = common::Time::GetWallTime();
-  this->zeroCount = 0;
-  this->posCount = 0;
-  this->attached = false;
+  this->dataPtr->prevUpdateTime = common::Time::GetWallTime();
+  this->dataPtr->zeroCount = 0;
+  this->dataPtr->posCount = 0;
+  this->dataPtr->attached = false;
 }
 
 /////////////////////////////////////////////////
-void Gripper::OnUpdate()
+std::string Gripper::GetName() const
+{
+  return this->Name();
+}
+
+/////////////////////////////////////////////////
+std::string Gripper::Name() const
+{
+  return this->dataPtr->name;
+}
+
+/////////////////////////////////////////////////
+bool Gripper::IsAttached() const
+{
+  return this->dataPtr->attached;
+}
+
+/////////////////////////////////////////////////
+void GripperPrivate::OnUpdate()
 {
   if (common::Time::GetWallTime() - this->prevUpdateTime < this->updateRate)
+  {
     return;
+  }
 
   // @todo: should package the decision into a function
   if (this->contacts.size() >= this->minContactCount)
@@ -159,12 +284,16 @@ void Gripper::OnUpdate()
   }
 
   if (this->posCount > this->attachSteps && !this->attached)
+  {
     this->HandleAttach();
+  }
   else if (this->zeroCount > this->detachSteps && this->attached)
+  {
     this->HandleDetach();
+  }
 
   {
-    boost::mutex::scoped_lock lock(this->mutexContacts);
+    std::lock_guard<std::mutex> lock(this->mutexContacts);
     this->contacts.clear();
   }
 
@@ -172,7 +301,7 @@ void Gripper::OnUpdate()
 }
 
 /////////////////////////////////////////////////
-void Gripper::HandleAttach()
+void GripperPrivate::HandleAttach()
 {
   if (!this->palmLink)
   {
@@ -212,15 +341,18 @@ void Gripper::HandleAttach()
   while (iter != contactCounts.end())
   {
     if (iter->second < 2)
+    {
       contactCounts.erase(iter++);
+    }
     else
     {
       if (!this->attached && cc[iter->first])
       {
-        math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
-          this->palmLink->GetWorldPose();
+        ignition::math::Pose3d diff =
+          cc[iter->first]->GetLink()->GetWorldPose().Ign() -
+          this->palmLink->GetWorldPose().Ign();
 
-        double dd = (diff - this->prevDiff).pos.GetSquaredLength();
+        double dd = (diff - this->prevDiff).Pos().SquaredLength();
 
         this->prevDiff = diff;
 
@@ -233,7 +365,7 @@ void Gripper::HandleAttach()
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Pose());
+              cc[iter->first]->GetLink(), ignition::math::Pose3d());
           this->fixedJoint->Init();
         }
 
@@ -245,14 +377,14 @@ void Gripper::HandleAttach()
 }
 
 /////////////////////////////////////////////////
-void Gripper::HandleDetach()
+void GripperPrivate::HandleDetach()
 {
   this->attached = false;
   this->fixedJoint->Detach();
 }
 
 /////////////////////////////////////////////////
-void Gripper::OnContacts(ConstContactsPtr &_msg)
+void GripperPrivate::OnContacts(ConstContactsPtr &_msg)
 {
   for (int i = 0; i < _msg->contact_size(); ++i)
   {
@@ -264,27 +396,17 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
     if ((collision1 && !collision1->IsStatic()) &&
         (collision2 && !collision2->IsStatic()))
     {
-      boost::mutex::scoped_lock lock(this->mutexContacts);
+      std::lock_guard<std::mutex> lock(this->mutexContacts);
       this->contacts.push_back(_msg->contact(i));
     }
   }
 }
 
 /////////////////////////////////////////////////
-void Gripper::ResetDiffs()
+void GripperPrivate::ResetDiffs()
 {
   for (unsigned int i = 0; i < 10; ++i)
     this->diffs[i] = GZ_DBL_MAX;
 }
 
-/////////////////////////////////////////////////
-std::string Gripper::GetName() const
-{
-  return this->name;
-}
 
-/////////////////////////////////////////////////
-bool Gripper::IsAttached() const
-{
-  return this->attached;
-}

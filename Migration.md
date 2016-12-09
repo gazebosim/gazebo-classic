@@ -66,6 +66,10 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/physics/Gripper.hh**
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+
 1. **gazebo/physics/World.hh**
     + ***Deprecation:*** bool GetRunning() const
     + ***Replacement:*** bool Running() const;
@@ -379,6 +383,8 @@ release will remove the deprecated code.
     + ***Replacement:*** public: ignition::math::OnePole
 
 1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
+    + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
     + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
     + ***Replacement:*** public: double ignition::math::fixnan(double)
     + ***Deprecation:*** public: float   gazebo::math::fixnan(float)
@@ -409,6 +415,14 @@ release will remove the deprecated code.
 1. **gazebo/math/Kmeans.hh**
     + ***Deprecation:*** public:   gazebo::math::Kmeans
     + ***Replacement:*** public: ignition::math::Kmeans
+
+1. **gazebo/math/Matrix4.hh**
+    + ***Deprecation:*** public:   gazebo::math::Matrix4
+    + ***Replacement:*** public: ignition::math::Matrix4
+
+1. **gazebo/math/Plane.hh**
+    + ***Deprecation:*** public:   gazebo::math::Plane
+    + ***Replacement:*** public: ignition::math::Plane
 
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline
