@@ -139,7 +139,7 @@ class gazebo::physics::GripperPrivate
 };
 
 /////////////////////////////////////////////////
-Gripper::Gripper(ModelPtr _model)
+Gripper::Gripper(ModelPtr _model) : dataPtr(new GripperPrivate)
 {
   this->dataPtr->model = _model;
   this->dataPtr->world = this->dataPtr->model->GetWorld();
