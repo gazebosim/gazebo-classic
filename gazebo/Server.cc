@@ -226,6 +226,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
+      // Deprecated. Remove the following line in gazebo9
       math::Rand::SetSeed(this->dataPtr->vm["seed"].as<double>());
       ignition::math::Rand::Seed(this->dataPtr->vm["seed"].as<double>());
     }
