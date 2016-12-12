@@ -66,6 +66,23 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/Distortion.hh**
+    + ***Deprecation:*** double GetK1() const
+    + ***Replacement:*** double K1() const
+    + ***Deprecation:*** double GetK2() const
+    + ***Replacement:*** double K2() const
+    + ***Deprecation:*** double GetK3() const
+    + ***Replacement:*** double K3() const
+    + ***Deprecation:*** double GetP1() const
+    + ***Replacement:*** double P1() const
+    + ***Deprecation:*** double GetP2() const
+    + ***Replacement:*** double P2() const
+    + ***Deprecation:*** math::Vector2d GetCenter() const
+    + ***Replacement:*** ignition::math::Vector2d Center() const
+    + ***Deprecation:*** static math::Vector2d Distort(const math::Vector2d &_in, const math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
+    + ***Replacement:*** static ignition::math::Vector2d Distort( const ignition::math::Vector2d &_in, const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
+
+
 1. **gazebo/physics/Gripper.hh**
     + ***Deprecation:*** std::string GetName() const
     + ***Replacement:*** std::string Name() const
