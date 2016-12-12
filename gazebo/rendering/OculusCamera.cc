@@ -308,14 +308,14 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
   if (_visual)
   {
     math::Pose origPose = this->WorldPose();
-    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    double yaw = _visual->WorldPose().Rot().Euler().Z();
 
-    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
+    double zDiff = origPose.pos.z - _visual->WorldPose().Pos().Z();
     double pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Distance(
+      double dist = _visual->WorldPose().Pos().Distance(
           this->WorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
@@ -323,9 +323,9 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
     this->Yaw(ignition::math::Angle(yaw));
     this->Pitch(ignition::math::Angle(pitch));
 
-    math::Box bb = _visual->GetBoundingBox();
-    math::Vector3 pos = bb.GetCenter();
-    pos.z = bb.max.z;
+    auto bb = _visual->BoundingBox();
+    auto pos = bb.Center();
+    pos.Z(bb.Max().Z());
   }
 
   return true;
@@ -390,9 +390,9 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   start.Correct();
 
   // Center of visual
-  ignition::math::Box box = _visual->GetBoundingBox().Ign();
+  auto box = _visual->BoundingBox();
   ignition::math::Vector3d visCenter = box.Center() +
-    _visual->GetWorldPose().pos.Ign();
+    _visual->WorldPose().Pos();
   visCenter.Correct();
 
   // Direction from start to visual center

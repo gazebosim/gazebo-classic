@@ -250,8 +250,8 @@ void Projector::ProjectorFrameListener::Init(VisualPtr _visual,
 
   this->visual = _visual;
 
-  this->nodeName = this->visual->GetName() + "_Projector";
-  this->filterNodeName = this->visual->GetName() + "_ProjectorFilter";
+  this->nodeName = this->visual->Name() + "_Projector";
+  this->filterNodeName = this->visual->Name() + "_ProjectorFilter";
 
   this->frustum = new Ogre::Frustum();
   this->filterFrustum = new Ogre::Frustum();

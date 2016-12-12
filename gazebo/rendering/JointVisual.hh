@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _JOINTVISUAL_HH_
-#define _JOINTVISUAL_HH_
+#ifndef GAZEBO_RENDERING_JOINTVISUAL_HH_
+#define GAZEBO_RENDERING_JOINTVISUAL_HH_
 
 #include <string>
 

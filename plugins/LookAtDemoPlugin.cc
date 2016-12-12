@@ -160,16 +160,13 @@ void LookAtDemoPlugin::OnChange(const double /*_newValue*/)
 {
   auto eye = ignition::math::Vector3d(this->eyeX->value(),
                                       this->eyeY->value(),
-                                      this->eyeZ->value()
-                                     );
+                                      this->eyeZ->value());
   auto target = ignition::math::Vector3d(this->targetX->value(),
                                          this->targetY->value(),
-                                         this->targetZ->value()
-                                        );
+                                         this->targetZ->value());
   auto up = ignition::math::Vector3d(this->upX->value(),
                                      this->upY->value(),
-                                     this->upZ->value()
-                                    );
+                                     this->upZ->value());
   auto lookat = ignition::math::Matrix4d::LookAt(eye, target, up).Pose();
 
   // Publish model modify messages
