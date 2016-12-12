@@ -62,7 +62,7 @@ TEST_F(COMVisual_TEST, COMVisualTest)
 
   // Create a message and set inertia pose
   ignition::math::Vector3d pos(1, 0, -3);
-  ignition::math::Quaterniond quat(IGN_PI/2, 0, -M_PI/5);
+  ignition::math::Quaterniond quat(IGN_PI/2, 0, -IGN_PI/5);
 
   gazebo::msgs::Link linkMsg;
   linkMsg.set_name("link");
