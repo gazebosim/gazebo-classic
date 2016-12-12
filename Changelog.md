@@ -3,7 +3,7 @@
 ## Gazebo 8.x.x (2017-xx-xx)
 
 1. Use ignition math with `rendering/Distortion` and update function names.
-    * [Pull request #252X](https://bitbucket.org/osrf/gazebo/pull-request/252X)
+    * [Pull request #2529](https://bitbucket.org/osrf/gazebo/pull-request/2529)
 
 1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
     * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
