@@ -259,10 +259,23 @@ endif()
 if (BUILD_OSX_BUNDLE)
   install (TARGETS gzclient BUNDLE DESTINATION .)
   set (APPS "${CMAKE_BINARY_DIR}/gzclient.app/Contents/MacOS/gzclient")
+  set (DIRS
+      ${OGRE_LIBRARY_DIRS}
+      ${CMAKE_BINARY_DIR}/lib
+      ${CMAKE_BINARY_DIR}/gazebo/util
+      ${CMAKE_BINARY_DIR}/gazebo/sensors
+      ${CMAKE_BINARY_DIR}/gazebo/math
+      ${CMAKE_BINARY_DIR}/gazebo/msgs
+      ${CMAKE_BINARY_DIR}/gazebo/physics
+      ${CMAKE_BINARY_DIR}/gazebo/sensors
+      ${CMAKE_BINARY_DIR}/gazebo/transport
+      ${CMAKE_BINARY_DIR}/gazebo/common
+      ${CMAKE_BINARY_DIR}/gazebo/rendering)
+
   INSTALL(CODE "
     # Needed for getting the right permissions when using brew
     set (BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-      fixup_bundle(\"${APPSC}\" \"\"  \"${OGRE_LIBRARY_DIRS}\")
+      fixup_bundle(\"${APPS}\" \"\"  \"${DIRS}\")
   " COMPONENT Runtime)
 endif()
