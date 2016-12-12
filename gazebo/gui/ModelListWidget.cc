@@ -3455,7 +3455,7 @@ void ModelListWidget::FillUserCamera()
     QtVariantProperty *item2 = this->dataPtr->variantManager->addProperty(
         QVariant::String, tr("name"));
     if (trackedVisual)
-        item2->setValue(trackedVisual->GetName().c_str());
+        item2->setValue(trackedVisual->Name().c_str());
     else
         item2->setValue("");
     item2->setEnabled(false);

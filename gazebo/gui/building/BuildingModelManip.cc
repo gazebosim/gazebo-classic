@@ -102,10 +102,9 @@ void BuildingModelManip::OnSizeChanged(double _width, double _depth,
 {
   this->dataPtr->size =
       BuildingMaker::ConvertSize(_width, _depth, _height);
-  double dScaleZ = this->dataPtr->visual->GetScale().Ign().Z() -
-                   this->dataPtr->size.Z();
+  double dScaleZ = this->dataPtr->visual->Scale().Z() - this->dataPtr->size.Z();
   this->dataPtr->visual->SetScale(this->dataPtr->size);
-  auto originalPos = this->dataPtr->visual->GetPosition().Ign();
+  auto originalPos = this->dataPtr->visual->Position();
   auto newPos = originalPos - ignition::math::Vector3d(0, 0, dScaleZ/2.0);
   this->dataPtr->visual->SetPosition(newPos);
   this->dataPtr->maker->BuildingChanged();
@@ -127,7 +126,7 @@ void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
   auto trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
       _yaw);
 
-  auto oldPose = this->dataPtr->visual->GetParent()->GetWorldPose().Ign();
+  auto oldPose = this->dataPtr->visual->GetParent()->WorldPose();
 
   this->dataPtr->visual->GetParent()->SetWorldPose(oldPose + trans);
   this->dataPtr->maker->BuildingChanged();
@@ -149,7 +148,7 @@ void BuildingModelManip::OnPositionChanged(double _x, double _y, double _z)
 void BuildingModelManip::OnWidthChanged(double _width)
 {
   double scaledWidth = BuildingMaker::Convert(_width);
-  this->dataPtr->size = this->dataPtr->visual->GetScale().Ign();
+  this->dataPtr->size = this->dataPtr->visual->Scale();
   this->dataPtr->size.X(scaledWidth);
   this->dataPtr->visual->SetScale(this->dataPtr->size);
   this->dataPtr->maker->BuildingChanged();
@@ -159,7 +158,7 @@ void BuildingModelManip::OnWidthChanged(double _width)
 void BuildingModelManip::OnDepthChanged(double _depth)
 {
   double scaledDepth = BuildingMaker::Convert(_depth);
-  this->dataPtr->size = this->dataPtr->visual->GetScale().Ign();
+  this->dataPtr->size = this->dataPtr->visual->Scale();
   this->dataPtr->size.Y(scaledDepth);
   this->dataPtr->visual->SetScale(this->dataPtr->size);
   this->dataPtr->maker->BuildingChanged();
@@ -169,10 +168,10 @@ void BuildingModelManip::OnDepthChanged(double _depth)
 void BuildingModelManip::OnHeightChanged(double _height)
 {
   double scaledHeight = BuildingMaker::Convert(_height);
-  this->dataPtr->size = this->dataPtr->visual->GetScale().Ign();
+  this->dataPtr->size = this->dataPtr->visual->Scale();
   this->dataPtr->size.Z(scaledHeight);
-  auto dScale = this->dataPtr->visual->GetScale().Ign() - this->dataPtr->size;
-  auto originalPos = this->dataPtr->visual->GetPosition().Ign();
+  auto dScale = this->dataPtr->visual->Scale() - this->dataPtr->size;
+  auto originalPos = this->dataPtr->visual->Position();
   this->dataPtr->visual->SetScale(this->dataPtr->size);
 
   auto newPos = originalPos - ignition::math::Vector3d(0, 0, dScale.Z()/2.0);
@@ -184,7 +183,7 @@ void BuildingModelManip::OnHeightChanged(double _height)
 /////////////////////////////////////////////////
 void BuildingModelManip::OnPosXChanged(double _posX)
 {
-  auto visualPose = this->dataPtr->visual->GetParent()->GetWorldPose().Ign();
+  auto visualPose = this->dataPtr->visual->GetParent()->WorldPose();
   double scaledX = BuildingMaker::Convert(_posX);
   visualPose.Pos().X(scaledX);
   this->dataPtr->visual->GetParent()->SetWorldPosition(visualPose.Pos());
@@ -194,7 +193,7 @@ void BuildingModelManip::OnPosXChanged(double _posX)
 /////////////////////////////////////////////////
 void BuildingModelManip::OnPosYChanged(double _posY)
 {
-  auto visualPose = this->dataPtr->visual->GetParent()->GetWorldPose().Ign();
+  auto visualPose = this->dataPtr->visual->GetParent()->WorldPose();
   double scaledY = BuildingMaker::Convert(_posY);
   visualPose.Pos().Y(-scaledY);
   this->dataPtr->visual->GetParent()->SetWorldPosition(visualPose.Pos());
@@ -204,7 +203,7 @@ void BuildingModelManip::OnPosYChanged(double _posY)
 /////////////////////////////////////////////////
 void BuildingModelManip::OnPosZChanged(double _posZ)
 {
-  auto visualPose = this->dataPtr->visual->GetParent()->GetWorldPose().Ign();
+  auto visualPose = this->dataPtr->visual->GetParent()->WorldPose();
   double scaledZ = BuildingMaker::Convert(_posZ);
   visualPose.Pos().Z(scaledZ);
   this->dataPtr->visual->GetParent()->SetWorldPosition(visualPose.Pos());
@@ -215,7 +214,7 @@ void BuildingModelManip::OnPosZChanged(double _posZ)
 void BuildingModelManip::OnYawChanged(double _yaw)
 {
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
-  auto angles = this->dataPtr->visual->GetRotation().GetAsEuler().Ign();
+  auto angles = this->dataPtr->visual->Rotation().Euler();
   angles.Z(-newYaw);
   this->dataPtr->visual->GetParent()->SetRotation(
       ignition::math::Quaterniond(angles));
@@ -299,9 +298,9 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 {
   this->dataPtr->size = BuildingMaker::ConvertSize(_width, _depth, _height);
 
-  auto dScale = this->dataPtr->visual->GetScale().Ign() - this->dataPtr->size;
+  auto dScale = this->dataPtr->visual->Scale() - this->dataPtr->size;
 
-  auto originalPos = this->dataPtr->visual->GetPosition().Ign();
+  auto originalPos = this->dataPtr->visual->Position();
   this->dataPtr->visual->SetPosition(ignition::math::Vector3d(0, 0, 0));
   this->dataPtr->visual->SetScale(this->dataPtr->size);
 
