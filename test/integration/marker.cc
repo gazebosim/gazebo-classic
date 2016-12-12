@@ -121,6 +121,8 @@ void Marker_TEST::AddRemove()
   markerMsg.set_id(0);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::SPHERE);
+
+  gzmsg << "Add sphere" << std::endl;
   result = node.Request(topicName, markerMsg);
   QVERIFY(result != false);
 
@@ -141,6 +143,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Remove the shape
+  gzmsg << "Remove sphere" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
@@ -153,6 +156,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Add a box
+  gzmsg << "Add box" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::BOX);
   result = node.Request(topicName, markerMsg);
@@ -167,6 +171,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Add a cylinder
+  gzmsg << "Add cylinder" << std::endl;
   markerMsg.set_ns("default");
   markerMsg.set_id(1);
   ignition::msgs::Set(markerMsg.mutable_pose(),
@@ -186,6 +191,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Delete everything
+  gzmsg << "Delete everything" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
   result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
@@ -199,6 +205,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Draw a vertical line using LINE_LIST
+  gzmsg << "Draw line list" << std::endl;
   markerMsg.set_id(2);
   ignition::msgs::Set(markerMsg.mutable_pose(),
                     ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
@@ -222,6 +229,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Draw another vertical line using LINE_STRIP
+  gzmsg << "Draw line strip" << std::endl;
   markerMsg.set_id(3);
   ignition::msgs::Set(markerMsg.mutable_pose(),
                     ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
@@ -250,6 +258,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Delete everything
+  gzmsg << "Delete everything" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
   result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
@@ -265,6 +274,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Draw a bunch of points
+  gzmsg << "Draw points" << std::endl;
   markerMsg.set_id(4);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::POINTS);
@@ -293,6 +303,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Delete everything
+  gzmsg << "Delete everything" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
   result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
@@ -307,6 +318,8 @@ void Marker_TEST::AddRemove()
   QVERIFY(this->WhiteCount(100) == 0);
 #endif
 
+  // Draw text
+  gzmsg << "Draw text" << std::endl;
   markerMsg.set_id(5);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::TEXT);
@@ -330,6 +343,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Remove the text
+  gzmsg << "Remove text" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
@@ -347,6 +361,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Draw a triangle fan
+  gzmsg << "Draw triangle fan" << std::endl;
   markerMsg.set_id(5);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::TRIANGLE_FAN);
@@ -378,6 +393,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Remove the triangle fan
+  gzmsg << "Remove triangle fan" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
@@ -395,6 +411,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Draw a triangle list
+  gzmsg << "Draw triangle list" << std::endl;
   markerMsg.set_id(6);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::TRIANGLE_LIST);
@@ -433,6 +450,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Remove the triangle list
+  gzmsg << "Remove triangle list" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   result = node.Request(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
@@ -451,6 +469,7 @@ void Marker_TEST::AddRemove()
 #endif
 
   // Draw a triangle strip
+  gzmsg << "Draw triangle strip" << std::endl;
   markerMsg.set_id(7);
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::TRIANGLE_STRIP);
