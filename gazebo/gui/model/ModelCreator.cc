@@ -213,6 +213,9 @@ namespace gazebo
 
       /// \brief True to show all collisions of all links.
       public: bool showCollisions = true;
+
+      /// \brief True to show all visuals of all links.
+      public: bool showVisuals = true;
     };
   }
 }
@@ -1203,6 +1206,7 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 
   link->SetName(leafName);
   link->ShowCollisions(this->dataPtr->showCollisions);
+  link->ShowVisuals(this->dataPtr->showVisuals);
 
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
@@ -1264,6 +1268,8 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
     leafName = newName.substr(idx+2);
   LinkData *link = it->second->Clone(leafName);
 
+  link->ShowCollisions(this->dataPtr->showCollisions);
+  link->ShowVisuals(this->dataPtr->showVisuals);
   this->dataPtr->allLinks[newName] = link;
 
   this->ModelChanged();
@@ -1458,6 +1464,8 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
+    link->ShowCollisions(this->dataPtr->showCollisions);
+    link->ShowVisuals(this->dataPtr->showVisuals);
     this->dataPtr->allLinks[linkName] = link;
   }
 
@@ -3230,15 +3238,6 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::ShowCollisions(const bool _show)
-{
-  this->dataPtr->showCollisions = _show;
-
-  for (auto link : this->dataPtr->allLinks)
-    link.second->ShowCollisions(_show);
-}
-
-/////////////////////////////////////////////////
 void ModelCreator::OnRequestLinkScale(const std::string &_name,
     const std::map<std::string, ignition::math::Vector3d> &_scales)
 {
@@ -3309,3 +3308,20 @@ ignition::math::Pose3d ModelCreator::WorldToLocal(
   return (parentModelWorld.Inverse() * targetWorld).Pose();
 }
 
+/////////////////////////////////////////////////
+void ModelCreator::ShowCollisions(const bool _show)
+{
+  this->dataPtr->showCollisions = _show;
+
+  for (auto link : this->dataPtr->allLinks)
+    link.second->ShowCollisions(_show);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::ShowVisuals(const bool _show)
+{
+  this->dataPtr->showVisuals = _show;
+
+  for (auto link : this->dataPtr->allLinks)
+    link.second->ShowVisuals(_show);
+}

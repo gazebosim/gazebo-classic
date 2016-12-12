@@ -74,7 +74,8 @@
   <file>images/view_angle_right.png</file>
   <file>images/view_angle_home.png</file>
   <file>images/eye.png</file>
-  <file>images/eye_collision.png</file>
+  <file>images/eye_collision.svg</file>
+  <file>images/eye_visual.svg</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>

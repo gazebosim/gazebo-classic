@@ -191,8 +191,15 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix `model.config` dependency support, and add ability to reference
+   textures using a URI.
+    * [Pull request 2517](https://bitbucket.org/osrf/gazebo/pull-request/2517)
+
 1. Fix DEM heightmap size, collision, scale
     * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
+
+1. Create ode_quiet parameter to silence solver messages
+    * [Pull request 2512](https://bitbucket.org/osrf/gazebo/pull-request/2512)
 
 1. Update QT render loop to throttle based on UserCamera::RenderRate.
     * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
