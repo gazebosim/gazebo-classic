@@ -317,7 +317,7 @@ void MarkerVisual::Text(const ignition::msgs::Marker &_msg)
   if (!this->dPtr->text)
   {
     this->dPtr->text.reset(new MovableText());
-    this->dPtr->text->Load(this->GetName() + "__TEXT__", _msg.text());
+    this->dPtr->text->Load(this->Name() + "__TEXT__", _msg.text());
     this->GetSceneNode()->attachObject(this->dPtr->text.get());
   }
   else
@@ -347,13 +347,13 @@ void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
 {
   _msg.mutable_lifetime()->set_sec(this->dPtr->lifetime.sec);
   _msg.mutable_lifetime()->set_nsec(this->dPtr->lifetime.nsec);
-  ignition::msgs::Set(_msg.mutable_pose(), this->GetPose().Ign());
+  ignition::msgs::Set(_msg.mutable_pose(), this->Pose());
 
   if (this->dPtr->text)
     _msg.set_text(this->dPtr->text->GetText());
 
   if (this->GetParent())
-    _msg.set_parent(this->GetParent()->GetName());
+    _msg.set_parent(this->GetParent()->Name());
 
   // Set the scale
   ignition::msgs::Set(_msg.mutable_scale(), this->dataPtr->scale);
