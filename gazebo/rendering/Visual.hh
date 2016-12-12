@@ -769,11 +769,6 @@ namespace gazebo
                         bool _useRTShader = true);
 
       /// \brief Process a material message.
-      /// Deprecate this function when we fully switch to ignition::msgs
-      /// \param[in] _msg The material message.
-      protected: void ProcessMaterialMsg(const msgs::Material &_msg);
-
-      /// \brief Process a material message.
       /// \param[in] _msg The ignition material message.
       protected: void ProcessMaterialMsg(const ignition::msgs::Material &_msg);
 

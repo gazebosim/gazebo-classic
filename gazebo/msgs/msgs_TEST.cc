@@ -16,6 +16,8 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/msgs.hh>
+#include <ignition/msgs/MessageTypes.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
 #include "test/util.hh"
@@ -3856,4 +3858,32 @@ TEST_F(MsgsTest, VisualPluginToFromSDF)
 
   EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
   EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgColor)
+{
+  ignition::msgs::Color ignMsg;
+  ignMsg.set_r(0.1);
+  ignMsg.set_g(0.2);
+  ignMsg.set_b(0.3);
+  ignMsg.set_a(0.4);
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_DOUBLE_EQ(ignMsg.r(), ignMsg2.r());
+  EXPECT_DOUBLE_EQ(ignMsg.g(), ignMsg2.g());
+  EXPECT_DOUBLE_EQ(ignMsg.b(), ignMsg2.b());
+  EXPECT_DOUBLE_EQ(ignMsg.a(), ignMsg2.a());
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgMaterialShaderType)
+{
+  ignition::msgs::Material::ShaderType ignMsg =
+      ignition::msgs::Material::PIXEL;
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_DOUBLE_EQ(ignMsg, ignMsg2);
 }

@@ -1,5 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include_directories(${IGNITION-MATH_INCLUDE_DIRS})
+include_directories(${IGNITION-MATH_INCLUDE_DIRS} ${IGNITION-MSGS_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
