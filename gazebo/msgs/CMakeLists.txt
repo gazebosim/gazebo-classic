@@ -207,6 +207,7 @@ endif()
 target_link_libraries(gazebo_msgs
   gazebo_common
   ${GZ_PROTOBUF_LIBRARY}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)

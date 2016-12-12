@@ -3879,11 +3879,60 @@ TEST_F(MsgsTest, ConvertIgnMsgColor)
 
 TEST_F(MsgsTest, ConvertIgnMsgMaterialShaderType)
 {
-  ignition::msgs::Material::ShaderType ignMsg =
-      ignition::msgs::Material::PIXEL;
+  auto ignMsg = ignition::msgs::Material::PIXEL;
 
   auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
   auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
 
   EXPECT_DOUBLE_EQ(ignMsg, ignMsg2);
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgMaterialScript)
+{
+  ignition::msgs::Material::Script ignMsg;
+  ignMsg.set_name("material_script");
+
+  for (size_t i = 0; i < 3; ++i)
+    ignMsg.add_uri("uri_" + std::to_string(i));
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_EQ(ignMsg.name(), ignMsg2.name());
+  EXPECT_EQ(ignMsg.uri().size(), 3);
+
+  for (size_t i = 0; i < 3; ++i)
+    EXPECT_EQ(ignMsg.uri(i), ignMsg2.uri(i));
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgMaterial)
+{
+  ignition::msgs::Material ignMsg;
+
+  auto script = ignMsg.mutable_script();
+  script->set_name("script");
+  script->add_uri("uri");
+
+  ignMsg.set_shader_type(ignition::msgs::Material::PIXEL);
+  ignMsg.set_normal_map("normal_map");
+
+  auto ambient = ignMsg.mutable_ambient();
+  ambient->set_r(0.1);
+  ambient->set_g(0.2);
+  ambient->set_b(0.3);
+  ambient->set_a(0.4);
+
+  ignMsg.set_lighting(false);
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_EQ(ignMsg.script().name(), ignMsg2.script().name());
+  EXPECT_EQ(ignMsg.script().uri(0), ignMsg2.script().uri(0));
+  EXPECT_EQ(ignMsg.normal_map(), ignMsg2.normal_map());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().r(), ignMsg2.ambient().r());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().g(), ignMsg2.ambient().g());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().b(), ignMsg2.ambient().b());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().a(), ignMsg2.ambient().a());
+  EXPECT_EQ(ignMsg.lighting(), ignMsg2.lighting());
 }
