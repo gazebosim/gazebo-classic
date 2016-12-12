@@ -66,6 +66,10 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/physics/Gripper.hh**
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+
 1. **gazebo/physics/World.hh**
     + ***Deprecation:*** bool GetRunning() const
     + ***Replacement:*** bool Running() const;
@@ -119,6 +123,34 @@ release will remove the deprecated code.
     + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale)
     + ***Deprecation:*** public: void SetPosition(const math::Vector3 &_pos)
     + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+    + ***Deprecation:*** math::Vector3 GetScale()
+    + ***Replacement:*** ignition::math::Vector3d Scale() const
+    + ***Deprecation:*** void SetRotation(const math::Quaternion &_rot)
+    + ***Replacement:*** void SetRotation(const ignition::math::Quaterniond &_rot)
+    + ***Deprecation:*** void SetPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetPose(const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** math::Vector3 GetPosition() const
+    + ***Replacement:*** ignition::math::Vector3d Position() const
+    + ***Deprecation:*** math::Quaternion GetRotation() const
+    + ***Replacement:*** ignition::math::Quaterniond Rotation() const
+    + ***Deprecation:*** math::Pose GetPose() const
+    + ***Replacement:*** ignition::math::Pose3d Pose()
+    + ***Deprecation:*** math::Pose GetWorldPose() const
+    + ***Replacement:*** ignition::math::Pose3d WorldPose() const
+    + ***Deprecation:*** void SetWorldPosition(const math::Vector3 &_pos)
+    + ***Replacement:*** void SetWorldPosition(const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** void SetWorldRotation(const math::Quaternion &_pos)
+    + ***Replacement:*** void SetWorldRotation(const ignition::math::Quaterniond &_pos)
+    + ***Deprecation:*** math::Box GetBoundingBox() const
+    + ***Replacement:*** ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void MoveToPosition(const math::Pose &_pose, double _time)
+    + ***Replacement:*** void MoveToPosition(const ignition::math::Pose3d &_pose, const double _time)
+    + ***Deprecation:*** void MoveToPositions(const std::vector<math::Pose> &_pts, double _time, std::function<void()> _onComplete = nullptr)
+    + ***Replacement:*** void MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts, const double _time, std::function<void()> _onComplete = nullptr)
+    + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose)
 
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
@@ -379,6 +411,8 @@ release will remove the deprecated code.
     + ***Replacement:*** public: ignition::math::OnePole
 
 1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
+    + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
     + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
     + ***Replacement:*** public: double ignition::math::fixnan(double)
     + ***Deprecation:*** public: float   gazebo::math::fixnan(float)
@@ -409,6 +443,28 @@ release will remove the deprecated code.
 1. **gazebo/math/Kmeans.hh**
     + ***Deprecation:*** public:   gazebo::math::Kmeans
     + ***Replacement:*** public: ignition::math::Kmeans
+
+1. **gazebo/math/Matrix4.hh**
+    + ***Deprecation:*** public:   gazebo::math::Matrix4
+    + ***Replacement:*** public: ignition::math::Matrix4
+
+1. **gazebo/math/Plane.hh**
+    + ***Deprecation:*** public:   gazebo::math::Plane
+    + ***Replacement:*** public: ignition::math::Plane
+
+1. **gazebo/math/Rand.hh**
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblNormal(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblNormal(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntNormal(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntNormal(int, int)
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblUniform(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblUniform(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntUniform(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntUniform(int, int)
+    + ***Deprecation:*** public: static       uint32_t gazebo::math::GetSeed()
+    + ***Replacement:*** public: static unsigned int ignition::math::Seed()
+    + ***Deprecation:*** public: static   void gazebo::math::SetSeed(uint32_t)
+    + ***Replacement:*** public: static void ignition::math::Seed(unsigned int)
 
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline

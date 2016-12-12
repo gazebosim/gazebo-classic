@@ -181,7 +181,7 @@ void ContactVisual::CreateNewPoint()
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);
 
-  std::string objName = this->GetName() +
+  std::string objName = this->Name() +
     "_contactpoint_" + std::to_string(dPtr->points.size());
 
   ContactVisualPrivate::ContactPoint *cp =

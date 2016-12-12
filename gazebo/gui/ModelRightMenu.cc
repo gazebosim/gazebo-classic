@@ -293,11 +293,11 @@ void ModelRightMenu::OnApplyWrench()
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    linkName = vis->GetChild(0)->GetName();
+    linkName = vis->GetChild(0)->Name();
   }
   else
   {
-    modelName = vis->GetRootVisual()->GetName();
+    modelName = vis->GetRootVisual()->Name();
     linkName = this->entityName;
   }
 

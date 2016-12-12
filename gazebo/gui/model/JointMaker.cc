@@ -226,7 +226,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
     joint = this->dataPtr->newJoint;
     // Already has hotspot
     if (joint->hotspot)
-      jointId = joint->hotspot->GetName();
+      jointId = joint->hotspot->Name();
     // Still only line
     else
       jointId = "";
@@ -258,7 +258,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
     {
       // FIXME: Ogre object destruction should be handled in rendering::Visual
       camera->GetScene()->OgreSceneManager()->destroyEntity(
-          joint->visual->GetName());
+          joint->visual->Name());
     }
 
     scene->RemoveVisual(joint->hotspot);
@@ -301,8 +301,8 @@ void JointMaker::RemoveJointsByLink(const std::string &_linkName)
   {
     JointData *joint = it.second;
 
-    if (joint->child->GetName() == _linkName ||
-        joint->parent->GetName() == _linkName)
+    if (joint->child->Name() == _linkName ||
+        joint->parent->Name() == _linkName)
     {
       toDelete.push_back(it.first);
     }
@@ -323,8 +323,8 @@ std::vector<JointData *> JointMaker::JointDataByLink(
   {
     JointData *jointData = jointIt.second;
 
-    if (jointData->child->GetName() == _linkName ||
-        jointData->parent->GetName() == _linkName)
+    if (jointData->child->Name() == _linkName ||
+        jointData->parent->Name() == _linkName)
     {
       linkJoints.push_back(jointData);
     }
@@ -352,7 +352,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
   if (vis)
   {
-    if (this->dataPtr->joints.find(vis->GetName()) !=
+    if (this->dataPtr->joints.find(vis->Name()) !=
         this->dataPtr->joints.end())
     {
       // stop event propagation as we don't want users to manipulate the
@@ -377,13 +377,13 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
     rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
     {
-      if (this->dataPtr->joints.find(vis->GetName()) !=
+      if (this->dataPtr->joints.find(vis->Name()) !=
           this->dataPtr->joints.end())
       {
         // trigger joint inspector on right click
         if (_event.Button() == common::MouseEvent::RIGHT)
         {
-          this->dataPtr->inspectName = vis->GetName();
+          this->dataPtr->inspectName = vis->Name();
           this->ShowContextMenu(this->dataPtr->inspectName);
           return true;
         }
@@ -434,7 +434,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           if (this->dataPtr->jointCreationDialog)
           {
             this->dataPtr->jointCreationDialog->SetParent(
-                this->dataPtr->newJoint->parent->GetName());
+                this->dataPtr->newJoint->parent->Name());
           }
         }
         // Pressed child link
@@ -447,7 +447,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           if (this->dataPtr->jointCreationDialog)
           {
             this->dataPtr->jointCreationDialog->SetChild(
-                this->dataPtr->newJoint->child->GetName());
+                this->dataPtr->newJoint->child->Name());
           }
         }
 
@@ -482,8 +482,8 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
 
-  auto parentOriginInRootFrame = _parent->GetWorldPose().Ign().Pos()
-      - _parent->GetRootVisual()->GetWorldPose().Ign().Pos();
+  auto parentOriginInRootFrame = _parent->WorldPose().Pos()
+      - _parent->GetRootVisual()->WorldPose().Pos();
   jointLine->AddPoint(parentOriginInRootFrame);
   jointLine->AddPoint(
       parentOriginInRootFrame + ignition::math::Vector3d(0, 0, 0.1));
@@ -491,7 +491,7 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
-  std::string jointVisName = jointVis->GetName();
+  std::string jointVisName = jointVis->Name();
   std::string leafName = jointVisName;
   size_t pIdx = jointVisName.rfind("::");
   if (pIdx != std::string::npos)
@@ -514,7 +514,7 @@ JointData *JointMaker::CreateJoint(const rendering::VisualPtr &_parent,
     const rendering::VisualPtr &_child)
 {
   std::stringstream ss;
-  ss << _parent->GetName() << "_JOINT_" << this->dataPtr->jointCounter++;
+  ss << _parent->Name() << "_JOINT_" << this->dataPtr->jointCounter++;
 
   JointData *jointData = this->CreateJointLine(ss.str(), _parent);
   jointData->child = _child;
@@ -656,8 +656,8 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     rendering::VisualPtr rootVis = vis->GetRootVisual();
     if (rootVis->IsPlane())
       this->dataPtr->hoverVis = vis->GetParent();
-    else if (!gui::get_entity_id(rootVis->GetName()) &&
-        vis->GetName().find("_UNIQUE_ID_") == std::string::npos)
+    else if (!gui::get_entity_id(rootVis->Name()) &&
+        vis->Name().find("_UNIQUE_ID_") == std::string::npos)
     {
       this->dataPtr->hoverVis = vis->GetParent();
       if (!this->dataPtr->newJoint || (this->dataPtr->newJoint->parent &&
@@ -678,7 +678,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     // Set end point to origin of child link
     if (!this->dataPtr->hoverVis->IsPlane())
     {
-      posWorld = this->dataPtr->hoverVis->GetWorldPose().Ign().Pos();
+      posWorld = this->dataPtr->hoverVis->WorldPose().Pos();
     }
     // Set end point to mouse plane intersection
     else
@@ -689,8 +689,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 
     // Set point in root frame
     this->dataPtr->newJoint->line->SetPoint(1, posWorld -
-        this->dataPtr->newJoint->parent->GetRootVisual()->
-        GetWorldPose().Ign().Pos());
+        this->dataPtr->newJoint->parent->GetRootVisual()->WorldPose().Pos());
   }
   return true;
 }
@@ -725,10 +724,10 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 
   if (vis)
   {
-    if (this->dataPtr->joints.find(vis->GetName()) !=
+    if (this->dataPtr->joints.find(vis->Name()) !=
         this->dataPtr->joints.end())
     {
-      this->OpenInspector(vis->GetName());
+      this->OpenInspector(vis->Name());
       return true;
     }
   }
@@ -745,7 +744,7 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
     {
       for (auto jointVis : this->dataPtr->selectedJoints)
       {
-        this->RemoveJoint(jointVis->GetName());
+        this->RemoveJoint(jointVis->Name());
       }
       this->DeselectAll();
       return true;
@@ -778,8 +777,8 @@ void JointMaker::RemoveJointByUser(const std::string &_name)
       auto cmd = this->dataPtr->userCmdManager->NewCmd(
           "Deleted [" + joint->name + "]", MEUserCmd::DELETING_JOINT);
       cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
-      cmd->SetScopedName(joint->visual->GetName());
-      cmd->SetJointId(joint->hotspot->GetName());
+      cmd->SetScopedName(joint->visual->Name());
+      cmd->SetJointId(joint->hotspot->Name());
     }
   }
 
@@ -795,7 +794,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
   // Joint hotspot visual name is the JointId for easy access when clicking
-  std::string jointId = _joint->visual->GetName() + "_UNIQUE_ID_";
+  std::string jointId = _joint->visual->Name() + "_UNIQUE_ID_";
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(jointId, _joint->visual, false));
   hotspotVisual->Load();
@@ -806,7 +805,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(
       camera->GetScene()->OgreSceneManager()->createEntity(
-      _joint->visual->GetName(), "unit_cylinder"));
+      _joint->visual->Name(), "unit_cylinder"));
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
@@ -824,7 +823,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   color.a = 0.5;
 
   double linkSize = std::min(0.1,
-      _joint->parent->GetBoundingBox().GetSize().GetLength()*0.05);
+      _joint->parent->BoundingBox().Size().Length()*0.05);
   linkSize = std::max(linkSize, 0.01);
 
   double dimension = linkSize;
@@ -845,7 +844,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   this->dataPtr->joints[jointId] = _joint;
 
   _joint->hotspot = hotspotVisual;
-  _joint->inspector->SetJointId(_joint->hotspot->GetName());
+  _joint->inspector->SetJointId(_joint->hotspot->Name());
 
   _joint->dirty = true;
 
@@ -865,13 +864,13 @@ void JointMaker::Update()
       if (joint->child && joint->parent)
       {
         bool poseUpdate = false;
-        if (joint->parentPose != joint->parent->GetWorldPose().Ign() ||
-            joint->childPose != joint->child->GetWorldPose().Ign() ||
-            joint->childScale != joint->child->GetScale().Ign())
+        if (joint->parentPose != joint->parent->WorldPose() ||
+            joint->childPose != joint->child->WorldPose() ||
+            joint->childScale != joint->child->Scale())
          {
-           joint->parentPose = joint->parent->GetWorldPose().Ign();
-           joint->childPose = joint->child->GetWorldPose().Ign();
-           joint->childScale = joint->child->GetScale().Ign();
+           joint->parentPose = joint->parent->WorldPose();
+           joint->childPose = joint->child->WorldPose();
+           joint->childScale = joint->child->Scale();
            poseUpdate = true;
 
            // Highlight links connected to joint being created if they have
@@ -880,12 +879,12 @@ void JointMaker::Update()
            {
              // Parent
              this->SetVisualMoved(joint->parent,
-                 joint->parent->GetWorldPose().Ign() !=
+                 joint->parent->WorldPose() !=
                  this->dataPtr->parentLinkOriginalPose);
 
              // Child
              this->SetVisualMoved(joint->child,
-                 joint->child->GetWorldPose().Ign() !=
+                 joint->child->WorldPose() !=
                  this->dataPtr->childLinkOriginalPose);
            }
          }
@@ -902,9 +901,9 @@ void JointMaker::Update()
           {
             // Get poses as homogeneous transforms
             ignition::math::Matrix4d parentWorld(
-                this->dataPtr->newJoint->parent->GetWorldPose().Ign());
+                this->dataPtr->newJoint->parent->WorldPose());
             ignition::math::Matrix4d childWorld(
-                this->dataPtr->newJoint->child->GetWorldPose().Ign());
+                this->dataPtr->newJoint->child->WorldPose());
 
             // w_T_c = w_T_p * p_T_c
             // w_T_p^-1 * w_T_c = p_T_c
@@ -973,14 +972,14 @@ void JointMaker::GenerateSDF()
     jointElem = msgs::JointToSDF(*jointMsg.get(), jointElem);
 
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
-    std::string parentName = joint->parent->GetName();
+    std::string parentName = joint->parent->Name();
     size_t pIdx = parentName.find("::");
     if (pIdx != std::string::npos)
       parentName = parentName.substr(pIdx+2);
     parentElem->Set(parentName);
 
     sdf::ElementPtr childElem = jointElem->GetElement("child");
-    std::string childName = joint->child->GetName();
+    std::string childName = joint->child->Name();
     size_t cIdx = childName.find("::");
     if (cIdx != std::string::npos)
       childName = childName.substr(cIdx+2);
@@ -1069,7 +1068,7 @@ void JointData::OnApply()
 
   // Name
   if (this->name != this->jointMsg->name())
-    gui::model::Events::jointNameChanged(this->hotspot->GetName(),
+    gui::model::Events::jointNameChanged(this->hotspot->Name(),
         this->jointMsg->name());
   this->name = this->jointMsg->name();
 
@@ -1078,12 +1077,12 @@ void JointData::OnApply()
       msgs::ConvertJointType(this->jointMsg->type()));
 
   // Get scoped names
-  std::string parentOldName = this->parent->GetName();
+  std::string parentOldName = this->parent->Name();
   std::string parentScope = parentOldName;
   size_t parentIdx = parentOldName.find("::");
   if (parentIdx != std::string::npos)
     parentScope = parentOldName.substr(0, parentIdx+2);
-  std::string childOldName = this->child->GetName();
+  std::string childOldName = this->child->Name();
   std::string childScope = childOldName;
   size_t childIdx = childOldName.find("::");
   if (childIdx != std::string::npos)
@@ -1144,8 +1143,8 @@ void JointData::Update()
   // Hotspot and parent handle
   if (this->parent && this->child && this->hotspot && this->handles)
   {
-    auto parentOrigin = this->parent->GetWorldPose().Ign().Pos();
-    auto childOrigin = this->child->GetWorldPose().Ign().Pos();
+    auto parentOrigin = this->parent->WorldPose().Pos();
+    auto childOrigin = this->child->WorldPose().Pos();
 
     // Hotspot position
     auto dPos = childOrigin - parentOrigin;
@@ -1167,7 +1166,7 @@ void JointData::Update()
     // Parent handle position
     this->handles->getBillboard(0)->setPosition(
         rendering::Conversions::Convert(parentOrigin -
-        this->hotspot->GetWorldPose().Ign().Pos()));
+        this->hotspot->WorldPose().Pos()));
     this->handles->_updateBounds();
 
     // set new material if joint type has changed
@@ -1201,7 +1200,7 @@ void JointData::Update()
     // Create joint visual
     else if (this->child)
     {
-      std::string childName = this->child->GetName();
+      std::string childName = this->child->Name();
       std::string jointVisName = childName;
       size_t idx = childName.find("::");
       if (idx != std::string::npos)
@@ -1223,25 +1222,24 @@ void JointData::Update()
     // Parent - child
     if (this->child && this->jointVisual)
     {
-      this->line->SetPoint(0, (this->child->GetWorldPose().pos
-          - this->child->GetParent()->GetWorldPose().pos).Ign());
-      this->line->SetPoint(1,
-          (this->jointVisual->GetWorldPose().pos
-          - this->child->GetParent()->GetWorldPose().pos).Ign());
+      this->line->SetPoint(0, this->child->WorldPose().Pos()
+          - this->child->GetParent()->WorldPose().Pos());
+      this->line->SetPoint(1, this->jointVisual->WorldPose().Pos()
+          - this->child->GetParent()->WorldPose().Pos());
     }
     // Parent - mouse
     else if (this->parent && this->parent->GetParent())
     {
-      this->line->SetPoint(0, this->parent->GetWorldPose().Ign().Pos());
+      this->line->SetPoint(0, this->parent->WorldPose().Pos());
     }
   }
 
   // Notify joint changes
   if (this->parent && this->child && this->hotspot)
   {
-    std::string parentName = this->parent->GetName();
-    std::string childName = this->child->GetName();
-    gui::model::Events::jointChanged(this->hotspot->GetName(), this->name,
+    std::string parentName = this->parent->Name();
+    std::string childName = this->child->Name();
+    gui::model::Events::jointChanged(this->hotspot->Name(), this->name,
         JointMaker::jointTypes[this->type], parentName, childName);
   }
 
@@ -1267,7 +1265,7 @@ void JointData::UpdateMsg()
   // Parent
   if (this->parent)
   {
-    std::string jointParentName = this->parent->GetName();
+    std::string jointParentName = this->parent->Name();
     std::string unscopedName = jointParentName;
     size_t pIdx = jointParentName.find("::");
     if (pIdx != std::string::npos)
@@ -1280,7 +1278,7 @@ void JointData::UpdateMsg()
   // Child
   if (this->child)
   {
-    std::string jointChildName = this->child->GetName();
+    std::string jointChildName = this->child->Name();
     std::string unscopedName = jointChildName;
     size_t pIdx = jointChildName.find("::");
     if (pIdx != std::string::npos)
@@ -1437,7 +1435,7 @@ void JointMaker::SetSelected(const rendering::VisualPtr &_jointVis,
     if (it == this->dataPtr->selectedJoints.end())
     {
       this->dataPtr->selectedJoints.push_back(_jointVis);
-      model::Events::setSelectedJoint(_jointVis->GetName(), _selected);
+      model::Events::setSelectedJoint(_jointVis->Name(), _selected);
     }
   }
   else
@@ -1445,7 +1443,7 @@ void JointMaker::SetSelected(const rendering::VisualPtr &_jointVis,
     if (it != this->dataPtr->selectedJoints.end())
     {
       this->dataPtr->selectedJoints.erase(it);
-      model::Events::setSelectedJoint(_jointVis->GetName(), _selected);
+      model::Events::setSelectedJoint(_jointVis->Name(), _selected);
     }
   }
 }
@@ -1458,7 +1456,7 @@ void JointMaker::DeselectAll()
     rendering::VisualPtr vis = this->dataPtr->selectedJoints[0];
     vis->SetHighlighted(false);
     this->dataPtr->selectedJoints.erase(this->dataPtr->selectedJoints.begin());
-    model::Events::setSelectedJoint(vis->GetName(), false);
+    model::Events::setSelectedJoint(vis->Name(), false);
   }
 }
 
@@ -1510,8 +1508,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
 
-  auto parentOriginInRootFrame = parentVis->GetWorldPose().Ign().Pos()
-      - parentVis->GetRootVisual()->GetWorldPose().Ign().Pos();
+  auto parentOriginInRootFrame = parentVis->WorldPose().Pos()
+      - parentVis->GetRootVisual()->WorldPose().Pos();
   jointLine->AddPoint(parentOriginInRootFrame);
   jointLine->AddPoint(parentOriginInRootFrame +
                       ignition::math::Vector3d(0, 0, 0.1));
@@ -1528,8 +1526,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   if (!jointId.empty())
   {
     gui::model::Events::jointInserted(jointId, joint->name,
-        jointTypes[joint->type], joint->parent->GetName(),
-        joint->child->GetName());
+        jointTypes[joint->type], joint->parent->Name(),
+        joint->child->Name());
   }
 }
 
@@ -1611,7 +1609,7 @@ bool JointMaker::SetParentLink(const rendering::VisualPtr &_parentLink)
     return false;
   }
 
-  this->dataPtr->parentLinkOriginalPose = _parentLink->GetWorldPose().Ign();
+  this->dataPtr->parentLinkOriginalPose = _parentLink->WorldPose();
   return true;
 }
 
@@ -1660,7 +1658,7 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
     _childLink->AttachVisual(this->dataPtr->newJoint->jointVisual);
   }
 
-  this->dataPtr->childLinkOriginalPose = _childLink->GetWorldPose().Ign();
+  this->dataPtr->childLinkOriginalPose = _childLink->WorldPose();
 
   // Change state to not creating joint
   gui::Events::manipMode("select");
@@ -1772,7 +1770,7 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
     return;
   }
 
-  auto newChildPose = this->dataPtr->newJoint->child->GetWorldPose().Ign();
+  auto newChildPose = this->dataPtr->newJoint->child->WorldPose();
 
   if (_resetAll)
   {
@@ -1796,7 +1794,7 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
   {
     // Get poses as homogeneous transforms
     ignition::math::Matrix4d parent_world(
-        this->dataPtr->newJoint->parent->GetWorldPose().Ign());
+        this->dataPtr->newJoint->parent->WorldPose());
     ignition::math::Matrix4d child_parent(_pose);
 
     // w_T_c = w_T_p * p_T_c
@@ -1866,11 +1864,11 @@ void JointMaker::FinalizeCreation()
       this->dataPtr->newJoint->child && this->dataPtr->newJoint->parent)
   {
     gui::model::Events::jointInserted(
-        this->dataPtr->newJoint->hotspot->GetName(),
+        this->dataPtr->newJoint->hotspot->Name(),
         this->dataPtr->newJoint->name,
         this->jointTypes[this->dataPtr->newJoint->type],
-        this->dataPtr->newJoint->parent->GetName(),
-        this->dataPtr->newJoint->child->GetName());
+        this->dataPtr->newJoint->parent->Name(),
+        this->dataPtr->newJoint->child->Name());
 
 
     // Reset visuals
@@ -1885,8 +1883,8 @@ void JointMaker::FinalizeCreation()
         "Inserted [" + this->dataPtr->newJoint->name + "]",
         MEUserCmd::INSERTING_JOINT);
     cmd->SetSDF(msgs::JointToSDF(*this->dataPtr->newJoint->jointMsg));
-    cmd->SetScopedName(this->dataPtr->newJoint->visual->GetName());
-    cmd->SetJointId(this->dataPtr->newJoint->hotspot->GetName());
+    cmd->SetScopedName(this->dataPtr->newJoint->visual->Name());
+    cmd->SetJointId(this->dataPtr->newJoint->hotspot->Name());
   }
 
   this->dataPtr->newJoint = nullptr;

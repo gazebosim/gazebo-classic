@@ -712,7 +712,7 @@ void GpuLaser::CreateCanvas()
       & ~GZ_VISIBILITY_SELECTABLE);
 
   ignition::math::Pose3d pose;
-  pose.Pos() = ignition::math::Vector3d(0.01, 0, 0);
+  pose.Pos().Set(0.01, 0, 0);
   pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
 
   this->dataPtr->visual->SetPose(pose);

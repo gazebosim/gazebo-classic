@@ -117,7 +117,7 @@ void RoadTest::RoadVisual()
     sleep++;
   }
   ASSERT_TRUE(roadVis != nullptr);
-  EXPECT_EQ(roadVis->GetName(), roadName);
+  EXPECT_EQ(roadVis->Name(), roadName);
 }
 
 /////////////////////////////////////////////////

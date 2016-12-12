@@ -74,8 +74,11 @@ namespace gazebo
     /// \param[in] _v value
     /// \param[in] _min minimum
     /// \param[in] _max maximum
+    /// \deprecated See ignition::math::clamp
     template<typename T>
-    inline T clamp(T _v, T _min, T _max)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    clamp(T _v, T _min, T _max)
     {
       return std::max(std::min(_v, _max), _min);
     }
