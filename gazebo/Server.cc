@@ -226,7 +226,14 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       math::Rand::SetSeed(this->dataPtr->vm["seed"].as<double>());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
       ignition::math::Rand::Seed(this->dataPtr->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)

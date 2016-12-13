@@ -17,6 +17,7 @@
 #include "gazebo/common/Color.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Material.hh"
 
@@ -178,6 +179,8 @@ void Material::Update(const gazebo::common::Material *_mat)
   if (!_mat->GetTextureImage().empty() &&
       pass->getTextureUnitState(_mat->GetTextureImage()) == NULL)
   {
+    // Make sure to add the path to the texture image.
+    RenderEngine::Instance()->AddResourcePath(_mat->GetTextureImage());
     Ogre::TextureUnitState *texState = pass->createTextureUnitState(
         _mat->GetTextureImage());
     texState->setTextureName(_mat->GetTextureImage());

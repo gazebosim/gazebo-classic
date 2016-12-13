@@ -192,21 +192,22 @@ void ModelPropShop::Update()
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
     {
-      math::Box bbox = vis->GetBoundingBox();
+      ignition::math::Box bbox = vis->BoundingBox();
 
       // Compute model scaling.
-      double scaling = 1.0 / bbox.GetSize().GetMax();
+      double scaling = 1.0 / bbox.Size().Max();
 
       // Compute the model translation.
-      math::Vector3 trans = bbox.GetCenter();
+      ignition::math::Vector3d trans = bbox.Center();
       trans *= -scaling;
 
       // Normalize the size of the visual
       vis->SetScale(ignition::math::Vector3d(scaling, scaling, scaling));
-      vis->SetWorldPose(math::Pose(trans.x, trans.y, trans.z, 0, 0, 0));
+      vis->SetWorldPose(
+          ignition::math::Pose3d(trans.X(), trans.Y(), trans.Z(), 0, 0, 0));
 
       // Place the visual at the origin
-      bbox = vis->GetBoundingBox();
+      bbox = vis->BoundingBox();
 
       ignition::math::Pose3d pose;
 

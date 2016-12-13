@@ -104,7 +104,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the screw joint
-  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(screwJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 2u);
 
   // Add a ball joint
@@ -115,11 +115,11 @@ void JointMaker_TEST::CreateRemoveJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the two joints connected to the sphere
-  jointMaker->RemoveJointsByLink(sphereLink->GetName());
+  jointMaker->RemoveJointsByLink(sphereLink->Name());
   QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Remove the last joint
-  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(ballJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   delete jointMaker;
@@ -171,19 +171,19 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   unsigned int jointCount = jointMaker->JointCount();
 
   // Remove joints connected to the each link
-  jointMaker->RemoveJointsByLink(link00Vis->GetName());
+  jointMaker->RemoveJointsByLink(link00Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
   jointCount = jointMaker->JointCount();
 
-  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  jointMaker->RemoveJointsByLink(link01Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
   jointCount = jointMaker->JointCount();
 
-  jointMaker->RemoveJointsByLink(link02Vis->GetName());
+  jointMaker->RemoveJointsByLink(link02Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
   jointCount = jointMaker->JointCount();
 
-  jointMaker->RemoveJointsByLink(link03Vis->GetName());
+  jointMaker->RemoveJointsByLink(link03Vis->Name());
   QVERIFY(jointMaker->JointCount() <= jointCount);
 
   // no more joints left
@@ -211,7 +211,7 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the screw joint
-  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(screwJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 2u);
 
   // Add a ball joint
@@ -222,11 +222,11 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the two joints connected to link01
-  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  jointMaker->RemoveJointsByLink(link01Vis->Name());
   QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Remove the last joint
-  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  jointMaker->RemoveJoint(ballJointData->hotspot->Name());
   QCOMPARE(jointMaker->JointCount(), 0u);
 
   delete jointMaker;

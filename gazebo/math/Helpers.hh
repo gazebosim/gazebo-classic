@@ -74,6 +74,7 @@ namespace gazebo
     /// \param[in] _v value
     /// \param[in] _min minimum
     /// \param[in] _max maximum
+    /// \deprecated See ignition::math::clamp
     template<typename T>
     inline T
     GAZEBO_DEPRECATED(8.0)
