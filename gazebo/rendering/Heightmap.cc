@@ -158,7 +158,15 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 
   if (_msg->geometry().heightmap().has_sampling())
   {
-    this->dataPtr->sampling = _msg->geometry().heightmap().sampling();
+    unsigned int s = _msg->geometry().heightmap().sampling();
+    if (s == 0u || s & (s - 1u))
+    {
+      gzerr << "Heightmap sampling value must be a power of 2. "
+            << "The default value of 2 will be used instead." << std::endl;
+      this->dataPtr->sampling = 2u;
+    }
+    else
+      this->dataPtr->sampling = s;
   }
 
   this->Load();
@@ -409,6 +417,7 @@ void Heightmap::Load()
         }
       }
 #endif
+
       // these params need to be the same as physics/HeightmapShape.cc
       // in order to generate consistent height data
       bool flipY = false;
