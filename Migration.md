@@ -452,6 +452,20 @@ release will remove the deprecated code.
     + ***Deprecation:*** public:   gazebo::math::Plane
     + ***Replacement:*** public: ignition::math::Plane
 
+1. **gazebo/math/Rand.hh**
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblNormal(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblNormal(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntNormal(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntNormal(int, int)
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblUniform(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblUniform(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntUniform(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntUniform(int, int)
+    + ***Deprecation:*** public: static       uint32_t gazebo::math::GetSeed()
+    + ***Replacement:*** public: static unsigned int ignition::math::Seed()
+    + ***Deprecation:*** public: static   void gazebo::math::SetSeed(uint32_t)
+    + ***Replacement:*** public: static void ignition::math::Seed(unsigned int)
+
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline
     + ***Replacement:*** public: ignition::math::RotationSpline
