@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
@@ -100,7 +102,7 @@ void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
 
     // Connect to the update event.
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&OccupiedEventSource::Update, this));
+        std::bind(&OccupiedEventSource::Update, this));
   }
 }
 

@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A 4-wheeled vehicle
- * Author: Nate Koenig
- */
 
 #ifndef GAZEBO_PLUGINS_VEHICLEPLUGIN_HH_
 #define GAZEBO_PLUGINS_VEHICLEPLUGIN_HH_

@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/VehiclePlugin.hh"
@@ -143,7 +145,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->rearPower = _sdf->Get<double>("rear_power");
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&VehiclePlugin::OnUpdate, this)));
+          std::bind(&VehiclePlugin::OnUpdate, this)));
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->Name());
