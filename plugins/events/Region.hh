@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PLUGIN_EVENTS_REGION_HH_
-#define _GAZEBO_PLUGIN_EVENTS_REGION_HH_
+#ifndef GAZEBO_PLUGIN_EVENTS_REGION_HH_
+#define GAZEBO_PLUGIN_EVENTS_REGION_HH_
 
 #include <string>
 #include <vector>

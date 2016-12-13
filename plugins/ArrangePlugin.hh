@@ -15,10 +15,11 @@
  *
 */
 
-#ifndef _GAZEBO_ARRANGE_PLUGIN_HH_
-#define _GAZEBO_ARRANGE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_ARRANGEPLUGIN_HH_
+#define GAZEBO_PLUGINS_ARRANGEPLUGIN_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 
 #include <boost/shared_ptr.hpp>
@@ -76,7 +77,7 @@ namespace gazebo
                  /// \brief Initial object pose.
                  public: ignition::math::Pose3d pose;
                };
-    typedef boost::shared_ptr<Object> ObjectPtr;
+    typedef std::shared_ptr<Object> ObjectPtr;
 
     /// \brief Map of strings to model pointers.
     typedef std::map<std::string, ObjectPtr> Object_M;

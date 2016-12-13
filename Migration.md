@@ -16,6 +16,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **plugins/events/Region.hh**
+    + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const;
+    + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
+
 1. **gazebo/physics/dart/**
     + Updated to support version 5 of DART physics engine.
 

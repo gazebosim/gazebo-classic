@@ -20,6 +20,7 @@
 #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <sstream>
 #include <ignition/math/Vector2.hh>
 
@@ -149,7 +150,7 @@ TimerGUIPlugin::TimerGUIPlugin()
 
   // Connect to the PreRender Gazebo signal
   this->connections.push_back(event::Events::ConnectPreRender(
-                              boost::bind(&TimerGUIPlugin::PreRender, this)));
+                              std::bind(&TimerGUIPlugin::PreRender, this)));
 
   // Initialize variables
   this->posX = 0;
@@ -318,7 +319,7 @@ common::Time TimerGUIPlugin::GetCurrentTime() const
 /////////////////////////////////////////////////
 void TimerGUIPlugin::PreRender()
 {
-  boost::mutex::scoped_lock lock(this->timerMutex);
+  std::lock_guard<std::mutex> lock(this->timerMutex);
   this->SetTime(QString::fromStdString(
       this->timer.GetElapsed().FormattedString(
       common::Time::FormatOption::HOURS)));
@@ -340,7 +341,7 @@ void TimerGUIPlugin::OnTimerCtrl(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void TimerGUIPlugin::Start()
 {
-  boost::mutex::scoped_lock lock(this->timerMutex);
+  std::lock_guard<std::mutex> lock(this->timerMutex);
   this->timer.Start();
 
   this->SetStartStopButton("Stop");
@@ -349,7 +350,7 @@ void TimerGUIPlugin::Start()
 /////////////////////////////////////////////////
 void TimerGUIPlugin::Stop()
 {
-  boost::mutex::scoped_lock lock(this->timerMutex);
+  std::lock_guard<std::mutex> lock(this->timerMutex);
   this->timer.Stop();
 
   this->SetStartStopButton("Start");
@@ -375,7 +376,7 @@ void TimerGUIPlugin::Reset()
   // stop before resetting
   this->Stop();
   {
-    boost::mutex::scoped_lock lock(this->timerMutex);
+    std::lock_guard<std::mutex> lock(this->timerMutex);
     this->timer.Reset();
   }
 }

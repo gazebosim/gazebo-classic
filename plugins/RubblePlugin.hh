@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_RUBBLE_PLUGIN_HH_
-#define _GAZEBO_RUBBLE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_RUBBLEPLUGIN_HH_
+#define GAZEBO_PLUGINS_RUBBLEPLUGIN_HH_
 
 #include <string>
 #include <vector>

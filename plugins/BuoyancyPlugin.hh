@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUOYANCY_PLUGIN_HH_
-#define _GAZEBO_BUOYANCY_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_BUOYANCYPLUGIN_HH_
+#define GAZEBO_PLUGINS_BUOYANCYPLUGIN_HH_
 
 #include <map>
 #include <ignition/math/Vector3.hh>

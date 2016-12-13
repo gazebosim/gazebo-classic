@@ -119,7 +119,8 @@ void OccupiedEventSource::Update()
       continue;
 
     // If inside, then transmit the desired message.
-    if (this->regions[this->regionName]->Contains((*iter)->GetWorldPose().pos))
+    if (this->regions[this->regionName]->Contains(
+        (*iter)->GetWorldPose().pos.Ign()))
     {
       this->msgPub->Publish(this->msg);
     }
