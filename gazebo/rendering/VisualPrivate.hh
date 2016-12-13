@@ -18,6 +18,7 @@
 #ifndef GAZEBO_RENDERING_VISUALPRIVATE_HH_
 #define GAZEBO_RENDERING_VISUALPRIVATE_HH_
 
+#include <map>
 #include <string>
 #include <utility>
 #include <list>
