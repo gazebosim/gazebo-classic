@@ -34,9 +34,15 @@ macro (gz_build_tests)
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
-    add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
-                   ${GTEST_SOURCE_file}
-                   ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    if (BUILD_TESTING)
+      add_executable(${BINARY_NAME}
+                     ${GTEST_SOURCE_file}
+                     ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    else()
+      add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
+                     ${GTEST_SOURCE_file}
+                     ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    endif()
 
     link_directories(${PROJECT_BINARY_DIR}/test)
     target_link_libraries(${BINARY_NAME}
@@ -93,8 +99,13 @@ if (VALID_DISPLAY)
      set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
      QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
 
-     add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
-      ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
+      if (BUILD_TESTING)
+        add_executable(${BINARY_NAME}
+         ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
+      else()
+        add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
+         ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
+      endif()
 
     add_dependencies(${BINARY_NAME}
       gazebo_gui
