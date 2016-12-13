@@ -181,6 +181,8 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   {
     this->DynamicRenderable(_msg);
   }
+
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
 /////////////////////////////////////////////////
