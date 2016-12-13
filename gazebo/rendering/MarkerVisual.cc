@@ -181,16 +181,6 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   {
     this->DynamicRenderable(_msg);
   }
-
-  if (_msg.has_visibility())
-  {
-    if (_msg.visibility() == ignition::msgs::Marker::GUI)
-      this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-    else if (_msg.visibility() == ignition::msgs::Marker::ALL)
-      this->SetVisibilityFlags(GZ_VISIBILITY_ALL);
-    else
-      gzerr << "Unknown visibilty flag[" << _msg.visibility() << "]\n";
-  }
 }
 
 /////////////////////////////////////////////////
