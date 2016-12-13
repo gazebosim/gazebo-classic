@@ -158,9 +158,11 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color diffuse =  _mat->GetDiffuse();
   common::Color specular = _mat->GetSpecular();
   common::Color emissive = _mat->GetEmissive();
-
+  float transparency = _mat->GetTransparency();
 
   pass->setLightingEnabled(_mat->GetLighting());
+  double alpha = transparency > 0 ? 1.0 - transparency : diffuse.a;
+  diffuse.a = alpha;
   pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
   pass->setAmbient(ambient.r, ambient.g, ambient.b);
 
