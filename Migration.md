@@ -22,7 +22,7 @@ release will remove the deprecated code.
     + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
 
 1. **plugins/BuoyancyPlugin.hh**
-    + VolumeProperties: changed type from `public: math::Vector3 cov` to ignition::math::Vector3d cov`
+    + VolumeProperties: changed type from `public: math::Vector3 cov` to `ignition::math::Vector3d cov`
 
 1. **plugins/ArrangePlugin.hh**
     + ArrangePlugin:Object: changed type from `public: math::Pose pose` to `ignition::math::Pose3d pose`
