@@ -137,7 +137,7 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-    std::bind(&CessnaPlugin::Update, this, _1));
+    std::bind(&CessnaPlugin::Update, this, std::placeholders::_1));
 
   // Initialize transport.
   this->node = transport::NodePtr(new transport::Node());
