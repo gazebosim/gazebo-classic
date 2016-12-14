@@ -19,12 +19,16 @@ release will remove the deprecated code.
 1. **plugins/events/Region.hh**
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
-    + ***Deprecation:*** std::vector<math::Box> boxes
-    + ***Replacement:*** std::vector<ignition::math::Box> boxes
+    + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
 
 1. **plugins/BuoyancyPlugin.hh**
-    + ***Deprecation:*** VolumeProperties: public: math::Vector3 cov
-    + ***Replacement:*** VolumeProperties: public: ignition::math::Vector3d cov
+    + VolumeProperties: changed type from `public: math::Vector3 cov` to ignition::math::Vector3d cov`
+
+1. **plugins/ArrangePlugin.hh**
+    + ArrangePlugin:Object: changed type from `public: math::Pose pose` to `ignition::math::Pose3d pose`
+    + changed type from `typedef boost::shared_ptr<Object> ObjectPtr` to `std::shared_ptr<Object> ObjectPtr`
+    + changed type from `typedef std::map<std::string, math::Pose> Pose_M` to `typedef std::map<std::string, ignition::math::Pose3d> Pose_M`
+    ;
 
 1. **gazebo/physics/dart/**
     + Updated to support version 5 of DART physics engine.
