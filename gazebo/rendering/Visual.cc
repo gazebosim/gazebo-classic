@@ -656,9 +656,9 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
           newMaterialName = this->dataPtr->sceneNode->getName() +
               "_MATERIAL_" + material->getName();
 
-          // keep a pointer to the original material so it can be used to
-          // restore material state when setting transparency
-          this->dataPtr->originalMaterials[newMaterialName] = material;
+          // keep a pointer to the original submesh material so it can be used
+          // to restore material state when setting transparency
+          this->dataPtr->submeshMaterials[newMaterialName] = material;
 
           material = material->clone(newMaterialName);
           subEntity->setMaterial(material);
@@ -1056,10 +1056,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
     {
       myMaterial = origMaterial->clone(this->dataPtr->myMaterialName);
     }
-    // keep a pointer to the original material so it can be used to
-    // restore material state when setting transparency
-    this->dataPtr->originalMaterials[this->dataPtr->myMaterialName] =
-        origMaterial;
   }
   else
   {
@@ -1496,8 +1492,8 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
       // see if the original ogre material associated with this sub-entity
       // exists or not
       Ogre::MaterialPtr origMat;
-      auto it = this->dataPtr->originalMaterials.find(material->getName());
-      if (it != this->dataPtr->originalMaterials.end())
+      auto it = this->dataPtr->submeshMaterials.find(material->getName());
+      if (it != this->dataPtr->submeshMaterials.end())
         origMat = it->second;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();

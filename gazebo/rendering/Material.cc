@@ -160,7 +160,6 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color emissive = _mat->GetEmissive();
   float transparency = _mat->GetTransparency();
 
-  pass->setLightingEnabled(_mat->GetLighting());
   // use transparency value if specified otherwise use diffuse alpha value
   double alpha = transparency > 0 ? 1.0 - transparency : diffuse.a;
   diffuse.a = alpha;
@@ -177,8 +176,8 @@ void Material::Update(const gazebo::common::Material *_mat)
 
   pass->setSpecular(specular.r, specular.g, specular.b, specular.a);
   pass->setSelfIllumination(emissive.r, emissive.g, emissive.b);
-
   pass->setShininess(_mat->GetShininess());
+  pass->setLightingEnabled(_mat->GetLighting());
 
   // Only add the texture unit if it's not present in the material
   if (!_mat->GetTextureImage().empty() &&

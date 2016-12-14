@@ -218,8 +218,8 @@ namespace gazebo
       /// \brief The initial pose of the visual.
       public: ignition::math::Pose3d initialRelativePose;
 
-      /// \brief Original ogre material scripts used by the visual
-      public: std::map<std::string, Ogre::MaterialPtr> originalMaterials;
+      /// \brief Original ogre materials used by the submeshes in the visual
+      public: std::map<std::string, Ogre::MaterialPtr> submeshMaterials;
     };
     /// \}
   }
