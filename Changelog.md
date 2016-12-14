@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Updated `gz_log` tool to use `ignition::math`.
+    * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
+
 1. Updated COMVisual class to use `ignition::math`.
     * [Pull request #2528](https://bitbucket.org/osrf/gazebo/pull-request/2528)
 
