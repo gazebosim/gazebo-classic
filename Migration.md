@@ -20,6 +20,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
 
+1. **plugins/BuoyancyPlugin.hh**
+    + ***Deprecation:*** VolumeProperties: public: math::Vector3 cov
+    + ***Replacement:*** VolumeProperties: public: ignition::math::Vector3d cov
+
 1. **gazebo/physics/dart/**
     + Updated to support version 5 of DART physics engine.
 
