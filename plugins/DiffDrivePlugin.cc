@@ -75,9 +75,9 @@ void DiffDrivePlugin::Init()
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->leftJoint->GetChild());
 
-  math::Box bb = parent->GetBoundingBox();
+  ignition::math::Box bb = parent->GetBoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
-  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+  this->wheelRadius = bb.Size().Max() * 0.5;
 }
 
 /////////////////////////////////////////////////

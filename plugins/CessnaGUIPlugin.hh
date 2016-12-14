@@ -18,6 +18,9 @@
 #define _GAZEBO_GUI_CESSNA_PLUGIN_HH_
 
 #include <mutex>
+
+#include <ignition/math/Angle.hh>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
@@ -110,7 +113,7 @@ namespace gazebo
     private: transport::SubscriberPtr stateSub;
 
     /// \brief Angle increment/decrement each time a key is pressed;
-    private: math::Angle angleStep;
+    private: ignition::math::Angle angleStep;
 
     /// \brief State received from the Cessna plugin.
     private: msgs::Cessna state;

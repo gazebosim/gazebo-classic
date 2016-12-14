@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "ExistenceEventSource.hh"
 
 using namespace gazebo;
@@ -37,7 +39,9 @@ void ExistenceEventSource::Load(const sdf::ElementPtr _sdf)
   }
 
   this->existenceConnection = SimEventConnector::ConnectSpawnModel(
-      boost::bind(&ExistenceEventSource::OnExistence, this, _1, _2));
+      std::bind(&ExistenceEventSource::OnExistence, this,
+      std::placeholders::_1,
+      std::placeholders::_2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
