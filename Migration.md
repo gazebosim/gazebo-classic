@@ -66,6 +66,30 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/Distortion.hh**
+    + ***Deprecation:*** double GetK1() const
+    + ***Replacement:*** double K1() const
+    + ***Deprecation:*** double GetK2() const
+    + ***Replacement:*** double K2() const
+    + ***Deprecation:*** double GetK3() const
+    + ***Replacement:*** double K3() const
+    + ***Deprecation:*** double GetP1() const
+    + ***Replacement:*** double P1() const
+    + ***Deprecation:*** double GetP2() const
+    + ***Replacement:*** double P2() const
+    + ***Deprecation:*** math::Vector2d GetCenter() const
+    + ***Replacement:*** ignition::math::Vector2d Center() const
+    + ***Deprecation:*** static math::Vector2d Distort(const math::Vector2d &_in, const math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
+    + ***Replacement:*** static ignition::math::Vector2d Distort( const ignition::math::Vector2d &_in, const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
+
+1. **gazebo/rendering/COMVisual.hh**
+    + ***Deprecation:*** math::Pose GetInertiaPose() const
+    + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
+
+1. **gazebo/physics/Gripper.hh**
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+
 1. **gazebo/physics/World.hh**
     + ***Deprecation:*** bool GetRunning() const
     + ***Replacement:*** bool Running() const;
@@ -119,6 +143,34 @@ release will remove the deprecated code.
     + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale)
     + ***Deprecation:*** public: void SetPosition(const math::Vector3 &_pos)
     + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+    + ***Deprecation:*** math::Vector3 GetScale()
+    + ***Replacement:*** ignition::math::Vector3d Scale() const
+    + ***Deprecation:*** void SetRotation(const math::Quaternion &_rot)
+    + ***Replacement:*** void SetRotation(const ignition::math::Quaterniond &_rot)
+    + ***Deprecation:*** void SetPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetPose(const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** math::Vector3 GetPosition() const
+    + ***Replacement:*** ignition::math::Vector3d Position() const
+    + ***Deprecation:*** math::Quaternion GetRotation() const
+    + ***Replacement:*** ignition::math::Quaterniond Rotation() const
+    + ***Deprecation:*** math::Pose GetPose() const
+    + ***Replacement:*** ignition::math::Pose3d Pose()
+    + ***Deprecation:*** math::Pose GetWorldPose() const
+    + ***Replacement:*** ignition::math::Pose3d WorldPose() const
+    + ***Deprecation:*** void SetWorldPosition(const math::Vector3 &_pos)
+    + ***Replacement:*** void SetWorldPosition(const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** void SetWorldRotation(const math::Quaternion &_pos)
+    + ***Replacement:*** void SetWorldRotation(const ignition::math::Quaterniond &_pos)
+    + ***Deprecation:*** math::Box GetBoundingBox() const
+    + ***Replacement:*** ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void MoveToPosition(const math::Pose &_pose, double _time)
+    + ***Replacement:*** void MoveToPosition(const ignition::math::Pose3d &_pose, const double _time)
+    + ***Deprecation:*** void MoveToPositions(const std::vector<math::Pose> &_pts, double _time, std::function<void()> _onComplete = nullptr)
+    + ***Replacement:*** void MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts, const double _time, std::function<void()> _onComplete = nullptr)
+    + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose)
 
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)

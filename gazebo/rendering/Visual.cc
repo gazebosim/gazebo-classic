@@ -109,11 +109,11 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->layer = -1;
   this->dataPtr->inheritTransparency = true;
 
-  std::string uniqueName = this->GetName();
+  std::string uniqueName = this->Name();
   int index = 0;
   while (_scene->OgreSceneManager()->hasSceneNode(uniqueName))
   {
-    uniqueName = this->GetName() + "_" +
+    uniqueName = this->Name() + "_" +
                  boost::lexical_cast<std::string>(index++);
   }
 
@@ -121,7 +121,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->SetName(uniqueName);
   this->dataPtr->sceneNode =
     this->dataPtr->scene->OgreSceneManager()->getRootSceneNode()->
-        createChildSceneNode(this->GetName());
+        createChildSceneNode(this->Name());
 
   this->Init();
 }
@@ -162,15 +162,15 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
     return;
   }
 
-  std::string uniqueName = this->GetName();
+  std::string uniqueName = this->Name();
   int index = 0;
   while (pnode->getCreator()->hasSceneNode(uniqueName))
-    uniqueName = this->GetName() + "_" +
+    uniqueName = this->Name() + "_" +
                  boost::lexical_cast<std::string>(index++);
 
   this->SetName(uniqueName);
 
-  this->dataPtr->sceneNode = pnode->createChildSceneNode(this->GetName());
+  this->dataPtr->sceneNode = pnode->createChildSceneNode(this->Name());
 
   this->dataPtr->parent = _parent;
   this->dataPtr->scene = this->dataPtr->parent->GetScene();
@@ -207,7 +207,7 @@ void Visual::Fini()
 
   // Detach from the parent
   if (this->dataPtr->parent)
-    this->dataPtr->parent->DetachVisual(this->GetName());
+    this->dataPtr->parent->DetachVisual(this->Name());
   this->dataPtr->parent.reset();
 
   if (this->dataPtr->boundingBox)
@@ -243,11 +243,11 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   result->Load(this->dataPtr->sdf);
   result->SetScale(this->dataPtr->scale);
   result->SetVisibilityFlags(this->dataPtr->visibilityFlags);
-  std::string visName = this->GetName();
+  std::string visName = this->Name();
   for (auto iter: this->dataPtr->children)
   {
     // give a unique name by prefixing child visuals with the new clone name
-    std::string childName = iter->GetName();
+    std::string childName = iter->Name();
     std::string newName = childName;
     size_t pos = childName.find(visName);
     if (pos == 0)
@@ -256,7 +256,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   }
 
   if (_newParent == this->dataPtr->scene->WorldVisual())
-    result->SetWorldPose(this->GetWorldPose());
+    result->SetWorldPose(this->WorldPose());
   result->ShowCollision(false);
   result->SetInheritTransparency(this->InheritTransparency());
 
@@ -345,7 +345,7 @@ void Visual::Load(sdf::ElementPtr _sdf)
 void Visual::Load()
 {
   std::ostringstream stream;
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = nullptr;
 
@@ -353,7 +353,7 @@ void Visual::Load()
     this->dataPtr->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->dataPtr->sdf->Get<math::Pose>("pose");
+  pose = this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
 
   std::string mesh = this->GetMeshName();
   std::string subMesh = this->GetSubMeshName();
@@ -391,7 +391,7 @@ void Visual::Load()
 
   // Set the pose of the scene node
   this->SetPose(pose);
-  this->dataPtr->initialRelativePose = pose.Ign();
+  this->dataPtr->initialRelativePose = pose;
 
   // Get the size of the mesh
   if (obj)
@@ -428,9 +428,9 @@ void Visual::Load()
     }
     else if (geomElem->HasElement("plane"))
     {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      geometrySize.Set(size.x, size.y, 1);
+      ignition::math::Vector2d size =
+          geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
+      geometrySize.Set(size.X(), size.Y(), 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
@@ -562,7 +562,7 @@ void Visual::Update()
     {
       this->dataPtr->animState = nullptr;
       this->dataPtr->sceneNode->getCreator()->destroyAnimation(
-          this->GetName() + "_animation");
+          this->Name() + "_animation");
       if (this->dataPtr->onAnimationComplete)
         this->dataPtr->onAnimationComplete();
       // event::Events::DisconnectPreRender(this->preRenderConnection);
@@ -579,6 +579,12 @@ void Visual::SetName(const std::string &_name)
 
 //////////////////////////////////////////////////
 std::string Visual::GetName() const
+{
+  return this->Name();
+}
+
+//////////////////////////////////////////////////
+std::string Visual::Name() const
 {
   return this->dataPtr->name;
 }
@@ -604,7 +610,7 @@ void Visual::AttachVisual(VisualPtr _vis)
 //////////////////////////////////////////////////
 void Visual::DetachVisual(VisualPtr _vis)
 {
-  this->DetachVisual(_vis->GetName());
+  this->DetachVisual(_vis->Name());
 }
 
 //////////////////////////////////////////////////
@@ -613,7 +619,7 @@ void Visual::DetachVisual(const std::string &_name)
   for (auto iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
@@ -661,10 +667,10 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     {
       RTShaderSystem::Instance()->UpdateShaders();
     }
-    _obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
+    _obj->getUserObjectBindings().setUserAny(Ogre::Any(this->Name()));
   }
   else
-    gzerr << "Visual[" << this->GetName() << "] already has object["
+    gzerr << "Visual[" << this->Name() << "] already has object["
           << _obj->getName() << "] attached.";
 
   _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
@@ -812,7 +818,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
   {
-    (*iter)->UpdateGeomSize(_scale * (*iter)->GetScale().Ign());
+    (*iter)->UpdateGeomSize(_scale * (*iter)->Scale());
   }
 
   // update the same way as server - see Link::UpdateVisualGeomSDF()
@@ -875,6 +881,12 @@ ignition::math::Vector3d Visual::GetGeometrySize() const
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
+  return this->Scale();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Visual::Scale() const
+{
   return this->dataPtr->scale;
 }
 
@@ -888,7 +900,7 @@ ignition::math::Vector3d Visual::DerivedScale() const
 
   while (vis && vis != worldVis)
   {
-    derivedScale = derivedScale * vis->GetScale().Ign();
+    derivedScale = derivedScale * vis->Scale();
     vis = vis->GetParent();
   }
 
@@ -1093,7 +1105,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->Initialized()
       && this->dataPtr->lighting &&
-      this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
+      this->Name().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();
   }
@@ -1110,7 +1122,7 @@ void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 
   if (this->dataPtr->myMaterialName.empty())
   {
-    std::string matName = this->GetName() + "_MATERIAL_";
+    std::string matName = this->Name() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
   }
@@ -1174,7 +1186,7 @@ void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
 
   if (this->dataPtr->myMaterialName.empty())
   {
-    std::string matName = this->GetName() + "_MATERIAL_";
+    std::string matName = this->Name() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
   }
@@ -1243,7 +1255,7 @@ void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 
   if (this->dataPtr->myMaterialName.empty())
   {
-    std::string matName = this->GetName() + "_MATERIAL_";
+    std::string matName = this->Name() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
   }
@@ -1577,7 +1589,7 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
-    auto bbox = this->GetBoundingBox().Ign();
+    auto bbox = this->BoundingBox();
 
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
@@ -1600,7 +1612,7 @@ void Visual::SetHighlighted(bool _highlighted)
   {
     for (auto child : this->dataPtr->children)
     {
-      if (child->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+      if (child->Name().find("LINK_FRAME_VISUAL__") != std::string::npos)
         child->SetHighlighted(_highlighted);
     }
   }
@@ -1712,48 +1724,78 @@ void Visual::SetPosition(const ignition::math::Vector3d &_pos)
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(_pos.X(), _pos.Y(), _pos.Z());
 
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+  this->SetRotation(_rot.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
+{
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is null");
   this->dataPtr->sceneNode->setOrientation(
-      Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
+      Ogre::Quaternion(_rot.W(), _rot.X(), _rot.Y(), _rot.Z()));
 
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
-  this->SetPosition(_pose.pos.Ign());
-  this->SetRotation(_pose.rot);
+  this->SetPose(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetPosition(_pose.Pos());
+  this->SetRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetPosition() const
 {
+  return this->Position();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Visual::Position() const
+{
   if (!this->dataPtr->sceneNode)
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   return Conversions::ConvertIgn(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+  return this->Rotation();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Visual::Rotation() const
+{
   if (!this->dataPtr->sceneNode)
-    return math::Vector3::Zero;
+    return ignition::math::Quaterniond::Identity;
   return Conversions::ConvertIgn(this->dataPtr->sceneNode->getOrientation());
 }
 
 //////////////////////////////////////////////////
 math::Pose Visual::GetPose() const
 {
-  math::Pose pos;
-  pos.pos = this->GetPosition();
-  pos.rot = this->GetRotation();
+  return this->Pose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Visual::Pose() const
+{
+  ignition::math::Pose3d pos;
+  pos.Pos() = this->Position();
+  pos.Rot() = this->Rotation();
   return pos;
 }
 
@@ -1766,32 +1808,54 @@ ignition::math::Pose3d Visual::InitialRelativePose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos);
-  this->SetWorldRotation(_pose.rot);
+  this->SetWorldPose(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetWorldPosition(_pose.Pos());
+  this->SetWorldRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+  this->SetWorldPosition(_pos.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
+{
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedPosition(
-    Conversions::Convert(_pos.Ign()));
+  this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
+  this->SetWorldRotation(_q.Ign());
+}
+
+//////////////////////////////////////////////////
+void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
+{
   if (!this->dataPtr->sceneNode)
     return;
-  this->dataPtr->sceneNode->_setDerivedOrientation(
-    Conversions::Convert(_q.Ign()));
+  this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
 //////////////////////////////////////////////////
 math::Pose Visual::GetWorldPose() const
 {
-  math::Pose pose;
+  return this->WorldPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Visual::WorldPose() const
+{
+  ignition::math::Pose3d pose;
 
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
@@ -1799,15 +1863,10 @@ math::Pose Visual::GetWorldPose() const
   if (this->dataPtr->sceneNode)
   {
     vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-    pose.pos.x = vpos.x;
-    pose.pos.y = vpos.y;
-    pose.pos.z = vpos.z;
+    pose.Pos().Set(vpos.x, vpos.y, vpos.z);
 
     vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-    pose.rot.w = vquatern.w;
-    pose.rot.x = vquatern.x;
-    pose.rot.y = vquatern.y;
-    pose.rot.z = vquatern.z;
+    pose.Rot().Set(vquatern.w, vquatern.x, vquatern.y, vquatern.z);
   }
 
   return pose;
@@ -1886,7 +1945,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
   {
     this->dataPtr->ribbonTrail =
         this->dataPtr->scene->OgreSceneManager()->createRibbonTrail(
-        this->GetName() + "_RibbonTrail");
+        this->Name() + "_RibbonTrail");
     this->dataPtr->ribbonTrail->setMaterialName("Gazebo/RibbonTrail");
     // this->dataPtr->ribbonTrail->setTrailLength(100);
     this->dataPtr->ribbonTrail->setMaxChainElements(10000);
@@ -1954,7 +2013,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 {
   this->dataPtr->lineVertices.push_back(std::make_pair(_line, _index));
-  _line->SetPoint(_index, this->GetWorldPose().pos.Ign());
+  _line->SetPoint(_index, this->WorldPose().Pos());
 }
 
 //////////////////////////////////////////////////
@@ -1966,25 +2025,32 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 math::Box Visual::GetBoundingBox() const
 {
-  math::Box box;
-  this->GetBoundsHelper(this->GetSceneNode(), box);
+  return this->BoundingBox();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Visual::BoundingBox() const
+{
+  ignition::math::Box box;
+  this->BoundsHelper(this->GetSceneNode(), box);
   return box;
 }
 
 //////////////////////////////////////////////////
-void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
+void Visual::BoundsHelper(Ogre::SceneNode *_node,
+                          ignition::math::Box &_box) const
 {
-  node->_updateBounds();
-  node->_update(false, true);
+  _node->_updateBounds();
+  _node->_update(false, true);
 
   Ogre::Matrix4 invTransform =
       this->dataPtr->sceneNode->_getFullTransform().inverse();
 
-  Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
+  Ogre::SceneNode::ChildNodeIterator it = _node->getChildIterator();
 
-  for (int i = 0; i < node->numAttachedObjects(); i++)
+  for (int i = 0; i < _node->numAttachedObjects(); i++)
   {
-    Ogre::MovableObject *obj = node->getAttachedObject(i);
+    Ogre::MovableObject *obj = _node->getAttachedObject(i);
 
     if (obj->isVisible() && obj->getMovableType() != "gazebo::dynamiclines"
         && obj->getMovableType() != "BillboardSet"
@@ -2014,7 +2080,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       else
       {
         // Get transform to be applied to the current node.
-        Ogre::Matrix4 transform = invTransform * node->_getFullTransform();
+        Ogre::Matrix4 transform = invTransform * _node->_getFullTransform();
         // Correct precision error which makes ogre's isAffine check fail.
         transform[3][0] = transform[3][1] = transform[3][2] = 0;
         transform[3][3] = 1;
@@ -2025,14 +2091,14 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
-      box.Merge(math::Box(min, max));
+      _box.Merge(ignition::math::Box(min, max));
     }
   }
 
   while (it.hasMoreElements())
   {
     Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
-    this->GetBoundsHelper(next, box);
+    this->BoundsHelper(next, _box);
   }
 }
 
@@ -2601,7 +2667,7 @@ bool Visual::IsAncestorOf(const rendering::VisualPtr _visual) const
   rendering::VisualPtr vis = _visual->GetParent();
   while (vis)
   {
-    if (vis->GetName() == this->GetName())
+    if (vis->Name() == this->Name())
       return true;
     vis = vis->GetParent();
   }
@@ -2619,7 +2685,7 @@ bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
   rendering::VisualPtr vis = this->GetParent();
   while (vis)
   {
-    if (vis->GetName() == _visual->GetName())
+    if (vis->Name() == _visual->Name())
       return true;
     vis = vis->GetParent();
   }
@@ -2708,7 +2774,7 @@ std::string Visual::GetMeshName() const
       return "unit_plane";
     else if (geomElem->HasElement("polyline"))
     {
-      std::string polyLineName = this->GetName();
+      std::string polyLineName = this->Name();
       common::MeshManager *meshManager = common::MeshManager::Instance();
 
       if (!meshManager->IsValidFilename(polyLineName))
@@ -2810,14 +2876,28 @@ bool Visual::GetCenterSubMesh() const
 //////////////////////////////////////////////////
 void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
                              double _time,
-                             boost::function<void()> _onComplete)
+                             std::function<void()> _onComplete)
+{
+  std::vector<ignition::math::Pose3d> pts;
+  for (auto const &pt : _pts)
+  {
+    pts.push_back(pt.Ign());
+  }
+
+  this->MoveToPositions(pts, _time, _onComplete);
+}
+
+//////////////////////////////////////////////////
+void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
+                             const double _time,
+                             std::function<void()> _onComplete)
 {
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
+  auto start = this->WorldPose().Pos();
 
   this->dataPtr->onAnimationComplete = _onComplete;
 
-  std::string animName = this->GetName() + "_animation";
+  std::string animName = this->Name() + "_animation";
 
   Ogre::Animation *anim =
     this->dataPtr->sceneNode->getCreator()->createAnimation(animName, _time);
@@ -2827,7 +2907,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
       this->dataPtr->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   double dt = _time / (_pts.size()-1);
@@ -2836,8 +2916,8 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   {
     key = strack->createNodeKeyFrame(tt);
     key->setTranslate(Ogre::Vector3(
-          _pts[i].pos.x, _pts[i].pos.y, _pts[i].pos.z));
-    key->setRotation(Conversions::Convert(_pts[i].Ign().Rot()));
+          _pts[i].Pos().X(), _pts[i].Pos().Y(), _pts[i].Pos().Z()));
+    key->setRotation(Conversions::Convert(_pts[i].Rot()));
 
     tt += dt;
   }
@@ -2860,13 +2940,19 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 //////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 {
+  this->MoveToPosition(_pose.Ign(), _time);
+}
+
+//////////////////////////////////////////////////
+void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
+{
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
-  math::Vector3 rpy = _pose.rot.GetAsEuler();
+  auto start = this->WorldPose().Pos();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
-  math::Quaternion rotFinal(0, rpy.y, rpy.z);
+  ignition::math::Quaterniond rotFinal(0, rpy.Y(), rpy.Z());
 
-  std::string animName = this->GetName() + "_animation";
+  std::string animName = this->Name() + "_animation";
 
   Ogre::Animation *anim =
     this->dataPtr->sceneNode->getCreator()->createAnimation(animName, _time);
@@ -2876,12 +2962,13 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
       anim->createNodeTrack(0, this->dataPtr->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
-  key->setRotation(Conversions::Convert(rotFinal.Ign()));
+  key->setTranslate(Ogre::Vector3(_pose.Pos().X(), _pose.Pos().Y(),
+        _pose.Pos().Z()));
+  key->setRotation(Conversions::Convert(rotFinal));
 
   this->dataPtr->animState =
     this->dataPtr->sceneNode->getCreator()->createAnimationState(animName);
@@ -2987,7 +3074,7 @@ void Visual::ShowSkeleton(bool _show)
   ///  make the rest of the model transparent
   this->SetTransparency(transp);
 
-  if (this->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+  if (this->Name().find("__SKELETON_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   std::vector<VisualPtr>::iterator iter;
@@ -3029,7 +3116,7 @@ void Visual::ShowJoints(bool _show)
 {
   // If this is a joint visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+      this->Name().find("JOINT_VISUAL__") != std::string::npos)
   {
     this->SetVisible(_show);
   }
@@ -3083,24 +3170,24 @@ void Visual::ShowCOM(bool _show)
 {
   // If this is a COM visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find("COM_VISUAL__") != std::string::npos)
+      this->Name().find("COM_VISUAL__") != std::string::npos)
   {
     this->SetVisible(_show);
   }
   // If this is a link without COM visuals, create them
   else if (_show && this->dataPtr->type == VT_LINK &&
-      !this->dataPtr->scene->GetVisual(this->GetName() + "_COM_VISUAL__"))
+      !this->dataPtr->scene->GetVisual(this->Name() + "_COM_VISUAL__"))
   {
     auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
     if (!msg)
     {
-      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+      gzerr << "Couldn't get link message for visual [" << this->Name() <<
           "]" << std::endl;
       return;
     }
     auto msgPtr = new ConstLinkPtr(msg);
 
-    COMVisualPtr vis(new COMVisual(this->GetName() + "_COM_VISUAL__",
+    COMVisualPtr vis(new COMVisual(this->Name() + "_COM_VISUAL__",
         shared_from_this()));
     vis->Load(*msgPtr);
     vis->SetVisible(_show);
@@ -3120,24 +3207,24 @@ void Visual::ShowInertia(bool _show)
 
   // If this is an inertia visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find(suffix) != std::string::npos)
+      this->Name().find(suffix) != std::string::npos)
   {
     this->SetVisible(_show);
   }
   // If this is a link without inertia visuals, create them
   else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
-      !this->dataPtr->scene->GetVisual(this->GetName() + suffix))
+      !this->dataPtr->scene->GetVisual(this->Name() + suffix))
   {
     auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
     if (!msg)
     {
-      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+      gzerr << "Couldn't get link message for visual [" << this->Name() <<
           "]" << std::endl;
       return;
     }
     auto msgPtr = new ConstLinkPtr(msg);
 
-    InertiaVisualPtr vis(new InertiaVisual(this->GetName() +
+    InertiaVisualPtr vis(new InertiaVisual(this->Name() +
         suffix, shared_from_this()));
     vis->Load(*msgPtr);
     vis->SetVisible(_show);
@@ -3155,15 +3242,15 @@ void Visual::ShowLinkFrame(bool _show)
 {
   // If this is a link frame visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
-      this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+      this->Name().find("LINK_FRAME_VISUAL__") != std::string::npos)
   {
     this->SetVisible(_show);
   }
   // If this is a link without link frame visuals, create them
   else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
-    !this->dataPtr->scene->GetVisual(this->GetName() + "_LINK_FRAME_VISUAL__"))
+    !this->dataPtr->scene->GetVisual(this->Name() + "_LINK_FRAME_VISUAL__"))
   {
-    LinkFrameVisualPtr vis(new LinkFrameVisual(this->GetName() +
+    LinkFrameVisualPtr vis(new LinkFrameVisual(this->Name() +
         "_LINK_FRAME_VISUAL__", shared_from_this()));
     vis->Load();
     vis->SetVisible(_show);
@@ -3181,7 +3268,7 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
 {
   if (!this->dataPtr->skeleton)
   {
-    gzerr << "Visual " << this->GetName() << " has no skeleton.\n";
+    gzerr << "Visual " << this->Name() << " has no skeleton.\n";
     return;
   }
 
@@ -3240,7 +3327,7 @@ void Visual::LoadPlugin(const std::string &_filename,
   {
     if (plugin->GetType() != VISUAL_PLUGIN)
     {
-      gzerr << "Visual[" << this->GetName() << "] is attempting to load "
+      gzerr << "Visual[" << this->Name() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
             << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
       return;

@@ -269,18 +269,18 @@ void UndoTest::UndoTranslateModel()
   // Get box model
   auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
-  auto boxInitialPose = boxModel->GetWorldPose();
+  auto boxInitialPose = boxModel->GetWorldPose().Ign();
 
   // Get box visual
   auto boxVis = scene->GetVisual("box");
   QVERIFY(boxVis != NULL);
-  QVERIFY(boxVis->GetWorldPose() == boxInitialPose);
+  QVERIFY(boxVis->WorldPose() == boxInitialPose);
 
   // Move visual
-  auto boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  auto boxFinalPose = ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
   boxVis->SetWorldPose(boxFinalPose);
-  QVERIFY(boxVis->GetWorldPose() != boxInitialPose);
-  QVERIFY(boxVis->GetWorldPose() == boxFinalPose);
+  QVERIFY(boxVis->WorldPose() != boxInitialPose);
+  QVERIFY(boxVis->WorldPose() == boxFinalPose);
 
   // Check that model has not moved yet
   QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
@@ -365,16 +365,16 @@ void UndoTest::UndoRotateLight()
   // Get sun visual
   auto sunVis = scene->GetVisual("sun");
   QVERIFY(sunVis != NULL);
-  QVERIFY(sunVis->GetRotation() == sunInitialRot);
+  QVERIFY(sunVis->Rotation() == sunInitialRot);
 
   // Move visual
   auto sunFinalRot = ignition::math::Quaterniond(1, 0, 0);
   sunVis->SetRotation(sunFinalRot);
-  QVERIFY(sunVis->GetRotation() != sunInitialRot);
-  QVERIFY(sunVis->GetRotation() == sunFinalRot);
+  QVERIFY(sunVis->Rotation() != sunInitialRot);
+  QVERIFY(sunVis->Rotation() == sunFinalRot);
 
   // Check that light has not moved yet
-  QVERIFY(sunLight->GetWorldPose().rot == sunInitialRot);
+  QVERIFY(sunLight->GetWorldPose().rot.Ign() == sunInitialRot);
 
   // Trigger user command
   gazebo::gui::ModelManipulator::Instance()->SetManipulationMode("rotate");
@@ -456,13 +456,13 @@ void UndoTest::UndoScaleModel()
   // Get box visual
   auto boxVis = scene->GetVisual("box");
   QVERIFY(boxVis != NULL);
-  QVERIFY(boxVis->GetScale() == boxInitialScale);
+  QVERIFY(boxVis->Scale() == boxInitialScale);
 
   // Scale visual
   auto boxFinalScale = ignition::math::Vector3d(0.1, 2, 3);
   boxVis->SetScale(boxFinalScale);
-  QVERIFY(boxVis->GetScale() != boxInitialScale);
-  QVERIFY(boxVis->GetScale() == boxFinalScale);
+  QVERIFY(boxVis->Scale() != boxInitialScale);
+  QVERIFY(boxVis->Scale() == boxFinalScale);
 
   // Check that model has not been scaled yet
   QVERIFY(boxModel->Scale() == boxInitialScale);
@@ -542,12 +542,12 @@ void UndoTest::UndoSnap()
   // Get box model
   auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
-  auto boxInitialPose = boxModel->GetWorldPose();
+  auto boxInitialPose = boxModel->GetWorldPose().Ign();
 
   // Get box visual
   auto boxVis = scene->GetVisual("box");
   QVERIFY(boxVis != NULL);
-  QVERIFY(boxVis->GetWorldPose() == boxInitialPose);
+  QVERIFY(boxVis->WorldPose() == boxInitialPose);
 
   // Trigger user command
   ignition::math::Triangle3d triangleSrc(
@@ -563,13 +563,13 @@ void UndoTest::UndoSnap()
   gazebo::gui::ModelSnap::Instance()->Snap(triangleSrc, triangleDest, boxVis);
 
   // Check that visual moved but model didn't
-  QVERIFY(boxVis->GetWorldPose() != boxInitialPose);
-  QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
+  QVERIFY(boxVis->WorldPose() != boxInitialPose);
+  QVERIFY(boxModel->GetWorldPose().Ign() == boxInitialPose);
 
   // Check that box model moved
   int sleep = 0;
   int maxSleep = 10;
-  while (boxModel->GetWorldPose() == boxInitialPose && sleep < maxSleep)
+  while (boxModel->GetWorldPose().Ign() == boxInitialPose && sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
@@ -578,7 +578,7 @@ void UndoTest::UndoSnap()
   }
   gzmsg << "Box pose [" << boxModel->GetWorldPose() << "] initial pose [" <<
       boxInitialPose << "]    sleep [" << sleep << "]" << std::endl;
-  QVERIFY(boxModel->GetWorldPose() != boxInitialPose);
+  QVERIFY(boxModel->GetWorldPose().Ign() != boxInitialPose);
 
   // Undo
   QVERIFY(gazebo::gui::g_undoAct != NULL);
@@ -589,7 +589,7 @@ void UndoTest::UndoSnap()
   // Check box is back to initial pose
   sleep = 0;
   maxSleep = 10;
-  while (boxModel->GetWorldPose() != boxInitialPose && sleep < maxSleep)
+  while (boxModel->GetWorldPose().Ign() != boxInitialPose && sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
@@ -598,7 +598,7 @@ void UndoTest::UndoSnap()
   }
   gzmsg << "Box pose [" << boxModel->GetWorldPose() << "] initial pose [" <<
       boxInitialPose << "]    sleep [" << sleep << "]" << std::endl;
-  QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
+  QVERIFY(boxModel->GetWorldPose().Ign() == boxInitialPose);
 
   // Clean up
   delete mainWindow;
@@ -633,11 +633,11 @@ void UndoTest::UndoAlign()
   // Get models
   auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
-  auto boxInitialPose = boxModel->GetWorldPose();
+  auto boxInitialPose = boxModel->GetWorldPose().Ign();
 
   auto cylinderModel = world->ModelByName("cylinder");
   QVERIFY(cylinderModel != NULL);
-  auto cylinderInitialPose = cylinderModel->GetWorldPose();
+  auto cylinderInitialPose = cylinderModel->GetWorldPose().Ign();
 
   auto sphereModel = world->ModelByName("sphere");
   QVERIFY(sphereModel != NULL);
@@ -646,15 +646,15 @@ void UndoTest::UndoAlign()
   // Get visuals
   auto boxVis = scene->GetVisual("box");
   QVERIFY(boxVis != NULL);
-  QVERIFY(boxVis->GetWorldPose() == boxInitialPose);
+  QVERIFY(boxVis->WorldPose() == boxInitialPose);
 
   auto cylinderVis = scene->GetVisual("cylinder");
   QVERIFY(cylinderVis != NULL);
-  QVERIFY(cylinderVis->GetWorldPose() == cylinderInitialPose);
+  QVERIFY(cylinderVis->WorldPose() == cylinderInitialPose);
 
   auto sphereVis = scene->GetVisual("sphere");
   QVERIFY(sphereVis != NULL);
-  QVERIFY(sphereVis->GetWorldPose() == sphereInitialPose);
+  QVERIFY(sphereVis->WorldPose() == sphereInitialPose.Ign());
 
   // Trigger user command
   std::vector<gazebo::rendering::VisualPtr> visuals;
@@ -667,14 +667,15 @@ void UndoTest::UndoAlign()
 
   // Check that models haven't moved yet
   QVERIFY(sphereModel->GetWorldPose() == sphereInitialPose);
-  QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
-  QVERIFY(cylinderModel->GetWorldPose() == cylinderInitialPose);
+  QVERIFY(boxModel->GetWorldPose().Ign() == boxInitialPose);
+  QVERIFY(cylinderModel->GetWorldPose().Ign() == cylinderInitialPose);
 
   // Check that box and cylinder models moved
   int sleep = 0;
   int maxSleep = 10;
-  while (boxModel->GetWorldPose() == boxInitialPose &&
-      cylinderModel->GetWorldPose() == cylinderInitialPose && sleep < maxSleep)
+  while (boxModel->GetWorldPose().Ign() == boxInitialPose &&
+      cylinderModel->GetWorldPose().Ign() == cylinderInitialPose &&
+      sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
@@ -686,8 +687,8 @@ void UndoTest::UndoAlign()
         << "] cylinder pose [" << cylinderModel->GetWorldPose()
         << "] cylinder initial pose [" << cylinderInitialPose
         << "]    sleep [" << sleep << "]" << std::endl;
-  QVERIFY(boxModel->GetWorldPose() != boxInitialPose);
-  QVERIFY(cylinderModel->GetWorldPose() != cylinderInitialPose);
+  QVERIFY(boxModel->GetWorldPose().Ign() != boxInitialPose);
+  QVERIFY(cylinderModel->GetWorldPose().Ign() != cylinderInitialPose);
 
   // Undo
   QVERIFY(gazebo::gui::g_undoAct != NULL);
@@ -698,8 +699,9 @@ void UndoTest::UndoAlign()
   // Check that box and cylinder are back to initial pose
   sleep = 0;
   maxSleep = 10;
-  while (boxModel->GetWorldPose() != boxInitialPose &&
-      cylinderModel->GetWorldPose() != cylinderInitialPose && sleep < maxSleep)
+  while (boxModel->GetWorldPose().Ign() != boxInitialPose &&
+      cylinderModel->GetWorldPose().Ign() != cylinderInitialPose &&
+      sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
@@ -711,8 +713,8 @@ void UndoTest::UndoAlign()
         << "] cylinder pose [" << cylinderModel->GetWorldPose()
         << "] cylinder initial pose [" << cylinderInitialPose
         << "]    sleep [" << sleep << "]" << std::endl;
-  QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
-  QVERIFY(cylinderModel->GetWorldPose() == cylinderInitialPose);
+  QVERIFY(boxModel->GetWorldPose().Ign() == boxInitialPose);
+  QVERIFY(cylinderModel->GetWorldPose().Ign() == cylinderInitialPose);
   QVERIFY(sphereModel->GetWorldPose() == sphereInitialPose);
 
   // Clean up

@@ -735,7 +735,7 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
   for (iter = this->dataPtr->visuals.begin();
       iter != this->dataPtr->visuals.end(); ++iter)
   {
-    if (iter->second->GetName() == _name)
+    if (iter->second->Name() == _name)
       break;
   }
 
@@ -747,7 +747,7 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
     for (iter = this->dataPtr->visuals.begin();
         iter != this->dataPtr->visuals.end(); ++iter)
     {
-      if (iter->second->GetName() == otherName)
+      if (iter->second->Name() == otherName)
         break;
     }
 
@@ -824,7 +824,7 @@ VisualPtr Scene::ModelVisualAt(CameraPtr _camera,
 {
   VisualPtr vis = this->VisualAt(_camera, _mousePos);
   if (vis)
-    vis = this->GetVisual(vis->GetName().substr(0, vis->GetName().find("::")));
+    vis = this->GetVisual(vis->Name().substr(0, vis->Name().find("::")));
 
   return vis;
 }
@@ -837,9 +837,10 @@ void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
 
   if (vis && visBelow)
   {
-    math::Vector3 pos = vis->GetWorldPose().pos;
-    double dz = vis->GetBoundingBox().min.z - visBelow->GetBoundingBox().max.z;
-    pos.z -= dz;
+    auto pos = vis->WorldPose().Pos();
+    double dz = vis->BoundingBox().Min().Z() -
+      visBelow->BoundingBox().Max().Z();
+    pos.Z() -= dz;
     vis->SetWorldPosition(pos);
   }
 }
@@ -853,16 +854,16 @@ VisualPtr Scene::VisualBelow(const std::string &_visualName)
   if (vis)
   {
     std::vector<VisualPtr> below;
-    this->VisualsBelowPoint(vis->GetWorldPose().pos.Ign(), below);
+    this->VisualsBelowPoint(vis->WorldPose().Pos(), below);
 
     double maxZ = -10000;
 
     for (uint32_t i = 0; i < below.size(); ++i)
     {
-      if (below[i]->GetName().find(vis->GetName()) != 0
-          && below[i]->GetBoundingBox().max.z > maxZ)
+      if (below[i]->Name().find(vis->Name()) != 0
+          && below[i]->BoundingBox().Max().Z() > maxZ)
       {
-        maxZ = below[i]->GetBoundingBox().max.z;
+        maxZ = below[i]->BoundingBox().Max().Z();
         result = below[i];
       }
     }
@@ -2714,7 +2715,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   visual->SetType(_type);
 
   this->dataPtr->visuals[visual->GetId()] = visual;
-  if (visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+  if (visual->Name().find("__SKELETON_VISUAL__") != std::string::npos)
   {
     visual->SetVisible(false);
     visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -3070,7 +3071,7 @@ void Scene::AddVisual(VisualPtr _vis)
   if (this->dataPtr->visuals.find(_vis->GetId()) !=
       this->dataPtr->visuals.end())
   {
-    gzwarn << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+    gzwarn << "Duplicate visuals detected[" << _vis->Name() << "]\n";
   }
 
   this->dataPtr->visuals[_vis->GetId()] = _vis;
@@ -3090,8 +3091,8 @@ void Scene::RemoveVisual(uint32_t _id)
     {
       // Check to see if the projector is a child of the visual that is
       // being removed.
-      if (piter->second->GetParent()->GetRootVisual()->GetName() ==
-          vis->GetRootVisual()->GetName())
+      if (piter->second->GetParent()->GetRootVisual()->Name() ==
+          vis->GetRootVisual()->Name())
       {
         delete piter->second;
         this->dataPtr->projectors.erase(piter++);
@@ -3196,7 +3197,7 @@ Heightmap *Scene::GetHeightmap() const
 /////////////////////////////////////////////////
 void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
+  COMVisualPtr comVis(new COMVisual(_linkVisual->Name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
   comVis->SetVisible(this->dataPtr->showCOMs);
@@ -3206,7 +3207,7 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
-  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
+  COMVisualPtr comVis(new COMVisual(_linkVisual->Name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_elem);
   comVis->SetVisible(false);
@@ -3216,7 +3217,7 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->Name() +
       "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_msg);
   inertiaVis->SetVisible(this->dataPtr->showInertias);
@@ -3226,7 +3227,7 @@ void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
-  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->Name() +
       "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_elem);
   inertiaVis->SetVisible(false);
@@ -3236,7 +3237,7 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 {
-  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->GetName() +
+  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->Name() +
       "_LINK_FRAME_VISUAL__", _linkVisual));
   linkFrameVis->Load();
   linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);

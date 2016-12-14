@@ -62,17 +62,29 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   this->dataPtr->tabWidget->addTab(this->dataPtr->visualConfig, "Visual");
   this->dataPtr->tabWidget->addTab(this->dataPtr->collisionConfig, "Collision");
 
-  // Show button
+  // Show collisions button
   auto showCollisionsButton = new QToolButton(this);
   showCollisionsButton->setObjectName("showCollisionsButton");
   showCollisionsButton->setFixedSize(QSize(30, 30));
   showCollisionsButton->setToolTip("Show/hide all collisions");
-  showCollisionsButton->setIcon(QPixmap(":/images/eye_collision.png"));
+  showCollisionsButton->setIcon(QPixmap(":/images/eye_collision.svg"));
   showCollisionsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   showCollisionsButton->setIconSize(QSize(16, 16));
   showCollisionsButton->setCheckable(true);
   this->connect(showCollisionsButton, SIGNAL(toggled(const bool)), this,
       SLOT(OnShowCollisions(const bool)));
+
+  // Show visuals button
+  auto showVisualsButton = new QToolButton(this);
+  showVisualsButton->setObjectName("showVisualsButton");
+  showVisualsButton->setFixedSize(QSize(30, 30));
+  showVisualsButton->setToolTip("Show/hide all visuals");
+  showVisualsButton->setIcon(QPixmap(":/images/eye_visual.svg"));
+  showVisualsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  showVisualsButton->setIconSize(QSize(16, 16));
+  showVisualsButton->setCheckable(true);
+  this->connect(showVisualsButton, SIGNAL(toggled(const bool)), this,
+      SLOT(OnShowVisuals(const bool)));
 
   // Remove button
   QToolButton *removeButton = new QToolButton(this);
@@ -99,6 +111,7 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(removeButton);
   buttonsLayout->addWidget(showCollisionsButton);
+  buttonsLayout->addWidget(showVisualsButton);
   buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(resetButton);
   buttonsLayout->addWidget(cancelButton);
@@ -181,6 +194,21 @@ void LinkInspector::OnShowCollisions(const bool _show)
 void LinkInspector::SetShowCollisions(const bool _show)
 {
   auto button = this->findChild<QToolButton *>("showCollisionsButton");
+
+  if (button)
+    button->setChecked(_show);
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnShowVisuals(const bool _show)
+{
+  this->ShowVisuals(_show);
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::SetShowVisuals(const bool _show)
+{
+  auto button = this->findChild<QToolButton *>("showVisualsButton");
 
   if (button)
     button->setChecked(_show);

@@ -447,11 +447,11 @@ void ApplyWrenchDialog::Fini()
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
 
     this->dataPtr->applyWrenchVisual->Fini();
   }
@@ -491,7 +491,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
   for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = vis->GetChild(i);
-    std::string linkName = childVis->GetName();
+    std::string linkName = childVis->Name();
 
     // Issue #1553: This is failing to get real links sometimes:
     // uint32_t flags = childVis->GetVisibilityFlags();
@@ -511,8 +511,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
 
         if (comVis)
         {
-          this->dataPtr->linkToCOMMap[linkName] =
-              comVis->GetInertiaPose().Ign().Pos();
+          this->dataPtr->linkToCOMMap[linkName] = comVis->InertiaPose().Pos();
           break;
         }
       }
@@ -586,7 +585,7 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->AddReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
         std::bind(&ApplyWrenchDialog::OnMouseRelease, this,
         std::placeholders::_1));
   }
@@ -601,7 +600,7 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 
   if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
@@ -987,7 +986,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
     // Register rotTool pose at drag start
     this->dataPtr->dragStartPose =
-        this->dataPtr->applyWrenchVisual->GetRotTool()->GetWorldPose().Ign();
+        this->dataPtr->applyWrenchVisual->GetRotTool()->WorldPose();
   }
   return false;
 }
@@ -1110,8 +1109,8 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     vec.Z(-sin(rotEuler.Y()));
 
     // To local frame
-    vec = this->dataPtr->linkVisual->
-        GetWorldPose().Ign().Rot().RotateVectorReverse(vec);
+    vec = this->dataPtr->linkVisual->WorldPose().Rot().RotateVectorReverse(
+        vec);
 
     if (this->GetMode() == Mode::FORCE)
     {
@@ -1206,12 +1205,12 @@ void ApplyWrenchDialog::SetActive(bool _active)
       g_arrowAct->trigger();
 
     MouseEventHandler::Instance()->AddPressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
         std::bind(&ApplyWrenchDialog::OnMousePress, this,
         std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
         std::bind(&ApplyWrenchDialog::OnMouseMove, this,
         std::placeholders::_1));
   }
@@ -1221,9 +1220,9 @@ void ApplyWrenchDialog::SetActive(bool _active)
         rendering::ApplyWrenchVisual::Mode::NONE);
 
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 }
 

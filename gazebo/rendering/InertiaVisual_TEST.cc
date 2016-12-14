@@ -53,9 +53,9 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
       "inertia_vis", scene->WorldVisual()));
   inertiaVis->Load();
 
-  EXPECT_EQ(inertiaVis->GetName(), "inertia_vis");
+  EXPECT_EQ(inertiaVis->Name(), "inertia_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
-  EXPECT_NE(scene->GetVisual(inertiaVis->GetName()), nullptr);
+  EXPECT_NE(scene->GetVisual(inertiaVis->Name()), nullptr);
 
   // test destroying the visual
   inertiaVis->Fini();
@@ -128,7 +128,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
     // need to set these flags in order to GetBoundingBox
     visual->SetVisible(true);
     visual->SetVisibilityFlags(GZ_VISIBILITY_ALL);
-    EXPECT_EQ(visual->GetBoundingBox().Ign(), box);
+    EXPECT_EQ(visual->BoundingBox(), box);
   }
 }
 

@@ -120,7 +120,7 @@ void MousePickingTest::Shapes()
   this->ProcessEventsAndDraw(mainWindow);
 
   // pick the first model - sphere
-  auto pickPt = cam->Project(model01Vis->GetWorldPose().pos.Ign());
+  auto pickPt = cam->Project(model01Vis->WorldPose().Pos());
   auto pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -132,7 +132,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick the second model - box
-  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign());
+  pickPt = cam->Project(model02Vis->WorldPose().Pos());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -144,7 +144,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick the third model - box
-  pickPt = cam->Project(model03Vis->GetWorldPose().pos.Ign());
+  pickPt = cam->Project(model03Vis->WorldPose().Pos());
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -156,7 +156,7 @@ void MousePickingTest::Shapes()
   QVERIFY(model03Vis->GetHighlighted());
 
   // pick near the edge of box
-  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+  pickPt = cam->Project(model02Vis->WorldPose().Pos() +
       ignition::math::Vector3d(-0.5, 0.49, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
@@ -169,7 +169,7 @@ void MousePickingTest::Shapes()
   QVERIFY(!model03Vis->GetHighlighted());
 
   // pick just outside the edge of box and verify nothing is selected
-  pickPt = cam->Project(model02Vis->GetWorldPose().pos.Ign() +
+  pickPt = cam->Project(model02Vis->WorldPose().Pos() +
       ignition::math::Vector3d(-0.5, 0.51, 0));
   pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
