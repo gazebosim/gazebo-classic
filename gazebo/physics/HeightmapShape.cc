@@ -168,14 +168,20 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     return;
   }
 
+  this->subSampling = 2u;
   if (this->sdf->HasElement("sampling"))
   {
-    this->subSampling =
-        static_cast<int>(this->sdf->Get<unsigned int>("sampling"));
-  }
-  else
-  {
-    this->subSampling = 2;
+    unsigned int s = this->sdf->Get<unsigned int>("sampling");
+    if (s == 0u || s & (s - 1u))
+    {
+      gzerr << "Heightmap sampling value must be a power of 2. "
+            << "The default value of 2 will be used instead." << std::endl;
+      this->subSampling = 2;
+    }
+    else
+    {
+      this->subSampling = static_cast<int>(s);
+    }
   }
 
   // Check if the geometry of the terrain data matches Ogre constrains

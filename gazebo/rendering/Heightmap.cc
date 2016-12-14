@@ -166,7 +166,9 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
       this->dataPtr->sampling = 2u;
     }
     else
+    {
       this->dataPtr->sampling = s;
+    }
   }
 
   this->Load();
