@@ -511,8 +511,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
 
         if (comVis)
         {
-          this->dataPtr->linkToCOMMap[linkName] =
-              comVis->GetInertiaPose().Ign().Pos();
+          this->dataPtr->linkToCOMMap[linkName] = comVis->InertiaPose().Pos();
           break;
         }
       }
