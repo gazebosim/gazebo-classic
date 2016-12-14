@@ -138,7 +138,7 @@ if (BUILD_OSX_BUNDLE)
   SET(CMAKE_INSTALL_FULL_DATAROOTDIR ${BUNDLE_DATA_DEST_DIR})
   SET(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
   SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-  
+
   set (LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
   set (BIN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 
@@ -282,7 +282,8 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
+include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS}
+                           ${IGNITION-MSGS_INCLUDE_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
