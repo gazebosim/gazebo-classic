@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Box.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/DiffDrivePlugin.hh"

@@ -40,8 +40,7 @@ void ExistenceEventSource::Load(const sdf::ElementPtr _sdf)
 
   this->existenceConnection = SimEventConnector::ConnectSpawnModel(
       std::bind(&ExistenceEventSource::OnExistence, this,
-      std::placeholders::_1,
-      std::placeholders::_2));
+      std::placeholders::_1, std::placeholders::_2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
