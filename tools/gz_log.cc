@@ -311,17 +311,24 @@ std::string LinkFilter::FilterParts(gazebo::physics::LinkState &_state,
     elemParts = *_partIter;
 
   if (part == "pose")
-    result << this->FilterPose(_state.GetPose(), part, elemParts,
-        _state);
+  {
+    result << this->FilterPose(_state.GetPose().Ign(), part, elemParts, _state);
+  }
   else if (part == "acceleration")
-    result << this->FilterPose(_state.GetAcceleration(), part,
+  {
+    result << this->FilterPose(_state.GetAcceleration().Ign(), part,
         elemParts, _state);
+  }
   else if (part == "velocity")
-    result << this->FilterPose(_state.GetVelocity(), part, elemParts,
+  {
+    result << this->FilterPose(_state.GetVelocity().Ign(), part, elemParts,
         _state);
+  }
   else if (part == "wrench")
-    result << this->FilterPose(_state.GetWrench(), part, elemParts,
+  {
+    result << this->FilterPose(_state.GetWrench().Ign(), part, elemParts,
         _state);
+  }
 
   return result.str();
 }
