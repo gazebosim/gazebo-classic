@@ -118,7 +118,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Connect to the update event.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&ElevatorPlugin::Update, this, _1));
+      std::bind(&ElevatorPlugin::Update, this, std::placeholders::_1));
 
   // Create the node for communication
   this->dataPtr->node = transport::NodePtr(new transport::Node());
