@@ -41,8 +41,6 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -61,6 +59,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace math
+  {
+    class Pose;
+  }
+
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering

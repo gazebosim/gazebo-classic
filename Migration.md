@@ -66,6 +66,10 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/COMVisual.hh**
+    + ***Deprecation:*** math::Pose GetInertiaPose() const
+    + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
+
 1. **gazebo/physics/Gripper.hh**
     + ***Deprecation:*** std::string GetName() const
     + ***Replacement:*** std::string Name() const
