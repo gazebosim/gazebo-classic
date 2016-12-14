@@ -19,6 +19,8 @@ release will remove the deprecated code.
 1. **plugins/events/Region.hh**
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
+    + ***Deprecation:*** std::vector<math::Box> boxes
+    + ***Replacement:*** std::vector<ignition::math::Box> boxes
 
 1. **plugins/BuoyancyPlugin.hh**
     + ***Deprecation:*** VolumeProperties: public: math::Vector3 cov
