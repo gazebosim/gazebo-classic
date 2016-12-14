@@ -82,6 +82,9 @@ release will remove the deprecated code.
     + ***Deprecation:*** static math::Vector2d Distort(const math::Vector2d &_in, const math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
     + ***Replacement:*** static ignition::math::Vector2d Distort( const ignition::math::Vector2d &_in, const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
 
+1. **gazebo/rendering/COMVisual.hh**
+    + ***Deprecation:*** math::Pose GetInertiaPose() const
+    + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
 
 1. **gazebo/physics/Gripper.hh**
     + ***Deprecation:*** std::string GetName() const
@@ -468,6 +471,20 @@ release will remove the deprecated code.
 1. **gazebo/math/Plane.hh**
     + ***Deprecation:*** public:   gazebo::math::Plane
     + ***Replacement:*** public: ignition::math::Plane
+
+1. **gazebo/math/Rand.hh**
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblNormal(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblNormal(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntNormal(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntNormal(int, int)
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblUniform(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblUniform(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntUniform(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntUniform(int, int)
+    + ***Deprecation:*** public: static       uint32_t gazebo::math::GetSeed()
+    + ***Replacement:*** public: static unsigned int ignition::math::Seed()
+    + ***Deprecation:*** public: static   void gazebo::math::SetSeed(uint32_t)
+    + ***Replacement:*** public: static void ignition::math::Seed(unsigned int)
 
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline

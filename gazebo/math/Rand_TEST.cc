@@ -20,6 +20,10 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class RandTest : public ::testing::Test { };
