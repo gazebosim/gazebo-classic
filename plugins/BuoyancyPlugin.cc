@@ -166,10 +166,10 @@ void BuoyancyPlugin::OnUpdate()
     ignition::math::Vector3d buoyancy =
         -this->fluidDensity * volume * this->model->GetWorld()->Gravity();
 
-    math::Pose linkFrame = link->GetWorldPose();
+    ignition::math::Pose3d linkFrame = link->GetWorldPose().Ign();
     // rotate buoyancy into the link frame before applying the force.
     ignition::math::Vector3d buoyancyLinkFrame =
-        linkFrame.rot.GetInverse().RotateVector(buoyancy).Ign();
+        linkFrame.Rot().Inverse().RotateVector(buoyancy);
 
     link->AddLinkForce(buoyancyLinkFrame, volumeProperties.cov);
   }
