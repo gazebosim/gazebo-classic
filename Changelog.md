@@ -5,6 +5,12 @@
 1. Update plugins to use ign-math.
     * [Pull request #2531](https://bitbucket.org/osrf/gazebo/pull-request/2531)
 
+1. Use ignition math with `rendering/Distortion` and update function names.
+    * [Pull request #2529](https://bitbucket.org/osrf/gazebo/pull-request/2529)
+
+1. Updated COMVisual class to use `ignition::math`.
+    * [Pull request #2528](https://bitbucket.org/osrf/gazebo/pull-request/2528)
+
 1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
     * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
 

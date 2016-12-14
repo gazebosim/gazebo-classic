@@ -26,7 +26,6 @@
 #include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
-#include <ignition/math/Pose3.hh>
 
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
@@ -555,7 +554,8 @@ bool ModelCommand::RunImpl()
 
 /////////////////////////////////////////////////
 bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
-    const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    transport::NodePtr _node)
 {
   sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
 
@@ -574,7 +574,7 @@ bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
 
   msgs::Factory msg;
   msg.set_sdf(_sdf->ToString());
-  msgs::Set(msg.mutable_pose(), _pose.Ign());
+  msgs::Set(msg.mutable_pose(), _pose);
   pub->Publish(msg, true);
 
   return true;
