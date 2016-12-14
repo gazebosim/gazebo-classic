@@ -52,9 +52,6 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/SignalStats.hh"
-#include "gazebo/math/Vector3Stats.hh"
-
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 #include "gazebo/util/system.hh"
@@ -137,7 +134,7 @@ namespace gazebo
     /// \brief Get the pose of an entity.
     /// \param[in] _name Name of the entity.
     /// \return Pose of the named entity.
-    protected: math::Pose GetEntityPose(const std::string &_name);
+    protected: ignition::math::Pose3d GetEntityPose(const std::string &_name);
 
     /// \brief Return true if the named entity exists.
     /// \param[in] _name Name of the entity to check for.
@@ -256,7 +253,8 @@ namespace gazebo
     /// \param[in] _cy Normalized optical center y, used for distortion.
     protected: void SpawnCamera(const std::string &_modelName,
                    const std::string &_cameraName,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    unsigned int _width = 320, unsigned int _height = 240,
                    double _rate = 25,
                    const std::string &_noiseType = "",
@@ -320,7 +318,8 @@ namespace gazebo
     /// \param[in] _noiseStdDev Standard deviation of the noise.
     protected: void SpawnRaySensor(const std::string &_modelName,
                    const std::string &_raySensorName,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                    double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
                    double _minRange = 0.08, double _maxRange = 10,
@@ -361,7 +360,8 @@ namespace gazebo
     /// \param[in] _noiseStdDev Standard deviation of the noise.
     protected: void SpawnGpuRaySensor(const std::string &_modelName,
                    const std::string &_raySensorName,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                    double _minRange = 0.08, double _maxRange = 10,
                    double _rangeResolution = 0.01, unsigned int _samples = 640,
@@ -402,7 +402,8 @@ namespace gazebo
     /// \param[in] _accelBiasStdDev Acceleration standard deviation bias
     protected: void SpawnImuSensor(const std::string &_modelName,
                    const std::string &_imuSensorName,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    const std::string &_noiseType = "",
                    double _rateNoiseMean = 0.0, double _rateNoiseStdDev = 0.0,
                    double _rateBiasMean = 0.0, double _rateBiasStdDev = 0.0,
@@ -418,8 +419,10 @@ namespace gazebo
     /// \param[in] _static True to make the model static
     protected: void SpawnUnitContactSensor(const std::string &_name,
                    const std::string &_sensorName,
-                   const std::string &_collisionType, const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy, bool _static = false);
+                   const std::string &_collisionType,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   bool _static = false);
 
     /// \brief Spawn an IMU sensor on a link
     /// \param[in] _name Model name
@@ -432,8 +435,10 @@ namespace gazebo
     protected: void SpawnUnitImuSensor(const std::string &_name,
                    const std::string &_sensorName,
                    const std::string &_collisionType,
-                   const std::string &_topic, const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy, bool _static = false);
+                   const std::string &_topic,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   bool _static = false);
 
     /// \brief Spawn an altimeter sensor on a link
     /// \param[in] _name Model name
@@ -486,8 +491,8 @@ namespace gazebo
     /// \param[in] _visualize Enable sensor visualization
     protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
                    const std::string &_sensorName,
-                   const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    const std::string &_essid,
                    double _freq,
                    double _power,
@@ -507,8 +512,8 @@ namespace gazebo
     /// \param[in] _visualize Enable sensor visualization
     protected: void SpawnWirelessReceiverSensor(const std::string &_name,
                    const std::string &_sensorName,
-                   const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    double _minFreq,
                    double _maxFreq,
                    double _power,
@@ -568,10 +573,12 @@ namespace gazebo
     /// \param[in] _castShadows True to cast shadows.
     protected: void SpawnLight(const std::string &_name,
                    const std::string &_type,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    const common::Color &_diffuse = common::Color::White,
                    const common::Color &_specular = common::Color::White,
-                   const math::Vector3 &_direction = -math::Vector3::UnitZ,
+                   const ignition::math::Vector3d &_direction =
+                                               -ignition::math::Vector3d::UnitZ,
                    double _attenuationRange = 20,
                    double _attenuationConstant = 0.5,
                    double _attenuationLinear = 0.01,
@@ -587,7 +594,8 @@ namespace gazebo
     /// \param[in] _rpy Roll, pitch, yaw for the model.
     /// \param[in] _static True to make the model static.
     protected: void SpawnCylinder(const std::string &_name,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    bool _static = false);
 
     /// \brief Spawn a sphere
@@ -598,7 +606,8 @@ namespace gazebo
     /// \param[in] _wait True to wait for the sphere to spawn before
     /// returning.
     protected: void SpawnSphere(const std::string &_name,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    bool _wait = true, bool _static = false);
 
     /// \brief Spawn a sphere
@@ -611,8 +620,10 @@ namespace gazebo
     /// \param[in] _wait True to wait for the sphere to spawn before
     /// returning.
     protected: void SpawnSphere(const std::string &_name,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                   const math::Vector3 &_cog, double _radius,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   const ignition::math::Vector3d &_cog,
+                   double _radius,
                    bool _wait = true, bool _static = false);
 
     /// \brief Spawn a box.
@@ -622,8 +633,10 @@ namespace gazebo
     /// \param[in] _rpy Roll, pitch, yaw for the model.
     /// \param[in] _static True to make the model static.
     protected: void SpawnBox(const std::string &_name,
-                   const math::Vector3 &_size, const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy, bool _static = false);
+                   const ignition::math::Vector3d &_size,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   bool _static = false);
 
     /// \brief Spawn a triangle mesh.
     /// \param[in] _name Name for the model.
@@ -633,8 +646,10 @@ namespace gazebo
     /// \param[in] _rpy Roll, pitch, yaw for the model.
     /// \param[in] _static True to make the model static.
     protected: void SpawnTrimesh(const std::string &_name,
-                   const std::string &_modelPath, const math::Vector3 &_scale,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const std::string &_modelPath,
+                   const ignition::math::Vector3d &_scale,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    bool _static = false);
 
     /// \brief Spawn an empty link.
@@ -643,7 +658,8 @@ namespace gazebo
     /// \param[in] _rpy Roll, pitch, yaw for the model.
     /// \param[in] _static True to make the model static.
     protected: void SpawnEmptyLink(const std::string &_name,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    bool _static = false);
 
     /// \brief Spawn a model from file.
@@ -694,27 +710,11 @@ namespace gazebo
     protected: void Record(const std::string &_prefix,
                            const ignition::math::SignalStats &_stats);
 
-    /// \brief Helper to record Vector3 signal statistics to gtest xml output.
+    /// \brief Helper to record Vector3d signal statistics to gtest xml output.
     /// \param[in] _prefix Prefix string for data names.
-    /// \param[in] _stats Vector3 signal statistics to store.
+    /// \param[in] _stats Vector3d signal statistics to store.
     protected: void Record(const std::string &_prefix,
                            const ignition::math::Vector3Stats &_stats);
-
-    /// \brief Helper to record signal statistics to gtest xml output.
-    /// \param[in] _prefix Prefix string for data names.
-    /// \param[in] _stats Signal statistics to store.
-    /// \deprecated See function that accepts ignition::math parameters.
-    protected: void Record(const std::string &_prefix,
-                           const math::SignalStats &_stats)
-                           GAZEBO_DEPRECATED(8.0);
-
-    /// \brief Helper to record Vector3 signal statistics to gtest xml output.
-    /// \param[in] _prefix Prefix string for data names.
-    /// \param[in] _stats Vector3 signal statistics to store.
-    /// \deprecated See function that accepts ignition::math parameters.
-    protected: void Record(const std::string &_prefix,
-                           const math::Vector3Stats &_stats)
-                           GAZEBO_DEPRECATED(8.0);
 
     /// \brief Pointer the Gazebo server.
     protected: Server *server;
@@ -738,7 +738,7 @@ namespace gazebo
     protected: transport::PublisherPtr requestPub;
 
     /// \brief Map of received poses.
-    protected: std::map<std::string, math::Pose> poses;
+    protected: std::map<std::string, ignition::math::Pose3d> poses;
 
     /// \brief Mutex to protect data structures that store messages.
     protected: boost::mutex receiveMutex;
