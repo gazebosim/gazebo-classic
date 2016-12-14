@@ -14,15 +14,9 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: a test for setting joint angles
- * Author: John Hsu
- */
-#ifndef GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
-#define GAZEBO_JOINT_TRAJECTORY_PLUGIN_HH
 
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#ifndef GAZEBO_PLUGINS_JOINTTRAJECTORYPLUGIN_HH_
+#define GAZEBO_PLUGINS_JOINTTRAJECTORYPLUGIN_HH_
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -58,8 +52,6 @@ namespace gazebo
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
     private: physics::JointPtr joint;
-
-    private: boost::mutex update_mutex;
 
     // Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;

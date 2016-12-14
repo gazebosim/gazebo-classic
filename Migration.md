@@ -16,6 +16,19 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **plugins/events/Region.hh**
+    + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
+    + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
+    + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
+
+1. **plugins/BuoyancyPlugin.hh**
+    + VolumeProperties: changed type from `public: math::Vector3 cov` to `ignition::math::Vector3d cov`
+
+1. **plugins/ArrangePlugin.hh**
+    + Object: changed type from `public: math::Pose pose` to `ignition::math::Pose3d pose`
+    + changed type from `typedef boost::shared_ptr<Object> ObjectPtr` to `std::shared_ptr<Object> ObjectPtr`
+    + changed type from `typedef std::map<std::string, math::Pose> Pose_M` to `typedef std::map<std::string, ignition::math::Pose3d> Pose_M`
+
 1. **gazebo/physics/dart/**
     + Updated to support version 5 of DART physics engine.
 
@@ -65,6 +78,22 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
 
 ### Deprecations
+
+1. **gazebo/rendering/Distortion.hh**
+    + ***Deprecation:*** double GetK1() const
+    + ***Replacement:*** double K1() const
+    + ***Deprecation:*** double GetK2() const
+    + ***Replacement:*** double K2() const
+    + ***Deprecation:*** double GetK3() const
+    + ***Replacement:*** double K3() const
+    + ***Deprecation:*** double GetP1() const
+    + ***Replacement:*** double P1() const
+    + ***Deprecation:*** double GetP2() const
+    + ***Replacement:*** double P2() const
+    + ***Deprecation:*** math::Vector2d GetCenter() const
+    + ***Replacement:*** ignition::math::Vector2d Center() const
+    + ***Deprecation:*** static math::Vector2d Distort(const math::Vector2d &_in, const math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
+    + ***Replacement:*** static ignition::math::Vector2d Distort( const ignition::math::Vector2d &_in, const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
 
 1. **gazebo/rendering/COMVisual.hh**
     + ***Deprecation:*** math::Pose GetInertiaPose() const

@@ -14,10 +14,8 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: a test for setting joint angles
- * Author: John Hsu
- */
+
+#include <functional>
 
 #include <plugins/JointTrajectoryPlugin.hh>
 
@@ -52,7 +50,8 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&JointTrajectoryPlugin::UpdateStates, this, _1));
+      std::bind(&JointTrajectoryPlugin::UpdateStates, this,
+      std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
