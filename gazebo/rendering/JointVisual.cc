@@ -172,7 +172,7 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
   double angle = acos(cosTheta);
   ignition::math::Quaterniond quat;
   // check the parallel case
-  if (math::equal(angle, M_PI))
+  if (ignition::math::equal(angle, M_PI))
     quat.Axis(u.Perpendicular(), angle);
   else
     quat.Axis((v.Cross(u)).Normalize(), angle);

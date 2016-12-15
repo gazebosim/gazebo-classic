@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
@@ -116,7 +118,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Connect to the update event.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ElevatorPlugin::Update, this, _1));
+      std::bind(&ElevatorPlugin::Update, this, std::placeholders::_1));
 
   // Create the node for communication
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -490,5 +492,3 @@ ElevatorPluginPrivate::LiftController::GetState() const
 {
   return this->state;
 }
-
-

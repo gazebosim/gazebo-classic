@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef GAZEBO_PLUGINS_ACTOR_PLUGIN_HH_
-#define GAZEBO_PLUGINS_ACTOR_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_ACTORPLUGIN_HH_
+#define GAZEBO_PLUGINS_ACTORPLUGIN_HH_
 
 #include <string>
 #include <vector>

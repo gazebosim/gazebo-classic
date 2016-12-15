@@ -109,7 +109,7 @@ void ODERayShape::Update()
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (!math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
         this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,

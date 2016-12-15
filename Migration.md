@@ -36,6 +36,9 @@ release will remove the deprecated code.
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
     + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
 
+1. **plugins/events/EventSource.hh**
+    + changed type from `typedef boost::shared_ptr<EventSource> EventSourcePtr` to `typedef std::shared_ptr<EventSource> EventSourcePtr`
+
 1. **plugins/BuoyancyPlugin.hh**
     + VolumeProperties: changed type from `public: math::Vector3 cov` to `ignition::math::Vector3d cov`
 
@@ -461,6 +464,8 @@ release will remove the deprecated code.
 1. **gazebo/math/Helpers.hh**
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
     + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
+    + ***Deprecation:*** public: bool   gazebo::math::equal(T, T, T)
+    + ***Replacement:*** public: bool ignition::math::equal(T, T, T)
     + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
     + ***Replacement:*** public: double ignition::math::fixnan(double)
     + ***Deprecation:*** public: float   gazebo::math::fixnan(float)
