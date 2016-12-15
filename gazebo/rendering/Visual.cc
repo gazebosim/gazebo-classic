@@ -1505,7 +1505,9 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
         Ogre::Technique *origTechnique = nullptr;
         if (!origMat.isNull()
             && (techniqueCount < origMat->getNumTechniques()))
+        {
           origTechnique = material->getTechnique(techniqueCount);
+        }
 
         for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
         {
