@@ -122,28 +122,26 @@ endif()
 
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
-if (ENABLE_TESTS_COMPILATION)
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
-  set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
-  set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
-  set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+# Increase timeout, to account for model download time.
+set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
+set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
-  set_property(
-    SOURCE world_clone.cc
-    PROPERTY COMPILE_DEFINITIONS
-    GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
-  )
+set_property(
+  SOURCE world_clone.cc
+  PROPERTY COMPILE_DEFINITIONS
+  GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+)
 
-  # Increase timeout for debug-mode
-  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
-      ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
-    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
-  endif()
-
-  # Add plugin dependency
-  add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+# Increase timeout for debug-mode
+if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
+    ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
+  set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
 endif()
+
+# Add plugin dependency
+add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 
 set(display_tests
 )
