@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_CESSNA_PLUGIN_HH_
-#define _GAZEBO_GUI_CESSNA_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_CESSNAGUIPLUGIN_HH_
+#define GAZEBO_PLUGINS_CESSNAGUIPLUGIN_HH_
 
 #include <mutex>
 
