@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "ActuatorPlugin.hh"
 
 using namespace gazebo;
