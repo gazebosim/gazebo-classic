@@ -14,16 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PLUGIN_EVENTS_REGION_HH_
-#define _GAZEBO_PLUGIN_EVENTS_REGION_HH_
+#ifndef GAZEBO_PLUGIN_EVENTS_REGION_HH_
+#define GAZEBO_PLUGIN_EVENTS_REGION_HH_
 
 #include <string>
 #include <vector>
 #include <memory>
 
 #include <sdf/sdf.hh>
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Box.hh"
+#include <gazebo/math/Vector3.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Box.hh>
 
 namespace gazebo
 {
@@ -43,7 +44,13 @@ namespace gazebo
     /// \brief Check if a point lies inside the region
     /// \param[in] _p Point to check
     /// \return True if point is in region
-    public: bool Contains(const math::Vector3 &_p) const;
+    /// \deprecated See function that accepts an ignition::math object
+    public: bool Contains(const math::Vector3 &_p) const GAZEBO_DEPRECATED(8.0);
+
+    /// \brief Check if a point lies inside the region
+    /// \param[in] _p Point to check
+    /// \return True if point is in region
+    public: bool Contains(const ignition::math::Vector3d &_p) const;
 
     /// \brief Output operator to print a region to the console.
     /// \param[in] _out The output stream.
@@ -56,7 +63,7 @@ namespace gazebo
     public: std::string name;
 
     /// \brief The list of volumes inside this region
-    public: std::vector<math::Box> boxes;
+    public: std::vector<ignition::math::Box> boxes;
   };
 
   /// \def RegionPtr
