@@ -21,6 +21,8 @@
 #include <linux/input.h>
 #include <linux/types.h>
 #include <cstring>
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/HydraPlugin.hh"
@@ -122,7 +124,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
       while (std::getline(fileIn, line) && device.empty())
       {
         if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
-          device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
+          device = "/dev/hidraw" + std::to_string(i);
       }
     }
   }
@@ -179,9 +181,9 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RazerHydra::Update, this, _1));
+      std::bind(&RazerHydra::Update, this, std::placeholders::_1));
 
-  this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
+  this->pollThread = new std::thread(std::bind(&RazerHydra::Run, this));
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_world->Name());
@@ -191,7 +193,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 /////////////////////////////////////////////////
 void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   ignition::math::Pose3d origRight(this->pos[1], this->quat[1]);
 
   ignition::math::Pose3d pivotRight = origRight;
@@ -356,7 +358,7 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
   this->rawAnalog[5] = buf[49];
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   // Put the raw position and orientation into Gazebo coordinate frame
   for (int i = 0; i < 2; ++i)
   {

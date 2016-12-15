@@ -18,11 +18,12 @@
  * Desc: Pressure Sensor Plugin
  * Author: Steve Peters
  */
-#ifndef _GAZEBO_PRESSURE_PLUGIN_HH_
-#define _GAZEBO_PRESSURE_PLUGIN_HH_
 
+#ifndef GAZEBO_PLUGINS_PRESSUREPLUGIN_HH_
+#define GAZEBO_PLUGINS_PRESSUREPLUGIN_HH_
+
+#include <map>
 #include <string>
-#include <boost/unordered_map.hpp>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
@@ -74,7 +75,7 @@ namespace gazebo
     private: std::string parentSensorName;
 
     /// \brief Parent sensor collision names.
-    private: boost::unordered_map<std::string, double> collisionNamesToArea;
+    private: std::map<std::string, double> collisionNamesToArea;
   };
 }
 #endif

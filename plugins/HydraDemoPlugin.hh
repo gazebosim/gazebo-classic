@@ -15,10 +15,10 @@
  *
 */
 
-#ifndef _SPHERE_HYDRADEMO_PLUGIN_HH_
-#define _SPHERE_HYDRADEMO_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SPHEREHYDRADEMOPLUGIN_HH_
+#define GAZEBO_PLUGINS_SPHEREHYDRADEMOPLUGIN_HH_
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -62,7 +62,7 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
 
     /// \brief Mutex to protect hydraMsgPtr.
-    private: boost::mutex msgMutex;
+    private: std::mutex msgMutex;
 
     /// \brief Store the last message from hydra.
     private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
