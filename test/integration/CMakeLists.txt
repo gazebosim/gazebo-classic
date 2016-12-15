@@ -190,7 +190,7 @@ set(qt_tests
 
 gz_build_qt_tests(${qt_tests})
 
-if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
+if (VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
