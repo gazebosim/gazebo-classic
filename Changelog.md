@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Fix restoring submesh material transparency
+    * [Pull request #2536](https://bitbucket.org/osrf/gazebo/pull-request/2536)
+
 1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
     * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
 
