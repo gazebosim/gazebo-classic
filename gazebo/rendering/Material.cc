@@ -76,9 +76,6 @@ void Material::CreateMaterials()
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 1));
 
-
-
-
   mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_TRANS_RED_MATERIAL__", "General");
   tech = mat->getTechnique(0);
