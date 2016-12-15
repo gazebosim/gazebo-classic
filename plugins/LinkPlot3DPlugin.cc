@@ -18,21 +18,19 @@
 #include <algorithm>
 #include <string>
 #include <deque>
+#include <vector>
+
+#include <ignition/msgs.hh>
+#include <ignition/transport.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/LinkPlot3DPlugin.hh"
 
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(LinkPlot3DPlugin)
-
-#include <string>
-#include <vector>
-#include <ignition/msgs.hh>
-#include <ignition/transport.hh>
 
 /// \brief Information about each plot
 struct Plot3D
@@ -187,7 +185,7 @@ void LinkPlot3DPlugin::OnUpdate()
 
       // Reduce message array
       if (plot.msg.point_size() > 1000)
-        plot.msg.mutable_point()->DeleteSubrange(0,5);
+        plot.msg.mutable_point()->DeleteSubrange(0, 5);
 
       // plot.prevPoint = point;
       this->dataPtr->node.Request("/marker", plot.msg);

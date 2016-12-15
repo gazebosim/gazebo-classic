@@ -253,6 +253,118 @@ Specify the encoding (txt, zlib, or bz2) for an output file. Valid in conjunctio
 .
 Filter output. Valid only with the echo, step, and output commands
 .UNINDENT
+.SS marker
+.sp
+.nf
+.ft C
+gz marker [options]
+.ft P
+.fi
+.sp
+
+Add, modify, or delete visual markers.
+
+Option Details
+-a, --add: No argument
+This option indicates that a marker should be added or modified.
+Use this in conjunction with -t to specify a marker type,
+-i to specify a marker id, -p to specify a parent, -f to specify
+a lifetime for the marker, or -n to specify a namespace.
+-n, --namespace: string argument
+Namespaces allow markers to be grouped. This option can be used
+the -a and -x command. The default namespace is empty string.
+-i, --id: integer argument
+Each marker has a unique id. Use this option with the -a command
+to assign an id to a marker. If -i is not specified, a value of
+zero will be used.
+-t, --type: string argument
+Use this command with -a to specify a marker type. The string
+argument must be one of: sphere, box, cylinder, line_list,
+line_strip, points, sphere, text, triangle_fan, triangle_list,
+triangle_strip.
+-p, --parent: string argument
+A marker can be attached to an existing visual. Use this command
+with -a to specify a parent visual. By default a marker is not
+attached to a parent visual.
+-f, --lifetime: double argument
+A marker's lifetime is the number of seconds that it will exist.
+Time starts counting when the marker is created. By default a
+marker has an infite lifetime.
+-d, --delete: integer argument
+This option will delete a single marker, if a marker exists with
+the specified id. The integer argument is the id of the marker to
+delete.
+-x, --delete-all: no argument
+Delete all markers.
+-l, --list: no argument
+List all markers.
+-y, --layer: integer argument
+Add or move a marker to the specified layer. Use this argument with   the -a argument.
+-m, --msg: string argument
+Use this option to send a custom marker message. This option will
+override all other command line options. Details about the marker
+message can be found using:
+$ ign msg -i ign_msgs.Marker
+
+Example:
+$ gz marker -m 'action: ADD_MODIFY, type: SPHERE, id: 2, scale: {x:0.2, y:0.4, z:1.2}'
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-\-verbose
+.
+Print extra information
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-a, \-\-add
+.
+Add or modify a visual marker
+.TP
+.B \-m, \-\-msg\fR=\fIarg\fR
+.
+Specify and send a marker message.
+.TP
+.B \-n, \-\-namespace\fR=\fIarg\fR
+.
+Namespace for the visual marker
+.TP
+.B \-i, \-\-id\fR=\fIarg\fR
+.
+Positive integer value of a visual marker
+.TP
+.B \-t, \-\-type\fR=\fIarg\fR
+.
+Type of geometry: box, cylinder, sphere, line_list, line_strip, points, text, triangle_fan, triangle_list, triangle_strip
+.TP
+.B \-p, \-\-parent\fR=\fIarg\fR
+.
+Name of a visual to which this marker should be attached.
+.TP
+.B \-f, \-\-lifetime\fR=\fIarg\fR
+.
+Simulation time the marker should last before deletion.
+.TP
+.B \-d, \-\-delete
+.
+Delete an existing visual marker.
+.TP
+.B \-x, \-\-delete\-all
+.
+Delete all markers, or all markers in a namespace.
+.TP
+.B \-l, \-\-list
+.
+Get a list of the visual markers.
+.TP
+.B \-y, \-\-layer\fR=\fIarg\fR
+.
+Add or move a marker to the specified layer.
+.UNINDENT
 .SS model
 .sp
 .nf

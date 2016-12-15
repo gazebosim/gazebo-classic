@@ -42,25 +42,24 @@ int main(int _argc, char **_argv)
 
   std::cout << "Spawning a sphere at the origin\n";
   gazebo::common::Time::Sleep(4);
-  bool result;
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Moving the sphere to x=0, y=0, z=1\n";
   gazebo::common::Time::Sleep(4);
   ignition::msgs::Set(markerMsg.mutable_pose(),
                       ignition::math::Pose3d(0, 0, 1, 0, 0, 0));
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Shrinking the sphere\n";
   gazebo::common::Time::Sleep(4);
   ignition::msgs::Set(markerMsg.mutable_scale(),
                     ignition::math::Vector3d(0.2, 0.2, 0.2));
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Changing the sphere to red\n";
   gazebo::common::Time::Sleep(4);
   matMsg->mutable_script()->set_name("Gazebo/Red");
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding a green box\n";
   gazebo::common::Time::Sleep(4);
@@ -72,12 +71,12 @@ int main(int _argc, char **_argv)
                     ignition::math::Vector3d(1.0, 1.0, 1.0));
   ignition::msgs::Set(markerMsg.mutable_pose(),
                     ignition::math::Pose3d(2, 0, .5, 0, 0, 0));
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Change the green box to a cylinder\n";
   gazebo::common::Time::Sleep(4);
   markerMsg.set_type(ignition::msgs::Marker::CYLINDER);
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding a line between the sphere and cylinder\n";
   gazebo::common::Time::Sleep(4);
@@ -90,7 +89,7 @@ int main(int _argc, char **_argv)
       ignition::math::Vector3d(0, 0, 1.1));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(2, 0, 0.5));
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding a square around the origin\n";
   gazebo::common::Time::Sleep(4);
@@ -107,7 +106,7 @@ int main(int _argc, char **_argv)
       ignition::math::Vector3d(-0.5, 0.5, 0.05));
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(0.5, 0.5, 0.05));
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding 100 points inside the square\n";
   gazebo::common::Time::Sleep(4);
@@ -123,7 +122,7 @@ int main(int _argc, char **_argv)
           ignition::math::Rand::DblUniform(-0.49, 0.49),
           0.05));
   }
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding HELLO at 0, 0, 2\n";
   gazebo::common::Time::Sleep(4);
@@ -135,7 +134,7 @@ int main(int _argc, char **_argv)
                     ignition::math::Vector3d(0.2, 0.2, 0.2));
   ignition::msgs::Set(markerMsg.mutable_pose(),
                     ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding a semi-circular triangle fan\n";
   gazebo::common::Time::Sleep(4);
@@ -153,7 +152,7 @@ int main(int _argc, char **_argv)
     ignition::msgs::Set(markerMsg.add_point(),
         ignition::math::Vector3d(radius * cos(t), radius * sin(t), 0.05));
   }
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding two triangles using a triangle list\n";
   gazebo::common::Time::Sleep(4);
@@ -177,7 +176,7 @@ int main(int _argc, char **_argv)
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(2, 2, 0.05));
 
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Adding a rectangular triangle strip\n";
   gazebo::common::Time::Sleep(4);
@@ -201,10 +200,10 @@ int main(int _argc, char **_argv)
   ignition::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(1, 2, 0.05));
 
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 
   std::cout << "Delete all the markers\n";
   gazebo::common::Time::Sleep(4);
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
-  result = node.Request("/marker", markerMsg);
+  node.Request("/marker", markerMsg);
 }
