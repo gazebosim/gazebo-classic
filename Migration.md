@@ -7,6 +7,21 @@ release will remove the deprecated code.
 
 ## Gazebo 7.X to 8.X
 
+### Build system
+
+1. ***Disable tests compilation by default:*** tests compilation has been
+   excluded from the make all (default make) target.  cmake will generate make
+   targets for all the tests in the code, individual test compilation can be
+   trigger by using: make <binary_test_name> (i.e make UNIT_gz_TEST).
+   For compiling the whole test suite see the new 'make tests' target.
+
+1. ***New 'tests' target for make***: a new 'tests' target has been implemented.
+   it will compile all the tests present in the code by calling 'make tests'.
+
+1. ***Deprecate ENABLE_TESTS_COMPILATION parameter:***  the previous cmake
+   parameter to control tests make target generation has been deprecated. Tests
+   compilation is disabled by default.
+
 ### Additions
 
 1. **gazebo/common/Event.hh**
