@@ -70,9 +70,15 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   // Initialize the node with the world name
   this->node->Init(_parent->GetName());
 
+  // Read topic, if specified
+  std::string topic ="/gazebo/sim_events";
+  if (this->sdf->HasElement("topic"))
+  {
+    topic = this->sdf->Get<std::string>("topic");
+  }
+
   // Create a publisher on the Rest plugin topic
-  this->pub = this->node->Advertise<gazebo::msgs::SimEvent>(
-      "/gazebo/sim_events");
+  this->pub = this->node->Advertise<gazebo::msgs::SimEvent>(topic);
 
   // Subscribe to model spawning
   this->spawnSub = this->node->Subscribe("~/model/info",
