@@ -30,6 +30,9 @@
 1. Support custom material scripts for heightmaps
     * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
 
+1. Sim events plugin accepts custom topics
+    * [Pull request 2535](https://bitbucket.org/osrf/gazebo/pull-request/2535)
+
 1. Model Editor: Show / hide collisions
     * [Pull request 2503](https://bitbucket.org/osrf/gazebo/pull-request/2503)
 
