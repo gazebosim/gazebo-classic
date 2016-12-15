@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -110,6 +111,9 @@ namespace gazebo
 
       /// \brief Publisher of image messages.
       protected: transport::PublisherPtr imagePub;
+
+      /// \brief Publisher of image messages.
+      protected: ignition::transport::Node::Publisher imagePubIgn;
 
       /// \internal
       /// \brief Private data pointer

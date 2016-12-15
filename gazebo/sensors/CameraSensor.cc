@@ -86,6 +86,11 @@ void CameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->Topic(), 50);
+
+  ignition::transport::AdvertiseMessageOptions opts;
+  opts.SetMsgsPerSec(50);
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
+      this->Topic(), opts);
 }
 
 //////////////////////////////////////////////////
@@ -200,22 +205,47 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 
   this->camera->PostRender();
 
-  if (this->imagePub && this->imagePub->HasConnections())
+  if ((this->imagePub && this->imagePub->HasConnections()) ||
+      this->imagePubIgn.HasConnections())
   {
-    msgs::ImageStamped msg;
-    msgs::Set(msg.mutable_time(), this->scene->SimTime());
-    msg.mutable_image()->set_width(this->camera->ImageWidth());
-    msg.mutable_image()->set_height(this->camera->ImageHeight());
-    msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-          this->camera->ImageFormat()));
+    auto simTime = this->scene->SimTime();
+    if (this->imagePub && this->imagePub->HasConnections())
+    {
+      msgs::ImageStamped msg;
+      msgs::Set(msg.mutable_time(), simTime);
+      msg.mutable_image()->set_width(this->camera->ImageWidth());
+      msg.mutable_image()->set_height(this->camera->ImageHeight());
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->ImageFormat()));
 
-    msg.mutable_image()->set_step(this->camera->ImageWidth() *
-        this->camera->ImageDepth());
-    msg.mutable_image()->set_data(this->camera->ImageData(),
-        msg.image().width() * this->camera->ImageDepth() *
-        msg.image().height());
+      msg.mutable_image()->set_step(this->camera->ImageWidth() *
+          this->camera->ImageDepth());
+      msg.mutable_image()->set_data(this->camera->ImageData(),
+          msg.image().width() * this->camera->ImageDepth() *
+          msg.image().height());
 
-    this->imagePub->Publish(msg);
+      this->imagePub->Publish(msg);
+    }
+
+    if (this->imagePubIgn.HasConnections())
+    {
+      ignition::msgs::ImageStamped msg;
+      msg.mutable_time()->set_sec(simTime.sec);
+      msg.mutable_time()->set_nsec(simTime.nsec);
+
+      msg.mutable_image()->set_width(this->camera->ImageWidth());
+      msg.mutable_image()->set_height(this->camera->ImageHeight());
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->ImageFormat()));
+
+      msg.mutable_image()->set_step(this->camera->ImageWidth() *
+          this->camera->ImageDepth());
+      msg.mutable_image()->set_data(this->camera->ImageData(),
+          msg.image().width() * this->camera->ImageDepth() *
+          msg.image().height());
+
+      this->imagePub->Publish(msg);
+    }
   }
 
   this->dataPtr->rendered = false;
@@ -280,7 +310,8 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
-    (this->imagePub && this->imagePub->HasConnections());
+    (this->imagePub && this->imagePub->HasConnections()) ||
+    this->imagePubIgn.HasConnections();
 }
 
 //////////////////////////////////////////////////

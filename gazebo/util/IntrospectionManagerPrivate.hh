@@ -90,6 +90,11 @@ namespace gazebo
       /// \brief Flag that will be true when the list of registered items has
       /// changed since the last update.
       public: bool itemsUpdated = false;
+
+      public: std::map<std::string, ignition::transport::Node::Publisher>
+              filterPubs;
+
+      public: ignition::transport::Node::Publisher itemsUpdatePub;
     };
   }
 }
