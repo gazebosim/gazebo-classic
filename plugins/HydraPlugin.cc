@@ -21,6 +21,7 @@
 #include <linux/input.h>
 #include <linux/types.h>
 #include <cstring>
+#include <string>
 #include <functional>
 
 #include "gazebo/physics/physics.hh"

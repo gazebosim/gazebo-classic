@@ -19,6 +19,7 @@
 #include <functional>
 #include <thread>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/PID.hh"
