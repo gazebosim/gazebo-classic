@@ -36,6 +36,9 @@ release will remove the deprecated code.
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
     + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
 
+1. **plugins/events/EventSource.hh**
+    + changed type from `typedef boost::shared_ptr<EventSource> EventSourcePtr` to `typedef std::shared_ptr<EventSource> EventSourcePtr`
+
 1. **plugins/BuoyancyPlugin.hh**
     + VolumeProperties: changed type from `public: math::Vector3 cov` to `ignition::math::Vector3d cov`
 

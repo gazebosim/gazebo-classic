@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_INITIAL_VELOCITY_PLUGIN_HH_
-#define _GAZEBO_INITIAL_VELOCITY_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_INITIALVELOCITYPLUGIN_HH_
+#define GAZEBO_PLUGINS_INITIALVELOCITYPLUGIN_HH_
 
 #include <string>
 #include <vector>
