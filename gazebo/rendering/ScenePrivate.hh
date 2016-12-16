@@ -125,6 +125,9 @@ namespace gazebo
       /// \brief Name of the scene.
       public: std::string name;
 
+      /// \brief True if the scene is in the server, false for the client.
+      public: bool isServer;
+
       /// \brief Scene SDF element.
       public: sdf::ElementPtr sdf;
 
