@@ -61,11 +61,11 @@ void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&HydraDemoPlugin::Update, this, std::placeholders::_1));
+      std::bind(&HydraDemoPlugin::Update, this));
 }
 
 /////////////////////////////////////////////////
-void HydraDemoPlugin::Update(const common::UpdateInfo & /*_info*/)
+void HydraDemoPlugin::Update()
 {
   std::lock_guard<std::mutex> lock(this->msgMutex);
 

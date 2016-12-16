@@ -182,7 +182,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&RazerHydra::Update, this, std::placeholders::_1));
+      std::bind(&RazerHydra::Update, this));
 
   this->pollThread = new std::thread(std::bind(&RazerHydra::Run, this));
 
@@ -192,7 +192,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
+void RazerHydra::Update()
 {
   std::lock_guard<std::mutex> lock(this->mutex);
   ignition::math::Pose3d origRight(this->pos[1], this->quat[1]);

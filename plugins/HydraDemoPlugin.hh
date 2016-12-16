@@ -39,8 +39,7 @@ namespace gazebo
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Update the controller
-    /// \param[in] _info Update information provided by the server.
-    private: void Update(const common::UpdateInfo &_info);
+    private: void Update();
 
     /// \brief Callback executed every time a new hydra message is received.
     /// \param[in] _msg The hydra message.

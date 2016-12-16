@@ -48,8 +48,7 @@ namespace gazebo
     private: void Run();
 
     /// \brief Update the hydra.
-    /// \param[in] _info Update information.
-    private: void Update(const common::UpdateInfo &_info);
+    private: void Update();
 
     /// \brief Raw controller positions.
     private: int16_t rawPos[6];
