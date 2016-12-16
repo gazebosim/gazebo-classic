@@ -18,6 +18,7 @@
 #ifndef GAZEBO_PLUGINS_ELEVATORPLUGIN_HH_
 #define GAZEBO_PLUGINS_ELEVATORPLUGIN_HH_
 
+#include <memory>
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -76,7 +77,7 @@ namespace gazebo
     private: void OnElevator(ConstGzStringPtr &_msg);
 
     /// \brief Private data pointer
-    private: ElevatorPluginPrivate *dataPtr;
+    private: std::unique_ptr<ElevatorPluginPrivate> dataPtr;
   };
 }
 #endif
