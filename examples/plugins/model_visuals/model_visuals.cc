@@ -16,6 +16,7 @@
 */
 #include <gazebo/physics/physics.hh>
 #include <gazebo/gazebo.hh>
+#include <ignition/math/Pose3.hh>
 
 namespace gazebo
 {
@@ -43,10 +44,12 @@ namespace gazebo
       geomMsg->mutable_cylinder()->set_length(.1);
 
       // Set the material to be bright red
-      visualMsg.mutable_material()->set_script("Gazebo/RedGlow");
+      visualMsg.mutable_material()->mutable_script()->set_name(
+        "Gazebo/RedGlow");
 
-      /// Set the pose of the visual relative to its parent
-      msgs::Set(visualMsg.mutable_pose(), math::Pose(0, 0, 0.6, 0, 0, 0));
+      // Set the pose of the visual relative to its parent
+      msgs::Set(visualMsg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0.6, 0, 0, 0));
 
       // Don't cast shadows
       visualMsg.set_cast_shadows(false);

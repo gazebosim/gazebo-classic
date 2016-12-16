@@ -39,14 +39,14 @@ ModelMove::ModelMove()
 }
 
 /////////////////////////////////////////////////
-void ModelMove::Move(const math::Vector3 &_start, const math::Vector3 &_end,
-                     math::Vector3 &_translation)
+void ModelMove::Move(const ignition::math::Vector3d &_start,
+  const ignition::math::Vector3d &_end, ignition::math::Vector3d &_translation)
 {
-  int duration = floor(_start.Distance(_end.x, _end.y, _end.z));
-  math::Vector3 diff = _end - _start;
-  float xStep = diff.x / duration;
-  float yStep = diff.y / duration;
-  float zStep = diff.z / duration;
+  int duration = floor(_start.Distance(_end));
+  ignition::math::Vector3d diff = _end - _start;
+  float xStep = diff.X() / duration;
+  float yStep = diff.Y() / duration;
+  float zStep = diff.Z() / duration;
   int currFrame = this->anim->GetKeyFrameCount();
 
   for (int i = 1; i <= duration; ++i)
@@ -55,26 +55,26 @@ void ModelMove::Move(const math::Vector3 &_start, const math::Vector3 &_end,
         i + currFrame);
 
     key->Translation(ignition::math::Vector3d(
-         _translation.x + xStep * i,
-         _translation.y + yStep * i,
-         _translation.z + zStep * i));
+         _translation.X() + xStep * i,
+         _translation.Y() + yStep * i,
+         _translation.Z() + zStep * i));
     key->Rotation(ignition::math::Quaterniond(0, 0, 0));
   }
 
-  _translation.Set(_translation.x + xStep * duration,
-                   _translation.y + yStep * duration,
-                   _translation.z + zStep * duration);
+  _translation.Set(_translation.X() + xStep * duration,
+                   _translation.Y() + yStep * duration,
+                   _translation.Z() + zStep * duration);
 }
 
 /////////////////////////////////////////////////
 void ModelMove::InitiateMove()
 {
   // get distance from starting point to the first of the goals
-  float pathLength = this->startPosition.Distance(this->pathGoals[0].pos);
+  float pathLength = this->startPosition.Distance(this->pathGoals[0].Pos());
 
   // to calculate the full distance, add the distance between goals
   for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
-    pathLength += this->pathGoals[i].pos.Distance(this->pathGoals[i+1].pos);
+    pathLength += this->pathGoals[i].Pos().Distance(this->pathGoals[i+1].Pos());
 
   // create the animation
   this->anim = gazebo::common::PoseAnimationPtr(
@@ -87,13 +87,16 @@ void ModelMove::InitiateMove()
   key->Translation(ignition::math::Vector3d(0, 0, 0));
   key->Rotation(ignition::math::Quaterniond(0, 0, 0));
 
-  math::Vector3 translation = math::Vector3(0, 0, 0);
+  ignition::math::Vector3d translation = ignition::math::Vector3d(0, 0, 0);
 
   // Move to the startPosition to first goal
-  this->Move(this->startPosition, this->pathGoals[0].pos, translation);
+  this->Move(this->startPosition, this->pathGoals[0].Pos(), translation);
 
   for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
-    this->Move(this->pathGoals[i].pos, this->pathGoals[i+1].pos, translation);
+  {
+    this->Move(
+      this->pathGoals[i].Pos(), this->pathGoals[i+1].Pos(), translation);
+  }
 
   // set the animation
   this->model->SetAnimation(this->anim);
@@ -129,7 +132,7 @@ bool ModelMove::LoadGoalsFromSDF(const sdf::ElementPtr _sdf)
 
   while (poseElem)
   {
-    this->pathGoals.push_back(poseElem->Get<math::Pose>());
+    this->pathGoals.push_back(poseElem->Get<ignition::math::Pose3d>());
     poseElem = poseElem->GetNextElement("pose");
   }
 
@@ -157,7 +160,7 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         _sdf->GetParent()->GetElement("pose")
             ->Get<ignition::math::Pose3d>().Pos();
       this->startPosition =
-        math::Vector3(sdfPose.X(), sdfPose.Y(), sdfPose.Z());
+        ignition::math::Vector3d(sdfPose.X(), sdfPose.Y(), sdfPose.Z());
 
       this->InitiateMove();
     }
