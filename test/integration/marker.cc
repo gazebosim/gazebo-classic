@@ -93,8 +93,11 @@ void Marker_TEST::AddRemove()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  gzmsg << "Main window size: " << mainWindow->width() << "x" <<
-      mainWindow->height() << std::endl;
+  auto windowWidth = mainWindow->width();
+  auto windowHeight = mainWindow->height();
+
+  gzmsg << "Main window size: " << windowWidth << " x " << windowHeight
+        << std::endl;
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -138,8 +141,10 @@ void Marker_TEST::AddRemove()
 #ifndef __APPLE__
   // Check that a white object is rendered
   int shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > 750, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 830, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 770 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 830 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Remove the shape
@@ -166,8 +171,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > 1125, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 1140, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 1125 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 1140 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Add a cylinder
@@ -186,8 +193,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > 2165, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 2180, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 2165 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 2180 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Delete everything
@@ -224,8 +233,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(180);
-  QVERIFY2(shapeWidth > 0, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 10, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 0,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 10 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Draw another vertical line using LINE_STRIP
@@ -253,8 +264,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(180);
-  QVERIFY2(shapeWidth > 10, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 20, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 10 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 20 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Delete everything
@@ -298,8 +311,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   count = this->WhiteCount(180);
-  QVERIFY2(count > 480, "Counted: " + count);
-  QVERIFY2(count < 570, "Counted: " + count);
+  QVERIFY2(count > windowWidth * 480 / 2560,
+      ("Counted: " + std::to_string(count)).c_str());
+  QVERIFY2(count < windowWidth * 570 / 2560,
+      ("Counted: " + std::to_string(count)).c_str());
 #endif
 
   // Delete everything
@@ -338,8 +353,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(250);
-  QVERIFY2(shapeWidth > 100, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 130, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 100 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 130 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Remove the text
@@ -388,8 +405,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > 1480, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 1500, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 1480 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 1500 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Remove the triangle fan
@@ -445,8 +464,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > 5, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 30, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 5 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 30 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   // Remove the triangle list
@@ -501,8 +522,10 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > 1300, "Measured: " + shapeWidth);
-  QVERIFY2(shapeWidth < 1330, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth > windowWidth * 1300 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
+  QVERIFY2(shapeWidth < windowWidth * 1330 / 2560,
+      ("Measured: " + std::to_string(shapeWidth)).c_str());
 #endif
 
   mainWindow->close();
