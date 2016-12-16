@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+
+#include <functional>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
-#include <stdio.h>
+#include <ignition/math/Vector3.hh>
 
 namespace gazebo
 {
@@ -32,14 +33,14 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&ModelPush::OnUpdate, this, _1));
+          std::bind(&ModelPush::OnUpdate, this));
     }
 
     // Called by the world update start event
-    public: void OnUpdate(const common::UpdateInfo & /*_info*/)
+    public: void OnUpdate()
     {
       // Apply a small linear velocity to the model.
-      this->model->SetLinearVel(math::Vector3(.3, 0, 0));
+      this->model->SetLinearVel(ignition::math::Vector3d(.3, 0, 0));
     }
 
     // Pointer to the model
