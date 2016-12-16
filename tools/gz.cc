@@ -591,14 +591,14 @@ JointCommand::JointCommand()
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("joint-name,j", po::value<std::string>(), "Joint name.")
     ("delete,d", "Delete a model.")
-    ("force,f", po::value<double>(), "Force to apply to a joint (n).")
+    ("force,f", po::value<double>(), "Force to apply to a joint (N).")
     ("pos-t", po::value<double>(),
-     "Target angle (r) for rotation joints or position (m) for linear joints.")
+     "Target angle(rad) for rotation joints or position (m) for linear joints.")
     ("pos-p", po::value<double>(), "Position proportional gain.")
     ("pos-i", po::value<double>(), "Position integral gain.")
     ("pos-d", po::value<double>(), "Position differential gain.")
     ("vel-t", po::value<double>(),
-     "Target speed (r/s for rotational joints or m/s for linear joints).")
+     "Target speed (rad/s for rotational joints or m/s for linear joints).")
     ("vel-p", po::value<double>(), "Velocity proportional gain.")
     ("vel-i", po::value<double>(), "Velocity integral gain.")
     ("vel-d", po::value<double>(), "Velocity differential gain.");
