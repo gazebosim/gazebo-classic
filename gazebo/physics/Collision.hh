@@ -189,7 +189,11 @@ namespace gazebo
       public: void SetWorldPoseDirty();
 
       // Documentation inherited.
-      public: virtual const math::Pose &GetWorldPose() const;
+      /// \deprecated See const ignition::math::Pose3d &WorldPose() const
+      public: virtual const math::Pose GetWorldPose() const;
+
+      // Documentation inherited.
+      public: virtual const ignition::math::Pose3d &WorldPose() const;
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.

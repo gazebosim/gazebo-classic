@@ -323,7 +323,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   // Compute anchor pose relative to parent frame.
   if (this->parentLink)
-    this->parentAnchorPose = worldPose - this->parentLink->GetWorldPose();
+    this->parentAnchorPose = worldPose - this->parentLink->WorldPose();
   else
     this->parentAnchorPose = worldPose;
 
@@ -785,7 +785,7 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
         // rotate child (childLink) about anchor point,
 
         // Get Child Link Pose
-        math::Pose childLinkPose = this->childLink->GetWorldPose();
+        math::Pose childLinkPose = this->childLink->WorldPose();
 
         // Compute new child link pose based on position change
         math::Pose newChildLinkPose =
@@ -883,7 +883,7 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       //  interpreted in world frame.
       math::Quaternion q;
       math::Vector3 parentOffset =
-        this->GetParentWorldPose().pos - this->parentLink->GetWorldPose().pos;
+        this->GetParentWorldPose().pos - this->parentLink->WorldPose().Pos();
       linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q);
     }
 
@@ -1255,7 +1255,7 @@ math::Pose Joint::GetInitialAnchorPose() const
 math::Pose Joint::GetWorldPose() const
 {
   if (this->childLink)
-    return this->anchorPose + this->childLink->GetWorldPose();
+    return this->anchorPose + this->childLink->WorldPose();
   return this->anchorPose;
 }
 
@@ -1263,7 +1263,7 @@ math::Pose Joint::GetWorldPose() const
 math::Pose Joint::GetParentWorldPose() const
 {
   if (this->parentLink)
-    return this->parentAnchorPose + this->parentLink->GetWorldPose();
+    return this->parentAnchorPose + this->parentLink->WorldPose();
   return this->parentAnchorPose;
 }
 
@@ -1288,10 +1288,10 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
   {
     // Use parent model frame
     if (this->parentLink)
-      return this->parentLink->GetModel()->GetWorldPose().rot;
+      return this->parentLink->GetModel()->WorldPose().Rot();
 
     // Parent model is world, use world frame
-    return math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   return this->GetWorldPose().rot;
@@ -1317,7 +1317,7 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
     math::Pose jointWorldPose = this->GetWorldPose();
     if (this->parentLink)
     {
-      parentModelWorldPose = this->parentLink->GetModel()->GetWorldPose();
+      parentModelWorldPose = this->parentLink->GetModel()->WorldPose();
     }
     return (parentModelWorldPose - jointWorldPose).rot;
   }
@@ -1387,7 +1387,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
           double _position)
 {
   // child link pose
-  math::Pose childLinkPose = this->childLink->GetWorldPose();
+  math::Pose childLinkPose = this->childLink->WorldPose();
 
   // default return to current pose
   math::Pose newRelativePose;

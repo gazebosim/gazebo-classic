@@ -1290,7 +1290,7 @@ void Model::OnPoseChange()
   math::Pose p;
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
-    p = this->GetWorldPose();
+    p = this->WorldPose();
     p += this->attachedModelsOffset[i];
     this->attachedModels[i]->SetWorldPose(p, true);
   }
@@ -1395,8 +1395,8 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
 /////////////////////////////////////////////////
 void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 {
-  math::Pose linkPose = _link->GetWorldPose();
-  math::Pose currentModelPose = this->GetWorldPose();
+  math::Pose linkPose = _link->WorldPose();
+  math::Pose currentModelPose = this->WorldPose();
   math::Pose linkRelPose = currentModelPose - linkPose;
   math::Pose targetModelPose =  linkRelPose * _pose;
   this->SetWorldPose(targetModelPose);
@@ -1614,7 +1614,7 @@ void Model::RegisterIntrospectionItems()
   // Callbacks.
   auto fModelPose = [this]()
   {
-    return this->GetWorldPose().Ign();
+    return this->WorldPose();
   };
 
   auto fModelLinVel = [this]()

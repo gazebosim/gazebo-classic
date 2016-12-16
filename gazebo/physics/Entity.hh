@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all physical entities
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
-
-#ifndef _ENTITY_HH_
-#define _ENTITY_HH_
+#ifndef GAZEBO_PHYSICS_ENTITY_HH_
+#define GAZEBO_PHYSICS_ENTITY_HH_
 
 #include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
 #include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
@@ -105,8 +101,19 @@ namespace gazebo
 
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
-      public: inline virtual const math::Pose &GetWorldPose() const
-              {return this->worldPose;}
+      /// \deprecated See const ignition::math::Pose3d &WorldPose() const
+      public: inline virtual const math::Pose GetWorldPose() const
+              GAZEBO_DEPRECATED(8.0)
+      {
+        return this->worldPose;
+      }
+
+      /// \brief Get the absolute pose of the entity.
+      /// \return The absolute pose of the entity.
+      public: inline virtual const ignition::math::Pose3d &WorldPose() const
+      {
+        return this->worldPose;
+      }
 
       /// \brief Get the pose of the entity relative to its parent.
       /// \return The pose of the entity relative to its parent.
@@ -237,7 +244,15 @@ namespace gazebo
       /// The dirty pose is the pose set by the physics engine before it's
       /// value is propagated to the rest of the simulator.
       /// \return The dirty pose of the entity.
-      public: const math::Pose &GetDirtyPose() const;
+      /// \deprecated See const ignition::math::Pose3d GetDirtyPose() const
+      public: const math::Pose GetDirtyPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Returns Entity#dirtyPose.
+      ///
+      /// The dirty pose is the pose set by the physics engine before it's
+      /// value is propagated to the rest of the simulator.
+      /// \return The dirty pose of the entity.
+      public: const ignition::math::Pose3d &DirtyPose() const;
 
       /// \brief This function is called when the entity's
       /// (or one of its parents) pose of the parent has changed.
@@ -255,7 +270,7 @@ namespace gazebo
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseModel(const math::Pose &_pose,
+      private: void SetWorldPoseModel(const ignition::math::Pose3d &_pose,
                                       bool _notify,
                                       bool _publish);
 
@@ -263,15 +278,16 @@ namespace gazebo
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseCanonicalLink(const math::Pose &_pose,
-                                              bool _notify, bool _publish);
+      private: void SetWorldPoseCanonicalLink(
+                   const ignition::math::Pose3d &_pose,
+                   bool _notify, bool _publish);
 
       /// \brief Set the world pose for a common entity.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
-                                        bool _publish);
+      private: void SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
+                   bool _notify, bool _publish);
 
       /// \brief Called when a new pose message arrives.
       /// \param[in] _msg The message to set the pose from.
@@ -292,7 +308,7 @@ namespace gazebo
       protected: EntityPtr parentEntity;
 
       /// \brief World pose of the entity.
-      protected: mutable math::Pose worldPose;
+      protected: mutable ignition::math::Pose3d worldPose;
 
       /// \brief Communication node.
       protected: transport::NodePtr node;
@@ -313,7 +329,7 @@ namespace gazebo
       protected: common::Time prevAnimationTime;
 
       /// \brief Start pose of an animation.
-      protected: math::Pose animationStartPose;
+      protected: ignition::math::Pose3d animationStartPose;
 
       /// \brief All our event connections.
       protected: std::vector<event::ConnectionPtr> connections;
@@ -322,7 +338,7 @@ namespace gazebo
       protected: event::ConnectionPtr animationConnection;
 
       /// \brief The pose set by a physics engine.
-      protected: math::Pose dirtyPose;
+      protected: ignition::math::Pose3d dirtyPose;
 
       /// \brief Scale of the entity
       protected: ignition::math::Vector3d scale;
@@ -334,7 +350,7 @@ namespace gazebo
       private: bool isCanonicalLink;
 
       /// \brief The initial pose of the entity.
-      private: math::Pose initialRelativePose;
+      private: ignition::math::Pose3d initialRelativePose;
 
       /// \brief Pose publisher.
       private: transport::PublisherPtr posePub;
@@ -346,7 +362,8 @@ namespace gazebo
       private: boost::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
-      private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool, bool);
+      private: void (Entity::*setWorldPoseFunc)(
+                   const ignition::math::Pose3d &, const bool, const bool);
     };
     /// \}
   }

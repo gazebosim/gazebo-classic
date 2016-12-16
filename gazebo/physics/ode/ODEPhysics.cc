@@ -437,13 +437,13 @@ void ODEPhysics::UpdatePhysics()
 
         // set force torque in link frame
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Force =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(f1.Ign());
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Force =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(f2.Ign());
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Torque =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(t1.Ign());
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Torque =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(t2.Ign());
       }
     }
   }
@@ -1348,7 +1348,7 @@ void ODEPhysics::DebugPrint() const
   {
     b = dWorldGetBody(this->dataPtr->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-    math::Pose pose = link->GetWorldPose();
+    math::Pose pose = link->WorldPose();
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
     math::Vector3 dpos(pos[0], pos[1], pos[2]);

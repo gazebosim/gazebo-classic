@@ -386,14 +386,20 @@ unsigned int Collision::GetMaxContacts()
 }
 
 /////////////////////////////////////////////////
-const math::Pose &Collision::GetWorldPose() const
+const math::Pose Collision::GetWorldPose() const
+{
+  return this->WorldPose();
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &Collision::WorldPose() const
 {
   // If true, compute a new world pose value.
   //
   if (this->worldPoseDirty)
   {
-    this->worldPose = this->GetInitialRelativePose() +
-                      this->link->GetWorldPose();
+    this->worldPose = this->GetInitialRelativePose().Ign() +
+      this->link->WorldPose();
     this->worldPoseDirty = false;
   }
 
