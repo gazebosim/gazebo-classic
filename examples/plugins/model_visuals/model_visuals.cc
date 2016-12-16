@@ -28,7 +28,7 @@ namespace gazebo
       msgs::Visual visualMsg;
 
       this->node = transport::NodePtr(new transport::Node());
-      this->node->Init(_parent->GetWorld()->GetName());
+      this->node->Init(_parent->GetWorld()->Name());
       visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
 
       // Set the visual's name. This should be unique.

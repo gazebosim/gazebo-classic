@@ -15,8 +15,8 @@
  *
 */
 #include <functional>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/physics.hh>
+#include "gazebo/gazebo.hh"
+#include "gazebo/physics/physics.hh"
 
 namespace gazebo
 {
