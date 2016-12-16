@@ -91,9 +91,11 @@ namespace gazebo
       /// changed since the last update.
       public: bool itemsUpdated = false;
 
+      /// \brief Map of filter topic names to publishers.
       public: std::map<std::string, ignition::transport::Node::Publisher>
               filterPubs;
 
+      /// \brief Items update publisher for ignition transport.
       public: ignition::transport::Node::Publisher itemsUpdatePub;
     };
   }
