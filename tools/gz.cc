@@ -591,12 +591,14 @@ JointCommand::JointCommand()
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("joint-name,j", po::value<std::string>(), "Joint name.")
     ("delete,d", "Delete a model.")
-    ("force,f", po::value<double>(), "Force to apply to a joint.")
-    ("pos-t", po::value<double>(), "Target angle.")
+    ("force,f", po::value<double>(), "Force to apply to a joint (n).")
+    ("pos-t", po::value<double>(),
+     "Target angle (r) for rotation joints or position (m) for linear joints.")
     ("pos-p", po::value<double>(), "Position proportional gain.")
     ("pos-i", po::value<double>(), "Position integral gain.")
     ("pos-d", po::value<double>(), "Position differential gain.")
-    ("vel-t", po::value<double>(), "Target speed.")
+    ("vel-t", po::value<double>(),
+     "Target speed (r/s for rotational joints or m/s for linear joints).")
     ("vel-p", po::value<double>(), "Velocity proportional gain.")
     ("vel-i", po::value<double>(), "Velocity integral gain.")
     ("vel-d", po::value<double>(), "Velocity differential gain.");
@@ -610,6 +612,17 @@ void JointCommand::HelpDetailed()
     "\toption -w, is not specified, the first world found on \n"
     "\tthe Gazebo master will be used.\n"
     "\tA model name and joint name are required.\n"
+    "\n"
+    "\tIt is recommended to use only one type of command:\n"
+    "\tforce, position PID, or velocity PID.\n"
+    "\n"
+    "\tForce: Use --force to apply a force.\n"
+    "\n"
+    "\tPosition PID: Use --pos-t to specify a target position\n"
+    "\twith --pos-p, --pos-i, --pos-d to specify the PID parameters.\n"
+    "\n"
+    "\tVelocity PID: Use --vel-t to specify a target velocity\n"
+    "\twith --vel-p, --vel-i, --vel-d to specify the PID parameters.\n"
     << std::endl;
 }
 
