@@ -84,7 +84,7 @@ void Marker_TEST::AddRemove()
   this->Load("worlds/empty_bright.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
 
   // Create the main window.
   mainWindow->Load();
@@ -93,9 +93,12 @@ void Marker_TEST::AddRemove()
 
   this->ProcessEventsAndDraw(mainWindow);
 
+  gzmsg << "Main window size: " << mainWindow->width() << "x" <<
+      mainWindow->height() << std::endl;
+
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
 
   cam->SetCaptureData(true);
 
@@ -135,8 +138,8 @@ void Marker_TEST::AddRemove()
 #ifndef __APPLE__
   // Check that a white object is rendered
   int shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth > 770);
-  QVERIFY(shapeWidth < 830);
+  QVERIFY2(shapeWidth > 750, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 830, "Measured: " + shapeWidth);
 #endif
 
   // Remove the shape
@@ -149,7 +152,7 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth == 0);
+  QCOMPARE(shapeWidth, 0);
 #endif
 
   // Add a box
@@ -163,8 +166,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth > 1125);
-  QVERIFY(shapeWidth < 1140);
+  QVERIFY2(shapeWidth > 1125, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 1140, "Measured: " + shapeWidth);
 #endif
 
   // Add a cylinder
@@ -183,8 +186,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth > 2165);
-  QVERIFY(shapeWidth < 2180);
+  QVERIFY2(shapeWidth > 2165, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 2180, "Measured: " + shapeWidth);
 #endif
 
   // Delete everything
@@ -198,7 +201,7 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth == 0);
+  QCOMPARE(shapeWidth, 0);
 #endif
 
   // Draw a vertical line using LINE_LIST
@@ -221,8 +224,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(180);
-  QVERIFY(shapeWidth > 0);
-  QVERIFY(shapeWidth < 10);
+  QVERIFY2(shapeWidth > 0, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 10, "Measured: " + shapeWidth);
 #endif
 
   // Draw another vertical line using LINE_STRIP
@@ -250,8 +253,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(180);
-  QVERIFY(shapeWidth > 10);
-  QVERIFY(shapeWidth < 20);
+  QVERIFY2(shapeWidth > 10, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 20, "Measured: " + shapeWidth);
 #endif
 
   // Delete everything
@@ -267,7 +270,7 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   int count = this->WhiteCount(100);
-  QVERIFY(count == 0);
+  QCOMPARE(count, 0);
 #endif
 
   // Draw a bunch of points
@@ -295,8 +298,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   count = this->WhiteCount(180);
-  QVERIFY(count > 480);
-  QVERIFY(count < 570);
+  QVERIFY2(count > 480, "Counted: " + count);
+  QVERIFY2(count < 570, "Counted: " + count);
 #endif
 
   // Delete everything
@@ -335,8 +338,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth(250);
-  QVERIFY(shapeWidth > 100);
-  QVERIFY(shapeWidth < 130);
+  QVERIFY2(shapeWidth > 100, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 130, "Measured: " + shapeWidth);
 #endif
 
   // Remove the text
@@ -354,7 +357,7 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth == 0);
+  QCOMPARE(shapeWidth, 0);
 #endif
 
   // Draw a triangle fan
@@ -385,8 +388,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth > 1480);
-  QVERIFY(shapeWidth < 1500);
+  QVERIFY2(shapeWidth > 1480, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 1500, "Measured: " + shapeWidth);
 #endif
 
   // Remove the triangle fan
@@ -404,7 +407,7 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth == 0);
+  QCOMPARE(shapeWidth, 0);
 #endif
 
   // Draw a triangle list
@@ -442,8 +445,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth > 5);
-  QVERIFY(shapeWidth < 30);
+  QVERIFY2(shapeWidth > 5, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 30, "Measured: " + shapeWidth);
 #endif
 
   // Remove the triangle list
@@ -462,7 +465,7 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth == 0);
+  QCOMPARE(shapeWidth, 0);
 #endif
 
   // Draw a triangle strip
@@ -498,8 +501,8 @@ void Marker_TEST::AddRemove()
 
 #ifndef __APPLE__
   shapeWidth = this->MidWhiteWidth();
-  QVERIFY(shapeWidth > 1300);
-  QVERIFY(shapeWidth < 1330);
+  QVERIFY2(shapeWidth > 1300, "Measured: " + shapeWidth);
+  QVERIFY2(shapeWidth < 1330, "Measured: " + shapeWidth);
 #endif
 
   mainWindow->close();
