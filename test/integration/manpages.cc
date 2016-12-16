@@ -168,9 +168,11 @@ TEST(ManTest, gz)
 
   std::string roffOut = customExec(g_gzRoff.string()
       + " " + (g_toolBinPath / command).string());
+  std::cout << "ROFFOUT[" << g_gzRoff.string() + " " + (g_toolBinPath / command).string() << "]\n";
 
   boost::filesystem::path origRoffFilename =
     g_toolSrcPath / (command + ".1.roff");
+  std::cout << "Origin roff file[" << origRoffFilename.string() << "]\n";
 
   std::string origRoff = readFile(origRoffFilename.string());
 
