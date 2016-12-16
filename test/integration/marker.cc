@@ -23,59 +23,6 @@
 #include "test_config.h"
 
 /////////////////////////////////////////////////
-int Marker_TEST::WhiteCount(const int _threshold)
-{
-  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-
-  // Get the image data
-  const unsigned char *data = cam->ImageData();
-  unsigned int width = cam->ImageWidth();
-  unsigned int height = cam->ImageHeight();
-  unsigned int depth = cam->ImageDepth();
-
-  int result = 0;
-
-  // Count all white pixels
-  for (unsigned int y = 0; y < height; y++)
-  {
-    for (unsigned int x = 0; x < width*depth; ++x)
-    {
-      if (data[y * width * depth + x] >= _threshold)
-        result++;
-    }
-  }
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-int Marker_TEST::MidWhiteWidth(const int _threshold)
-{
-  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-
-  // Get the image data
-  const unsigned char *data = cam->ImageData();
-  unsigned int width = cam->ImageWidth();
-  unsigned int height = cam->ImageHeight();
-  unsigned int depth = cam->ImageDepth();
-
-  int result = 0;
-
-  // Count the white pixels over the 4 middle rows
-  for (unsigned int y = height/2 - 2; y < height/2 + 2; y++)
-  {
-    for (unsigned int x = 0; x < width*depth; ++x)
-    {
-      if (data[y * width * depth + x] >= _threshold)
-        result++;
-    }
-  }
-
-  // Return the average over the four rows.
-  return result/4;
-}
-
-/////////////////////////////////////////////////
 void Marker_TEST::AddRemove()
 {
   this->resMaxPercentChange = 5.0;
@@ -93,17 +40,15 @@ void Marker_TEST::AddRemove()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  auto windowWidth = mainWindow->width();
-  auto windowHeight = mainWindow->height();
-
-  gzmsg << "Main window size: " << windowWidth << " x " << windowHeight
-        << std::endl;
-
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != nullptr);
 
   cam->SetCaptureData(true);
+
+  auto camWidth = (int) cam->ImageWidth();
+
+  gzmsg << "Camera width: " << camWidth << std::endl;
 
   // Create our node for communication
   ignition::transport::Node node;
@@ -138,15 +83,6 @@ void Marker_TEST::AddRemove()
     scene->GetVisual("__GZ_MARKER_VISUAL_default_0");
   QVERIFY(vis != nullptr);
 
-#ifndef __APPLE__
-  // Check that a white object is rendered
-  int shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > windowWidth * 770 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 830 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
-
   // Remove the shape
   gzmsg << "Remove sphere" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
@@ -154,11 +90,6 @@ void Marker_TEST::AddRemove()
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QCOMPARE(shapeWidth, 0);
-#endif
 
   // Add a box
   gzmsg << "Add box" << std::endl;
@@ -168,14 +99,6 @@ void Marker_TEST::AddRemove()
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > windowWidth * 1125 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 1140 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
 
   // Add a cylinder
   gzmsg << "Add cylinder" << std::endl;
@@ -191,14 +114,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") != nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") != nullptr);
 
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > windowWidth * 2165 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 2180 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
-
   // Delete everything
   gzmsg << "Delete everything" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
@@ -207,11 +122,6 @@ void Marker_TEST::AddRemove()
 
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QCOMPARE(shapeWidth, 0);
-#endif
 
   // Draw a vertical line using LINE_LIST
   gzmsg << "Draw line list" << std::endl;
@@ -230,14 +140,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_0") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") != nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth(180);
-  QVERIFY2(shapeWidth > windowWidth * 0,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 10 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
 
   // Draw another vertical line using LINE_STRIP
   gzmsg << "Draw line strip" << std::endl;
@@ -262,14 +164,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") != nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") != nullptr);
 
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth(180);
-  QVERIFY2(shapeWidth > windowWidth * 10 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 20 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
-
   // Delete everything
   gzmsg << "Delete everything" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
@@ -280,11 +174,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_1") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
-
-#ifndef __APPLE__
-  int count = this->WhiteCount(100);
-  QCOMPARE(count, 0);
-#endif
 
   // Draw a bunch of points
   gzmsg << "Draw points" << std::endl;
@@ -309,14 +198,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") != nullptr);
 
-#ifndef __APPLE__
-  count = this->WhiteCount(180);
-  QVERIFY2(count > windowWidth * 480 / 2560,
-      ("Counted: " + std::to_string(count)).c_str());
-  QVERIFY2(count < windowWidth * 570 / 2560,
-      ("Counted: " + std::to_string(count)).c_str());
-#endif
-
   // Delete everything
   gzmsg << "Delete everything" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
@@ -328,10 +209,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_2") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
-
-#ifndef __APPLE__
-  QVERIFY(this->WhiteCount(100) == 0);
-#endif
 
   // Draw text
   gzmsg << "Draw text" << std::endl;
@@ -351,14 +228,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") != nullptr);
 
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth(250);
-  QVERIFY2(shapeWidth > windowWidth * 100 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 130 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
-
   // Remove the text
   gzmsg << "Remove text" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
@@ -371,11 +240,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QCOMPARE(shapeWidth, 0);
-#endif
 
   // Draw a triangle fan
   gzmsg << "Draw triangle fan" << std::endl;
@@ -403,14 +267,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") != nullptr);
 
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > windowWidth * 1480 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 1500 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
-
   // Remove the triangle fan
   gzmsg << "Remove triangle fan" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
@@ -423,11 +279,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_3") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QCOMPARE(shapeWidth, 0);
-#endif
 
   // Draw a triangle list
   gzmsg << "Draw triangle list" << std::endl;
@@ -462,14 +313,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_6") != nullptr);
 
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > windowWidth * 5 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 30 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
-
   // Remove the triangle list
   gzmsg << "Remove triangle list" << std::endl;
   markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
@@ -483,11 +326,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_4") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_6") == nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QCOMPARE(shapeWidth, 0);
-#endif
 
   // Draw a triangle strip
   gzmsg << "Draw triangle strip" << std::endl;
@@ -519,14 +357,6 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_6") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_7") != nullptr);
-
-#ifndef __APPLE__
-  shapeWidth = this->MidWhiteWidth();
-  QVERIFY2(shapeWidth > windowWidth * 1300 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-  QVERIFY2(shapeWidth < windowWidth * 1330 / 2560,
-      ("Measured: " + std::to_string(shapeWidth)).c_str());
-#endif
 
   mainWindow->close();
   delete mainWindow;

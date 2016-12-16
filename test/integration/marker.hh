@@ -24,14 +24,6 @@ class Marker_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Count all the white pixels
-  /// \param[in] _threshold Minimum value for a pixel to be considered white
-  private: int WhiteCount(const int _threshold = 250);
-
-  /// \brief Count all the white pixels along the middle row
-  /// \param[in] _threshold Minimum value for a pixel to be considered white
-  private: int MidWhiteWidth(const int _threshold = 250);
-
   /// \brief Test adding and removing markers.
   private slots: void AddRemove();
 };
