@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_CESSNA_PLUGIN_HH_
-#define _GAZEBO_CESSNA_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_CESSNAPLUGIN_HH_
+#define GAZEBO_PLUGINS_CESSNAPLUGIN_HH_
 
 #include <array>
 #include <mutex>

@@ -887,8 +887,8 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
     angle += dAngle;
 
-    if ((math::equal(this->dissipationCoefficient[i], 0.0) &&
-         math::equal(this->stiffnessCoefficient[i], 0.0)) ||
+    if ((ignition::math::equal(this->dissipationCoefficient[i], 0.0) &&
+         ignition::math::equal(this->stiffnessCoefficient[i], 0.0)) ||
         angle >= this->upperLimit[i].Radian() ||
         angle <= this->lowerLimit[i].Radian())
     {
@@ -917,8 +917,8 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
       }
       */
     }
-    else if (!math::equal(this->dissipationCoefficient[i], 0.0) ||
-             !math::equal(this->stiffnessCoefficient[i], 0.0))
+    else if (!ignition::math::equal(this->dissipationCoefficient[i], 0.0) ||
+             !ignition::math::equal(this->stiffnessCoefficient[i], 0.0))
     {
       double kd = fabs(this->dissipationCoefficient[i]);
       double kp = this->stiffnessCoefficient[i];
@@ -931,8 +931,8 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
       // update if going into DAMPING_ACTIVE mode, or
       // if current applied damping value is not the same as predicted.
       if (this->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
-          !math::equal(kd, this->currentKd[i]) ||
-          !math::equal(kp, this->currentKp[i]))
+          !ignition::math::equal(kd, this->currentKd[i]) ||
+          !ignition::math::equal(kp, this->currentKp[i]))
       {
         // save kp, kd applied for efficiency
         this->currentKd[i] = kd;
