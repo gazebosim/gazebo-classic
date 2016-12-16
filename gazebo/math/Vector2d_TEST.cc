@@ -20,6 +20,10 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Vector2d.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class Vector2dTest : public ::testing::Test { };

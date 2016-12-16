@@ -202,9 +202,11 @@ namespace gazebo
     /// \param[in] _a the first value
     /// \param[in] _b the second value
     /// \param[in] _epsilon the tolerance
+    /// \deprecated See ignition::math::equal
     template<typename T>
-    inline bool equal(const T &_a, const T &_b,
-                      const T &_epsilon = 1e-6)
+    inline bool
+    GAZEBO_DEPRECATED(8.0)
+    equal(const T &_a, const T &_b, const T &_epsilon = 1e-6)
     {
       return std::fabs(_a - _b) <= _epsilon;
     }
