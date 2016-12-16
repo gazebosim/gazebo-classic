@@ -15,9 +15,15 @@
  *
 */
 
+#include <functional>
+#include <map>
+#include <set>
+
 #include <boost/algorithm/string.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
@@ -165,7 +171,7 @@ void MudPlugin::Init()
 /////////////////////////////////////////////////
 void MudPlugin::OnContact(ConstContactsPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   this->newestContactsMsg = *_msg;
   this->newMsg = true;
 }
@@ -178,11 +184,11 @@ void MudPlugin::OnUpdate()
     dt = 1e-6;
   if (this->newMsg)
   {
-    boost::mutex::scoped_lock lock(this->mutex);
+    std::lock_guard<std::mutex> lock(this->mutex);
 
     unsigned int nc = this->newestContactsMsg.contact_size();
-    boost::unordered_set<std::string> contactLinkNames;
-    boost::unordered_map<std::string, unsigned int> linkNameIndices;
+    std::set<std::string> contactLinkNames;
+    std::map<std::string, unsigned int> linkNameIndices;
 
     // If new contacts, then get the link names
     if (nc)
@@ -227,7 +233,7 @@ void MudPlugin::OnUpdate()
       if (contactLinkNames.end() != contactLinkNames.find(*iterLinkName))
       {
         // Compute the average contact point position
-        math::Vector3 contactPositionAverage;
+        ignition::math::Vector3d contactPositionAverage;
         {
           // Find the index to the correct contact data structure
           unsigned int i = linkNameIndices[*iterLinkName];
@@ -282,7 +288,8 @@ void MudPlugin::OnUpdate()
             (*iterJoint)->Attach(this->link, *iterLink);
 
             (*iterJoint)->Load(this->link, *iterLink,
-              math::Pose(contactPositionAverage, math::Quaternion()));
+              ignition::math::Pose3d(contactPositionAverage,
+                  ignition::math::Quaterniond()));
             // Joint names must be unique
             // name as mud_joint_0, mud_joint_1, etc.
             {

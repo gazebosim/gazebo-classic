@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "plugins/SphereAtlasDemoPlugin.hh"
 
@@ -156,7 +158,7 @@ void SphereAtlasDemoPlugin::Load(physics::ModelPtr _model,
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
+          std::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////

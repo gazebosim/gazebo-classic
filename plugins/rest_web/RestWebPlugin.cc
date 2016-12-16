@@ -20,6 +20,7 @@
   #pragma comment(lib, "Rpcrt4.lib")
 #else /* UNIX */
 
+#include <functional>
 #include <gazebo/gazebo.hh>
 
 #ifdef HAVE_UUID
@@ -106,8 +107,8 @@ void RestWebPlugin::Init()
   this->subSimEvent = node->Subscribe("/gazebo/sim_events",
                                 &RestWebPlugin::OnSimEvent, this);
 
-  this->requestQThread = new boost::thread(
-      boost::bind(&RestWebPlugin::RunRequestQ, this));
+  this->requestQThread = new std::thread(
+      std::bind(&RestWebPlugin::RunRequestQ, this));
 }
 
 //////////////////////////////////////////////////
@@ -284,14 +285,14 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->requestQMutex);
+  std::lock_guard<std::mutex> lock(this->requestQMutex);
   this->msgLoginQ.push_back(_msg);
 }
 
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->requestQMutex);
+  std::lock_guard<std::mutex> lock(this->requestQMutex);
   this->restApi.Logout();
 
   gazebo::msgs::RestResponse msg;
@@ -350,7 +351,7 @@ void RestWebPlugin::RunRequestQ()
       boost::shared_ptr<const gazebo::msgs::RestLogin> login;
       // Grab the mutex and remove first message the queue
       {
-        boost::mutex::scoped_lock lock(this->requestQMutex);
+        std::lock_guard<std::mutex> lock(this->requestQMutex);
         if (!this->msgLoginQ.empty())
         {
           login = this->msgLoginQ.front();

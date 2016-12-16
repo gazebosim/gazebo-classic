@@ -8,6 +8,7 @@
 1. Update plugins to use ign-math.
     * [Pull request #2531](https://bitbucket.org/osrf/gazebo/pull-request/2531)
     * [Pull request #2534](https://bitbucket.org/osrf/gazebo/pull-request/2534)
+    * [Pull request #2538](https://bitbucket.org/osrf/gazebo/pull-request/2538)
 
 1. Use ignition math with `rendering/Distortion` and update function names.
     * [Pull request #2529](https://bitbucket.org/osrf/gazebo/pull-request/2529)

@@ -15,10 +15,10 @@
  *
 */
 
-#ifndef _SPHERE_HYDRADEMO_PLUGIN_HH_
-#define _SPHERE_HYDRADEMO_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_HYDRADEMOPLUGIN_HH_
+#define GAZEBO_PLUGINS_HYDRADEMOPLUGIN_HH_
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -39,8 +39,7 @@ namespace gazebo
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Update the controller
-    /// \param[in] _info Update information provided by the server.
-    private: void Update(const common::UpdateInfo &_info);
+    private: void Update();
 
     /// \brief Callback executed every time a new hydra message is received.
     /// \param[in] _msg The hydra message.
@@ -62,7 +61,7 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
 
     /// \brief Mutex to protect hydraMsgPtr.
-    private: boost::mutex msgMutex;
+    private: std::mutex msgMutex;
 
     /// \brief Store the last message from hydra.
     private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
