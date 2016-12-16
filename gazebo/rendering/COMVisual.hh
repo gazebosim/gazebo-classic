@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COMVISUAL_HH_
-#define _COMVISUAL_HH_
+#ifndef GAZEBO_RENDERING_COMVISUAL_HH_
+#define GAZEBO_RENDERING_COMVISUAL_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -54,7 +54,12 @@ namespace gazebo
 
       /// \brief Get inertia pose.
       /// \return Inertia pose in link frame.
-      public: math::Pose GetInertiaPose() const;
+      /// \deprecated See ignition::math::Pose3d InertiaPose() const
+      public: math::Pose GetInertiaPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: ignition::math::Pose3d InertiaPose() const;
 
       /// \brief Load using previously set member variables.
       private: void Load();

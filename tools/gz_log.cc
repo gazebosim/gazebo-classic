@@ -28,6 +28,9 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include <gazebo/util/util.hh>
 #include "gz_log.hh"
 
@@ -65,7 +68,7 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
 }
 
 /////////////////////////////////////////////////
-std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
+std::string FilterBase::FilterPose(const ignition::math::Pose3d &_pose,
     const std::string &_xmlName,
     std::string _filter,
     const gazebo::physics::State &_state)
@@ -85,7 +88,7 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
   }
 
   // Get the euler angles.
-  gazebo::math::Vector3 rpy = _pose.rot.GetAsEuler();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
   // If the filter is empty, then output the whole pose.
   if (!_filter.empty())
@@ -106,29 +109,29 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
         case 'X':
         case 'x':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.x << " ";
+            << _pose.Pos().X() << " ";
           break;
         case 'Y':
         case 'y':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.y << " ";
+            << _pose.Pos().Y() << " ";
           break;
         case 'Z':
         case 'z':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.z << " ";
+            << _pose.Pos().Z() << " ";
           break;
         case 'R':
         case 'r':
-          this->Out(result, _state) << std::fixed << rpy.x << " ";
+          this->Out(result, _state) << std::fixed << rpy.X() << " ";
           break;
         case 'P':
         case 'p':
-          this->Out(result, _state) << std::fixed << rpy.y << " ";
+          this->Out(result, _state) << std::fixed << rpy.Y() << " ";
           break;
         case 'A':
         case 'a':
-          this->Out(result, _state) << std::fixed << rpy.z << " ";
+          this->Out(result, _state) << std::fixed << rpy.Z() << " ";
           break;
         default:
           std::cerr << "Invalid pose value[" << *elemIter << "]\n";
@@ -206,7 +209,7 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
         if (axis >= _state.GetAngleCount())
           continue;
 
-        gazebo::math::Angle angle = _state.GetAngle(axis);
+        ignition::math::Angle angle = _state.GetAngle(axis).Ign();
 
         if (this->xmlOutput)
         {
@@ -308,17 +311,24 @@ std::string LinkFilter::FilterParts(gazebo::physics::LinkState &_state,
     elemParts = *_partIter;
 
   if (part == "pose")
-    result << this->FilterPose(_state.GetPose(), part, elemParts,
-        _state);
+  {
+    result << this->FilterPose(_state.GetPose().Ign(), part, elemParts, _state);
+  }
   else if (part == "acceleration")
-    result << this->FilterPose(_state.GetAcceleration(), part,
+  {
+    result << this->FilterPose(_state.GetAcceleration().Ign(), part,
         elemParts, _state);
+  }
   else if (part == "velocity")
-    result << this->FilterPose(_state.GetVelocity(), part, elemParts,
+  {
+    result << this->FilterPose(_state.GetVelocity().Ign(), part, elemParts,
         _state);
+  }
   else if (part == "wrench")
-    result << this->FilterPose(_state.GetWrench(), part, elemParts,
+  {
+    result << this->FilterPose(_state.GetWrench().Ign(), part, elemParts,
         _state);
+  }
 
   return result.str();
 }
@@ -444,7 +454,7 @@ std::string ModelFilter::FilterParts(gazebo::physics::ModelState &_state,
   if (*_partIter == "pose")
   {
     // Get the model state pose
-    gazebo::math::Pose pose = _state.GetPose();
+    ignition::math::Pose3d pose = _state.GetPose().Ign();
     ++_partIter;
 
     // Get the elements to filter pose by.

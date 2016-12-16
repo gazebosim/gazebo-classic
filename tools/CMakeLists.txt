@@ -38,9 +38,7 @@ set (test_sources
 )
 gz_build_tests(${test_sources} EXTRA_LIBS libgazebo_client gazebo_transport gazebo_util)
 
-if (ENABLE_TESTS_COMPILATION)
-  add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
-endif()
+add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
 
 add_executable(gz gz.cc gz_topic.cc gz_log.cc)
 

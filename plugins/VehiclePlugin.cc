@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/VehiclePlugin.hh"
@@ -143,7 +145,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->rearPower = _sdf->Get<double>("rear_power");
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&VehiclePlugin::OnUpdate, this)));
+          std::bind(&VehiclePlugin::OnUpdate, this)));
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->Name());
@@ -160,8 +162,8 @@ void VehiclePlugin::Init()
   // This assumes that the largest dimension of the wheel is the diameter
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->joints[0]->GetChild());
-  math::Box bb = parent->GetBoundingBox();
-  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+  ignition::math::Box bb = parent->GetBoundingBox().Ign();
+  this->wheelRadius = bb.Size().Max() * 0.5;
 
   // The total range the steering wheel can rotate
   double steeringRange = this->steeringJoint->GetHighStop(0).Radian() -
@@ -228,23 +230,24 @@ void VehiclePlugin::OnUpdate()
   this->joints[1]->SetLowStop(0, wheelAngle);
 
   // Get the current velocity of the car
-  this->velocity = this->chassis->GetWorldLinearVel();
+  this->velocity = this->chassis->GetWorldLinearVel().Ign();
 
   //  aerodynamics
   this->chassis->AddForce(
-      math::Vector3(0, 0, this->aeroLoad * this->velocity.GetSquaredLength()));
+      ignition::math::Vector3d(0, 0,
+      this->aeroLoad * this->velocity.SquaredLength()));
 
   // Sway bars
-  math::Vector3 bodyPoint;
-  math::Vector3 hingePoint;
-  math::Vector3 axis;
+  ignition::math::Vector3d bodyPoint;
+  ignition::math::Vector3d hingePoint;
+  ignition::math::Vector3d axis;
 
   for (int ix = 0; ix < 4; ++ix)
   {
-    hingePoint = this->joints[ix]->GetAnchor(0);
-    bodyPoint = this->joints[ix]->GetAnchor(1);
+    hingePoint = this->joints[ix]->GetAnchor(0).Ign();
+    bodyPoint = this->joints[ix]->GetAnchor(1).Ign();
 
-    axis = this->joints[ix]->GetGlobalAxis(0).Round();
+    axis = this->joints[ix]->GetGlobalAxis(0).Round().Ign();
     double displacement = (bodyPoint - hingePoint).Dot(axis);
 
     float amt = displacement * this->swayForce;
@@ -253,13 +256,14 @@ void VehiclePlugin::OnUpdate()
       if (amt > 15)
         amt = 15;
 
-      math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();
+      ignition::math::Pose3d p =
+          this->joints[ix]->GetChild()->GetWorldPose().Ign();
       this->joints[ix]->GetChild()->AddForce(axis * -amt);
-      this->chassis->AddForceAtWorldPosition(axis * amt, p.pos);
+      this->chassis->AddForceAtWorldPosition(axis * amt, p.Pos());
 
-      p = this->joints[ix^1]->GetChild()->GetWorldPose();
+      p = this->joints[ix^1]->GetChild()->GetWorldPose().Ign();
       this->joints[ix^1]->GetChild()->AddForce(axis * amt);
-      this->chassis->AddForceAtWorldPosition(axis * -amt, p.pos);
+      this->chassis->AddForceAtWorldPosition(axis * -amt, p.Pos());
     }
   }
 }

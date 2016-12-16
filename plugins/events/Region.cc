@@ -20,8 +20,14 @@
 
 using namespace gazebo;
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////
 bool Region::Contains(const math::Vector3 &_p) const
+{
+  return Contains(_p.Ign());
+}
+
+/////////////////////////////////////////////
+bool Region::Contains(const ignition::math::Vector3d &_p) const
 {
   for (auto v: this->boxes)
   {
@@ -33,7 +39,7 @@ bool Region::Contains(const math::Vector3 &_p) const
   return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////
 void Region::Load(const sdf::ElementPtr &_sdf)
 {
   sdf::ElementPtr child = _sdf->GetFirstElement();
@@ -42,8 +48,9 @@ void Region::Load(const sdf::ElementPtr &_sdf)
     std::string ename = child->GetName();
     if (ename == "volume")
     {
-      this->boxes.push_back(math::Box(child->Get<math::Vector3>("min"),
-                                      child->Get<math::Vector3>("max")));
+      this->boxes.push_back(
+          ignition::math::Box(child->Get<ignition::math::Vector3d>("min"),
+          child->Get<ignition::math::Vector3d>("max")));
     }
     else if (ename == "name")
     {
