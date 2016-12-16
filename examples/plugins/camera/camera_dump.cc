@@ -36,11 +36,11 @@ namespace gazebo
     {
       char tmp[1024];
       snprintf(tmp, sizeof(tmp), "/tmp/%s-%04d.jpg",
-          this->parentSensor->GetCamera()->GetName().c_str(), this->saveCount);
+          this->parentSensor->Camera()->Name().c_str(), this->saveCount);
 
       if (this->saveCount < 10)
       {
-        this->parentSensor->GetCamera()->SaveFrame(
+        this->parentSensor->Camera()->SaveFrame(
             _image, _width, _height, _depth, _format, tmp);
         gzmsg << "Saving frame [" << this->saveCount
               << "] as [" << tmp << "]\n";

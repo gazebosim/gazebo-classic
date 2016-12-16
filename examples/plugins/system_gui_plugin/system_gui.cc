@@ -15,6 +15,7 @@
  *
 */
 
+#include <functional>
 #include <gazebo/gui/GuiIface.hh>
 #include <gazebo/rendering/rendering.hh>
 #include <gazebo/gazebo.hh>
@@ -39,7 +40,7 @@ namespace gazebo
     {
       this->connections.push_back(
           event::Events::ConnectPreRender(
-            boost::bind(&SystemGUI::Update, this)));
+            std::bind(&SystemGUI::Update, this)));
     }
 
     /////////////////////////////////////////////

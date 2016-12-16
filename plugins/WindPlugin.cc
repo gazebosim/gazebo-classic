@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "plugins/WindPlugin.hh"

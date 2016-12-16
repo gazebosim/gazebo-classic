@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_RESTUI_WIDGET_HH_
-#define _GAZEBO_RESTUI_WIDGET_HH_
+#ifndef GAZEBO_PLUGINS_REST_WEB_RESTUIWIDGET_HH_
+#define GAZEBO_PLUGINS_REST_WEB_RESTUIWIDGET_HH_
 
 #include <string>
 #include <list>
