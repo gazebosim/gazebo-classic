@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GZ_LOG_HH_
-#define _GZ_LOG_HH_
+#ifndef GAZEBO_TOOLS_GZLOG_HH_
+#define GAZEBO_TOOLS_GZLOG_HH_
 
 #include <string>
 #include <list>
@@ -47,7 +47,7 @@ namespace gazebo
     /// \param[in] _filter The filter string [x,y,z,r,p,a].
     /// \param[in] _state Current state.
     /// \return Filtered pose string.
-    public: std::string FilterPose(const gazebo::math::Pose &_pose,
+    public: std::string FilterPose(const ignition::math::Pose3d &_pose,
                 const std::string &_xmlName,
                 std::string _filter,
                 const gazebo::physics::State &_state);

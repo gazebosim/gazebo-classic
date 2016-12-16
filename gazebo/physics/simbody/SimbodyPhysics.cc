@@ -895,7 +895,7 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->world->Gravity().Length(), 0.0))
+  if (!ignition::math::equal(this->world->Gravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
       SimbodyPhysics::Vector3ToVec3(this->world->Gravity()));
   else
@@ -1048,7 +1048,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
 
-        if (math::equal(pitch, 0.0))
+        if (ignition::math::equal(pitch, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using pitch = 1.0e6\n";

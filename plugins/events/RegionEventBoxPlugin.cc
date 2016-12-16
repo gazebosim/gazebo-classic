@@ -84,7 +84,8 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RegionEventBoxPlugin::OnUpdate, this, _1));
+      std::bind(&RegionEventBoxPlugin::OnUpdate, this,
+      std::placeholders::_1));
 }
 
 //////////////////////////////////////////////////

@@ -12,9 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.k *
-*/  
-#ifndef _SIMEVENTS_EXCEPTION_HH_
-#define _SIMEVENTS_EXCEPTION_HH_
+*/
+
+#ifndef GAZEBO_PLUGINS_SIMEVENTSEXCEPTION_HH_
+#define GAZEBO_PLUGINS_SIMEVENTSEXCEPTION_HH_
 
 #include <stdexcept>
 

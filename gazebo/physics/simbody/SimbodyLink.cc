@@ -570,7 +570,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
       this->inertial->GetPose());
     const SimTK::Vec3 &com_L = X_LI.p();  // vector from Lo to com, exp. in L
 
-    if (math::equal(mass, 0.0))
+    if (ignition::math::equal(mass, 0.0))
       return SimTK::MassProperties(mass, com_L, SimTK::UnitInertia(1, 1, 1));
 
     // Get mass-weighted central inertia, expressed in I frame.

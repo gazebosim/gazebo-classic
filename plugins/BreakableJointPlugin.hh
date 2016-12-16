@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PLUGINS_BREAKABLE_JOINT_PLUGIN_HH_
-#define _GAZEBO_PLUGINS_BREAKABLE_JOINT_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_BREAKABLEJOINTPLUGIN_HH_
+#define GAZEBO_PLUGINS_BREAKABLEJOINTPLUGIN_HH_
 
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"

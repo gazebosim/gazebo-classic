@@ -22,6 +22,10 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Vector3.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 

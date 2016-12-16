@@ -7,6 +7,21 @@ release will remove the deprecated code.
 
 ## Gazebo 7.X to 8.X
 
+### Build system
+
+1. ***Disable tests compilation by default:*** tests compilation has been
+   excluded from the make all (default make) target.  cmake will generate make
+   targets for all the tests in the code, individual test compilation can be
+   trigger by using: make <binary_test_name> (i.e make UNIT_gz_TEST).
+   For compiling the whole test suite see the new 'make tests' target.
+
+1. ***New 'tests' target for make***: a new 'tests' target has been implemented.
+   it will compile all the tests present in the code by calling 'make tests'.
+
+1. ***Deprecate ENABLE_TESTS_COMPILATION parameter:***  the previous cmake
+   parameter to control tests make target generation has been deprecated. Tests
+   compilation is disabled by default.
+
 ### Additions
 
 1. **gazebo/common/Material.hh**
@@ -23,6 +38,9 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
     + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
+
+1. **plugins/events/EventSource.hh**
+    + changed type from `typedef boost::shared_ptr<EventSource> EventSourcePtr` to `typedef std::shared_ptr<EventSource> EventSourcePtr`
 
 1. **plugins/BuoyancyPlugin.hh**
     + VolumeProperties: changed type from `public: math::Vector3 cov` to `ignition::math::Vector3d cov`
@@ -449,6 +467,8 @@ release will remove the deprecated code.
 1. **gazebo/math/Helpers.hh**
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
     + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
+    + ***Deprecation:*** public: bool   gazebo::math::equal(T, T, T)
+    + ***Replacement:*** public: bool ignition::math::equal(T, T, T)
     + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
     + ***Replacement:*** public: double ignition::math::fixnan(double)
     + ***Deprecation:*** public: float   gazebo::math::fixnan(float)
