@@ -175,3 +175,47 @@ if (BUILD_OSX_BUNDLE)
     fixup_bundle(\"${APPS}\" \"\"  \"${DIRS}\")
   " COMPONENT Runtime)
 endif()
+
+if (BUILD_OSX_BUNDLE)
+  set(OSX_BUNDLE_ROOT "${CMAKE_BINARY_DIR}/gazebo.app/Contents")
+  # Info.plist
+  configure_file("${CMAKE_SOURCE_DIR}/tools/osx/Info.plist.in"
+      "${OSX_BUNDLE_ROOT}/Info.plist" @ONLY)
+  # gazezo.icns
+  install(FILES "${CMAKE_SOURCE_DIR}/tools/osx/gazebo.icns"
+      DESTINATION "${OSX_BUNDLE_ROOT}/Resources/")
+
+  set(APPS_GAZEBO "${OSX_BUNDLE_ROOT}/MacOS/gazebo")
+  install (TARGETS gazebo BUNDLE DESTINATION .)
+  # Different libraries are not being installed into CMAKE_BINARY_DIR/lib
+  # don't know why :/
+  set (DIRS_GAZEBO
+      ${IGNITION-MATH_LIBRARY_DIRS}
+      ${IGNITION-MSGS_LIBRARY_DIRS}
+      ${IGNITION-TRANSPORT_LIBRARY_DIRS}
+      ${SDFormat_LIBRARY_DIRS}
+      ${OGRE_LIBRARY_DIRS}
+      ${CMAKE_BINARY_DIR}/lib
+      ${CMAKE_BINARY_DIR}/gazebo/util
+      ${CMAKE_BINARY_DIR}/gazebo/math
+      ${CMAKE_BINARY_DIR}/gazebo/msgs
+      ${CMAKE_BINARY_DIR}/gazebo/physics
+      ${CMAKE_BINARY_DIR}/gazebo/sensors
+      ${CMAKE_BINARY_DIR}/gazebo/transport
+      ${CMAKE_BINARY_DIR}/gazebo/common
+      ${CMAKE_BINARY_DIR}/gazebo/rendering)
+
+  SET(OGRE_COMPONENT_DIR gazebo.app/Contents/)
+  FILE (GLOB OGRE_COMPONENTS "${OGRE_LIBRARY_DIRS}/libOgrePaging.*")
+    INSTALL(FILES ${OGRE_COMPONENTS}
+    DESTINATION ${OGRE_COMPONENT_DIR}/Components)
+
+  INSTALL(CODE "
+    file(GLOB_RECURSE LIBS
+      \"\${CMAKE_INSTALL_PREFIX}/${OGRE_COMPONENT_DIR}/Components/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+    # Needed for getting the right permissions when using brew
+    set (BU_CHMOD_BUNDLE_ITEMS ON)
+    include(BundleUtilities)
+    fixup_bundle(\"${APPS_GAZEBO}\" \"\"  \"${DIRS_GAZEBO}\")
+  " COMPONENT Runtime)
+endif()
