@@ -59,6 +59,13 @@ void OrthoViewController::Init()
 void OrthoViewController::Init(const math::Vector3 &_focalPoint,
     double _yaw, double _pitch)
 {
+  this->Init(_focalPoint.Ign(), _yaw, _pitch);
+}
+
+//////////////////////////////////////////////////
+void OrthoViewController::Init(const ignition::math::Vector3d &_focalPoint,
+    double _yaw, double _pitch)
+{
   // this function also gets called when camera animation is complete so make
   // sure zoom is reset only if not yet initialized.
   if (!this->init)
@@ -144,7 +151,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // The left mouse button is used to translate the camera.
   else if ((_event.Buttons() & common::MouseEvent::LEFT) && _event.Dragging())
   {
-    math::Vector3 translation;
+    ignition::math::Vector3d translation;
 
     double factor = 1.0;
 
@@ -222,7 +229,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
 //////////////////////////////////////////////////
 void OrthoViewController::Zoom(const float _amount,
-                               const math::Vector2i &_screenPos)
+                               const ignition::math::Vector2i &_screenPos)
 {
   // Zoom to mouse cursor position
   // Three step process:
@@ -230,7 +237,7 @@ void OrthoViewController::Zoom(const float _amount,
   // Zoom by changing the orthographic window size
   // Translate back to mouse cursor position
 
-  math::Vector3 translation;
+  ignition::math::Vector3d translation;
   int width = this->camera->ViewportWidth();
   int height = this->camera->ViewportHeight();
 
@@ -238,9 +245,9 @@ void OrthoViewController::Zoom(const float _amount,
   double orthoHeight = height / this->dataPtr->scale;
 
   translation.Set(0.0,
-      ((width/2.0 - _screenPos.x) / static_cast<float>(width))
+      ((width/2.0 - _screenPos.X()) / static_cast<float>(width))
       * orthoWidth,
-      ((height/2.0 - _screenPos.y) / static_cast<float>(height))
+      ((height/2.0 - _screenPos.Y()) / static_cast<float>(height))
       * orthoHeight);
   this->TranslateLocal(translation);
 
@@ -263,9 +270,9 @@ void OrthoViewController::Zoom(const float _amount,
   double newOrthoHeight = height / this->dataPtr->scale;
 
   translation.Set(0.0,
-      ((_screenPos.x - width/2.0) / static_cast<float>(width))
+      ((_screenPos.X() - width/2.0) / static_cast<float>(width))
       * newOrthoWidth,
-      ((_screenPos.y - height/2.0) / static_cast<float>(height))
+      ((_screenPos.Y() - height/2.0) / static_cast<float>(height))
       * newOrthoHeight);
 
   this->TranslateLocal(translation);

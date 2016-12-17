@@ -59,6 +59,17 @@ void Projector::Load(const std::string &_name,
                      double _farClip,
                      double _fov)
 {
+  this->Load(_name, _pose.Ign(), _textureName, _nearClip, _farClip, _fov);
+}
+
+/////////////////////////////////////////////////
+void Projector::Load(const std::string &_name,
+                     const ignition::math::Pose3d &_pose,
+                     const std::string &_textureName,
+                     double _nearClip,
+                     double _farClip,
+                     double _fov)
+{
   std::string topicName = std::string("~/") + _name;
 
   boost::replace_all(topicName, "::", "/");
@@ -331,10 +342,10 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 }
 
 /////////////////////////////////////////////////
-void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
+void Projector::ProjectorFrameListener::SetPose(const ignition::math::Pose3d &_pose)
 {
-  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.Ign().Rot());
-  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.Ign().Pos());
+  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.Rot());
+  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.Pos());
   Ogre::Quaternion offsetQuaternion;
 
   this->node->setPosition(ogreVec);

@@ -48,7 +48,12 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
+      /// \deprecated See version that uses an ignition vector3d object.
       public: virtual void Init(const math::Vector3 &_focalPoint,
+        const double _yaw = 0, const double _pitch = 0) GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited
+      public: virtual void Init(const ignition::math::Vector3d &_focalPoint,
                   const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Get the type name of this view controller.
@@ -63,7 +68,8 @@ namespace gazebo
       /// \param[in] _amount Zoom quantity.
       /// \param[in] _point Position on screen to zoom to
       private: void Zoom(const float _amount,
-                         const math::Vector2i &_point = math::Vector2i(0, 0));
+        const ignition::math::Vector2i &_point = \
+          ignition::math::Vector2i(0, 0));
 
       // Documentation inherited
       public: virtual void Resize(const unsigned int _width,

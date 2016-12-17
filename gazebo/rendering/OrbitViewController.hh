@@ -52,7 +52,12 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
+      /// \deprecated See version that uses an ignition vector3d object.
       public: virtual void Init(const math::Vector3 &_focalPoint,
+        const double _yaw = 0, const double _pitch = 0) GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited
+      public: virtual void Init(const ignition::math::Vector3d &_focalPoint,
                   const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Update.
@@ -90,11 +95,23 @@ namespace gazebo
 
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      protected: void TranslateLocal(const math::Vector3 &_vec);
+      /// \deprecated See version that uses an ignition vector3d object.
+      protected: void TranslateLocal(const math::Vector3 &_vec)
+        GAZEBO_DEPRECATED(8.0);
 
       /// \brief Translate the focal point in the global coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      protected: void TranslateGlobal(const math::Vector3 &_vec);
+      /// \deprecated See version that uses an ignition vector3d object.
+      protected: void TranslateGlobal(const math::Vector3 &_vec)
+        GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Translate the focal point in the local coordinate frame.
+      /// \param[in] _vec Direction and amount to translate the camera.
+      protected: void TranslateLocal(const ignition::math::Vector3d &_vec);
+
+      /// \brief Translate the focal point in the global coordinate frame.
+      /// \param[in] _vec Direction and amount to translate the camera.
+      protected: void TranslateGlobal(const ignition::math::Vector3d &_vec);
 
       /// \brief Zoom the camera.
       /// \paramp[in] _amount Zoom quatity.

@@ -68,6 +68,22 @@ namespace gazebo
       /// \param[in] _farClip Far clip distance.
       /// \param[in] _fov Field of view.
       public: void Load(const std::string &_name,
+        const ignition::math::Pose3d &_pose = \
+          ignition::math::Pose3d(0, 0, 0, 0, 0, 0),
+        const std::string &_textureName = "",
+        double _nearClip = 0.25,
+        double _farClip = 15.0,
+        double _fov = M_PI * 0.25);
+
+      /// \brief Load the projector.
+      /// \param[in] _name Name of the projector.
+      /// \param[in] _pos Pose of the projector.
+      /// \param[in] _textureName Name of the texture to project.
+      /// \param[in] _nearClip Near clip distance.
+      /// \param[in] _farClip Far clip distance.
+      /// \param[in] _fov Field of view.
+      /// \deprecated See version that uses an ignition Pose3d object.
+      public: void Load(const std::string &_name,
                         const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
                         const std::string &_textureName = "",
                         double _nearClip = 0.25,
@@ -120,7 +136,7 @@ namespace gazebo
         public: void SetEnabled(bool _enabled);
         public: void SetUsingShaders(bool _usingShaders);
 
-        public: void SetPose(const math::Pose &_pose);
+        public: void SetPose(const ignition::math::Pose3d &_pose);
 
         private: void SetSceneNode();
 
