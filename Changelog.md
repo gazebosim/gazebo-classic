@@ -3,7 +3,7 @@
 ## Gazebo 8.x.x (2017-xx-xx)
 
 1. Updated `gz_log` tool to use `ignition::math`.
-    * [Pull request #2541](https://bitbucket.org/osrf/gazebo/pull-request/2541)
+    * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
 
 1. Update plugins to use ign-math.
     * [Pull request #2531](https://bitbucket.org/osrf/gazebo/pull-request/2531)
@@ -20,7 +20,7 @@
 
 1. Added VisualMarkers to the rendering engine. Visual markers support
    programmatic rendering of various shapes in a scene.
-    * [Pull request 2498](https://bitbucket.org/osrf/gazebo/pull-request/2498)
+    * [Pull request 2541](https://bitbucket.org/osrf/gazebo/pull-request/2541)
 
 1. Support version 5 of the DART Physics Engine.
     * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
