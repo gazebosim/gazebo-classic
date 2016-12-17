@@ -134,7 +134,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   if (_msg.has_scale())
   {
     this->SetScale(ignition::math::Vector3d(
-          _msg.scale().x(), _msg.scale().y(), _msg.scale().z()));
+        _msg.scale().x(), _msg.scale().y(), _msg.scale().z()));
   }
 
   // Set the visual's pose
@@ -144,7 +144,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   // Set the marker's end time
   if (_msg.has_lifetime() &&
       (_msg.lifetime().sec() > 0 ||
-       (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
+      (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
   {
     this->dPtr->lifetime = this->GetScene()->SimTime() +
       gazebo::common::Time(_msg.lifetime().sec(), _msg.lifetime().nsec());
