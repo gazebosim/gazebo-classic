@@ -247,7 +247,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     rendering::VisualPtr previousParent;
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
-    if (gui::get_entity_id(currentParent->GetName()))
+    if (gui::get_entity_id(currentParent->Name()))
     {
       if (this->dataPtr->selectedVis)
         previousParent = this->dataPtr->selectedVis->GetRootVisual();
@@ -329,13 +329,13 @@ void ModelSnap::Snap(const ignition::math::Triangle3d &_triangleSrc,
   ignition::math::Quaterniond rotation;
 
   this->SnapTransform(_triangleSrc, _triangleDest,
-      _visualSrc->GetWorldPose().Ign(), translation, rotation);
+      _visualSrc->WorldPose(), translation, rotation);
 
   _visualSrc->SetWorldPose(
-      ignition::math::Pose3d(_visualSrc->GetWorldPose().Ign().Pos() +
-      translation, rotation * _visualSrc->GetWorldPose().Ign().Rot()));
+      ignition::math::Pose3d(_visualSrc->WorldPose().Pos() +
+      translation, rotation * _visualSrc->WorldPose().Rot()));
 
-  Events::moveEntity(_visualSrc->GetName(), _visualSrc->GetWorldPose().Ign(),
+  Events::moveEntity(_visualSrc->Name(), _visualSrc->WorldPose(),
       true);
 
   this->PublishVisualPose(_visualSrc);
@@ -411,17 +411,17 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   {
     // Register user command on server
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_description("Snap [" + _vis->Name() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
     msgs::Model msg;
 
-    auto id = gui::get_entity_id(_vis->GetName());
+    auto id = gui::get_entity_id(_vis->Name());
     if (id)
       msg.set_id(id);
 
-    msg.set_name(_vis->GetName());
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msg.set_name(_vis->Name());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);
@@ -443,9 +443,9 @@ void ModelSnap::Update()
       for (unsigned int i = 0; i < 3; ++i)
       {
         hoverTriangle.Set(i,
-            this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
+            this->dataPtr->hoverVis->WorldPose().Rot().Inverse() *
             (this->dataPtr->hoverTriangle[i] -
-            this->dataPtr->hoverVis->GetWorldPose().Ign().Pos()));
+            this->dataPtr->hoverVis->WorldPose().Pos()));
       }
 
       if (!this->dataPtr->highlightVisual)
@@ -505,9 +505,9 @@ void ModelSnap::Update()
     for (unsigned int i = 0; i < 3; ++i)
     {
       triangle.Set(i,
-          this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
+          this->dataPtr->selectedVis->WorldPose().Rot().Inverse() *
           (this->dataPtr->selectedTriangle[i] -
-          this->dataPtr->selectedVis->GetWorldPose().Ign().Pos()));
+          this->dataPtr->selectedVis->WorldPose().Pos()));
     }
 
     if (!this->dataPtr->snapVisual)

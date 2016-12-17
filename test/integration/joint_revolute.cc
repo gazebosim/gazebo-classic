@@ -175,6 +175,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
   // Set solver type
   physics->SetParam("solver_type", _solverType);
+  if (_solverType == "world")
+  {
+    physics->SetParam("ode_quiet", true);
+  }
 
   // Model names
   std::vector<std::string> modelNames;
@@ -346,8 +350,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
           // Expect angle change in direction of joint velocity
           angle2 = joint->GetAngle(0).Radian();
-          EXPECT_GT((angle2 - angle1) * math::clamp(jointVel1*1e4, -1.0, 1.0)
-                    , 0);
+          EXPECT_GT(
+            (angle2 - angle1) * ignition::math::clamp(jointVel1*1e4, -1.0, 1.0)
+            , 0);
 
           jointVel2 = joint->GetVelocity(0);
           EXPECT_GT(fabs(jointVel2), 1e-1);
@@ -355,8 +360,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           // Take 1 step and measure the last angle, expect decrease
           world->Step(1);
           angle3 = joint->GetAngle(0).Radian();
-          EXPECT_GT((angle3 - angle2) * math::clamp(jointVel2*1e4, -1.0, 1.0)
-                    , 0);
+          EXPECT_GT(
+            (angle3 - angle2) * ignition::math::clamp(jointVel2*1e4, -1.0, 1.0)
+            , 0);
         }
         else
         {

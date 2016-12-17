@@ -14,10 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
-#define _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
-
+#ifndef GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
+#define GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
 
 #include <string>
 #include <utility>
@@ -28,16 +26,12 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 #include "gazebo/rendering/Camera.hh"
-
 
 namespace gazebo
 {
@@ -249,6 +243,4 @@ namespace gazebo
     /// \}
   }
 }
-
-
 #endif

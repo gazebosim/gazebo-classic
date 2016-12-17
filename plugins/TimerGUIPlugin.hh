@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GUI_TIMER_PLUGIN_HH_
-#define _GUI_TIMER_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_TIMERGUIPLUGIN_HH_
+#define GAZEBO_PLUGINS_TIMERGUIPLUGIN_HH_
 
+#include <mutex>
 #include <string>
 #include <vector>
-#include <boost/thread/mutex.hpp>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
@@ -121,7 +121,7 @@ namespace gazebo
     private: std::vector<event::ConnectionPtr> connections;
 
     /// \brief Mutex to protect timer updates.
-    private: boost::mutex timerMutex;
+    private: std::mutex timerMutex;
 
     /// \brief Start/stop button.
     private: QPushButton *startStopButton;

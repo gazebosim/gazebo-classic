@@ -151,7 +151,7 @@ void MainWindow_TEST::Selection()
   gazebo::rendering::VisualPtr vis =
       cam->GetVisual(glWidgetCenter);
   QVERIFY(vis != NULL);
-  QVERIFY(vis->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis->GetRootVisual()->Name() == "box");
 
   // move camera to look at the box
   ignition::math::Pose3d cameraPose(ignition::math::Vector3d(-1, 0, 0.5),
@@ -163,7 +163,7 @@ void MainWindow_TEST::Selection()
   gazebo::rendering::VisualPtr vis2 =
       cam->GetVisual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis2 != NULL);
-  QVERIFY(vis2->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis2->GetRootVisual()->Name() == "box");
 
   // look upwards
   ignition::math::Quaterniond pitch90(ignition::math::Vector3d(0, -1.57, 0));
@@ -183,7 +183,7 @@ void MainWindow_TEST::Selection()
   gazebo::rendering::VisualPtr vis4 =
       cam->GetVisual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis4 != NULL);
-  QVERIFY(vis4->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis4->GetRootVisual()->Name() == "box");
 
   // hide the box
   vis4->SetVisible(false);
