@@ -66,7 +66,7 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -119,14 +119,12 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
 
       double vel = sqrt(2.0*torque*joint->GetAngle(0).Radian() / inertia);
       world->Step(1);
-      double v_tol=2e-2;
-      if (_physicsEngine == "dart") v_tol=3e-2;
-      EXPECT_NEAR(joint->GetVelocity(0), vel, v_tol);
-      double time = world->GetSimTime().Double();
+      EXPECT_NEAR(joint->GetVelocity(0), vel, 2e-2);
+      double time = world->SimTime().Double();
       math::Angle angle(0.5 * torque * time*time / inertia);
       EXPECT_NEAR(joint->GetAngle(0).Radian(), angle.Radian(), g_tolerance);
     }
-    std::cout << "Final time:  " << world->GetSimTime().Double() << std::endl;
+    std::cout << "Final time:  " << world->SimTime().Double() << std::endl;
     std::cout << "Final angle: " << joint->GetAngle(0).Radian() << std::endl;
     std::cout << "Final speed: " << joint->GetVelocity(0) << std::endl;
   }
@@ -162,7 +160,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -170,10 +168,10 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -182,7 +180,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   gzlog << "t after one step : " << t << "\n";
 
   // get model, joints and get links
-  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::ModelPtr model_1 = world->ModelByName("model_1");
   physics::LinkPtr link_00 = model_1->GetLink("link_00");
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
   physics::JointPtr joint_00 = model_1->GetJoint("joint_00");
@@ -285,7 +283,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -293,10 +291,10 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
@@ -305,7 +303,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   gzlog << "t after one step : " << t << "\n";
 
   // get model, joints and get links
-  physics::ModelPtr model_1 = world->GetModel("model_1");
+  physics::ModelPtr model_1 = world->ModelByName("model_1");
   physics::LinkPtr link_00 = model_1->GetLink("link_00");
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
   physics::JointPtr joint_00 = model_1->GetJoint("joint_00");
@@ -345,11 +343,6 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
               << " joint_00 " << angle_00_linear
               << " shoudl be 0.3\n";
       }
-    }
-    else if (_physicsEngine == "dart")
-    {
-      // dart requires a slightly higher tolerance
-      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 2e-8);
     }
     else
     {
@@ -502,17 +495,17 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
   // get model, joints and get links
-  physics::ModelPtr model = world->GetModel("pr2");
+  physics::ModelPtr model = world->ModelByName("pr2");
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
 
   // drop from some height

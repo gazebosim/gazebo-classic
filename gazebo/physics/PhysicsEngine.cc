@@ -31,8 +31,6 @@
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"
@@ -55,7 +53,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->maxStepSize = 0;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
   this->physicsSub = this->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
@@ -141,7 +139,7 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 {
   CollisionPtr result;
   LinkPtr link =
-    boost::dynamic_pointer_cast<Link>(this->world->GetEntity(_linkName));
+    boost::dynamic_pointer_cast<Link>(this->world->EntityByName(_linkName));
 
   if (!link)
     gzerr << "Unable to find link[" << _linkName << "]\n";
@@ -225,7 +223,7 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  this->world->GetPresetManager()->CurrentProfile(_msg->profile_name());
+  this->world->PresetMgr()->CurrentProfile(_msg->profile_name());
 }
 
 //////////////////////////////////////////////////

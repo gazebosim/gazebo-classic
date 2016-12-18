@@ -60,22 +60,22 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
   // simulate a few steps
   int steps = 20;
   world->Step(steps);
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  t = world->GetSimTime().Double();
+  t = world->SimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
@@ -98,7 +98,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -187,14 +187,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     if (model != NULL)
     {
       gzdbg << "Check freefall of model " << name << '\n';
       // Step once and check downward z velocity
       world->Step(1);
       vel1 = model->GetWorldLinearVel();
-      t = world->GetSimTime().Double();
+      t = world->SimTime().Double();
       EXPECT_EQ(vel1.x, 0);
       EXPECT_EQ(vel1.y, 0);
       EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
@@ -234,7 +234,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   double tHit = sqrt(2*(z0-0.5) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
-  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double dtHit = tHit+0.5 - world->SimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
 
@@ -246,7 +246,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   //   world->Step(1);
   //   if (physics->GetType()  == "bullet")
   //   {
-  //     model = world->GetModel("link_offset_box");
+  //     model = world->ModelByName("link_offset_box");
   //     gzerr << "m[" << model->GetName()
   //           << "] i[" << i << "/" << steps
   //           << "] pm[" << model->GetWorldPose()
@@ -270,13 +270,13 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     if (model != NULL)
     {
       gzdbg << "Check ground contact of model " << name << '\n';
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
-      t = world->GetSimTime().Double();
+      t = world->SimTime().Double();
       EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
       if (name == "test_empty")
@@ -326,7 +326,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   // Compute and check link pose of link_offset_box
   gzdbg << "Check link pose of link_offset_box\n";
-  model = world->GetModel("link_offset_box");
+  model = world->ModelByName("link_offset_box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
   ASSERT_TRUE(link != NULL);
@@ -379,7 +379,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -482,7 +482,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   for (i = 0; i < modelNames.size(); ++i)
   {
     // Make sure the model is loaded
-    model = world->GetModel(modelNames[i]);
+    model = world->ModelByName(modelNames[i]);
     x0 = x0s[i];
     y0 = y0s[i];
     radius = radii[i];
@@ -492,7 +492,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       // Step once and check downward z velocity
       world->Step(1);
       vel1 = model->GetWorldLinearVel();
-      t = world->GetSimTime().Double();
+      t = world->SimTime().Double();
       EXPECT_NEAR(vel1.x, 0, 1e-16);
       EXPECT_NEAR(vel1.y, 0, 1e-16);
       EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
@@ -522,7 +522,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   double tHit = sqrt(2*(z0-0.5) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
-  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double dtHit = tHit+0.5 - world->SimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
   world->Step(steps);
@@ -534,7 +534,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   for (i = 0; i < modelNames.size(); ++i)
   {
     // Make sure the model is loaded
-    model = world->GetModel(modelNames[i]);
+    model = world->ModelByName(modelNames[i]);
     x0 = x0s[i];
     y0 = y0s[i];
     radius = radii[i];
@@ -671,7 +671,7 @@ TEST_F(PhysicsTest, StateChange)
   world->SetPaused(true);
 
   ignition::math::Pose3d newPose(1, 2, 0.5, 0, 0, 0);
-  world->GetModel("box")->SetWorldPose(newPose);
+  world->ModelByName("box")->SetWorldPose(newPose);
 
   world->Step(1);
 
@@ -703,10 +703,10 @@ TEST_F(PhysicsTest, StateInsertion)
   std::string newLightName("new_light");
 
   // Check initial count
-  EXPECT_EQ(1u, world->GetModelCount());
+  EXPECT_EQ(1u, world->ModelCount());
   EXPECT_EQ(1u, world->LightCount());
-  EXPECT_TRUE(world->GetModel(newModelName) == NULL);
-  EXPECT_TRUE(world->Light(newLightName) == NULL);
+  EXPECT_TRUE(world->ModelByName(newModelName) == NULL);
+  EXPECT_TRUE(world->LightByName(newLightName) == NULL);
 
   // Current world state
   physics::WorldState worldState(world);
@@ -752,10 +752,10 @@ TEST_F(PhysicsTest, StateInsertion)
   world->Step(1);
 
   // Check entities were inserted
-  EXPECT_EQ(2u, world->GetModelCount());
+  EXPECT_EQ(2u, world->ModelCount());
   EXPECT_EQ(2u, world->LightCount());
-  EXPECT_FALSE(world->GetModel(newModelName) == NULL);
-  EXPECT_FALSE(world->Light(newLightName) == NULL);
+  EXPECT_FALSE(world->ModelByName(newModelName) == NULL);
+  EXPECT_FALSE(world->LightByName(newLightName) == NULL);
 
   // New world state
   physics::WorldState newWorldState(world);
@@ -774,10 +774,10 @@ TEST_F(PhysicsTest, StateDeletion)
   std::string deleteLightName("sun");
 
   // Check initial count
-  EXPECT_EQ(4u, world->GetModelCount());
+  EXPECT_EQ(4u, world->ModelCount());
   EXPECT_EQ(1u, world->LightCount());
-  EXPECT_FALSE(world->GetModel(deleteModelName) == NULL);
-  EXPECT_FALSE(world->Light(deleteLightName) == NULL);
+  EXPECT_FALSE(world->ModelByName(deleteModelName) == NULL);
+  EXPECT_FALSE(world->LightByName(deleteLightName) == NULL);
 
   // Current world state
   physics::WorldState worldState(world);
@@ -797,10 +797,10 @@ TEST_F(PhysicsTest, StateDeletion)
   gazebo::common::Time::MSleep(10);
 
   // Check entities were deleted
-  EXPECT_EQ(3u, world->GetModelCount());
+  EXPECT_EQ(3u, world->ModelCount());
   EXPECT_EQ(0u, world->LightCount());
-  EXPECT_TRUE(world->GetModel(deleteModelName) == NULL);
-  EXPECT_TRUE(world->Light(deleteLightName) == NULL);
+  EXPECT_TRUE(world->ModelByName(deleteModelName) == NULL);
+  EXPECT_TRUE(world->LightByName(deleteLightName) == NULL);
 
   // New world state
   physics::WorldState newWorldState(world);
@@ -827,25 +827,26 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
   if (i > 20)
     gzthrow("Unable to get model_4_mass_1_ixx_1_damping_10");
 
-  physics::ModelPtr model = world->GetModel("model_4_mass_1_ixx_1_damping_10");
+  physics::ModelPtr model = world->ModelByName(
+      "model_4_mass_1_ixx_1_damping_10");
   EXPECT_TRUE(model != NULL);
 
   {
     // compare against recorded data only
     double test_duration = 1.5;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+    double dt = world->Physics()->GetMaxStepSize();
     int steps = test_duration/dt;
 
     for (int i = 0; i < steps; ++i)
     {
       world->Step(1);  // theoretical contact, but
-      // gzdbg << "box time [" << world->GetSimTime().Double()
+      // gzdbg << "box time [" << world->SimTime().Double()
       //       << "] vel [" << model->GetWorldLinearVel()
       //       << "] pose [" << model->GetWorldPose()
       //       << "]\n";
     }
 
-    EXPECT_EQ(world->GetSimTime().Double(), 1.5);
+    EXPECT_EQ(world->SimTime().Double(), 1.5);
 
     // This test expects a linear velocity at the CoG
     math::Vector3 vel = model->GetLink()->GetWorldCoGLinearVel();
@@ -903,7 +904,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
     double z = 10.5;
     double v = 0.0;
     double g = -10.0;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+    double dt = world->Physics()->GetMaxStepSize();
 
     // world->Step(1428);  // theoretical contact, but
     // world->Step(100);  // integration error requires few more steps
@@ -919,12 +920,12 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 
       world->Step(1);  // theoretical contact, but
       {
-        physics::ModelPtr box_model = world->GetModel("box");
+        physics::ModelPtr box_model = world->ModelByName("box");
         if (box_model)
         {
           math::Vector3 vel = box_model->GetWorldLinearVel();
           math::Pose pose = box_model->GetWorldPose();
-          // gzdbg << "box time [" << world->GetSimTime().Double()
+          // gzdbg << "box time [" << world->SimTime().Double()
           //      << "] sim z [" << pose.pos.z
           //      << "] exact z [" << z
           //      << "] sim vz [" << vel.z
@@ -951,12 +952,12 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           }
         }
 
-        physics::ModelPtr sphere_model = world->GetModel("sphere");
+        physics::ModelPtr sphere_model = world->ModelByName("sphere");
         if (sphere_model)
         {
           math::Vector3 vel = sphere_model->GetWorldLinearVel();
           math::Pose pose = sphere_model->GetWorldPose();
-          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          // gzdbg << "sphere time [" << world->SimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
           //       << "] sim vz [" << vel.z
@@ -984,12 +985,12 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           }
         }
 
-        physics::ModelPtr cylinder_model = world->GetModel("cylinder");
+        physics::ModelPtr cylinder_model = world->ModelByName("cylinder");
         if (cylinder_model)
         {
           math::Vector3 vel = cylinder_model->GetWorldLinearVel();
           math::Pose pose = cylinder_model->GetWorldPose();
-          // gzdbg << "cylinder time [" << world->GetSimTime().Double()
+          // gzdbg << "cylinder time [" << world->SimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
           //       << "] sim vz [" << vel.z
@@ -1055,9 +1056,9 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
   {
     // todo: get parameters from drop_test.world
     double test_duration = 1.1;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+    double dt = world->Physics()->GetMaxStepSize();
 
-    physics::ModelPtr box_model = world->GetModel("box");
+    physics::ModelPtr box_model = world->ModelByName("box");
     physics::LinkPtr box_link = box_model->GetLink("link");
     double f = 1000.0;
     double v = 0;
@@ -1068,7 +1069,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 
     for (int i = 0; i < steps; ++i)
     {
-      double t = world->GetSimTime().Double();
+      double t = world->SimTime().Double();
       double velTolerance = PHYSICS_TOL;
 #ifdef HAVE_BULLET
       if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
@@ -1113,12 +1114,12 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
         }
       }
 
-      physics::ModelPtr sphere_model = world->GetModel("sphere");
+      physics::ModelPtr sphere_model = world->ModelByName("sphere");
       if (sphere_model)
       {
         math::Vector3 vel = sphere_model->GetWorldLinearVel();
         math::Pose pose = sphere_model->GetWorldPose();
-        // gzdbg << "sphere time [" << world->GetSimTime().Double()
+        // gzdbg << "sphere time [" << world->SimTime().Double()
         //      << "] sim x [" << pose.pos.x
         //      << "] ideal x [" << x
         //      << "] sim vx [" << vel.x
@@ -1190,7 +1191,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -1206,7 +1207,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   if (i > 20)
     gzthrow("Unable to get sphere_atlas");
 
-  physics::ModelPtr model = world->GetModel("sphere_atlas");
+  physics::ModelPtr model = world->ModelByName("sphere_atlas");
   EXPECT_TRUE(model != NULL);
   physics::LinkPtr head = model->GetLink("head");
   EXPECT_TRUE(head != NULL);
@@ -1442,7 +1443,7 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
     gzthrow("Unable to spawn model");
 
   world->Step(5);
-  physics::ModelPtr model = world->GetModel(modelName);
+  physics::ModelPtr model = world->ModelByName(modelName);
 
   math::Vector3 vel;
 
@@ -1479,7 +1480,7 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("ground_plane");
+  physics::ModelPtr model = world->ModelByName("ground_plane");
   ASSERT_TRUE(model != NULL);
 }
 

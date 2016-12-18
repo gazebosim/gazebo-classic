@@ -2,12 +2,42 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Updated `gz_log` tool to use `ignition::math`.
+    * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
+
+1. Update examples to use ign-math.
+    * [Pull request #2539](https://bitbucket.org/osrf/gazebo/pull-request/2539)
+
+1. Update plugins to use ign-math.
+    * [Pull request #2531](https://bitbucket.org/osrf/gazebo/pull-request/2531)
+    * [Pull request #2534](https://bitbucket.org/osrf/gazebo/pull-request/2534)
+    * [Pull request #2538](https://bitbucket.org/osrf/gazebo/pull-request/2538)
+
+1. Use ignition math with `rendering/Distortion` and update function names.
+    * [Pull request #2529](https://bitbucket.org/osrf/gazebo/pull-request/2529)
+
+1. Updated COMVisual class to use `ignition::math`.
+    * [Pull request #2528](https://bitbucket.org/osrf/gazebo/pull-request/2528)
+
+1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
+    * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
+
 1. Support version 5 of the DART Physics Engine.
     * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
 
+1. UserCamera overrides `Camera::Render` to reduce CPU usage.
+    * [Pull request 2480](https://bitbucket.org/osrf/gazebo/pull-request/2480)
+
+1. Static links no longer subscribe to wrench topics.
+    * [Pull request #2452]((https://bitbucket.org/osrf/gazebo/pull-request/2452)
+
+1. Add Gazebo math helper functions to convert to and from Ignition Math
+   objects.
+    * [Pull request #2461](https://bitbucket.org/osrf/gazebo/pull-request/2461)
+
 1. Add video recording of user camera. This change added an optional
    dependency on libavdevice>=56.4.100 for linux systems. When installed,
-   libavdevice will allow a user to stream a simulated camera to a video4linux2 
+   libavdevice will allow a user to stream a simulated camera to a video4linux2
    loopback device.
     * [Pull request #2443](https://bitbucket.org/osrf/gazebo/pull-request/2443)
 
@@ -82,11 +112,19 @@
     * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
 
 1. Deprecate gazebo::math
+    * [Pull request #2513](https://bitbucket.org/osrf/gazebo/pull-request/2513)
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
     * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
     * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
+    * [Pull request #2436](https://bitbucket.org/osrf/gazebo/pull-request/2436)
+    * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
+    * [Pull request #2505](https://bitbucket.org/osrf/gazebo/pull-request/2505)
+    * [Pull request #2514](https://bitbucket.org/osrf/gazebo/pull-request/2514)
+    * [Pull request #2522](https://bitbucket.org/osrf/gazebo/pull-request/2522)
+    * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
+    * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
@@ -127,6 +165,9 @@
     * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
     * A contribution from Oliver Crave
 
+1. Get plugin info with Ignition transport service
+    * [Pull request #2420](https://bitbucket.org/osrf/gazebo/pull-request/2420)
+
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
 
@@ -163,16 +204,58 @@
 
     1. Display attached model plugins in the world tab / Add subheaders for model links, joints and plugins
         * [Pull request #2323](https://bitbucket.org/osrf/gazebo/pull-request/2323)
-        * [Issue #1698](https://bitbucket.org/osrf/gazebo/pull-request/1698)
+        * [Issue #1698](https://bitbucket.org/osrf/gazebo/issues/1698)
 
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix `model.config` dependency support, and add ability to reference
+   textures using a URI.
+    * [Pull request 2517](https://bitbucket.org/osrf/gazebo/pull-request/2517)
+
+1. Fix DEM heightmap size, collision, scale
+    * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
+
+1. Create ode_quiet parameter to silence solver messages
+    * [Pull request 2512](https://bitbucket.org/osrf/gazebo/pull-request/2512)
+
+1. Update QT render loop to throttle based on UserCamera::RenderRate.
+    * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)
+    * [Issue 1560](https://bitbucket.org/osrf/gazebo/issues/1560)
+
+1. Generate visualization on demand, instead of on load. This helps to
+   reduce load time.
+    * [Pull request 2457](https://bitbucket.org/osrf/gazebo/pull-request/2457)
+
+1. Added a plugin to teleoperate joints in a model with the keyboard.
+    * [Pull request 2490](https://bitbucket.org/osrf/gazebo/pull-request/2490)
+
+1. Add GUI items to change the user camera clip distance
+    * [Pull request 2470](https://bitbucket.org/osrf/gazebo/pull-request/2470)
+    * [Issue 2064](https://bitbucket.org/osrf/gazebo/issues/2064)
+
+1. Support custom material scripts for heightmaps
+    * [Pull request 2473](https://bitbucket.org/osrf/gazebo/pull-request/2473)
+
+1. Model Editor: Show / hide collisions
+    * [Pull request 2503](https://bitbucket.org/osrf/gazebo/pull-request/2503)
+
+## Gazebo 7.4.0 (2016-10-11)
+
+1. Add test for HarnessPlugin, reduce likelihood of race condition
+    * [Pull request 2431](https://bitbucket.org/osrf/gazebo/pull-request/2431)
+    * [Issue 2034](https://bitbucket.org/osrf/gazebo/issues/2034)
+
+1. Add `syntax = proto2` in proto files to fix some protobuf3 warnings
+    * [Pull request 2456](https://bitbucket.org/osrf/gazebo/pull-request/2456)
+
+1. Add support for loading wavefront obj mesh files
+    * [Pull request 2454](https://bitbucket.org/osrf/gazebo/pull-request/2454)
+
 1. Added filesystem operations to the common library. Additions include
    `cwd`, `exists`, `isDirectory`, `isFile`, `copyFile`, and `moveFile`.
     * [Pull request 2417](https://bitbucket.org/osrf/gazebo/pull-request/2417)
-
 
 1. Fix loading collada files with multiple texture coordinates.
     * [Pull request 2413](https://bitbucket.org/osrf/gazebo/pull-request/2413)

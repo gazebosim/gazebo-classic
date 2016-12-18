@@ -158,6 +158,14 @@ namespace gazebo
       /// \return A clone of this link data.
       public: LinkData *Clone(const std::string &_newName);
 
+      /// \brief Show or hide collision visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowCollisions(const bool _show);
+
+      /// \brief Show or hide visual visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowVisuals(const bool _show);
+
       /// \brief Computes the volume of a link.
       /// \param[in] _collision A collision message.
       /// \return The computed volume.
@@ -213,6 +221,18 @@ namespace gazebo
       /// \param[in] _name Name of collision.
       private slots: void OnRemoveCollision(const std::string &_name);
 
+      /// \brief Qt callback when a collision is to be shown/hidden.
+      /// \param[in] _show True to show.
+      /// \param[in] _name Name of collision.
+      private slots: void OnShowCollision(const bool _show,
+          const std::string &_name);
+
+      /// \brief Qt callback when a visual is to be shown/hidden.
+      /// \param[in] _show True to show.
+      /// \param[in] _name Name of visual.
+      private slots: void OnShowVisual(const bool _show,
+          const std::string &_name);
+
       /// \brief Qt callback when the inspector is opened.
       private slots: void OnInspectorOpened();
 
@@ -267,6 +287,12 @@ namespace gazebo
 
       /// \brief Flag set to true if this is a link of a nested model.
       public: bool nested;
+
+      /// \brief True if all collisions are currently visible, false otherwise.
+      public: bool showCollisions = true;
+
+      /// \brief True if all visuals are currently visible, false otherwise.
+      public: bool showVisuals = true;
     };
 
     /// \brief Helper class to store model plugin data

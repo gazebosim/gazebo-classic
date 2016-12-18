@@ -62,32 +62,44 @@ namespace gazebo
       /// \brief Set the seed value.
       /// \param[in] _seed The seed used to initialize the randon number
       /// generator.
-      public: static void SetSeed(uint32_t _seed);
+      /// \deprecated See void ignition::math::Rand::Seed(unsigned int)
+      public: static void SetSeed(uint32_t _seed)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the seed value.
       /// \return The seed value used to initialize the random number
       /// generator.
-      public: static uint32_t GetSeed();
+      /// \deprecated See unsigned int ignition::math::Rand::Seed()
+      public: static uint32_t GetSeed()
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a double from a uniform distribution
       /// \param[in] _min Minimum bound for the random number
       /// \param[in] _max Maximum bound for the random number
-      public: static double GetDblUniform(double _min = 0, double _max = 1);
+      /// \deprecated See ignition::math::Rand::DblUniform
+      public: static double GetDblUniform(double _min = 0, double _max = 1)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a double from a normal distribution
       /// \param[in] _mean Mean value for the distribution
       /// \param[in] _sigma Sigma value for the distribution
-      public: static double GetDblNormal(double _mean = 0, double _sigma = 1);
+      /// \deprecated See ignition::math::Rand::DblNormal
+      public: static double GetDblNormal(double _mean = 0, double _sigma = 1)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a integer from a uniform distribution
       /// \param[in] _min Minimum bound for the random number
       /// \param[in] _max Maximum bound for the random number
-      public: static int GetIntUniform(int _min, int _max);
+      /// \deprecated See ignition::math::Rand::IntUniform
+      public: static int GetIntUniform(int _min, int _max)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a double from a normal distribution
       /// \param[in] _mean Mean value for the distribution
       /// \param[in] _sigma Sigma value for the distribution
-      public: static int GetIntNormal(int _mean, int _sigma);
+      /// \deprecated See ignition::math::Rand::IntNormal
+      public: static int GetIntNormal(int _mean, int _sigma)
+              GAZEBO_DEPRECATED(8.0);
 
       // The random number generator
       private: static GeneratorType *randGenerator;

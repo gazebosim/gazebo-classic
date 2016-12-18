@@ -32,7 +32,7 @@ TEST_F(Issue1146Test, Reset)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");

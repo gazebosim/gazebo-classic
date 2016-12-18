@@ -15,7 +15,7 @@
  *
 */
 
-#include <mutex>
+#include <functional>
 #include <string>
 #include <sdf/sdf.hh>
 #include <gazebo/common/Assert.hh>
@@ -132,12 +132,12 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Controller time control.
-  this->lastControllerUpdateTime = this->model->GetWorld()->GetSimTime();
+  this->lastControllerUpdateTime = this->model->GetWorld()->SimTime();
 
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&CessnaPlugin::Update, this, _1));
+    std::bind(&CessnaPlugin::Update, this, std::placeholders::_1));
 
   // Initialize transport.
   this->node = transport::NodePtr(new transport::Node());
@@ -155,7 +155,7 @@ void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  gazebo::common::Time curTime = this->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->model->GetWorld()->SimTime();
 
   if (curTime > this->lastControllerUpdateTime)
   {

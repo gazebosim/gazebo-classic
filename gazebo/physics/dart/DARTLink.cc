@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -59,7 +61,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   std::string bodyName = this->GetName();
 
   this->dataPtr->dartPhysics = boost::dynamic_pointer_cast<DARTPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->GetWorld()->Physics());
 
   if (this->dataPtr->dartPhysics == nullptr)
     gzthrow("Not using the dart physics engine");
@@ -751,7 +753,7 @@ void DARTLink::SetSelfCollide(bool _collide)
     return;
 
   dart::simulation::WorldPtr dtWorld =
-      this->dataPtr->dartPhysics->GetDARTWorldPtr();
+      this->dataPtr->dartPhysics->DARTWorld();
   dart::dynamics::SkeletonPtr dtSkeleton = dtBodyNode->getSkeleton();
   dart::collision::CollisionDetectorPtr dtCollDet =
       dtWorld->getConstraintSolver()->getCollisionDetector();
@@ -907,13 +909,13 @@ void DARTLink::SetLinkStatic(bool _static)
     // Add weld joint constraint to DART
     this->dataPtr->dtWeldJointConst.reset(
         new dart::constraint::WeldJointConstraint(this->dataPtr->dtBodyNode));
-    GetDARTWorldPtr()->getConstraintSolver()->addConstraint(
+    DARTWorld()->getConstraintSolver()->addConstraint(
         this->dataPtr->dtWeldJointConst);
   }
   else
   {
     // Remove ball and revolute joint constraints from DART
-    GetDARTWorldPtr()->getConstraintSolver()->removeConstraint(
+    DARTWorld()->getConstraintSolver()->removeConstraint(
         this->dataPtr->dtWeldJointConst);
     this->dataPtr->dtWeldJointConst.reset();
   }
@@ -946,32 +948,32 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 }
 
 //////////////////////////////////////////////////
-DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
+DARTPhysicsPtr DARTLink::DARTPhysics(void) const
 {
   return boost::dynamic_pointer_cast<DARTPhysics>(
-        this->GetWorld()->GetPhysicsEngine());
+        this->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////
 dart::simulation::World *DARTLink::GetDARTWorld(void) const
 {
-  return GetDARTPhysics()->GetDARTWorldPtr().get();
+  return DARTPhysics()->DARTWorld().get();
 }
 
 //////////////////////////////////////////////////
-dart::simulation::WorldPtr DARTLink::GetDARTWorldPtr(void) const
+dart::simulation::WorldPtr DARTLink::DARTWorld(void) const
 {
-  return GetDARTPhysics()->GetDARTWorldPtr();
+  return DARTPhysics()->DARTWorld();
 }
 
 //////////////////////////////////////////////////
-DARTModelPtr DARTLink::GetDARTModel() const
+DARTModelPtr DARTLink::DARTModel() const
 {
   return boost::dynamic_pointer_cast<DARTModel>(this->GetModel());
 }
 
 //////////////////////////////////////////////////
-DARTBodyNodePropPtr DARTLink::GetDARTProperties() const
+DARTBodyNodePropPtr DARTLink::DARTProperties() const
 {
   return this->dataPtr->dtProperties;
 }

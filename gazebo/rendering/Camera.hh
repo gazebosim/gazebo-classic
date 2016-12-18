@@ -41,8 +41,6 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -61,6 +59,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace math
+  {
+    class Pose;
+  }
+
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -114,7 +117,7 @@ namespace gazebo
       /// camera images.
       /// \param[in] _force Force camera to render. Ignore camera update
       /// rate.
-      public: void Render(const bool _force = false);
+      public: virtual void Render(const bool _force = false);
 
       /// \brief Post render
       ///
@@ -249,8 +252,8 @@ namespace gazebo
       /// \return Image height
       public: virtual unsigned int ImageHeight() const;
 
-      /// \brief Get the depth of the image
-      /// \return Depth of the image
+      /// \brief Get the depth of the image in bytes per pixel
+      /// \return Depth of the image in bytes per pixel
       public: unsigned int ImageDepth() const;
 
       /// \brief Get the string representation of the image format.
@@ -580,6 +583,11 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
 
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: virtual bool SetBackgroundColor(const common::Color &_color);
+
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix
       public: ignition::math::Matrix4d ProjectionMatrix() const;
@@ -732,6 +740,16 @@ namespace gazebo
 
       /// \brief Set the clip distance based on stored SDF values
       protected: virtual void SetClipDist();
+
+      /// \brief Tell the camera whether to yaw around its own local Y axis or a
+      /// fixed axis of choice.
+      /// \param[in] _useFixed If true, the axis passed in the second parameter
+      /// will always be the yaw axis no matter what the camera orientation.
+      /// If false, the camera yaws around the local Y.
+      /// \param[in] _fixedAxis The axis to use if the first parameter is true.
+      protected: virtual void SetFixedYawAxis(const bool _useFixed,
+          const ignition::math::Vector3d &_fixedAxis =
+            ignition::math::Vector3d::UnitY);
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats

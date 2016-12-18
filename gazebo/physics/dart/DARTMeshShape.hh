@@ -36,6 +36,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
+      /// \deprecated See version that accepts DARTCollisionPtr
       public: explicit DARTMeshShape(CollisionPtr _parent)
               GAZEBO_DEPRECATED(8.0);
 

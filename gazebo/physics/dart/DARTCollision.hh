@@ -82,15 +82,16 @@ namespace gazebo
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
+      /// \deprecated See version that accepts dart::dynamics::ShapePtr
       public: void SetDARTCollisionShape(dart::dynamics::Shape *_shape,
-                                         bool _placeable = true)
+                                         const bool _placeable = true)
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
       public: void SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
-                                         bool _placeable = true)
+                                         const bool _placeable = true)
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set DART collision shape.

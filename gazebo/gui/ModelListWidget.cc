@@ -27,6 +27,7 @@
 #include <google/protobuf/message.h>
 
 #include <ignition/math/Angle.hh>
+#include <ignition/msgs/stringmsg.pb.h>
 
 #include <sdf/sdf.hh>
 
@@ -166,9 +167,21 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelListWidget::~ModelListWidget()
 {
+  this->dataPtr->responseSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->modelPub.reset();
+  this->dataPtr->scenePub.reset();
+  this->dataPtr->physicsPub.reset();
+  this->dataPtr->atmospherePub.reset();
+  this->dataPtr->windPub.reset();
+  this->dataPtr->lightPub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
   delete this->dataPtr->propMutex;
   delete this->dataPtr->receiveMutex;
+  this->dataPtr->node.reset();
 }
 
 /////////////////////////////////////////////////
@@ -251,18 +264,19 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      if (this->dataPtr->requestPub)
+      if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
       {
-        if (mItem->data(3, Qt::UserRole).toString().toStdString() == "Plugin")
-        {
-          this->dataPtr->requestMsg = msgs::CreateRequest("model_plugin_info",
-              this->dataPtr->selectedEntityName);
-        }
-        else
-        {
-          this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-           this->dataPtr->selectedEntityName);
-        }
+        std::string pluginInfoService("/physics/info/plugin");
+        ignition::msgs::StringMsg req;
+        req.set_data(this->dataPtr->selectedEntityName);
+
+        this->dataPtr->ignNode.Request(pluginInfoService, req,
+            &ModelListWidget::OnPluginInfo, this);
+      }
+      else if (this->dataPtr->requestPub)
+      {
+        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+            this->dataPtr->selectedEntityName);
         this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
       }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
@@ -518,10 +532,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   else if (_msg->has_type() && _msg->type() ==
     this->dataPtr->pluginMsg.GetTypeName())
   {
-    this->dataPtr->propMutex->lock();
-    this->dataPtr->pluginMsg.ParseFromString(_msg->serialized_data());
-    this->dataPtr->fillTypes.push_back("Plugin");
-    this->dataPtr->propMutex->unlock();
+    gzerr << "Plugin requests should use OnPluginInfo callback" << std::endl;
   }
   else if (_msg->has_type() && _msg->type() ==
       this->dataPtr->sceneMsg.GetTypeName())
@@ -819,6 +830,38 @@ void ModelListWidget::GUICameraPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+
+  QtProperty *cameraClipProperty = this->ChildItem(cameraProperty, "clip");
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+
+    if (cam)
+    {
+      if (changedProperty == "near")
+      {
+        cam->SetClipDist(this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "near")).toDouble(),
+            cam->FarClip());
+      }
+      else if (changedProperty == "far")
+      {
+        cam->SetClipDist(cam->NearClip(), this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "far")).toDouble());
+      }
+      else
+      {
+        gzerr << "Unable to process user camera clip property["
+          << changedProperty << "]\n";
+      }
+    }
+    else
+    {
+      gzerr << "Unable to get pointer to active user camera when setting clip "
+        << "plane values. This should not happen.\n";
     }
   }
 
@@ -2593,7 +2636,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::FillPropertyTree(const msgs::Plugin &_msg,
+void ModelListWidget::FillPropertyTree(const ignition::msgs::Plugin &_msg,
                                        QtProperty *_parent)
 {
   QtVariantProperty *item = nullptr;
@@ -3369,6 +3412,23 @@ void ModelListWidget::FillUserCamera()
   topItem->addSubProperty(item);
   item->setEnabled(false);
 
+  // Create and set the gui camera clip distance items
+  auto clipItem = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("clip"));
+  topItem->addSubProperty(clipItem);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("near"));
+  item->setValue(cam->NearClip());
+  clipItem->addSubProperty(item);
+  item->setEnabled(true);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("far"));
+  item->setValue(cam->FarClip());
+  clipItem->addSubProperty(item);
+  item->setEnabled(true);
+
   // Create and set the gui camera pose
   item = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
@@ -3377,6 +3437,12 @@ void ModelListWidget::FillUserCamera()
     ignition::math::Pose3d cameraPose = cam->WorldPose();
 
     this->FillPoseProperty(msgs::Convert(cameraPose), item);
+    // set expanded to true by default for easier viewing
+    this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
+    for (auto browser : cameraBrowser->children())
+    {
+      this->dataPtr->propTreeBrowser->setExpanded(browser, true);
+    }
   }
 
   // Create and set the gui camera position relative to a tracked model
@@ -3389,7 +3455,7 @@ void ModelListWidget::FillUserCamera()
     QtVariantProperty *item2 = this->dataPtr->variantManager->addProperty(
         QVariant::String, tr("name"));
     if (trackedVisual)
-        item2->setValue(trackedVisual->GetName().c_str());
+        item2->setValue(trackedVisual->Name().c_str());
     else
         item2->setValue("");
     item2->setEnabled(false);
@@ -3511,4 +3577,23 @@ void ModelListWidget::FillGrid()
       tr("line color"));
   item->setValue(gui::Conversions::Convert(color));
   topItem->addSubProperty(item);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::OnPluginInfo(const ignition::msgs::Plugin_V &_plugins,
+    const bool _success)
+{
+  if (!_success)
+  {
+    gzerr << "Failed to receive plugin info. Check server logs." << std::endl;
+    return;
+  }
+
+  // We asked for only one plugin
+  GZ_ASSERT(_plugins.plugins().size() == 1, "Wrong number of plugins");
+
+  this->dataPtr->propMutex->lock();
+  this->dataPtr->pluginMsg.CopyFrom(_plugins.plugins(0));
+  this->dataPtr->fillTypes.push_back("Plugin");
+  this->dataPtr->propMutex->unlock();
 }

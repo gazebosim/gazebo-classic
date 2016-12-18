@@ -63,14 +63,14 @@ void TrackVisualTest::TrackVisual()
   // Get box model visual
   auto boxModelVis = scene->GetVisual("box");
   QVERIFY(boxModelVis != NULL);
-  auto boxModelVisPose = boxModelVis->GetPose().Ign();
+  auto boxModelVisPose = boxModelVis->Pose();
 
   // Get tracked model visual
   auto trackedModelVis = cam->TrackedVisual();
   QVERIFY(trackedModelVis == boxModelVis);
 
   // Get box model
-  auto boxModel = world->GetModel("box");
+  auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
   QVERIFY(boxModel->GetWorldPose().Ign() == boxModelVisPose);
 

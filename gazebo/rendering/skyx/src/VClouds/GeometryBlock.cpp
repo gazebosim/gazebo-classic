@@ -83,8 +83,11 @@ namespace SkyX { namespace VClouds
     mMesh->touch();
 
     // Create entity
-    mEntity = mVClouds->getSceneManager()->createEntity(
-        "_SkyX_VClouds_BlockEnt" + Ogre::StringConverter::toString(mPosition),
+    std::string entityName =
+        "_SkyX_VClouds_BlockEnt" + Ogre::StringConverter::toString(mPosition);
+    while (mVClouds->getSceneManager()->hasEntity(entityName))
+      entityName += "_";
+    mEntity = mVClouds->getSceneManager()->createEntity(entityName,
         "_SkyX_VClouds_Block" + Ogre::StringConverter::toString(mPosition));
     mEntity->setMaterialName("SkyX_VolClouds");
     mEntity->setCastShadows(false);

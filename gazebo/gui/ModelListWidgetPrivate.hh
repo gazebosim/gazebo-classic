@@ -22,6 +22,8 @@
 #include <vector>
 #include <deque>
 #include <sdf/sdf.hh>
+#include <ignition/msgs/plugin.pb.h>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
@@ -106,7 +108,7 @@ namespace gazebo
       public: msgs::Joint jointMsg;
 
       /// \brief Keep latest plugin message.
-      public: msgs::Plugin pluginMsg;
+      public: ignition::msgs::Plugin pluginMsg;
 
       public: msgs::Physics physicsMsg;
       public: msgs::Wind windMsg;
@@ -127,6 +129,9 @@ namespace gazebo
 
       /// \brief Type of atmosphere model.
       public: msgs::Atmosphere_Type atmosphereType;
+
+      /// \brief Node for ignition transport communication.
+      public: ignition::transport::Node ignNode;
     };
   }
 }

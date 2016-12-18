@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_LIGHT_HH_
-#define _GAZEBO_RENDERING_LIGHT_HH_
+#ifndef GAZEBO_RENDERING_LIGHT_HH_
+#define GAZEBO_RENDERING_LIGHT_HH_
 
 #include <string>
 #include <iostream>
@@ -55,7 +55,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
-      public: Light(ScenePtr _scene);
+      public: explicit Light(ScenePtr _scene);
 
       /// \brief Destructor
       public: virtual ~Light();
@@ -124,6 +124,10 @@ namespace gazebo
       /// \param[in] _type The light type: "point", "spot", "directional"
       public: void SetLightType(const std::string &_type);
 
+      /// \brief Get the light type.
+      /// \return The light type: "point", "spot", "directional".
+      public: std::string LightType() const;
+
       /// \brief Set the diffuse color
       /// \param[in] _color Light diffuse color.
       public: void SetDiffuseColor(const common::Color &_color);
@@ -175,6 +179,10 @@ namespace gazebo
       /// \brief Set cast shadows
       /// \param[in] _cast Set to true to cast shadows.
       public: void SetCastShadows(const bool _cast);
+
+      /// \brief Get cast shadows
+      /// \return True if cast shadows.
+      public: bool CastShadows() const;
 
       /// \brief Fill the contents of a light message.
       /// \param[out] _msg Message to fill.

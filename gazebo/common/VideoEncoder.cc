@@ -21,8 +21,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/ioctl.h>
-
+#ifndef _WIN32
+  #include <sys/ioctl.h>
+#endif
 #ifdef HAVE_FFMPEG
 
 #ifndef INT64_C
@@ -46,7 +47,6 @@ extern "C"
 }
 #endif
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/VideoEncoder.hh"

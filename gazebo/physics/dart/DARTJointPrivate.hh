@@ -61,6 +61,8 @@ namespace gazebo
         for (auto func : mFuncs)
           func();
 
+        mFuncs.clear();
+
         dtJoint->setPositionLimitEnforced(true);
       }
 

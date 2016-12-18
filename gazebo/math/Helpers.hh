@@ -74,8 +74,11 @@ namespace gazebo
     /// \param[in] _v value
     /// \param[in] _min minimum
     /// \param[in] _max maximum
+    /// \deprecated See ignition::math::clamp
     template<typename T>
-    inline T clamp(T _v, T _min, T _max)
+    inline T
+    GAZEBO_DEPRECATED(8.0)
+    clamp(T _v, T _min, T _max)
     {
       return std::max(std::min(_v, _max), _min);
     }
@@ -199,9 +202,11 @@ namespace gazebo
     /// \param[in] _a the first value
     /// \param[in] _b the second value
     /// \param[in] _epsilon the tolerance
+    /// \deprecated See ignition::math::equal
     template<typename T>
-    inline bool equal(const T &_a, const T &_b,
-                      const T &_epsilon = 1e-6)
+    inline bool
+    GAZEBO_DEPRECATED(8.0)
+    equal(const T &_a, const T &_b, const T &_epsilon = 1e-6)
     {
       return std::fabs(_a - _b) <= _epsilon;
     }

@@ -69,6 +69,7 @@ namespace gazebo
         for (auto func : mCachedFuncs)
           func();
 
+	mCachedFuncs.clear();
         gzdbg << "Finished calling cached Link functions.\n";
       }
 

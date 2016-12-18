@@ -66,24 +66,27 @@ namespace gazebo
 
       /// \brief Get pointer to DART Skeleton.
       /// \return The pointer to DART Skeleton.
+      /// \deprecated See dart::dynamics::SkeletonPtr DARTSkeleton()
       public: dart::dynamics::Skeleton *GetDARTSkeleton()
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get pointer to DART Skeleton.
       /// \return The pointer to DART Skeleton.
-      public: dart::dynamics::SkeletonPtr GetDARTSkeletonPtr();
-      // TODO: Rename to GetDARTSkeleton()
+      public: dart::dynamics::SkeletonPtr DARTSkeleton();
 
       /// \brief Get pointer to DART Physics.
       /// \return The pointer to DART Physics.
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
+      /// \brief Get pointer to DART World
+      /// \return The pointer to DART World.
+      /// \deprecated See dart::simulation::WorldPtr DARTWorld(void) const
+      public: dart::simulation::World *GetDARTWorld(void) const
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get pointer to DART World
       /// \return The pointer to DART World.
-      public: dart::simulation::WorldPtr GetDARTWorldPtr(void) const;
-      // TODO: Rename to GetDARTWorld().
-
+      public: dart::simulation::WorldPtr DARTWorld(void) const;
 
       /// \internal
       /// \brief Pointer to private data

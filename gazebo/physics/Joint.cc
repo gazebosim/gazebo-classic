@@ -213,17 +213,17 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       // need to do this if child link belongs to another model
       this->childLink = boost::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(childName));
+          this->GetWorld()->BaseByName(childName));
     }
     this->parentLink = this->model->GetLink(parentName);
   }
   else
   {
     this->childLink = boost::dynamic_pointer_cast<Link>(
-        this->GetWorld()->GetByName(childName));
+        this->GetWorld()->BaseByName(childName));
 
     this->parentLink = boost::dynamic_pointer_cast<Link>(
-        this->GetWorld()->GetByName(parentName));
+        this->GetWorld()->BaseByName(parentName));
   }
 
   // Link might not have been found because it is on another model
@@ -239,7 +239,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
           parentModel->GetScopedName() + "::" + parentName;
 
       this->parentLink = boost::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(scopedParentName));
+          this->GetWorld()->BaseByName(scopedParentName));
 
       parentModel = parentModel->GetParent();
     }
@@ -258,7 +258,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       parentNameThisModel = parentModel->GetName() + parentNameThisModel;
 
       this->parentLink = boost::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(parentNameThisModel));
+          this->GetWorld()->BaseByName(parentNameThisModel));
     }
     if (!this->parentLink)
       gzthrow("Couldn't Find Parent Link[" + parentName + "]");
@@ -273,7 +273,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       std::string scopedChildName =
           parentModel->GetScopedName() + "::" + childName;
       this->childLink = boost::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(scopedChildName));
+          this->GetWorld()->BaseByName(scopedChildName));
 
       parentModel = parentModel->GetParent();
     }
@@ -292,7 +292,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       childNameThisModel = parentModel->GetName() + childNameThisModel;
 
       this->childLink = boost::dynamic_pointer_cast<Link>(
-          this->GetWorld()->GetByName(childNameThisModel));
+          this->GetWorld()->BaseByName(childNameThisModel));
     }
     if (!this->childLink)
       gzthrow("Couldn't Find Child Link[" + childName  + "]");
@@ -342,7 +342,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
         // Tell the sensor library to create a sensor.
         event::Events::createSensor(sensorElem,
-            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
+            this->GetWorld()->Name(), this->GetScopedName(), this->GetId());
 
         this->sensors.push_back(sensorName);
       }
@@ -751,9 +751,9 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   double lower = this->GetLowStop(_index).Radian();
   double upper = this->GetHighStop(_index).Radian();
   if (lower < upper)
-    _position = math::clamp(_position, lower, upper);
+    _position = ignition::math::clamp(_position, lower, upper);
   else
-    _position = math::clamp(_position, upper, lower);
+    _position = ignition::math::clamp(_position, upper, lower);
 
   // only deal with hinge, universal, slider joints in the user
   // request joint_names list
@@ -800,7 +800,7 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
         {
           // block any other physics pose updates
           boost::recursive_mutex::scoped_lock lock(
-            *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+            *this->GetWorld()->Physics()->GetPhysicsUpdateMutex());
 
           for (Link_V::iterator li = connectedLinks.begin();
                                 li != connectedLinks.end(); ++li)
@@ -961,7 +961,7 @@ double Joint::CheckAndTruncateForce(unsigned int _index, double _effort)
 
   // truncate effort if effortLimit is not negative
   if (this->effortLimit[_index] >= 0.0)
-    _effort = math::clamp(_effort, -this->effortLimit[_index],
+    _effort = ignition::math::clamp(_effort, -this->effortLimit[_index],
       this->effortLimit[_index]);
 
   return _effort;
@@ -996,7 +996,7 @@ double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
     double ciam = cia.GetLength();
 
     // return ratio of child MOI to parent MOI.
-    if (!math::equal(piam, 0.0))
+    if (!ignition::math::equal(piam, 0.0))
     {
       return ciam/piam;
     }
@@ -1435,7 +1435,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
     // Joint Trajectory velocity and use time step since last update.
     /*
     double dt =
-      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+      this->dataPtr->model->GetWorld()-Physics()->GetMaxStepTime();
     this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
     */
   }
@@ -1456,7 +1456,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
     /// velocity and use time step since last update.
     /*
     double dt =
-      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+      this->dataPtr->model->GetWorld()-Physics()->GetMaxStepTime();
     this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
     */
   }

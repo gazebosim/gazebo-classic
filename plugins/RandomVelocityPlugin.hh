@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RANDOMVELOCITY_PLUGIN_HH_
-#define _GAZEBO_RANDOMVELOCITY_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_RANDOMVELOCITYPLUGIN_HH_
+#define GAZEBO_PLUGINS_RANDOMVELOCITYPLUGIN_HH_
+
+#include <memory>
 
 #include <sdf/sdf.hh>
 #include <gazebo/common/UpdateInfo.hh>
@@ -82,7 +84,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Private data pointer
-    private: RandomVelocityPluginPrivate *dataPtr;
+    private: std::unique_ptr<RandomVelocityPluginPrivate> dataPtr;
   };
 }
 #endif

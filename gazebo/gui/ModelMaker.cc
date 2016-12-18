@@ -205,7 +205,7 @@ bool ModelMaker::Init()
   this->dataPtr->modelVisual->Load();
   this->dataPtr->modelVisual->SetPose(modelPose);
 
-  modelName = this->dataPtr->modelVisual->GetName();
+  modelName = this->dataPtr->modelVisual->Name();
   modelElem->GetAttribute("name")->Set(modelName);
 
   if (modelElem->GetName() == "model")
@@ -240,7 +240,7 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
     rendering::VisualPtr modelVis = modelElemList.front().second;
     modelElemList.pop_front();
 
-    std::string modelName = modelVis->GetName();
+    std::string modelName = modelVis->Name();
 
     // create model
     sdf::ElementPtr linkElem;
@@ -374,7 +374,7 @@ void ModelMaker::CreateTheEntity()
     // The the SDF model's name
     modelElem->GetAttribute("name")->Set(modelName);
     modelElem->GetElement("pose")->Set(
-        this->dataPtr->modelVisual->GetWorldPose().Ign());
+        this->dataPtr->modelVisual->WorldPose());
 
     // Spawn the model in the physics server
     msg.set_sdf(this->dataPtr->modelSDF->ToString());
@@ -382,9 +382,9 @@ void ModelMaker::CreateTheEntity()
   else
   {
     msgs::Set(msg.mutable_pose(),
-        this->dataPtr->modelVisual->GetWorldPose().Ign());
-    msg.set_clone_model_name(this->dataPtr->modelVisual->GetName().substr(0,
-          this->dataPtr->modelVisual->GetName().find("_clone_tmp")));
+        this->dataPtr->modelVisual->WorldPose());
+    msg.set_clone_model_name(this->dataPtr->modelVisual->Name().substr(0,
+          this->dataPtr->modelVisual->Name().find("_clone_tmp")));
   }
 
   this->dataPtr->makerPub->Publish(msg);
@@ -393,7 +393,7 @@ void ModelMaker::CreateTheEntity()
 /////////////////////////////////////////////////
 ignition::math::Vector3d ModelMaker::EntityPosition() const
 {
-  return this->dataPtr->modelVisual->GetWorldPose().pos.Ign();
+  return this->dataPtr->modelVisual->WorldPose().Pos();
 }
 
 /////////////////////////////////////////////////

@@ -166,7 +166,9 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 ModelRightMenu::~ModelRightMenu()
 {
+  this->requestSub.reset();
   this->node->Fini();
+  this->node.reset();
 }
 
 /////////////////////////////////////////////////
@@ -291,11 +293,11 @@ void ModelRightMenu::OnApplyWrench()
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    linkName = vis->GetChild(0)->GetName();
+    linkName = vis->GetChild(0)->Name();
   }
   else
   {
-    modelName = vis->GetRootVisual()->GetName();
+    modelName = vis->GetRootVisual()->Name();
     linkName = this->entityName;
   }
 

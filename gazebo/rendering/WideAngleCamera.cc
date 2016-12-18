@@ -40,7 +40,6 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/WideAngleCamera.hh"
 
-
 using namespace gazebo;
 using namespace rendering;
 
@@ -612,6 +611,33 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
+bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+{
+  bool retVal = true;
+  Ogre::ColourValue clr = Conversions::Convert(_color);
+  if (this->OgreViewport())
+  {
+    this->OgreViewport()->setBackgroundColour(clr);
+    for (int i = 0; i < 6; ++i)
+    {
+      if (this->dataPtr->envViewports[i])
+      {
+        this->dataPtr->envViewports[i]->setBackgroundColour(clr);
+      }
+      else
+      {
+        retVal = false;
+      }
+    }
+  }
+  else
+  {
+    retVal = false;
+  }
+  return retVal;
+}
+
+//////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
   int fsaa = 4;
@@ -638,6 +664,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   {
     Ogre::RenderTarget *rtt;
     rtt = this->dataPtr->envCubeMapTexture->getBuffer(i)->getRenderTarget();
+    rtt->setAutoUpdated(false);
 
     Ogre::Viewport *vp = rtt->addViewport(this->dataPtr->envCameras[i]);
     vp->setClearEveryFrame(true);
@@ -704,4 +731,11 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   // suppose that this function was invoked in a thread that has OpenGL context
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
+}
+
+//////////////////////////////////////////////////
+void WideAngleCamera::UpdateFOV()
+{
+  // override to prevent parent class from updating fov as
+  // it'll be handled here in this class.
 }

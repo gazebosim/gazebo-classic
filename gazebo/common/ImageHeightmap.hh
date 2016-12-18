@@ -51,7 +51,7 @@ namespace gazebo
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
           const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
-          std::vector<float> &_heights);
+          std::vector<float> &_heights) GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,

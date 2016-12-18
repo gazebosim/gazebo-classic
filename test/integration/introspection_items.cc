@@ -57,7 +57,7 @@ void IntrospectionItemsTest::RegisteredItems(const std::string &_physicsEngine)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -90,7 +90,7 @@ void IntrospectionItemsTest::RegisteredItems(const std::string &_physicsEngine)
   }
 
   // Get list of items expected for models and their children
-  auto models = world->GetModels();
+  auto models = world->Models();
   EXPECT_FALSE(models.empty());
 
   for (auto model : models)
@@ -106,7 +106,7 @@ void IntrospectionItemsTest::RegisteredItems(const std::string &_physicsEngine)
   // Remove models
   for (auto model : models)
     world->RemoveModel(model);
-  EXPECT_TRUE(world->GetModels().empty());
+  EXPECT_TRUE(world->Models().empty());
 
   // Expect items not to be registered
   itemsAvailable.clear();

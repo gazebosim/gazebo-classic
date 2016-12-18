@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_LINK_INSPECTOR_HH_
-#define _GAZEBO_GUI_LINK_INSPECTOR_HH_
+#ifndef GAZEBO_GUI_MODEL_LINKINSPECTOR_HH_
+#define GAZEBO_GUI_MODEL_LINKINSPECTOR_HH_
 
 #include <memory>
 #include <string>
@@ -75,6 +74,14 @@ namespace gazebo
       /// \brief Open the inspector.
       public: void Open();
 
+      /// \brief Set the state of a show collision button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowCollisions(const bool _show);
+
+      /// \brief Set the state of a show visual button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowVisuals(const bool _show);
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -103,8 +110,26 @@ namespace gazebo
       /// and the inspector closed.
       Q_SIGNALS: void Accepted();
 
+      /// \brief Qt signal emitted to indicate that all collisions should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowCollisions(const bool _show);
+
+      /// \brief Qt signal emitted to indicate that all visuals should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowVisuals(const bool _show);
+
       /// \brief Qt callback when the Remove button is pressed.
       private slots: void OnRemove();
+
+      /// \brief Qt callback when the show collisions button is pressed.
+      /// \param[in] _show Show if checked, hide otherwise.
+      private slots: void OnShowCollisions(const bool _show);
+
+      /// \brief Qt callback when the show visuals button is pressed.
+      /// \param[in] _show Show if checked, hide otherwise.
+      private slots: void OnShowVisuals(const bool _show);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();

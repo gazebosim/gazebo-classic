@@ -34,6 +34,12 @@ class ModelEditorTest : public QTestFixture
   /// \brief Test pose of joint hotspot visual when parent or child link is
   /// changed via the joint inspector
   private slots: void JointInspectorUpdate();
+
+  /// \brief Test showing and hiding collisions.
+  private slots: void ShowCollisions();
+
+  /// \brief Test showing and hiding visuals.
+  private slots: void ShowVisuals();
 };
 
 #endif

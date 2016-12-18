@@ -44,7 +44,9 @@ set(tests
   gz_model.cc
   gz_physics.cc
   gz_world.cc
+  harness.cc
   imu.cc
+  info_services.cc
   introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc
@@ -56,7 +58,9 @@ set(tests
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
+  keys_to_joints.cc
   laser.cc
+  link.cc
   logical_camera_sensor.cc
   model.cc
   model_database.cc
@@ -118,28 +122,26 @@ endif()
 
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
-if (ENABLE_TESTS_COMPILATION)
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
-  set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
-  set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
-  set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+# Increase timeout, to account for model download time.
+set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
+set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
-  set_property(
-    SOURCE world_clone.cc
-    PROPERTY COMPILE_DEFINITIONS
-    GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
-  )
+set_property(
+  SOURCE world_clone.cc
+  PROPERTY COMPILE_DEFINITIONS
+  GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+)
 
-  # Increase timeout for debug-mode
-  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
-      ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
-    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
-  endif()
-
-  # Add plugin dependency
-  add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+# Increase timeout for debug-mode
+if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
+    ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
+  set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
 endif()
+
+# Add plugin dependency
+add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 
 set(display_tests
 )
@@ -163,11 +165,13 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  wideanglecamera_sensor.cc
   world_reset.cc
 )
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
+  camera_gui.cc
   collada_visualization.cc
   insert_model.cc
   model_editor.cc
@@ -183,7 +187,7 @@ set(qt_tests
 
 gz_build_qt_tests(${qt_tests})
 
-if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
+if (VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)

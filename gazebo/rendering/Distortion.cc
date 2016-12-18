@@ -14,49 +14,78 @@
  * limitations under the License.
  *
 */
-
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/Assert.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/rendering/DistortionPrivate.hh"
 #include "gazebo/rendering/Distortion.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
+namespace gazebo
+{
+  namespace rendering
+  {
+    /// \brief Private data for the Distortion class
+    class DistortionPrivate
+    {
+      /// \brief Radial distortion coefficient k1.
+      public: double k1 = 0;
+
+      /// \brief Radial distortion coefficient k2.
+      public: double k2 = 0;
+
+      /// \brief Radial distortion coefficient k3.
+      public: double k3 = 0;
+
+      /// \brief Tangential distortion coefficient p1.
+      public: double p1 = 0;
+
+      /// \brief Tangential distortion coefficient p2.
+      public: double p2 = 0;
+
+      /// \brief Lens center used for distortion
+      public: ignition::math::Vector2d lensCenter = {0.5, 0.5};
+
+      /// \brief Scale applied to distorted image.
+      public: ignition::math::Vector2d distortionScale = {1.0, 1.0};
+
+      /// \brief True if the distorted image will be cropped to remove the
+      /// black pixels at the corners of the image.
+      public: bool distortionCrop = true;
+
+      /// \brief Lens distortion compositor
+      public: Ogre::CompositorInstance *lensDistortionInstance;
+
+      /// \brief Connection for the pre render event.
+      public: event::ConnectionPtr preRenderConnection;
+
+      /// \brief Mapping of distorted to undistorted normalized pixels
+      public: std::vector<ignition::math::Vector2d> distortionMap;
+    };
+  }
+}
 //////////////////////////////////////////////////
 Distortion::Distortion()
   : dataPtr(new DistortionPrivate)
 {
-  this->dataPtr->k1 = 0;
-  this->dataPtr->k2 = 0;
-  this->dataPtr->k3 = 0;
-  this->dataPtr->p1 = 0;
-  this->dataPtr->p2 = 0;
-  this->dataPtr->lensCenter = math::Vector2d(0.5, 0.5);
-  this->dataPtr->distortionScale = math::Vector2d(1.0, 1.0);
-  this->dataPtr->distortionCrop = true;
 }
 
 //////////////////////////////////////////////////
 Distortion::~Distortion()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 void Distortion::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
-  this->dataPtr->k1 = this->sdf->Get<double>("k1");
-  this->dataPtr->k2 = this->sdf->Get<double>("k2");
-  this->dataPtr->k3 = this->sdf->Get<double>("k3");
-  this->dataPtr->p1 = this->sdf->Get<double>("p1");
-  this->dataPtr->p2 = this->sdf->Get<double>("p2");
-  this->dataPtr->lensCenter = this->sdf->Get<math::Vector2d>("center");
+  this->dataPtr->k1 = _sdf->Get<double>("k1");
+  this->dataPtr->k2 = _sdf->Get<double>("k2");
+  this->dataPtr->k3 = _sdf->Get<double>("k3");
+  this->dataPtr->p1 = _sdf->Get<double>("p1");
+  this->dataPtr->p2 = _sdf->Get<double>("p2");
+  this->dataPtr->lensCenter = _sdf->Get<ignition::math::Vector2d>("center");
 
   if (this->dataPtr->k1 >= 0)
   {
@@ -97,11 +126,13 @@ void Distortion::SetCamera(CameraPtr _camera)
   double incrV = 1.0 / texHeight;
 
   // obtain bounds of the distorted image points.
-  math::Vector2d boundA = this->Distort(math::Vector2d(0, 0),
+  ignition::math::Vector2d boundA = this->Distort(
+      ignition::math::Vector2d::Zero,
       this->dataPtr->lensCenter,
       this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
       this->dataPtr->p1, this->dataPtr->p2);
-  math::Vector2d boundB = this->Distort(math::Vector2d(1, 1),
+
+  ignition::math::Vector2d boundB = this->Distort(ignition::math::Vector2d::One,
       this->dataPtr->lensCenter,
       this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
       this->dataPtr->p1, this->dataPtr->p2);
@@ -116,14 +147,15 @@ void Distortion::SetCamera(CameraPtr _camera)
     for (unsigned int j = 0; j < texWidth; ++j)
     {
       double u = j*incrV;
-      math::Vector2d uv(u, v);
-      math::Vector2d out = this->Distort(uv, this->dataPtr->lensCenter,
-          this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-          this->dataPtr->p1, this->dataPtr->p2);
+      ignition::math::Vector2d uv(u, v);
+      ignition::math::Vector2d out =
+        this->Distort(uv, this->dataPtr->lensCenter,
+            this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+            this->dataPtr->p1, this->dataPtr->p2);
 
       // compute the index in the distortion map
-      unsigned int idxU = out.x * texWidth;
-      unsigned int idxV = out.y * texHeight;
+      unsigned int idxU = out.X() * texWidth;
+      unsigned int idxV = out.Y() * texHeight;
       unsigned int mapIdx = idxV * texWidth + idxU;
 
       // this should not happen for barrel distortion as the normalized
@@ -143,10 +175,10 @@ void Distortion::SetCamera(CameraPtr _camera)
   // Apply interpolation to the resulting distortion map.
   // This is mostly needed for barrel distortion where the the center of the
   // distortion texture may contain a few black pixels.
-  unsigned int boundAIdxU = boundA.x * texWidth;
-  unsigned int boundAIdxV = boundA.y * texHeight;
-  unsigned int boundBIdxU = boundB.x * texWidth;
-  unsigned int boundBIdxV = boundB.y * texHeight;
+  unsigned int boundAIdxU = boundA.X() * texWidth;
+  unsigned int boundAIdxV = boundA.Y() * texHeight;
+  unsigned int boundBIdxU = boundB.X() * texWidth;
+  unsigned int boundBIdxV = boundB.Y() * texHeight;
   // limit interpolation to the boundary formed by the distorted image points.
   unsigned int roiWidth = boundBIdxU - boundAIdxU;
   unsigned int roiHeight = boundBIdxV - boundAIdxV;
@@ -157,20 +189,23 @@ void Distortion::SetCamera(CameraPtr _camera)
       unsigned int mapIdx = (boundAIdxV + i)  * texWidth + boundAIdxU + j;
       // check for empty mapping within the region and correct it by
       // interpolating four neighboring distortion map values.
-      if (this->dataPtr->distortionMap[mapIdx] == math::Vector2d(-1, -1))
+      if (this->dataPtr->distortionMap[mapIdx] ==
+          ignition::math::Vector2d(-1, -1))
       {
-        math::Vector2d interpolate(0, 0);
+        ignition::math::Vector2d interpolate(0, 0);
         int sampleSize = 0;
         // left
         if ((boundAIdxU + j) != 0 &&
-            !(this->dataPtr->distortionMap[mapIdx-1] == math::Vector2d(-1, -1)))
+            !(this->dataPtr->distortionMap[mapIdx-1] ==
+              ignition::math::Vector2d(-1, -1)))
         {
           interpolate += this->dataPtr->distortionMap[mapIdx-1];
           sampleSize++;
         }
         // right
         if ((boundAIdxU + j+1) < texWidth &&
-            !(this->dataPtr->distortionMap[mapIdx+1] == math::Vector2d(-1, -1)))
+            !(this->dataPtr->distortionMap[mapIdx+1] ==
+              ignition::math::Vector2d(-1, -1)))
         {
           interpolate += this->dataPtr->distortionMap[mapIdx+1];
           sampleSize++;
@@ -181,7 +216,7 @@ void Distortion::SetCamera(CameraPtr _camera)
           unsigned int topIdx =
               (boundAIdxV + i-1) * texWidth + boundAIdxU + j;
           if (!(this->dataPtr->distortionMap[topIdx]
-              == math::Vector2d(-1, -1)))
+              == ignition::math::Vector2d(-1, -1)))
           {
             interpolate += this->dataPtr->distortionMap[mapIdx-1];
             sampleSize++;
@@ -193,14 +228,14 @@ void Distortion::SetCamera(CameraPtr _camera)
           unsigned int bottomIdx =
               (boundAIdxV + i+1) * texWidth + boundAIdxU + j;
           if (!(this->dataPtr->distortionMap[bottomIdx]
-              == math::Vector2d(-1, -1)))
+              == ignition::math::Vector2d(-1, -1)))
           {
             interpolate += this->dataPtr->distortionMap[mapIdx+1];
             sampleSize++;
           }
         }
-        interpolate.x = interpolate.x / sampleSize;
-        interpolate.y = interpolate.y / sampleSize;
+        interpolate.X() = interpolate.X() / sampleSize;
+        interpolate.Y() = interpolate.Y() / sampleSize;
         this->dataPtr->distortionMap[mapIdx] = interpolate;
       }
     }
@@ -236,10 +271,10 @@ void Distortion::SetCamera(CameraPtr _camera)
   {
     for (unsigned int j = 0; j < texWidth; ++j)
     {
-      math::Vector2d vec =
+      ignition::math::Vector2d vec =
           this->dataPtr->distortionMap[i*texWidth+j];
-      *pDest++ = vec.x;
-      *pDest++ = vec.y;
+      *pDest++ = vec.X();
+      *pDest++ = vec.Y();
       *pDest++ = 0;
     }
   }
@@ -250,8 +285,8 @@ void Distortion::SetCamera(CameraPtr _camera)
   Ogre::GpuProgramParametersSharedPtr params =
       distMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
   params->setNamedConstant("scale",
-      Ogre::Vector3(this->dataPtr->distortionScale.x,
-      this->dataPtr->distortionScale.y, 1.0));
+      Ogre::Vector3(this->dataPtr->distortionScale.X(),
+      this->dataPtr->distortionScale.Y(), 1.0));
 
   // set up the distortion map texture to be used in the pixel shader.
   distMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName, 1);
@@ -262,38 +297,58 @@ math::Vector2d Distortion::Distort(const math::Vector2d &_in,
     const math::Vector2d &_center, double _k1, double _k2, double _k3,
     double _p1, double _p2)
 {
+  return Distort(_in.Ign(), _center.Ign(), _k1, _k2, _k3, _p1, _p2);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2d Distortion::Distort(
+    const ignition::math::Vector2d &_in,
+    const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3,
+    double _p1, double _p2)
+{
   // apply Brown's distortion model, see
   // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
 
-  math::Vector2d normalized2d = _in - _center;
-  math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
-  double rSq = normalized.x * normalized.x
-      + normalized.y * normalized.y;
+  ignition::math::Vector2d normalized2d = _in - _center;
+  ignition::math::Vector3d normalized(normalized2d.X(), normalized2d.Y(), 0);
+  double rSq = normalized.X() * normalized.X() +
+               normalized.Y() * normalized.Y();
 
   // radial
-  math::Vector3 dist = normalized * (1.0 +
+  ignition::math::Vector3d dist = normalized * (1.0 +
       _k1 * rSq +
       _k2 * rSq * rSq +
       _k3 * rSq * rSq * rSq);
 
   // tangential
-  dist.x += _p2 * (rSq + 2 * (normalized.x*normalized.x)) +
-      2 * _p1 * normalized.x * normalized.y;
-  dist.y += _p1 * (rSq + 2 * (normalized.y*normalized.y)) +
-      2 * _p2 * normalized.x * normalized.y;
-  math::Vector2d out = _center + math::Vector2d(dist.x, dist.y);
+  dist.X() += _p2 * (rSq + 2 * (normalized.X()*normalized.X())) +
+      2 * _p1 * normalized.X() * normalized.Y();
+  dist.Y() += _p1 * (rSq + 2 * (normalized.Y()*normalized.Y())) +
+      2 * _p2 * normalized.X() * normalized.Y();
 
-  return out;
+  return _center + ignition::math::Vector2d(dist.X(), dist.Y());
 }
 
 //////////////////////////////////////////////////
-void Distortion::SetCrop(bool _crop)
+void Distortion::SetCrop(const bool _crop)
 {
   this->dataPtr->distortionCrop = _crop;
 }
 
 //////////////////////////////////////////////////
+bool Distortion::Crop() const
+{
+  return this->dataPtr->distortionCrop;
+}
+
+//////////////////////////////////////////////////
 double Distortion::GetK1() const
+{
+  return this->K1();
+}
+
+//////////////////////////////////////////////////
+double Distortion::K1() const
 {
   return this->dataPtr->k1;
 }
@@ -301,11 +356,23 @@ double Distortion::GetK1() const
 //////////////////////////////////////////////////
 double Distortion::GetK2() const
 {
+  return this->K2();
+}
+
+//////////////////////////////////////////////////
+double Distortion::K2() const
+{
   return this->dataPtr->k2;
 }
 
 //////////////////////////////////////////////////
 double Distortion::GetK3() const
+{
+  return this->K3();
+}
+
+//////////////////////////////////////////////////
+double Distortion::K3() const
 {
   return this->dataPtr->k3;
 }
@@ -313,17 +380,35 @@ double Distortion::GetK3() const
 //////////////////////////////////////////////////
 double Distortion::GetP1() const
 {
+  return this->P1();
+}
+
+//////////////////////////////////////////////////
+double Distortion::P1() const
+{
   return this->dataPtr->p1;
 }
 
 //////////////////////////////////////////////////
 double Distortion::GetP2() const
 {
+  return this->P2();
+}
+
+//////////////////////////////////////////////////
+double Distortion::P2() const
+{
   return this->dataPtr->p2;
 }
 
 //////////////////////////////////////////////////
 math::Vector2d Distortion::GetCenter() const
+{
+  return this->Center();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2d Distortion::Center() const
 {
   return this->dataPtr->lensCenter;
 }

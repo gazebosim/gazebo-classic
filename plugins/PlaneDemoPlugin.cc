@@ -15,7 +15,11 @@
  *
 */
 
+#include <chrono>
+#include <functional>
+#include <thread>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/PID.hh"
@@ -173,7 +177,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   this->dataPtr->world = this->dataPtr->model->GetWorld();
   GZ_ASSERT(this->dataPtr->world, "PlaneDemoPlugin world pointer is NULL");
 
-  this->dataPtr->physics = this->dataPtr->world->GetPhysicsEngine();
+  this->dataPtr->physics = this->dataPtr->world->Physics();
   GZ_ASSERT(this->dataPtr->physics, "PlaneDemoPlugin physics pointer is NULL");
 
   GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
@@ -351,7 +355,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::Init()
 {
-  this->dataPtr->lastUpdateTime = this->dataPtr->world->GetSimTime();
+  this->dataPtr->lastUpdateTime = this->dataPtr->world->SimTime();
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
           std::bind(&PlaneDemoPlugin::OnUpdate, this));
   gzdbg << "Init done.\n";
@@ -363,7 +367,7 @@ void PlaneDemoPlugin::OnUpdate()
   // gzdbg << "executing OnUpdate.\n";
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-    common::Time curTime = this->dataPtr->world->GetSimTime();
+    common::Time curTime = this->dataPtr->world->SimTime();
     for (std::vector<EngineControl>::iterator ei =
         this->dataPtr->engineControls.begin();
         ei != this->dataPtr->engineControls.end(); ++ei)
@@ -377,8 +381,8 @@ void PlaneDemoPlugin::OnUpdate()
       ti != this->dataPtr->thrusterControls.end(); ++ti)
     {
       // fire up thruster
-      math::Pose pose = ti->link->GetWorldPose();
-      ti->link->AddForce(pose.rot.RotateVector(ti->force));
+      ignition::math::Pose3d pose = ti->link->GetWorldPose().Ign();
+      ti->link->AddForce(pose.Rot().RotateVector(ti->force));
     }
 
     for (std::vector<JointControl>::iterator ji =
@@ -423,7 +427,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       // ungetc( ch, stdin );
       // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
-    ei->torque = math::clamp(ei->torque, ei->minVal, ei->maxVal);
+    ei->torque = ignition::math::clamp(ei->torque, ei->minVal, ei->maxVal);
     gzerr << "torque: " << ei->torque << "\n";
   }
 
@@ -445,9 +449,12 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       // ungetc( ch, stdin );
       // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
-    ti->force.X() = math::clamp(ti->force.X(), ti->minVal.X(), ti->maxVal.X());
-    ti->force.Y() = math::clamp(ti->force.Y(), ti->minVal.Y(), ti->maxVal.Y());
-    ti->force.Z() = math::clamp(ti->force.Z(), ti->minVal.Z(), ti->maxVal.Z());
+    ti->force.X() =
+      ignition::math::clamp(ti->force.X(), ti->minVal.X(), ti->maxVal.X());
+    ti->force.Y() =
+      ignition::math::clamp(ti->force.Y(), ti->minVal.Y(), ti->maxVal.Y());
+    ti->force.Z() =
+      ignition::math::clamp(ti->force.Z(), ti->minVal.Z(), ti->maxVal.Z());
     gzerr << "force: " << ti->force << "\n";
   }
 
@@ -459,7 +466,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     {
       // spin up motor
       ji->cmd += ji->incVal;
-      ji->cmd = math::clamp(ji->cmd, ji->minVal, ji->maxVal);
+      ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
             << " cur: " << ji->joint->GetAngle(0).Radian()
@@ -468,7 +475,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
     else if (static_cast<int>(ch) == ji->decKey)
     {
       ji->cmd -= ji->incVal;
-      ji->cmd = math::clamp(ji->cmd, ji->minVal, ji->maxVal);
+      ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
             << " cur: " << ji->joint->GetAngle(0).Radian()
@@ -488,5 +495,5 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       // gzerr << (int)ch << " : " << this->clIncKey << "\n";
     }
   }
-  usleep(500);
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }

@@ -41,6 +41,15 @@ namespace boost
   class recursive_mutex;
 }
 
+// Forward declare reference and pointer parameters
+namespace ignition
+{
+  namespace msgs
+  {
+    class Plugin_V;
+  }
+}
+
 namespace gazebo
 {
   namespace physics
@@ -385,6 +394,14 @@ namespace gazebo
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
+      /// \brief Create a joint for this model
+      /// \param[in] _sdf SDF parameters for <joint>
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
+
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint
       /// \return true if successful, false if not.
@@ -407,6 +424,26 @@ namespace gazebo
       /// \return a LinkPtr to the new link created,
       /// returns NULL if link _name already exists.
       public: LinkPtr CreateLink(const std::string &_name);
+
+      /// \brief Get information about plugins in this model or one of its
+      /// children, according to the given _pluginUri. Some accepted URI
+      /// patterns:
+      ///
+      /// * Info about a specific model plugin in this model:
+      ///    data://world/<world_name>/model/<this_name>/plugin/<plugin_name>
+      ///
+      /// * Info about all model plugins in this model (empty plugin name):
+      ///    data://world/<world_name>/model/<this_name>/plugin
+      ///
+      /// * Info about a model plugin in a nested model:
+      ///    data://world/<world_name>/model/<this_name>/model/
+      ///        <nested_model_name>/plugin/<plugin_name>
+      ///
+      /// \param[in] _pluginUri URI for the desired plugin(s).
+      /// \param[out] _plugins Message containing vector of plugins.
+      /// \param[out] _success True if the info was successfully obtained.
+      public: void PluginInfo(const common::URI &_pluginUri,
+          ignition::msgs::Plugin_V &_plugins, bool &_success);
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
@@ -439,10 +476,6 @@ namespace gazebo
 
       /// \brief Publish the scale.
       private: virtual void PublishScale();
-
-      /// \brief Called when a request message is received.
-      /// \param[in] _msg The request message.
-      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
@@ -480,12 +513,6 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
-
-      /// \brief Publisher for request response messages.
-      private: transport::PublisherPtr responsePub;
-
-      /// \brief Subscriber to request messages.
-      private: transport::SubscriberPtr requestSub;
 
       /// \brief Mutex used during the update cycle.
       private: mutable boost::recursive_mutex updateMutex;

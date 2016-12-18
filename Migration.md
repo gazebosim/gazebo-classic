@@ -7,6 +7,21 @@ release will remove the deprecated code.
 
 ## Gazebo 7.X to 8.X
 
+### Build system
+
+1. ***Disable tests compilation by default:*** tests compilation has been
+   excluded from the make all (default make) target.  cmake will generate make
+   targets for all the tests in the code, individual test compilation can be
+   trigger by using: make <binary_test_name> (i.e make UNIT_gz_TEST).
+   For compiling the whole test suite see the new 'make tests' target.
+
+1. ***New 'tests' target for make***: a new 'tests' target has been implemented.
+   it will compile all the tests present in the code by calling 'make tests'.
+
+1. ***Deprecate ENABLE_TESTS_COMPILATION parameter:***  the previous cmake
+   parameter to control tests make target generation has been deprecated. Tests
+   compilation is disabled by default.
+
 ### Additions
 
 1. **gazebo/common/Event.hh**
@@ -15,6 +30,28 @@ release will remove the deprecated code.
     + public: void Event::SetSignaled(const bool);
 
 ### Modifications
+
+1. **plugins/events/Region.hh**
+    + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
+    + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
+    + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
+
+1. **plugins/events/EventSource.hh**
+    + changed type from `typedef boost::shared_ptr<EventSource> EventSourcePtr` to `typedef std::shared_ptr<EventSource> EventSourcePtr`
+
+1. **plugins/BuoyancyPlugin.hh**
+    + VolumeProperties: changed type from `public: math::Vector3 cov` to `public ignition::math::Vector3d cov`
+
+1. **plugins/ArrangePlugin.hh**
+    + Object: changed type from `public: math::Pose pose` to `public: ignition::math::Pose3d pose`
+    + changed type from `typedef boost::shared_ptr<Object> ObjectPtr` to `std::shared_ptr<Object> ObjectPtr`
+    + changed type from `typedef std::map<std::string, math::Pose> Pose_M` to `typedef std::map<std::string, ignition::math::Pose3d> Pose_M`
+
+1. **plugins/LiftDragPlugin.hh**
+    + changed type from `protected: math::Vector3 cp` to `protected: ignition::math::Vector3d cp`
+    + changed type from `protected: math::Vector3 forward` to `protected: ignition::math::Vector3d forward`
+    + changed type from `protected: math::Vector3 upward` to `protected: ignition::math::Vector3d upward`
+    + changed type from `protected: math::Vector3 velSmooth` to `protected: ignition::math::Vector3d velSmooth`
 
 1. **gazebo/physics/dart/**
     + Updated to support version 5 of DART physics engine.
@@ -66,9 +103,125 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/Distortion.hh**
+    + ***Deprecation:*** double GetK1() const
+    + ***Replacement:*** double K1() const
+    + ***Deprecation:*** double GetK2() const
+    + ***Replacement:*** double K2() const
+    + ***Deprecation:*** double GetK3() const
+    + ***Replacement:*** double K3() const
+    + ***Deprecation:*** double GetP1() const
+    + ***Replacement:*** double P1() const
+    + ***Deprecation:*** double GetP2() const
+    + ***Replacement:*** double P2() const
+    + ***Deprecation:*** math::Vector2d GetCenter() const
+    + ***Replacement:*** ignition::math::Vector2d Center() const
+    + ***Deprecation:*** static math::Vector2d Distort(const math::Vector2d &_in, const math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
+    + ***Replacement:*** static ignition::math::Vector2d Distort( const ignition::math::Vector2d &_in, const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3, double _p1, double _p2)
+
+1. **gazebo/rendering/COMVisual.hh**
+    + ***Deprecation:*** math::Pose GetInertiaPose() const
+    + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
+
+1. **gazebo/physics/Gripper.hh**
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+
+1. **gazebo/physics/World.hh**
+    + ***Deprecation:*** bool GetRunning() const
+    + ***Replacement:*** bool Running() const;
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+    + ***Deprecation:*** PhysicsEnginePtr GetPhysicsEngine() const
+    + ***Replacement:*** PhysicsEnginePtr Physics() const
+    + ***Deprecation:*** PresetManagerPtr GetPresetManager() const
+    + ***Replacement:*** PresetManagerPtr PresetMgr() const
+    + ***Deprecation:*** common::SphericalCoordinatesPtr GetSphericalCoordinates() const
+    + ***Replacement:*** common::SphericalCoordinatesPtr SphericalCoords() const
+    + ***Deprecation:*** unsigned int GetModelCount() const
+    + ***Replacement:*** unsigned int ModelCount() const
+    + ***Deprecation:*** ModelPtr GetModel(unsigned int _index) const
+    + ***Replacement:*** ModelPtr ModelByIndex(const unsigned int _index) const
+    + ***Deprecation:*** Model_V GetModels() const
+    + ***Replacement:*** Model_V Models() const
+    + ***Deprecation:*** common::Time GetSimTime() const
+    + ***Replacement:*** common::Time SimTime() const
+    + ***Deprecation:*** common::Time GetPauseTime() const
+    + ***Replacement:*** common::Time PauseTime() const
+    + ***Deprecation:*** common::Time GetStartTime() const
+    + ***Replacement:*** common::Time StartTime() const
+    + ***Deprecation:*** common::Time GetRealTime() const
+    + ***Replacement:*** common::Time RealTime() const
+    + ***Deprecation:*** BasePtr GetByName(const std::string &_name)
+    + ***Replacement:*** BasePtr BaseByName(const std::string &_name) const
+    + ***Deprecation:*** ModelPtr GetModel(const std::string &_name)
+    + ***Replacement:*** ModelPtr ModelByName(const std::string &_name) const
+    + ***Deprecation:*** LightPtr Light(const std::string &_name) const
+    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const
+    + ***Deprecation:*** EntityPtr GetEntity(const std::string &_name)
+    + ***Replacement:*** EntityPtr EntityByName(const std::string &_name) const
+    + ***Deprecation:*** ModelPtr GetModelBelowPoint(const math::Vector3 &_pt)
+    + ***Replacement:*** ModelPtr ModelBelowPoint(const ignition::math::Vector3d &_pt) const
+    + ***Deprecation:*** EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt)
+    + ***Replacement:*** EntityPtr EntityBelowPoint(const ignition::math::Vector3d &_pt) const
+    + ***Deprecation:*** std::mutex &GetSetWorldPoseMutex() const
+    + ***Replacement:*** std::mutex &WorldPoseMutex() const
+    + ***Deprecation:*** bool GetEnablePhysicsEngine()
+    + ***Replacement:*** bool PhysicsEnabled() const
+    + ***Deprecation:*** void EnablePhysicsEngine(const bool _enable)
+    + ***Replacement:*** void SetPhysicsEnabled(const bool _enable)
+    + ***Deprecation:*** uint32_t GetIterations() const
+    + ***Replacement:*** uint32_t Iterations() const
+    + ***Deprecation:*** msgs::Scene GetSceneMsg() const
+    + ***Replacement:*** msgs::Scene SceneMsg() const
+
+1. **gazebo/rendering/Visual.hh**
+    + ***Deprecation:*** public: void SetScale(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** public: void SetPosition(const math::Vector3 &_pos)
+    + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** std::string GetName() const
+    + ***Replacement:*** std::string Name() const
+    + ***Deprecation:*** math::Vector3 GetScale()
+    + ***Replacement:*** ignition::math::Vector3d Scale() const
+    + ***Deprecation:*** void SetRotation(const math::Quaternion &_rot)
+    + ***Replacement:*** void SetRotation(const ignition::math::Quaterniond &_rot)
+    + ***Deprecation:*** void SetPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetPose(const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** math::Vector3 GetPosition() const
+    + ***Replacement:*** ignition::math::Vector3d Position() const
+    + ***Deprecation:*** math::Quaternion GetRotation() const
+    + ***Replacement:*** ignition::math::Quaterniond Rotation() const
+    + ***Deprecation:*** math::Pose GetPose() const
+    + ***Replacement:*** ignition::math::Pose3d Pose()
+    + ***Deprecation:*** math::Pose GetWorldPose() const
+    + ***Replacement:*** ignition::math::Pose3d WorldPose() const
+    + ***Deprecation:*** void SetWorldPosition(const math::Vector3 &_pos)
+    + ***Replacement:*** void SetWorldPosition(const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** void SetWorldRotation(const math::Quaternion &_pos)
+    + ***Replacement:*** void SetWorldRotation(const ignition::math::Quaterniond &_pos)
+    + ***Deprecation:*** math::Box GetBoundingBox() const
+    + ***Replacement:*** ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void MoveToPosition(const math::Pose &_pose, double _time)
+    + ***Replacement:*** void MoveToPosition(const ignition::math::Pose3d &_pose, const double _time)
+    + ***Deprecation:*** void MoveToPositions(const std::vector<math::Pose> &_pts, double _time, std::function<void()> _onComplete = nullptr)
+    + ***Replacement:*** void MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts, const double _time, std::function<void()> _onComplete = nullptr)
+    + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose)
+
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose)
+
+1. **gazebo/rendering/WireBox.hh**
+    + ***Deprecation:*** public: explicit WireBox(VisualPtr _parent, const math::Box &_box)
+    + ***Replacement:*** public: explicit WireBox(VisualPtr _parent, const ignition::math::Box &_box);
+    + ***Deprecation:*** public: void Init(const math::Box &_box)
+    + ***Replacement:*** public: void Init(const ignition::math::Box &_box)
+    + ***Deprecation:*** public: bool GetVisible() const
+    + ***Replacement:*** public: bool Visible() const
+    + ***Deprecation:*** public: math::Box GetBox() const
+    + ***Replacement:*** public: ignition::math::Box Box()
 
 1. **gazebo/gui/ModelManipulator.hh**
     + ***Deprecation:*** public: void RotateEntity(rendering::VisualPtr &_vis,
@@ -111,6 +264,33 @@ release will remove the deprecated code.
                                                                                    const ignition::math::Pose3d &_pose,
                                                                                    const ignition::math::Vector3d &_axis,
                                                                                    const bool _local)
+
+1. **gazebo/gui/ModelSnap.hh**
+    + ***Deprecation:*** public: void Snap(const std::vector<math::Vector3> &_triangleSrc,
+                                           const std::vector<math::Vector3> &_triangleDest,
+                                           rendering::VisualPtr _visualSrc)
+    + ***Replacement:*** public: void Snap(const ignition::math::Triangle3d &_triangleSrc,
+                                           const ignition::math::Triangle3d &_triangleDest,
+                                           rendering::VisualPtr _visualSrc);
+    + ***Deprecation:*** public: void GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
+                                                       const std::vector<math::Vector3> &_triangleDest,
+                                                       const math::Pose &_poseSrc, math::Vector3 &_trans,
+                                                       math::Quaternion &_rot)
+    + ***Replacement:*** public: void SnapTransform(const ignition::math::Triangle3d &_triangleSrc,
+                                                    const ignition::math::Triangle3d &_triangleDest,
+                                                    const ignition::math::Pose3d &_poseSrc,
+                                                    ignition::math::Vector3d &_trans,
+                                                    ignition::math::Quaterniond &_rot)
+
+1. **gazebo/rendering/RayQuery.hh**
+    + ***Deprecation:*** public: bool SelectMeshTriangle(int _x, int _y,
+                                                         VisualPtr _visual,
+                                                         math::Vector3 &_intersect,
+                                                         std::vector<math::Vector3> &_vertices)
+    + ***Replacement:*** public: bool SelectMeshTriangle(const int _x, const int _y,
+                                                         const VisualPtr _visual,
+                                                         ignition::math::Vector3d &_intersect,
+                                                         ignition::math::Triangle3d &_triangle)
 
 1. **gazebo/rendering/Road2d.hh**
     + ***Deprecation:*** public: void Load(VisualPtr);
@@ -171,9 +351,57 @@ release will remove the deprecated code.
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
+1. **gazebo/rendering/Conversions.hh**
+    + ***Deprecation:*** public: static Ogre::Quaternion Convert(const math::Quaternion &)
+    + ***Replacement:*** public: static Ogre::Quaternion Convert(const ignition::math::Quaterniond &)
+    + ***Deprecation:*** public: static Ogre::Vector3 Convert(const math::Vector3 &)
+    + ***Replacement:*** public: static Ogre::Vector3 Convert(const ignition::math::Vector3d &)
+    + ***Deprecation:*** public: static math::Quaternion Convert(const Ogre::Quaternion &)
+    + ***Replacement:*** public: static ignition::math::Quaterniond ConvertIgn(const Ogre::Quaternion &)
+    + ***Deprecation:*** public: static math::Vector3 Convert(const Ogre::Vector3 &)
+    + ***Replacement:*** public: static ignition::math::Vector3d ConvertIgn(const Ogre::Vector3 &)
+
+1. **gazebo/physics/dart/DARTCollision.hh**
+    + ***Deprecation:*** public: dart::dynamics::Shape *GetDARTCollisionShape() const
+    + ***Replacement:*** public: dart::dynamics::ShapePtr DARTCollisionShape() const
+    + ***Deprecation:*** public: void SetDARTCollisionShape(dart::dynamics::Shape*,...)
+    + ***Replacement:*** public: void SetDARTCollisionShape(dart::dynamics::ShapePtr,...)
+
+1. **gazebo/physics/dart/DARTCylinderShape.hh**
+    + ***Deprecation:*** public: DARTCylinderShape(CollisionPtr)
+    + ***Replacement:*** public: DARTCylinderShape(DARTCollisionPtr)
+
+1. **gazebo/physics/dart/DARTHeightmapShape.hh**
+    + ***Deprecation:*** public: DARTHeightmapShape(CollisionPtr)
+    + ***Replacement:*** public: DARTHeightmapShape(DARTCollisionPtr)
+    + ***Deprecation:*** public: dart::simulation::World *GetDARTWorld() const
+    + ***Replacement:*** public: dart::simulation::WorldPtr DARTWorld() const
+
+1. **gazebo/physics/dart/DARTMeshShape.hh**
+    + ***Deprecation:*** public: DARTMeshShape(CollisionPtr)
+    + ***Replacement:*** public: DARTMeshShape(DARTCollisionPtr)
+
+1. **gazebo/physics/dart/DARTModel.hh**
+    + ***Deprecation:*** public: dart::dynamics::Skeleton *GetDARTSkeleton() const
+    + ***Replacement:*** public: dart::dynamics::SkeletonPtr DARTSkeleton() const
+    + ***Deprecation:*** public: dart::simulation::World *GetDARTWorld() const
+    + ***Replacement:*** public: dart::simulation::WorldPtr DARTWorld() const
+
+1. **gazebo/physics/dart/DARTMultiRayShape.hh**
+    + ***Deprecation:*** public: DARTMultiRayShape(CollisionPtr)
+    + ***Replacement:*** public: DARTMultiRayShape(DARTCollisionPtr)
+
+1. **gazebo/physics/dart/DARTPhysics.hh**
+    + ***Deprecation:*** public: dart::simulation::World *GetDARTWorld() const
+    + ***Replacement:*** public: dart::simulation::WorldPtr DARTWorld() const
+
+1. **gazebo/physics/dart/DARTPlaneShape.hh**
+    + ***Deprecation:*** public: DARTPlaneShape(CollisionPtr)
+    + ***Replacement:*** public: DARTPlaneShape(DARTCollisionPtr)
+
 1. **gazebo/rendering/Grid.hh**
-    + ***Deprecation:*** public: public: Ogre::SceneNode *GetSceneNode()
-    + ***Replacement:*** public: public: Ogre::SceneNode *SceneNode() const
+    + ***Deprecation:*** public: Ogre::SceneNode *GetSceneNode()
+    + ***Replacement:*** public: Ogre::SceneNode *SceneNode() const
     + ***Deprecation:*** public: common::Color GetColor() const
     + ***Replacement:*** public: common::Color Color() const
     + ***Deprecation:*** public: uint32_t GetCellCount() const
@@ -240,6 +468,10 @@ release will remove the deprecated code.
     + ***Replacement:*** public: ignition::math::OnePole
 
 1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
+    + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
+    + ***Deprecation:*** public: bool   gazebo::math::equal(T, T, T)
+    + ***Replacement:*** public: bool ignition::math::equal(T, T, T)
     + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
     + ***Replacement:*** public: double ignition::math::fixnan(double)
     + ***Deprecation:*** public: float   gazebo::math::fixnan(float)
@@ -270,6 +502,28 @@ release will remove the deprecated code.
 1. **gazebo/math/Kmeans.hh**
     + ***Deprecation:*** public:   gazebo::math::Kmeans
     + ***Replacement:*** public: ignition::math::Kmeans
+
+1. **gazebo/math/Matrix4.hh**
+    + ***Deprecation:*** public:   gazebo::math::Matrix4
+    + ***Replacement:*** public: ignition::math::Matrix4
+
+1. **gazebo/math/Plane.hh**
+    + ***Deprecation:*** public:   gazebo::math::Plane
+    + ***Replacement:*** public: ignition::math::Plane
+
+1. **gazebo/math/Rand.hh**
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblNormal(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblNormal(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntNormal(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntNormal(int, int)
+    + ***Deprecation:*** public: static double   gazebo::math::GetDblUniform(double, double)
+    + ***Replacement:*** public: static double ignition::math::DblUniform(double, double)
+    + ***Deprecation:*** public: static int   gazebo::math::GetIntUniform(int, int)
+    + ***Replacement:*** public: static int ignition::math::IntUniform(int, int)
+    + ***Deprecation:*** public: static       uint32_t gazebo::math::GetSeed()
+    + ***Replacement:*** public: static unsigned int ignition::math::Seed()
+    + ***Deprecation:*** public: static   void gazebo::math::SetSeed(uint32_t)
+    + ***Replacement:*** public: static void ignition::math::Seed(unsigned int)
 
 1. **gazebo/math/RotationSpline.hh**
     + ***Deprecation:*** public:   gazebo::math::RotationSpline
@@ -304,6 +558,14 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
+
+## Gazebo 7.3.1 to 7.4
+
+### Deprecations
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
+    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
 
 ## Gazebo 7.1.0 to 7.X
 
@@ -756,8 +1018,6 @@ release will remove the deprecated code.
 1. **gazebo/sensors/ImuSensor.hh**
     + ***Deprecation:** public: msgs::IMU GetImuMessage() const
     + ***Replacement:** public: msgs::IMU ImuMessage() const;
-    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
-    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
 
 1. **gazebo/sensors/MultiCameraSensor.hh**
     + ***Deprecation:** public: virtual std::string GetTopic() const;

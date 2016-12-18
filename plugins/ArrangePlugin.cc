@@ -53,12 +53,12 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       {
         // Add names to map
         std::string modelName = elem->Get<std::string>();
-        physics::ModelPtr model = world->GetModel(modelName);
+        physics::ModelPtr model = world->ModelByName(modelName);
         if (model)
         {
           ObjectPtr object(new Object);
           object->model = model;
-          object->pose = model->GetWorldPose();
+          object->pose = model->GetWorldPose().Ign();
           this->objects[modelName] = object;
         }
         else
@@ -129,7 +129,7 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
               continue;
             }
             std::string poseName = poseElem->Get<std::string>("model");
-            poses[poseName] = poseElem->Get<math::Pose>();
+            poses[poseName] = poseElem->Get<ignition::math::Pose3d>();
 
             poseElem = poseElem->GetNextElement("pose");
           }
@@ -144,7 +144,7 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // Subscribe to the topic specified in the world file
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
+  this->node->Init(_world->Name());
 
   this->sub = this->node->Subscribe(this->eventTopicName,
                               &ArrangePlugin::ArrangementCallback, this);
@@ -188,7 +188,7 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
         iter != this->objects.end(); ++iter)
   {
     physics::ModelPtr model = iter->second->model;
-    math::Pose pose;
+    ignition::math::Pose3d pose;
     Pose_M::iterator poseIter = arrangement.find(iter->first);
     if (poseIter != arrangement.end())
     {
@@ -207,4 +207,3 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
   }
   return true;
 }
-

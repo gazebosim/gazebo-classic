@@ -47,7 +47,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 {
   // store a pointer to the simbody physics engine for convenience
   this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
-    this->model->GetWorld()->GetPhysicsEngine());
+    this->model->GetWorld()->Physics());
 
   Joint::Load(_sdf);
 
@@ -327,10 +327,10 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->GetAngleCount())
   {
-    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
       // reset forces if time step is new
-      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceAppliedTime = this->GetWorld()->SimTime();
       this->forceApplied[0] = this->forceApplied[1] = 0;
     }
 

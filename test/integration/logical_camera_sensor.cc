@@ -71,7 +71,7 @@ TEST_F(LogicalCameraSensor, Box)
   ASSERT_TRUE(world != NULL);
 
   // Get the model that has the logical camera
-  physics::ModelPtr cameraModel = world->GetModel("box");
+  physics::ModelPtr cameraModel = world->ModelByName("box");
   ASSERT_TRUE(cameraModel != NULL);
 
   // Get the logical camera sensor

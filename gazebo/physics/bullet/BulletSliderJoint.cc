@@ -384,7 +384,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
         // https://github.com/bulletphysics/bullet3/pull/328
         // As a workaround, multiply the desired friction
         // parameter by dt^2 when setting
-        double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+        double dt = this->world->Physics()->GetMaxStepSize();
         value *= dt*dt;
 #endif
         this->bulletSlider->setMaxLinMotorForce(value);
@@ -432,7 +432,7 @@ double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
       // https://github.com/bulletphysics/bullet3/pull/328
       // As a workaround, divide the desired friction
       // parameter by dt^2 when getting
-      double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+      double dt = this->world->Physics()->GetMaxStepSize();
       value /= dt*dt;
 #endif
       return value;

@@ -435,22 +435,22 @@ bool ModelCommand::RunImpl()
     return false;
   }
 
-  math::Pose pose;
-  math::Vector3 rpy;
+  ignition::math::Pose3d pose;
+  ignition::math::Vector3d rpy;
 
   if (this->vm.count("pose-x"))
-    pose.pos.x = this->vm["pose-x"].as<double>();
+    pose.Pos().X(this->vm["pose-x"].as<double>());
   if (this->vm.count("pose-y"))
-    pose.pos.y = this->vm["pose-y"].as<double>();
+    pose.Pos().Y(this->vm["pose-y"].as<double>());
   if (this->vm.count("pose-z"))
-    pose.pos.z = this->vm["pose-z"].as<double>();
+    pose.Pos().Z(this->vm["pose-z"].as<double>());
   if (this->vm.count("pose-R"))
-    rpy.x = this->vm["pose-R"].as<double>();
+    rpy.X(this->vm["pose-R"].as<double>());
   if (this->vm.count("pose-P"))
-    rpy.y = this->vm["pose-P"].as<double>();
+    rpy.Y(this->vm["pose-P"].as<double>());
   if (this->vm.count("pose-Y"))
-    rpy.z = this->vm["pose-Y"].as<double>();
-  pose.rot.SetFromEuler(rpy);
+    rpy.Z(this->vm["pose-Y"].as<double>());
+  pose.Rot().Euler(rpy);
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
@@ -545,7 +545,7 @@ bool ModelCommand::RunImpl()
 
     msgs::Model msg;
     msg.set_name(modelName);
-    msgs::Set(msg.mutable_pose(), pose.Ign());
+    msgs::Set(msg.mutable_pose(), pose);
     pub->Publish(msg, true);
   }
 
@@ -554,7 +554,8 @@ bool ModelCommand::RunImpl()
 
 /////////////////////////////////////////////////
 bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
-    const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    transport::NodePtr _node)
 {
   sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
 
@@ -573,7 +574,7 @@ bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
 
   msgs::Factory msg;
   msg.set_sdf(_sdf->ToString());
-  msgs::Set(msg.mutable_pose(), _pose.Ign());
+  msgs::Set(msg.mutable_pose(), _pose);
   pub->Publish(msg, true);
 
   return true;

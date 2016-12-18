@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _TOOLS_WIDGET_HH_
-#define _TOOLS_WIDGET_HH_
+#ifndef GAZEBO_GUI_TOOLSWIDGET_HH_
+#define GAZEBO_GUI_TOOLSWIDGET_HH_
 
 #include <vector>
 #include <string>

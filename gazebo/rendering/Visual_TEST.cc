@@ -16,7 +16,9 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -32,7 +34,7 @@ class Visual_TEST : public RenderingFixture
 std::string GetVisualSDFString(const std::string &_name,
     const std::string &_geomType = "box",
     const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
-    gazebo::math::Pose _pose = gazebo::math::Pose::Zero,
+    ignition::math::Pose3d _pose = ignition::math::Pose3d::Zero,
     double _transparency = 0, bool _castShadows = true,
     const std::string &_material = "Gazebo/Grey",
     bool _lighting = true,
@@ -123,14 +125,15 @@ TEST_F(Visual_TEST, BoundingBox)
   Load("worlds/empty.world");
 
   // Spawn a box and check its bounding box dimensions.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
-      math::Vector3(0, 0, 0));
+  SpawnBox("box", ignition::math::Vector3d::One,
+      ignition::math::Vector3d(10, 10, 1),
+      ignition::math::Vector3d::Zero);
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
@@ -147,35 +150,37 @@ TEST_F(Visual_TEST, BoundingBox)
   ASSERT_NE(visual, nullptr);
 
   // verify initial bounding box
-  math::Vector3 bboxMin(-0.5, -0.5, -0.5);
-  math::Vector3 bboxMax(0.5, 0.5, 0.5);
-  math::Box boundingBox = visual->GetBoundingBox();
-  EXPECT_EQ(boundingBox.min, bboxMin);
-  EXPECT_EQ(boundingBox.max, bboxMax);
+  ignition::math::Vector3d bboxMin(-0.5, -0.5, -0.5);
+  ignition::math::Vector3d bboxMax(0.5, 0.5, 0.5);
+  ignition::math::Box boundingBox = visual->BoundingBox();
+  EXPECT_EQ(boundingBox.Min(), bboxMin);
+  EXPECT_EQ(boundingBox.Max(), bboxMax);
 
   // verify scale
-  math::Vector3 scale = visual->GetScale();
-  EXPECT_EQ(scale, math::Vector3(1, 1, 1));
+  ignition::math::Vector3d scale = visual->Scale();
+  EXPECT_EQ(scale, ignition::math::Vector3d::One);
 
   // set new scale
-  math::Vector3 scaleToSet(2, 3, 4);
+  ignition::math::Vector3d scaleToSet(2, 3, 4);
   visual->SetScale(scaleToSet);
 
   // verify new scale
-  math::Vector3 newScale = visual->GetScale();
+  ignition::math::Vector3d newScale = visual->Scale();
   EXPECT_EQ(newScale, scaleToSet);
-  EXPECT_EQ(newScale, math::Vector3(2, 3, 4));
+  EXPECT_EQ(newScale, ignition::math::Vector3d(2, 3, 4));
 
   // verify local bounding box dimensions remain the same
-  math::Box newBoundingBox = visual->GetBoundingBox();
-  EXPECT_EQ(newBoundingBox.min, bboxMin);
-  EXPECT_EQ(newBoundingBox.max, bboxMax);
+  ignition::math::Box newBoundingBox = visual->BoundingBox();
+  EXPECT_EQ(newBoundingBox.Min(), bboxMin);
+  EXPECT_EQ(newBoundingBox.Max(), bboxMax);
 
   // verify local bounding box dimensions with scale applied
-  EXPECT_EQ(newScale*newBoundingBox.min, newScale*bboxMin);
-  EXPECT_EQ(newScale*newBoundingBox.max, newScale*bboxMax);
-  EXPECT_EQ(newScale*newBoundingBox.min, math::Vector3(-1, -1.5, -2));
-  EXPECT_EQ(newScale*newBoundingBox.max, math::Vector3(1, 1.5, 2));
+  EXPECT_EQ(newScale*newBoundingBox.Min(), newScale*bboxMin);
+  EXPECT_EQ(newScale*newBoundingBox.Max(), newScale*bboxMax);
+  EXPECT_EQ(newScale*newBoundingBox.Min(),
+      ignition::math::Vector3d(-1, -1.5, -2));
+  EXPECT_EQ(newScale*newBoundingBox.Max(),
+      ignition::math::Vector3d(1, 1.5, 2));
 }
 
 /////////////////////////////////////////////////
@@ -231,12 +236,12 @@ TEST_F(Visual_TEST, Geometry)
         new gazebo::rendering::Visual("box_visual", scene));
     boxVis->Load(boxSDF);
     EXPECT_EQ(boxVis->GetGeometrySize(), boxSize);
-    EXPECT_EQ(boxVis->GetScale(), boxSize);
+    EXPECT_EQ(boxVis->Scale(), boxSize);
 
     ignition::math::Vector3d boxScale(1.5, 2.4, 3.0);
     boxVis->SetScale(boxScale);
     EXPECT_EQ(boxVis->GetGeometrySize(), boxScale);
-    EXPECT_EQ(boxVis->GetScale(), boxScale);
+    EXPECT_EQ(boxVis->Scale(), boxScale);
 
     sdf::ElementPtr newBoxSDF = boxVis->GetSDF();
     sdf::ElementPtr newBoxGeomElem = newBoxSDF->GetElement("geometry");
@@ -256,12 +261,12 @@ TEST_F(Visual_TEST, Geometry)
         new gazebo::rendering::Visual("sphere_visual", scene));
     sphereVis->Load(sphereSDF);
     EXPECT_EQ(sphereVis->GetGeometrySize(), sphereSize);
-    EXPECT_EQ(sphereVis->GetScale(), sphereSize);
+    EXPECT_EQ(sphereVis->Scale(), sphereSize);
 
     ignition::math::Vector3d sphereScale(3.5, 3.5, 3.5);
     sphereVis->SetScale(sphereScale);
     EXPECT_EQ(sphereVis->GetGeometrySize(), sphereScale);
-    EXPECT_EQ(sphereVis->GetScale(), sphereScale);
+    EXPECT_EQ(sphereVis->Scale(), sphereScale);
 
     sdf::ElementPtr newSphereSDF = sphereVis->GetSDF();
     sdf::ElementPtr newSphereGeomElem = newSphereSDF->GetElement("geometry");
@@ -282,12 +287,12 @@ TEST_F(Visual_TEST, Geometry)
         new gazebo::rendering::Visual("cylinder_visual", scene));
     cylinderVis->Load(cylinderSDF);
     EXPECT_EQ(cylinderVis->GetGeometrySize(), cylinderSize);
-    EXPECT_EQ(cylinderVis->GetScale(), cylinderSize);
+    EXPECT_EQ(cylinderVis->Scale(), cylinderSize);
 
     ignition::math::Vector3d cylinderScale(0.1, 0.1, 3.0);
     cylinderVis->SetScale(cylinderScale);
     EXPECT_EQ(cylinderVis->GetGeometrySize(), cylinderScale);
-    EXPECT_EQ(cylinderVis->GetScale(), cylinderScale);
+    EXPECT_EQ(cylinderVis->Scale(), cylinderScale);
 
     sdf::ElementPtr newCylinderSDF = cylinderVis->GetSDF();
     sdf::ElementPtr newCylinderGeomElem =
@@ -316,7 +321,7 @@ TEST_F(Visual_TEST, CastShadows)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("visual_box_has_shadows", "box",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true),
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true),
       boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", scene));
@@ -327,7 +332,7 @@ TEST_F(Visual_TEST, CastShadows)
   sdf::ElementPtr boxSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF2);
   sdf::readString(GetVisualSDFString("visual_box_has_no_shadows", "box",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, false),
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, false),
       boxSDF2);
   gazebo::rendering::VisualPtr boxVis2(
       new gazebo::rendering::Visual("box_visual2", scene));
@@ -352,7 +357,8 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
   sdf::readString(GetVisualSDFString("visual_sphere_no_transparency", "sphere",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), sphereSDF);
+      ignition::math::Vector3d::One,
+      ignition::math::Pose3d::Zero, 0), sphereSDF);
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
@@ -361,7 +367,7 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF2);
   sdf::readString(GetVisualSDFString("visual_sphere_semi_transparent", "sphere",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0.5),
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0.5),
       sphereSDF2);
   gazebo::rendering::VisualPtr sphereVis2(
       new gazebo::rendering::Visual("sphere_visual2", scene));
@@ -441,10 +447,10 @@ TEST_F(Visual_TEST, DerivedTransparency)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -739,7 +745,8 @@ TEST_F(Visual_TEST, Wireframe)
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
   sdf::readString(GetVisualSDFString("sphere_visual", "sphere",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), sphereSDF);
+      ignition::math::Vector3d::One,
+      ignition::math::Pose3d::Zero, 0), sphereSDF);
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
@@ -747,7 +754,7 @@ TEST_F(Visual_TEST, Wireframe)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("box_visual", "box",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), boxSDF);
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0), boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", sphereVis));
   boxVis->Load(boxSDF);
@@ -798,7 +805,7 @@ TEST_F(Visual_TEST, Material)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("visual_box_red", "box",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
       "Gazebo/Red"), boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", scene));
@@ -811,7 +818,7 @@ TEST_F(Visual_TEST, Material)
   sdf::ElementPtr boxSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF2);
   sdf::readString(GetVisualSDFString("visual_box_white", "box",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
       "Gazebo/White", true), boxSDF2);
   gazebo::rendering::VisualPtr boxVis2(
       new gazebo::rendering::Visual("box_visual2", scene));
@@ -893,7 +900,7 @@ TEST_F(Visual_TEST, Lighting)
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_lighting", "cylinder",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
       "Gazebo/Grey", true), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
@@ -903,7 +910,7 @@ TEST_F(Visual_TEST, Lighting)
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_no_lighting", "cylinder",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
       "Gazebo/Grey", false), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
@@ -928,7 +935,7 @@ TEST_F(Visual_TEST, Color)
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
       "Gazebo/Grey", true, common::Color::Black, common::Color::Black,
       common::Color::Black, common::Color::Black), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
@@ -942,7 +949,7 @@ TEST_F(Visual_TEST, Color)
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_color", "cylinder",
-      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
       "Gazebo/Grey", true, common::Color::Green, common::Color::Blue,
       common::Color::Red, common::Color::Yellow), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
@@ -1116,7 +1123,7 @@ TEST_F(Visual_TEST, ColorMaterial)
 
   // test with a visual that only has a material name and no color components.
   std::string visualName = "boxMaterialColor";
-  math::Pose visualPose = math::Pose::Zero;
+  ignition::math::Pose3d visualPose = ignition::math::Pose3d::Zero;
   std::stringstream visualString;
   visualString
       << "<sdf version='" << SDF_VERSION << "'>"
@@ -1502,10 +1509,10 @@ TEST_F(Visual_TEST, Scale)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -1547,9 +1554,9 @@ TEST_F(Visual_TEST, Scale)
   }
   ASSERT_NE(boxVisual, nullptr);
 
-  EXPECT_EQ(box->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(boxLink->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(box->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxLink->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->Scale(), ignition::math::Vector3d::One);
 
   EXPECT_EQ(box->DerivedScale(), ignition::math::Vector3d::One);
   EXPECT_EQ(boxLink->DerivedScale(), ignition::math::Vector3d::One);
@@ -1575,9 +1582,9 @@ TEST_F(Visual_TEST, Scale)
   }
   ASSERT_NE(sphereVisual, nullptr);
 
-  EXPECT_EQ(sphere->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(sphereLink->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphere->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereLink->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->Scale(), ignition::math::Vector3d::One);
 
   EXPECT_EQ(sphere->DerivedScale(), ignition::math::Vector3d::One);
   EXPECT_EQ(sphereLink->DerivedScale(), ignition::math::Vector3d::One);
@@ -1603,9 +1610,9 @@ TEST_F(Visual_TEST, Scale)
   }
   ASSERT_NE(cylinderVisual, nullptr);
 
-  EXPECT_EQ(cylinder->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(cylinderLink->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinder->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderLink->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->Scale(), ignition::math::Vector3d::One);
 
   EXPECT_EQ(cylinder->DerivedScale(), ignition::math::Vector3d::One);
   EXPECT_EQ(cylinderLink->DerivedScale(), ignition::math::Vector3d::One);
@@ -1614,31 +1621,31 @@ TEST_F(Visual_TEST, Scale)
   // update model scale and verify derived scale and geom size
   ignition::math::Vector3d newBoxScale(0.4, 0.5, 0.6);
   box->SetScale(newBoxScale);
-  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
-  EXPECT_EQ(boxLink->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(box->Scale(), newBoxScale);
+  EXPECT_EQ(boxLink->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->Scale(), ignition::math::Vector3d::One);
   EXPECT_EQ(boxVisual->GetGeometrySize(), newBoxScale);
 
   ignition::math::Vector3d newSphereScale(0.3, 0.3, 0.3);
   sphere->SetScale(newSphereScale);
-  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
-  EXPECT_EQ(sphereLink->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphere->Scale(), newSphereScale);
+  EXPECT_EQ(sphereLink->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->Scale(), ignition::math::Vector3d::One);
   EXPECT_EQ(sphereVisual->GetGeometrySize(), newSphereScale);
 
   ignition::math::Vector3d newCylinderScale(0.2, 0.2, 0.5);
   cylinder->SetScale(newCylinderScale);
-  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
-  EXPECT_EQ(cylinderLink->GetScale().Ign(), ignition::math::Vector3d::One);
-  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinder->Scale(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->Scale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->Scale(), ignition::math::Vector3d::One);
   EXPECT_EQ(cylinderVisual->GetGeometrySize(), newCylinderScale);
 
   // update link scale and verify derived scale and geom size
   ignition::math::Vector3d newBoxLinkScale(0.2, 0.1, 3);
   boxLink->SetScale(newBoxLinkScale);
-  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
-  EXPECT_EQ(boxLink->GetScale().Ign(), newBoxLinkScale);
-  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(box->Scale(), newBoxScale);
+  EXPECT_EQ(boxLink->Scale(), newBoxLinkScale);
+  EXPECT_EQ(boxVisual->Scale(), ignition::math::Vector3d::One);
   EXPECT_EQ(boxVisual->GetGeometrySize(), newBoxScale * newBoxLinkScale);
 
   EXPECT_EQ(box->DerivedScale(), newBoxScale);
@@ -1647,9 +1654,9 @@ TEST_F(Visual_TEST, Scale)
 
   ignition::math::Vector3d newSphereLinkScale(2, 2, 2);
   sphereLink->SetScale(newSphereLinkScale);
-  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
-  EXPECT_EQ(sphereLink->GetScale().Ign(), newSphereLinkScale);
-  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphere->Scale(), newSphereScale);
+  EXPECT_EQ(sphereLink->Scale(), newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->Scale(), ignition::math::Vector3d::One);
   EXPECT_EQ(sphereVisual->GetGeometrySize(),
       newSphereScale * newSphereLinkScale);
 
@@ -1659,9 +1666,9 @@ TEST_F(Visual_TEST, Scale)
 
   ignition::math::Vector3d newCylinderLinkScale(4, 4, 0.5);
   cylinderLink->SetScale(newCylinderLinkScale);
-  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
-  EXPECT_EQ(cylinderLink->GetScale().Ign(), newCylinderLinkScale);
-  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinder->Scale(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->Scale(), newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->Scale(), ignition::math::Vector3d::One);
   EXPECT_EQ(cylinderVisual->GetGeometrySize(),
       newCylinderScale * newCylinderLinkScale);
 
@@ -1674,9 +1681,9 @@ TEST_F(Visual_TEST, Scale)
   // update visual scale and verify derived scale and geom size
   ignition::math::Vector3d newBoxVisualScale(1.2, 1, 50);
   boxVisual->SetScale(newBoxVisualScale);
-  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
-  EXPECT_EQ(boxLink->GetScale().Ign(), newBoxLinkScale);
-  EXPECT_EQ(boxVisual->GetScale().Ign(), newBoxVisualScale);
+  EXPECT_EQ(box->Scale(), newBoxScale);
+  EXPECT_EQ(boxLink->Scale(), newBoxLinkScale);
+  EXPECT_EQ(boxVisual->Scale(), newBoxVisualScale);
   EXPECT_EQ(boxVisual->GetGeometrySize(),
       newBoxScale * newBoxLinkScale * newBoxVisualScale);
 
@@ -1687,9 +1694,9 @@ TEST_F(Visual_TEST, Scale)
 
   ignition::math::Vector3d newSphereVisualScale(0.08, 0.08, 0.08);
   sphereVisual->SetScale(newSphereVisualScale);
-  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
-  EXPECT_EQ(sphereLink->GetScale().Ign(), newSphereLinkScale);
-  EXPECT_EQ(sphereVisual->GetScale().Ign(), newSphereVisualScale);
+  EXPECT_EQ(sphere->Scale(), newSphereScale);
+  EXPECT_EQ(sphereLink->Scale(), newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->Scale(), newSphereVisualScale);
   EXPECT_EQ(sphereVisual->GetGeometrySize(),
       newSphereScale * newSphereLinkScale * newSphereVisualScale);
 
@@ -1700,9 +1707,9 @@ TEST_F(Visual_TEST, Scale)
 
   ignition::math::Vector3d newCylinderVisualScale(3, 3, 0.25);
   cylinderVisual->SetScale(newCylinderVisualScale);
-  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
-  EXPECT_EQ(cylinderLink->GetScale().Ign(), newCylinderLinkScale);
-  EXPECT_EQ(cylinderVisual->GetScale().Ign(), newCylinderVisualScale);
+  EXPECT_EQ(cylinder->Scale(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->Scale(), newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->Scale(), newCylinderVisualScale);
   EXPECT_EQ(cylinderVisual->GetGeometrySize(),
       newCylinderScale * newCylinderLinkScale * newCylinderVisualScale);
 
@@ -1729,7 +1736,7 @@ TEST_F(Visual_TEST, Scale)
   {
     auto visualPair = cloneVisuals.front();
     cloneVisuals.pop();
-    EXPECT_EQ(visualPair.first->GetScale(), visualPair.second->GetScale());
+    EXPECT_EQ(visualPair.first->Scale(), visualPair.second->Scale());
     EXPECT_EQ(visualPair.first->DerivedScale(),
         visualPair.second->DerivedScale());
     EXPECT_EQ(visualPair.first->GetGeometrySize(),
@@ -1774,21 +1781,21 @@ TEST_F(Visual_TEST, Clone)
   gazebo::rendering::VisualPtr vis1Clone = vis1->Clone("vis1_clone",
       vis1->GetParent());
   ASSERT_NE(vis1Clone, nullptr);
-  EXPECT_EQ(vis1Clone->GetName(), "vis1_clone");
+  EXPECT_EQ(vis1Clone->Name(), "vis1_clone");
 
   EXPECT_EQ(vis1Clone->GetChildCount(), vis1->GetChildCount());
   EXPECT_EQ(vis1Clone->GetChildCount(), 1u);
 
   gazebo::rendering::VisualPtr vis2Clone = vis1Clone->GetChild(0);
   ASSERT_NE(vis2Clone, nullptr);
-  EXPECT_EQ(vis2Clone->GetName(), "vis1_clone::vis2");
+  EXPECT_EQ(vis2Clone->Name(), "vis1_clone::vis2");
 
   EXPECT_EQ(vis2Clone->GetChildCount(), vis2->GetChildCount());
   EXPECT_EQ(vis2Clone->GetChildCount(), 1u);
 
   gazebo::rendering::VisualPtr vis3Clone = vis2Clone->GetChild(0);
   ASSERT_NE(vis3Clone, nullptr);
-  EXPECT_EQ(vis3Clone->GetName(), "vis1_clone::vis2::vis3");
+  EXPECT_EQ(vis3Clone->Name(), "vis1_clone::vis2::vis3");
 
   EXPECT_EQ(vis3Clone->GetChildCount(), vis3->GetChildCount());
   EXPECT_EQ(vis3Clone->GetChildCount(), 0u);
@@ -1801,10 +1808,10 @@ TEST_F(Visual_TEST, VisibilityFlags)
   Load("worlds/shapes.world");
 
   // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -1923,6 +1930,48 @@ TEST_F(Visual_TEST, DestroyWithPlugin)
   vis.reset();
 
   ASSERT_EQ(vis, nullptr);
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, Pose)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  // parent box vis
+  ignition::math::Pose3d boxPose(0.0, 1.0, 2.0, 0.0, 0.0, 0.0);
+  sdf::ElementPtr boxSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", boxSDF);
+  sdf::readString(GetVisualSDFString("visual_box", "box",
+      ignition::math::Vector3d::One, boxPose), boxSDF);
+  gazebo::rendering::VisualPtr boxVis(
+      new gazebo::rendering::Visual("box_visual", scene));
+  boxVis->Load(boxSDF);
+  EXPECT_EQ(boxVis->Pose(), boxPose);
+  EXPECT_EQ(boxVis->WorldPose(), boxPose);
+  EXPECT_EQ(boxVis->InitialRelativePose(), boxPose);
+
+  // child sphere vis
+  ignition::math::Pose3d spherePose(0.0, 5.0, 5.0, 1.57, 0.0, 0.0);
+  sdf::ElementPtr sphereSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", sphereSDF);
+  sdf::readString(GetVisualSDFString("visual_sphere", "sphere",
+      ignition::math::Vector3d::One, spherePose), sphereSDF);
+  gazebo::rendering::VisualPtr sphereVis(
+      new gazebo::rendering::Visual("sphere_visual", boxVis));
+  sphereVis->Load(sphereSDF);
+  EXPECT_EQ(sphereVis->Pose(), spherePose);
+  EXPECT_EQ(sphereVis->WorldPose(), spherePose + boxPose);
+  EXPECT_EQ(sphereVis->InitialRelativePose(), spherePose);
+
+  // set new sphere pose and verify
+  ignition::math::Pose3d newSpherePose(1.0, 20.0, 0.0, 0.0, 0.0, 1.57);
+  sphereVis->SetPose(newSpherePose);
+  EXPECT_EQ(sphereVis->Pose(), newSpherePose);
+  EXPECT_EQ(sphereVis->WorldPose(), newSpherePose + boxPose);
+  EXPECT_EQ(sphereVis->InitialRelativePose(), spherePose);
 }
 
 /////////////////////////////////////////////////

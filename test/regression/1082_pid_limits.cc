@@ -35,7 +35,7 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
   gazebo::physics::JointControllerPtr jointController =
     model->GetJointController();
 
@@ -79,7 +79,7 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
   gazebo::physics::JointControllerPtr jointController =
     model->GetJointController();
 

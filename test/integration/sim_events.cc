@@ -178,7 +178,7 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
       &ReceiveSimEvent);
 
-  physics::ModelPtr can1 = world->GetModel("can1");
+  physics::ModelPtr can1 = world->ModelByName("can1");
   EXPECT_TRUE(can1 != NULL);
 
   unsigned int countBefore1 = GetEventCount();
@@ -207,7 +207,7 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
 
   // Get the elevator model
-  physics::ModelPtr elevatorModel = world->GetModel("elevator");
+  physics::ModelPtr elevatorModel = world->ModelByName("elevator");
 
   gzdbg << "Elevator Pose1["
         << elevatorModel->GetWorldPose().pos << "]\n";
@@ -244,7 +244,7 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
 
   // Get the revoluter model
-  physics::ModelPtr model = world->GetModel("revoluter");
+  physics::ModelPtr model = world->ModelByName("revoluter");
   physics::JointPtr joint = model->GetJoint("joint");
 
   // setup the callback that increments the counter everytime a

@@ -23,6 +23,16 @@ message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
+if(DEFINED ENABLE_TESTS_COMPILATION)
+ message(FATAL_ERROR "The parameter ENABLE_TESTS_COMPILATION is deprecated. "
+   "The new behaviour is to call 'make tests' explicitly to compile the test"
+   "suite. Calling 'make' or 'make all' won't compile the tests")
+endif()
+
+if(NOT DEFINED BUILD_TESTING)
+    set(BUILD_TESTING OFF)
+endif()
+
 ########################################
 # Package Creation:
 include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
@@ -223,8 +233,8 @@ else()
 endif()
 filter_valid_compiler_flags(${WARN_LEVEL}
   -Wextra -Wno-long-long -Wno-unused-value -Wfloat-equal -Wshadow
-  -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
-				   
+  -Wswitch-default -Wmissing-include-dirs -pedantic)
+
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
 if (UNIX AND NOT APPLE)
@@ -258,8 +268,7 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS}
-                           ${IGNITION-MSGS_INCLUDE_DIRS})
+include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -314,16 +323,24 @@ else (build_errors)
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
 
   if (BUILD_GAZEBO)
+    add_custom_target(tests)
     set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
     add_subdirectory(media)
-    add_subdirectory(test)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
     add_subdirectory(worlds)
     add_subdirectory(models)
+
+    if (BUILD_TESTING)
+      add_subdirectory(test)
+    else()
+      add_subdirectory(test EXCLUDE_FROM_ALL)
+    endif()
+
   endif (BUILD_GAZEBO)
+
 
   ########################################
   # Make the package config files

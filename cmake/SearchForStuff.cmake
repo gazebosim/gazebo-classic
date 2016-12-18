@@ -685,11 +685,13 @@ if (NOT ignition-msgs0_FOUND)
   BUILD_ERROR ("Missing: Ignition msgs0 library.")
 else()
   message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+  include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
+  link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math2 2.4 QUIET)
+find_package(ignition-math2 2.6 QUIET)
 if (NOT ignition-math2_FOUND)
   message(STATUS "Looking for ignition-math2-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition math2 library.")
@@ -703,8 +705,12 @@ find_package(ignition-transport2 QUIET)
 if (NOT ignition-transport2_FOUND)
   find_package(ignition-transport1 QUIET)
   if (NOT ignition-transport1_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev")
+    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
+  else()
+    message(STATUS "Looking for ignition-transport1-config.cmake - found")
   endif()
+else()
+  message(STATUS "Looking for ignition-transport2-config.cmake - found")
 endif()
 
 if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
@@ -742,14 +748,17 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/include
   /usr/local/include
   /usr/local/lib/qwt.framework/Headers
+  ${QWT_WIN_INCLUDE_DIR}
+
   PATH_SUFFIXES qwt-qt4 qwt qwt5
-  )
+)
 
 find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
-  )
+  ${QWT_WIN_LIBRARY_DIR}
+)
 
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)
@@ -772,6 +781,11 @@ if ( _VERSION_LINE )
   set(QWT_VERSION
     ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
 endif ()
+
+# in Windows, the path need to point to the parent to get correct qwt/foo headers
+if (WIN32)
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")	
+endif()
 
 if (HAVE_QWT)
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")

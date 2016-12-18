@@ -19,7 +19,6 @@
 
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 struct _GtsSurface;

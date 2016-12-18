@@ -14,9 +14,10 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_CART_DEMO_PLUGIN_HH_
-#define _GAZEBO_CART_DEMO_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_CARTDEMOPLUGIN_HH_
+#define GAZEBO_PLUGINS_CARTDEMOPLUGIN_HH_
 
+#include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"

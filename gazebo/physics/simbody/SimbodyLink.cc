@@ -57,7 +57,7 @@ SimbodyLink::~SimbodyLink()
 void SimbodyLink::Load(sdf::ElementPtr _sdf)
 {
   this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->GetWorld()->Physics());
 
   if (this->simbodyPhysics == nullptr)
     gzthrow("Not using the simbody physics engine");
@@ -357,7 +357,7 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
   {
     // lock physics update mutex to ensure thread safety
     boost::recursive_mutex::scoped_lock lock(
-      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+      *this->world->Physics()->GetPhysicsUpdateMutex());
     v = SimbodyPhysics::Vec3ToVector3(
       this->masterMobod.findStationVelocityInGround(
       this->simbodyPhysics->integ->getState(), station));
@@ -384,7 +384,7 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
 
     // lock physics update mutex to ensure thread safety
     boost::recursive_mutex::scoped_lock lock(
-      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+      *this->world->Physics()->GetPhysicsUpdateMutex());
 
     const SimTK::Rotation &R_WL = this->masterMobod.getBodyRotation(
       this->simbodyPhysics->integ->getState());
@@ -409,7 +409,7 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
   {
     // lock physics update mutex to ensure thread safety
     boost::recursive_mutex::scoped_lock lock(
-      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+      *this->world->Physics()->GetPhysicsUpdateMutex());
     SimTK::Vec3 station = this->masterMobod.getBodyMassCenterStation(
        this->simbodyPhysics->integ->getState());
     v = SimbodyPhysics::Vec3ToVector3(
@@ -438,7 +438,7 @@ math::Vector3 SimbodyLink::GetWorldAngularVel() const
 {
   // lock physics update mutex to ensure thread safety
   boost::recursive_mutex::scoped_lock lock(
-    *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+    *this->world->Physics()->GetPhysicsUpdateMutex());
   SimTK::Vec3 w =
     this->masterMobod.getBodyAngularVelocity(
     this->simbodyPhysics->integ->getState());
@@ -570,7 +570,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
       this->inertial->GetPose());
     const SimTK::Vec3 &com_L = X_LI.p();  // vector from Lo to com, exp. in L
 
-    if (math::equal(mass, 0.0))
+    if (ignition::math::equal(mass, 0.0))
       return SimTK::MassProperties(mass, com_L, SimTK::UnitInertia(1, 1, 1));
 
     // Get mass-weighted central inertia, expressed in I frame.

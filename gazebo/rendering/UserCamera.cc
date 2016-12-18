@@ -59,7 +59,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
   // Set default UserCamera render rate to 120Hz when stereo rendering is
   // enabled. Otherwise use 60Hz.
   // Some padding is added for safety.
-  this->SetRenderRate(_stereoEnabled ? 130.0 : 70.0);
+  this->SetRenderRate(_stereoEnabled ? 124.0 : 62.0);
 
   this->SetUseSDFPose(false);
 }
@@ -116,7 +116,7 @@ void UserCamera::Init()
   Camera::Init();
 
   // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  this->SetFixedYawAxis(true, ignition::math::Vector3d::UnitZ);
   this->camera->setDirection(1, 0, 0);
   this->camera->setAutoAspectRatio(false);
 
@@ -252,6 +252,16 @@ void UserCamera::AnimationComplete()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::Render(const bool /*_force*/)
+{
+  if (this->initialized)
+  {
+    this->newData = true;
+    this->RenderImpl();
+  }
+}
+
+//////////////////////////////////////////////////
 void UserCamera::PostRender()
 {
   Camera::PostRender();
@@ -322,14 +332,14 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   if (_visual)
   {
     ignition::math::Pose3d origPose = this->WorldPose();
-    ignition::math::Angle yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    ignition::math::Angle yaw = _visual->WorldPose().Rot().Euler().Z();
 
-    double zDiff = origPose.Pos().Z() - _visual->GetWorldPose().pos.z;
+    double zDiff = origPose.Pos().Z() - _visual->WorldPose().Pos().Z();
     ignition::math::Angle pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Ign().Distance(
+      double dist = _visual->WorldPose().Pos().Distance(
           this->WorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
@@ -337,9 +347,9 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     this->Yaw(yaw);
     this->Pitch(pitch);
 
-    math::Box bb = _visual->GetBoundingBox();
-    math::Vector3 pos = bb.GetCenter();
-    pos.z = bb.max.z;
+    auto bb = _visual->BoundingBox();
+    auto pos = bb.Center();
+    pos.Z(bb.Max().Z());
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }
@@ -513,64 +523,67 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->OgreSceneManager()->destroyAnimation("cameratrack");
   }
 
-  ignition::math::Box box = _visual->GetBoundingBox().Ign();
-  ignition::math::Vector3d size = box.Size();
-  double maxSize = size.Max();
-
+  // Start from current position
   ignition::math::Vector3d start = this->WorldPose().Pos();
   start.Correct();
-  ignition::math::Vector3d end = box.Center() +
-    _visual->GetWorldPose().pos.Ign();
-  end.Correct();
-  ignition::math::Vector3d dir = end - start;
+
+  // Center of visual
+  ignition::math::Box box = _visual->BoundingBox();
+  ignition::math::Vector3d visCenter = box.Center() +
+    _visual->WorldPose().Pos();
+  visCenter.Correct();
+
+  // Direction from start to visual center
+  ignition::math::Vector3d dir = visCenter - start;
   dir.Correct();
   dir.Normalize();
 
-  double dist = start.Distance(end) - maxSize;
+  // Distance to move
+  ignition::math::Vector3d size = box.Size();
+  double maxSize = size.Max();
+  double dist = start.Distance(visCenter) - maxSize;
 
+  // Find midway point and change its Z
   ignition::math::Vector3d mid = start + dir*(dist*.5);
   mid.Z(box.Center().Z() + box.Size().Z() + 2.0);
 
-  dir = end - mid;
+  // Direction from mid to visual center
+  dir = visCenter - mid;
   dir.Correct();
-
-  dist = mid.Distance(end) - maxSize;
-
-  double yawAngle = atan2(dir.Y(), dir.X());
-  double pitchAngle = atan2(-dir.Z(), sqrt(dir.X()*dir.X() + dir.Y()*dir.Y()));
-  ignition::math::Quaterniond pitchYawOnly(0, pitchAngle, yawAngle);
-  Ogre::Quaternion pitchYawFinal = Conversions::Convert(pitchYawOnly);
-
   dir.Normalize();
 
+  // Get new distance
+  dist = mid.Distance(visCenter) - maxSize;
+
+  // Scale to fit in view
   double scale = maxSize / tan((this->HFOV()/2.0).Radian());
 
-  end = mid + dir*(dist - scale);
+  // End position
+  auto end = mid + dir*(dist - scale);
 
-  // dist = start.Distance(end);
-  // double vel = 5.0;
-  double time = 0.5;  // dist / vel;
+  // Orientation
+  auto mat = ignition::math::Matrix4d::LookAt(end, visCenter);
 
+  // Time
+  double time = 0.5;
+
+  // Ogre animation
   Ogre::Animation *anim =
     this->scene->OgreSceneManager()->createAnimation("cameratrack", time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
+  // Start keyframe
   Ogre::TransformKeyFrame *key;
-
   key = strack->createNodeKeyFrame(0);
   key->setTranslate(Conversions::Convert(start));
   key->setRotation(this->sceneNode->getOrientation());
 
-  /*key = strack->createNodeKeyFrame(time * 0.5);
-  key->setTranslate(Ogre::Vector3(mid.x, mid.y, mid.z));
-  key->setRotation(pitchYawFinal);
-  */
-
+  // End keyframe
   key = strack->createNodeKeyFrame(time);
   key->setTranslate(Conversions::Convert(end));
-  key->setRotation(pitchYawFinal);
+  key->setRotation(Conversions::Convert(mat.Rotation()));
 
   this->animState =
     this->scene->OgreSceneManager()->createAnimationState("cameratrack");

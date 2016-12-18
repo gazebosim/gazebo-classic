@@ -80,7 +80,7 @@ void DARTModel::Init()
 
     DARTModelPrivate::BodyNodeBuildData bodyNodeBD;
     bodyNodeBD.dartLink = dartLink;
-    bodyNodeBD.properties = dartLink->GetDARTProperties();
+    bodyNodeBD.properties = dartLink->DARTProperties();
     bodyNodeBD.initTransform = DARTTypes::ConvPose(dartLink->GetWorldPose());
     bodyNodeBD.type = dartLink->IsSoftBody() ? "soft" : "";
 
@@ -94,7 +94,7 @@ void DARTModel::Init()
 
     DARTModelPrivate::JointBuildData jointBD;
     jointBD.dartJoint = dartJoint;
-    jointBD.properties = dartJoint->GetDARTProperties();
+    jointBD.properties = dartJoint->DARTProperties();
     if (dartJoint->GetParent())
       jointBD.parentName = dartJoint->GetParent()->GetName();
     if (dartJoint->GetChild())
@@ -250,7 +250,7 @@ void DARTModel::Init()
   this->BackupState();
 
   // Add the skeleton to the world
-  this->GetDARTWorldPtr()->addSkeleton(this->dataPtr->dtSkeleton);
+  this->DARTWorld()->addSkeleton(this->dataPtr->dtSkeleton);
 }
 
 
@@ -293,11 +293,11 @@ void DARTModel::RestoreState()
 //////////////////////////////////////////////////
 dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 {
-  return this->GetDARTSkeletonPtr().get();
+  return this->DARTSkeleton().get();
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::SkeletonPtr DARTModel::GetDARTSkeletonPtr()
+dart::dynamics::SkeletonPtr DARTModel::DARTSkeleton()
 {
   return this->dataPtr->dtSkeleton;
 }
@@ -306,12 +306,17 @@ dart::dynamics::SkeletonPtr DARTModel::GetDARTSkeletonPtr()
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 {
   return boost::dynamic_pointer_cast<DARTPhysics>(
-    this->GetWorld()->GetPhysicsEngine());
+    this->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////
-dart::simulation::WorldPtr DARTModel::GetDARTWorldPtr(void) const
+dart::simulation::World *DARTModel::GetDARTWorld(void) const
 {
-  return GetDARTPhysics()->GetDARTWorldPtr();
+  return GetDARTPhysics()->DARTWorld().get();
 }
 
+//////////////////////////////////////////////////
+dart::simulation::WorldPtr DARTModel::DARTWorld(void) const
+{
+  return GetDARTPhysics()->DARTWorld();
+}

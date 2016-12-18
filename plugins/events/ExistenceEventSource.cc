@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "ExistenceEventSource.hh"
 
 using namespace gazebo;
@@ -37,14 +39,15 @@ void ExistenceEventSource::Load(const sdf::ElementPtr _sdf)
   }
 
   this->existenceConnection = SimEventConnector::ConnectSpawnModel(
-      boost::bind(&ExistenceEventSource::OnExistence, this, _1, _2));
+      std::bind(&ExistenceEventSource::OnExistence, this,
+      std::placeholders::_1, std::placeholders::_2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExistenceEventSource::OnExistence(const std::string &_model, bool _alive)
 {
   // is this a model we're interested in?
-  if (_model.find(this->model) == 0)
+  if (_model.compare(this->model) == 0)
   {
     // set the data for the existence event
     std::string json = "{";

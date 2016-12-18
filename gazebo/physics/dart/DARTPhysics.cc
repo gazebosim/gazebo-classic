@@ -86,14 +86,6 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
-
-  // Time step
-  // double timeStep = this->sdf->GetValueDouble("time_step");
-  // this->dartWorld->setTimeStep(timeStep);
-
-  // TODO: Elements for dart settings
-  // sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  // this->stepTimeDouble = dartElem->GetElement("dt")->GetValueDouble();
 }
 
 //////////////////////////////////////////////////
@@ -113,13 +105,13 @@ void DARTPhysics::Reset()
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
   // Restore state all the models
-  unsigned int modelCount = this->world->GetModelCount();
+  unsigned int modelCount = this->world->ModelCount();
   DARTModelPtr dartModelIt;
 
   for (unsigned int i = 0; i < modelCount; ++i)
   {
     dartModelIt =
-      boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
+      boost::dynamic_pointer_cast<DARTModel>(this->world->ModelByIndex(i));
     GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is null");
 
     dartModelIt->RestoreState();
@@ -135,9 +127,6 @@ void DARTPhysics::InitForThread()
 void DARTPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
-
-  // dart::constraint::ConstraintSolver *dtConstraintSolver =
-  //    this->dataPtr->dtWorld->getConstraintSolver();
 
   const dart::collision::CollisionResult& dtLastResult =
     this->dataPtr->dtWorld->getLastCollisionResult();
@@ -156,10 +145,7 @@ void DARTPhysics::UpdateCollision()
 
     dart::dynamics::ConstBodyNodePtr dtBodyNode1;
     dart::dynamics::ConstBodyNodePtr dtBodyNode2;
-    /// old:
-    // dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1.lock().get();
-    // dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2.lock().get();
-
+    
     const dart::dynamics::ShapeFrame *dtShapeFrame1 =
       dtCollObj1->getShapeFrame();
     const dart::dynamics::ShapeFrame *dtShapeFrame2 =
@@ -180,9 +166,9 @@ void DARTPhysics::UpdateCollision()
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
 
     GZ_ASSERT(dartLink1.get() != nullptr,
-        "dartLink1 in collision pare is null");
+        "dartLink1 in collision pair is null");
     GZ_ASSERT(dartLink2.get() != nullptr,
-        "dartLink2 in collision pare is null");
+        "dartLink2 in collision pair is null");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
@@ -192,7 +178,7 @@ void DARTPhysics::UpdateCollision()
     // listening for contact information.
     Contact *contactFeedback = this->GetContactManager()->NewContact(
                                  collisionPtr1.get(), collisionPtr2.get(),
-                                 this->world->GetSimTime());
+                                 this->world->SimTime());
 
     if (!contactFeedback)
       continue;
@@ -258,12 +244,12 @@ void DARTPhysics::UpdatePhysics()
 
   // Update all the transformation of DART's links to gazebo's links
   // TODO: How to visit all the links in the world?
-  unsigned int modelCount = this->world->GetModelCount();
+  unsigned int modelCount = this->world->ModelCount();
   ModelPtr modelItr;
 
   for (unsigned int i = 0; i < modelCount; ++i)
   {
-    modelItr = this->world->GetModel(i);
+    modelItr = this->world->ModelByIndex(i);
     // TODO: need to improve speed
     Link_V links = modelItr->GetLinks();
     unsigned int linkCount = links.size();
@@ -276,8 +262,6 @@ void DARTPhysics::UpdatePhysics()
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
   }
-
-  // this->lastUpdateTime = currTime;
 }
 
 //////////////////////////////////////////////////
@@ -356,7 +340,7 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new DARTRayShape(collision));
     else
-      shape.reset(new DARTRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new DARTRayShape(this->world->Physics()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -476,15 +460,14 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 dart::simulation::World *DARTPhysics::GetDARTWorld()
 {
-  return this->dataPtr->dtWorld.get();
+  return this->DARTWorld().get();
 }
 
 //////////////////////////////////////////////////
-dart::simulation::WorldPtr DARTPhysics::GetDARTWorldPtr()
+dart::simulation::WorldPtr DARTPhysics::DARTWorld() const
 {
   return this->dataPtr->dtWorld;
 }
-
 
 //////////////////////////////////////////////////
 void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
@@ -503,7 +486,7 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
       msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->world->MagneticField()));
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -523,7 +506,7 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   PhysicsEngine::OnPhysicsMsg(_msg);
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+    this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
@@ -551,7 +534,7 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 {
   DARTLinkPtr res;
 
-  const Model_V& models = this->world->GetModels();
+  const Model_V& models = this->world->Models();
 
   for (Model_V::const_iterator itModel = models.begin();
        itModel != models.end(); ++itModel)

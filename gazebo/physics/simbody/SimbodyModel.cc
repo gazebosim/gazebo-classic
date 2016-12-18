@@ -83,10 +83,12 @@ void SimbodyModel::Init()
   // this needs to happen before this->joints are used
   physics::SimbodyPhysicsPtr simbodyPhysics =
     boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+        this->GetWorld()->Physics());
   if (simbodyPhysics)
+  {
     simbodyPhysics->InitModel(
         boost::static_pointer_cast<Model>(shared_from_this()));
+  }
 
   // Initialize the joints last.
   Joint_V myJoints = this->GetJoints();
@@ -126,7 +128,7 @@ void SimbodyModel::Init()
 //   // this needs to happen before this->joints are used
 //   physics::SimbodyPhysicsPtr simbodyPhysics =
 //     boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
-//       this->GetWorld()->GetPhysicsEngine());
+//       this->GetWorld()->Physics());
 //   if (simbodyPhysics)
 //     simbodyPhysics->InitModel(this);
 //

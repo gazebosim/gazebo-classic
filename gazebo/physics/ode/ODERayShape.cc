@@ -70,7 +70,7 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
     boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
   this->physicsEngine = boost::static_pointer_cast<ODEPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->collisionParent->GetWorld()->Physics());
 
   GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is null");
   this->geomId = dCreateRay(collision->GetSpaceId(), 1.0);
@@ -109,7 +109,7 @@ void ODERayShape::Update()
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (!math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
         this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,
