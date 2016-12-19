@@ -9,7 +9,7 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-option(BUILD_OSX_BUNDLE "Build MacOSX bundle" ON)
+option(BUILD_OSX_BUNDLE "Build MacOSX bundle" OFF)
 
 set (GAZEBO_MAJOR_VERSION 8)
 set (GAZEBO_MINOR_VERSION 0)
@@ -133,7 +133,6 @@ if (BUILD_OSX_BUNDLE)
   # failed trying to remove it from binaries.
   set(OSX_BUNDLE_ROOT "${CMAKE_BINARY_DIR}/gazebo.app/Contents")
   SET(CMAKE_SKIP_RPATH TRUE)
-  #SET(CMAKE_MACOSX_RPATH TRUE)
   SET(BUNDLE_INSTALL_BINARY_DIR ${PROJECT_BINARY_DIR}/gazebo/Contents/MacOS/)
   SET(BUNDLE_DATA_DEST_DIR ${BUNDLE_INSTALL_BINARY_DIR}/../Resources)
   SET(CMAKE_INSTALL_FULL_DATAROOTDIR ${BUNDLE_DATA_DEST_DIR})
@@ -142,11 +141,6 @@ if (BUILD_OSX_BUNDLE)
 
   set (LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
   set (BIN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin)
-
-  #SET(MACOSX_BUNDLE_ICON_FILE QtTest.icns)
-  # set where in the bundle to put the icns file
-  #SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/doc/qtest.icns
-  #                            PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
