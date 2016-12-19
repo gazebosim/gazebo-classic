@@ -145,7 +145,7 @@ void DARTPhysics::UpdateCollision()
 
     dart::dynamics::ConstBodyNodePtr dtBodyNode1;
     dart::dynamics::ConstBodyNodePtr dtBodyNode2;
-    
+
     const dart::dynamics::ShapeFrame *dtShapeFrame1 =
       dtCollObj1->getShapeFrame();
     const dart::dynamics::ShapeFrame *dtShapeFrame2 =
@@ -464,7 +464,7 @@ dart::simulation::World *DARTPhysics::GetDARTWorld()
 }
 
 //////////////////////////////////////////////////
-dart::simulation::WorldPtr DARTPhysics::DARTWorld() const
+dart::simulation::WorldPtr DARTPhysics::DARTWorld()
 {
   return this->dataPtr->dtWorld;
 }

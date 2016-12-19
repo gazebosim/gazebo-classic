@@ -627,7 +627,7 @@ DARTModelPtr DARTJoint::GetDARTModel() const
 }
 
 /////////////////////////////////////////////////
-DARTJointPropPtr DARTJoint::GetDARTProperties() const
+DARTJointPropPtr DARTJoint::DARTProperties() const
 {
   return this->dataPtr->dtProperties;
 }

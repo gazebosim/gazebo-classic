@@ -948,7 +948,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 }
 
 //////////////////////////////////////////////////
-DARTPhysicsPtr DARTLink::DARTPhysics(void) const
+DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 {
   return boost::dynamic_pointer_cast<DARTPhysics>(
         this->GetWorld()->Physics());
@@ -957,17 +957,17 @@ DARTPhysicsPtr DARTLink::DARTPhysics(void) const
 //////////////////////////////////////////////////
 dart::simulation::World *DARTLink::GetDARTWorld(void) const
 {
-  return DARTPhysics()->DARTWorld().get();
+  return GetDARTPhysics()->DARTWorld().get();
 }
 
 //////////////////////////////////////////////////
 dart::simulation::WorldPtr DARTLink::DARTWorld(void) const
 {
-  return DARTPhysics()->DARTWorld();
+  return GetDARTPhysics()->DARTWorld();
 }
 
 //////////////////////////////////////////////////
-DARTModelPtr DARTLink::DARTModel() const
+DARTModelPtr DARTLink::GetDARTModel() const
 {
   return boost::dynamic_pointer_cast<DARTModel>(this->GetModel());
 }

@@ -158,7 +158,7 @@ namespace gazebo
 
       /// \brief Get pointer to DART Physics engine associated with this link.
       /// \return Pointer to the DART Physics engine.
-      public: DARTPhysicsPtr DARTPhysics(void) const;
+      public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
       /// \brief Get pointer to DART World associated with this link.
       /// \return Pointer to the DART World.
@@ -172,7 +172,7 @@ namespace gazebo
 
       /// \brief Get pointer to DART Model associated with this link.
       /// \return Pointer to the DART Model.
-      public: DARTModelPtr DARTModel() const;
+      public: DARTModelPtr GetDARTModel() const;
 
       /// \brief Get DART BodyNode properties
       public: DARTBodyNodePropPtr DARTProperties() const;
