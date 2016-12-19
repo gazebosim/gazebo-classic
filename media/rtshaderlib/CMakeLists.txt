@@ -27,4 +27,4 @@ else ()
  set (install_files ${files})
 endif ()
 
-install(FILES ${install_files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/rtshaderlib)
+INSTALL(FILES ${install_files} DESTINATION ${MEDIA_ROOT_DESTINATION}/rtshaderlib)
