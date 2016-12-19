@@ -2,10 +2,6 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
-1. Added VisualMarkers to the rendering engine. Visual markers support
-   programmatic rendering of various shapes in a scene.
-    * [Pull request 2498](https://bitbucket.org/osrf/gazebo/pull-request/2498)
-
 1. Updated `gz_log` tool to use `ignition::math`.
     * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
 
