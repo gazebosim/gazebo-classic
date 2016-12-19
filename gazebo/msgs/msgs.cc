@@ -1135,12 +1135,6 @@ namespace gazebo
           msgs::Plugin *pluginMsg = result.add_plugin();
           pluginMsg->CopyFrom(PluginFromSDF(pluginElem));
 
-          // DEPRECATED in Gazebo7, remove in Gazebo8
-          // duplicate innerxml contents into an <sdf> tag to keep backwards
-          // compatibility
-          pluginMsg->set_innerxml(pluginMsg->innerxml() +
-              "\n<sdf>" + pluginMsg->innerxml() + "</sdf>");
-
           pluginElem = pluginElem->GetNextElement("plugin");
         }
       }
