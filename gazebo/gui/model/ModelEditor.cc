@@ -145,6 +145,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
 
+  this->dataPtr->showLinkFramesAct = new QAction(tr("Link Frames"), this);
+  this->dataPtr->showLinkFramesAct->setStatusTip(tr("Show Link Frames"));
+  this->dataPtr->showLinkFramesAct->setCheckable(true);
+  this->dataPtr->showLinkFramesAct->setChecked(true);
+  this->connect(this->dataPtr->showLinkFramesAct, SIGNAL(toggled(bool)),
+      this->dataPtr->modelPalette->ModelCreator(), SLOT(ShowLinkFrames(bool)));
+
   // Clone actions from main window
   this->dataPtr->showToolbarsAct =
       this->mainWindow->CloneAction(g_showToolbarsAct, this);
@@ -370,6 +377,7 @@ void ModelEditor::CreateMenus()
   viewMenu->addAction(this->dataPtr->showCollisionsAct);
   viewMenu->addAction(this->dataPtr->showVisualsAct);
   viewMenu->addAction(this->dataPtr->showJointsAct);
+  viewMenu->addAction(this->dataPtr->showLinkFramesAct);
 
   QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
   if (this->dataPtr->schematicViewAct)

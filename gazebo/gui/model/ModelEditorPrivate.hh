@@ -80,6 +80,9 @@ namespace gazebo
       /// \brief Action to show joints.
       public: QAction *showJointsAct;
 
+      /// \brief Action to show link frames.
+      public: QAction *showLinkFramesAct;
+
       /// \brief Action to show/hide the schematic view.
       public: QAction *schematicViewAct;
 

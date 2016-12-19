@@ -97,6 +97,14 @@ namespace gazebo
       /// \brief Destructor
       public: ~LinkData();
 
+      /// \brief Get the link visual.
+      /// \return Link visual pointer.
+      public: rendering::VisualPtr LinkVisual() const;
+
+      /// \brief Set the link visual.
+      /// \param[in] Link visual pointer.
+      public: void SetLinkVisual(rendering::VisualPtr _linkVisual);
+
       /// \brief Get the name of the link.
       /// \return Name of link.
       public: std::string GetName() const;
@@ -150,6 +158,10 @@ namespace gazebo
       /// \brief Show or hide visual visuals.
       /// \param[in] _show True to show, false to hide.
       public slots: void ShowVisuals(const bool _show);
+
+      /// \brief Show or hide link frame visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowLinkFrame(const bool _show);
 
       /// \brief Update callback on PreRender.
       private: void Update();
@@ -222,7 +234,7 @@ namespace gazebo
       public: ignition::math::Vector3d scale;
 
       /// \brief Visual representing this link.
-      public: rendering::VisualPtr linkVisual;
+      private: rendering::VisualPtr linkVisual;
 
       /// \brief Visuals of the link.
       public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
@@ -242,6 +254,9 @@ namespace gazebo
       /// \brief Deleted collisions of the link.
       public: std::map<rendering::VisualPtr, msgs::Collision> deletedCollisions;
 
+      /// \brief Link frame visual.
+      public: rendering::LinkFrameVisualPtr linkFrameVis;
+
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
 
@@ -253,6 +268,9 @@ namespace gazebo
 
       /// \brief True if all visuals are currently visible, false otherwise.
       public: bool showVisuals = true;
+
+      /// \brief True if all link frames are currently visible, false otherwise.
+      public: bool showLinkFrame = true;
     };
 
     /// \brief Helper class to store model plugin data
