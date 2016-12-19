@@ -618,7 +618,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
   {
     // check velocity / energy
     math::Vector3 vel = link->GetWorldLinearVel();
-    math::Pose pos = link->GetWorldPose();
+    math::Pose pos = link->WorldPose();
     double pe = g * m * pos.pos.z;
     double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
     e_start = pe + ke;
@@ -643,7 +643,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       {
         // check velocity / energy
         math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->GetWorldPose();
+        math::Pose pos = link->WorldPose();
         double pe = g * m * pos.pos.z;
         double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
         double e = pe + ke;
@@ -671,7 +671,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
-        //       << "] pose [" << model->GetWorldPose()
+        //       << "] pose [" << model->WorldPose()
         //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
@@ -694,7 +694,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       {
         // check velocity / energy
         math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->GetWorldPose();
+        math::Pose pos = link->WorldPose();
         double pe = g * m * pos.pos.z;
         double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
         double e = pe + ke;
@@ -722,7 +722,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
-        //       << "] pose [" << model->GetWorldPose()
+        //       << "] pose [" << model->WorldPose()
         //       << "]\n";
          EXPECT_LT(fabs(integ_theta - actual_theta) , 0.01);
       }
