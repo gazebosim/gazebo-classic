@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_PLUGIN_EVENTSOURCE_HH_
-#define _GAZEBO_PLUGIN_EVENTSOURCE_HH_
+#ifndef GAZEBO_PLUGINS_EVENTSOURCE_HH_
+#define GAZEBO_PLUGINS_EVENTSOURCE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -24,6 +24,7 @@
 #include <Winsock2.h>
 #endif
 
+#include <memory>
 #include <string>
 
 #include "gazebo/gazebo.hh"
@@ -83,12 +84,12 @@ namespace gazebo
     protected: transport::PublisherPtr pub;
   };
 
-  typedef boost::shared_ptr<EventSource> EventSourcePtr;
+  typedef std::shared_ptr<EventSource> EventSourcePtr;
 
   /// \brief Gazebo events to detect model creation/deletion
   class SimEventConnector
   {
-    /// \brief Connect a boost::slot to the spawn model event
+    /// \brief Connect a callback to the spawn model event
     /// \param[in] _subscriber the subscriber to this event
     /// \return a connection
     public: template<typename T>
@@ -96,7 +97,7 @@ namespace gazebo
             ConnectSpawnModel(T _subscriber)
       { return spawnModel.Connect(_subscriber); }
 
-    /// \brief Disconnect a boost::slot to the spawn model event
+    /// \brief Disconnect a callback to the spawn model event
     /// \param[in] _subscriber the subscriber to this event
     /// \deprecated Use event::~Connection to disconnect
     public: static void DisconnectSpawnModel(

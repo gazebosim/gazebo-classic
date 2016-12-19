@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <string>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -56,7 +58,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
@@ -279,7 +280,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::Seed());
 
   btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }

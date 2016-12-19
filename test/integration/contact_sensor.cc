@@ -460,7 +460,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
       {
         // Contact between the sphere and the contact sensor occurs at z=1.0
         // Skip other contact points with the ground plane
-        if (!math::equal(contacts[k].contact(i).position(j).z(), 1.0))
+        if (!ignition::math::equal(contacts[k].contact(i).position(j).z(), 1.0))
           continue;
 
         EXPECT_NEAR(contacts[k].contact(i).position(j).x(),

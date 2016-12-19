@@ -31,8 +31,6 @@
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"

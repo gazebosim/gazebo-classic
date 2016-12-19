@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "SimStateEventSource.hh"
 
 using namespace gazebo;
@@ -40,12 +42,12 @@ void SimStateEventSource::Load(const sdf::ElementPtr _sdf)
   // Listen to the pause event. This event is broadcast every
   // simulation iteration.
   this->pauseConnection = event::Events::ConnectPause(
-      boost::bind(&SimStateEventSource::OnPause, this, _1));
+      std::bind(&SimStateEventSource::OnPause, this, std::placeholders::_1));
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&SimStateEventSource::OnUpdate, this, _1));
+      std::bind(&SimStateEventSource::OnUpdate, this, std::placeholders::_1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

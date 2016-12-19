@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RANDOMVELOCITY_PLUGIN_PRIVATE_HH_
-#define _GAZEBO_RANDOMVELOCITY_PLUGIN_PRIVATE_HH_
+#ifndef GAZEBO_PLUGINS_RANDOMVELOCITYPLUGINPRIVATE_HH_
+#define GAZEBO_PLUGINS_RANDOMVELOCITYPLUGINPRIVATE_HH_
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>

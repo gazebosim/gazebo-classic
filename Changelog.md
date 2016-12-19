@@ -6,6 +6,26 @@
    programmatic rendering of various shapes in a scene.
     * [Pull request 2498](https://bitbucket.org/osrf/gazebo/pull-request/2498)
 
+1. Updated `gz_log` tool to use `ignition::math`.
+    * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
+
+1. Update examples to use ign-math.
+    * [Pull request #2539](https://bitbucket.org/osrf/gazebo/pull-request/2539)
+
+1. Update plugins to use ign-math.
+    * [Pull request #2531](https://bitbucket.org/osrf/gazebo/pull-request/2531)
+    * [Pull request #2534](https://bitbucket.org/osrf/gazebo/pull-request/2534)
+    * [Pull request #2538](https://bitbucket.org/osrf/gazebo/pull-request/2538)
+
+1. Use ignition math with `rendering/Distortion` and update function names.
+    * [Pull request #2529](https://bitbucket.org/osrf/gazebo/pull-request/2529)
+
+1. Updated COMVisual class to use `ignition::math`.
+    * [Pull request #2528](https://bitbucket.org/osrf/gazebo/pull-request/2528)
+
+1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
+    * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
+
 1. Support version 5 of the DART Physics Engine.
     * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
 
@@ -96,6 +116,7 @@
     * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
 
 1. Deprecate gazebo::math
+    * [Pull request #2513](https://bitbucket.org/osrf/gazebo/pull-request/2513)
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
     * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
@@ -105,6 +126,9 @@
     * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
     * [Pull request #2505](https://bitbucket.org/osrf/gazebo/pull-request/2505)
     * [Pull request #2514](https://bitbucket.org/osrf/gazebo/pull-request/2514)
+    * [Pull request #2522](https://bitbucket.org/osrf/gazebo/pull-request/2522)
+    * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
+    * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
@@ -190,8 +214,15 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix `model.config` dependency support, and add ability to reference
+   textures using a URI.
+    * [Pull request 2517](https://bitbucket.org/osrf/gazebo/pull-request/2517)
+
 1. Fix DEM heightmap size, collision, scale
     * [Pull request 2477](https://bitbucket.org/osrf/gazebo/pull-request/2477)
+
+1. Create ode_quiet parameter to silence solver messages
+    * [Pull request 2512](https://bitbucket.org/osrf/gazebo/pull-request/2512)
 
 1. Update QT render loop to throttle based on UserCamera::RenderRate.
     * [Pull request 2476](https://bitbucket.org/osrf/gazebo/pull-request/2476)

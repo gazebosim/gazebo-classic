@@ -74,7 +74,7 @@ void ModelAlign_TEST::AlignXMin()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -83,16 +83,16 @@ void ModelAlign_TEST::AlignXMin()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "x", "min", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetMinX = modelVisuals[0]->GetWorldPose().Ign().Pos().X() +
+  double targetMinX = modelVisuals[0]->WorldPose().Pos().X() +
       centerOffsets[0].X() - targetBbox.XLength()/2.0;
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double minX = vis->GetWorldPose().Ign().Pos().X() + centerOffsets[i].X() -
+    double minX = vis->WorldPose().Pos().X() + centerOffsets[i].X() -
         bbox.XLength()/2.0;
     QVERIFY(ignition::math::equal(minX, targetMinX, 1e-5));
   }
@@ -151,7 +151,7 @@ void ModelAlign_TEST::AlignXMinReverse()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -162,17 +162,17 @@ void ModelAlign_TEST::AlignXMinReverse()
       modelVisuals, "x", "min", "first", true, true);
 
   // Get the target pose
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
-  double targetMinX = modelVisuals[0]->GetWorldPose().Ign().Pos().X() +
+  auto targetBbox = modelVisuals[0]->BoundingBox();
+  double targetMinX = modelVisuals[0]->WorldPose().Pos().X() +
       centerOffsets[0].X() - targetBbox.XLength()/2.0;
 
   // Check models were properly aligned
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     auto vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double minX = vis->GetWorldPose().Ign().Pos().X() + centerOffsets[i].X() +
+    double minX = vis->WorldPose().Pos().X() + centerOffsets[i].X() +
         bbox.XLength()/2.0;
     QVERIFY(ignition::math::equal(minX, targetMinX, 1e-5));
   }
@@ -228,7 +228,7 @@ void ModelAlign_TEST::AlignXCenter()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -237,17 +237,17 @@ void ModelAlign_TEST::AlignXCenter()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "x", "center", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetCenterX = modelVisuals[0]->GetWorldPose().Ign().Pos().X() +
+  double targetCenterX = modelVisuals[0]->WorldPose().Pos().X() +
       centerOffsets[0].X();
 
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double centerX = vis->GetWorldPose().Ign().Pos().X() + centerOffsets[i].X();
+    double centerX = vis->WorldPose().Pos().X() + centerOffsets[i].X();
     QVERIFY(ignition::math::equal(centerX, targetCenterX, 1e-5));
   }
 }
@@ -302,7 +302,7 @@ void ModelAlign_TEST::AlignXMax()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -311,17 +311,17 @@ void ModelAlign_TEST::AlignXMax()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "x", "max", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetMaxX = modelVisuals[0]->GetWorldPose().Ign().Pos().X() +
+  double targetMaxX = modelVisuals[0]->WorldPose().Pos().X() +
       centerOffsets[0].X() + targetBbox.XLength()/2.0;
 
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double maxX = vis->GetWorldPose().Ign().Pos().X() + centerOffsets[i].X()
+    double maxX = vis->WorldPose().Pos().X() + centerOffsets[i].X()
         + bbox.XLength()/2.0;
     QVERIFY(ignition::math::equal(maxX, targetMaxX, 1e-5));
   }
@@ -380,7 +380,7 @@ void ModelAlign_TEST::AlignXMaxReverse()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -391,17 +391,17 @@ void ModelAlign_TEST::AlignXMaxReverse()
       modelVisuals, "x", "max", "first", true, true);
 
   // Get the target pose
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
-  double targetMaxX = modelVisuals[0]->GetWorldPose().Ign().Pos().X() +
+  auto targetBbox = modelVisuals[0]->BoundingBox();
+  double targetMaxX = modelVisuals[0]->WorldPose().Pos().X() +
       centerOffsets[0].X() + targetBbox.XLength()/2.0;
 
   // Check models were properly aligned
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     auto vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double maxX = vis->GetWorldPose().Ign().Pos().X() + centerOffsets[i].X() -
+    double maxX = vis->WorldPose().Pos().X() + centerOffsets[i].X() -
         bbox.XLength()/2.0;
     QVERIFY(ignition::math::equal(maxX, targetMaxX, 1e-5));
   }
@@ -457,7 +457,7 @@ void ModelAlign_TEST::AlignYMin()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -466,16 +466,16 @@ void ModelAlign_TEST::AlignYMin()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "y", "min", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetMinY = modelVisuals[0]->GetWorldPose().Ign().Pos().Y() +
+  double targetMinY = modelVisuals[0]->WorldPose().Pos().Y() +
       centerOffsets[0].Y() - targetBbox.YLength()/2.0;
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double minY = vis->GetWorldPose().Ign().Pos().Y() + centerOffsets[i].Y() -
+    double minY = vis->WorldPose().Pos().Y() + centerOffsets[i].Y() -
         bbox.YLength()/2.0;
     QVERIFY(ignition::math::equal(minY, targetMinY, 1e-5));
   }
@@ -534,7 +534,7 @@ void ModelAlign_TEST::AlignYMinReverse()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -545,17 +545,17 @@ void ModelAlign_TEST::AlignYMinReverse()
       modelVisuals, "y", "min", "first", true, true);
 
   // Get the target pose
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
-  double targetMinY = modelVisuals[0]->GetWorldPose().Ign().Pos().Y() +
+  auto targetBbox = modelVisuals[0]->BoundingBox();
+  double targetMinY = modelVisuals[0]->WorldPose().Pos().Y() +
       centerOffsets[0].Y() - targetBbox.YLength()/2.0;
 
   // Check models were properly aligned
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     auto vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double minY = vis->GetWorldPose().Ign().Pos().Y() + centerOffsets[i].Y() +
+    double minY = vis->WorldPose().Pos().Y() + centerOffsets[i].Y() +
         bbox.YLength()/2.0;
     QVERIFY(ignition::math::equal(minY, targetMinY, 1e-5));
   }
@@ -611,7 +611,7 @@ void ModelAlign_TEST::AlignYCenter()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -620,18 +620,18 @@ void ModelAlign_TEST::AlignYCenter()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "y", "center", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetCenterY = modelVisuals[0]->GetWorldPose().Ign().Pos().Y() +
+  double targetCenterY = modelVisuals[0]->WorldPose().Pos().Y() +
       centerOffsets[0].Y();
 
 
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double centerY = vis->GetWorldPose().Ign().Pos().Y() + centerOffsets[i].Y();
+    double centerY = vis->WorldPose().Pos().Y() + centerOffsets[i].Y();
     QVERIFY(ignition::math::equal(centerY, targetCenterY, 1e-5));
   }
 }
@@ -686,7 +686,7 @@ void ModelAlign_TEST::AlignYMax()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -695,17 +695,17 @@ void ModelAlign_TEST::AlignYMax()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "y", "max", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetMaxY = modelVisuals[0]->GetWorldPose().Ign().Pos().Y() +
+  double targetMaxY = modelVisuals[0]->WorldPose().Pos().Y() +
       centerOffsets[0].Y() + targetBbox.YLength()/2.0;
 
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double maxY = vis->GetWorldPose().Ign().Pos().Y() + centerOffsets[i].Y()
+    double maxY = vis->WorldPose().Pos().Y() + centerOffsets[i].Y()
         + bbox.YLength()/2.0;
     QVERIFY(ignition::math::equal(maxY, targetMaxY, 1e-5));
   }
@@ -764,7 +764,7 @@ void ModelAlign_TEST::AlignYMaxReverse()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -775,17 +775,17 @@ void ModelAlign_TEST::AlignYMaxReverse()
       modelVisuals, "y", "max", "first", true, true);
 
   // Get the target pose
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
-  double targetMaxY = modelVisuals[0]->GetWorldPose().Ign().Pos().Y() +
+  auto targetBbox = modelVisuals[0]->BoundingBox();
+  double targetMaxY = modelVisuals[0]->WorldPose().Pos().Y() +
       centerOffsets[0].Y() + targetBbox.YLength()/2.0;
 
   // Check models were properly aligned
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     auto vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double maxY = vis->GetWorldPose().Ign().Pos().Y() + centerOffsets[i].Y() -
+    double maxY = vis->WorldPose().Pos().Y() + centerOffsets[i].Y() -
         bbox.YLength()/2.0;
     QVERIFY(ignition::math::equal(maxY, targetMaxY, 1e-5));
   }
@@ -841,7 +841,7 @@ void ModelAlign_TEST::AlignZMin()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -850,16 +850,16 @@ void ModelAlign_TEST::AlignZMin()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "z", "min", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetMinZ = modelVisuals[0]->GetWorldPose().Ign().Pos().Z() +
+  double targetMinZ = modelVisuals[0]->WorldPose().Pos().Z() +
       centerOffsets[0].Z() - targetBbox.ZLength()/2.0;
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double minZ = vis->GetWorldPose().Ign().Pos().Z() + centerOffsets[i].Z() -
+    double minZ = vis->WorldPose().Pos().Z() + centerOffsets[i].Z() -
         bbox.ZLength()/2.0;
     QVERIFY(ignition::math::equal(minZ, targetMinZ, 1e-5));
   }
@@ -918,7 +918,7 @@ void ModelAlign_TEST::AlignZMinReverse()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -929,17 +929,17 @@ void ModelAlign_TEST::AlignZMinReverse()
       modelVisuals, "z", "min", "first", true, true);
 
   // Get the target pose
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
-  double targetMinZ = modelVisuals[0]->GetWorldPose().Ign().Pos().Z() +
+  auto targetBbox = modelVisuals[0]->BoundingBox();
+  double targetMinZ = modelVisuals[0]->WorldPose().Pos().Z() +
       centerOffsets[0].Z() - targetBbox.ZLength()/2.0;
 
   // Check models were properly aligned
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     auto vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double minZ = vis->GetWorldPose().Ign().Pos().Z() + centerOffsets[i].Z() +
+    double minZ = vis->WorldPose().Pos().Z() + centerOffsets[i].Z() +
         bbox.ZLength()/2.0;
     QVERIFY(ignition::math::equal(minZ, targetMinZ, 1e-5));
   }
@@ -995,7 +995,7 @@ void ModelAlign_TEST::AlignZCenter()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -1004,17 +1004,17 @@ void ModelAlign_TEST::AlignZCenter()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "z", "center", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetCenterZ = modelVisuals[0]->GetWorldPose().Ign().Pos().Z() +
+  double targetCenterZ = modelVisuals[0]->WorldPose().Pos().Z() +
       centerOffsets[0].Z();
 
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double centerZ = vis->GetWorldPose().Ign().Pos().Z() + centerOffsets[i].Z();
+    double centerZ = vis->WorldPose().Pos().Z() + centerOffsets[i].Z();
     QVERIFY(ignition::math::equal(centerZ, targetCenterZ, 1e-5));
   }
 }
@@ -1069,7 +1069,7 @@ void ModelAlign_TEST::AlignZMax()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -1078,17 +1078,17 @@ void ModelAlign_TEST::AlignZMax()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "z", "max", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
 
-  double targetMaxZ = modelVisuals[0]->GetWorldPose().Ign().Pos().Z() +
+  double targetMaxZ = modelVisuals[0]->WorldPose().Pos().Z() +
       centerOffsets[0].Z() + targetBbox.ZLength()/2.0;
 
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double maxZ = vis->GetWorldPose().Ign().Pos().Z() + centerOffsets[i].Z()
+    double maxZ = vis->WorldPose().Pos().Z() + centerOffsets[i].Z()
         + bbox.ZLength()/2.0;
     QVERIFY(ignition::math::equal(maxZ, targetMaxZ, 1e-5));
   }
@@ -1147,7 +1147,7 @@ void ModelAlign_TEST::AlignZMaxReverse()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -1158,17 +1158,17 @@ void ModelAlign_TEST::AlignZMaxReverse()
       modelVisuals, "z", "max", "first", true, true);
 
   // Get the target pose
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
-  double targetMaxZ = modelVisuals[0]->GetWorldPose().Ign().Pos().Z() +
+  auto targetBbox = modelVisuals[0]->BoundingBox();
+  double targetMaxZ = modelVisuals[0]->WorldPose().Pos().Z() +
       centerOffsets[0].Z() + targetBbox.ZLength()/2.0;
 
   // Check models were properly aligned
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     auto vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
+    auto bbox = vis->BoundingBox();
 
-    double maxZ = vis->GetWorldPose().Ign().Pos().Z() + centerOffsets[i].Z() -
+    double maxZ = vis->WorldPose().Pos().Z() + centerOffsets[i].Z() -
         bbox.ZLength()/2.0;
     QVERIFY(ignition::math::equal(maxZ, targetMaxZ, 1e-5));
   }
@@ -1223,7 +1223,7 @@ void ModelAlign_TEST::AlignScale()
   {
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelNames[i]);
     QVERIFY(modelVis != NULL);
-    auto modelCenterOffset = modelVis->GetBoundingBox().Ign().Center();
+    auto modelCenterOffset = modelVis->BoundingBox().Center();
     modelVisuals.push_back(modelVis);
     centerOffsets.push_back(modelCenterOffset);
   }
@@ -1231,25 +1231,25 @@ void ModelAlign_TEST::AlignScale()
   // manually change scale of model visual and verify
   gazebo::rendering::VisualPtr targetVis = modelVisuals[0];
   targetVis->SetScale(ignition::math::Vector3d(1.5, 1, 1));
-  QVERIFY(targetVis->GetScale().Ign() == ignition::math::Vector3d(1.5, 1, 1));
+  QVERIFY(targetVis->Scale() == ignition::math::Vector3d(1.5, 1, 1));
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "x", "min", "first");
 
-  auto targetBbox = modelVisuals[0]->GetBoundingBox().Ign();
-  auto targetScale = modelVisuals[0]->GetScale().Ign();
+  auto targetBbox = modelVisuals[0]->BoundingBox();
+  auto targetScale = modelVisuals[0]->Scale();
 
   // verify other models align at minx of the scaled target model
-  double targetMinX = modelVisuals[0]->GetWorldPose().Ign().Pos().X() +
+  double targetMinX = modelVisuals[0]->WorldPose().Pos().X() +
       centerOffsets[0].X() - targetScale.X() * targetBbox.XLength()/2.0;
   for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
-    auto bbox = vis->GetBoundingBox().Ign();
-    auto visScale = vis->GetScale().Ign();
+    auto bbox = vis->BoundingBox();
+    auto visScale = vis->Scale();
 
-    double minX = vis->GetWorldPose().Ign().Pos().X() + centerOffsets[i].X() -
+    double minX = vis->WorldPose().Pos().X() + centerOffsets[i].X() -
         visScale.X() * bbox.XLength()/2.0;
     QVERIFY(ignition::math::equal(minX, targetMinX, 1e-5));
   }

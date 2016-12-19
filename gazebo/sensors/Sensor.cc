@@ -423,13 +423,13 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
-      distortionMsg->set_k1(distortion->GetK1());
-      distortionMsg->set_k2(distortion->GetK2());
-      distortionMsg->set_k3(distortion->GetK3());
-      distortionMsg->set_p1(distortion->GetP1());
-      distortionMsg->set_p2(distortion->GetP2());
-      distortionMsg->mutable_center()->set_x(distortion->GetCenter().x);
-      distortionMsg->mutable_center()->set_y(distortion->GetCenter().y);
+      distortionMsg->set_k1(distortion->K1());
+      distortionMsg->set_k2(distortion->K2());
+      distortionMsg->set_k3(distortion->K3());
+      distortionMsg->set_p1(distortion->P1());
+      distortionMsg->set_p2(distortion->P2());
+      distortionMsg->mutable_center()->set_x(distortion->Center().X());
+      distortionMsg->mutable_center()->set_y(distortion->Center().Y());
     }
   }
 }

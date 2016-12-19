@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SELECTIONOBJ_HH_
-#define _SELECTIONOBJ_HH_
+#ifndef GAZEBO_RENDERING_SELECTIONOBJ_HH_
+#define GAZEBO_RENDERING_SELECTIONOBJ_HH_
 
 #include <string>
 

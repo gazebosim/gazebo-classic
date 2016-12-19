@@ -32,12 +32,13 @@
 #include <utility>
 #include <vector>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -130,6 +131,11 @@ class Colliders_TBB
 };
 
 //////////////////////////////////////////////////
+extern "C" void dMessageQuiet(int, const char *, va_list)
+{
+}
+
+//////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
     : PhysicsEngine(_world), dataPtr(new ODEPhysicsPrivate)
 {
@@ -152,7 +158,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::Seed());
 }
 
 //////////////////////////////////////////////////
@@ -1514,6 +1520,18 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
         boost::any_cast<int>(_value));
     }
+    else if (_key == "ode_quiet")
+    {
+      bool odeQuiet = boost::any_cast<bool>(_value);
+      if (odeQuiet)
+      {
+        dSetMessageHandler(&dMessageQuiet);
+      }
+      else
+      {
+        dSetMessageHandler(0);
+      }
+    }
     else
     {
       return PhysicsEngine::SetParam(_key, _value);
@@ -1601,6 +1619,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
+  else if (_key == "ode_quiet")
+    _value = dGetMessageHandler() != 0;
   else if (_key == "world_step_solver")
     _value = this->GetWorldStepSolverType();
   else

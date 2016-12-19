@@ -245,7 +245,7 @@ void BulletScrewJoint::Init()
   this->bulletScrew->setUpperAngLimit(upper);
   // enforce linear dof in bullet.
   double tp = this->threadPitch;
-  if (math::equal(tp, 0.0))
+  if (ignition::math::equal(tp, 0.0))
   {
     gzerr << "thread pitch should not be zero (joint is a slider?)"
           << " using thread pitch = 1.0e6\n";
@@ -412,7 +412,7 @@ bool BulletScrewJoint::SetHighStop(unsigned int _index,
 
     // set corresponding linear constraints
     double tp = this->threadPitch;
-    if (math::equal(tp, 0.0))
+    if (ignition::math::equal(tp, 0.0))
     {
       gzwarn << "thread pitch should not be zero (joint is a slider?)"
              << " using thread pitch = 1.0e6\n";
@@ -487,7 +487,7 @@ bool BulletScrewJoint::SetLowStop(unsigned int _index,
 
     // set corresponding linear constraints
     double tp = this->threadPitch;
-    if (math::equal(tp, 0.0))
+    if (ignition::math::equal(tp, 0.0))
     {
       gzerr << "thread pitch should not be zero (joint is a slider?)"
             << " using thread pitch = 1.0e6\n";
@@ -957,7 +957,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // if (limit && (lostop == histop)) raises warnings, using
     // a warning-less implementation.
     if (limit &&
-      math::equal(lostop, histop,
+      ignition::math::equal(lostop, histop,
       static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
     {
       // the joint motor is ineffective
@@ -993,7 +993,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
       // issue #1104:
       // if (lostop == histop) raises warnings, using
       // a warning-less implementation.
-      if (math::equal(lostop, histop,
+      if (ignition::math::equal(lostop, histop,
           static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
       {
         // limited low and high simultaneously
@@ -1084,7 +1084,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // if (limit && (lostop == histop)) raises warnings, using
     // a warning-less implementation.
     if (limit &&
-      math::equal(lostop, histop,
+      ignition::math::equal(lostop, histop,
       static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
     {  // the joint motor is ineffective
       powered = 0;
@@ -1114,7 +1114,7 @@ void btScrewConstraint::_getInfo2NonVirtual(
       // issue #1104:
       // if (lostop == histop) raises warnings, using
       // a warning-less implementation.
-      if (math::equal(lostop, histop,
+      if (ignition::math::equal(lostop, histop,
           static_cast<btScalar>(std::numeric_limits<double>::epsilon())))
       {
         // limited low and high simultaneously
