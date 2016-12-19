@@ -134,8 +134,8 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   // Spawn a sphere over the polyline shape, and check that it doesn't pass
   // through the polyline
   {
-    SpawnSphere("test_sphere", math::Vector3(0, 0, 1.5),
-        math::Vector3(0, 0, 0));
+    SpawnSphere("test_sphere", ignition::math::Vector3d(0, 0, 1.5),
+        ignition::math::Vector3d(0, 0, 0));
     physics::ModelPtr sphere = GetModel("test_sphere");
 
     common::Time::MSleep(1000);

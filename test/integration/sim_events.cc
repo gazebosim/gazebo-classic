@@ -217,8 +217,8 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.07);
 
   // Spawn a box on the second floor, which should call the elevator up.
-  this->SpawnBox("_my_test_box_", math::Vector3(0.5, 0.5, 0.5),
-      math::Vector3(2, 0, 3.65), math::Vector3(0, 0, 0));
+  this->SpawnBox("_my_test_box_", ignition::math::Vector3d(0.5, 0.5, 0.5),
+      ignition::math::Vector3d(2, 0, 3.65), ignition::math::Vector3d(0, 0, 0));
 
   // Wait for elevator to move. 10 seconds is more than long enough.
   common::Time::Sleep(10);

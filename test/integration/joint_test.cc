@@ -94,8 +94,6 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
       // in parent and child links, preventing joint from being destroyed.
       joint->Load(parentLink, childLink, anchor);
       // joint->SetAnchor(0, anchor);
-      joint->SetAxis(0, axis);
-      joint->SetHighStop(0, upper);
       joint->SetLowStop(0, lower);
 
       if (parentLink)
@@ -419,10 +417,11 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Spawn two boxes
-  SpawnBox("box1", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
-      math::Vector3::Zero, false);
-  SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
-      math::Vector3::Zero, false);
+  SpawnBox("box1", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Vector3d::Zero, false);
+  SpawnBox("box2", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(-1, 0, 0.5),
+      ignition::math::Vector3d::Zero, false);
+
   physics::ModelPtr model  = world->ModelByName("box1");
   physics::ModelPtr model2 = world->ModelByName("box2");
   ASSERT_TRUE(model  != NULL);

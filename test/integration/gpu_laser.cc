@@ -63,21 +63,21 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
-  math::Pose testPose(math::Vector3(0, 0, 0.1),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.1),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn another gpu ray sensor at 90 degree roll
   std::string modelName2 = "gpu_ray_model_roll";
   std::string raySensorName2 = "gpu_ray_sensor_roll";
-  math::Pose testPose2(math::Vector3(0, 0, 0.1),
-      math::Quaternion(M_PI/2.0, 0, 0));
+  ignition::math::Pose3d testPose2(ignition::math::Vector3d(0, 0, 0.1),
+      ignition::math::Quaterniond(M_PI/2.0, 0, 0));
 
-  SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+  SpawnGpuRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
-  SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.pos,
-      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+  SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.Pos(),
+      testPose2.Rot().Euler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   std::string box01 = "box_01";
@@ -89,21 +89,24 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   world->Physics()->SetGravity(math::Vector3(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
-  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+                                   ignition::math::Quaterniond(0, 0, 0));
   // box on the right of ray sensor 1
-  math::Pose box02Pose(math::Vector3(0, -1, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5),
+                                   ignition::math::Quaterniond(0, 0, 0));
   // box on the left of the ray sensor 1 but out of range
-  math::Pose box03Pose(math::Vector3(0, maxRange + 1, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box03Pose(
+      ignition::math::Vector3d(0, maxRange + 1, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
-      box01Pose.rot.GetAsEuler());
+  SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
+      box01Pose.Rot().Euler());
 
-  SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
-      box02Pose.rot.GetAsEuler());
+  SpawnBox(box02, ignition::math::Vector3d(1, 1, 1), box02Pose.Pos(),
+      box02Pose.Rot().Euler());
 
-  SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
-      box03Pose.rot.GetAsEuler());
+  SpawnBox(box03, ignition::math::Vector3d(1, 1, 1), box03Pose.Pos(),
+      box03Pose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
@@ -142,7 +145,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   int mid = samples / 2;
   double unitBoxSize = 1.0;
-  double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
+  double expectedRangeAtMidPoint = box01Pose.Pos().X() - unitBoxSize/2;
 
   // ray sensor 1 should see box01 and box02
   EXPECT_NEAR(raySensor->Range(mid), expectedRangeAtMidPoint, LASER_TOL);
@@ -234,21 +237,21 @@ TEST_F(GPURaySensorTest, NameCollision)
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
-  math::Pose testPose(math::Vector3(0, 0, 0.1),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.1),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn another gpu ray sensor at 90 degree roll
   std::string modelName2 = "gpu_ray_model_roll";
   std::string raySensorName2 = "gpu_ray_sensor";
-  math::Pose testPose2(math::Vector3(0, 0, 0.1),
-      math::Quaternion(M_PI/2.0, 0, 0));
+  ignition::math::Pose3d testPose2(ignition::math::Vector3d(0, 0, 0.1),
+      ignition::math::Quaterniond(M_PI/2.0, 0, 0));
 
-  SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+  SpawnGpuRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
-  SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.pos,
-      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+  SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.Pos(),
+      testPose2.Rot().Euler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   std::string box01 = "box_01";
@@ -260,21 +263,23 @@ TEST_F(GPURaySensorTest, NameCollision)
   world->Physics()->SetGravity(math::Vector3(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
-  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+                                   ignition::math::Quaterniond(0, 0, 0));
   // box on the right of ray sensor 1
-  math::Pose box02Pose(math::Vector3(0, -1, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5),
+                                   ignition::math::Quaterniond(0, 0, 0));
   // box on the left of the ray sensor 1 but out of range
-  math::Pose box03Pose(math::Vector3(0, maxRange + 1, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box03Pose(ignition::math::Vector3d(0, maxRange + 1, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
-      box01Pose.rot.GetAsEuler());
+  SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
+      box01Pose.Rot().Euler());
 
-  SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
-      box02Pose.rot.GetAsEuler());
+  SpawnBox(box02, ignition::math::Vector3d(1, 1, 1), box02Pose.Pos(),
+      box02Pose.Rot().Euler());
 
-  SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
-      box03Pose.rot.GetAsEuler());
+  SpawnBox(box03, ignition::math::Vector3d(1, 1, 1), box03Pose.Pos(),
+      box03Pose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =

@@ -277,7 +277,7 @@ void UndoTest::UndoTranslateModel()
   QVERIFY(boxVis->GetWorldPose() == boxInitialPose);
 
   // Move visual
-  auto boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  auto boxFinalPose = ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
   boxVis->SetWorldPose(boxFinalPose);
   QVERIFY(boxVis->GetWorldPose() != boxInitialPose);
   QVERIFY(boxVis->GetWorldPose() == boxFinalPose);
@@ -746,7 +746,7 @@ void UndoTest::UndoResetTime()
   QVERIFY(box != NULL);
   auto boxInitialPose = box->GetWorldPose();
 
-  auto boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  auto boxFinalPose = ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
   box->SetWorldPose(boxFinalPose);
   QVERIFY(box->GetWorldPose() != boxInitialPose);
   QVERIFY(box->GetWorldPose() == boxFinalPose);
@@ -831,7 +831,7 @@ void UndoTest::UndoResetWorld()
   QVERIFY(box != NULL);
   auto boxInitialPose = box->GetWorldPose();
 
-  gazebo::math::Pose boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  ignition::math::Pose3d boxFinalPose = ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
   box->SetWorldPose(boxFinalPose);
   QVERIFY(box->GetWorldPose() != boxInitialPose);
   QVERIFY(box->GetWorldPose() == boxFinalPose);
@@ -921,7 +921,7 @@ void UndoTest::UndoResetModelPoses()
   QVERIFY(box != NULL);
   auto boxInitialPose = box->GetWorldPose();
 
-  gazebo::math::Pose boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  ignition::math::Pose3d boxFinalPose = ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
   box->SetWorldPose(boxFinalPose);
   QVERIFY(box->GetWorldPose() != boxInitialPose);
   QVERIFY(box->GetWorldPose() == boxFinalPose);

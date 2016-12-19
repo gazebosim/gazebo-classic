@@ -109,9 +109,9 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   // spawn a box
   std::string name = "test_box";
   double z0 = 5;
-  math::Vector3 pos = math::Vector3(0, 0, z0);
-  math::Vector3 size = math::Vector3(1, 1, 1);
-  SpawnBox(name, size, pos, math::Vector3::Zero);
+  ignition::math::Vector3d pos(0, 0, z0);
+  ignition::math::Vector3d size(1, 1, 1);
+  SpawnBox(name, size, pos, ignition::math::Vector3d::Zero);
   gzdbg << "SpawnBox called" << std::endl;
 
   // advertise on "~/model/modify"
@@ -134,7 +134,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
 
   {
     math::Pose initialPose = model->GetWorldPose();
-    EXPECT_EQ(pos, initialPose.pos);
+    EXPECT_EQ(pos, initialPose.pos.Ign());
   }
 
   {
@@ -185,9 +185,9 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   // spawn a box
   std::string name = "test_box";
   double z0 = 5;
-  math::Vector3 pos = math::Vector3(0, 0, z0);
-  math::Vector3 size = math::Vector3(1, 1, 1);
-  SpawnBox(name, size, pos, math::Vector3::Zero);
+  ignition::math::Vector3d pos(0, 0, z0);
+  ignition::math::Vector3d size(1, 1, 1);
+  SpawnBox(name, size, pos, ignition::math::Vector3d::Zero);
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
@@ -417,40 +417,40 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // spawn some simple shapes with unit size
   double z0 = 0.5;
-  std::map<std::string, math::Vector3> modelPos;
-  modelPos["test_box"] = math::Vector3(0, 0, z0);
-  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
-  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
-  modelPos["test_non_unit_box"] = math::Vector3(16, 0, z0);
+  std::map<std::string, ignition::math::Vector3d> modelPos;
+  modelPos["test_box"] = ignition::math::Vector3d(0, 0, z0);
+  modelPos["test_sphere"] = ignition::math::Vector3d(4, 0, z0);
+  modelPos["test_cylinder"] = ignition::math::Vector3d(8, 0, z0);
+  modelPos["test_non_unit_box"] = ignition::math::Vector3d(16, 0, z0);
 
-  std::map<std::string, math::Vector3> modelSize;
-  modelSize["test_box"] = math::Vector3::One;
-  modelSize["test_sphere"] = math::Vector3::One;
-  modelSize["test_cylinder"] = math::Vector3::One;
-  modelSize["test_non_unit_box"] = math::Vector3(3, 8, 1.0);
+  std::map<std::string, ignition::math::Vector3d> modelSize;
+  modelSize["test_box"] = ignition::math::Vector3d::One;
+  modelSize["test_sphere"] = ignition::math::Vector3d::One;
+  modelSize["test_cylinder"] = ignition::math::Vector3d::One;
+  modelSize["test_non_unit_box"] = ignition::math::Vector3d(3, 8, 1.0);
 
-  SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
-      math::Vector3::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
+  SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1), modelPos["test_box"],
+      ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"], ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
-      math::Vector3::Zero);
+      ignition::math::Vector3d::Zero);
   SpawnBox("test_non_unit_box", modelSize["test_non_unit_box"],
-      modelPos["test_non_unit_box"], math::Vector3::Zero);
+      modelPos["test_non_unit_box"], ignition::math::Vector3d::Zero);
 
   // spawn another set of shapes and use messages to resize these
-  modelPos["test_box2"] = math::Vector3(0, 9, z0);
-  modelPos["test_sphere2"] = math::Vector3(4, 9, z0);
-  modelPos["test_cylinder2"] = math::Vector3(8, 9, z0);
+  modelPos["test_box2"] = ignition::math::Vector3d(0, 9, z0);
+  modelPos["test_sphere2"] = ignition::math::Vector3d(4, 9, z0);
+  modelPos["test_cylinder2"] = ignition::math::Vector3d(8, 9, z0);
 
-  modelSize["test_box2"] = math::Vector3::One;
-  modelSize["test_sphere2"] = math::Vector3::One;
-  modelSize["test_cylinder2"] = math::Vector3::One;
+  modelSize["test_box2"] = ignition::math::Vector3d::One;
+  modelSize["test_sphere2"] = ignition::math::Vector3d::One;
+  modelSize["test_cylinder2"] = ignition::math::Vector3d::One;
 
-  SpawnBox("test_box2", math::Vector3(1, 1, 1), modelPos["test_box2"],
-      math::Vector3::Zero);
-  SpawnSphere("test_sphere2", modelPos["test_sphere2"], math::Vector3::Zero);
+  SpawnBox("test_box2", ignition::math::Vector3d(1, 1, 1), modelPos["test_box2"],
+      ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere2", modelPos["test_sphere2"], ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder2", modelPos["test_cylinder2"],
-      math::Vector3::Zero);
+      ignition::math::Vector3d::Zero);
 
   // advertise on "~/model/modify" to generate resize messages
   transport::PublisherPtr modelPub =
@@ -459,7 +459,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   int steps = 2;
   physics::ModelPtr model;
   math::Pose pose1, pose2;
-  math::Vector3 vel1, vel2;
+  ignition::math::Vector3d vel1, vel2;
   double x0, y0;
 
   // Allow objects to settle on ground_plane
@@ -474,8 +474,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     EXPECT_TRUE(model != NULL);
 
     pose1 = model->GetWorldPose();
-    x0 = modelPos[name].x;
-    y0 = modelPos[name].y;
+    x0 = modelPos[name].X();
+    y0 = modelPos[name].Y();
 
     EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
     EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
@@ -535,8 +535,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       gzdbg << "Check ground contact of model " << name << '\n';
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
-      x0 = modelPos[name].x;
-      y0 = modelPos[name].y;
+      x0 = modelPos[name].X();
+      y0 = modelPos[name].Y();
       double xTolerance = PHYSICS_TOL;
       double yTolerance = PHYSICS_TOL;
 #ifdef HAVE_BULLET
@@ -582,19 +582,19 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         if (geomMsg.has_box())
         {
           EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
-              modelSize[name].Ign() * scaleFactor);
+              modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
           EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
         }
         else if (geomMsg.has_cylinder())
         {
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
-              modelSize[name].z * scaleFactor);
+              modelSize[name].Z() * scaleFactor);
         }
       }
 
@@ -606,19 +606,19 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         if (geomMsg.has_box())
         {
           EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
-              modelSize[name].Ign() * scaleFactor);
+              modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
           EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
         }
         else if (geomMsg.has_cylinder())
         {
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
-              modelSize[name].z * scaleFactor);
+              modelSize[name].Z() * scaleFactor);
         }
       }
     }
@@ -651,15 +651,15 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       {
         sdf::ElementPtr sphereElem = visualGeomElem->GetElement("sphere");
         double radius = sphereElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
       }
       else if (visualGeomElem->HasElement("cylinder"))
       {
         sdf::ElementPtr cylinderElem = visualGeomElem->GetElement("cylinder");
         double radius = cylinderElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
         double length = cylinderElem->Get<double>("length");
-        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
+        EXPECT_EQ(length, modelSize[name].Z() * scaleFactor);
       }
 
       // verify collision geom sdf
@@ -678,16 +678,16 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       {
         sdf::ElementPtr sphereElem = collisionGeomElem->GetElement("sphere");
         double radius = sphereElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
       }
       else if (collisionGeomElem->HasElement("cylinder"))
       {
         sdf::ElementPtr cylinderElem =
             collisionGeomElem->GetElement("cylinder");
         double radius = cylinderElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
         double length = cylinderElem->Get<double>("length");
-        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
+        EXPECT_EQ(length, modelSize[name].Z() * scaleFactor);
       }
       linkElem = linkElem->GetNextElement("link");
     }

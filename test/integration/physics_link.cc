@@ -174,8 +174,8 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
-  math::Vector3 size(1, 1, 1);
-  SpawnBox("box", size, math::Vector3::Zero, math::Vector3::Zero, false);
+  ignition::math::Vector3d size(1, 1, 1);
+  SpawnBox("box", size, ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
@@ -333,9 +333,9 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
 
   // Spawn a box
   double z0 = 10.0;
-  math::Vector3 size(1, 1, 1);
-  math::Vector3 pos0(0, 0, z0 + size.z / 2);
-  SpawnBox("box", size, pos0, math::Vector3::Zero, false);
+  ignition::math::Vector3d size(1, 1, 1);
+  ignition::math::Vector3d pos0(0, 0, z0 + size.Z() / 2);
+  SpawnBox("box", size, pos0, ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
@@ -542,8 +542,9 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
-  math::Vector3 size(1, 1, 1);
-  SpawnBox("box", size, math::Vector3::Zero, math::Vector3::Zero, false);
+  ignition::math::Vector3d size(1, 1, 1);
+  SpawnBox("box", size, ignition::math::Vector3d::Zero,
+                        ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
@@ -659,9 +660,9 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
-  math::Vector3 size(1, 1, 1);
+  ignition::math::Vector3d size(1, 1, 1);
   math::Vector3 pos0(0, 0, 1);
-  SpawnBox("box", size, pos0, math::Vector3::Zero, false);
+  SpawnBox("box", size, pos0.Ign(), ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();

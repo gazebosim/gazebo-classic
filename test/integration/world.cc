@@ -108,7 +108,7 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
   EXPECT_EQ(world->ModelCount(), 0u);
 
   // Now spawn something, and the model count should increase
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
   EXPECT_EQ(world->ModelCount(), 1u);
 }
 
@@ -133,7 +133,7 @@ TEST_F(WorldTest, Clear)
 
   EXPECT_EQ(world->ModelCount(), 0u);
 
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
 
   EXPECT_EQ(world->ModelCount(), 1u);
 }

@@ -85,7 +85,7 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
 
   // spawn a box with known initial pose
   ignition::math::Pose3d initialPose(1, 2, 0.0, 0, 0, 1.57);
-  math::Vector3 size(1, 1, 1);
+  ignition::math::Vector3d size(1, 1, 1);
   SpawnBox("box", size, initialPose.Pos(), initialPose.Rot().Euler(), false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
@@ -197,7 +197,7 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
   ignition::math::Pose3d initialPose(1, 2, 0.5, 0, 0, 1.57);
 
   // spawn a box with known initial pose
-  math::Vector3 size(1, 1, 1);
+  ignition::math::Vector3d size(1, 1, 1);
   SpawnBox("box", size, initialPose.Pos(), initialPose.Rot().Euler(), false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
