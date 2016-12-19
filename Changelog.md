@@ -4,7 +4,7 @@
 
 1. Added ignition transport dependency, and output camera sensor images on
    an ignition transport topic.
-    * [Pull request #25xx](https://bitbucket.org/osrf/gazebo/pull-request/25xx)
+    * [Pull request #2544](https://bitbucket.org/osrf/gazebo/pull-request/2544)
 
 1. Updated `gz_log` tool to use `ignition::math`.
     * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)

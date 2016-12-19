@@ -95,11 +95,6 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
   EXPECT_LT(dt.Double(), 3.0);
 }
 
-
-
-
-
-
 int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
