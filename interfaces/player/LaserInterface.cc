@@ -22,6 +22,7 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 #include <iostream>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/transport/transport.hh"
@@ -180,7 +181,7 @@ void LaserInterface::OnScan(ConstLaserScanStampedPtr &_msg)
     this->data.scan.intensity_count = _msg->scan().ranges_size();
   this->data.scan.id = this->scanId++;
 
-  if (!gazebo::math::equal(oldCount,
+  if (!ignition::math::equal(oldCount,
         static_cast<double>(this->data.scan.ranges_count)))
   {
     delete [] this->data.scan.ranges;

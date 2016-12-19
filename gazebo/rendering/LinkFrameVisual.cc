@@ -87,5 +87,6 @@ bool LinkFrameVisual::GetHighlighted()
   LinkFrameVisualPrivate *dPtr =
       reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
 
-  return math::equal(this->GetTransparency(), dPtr->highlightedTransp);
+  return ignition::math::equal(this->GetTransparency(),
+                               dPtr->highlightedTransp);
 }

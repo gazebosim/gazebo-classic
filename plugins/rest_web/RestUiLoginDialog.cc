@@ -15,9 +15,6 @@
  *
 */
 
-#ifndef _REST_UI_LOGIN_DIALOG_HH_
-#define _REST_UI_LOGIN_DIALOG_HH_
-
 #include <iostream>
 #include <curl/curl.h>
 
@@ -120,5 +117,3 @@ void RestUiLoginDialog::SlotAcceptLogin()
   this->url = u.toStdString();
   accept();
 }
-
-#endif

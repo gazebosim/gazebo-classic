@@ -320,7 +320,7 @@ bool SimbodyScrewJoint::SetHighStop(
       else if (_index == 1)
       {
         double tp = this->GetThreadPitch();
-        if (math::equal(tp, 0.0))
+        if (ignition::math::equal(tp, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using thread pitch = 1.0e6\n";
@@ -398,7 +398,7 @@ bool SimbodyScrewJoint::SetLowStop(
       else if (_index == 1)
       {
         double tp = this->GetThreadPitch();
-        if (math::equal(tp, 0.0))
+        if (ignition::math::equal(tp, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using thread pitch = 1.0e6\n";
@@ -464,7 +464,7 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
   else if (_index == 1)
   {
     double tp = this->GetThreadPitch();
-    if (math::equal(tp, 0.0))
+    if (ignition::math::equal(tp, 0.0))
     {
       gzerr << "thread pitch should not be zero (joint is a slider?)"
             << " using thread pitch = 1.0e6\n";
@@ -504,7 +504,7 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
   else if (_index == 1)
   {
     double tp = this->GetThreadPitch();
-    if (math::equal(tp, 0.0))
+    if (ignition::math::equal(tp, 0.0))
     {
       gzerr << "thread pitch should not be zero (joint is a slider?)"
             << " using thread pitch = 1.0e6\n";

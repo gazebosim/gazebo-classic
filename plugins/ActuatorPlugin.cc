@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "ActuatorPlugin.hh"
 
 using namespace gazebo;
@@ -157,7 +159,7 @@ void ActuatorPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
     // Set up a physics update callback
     this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ActuatorPlugin::WorldUpdateCallback, this)));
+      std::bind(&ActuatorPlugin::WorldUpdateCallback, this)));
   }
 }
 

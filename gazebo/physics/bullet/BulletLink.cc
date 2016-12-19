@@ -280,7 +280,7 @@ bool BulletLink::GetGravityMode() const
     return result;
   }
   btVector3 g = this->rigidLink->getGravity();
-  result = !math::equal(static_cast<double>(g.length()), 0.0);
+  result = !ignition::math::equal(static_cast<double>(g.length()), 0.0);
 
   return result;
 }

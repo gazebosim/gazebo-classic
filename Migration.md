@@ -7,6 +7,21 @@ release will remove the deprecated code.
 
 ## Gazebo 7.X to 8.X
 
+### Build system
+
+1. ***Disable tests compilation by default:*** tests compilation has been
+   excluded from the make all (default make) target.  cmake will generate make
+   targets for all the tests in the code, individual test compilation can be
+   trigger by using: make <binary_test_name> (i.e make UNIT_gz_TEST).
+   For compiling the whole test suite see the new 'make tests' target.
+
+1. ***New 'tests' target for make***: a new 'tests' target has been implemented.
+   it will compile all the tests present in the code by calling 'make tests'.
+
+1. ***Deprecate ENABLE_TESTS_COMPILATION parameter:***  the previous cmake
+   parameter to control tests make target generation has been deprecated. Tests
+   compilation is disabled by default.
+
 ### Additions
 
 1. **gazebo/common/Event.hh**
@@ -21,13 +36,22 @@ release will remove the deprecated code.
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
     + changed type from `std::vector<math::Box> boxes` to `std::vector<ignition::math::Box> boxes`
 
+1. **plugins/events/EventSource.hh**
+    + changed type from `typedef boost::shared_ptr<EventSource> EventSourcePtr` to `typedef std::shared_ptr<EventSource> EventSourcePtr`
+
 1. **plugins/BuoyancyPlugin.hh**
-    + VolumeProperties: changed type from `public: math::Vector3 cov` to `ignition::math::Vector3d cov`
+    + VolumeProperties: changed type from `public: math::Vector3 cov` to `public ignition::math::Vector3d cov`
 
 1. **plugins/ArrangePlugin.hh**
-    + Object: changed type from `public: math::Pose pose` to `ignition::math::Pose3d pose`
+    + Object: changed type from `public: math::Pose pose` to `public: ignition::math::Pose3d pose`
     + changed type from `typedef boost::shared_ptr<Object> ObjectPtr` to `std::shared_ptr<Object> ObjectPtr`
     + changed type from `typedef std::map<std::string, math::Pose> Pose_M` to `typedef std::map<std::string, ignition::math::Pose3d> Pose_M`
+
+1. **plugins/LiftDragPlugin.hh**
+    + changed type from `protected: math::Vector3 cp` to `protected: ignition::math::Vector3d cp`
+    + changed type from `protected: math::Vector3 forward` to `protected: ignition::math::Vector3d forward`
+    + changed type from `protected: math::Vector3 upward` to `protected: ignition::math::Vector3d upward`
+    + changed type from `protected: math::Vector3 velSmooth` to `protected: ignition::math::Vector3d velSmooth`
 
 1. **gazebo/physics/dart/**
     + Updated to support version 5 of DART physics engine.
@@ -446,6 +470,8 @@ release will remove the deprecated code.
 1. **gazebo/math/Helpers.hh**
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
     + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
+    + ***Deprecation:*** public: bool   gazebo::math::equal(T, T, T)
+    + ***Replacement:*** public: bool ignition::math::equal(T, T, T)
     + ***Deprecation:*** public: double   gazebo::math::fixnan(double)
     + ***Replacement:*** public: double ignition::math::fixnan(double)
     + ***Deprecation:*** public: float   gazebo::math::fixnan(float)

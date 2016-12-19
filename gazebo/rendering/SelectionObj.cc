@@ -127,7 +127,7 @@ void SelectionObj::UpdateSize()
 
   // Handle special case for rotation visuals. Only set the visuals to be
   // overlays for big objects.
-  if (math::equal(max, dPtr->maxScale))
+  if (ignition::math::equal(max, dPtr->maxScale))
   {
     this->SetHandleMaterial(ROT_X, dPtr->xAxisMatOverlay, false);
     this->SetHandleMaterial(ROT_Y, dPtr->yAxisMatOverlay, false);

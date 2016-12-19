@@ -71,8 +71,8 @@ void DeferredLight::SetAttenuation(float _c, float _b, float _a)
   float outerRadius = this->parentLight->getAttenuationRange();
 
   /// There is attenuation? Set material accordingly
-  if (!math::equal(_c, 1.0f) || !math::equal(_b, 0.0f) ||
-      !math::equal(_a, 0.0f))
+  if (!ignition::math::equal(_c, 1.0f) || !ignition::math::equal(_b, 0.0f) ||
+      !ignition::math::equal(_a, 0.0f))
   {
     ENABLE_BIT(this->permutation,
         LightMaterialGenerator<NullTechnique>::MI_ATTENUATED);
@@ -106,8 +106,9 @@ void DeferredLight::SetSpecularColor(const Ogre::ColourValue &_col)
   // setCustomParameter(2, Vector4(col.r, col.g, col.b, col.a));
   // There is a specular component? Set material accordingly
 
-  if (!math::equal(_col.r, 0.0f) || !math::equal(_col.g, 0.0f) ||
-      !math::equal(_col.b, 0.0f))
+  if (!ignition::math::equal(_col.r, 0.0f) ||
+      !ignition::math::equal(_col.g, 0.0f) ||
+      !ignition::math::equal(_col.b, 0.0f))
   {
     ENABLE_BIT(this->permutation,
         LightMaterialGenerator<NullTechnique>::MI_SPECULAR);

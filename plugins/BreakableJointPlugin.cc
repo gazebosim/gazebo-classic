@@ -14,11 +14,14 @@
  * limitations under the License.
  *
 */
+
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <functional>
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "plugins/BreakableJointPlugin.hh"
@@ -75,7 +78,7 @@ void BreakableJointPlugin::OnUpdate(msgs::WrenchStamped _msg)
     if (force.Length() > this->breakingForce)
     {
       this->worldConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&BreakableJointPlugin::OnWorldUpdate, this));
+        std::bind(&BreakableJointPlugin::OnWorldUpdate, this));
     }
   }
 }
