@@ -131,6 +131,7 @@ endif()
 if (BUILD_OSX_BUNDLE)
   # Need to disable all RPATH. It was added to gazebo libraries but not to gazebo binaries and BundleUtilities
   # failed trying to remove it from binaries.
+  set(OSX_BUNDLE_ROOT "${CMAKE_BINARY_DIR}/gazebo.app/Contents")
   SET(CMAKE_SKIP_RPATH TRUE)
   #SET(CMAKE_MACOSX_RPATH TRUE)
   SET(BUNDLE_INSTALL_BINARY_DIR ${PROJECT_BINARY_DIR}/gazebo/Contents/MacOS/)

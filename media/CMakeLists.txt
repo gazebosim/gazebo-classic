@@ -1,3 +1,11 @@
+if (BUILD_OSX_BUNDLE)
+  set(MEDIA_ROOT_DESTINATION
+      ${OSX_BUNDLE_ROOT}/Resources/media/)
+else()
+  set(MEDIA_ROOT_DESTINATION
+      ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/)
+endif()
+
 add_subdirectory(audio)
 add_subdirectory(dem)
 add_subdirectory(fonts)

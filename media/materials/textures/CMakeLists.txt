@@ -40,5 +40,4 @@ set (files
   WoodPallet.png
 )
 
-
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/materials/textures/)
+INSTALL(FILES ${files} DESTINATION ${MEDIA_ROOT_DESTINATION}/materials/textures/)

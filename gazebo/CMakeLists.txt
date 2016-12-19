@@ -177,7 +177,6 @@ if (BUILD_OSX_BUNDLE)
 endif()
 
 if (BUILD_OSX_BUNDLE)
-  set(OSX_BUNDLE_ROOT "${CMAKE_BINARY_DIR}/gazebo.app/Contents")
   # Info.plist
   configure_file("${CMAKE_SOURCE_DIR}/tools/osx/Info.plist.in"
       "${OSX_BUNDLE_ROOT}/Info.plist" @ONLY)

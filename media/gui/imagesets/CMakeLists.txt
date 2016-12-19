@@ -18,6 +18,4 @@ set (files Imageset.xsd
            Gazebo.imageset
 )
 
-
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/gui/imagesets/)
-
+INSTALL(FILES ${files} DESTINATION ${MEDIA_ROOT_DESTINATION}/gui/imagesets)

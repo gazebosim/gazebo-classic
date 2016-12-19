@@ -6,6 +6,4 @@ set (files Falagard.xsd
            Gazebo.looknfeel
 )
 
-
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/gui/looknfeel/)
-
+INSTALL(FILES ${files} DESTINATION ${MEDIA_ROOT_DESTINATION}/gui/looknfeel)

@@ -98,9 +98,12 @@ set (GUIplugins
   TimerGUIPlugin
 )
 
-set(GAZEBO_PLUGIN_INSTALL_DIR
-  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
-)
+if (BUILD_OSX_BUNDLE)
+  set(GAZEBO_PLUGIN_INSTALL_DIR ${OSX_BUNDLE_ROOT}/Resources/plugins/)
+else()
+  set(GAZEBO_PLUGIN_INSTALL_DIR
+     ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/)
+endif()
 
 foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)

@@ -13,9 +13,4 @@ set (files Animation.xsd
            GazeboSkin.scheme
 )
 
-
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/gui/schemes/)
-
-
-
-
+INSTALL(FILES ${files} DESTINATION ${MEDIA_ROOT_DESTINATION}/gui/schemes/)
