@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _MUD_PLUGIN_HH_
-#define _MUD_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_MUDPLUGIN_HH_
+#define GAZEBO_PLUGINS_MUDPLUGIN_HH_
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -74,7 +75,7 @@ namespace gazebo
     private: std::string contactSensorName;
 
     /// \brief Mutex to protect reads and writes.
-    private: mutable boost::mutex mutex;
+    private: mutable std::mutex mutex;
 
     /// \brief Store newest contacts message.
     private: msgs::Contacts newestContactsMsg;

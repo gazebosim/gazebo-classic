@@ -51,9 +51,6 @@ ElevatorPlugin::~ElevatorPlugin()
 
   delete this->dataPtr->liftController;
   this->dataPtr->liftController = NULL;
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////

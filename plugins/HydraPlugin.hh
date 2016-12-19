@@ -15,8 +15,11 @@
  *
 */
 
-#ifndef _GAZEBO_RAZER_HYDRA_HH_
-#define _GAZEBO_RAZER_HYDRA_HH_
+#ifndef GAZEBO_PLUGINS_HYDRAPLUGIN_HH_
+#define GAZEBO_PLUGINS_HYDRAPLUGIN_HH_
+
+#include <mutex>
+#include <thread>
 
 #include <ignition/math/Filter.hh>
 #include <ignition/math/Quaternion.hh>
@@ -45,8 +48,7 @@ namespace gazebo
     private: void Run();
 
     /// \brief Update the hydra.
-    /// \param[in] _info Update information.
-    private: void Update(const common::UpdateInfo &_info);
+    private: void Update();
 
     /// \brief Raw controller positions.
     private: int16_t rawPos[6];
@@ -91,10 +93,10 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
 
     /// \brief Mutex
-    private: boost::mutex mutex;
+    private: std::mutex mutex;
 
     /// \brief Additional thread
-    private: boost::thread *pollThread;
+    private: std::thread *pollThread;
 
     /// \brief Use to stop the additional thread that the plugin uses.
     private: bool stop;

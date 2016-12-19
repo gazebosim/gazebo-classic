@@ -15,7 +15,10 @@
  *
 */
 
-#include <boost/bind.hpp>
+#include <functional>
+
+#include <ignition/math/Vector3.hh>
+
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include "gazebo/transport/transport.hh"
@@ -38,7 +41,7 @@ HydraDemoPlugin::~HydraDemoPlugin()
 /////////////////////////////////////////////////
 void HydraDemoPlugin::OnHydra(ConstHydraPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->msgMutex);
+  std::lock_guard<std::mutex> lock(this->msgMutex);
   this->hydraMsgPtr = _msg;
 }
 
@@ -58,13 +61,13 @@ void HydraDemoPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&HydraDemoPlugin::Update, this, _1));
+      std::bind(&HydraDemoPlugin::Update, this));
 }
 
 /////////////////////////////////////////////////
-void HydraDemoPlugin::Update(const common::UpdateInfo & /*_info*/)
+void HydraDemoPlugin::Update()
 {
-  boost::mutex::scoped_lock lock(this->msgMutex);
+  std::lock_guard<std::mutex> lock(this->msgMutex);
 
   // Return if we don't have messages yet
   if (!this->hydraMsgPtr)
@@ -75,7 +78,8 @@ void HydraDemoPlugin::Update(const common::UpdateInfo & /*_info*/)
   double joyY = this->hydraMsgPtr->right().joy_y();
 
   // Move the model.
-  this->model->SetLinearVel(math::Vector3(-joyX * 0.2, joyY * 0.2, 0));
+  this->model->SetLinearVel(
+      ignition::math::Vector3d(-joyX * 0.2, joyY * 0.2, 0));
 
   // Remove the message that has been processed.
   this->hydraMsgPtr.reset();
