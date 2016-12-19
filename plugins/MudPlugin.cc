@@ -289,7 +289,7 @@ void MudPlugin::OnUpdate()
 
             (*iterJoint)->Load(this->link, *iterLink,
               ignition::math::Pose3d(contactPositionAverage,
-                  ignition::math::Quaterniond()));
+                  ignition::math::Quaterniond::Identity));
             // Joint names must be unique
             // name as mud_joint_0, mud_joint_1, etc.
             {
