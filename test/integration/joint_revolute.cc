@@ -175,6 +175,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
   // Set solver type
   physics->SetParam("solver_type", _solverType);
+  if (_solverType == "world")
+  {
+    physics->SetParam("ode_quiet", true);
+  }
 
   // Model names
   std::vector<std::string> modelNames;

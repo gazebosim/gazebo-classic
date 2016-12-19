@@ -204,6 +204,10 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
   {
     // Set solver type
     physics->SetParam("solver_type", _solverType);
+    if (_solverType == "world")
+    {
+      physics->SetParam("ode_quiet", true);
+    }
 
     // Set world step solver type
     physics->SetParam("world_step_solver", _worldSolverType);
