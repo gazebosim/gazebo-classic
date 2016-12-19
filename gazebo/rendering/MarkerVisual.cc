@@ -134,7 +134,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   if (_msg.has_scale())
   {
     this->SetScale(ignition::math::Vector3d(
-          _msg.scale().x(), _msg.scale().y(), _msg.scale().z()));
+        _msg.scale().x(), _msg.scale().y(), _msg.scale().z()));
   }
 
   // Set the visual's pose
@@ -144,7 +144,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
   // Set the marker's end time
   if (_msg.has_lifetime() &&
       (_msg.lifetime().sec() > 0 ||
-       (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
+      (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
   {
     this->dPtr->lifetime = this->GetScene()->SimTime() +
       gazebo::common::Time(_msg.lifetime().sec(), _msg.lifetime().nsec());
@@ -182,15 +182,7 @@ void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
     this->DynamicRenderable(_msg);
   }
 
-  if (_msg.has_visibility())
-  {
-    if (_msg.visibility() == ignition::msgs::Marker::GUI)
-      this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-    else if (_msg.visibility() == ignition::msgs::Marker::ALL)
-      this->SetVisibilityFlags(GZ_VISIBILITY_ALL);
-    else
-      gzerr << "Unknown visibilty flag[" << _msg.visibility() << "]\n";
-  }
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
 /////////////////////////////////////////////////
@@ -317,7 +309,7 @@ void MarkerVisual::Text(const ignition::msgs::Marker &_msg)
   if (!this->dPtr->text)
   {
     this->dPtr->text.reset(new MovableText());
-    this->dPtr->text->Load(this->GetName() + "__TEXT__", _msg.text());
+    this->dPtr->text->Load(this->Name() + "__TEXT__", _msg.text());
     this->GetSceneNode()->attachObject(this->dPtr->text.get());
   }
   else
@@ -347,13 +339,13 @@ void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
 {
   _msg.mutable_lifetime()->set_sec(this->dPtr->lifetime.sec);
   _msg.mutable_lifetime()->set_nsec(this->dPtr->lifetime.nsec);
-  ignition::msgs::Set(_msg.mutable_pose(), this->GetPose().Ign());
+  ignition::msgs::Set(_msg.mutable_pose(), this->Pose());
 
   if (this->dPtr->text)
     _msg.set_text(this->dPtr->text->GetText());
 
   if (this->GetParent())
-    _msg.set_parent(this->GetParent()->GetName());
+    _msg.set_parent(this->GetParent()->Name());
 
   // Set the scale
   ignition::msgs::Set(_msg.mutable_scale(), this->dataPtr->scale);
