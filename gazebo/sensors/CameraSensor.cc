@@ -81,16 +81,25 @@ std::string CameraSensor::Topic() const
 }
 
 //////////////////////////////////////////////////
+std::string CameraSensor::TopicIgn() const
+{
+  std::string topicName = this->ScopedName() + "/image";
+  boost::replace_all(topicName, "::", "/");
+  boost::replace_all(topicName, " ", "_");
+
+  return topicName;
+}
+
+//////////////////////////////////////////////////
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
-      this->Topic(), 50);
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->Topic(), 50);
 
   ignition::transport::AdvertiseMessageOptions opts;
   opts.SetMsgsPerSec(50);
   this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
-      this->Topic(), opts);
+      this->TopicIgn(), opts);
 }
 
 //////////////////////////////////////////////////
@@ -205,6 +214,7 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 
   this->camera->PostRender();
 
+
   if ((this->imagePub && this->imagePub->HasConnections()) ||
       this->imagePubIgn.HasConnections())
   {
@@ -244,7 +254,7 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
           msg.image().width() * this->camera->ImageDepth() *
           msg.image().height());
 
-      this->imagePub->Publish(msg);
+      this->imagePubIgn.Publish(msg);
     }
   }
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_CAMERASENSOR_HH_
-#define _GAZEBO_SENSORS_CAMERASENSOR_HH_
+#ifndef GAZEBO_SENSORS_CAMERASENSOR_HH_
+#define GAZEBO_SENSORS_CAMERASENSOR_HH_
 
 #include <memory>
 #include <string>
@@ -64,6 +64,10 @@ namespace gazebo
       /// \brief Gets the topic name of the sensor
       /// \return Topic name
       public: virtual std::string Topic() const;
+
+      /// \brief Gets the ignition topic name of the sensor
+      /// \return Ignition topic name
+      public: std::string TopicIgn() const;
 
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
