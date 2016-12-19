@@ -26,7 +26,8 @@ namespace gazebo
   // Forward declare private data class
   class LinkPlot3DPluginPrivate;
 
-  /// \brief A plugin that simulates lift and drag.
+  /// \brief A plugin that traces the trajectory of a link in the rendering
+  /// scene.
   class GAZEBO_VISIBLE LinkPlot3DPlugin : public ModelPlugin
   {
     /// \brief Constructor.

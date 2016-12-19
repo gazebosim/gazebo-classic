@@ -46,10 +46,6 @@ void Marker_TEST::AddRemove()
 
   cam->SetCaptureData(true);
 
-  auto camWidth = (int) cam->ImageWidth();
-
-  gzmsg << "Camera width: " << camWidth << std::endl;
-
   // Create our node for communication
   ignition::transport::Node node;
 

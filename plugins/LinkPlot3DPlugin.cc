@@ -15,9 +15,8 @@
  *
 */
 
-#include <algorithm>
+#include <functional>
 #include <string>
-#include <deque>
 #include <vector>
 
 #include <ignition/msgs.hh>
@@ -25,7 +24,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/transport/transport.hh"
 #include "plugins/LinkPlot3DPlugin.hh"
 
 using namespace gazebo;

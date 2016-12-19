@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <mutex>
+
 #include <ignition/msgs.hh>
 #include <ignition/transport/Node.hh>
 

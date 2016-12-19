@@ -3478,11 +3478,8 @@ void Scene::ToggleLayer(const int32_t _layer)
 /////////////////////////////////////////////////
 bool Scene::LayerState(const int32_t _layer) const
 {
-  if (_layer >= 0 &&
-      this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end())
-  {
+  if (this->HasLayer(_layer))
     return this->dataPtr->layerState[_layer];
-  }
 
   return true;
 }

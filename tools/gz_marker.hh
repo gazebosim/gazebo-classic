@@ -65,7 +65,7 @@ namespace gazebo
     /// If empty, all markers in all namespaces will be deleted.
     private: void DeleteAll(const std::string &_ns);
 
-    /// \brief Node pointer.
+    /// \brief Ignition node.
     private: ignition::transport::Node node;
   };
 }
