@@ -212,7 +212,8 @@ void DARTModel::Init()
     this->dataPtr->dtSkeleton->enableSelfCollisionCheck();
     this->dataPtr->dtSkeleton->setAdjacentBodyCheck(false);
 
-    gzwarn << "DART does not fully support self-collision yet. "<<__FILE__<<"< "<<__LINE__<<"\n";
+    gzwarn << "DART does not fully support self-collision yet. "
+           << __FILE__ << ", " << __LINE__ << "\n";
     /*
       This has to be disalbed in dart 6 because there is no equivalent to disalbePair().
     dart::simulation::WorldPtr dtWorld = this->GetDARTPhysics()->GetDARTWorldPtr();

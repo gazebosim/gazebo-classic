@@ -4,9 +4,6 @@ General
 - Change of all find_package(DARTCore ...) to find_package(DART ...)
 - New dart headers end with .hpp and not .h, changed it where applicable
 
-
-
-
 DARTCollision.cc 74
 +++++++++++++++++++++++++++
  old:
@@ -119,15 +116,9 @@ NEW:
     GZ_ASSERT(dtBodyNode1 != nullptr, "body node 1 is null!");
     GZ_ASSERT(dtBodyNode2 != nullptr, "body node 2 is null!");
 
-
-
-
 DARTPlaneShapePrivate.hh 37
 +++++++++++++++++++++++++++
 
 TODO PlaneShapePrivate is not supported any more,
 we cannot access the setOffet method of Shape any more because it's moved to ShapeNode
-
-
-
 

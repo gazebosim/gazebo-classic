@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #include <functional>
+#include <algorithm>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -33,8 +34,6 @@
 #include "gazebo/physics/dart/DARTSurfaceParams.hh"
 
 #include "gazebo/physics/dart/DARTLinkPrivate.hh"
-
-#include <algorithm>
 
 using namespace gazebo;
 using namespace physics;
@@ -182,7 +181,6 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     this->dataPtr->dtProperties.reset(
           new dart::dynamics::BodyNode::Properties(properties));
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -262,7 +260,8 @@ void DARTLink::Init()
   hackAvgMu2 /= static_cast<double>(numCollisions);
 
   float coeff = 0.5 * (hackAvgMu1 + hackAvgMu2);
-  coeff = std::max(0.0f,coeff);  // friction coefficient may not be negative in DART
+  // friction coefficient may not be negative in DART
+  coeff = std::max(0.0f, coeff);
   this->dataPtr->dtBodyNode->setFrictionCoeff(coeff);
 
   // We don't add dart body node to the skeleton here because dart body node
