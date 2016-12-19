@@ -81,7 +81,7 @@ namespace gazebo
 
       /// \brief Get the focal point
       /// \return The focal point
-      public: math::Vector3 GetFocalPoint() const;
+      public: ignition::math::Vector3d GetFocalPoint() const;
 
       // Documentation inherited from parent
       public: void HandleKeyReleaseEvent(const std::string &_key);

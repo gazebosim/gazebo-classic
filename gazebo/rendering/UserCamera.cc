@@ -423,6 +423,13 @@ void UserCamera::SetViewController(const std::string &_type)
 void UserCamera::SetViewController(const std::string &_type,
                                    const math::Vector3 &_pos)
 {
+  this->SetViewController(_type, _pos.Ign());
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetViewController(const std::string &_type,
+                                   const ignition::math::Vector3d &_pos)
+{
   if (_type.empty() ||
       this->dataPtr->viewController->GetTypeString() == _type)
   {
@@ -604,7 +611,7 @@ void UserCamera::OnMoveToVisualComplete()
 {
   this->dataPtr->orbitViewController->SetDistance(
       this->WorldPose().Pos().Distance(
-      this->dataPtr->orbitViewController->GetFocalPoint().Ign()));
+      this->dataPtr->orbitViewController->GetFocalPoint()));
 }
 
 //////////////////////////////////////////////////

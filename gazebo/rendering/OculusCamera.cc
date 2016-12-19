@@ -307,10 +307,10 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->WorldPose();
+    ignition::math::Pose3d origPose = this->WorldPose();
     double yaw = _visual->WorldPose().Rot().Euler().Z();
 
-    double zDiff = origPose.pos.z - _visual->WorldPose().Pos().Z();
+    double zDiff = origPose.pos.Z() - _visual->WorldPose().Pos().Z();
     double pitch = 0;
 
     if (fabs(zDiff) > 1e-3)

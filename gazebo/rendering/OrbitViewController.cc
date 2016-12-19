@@ -336,7 +336,7 @@ void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 OrbitViewController::GetFocalPoint() const
+ignition::math::Vector3d OrbitViewController::GetFocalPoint() const
 {
   return this->focalPoint;
 }

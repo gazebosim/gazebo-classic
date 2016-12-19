@@ -52,15 +52,15 @@ void FPSViewController::Init()
   this->xVelocityFactor = 1.0;
   this->yVelocityFactor = 0.8;
 
-  this->xVelocity = math::Vector3::Zero;
-  this->yVelocity = math::Vector3::Zero;
+  this->xVelocity = ignition::math::Vector3d::Zero;
+  this->yVelocity = ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 void FPSViewController::Update()
 {
-  if (this->xVelocity != math::Vector3::Zero ||
-      this->yVelocity != math::Vector3::Zero)
+  if (this->xVelocity != ignition::math::Vector3d::Zero ||
+      this->yVelocity != ignition::math::Vector3d::Zero)
   {
     // Move based on the camera's current velocity
     // Calculate delta based on frame rate
@@ -68,8 +68,7 @@ void FPSViewController::Update()
       this->camera->LastRenderWallTime();
     float dt = interval.Float();
 
-    ignition::math::Vector3d trans = this->xVelocity.Ign() +
-                                     this->yVelocity.Ign();
+    ignition::math::Vector3d trans = this->xVelocity + this->yVelocity;
     this->camera->Translate(trans * dt);
   }
 }
@@ -120,22 +119,22 @@ std::string FPSViewController::GetTypeString()
 void FPSViewController::HandleKeyReleaseEvent(const std::string & _key)
 {
   if (_key.compare("w") == 0 || _key.compare("s") == 0)
-    this->xVelocity = math::Vector3::Zero;
+    this->xVelocity = ignition::math::Vector3d::Zero;
 
   if (_key.compare("a") == 0 || _key.compare("d") == 0)
-    this->yVelocity = math::Vector3::Zero;
+    this->yVelocity = ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 void FPSViewController::HandleKeyPressEvent(const std::string & _key)
 {
   if (_key.compare("w") == 0)
-    this->xVelocity = math::Vector3(this->xVelocityFactor, 0, 0);
+    this->xVelocity = ignition::math::Vector3d(this->xVelocityFactor, 0, 0);
   else if (_key.compare("s") == 0)
-    this->xVelocity = math::Vector3(-this->xVelocityFactor, 0, 0);
+    this->xVelocity = ignition::math::Vector3d(-this->xVelocityFactor, 0, 0);
 
   if (_key.compare("a") == 0)
-    this->yVelocity = math::Vector3(0, this->yVelocityFactor, 0);
+    this->yVelocity = ignition::math::Vector3d(0, this->yVelocityFactor, 0);
   else if (_key.compare("d") == 0)
-    this->yVelocity = math::Vector3(0, -this->yVelocityFactor, 0);
+    this->yVelocity = ignition::math::Vector3d(0, -this->yVelocityFactor, 0);
 }

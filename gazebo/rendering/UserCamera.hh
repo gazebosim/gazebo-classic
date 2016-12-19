@@ -128,7 +128,15 @@ namespace gazebo
       /// \param[in] _type The type of view controller: "orbit", "fps"
       /// \param[in] _pos The initial pose of the camera.
       public: void SetViewController(const std::string &_type,
-                                     const math::Vector3 &_pos);
+                                     const ignition::math::Vector3d &_pos);
+
+
+      /// \brief Set view controller
+      /// \param[in] _type The type of view controller: "orbit", "fps"
+      /// \param[in] _pos The initial pose of the camera.
+      /// \deprecated See function that uses ignition::math::Vector3d
+      public: void SetViewController(const std::string &_type,
+                            const math::Vector3 &_pos) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get current view controller type.
       /// \return Type of the current view controller: "orbit", "fps"
