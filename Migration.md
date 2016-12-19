@@ -31,6 +31,12 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/physics/Entity.hh**
+    + `gazebo::math::Pose worldPose` replaced with `ignition::math::Pose3d worldPose`
+    + `gazebo::math::Pose animationStartPose` replaced with `ignition::math::Pose3d animationStartPose`
+    + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
+    + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d initialRelativePose`
+
 1. **plugins/events/Region.hh**
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
@@ -102,6 +108,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
 
 ### Deprecations
+
+1. **gazebo/physics/Entity.hh**
+    + ***Deprecation:*** const math::Pose GetDirtyPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
 
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
