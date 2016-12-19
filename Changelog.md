@@ -39,6 +39,12 @@
 1. Model Editor: Show / hide collisions
     * [Pull request 2503](https://bitbucket.org/osrf/gazebo/pull-request/2503)
 
+1. Model Editor: Show / hide visuals
+    * [Pull request 2516](https://bitbucket.org/osrf/gazebo/pull-request/2516)
+
+1. Model Editor: Show / hide link frames
+    * [Pull request 2521](https://bitbucket.org/osrf/gazebo/pull-request/2521)
+
 ## Gazebo 7.4.0 (2016-10-11)
 
 1. Add test for HarnessPlugin, reduce likelihood of race condition
