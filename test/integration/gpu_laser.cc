@@ -269,7 +269,8 @@ TEST_F(GPURaySensorTest, NameCollision)
   ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5),
                                    ignition::math::Quaterniond(0, 0, 0));
   // box on the left of the ray sensor 1 but out of range
-  ignition::math::Pose3d box03Pose(ignition::math::Vector3d(0, maxRange + 1, 0.5),
+  ignition::math::Pose3d box03Pose(
+      ignition::math::Vector3d(0, maxRange + 1, 0.5),
       ignition::math::Quaterniond(0, 0, 0));
 
   SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),

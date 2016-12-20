@@ -831,7 +831,8 @@ void UndoTest::UndoResetWorld()
   QVERIFY(box != NULL);
   auto boxInitialPose = box->GetWorldPose();
 
-  ignition::math::Pose3d boxFinalPose = ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
+  ignition::math::Pose3d boxFinalPose =
+    ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
   box->SetWorldPose(boxFinalPose);
   QVERIFY(box->GetWorldPose() != boxInitialPose);
   QVERIFY(box->GetWorldPose() == boxFinalPose);
@@ -921,7 +922,8 @@ void UndoTest::UndoResetModelPoses()
   QVERIFY(box != NULL);
   auto boxInitialPose = box->GetWorldPose();
 
-  ignition::math::Pose3d boxFinalPose = ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
+  ignition::math::Pose3d boxFinalPose =
+    ignition::math::Pose3d(10, 20, 0.5, 0, 0, 0);
   box->SetWorldPose(boxFinalPose);
   QVERIFY(box->GetWorldPose() != boxInitialPose);
   QVERIFY(box->GetWorldPose() == boxFinalPose);

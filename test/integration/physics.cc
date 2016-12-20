@@ -125,12 +125,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   // See issue #513. Uncomment test when issue is resolved.
   // modelPos["test_trimesh"] = math::Vector3(16, 0, z0);
 
-  SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1), modelPos["test_box"].Ign(),
+  SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1),
+      modelPos["test_box"].Ign(), ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"].Ign(),
       ignition::math::Vector3d::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"].Ign(), ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"].Ign(),
       ignition::math::Vector3d::Zero);
-  SpawnEmptyLink("test_empty", modelPos["test_empty"].Ign(), ignition::math::Vector3d::Zero);
+  SpawnEmptyLink("test_empty", modelPos["test_empty"].Ign(),
+      ignition::math::Vector3d::Zero);
 
   std::ostringstream linkOffsetStream;
   math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
@@ -467,7 +469,8 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   unsigned int i;
   for (i = 0; i < modelNames.size(); ++i)
   {
-    SpawnSphere(modelNames[i], ignition::math::Vector3d(x0s[i], y0s[i], z0+radii[i]),
+    SpawnSphere(modelNames[i],
+                ignition::math::Vector3d(x0s[i], y0s[i], z0+radii[i]),
                 v30, cogs[i], radii[i]);
   }
 

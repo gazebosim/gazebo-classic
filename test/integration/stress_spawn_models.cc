@@ -49,8 +49,8 @@ TEST_P(SpawnModels, WirelessTransmitters)
          boost::lexical_cast<std::string>(j);
 
       SpawnWirelessTransmitterSensor(modelName, sensorName,
-          ignition::math::Vector3d(i, j, 0.25), ignition::math::Vector3d(0, 0, 0),
-          "osrf", 2450.0, power, gain);
+          ignition::math::Vector3d(i, j, 0.25),
+          ignition::math::Vector3d(0, 0, 0), "osrf", 2450.0, power, gain);
 
       sensors::WirelessTransmitterPtr tx =
         std::static_pointer_cast<sensors::WirelessTransmitter>(

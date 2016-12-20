@@ -76,7 +76,7 @@ TEST_F(CameraSensor, WorldReset)
   unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(
-      ignition::math::Vector3d(-5, 0, 5), 
+      ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);

@@ -431,7 +431,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1), modelPos["test_box"],
       ignition::math::Vector3d::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"],
+      ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       ignition::math::Vector3d::Zero);
   SpawnBox("test_non_unit_box", modelSize["test_non_unit_box"],
@@ -446,9 +447,11 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   modelSize["test_sphere2"] = ignition::math::Vector3d::One;
   modelSize["test_cylinder2"] = ignition::math::Vector3d::One;
 
-  SpawnBox("test_box2", ignition::math::Vector3d(1, 1, 1), modelPos["test_box2"],
+  SpawnBox("test_box2", ignition::math::Vector3d(1, 1, 1),
+      modelPos["test_box2"],
       ignition::math::Vector3d::Zero);
-  SpawnSphere("test_sphere2", modelPos["test_sphere2"], ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere2", modelPos["test_sphere2"],
+      ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder2", modelPos["test_cylinder2"],
       ignition::math::Vector3d::Zero);
 

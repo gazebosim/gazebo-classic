@@ -87,7 +87,8 @@ TEST_F(LogicalCameraSensor, Box)
   EXPECT_EQ(cam->Image().model(0).name(), "ground_plane");
 
   // Insert box
-  SpawnBox("spawn_box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(2, 0, 0.5),
+  SpawnBox("spawn_box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(2, 0, 0.5),
       ignition::math::Vector3d::Zero);
   cam->Update(true);
 

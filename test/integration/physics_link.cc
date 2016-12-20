@@ -175,7 +175,8 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 
   // Spawn a box
   ignition::math::Vector3d size(1, 1, 1);
-  SpawnBox("box", size, ignition::math::Vector3d::Zero, ignition::math::Vector3d::Zero, false);
+  SpawnBox("box", size, ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();

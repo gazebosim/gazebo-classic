@@ -72,7 +72,6 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   physics::JointPtr joint;
   math::Pose anchor;
   math::Vector3 axis(1, 0, 0);
-  double upper = M_PI;
   double lower = -M_PI;
 
   double residentLast = 0, shareLast = 0;
@@ -417,9 +416,11 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Spawn two boxes
-  SpawnBox("box1", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(1, 0, 0.5),
+  SpawnBox("box1", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(1, 0, 0.5),
       ignition::math::Vector3d::Zero, false);
-  SpawnBox("box2", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(-1, 0, 0.5),
+  SpawnBox("box2", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(-1, 0, 0.5),
       ignition::math::Vector3d::Zero, false);
 
   physics::ModelPtr model  = world->ModelByName("box1");

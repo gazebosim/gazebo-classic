@@ -446,7 +446,8 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
       double R = raySensor->Range(v*hSamples*hResolution + h);
 
       ignition::math::Quaterniond rot(0.0, -p, y);
-      ignition::math::Vector3d axis = testPose.Rot() * rot * ignition::math::Vector3d::UnitX;
+      ignition::math::Vector3d axis =
+        testPose.Rot() * rot * ignition::math::Vector3d::UnitX;
       ignition::math::Vector3d intersection = (axis * R) + testPose.Pos();
       EXPECT_NEAR(intersection.Z(), 0.0, rangeResolution);
     }
@@ -526,7 +527,8 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
       double R = raySensor->Range(v*hSamples + h);
 
       ignition::math::Quaterniond rot(0.0, -p, y);
-      ignition::math::Vector3d axis = testPose.Rot() * rot * ignition::math::Vector3d::UnitX;
+      ignition::math::Vector3d axis =
+        testPose.Rot() * rot * ignition::math::Vector3d::UnitX;
       ignition::math::Vector3d intersection = (axis * R) + testPose.Pos();
       EXPECT_NEAR(intersection.Z(), 0.0, rangeResolution);
     }

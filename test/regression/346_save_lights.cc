@@ -69,7 +69,8 @@ TEST_F(Issue346Test, SaveLights)
   while (lightElem)
   {
     std::string name = lightElem->Get<std::string>("name");
-    ignition::math::Pose3d pose = lightElem->Get<ignition::math::Pose3d>("pose");
+    ignition::math::Pose3d pose =
+      lightElem->Get<ignition::math::Pose3d>("pose");
     if (name == spotLightName)
     {
       hasSpotLight++;
