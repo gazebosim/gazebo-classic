@@ -105,6 +105,15 @@ namespace gazebo
       /// \param[in] _modulus elastic modulus to set to
       public: void SetElasticModulus(const double _modulus);
 
+      /// \brief Vector for specifying the primary friction direction,
+      /// relative to the parent collision frame. The component of this
+      /// vector that is orthogonal to the surface normal will be set
+      /// as the primary friction direction.
+      /// If undefined, a vector consstrained to be perpendicular
+      /// to the contact normal in the global y-z plane is used.
+      /// \sa http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
+      public: ignition::math::Vector3d direction1;
+
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
       /// 1 for secondary direction.
@@ -119,15 +128,6 @@ namespace gazebo
       /// 1 for secondary direction.
       /// \param[in] _mu Friction coefficient.
       private: void SetMu(unsigned int _index, double _mu);
-
-      /// \brief Vector for specifying the primary friction direction,
-      /// relative to the parent collision frame. The component of this
-      /// vector that is orthogonal to the surface normal will be set
-      /// as the primary friction direction.
-      /// If undefined, a vector consstrained to be perpendicular
-      /// to the contact normal in the global y-z plane is used.
-      /// \sa http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: ignition::math::Vector3d direction1;
 
       /// \brief Array of dry friction coefficients. mu[0] is in the
       /// primary direction as defined by the friction pyramid.
