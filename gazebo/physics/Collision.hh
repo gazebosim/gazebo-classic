@@ -190,7 +190,8 @@ namespace gazebo
 
       // Documentation inherited.
       /// \deprecated See const ignition::math::Pose3d &WorldPose() const
-      public: virtual const math::Pose GetWorldPose() const;
+      public: virtual const math::Pose GetWorldPose() const
+              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited.
       public: virtual const ignition::math::Pose3d &WorldPose() const;
