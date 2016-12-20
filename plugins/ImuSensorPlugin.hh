@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_IMU_SENSOR_PLUGIN_HH_
-#define _GAZEBO_IMU_SENSOR_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_IMUSENSORPLUGIN_HH_
+#define GAZEBO_PLUGINS_IMUSENSORPLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/sensors.hh"

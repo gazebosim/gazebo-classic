@@ -346,7 +346,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     while (!this->dataPtr->selectedVisuals.empty())
     {
-      std::string name = this->dataPtr->selectedVisuals.back()->GetName();
+      std::string name = this->dataPtr->selectedVisuals.back()->Name();
       int id = this->dataPtr->selectedVisuals.back()->GetId();
       this->dataPtr->selectedVisuals.pop_back();
 
@@ -583,7 +583,7 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
   rendering::VisualPtr vis =
     this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
 
-  if (vis && gui::get_entity_id(vis->GetRootVisual()->GetName()))
+  if (vis && gui::get_entity_id(vis->GetRootVisual()->Name()))
   {
     if (vis->IsPlane())
     {
@@ -811,19 +811,19 @@ void GLWidget::OnMouseReleaseNormal()
         this->dataPtr->selectionLevel = SelectionLevels::MODEL;
       }
       this->SetSelectedVisual(selectVis);
-      event::Events::setSelectedEntity(selectVis->GetName(), "normal");
+      event::Events::setSelectedEntity(selectVis->Name(), "normal");
 
       // Open context menu
       if (rightButton)
       {
         if (selectVis == modelVis)
         {
-          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+          g_modelRightMenu->Run(selectVis->Name(), QCursor::pos(),
               ModelRightMenu::EntityTypes::MODEL);
         }
         else if (selectVis == linkVis)
         {
-          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+          g_modelRightMenu->Run(selectVis->Name(), QCursor::pos(),
               ModelRightMenu::EntityTypes::LINK);
         }
       }
@@ -1079,7 +1079,7 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
     g_copyAct->setEnabled(true);
 
     msg.set_id(_vis->GetId());
-    msg.set_name(_vis->GetName());
+    msg.set_name(_vis->Name());
     msg.set_selected(true);
     this->dataPtr->selectionPub->Publish(msg);
   }
@@ -1102,7 +1102,7 @@ void GLWidget::DeselectAllVisuals()
   {
     this->dataPtr->selectedVisuals[i]->SetHighlighted(false);
     msg.set_id(this->dataPtr->selectedVisuals[i]->GetId());
-    msg.set_name(this->dataPtr->selectedVisuals[i]->GetName());
+    msg.set_name(this->dataPtr->selectedVisuals[i]->Name());
     msg.set_selected(false);
     this->dataPtr->selectionPub->Publish(msg);
   }
@@ -1128,7 +1128,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
     {
       // Make sure model is not updated by server during manipulation
       this->dataPtr->scene->SelectVisual(
-          this->dataPtr->selectedVisuals.back()->GetName(), "move");
+          this->dataPtr->selectedVisuals.back()->Name(), "move");
     }
   }
 
@@ -1160,7 +1160,7 @@ void GLWidget::OnCopy()
   if (!this->dataPtr->selectedVisuals.empty() &&
       !this->dataPtr->modelEditorEnabled)
   {
-    this->Copy(this->dataPtr->selectedVisuals.back()->GetName());
+    this->Copy(this->dataPtr->selectedVisuals.back()->Name());
   }
 }
 
@@ -1240,7 +1240,7 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
           this->dataPtr->selectedVisuals.end(), selection);
 
     // Shortcircuit the case when GLWidget already selected the visual.
-    if (it == this->dataPtr->selectedVisuals.end() || _name != (*it)->GetName())
+    if (it == this->dataPtr->selectedVisuals.end() || _name != (*it)->Name())
     {
       this->SetSelectedVisual(selection);
       this->dataPtr->scene->SelectVisual(name, _mode);
@@ -1266,7 +1266,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
           it != this->dataPtr->selectedVisuals.end();
           ++it)
       {
-        if ((*it)->GetName() == _msg->data())
+        if ((*it)->Name() == _msg->data())
         {
           ModelManipulator::Instance()->Detach();
           this->dataPtr->selectedVisuals.erase(it);

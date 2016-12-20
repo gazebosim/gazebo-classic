@@ -404,7 +404,8 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   // Rotate and update the reference visual.
   this->yaw = this->NormalizeYaw(this->yaw + _dy);
   this->pitch = this->NormalizePitch(this->pitch + _dp);
-  this->refVisual->SetRotation(math::Quaternion(0, this->pitch, this->yaw));
+  this->refVisual->SetRotation(
+      ignition::math::Quaterniond(0, this->pitch, this->yaw));
 
   // Get the final position of the camera. Special case when the orbit view
   // camera has just been initialized.

@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
@@ -38,8 +41,6 @@ TransporterPlugin::TransporterPlugin()
 /////////////////////////////////////////////////
 TransporterPlugin::~TransporterPlugin()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -88,12 +89,12 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
     // Read the outgoing information
     sdf::ElementPtr outElem = padElem->GetElement("outgoing");
-    pad->outgoingBox.min = outElem->Get<math::Vector3>("min");
-    pad->outgoingBox.max = outElem->Get<math::Vector3>("max");
+    pad->outgoingBox.Min() = outElem->Get<ignition::math::Vector3d>("min");
+    pad->outgoingBox.Max() = outElem->Get<ignition::math::Vector3d>("max");
 
     // Read the incoming information
     sdf::ElementPtr inElem = padElem->GetElement("incoming");
-    pad->incomingPose = inElem->Get<math::Pose>("pose");
+    pad->incomingPose = inElem->Get<ignition::math::Pose3d>("pose");
 
     // Store the pad
     this->dataPtr->pads[pad->name] = pad;
@@ -104,7 +105,7 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   // Connect to the update event
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&TransporterPlugin::Update, this));
+      std::bind(&TransporterPlugin::Update, this));
 
   // Listen on the activation topic, if present. This topic is used for
   // manual activation.
@@ -159,13 +160,13 @@ void TransporterPlugin::Update()
       continue;
 
     // Get the model's pose
-    math::Pose modelPose = model->GetWorldPose();
+    ignition::math::Pose3d modelPose = model->GetWorldPose().Ign();
 
     // Iterate over all pads
     for (auto const &padIter : this->dataPtr->pads)
     {
       // Check if the model is in the pad's outgoing box.
-      if (padIter.second->outgoingBox.Contains(modelPose.pos))
+      if (padIter.second->outgoingBox.Contains(modelPose.Pos()))
       {
         // Get the destination pad
         auto const &destIter = this->dataPtr->pads.find(padIter.second->dest);

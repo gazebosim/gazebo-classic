@@ -332,14 +332,14 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   if (_visual)
   {
     ignition::math::Pose3d origPose = this->WorldPose();
-    ignition::math::Angle yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    ignition::math::Angle yaw = _visual->WorldPose().Rot().Euler().Z();
 
-    double zDiff = origPose.Pos().Z() - _visual->GetWorldPose().pos.z;
+    double zDiff = origPose.Pos().Z() - _visual->WorldPose().Pos().Z();
     ignition::math::Angle pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Ign().Distance(
+      double dist = _visual->WorldPose().Pos().Distance(
           this->WorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
@@ -347,9 +347,9 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     this->Yaw(yaw);
     this->Pitch(pitch);
 
-    math::Box bb = _visual->GetBoundingBox();
-    math::Vector3 pos = bb.GetCenter();
-    pos.z = bb.max.z;
+    auto bb = _visual->BoundingBox();
+    auto pos = bb.Center();
+    pos.Z(bb.Max().Z());
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }
@@ -528,9 +528,9 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   start.Correct();
 
   // Center of visual
-  ignition::math::Box box = _visual->GetBoundingBox().Ign();
+  ignition::math::Box box = _visual->BoundingBox();
   ignition::math::Vector3d visCenter = box.Center() +
-    _visual->GetWorldPose().pos.Ign();
+    _visual->WorldPose().Pos();
   visCenter.Correct();
 
   // Direction from start to visual center

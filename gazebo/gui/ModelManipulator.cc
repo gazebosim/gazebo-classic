@@ -178,7 +178,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     rot = rot * this->dataPtr->mouseMoveVisStartPose.Rot();
 
   _vis->SetWorldRotation(rot);
-  Events::moveEntity(_vis->GetName(), _vis->GetWorldPose().Ign(), false);
+  Events::moveEntity(_vis->Name(), _vis->WorldPose(), false);
 }
 
 /////////////////////////////////////////////////
@@ -379,7 +379,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const ignition::math::Vector3d &_axis, const bool _local)
 {
   auto bbox = this->dataPtr->mouseVisualBbox;
-  auto pose = _vis->GetWorldPose().Ign();
+  auto pose = _vis->WorldPose();
   auto distance =  this->MouseMoveDistance(pose, _axis, _local);
 
   auto bboxSize = bbox.Size();
@@ -395,7 +395,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);
 
-      if (childVis->GetPose().pos != ignition::math::Vector3d::Zero)
+      if (childVis->Pose().Pos() != ignition::math::Vector3d::Zero)
       {
         gzwarn << "Scaling is currently limited to simple shapes with their "
             << "origin in the centroid." << std::endl;
@@ -407,7 +407,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
         rendering::VisualPtr grandChildVis = childVis->GetChild(j);
         std::string thisGeomType = grandChildVis->GetGeometryType();
 
-        if (grandChildVis->GetPose().pos != ignition::math::Vector3d::Zero)
+        if (grandChildVis->Pose().Pos() != ignition::math::Vector3d::Zero)
         {
           gzwarn << "Scaling is currently limited to simple shapes with their "
               << "origin in the centroid." << std::endl;
@@ -462,7 +462,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       newScale.Z(std::max(1e-4, newScale.Z()));
     }
     _vis->SetScale(newScale);
-    Events::scaleEntity(_vis->GetName(), newScale);
+    Events::scaleEntity(_vis->Name(), newScale);
   }
   else
   {
@@ -504,7 +504,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
         }
 
         childVis->SetScale(newScale);
-        Events::scaleEntity(childVis->GetName(), newScale);
+        Events::scaleEntity(childVis->Name(), newScale);
       }
     }
   }
@@ -560,7 +560,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     const ignition::math::Vector3d &_axis, const bool _local)
 {
-  auto pose = _vis->GetWorldPose().Ign();
+  auto pose = _vis->WorldPose();
   auto distance =  this->MouseMoveDistance(pose, _axis, _local);
 
   pose.Pos() = this->dataPtr->mouseMoveVisStartPose.Pos() + distance;
@@ -571,10 +571,10 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
   }
 
   if (!(_axis.Z() > 0) && !_local)
-    pose.Pos().Z() = _vis->GetWorldPose().Ign().Pos().Z();
+    pose.Pos().Z() = _vis->WorldPose().Pos().Z();
 
   _vis->SetWorldPose(pose);
-  Events::moveEntity(_vis->GetName(), pose, false);
+  Events::moveEntity(_vis->Name(), pose, false);
 }
 
 /////////////////////////////////////////////////
@@ -601,7 +601,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   }
 
   msgs::UserCmd userCmdMsg;
-  userCmdMsg.set_description(description + _vis->GetName() + "]");
+  userCmdMsg.set_description(description + _vis->Name() + "]");
   userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
   // Only publish for models
@@ -609,29 +609,29 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   {
     msgs::Model msg;
 
-    auto id = gui::get_entity_id(_vis->GetName());
+    auto id = gui::get_entity_id(_vis->Name());
     if (id)
       msg.set_id(id);
 
-    msg.set_name(_vis->GetName());
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msg.set_name(_vis->Name());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);
   }
   // Otherwise, check to see if the visual is a light
-  else if (this->dataPtr->scene->GetLight(_vis->GetName()))
+  else if (this->dataPtr->scene->GetLight(_vis->Name()))
   {
     msgs::Light msg;
-    msg.set_name(_vis->GetName());
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msg.set_name(_vis->Name());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
 
     auto lightMsg = userCmdMsg.add_light();
     lightMsg->CopyFrom(msg);
   }
   else
   {
-    gzerr << "Visual [" << _vis->GetName() << "] isn't a model or a light"
+    gzerr << "Visual [" << _vis->Name() << "] isn't a model or a light"
         << std::endl;
     return;
   }
@@ -649,17 +649,17 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;
-  userCmdMsg.set_description("Scale [" + _vis->GetName() + "]");
+  userCmdMsg.set_description("Scale [" + _vis->Name() + "]");
   userCmdMsg.set_type(msgs::UserCmd::SCALING);
 
   msgs::Model msg;
 
-  auto id = gui::get_entity_id(_vis->GetName());
+  auto id = gui::get_entity_id(_vis->Name());
   if (id)
     msg.set_id(id);
 
-  msg.set_name(_vis->GetName());
-  msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
+  msg.set_name(_vis->Name());
+  msgs::Set(msg.mutable_scale(), _vis->Scale());
 
   auto modelMsg = userCmdMsg.add_model();
   modelMsg->CopyFrom(msg);
@@ -711,7 +711,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     // If the root visual's ID can be found, it is a model in the main window
     // TODO gui::get_entity_id always return 0 in QTestFixture due to nullptr
     // g_main_win
-    if (gui::get_entity_id(rootVis->GetName()))
+    if (gui::get_entity_id(rootVis->Name()))
     {
       // select model
       vis = rootVis;
@@ -731,12 +731,12 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       vis = topLevelVis;
     }
 
-    this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose().Ign();
+    this->dataPtr->mouseMoveVisStartPose = vis->WorldPose();
 
     this->SetMouseMoveVisual(vis);
 
     event::Events::setSelectedEntity(
-        this->dataPtr->mouseMoveVis->GetName(), "move");
+        this->dataPtr->mouseMoveVis->Name(), "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
 
     if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
@@ -958,10 +958,10 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 {
   rendering::VisualPtr vis = _vis;
 
-  if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+  if (gui::get_entity_id(vis->GetRootVisual()->Name()))
     vis = vis->GetRootVisual();
 
-  this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose().Ign();
+  this->dataPtr->mouseMoveVisStartPose = vis->WorldPose();
 
   this->SetMouseMoveVisual(vis);
 
@@ -976,17 +976,16 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   if (_vis)
   {
     this->dataPtr->transparent = true;
-    this->dataPtr->mouseVisualScale = _vis->GetScale().Ign();
+    this->dataPtr->mouseVisualScale = _vis->Scale();
     this->dataPtr->mouseChildVisualScale.clear();
     // keep track of all child visual scale for scaling to work in
     // model editor mode.
     for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
     {
       rendering::VisualPtr childVis = _vis->GetChild(i);
-      this->dataPtr->mouseChildVisualScale.push_back(
-          childVis->GetScale().Ign());
+      this->dataPtr->mouseChildVisualScale.push_back(childVis->Scale());
     }
-    this->dataPtr->mouseVisualBbox = _vis->GetBoundingBox().Ign();
+    this->dataPtr->mouseVisualBbox = _vis->BoundingBox();
   }
   else
     this->dataPtr->mouseVisualScale = ignition::math::Vector3d::One;
@@ -1008,7 +1007,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
       if (this->dataPtr->mouseMoveVis)
       {
         this->dataPtr->mouseMoveVisStartPose =
-            this->dataPtr->mouseMoveVis->GetWorldPose().Ign();
+            this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
     else if (this->dataPtr->keyEvent.shift)
@@ -1035,7 +1034,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
       if (this->dataPtr->mouseMoveVis)
       {
         this->dataPtr->mouseMoveVisStartPose =
-            this->dataPtr->mouseMoveVis->GetWorldPose().Ign();
+            this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
     else if (!this->dataPtr->keyEvent.shift)

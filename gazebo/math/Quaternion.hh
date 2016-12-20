@@ -21,6 +21,7 @@
 #include <math.h>
 #include <iostream>
 #include <cmath>
+#include <ignition/math/Helpers.hh>
 #include <ignition/math/Quaternion.hh>
 
 #include "gazebo/math/Helpers.hh"
@@ -105,7 +106,7 @@ namespace gazebo
               // use s to test if quaternion is valid
               s = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 
-              if (math::equal(s, 0.0))
+              if (ignition::math::equal(s, 0.0))
               {
                 q.w = 1.0;
                 q.x = 0.0;
@@ -301,10 +302,10 @@ namespace gazebo
               if (!std::isfinite(this->w))
                 this->w = 1;
 
-              if (math::equal(this->w, 0.0) &&
-                  math::equal(this->x, 0.0) &&
-                  math::equal(this->y, 0.0) &&
-                  math::equal(this->z, 0.0))
+              if (ignition::math::equal(this->w, 0.0) &&
+                  ignition::math::equal(this->x, 0.0) &&
+                  ignition::math::equal(this->y, 0.0) &&
+                  ignition::math::equal(this->z, 0.0))
               {
                 this->w = 1;
               }

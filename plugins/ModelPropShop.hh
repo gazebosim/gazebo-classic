@@ -14,10 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifndef GAZEBO_PLUGINS_MODELPROPSHOP_HH_
+#define GAZEBO_PLUGINS_MODELPROPSHOP_HH_
+
 #include <string>
 
-// Include Rand.hh first to avoid osx compilation errors
-#include "gazebo/math/Rand.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/util/system.hh"
@@ -79,3 +81,5 @@ namespace gazebo
     private: boost::filesystem::path savePath;
   };
 }
+
+#endif

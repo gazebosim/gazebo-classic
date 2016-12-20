@@ -44,7 +44,7 @@ void LinkFrameVisual::Load()
   AxisVisual::Load();
 
   double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+      dPtr->parent->BoundingBox().Size().Length());
   linkSize = std::min(linkSize, 1.0);
   dPtr->scaleToLink = ignition::math::Vector3d(linkSize * 0.7,
                                                linkSize * 0.7,
@@ -87,5 +87,6 @@ bool LinkFrameVisual::GetHighlighted()
   LinkFrameVisualPrivate *dPtr =
       reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
 
-  return math::equal(this->GetTransparency(), dPtr->highlightedTransp);
+  return ignition::math::equal(this->GetTransparency(),
+                               dPtr->highlightedTransp);
 }

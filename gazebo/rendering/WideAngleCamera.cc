@@ -40,7 +40,6 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/WideAngleCamera.hh"
 
-
 using namespace gazebo;
 using namespace rendering;
 

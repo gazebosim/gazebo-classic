@@ -93,5 +93,4 @@ cmake -Wno-dev -G "NMake Makefiles"^
     -DTBB_LIBRARY_DIR="%TBB_LIBRARY_DIR%"^
     -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
-    -DENABLE_TESTS_COMPILATION:BOOL=False^
     ..
