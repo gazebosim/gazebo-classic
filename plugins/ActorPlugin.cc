@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include <ignition/math.hh>
 #include "gazebo/physics/physics.hh"
 #include "plugins/ActorPlugin.hh"

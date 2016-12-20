@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DIFFDRIVE_PLUGIN_HH_
-#define _GAZEBO_DIFFDRIVE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
+#define GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"

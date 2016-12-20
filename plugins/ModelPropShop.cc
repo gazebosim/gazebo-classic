@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include <boost/program_options.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -112,10 +114,10 @@ void ModelPropShop::Load(int _argc, char **_argv)
 void ModelPropShop::Init()
 {
   this->worldCreatedConn = event::Events::ConnectWorldCreated(
-        boost::bind(&ModelPropShop::OnWorldCreated, this));
+        std::bind(&ModelPropShop::OnWorldCreated, this));
 
   this->updateConn = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&ModelPropShop::Update, this));
+        std::bind(&ModelPropShop::Update, this));
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
