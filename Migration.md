@@ -127,8 +127,24 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
 
 1. **gazebo/rendering/JointVisual.hh**
-    + ***Deorecation:*** ArrowVisualPtr CreateAxis(const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+    + ***Deprecation:*** ArrowVisualPtr CreateAxis(const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
     + ***Deprecation:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+
+1. **gazebo/rendering/OrbitViewController.hh**
+    + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+    + ***Replacement:*** math::Vector3 GetFocalPoint() const
+    + ***Deprecation:*** void TranslateLocal(const math::Vector3 &_vec)
+    + ***Deprecation:*** void TranslateGlobal(const math::Vector3 &_vec)
+
+1. **gazebo/rendering/Projector.hh**
+    + ***Deprecation:*** void Load(const std::string &_name, const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0), const std::string &_textureName = "", double _nearClip = 0.25, double _farClip = 15.0, double _fov = M_PI * 0.25)
+    + ***Deprecation:*** void SetPose(const math::Pose &_pose)
+
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Deprecation:*** void SetViewController(const std::string &_type, const math::Vector3 &_pos)
+
+1. **gazebo/rendering/ViewController.hh**
+    + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
 
 1. **gazebo/physics/Gripper.hh**
     + ***Deprecation:*** std::string GetName() const
