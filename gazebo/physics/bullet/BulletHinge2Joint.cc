@@ -71,7 +71,8 @@ void BulletHinge2Joint::Init()
 
   // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
-  btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
+  btVector3 banchor(this->anchorPos.X(), this->anchorPos.Y(),
+                    this->anchorPos.Z());
   btVector3 baxis1(axis1.x, axis1.y, axis1.z);
   btVector3 baxis2(axis2.x, axis2.y, axis2.z);
 

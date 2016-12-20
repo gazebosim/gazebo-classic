@@ -720,7 +720,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       // childMomentArm: from child CG to joint location in child link frame
       // moment arm rotated into world frame (given feedback is in world frame)
       ignition::math::Vector3d childMomentArm = childPose.Rot().RotateVector(
-        (this->anchorPose.Ign() -
+        (this->anchorPose -
          ignition::math::Pose3d(cgPose.Pos(),
            ignition::math::Quaterniond::Identity)).Pos());
 
@@ -747,38 +747,41 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     if (this->parentLink)
     {
       // get child pose, or it's the inertial world if childLink is nullptr
-      math::Pose childPose;
+      ignition::math::Pose3d childPose;
       if (this->childLink)
         childPose = this->childLink->WorldPose();
       else
         gzerr << "missing child link, double check model.";
 
-      math::Pose parentPose = this->parentLink->WorldPose();
+      ignition::math::Pose3d parentPose = this->parentLink->WorldPose();
 
       // if parent link exists, convert torque from about parent
       // CG to joint anchor location
 
       // parent cg specified in parent link frame
-      math::Pose cgPose;
+      ignition::math::Pose3d cgPose;
       auto inertial = this->parentLink->GetInertial();
       if (inertial)
-        cgPose = inertial->GetPose();
+        cgPose = inertial->GetPose().Ign();
 
       // get parent CG pose in child link frame
-      math::Pose parentCGInChildLink =
-        math::Pose(cgPose.pos, math::Quaternion()) - (childPose - parentPose);
+      ignition::math::Pose3d parentCGInChildLink =
+        ignition::math::Pose3d(cgPose.Pos(),
+            ignition::math::Quaterniond::Identity) - (childPose - parentPose);
 
       // anchor location in parent CG frame
       // this is the moment arm, but it's in parent CG frame, we need
       // to convert it into world frame
-      math::Pose anchorInParendCGFrame = this->anchorPose - parentCGInChildLink;
+      // ignition::math::Pose3d anchorInParendCGFrame = this->anchorPose -
+      //  parentCGInChildLink;
 
       // paretnCGFrame in world frame
-      math::Pose parentCGInWorld = cgPose + parentPose;
+      ignition::math::Pose3d parentCGInWorld = cgPose + parentPose;
 
       // rotate momeent arms into world frame
-      math::Vector3 parentMomentArm = parentCGInWorld.rot.RotateVector(
-        (this->anchorPose - parentCGInChildLink).pos);
+      ignition::math::Vector3d parentMomentArm =
+        parentCGInWorld.Rot().RotateVector(
+            (this->anchorPose - parentCGInChildLink).Pos());
 
       // gzerr << "anchor [" << this->anchorPose
       //       << "] pcginc[" << parentCGInChildLink
@@ -794,12 +797,12 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         this->wrench.body1Force.Cross(parentMomentArm);
 
       // rotate resulting body1Force in world frame into link frame
-      this->wrench.body1Force = parentPose.rot.RotateVectorReverse(
-        -this->wrench.body1Force);
+      this->wrench.body1Force = parentPose.Rot().RotateVectorReverse(
+        -this->wrench.body1Force.Ign());
 
       // rotate resulting body1Torque in world frame into link frame
-      this->wrench.body1Torque = parentPose.rot.RotateVectorReverse(
-        -this->wrench.body1Torque);
+      this->wrench.body1Torque = parentPose.Rot().RotateVectorReverse(
+        -this->wrench.body1Torque.Ign());
 
       if (!this->childLink)
       {
