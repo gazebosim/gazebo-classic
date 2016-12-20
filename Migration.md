@@ -24,6 +24,9 @@ release will remove the deprecated code.
 
 ### Additions
 
+1. **gazebo/common/Material.hh**
+    + changed default lighting value to true
+
 1. **gazebo/common/Event.hh**
     + public: bool Connection::Id() const;
     + public: bool Event::Signaled() const;
