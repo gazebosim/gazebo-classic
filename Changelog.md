@@ -5,6 +5,11 @@
 1. Updated `gz_log` tool to use `ignition::math`.
     * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
 
+1. Updated the following rendering classes to use `ignition::math`:
+   `FPSViewController`, `JointVisual`, `OculusCamera`, `OrbitViewController`,
+   `OrthoViewController`, `Projector`, `UserCamera`, `ViewController`.
+    * [Pull request #25](https://bitbucket.org/osrf/gazebo/pull-request/25)
+
 1. Update examples to use ign-math.
     * [Pull request #2539](https://bitbucket.org/osrf/gazebo/pull-request/2539)
 

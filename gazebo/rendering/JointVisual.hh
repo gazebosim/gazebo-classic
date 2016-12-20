@@ -76,7 +76,7 @@ namespace gazebo
       /// \returns Newly created arrow visual.
       /// \deprecated See function that takes a ignition::math::Vector3d object
       public: ArrowVisualPtr CreateAxis(const math::Vector3 &_axis,
-          bool _useParentFrame, msgs::Joint::Type _type);
+        bool _useParentFrame, msgs::Joint::Type _type) GAZEBO_DEPRECATED(8.0);
 
       // Documentation Inherited.
       public: virtual void SetVisible(bool _visible, bool _cascade = true);

@@ -123,6 +123,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Pose GetInertiaPose() const
     + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
 
+1. **gazebo/rendering/JointVisual.hh**
+    + ***Deorecation:*** ArrowVisualPtr CreateAxis(const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+    + ***Deprecation:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+
 1. **gazebo/physics/Gripper.hh**
     + ***Deprecation:*** std::string GetName() const
     + ***Replacement:*** std::string Name() const
