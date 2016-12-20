@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Fix restoring submesh material transparency
+    * [Pull request #2536](https://bitbucket.org/osrf/gazebo/pull-request/2536)
+
 1. Updated `gz_log` tool to use `ignition::math`.
     * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
 

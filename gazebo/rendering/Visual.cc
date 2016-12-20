@@ -659,6 +659,11 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
           std::string newMaterialName;
           newMaterialName = this->dataPtr->sceneNode->getName() +
               "_MATERIAL_" + material->getName();
+
+          // keep a pointer to the original submesh material so it can be used
+          // to restore material state when setting transparency
+          this->dataPtr->submeshMaterials[newMaterialName] = material;
+
           material = material->clone(newMaterialName);
           subEntity->setMaterial(material);
         }
@@ -1488,33 +1493,75 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
       Ogre::Pass *pass;
       Ogre::ColourValue dc;
 
+      // see if the original ogre material associated with this sub-entity
+      // exists or not
+      Ogre::MaterialPtr origMat;
+      auto it = this->dataPtr->submeshMaterials.find(material->getName());
+      if (it != this->dataPtr->submeshMaterials.end())
+        origMat = it->second;
+
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
            ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
+        // get original material technique
+        Ogre::Technique *origTechnique = nullptr;
+        if (!origMat.isNull()
+            && (techniqueCount < origMat->getNumTechniques()))
+        {
+          origTechnique = material->getTechnique(techniqueCount);
+        }
+
         for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
         {
           pass = technique->getPass(passCount);
 
-          // Need to fix transparency
-          if (!pass->isProgrammable() &&
-              pass->getPolygonMode() == Ogre::PM_SOLID)
+          // get original material pass
+          Ogre::Pass *origPass = nullptr;
+          if (origTechnique)
           {
-            pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+            origPass =
+                origMat->getTechnique(techniqueCount)->getPass(passCount);
           }
 
-          if (derivedTransparency > 0.0)
+          // account for the diffuse alpha value in the ogre material script
+          // in addtion to the <transparency> value in sdf.
+          float origPassAlpha = 1.0;
+          if (origPass)
           {
+            Ogre::ColourValue origPassDiffuse = origPass->getDiffuse();
+            origPassAlpha = origPassDiffuse.a;
+          }
+          float passDerivedTransparency = 1.0f -
+              (1.0f - derivedTransparency) * origPassAlpha;
+
+          if (passDerivedTransparency > 0.0)
+          {
+            // set up ogre material pass to render transparent objects
             pass->setDepthWriteEnabled(false);
+            if (!pass->isProgrammable() &&
+                pass->getPolygonMode() == Ogre::PM_SOLID)
+            {
+              pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+            }
           }
           else
           {
-            pass->setDepthWriteEnabled(true);
+            // restore original ogre material pass properties when transparency
+            // is turned off
+            bool depthWrite = true;
+            if (origPass)
+            {
+              pass->setSceneBlending(origPass->getSourceBlendFactor(),
+                  origPass->getDestBlendFactor());
+              depthWrite = origPass->getDepthWriteEnabled();
+            }
+            pass->setDepthWriteEnabled(depthWrite);
           }
 
           dc = pass->getDiffuse();
-          dc.a = (1.0f - derivedTransparency);
+          dc.a = (1.0f - passDerivedTransparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
@@ -1528,7 +1575,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
             {
               textureUnitState->setAlphaOperation(
                   Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
-                  1.0 - derivedTransparency);
+                  1.0 - passDerivedTransparency);
             }
           }
         }

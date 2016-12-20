@@ -3824,16 +3824,6 @@ TEST_F(MsgsTest, VisualPluginToFromSDF)
   auto sdf2 = msgs::VisualToSDF(msg1);
   ASSERT_TRUE(sdf2 != nullptr);
 
-  // DEPRECATED: Remove this test in Gazebo8
-  {
-    EXPECT_TRUE(sdf2->HasElement("plugin"));
-    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("plugin_param"));
-
-    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("sdf"));
-    EXPECT_TRUE(sdf2->GetElement("plugin")->GetElement("sdf")->
-        HasElement("plugin_param"));
-  }
-
   // Back to Msg
   auto msg2 = msgs::VisualFromSDF(sdf2);
 
