@@ -342,7 +342,8 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 }
 
 /////////////////////////////////////////////////
-void Projector::ProjectorFrameListener::SetPose(const ignition::math::Pose3d &_pose)
+void Projector::ProjectorFrameListener::SetPose(
+  const ignition::math::Pose3d &_pose)
 {
   Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.Rot());
   Ogre::Vector3 ogreVec = Conversions::Convert(_pose.Pos());
