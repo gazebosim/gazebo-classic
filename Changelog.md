@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Added igntition::transport interfaces to header files
+    * [Pull request #25xx](https://bitbucket.org/osrf/gazebo/pull-request/25xx)
+
 1. Fix restoring submesh material transparency
     * [Pull request #2536](https://bitbucket.org/osrf/gazebo/pull-request/2536)
 
