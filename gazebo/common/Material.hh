@@ -208,10 +208,10 @@ namespace gazebo
       protected: Color emissive;
 
       /// \brief transparency value in the range 0 to 1
-      protected: double transparency;
+      protected: double transparency = 0.0;
 
       /// \brief shininess value (0 to 1)
-      protected: double shininess;
+      protected: double shininess = 0.0;
 
       /// \brief point size
       protected: double pointSize;
@@ -226,9 +226,9 @@ namespace gazebo
       private: static unsigned int counter;
 
       /// \brief flag to perform depth buffer write
-      private: bool depthWrite;
+      private: bool depthWrite = true;
 
-      private: bool lighting;
+      private: bool lighting = true;
 
       /// \brief source blend factor
       private: double srcBlendFactor;
