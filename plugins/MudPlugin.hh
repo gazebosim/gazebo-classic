@@ -55,7 +55,7 @@ namespace gazebo
 
     /// \brief Ignition transport node used for subscribing to
     /// contact sensor messages.
-    private: ignition::transport::Node node;
+    private: ignition::transport::Node nodeIgn;
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;

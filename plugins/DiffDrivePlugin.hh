@@ -40,7 +40,7 @@ namespace gazebo
     private: transport::SubscriberPtr velSub;
 
     /// \brief Ignition transport node
-    private: ignition::transport::Node node;
+    private: ignition::transport::Node nodeIgn;
 
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;

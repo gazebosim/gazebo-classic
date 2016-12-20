@@ -120,7 +120,7 @@ namespace gazebo
     private: transport::PublisherPtr statePub;
 
     /// \brief Ignition node used for using Gazebo communications.
-    private: ignition::transport::Node node;
+    private: ignition::transport::Node nodeIgn;
 
     /// \brief Ignition Publisher.
     private: ignition::transport::Node::Publisher statePubIgn;

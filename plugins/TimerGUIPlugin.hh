@@ -116,7 +116,7 @@ namespace gazebo
     private: transport::SubscriberPtr ctrlSub;
 
     /// \brief Ignition Node used to establish communication with gzserver.
-    private: ignition::transport::Node node;
+    private: ignition::transport::Node nodeIgn;
 
     /// \brief The actual timer
     private: common::Timer timer;
