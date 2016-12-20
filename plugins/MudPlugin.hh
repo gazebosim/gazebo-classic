@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -51,6 +52,10 @@ namespace gazebo
 
     /// \brief Subscriber to contact sensor messages.
     private: transport::SubscriberPtr contactSub;
+
+    /// \brief Ignition transport node used for subscribing to
+    /// contact sensor messages.
+    private: ignition::transport::Node node;
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;

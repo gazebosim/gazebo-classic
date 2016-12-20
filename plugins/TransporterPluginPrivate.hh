@@ -21,6 +21,7 @@
 #include <string>
 #include <mutex>
 #include <memory>
+#include <ignition/transport/Node.hh>
 
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Box.hh>
@@ -73,6 +74,9 @@ namespace gazebo
 
     /// \brief Subscriber to the activation topic.
     public: transport::SubscriberPtr activationSub;
+
+    /// \brief Ignition node for communication.
+    public: ignition::transport::Node nodeIgn;
 
     /// \brief Mutex to protect pad data.
     public: std::mutex padMutex;

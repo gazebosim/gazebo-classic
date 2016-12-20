@@ -18,6 +18,7 @@
 #define GAZEBO_PLUGINS_SKIDSTEERDRIVEPLUGIN_HH_
 
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -60,6 +61,9 @@ namespace gazebo
 
     /// \brief Gazebo topic subscriber
     private: transport::SubscriberPtr velSub;
+
+    /// \brief Ignition node for subscriber
+    private: ignition::transport::Node nodeIgn;
 
     /// \brief Pointer to the model which this plugin is attached
     private: physics::ModelPtr model;

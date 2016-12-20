@@ -16,6 +16,7 @@
 */
 #ifndef GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
 #define GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -37,6 +38,9 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
+
+    /// \brief Ignition transport node
+    private: ignition::transport::Node node;
 
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;

@@ -19,6 +19,7 @@
 #define GAZEBO_PLUGINS_MODELPROPSHOP_HH_
 
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/rendering/rendering.hh"
@@ -61,6 +62,15 @@ namespace gazebo
 
     /// \brief Publisher used to spawn the model.
     private: transport::PublisherPtr factoryPub;
+
+    /// \brief Ignition node for communication.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition publisher used to stop the server.
+    private: ignition::transport::Node::Publisher pubIgn;
+
+    /// \brief Ignition publisher used to spawn the model.
+    private: ignition::transport::Node::Publisher factoryPubIgn;
 
     /// \brief Pointer to the scene.
     private: rendering::ScenePtr scene;

@@ -23,6 +23,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>
@@ -283,6 +284,9 @@ namespace gazebo
 
     /// \brief Node for communication
     public: transport::NodePtr node;
+
+    /// \brief Ignition node for communication
+    public: ignition::transport::Node nodeIgn;
 
     /// \brief Used to subscribe to command message. This will call the
     /// OnElevator function when a message arrives.

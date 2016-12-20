@@ -17,6 +17,8 @@
 #ifndef GAZEBO_PLUGINS_LOOKATDEMOPLUGIN_HH_
 #define GAZEBO_PLUGINS_LOOKATDEMOPLUGIN_HH_
 
+#include <ignition/transport/Node.hh>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
@@ -90,6 +92,13 @@ namespace gazebo
 
     /// \brief To publish model modify messages.
     private: transport::PublisherPtr modelModifyPub;
+
+    /// \brief Node for communication.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief To publish model modify messages.
+    private: ignition::transport::Node::Publisher modelModifyPubIgn;
+
   };
 }
 
