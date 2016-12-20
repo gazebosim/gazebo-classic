@@ -71,6 +71,13 @@ void RenderingFixture::SetUp()
 }
 
 /////////////////////////////////////////////////
+void RenderingFixture::Unload()
+{
+  rendering::fini();
+  ServerFixture::Unload();
+}
+
+/////////////////////////////////////////////////
 ServerFixture::ServerFixture()
 {
   this->server = NULL;
