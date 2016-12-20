@@ -362,8 +362,8 @@ namespace gazebo
       private: boost::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
-      private: void (Entity::*setWorldPoseFunc)(
-                   const ignition::math::Pose3d &, const bool, const bool);
+      private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &,
+                   const bool, const bool);
     };
     /// \}
   }

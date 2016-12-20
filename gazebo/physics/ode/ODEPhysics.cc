@@ -1113,7 +1113,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = _collision1->WorldPose().Rot().RotateVector(fd.Ign());
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -1129,7 +1129,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         surf2->FrictionPyramid()->MuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd2 = _collision2->WorldPose().Rot().RotateVector(fd2.Ign());
 
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
@@ -1371,7 +1371,7 @@ void ODEPhysics::DebugPrint() const
     {
       ODECollision *coll = static_cast<ODECollision*>(dGeomGetData(g));
 
-      pose = coll->GetWorldPose();
+      pose = coll->WorldPose();
       const dReal *gpos = dGeomGetPosition(g);
       const dReal *grot = dGeomGetRotation(g);
       dpos.Set(gpos[0], gpos[1], gpos[2]);
