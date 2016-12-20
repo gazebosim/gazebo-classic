@@ -291,11 +291,15 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_newItems,
 
   std::string topicName = this->dataPtr->prefix + "filter/" + _filterId;
 
-  this->dataPtr->filterPubs[topicName] =
+  ignition::transport::Node::Publisher pub =
     this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topicName);
 
   // Advertise the new topic.
-  if (!this->dataPtr->filterPubs[topicName])
+  if (pub)
+  {
+    this->dataPtr->filterPubs[topicName] = pub;
+  }
+  else
   {
     gzerr << "Error advertising topic [" << topicName << "]." << std::endl;
     gzerr << "Ignoring request." << std::endl;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,11 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
   unsigned int width  = 320;
   unsigned int height = 240;
   double updateRate = 10;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.pos,
-      setPose.rot.GetAsEuler(), width, height, updateRate);
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
