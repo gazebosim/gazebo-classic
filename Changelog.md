@@ -1,6 +1,8 @@
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+1. Changed the type of `FrictionPyramid::direction1` from `gazebo::math::Vector3` to `ignition::math::Vector3d`.
+    * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
 
 1. Fix restoring submesh material transparency
     * [Pull request #2536](https://bitbucket.org/osrf/gazebo/pull-request/2536)
