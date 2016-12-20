@@ -109,7 +109,7 @@ namespace gazebo
       /// relative to the parent collision frame. The component of this
       /// vector that is orthogonal to the surface normal will be set
       /// as the primary friction direction.
-      /// If undefined, a vector consstrained to be perpendicular
+      /// If undefined, a vector constrained to be perpendicular
       /// to the contact normal in the global y-z plane is used.
       /// \sa http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: ignition::math::Vector3d direction1;
