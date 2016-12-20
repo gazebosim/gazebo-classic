@@ -31,7 +31,6 @@ DARTPlaneShape::DARTPlaneShape(CollisionPtr _parent)
   : PlaneShape(_parent),
     dataPtr(new DARTPlaneShapePrivate())
 {
-  gzerr << "Cannot create shape with deprecated DARTPlaneShapeConstructor.\n";
 }
 
 //////////////////////////////////////////////////

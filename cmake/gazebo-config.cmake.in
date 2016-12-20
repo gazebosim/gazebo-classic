@@ -122,8 +122,6 @@ if (GAZEBO_HAS_DART)
   list(APPEND @PKG_NAME@_LIBRARIES ${DART_LIBRARIES})
 endif()
 
-
-
 # Visual Studio enables c++11 support by default
 if (NOT MSVC)
   list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)

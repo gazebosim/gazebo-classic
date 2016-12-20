@@ -23,7 +23,6 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <limits.h>
 
 #include <fcntl.h>
 #include <sys/stat.h>

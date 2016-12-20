@@ -189,7 +189,7 @@ void DARTModel::Init()
   // Check whether there exist at least one pair of self collidable links.
   int numSelfCollidableLinks = 0;
   bool hasPairOfSelfCollidableLinks = false;
-  for (auto link: linkList)
+  for (auto link : linkList)
   {
     if (link->GetSelfCollide())
     {
