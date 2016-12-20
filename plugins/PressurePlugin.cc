@@ -14,7 +14,10 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Vector3.hh>
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
 
@@ -88,11 +91,11 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
               boost::dynamic_pointer_cast<physics::BoxShape>(shape);
             if (box)
             {
-              math::Vector3 size = box->GetSize();
+              ignition::math::Vector3d size = box->GetSize().Ign();
               std::vector<double> sizeVector;
-              sizeVector.push_back(size.x);
-              sizeVector.push_back(size.y);
-              sizeVector.push_back(size.z);
+              sizeVector.push_back(size.X());
+              sizeVector.push_back(size.Y());
+              sizeVector.push_back(size.Z());
               std::sort(sizeVector.begin(), sizeVector.end());
               double area = sizeVector[1] * sizeVector[2];
               if (area > 0.0)
@@ -126,7 +129,7 @@ void PressurePlugin::OnUpdate()
   msgs::Tactile tactileMsg;
 
   // For each collision attached to this sensor
-  boost::unordered_map<std::string, double>::iterator iter;
+  std::map<std::string, double>::iterator iter;
   for (iter = this->collisionNamesToArea.begin();
        iter != this->collisionNamesToArea.end(); ++iter)
   {

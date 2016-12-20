@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_RAY_SENSOR_NOISE_PLUGIN_HH_
-#define _GAZEBO_RAY_SENSOR_NOISE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_RAYSENSORNOISEPLUGIN_HH_
+#define GAZEBO_PLUGINS_RAYSENSORNOISEPLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/SensorTypes.hh"

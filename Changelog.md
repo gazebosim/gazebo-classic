@@ -6,12 +6,19 @@
    an ignition transport topic.
     * [Pull request #2544](https://bitbucket.org/osrf/gazebo/pull-request/2544)
 
+1. Fix restoring submesh material transparency
+    * [Pull request #2536](https://bitbucket.org/osrf/gazebo/pull-request/2536)
+
 1. Updated `gz_log` tool to use `ignition::math`.
     * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
+
+1. Update examples to use ign-math.
+    * [Pull request #2539](https://bitbucket.org/osrf/gazebo/pull-request/2539)
 
 1. Update plugins to use ign-math.
     * [Pull request #2531](https://bitbucket.org/osrf/gazebo/pull-request/2531)
     * [Pull request #2534](https://bitbucket.org/osrf/gazebo/pull-request/2534)
+    * [Pull request #2538](https://bitbucket.org/osrf/gazebo/pull-request/2538)
 
 1. Use ignition math with `rendering/Distortion` and update function names.
     * [Pull request #2529](https://bitbucket.org/osrf/gazebo/pull-request/2529)

@@ -15,6 +15,7 @@
  *
 */
 #include <map>
+#include <string>
 #include "gazebo/gazebo.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"

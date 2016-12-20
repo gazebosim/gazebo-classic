@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+
+#ifndef GAZEBO_PLUGINS_MODELPROPSHOP_HH_
+#define GAZEBO_PLUGINS_MODELPROPSHOP_HH_
+
 #include <string>
 
 #include "gazebo/common/Plugin.hh"
@@ -77,3 +81,5 @@ namespace gazebo
     private: boost::filesystem::path savePath;
   };
 }
+
+#endif

@@ -16,8 +16,10 @@
 */
 
 #include <chrono>
+#include <functional>
 #include <thread>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/PID.hh"
@@ -379,8 +381,8 @@ void PlaneDemoPlugin::OnUpdate()
       ti != this->dataPtr->thrusterControls.end(); ++ti)
     {
       // fire up thruster
-      math::Pose pose = ti->link->GetWorldPose();
-      ti->link->AddForce(pose.rot.RotateVector(ti->force));
+      ignition::math::Pose3d pose = ti->link->GetWorldPose().Ign();
+      ti->link->AddForce(pose.Rot().RotateVector(ti->force));
     }
 
     for (std::vector<JointControl>::iterator ji =
