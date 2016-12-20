@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Sphere shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 #include "gazebo/physics/SphereShape.hh"
 
 using namespace gazebo;
@@ -54,17 +50,16 @@ double SphereShape::GetRadius() const
 }
 
 //////////////////////////////////////////////////
-void SphereShape::SetScale(const math::Vector3 &_scale)
+void SphereShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
   if (_scale == this->scale)
     return;
 
-  double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
-  double oldRadius = std::max(this->scale.z,
-      std::max(this->scale.x, this->scale.y));
+  double newRadius = _scale.Max();
+  double oldRadius = this->scale.Max();
 
   this->SetRadius((newRadius/oldRadius)*this->GetRadius());
 

@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _MESHSHAPE_HH_
-#define _MESHSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_MESHSHAPE_HH_
+#define GAZEBO_PHYSICS_MESHSHAPE_HH_
 
 #include <string>
 
@@ -73,7 +68,7 @@ namespace gazebo
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Populate a msgs::Geometry message with data from this
       /// shape.
