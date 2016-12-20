@@ -123,6 +123,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->idString = std::to_string(this->dataPtr->id);
 
   this->dataPtr->name = _name;
+  this->dataPtr->isServer = _isServer;
   this->dataPtr->manager = NULL;
   this->dataPtr->raySceneQuery = NULL;
   this->dataPtr->skyx = NULL;
@@ -262,8 +263,16 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
+  // FIXME: Hack to avoid segfault when deleting server sky, see issue #2118
+  if (!this->dataPtr->isServer)
+  {
+    if (this->dataPtr->skyx)
+      delete this->dataPtr->skyx;
+    if (this->dataPtr->skyxController)
+      delete this->dataPtr->skyxController;
+  }
+  this->dataPtr->skyx = nullptr;
+  this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
 
