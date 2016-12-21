@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleExecutable</key>
-    <string>gazebo</string>
+    <string>run_gazebo_from_bundle.bash</string>
     <key>CFBundleGetInfoString</key>
     <string>${GAZEBO_VERSION_FULL}</string>
     <key>CFBundleIconFile</key>

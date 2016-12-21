@@ -129,18 +129,29 @@ endif()
 
 # MACOSX Bundle
 if (BUILD_OSX_BUNDLE)
-  # Need to disable all RPATH. It was added to gazebo libraries but not to gazebo binaries and BundleUtilities
-  # failed trying to remove it from binaries.
+  # Need to disable all RPATH. It was added to gazebo libraries but not to
+  # gazebo binaries and BundleUtilities failed trying to remove it from
+  # binaries.
+  set(OSX_TOOLS "${CMAKE_SOURCE_DIR}/tools/osx")
   set(OSX_BUNDLE_ROOT "${CMAKE_BINARY_DIR}/gazebo.app/Contents")
+  SET(OSX_BUNDLE_BINDIR "${OSX_BUNDLE_ROOT}/MacOS")
+  SET(OSX_BUNDLE_DATADIR ${OSX_BUNDLE_ROOT}/Resources)
   SET(CMAKE_SKIP_RPATH TRUE)
-  SET(BUNDLE_INSTALL_BINARY_DIR ${PROJECT_BINARY_DIR}/gazebo/Contents/MacOS/)
-  SET(BUNDLE_DATA_DEST_DIR ${BUNDLE_INSTALL_BINARY_DIR}/../Resources)
-  SET(CMAKE_INSTALL_FULL_DATAROOTDIR ${BUNDLE_DATA_DEST_DIR})
+  SET(CMAKE_INSTALL_FULL_DATAROOTDIR ${OSX_BUNDLE_DATADIR})
   SET(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
   SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
   set (LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
   set (BIN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin)
+
+  # Info.plist
+  configure_file("${OSX_TOOLS}/Info.plist.in" "${OSX_BUNDLE_ROOT}/Info.plist" @ONLY)
+  # Launch wrapper script
+  install(PROGRAMS "${OSX_TOOLS}/run_gazebo_from_bundle.bash"            
+          DESTINATION "${OSX_BUNDLE_BINDIR}")
+  # gazezo.icns
+  install(FILES "${OSX_TOOLS}/gazebo.icns" 
+          DESTINATION "${OSX_BUNDLE_ROOT}/Resources/")
 endif()
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
@@ -154,15 +165,29 @@ message (STATUS "----------------------------------------\n")
 # 2. In the generation of cmake/setup.sh from cmake/setup.sh.in
 set(GAZEBO_DEFAULT_MASTER_HOST localhost)
 set(GAZEBO_DEFAULT_MASTER_PORT 11345)
-set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
-set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
-set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
 set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
-set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
-# Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
-# we pass it to the compiler later.
-string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
-
+if (BUILD_OSX_BUNDLE)
+  set(GAZEBO_PLUGIN_PATH "$PWD/../Resources/plugins")
+  set(GAZEBO_MODEL_PATH "$PWD/../Resources/models")
+  set(GAZEBO_RESOURCE_PATH  "$PWD/../Resources")
+  # Ogre libraries are in MacOS directory, same as wrapper script
+  set(OGRE_RESOURCE_PATH "$PWD/../Components")
+  # Need to point the PATH to PWD so the gazebo invocation inside the bundle
+  # found gzclient/gzserver
+  set(CUSTOM_PATH "$PWD:$PATH")
+else()
+  set(GAZEBO_PLUGIN_PATH
+      ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+  set(GAZEBO_MODEL_PATH
+      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
+  set(GAZEBO_RESOURCE_PATH 
+      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
+  set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
+  set(CUSTOM_PATH "$PATH")
+  # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
+  # we pass it to the compiler later.
+  string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
+endif()
 
 # Check for DRI capable Display
 include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
@@ -319,9 +344,14 @@ else (build_errors)
   gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
-  # Also install the setup.sh in an unversioned location
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
+
+  if (BUILD_OSX_BUNDLE)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${OSX_BUNDLE_BINDIR})
+  elseif()
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
+    # Also install the setup.sh in an unversioned location
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
+  endif()
 
 
   if (DEFINED CMAKE_CXX_FLAGS)

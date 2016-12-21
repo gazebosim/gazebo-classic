@@ -138,8 +138,6 @@ set(headers
 gz_install_includes("" ${headers})
 
 if (BUILD_OSX_BUNDLE)
-  message ("bundle dirs ogre: ${OGRE_LIBRARY_DIRS}")
-  message ("bundle dirs sformat: ${SDFormat_LIBRARY_DIRS}")
 
   install (TARGETS gzserver BUNDLE DESTINATION .)
   set (APPS "${CMAKE_BINARY_DIR}/gzserver.app/Contents/MacOS/gzserver")
@@ -162,9 +160,8 @@ if (BUILD_OSX_BUNDLE)
       ${CMAKE_BINARY_DIR}/gazebo/rendering)
 
   SET(OGRE_COMPONENT_DIR gzserver.app/Contents/)
-  FILE (GLOB OGRE_COMPONENTS "${OGRE_LIBRARY_DIRS}/libOgrePaging.*")
-    INSTALL(FILES ${OGRE_COMPONENTS}
-    DESTINATION ${OGRE_COMPONENT_DIR}/Components)
+  FILE (GLOB OGRE_COMPONENTS "${OGRE_LIBRARY_DIRS}/lib*.*")
+  INSTALL(FILES ${OGRE_COMPONENTS} DESTINATION ${OGRE_COMPONENT_DIR}/Components)
 
   INSTALL(CODE "
     file(GLOB_RECURSE LIBS
@@ -176,14 +173,7 @@ if (BUILD_OSX_BUNDLE)
   " COMPONENT Runtime)
 endif()
 
-if (BUILD_OSX_BUNDLE)
-  # Info.plist
-  configure_file("${CMAKE_SOURCE_DIR}/tools/osx/Info.plist.in"
-      "${OSX_BUNDLE_ROOT}/Info.plist" @ONLY)
-  # gazezo.icns
-  install(FILES "${CMAKE_SOURCE_DIR}/tools/osx/gazebo.icns"
-      DESTINATION "${OSX_BUNDLE_ROOT}/Resources/")
-
+if (BUILD_OSX_BUNDLE)  
   set(APPS_GAZEBO "${OSX_BUNDLE_ROOT}/MacOS/gazebo")
   install (TARGETS gazebo BUNDLE DESTINATION .)
   # Different libraries are not being installed into CMAKE_BINARY_DIR/lib
@@ -205,8 +195,8 @@ if (BUILD_OSX_BUNDLE)
       ${CMAKE_BINARY_DIR}/gazebo/rendering)
 
   SET(OGRE_COMPONENT_DIR gazebo.app/Contents/)
-  FILE (GLOB OGRE_COMPONENTS "${OGRE_LIBRARY_DIRS}/libOgrePaging.*")
-    INSTALL(FILES ${OGRE_COMPONENTS}
+  FILE (GLOB OGRE_COMPONENTS "${OGRE_LIBRARY_DIRS}/lib*.*")
+  INSTALL(FILES ${OGRE_COMPONENTS}
     DESTINATION ${OGRE_COMPONENT_DIR}/Components)
 
   INSTALL(CODE "
