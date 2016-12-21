@@ -14,10 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SkidSteerDrive_PLUGIN_HH_
-#define _GAZEBO_SkidSteerDrive_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SKIDSTEERDRIVE_PLUGIN_HH_
+#define GAZEBO_PLUGINS_SKIDSTEERDRIVE_PLUGIN_HH_
 
 #include <string>
+#include <ignition/transport/Node.hh>
+#include <ignition/msgs/cmd_vel2d.pb.h>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -55,6 +57,10 @@ namespace gazebo
     /// \param[in] _msg Pose message from external publisher
     private: void OnVelMsg(ConstPosePtr &_msg);
 
+    /// \brief Callback for igntion transport topic
+    /// \param[in] _msg CmdVel2D message from external publisher
+    private: void OnVelMsgIgn(const ignition::msgs::CmdVel2D &_msg);
+
     /// \brief Node for subscriber
     private: transport::NodePtr node;
 
@@ -72,6 +78,9 @@ namespace gazebo
 
     /// \brief Radius of the wheels (Determined from SDF)
     private: double wheelRadius;
+
+    /// \brief Igntion transport node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

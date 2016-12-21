@@ -17,6 +17,9 @@
 #ifndef GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
 #define GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
 
+#include <ignition/transport/Node.hh>
+#include <ignition/msgs/cmd_vel2d.pb.h>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -35,6 +38,10 @@ namespace gazebo
 
     private: void OnVelMsg(ConstPosePtr &_msg);
 
+    /// \brief Callback for igntion transport topic
+    /// \param[in] _msg CmdVel2D message from external publisher
+    private: void OnVelMsgIgn(const ignition::msgs::CmdVel2D &_msg);
+
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
 
@@ -47,6 +54,9 @@ namespace gazebo
     private: common::Time prevUpdateTime;
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
+
+    /// \brief Igntion transport node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

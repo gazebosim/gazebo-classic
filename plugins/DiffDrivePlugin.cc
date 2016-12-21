@@ -44,6 +44,7 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->Name());
+  this->nodeIgn.Subscribe("/cmd_vel", &DiffDrivePlugin::OnVelMsgIgn, this);
 
   this->velSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
@@ -82,6 +83,18 @@ void DiffDrivePlugin::Init()
   ignition::math::Box bb = parent->GetBoundingBox().Ign();
   // This assumes that the largest dimension of the wheel is the diameter
   this->wheelRadius = bb.Size().Max() * 0.5;
+}
+
+/////////////////////////////////////////////////
+void DiffDrivePlugin::OnVelMsgIgn(const ignition::msgs::CmdVel2D &_msg)
+{
+  double vr, va;
+
+  vr = _msg.velocity();
+  va = _msg.theta();
+
+  this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2.0;
+  this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2.0;
 }
 
 /////////////////////////////////////////////////

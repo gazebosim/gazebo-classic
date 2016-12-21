@@ -106,11 +106,27 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
     return;
   }
 
+  this->nodeIgn.Subscribe(
+    std::string("/") + this->model->GetName() + std::string("/vel_cmd"),
+    &SkidSteerDrivePlugin::OnVelMsgIgn, this);
+
   this->velSub = this->node->Subscribe(
     std::string("~/") + this->model->GetName() + std::string("/vel_cmd"),
     &SkidSteerDrivePlugin::OnVelMsg, this);
 }
 
+/////////////////////////////////////////////////
+void SkidSteerDrivePlugin::OnVelMsgIgn(const ignition::msgs::CmdVel2D &_msg)
+{
+  double vel_lin = _msg.velocity() / this->wheelRadius;
+  double vel_rot = -1 * _msg.theta() *
+    (this->wheelSeparation / this->wheelRadius);
+
+  this->joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);
+  this->joints[RIGHT_REAR ]->SetVelocity(0, vel_lin - vel_rot);
+  this->joints[LEFT_FRONT ]->SetVelocity(0, vel_lin + vel_rot);
+  this->joints[LEFT_REAR  ]->SetVelocity(0, vel_lin + vel_rot);
+}
 
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
