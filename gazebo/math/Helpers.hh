@@ -65,10 +65,14 @@ namespace gazebo
     /// \{
 
     /// \brief Returns the representation of a quiet not a number (NAN)
-    static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
+    static const double
+    GAZEBO_DEPRECATED(8.0)
+    NAN_D = std::numeric_limits<double>::quiet_NaN();
 
     /// \brief Returns the representation of a quiet not a number (NAN)
-    static const int NAN_I = std::numeric_limits<int>::quiet_NaN();
+    static const int
+    GAZEBO_DEPRECATED(8.0)
+    NAN_I = std::numeric_limits<int>::quiet_NaN();
 
     /// \brief Simple clamping function
     /// \param[in] _v value
@@ -283,8 +287,15 @@ namespace gazebo
     parseInt(const std::string& _input)
     {
       const char *p = _input.c_str();
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       if (!*p || *p == '?')
         return NAN_I;
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 
       int s = 1;
       while (*p == ' ')
@@ -319,8 +330,15 @@ namespace gazebo
     parseFloat(const std::string& _input)
     {
       const char *p = _input.c_str();
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       if (!*p || *p == '?')
         return NAN_D;
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
       int s = 1;
       while (*p == ' ')
         p++;
