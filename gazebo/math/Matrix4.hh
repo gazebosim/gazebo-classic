@@ -40,16 +40,19 @@ namespace gazebo
     class GZ_MATH_VISIBLE Matrix4
     {
       /// \brief Constructor
+      /// \deprecated See ignition::math::Matrix4
       public: Matrix4()
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor
       /// \param _m Matrix to copy
+      /// \deprecated See ignition::math::Matrix4
       public: Matrix4(const Matrix4 &_m)
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor for ignition math
       /// \param _m Matrix to copy
+      /// \deprecated See ignition::math::Matrix4
       public: Matrix4(const ignition::math::Matrix4d &_m)
               GAZEBO_DEPRECATED(8.0);
 
@@ -70,6 +73,7 @@ namespace gazebo
       /// \param[in] _v31 Row 3, Col 1 value
       /// \param[in] _v32 Row 3, Col 2 value
       /// \param[in] _v33 Row 3, Col 3 value
+      /// \deprecated See ignition::math::Matrix4
       public: Matrix4(double _v00, double _v01, double _v02, double _v03,
                       double _v10, double _v11, double _v12, double _v13,
                       double _v20, double _v21, double _v22, double _v23,

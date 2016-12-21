@@ -61,16 +61,16 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   double width = 1.0;
   double height = imageSize.Y() / imageSize.X();
 
-  dPtr->camera = dPtr->scene->CreateCamera(this->GetName(), false);
+  dPtr->camera = dPtr->scene->CreateCamera(this->Name(), false);
 
   sdf::ElementPtr cameraElem = msgs::CameraSensorToSDF(_msg);
   dPtr->camera->Load(cameraElem);
   dPtr->camera->Init();
-  dPtr->camera->CreateRenderTexture(this->GetName() + "_RTT");
+  dPtr->camera->CreateRenderTexture(this->Name() + "_RTT");
 
   Ogre::MaterialPtr material =
     Ogre::MaterialManager::getSingleton().create(
-        this->GetName()+"_RTT_material",
+        this->Name()+"_RTT_material",
 
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   material->getTechnique(0)->getPass(0)->createTextureUnitState();
@@ -78,25 +78,25 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(true);
   material->getTechnique(0)->getPass(0)->setLightingEnabled(false);
   material->getTechnique(0)->getPass(0)->getTextureUnitState(
-      0)->setTextureName(this->GetName()+"_RTT");
+      0)->setTextureName(this->Name()+"_RTT");
 
   Ogre::Plane plane;
   plane.normal = Ogre::Vector3::NEGATIVE_UNIT_X;
   plane.d = dist;
 
   if (!Ogre::MeshManager::getSingleton().resourceExists(
-        this->GetName() + "__floor"))
+        this->Name() + "__floor"))
   {
-    Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor",
+    Ogre::MeshManager::getSingleton().createPlane(this->Name() + "__floor",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         plane, width, height, 1, 1, true, 1, 1.0f, 1.0f,
         Ogre::Vector3::UNIT_Z);
   }
 
   Ogre::Entity *planeEnt =
-    dPtr->scene->OgreSceneManager()->createEntity(this->GetName() + "__plane",
-        this->GetName() + "__floor");
-  planeEnt->setMaterialName(this->GetName()+"_RTT_material");
+    dPtr->scene->OgreSceneManager()->createEntity(this->Name() + "__plane",
+        this->Name() + "__floor");
+  planeEnt->setMaterialName(this->Name()+"_RTT_material");
   planeEnt->setCastShadows(false);
   planeEnt->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
@@ -159,7 +159,7 @@ void CameraVisual::Fini()
   if (this->dataPtr->scene)
   {
     this->dataPtr->scene->OgreSceneManager()->destroyEntity(
-        this->GetName() + "__plane");
+        this->Name() + "__plane");
   }
 
   Visual::Fini();

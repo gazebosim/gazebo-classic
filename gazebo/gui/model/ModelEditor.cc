@@ -130,6 +130,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->connect(this->dataPtr->showCollisionsAct, SIGNAL(toggled(bool)),
       this->dataPtr->modelPalette->ModelCreator(), SLOT(ShowCollisions(bool)));
 
+  this->dataPtr->showVisualsAct = new QAction(tr("Visuals"), this);
+  this->dataPtr->showVisualsAct->setStatusTip(tr("Show Visuals"));
+  this->dataPtr->showVisualsAct->setCheckable(true);
+  this->dataPtr->showVisualsAct->setChecked(true);
+  this->connect(this->dataPtr->showVisualsAct, SIGNAL(toggled(bool)),
+      this->dataPtr->modelPalette->ModelCreator(), SLOT(ShowVisuals(bool)));
+
   this->dataPtr->showJointsAct = new QAction(tr("Joints"), this);
   this->dataPtr->showJointsAct->setStatusTip(tr("Show Joints"));
   this->dataPtr->showJointsAct->setCheckable(true);
@@ -361,6 +368,7 @@ void ModelEditor::CreateMenus()
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showCollisionsAct);
+  viewMenu->addAction(this->dataPtr->showVisualsAct);
   viewMenu->addAction(this->dataPtr->showJointsAct);
 
   QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));

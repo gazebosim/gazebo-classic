@@ -82,10 +82,12 @@ void InRegionEventSource::Info() const
   for (auto v: this->region->boxes)
   {
     ss << "  Min ";
-    ss << "[" << v.min.x << ", " << v.min.y << ", " << v.min.z << "]";
+    ss << "[" << v.Min().X() << ", " << v.Min().Y() << ", " << v.Min().Z()
+       << "]";
     ss << std::endl;
     ss << "  Max ";
-    ss << "[" << v.max.x << ", " << v.max.y << ", " << v.max.z << "]\n";
+    ss << "[" << v.Max().X() << ", " << v.Max().Y() << ", " << v.Max().Z()
+       << "]\n";
   }
   ss << "  inside: " << this->isInside << std::endl;
   gzmsg << ss.str();
@@ -102,7 +104,7 @@ void InRegionEventSource::Update()
   if (!this->region)
     return;
 
-  math::Vector3 point = this->model->GetWorldPose().pos;
+  ignition::math::Vector3d point = this->model->GetWorldPose().pos.Ign();
   bool oldState = this->isInside;
   bool currentState = this->region->Contains(point);
 

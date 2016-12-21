@@ -117,10 +117,8 @@ void FactoryTest::Box(const std::string &_physicsEngine)
         ignition::math::Quaterniond(0, 0, 0));
     SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str());
-    EXPECT_TRUE(math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
+    testPose = GetEntityPose(name.str()).Ign();
+    EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
 
@@ -143,10 +141,8 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
         ignition::math::Quaterniond(0, 0, 0));
     SpawnSphere(name.str(), setPose.Pos(), setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str());
-    EXPECT_TRUE(math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
+    testPose = GetEntityPose(name.str()).Ign();
+    EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
 
@@ -170,10 +166,8 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
         ignition::math::Vector3d(0, 0, i+0.5),
         ignition::math::Quaterniond(0, 0, 0));
     SpawnCylinder(name.str(), setPose.Pos(), setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str());
-    EXPECT_TRUE(math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
+    testPose = GetEntityPose(name.str()).Ign();
+    EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
 
@@ -680,10 +674,8 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   this->WaitUntilEntitySpawn(cloneName, 100, 100);
 
   EXPECT_TRUE(this->HasEntity(cloneName));
-  testPose = GetEntityPose(cloneName);
-  EXPECT_TRUE(math::equal(testPose.Pos().X(), clonePose.Pos().X(), 0.1));
-  EXPECT_TRUE(math::equal(testPose.Pos().Y(), clonePose.Pos().Y(), 0.1));
-  EXPECT_TRUE(math::equal(testPose.Pos().Z(), clonePose.Pos().Z(), 0.1));
+  testPose = GetEntityPose(cloneName).Ign();
+  EXPECT_TRUE(testPose.Pos().Equal(clonePose.Pos(), 0.1));
 
   // Verify properties of the pr2 clone with the original model.
   // Check model
