@@ -331,7 +331,13 @@ void OrbitViewController::SetDistance(float _d)
 //////////////////////////////////////////////////
 void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 {
-  this->focalPoint = _fp.Ign();
+  this->SetFocalPoint(_fp);
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::SetFocalPoint(const ignition::math::Vector3d &_fp)
+{
+  this->focalPoint = _fp;
   this->refVisual->SetPosition(this->focalPoint);
 }
 

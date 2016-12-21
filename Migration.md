@@ -133,6 +133,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/OrbitViewController.hh**
     + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
     + ***Replacement:*** math::Vector3 GetFocalPoint() const
+    + ***Deprecation:*** void SetFocalPoint(const math::Vector3 &_fp)
     + ***Deprecation:*** void TranslateLocal(const math::Vector3 &_vec)
     + ***Deprecation:*** void TranslateGlobal(const math::Vector3 &_vec)
 

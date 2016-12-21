@@ -77,7 +77,13 @@ namespace gazebo
 
       /// \brief Set the focal point
       /// \param[in] _fp The focal point
-      public: void SetFocalPoint(const math::Vector3 &_fp);
+      /// \deprecated See version that uses an ignition vector3d object.
+      public: void SetFocalPoint(const math::Vector3 &_fp)
+        GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the focal point
+      /// \param[in] _fp The focal point
+      public: void SetFocalPoint(const ignition::math::Vector3d &_fp);
 
       /// \brief Get the focal point
       /// \return The focal point
