@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "InRegionEventSource.hh"
 
 using namespace gazebo;
@@ -43,7 +45,7 @@ void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&InRegionEventSource::Update, this));
+      std::bind(&InRegionEventSource::Update, this));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

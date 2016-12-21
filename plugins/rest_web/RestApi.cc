@@ -200,7 +200,7 @@ void RestApi::PostJsonData(const char *_route, const char *_json)
   post.route = _route;
   post.json = _json;
   {
-    boost::mutex::scoped_lock lock(this->postsMutex);
+    std::lock_guard<std::mutex> lock(this->postsMutex);
     this->posts.push_back(post);
   }
   this->SendUnpostedPosts();
@@ -247,7 +247,7 @@ void RestApi::SendUnpostedPosts()
     {
       Post post;
       {
-        boost::mutex::scoped_lock lock(this->postsMutex);
+        std::lock_guard<std::mutex> lock(this->postsMutex);
         post = this->posts.front();
 
         //  You can generate a similar request on the cmd line like so:

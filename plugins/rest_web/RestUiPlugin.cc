@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -69,11 +71,11 @@ void RestUiPlugin::Init()
   // Connect to the sensor update event.
   this->connections.push_back(
       gui::Events::ConnectMainWindowReady(
-      boost::bind(&RestUiPlugin::OnMainWindowReady, this)));
+      std::bind(&RestUiPlugin::OnMainWindowReady, this)));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
-      boost::bind(&RestUiPlugin::Update, this)));
+      std::bind(&RestUiPlugin::Update, this)));
 }
 
 /////////////////////////////////////////////////

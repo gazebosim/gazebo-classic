@@ -33,6 +33,7 @@
 #include <vector>
 
 #include <ignition/math/Rand.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
@@ -1109,11 +1110,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = surf1->FrictionPyramid()->direction1;
-  if (fd != math::Vector3::Zero)
+  ignition::math::Vector3d fd = surf1->FrictionPyramid()->direction1;
+  if (fd != ignition::math::Vector3d::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = _collision1->GetWorldPose().rot.Ign().RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -1123,13 +1124,14 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = surf2->FrictionPyramid()->direction1;
-  if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
+  ignition::math::Vector3d fd2 = surf2->FrictionPyramid()->direction1;
+  if (fd2 != ignition::math::Vector3d::Zero &&
+      (fd == ignition::math::Vector3d::Zero ||
         surf1->FrictionPyramid()->MuPrimary() >
         surf2->FrictionPyramid()->MuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd2 = _collision2->GetWorldPose().rot.Ign().RotateVector(fd2);
 
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
@@ -1140,12 +1142,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     ///         << " from surface with smaller mu1\n";
   }
 
-  if (fd != math::Vector3::Zero)
+  if (fd != ignition::math::Vector3d::Zero)
   {
     contact.surface.mode |= dContactFDir1;
-    contact.fdir1[0] = fd.x;
-    contact.fdir1[1] = fd.y;
-    contact.fdir1[2] = fd.z;
+    contact.fdir1[0] = fd.X();
+    contact.fdir1[1] = fd.Y();
+    contact.fdir1[2] = fd.Z();
   }
 
   // Set the friction coefficients.

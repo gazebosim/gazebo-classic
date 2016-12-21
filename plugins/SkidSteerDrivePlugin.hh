@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SkidSteerDrive_PLUGIN_HH_
-#define _GAZEBO_SkidSteerDrive_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SKIDSTEERDRIVEPLUGIN_HH_
+#define GAZEBO_PLUGINS_SKIDSTEERDRIVEPLUGIN_HH_
 
 #include <string>
 

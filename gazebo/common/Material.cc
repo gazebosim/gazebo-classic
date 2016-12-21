@@ -40,12 +40,9 @@ Material::Material()
   this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
   this->blendMode = REPLACE;
   this->shadeMode = GOURAUD;
-  this->transparency = 0;
-  this->shininess = 0;
   this->ambient.Set(0.4, 0.4, 0.4, 1);
   this->diffuse.Set(0.5, 0.5, 0.5, 1);
   this->specular.Set(0, 0, 0, 1);
-  this->lighting = false;
   this->dstBlendFactor = this->srcBlendFactor = 1.0;
 }
 
@@ -55,11 +52,8 @@ Material::Material(const Color &_clr)
   this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
   this->blendMode = REPLACE;
   this->shadeMode = GOURAUD;
-  this->transparency = 0;
-  this->shininess = 0;
   this->ambient = _clr;
   this->diffuse = _clr;
-  this->lighting = false;
 }
 
 //////////////////////////////////////////////////
@@ -123,7 +117,6 @@ Color Material::GetAmbient() const
 void Material::SetDiffuse(const Color &_clr)
 {
   this->diffuse = _clr;
-  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -136,7 +129,6 @@ Color Material::GetDiffuse() const
 void Material::SetSpecular(const Color &_clr)
 {
   this->specular = _clr;
-  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -162,7 +154,6 @@ void Material::SetTransparency(double _t)
 {
   this->transparency = std::min(_t, 1.0);
   this->transparency = std::max(this->transparency, 0.0);
-  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
@@ -175,7 +166,6 @@ double Material::GetTransparency() const
 void Material::SetShininess(double _s)
 {
   this->shininess = _s;
-  this->lighting = true;
 }
 
 //////////////////////////////////////////////////
