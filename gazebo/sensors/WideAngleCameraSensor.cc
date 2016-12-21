@@ -155,6 +155,11 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
+  ignition::transport::AdvertiseMessageOptions opts;
+  opts.SetMsgsPerSec(50);
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
+      this->TopicIgn(), opts);
+
   this->dataPtr->lensSub =
     this->node->Subscribe(lensTopicName + "control",
         &WideAngleCameraSensor::OnCtrlMessage, this);

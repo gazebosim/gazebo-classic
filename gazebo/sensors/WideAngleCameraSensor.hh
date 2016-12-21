@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
-#define _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
+#ifndef GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
+#define GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
 
 #include <memory>
 #include <string>
