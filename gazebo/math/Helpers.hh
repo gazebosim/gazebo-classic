@@ -28,31 +28,31 @@
 #include "gazebo/util/system.hh"
 
 /// \brief Double maximum value
-#define GZ_DBL_MAX std::numeric_limits<double>::max()
+#define GZ_DBL_MAX gazebo::math::MAX_D
 
 /// \brief Double min value
-#define GZ_DBL_MIN std::numeric_limits<double>::min()
+#define GZ_DBL_MIN gazebo::math::MIN_D
 
 /// \brief Double positive infinite value
-#define GZ_DBL_INF std::numeric_limits<double>::infinity()
+#define GZ_DBL_INF gazebo::math::INF_D
 
 /// \brief Float maximum value
-#define GZ_FLT_MAX std::numeric_limits<float>::max()
+#define GZ_FLT_MAX gazebo::math::MIN_F
 
 /// \brief Float minimum value
-#define GZ_FLT_MIN std::numeric_limits<float>::min()
+#define GZ_FLT_MIN gazebo::math::MIN_F
 
 /// \brief 32bit unsigned integer maximum value
-#define GZ_UINT32_MAX std::numeric_limits<uint32_t>::max()
+#define GZ_UINT32_MAX gazebo::math::MAX_UI32
 
 /// \brief 32bit unsigned integer minimum value
-#define GZ_UINT32_MIN std::numeric_limits<uint32_t>::min()
+#define GZ_UINT32_MIN gazebo::math::MIN_UI32
 
 /// \brief 32bit integer maximum value
-#define GZ_INT32_MAX std::numeric_limits<int32_t>::max()
+#define GZ_INT32_MAX gazebo::math::MAX_I32
 
 /// \brief 32bit integer minimum value
-#define GZ_INT32_MIN std::numeric_limits<int32_t>::min()
+#define GZ_INT32_MIN gazebo::math::MIN_I32
 
 
 namespace gazebo
@@ -64,10 +64,55 @@ namespace gazebo
     ///        functions.
     /// \{
 
+    /// \brief Double maximum value. This value will be similar to 1.79769e+308
+    static const double
+    GAZEBO_DEPRECATED(8.0)
+    MAX_D = std::numeric_limits<double>::max();
+
+    /// \brief Double min value. This value will be similar to 2.22507e-308
+    static const double
+    GAZEBO_DEPRECATED(8.0)
+    MIN_D = std::numeric_limits<double>::min();
+
+    /// \brief Double positive infinite value
+    static const double
+    GAZEBO_DEPRECATED(8.0)
+    INF_D = std::numeric_limits<double>::infinity();
+
     /// \brief Returns the representation of a quiet not a number (NAN)
     static const double
     GAZEBO_DEPRECATED(8.0)
     NAN_D = std::numeric_limits<double>::quiet_NaN();
+
+    /// \brief Float maximum value. This value will be similar to 3.40282e+38
+    static const float
+    GAZEBO_DEPRECATED(8.0)
+    MAX_F = std::numeric_limits<float>::max();
+
+    /// \brief Float minimum value. This value will be similar to 1.17549e-38
+    static const float
+    GAZEBO_DEPRECATED(8.0)
+    MIN_F = std::numeric_limits<float>::min();
+
+    /// \brief 32bit unsigned integer maximum value
+    static const uint32_t
+    GAZEBO_DEPRECATED(8.0)
+    MAX_UI32 = std::numeric_limits<uint32_t>::max();
+
+    /// \brief 32bit unsigned integer minimum value
+    static const uint32_t
+    GAZEBO_DEPRECATED(8.0)
+    MIN_UI32 = std::numeric_limits<uint32_t>::min();
+
+    /// \brief 32bit unsigned integer maximum value
+    static const int32_t
+    GAZEBO_DEPRECATED(8.0)
+    MAX_I32 = std::numeric_limits<int32_t>::max();
+
+    /// \brief 32bit unsigned integer minimum value
+    static const int32_t
+    GAZEBO_DEPRECATED(8.0)
+    MIN_I32 = std::numeric_limits<int32_t>::min();
 
     /// \brief Returns the representation of a quiet not a number (NAN)
     static const int
