@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_PLUGINS_SKIDSTEERDRIVE_PLUGIN_HH_
-#define GAZEBO_PLUGINS_SKIDSTEERDRIVE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SKIDSTEERDRIVEPLUGIN_HH_
+#define GAZEBO_PLUGINS_SKIDSTEERDRIVEPLUGIN_HH_
 
 #include <string>
 #include <ignition/transport/Node.hh>

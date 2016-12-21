@@ -15,11 +15,13 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_MOVE_HH_
-#define _GAZEBO_MODEL_MOVE_HH_
+#ifndef GAZEBO_MODEL_MOVE_HH_
+#define GAZEBO_MODEL_MOVE_HH_
 
 #include <gazebo/msgs/pose_animation.pb.h>
 #include <vector>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 namespace gazebo
 {
@@ -34,8 +36,9 @@ namespace gazebo
     /// \param[in] _start starting point
     /// \param[in] _end goal point
     /// \param[in, out] _translation translation done before start
-    private: void Move(const math::Vector3 &_start, const math::Vector3 &_end,
-                       math::Vector3 &_translation);
+    private: void Move(const ignition::math::Vector3d &_start,
+                       const ignition::math::Vector3d &_end,
+                       ignition::math::Vector3d &_translation);
 
     /// \brief Parse goals defined in the SDF
     /// \param[in] _sdf sdf pointer corresponding to goals element
@@ -69,10 +72,10 @@ namespace gazebo
     private: transport::SubscriberPtr pathSubscriber;
 
     /// \brief Starting point of the path to follow
-    private: math::Vector3 startPosition;
+    private: ignition::math::Vector3d startPosition;
 
     /// \brief Path to follow
-    private: std::vector<math::Pose> pathGoals;
+    private: std::vector<ignition::math::Pose3d> pathGoals;
   };
 }
 #endif

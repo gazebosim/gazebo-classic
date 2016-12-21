@@ -18,6 +18,7 @@
 #ifndef GAZEBO_RENDERING_VISUALPRIVATE_HH_
 #define GAZEBO_RENDERING_VISUALPRIVATE_HH_
 
+#include <map>
 #include <string>
 #include <utility>
 #include <list>
@@ -216,6 +217,9 @@ namespace gazebo
 
       /// \brief The initial pose of the visual.
       public: ignition::math::Pose3d initialRelativePose;
+
+      /// \brief Original ogre materials used by the submeshes in the visual
+      public: std::map<std::string, Ogre::MaterialPtr> submeshMaterials;
     };
     /// \}
   }

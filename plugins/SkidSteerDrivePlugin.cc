@@ -86,8 +86,8 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
                                         this->joints[RIGHT_FRONT]->GetChild() );
   if (wheelLink)
   {
-    math::Box bb = wheelLink->GetBoundingBox();
-    this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+    ignition::math::Box bb = wheelLink->GetBoundingBox().Ign();
+    this->wheelRadius = bb.Size().Max() * 0.5;
   }
 
   // Validity checks...
