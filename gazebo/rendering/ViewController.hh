@@ -18,6 +18,7 @@
 #define GAZEBO_RENDERING_VIEWCONTROLLER_HH_
 
 #include <string>
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
