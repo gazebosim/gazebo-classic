@@ -2,7 +2,7 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 1. Use ignition math with ServerFixture
-    * [ ]()
+    * [Pull request #2552](https://bitbucket.org/osrf/gazebo/pull-request/2552)
 
 1. Changed the type of `FrictionPyramid::direction1` from `gazebo::math::Vector3` to `ignition::math::Vector3d`.
     * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
