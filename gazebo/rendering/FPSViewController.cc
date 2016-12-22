@@ -20,7 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/rendering/UserCamera.hh"

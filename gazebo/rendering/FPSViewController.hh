@@ -18,8 +18,8 @@
 #define GAZEBO_RENDERING_FPSVIEWCONTROLLER_HH_
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/util/system.hh"
 
