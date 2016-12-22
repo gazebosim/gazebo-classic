@@ -14,7 +14,12 @@
  * limitations under the License.
  *
 */
+
 #include <ignition/math/Helpers.hh>
+#include <ignition/math/Plane.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/MouseEvent.hh"
 
@@ -331,7 +336,7 @@ void OrbitViewController::SetDistance(float _d)
 //////////////////////////////////////////////////
 void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 {
-  this->SetFocalPoint(_fp);
+  this->SetFocalPoint(_fp.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -342,7 +347,13 @@ void OrbitViewController::SetFocalPoint(const ignition::math::Vector3d &_fp)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d OrbitViewController::GetFocalPoint() const
+math::Vector3 OrbitViewController::GetFocalPoint() const
+{
+  return this->FocalPoint();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d OrbitViewController::FocalPoint() const
 {
   return this->focalPoint;
 }

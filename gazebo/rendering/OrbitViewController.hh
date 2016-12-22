@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ORBITVIEWCONTROLLER_HH_
-#define _ORBITVIEWCONTROLLER_HH_
+#ifndef GAZEBO_RENDERING_ORBITVIEWCONTROLLER_HH_
+#define GAZEBO_RENDERING_ORBITVIEWCONTROLLER_HH_
 
 #include <string>
 
@@ -87,7 +87,12 @@ namespace gazebo
 
       /// \brief Get the focal point
       /// \return The focal point
-      public: ignition::math::Vector3d GetFocalPoint() const;
+      /// \deprecated See version that returns an ignition vector3d object.
+      public: math::Vector3 GetFocalPoint() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the focal point
+      /// \return The focal point
+      public: ignition::math::Vector3d FocalPoint() const;
 
       // Documentation inherited from parent
       public: void HandleKeyReleaseEvent(const std::string &_key);

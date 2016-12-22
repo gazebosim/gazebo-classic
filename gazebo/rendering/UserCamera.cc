@@ -396,7 +396,7 @@ void UserCamera::SetViewController(const std::string &_type)
     if (vc == "orbit")
     {
       this->dataPtr->viewController->Init(
-          this->dataPtr->orbitViewController->GetFocalPoint(),
+          this->dataPtr->orbitViewController->FocalPoint(),
           this->dataPtr->orbitViewController->Yaw(),
           this->dataPtr->orbitViewController->Pitch());
     }
@@ -611,7 +611,7 @@ void UserCamera::OnMoveToVisualComplete()
 {
   this->dataPtr->orbitViewController->SetDistance(
       this->WorldPose().Pos().Distance(
-      this->dataPtr->orbitViewController->GetFocalPoint()));
+      this->dataPtr->orbitViewController->FocalPoint()));
 }
 
 //////////////////////////////////////////////////
@@ -715,7 +715,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 //////////////////////////////////////////////////
 void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
 {
-  this->dataPtr->orbitViewController->SetFocalPoint(_pt);
+  this->dataPtr->orbitViewController->SetFocalPoint(_pt.Ign());
 }
 
 //////////////////////////////////////////////////
