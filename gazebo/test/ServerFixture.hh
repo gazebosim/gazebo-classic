@@ -951,10 +951,8 @@ namespace gazebo
     /// \param[in] _wait True to wait for the sphere to spawn before
     /// returning.
     protected: void SpawnSphere(const std::string &_name,
-                   const ignition::math::Vector3d &_pos =
-                   ignition::math::Vector3d::Zero,
-                   const ignition::math::Vector3d &_rpy =
-                   ignition::math::Vector3d::Zero,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    bool _wait = true, bool _static = false);
 
     /// \brief Spawn a sphere
@@ -988,12 +986,9 @@ namespace gazebo
     /// \param[in] _wait True to wait for the sphere to spawn before
     /// returning.
     protected: void SpawnSphere(const std::string &_name,
-                   const ignition::math::Vector3d &_pos =
-                   ignition::math::Vector3d::Zero,
-                   const ignition::math::Vector3d &_rpy =
-                   ignition::math::Vector3d::Zero,
-                   const ignition::math::Vector3d &_cog =
-                   ignition::math::Vector3d::Zero,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   const ignition::math::Vector3d &_cog,
                    double _radius = 1.0,
                    bool _wait = true, bool _static = false);
 
