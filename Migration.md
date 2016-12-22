@@ -34,6 +34,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **physics/SurfaceParams.hh**
+    + Changed the type of `FrictionPyramid::direction1` from
+    `gazebo::math::Vector3` to `ignition::math::Vector3d`.
+
 1. **plugins/events/Region.hh**
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
@@ -105,6 +109,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
 
 ### Deprecations
+
+1. **gazebo/physics/Shape.hh**
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** math::Vector3 GetScale() const 
+    + ***Replacement:*** ignition::math::Vector3d Scale() const
 
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
