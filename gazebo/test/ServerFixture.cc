@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <functional>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo.hh"
@@ -189,8 +190,8 @@ void ServerFixture::LoadArgs(const std::string &_args)
     paused = true;
 
   // Create, load, and run the server in its own thread
-  this->serverThread = new boost::thread(
-    boost::bind(&ServerFixture::RunServer, this, params));
+  this->serverThread = new std::thread(
+    std::bind(&ServerFixture::RunServer, this, params));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -340,17 +341,23 @@ double ServerFixture::GetPercentRealTime() const
 /////////////////////////////////////////////////
 void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
   }
 }
+/////////////////////////////////////////////////
+math::Pose ServerFixture::GetEntityPose(const std::string &_name)
+{
+  return this->EntityPose(_name);
+}
 
 /////////////////////////////////////////////////
-ignition::math::Pose3d ServerFixture::GetEntityPose(const std::string &_name)
+ignition::math::Pose3d ServerFixture::EntityPose(
+    const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
 
   std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
@@ -361,7 +368,7 @@ ignition::math::Pose3d ServerFixture::GetEntityPose(const std::string &_name)
 /////////////////////////////////////////////////
 bool ServerFixture::HasEntity(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
   std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
   return iter != this->poses.end();
