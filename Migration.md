@@ -34,6 +34,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **rendering/Projector.hh"
+    + Changed `void SetPose(const math::Pose &_pose)` to `void SetPose(const ignition::math::Pose3d &_pose)`.
+
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.
@@ -142,8 +145,8 @@ release will remove the deprecated code.
     + ***Deprecation:*** void TranslateGlobal(const math::Vector3 &_vec)
 
 1. **gazebo/rendering/Projector.hh**
-    + ***Deprecation:*** void Load(const std::string &_name, const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0), const std::string &_textureName = "", double _nearClip = 0.25, double _farClip = 15.0, double _fov = M_PI * 0.25)
-    + ***Deprecation:*** void SetPose(const math::Pose &_pose)
+    + ***Deprecation:*** void Load(const std::string &_name, const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0), const std::string &_textureName = "", double _nearClip = 0.25, double _farClip = 15.0, double _fov = IGN_PI * 0.25)
+    + ***Replacement:*** void Load(const std::string &_name, const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero, const std::string &_textureName = "", const double _nearClip = 0.25, const double _farClip = 15.0, const double _fov = IGN_PI * 0.25); 
 
 1. **gazebo/rendering/UserCamera.hh**
     + ***Deprecation:*** void SetViewController(const std::string &_type, const math::Vector3 &_pos)

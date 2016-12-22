@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Projector
- * Author: Jared Duke, (some maintainence by John Hsu)
- */
-
-#ifndef _PROJECTOR_HH_
-#define _PROJECTOR_HH_
+#ifndef GAZEBO_RENDERING_PROJECTOR_HH_
+#define GAZEBO_RENDERING_PROJECTOR_HH_
 
 #include <string>
 #include <map>
