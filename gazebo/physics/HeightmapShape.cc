@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -195,12 +190,12 @@ void HeightmapShape::Init()
 
   this->subSampling = 2;
 
-  math::Vector3 terrainSize = this->GetSize();
+  ignition::math::Vector3d terrainSize = this->GetSize().Ign();
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
-  this->scale.x = terrainSize.x / this->vertSize;
-  this->scale.y = terrainSize.y / this->vertSize;
+  this->scale.X() = terrainSize.X() / this->vertSize;
+  this->scale.Y() = terrainSize.Y() / this->vertSize;
 
   // TODO add a virtual HeightmapData::GetMinElevation function to avoid the
   // ifdef check. i.e. heightmapSizeZ = GetMaxElevation - GetMinElevation
@@ -213,17 +208,17 @@ void HeightmapShape::Init()
 #endif
 
   if (ignition::math::equal(heightmapSizeZ, 0.0))
-    this->scale.z = 1.0;
+    this->scale.Z() = 1.0;
   else
-    this->scale.z = fabs(terrainSize.z) / heightmapSizeZ;
+    this->scale.Z() = fabs(terrainSize.Z()) / heightmapSizeZ;
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->GetSize().Ign(), this->scale.Ign(), this->flipY, this->heights);
+      this->GetSize().Ign(), this->scale, this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::SetScale(const math::Vector3 &_scale)
+void HeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
