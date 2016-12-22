@@ -76,22 +76,31 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
 
   // Create the ignition::transport node
   ignition::transport::Node node;
+  imageCount = 0;
 
   // Subscribe to the camera topic
   node.Subscribe(camSensor->TopicIgn(), &OnNewCameraFrame);
 
-  imageCount = 0;
-  int total_images = 20;
+  int totalImages = 20;
   common::Timer timer;
 
   common::Time dt = timer.GetElapsed();
   timer.Reset();
   timer.Start();
 
-  while (imageCount < total_images && timer.GetElapsed().Double() < 4)
+  while (true)
+  {
+    {
+      std::lock_guard<std::mutex> lock(mutex);
+      if (imageCount >= totalImages || timer.GetElapsed().Double() >= 4)
+        break;
+    }
+
     common::Time::MSleep(10);
+  }
+
   dt = timer.GetElapsed();
-  EXPECT_GE(imageCount, total_images);
+  EXPECT_GE(imageCount, totalImages);
   EXPECT_GT(dt.Double(), 1.0);
   EXPECT_LT(dt.Double(), 3.0);
 }
